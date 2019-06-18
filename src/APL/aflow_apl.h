@@ -1384,7 +1384,7 @@ class DOSCalculator {  // ME190424
   std::vector<double> _bins;
   std::vector<double> _dos;
   std::vector<double> _idos;  // ME190614
-  std::vector<vector<vector<double> > > _projected_dos; // ME190614
+  std::vector<vector<vector<double> > > _projectedDOS; // ME190614 - projectedDOS.at(atom).at(direction).at(frequency)
   double _temperature;  // ME190614
   //CO - START
  //private:
