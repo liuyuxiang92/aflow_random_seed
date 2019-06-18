@@ -597,6 +597,9 @@ int main(int _argc,char **_argv) {
   if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
     cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
+  if(XHOST.vflag_control.flag("README_CCE"))  {
+    cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
+      /*exit(1)*/return 0;} // << endl; // CO 180419
   if(XHOST.vflag_control.flag("README_CHULL"))  {
     cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419

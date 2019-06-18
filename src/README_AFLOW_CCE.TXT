@@ -1,0 +1,161 @@
+********************************************************************************
+*                                                                              *
+*             Aflow STEFANO CURTAROLO - Duke University 2003-2019              *
+*                High-Throughput ab-initio Materials Discovery                 *
+*                                                                              *
+********************************************************************************
+LATEST VERSION OF THE FILE:        materials.duke.edu/AFLOW/README_AFLOW_CCE.TXT
+********************************************************************************
+
+Written by Rico Friedrich and Corey Oses, 2019
+
+USER INSTRUCTIONS:
+
+(i) GENERAL INFORMATION:
+Implementation to obtain corrected DFT formation enthalpies is based on the coordination corrected 
+enthalpies (CCE) methodology described in:
+Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);
+https://doi.org/10.1038/s41524-019-0192-1.
+Please cite this article when using this method and/or this implementation.
+The corrections depend on the number of cation-anion bonds and on the cation oxidation state.
+The current implementation requires a structure file in VASP5 POSCAR format as input and will 
+return the CCE corrections for the DFT formation energies for PBE, LDA and SCAN if the oxidation 
+numbers for each cation can be determined.
+The oxidation numbers can be determined in two ways:
+- as specified by the user as an input option or
+- if both an aflow.in and a Bader charges file in the AFLOW format are present and no oxidation 
+numbers are given as input, this implementation will try to determine the oxidation numbers based 
+on this data.
+In addition, the user can provide precalculated DFT formation energies for PBE, LDA and SCAN and the 
+implementation will directly calculate and return the CCE formation enthalpies at both 0 and 298.15K.
+If DFT formation energies are provided as additional input, the functionals corresponding to those 
+energies are required. They need to be given in the same sequence as the precalculated DFT formation 
+energies they correspond to.
+However, when you specify only one formation energy, no functional is required as it is assumed to 
+be PBE (default).
+Details for the options available are explained in the following.
+
+(ii) AVAILABLE OPTIONS:
+--cce                       Prints these user instructions.
+--cce=POSCAR_FILE_PATH      Provide the path to the structure file in VASP5 POSCAR format.
+--oxidation_numbers=        Provide as a comma separated list the oxidation numbers. It is 
+                            assumed that: (i) one is provided for each atom of the structure and 
+                            (ii) they are in the same sequence as the corresponding atoms in the 
+                            provided POSCAR file.
+--dft_formation_energies=   Provide a comma separated list of precalculated DFT formation energies, 
+                            they are assumed to be: (i) negative for compounds lower in energy 
+                            than the elements, (ii) in eV/cell. Currently, corrections are available 
+                            for PBE, LDA and SCAN (no DFT+U yet).
+--functionals=              Provide a comma separated list with the functionals in the same sequence 
+                            as the DFT formation energies they correspond to. These can be:
+                            (i) PBE, (ii) LDA or (iii) SCAN. Default: PBE (if only one DFT formation 
+                            energy is provided).
+
+(iii) EXAMPLE INPUT STRUCTURE FOR ROCKSALT MgO:
+Mg1O1   [FCC,FCC,cF8] (STD_PRIM doi:10.1  [FCC,FCC,cF8] (STD_PRIM doi:10.1016/j.commatsci.2010.05.010)
+1.224745
+   0.00000000000000   1.73568248770103   1.73568248770103
+   1.73568248770103   0.00000000000000   1.73568248770103
+   1.73568248770103   1.73568248770103   0.00000000000000
+Mg O
+1 1
+Direct(2) [A1B1]
+   0.00000000000000   0.00000000000000   0.00000000000000  Mg
+   0.50000000000000   0.50000000000000   0.50000000000000  O
+
+(iv) EXAMPLE COMMANDS:
+Assuming that AFLOW is in your PATH and you saved the above example structure file for MgO 
+in the current directory as POSCAR, the following commands can be executed:
+
+aflow --cce=POSCAR --dft_formation_energies=-5.434,-6.220,-6.249 --functionals=PBE,LDA,SCAN --oxidation_numbers=2,-2
+This will give you the CCE corrections and CCE formation enthalpies for PBE, LDA and SCAN for MgO.
+
+aflow --cce=POSCAR --dft_formation_energies=-6.220 --functionals=LDA --oxidation_numbers=2,-2
+This gives you only the CCE corrections and CCE formation enthalpies for LDA.
+
+aflow --cce=POSCAR --dft_formation_energies=-5.434 --oxidation_numbers=2,-2
+This gives you the CCE corrections and CCE formation enthalpies for PBE with a warning that 
+PBE is assumed as functional.
+
+aflow --cce=POSCAR --oxidation_numbers=2,-2
+This gives you only the CCE corrections for PBE, LDA and SCAN.
+
+aflow --cce=POSCAR
+This gives you the CCE corrections for PBE, LDA and SCAN if an aflow.in and a Bader charges file 
+in AFLOW format are present and the oxidation numbers can be determined from them.
+
+(v) AVAILABLE CORRECTIONS:
+
+Currently, corrections are available for:
+OXIDES
+Ag +1 from Ag2O           
+Al +3 from Al2O3          
+As +5 from As2O5          
+B  +3 from B2O3            
+Ba +2 from BaO            
+Be +2 from BeO            
+Bi +3 from Bi2O3          
+Ca +2 from CaO            
+Cd +2 from CdO            
+Co +2 from CoO            
+Cr +3 from Cr2O3          
+Cr +6 from CrO3           
+Cs +1 from Cs2O           
+Cu +1 from Cu2O
+Cu +2 from CuO
+Fe +2 from FeO
+Fe +3 from Fe2O3          
+Ga +3 from Ga2O3          
+Ge +4 from GeO2           
+Hf +4 from HfO2
+Hg +2 from HgO            
+In +3 from In2O3          
+Ir +4 from IrO2
+K  +1 from K2O             
+Li +1 from Li2O           
+Mg +2 from MgO            
+Mn +2 from MnO            
+Mn +4 from MnO2           
+Mo +4 from MoO2           
+Mo +6 from MoO3           
+Na +1 from Na2O
+Nb +2 from NbO            
+Ni +2 from NiO            
+Os +4 from OsO2           
+Os +8 from OsO4           
+Pb +2 from PbO            
+Pb +4 from PbO2           
+Pd +2 from PdO            
+Rb +1 from Rb2O           
+Re +4 from ReO2
+Re +6 from ReO3
+Rh +3 from Rh2O3          
+Ru +4 from RuO2           
+Sb +3 from Sb2O3          
+Sb +5 from Sb2O5
+Sc +3 from Sc2O3          
+Se +4 from SeO2           
+Si +4 from SiO2(al-quartz)
+Sn +2 from SnO
+Sn +4 from SnO2
+Sr +2 from SrO            
+Te +4 from TeO2
+Ti +2 from TiO            
+Ti +3 from Ti2O3          
+Ti +4 from TiO2(rutile)   
+Tl +1 from Tl2O           
+Tl +3 from Tl2O3          
+V  +2 from VO              
+V  +3 from V2O3            
+V  +4 from VO2             
+V  +5 from V2O5            
+W  +4 from WO2             
+W  +6 from WO3             
+Y  +3 from Y2O3            
+Zn +2 from ZnO            
+Zr +4 from ZrO2
+
+for per- and superoxides
+O2 -2 from Li2O2
+O2 -1 from KO2  
+

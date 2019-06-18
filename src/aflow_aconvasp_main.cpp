@@ -1041,6 +1041,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
 
+  vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
+  vpflow.flag("CCE_CORRECTION",vpflow.flag("CCE_CORRECTION::USAGE") || !vpflow.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty());
+  if(vpflow.flag("CCE_CORRECTION") && aurostd::args2flag(argv,cmds,"--usage")){vpflow.flag("CCE_CORRECTION::USAGE",TRUE);}
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DFT_FORMATION_ENERGIES","--dft_formation_energies=|--dfte=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::FUNCTIONALS","--functional=|--func=|--functionals=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::OXIDATION_NUMBERS","--oxidation_numbers=|--ox_nums=|--oxidation_number=","");
+
   vpflow.flag("RMATOM",aurostd::args2flag(argv,cmds,"--rm_atom") && argv.at(1)=="--rm_atom");
   vpflow.flag("RMCOPIES",aurostd::args2flag(argv,cmds,"--rm_copies") && argv.at(1)=="--rm_copies");
   vpflow.flag("RSM",aurostd::args2flag(argv,cmds,"--rsm"));
@@ -1698,6 +1706,7 @@ namespace pflow {
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION")) {pflow::CCE(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}
@@ -2025,6 +2034,7 @@ namespace pflow {
   "<< x<<" --bzplotdata < POSCAR \n\
   "<< x<<" --bzplotdatauseKPOINTS=KPOINTS < POSCAR \n\
   "<< x<<" --cart [-c] < POSCAR \n\
+  "<< x<<" [--cce (prints user instructions and exits)] --cce=POSCAR_FILE_PATH [--oxidation_numbers=ox_num_1,ox_num_2,...] [--dft_formation_energies=form_energy_1,form_energy_2,...] [--functionals=functional_1,functional_2,...] \n\
   "<< x<<" [options] --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]|CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]|CHGCAR,CUTOFF[,DOWNSAMPLE] \n\
    options are:  --usage \n\
                  --output=|--o=OUTPUT_FILE \n\

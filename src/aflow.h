@@ -391,12 +391,13 @@ class _XHOST {
 #define XHOST_README_AFLOW_COMPARE_TXT                 XHOST.vGlobal_string.at(53)
 #define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(53)  //CO190401
 #define XHOST_README_AFLOW_SYM_TXT                     XHOST.vGlobal_string.at(54)
-#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(55)
-#define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(56) //ME180705
-#define XHOST_README_AFLOW_HTRESOURCES_TXT             XHOST.vGlobal_string.at(57)
-#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
-#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
-#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(60)
+#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO190620
+#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO190620
+#define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME180705
+#define XHOST_README_AFLOW_HTRESOURCES_TXT             XHOST.vGlobal_string.at(58)
+#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(59)
+#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(60)
+#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(61)
 
 #define XHOST_FINDSYM_data_space_txt                   XHOST.vGlobal_string.at(70)
 #define XHOST_FINDSYM_data_wyckoff_txt                 XHOST.vGlobal_string.at(71)
