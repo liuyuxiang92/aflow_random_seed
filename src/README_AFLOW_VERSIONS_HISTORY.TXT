@@ -22,8 +22,8 @@
         -- reduce total layers creation by calculating how many layers are in a cell for that particular direction (CO)
         -- added XHOST.WEB_MODE to reduce cluttered AFLOW-Online output (CO)
         -- removed pocc progress bar in web_mode (CO)
-        -- added FPOSDistance() for skew considerations
-        -- reduced dims considered for GetSuperCell(), RadiusSphereLattice and LatticeDimensionSphere() are enough
+        -- added FPOSDistance() for skew considerations (CO)
+        -- reduced dims considered for GetSuperCell(), RadiusSphereLattice and LatticeDimensionSphere() are enough (CO)
 3.1.224 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.224.tar.xz
         -- Fixed bug that didn't allow users to override the standard lattice phonon dispersion path. (ME)
