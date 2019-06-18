@@ -116,7 +116,8 @@ namespace aurostd {
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
-  int gcd(int a,int b);
+  int GCD(int a,int b); //CO180409
+  int LCM(int a,int b); //CO190520
   template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;
 
   //bool isinteger(bool x,bool tolerance=(bool)0.01);

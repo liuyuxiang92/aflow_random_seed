@@ -329,7 +329,8 @@ namespace aurostd {
   template<class utype> xvector<utype>                  // clear values too small
     roundoff(const xvector<utype>&,utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; // claar values too small //CO 180409
 
-  int gcd(const xvector<int>&);                         // get GCD of vector //CO 180409
+  int GCD(const xvector<int>&);                         // get GCD of vector //CO 180409
+  int LCM(const xvector<int>&);                         // get LCM of vector //CO 180520
 
   template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO 180409
     reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO 180409
@@ -460,6 +461,12 @@ namespace aurostd {
 
   template<class utype> xvector<utype>
     getGeneralNormal(const vector<xvector<utype> >& _directive_vectors); //CO 180409
+  
+  template<class utype> xvector<utype>
+    pointLineIntersection(const xvector<utype>& a,const xvector<utype>& n,const xvector<utype>& p); //CO 180520
+
+  template<class utype> bool
+    linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection); //CO 180520
 
   // SIMPLE SORT ROUTINES
   template<class utype> xvector<utype>  // WRAP TO SHELL SHORT

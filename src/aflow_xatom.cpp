@@ -5211,6 +5211,18 @@ void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO181226
   }
 }
 
+void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO190520
+  //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
+  //it takes care of num_each_type, species, etc.
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="xstructure::ReplaceAtoms():";
+  for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
+    if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+    RemoveAtom(i);
+  }
+  for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
+}
+
 // **************************************************************************
 // xstructure::RemoveCopies xstructure::RemoveFractionalCopies xstructure::RemoveCartesianCopies
 // **************************************************************************
@@ -9167,55 +9179,98 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX 20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX 20190214 [OBSOLETE]}
 
-deque<_atom> foldAtomsInCell(xstructure& a, xmatrix<double>& lattice_new, bool skew, double tol, bool fold_in_only) { //CO190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol) { //CO190520 - removed pointers for bools and doubles, added const where possible
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  xmatrix<double> f2c_new=trasp(lattice_new);
-  xmatrix<double> c2f_new=inverse(f2c_new);
-  if(fold_in_only){return foldAtomsInCell(a.atoms,c2f_new,f2c_new,skew,tol);}
-  double radius=RadiusSphereLattice(lattice_new);
-  xvector<int> dims=LatticeDimensionSphere(a.lattice,radius); 
-  xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
-  vector<int> sc2pcMap, pc2scMap; //dummy
-  if(LDEBUG) {cerr << "BUILDING SUPERCELL " << dims << endl;}
-  xstructure b=GetSuperCell(a,supercell,sc2pcMap,pc2scMap,false,false);
-  if(LDEBUG) {cerr << "BUILT SUPERCELL " << endl;}
-  return foldAtomsInCell(b.atoms,c2f_new,f2c_new,skew,tol);
+  string soliloquy="foldAtomsInCell():";
+
+  double volume_original=abs(aurostd::det(a.lattice));
+  double volume_new=abs(aurostd::det(lattice_new));
+  bool fold_in_only=( (volume_new < volume_original) || (aurostd::isequal(volume_original,volume_new)) );
+
+  deque<_atom> atoms_orig=a.atoms;  //need to make a copy for the pointer
+  deque<_atom>* ptr_atoms=&atoms_orig;
+  xstructure atomic_grid; //stays empty if not needed
+  if(!fold_in_only){
+    double radius=RadiusSphereLattice(lattice_new);
+    xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO190520
+    if(LDEBUG){
+      cerr << soliloquy << " a.lattice=" << endl;cerr << a.lattice << endl;
+      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << soliloquy << " vol(a.lattice)=" << abs(aurostd::det(a.lattice)) << endl;
+      cerr << soliloquy << " vol(lattice_new)=" << abs(aurostd::det(lattice_new)) << endl;
+      cerr << soliloquy << " radius(a.lattice)=" << RadiusSphereLattice(a.lattice) << endl;
+      cerr << soliloquy << " radius(lattice_new)=" << radius << endl;
+      cerr << soliloquy << " dims=" << dims << endl;
+    }
+    //[CO190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
+    //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
+    //vector<int> sc2pcMap, pc2scMap; //dummy
+    if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
+    atomic_grid=a;atomic_grid.Clean();
+    atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
+    if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
+    ptr_atoms=&atomic_grid.atoms;
+  }
+  const deque<_atom> atoms=*ptr_atoms;
+
+  return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol);
 }
 
-deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew, double tol) { //CO190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol) {  
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="foldAtomsInCell():";
+  
   deque<_atom> atoms_in_cell;
+  
+  xmatrix<double> f2c_new=trasp(lattice_new);
+  xmatrix<double> c2f_new=inverse(f2c_new);
+
+  if(LDEBUG){
+    cerr << soliloquy << " f2c_new=" << endl;cerr << f2c_new << endl;
+    cerr << soliloquy << " c2f_new=" << endl;cerr << c2f_new << endl;
+  }
+  
   _atom tmp;
   for (uint j = 0; j < atoms.size(); j++) {
-    if(atoms_in_cell.size() == 0) {
-//[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
-//[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
-//[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
-atoms_in_cell.push_back(atoms[j]);
-atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
-atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
-atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-    } else {
-//bool duplicate_atom = false;
-tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
-tmp.cpos = f2c_new * tmp.fpos;
-//[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
-//[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
-//[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
-//[OBSOLETE]    duplicate_atom = true;
-//[OBSOLETE]    break;
-//[OBSOLETE]  }
-//[OBSOLETE]}
-//[OBSOLETE]if(duplicate_atom == false) {
-if(!SYM::MapAtom(atoms_in_cell,tmp,false,c2f_new,f2c_new,skew,tol)){
-  //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
-  //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
-  atoms_in_cell.push_back(atoms[j]);
-  atoms_in_cell.back().fpos = tmp.fpos;
-  atoms_in_cell.back().cpos = tmp.cpos;
-  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-}
+    //[CO190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
+    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
+    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
+    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
+    //[CO190520 - this case is not needed]  atoms_in_cell.push_back(atoms[j]);
+    //[CO190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
+    //[CO190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
+    //[CO190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+    //[CO190520 - this case is not needed]} else {
+    //bool duplicate_atom = false;
+    tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
+    tmp.cpos = f2c_new * tmp.fpos;
+    //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
+    //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
+    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
+    //[OBSOLETE]    duplicate_atom = true;
+    //[OBSOLETE]    break;
+    //[OBSOLETE]  }
+    //[OBSOLETE]}
+    //[OBSOLETE]if(duplicate_atom == false) {
+    if(!SYM::MapAtom(atoms_in_cell,tmp,false,c2f_new,f2c_new,skew,tol)){
+      //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
+      //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
+      atoms_in_cell.push_back(atoms[j]);
+      atoms_in_cell.back().fpos = tmp.fpos;
+      atoms_in_cell.back().cpos = tmp.cpos;
+      atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
     }
+    //[CO190520 - this case is not needed]}
   }
+
+  double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
+  double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
+  if(LDEBUG){
+    cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
+    cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
+  }
+  if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
+
   return atoms_in_cell;
 }
 
@@ -9225,13 +9280,13 @@ if(!SYM::MapAtom(atoms_in_cell,tmp,false,c2f_new,f2c_new,skew,tol)){
 // get reduced lattice in reciprocal space, converts to real and folds atoms into this lattice
 // this should be the fastest lattice for VASP
 // CO 180409 - refer to standard primitive instead, this function is simply a test, probably not optimal to standard primitive
-xstructure GetPrimitiveVASP(xstructure& a) {
+xstructure GetPrimitiveVASP(const xstructure& a) {
   double tol=a.sym_eps;
   if(tol==AUROSTD_NAN){tol=SYM::defaultTolerance(a);}
   return GetPrimitiveVASP(a,tol);
 }
 
-xstructure GetPrimitiveVASP(xstructure& a,double tol) {
+xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   xstructure b(a);
   b.ReScale(1.0);
@@ -9244,7 +9299,9 @@ xstructure GetPrimitiveVASP(xstructure& a,double tol) {
   //get skew - STOP
   b.lattice=lattice_new; //b.f2c=trasp(b.lattice); b.c2f=inverse(b.f2c);  //set new lattice, f2c, c2f
   //b.atoms=foldAtomsInCell(b.atoms,b.c2f,b.f2c,skew,tol);                //fold atoms into new lattice
-  b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
+  //[CO190520 - ReplaceAtoms()]b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
+  deque<_atom> atoms=foldAtomsInCell(a,b.lattice,skew,tol);  //CO190520 - ReplaceAtoms()
+  b.ReplaceAtoms(atoms);  //CO190520 - ReplaceAtoms()
   if((0||LDEBUG)&&!isequal(a.lattice,b.lattice,1e-3)){
     cerr << "-----------------------------------------------------------------------" << endl;
     cerr << "ORIG STRUCTURE " << endl;
@@ -10991,7 +11048,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   string soliloquy="GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001) {cerr << "ERROR: singular supercell matrix" << endl;exit(0);}
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);} //exit(0)
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -10999,7 +11056,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //pflow::CalculateFullSymmetry(a);
   _atom atom,atom2;
   _sym_op pSymOp,fSymOp,aSymOp;  //corey
-  int i,j,k,dim;
+  int i,j,k; //,dim;
   uint iat;//,at_indx; //corey
   xvector<int> dims(3);
   xvector<double> cshift(3);  //corey
@@ -11044,11 +11101,13 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 
   // DX 20190319 - added option to expand strictly by uniform supercell matrix - START
   // CO190409 - note, force_supercell_matrix is PURELY for speed up purposes, the other approach should yield the same results (just slower)
-  if(force_supercell_matrix && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
-  else {
-  radius=RadiusSphereLattice(b.lattice);
-  dims=LatticeDimensionSphere(a.lattice,radius);dim=max(dims)+1;
+  if(force_supercell_matrix && aurostd::isdiagonal(supercell)){dims[1]=nx;dims[2]=ny;dims[3]=nz;} //[CO190520 - fixing for dims] && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
+  else{
+    radius=RadiusSphereLattice(b.lattice);
+    dims=LatticeDimensionSphere(a.lattice,radius);//[CO190520 - EXCESSIVE]dim=max(dims)+1;
   } 
+
+  if(LDEBUG){cerr << soliloquy << " dims=" << dims << endl;}
   // DX 20190319 - added option to expand strictly by uniform supercell matrix - END
   // if(LDEBUG) cerr << "DEBUG  dims=" << dims << " " << " radius=" << radius << endl;  // DEBUG
 
@@ -11084,9 +11143,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     for(uint ia=0;ia<a.iatoms.size();ia++){
       for(uint iia=0;iia<a.iatoms[ia].size();iia++){
         pcmap=false;
-        for(i=-dim;i<=dim;i++) {
-          for(j=-dim;j<=dim;j++) {
-            for(k=-dim;k<=dim;k++) {
+        //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {
+        //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {
+        //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {
+        for(i=-dims[1];i<=dims[1];i++) {
+          for(j=-dims[2];j<=dims[2];j++) {
+            for(k=-dims[3];k<=dims[3];k++) {
               atom=a.atoms[a.iatoms[ia][iia]];
               //cerr << "atom " << a.iatoms[ia][iia] << " fpos_UNrot " << atom.fpos << endl;
               cshift=((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3);
@@ -11163,7 +11225,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
         if(ignore_pcmap==false && pcmap==false){
           if(force_strict_pc2scMap){
             message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-            throw aurostd::xerror(soliloquy, message, _INDEX_MISMATCH_);
+            throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
           }
           ignore_pcmap=true;
           pc2scMap.clear();
@@ -11186,9 +11248,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   } else {
     for(uint ia=0;ia<a.atoms.size();ia++) {
       pcmap=false;
-      for(i=-dim;i<=dim;i++){
-        for(j=-dim;j<=dim;j++){
-          for(k=-dim;k<=dim;k++){
+      //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){
+      //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){
+      //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){
+      for(i=-dims[1];i<=dims[1];i++){
+        for(j=-dims[2];j<=dims[2];j++){
+          for(k=-dims[3];k<=dims[3];k++){
             atom=a.atoms[ia];
             //atom.cpos=atom.cpos+(((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3));
             cshift=((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3);
@@ -11271,21 +11336,37 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   double density_a=a.scale*a.scale*a.scale*abs(det(a.lattice))/a.atoms.size();
   double density_b=b.scale*b.scale*b.scale*abs(det(b.lattice))/b.atoms.size();
   if(abs(b.atoms.size()-a.atoms.size()*fraction)>0.1 || abs(density_a-density_b)>0.001) {
-    cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
-    cerr << "         supercell has the wrong number of atoms" << endl;
-    cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
-    cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
-    cerr << "         b.scale            = " << b.scale << endl;
-    cerr << "         a.scale            = " << a.scale << endl;
-    cerr << "         fraction           = " << fraction << endl;
-    cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
-    cerr << "         b.density          = " << density_b << endl;
-    cerr << "         a.density          = " << density_a << endl;
-    cerr << "         b.lattice          = " << endl;
-    cerr << b.lattice << endl;
-    cerr << "         a.lattice          = " << endl;
-    cerr << a.lattice << endl;
-    exit(0);
+    //[CO190520 - OBSOLETE]cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
+    //[CO190520 - OBSOLETE]cerr << "         supercell has the wrong number of atoms" << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.scale            = " << b.scale << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.scale            = " << a.scale << endl;
+    //[CO190520 - OBSOLETE]cerr << "         fraction           = " << fraction << endl;
+    //[CO190520 - OBSOLETE]cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.density          = " << density_b << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.density          = " << density_a << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.lattice          = " << endl;
+    //[CO190520 - OBSOLETE]cerr << b.lattice << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.lattice          = " << endl;
+    //[CO190520 - OBSOLETE]cerr << a.lattice << endl;
+
+    message << "Supercell has the wrong number of atoms" << endl;
+    message << "b.atoms.size()     = " << b.atoms.size() << endl;
+    message << "a.atoms.size()     = " << a.atoms.size() << endl;
+    message << "b.scale            = " << b.scale << endl;
+    message << "a.scale            = " << a.scale << endl;
+    message << "fraction           = " << fraction << endl;
+    message << "supercell atoms    = " << fraction*a.atoms.size() << endl;
+    message << "b.density          = " << density_b << endl;
+    message << "a.density          = " << density_a << endl;
+    message << "b.lattice          = " << endl;
+    message << b.lattice << endl;
+    message << "a.lattice          = " << endl;
+    message << a.lattice << endl;
+
+    throw aurostd::xerror(soliloquy,message,_RUNTIME_ERROR_);
+    //exit(0);
   }
 
   bool pretend_uniform=false;//true;  // COREY TEST, REMOVE ME
@@ -11613,8 +11694,12 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
   }
-  cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  exit(0);
+  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO190520 -OBSOLETE]exit(0);
+  string soliloquy="GetSuperCell():";
+  stringstream message;
+  message << "Matrix must have 9 or 3 elements";
+  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -11631,8 +11716,12 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
   }
-  cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  exit(0);
+  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO190520 -OBSOLETE]exit(0);
+  string soliloquy="GetSuperCell():";
+  stringstream message;
+  message << "Matrix must have 9 or 3 elements";
+  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -12706,8 +12795,11 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
   _atom atom;
   str.BringInCell();  // are INCELL.
-  xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
-  a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
+  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
   for(uint iat=0;iat<str.atoms.size();iat++){
     str.grid_atoms.push_back(str.atoms.at(iat));  // put first the unit cell !
     str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
@@ -12716,7 +12808,7 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
-	if(i!=0 || j!=0 || k!=0) {
+	if(i!=0 || j!=0 || k!=0) {  //these are ALREADY included
 	  for(uint iat=0;iat<str.atoms.size();iat++) {
 	    atom=str.atoms.at(iat);
 	    atom.isincell=FALSE; // these are OUT OF CELL
