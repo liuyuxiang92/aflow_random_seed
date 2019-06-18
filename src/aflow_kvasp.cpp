@@ -1415,8 +1415,8 @@ namespace KBIN {
 		    }
 		    if(xvasp.NRELAXING==xvasp.NRELAX) {
 		      Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
-		      KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);  // ME190610 - or else SPIN_REMOVE_RELAX_2 won't work
 		      if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION=]");return Krun;}
+		      KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);  // ME190610 - or else SPIN_REMOVE_RELAX_2 won't work
 		    }
 		  }
 		  xvasp.NRELAXING=xvasp.NRELAX;
