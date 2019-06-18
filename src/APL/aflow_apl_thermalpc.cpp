@@ -145,6 +145,9 @@ void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER
 
   string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE; //ME181226
   _logger << "Writing thermodynamic properties into file " << filename << "." << apl::endl; //ME181226
+  outfile << AFLOWIN_SEPARATION_LINE << std::endl;  // ME190614
+  if (!_dosc._system.empty()) outfile << "[APL_THERMO]SYSTEM=" << _dosc._system << std::endl;  // ME190614
+  outfile << "[APL_THERMO]START" << std::endl;  // ME190614
   outfile << "#  T(K)     U0(meV/cell)    U(meV/cell)     F(meV/cell)      S(kB/cell)      Cv(kB/cell)" << std::endl;
   outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
   int n = (int)((USER_TP_TEND - USER_TP_TSTART) / USER_TP_TSTEP);
@@ -163,6 +166,8 @@ void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER
             << setw(15) << Svib << "\t"
             << setw(15) << Cv << std::endl;
   }
+  outfile << "[APL_THERMO]STOP" << std::endl;  // ME190614
+  outfile << AFLOWIN_SEPARATION_LINE << std::endl;  // ME190614
   //CO - START
   aurostd::stringstream2file(outfile, filename); //ME181226
   if (!aurostd::FileExist(filename)) { //ME181226

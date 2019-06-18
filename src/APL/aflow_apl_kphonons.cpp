@@ -1561,9 +1561,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
                   }
                 }
                 // ME190501 Allow user to override path
-                  if(!USER_DC_USERPATH.empty()) {  // Set path
-                    pdisc.setPath(USER_DC_USERPATH);
-                  }
+                if(!USER_DC_USERPATH.empty()) {  // Set path
+                  pdisc.setPath(USER_DC_USERPATH);
+                }
 
                 std::vector< xvector<double> > qpoints=pdisc.get_qpoints();
                 store.create_pdispath(qpoints);
@@ -1676,15 +1676,16 @@ void RunPhonons_APL_181216(_xinput& xinput,
         }
       }
       // ME190501 Allow user to override path
-        if(!USER_DC_USERPATH.empty()){  // Set path
-          pdisc.setPath(USER_DC_USERPATH);
-        }
+      if(!USER_DC_USERPATH.empty()){  // Set path
+        pdisc.setPath(USER_DC_USERPATH);
+      }
 
       // Calculate frequencies on path
       pdisc.calc(frequencyFormat);
 
       // Write results into PDIS file
       pdisc.writePDIS();
+      pdisc.writePHEIGENVAL();  // ME190614
 	//QHA/SCQHA/QHA3P  START //PN180705
 	//////////////////////////////////////////////////////////////////////
         ptr_hsq.reset(new apl::PhononHSQpoints(logger));
@@ -1745,6 +1746,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) {
         dosc.writePDOS();
+        dosc.writePHDOSCAR();  // ME190614
       }
 
       // Calculate thermal properties
@@ -3815,7 +3817,6 @@ void RunPhonons_APL_180101(_xinput& xinput,
       bool awakeAnharmIFCs;
       for (uint i = 0; i < phcalc->_clusters.size(); i++) {
         string ifcs_hib_file = DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
-        //[ME181226] std::cout << ifcs_hib_file << std::endl;
         if (USER_HIBERNATE_OPTION.option) {
           awakeAnharmIFCs = (aurostd::EFileExist(ifcs_hib_file) ||
                              aurostd::FileExist(ifcs_hib_file));

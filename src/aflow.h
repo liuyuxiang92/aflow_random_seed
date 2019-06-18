@@ -2900,14 +2900,19 @@ class xDOSCAR {
   double energy_max;
   double energy_min;
   uint number_energies;
+  uint number_atoms;  // ME190614
+  bool partial;  // ME190614
   double denergy;
   deque<double> venergy;                                        // venergy.at(energy_number) 
   deque<double> venergyEf;                                      // venergyEf.at(energy_number) 
-  deque<deque<double> > vDOS;                                   // vDOS.at(energy_number).at(spin)
-  deque<deque<double> > viDOS;                                  // viDOS.at(energy_number).at(spin)
-  deque<deque<double> > vDOSs;                                  // vDOSs.at(energy_number).at(spin)
-  deque<deque<double> > vDOSp;                                  // vDOSp.at(energy_number).at(spin)
-  deque<deque<double> > vDOSd;                                  // vDOSd.at(energy_number).at(spin)
+  // ME190614 - BEGIN
+  //[OBSOLETE]  deque<deque<double> > vDOS;                                   // vDOS.at(energy_number).at(spin)
+  deque<deque<double> > viDOS;                                  // viDOS.at(spin).at(energy_number)
+  //[OBSOLETE]  deque<deque<double> > vDOSs;                                  // vDOSs.at(energy_number).at(spin)
+  //[OBSOLETE]  deque<deque<double> > vDOSp;                                  // vDOSp.at(energy_number).at(spin)
+  //[OBSOLETE]  deque<deque<double> > vDOSd;                                  // vDOSd.at(energy_number).at(spin)
+  deque<deque<deque<deque<double> > > > vDOS;                   // vDOS.at(atom).at(orbital).at(spin).at(energy_number); 0 = total for atoms and orbitals
+  // ME190614 - END
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
@@ -2940,6 +2945,8 @@ class xEIGENVAL {
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  double energy_max;  // ME190614
+  double energy_min;  // ME190614
  private:                                                        //
   void free();                                                  // free space
   void copy(const xEIGENVAL& b);                                //
@@ -3049,6 +3056,7 @@ class xKPOINTS {
   xvector<double> ooo_kpoints; // ORIGIN                         // triplet of origin
   int nkpoints;                                                  // total kpoints
   string path_mode,path;vector<string> vpath;int path_grid;      // path if any
+  vector<xvector<double> > vkpoints;                             // ME190614 - k-point coordinates of the path
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
@@ -3177,6 +3185,80 @@ bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
 //-------------------------------------------------------------------------------------------------
+// ME190614 - plotter functions
+namespace plotter {
+  // Plot setup --------------------------------------------------------------
+  // Plot options
+  aurostd::xoption getPlotOptions(const aurostd::xoption&, const string&, bool=false);
+  aurostd::xoption getPlotOptionsEStructure(const aurostd::xoption&, const string&, bool=false);
+  aurostd::xoption getPlotOptionsPhonons(const aurostd::xoption&, const string&);
+
+  // Plot functions
+  void generateHeader(stringstream&, const aurostd::xoption&, bool=false);
+  void savePlotGNUPLOT(const aurostd::xoption&, const stringstream&);
+  void setFileName(aurostd::xoption&, string="");
+  void setTitle(aurostd::xoption&);
+  string formatDefaultPlotTitle(const aurostd::xoption&);
+  string formatCompoundLATEX(const string&);
+
+  // Electronic structure ----------------------------------------------------
+  // Plot functions
+  void PLOT_DOS(aurostd::xoption&);
+  void PLOT_DOS(aurostd::xoption&, stringstream&);
+  void PLOT_PDOS(aurostd::xoption&);
+  void PLOT_PDOS(aurostd::xoption&, stringstream&);
+  void PLOT_BAND(aurostd::xoption&);
+  void PLOT_BAND(aurostd::xoption&, stringstream&);
+  void BANDDOS2JSON(ostream&, string);
+  void PLOT_BANDDOS(aurostd::xoption&);
+  void PLOT_BANDDOS(aurostd::xoption&, stringstream&);
+
+  // Helper functions
+  xstructure getStructureWithNames(const aurostd::xoption&);
+  string getLatticeFromKpointsTitle(const string&);
+  void shiftEfermiToZero(xEIGENVAL&, const double&);
+  void setEMinMax(aurostd::xoption&, const double&, const double&);
+
+  // DOS
+  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&);
+
+  // Bands
+  void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
+  string convertKPointLabel(const string&, const string&);
+  string convertKPointLetter(string, const string&);
+
+  // Gnuplot
+  void generateDosPlotGNUPLOT(stringstream&, const xDOSCAR&, const deque<double>&,
+                              const deque<deque<deque<double> > >&, const vector<string>&, const aurostd::xoption&);
+  void generateBandPlotGNUPLOT(stringstream&, const xEIGENVAL&, const vector<double>&,
+                               const vector<double>&, const vector<string>&, const aurostd::xoption&);
+  string getFormattedUnit(const string&);
+
+  // Phonons -----------------------------------------------------------------
+  void PLOT_PHDOS(aurostd::xoption&);
+  void PLOT_PHDOS(aurostd::xoption&, stringstream&);
+  void PLOT_PHDISP(aurostd::xoption&);
+  void PLOT_PHDISP(aurostd::xoption&, stringstream&);
+  void PLOT_PHDISPDOS(aurostd::xoption&);
+  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&);
+  void convertEnergies(xEIGENVAL&, const string&);
+  void convertEnergies(xDOSCAR&, const string&);
+  double getEnergyConversionFactor(const string&);
+
+  // Properties plotter ------------------------------------------------------
+  void PLOT_THERMO(aurostd::xoption&);
+  void PLOT_THERMO(aurostd::xoption&, stringstream&);
+  void PLOT_TCOND(aurostd::xoption&);
+  void PLOT_TCOND(aurostd::xoption&, stringstream&);
+
+  // General plots -----------------------------------------------------------
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, const int&);
+  void plotMatrix(xoption& plotoptions, stringstream&);
+  void setPlotLabels(aurostd::xoption&, const string&, const string&, const string&, const string&);
+  vector<vector<double> > readAflowDataFile(aurostd::xoption&);
+  void generatePlotGNUPLOT(stringstream&, const xoption&, const vector<vector<double> >&);
+}
+
 //-------------------------------------------------------------------------------------------------
 // aflow_estructure_dos.cpp
 

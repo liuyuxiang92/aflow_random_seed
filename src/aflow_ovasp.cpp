@@ -3571,7 +3571,8 @@ xDOSCAR::xDOSCAR() {
   venergy.clear();
   venergy.clear();
   vDOS.clear();viDOS.clear();
-  vDOSs.clear();vDOSp.clear();vDOSd.clear();
+  // vDOSs.clear();vDOSp.clear();vDOSd.clear(); OBSOLETE ME190614 - not used
+  partial = false; // ME190614
 }  
 
 xDOSCAR::~xDOSCAR() {
@@ -3585,9 +3586,9 @@ void xDOSCAR::free() {
   venergy.clear(); 
   vDOS.clear();
   viDOS.clear();
-  vDOSs.clear();
-  vDOSp.clear();
-  vDOSd.clear();
+  // vDOSs.clear();  OBSOLETE ME190614 - not used
+  // vDOSp.clear();  OBSOLETE ME190614 - not used
+  // vDOSd.clear();  OBSOLETE ME190614 - not used
 }
 
 void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
@@ -3610,12 +3611,14 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   denergy=b.denergy;  
   venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i));
   venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i));
-  vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i));
+  //vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i)); OBSOLETE ME190614
+  vDOS.clear(); vDOS = b.vDOS;  // ME190614
   viDOS.clear(); for(uint i=0;i<b.viDOS.size();i++) viDOS.push_back(b.viDOS.at(i));
-  vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));
-  vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));
-  vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));
-  vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));
+  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME190614 - not used
+  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME190614 - not used
+  //vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));  OBSOLETE ME190614 - not used
+  //vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));  OBSOLETE ME190614 - not used
+  partial = b.partial;  // ME190614
 }
 
 const xDOSCAR& xDOSCAR::operator=(const xDOSCAR& b) {  // operator= PUBLIC
@@ -3672,12 +3675,21 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   vector<string> vline,tokens;
   aurostd::string2vectorstring(content,vcontent);
   string line;
+  uint ndos = 1;  // ME190614
   if(filename=="") filename="stringstream";
   // crunchig to eat the info
-  for(uint iline=0;iline<vcontent.size();iline++) {
+  //for(uint iline=0;iline<vcontent.size();iline++) {
+  for(uint iline = 0; iline < 7;iline++) { // ME190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
     // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
     // WRONG if(iline==0 && tokens.size()==4)  spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
+    // ME190614 - START
+    if (iline == 0 && tokens.size() >= 4) {
+      number_atoms = aurostd::string2utype<uint>(tokens[1]);
+      partial = aurostd::string2utype<bool>(tokens[2]);
+      if (partial) ndos += number_atoms;
+    }
+    // ME190614 - END
     if(iline==1 && tokens.size()>=5) {
       uint i=0;
       Vol=aurostd::string2utype<double>(tokens.at(i++));
@@ -3687,7 +3699,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
-    if(iline==4) title=vcontent.at(iline);
+    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190508 - clean title
     if(iline==5) {
       // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
       energy_max=aurostd::string2utype<double>(tokens.at(0));
@@ -3697,43 +3709,89 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
     if(iline==6 && tokens.size()==4) {spin=0;RWIGS=TRUE;}
     if(iline==6 && tokens.size()==7) {spin=1;RWIGS=TRUE;}
-    if(iline>=6 && iline < number_energies + 6 ) {
-      aurostd::string2tokens(vcontent.at(iline),tokens);
-      uint i=0;
-      if(tokens.size()==3 || tokens.size()==5) {
-	RWIGS=FALSE;
-	if(tokens.size()==3) spin=0;
-	if(tokens.size()==5) spin=1;
-	venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	//vDOS
-	deque<double> entryDOS;
-	entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==5) entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	vDOS.push_back(entryDOS);
-	//viDOS
-	deque<double> entryiDOS;
-	entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==5) entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	viDOS.push_back(entryiDOS);
-      }
-      if(tokens.size()==4 || tokens.size()==7) {
-	RWIGS=TRUE;
-	if(tokens.size()==4) spin=0;
-	if(tokens.size()==7) spin=1;
-	venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	//vDOS s p d
-	deque<double> entryDOSs,entryDOSp,entryDOSd;
-	entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==7) entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==7) entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==7) entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	vDOSs.push_back(entryDOSs);
-	vDOSp.push_back(entryDOSp);
-	vDOSd.push_back(entryDOSd);
-      }
+    // ME190614 - START
+    if (iline == 6) {
+      if (tokens.size() == 3) spin = 0;
+      if (tokens.size() == 5) spin = 1;
     }
+    // ME190614 - END
+  }
+  // Done reading header
+  // ME190614 - START
+  uint norbitals = 0;
+  int d = 0, e = 0;
+  double dos;
+  if (partial) {
+    aurostd::string2tokens(vcontent.at(number_energies + 7), tokens, " ");
+    norbitals = (tokens.size() - 1)/(spin + 1);
+  }
+  vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(spin + 1, deque<double>(number_energies, 0.0))));
+  venergy.resize(number_energies);
+  viDOS.assign(spin + 1, deque<double>(number_energies, 0.0));
+  // Read data
+  for (uint iline = 6; iline < vcontent.size(); iline++) {
+    if (iline == (d + 1) * number_energies + 6 + d) {
+      d++;
+      e = 0;
+    } else {
+      aurostd::string2tokens(vcontent.at(iline),tokens);
+      if (d == 0) {
+        venergy[e] = aurostd::string2utype<double>(tokens[0]);
+        for (uint i = 0; i < (spin + 1); i++) {
+          vDOS[0][0][i][e] = aurostd::string2utype<double>(tokens[i + 1]);
+          viDOS[i][e] = aurostd::string2utype<double>(tokens[i + spin + 2]);
+        }
+        e++;
+      } else {
+        for (uint i = 0; i < (spin + 1) * norbitals; i++) {
+          dos = aurostd::string2utype<double>(tokens[i + 1]);
+          vDOS[d][i/(spin + 1) + 1][i % (spin + 1)][e] = dos;
+          vDOS[d][0][i % (spin + 1)][e] += dos;
+          vDOS[0][i/(spin + 1) + 1][i % (spin + 1)][e] += dos;
+        }
+        e++;
+      }
+      // ME190614 - The procedure below makes too many assumptions about how the
+      // DOSCAR file is structured and fails for f-elements.
+      //[OBSOLETE]    if(iline>=6 && iline < number_energies + 6 ) {
+      //[OBSOLETE]      aurostd::string2tokens(vcontent.at(iline),tokens);
+      //[OBSOLETE]      uint i=0;
+      //[OBSOLETE]      if(tokens.size()==3 || tokens.size()==5) {
+      //[OBSOLETE]	RWIGS=FALSE;
+      //[OBSOLETE]	if(tokens.size()==3) spin=0;
+      //[OBSOLETE]	if(tokens.size()==5) spin=1;
+      //[OBSOLETE]	if (venergy.size() <= number_energies) venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));  // ME190507
+      //[OBSOLETE]	//vDOS
+      //[OBSOLETE]	deque<double> entryDOS;
+      //[OBSOLETE]	entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==5) entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	vDOS.push_back(entryDOS);
+      //[OBSOLETE]	//viDOS
+      //[OBSOLETE]	deque<double> entryiDOS;
+      //[OBSOLETE]	entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==5) entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	viDOS.push_back(entryiDOS);
+      //[OBSOLETE]      }
+      //[OBSOLETE]      if(tokens.size()==4 || tokens.size()==7) {
+      //[OBSOLETE]	RWIGS=TRUE;
+      //[OBSOLETE]	if(tokens.size()==4) spin=0;
+      //[OBSOLETE]	if(tokens.size()==7) spin=1;
+      //[OBSOLETE]	venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	//vDOS s p d
+      //[OBSOLETE]	deque<double> entryDOSs,entryDOSp,entryDOSd;
+      //[OBSOLETE]	entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==7) entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==7) entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==7) entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	vDOSs.push_back(entryDOSs);
+      //[OBSOLETE]	vDOSp.push_back(entryDOSp);
+      //[OBSOLETE]	vDOSd.push_back(entryDOSd);
+      //[OBSOLETE]      }
+      //[OBSOLETE]    }
+    }
+    // ME190614 - END
   }
   // fix denergy
   denergy=venergy.at(1)-venergy.at(0);
@@ -3791,13 +3849,15 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: energy_max=" << energy_max << " energy_min=" << energy_min << endl;
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: denergy=" << denergy << endl;
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;
+  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  // ME190614 - new vDOS format
+  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  // ME190614 - new viDOS format
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
@@ -3827,6 +3887,8 @@ xEIGENVAL::xEIGENVAL() {
   number_electrons=0;
   number_kpoints=0;
   number_bands=0;
+  energy_max = -1e30;  // ME190614
+  energy_min = 1e30;  // ME190614
   vweight.clear();
   vkpoint.clear();
   venergy.clear();
@@ -3865,6 +3927,8 @@ void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
   number_electrons=b.number_electrons;
   number_kpoints=b.number_kpoints;
   number_bands=b.number_bands;
+  energy_min = b.energy_min;  // ME190614
+  energy_max = b.energy_max;  // ME190614
   vweight.clear(); 
   for(uint i=0;i<b.vweight.size();i++) vweight.push_back(b.vweight.at(i));
   vkpoint.clear(); 
@@ -3950,7 +4014,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
-    if(iline==4) title=vcontent.at(iline);
+    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190614 - clean title
     if(iline==5 && tokens.size()>=3) {
       uint i=0;
       number_electrons=aurostd::string2utype<uint>(tokens.at(i++));
@@ -3972,11 +4036,19 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	iline++; // move to energies
 	deque<double> keigenval;
 	deque<deque<double> > knenergy;
+        double eigen;  // ME190614
 	for(uint kline=0;kline<number_bands&&iline<vcontent.size();kline++,iline++) {
 	  aurostd::string2tokens(vcontent.at(iline),tokens);
 	  keigenval.clear();
-	  for(uint i=1;i<tokens.size();i++)
-	    keigenval.push_back(aurostd::string2utype<double>(tokens.at(i)));  // build one eigenvalue
+	  for(uint i=1;i<tokens.size();i++) {
+            // ME190614 - START
+            eigen = aurostd::string2utype<double>(tokens[i]);
+            if (eigen < energy_min) energy_min = eigen;
+            if (eigen > energy_max) energy_max = eigen;
+            keigenval.push_back(eigen);
+	    //[OBSOLETE] keigenval.push_back(aurostd::string2utype<double>(tokens.at(i)));  // build one eigenvalue
+            // ME190614 - END
+          }
 	  knenergy.push_back(keigenval);
 	}
 	venergy.push_back(knenergy);
@@ -6840,6 +6912,7 @@ xKPOINTS::xKPOINTS() {
   path_mode="";                 // for aflowlib_libraries.cpp
   path="";                      // for aflowlib_libraries.cpp
   vpath.clear();                // for aflowlib_libraries.cpp
+  vkpoints.clear();             // ME190614
   path_grid=0;                  // for aflowlib_libraries.cpp
 }        
 
@@ -6853,6 +6926,7 @@ void xKPOINTS::free() {
   nnn_kpoints.clear();          // for aflowlib_libraries.cpp
   ooo_kpoints.clear();          // for aflowlib_libraries.cpp
   vpath.clear();                // for aflowlib_libraries.cpp
+  vkpoints.clear();             // ME190614
 }
 
 void xKPOINTS::copy(const xKPOINTS& b) { // copy PRIVATE
@@ -6871,6 +6945,7 @@ void xKPOINTS::copy(const xKPOINTS& b) { // copy PRIVATE
   path_mode=b.path_mode;
   path=b.path;
   vpath=b.vpath;
+  vkpoints = b.vkpoints;  // ME190614
   path_grid=b.path_grid;
 }
 
@@ -6987,6 +7062,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       path_grid=aurostd::string2utype<int>(vcontent.at(1));
       grid_type=vcontent.at(2);
       path_mode=vcontent.at(3);
+      xvector<double> kpt(3);  // ME190614
       for(uint iline=4;iline<vcontent.size();iline++) {
 	aurostd::StringSubst(vcontent.at(iline),"!","@");
 	if(aurostd::substring2bool(vcontent.at(iline),"@")) { // avoid removing ! as comment
@@ -6996,8 +7072,11 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	    for(uint k=0;k<tokens.size();k++) {
 	      if(tokens.at(k)=="@" && k+1<tokens.size()) {
 		vpath.push_back(tokens.at(k+1));
-	      }
+	      } else if (k < 3) {  // ME190614
+                kpt[k+1] = aurostd::string2utype<double>(tokens[k]);
+              }
 	    }
+            vkpoints.push_back(kpt);  // ME190614
 	  }
 	}
       }

@@ -1971,8 +1971,20 @@ namespace aflowlib {
       // [OBSOLETE]  directory.push_back("./");
       // [OBSOLETE]  estructure::PLOT_BANDDOS(directory);
       // [OBSOLETE]  estructure::PLOT_PEDOSALL_AFLOWLIB(directory, aflags);
-      estructure::PLOT_BANDDOS("./");
-      estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
+
+      // ME190614 - START
+      // [OBSOLETE]  estructure::PLOT_BANDDOS("./");
+      // [OBSOLETE]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
+      aurostd::xoption opts, plotoptions;
+      opts.push_attached("PLOT_BANDDOS", "./,,,1.75"); // 1.75 prevents plot legend from overlapping with DOS
+      opts.push_attached("PLOTTER::PRINT", "png");
+      opts.flag("PLOTTER::WEB", true);
+      opts.push_attached("PLOT_PDOS", "./,-1,,,1.5");  // 1.5 is enough to prevent plot legend from overlapping with DOS
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_BANDDOS");
+      plotter::PLOT_BANDDOS(plotoptions);
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_PDOS");
+      plotter::PLOT_PDOS(plotoptions);
+      // ME190614 - END
 
       chdir(work_dir);  //Go to the working direcotry
     }

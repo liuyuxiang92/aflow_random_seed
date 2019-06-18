@@ -30,6 +30,7 @@ DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string
     : _pc(pc), _rg(rg), _logger(l) {
   clear();
   _bzmethod = method;
+  _system = _pc.getSystemName();  // ME190614
   calculateFrequencies();
 }
 
@@ -47,7 +48,10 @@ void DOSCalculator::clear() {
   _freqs.clear();
   _bins.clear();
   _dos.clear();
+  _idos.clear();  // ME190614
+  _projected_dos.clear(); // ME190614
   _bzmethod = "";
+  _temperature = 0.0;  // ME190614
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -167,16 +171,18 @@ void DOSCalculator::calculateFrequencies() {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-void DOSCalculator::smearWithGaussian(vector<double>& dos, double h, double sigma) {
+// ME190614 - added integrated DOS
+void DOSCalculator::smearWithGaussian(vector<double>& dos, vector<double>& idos, double h, double sigma) {
   // Construct table for gaussian function
   int ng = (int)(6.0 * sigma / h + 1.0);
   double fact = 1.0 / (sqrt(2.0 * M_PI) * sigma);
-  vector<double> gauss;
+  vector<double> gauss, igauss;
   double gnorm = 0.0;
   for (int ig = -ng; ig <= ng; ig++) {
     double eg = ig * h;
     double arg = eg * eg / (sigma * sigma) / 2.0;
     gauss.push_back(fact * exp(-arg));
+    igauss.push_back(fact * erf(-arg));
     gnorm += gauss.back();
   }
 
@@ -184,6 +190,7 @@ void DOSCalculator::smearWithGaussian(vector<double>& dos, double h, double sigm
   gnorm *= h;
   for (int ig = -ng; ig <= ng; ig++) {
     gauss[ig + ng] /= gnorm;
+    igauss[ig + ng] /= gnorm;
   }
 
   // Prepare new dos
@@ -191,15 +198,18 @@ void DOSCalculator::smearWithGaussian(vector<double>& dos, double h, double sigm
   for (uint i = 0; i < dos.size(); i++) {
     newdos.push_back(0.0);
   }
+  vector<double> newidos(newdos.size(), 0.0);
 
   // Convolute...
   for (int ie = 0; ie < (int)dos.size(); ie++) {
     double wt = dos[ie] * h;
+    double wti = idos[ie] * h;
     for (int jg = -ng; jg <= ng; jg++) {
       int je = ie + jg;
       if (je < 0) continue;
       if (je >= (int)dos.size()) continue;
       newdos[je] += gauss[jg + ng] * wt;
+      newidos[je] += igauss[jg + ng] * wti;
     }
   }
 
@@ -227,11 +237,13 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
 
   // Clear old stuff
   _dos.clear();
+  _idos.clear();  // ME190614
   _bins.clear();
 
   // Prepare storagearrays
   for (int k = 0; k < USER_DOS_NPOINTS; k++) {
     _dos.push_back(0);
+    _idos.push_back(0);  // ME190614
     _bins.push_back(_minFreq + k * _stepDOS + _halfStepDOS);
   }
 
@@ -244,7 +256,7 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
 
   // Smooth DOS by gaussians
   if (USER_DOS_SMEAR > 1E-6)
-    smearWithGaussian(_dos, _stepDOS, USER_DOS_SMEAR);
+    smearWithGaussian(_dos, _idos, _stepDOS, USER_DOS_SMEAR);  // ME190614
 
   // Normalize to number of branches
   double sum = 0.0;
@@ -252,8 +264,10 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
     sum += _dos[k];
   sum /= _pc.getNumberOfBranches();
 
-  for (int k = 0; k < USER_DOS_NPOINTS; k++)
+  for (int k = 0; k < USER_DOS_NPOINTS; k++) {
     _dos[k] /= (sum * _stepDOS);
+    _idos[k] /= (sum * _stepDOS);  // ME190614
+  }
 }
 
 // ME190423 - START
@@ -270,6 +284,11 @@ void DOSCalculator::calcDosRS() {
         }
       }
     }
+  }
+  // ME190614 - calculate integrated DOS
+  _idos[0] = _dos[0];
+  for (uint k = 1; k < _dos.size(); k++) {
+    _idos[k] = _idos[k-1] + _dos[k];
   }
 }
 
@@ -313,17 +332,23 @@ void DOSCalculator::calcDosLT() {
       double cc34 = 3.0 * weightVolumeTetrahedron/(f41 * f42 * f43);
 
       double fbin;
+      // ME190614 - added integrated DOS
       for (int k = kstart; k <= kstop; k++) {
         fbin = _minFreq + k * _stepDOS + _halfStepDOS;
         if ((f[0] <= fbin) && (fbin <= f[1])) {
           double df = fbin - f[0];
           _dos[k] += cc12 * df * df;
+          _idos[k] += cc12 * (df * df * df)/3.0;
         } else if ((f[1] < fbin) && (fbin <= f[2])) {
           double df = fbin - f[1];
           _dos[k] += cc23a + cc23b * df + cc23c * df * df;
+          _idos[k] += cc23a * f21/3.0 + cc23 * f21 * df + cc23 * df * df + cc23c * (df * df * df)/3.0;
         } else if ((f[2] < fbin) && (fbin <= f[3])) {
           double df = f[3] - fbin;
           _dos[k] += cc34 * df * df;
+          _idos[k] += weightVolumeTetrahedron + cc34 * (df * df * df)/3.0;
+        } else if (f[3] < fbin) {
+          _idos[k] += weightVolumeTetrahedron;
         }
       }
     }
@@ -373,6 +398,66 @@ void DOSCalculator::writePDOS() {
   //outfile.clear();
   //outfile.close();
   //CO - END
+}
+
+// ME190614 - writes phonon DOS in DOSCAR format
+void DOSCalculator::writePHDOSCAR() {
+  string filename = DEFAULT_APL_PHDOSCAR_FILE;
+  _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
+  stringstream outfile;
+  // Header
+  int nions = (int) _pc.getInputCellStructure().atoms.size();
+  bool partial = (_projected_dos.size() > 0);
+  outfile << std::setw(4) << nions
+          << std::setw(4) << nions
+          << std::setw(4) << partial
+          << std::setw(4) << 0 << std::endl;
+  double vol, a, b, c, potim;
+  vol = GetVolume(_pc.getInputCellStructure())/nions;
+  a = _pc.getInputCellStructure().a * 1E-10;
+  b = _pc.getInputCellStructure().b * 1E-10;
+  c = _pc.getInputCellStructure().c * 1E-10;
+  potim = 0.5E-15;
+  outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  outfile << std::fixed;
+  outfile << std::setprecision(7) << std::scientific;
+  outfile << std::setw(15) << vol
+          << std::setw(15) << a
+          << std::setw(15) << b
+          << std::setw(15) << c
+          << std::setw(15) << potim << std::endl;
+  
+  outfile << std::setw(23) << std::setprecision(15) << _temperature << std::endl;
+  outfile << "  CAR" << std::endl;
+  outfile << " " << _system << std::endl;
+
+  int ndos = (int) _dos.size();
+  double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
+  double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+  double conv = factorTHz2Raw * factorRaw2meV/1000;
+  stringstream dosline;  // Will be reused for partial DOS
+  dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << (_maxFreq * conv)
+          << std::fixed << std::setw(15) << (_minFreq * conv)
+          << std::setprecision(0) << "  " << ndos
+          << std::setprecision(8) << std::fixed << std::setw(15) << 0.0  // phonon DOS have no EFERMI
+          << std::setprecision(8) << std::fixed << std::setw(15) << 1.0 << std::endl;
+  outfile << dosline.str();
+
+  // Data
+  outfile << std::setprecision(4);
+  for (int k = 0; k < ndos; k++) {
+    outfile << std::setw(12) << _bins[k] * conv 
+            << std::setw(12) << _dos[k]
+            << std::setw(12) << _idos[k] << std::endl;
+  }
+
+  // Write file
+  aurostd::stringstream2file(outfile, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "DOSCalculator::writePHDOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
 }
 
 // ///////////////////////////////////////////////////////////////////////////

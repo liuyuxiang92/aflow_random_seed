@@ -161,12 +161,12 @@ namespace AGL_functions {
       AGL_dos_pressure.energy.clear();
       AGL_dos_pressure.dosval.clear();
       AGL_dos_pressure.idosval.clear();
-      if (doscar.vDOS.size() < doscar.venergy.size()) {
+      if (doscar.vDOS[0][0][0].size() < doscar.venergy.size()) {  // ME190614 - new vDOS format
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_WARNING_ + "Mismatch between number of DOS values and number of energy values" << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	continue;
-      } else if (doscar.viDOS.size() < doscar.venergy.size()) {
+      } else if (doscar.viDOS[0].size() < doscar.venergy.size()) {  // ME190614 - new vDOS format
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_WARNING_ + "Mismatch between number of DOS values and number of energy values" << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -176,11 +176,11 @@ namespace AGL_functions {
 	AGL_dos_pressure.energy.push_back(doscar.venergy.at(i));
 	sumdos = 0.0;
 	sumidos = 0.0;
-	for (uint j = 0; j < doscar.vDOS.at(i).size(); j++) {
-	  sumdos = sumdos + doscar.vDOS.at(i).at(j);
+	for (uint j = 0; j < doscar.vDOS[0][0].size(); j++) {  // ME190614 - new vDOS format
+	  sumdos = sumdos + doscar.vDOS[0][0][j][i];  // ME190614 - new vDOS format
 	}
-	for (uint j = 0; j < doscar.viDOS.at(i).size(); j++) {
-	  sumidos = sumidos + doscar.viDOS.at(i).at(j);
+	for (uint j = 0; j < doscar.viDOS.size(); j++) {  // ME190614 - new viDOS format
+	  sumidos = sumidos + doscar.viDOS[j][i];  // ME190614 - new viDOS format
 	}
 	AGL_dos_pressure.dosval.push_back(sumdos);
 	AGL_dos_pressure.idosval.push_back(sumidos);

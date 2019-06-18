@@ -45,6 +45,12 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
+  // ME190614
+  const apl::PathBuilder::StoreEnumType& PathBuilder::getStore() const {
+    return _store;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
 
   void PathBuilder::addPoint(const string& l, int dim, ...) {
     va_list arguments;
@@ -147,7 +153,7 @@ namespace apl {
 	  for(int j = 1; j <= (int)_nPointsPerSubPath; j++) {
 	      xvector<double> p = startPoint + j*dPoint;
 	      _path.push_back(p);
-	    }
+	  }
 	}
       }
       //_path.push_back(endPoint);
@@ -422,7 +428,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void PathBuilder::defineCustomPoints(const string& coords,const string& labels,const Supercell& sc,bool CARESTIAN_COORDS){ //CO 180409
+  void PathBuilder::defineCustomPoints(const string& coords,const string& labels,const Supercell& sc,bool CARTESIAN_COORDS){ //CO 180409
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="PathBuilder::defineCustomPoints():";
     vector<string> vcoords,vlabels;
@@ -438,11 +444,11 @@ namespace apl {
     for(uint i=0;i<vcoords.size();i++){
       aurostd::string2tokens<double>(vcoords[i],coordinate,",");
       if(coordinate.size()!=3){throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3");}
-      if(LDEBUG){cerr << soliloquy << " found point " << vlabels[i] << ": (" << (CARESTIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
+      if(LDEBUG){cerr << soliloquy << " found point " << vlabels[i] << ": (" << (CARTESIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
       addPoint(vlabels[i],3,coordinate[0],coordinate[1],coordinate[2]);
     }
 
-    if(!CARESTIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
+    if(!CARTESIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
     
     //set lattices
     cartesianLattice = sc.getSupercellStructure().lattice;
@@ -496,5 +502,94 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
+
+  // ME190614
+  // Writes the k-points path into a VASP KPOINTS-formatted file
+  void PathBuilder::writePHKPOINTS(const Supercell& sc) {
+    if (_mode == COUPLE_POINT_MODE) {
+      writePHKPOINTS(sc, _points, _labels);
+    } else if (_mode == SINGLE_POINT_MODE) {
+      vector<xvector<double> > points(2 * (_points.size() - 1), xvector<double>(3));
+      vector<string> labels(2 * (_points.size() - 1));
+      points[0] = _points[0];
+      labels[0] = _labels[0];
+      for (uint i = 1; i < _points.size() - 1; i++) {
+        points[2 * i - 1] = _points[i];
+        points[2 * i] = _points[i];
+        labels[2 * i - 1] = _labels[i];
+        labels[2 * i] = _labels[i];
+      }
+      points.back() = _points.back();
+      labels.back() = _labels.back();
+      writePHKPOINTS(sc, points, labels);
+    }
+  }
+
+  void PathBuilder::writePHKPOINTS(const Supercell& sc, const vector<xvector<double> >& points,
+                                   const vector<string>& labels) {
+    string filename = DEFAULT_APL_PHKPOINTS_FILE;
+    xvector<double> kpt(3);
+    xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getInputStructure().lattice)));
+
+    // Build title
+    // Lattice string
+    string lattice = sc.getPrimitiveStructure().bravais_lattice_type;
+    if (lattice == "CUB") lattice += " (simple cubic) ";
+    else if (lattice == "FCC") lattice += " (face-centered cubic) ";
+    else if (lattice == "BCC") lattice += " (body-centered cubic) ";
+    else if (lattice == "TET") lattice += " (tetragonal) ";
+    else if (lattice == "BCT") lattice += " (body-centered tetragonal) ";
+    else if (lattice == "BCT1") lattice += " (body-centered tetragonal c < a) ";
+    else if (lattice == "BCT2") lattice += " (body-centered tetragonal a < c) ";
+    else if (lattice == "ORC") lattice += " (orthorhombic) ";
+    else if (lattice == "ORCF") lattice += " (face-centered orthorhombic) ";
+    else if (lattice == "ORCF1") lattice += " (face-centered orthorhombic 1/a^2 > 1/b^2+1/c^2) ";
+    else if (lattice == "ORCF2") lattice += " (face-centered orthorhombic 1/a^2 < 1/b^2+1/c^2) ";
+    else if (lattice == "ORCF3") lattice += " (face-centered orthorhombic 1/a^2 = 1/b^2+1/c^2) ";
+    else if (lattice == "ORCI") lattice += " (body-centered orthorhombic a < b < c) ";
+    else if (lattice == "ORCC") lattice += " (C-centered orthorhombic a < b) ";
+    else if (lattice == "HEX") lattice += " (hexagonal) ";
+    else if (lattice == "RHL") lattice += " (rhombohedral) ";
+    else if (lattice == "RHL1") lattice += " (rhombohedral alpha < 90) ";
+    else if (lattice == "RHL2") lattice += " (rhombohedral alpha > 90) ";
+    else if (lattice == "MCL") lattice += " (monoclinic) ";
+    else if (lattice == "MCLC") lattice += " (C-centered monoclinic) ";
+    else if (lattice == "MCLC1") lattice += " (C-centered monoclinic kgamma > 90) ";
+    else if (lattice == "MCLC2") lattice += " (C-centered monoclinic kgamma = 90) ";
+    else if (lattice == "MCLC3") lattice += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2<1) ";
+    else if (lattice == "MCLC4") lattice += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2=1) ";
+    else if (lattice == "MCLC5") lattice += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2>1) ";
+    else if ((lattice == "TRI") || (aurostd::toupper(lattice) == "TRI1A") || (aurostd::toupper(lattice) == "TRI1B") || (aurostd::toupper(lattice) == "TRI2A") || (aurostd::toupper(lattice) == "TRI2B")) lattice += " (triclinic) ";
+
+    // Build path
+    string title = lattice + labels[0];
+    for (uint i = 2; i < labels.size(); i+= 2) {
+      title += "-" + labels[i-1];
+      if (labels[i-1] != labels[i]) title += "|" + labels[i];
+    }
+    title += "-" + labels.back();
+
+    stringstream outfile;
+    outfile << title << std::endl;
+    outfile << (_path.size()/(_points.size()/2)) << std::endl;
+    outfile << "Line-mode" << std::endl;
+    outfile << "reciprocal" << std::endl;
+    for (uint i = 0; i < points.size(); i++) {
+      if (_store == CARTESIAN_LATTICE) kpt = c2f * points[i];
+      else kpt = points[i];
+      for (int j = 1; j < 4; j++) {
+        outfile << std::setprecision(4) << std::fixed << std::setw(9) << kpt[j];
+      }
+      outfile << "  ! " << labels[i] << std::endl;
+      if ((i % 2 == 1) && (i < points.size() - 1)) outfile << std::endl;
+    }
+
+    aurostd::stringstream2file(outfile, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "PathBuilder::writePHKPOINTS()";
+      string message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
+    }
+  }
 
 } // namespace apl
