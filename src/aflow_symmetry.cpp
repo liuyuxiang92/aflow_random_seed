@@ -322,7 +322,7 @@ namespace SYM {
 // Tolerance scan for symmetry analysis
 namespace SYM {
   // DX 9/5/17 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double tolerance, double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible,  //DX 20190524 - need pointer for change tolerance, otherwise it will not update
     // Scans between 5*orig_tol/10.0 on upper end and 5*orig_tol/10 on the right
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // DX 20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
@@ -557,7 +557,7 @@ namespace SYM {
 // where atoms are close to the edge of the unit cell wall). Requires atoms to 
 // be the same type
 namespace SYM {
-  bool AtomsMapped(_atom& a, _atom& b, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     if(a.spin_is_given){ // DX 9/21/17 - magnetic symmetry
       bool spins_match = (aurostd::abs(a.spin-b.spin)<=tol);
       return a.type==b.type&&spins_match&&AtomFPOSMatch(a,b,c2f,f2c,skew,tol);
@@ -759,7 +759,7 @@ namespace SYM {
 // Determine if atoms in fractional coordinates are the same (also considers cases
 // where atoms are close to the edge of the unit cell wall)
 namespace SYM {
-  bool AtomFPOSMatch(deque<_atom>& atom_set, _atom& atom2, uint& match_type, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomFPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     for(uint i=0;i<atom_set.size();i++){
       if(AtomFPOSMatch(atom_set[i],atom2,c2f,f2c,skew,tol)){
         match_type = atom_set[i].type;
@@ -771,7 +771,7 @@ namespace SYM {
 } //namespace SYM
 
 namespace SYM {
-  bool AtomFPOSMatch(_atom& atom1, _atom& atom2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomFPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     return AtomFPOSMatch(atom1.fpos,atom2.fpos,c2f,f2c,skew,tol);
     /*xvector<double> fdiff = atom1.fpos - atom2.fpos;
       if(skew){
@@ -785,8 +785,39 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
-  bool AtomFPOSMatch(xvector<double>& fpos1, xvector<double>& fpos2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  xvector<double> FPOSDistance(const xvector<double>& fpos1,const xvector<double>& fpos2,
+      const xmatrix<double>& lattice,bool skew){
+    xmatrix<double> f2c=trasp(lattice);xmatrix<double> c2f=inverse(trasp(lattice));
+    return FPOSDistance(fpos1,fpos2,lattice,c2f,f2c,skew);
+  }
+  xvector<double> FPOSDistance(const xvector<double>& fpos1,const xvector<double>& fpos2,
+      const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO190525
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="SYM::FPOSDistance():";
+    xvector<double> fdiff;
+    if(skew){
+      xvector<double> cpos1=f2c*fpos1;
+      xvector<double> cpos2=f2c*fpos2;
+      xvector<int> ijk;
+      xvector<double> cdiff=SYM::minimumCartesianVector(cpos1,cpos2,lattice,ijk);
+      fdiff=c2f*cdiff;
+    }else{
+      if(LDEBUG){
+        cerr << soliloquy << " fpos1=" << fpos1 << endl;
+        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+      }
+      fdiff=fpos1-fpos2;
+      if(LDEBUG){cerr << soliloquy << " fdiff=" << fdiff << endl;}
+      PBC(fdiff);
+      if(LDEBUG){cerr << soliloquy << " PBC(fdiff)=" << fdiff << endl;}
+    }
+    return fdiff;
+  }
+  bool AtomFPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="SYM::AtomFPOSMatch():";
     xvector<double> fdiff = fpos1 - fpos2;
+    if(LDEBUG){cerr << soliloquy << " fdiff=" << fdiff << endl;}
     if(XHOST.SKEW_TEST){
       xvector<double> pbc_fdiff = fdiff;
       PBC(pbc_fdiff);
@@ -820,6 +851,11 @@ namespace SYM {
     }
     else {
       PBC(fdiff);
+      if(LDEBUG){cerr << soliloquy << " PBC(fdiff)=" << fdiff << endl;}
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " f2c*PBC(fdiff)=" << f2c*fdiff << endl;
+      cerr << soliloquy << " map=" << (aurostd::modulus(f2c*fdiff)<tol) << endl;
     }
     return (aurostd::modulus(f2c*fdiff)<tol);
   }
@@ -863,7 +899,7 @@ namespace SYM {
 
 // MapAtomWithBasis (xvector<_atom>) with mapping index
 namespace SYM {
-  bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, 
+  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& c2f, const xmatrix<double>& f2c, 
                        bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible
     int count=0;
 
@@ -906,7 +942,7 @@ namespace SYM {
 
 // MapAtomWithBasis (deque<_atom>) with mappping index
 namespace SYM {
-  bool MapAtomWithBasis(deque<_atom>& deq, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, 
+  bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& c2f, const xmatrix<double>& f2c, 
                        bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible
     int count=0;
 
@@ -944,7 +980,7 @@ namespace SYM {
 // Map an atom to a set of atoms
 // MapAtom (deque<_atom> and _atom)
 namespace SYM {
-  bool MapAtom(deque<_atom>& a_deq, _atom& b, bool map_types, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     for(uint i=0;i<a_deq.size();i++){
       //_atom a = a_deq[i];
       if(MapAtom(a_deq[i], b, map_types, c2f, f2c, skew, tol)){
@@ -957,7 +993,7 @@ namespace SYM {
 
 // MapAtom (vector<_atom> and _atom)
 namespace SYM {
-  bool MapAtom(vector<_atom> a_vec, _atom b, bool map_types, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     for(uint i=0;i<a_vec.size();i++){
       //_atom a = a_vec[i];
       if(MapAtom(a_vec[i], b, map_types, c2f, f2c, skew, tol)){
@@ -976,7 +1012,7 @@ namespace SYM {
 // MapAtom (xvector and xvector)
 // NOT TYPE SPECIFIC BY IT'S VERY NATURE
 namespace SYM {
-  bool MapAtom(xvector<double>& a, xvector<double>& b, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     //_atom a_atom; a_atom.fpos=a; a_atom.cpos=f2c*a;
     //_atom b_atom; b_atom.fpos=b; b_atom.cpos=f2c*b;
     if(AtomFPOSMatch(a, b, c2f, f2c, skew, tol)){
@@ -988,7 +1024,7 @@ namespace SYM {
 
 // MapAtom (_atom and _atom)
 namespace SYM { 
-  bool MapAtom(_atom& a, _atom& b, bool map_types, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     if(map_types){
       return AtomsMapped(a,b,c2f,f2c,skew,tol); //type specific
     } else {
@@ -4658,7 +4694,7 @@ xvector<double> BringInCell2(const xvector<double>& v_in) {
 
 namespace SYM {
   //xstructure and _sym_op
-  bool getFullSymBasis(xstructure& a, _sym_op& symOp,bool map_types,vector<int>& basis_atoms_map,vector<int>& basis_types_map){
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,vector<int>& basis_atoms_map,vector<int>& basis_types_map){
     double tolerance;
     if(a.sym_eps!=AUROSTD_NAN){
       tolerance=a.sym_eps;
@@ -4667,17 +4703,17 @@ namespace SYM {
     }
     return getFullSymBasis(a,symOp,map_types,tolerance,basis_atoms_map,basis_types_map);
   }
-  bool getFullSymBasis(xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
     double min_dist=a.dist_nn_min; // CO 180409
     if(min_dist == AUROSTD_NAN){min_dist=minimumDistance(a);} // CO 180409
     bool skew = isLatticeSkewed(a.lattice,min_dist,tolerance); // CO 180409
     return getFullSymBasis(a,symOp,map_types,skew,tolerance,basis_atoms_map,basis_types_map);
   }
-  bool getFullSymBasis(xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const xstructure& a, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){ //CO190520 - removed pointers for bools and doubles, added const where possible
     return getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,map_types,skew,tolerance,basis_atoms_map,basis_types_map);
   }
   //atoms, c2f, f2c and _sym_op
-  bool getFullSymBasis(deque<_atom>& atoms,xmatrix<double>& lattice,xmatrix<double>& c2f, xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool fast=true;  // DX COME BACK HERE, MAKE THIS AN INPUT // CO, no need, if fast doesn't work, we have bigger problems
@@ -4787,7 +4823,7 @@ namespace SYM {
 
   // DX AND COREY - START
   // warning: this variant gets wrong basis_atoms_map, it flips indices between transformed crystal and original (but everything else should be the same)
-  bool getFullSymBasis_20170729(deque<_atom>& atoms,xmatrix<double>& lattice,xmatrix<double>& c2f, xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool getFullSymBasis_20170729(const deque<_atom>& atoms,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c, _sym_op& symOp,bool map_types,bool skew,double tolerance,vector<int>& basis_atoms_map,vector<int>& basis_types_map){  //MAIN FUNCTION //CO190520 - removed pointers for bools and doubles, added const where possible
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     bool fast=true;  // DX COME BACK HERE, MAKE THIS AN INPUT // CO, no need, if fast doesn't work, we have bigger problems

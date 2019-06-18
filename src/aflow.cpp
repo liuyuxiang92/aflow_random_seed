@@ -501,6 +501,7 @@ int main(int _argc,char **_argv) {
   if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
   if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
   if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {Arun=TRUE;slab::slabTest();}  //CO190601
   if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
   
   // **************************************************************

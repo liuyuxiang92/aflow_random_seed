@@ -1143,15 +1143,26 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("SOF",aurostd::args2flag(argv,cmds,"--sof"));
   vpflow.flag("SPECIES",aurostd::args2flag(argv,cmds,"--species"));
   vpflow.flag("STATDIEL",aurostd::args2flag(argv,cmds,"--statdiel") ); // CAMILO
-  vpflow.flag("STACKING_FAULT_ENERGY",aurostd::args2flag(argv,cmds,"--stacking_fault")); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:PLANE_INTEREST","--plane_interest=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:PLANE_SHEAR","--plane_shear=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:STEP_SIZE","--step_size=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:STEPS","--steps=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:TOTAL_LAYERS","--total_layers=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:FIXED_LAYERS","--fixed_layers=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:VACUUM","--vacuum=",""); //CO190321
-  vpflow.flag("STACKING_FAULT_ENERGY:SPIN_OFF",aurostd::args2flag(argv,cmds,"--spin_off")); //CO190321
+
+  vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY",aurostd::args2flag(argv,cmds,"--stacking_fault")); //CO190321
+  if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")){
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::SHEAR_DIRECTION","--shear_direction=|--shear=",""); //CO190321
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE","--step_size=",""); //CO190321
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::STEPS","--steps=",""); //CO190321
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::FIXED_LAYERS","--fixed_layers=",""); //CO190321
+    vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::SPIN_OFF",aurostd::args2flag(argv,cmds,"--spin_off")); //CO190321
+    vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::PARTIAL_DISSOCIATION",aurostd::args2flag(argv,cmds,"--partial_dissociation")); //CO190321
+  }
+
+  vpflow.flag("CLEAVAGE_ENERGY",aurostd::args2flag(argv,cmds,"--cleavage_energy")); //CO190321
+  if(vpflow.flag("CLEAVAGE_ENERGY")){
+    vpflow.args2addattachedscheme(argv,cmds,"CLEAVAGE_ENERGY::RELAXATION_LAYERS","--relaxation_layers=",""); //CO190321
+    vpflow.flag("CLEAVAGE_ENERGY::SPIN_OFF",aurostd::args2flag(argv,cmds,"--spin_off")); //CO190321
+  }
+  vpflow.args2addattachedscheme(argv,cmds,"CREATE_SLAB::PLANE_INTEREST","--plane_interest=|--plane=",""); //CO190321
+  vpflow.args2addattachedscheme(argv,cmds,"CREATE_SLAB::TOTAL_LAYERS","--total_layers=",""); //CO190321
+  vpflow.args2addattachedscheme(argv,cmds,"CREATE_SLAB::VACUUM","--vacuum=",""); //CO190321
+
   vpflow.flag("STDCONVCELL",aurostd::args2flag(argv,cmds,"--sc|--standard_conventional|--std_conv|--sconv"));
   vpflow.flag("STDPRIMCELL",aurostd::args2flag(argv,cmds,"--sp|--standard_primitive|--std_prim|--sprim"));
   //DX 20190128 - add structure2ANRL - START
@@ -1399,12 +1410,8 @@ namespace pflow {
       if(vpflow.flag("CHGCAR2JVXL")) {cout << pflow::CHGCAR2JVXL(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGDIFF")) {cout << pflow::CHGDIFF(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGSUM")) {cout << pflow::CHGSUM(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CLEAVAGE_ENERGY")) {pflow::CleavageEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO190520
       //DAVID
-      // DX AND COREY - START
-      if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
-      // DX AND COREY - END
-      if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF190329 - GFA
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_FILE")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
@@ -1424,10 +1431,15 @@ namespace pflow {
       }
       //DX 20190425 - END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << pflow::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX 20190201
+      if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF190329 - GFA
+      // DX AND COREY - START
+      if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
+      // DX AND COREY - END
       if(vpflow.flag("STRUCTURE2ANRL")) {cout << anrl::structure2anrl(cin,vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE2PROTOTYPES")) {cout << pflow::printMatchingPrototypes(cin,vpflow); _PROGRAMRUN=true;} //DX 20190314
       if(vpflow.flag("COMPARE2DATABASE")) {cout << pflow::compare2database(cin, vpflow); _PROGRAMRUN=true;} //DX 20190201
-      if(vpflow.flag("STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyDirSetup(vpflow,cin); _PROGRAMRUN=true;} //CO190520
+      if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO190520
+      if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
       //DAVID
     }
     // *********************************************************************

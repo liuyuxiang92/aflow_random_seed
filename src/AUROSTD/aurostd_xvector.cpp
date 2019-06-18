@@ -1385,9 +1385,9 @@ namespace aurostd {  // namespace aurostd
 //[OBSOLETE CO 180409]}
 
 // ----------------------------------------------------------------------------
-// gcd //CO 180409
+// GCD //CO 180409
 namespace aurostd {
-  int gcd(const xvector<int>& in_V){
+  int GCD(const xvector<int>& in_V){
     // find first nonzero entry
     int counter;
     bool set=false;
@@ -1395,12 +1395,27 @@ namespace aurostd {
       if(in_V[i]) {
         counter=i;
         set=true;
-  }
+      }
     }
     if(!set) {return 1;}  // always works
-    int denom=in_V[counter];
-    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){denom=gcd(denom,in_V[i]);}}// if we use chullpoint, there will be 0's!
-    return denom;
+    int gcd=in_V[counter];
+    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return gcd;
+  }
+  int LCM(const xvector<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 0;}  //special, trivial case: lcm must really be positive
+    int lcm=in_V[counter];
+    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){lcm=LCM(lcm,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return lcm;
   }
 }
 
@@ -1412,7 +1427,7 @@ namespace aurostd {
 
     xvector<int> v1(in_V.lrows,in_V.urows); //cast to xvector of ints
     for(int i=in_V.lrows;i<=in_V.urows;i++){v1[i]=nint(in_V[i]);}
-    int denom=gcd(v1);
+    int denom=GCD(v1);
     if(denom!=0){v1/=denom;}  //safety
     for(int i=v1.lrows;i<=v1.urows;i++){out_V[i]=(utype)v1[i];}  //cast back
     
@@ -1420,7 +1435,7 @@ namespace aurostd {
   }
   //xvector<int> reduceByGCD(const xvector<int>& in_V){
   //  xvector<int> out_V=in_V;
-  //  int denom=gcd(in_V);
+  //  int denom=GCD(in_V);
   //  if(denom!=1){out_V/=denom;}
   //  return out_V;
   //}
@@ -1959,6 +1974,48 @@ namespace aurostd {
 
       aurostd::shiftlrows(normal,lrows); //shift back to original!
       return normal;
+    }
+}
+
+namespace aurostd {
+  template<class utype> xvector<utype>
+    pointLineIntersection(const xvector<utype>& a,const xvector<utype>& n,const xvector<utype>& p){ //CO 180520
+      //https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line (vector formulation)
+      //equation of line: x=a+t*n
+      //a is point on line
+      //n is direction of line
+      //p is arbitrary point
+      return p + ((a-p) - (aurostd::scalar_product((a-p),n)*n));
+    }
+  template<class utype> bool
+    linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection){ //CO 180520
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      string soliloquy="aurostd::linePlaneIntersect():";
+      //https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection (algebraic form)
+      //plane is defined as (p-p0)*n=0 for set of points p on plane
+      //equation of line: p=d*l+l0
+      double numerator=aurostd::scalar_product((p0-l0),n);
+      double denominator=aurostd::scalar_product(l,n);
+      d=0.0;
+      if(LDEBUG){
+        cerr << soliloquy << " p0=" << p0 << endl;
+        cerr << soliloquy << " n=" << n << endl;
+        cerr << soliloquy << " l0=" << l0 << endl;
+        cerr << soliloquy << " l=" << l << endl;
+        cerr << soliloquy << " numerator=" << numerator << endl;
+        cerr << soliloquy << " denominator=" << denominator << endl;
+      }
+      if(aurostd::isequal(denominator,0.0,_ZERO_TOL_)){ //line and plane are parallel
+        if(aurostd::isequal(numerator,0.0,_ZERO_TOL_)){intersection=l0;return true;} //line is contained in plane, so return back initial point
+        else{return false;} //line and plane have no intersection
+      }
+      d=numerator/denominator;
+      intersection=d*l+l0;
+      if(LDEBUG){
+        cerr << soliloquy << " d=" << d << endl;
+        cerr << soliloquy << " intersection=" << intersection << endl;
+      }
+      return true;
     }
 }
 
