@@ -12797,7 +12797,7 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   str.BringInCell();  // are INCELL.
   //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
   //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
-  const xvector<double> a1=str.lattice(1);  //CO190520 - no need to make copies
+  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
   const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
   const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
   for(uint iat=0;iat<str.atoms.size();iat++){
