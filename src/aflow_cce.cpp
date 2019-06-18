@@ -153,13 +153,7 @@ namespace pflow {
 
   // main CCE function for analyzing the structure, determining the oxidation numbers, assigning corrections, calculating total corrections and writing output
   void CCE(aurostd::xoption& flags){
-<<<<<<< HEAD
-	bool LDEBUG=(XHOST.DEBUG);
 	//bool LDEBUG=(FALSE || XHOST.DEBUG);
-=======
-	bool LDEBUG=(FALSE || XHOST.DEBUG);
-	//bool LDEBUG=(TRUE || XHOST.DEBUG);
->>>>>>> 2d98624a4bfdc508844c1178737ed9fd445d7f89
 	string soliloquy="pflow::CCE_CORRECTION():";
 	stringstream message;
 
