@@ -342,9 +342,9 @@ void PhononCalculator::runVASPCalculationsLRBE(_xinput& xInput, bool born, uint 
       xInput.xvasp.AVASP_arun_runname = "1_" + _AFLOW_APL_FORCEFIELDS_RUNNAME_;
       xInput.xvasp.aopts.flag("FLAG::AVASP_BORN", false);
       xInput.xvasp.aopts.flag("FLAG::AVASP_LR", true);
-  }
+    }
     // Switch off autotune
-  _kbinFlags.KBIN_MPI_AUTOTUNE = false;
+    _kbinFlags.KBIN_MPI_AUTOTUNE = false;
 
     // Set POSCAR to VASP5 format
     xInput.getXStr().is_vasp4_poscar_format = false;
@@ -352,18 +352,18 @@ void PhononCalculator::runVASPCalculationsLRBE(_xinput& xInput, bool born, uint 
     createAflowInPhonons(xInput);
   }
   // For AIMS, use the old method until we have AVASP_populateXAIMS
-  if(xInput.AFLOW_MODE_AIMS){
+  if(xInput.AFLOW_MODE_AIMS) {
     string runname;
     if (born) {
       runname = _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_;
     } else {
       runname = _AFLOW_APL_FORCEFIELDS_DIRECTORY_NAME_;
-  }
+    }
     xInput.setDirectory( _xInput.getDirectory() + "/" + runname );
     if (!filesExistPhonons(xInput)) {
-  _logger << "Creating " << xInput.getDirectory() << apl::endl;
+      _logger << "Creating " << xInput.getDirectory() << apl::endl;
       createAflowInPhonons(xInput, runname);
-  }
+    }
   }
 }
 

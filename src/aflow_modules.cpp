@@ -289,6 +289,7 @@ vector<aurostd::xoption> loadDefaultsAAPL() {
   opt.keyword="BOUNDARY"; opt.option = DEFAULT_AAPL_BOUNDARY; opt.xscheme = (opt.option?"ON":"OFF"); aaplflags.push_back(opt); opt.clear();
   opt.keyword="CUMULATIVEK"; opt.option = DEFAULT_AAPL_CUMULATIVEK; opt.xscheme = (opt.option?"ON":"OFF"); aaplflags.push_back(opt); opt.clear();
   opt.keyword="NANO_SIZE"; opt.xscheme = utype2string<double>(DEFAULT_AAPL_NANO_SIZE, FLAG_PRECISION); aaplflags.push_back(opt); opt.clear();
+  opt.keyword="KPPRA_AAPL"; opt.xscheme = utype2string<int>(-1); aaplflags.push_back(opt);
   if (LDEBUG) {
     for (uint i = 0; i < aaplflags.size(); i++) {
       std::cerr << soliloquy << " key: " << aaplflags[i].keyword << ", xscheme: " << aaplflags[i].xscheme << ", option: " << aaplflags[i].option << std::endl;
@@ -348,6 +349,13 @@ void readParametersAAPL(const string& AflowIn,
       module_opts.cut_rad_shell[1] = module_opts.aaplflags[i].isentry;
       continue;
     }
+    // ME 190408 - START
+    // If KPPRA_AAPL is not set, use APL KPPRA
+    if (key == "KPPRA_AAPL" && module_opts.aaplflags[i].content_int < 1) {
+      xinput.xvasp.aaplopts.flag("AFLOWIN_FLAG::AAPL_KPPRA_AAPL", false);
+      continue;
+    }
+    // ME 190408 - END
   }
   if (module_opts.cut_rad_shell[0] != module_opts.cut_rad_shell[1]) {
     if (xinput.AFLOW_MODE_VASP) {

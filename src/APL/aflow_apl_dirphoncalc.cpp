@@ -254,22 +254,22 @@ void DirectMethodPC::testDistortion(const xvector<double>& distortionVector,
     //cout << "new unique distortion vector: " << testDistortion << std::endl;
   }
 
-  if(integrate_equivalent_distortions){ //CO181226
-  // Apply all symmetry operations on test vector and generate all
-  // unique directions and store them for future comparison
-  for (uint iSymOp = 0; iSymOp < symPool.size(); iSymOp++) {
-    testDistortion = symPool[iSymOp].Uc * distortionVector;
+  if(integrate_equivalent_distortions) { //CO181226
+    // Apply all symmetry operations on test vector and generate all
+    // unique directions and store them for future comparison
+    for (uint iSymOp = 0; iSymOp < symPool.size(); iSymOp++) {
+      testDistortion = symPool[iSymOp].Uc * distortionVector;
 
-    for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
-      testDistortion = testDistortion - getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
-    }
-    if (aurostd::modulus(testDistortion) > _AFLOW_APL_EPS_) {
-      testDistortion = testDistortion / aurostd::modulus(testDistortion);
-      allDistortionsOfAtom.push_back(testDistortion);
-      //cout << "new symmetry generated distortion vector: " << testDistortion << std::endl;
+      for (uint k = 0; k < allDistortionsOfAtom.size(); k++) {
+        testDistortion = testDistortion - getVectorProjection(testDistortion, allDistortionsOfAtom[k]);
+      }
+      if (aurostd::modulus(testDistortion) > _AFLOW_APL_EPS_) {
+        testDistortion = testDistortion / aurostd::modulus(testDistortion);
+       allDistortionsOfAtom.push_back(testDistortion);
+        //cout << "new symmetry generated distortion vector: " << testDistortion << std::endl;
+      }
     }
   }
-}
 }
 
 //////////////////////////////////////////////////////////////////////////////
