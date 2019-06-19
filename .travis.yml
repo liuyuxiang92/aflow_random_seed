@@ -3,8 +3,10 @@ language: cpp
 compiler:
   - gcc
   - clang
-before_script:
-  - cd src
+os:
+  - linux
+  - osx
 script:
-  - [ $CXX = g++ ] && make || true
-  - [ $CXX = clang++ ] && make mac || true
+  - cd src
+  - if [ $CXX = g++ ];      then make       ; fi
+  - if [ $CXX = clang++ ];  then make mac   ; fi
