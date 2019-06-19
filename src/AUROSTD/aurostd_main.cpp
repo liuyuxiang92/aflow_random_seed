@@ -902,9 +902,13 @@ namespace aurostd {
       
     // removes control code and backspace characters (e.g., NUL, DEL, etc.)
     // only keep printable characters (i.e., digits, letters, punctuation, and spaces) 
-    // and white space characters (i.e., space, newline, tabs, and carrage returns)
+    // and white space characters (i.e., space, newline, tabs)
     // a boolean indicates if the stringstream contained a control code character
     // stringstream input version
+    //
+    // ME190614: We don't want carriage returns either because they mess up string additions.
+    // Since they point to the beginning of the string, adding to a string with a carriage
+    // return would overwrite instead of append
 
     bool detected_control_char = false;
     char c;
@@ -913,7 +917,7 @@ namespace aurostd {
 
     //stringstream tmp; tmp << ss_in.str();
     while(ss_in.get(c)){
-      if(isprint(c) || isspace(c)){
+      if(isprint(c) || isspace(c) || (c != '\r')) {  // ME190614
         ss_out << c;
       }
       else{
@@ -1202,30 +1206,69 @@ namespace aurostd {
   //     return ss;
   //   }
   
-  string RemoveComments(const string &strin) {
-    string strout=strin;
-    vector<string> vstrout;aurostd::string2vectorstring(strout,vstrout);
-    strout.clear();
-    string::size_type loc;  //CO 180409, don't do find twice (expensive)
-    for(uint i=0;i<vstrout.size();i++) {
-      //COMMENT_NEGLECT_1
-      loc=vstrout.at(i).find(COMMENT_NEGLECT_1);  //CO 180409
-      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
+  // ME190614 - added vector<string> version of RemoveComments
+  vector<string> RemoveComments(const vector<string>& vstrin) {
+    vector<string> vstrout;
+    string::size_type loc;
+    string line;
+    for (uint i = 0; i < vstrin.size(); i++) {
+      line = vstrin[i];
+      // COMMENT_NEGLECT_1
+      loc = line.find(COMMENT_NEGLECT_1);
+      line = line.substr(0, loc);
 
-      //COMMENT_NEGLECT_2, but not ":"+//COMMENT_NEGLECT_1
-      loc=vstrout.at(i).find(COMMENT_NEGLECT_2);  //CO 180409
-      while(loc!=string::npos){
-        if(!(loc>0&&loc<vstrout.at(i).size()&&vstrout.at(i).at(loc-1)==':')){  //find the NOT case where we are in the range and we find ':' before comment
-          vstrout.at(i)=vstrout.at(i).substr(0,loc);
+      // COMMENT_NEGLECT_2
+      loc = line.find(COMMENT_NEGLECT_2);
+      while (loc != string::npos) {
+        // Do not remove :// since it is not a comment
+        if (!((loc > 0) && (loc < line.size()) && (line[loc -1] == ':'))) {
+          line = line.substr(0, loc);
           break;
         }
-        loc=vstrout.at(i).find(COMMENT_NEGLECT_2,loc+1);
+        loc = line.find(COMMENT_NEGLECT_2, loc + 1);
       }
 
-      //COMMENT_NEGLECT_3
-      loc=vstrout.at(i).find(COMMENT_NEGLECT_3);  //CO 180409
-      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
+      // COMMENT_NEGLECT_3
+      loc = line.find(COMMENT_NEGLECT_3);
+      line = line.substr(0, loc);
+      if (!line.empty()) vstrout.push_back(line);
+    }
+    return vstrout;
+  }
 
+  string RemoveComments(const string& strin) {
+    vector<string> vlines;
+    aurostd::string2vectorstring(strin, vlines);
+    vlines = RemoveComments(vlines);
+    string strout;
+    for (uint i = 0; i < vlines.size(); i++) strout += vlines[i] + '\n';
+    return strout;
+  }
+
+//[OBSOLETE]  string RemoveComments(const string &strin) {
+//[OBSOLETE]    string strout=strin;
+//[OBSOLETE]    vector<string> vstrout;aurostd::string2vectorstring(strout,vstrout);
+//[OBSOLETE]    strout.clear();
+//[OBSOLETE]    string::size_type loc;  //CO 180409, don't do find twice (expensive)
+//[OBSOLETE]    for(uint i=0;i<vstrout.size();i++) {
+//[OBSOLETE]      //COMMENT_NEGLECT_1
+//[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_1);  //CO 180409
+//[OBSOLETE]      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
+//[OBSOLETE]
+//[OBSOLETE]      //COMMENT_NEGLECT_2, but not ":"+//COMMENT_NEGLECT_1
+//[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_2);  //CO 180409
+//[OBSOLETE]      while(loc!=string::npos){
+//[OBSOLETE]        if(!(loc>0&&loc<vstrout.at(i).size()&&vstrout.at(i).at(loc-1)==':')){  //find the NOT case where we are in the range and we find ':' before comment
+//[OBSOLETE]          vstrout.at(i)=vstrout.at(i).substr(0,loc);
+//[OBSOLETE]          break;
+//[OBSOLETE]        }
+//[OBSOLETE]        loc=vstrout.at(i).find(COMMENT_NEGLECT_2,loc+1);
+//[OBSOLETE]      }
+//[OBSOLETE]
+//[OBSOLETE]      //COMMENT_NEGLECT_3
+//[OBSOLETE]      loc=vstrout.at(i).find(COMMENT_NEGLECT_3);  //CO 180409
+//[OBSOLETE]      vstrout.at(i)=vstrout.at(i).substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
+//[OBSOLETE]
       //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_1)!=string::npos) 
       //[OBSOLETE]  vstrout.at(i)=vstrout.at(i).substr(0,vstrout.at(i).find(COMMENT_NEGLECT_1));  
       //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_2)!=string::npos && vstrout.at(i).find(":"+COMMENT_NEGLECT_2)==string::npos)  // look for // but dont touch ://
@@ -1233,11 +1276,11 @@ namespace aurostd {
       //[OBSOLETE]if(vstrout.at(i).find(COMMENT_NEGLECT_3)!=string::npos)
       //[OBSOLETE]  vstrout.at(i)=vstrout.at(i).substr(0,vstrout.at(i).find(COMMENT_NEGLECT_3));
       //[OBSOLETE]  if(!vstrout.at(i).empty()) cout << vstrout.at(i) << endl;
-      if(!vstrout.at(i).empty()) strout+=vstrout.at(i)+"\n";
-    }  
-    return strout;
-  }
-  
+//[OBSOLETE]      if(!vstrout.at(i).empty()) strout+=vstrout.at(i)+"\n";
+//[OBSOLETE]    }  
+//[OBSOLETE]    return strout;
+//[OBSOLETE]  }
+
   // ***************************************************************************
   // Function RemoveCharacter
   // ***************************************************************************

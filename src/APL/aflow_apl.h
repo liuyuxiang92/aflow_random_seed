@@ -833,6 +833,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   void outfileFoundEverywherePhonons(vector<_xinput>&);
   void subtractZeroStateForces(vector<_xinput>&);
   // END ME 180518
+  vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
 };
 }  // namespace apl
 
@@ -1229,13 +1230,13 @@ struct _kcell {
 };
 
 class QMesh {
- public:
+  public:
     QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const vector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const QMesh&);
     QMesh& operator=(const QMesh&);
     ~QMesh();
-  void clear();
+    void clear();
 
     void makeIrreducible();
     void writeQpoints(string, bool=true);
@@ -1293,7 +1294,7 @@ class QMesh {
 
 namespace apl {
 class LTMethod {
- public:
+  public:
     LTMethod(QMesh&, Logger&);
     LTMethod(const LTMethod&);
     LTMethod& operator=(const LTMethod&);
@@ -1472,9 +1473,9 @@ class ThermalPropertiesCalculator {
 
 }  // namespace apl
 
-   // ***************************************************************************
+// ***************************************************************************
 // BEGIN ME: Lattice Thermal Conductivity (AAPL)
-   // ***************************************************************************
+// ***************************************************************************
 
 namespace apl {
 

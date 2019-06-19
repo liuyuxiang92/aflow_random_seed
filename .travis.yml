@@ -1,0 +1,10 @@
+sudo: false
+language: cpp
+compiler:
+  - gcc
+  - clang
+before_script:
+  - cd src
+script:
+  - "[ $CXX = g++ ] && make || true"
+  - "[ $CXX = clang++ ] && make mac || true"
