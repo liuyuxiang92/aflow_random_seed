@@ -13,7 +13,8 @@
 #include "aflow.h"
 #include "aflow_pflow.h"
 #include "aflow_cce.h"
-
+using std::cout;
+using std::endl;
 namespace pflow {
   // function to get Bader charges from the binaries used to determine the corrections
   string get_Bader_templates(const string& element) {
