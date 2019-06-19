@@ -1056,6 +1056,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
 
+  vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
+  vpflow.flag("CCE_CORRECTION",vpflow.flag("CCE_CORRECTION::USAGE") || !vpflow.getattachedscheme("CCE_CORRECTION::POSCAR_PATH").empty());
+  if(vpflow.flag("CCE_CORRECTION") && aurostd::args2flag(argv,cmds,"--usage")){vpflow.flag("CCE_CORRECTION::USAGE",TRUE);}
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::DFT_FORMATION_ENERGIES","--dft_formation_energies=|--dfte=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::FUNCTIONALS","--functional=|--func=|--functionals=","");
+  vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::OXIDATION_NUMBERS","--oxidation_numbers=|--ox_nums=|--oxidation_number=","");
+
   vpflow.flag("RMATOM",aurostd::args2flag(argv,cmds,"--rm_atom") && argv.at(1)=="--rm_atom");
   vpflow.flag("RMCOPIES",aurostd::args2flag(argv,cmds,"--rm_copies") && argv.at(1)=="--rm_copies");
   vpflow.flag("RSM",aurostd::args2flag(argv,cmds,"--rsm"));
@@ -1158,15 +1166,26 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("SOF",aurostd::args2flag(argv,cmds,"--sof"));
   vpflow.flag("SPECIES",aurostd::args2flag(argv,cmds,"--species"));
   vpflow.flag("STATDIEL",aurostd::args2flag(argv,cmds,"--statdiel") ); // CAMILO
-  vpflow.flag("STACKING_FAULT_ENERGY",aurostd::args2flag(argv,cmds,"--stacking_fault")); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:PLANE_INTEREST","--plane_interest=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:PLANE_SHEAR","--plane_shear=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:STEP_SIZE","--step_size=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:STEPS","--steps=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:TOTAL_LAYERS","--total_layers=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:FIXED_LAYERS","--fixed_layers=",""); //CO190321
-  vpflow.args2addattachedscheme(argv,cmds,"STACKING_FAULT_ENERGY:VACUUM","--vacuum=",""); //CO190321
-  vpflow.flag("STACKING_FAULT_ENERGY:SPIN_OFF",aurostd::args2flag(argv,cmds,"--spin_off")); //CO190321
+
+  vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY",aurostd::args2flag(argv,cmds,"--stacking_fault")); //CO190321
+  if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")){
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::SHEAR_DIRECTION","--shear_direction=|--shear=",""); //CO190321
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE","--step_size=",""); //CO190321
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::STEPS","--steps=",""); //CO190321
+    vpflow.args2addattachedscheme(argv,cmds,"GENERALIZED_STACKING_FAULT_ENERGY::FIXED_LAYERS","--fixed_layers=",""); //CO190321
+    vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::SPIN_OFF",aurostd::args2flag(argv,cmds,"--spin_off")); //CO190321
+    vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::PARTIAL_DISSOCIATION",aurostd::args2flag(argv,cmds,"--partial_dissociation")); //CO190321
+  }
+
+  vpflow.flag("CLEAVAGE_ENERGY",aurostd::args2flag(argv,cmds,"--cleavage_energy")); //CO190321
+  if(vpflow.flag("CLEAVAGE_ENERGY")){
+    vpflow.args2addattachedscheme(argv,cmds,"CLEAVAGE_ENERGY::RELAXATION_LAYERS","--relaxation_layers=",""); //CO190321
+    vpflow.flag("CLEAVAGE_ENERGY::SPIN_OFF",aurostd::args2flag(argv,cmds,"--spin_off")); //CO190321
+  }
+  vpflow.args2addattachedscheme(argv,cmds,"CREATE_SLAB::PLANE_INTEREST","--plane_interest=|--plane=",""); //CO190321
+  vpflow.args2addattachedscheme(argv,cmds,"CREATE_SLAB::TOTAL_LAYERS","--total_layers=",""); //CO190321
+  vpflow.args2addattachedscheme(argv,cmds,"CREATE_SLAB::VACUUM","--vacuum=",""); //CO190321
+
   vpflow.flag("STDCONVCELL",aurostd::args2flag(argv,cmds,"--sc|--standard_conventional|--std_conv|--sconv"));
   vpflow.flag("STDPRIMCELL",aurostd::args2flag(argv,cmds,"--sp|--standard_primitive|--std_prim|--sprim"));
   //DX 20190128 - add structure2ANRL - START
@@ -1414,12 +1433,8 @@ namespace pflow {
       if(vpflow.flag("CHGCAR2JVXL")) {cout << pflow::CHGCAR2JVXL(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGDIFF")) {cout << pflow::CHGDIFF(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CHGSUM")) {cout << pflow::CHGSUM(vpflow); _PROGRAMRUN=true;}
-      if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
+      if(vpflow.flag("CLEAVAGE_ENERGY")) {pflow::CleavageEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO190520
       //DAVID
-      // DX AND COREY - START
-      if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
-      // DX AND COREY - END
-      if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF190329 - GFA
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_DIRECTORY")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE_DIRECTORY")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL_FILE")) {cout << pflow::compareStructureDirectory(vpflow); _PROGRAMRUN=true;}
@@ -1439,10 +1454,15 @@ namespace pflow {
       }
       //DX 20190425 - END
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << pflow::comparePermutations(cin,vpflow); _PROGRAMRUN=true;} //DX 20190201
+      if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF190329 - GFA
+      // DX AND COREY - START
+      if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
+      // DX AND COREY - END
       if(vpflow.flag("STRUCTURE2ANRL")) {cout << anrl::structure2anrl(cin,vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE2PROTOTYPES")) {cout << pflow::printMatchingPrototypes(cin,vpflow); _PROGRAMRUN=true;} //DX 20190314
       if(vpflow.flag("COMPARE2DATABASE")) {cout << pflow::compare2database(cin, vpflow); _PROGRAMRUN=true;} //DX 20190201
-      if(vpflow.flag("STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyDirSetup(vpflow,cin); _PROGRAMRUN=true;} //CO190520
+      if(vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY")) {pflow::GeneralizedStackingFaultEnergyCalculation(vpflow,cin); _PROGRAMRUN=true;} //CO190520
+      if(vpflow.flag("PREPARE_CHGCAR_4_JMOL")) {cout << bader_functions::prepare_CHGCAR_4_Jmol(vpflow); _PROGRAMRUN=true;}
       //DAVID
     }
     // *********************************************************************
@@ -1725,6 +1745,7 @@ namespace pflow {
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RASMOL")) {pflow::RASMOL(vpflow.getattachedscheme("RASMOL"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("CCE_CORRECTION")) {pflow::CCE(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("RMATOM")) {cout << pflow::RMATOM(cin,aurostd::args2utype(argv,"--rm_atom",(int) (0))); _PROGRAMRUN=true;}
       // S
       if(vpflow.flag("SHELL")) {pflow::SHELL(vpflow.getattachedscheme("SHELL"),cin); _PROGRAMRUN=true;}
@@ -2052,6 +2073,7 @@ namespace pflow {
   "<< x<<" --bzplotdata < POSCAR \n\
   "<< x<<" --bzplotdatauseKPOINTS=KPOINTS < POSCAR \n\
   "<< x<<" --cart [-c] < POSCAR \n\
+  "<< x<<" [--cce (prints user instructions and exits)] --cce=POSCAR_FILE_PATH [--oxidation_numbers=ox_num_1,ox_num_2,...] [--dft_formation_energies=form_energy_1,form_energy_2,...] [--functionals=functional_1,functional_2,...] \n\
   "<< x<<" [options] --chgcar2jvxl=|--c2j=CHGCAR11[,CHGCAR2,...]::CUTOFF1,CUTOFF2...[::DOWNSAMPLE1,DOWNSAMPLE2,...]|CHGCAR1,CUTOFF1[,DOWNSAMPLE1:CHGCAR2,CUTOFF2[,DOWNSAMPLE2:...]]|CHGCAR,CUTOFF[,DOWNSAMPLE] \n\
    options are:  --usage \n\
                  --output=|--o=OUTPUT_FILE \n\

@@ -501,6 +501,7 @@ int main(int _argc,char **_argv) {
   if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
   if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
   if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {Arun=TRUE;slab::slabTest();}  //CO190601
   if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
   
   // **************************************************************
@@ -596,6 +597,9 @@ int main(int _argc,char **_argv) {
       /*exit(1)*/return 0;} // << endl; // CO 180419
   if(XHOST.vflag_control.flag("README_SYMMETRY"))  {
     cout << init::InitGlobalObject("README_AFLOW_SYM_TXT") << endl;
+      /*exit(1)*/return 0;} // << endl; // CO 180419
+  if(XHOST.vflag_control.flag("README_CCE"))  {
+    cout << init::InitGlobalObject("README_AFLOW_CCE_TXT") << endl;
       /*exit(1)*/return 0;} // << endl; // CO 180419
   if(XHOST.vflag_control.flag("README_CHULL"))  {
     cout << init::InitGlobalObject("README_AFLOW_CHULL_TXT") << endl;

@@ -508,7 +508,7 @@ namespace aurostd {
   // but since you have just done an N3 procedure to get the eigenvalues, you can afford yourself
   // this little indulgence.
   template<class utype> 
-    xmatrix<utype> generalHouseHolderQRDecomposition(xmatrix<utype>& mat,const utype& tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_);
+    xmatrix<utype> generalHouseHolderQRDecomposition(xmatrix<utype>& mat,utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_);
   // general Householder, A is mxn, m>=n
   // output:  Q
   // mat will change to R

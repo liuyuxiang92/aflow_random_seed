@@ -2245,7 +2245,8 @@ namespace apl {
       }
       if(_kbinFlags.AFLOW_MODE_VASP) {
 	if(aurostd::EFileExist(dir + string("/vasprun.xml.static")) || 
-	   aurostd::EFileExist(dir + string("/vasprun.xml"))) {
+	   aurostd::EFileExist(dir + string("/vasprun.xml")) || 
+           aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME190607
 	  return true;
 	}
       }
@@ -2260,25 +2261,32 @@ namespace apl {
 
   //outfileFoundEverywherePhonons///////////////////////////////////////////////
   void PhononCalculator::outfileFoundEverywherePhonons(vector<_xinput>& xinps) {
-	  _logger << "Reading vasprun.xml files." << apl::endl; //CO190116
+    _logger << "Reading force files." << apl::endl; //CO190116  // ME190607
     for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {
-      _logger << "Reading vasprun.xml " << idxRun+1 << "/" << (uint)xinps.size() << "." << apl::endl; //CO190116
-      string tarfilename = xinps[idxRun].getDirectory() + ".tar";
+      _logger << "Reading force file " << idxRun+1 << "/" << (uint)xinps.size() << "." << apl::endl; //CO190116  // ME190607
+      // string tarfilename = xinps[idxRun].getDirectory() + ".tar";  OBSOLETE ME 190607
       xinps[idxRun].getXStr().qm_forces.clear();
       // Load data....
       if(_kbinFlags.AFLOW_MODE_VASP){
-	string vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml.static");
-	if(!aurostd::EFileExist(vasprunxml_file)) {
-	  vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml");
-	  if(!aurostd::EFileExist(vasprunxml_file)) {
-	    _logger << apl::warning << "The vasprun.xml file in " << xinps[idxRun].getDirectory() << " directory is missing." << apl::endl;
-	    throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
-	  }
-	}
-	//xVASPRUNXML vasprunxml(vasprunxml_file); OBSOLETE ME 190204 - far too slow
-        xVASPRUNXML vasprunxml;
-        vasprunxml.GetForcesFile(vasprunxml_file);
-	for (uint i = 0; i < vasprunxml.vforces.size(); i++) xinps[idxRun].getXStr().qm_forces.push_back(vasprunxml.vforces.at(i));
+        // ME 190607 - BEGIN
+        // Read forces from aflow qmvasp file - much faster
+        xinps[idxRun].getXStr().qm_forces = readForcesFromQmvasp(xinps[idxRun].getDirectory());
+        if ((int) xinps[idxRun].getXStr().qm_forces.size() != _supercell.getNumberOfAtoms()) {
+          _logger << "Reading forces from " << DEFAULT_AFLOW_QMVASP_OUT << " failed. Will try vasprun.xml" << apl::endl;
+          xinps[idxRun].getXStr().qm_forces.clear();
+          string vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml.static");
+          if(!aurostd::EFileExist(vasprunxml_file)) {
+            vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml");
+            if(!aurostd::EFileExist(vasprunxml_file)) {
+              _logger << apl::warning << "The vasprun.xml file in " << xinps[idxRun].getDirectory() << " directory is missing." << apl::endl;
+              throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
+            }
+          }
+          //xVASPRUNXML vasprunxml(vasprunxml_file); OBSOLETE ME 190204 - far too slow
+          xVASPRUNXML vasprunxml;
+          vasprunxml.GetForcesFile(vasprunxml_file);
+          for (uint i = 0; i < vasprunxml.vforces.size(); i++) xinps[idxRun].getXStr().qm_forces.push_back(vasprunxml.vforces.at(i));
+        }
 	if (int(xinps[idxRun].getXStr().qm_forces.size()) == _supercell.getNumberOfAtoms()) { xinps[idxRun].getXStr().qm_calculated = TRUE; }
       }
       if(_kbinFlags.AFLOW_MODE_AIMS){
@@ -2313,7 +2321,7 @@ namespace apl {
 //	if (aurostd::FileExist(tarfilename)) aurostd::execute(string("rm -rf ") + xinps[idxRun].getDirectory() + "/");
 //      }
     }
-    _logger << "No errors caught, all vasprun.xml files read successfully." << apl::endl; //CO190116
+    _logger << "No errors caught, all force files read successfully." << apl::endl; //CO190116  // ME190607
   }
   
   void PhononCalculator::subtractZeroStateForces(vector<_xinput>& xinps) {
@@ -2327,4 +2335,37 @@ namespace apl {
   }
   // END ME 180518
 
+  // ME 190607
+  vector<xvector<double> > PhononCalculator::readForcesFromQmvasp(const string& directory) {
+    vector<xvector<double> > forces;
+    string file = directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
+    if (aurostd::EFileExist(file)) {
+      vector<string> vlines;
+      aurostd::efile2vectorstring(file, vlines);
+      uint vsize = vlines.size();
+      uint line_count = 0;
+      string line;
+      while (line_count != vsize) {
+        line = vlines[line_count++];
+        if (line.find("TOTAL-FORCE") != string::npos) {
+          vector<double> tokens;
+          xvector<double> f(3);
+          line = vlines[++line_count];  // Skip [AFLOW] line
+          while ((line_count < vsize) && (line.find("[AFLOW]") == string::npos)) {
+            aurostd::string2tokens(line, tokens, " ");
+            if (tokens.size() == 6) {
+              for (int i = 1; i < 4; i++) f[i] = tokens[i+2];
+              forces.push_back(f);
+            } else {  // size has to be six, or there is an error in the file
+              forces.clear();
+              return forces;
+            }
+            line = vlines[++line_count];
+          }
+          return forces;
+        }
+      }
+    }
+    return forces;
+  }
 }  // namespace apl

@@ -1678,6 +1678,7 @@ void POccCalculator::add2DerivativeStructuresList(const POccSuperCell& psc){
 }
 
 void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
+  if(XHOST.WEB_MODE){return;} //CO190520 - no progress bar for web stuff
   double progress = (double)current/(double)end;
   int pos = BAR_WIDTH * progress;
 
