@@ -748,12 +748,12 @@ namespace SYM {
       }
     }
     //double min_mod = find_min_lattice_vector(xvec2xmat(expanded[0],expanded[1],expanded[2]));
-    xmatrix<double> f2c = trasp(lattice);
-    xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 [OBOSLETE] xmatrix<double> f2c = trasp(lattice);
+    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = SYM::isLatticeSkewed(lattice, min_dist, sym_tol); //DX 20190215
 
     for (uint i = 0; i < expanded.size(); i++) {
-      if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, c2f, f2c, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX 20190215
+      if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, lattice, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX 20190215 //DX 20190619 - replace f2c and c2f with lattice
 	tmpvec.push_back(expanded[i]);
       }
     }

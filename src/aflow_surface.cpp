@@ -2420,7 +2420,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
   uint starting_atom=AUROSTD_MAX_UINT;
   for(uint i=0;i<atoms.size();i++){
     if(LDEBUG){cerr << soliloquy << " checking atoms[i=" << i << "].fpos=" << atoms[i].fpos << endl;}
-    if(SYM::AtomFPOSMatch(fpos_starting,atoms[i].fpos,c2f,f2c,skew,sym_eps)){starting_atom=i;break;}
+    if(SYM::AtomFPOSMatch(fpos_starting,atoms[i].fpos,lattice,skew,sym_eps)){starting_atom=i;break;} //DX 20190619 - changed c2f and f2c to lattice
   }
   if(starting_atom==AUROSTD_MAX_UINT){
     if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}

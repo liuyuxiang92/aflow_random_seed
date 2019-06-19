@@ -1,6 +1,11 @@
 3.1.225 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- patched change_tolerance() bug for double& tolerance return (DX)
+        -- renamed minimum distance functions, more descriptive (minimizeDistanceCartesianMethod() and minimizeDistanceFractionalMethod()) (DX)
+        -- reduced number of inputs for minimum distance functions (DX)
+        -- added functionality to read VASP5 format in CHGCAR (DX)
+        -- cleaned species/atom names in xstructure2json; remove pseudopotential information, oxidation numbers, etc. (DX)
+        -- added boolean to ignore minimum distance check in foldAtomsInCell() (DX)
         -- added functions to find pointLineIntersection() and linePlaneIntersection() (CO)
         -- added function to find 3D rotation between two 3D vectors (CO)
         -- remapped const utype& tol -> utype tol in function inputs (CO)

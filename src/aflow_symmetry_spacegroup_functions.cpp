@@ -1318,11 +1318,14 @@ namespace SYM {
       xvector<double> rhs_cart_xvec = f2c * rhs_tmp;
       if(skew) {
 	xvector<double> origin;
-	SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
+	rhs_cart_xvec = SYM::minimizeDistanceCartesianMethod(origin, rhs_cart_xvec, lattice); //DX 20190613
+	//DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
       } else {
-	SYM::PBC(rhs_tmp);
+        xvector<double> rhs_frac_xvec = SYM::minimizeDistanceFractionalMethod(rhs_tmp); //DX 20190613
+        rhs_cart_xvec = f2c * rhs_tmp; //DX 20190613
+	//DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
       }
-      rhs_cart_xvec = f2c * rhs_tmp;
+      //DX 20190613 [OBSOLETE] rhs_cart_xvec = f2c * rhs_tmp;
       RHS_cart.push_back(rhs_cart_xvec(1));
       RHS_cart.push_back(rhs_cart_xvec(2));
       RHS_cart.push_back(rhs_cart_xvec(3));
@@ -1401,20 +1404,31 @@ namespace SYM {
 	    coord(1) = DotPro(LHS[ii], origin_shift) - RHS[ii];
 	    coord(2) = DotPro(LHS[ii + 1], origin_shift) - RHS[ii + 1];
 	    coord(3) = DotPro(LHS[ii + 2], origin_shift) - RHS[ii + 2];
+            double min_dist = 1e9; //DX 20190613
 	    if(skew) {
 	      xvector<double> origin;
 	      xvector<double> coord_cart = f2c * coord;
-	      if(!SYM::minimizeCartesianDistance(origin, coord_cart, coord, c2f, f2c, tol)) { //DX 20190215
-		found = false;
-		break;
-	      }
+	      xvector<double> min_coord_cart = SYM::minimizeDistanceCartesianMethod(origin, coord_cart, lattice); //DX 20190613
+              min_dist = aurostd::modulus(min_coord_cart); //DX 20190613
+	      //DX 20190613 [OBSOLETE] if(!SYM::minimizeCartesianDistance(origin, coord_cart, coord, c2f, f2c, tol)) { //DX 20190215
+	      //DX 20190613 [OBSOLETE]   found = false;
+	      //DX 20190613 [OBSOLETE]   break;
+	      //DX 20190613 [OBSOLETE] }
 	    } else {
-	      SYM::PBC(coord);
-	      if(aurostd::modulus(f2c * coord) > tol) {
+              xvector<double> min_frac_coord = SYM::minimizeDistanceFractionalMethod(coord); //DX 20190613
+              min_dist = aurostd::modulus(f2c * min_frac_coord); //DX 20190613
+	      //DX 20190613 [OBSOLETE] SYM::PBC(coord);
+	      //DX 20190613 [OBSOLETE] if(aurostd::modulus(f2c * coord) > tol) {
+	      //DX 20190613 [OBSOLETE]   found = false;
+	      //DX 20190613 [OBSOLETE]   break;
+	      //DX 20190613 [OBSOLETE] }
+	      }
+            //DX 20190613 - move loop outside if-statements - START
+            if(min_dist > tol){
 		found = false;
 		break;
 	      }
-	    }
+            //DX 20190613 - move loop outside if-statements - END
 	  }
 	  if(found == true) {
 	    //cerr << "FOUND CART" << endl;
@@ -2713,7 +2727,8 @@ namespace SYM {
 		  //cerr << "RR FORM: " << endl; //DEBUG MODE
 		  //cerr << W_tmp << endl; //DEBUG MODE
 		  xvector<double> solution; solution(1) = (W_tmp(1, 4)); solution(2) = (W_tmp(2, 4)); solution(3) = (W_tmp(3, 4));
-		  SYM::PBC(solution); 
+		  solution = SYM::minimizeDistanceFractionalMethod(solution); //DX 20190613
+		  //DX 20190613 [OBSOLETE] SYM::PBC(solution); 
 		  xvector<double> cart_solution = trasp(CCell.lattice)*solution;
 
 		  xvector<double> ideal_wyckoff = solution;
@@ -2727,7 +2742,8 @@ namespace SYM {
 		  if((aurostd::abs(W_tmp(3, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(3, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(3, 3)) < _ZERO_TOL_)){
 		    ideal_wyckoff(3) = 0.0;
 		  }
-		  SYM::PBC(ideal_wyckoff);
+		  ideal_wyckoff = SYM::minimizeDistanceFractionalMethod(ideal_wyckoff); //DX 20190613
+		  //DX 20190613 [OBSOLETE] SYM::PBC(ideal_wyckoff);
 		  xvector<double> ideal_cart_position = trasp(CCell.lattice)*ideal_wyckoff;
 		  if(aurostd::modulus(cart_solution-ideal_cart_position)>CCell.sym_eps){ //DX 20190215
 		    found_wyckoff = false;
@@ -2829,7 +2845,8 @@ namespace SYM {
 		    }
 		  }
 		}
-		SYM::PBC(diff);
+		diff = SYM::minimizeDistanceFractionalMethod(diff); //DX 20190613
+		//DX 20190613 [OBSOLETE] SYM::PBC(diff);
 		if(aurostd::modulus(trasp(CCell.lattice)*diff)>CCell.sym_eps){ //DX 20190215
 		  found_wyckoff = false;
 		}
@@ -4257,14 +4274,22 @@ namespace SYM {
 // ******************************************************************************
 // This differs from MapAtom since we need information about the original and new lattice
 namespace SYM {
-  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double> c2f_orig, xmatrix<double>& f2c_new, bool& skew, double& tol) {
-    xvector<double> fdiff = a.fpos - b.fpos;
+  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& lattice_new, bool& skew, double& tol) { //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
+    //DX 20190613 [OBSOLETE-moved down] xvector<double> fdiff = a.fpos - b.fpos;
+    double min_dist = 1e9;
     if(skew) {
-      return SYM::minimizeCartesianDistance(a.cpos, b.cpos, fdiff, c2f_orig, f2c_new, tol);
+      xvector<double> min_cdiff = SYM::minimizeDistanceCartesianMethod(a.cpos, b.cpos, lattice_new); //DX 20190613
+      min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] return SYM::minimizeCartesianDistance(a.cpos, b.cpos, fdiff, c2f_orig, f2c_new, tol);
     } else {
-      SYM::PBC(fdiff);
+      xmatrix<double> f2c_new = trasp(lattice_new); //DX 20190613
+      xvector<double> fdiff = a.fpos - b.fpos; //DX 20190613
+      xvector<double> min_fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613 
+      min_dist = aurostd::modulus(f2c_new * min_fdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] SYM::PBC(fdiff);
     }
-    return (aurostd::modulus(f2c_new * fdiff) < tol);
+    return (min_dist < tol); //DX 20190613
+    //DX 20190613 [OBSOLETE] return (aurostd::modulus(f2c_new * fdiff) < tol);
   }
 } //namespace SYM
 
@@ -4273,16 +4298,24 @@ namespace SYM {
 // ******************************************************************************
 // This differs from MapAtom since we need information about the original and new lattice
 namespace SYM {
-  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& c2f_orig, xmatrix<double>& f2c_new, bool& skew, double& tol) {
-    xvector<double> fdiff = a - b;
+  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& lattice_new, bool& skew, double& tol) { //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
+    //DX 20190613 [OBSOLETE-moved down] xvector<double> fdiff = a - b;
+    double min_dist = 1e9; //DX 20190613
+    xmatrix<double> f2c_new = trasp(lattice_new); //DX 20190613
     if(skew) {
-      xvector<double> coord1 = f2c_new * a;
-      xvector<double> coord2 = f2c_new * b;
-      return SYM::minimizeCartesianDistance(coord1, coord2, fdiff, c2f_orig, f2c_new, tol);
+      xvector<double> cpos1 = f2c_new * a; //DX 20190613 - coord1 to cpos1
+      xvector<double> cpos2 = f2c_new * b; //DX 20190613 - coord2 to cpos2
+      xvector<double> min_cdiff = SYM::minimizeDistanceCartesianMethod(cpos1, cpos2, lattice_new); //DX 20190613
+      min_dist = aurostd::modulus(min_cdiff);
+      //DX 20190613 [OBSOLETE] return SYM::minimizeCartesianDistance(coord1, coord2, fdiff, c2f_orig, f2c_new, tol);
     } else {
-      SYM::PBC(fdiff);
+      xvector<double> fdiff = a - b; //DX 20190613
+      xvector<double> min_fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+      min_dist = aurostd::modulus(f2c_new * min_fdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] SYM::PBC(fdiff);
     }
-    return (aurostd::modulus(f2c_new * fdiff) < tol);
+    return (min_dist < tol); //DX 20190613
+    //DX 20190613 [OBSOLETE] return (aurostd::modulus(f2c_new * fdiff) < tol);
   }
 } //namespace SYM
 
@@ -4296,7 +4329,7 @@ namespace SYM {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     deque<deque<_atom> > equivalent_atoms;
     xmatrix<double> f2c = trasp(lattice);
-    xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = SYM::isLatticeSkewed(lattice, min_dist, tol); //DX 20190215
     for (uint k = 0; k < atoms.size(); k++) {
       deque<_atom> tmpv;
@@ -4312,7 +4345,7 @@ namespace SYM {
         tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
 	bool contained = false;
 	for (uint j = 0; j < equivalent_atoms.size(); j++) {
-	  if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, c2f, f2c, skew, tol)) { //DX 20190215
+	  if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, skew, tol)) { //DX 20190215 //DX 20190619 - replace f2c and c2f with lattice
 	    contained = true;
 	    break;
 	  }
@@ -4348,7 +4381,7 @@ namespace SYM {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     deque<deque<_atom> > equivalent_atoms_shifted;
     xmatrix<double> f2c = trasp(lattice);
-    xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = SYM::isLatticeSkewed(lattice, min_dist, tol); //DX 20190215
 
     deque<_atom> one_shifted_group;
@@ -4371,7 +4404,7 @@ namespace SYM {
 	} else {
 	  bool duplicate_atom = false;
 	  for (uint b = 0; b < one_shifted_group.size(); b++) {
-	    if(SYM::MapAtom(one_shifted_group[b].fpos, tmp.fpos, c2f, f2c, skew, tol)) { //DX 20190215
+	    if(SYM::MapAtom(one_shifted_group[b].fpos, tmp.fpos, lattice, skew, tol)) { //DX 20190215 //DX 20190619 - replace f2c and c2f with lattice
 	      duplicate_atom = true;
 	      break;
 	    }
@@ -5201,11 +5234,19 @@ namespace SYM {
     xvector<double> fdiff = P1_fpos - P2_fpos;
     double orig_cdiff = aurostd::modulus(f2c * fdiff);
     xvector<int> ijk;
-    bool neighbor_restriction = false;
+    //DX 20190613 [OBSOLETE] bool neighbor_restriction = false;
+    double min_dist = 1e9; //DX 20190613
+
     if(skew) {
-      SYM::minimizeCartesianDistance(P1, P2, fdiff, c2f, f2c, ijk, neighbor_restriction, tol);
+      xmatrix<double> lattice = trasp(f2c); //DX 20190613
+      xvector<double> min_cdiff = SYM::minimizeDistanceCartesianMethod(P1, P2, lattice, ijk); //DX 20190613
+      fdiff = c2f * min_cdiff; //DX 20190613
+      min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(P1, P2, fdiff, c2f, f2c, ijk, neighbor_restriction, tol);
     } else {
-      SYM::PBC(fdiff, ijk, neighbor_restriction);
+      fdiff = SYM::minimizeDistanceFractionalMethod(fdiff,ijk); //DX 20190613
+      min_dist = aurostd::modulus(f2c*fdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] SYM::PBC(fdiff, ijk, neighbor_restriction);
     }
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(ijk(i)) > 3 && (orig_cdiff - radius) > _ZERO_TOL_) {
@@ -5217,7 +5258,8 @@ namespace SYM {
       tmp_fdiff(i) = fdiff(i) + (double)ijk(i);
     }
     lattice_vector = f2c * tmp_fdiff;
-    return (aurostd::modulus(f2c * fdiff) < tol);
+    return (min_dist < tol); //DX 20190613
+    //DX 20190613 [OBSOLETE] return (aurostd::modulus(f2c * fdiff) < tol);
   }
 } //namespace SYM
 
@@ -5238,11 +5280,17 @@ namespace SYM {
     //xvector<double> fdiff = tmp - origin;
     double orig_cdiff = aurostd::modulus(point);
     xvector<int> ijk;
-    bool neighbor_restriction = false;
+    double min_dist = 1e9; //DX 20190613
+    //DX 20190613 [OBSOLETE] bool neighbor_restriction = false;
     if(skew) {
-      SYM::minimizeCartesianDistance(origin, point, fdiff, c2f, f2c, ijk, neighbor_restriction, tol); //DX 20190215
+      xvector<double> min_cdiff = SYM::minimizeDistanceCartesianMethod(origin, point, L, ijk); //DX 20190613
+      fdiff = c2f * min_cdiff; //DX 20190613
+      min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, point, fdiff, c2f, f2c, ijk, neighbor_restriction, tol); //DX 20190215
     } else {
-      SYM::PBC(fdiff, ijk, neighbor_restriction);
+      fdiff = SYM::minimizeDistanceFractionalMethod(fdiff, ijk); //DX 20190613
+      min_dist = aurostd::modulus(f2c * fdiff); //DX 20190613
+      //DX 20190613 [OBSOLETE] SYM::PBC(fdiff, ijk, neighbor_restriction);
     }
     xvector<double> tmp_fdiff;
     for (uint i = 1; i < 4; i++) {
@@ -5252,7 +5300,8 @@ namespace SYM {
       tmp_fdiff(i) = fdiff(i) + (double)ijk(i);
     }
     lattice_vector = f2c * tmp_fdiff;
-    return (aurostd::modulus(f2c * fdiff) < tol); //DX 20190215
+    return (min_dist < tol); //DX 20190215
+    //DX 20190613 [OBSOLETE] return (aurostd::modulus(f2c * fdiff) < tol); //DX 20190215
   }
 } //namespace SYM
 

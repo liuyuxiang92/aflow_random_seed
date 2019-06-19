@@ -210,7 +210,7 @@ void QMesh::makeIrreducible() {
     for (int sym = 0; sym < nsym; sym++) {
       for (int iq = 0; iq < _nIQPs; iq++) {
         if (SYM::AtomFPOSMatch(_qpoints[q].fpos, irred_trans[iq][sym],
-                               _recCell.c2f, _recCell.f2c, _recCell.skewed, tol)) {
+                               _recCell.lattice, _recCell.skewed, tol)) { //DX 20190619 - replace f2c and c2f with lattice
           append = false;
           _weights[iq]++;
           _qpoints[q].symop = sym;

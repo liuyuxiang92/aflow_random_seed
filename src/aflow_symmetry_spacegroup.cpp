@@ -488,36 +488,36 @@ namespace SYM {
 	  lattice_basis[1] = tmpvec;
 	  swap_columns(atomic_basis_, 1, 2);
 	}
-	if((!SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, c2f, f2c, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol
-	     !SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, c2f, f2c, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol
-	     !SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, c2f, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol
+	if((!SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	     !SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	     !SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
 	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
 	  lattice_basis[0] = -1 * lattice_basis[0];
 	  minus_one(atomic_basis_, 1);
 	  lattice_basis[1] = -1 * lattice_basis[1];
 	  minus_one(atomic_basis_, 2);
 	}
-	if(!(SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, c2f, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol
-	      SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, c2f, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol
-	      SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, c2f, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol
+	if(!(SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	      SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	      SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
 	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
 	  lattice_basis[0] = -1 * lattice_basis[0];
 	  minus_one(atomic_basis_, 1);
 	  lattice_basis[2] = -1 * lattice_basis[2];
 	  minus_one(atomic_basis_, 3);
 	}
-	if(!(SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, c2f, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol
-	      SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, c2f, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol
-	      SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, c2f, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol
+	if(!(SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	      SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	      SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
 	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
 	  lattice_basis[1] = -1 * lattice_basis[1];
 	  minus_one(atomic_basis_, 2);
 	  lattice_basis[2] = -1 * lattice_basis[2];
 	  minus_one(atomic_basis_, 3);
 	}
-	if(!(SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, c2f, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol
-	      SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, c2f, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol
-	      SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, c2f, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol
+	if(!(SYM::AtomFPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	      SYM::AtomFPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
+	      SYM::AtomFPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
 	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
 	  cerr << "SYM::orient: PROBLEM TRANFORMING TO OBVERSE SETTING. QUITING PROGRAM [dir = " << xstr.directory << "]." << endl;
 	  exit(0);
@@ -596,19 +596,19 @@ namespace SYM {
     uint match_type2 = 0;
     uint match_type3 = 0;
     bool obverse = true;
-    if(SYM::AtomFPOSMatch(atomic_basis_, reverse1, match_type1, c2f, f2c, skew, tolerance) &&
-	SYM::AtomFPOSMatch(atomic_basis_, reverse2, match_type2, c2f, f2c, skew, tolerance) &&
-	SYM::AtomFPOSMatch(atomic_basis_, reverse3, match_type3, c2f, f2c, skew, tolerance) &&
+    if(SYM::AtomFPOSMatch(atomic_basis_, reverse1, match_type1, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	SYM::AtomFPOSMatch(atomic_basis_, reverse2, match_type2, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	SYM::AtomFPOSMatch(atomic_basis_, reverse3, match_type3, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
 	match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
       obverse = false;
-    } else if(SYM::AtomFPOSMatch(atomic_basis_, half_x, match_type1, c2f, f2c, skew, tolerance) &&
-	       SYM::AtomFPOSMatch(atomic_basis_, half_x_shift1, match_type2, c2f, f2c, skew, tolerance) &&
-	       SYM::AtomFPOSMatch(atomic_basis_, half_x_shift2, match_type3, c2f, f2c, skew, tolerance) &&
+    } else if(SYM::AtomFPOSMatch(atomic_basis_, half_x, match_type1, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	       SYM::AtomFPOSMatch(atomic_basis_, half_x_shift1, match_type2, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	       SYM::AtomFPOSMatch(atomic_basis_, half_x_shift2, match_type3, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
 	       match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
       obverse = false;
-    } else if(SYM::AtomFPOSMatch(atomic_basis_, half_xz, match_type1, c2f, f2c, skew, tolerance) &&
-	       SYM::AtomFPOSMatch(atomic_basis_, half_xz_shift1, match_type2, c2f, f2c, skew, tolerance) &&
-	       SYM::AtomFPOSMatch(atomic_basis_, half_xz_shift2, match_type3, c2f, f2c, skew, tolerance) &&
+    } else if(SYM::AtomFPOSMatch(atomic_basis_, half_xz, match_type1, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	       SYM::AtomFPOSMatch(atomic_basis_, half_xz_shift1, match_type2, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	       SYM::AtomFPOSMatch(atomic_basis_, half_xz_shift2, match_type3, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
 	       match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
       obverse = false;
     }
@@ -679,21 +679,21 @@ namespace SYM {
     uint match_type3 = 0;
     bool obverse = true;
     for (uint i = 0; i < equivalent_atoms.size(); i++) {
-      if(SYM::AtomFPOSMatch(equivalent_atoms[i], reverse1, match_type1, c2f, f2c, skew, tolerance) &&
-	  SYM::AtomFPOSMatch(equivalent_atoms[i], reverse2, match_type2, c2f, f2c, skew, tolerance) &&
-	  SYM::AtomFPOSMatch(equivalent_atoms[i], reverse3, match_type3, c2f, f2c, skew, tolerance) &&
+      if(SYM::AtomFPOSMatch(equivalent_atoms[i], reverse1, match_type1, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	  SYM::AtomFPOSMatch(equivalent_atoms[i], reverse2, match_type2, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+	  SYM::AtomFPOSMatch(equivalent_atoms[i], reverse3, match_type3, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
 	  match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
 	obverse = false;
 	break;
-      } else if(SYM::AtomFPOSMatch(equivalent_atoms[i], half_x, match_type1, c2f, f2c, skew, tolerance) &&
-		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_x_shift1, match_type2, c2f, f2c, skew, tolerance) &&
-		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_x_shift2, match_type3, c2f, f2c, skew, tolerance) &&
+      } else if(SYM::AtomFPOSMatch(equivalent_atoms[i], half_x, match_type1, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_x_shift1, match_type2, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_x_shift2, match_type3, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
 		 match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
 	obverse = false;
 	break;
-      } else if(SYM::AtomFPOSMatch(equivalent_atoms[i], half_xz, match_type1, c2f, f2c, skew, tolerance) &&
-		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_xz_shift1, match_type2, c2f, f2c, skew, tolerance) &&
-		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_xz_shift2, match_type3, c2f, f2c, skew, tolerance) &&
+      } else if(SYM::AtomFPOSMatch(equivalent_atoms[i], half_xz, match_type1, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_xz_shift1, match_type2, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
+		 SYM::AtomFPOSMatch(equivalent_atoms[i], half_xz_shift2, match_type3, lattice, skew, tolerance) && //DX 20190619 - replace f2c and c2f with lattice
 		 match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
 	obverse = false;
       }
@@ -915,7 +915,7 @@ uint xstructure::GetPrimitiveCell(void) {
         atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
         atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
         atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-        if(SYM::MapAtom(atomic_basis_, atmp, TRUE, c2f, f2c, skew, (*this).sym_eps)) { //DX 20190215 - _SYM_TOL_ to (*this).sym_eps
+        if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, skew, (*this).sym_eps)) { //DX 20190215 - _SYM_TOL_ to (*this).sym_eps //DX 20190619 - replace f2c and c2f with lattice_basis_xmat
           count += 1;
         }
         //DX 5/15/18 - break if it does not match with one - START
@@ -1016,7 +1016,7 @@ uint xstructure::GetPrimitiveCell(void) {
       double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
       //Now get atoms inside of new, reduced basis:
       //[CO190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); // CO 180409
-      newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol); // CO 180409
+      newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol,false); // CO 180409 //DX 20190619 - false->do not check min dists (expensive)
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
       //for(uint n=0;n<newbasis.size();n++){
@@ -1242,7 +1242,7 @@ namespace SYM {
     // === Check if atoms occupying the same space === //
     for (uint i = 0; i < primitive_atomic_basis.size(); i++) {
       for (uint j = i + 1; j < primitive_atomic_basis.size(); j++) {
-	if(SYM::MapAtom(primitive_atomic_basis[i], primitive_atomic_basis[j], FALSE, c2f, f2c, skew, sym_tol)) { //DX 20190215 - added sym_tol
+	if(SYM::MapAtom(primitive_atomic_basis[i], primitive_atomic_basis[j], FALSE, LPRIM, skew, sym_tol)) { //DX 20190215 - added sym_tol //DX 20190619 - replace f2c and c2f with LPRIM
 	  if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Atoms occupying the same space (given tolerance " << sym_tol << "). Check structure [dir=" << xstr.directory << "]." << endl; } //DX 20190215 - _SYM_TOL_ to sym_tol
 	  if(LDEBUG) { cerr << "SYM::ConventionalCell: atom #" << i << " symbol: " << primitive_atomic_basis[i].name << " coord: " << primitive_atomic_basis[i].fpos << endl; }
 	  if(LDEBUG) { cerr << "SYM::ConventionalCell: atom #" << j << " symbol: " << primitive_atomic_basis[j].name << " coord: " << primitive_atomic_basis[j].fpos << endl; }
@@ -1634,7 +1634,7 @@ namespace SYM {
 	// ========== Conventional Atomic Basis ========== //
 	//Now add those basis atoms that fit in conventional cell:
 	//[CO190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
-	deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+	deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol, false); //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - false->do not check min dists (expensive)
 
 	bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.
 	// ===== Check if ratio of atoms is consistent with primitive atomic basis ===== //
@@ -2772,6 +2772,7 @@ namespace SYM {
   bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - _SYM_TOL_ to tol
     // Find number of lattice points in cell (lattice centering)
 
+    xmatrix<double> lattice = trasp(f2c); //DX 20190619 
     for (uint j = 0; j < big_expanded.size(); j++) {
       if(bravais_basis.size() == 0) {
 	bravais_basis.push_back(big_expanded[j]);
@@ -2781,7 +2782,7 @@ namespace SYM {
 	  xvector<double> bravais_fpos = BringInCell(c2f * bravais_basis[a]);
 	  xvector<double> tmp = BringInCell(c2f * big_expanded[j]);
 	  //if(MapAtoms(bravais_fpos, tmp, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	  if(SYM::MapAtom(bravais_fpos,tmp,c2f,f2c,skew,tol)){ //DX 20190215 - _SYM_TOL_ to tol
+	  if(SYM::MapAtom(bravais_fpos,tmp,lattice,skew,tol)){ //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - replace f2c and c2f with lattice
 	    duplicate_lattice_point = true;
 	    break;
 	  }
@@ -2847,9 +2848,9 @@ namespace SYM {
 	bool centering2_found = false;
 	for (uint a = 0; a < bravais_basis.size(); a++) {
 	  xvector<double> bravais_fpos = BringInCell(c2f * bravais_basis[a]);
-	  if(SYM::MapAtom(bravais_fpos, centering1, c2f, f2c, skew, tol) || SYM::MapAtom(bravais_fpos, centering1_swap, c2f, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol
+	  if(SYM::MapAtom(bravais_fpos, centering1, lattice, skew, tol) || SYM::MapAtom(bravais_fpos, centering1_swap, lattice, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - replace f2c and c2f with lattice
 	    centering1_found = true;
-	  } else if(SYM::MapAtom(bravais_fpos, centering2, c2f, f2c, skew, tol) || SYM::MapAtom(bravais_fpos, centering2_swap, c2f, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol
+	  } else if(SYM::MapAtom(bravais_fpos, centering2, lattice, skew, tol) || SYM::MapAtom(bravais_fpos, centering2_swap, lattice, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - replace f2c and c2f with lattice
 	    centering2_found = true;
 	  }
 	}

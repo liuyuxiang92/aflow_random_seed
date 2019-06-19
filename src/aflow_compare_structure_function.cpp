@@ -5245,8 +5245,8 @@ namespace compare{
     double tolerance = 0.01; // Hundredth of an angstrom
     deque<_atom> atoms = lfa_supercell.atoms;
     xmatrix<double> lattice = lfa_supercell.lattice;
-    xmatrix<double> f2c = trasp(lattice);
-    xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 [OBSOLETE] xmatrix<double> f2c = trasp(lattice);
+    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = false;
 
     vector<int> ind(2); ind[0]=i, ind[1]=j;
@@ -5262,7 +5262,7 @@ namespace compare{
       tmp.type = atoms[d].type;
       tmp.cpos = atoms[d].cpos+vec;
       tmp.fpos = C2F(lattice,tmp.cpos);
-      if(SYM::MapAtom(atoms,tmp,true,c2f,f2c,skew,tolerance)){
+      if(SYM::MapAtom(atoms,tmp,true,lattice,skew,tolerance)){ //DX 20190619 - replace f2c and c2f with lattice
         transformed.push_back(tmp);
         index_to_check.push_back(d);
         count++;
@@ -5896,7 +5896,7 @@ namespace compare{
 	  bool duplicate_lattice_point=false;
 	  for(uint a=0; a<new_basis.size(); a++){
 	    xvector<double> tmp = BringInCell(proto.atoms[j].fpos,1e-10);
-	    if(SYM::MapAtom(new_basis[a].fpos,tmp,c2f,f2c,skew,tol)){
+	    if(SYM::MapAtom(new_basis[a].fpos,tmp,proto.lattice,skew,tol)){ //DX 20190619 - replace f2c and c2f with lattice
 	      duplicate_lattice_point=true;
 	      break;
 	    }
