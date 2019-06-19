@@ -49,7 +49,7 @@ void DOSCalculator::clear() {
   _bins.clear();
   _dos.clear();
   _idos.clear();  // ME190614
-  _projected_dos.clear(); // ME190614
+  _projectedDOS.clear(); // ME190614
   _bzmethod = "";
   _temperature = 0.0;  // ME190614
 }
@@ -407,7 +407,7 @@ void DOSCalculator::writePHDOSCAR() {
   stringstream outfile;
   // Header
   int nions = (int) _pc.getInputCellStructure().atoms.size();
-  bool partial = (_projected_dos.size() > 0);
+  bool partial = (_projectedDOS.size() > 0);
   outfile << std::setw(4) << nions
           << std::setw(4) << nions
           << std::setw(4) << partial
