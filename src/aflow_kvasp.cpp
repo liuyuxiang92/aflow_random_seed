@@ -2676,6 +2676,7 @@ namespace KBIN {
 			     aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING: Sub-Space-Matrix is not hermitian in DAV")) );
 	xwarning.flag("EDDDAV",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Error EDDDAV: Call to ZHEGV failed. Returncode"));
 	xwarning.flag("ZPOTRF",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LAPACK: Routine ZPOTRF failed"));
+      //ME190620 - Avoid changing NBANDS in the aflow.in file just because VASP throws the warning that NBANDS is changed because of NPAR. However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
 	xwarning.flag("NBANDS", aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NBANDS") && // GET ALL TIMES
 				((aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons")) // ME190611 - or else the "avoid self healing" can prevent this NBANDS error from being found
                                 || (!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The number of bands has been changed from the values supplied") &&  // AVOID SELF HEALING
