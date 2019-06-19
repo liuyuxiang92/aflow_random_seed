@@ -8,5 +8,5 @@ os:
   - osx
 script:
   - cd src
-  - if [ $CXX = g++ ];      then make       ; fi
-  - if [ $CXX = clang++ ];  then make mac   ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ]; then    make       ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then  make mac   ; fi
