@@ -6,5 +6,5 @@ compiler:
 before_script:
   - cd src
 script:
-  - "[ $CXX = g++ ] && make || true"
-  - "[ $CXX = clang++ ] && make mac || true"
+  - [ $CXX = g++ ] && make || true
+  - [ $CXX = clang++ ] && make mac || true
