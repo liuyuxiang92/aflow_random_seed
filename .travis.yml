@@ -1,11 +1,17 @@
 sudo: false
 language: cpp
-compiler:
-  - gcc
-  - clang
 os:
   - linux
   - osx
+compiler:
+  - gcc
+  - clang
+matrix:
+  exclude:
+    - os: linux
+      compiler: clang
+    - os: osx
+      compiler: gcc
 script:
   - cd src
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ]; then    make       ; fi
