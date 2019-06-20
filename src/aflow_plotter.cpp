@@ -48,7 +48,7 @@ xoption getPlotOptions(const aurostd::xoption& xopt, const string& key, bool dat
   uint ntokens = aurostd::string2tokens(scheme, tokens, ",", true); // Keep empty arguments
 
   if (ntokens >= 1) {
-    if (tokens[0].back() != '/') tokens[0] += '/';
+    if (tokens[0][tokens[0].size() - 1] != '/') tokens[0] += '/';
     plotoptions.push_attached("DIRECTORY", tokens[0]);
   }
   // Need to shift options if partial DOS are plotted
