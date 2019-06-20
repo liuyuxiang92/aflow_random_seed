@@ -1,4 +1,4 @@
-3.1.225 - 2019/05/20
+3.1.225 - 2019/06/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- patched change_tolerance() bug for double& tolerance return (DX)
         -- added functions to find pointLineIntersection() and linePlaneIntersection() (CO)
@@ -24,6 +24,9 @@
         -- removed pocc progress bar in web_mode (CO)
         -- added FPOSDistance() for skew considerations (CO)
         -- reduced dims considered for GetSuperCell(), RadiusSphereLattice and LatticeDimensionSphere() are enough (CO)
+        -- added general getPeaks() function to AUROSTD (CO)
+        -- calculated X-ray amplitude on-the-fly, no need to pass it around (CO)
+        -- moved double lambda to end of inputs and default to 1.5418 Cooper K-alpha (CO)
 3.1.224 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.224.tar.xz
         -- Fixed bug that didn't allow users to override the standard lattice phonon dispersion path. (ME)
