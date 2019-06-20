@@ -7870,7 +7870,14 @@ void ConvexHull::writePDF() const {
     doc_header_TEX_ss << "\\usepackage{hyperref} \\hypersetup{colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=blue}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepackage{bookmark} \%hyperref without .out" << " \%HEADER" << endl;
   }
+  
+  doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
+  doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
 
+  _doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+  _doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+  _doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+  _doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
   _doc_header_TEX_ss << "\\newcommand{\\newAlloy}[2]{%" << " \%HEADER" << endl;
   _doc_header_TEX_ss << "\\setAlloy{#1}" << " \%HEADER" << endl;
   _doc_header_TEX_ss << "\\setCountTotalEntries{#2}" << " \%HEADER" << endl;
@@ -8042,8 +8049,8 @@ void ConvexHull::writePDF() const {
 
     doc_header_TEX_ss << "\\usepackage{pgfplots}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepackage{pdflscape}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\pgfplotsset{compat=1.10}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepgfplotslibrary{ternary,units}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usetikzlibrary{decorations.pathmorphing,pgfplots.units,backgrounds}" << " \%HEADER" << endl;
@@ -8060,10 +8067,10 @@ void ConvexHull::writePDF() const {
     doc_header_TEX_ss << "\\pgfdeclarelayer{foreground}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\pgfsetlayers{background,main,foreground}" << " \%HEADER" << endl;
     
-    doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
 
     doc_header_TEX_ss << _doc_header_TEX_ss.str();
     _doc_header_TEX_ss.str("");  // don't repeat
@@ -9675,7 +9682,7 @@ void ConvexHull::writePDF() const {
     tikzpic_TEX_ss << "\\restoregeometry" << endl;
   } else {
     // make sure to add this in
-    doc_header_TEX_ss << "\\usepackage{graphicx}" << endl;
+    doc_header_TEX_ss << "\\usepackage{graphicx}  \%HEADER" << endl;
     // contains begin{document}, which needs to go in sooner
     doc_header_TEX_ss << _doc_header_TEX_ss.str();
     _doc_header_TEX_ss.str("");

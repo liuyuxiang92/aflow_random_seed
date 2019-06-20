@@ -1,0 +1,12 @@
+sudo: false
+language: cpp
+compiler:
+  - gcc
+  - clang
+os:
+  - linux
+  - osx
+script:
+  - cd src
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ]; then    make       ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then  make mac   ; fi

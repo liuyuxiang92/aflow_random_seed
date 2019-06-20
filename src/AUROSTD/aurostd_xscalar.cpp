@@ -387,10 +387,10 @@ namespace aurostd {
 }
 
 // ***************************************************************************
-// Function gcd
+// Function GCD
 // ***************************************************************************
 namespace aurostd {
-int gcd(int a,int b){
+int GCD(int a,int b){ //CO180409
   // added for safety, will always give nonzero result, important for division!
   if(!a && !b) {return 1;} // you can always divide by 1
   else if(!a) {return b;}
@@ -398,8 +398,13 @@ int gcd(int a,int b){
   // borrowed from Kesong aflow_contrib_kesong_pocc_basic.cpp
   // calculate greatest common denominator of two integers
   if(a % b == 0) {return b;}
-  else {return gcd(b, a % b);}
+  else {return GCD(b, a % b);}
 }
+//https://www.geeksforgeeks.org/program-to-find-lcm-of-two-numbers/
+int LCM(int a,int b){ //CO190520
+  if(!a || !b){return 0;} //special, trivial case: lcm must really be positive
+  return a*b/GCD(a,b);
+} //CO190520
 } // namespace aurostd
 
 // ***************************************************************************

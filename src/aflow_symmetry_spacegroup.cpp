@@ -1015,7 +1015,8 @@ uint xstructure::GetPrimitiveCell(void) {
       xmatrix<double> PL_inv = aurostd::inverse(prim_lattice);
       double same_atom_tol = (*this).dist_nn_min - 0.1;  //min_dist itself will consider nn atom to be the same, needs to be slightly smaller.`
       //Now get atoms inside of new, reduced basis:
-      newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); // CO 180409
+      //[CO190520]newbasis = foldAtomsInCell(expanded_basis, c2f, f2c, skew, same_atom_tol); // CO 180409
+      newbasis = foldAtomsInCell(expanded_basis, (*this).lattice, lattice_basis_xmat, skew, same_atom_tol); // CO 180409
       //DEBUG
       //cerr << "newbasis.size(): " << newbasis.size() << endl;
       //for(uint n=0;n<newbasis.size();n++){
@@ -1632,7 +1633,8 @@ namespace SYM {
 	// *****************************************************************************************************************************
 	// ========== Conventional Atomic Basis ========== //
 	//Now add those basis atoms that fit in conventional cell:
-	deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+	//[CO190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+	deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
 
 	bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.
 	// ===== Check if ratio of atoms is consistent with primitive atomic basis ===== //

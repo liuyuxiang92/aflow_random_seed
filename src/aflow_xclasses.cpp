@@ -1223,7 +1223,7 @@ _xvasp::_xvasp() {
   aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_MINKOWSKI",TRUE);
   aopts.flag("FLAG::VOLUME_PRESERVED",FALSE);            // DEFAULT VALUES
   aopts.flag("FLAG::EXTRA_INCAR",FALSE);                 // DEFAULT VALUES
-  AVASP_EXTRA_INCAR.clear();                             // DEFAULT VALUES
+  AVASP_EXTRA_INCAR.str("");                             // DEFAULT VALUES  // ME 190614  clear ss with .str("")
   AVASP_INCAR_KEYWORD.clear();                           // DEFAULT VALUES  // ME 180601
   AVASP_INCAR_EXPLICIT_START_STOP.str("");               // DEFAULT VALUES  // ME 180601  //CO190401 - clear ss with .str("")
   AVASP_KPOINTS_KEYWORD.clear();                         // DEFAULT VALUES  // ME 180601

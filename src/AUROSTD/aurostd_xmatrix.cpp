@@ -1353,6 +1353,13 @@ namespace aurostd { // namespace aurostd
         cerr << soliloquy << " a=" << a << endl;
         cerr << soliloquy << " b=" << b << endl;
       }
+      xmatrix<utype> R=aurostd::eye<utype>(3,3); //CO190520
+      
+      //trivial cases
+      if(aurostd::isequal(a,b,(utype)_ZERO_TOL_)){return R;}
+      if(aurostd::isequal(a,-b,(utype)_ZERO_TOL_)){R(1,1)=R(2,2)=R(3,3)=-1;return R;}
+
+      //non-trivial case
       xvector<utype> v=aurostd::vector_product(a,b); //requires first index 1
       if(LDEBUG){cerr << soliloquy << " v=" << v << endl;}
       utype s=aurostd::modulus(v);
@@ -1367,8 +1374,7 @@ namespace aurostd { // namespace aurostd
       vx[1][3]=v[2];
       vx[2][3]=-v[1];
       if(LDEBUG){cerr << soliloquy << " vx=" << endl;cerr << vx << endl;}
-      xmatrix<utype> R=aurostd::eye<utype>(3,3); //CO190520
-      R+=vx+vx*vx*((utype)1-c)/(s*s);
+      if(!aurostd::isequal(s,(utype)0,(utype)_ZERO_TOL_)){R+=vx+vx*vx*((utype)1-c)/(s*s);}
       if(LDEBUG){cerr << soliloquy << " R=" << endl;cerr << R << endl;}
       return R;
     }
@@ -3024,7 +3030,7 @@ namespace aurostd {
 // CO 171129
 namespace aurostd {
   template<class utype>
-  xmatrix<utype> generalHouseHolderQRDecomposition(xmatrix<utype>& mat,const utype& tol) {
+  xmatrix<utype> generalHouseHolderQRDecomposition(xmatrix<utype>& mat,utype tol) {
     // mat is mxn, m>=n
     // output:  Q
     // mat will change to R
@@ -3032,6 +3038,8 @@ namespace aurostd {
 
     string soliloquy="aurostd::generalHouseHolderQRDecomposition():";
     if(mat.rows<mat.cols){cerr << soliloquy << " ERROR! m<n, please flip the matrix." << endl;exit(1);}
+
+    xmatrix<utype> mat_orig=mat;
 
     utype vModulus, xModulus;
     std::vector<xmatrix<utype> > V;
@@ -3099,6 +3107,9 @@ namespace aurostd {
 	Q(i, k) = ek(i, 1);
       }
     }
+
+    if(!aurostd::isequal(mat_orig,Q*mat)){throw aurostd::xerror(soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
+
     return Q;
   }
 }

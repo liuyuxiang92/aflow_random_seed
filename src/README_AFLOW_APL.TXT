@@ -18,8 +18,7 @@ or png by the tool apl2agr (located in SOURCES/APL2AGR).
 
 The Automatic Anharmonic Phonon Library (AAPL) is an expansion of APL and can calculate the lattice
 thermal conductivity of a material via the Boltzmann Transport Equation using anharmonic
-interatomic force constants. By default, it uses only three-phonon processes but four-phonon
-processes can be captured as well.
+interatomic force constants. 
 
 The default values of APL and AAPL can be changed by editing the appropriate values in aflow.rc.
 
@@ -54,8 +53,7 @@ Table of Contents:
 7.2.    Anharmonic Interatomic Force Constants
 7.2.1.    Cluster Parameters
 7.2.2.    Sum Rule Parameters
-7.2.3.    Four-Phonon Processes
-7.2.4.    k-Point Parameters
+7.2.3.    k-Point Parameters
 7.3.    Lattice Thermal Conductivity Calculations
 7.4.    Example AAPL Input File
 
@@ -588,7 +586,7 @@ then proceed with a subsequent analysis (QHA/AAPL) without the need to change th
 The Automatic Anharmonic Phonon Library (AAPL) is the anharmonic extension to APL and calculates
 anharmonic interatomic force constants (IFCs). These can then be used to calculate the lattice
 thermal conductivity by solving the Boltzmann Transport Equation (BTE). AAPL can use three-phonon
-and four-phonon processes to calculate thermal conductivities.
+processes to calculate thermal conductivities.
 
 To use AAPL, the following needs to be added to the aflow.in file:
 
@@ -681,26 +679,7 @@ parameters.
       convergence cannot be reached because the corrections are too large, this parameter should
       be adjusted.
 
-7.2.3. Four-Phonon Processes
-
-Four-phonon processes play a critical role at high temperatures. Without including these processes,
-thermal conductivities are often overestimated. However, they are also very expensive to compute.
-
-To include four-phonon processes, the FOURTH_ORDER keyword needs to be set:
-
-    [AFLOW_AAPL]FOURTH_ORDER=ON
-
-The default is FOURTH_ORDER=OFF, i.e. only three-phonon processes are considered.
-
-CUT_SHELL and CUT_RAD can be set separately for third and fourth order clusters. To do this, the
-flags need to be written as:
-
-    [AFLOW_AAPL]CUT_RAD=5,3
-
-This is also the default setting. If no second value is provided, AAPL will set the fourth order
-parameters to the third order parameters and display a warning.
-
-7.2.4. k-Point Parameters
+7.2.3. k-Point Parameters
 
 The KPPRA parameter can be set separately for AAPL calculations. This may be desirable to reduce
 the computational cost. The parameter to set is KPPRA_AAPL:
@@ -783,7 +762,6 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [AFLOW_MODE_MPI_MODE]BINARY="mpivasp46s"
 [AFLOW] *******************************************************************************************
 [AFLOW_AAPL]CALC
-[AFLOW_APPL]FOURTH_ORDER=ON
 [AFLOW_AAPL]CUT_SHELL=4,2
 #[AFLOW_AAPL]CUT_RAD=5.0,4.0
 [AFLOW_AAPL]SUMRULE=1E-7
