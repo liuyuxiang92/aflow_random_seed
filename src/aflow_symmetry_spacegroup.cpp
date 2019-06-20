@@ -681,23 +681,23 @@ namespace SYM {
     uint match_type3 = 0;
     bool obverse = true;
     for (uint i = 0; i < equivalent_atoms.size(); i++) {
-      if(SYM::FPOSMatch(equivalent_atoms[i], reverse1, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
-	       SYM::FPOSMatch(equivalent_atoms[i], reverse2, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
-	       SYM::FPOSMatch(equivalent_atoms[i], reverse3, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      if(SYM::FPOSMatch(equivalent_atoms[i], reverse1, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
+	       SYM::FPOSMatch(equivalent_atoms[i], reverse2, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+	       SYM::FPOSMatch(equivalent_atoms[i], reverse3, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
 	       match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
 	      obverse = false;
 	      break;
       } 
-      else if(SYM::FPOSMatch(equivalent_atoms[i], half_x, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
-		          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
-		          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      else if(SYM::FPOSMatch(equivalent_atoms[i], half_x, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+		          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+		          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
 		          match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
 	      obverse = false;
 	      break;
       } 
-      else if(SYM::FPOSMatch(equivalent_atoms[i], half_xz, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
-		          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
-		          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift2, match_type3, lattice, f2c,  skew, tolerance) && //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      else if(SYM::FPOSMatch(equivalent_atoms[i], half_xz, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
+		          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+		          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift2, match_type3, lattice, f2c,  skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
 		    match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
 	      obverse = false;
       }

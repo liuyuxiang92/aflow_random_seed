@@ -1150,7 +1150,7 @@ namespace SYM {
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
         if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
-        if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input
+        if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
           count++;
           mapped_index=i;
             if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
@@ -1258,7 +1258,7 @@ namespace SYM {
   bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     for(uint i=0;i<a_vec.size();i++){
       //_atom a = a_vec[i];
-      if(MapAtom(a_vec[i], b, map_types, lattice, f2c, skew, tol)){ //DX 20190619 - lattice and f2c as input
+      if(MapAtom(a_vec[i], b, map_types, lattice, f2c, skew, tol)){ //DX 20190619 - replace f2c and c2f with lattice
         return TRUE;
       }
     }
@@ -1299,7 +1299,7 @@ namespace SYM {
   
   bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(map_types){
-      return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX 20190619 - lattice and f2c as input
+      return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX 20190619 - replace f2c and c2f with lattice
     } else {
       return FPOSMatch(a.fpos,b.fpos,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
@@ -5169,7 +5169,7 @@ namespace SYM {
     // ===== If each atom is mapped to another atom (i.e. onto), we need to check if each mapping is unique (i.e. one-to-one) ===== //
     for(uint ix=0;ix<atoms.size();ix++){
       uint mapped_index=0;
-      if(MapAtomWithBasis(transformedcrystal, atoms[ix], map_types,index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input
+      if(MapAtomWithBasis(transformedcrystal, atoms[ix], map_types,index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
