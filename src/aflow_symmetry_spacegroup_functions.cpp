@@ -4345,7 +4345,7 @@ namespace SYM {
         tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
 	bool contained = false;
 	for (uint j = 0; j < equivalent_atoms.size(); j++) {
-	  if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, skew, tol)) { //DX 20190215 //DX 20190619 - replace f2c and c2f with lattice
+	  if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
 	    contained = true;
 	    break;
 	  }
@@ -4404,7 +4404,7 @@ namespace SYM {
 	} else {
 	  bool duplicate_atom = false;
 	  for (uint b = 0; b < one_shifted_group.size(); b++) {
-	    if(SYM::MapAtom(one_shifted_group[b].fpos, tmp.fpos, lattice, skew, tol)) { //DX 20190215 //DX 20190619 - replace f2c and c2f with lattice
+	    if(SYM::MapAtom(one_shifted_group[b].fpos, tmp.fpos, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
 	      duplicate_atom = true;
 	      break;
 	    }
