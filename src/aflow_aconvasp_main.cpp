@@ -319,7 +319,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
           else {vpflow.flag("CHULL::JSON_DOC",TRUE);}    //turn on
         } else if(out_form.at(0)=='W'){
           vpflow.flag("CHULL::WEB_DOC",TRUE);     //turn on
-          vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",TRUE); //the app cannot handle more than one g-state in the visualization
+          //[WS190620 - stability criterion error otherwise for Pd1]vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",TRUE); //the app cannot handle more than one g-state in the visualization
           vpflow.flag("FORCE",TRUE); //just include everything!
           //vpflow.flag("CHULL::INCLUDE_UNRELIABLE",TRUE); //we include colors on the website
         } else if(out_form.at(0)=='L'||(out_form.at(0)=='P'&&out_form!="PNG")||out_form=="PDF"){    //Latex or Pdf
