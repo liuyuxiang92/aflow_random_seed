@@ -3517,8 +3517,11 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
   pflow::matrix<double> data;
-  double intmax;
-  pflow::GetXrayData(str,dist,sf,lambda,scatt_fact,mass,twoB_vec,ids,data,intmax);
+  pflow::GetXrayData(str,dist,sf,lambda,scatt_fact,mass,twoB_vec,ids,data); //CO190620 - intmax can be grabbed later
+
+  //get intmax
+  double intmax=1e-8;
+  for(uint i=0;i<data.size();i++){if(data[i][4]>intmax){intmax=data[i][4];}}
 
   double tol=XRAY_THETA_TOL; //1.0E-5;
   int w1=4; // int
@@ -3629,10 +3632,10 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   } // for
 }
 
-void GetXray2ThetaIntensity(const xstructure& str,double lambda,
+void GetXray2ThetaIntensity(const xstructure& str,
     vector<double>& v_twotheta,
     vector<double>& v_intensity,
-    vector<double>& v_amplitude) { //CO190520
+    double lambda) { //CO190520 //CO190620 - v_amplitude can be calculated later
   int num_atoms=str.atoms.size();
   //  vector<string> names=str.GetNames();
   vector<double> dist,sf;
@@ -3642,11 +3645,9 @@ void GetXray2ThetaIntensity(const xstructure& str,double lambda,
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
   pflow::matrix<double> data;
-  double intmax;
-  pflow::GetXrayData(str,dist,sf,lambda,scatt_fact,mass,twoB_vec,ids,data,intmax);
+  pflow::GetXrayData(str,dist,sf,lambda,scatt_fact,mass,twoB_vec,ids,data); //CO190620 - intmax can be grabbed later
 
   v_twotheta.clear();
-  v_amplitude.clear();
 
   double tol=XRAY_THETA_TOL;
 
@@ -3660,76 +3661,87 @@ void GetXray2ThetaIntensity(const xstructure& str,double lambda,
         if(theta>tol){
           v_twotheta.push_back(2.0*theta);
           v_intensity.push_back(data[i][4]);
-          v_amplitude.push_back(100*data[i][4]/intmax);
         } // if theta<tol
       } // if term<=1
     } // if dist>0
   } // for
 }
 
-void GetXrayPeaks(const xstructure& str,double lambda,vector<double>& v_intensity_smooth,vector<double>& v_peaks_twotheta,vector<double>& v_peaks_intensity,vector<double>& v_peaks_amplitude) { //CO190520
+vector<uint> GetXrayPeaks(const xstructure& str,
+    vector<double>& v_twotheta,
+    vector<double>& v_intensity,
+    vector<double>& v_intensity_smooth,
+    double lambda) { //CO190520 //CO190620 - v_peaks_amplitude not needed
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="GetXrayPeaks():";
-  vector<double> v_twotheta, v_intensity, v_amplitude;
-  GetXray2ThetaIntensity(str,lambda,v_twotheta,v_intensity,v_amplitude);
 
+  if(LDEBUG){cerr << soliloquy << " input str=" << endl;cerr << str << endl;}
+  
+  GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
   if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
-  if(v_twotheta.size()!=v_amplitude.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_amplitude.size()",_VALUE_ILLEGAL_);}
 
-  v_intensity_smooth.clear();
-  v_peaks_twotheta.clear();
-  v_peaks_intensity.clear();
-  v_peaks_amplitude.clear();
+  xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
+  uint smoothing_iterations=4;int avg_window=4;double significance_multiplier=1.0;
+  vector<int> _peak_indices=aurostd::getPeaks(xv_intensity,xv_intensity_smooth,smoothing_iterations,avg_window,significance_multiplier);  //indices wrt xvector (starts at 1), need to convert
+  v_intensity_smooth=aurostd::xvector2vector<double>(xv_intensity_smooth);
+  vector<uint> peak_indices;for(uint i=0;i<_peak_indices.size();i++){peak_indices.push_back(_peak_indices[i]-xv_intensity.lrows);} //shift indices for xvector -> vector conversion
 
-  //using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
-  //raw data is X
-  //smooth data via moving average to get Y
-  //stddev(X-Y) is sigma
-  //detect peaks when (X-Y)>multiplier*sigma
-
-  //smooth data
-  uint smoothing_iterations=4;int avg_window=4;
-  xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity);
-  xvector<double> xv_intensity_smooth=xv_intensity;
-  for(uint i=0;i<smoothing_iterations;i++){xv_intensity_smooth=aurostd::moving_average(xv_intensity_smooth,avg_window);}
-  xvector<double> diff=xv_intensity-xv_intensity_smooth;
-  double sigma=aurostd::stddev(diff);
-  double multiplier=1;
-
-  bool local_maximum=false;
-  bool significant=false;
-  for(int i=xv_intensity.lrows;i<=xv_intensity.urows;i++){
-    local_maximum=(i>xv_intensity.lrows && i<xv_intensity.urows && xv_intensity[i]>xv_intensity[i-1] && xv_intensity[i]>xv_intensity[i+1]);
-    significant=(diff[i]>multiplier*sigma);
-    if(local_maximum && significant){
-      v_peaks_twotheta.push_back(v_twotheta[i-xv_intensity.lrows]);
-      v_peaks_intensity.push_back(v_intensity[i-xv_intensity.lrows]);
-      v_peaks_amplitude.push_back(v_amplitude[i-xv_intensity.lrows]);
-      if(LDEBUG) {cerr << soliloquy << " PEAK[two-theta=" << v_twotheta[i-xv_intensity.lrows] << "]=" << xv_intensity[i] << endl;}
-    }
+  if(LDEBUG){
+    cerr << soliloquy << " _peak_indices=" << aurostd::joinWDelimiter(_peak_indices,",") << endl;
+    cerr << soliloquy << "  peak_indices=" << aurostd::joinWDelimiter(peak_indices,",") << endl;
   }
 
-  v_intensity_smooth=aurostd::xvector2vector(xv_intensity_smooth);
+  return peak_indices;
 
-  if(0){  //don't bother sorting
-    for(uint i=0;i<v_peaks_twotheta.size();i++){
-      for(uint j=i+1;j<v_peaks_twotheta.size();j++){
-        if(v_peaks_amplitude[j]>v_peaks_amplitude[i]){
-          double tmp_twotheta=v_peaks_twotheta[i];
-          double tmp_intensity=v_peaks_intensity[i];
-          double tmp_amplitude=v_peaks_amplitude[i];
-          
-          v_peaks_twotheta[i]=v_peaks_twotheta[j];
-          v_peaks_intensity[i]=v_peaks_intensity[j];
-          v_peaks_amplitude[i]=v_peaks_amplitude[j];
-          
-          v_peaks_twotheta[j]=tmp_twotheta;
-          v_peaks_intensity[j]=tmp_intensity;
-          v_peaks_amplitude[j]=tmp_amplitude;
-        }
-      }
-    }
-  }
+  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_twotheta.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_intensity.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]//using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
+  //[CO190620 - moved to aurostd::getPeaks()]//raw data is X
+  //[CO190620 - moved to aurostd::getPeaks()]//smooth data via moving average to get Y
+  //[CO190620 - moved to aurostd::getPeaks()]//stddev(X-Y) is sigma
+  //[CO190620 - moved to aurostd::getPeaks()]//detect peaks when (X-Y)>multiplier*sigma
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]//smooth data
+  //[CO190620 - moved to aurostd::getPeaks()]uint smoothing_iterations=4;int avg_window=4;
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity);
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity_smooth=xv_intensity;
+  //[CO190620 - moved to aurostd::getPeaks()]for(uint i=0;i<smoothing_iterations;i++){xv_intensity_smooth=aurostd::moving_average(xv_intensity_smooth,avg_window);}
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> diff=xv_intensity-xv_intensity_smooth;
+  //[CO190620 - moved to aurostd::getPeaks()]double sigma=aurostd::stddev(diff);
+  //[CO190620 - moved to aurostd::getPeaks()]double multiplier=1;
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]bool local_maximum=false;
+  //[CO190620 - moved to aurostd::getPeaks()]bool significant=false;
+  //[CO190620 - moved to aurostd::getPeaks()]for(int i=xv_intensity.lrows;i<=xv_intensity.urows;i++){
+  //[CO190620 - moved to aurostd::getPeaks()]  local_maximum=(i>xv_intensity.lrows && i<xv_intensity.urows && xv_intensity[i]>xv_intensity[i-1] && xv_intensity[i]>xv_intensity[i+1]);
+  //[CO190620 - moved to aurostd::getPeaks()]  significant=(diff[i]>multiplier*sigma);
+  //[CO190620 - moved to aurostd::getPeaks()]  if(local_maximum && significant){
+  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_twotheta.push_back(v_twotheta[i-xv_intensity.lrows]);
+  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_intensity.push_back(v_intensity[i-xv_intensity.lrows]);
+  //[CO190620 - moved to aurostd::getPeaks()]    if(LDEBUG) {cerr << soliloquy << " PEAK[two-theta=" << v_twotheta[i-xv_intensity.lrows] << "]=" << xv_intensity[i] << endl;}
+  //[CO190620 - moved to aurostd::getPeaks()]  }
+  //[CO190620 - moved to aurostd::getPeaks()]}
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth=aurostd::xvector2vector(xv_intensity_smooth);
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]if(0){  //don't bother sorting
+  //[CO190620 - moved to aurostd::getPeaks()]  for(uint i=0;i<v_peaks_twotheta.size();i++){
+  //[CO190620 - moved to aurostd::getPeaks()]    for(uint j=i+1;j<v_peaks_twotheta.size();j++){
+  //[CO190620 - moved to aurostd::getPeaks()]      if(v_peaks_intensity[j]>v_peaks_intensity[i]){  //CO190620 - use intensity vs. amplitude
+  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_twotheta=v_peaks_twotheta[i];
+  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_intensity=v_peaks_intensity[i];
+  //[CO190620 - moved to aurostd::getPeaks()]        
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[i]=v_peaks_twotheta[j];
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[i]=v_peaks_intensity[j];
+  //[CO190620 - moved to aurostd::getPeaks()]        
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[j]=tmp_twotheta;
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[j]=tmp_intensity;
+  //[CO190620 - moved to aurostd::getPeaks()]      }
+  //[CO190620 - moved to aurostd::getPeaks()]    }
+  //[CO190620 - moved to aurostd::getPeaks()]  }
+  //[CO190620 - moved to aurostd::getPeaks()]}
 
 }
 
@@ -3740,8 +3752,7 @@ void GetXrayData(const xstructure& str,
 	       double lambda,vector<double>& scatt_fact,
 	       vector<double>& mass,vector<double>& twoB_vec,
          vector<vector<double> >& ids,
-         pflow::matrix<double>& data,
-         double& intmax) { //CO190520
+         pflow::matrix<double>& data) { //CO190520  //CO190620 - intmax can be grabbed later
   //int num_atoms=str.atoms.size();
   //  vector<string> names=str.GetNames();
   //vector<double> dist,sf;
@@ -3857,8 +3868,7 @@ void GetXrayData(const xstructure& str,
   // Choose hkl such that h is the largest, k the second, and l the third.
   // Multiply the sf by the number of degenerate points at that distance.
   // Get max integrated intensity for normalizations and percentages.
-  //double intmax=1E-8;
-  intmax=1E-8;
+  //[CO190620 - not needed here]double intmax=1E-8;
   double odist=dist[(int)ids[0][1]]; // Initialize odsit to first distance.
   double osf=sf[(int)ids[0][1]]; // Initialize osf to first distance.
   vector<vector<int> > hkl_list;
@@ -3894,7 +3904,7 @@ void GetXrayData(const xstructure& str,
           datav[4]=osf*hkl_list.size();
           datav[5]=hkl_list.size();
           data.push_back(datav);
-          if(datav[4]>intmax) {intmax=datav[4];}
+          //[CO190620 - not needed here]if(datav[4]>intmax) {intmax=datav[4];}
           vector<int> v(0);
           hkl_list= vector<vector<int> > (0,v);
           hkl[0]=ii0;		    

@@ -527,6 +527,12 @@ namespace aurostd { //CO190419
   template<class utype> xvector<utype> moving_average(const xvector<utype>& signal,int window); //CO190419
 }
 
+namespace aurostd { //CO190620
+  //signal processing
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,uint smoothing_iterations=4,uint avg_window=4,double significance_multiplier=1.0);  //CO190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,double significance_multiplier=1.0);  //CO190620
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 

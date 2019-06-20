@@ -14144,16 +14144,30 @@ namespace pflow {
       init::ErrorOption(cout,"","pflow::XRAY","aflow --xray_peaks=lambda < POSCAR");
       exit(0);
     }
+    
+    cout << aflow::Banner("BANNER_TINY") << endl;
  
     xstructure a(input,IOAFLOW_AUTO);
 
-    vector<double> v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude;
-    GetXrayPeaks(a,lambda,v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude);
+    vector<double> v_twotheta,v_intensity,v_intensity_smooth;
+    vector<uint> peak_indices=GetXrayPeaks(a,v_twotheta,v_intensity,v_intensity_smooth,lambda);
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
     
-    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_peaks_twotheta.size()!=v_peaks_amplitude.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_amplitude.size()",_VALUE_ILLEGAL_);}
+    //get amplitude
+    vector<double> v_amplitude,v_peaks_amplitude;
+    double intmax=1e-8;
+    for(uint i=0;i<v_intensity.size();i++){if(v_intensity[i]>intmax){intmax=v_intensity[i];}}
+    for(uint i=0;i<v_intensity.size();i++){v_amplitude.push_back(100*v_intensity[i]/intmax);}
 
-    cout << aflow::Banner("BANNER_TINY") << endl;
+    //match peak_indices to peaks
+    vector<double> v_peaks_twotheta,v_peaks_intensity;
+    for(uint i=0;i<peak_indices.size();i++){
+      v_peaks_twotheta.push_back(v_twotheta[peak_indices[i]]);
+      v_peaks_intensity.push_back(v_intensity[peak_indices[i]]);
+      v_peaks_amplitude.push_back(v_amplitude[peak_indices[i]]);
+    }
+    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
 
     cout << "X-Ray Peaks:" << endl;
     cout << "Two-Theta=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_peaks_twotheta,5,false),",") << endl; //no roff
@@ -14181,18 +14195,27 @@ namespace pflow {
     if(directory.empty()){directory=".";}
     if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
     
-    vector<double> v_twotheta,v_intensity,v_amplitude;
-    GetXray2ThetaIntensity(str,lambda,v_twotheta,v_intensity,v_amplitude);
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_twotheta.size()!=v_amplitude.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_amplitude.size()",_VALUE_ILLEGAL_);}
-    
-    vector<double> v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude;
-    GetXrayPeaks(str,lambda,v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude);
-    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
-    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_peaks_twotheta.size()!=v_peaks_amplitude.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_amplitude.size()",_VALUE_ILLEGAL_);}
-    
     cout << aflow::Banner("BANNER_TINY") << endl;
+    
+    vector<double> v_twotheta,v_intensity,v_intensity_smooth;
+    vector<uint> peak_indices=GetXrayPeaks(str,v_twotheta,v_intensity,v_intensity_smooth,lambda);
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
+    
+    //get amplitude
+    vector<double> v_amplitude,v_peaks_amplitude;
+    double intmax=1e-8;
+    for(uint i=0;i<v_intensity.size();i++){if(v_intensity[i]>intmax){intmax=v_intensity[i];}}
+    for(uint i=0;i<v_intensity.size();i++){v_amplitude.push_back(100*v_intensity[i]/intmax);}
+
+    //match peak_indices to peaks
+    vector<double> v_peaks_twotheta,v_peaks_intensity;
+    for(uint i=0;i<peak_indices.size();i++){
+      v_peaks_twotheta.push_back(v_twotheta[peak_indices[i]]);
+      v_peaks_intensity.push_back(v_intensity[peak_indices[i]]);
+      v_peaks_amplitude.push_back(v_amplitude[peak_indices[i]]);
+    }
+    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
 
     stringstream data_file_ss;
     string data_file;

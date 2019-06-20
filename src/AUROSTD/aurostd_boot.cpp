@@ -242,6 +242,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO190520
   v=aurostd::gaussian_filter_xv<utype>(x);v=aurostd::gaussian_filter_xv<utype>(x,1);v=aurostd::gaussian_filter_xv<utype>(x,1,1); //CO190520
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::moving_average(v,x); //CO190520
+  vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
 
   // initialize matrices
   utype* mstar;mstar=NULL;

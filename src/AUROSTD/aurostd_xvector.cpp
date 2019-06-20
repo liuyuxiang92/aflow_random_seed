@@ -2591,6 +2591,41 @@ namespace aurostd {
   }
 }
 
+namespace aurostd {
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,uint smoothing_iterations,uint avg_window,double significance_multiplier){  //CO190620
+    xvector<utype> signal_smooth;
+    return getPeaks(signal,signal_smooth,smoothing_iterations,avg_window,significance_multiplier);
+  }
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,xvector<utype>& signal_smooth,uint smoothing_iterations,uint avg_window,double significance_multiplier){  //CO190620
+    //using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
+    //raw data is X
+    //smooth data via moving average to get Y
+    //stddev(X-Y) is sigma
+    //detect peaks when (X-Y)>multiplier*sigma
+
+    //smooth data
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::getPeaks():";
+    signal_smooth=signal;
+    for(uint i=0;i<smoothing_iterations;i++){signal_smooth=aurostd::moving_average(signal_smooth,avg_window);}
+    xvector<utype> diff=signal-signal_smooth;
+    utype sigma=aurostd::stddev(diff);
+
+    vector<int> peak_indices;
+    bool local_maximum=false;
+    bool significant=false;
+    for(int i=signal.lrows;i<=signal.urows;i++){
+      local_maximum=(i>signal.lrows && i<signal.urows && signal[i]>signal[i-1] && signal[i]>signal[i+1]);
+      significant=(diff[i]>significance_multiplier*sigma);
+      if(local_maximum && significant){
+        peak_indices.push_back(i);
+        if(LDEBUG) {cerr << soliloquy << " PEAK[i=" << i << "]=" << signal[i] << endl;}
+      }
+    }
+    return peak_indices;
+  }
+} // namespace aurostd
+
 #endif  // _AUROSTD_XVECTOR_IMPLEMENTATIONS_
 
 

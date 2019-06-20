@@ -482,8 +482,8 @@ void PrintRDFCmp(const xstructure& str_A,const xstructure& str_B,const double& r
 void PrintRSM(const xstructure&,ostream& oss=cout);
 void PrintShell(const xstructure& str,const int& ns,const double& rmin,const double& rmax,const string& sname,const int lin_dens,ostream& oss=cout);
 void PrintXray(const xstructure& str,double l,ostream& oss=cout); //CO190520
-void GetXray2ThetaIntensity(const xstructure& str, double lambda,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_amplitude); //CO190520
-void GetXrayPeaks(const xstructure& str,double lambda,vector<double>& v_intensity_smooth,vector<double>& v_peaks_twotheta,vector<double>& v_peaks_intensity,vector<double>& v_peaks_amplitude); //CO190520
+void GetXray2ThetaIntensity(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,double lambda=1.5418); //CO190520
+vector<uint> GetXrayPeaks(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_intensity_smooth,double lambda=1.5418); //CO190520  //CO190620 - v_peaks_amplitude not needed
 void PrintXYZ(const xstructure& a,const xvector<int>& n,ostream& oss=cout);
 void PrintXYZws(const xstructure& a,ostream& oss=cout);
 void PrintXYZInSphere(const xstructure& a,const double& radius,ostream& oss=cout);
@@ -521,7 +521,7 @@ namespace pflow {
 	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec); //CO190520
   void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,double lambda,
         vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
-        vector<vector<double> >& ids,pflow::matrix<double>& data,double& intmax);  //CO190409
+        vector<vector<double> >& ids,pflow::matrix<double>& data);  //CO190409  //CO190620 - intmax can be grabbed later
   void GetRDF(xstructure str,const double& rmax,const int& nbins,matrix<double>& rdf_all);
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,
 		    const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
