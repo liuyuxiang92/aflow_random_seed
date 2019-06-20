@@ -200,8 +200,8 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
         mapped = false;
         fpos_scaled = (pcell.fgroup[fg].Uf * scell.atoms[atsc].fpos) + ftau_scaled;
         for (uint at_map = 0; at_map < natoms; at_map++) {
-          if (SYM::AtomFPOSMatch(fpos_scaled, scell.atoms[at_map].fpos,
-                                 scell.lattice, skewed, scell.sym_eps)) { //DX 20190619 - replace f2c and c2f with lattice
+          if (SYM::FPOSMatch(fpos_scaled, scell.atoms[at_map].fpos,
+                             scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
             sym_map[fg][atsc] = at_map;
             mapped = true;
           }
@@ -583,8 +583,8 @@ vector<int> ClusterSet::translateToPcell(const vector<int>& atoms, int at) {
       for (uint j = 0; j < scell.atoms.size(); j++) {
         // No need to compare when atoms are of different type
         if (scell.atoms[j].type == scell.atoms[atoms[i]].type) {
-          if (SYM::AtomFPOSMatch(fpos_transl, scell.atoms[j].fpos, scell.lattice,
-                                 update, scell.sym_eps)) { //DX 20190619 - replace f2c and c2f with lattice
+          if (SYM::FPOSMatch(fpos_transl, scell.atoms[j].fpos, scell.lattice,
+                             scell.f2c, update, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
             atoms_translated[i] = j;
             j = scell.atoms.size();
           }
@@ -1017,8 +1017,8 @@ vector<int> ClusterSet::getTransformationMap(const int& fg, const int& atom) {
       atom_trans = symmetry_map[fg][at];
       xvector<double> fpos = scell.c2f * (scell.atoms[atom_trans].cpos - transl);
       for (uint at_map = 0; at_map < natoms; at_map++) {
-        if (SYM::AtomFPOSMatch(fpos, scell.atoms[at_map].fpos,
-                               scell.lattice, skewed, scell.sym_eps)) { //DX 20190619 - replace f2c and c2f with lattice
+        if (SYM::FPOSMatch(fpos, scell.atoms[at_map].fpos,
+                           scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
           transformation_map[at] = at_map;
           at_map = natoms;
         }

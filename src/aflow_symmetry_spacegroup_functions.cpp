@@ -1317,13 +1317,13 @@ namespace SYM {
       rhs_tmp(3) = RHS[i + 2];
       xvector<double> rhs_cart_xvec = f2c * rhs_tmp;
       if(skew) {
-	xvector<double> origin;
-	rhs_cart_xvec = SYM::minimizeDistanceCartesianMethod(origin, rhs_cart_xvec, lattice); //DX 20190613
-	//DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
+	      xvector<double> origin;
+	      rhs_cart_xvec = SYM::minimizeDistanceCartesianMethod(origin, rhs_cart_xvec, lattice); //DX 20190613
+	      //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
       } else {
         xvector<double> rhs_frac_xvec = SYM::minimizeDistanceFractionalMethod(rhs_tmp); //DX 20190613
         rhs_cart_xvec = f2c * rhs_tmp; //DX 20190613
-	//DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
+	      //DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
       }
       //DX 20190613 [OBSOLETE] rhs_cart_xvec = f2c * rhs_tmp;
       RHS_cart.push_back(rhs_cart_xvec(1));
@@ -1404,19 +1404,19 @@ namespace SYM {
 	    coord(1) = DotPro(LHS[ii], origin_shift) - RHS[ii];
 	    coord(2) = DotPro(LHS[ii + 1], origin_shift) - RHS[ii + 1];
 	    coord(3) = DotPro(LHS[ii + 2], origin_shift) - RHS[ii + 2];
-            double min_dist = 1e9; //DX 20190613
+      double min_dist = 1e9; //DX 20190613
 	    if(skew) {
 	      xvector<double> origin;
 	      xvector<double> coord_cart = f2c * coord;
 	      xvector<double> min_coord_cart = SYM::minimizeDistanceCartesianMethod(origin, coord_cart, lattice); //DX 20190613
-              min_dist = aurostd::modulus(min_coord_cart); //DX 20190613
+         min_dist = aurostd::modulus(min_coord_cart); //DX 20190613
 	      //DX 20190613 [OBSOLETE] if(!SYM::minimizeCartesianDistance(origin, coord_cart, coord, c2f, f2c, tol)) { //DX 20190215
 	      //DX 20190613 [OBSOLETE]   found = false;
 	      //DX 20190613 [OBSOLETE]   break;
 	      //DX 20190613 [OBSOLETE] }
 	    } else {
-              xvector<double> min_frac_coord = SYM::minimizeDistanceFractionalMethod(coord); //DX 20190613
-              min_dist = aurostd::modulus(f2c * min_frac_coord); //DX 20190613
+        xvector<double> min_frac_coord = SYM::minimizeDistanceFractionalMethod(coord); //DX 20190613
+        min_dist = aurostd::modulus(f2c * min_frac_coord); //DX 20190613
 	      //DX 20190613 [OBSOLETE] SYM::PBC(coord);
 	      //DX 20190613 [OBSOLETE] if(aurostd::modulus(f2c * coord) > tol) {
 	      //DX 20190613 [OBSOLETE]   found = false;

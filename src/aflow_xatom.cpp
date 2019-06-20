@@ -9253,7 +9253,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //[OBSOLETE]if(duplicate_atom == false) {
-      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,skew,tol)){ //DX 20190619 - replace f2c and c2f with lattice_new
+      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX 20190619 - lattice_new and f2c_new as input
       //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
       //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
       atoms_in_cell.push_back(atoms[j]);
