@@ -1,5 +1,8 @@
 3.1.225 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
+        -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)
+        -- changed output name for --output=web to aflow_ALLOY_hull_web.json (WS)
+        -- integrated N+1_enthalpy_gain and stability criterion to --output=web (WS)
         -- patched change_tolerance() bug for double& tolerance return (DX)
         -- added functions to find pointLineIntersection() and linePlaneIntersection() (CO)
         -- added function to find 3D rotation between two 3D vectors (CO)
