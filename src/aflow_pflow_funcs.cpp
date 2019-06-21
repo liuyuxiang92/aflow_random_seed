@@ -5640,16 +5640,35 @@ namespace pflow {
     line_tokens.clear();
     if(LDEBUG) oss << soliloquy << "FORMAT FOR LATTICE VECTORS LOOKS OK" << endl;
 
+    //DX 20190618 - check for VASP5 - START
+    //mirrors check in aflow_xatom.cpp
+    bool is_vasp_4_poscar = true; //VASP4 (default)
+    uint poscar_header_count = 7 ; // VASP4 (default)
+    uint species_line_number = 5 ; // VASP4 (default)
+    string stmp = vcontent.at(6);
+    aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
+    aurostd::string2tokens(stmp,line_tokens);
+    if(line_tokens.at(0)[0]!='S' && line_tokens.at(0)[0]!='s' && line_tokens.at(0)[0]!='D' && line_tokens.at(0)[0]!='d' && line_tokens.at(0)[0]!='C' && line_tokens.at(0)[0]!='c') {
+      is_vasp_4_poscar = false; // then VASP5
+      poscar_header_count = 8; // then VASP5
+      species_line_number = 6; // then VASP5
+    }
+    line_tokens.clear();
+    if(LDEBUG) oss << soliloquy << "IS VASP4 FORMAT = " << is_vasp_4_poscar << endl;
+    //DX 20190618 - check for VASP5 - END
+
     //if we get here, assume CHGCAR is formatted correctly for now
     //read in header, scaling factor, lattice vectors, number of atoms, coordinate type
     if(LDEBUG) oss << soliloquy << "READING POSCAR" << endl;
-    for(uint i=0;i<7;i++) {
+    //DX 20190618 [OBSOLETE] for(uint i=0;i<7;i++) {
+    for(uint i=0;i<poscar_header_count;i++) { //DX 20190618
       poscar << vcontent.at(i) << endl;
       chgcar_header << vcontent.at(i) << endl;
       linecount=i;
     }
     //read in number of atoms
-    aurostd::string2tokens(vcontent.at(5),sum_tokens," ");
+    //DX 20190618 aurostd::string2tokens(vcontent.at(5),sum_tokens," ");
+    aurostd::string2tokens(vcontent.at(species_line_number),sum_tokens," "); //DX 20190618
     for(uint i=0;i<sum_tokens.size();i++) {
       natoms+=aurostd::string2utype<uint>(sum_tokens.at(i));
     }

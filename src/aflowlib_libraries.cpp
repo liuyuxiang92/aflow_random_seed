@@ -2265,6 +2265,7 @@ namespace aflowlib {
     // aurostd::StringSubst(directory_LIB,"/./","/");
     // aurostd::StringSubst(directory_RAW,"/./","/");
     vector<string> vspecies;aurostd::string2tokens(data.species,vspecies,",");
+    deque<string> deq_species;aurostd::string2tokens(data.species,deq_species,","); //DX 20190620
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Thermodynamics - begin " << directory_LIB << endl;
     if(LDEBUG) cerr << "directory_LIB=\"" << directory_LIB << "\"" << endl;
     if(LDEBUG) cerr << "directory_RAW=\"" << directory_RAW << "\"" << endl;
@@ -2627,6 +2628,7 @@ namespace aflowlib {
     if(str_orig.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
       xstructure _str_orig(directory_RAW+"/POSCAR.orig",IOVASP_AUTO);
       str_orig=_str_orig;
+      str_orig.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_orig.ReScale(1.0);
       /*xstr_js.str("");xstr_js << xstructure2json(str_orig);aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_orig.json");*/
     } // CO 171025
@@ -2636,9 +2638,10 @@ namespace aflowlib {
     if(str_relax.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
       xstructure _str_relax(directory_RAW+"/CONTCAR.relax",IOVASP_AUTO);
       str_relax=_str_relax;
+      str_relax.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_relax.ReScale(1.0);
       xstr_js.str("");
-      xstr_js << xstructure2json(str_orig);
+      xstr_js << xstructure2json(str_relax); //DX 20190620 - bug fix; orig->relax
       aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax.json");
     } // CO 171025
  
@@ -2647,9 +2650,10 @@ namespace aflowlib {
    if(str_relax.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/CONTCAR.static")) {
       xstructure _str_relax(directory_RAW+"/CONTCAR.static",IOVASP_AUTO);
       str_relax=_str_relax;
+      str_relax.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_relax.ReScale(1.0);
       xstr_js.str("");
-      xstr_js << xstructure2json(str_orig);
+      xstr_js << xstructure2json(str_relax); //DX 20190620 - bug fix; orig->relax
       aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax.json");
     } // CO 171025
  
@@ -2658,9 +2662,10 @@ namespace aflowlib {
    if(aurostd::FileExist(directory_RAW+"/CONTCAR.relax1")) {
       xstructure _str_relax1(directory_RAW+"/CONTCAR.relax1",IOVASP_AUTO);
       str_relax1=_str_relax1;
+      str_relax1.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_relax1.ReScale(1.0);
       xstr_js.str("");
-      xstr_js << xstructure2json(str_orig);
+      xstr_js << xstructure2json(str_relax1); //DX 20190620 - bug fix; orig->relax1
       aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax1.json");
     } // CO 171025
     // do the extractions
