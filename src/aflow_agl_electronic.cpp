@@ -176,10 +176,10 @@ namespace AGL_functions {
 	AGL_dos_pressure.energy.push_back(doscar.venergy.at(i));
 	sumdos = 0.0;
 	sumidos = 0.0;
-	for (uint j = 0; j < doscar.vDOS[0][0].size(); j++) {  // ME190614 - new vDOS format
+	for (uint j = 0; j < doscar.spin + 1; j++) {  // ME190614 - new vDOS format
 	  sumdos = sumdos + doscar.vDOS[0][0][j][i];  // ME190614 - new vDOS format
 	}
-	for (uint j = 0; j < doscar.viDOS.size(); j++) {  // ME190614 - new viDOS format
+	for (uint j = 0; j < doscar.spin + 1; j++) {  // ME190614 - new viDOS format
 	  sumidos = sumidos + doscar.viDOS[j][i];  // ME190614 - new viDOS format
 	}
 	AGL_dos_pressure.dosval.push_back(sumdos);

@@ -140,7 +140,8 @@ xoption getPlotOptionsPhonons(const aurostd::xoption& xopt, const string& key) {
   plotoptions.flag("NOSHIFT", true);
 
   // Orbital-projections do not exist for phonons
-  if (plotoptions.getattachedscheme("PROJECTION") == "ORBITALS") {
+  scheme = plotoptions.getattachedscheme("PROJECTION");
+  if ((scheme == "ORBITALS") || (scheme == "LM")) {
     plotoptions.pop_attached("PROJECTION");
     plotoptions.push_attached("PROJECTION", "NONE");
   }
@@ -245,7 +246,6 @@ void setTitle(xoption& plotoptions) {
   string title = plotoptions.getattachedscheme("TITLE");
   // Format title
   if (title.empty()) title = formatDefaultPlotTitle(plotoptions);
-  title = aurostd::StringSubst(title, "_", "\\_");  // Need to substitute for epslatex
   plotoptions.push_attached("PLOT_TITLE", title);
 }
 
@@ -320,7 +320,7 @@ string formatCompoundLATEX(const string& compound) {
 //////////////////////////////////////////////////////////////////////////////
 
 static const string EFERMI_COLOR = "#0000FF";
-static const int ESTRUCTURE_NCOLORS = 7;
+static const int ESTRUCTURE_NCOLORS = 11;
 static const string ESTRUCTURE_COLORS[ESTRUCTURE_NCOLORS] = {
     "#000000",  // black
     "#4C72B0",  // blue
@@ -328,10 +328,18 @@ static const string ESTRUCTURE_COLORS[ESTRUCTURE_NCOLORS] = {
     "#C44E52",  // red
     "#8172B2",  // purple
     "#CCB974",  // yellow
-    "#64B5CD"   // light blue
+    "#64B5CD",  // light blue
+    "#E08000",  // orange
+    "#006060",  // blue-green
+    "#BE80FF",  // light purple
+    "#A06000"   // brown
 };
 static const string ISPIN_COLORS[2] = {"#000000", "#C44E52"};
 static const string ORBITALS[4] = {"s", "p", "d", "f"};
+static const string LM_ORBITALS[16] = {"s", "p_y", "p_z", "p_x",
+                                       "d_{xy}", "d_{yz}", "d_{z^2}", "d_{xz}", "d_{x^2-y^2}",
+                                       "f_{y(3x^2-y^2)}", "f_{xyz}", "f_{yz^2}", "f_{z^3}",
+                                       "f_{xz^2}", "f_{z(x^2-y^2)}", "f_{x(x^2-3y^2)}"};
 
 namespace plotter {
 
@@ -355,6 +363,13 @@ void PLOT_DOS(xoption& plotoptions, stringstream& out) {
   string directory = plotoptions.getattachedscheme("DIRECTORY");
   xDOSCAR xdos;
   xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
+  // Make sure the projections are consistent with the DOSCAR file
+  if ((plotoptions.getattachedscheme("PROJECTION") == "LM") && !(xdos.lmResolved)) {
+    std::cerr << "Found --projection=lm, but DOSCAR is not lm-resolved."
+              << " Will choose --projection=orbitals instead." << std::endl;
+    plotoptions.pop_attached("PROJECTION");
+    plotoptions.push_attached("PROJECTION", "ORBITALS");
+  }
 
   plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
   setFileName(plotoptions);
@@ -630,19 +645,52 @@ void setEMinMax(xoption& plotoptions, const double& Emin, const double& Emax) {
 void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions) {
   deque<deque<deque<double> > > dos;
   vector<string> labels;
+  labels.push_back("total");  // There is always a total DOS
   string projection = plotoptions.getattachedscheme("PROJECTION");
   int pdos = aurostd::string2utype<int>(plotoptions.getattachedscheme("DATASET"));
   if (projection == "ORBITALS") {
-    labels.push_back("total");
-    for (uint i = 1; i < xdos.vDOS[pdos].size(); i++) {
-      labels.push_back("$" + ORBITALS[i-1] + "$");
+    // If the DOSCAR is lm-resolved, the orbital projection is the sum of all individual
+    // orbitals with the same quantum number
+    int norbitals;
+    if (xdos.lmResolved) norbitals = (int) std::sqrt(xdos.vDOS[pdos].size());  // size is either 17 or 10
+    else norbitals = (int) xdos.vDOS[pdos].size() - 1;
+    for (int i = 0; i < norbitals; i++) {
+      labels.push_back("$" + ORBITALS[i] + "$");
     }
-    dos = xdos.vDOS[pdos]; 
+    if (xdos.lmResolved) {
+      // Total DOS and s-orbitals
+      dos.push_back(xdos.vDOS[pdos][0]);
+      dos.push_back(xdos.vDOS[pdos][1]);
+      // p-, d-, and maybe f-orbitals
+      deque<deque<deque<double> > > dospart(norbitals - 1, deque<deque<double> >(xdos.spin + 1, deque<double>(xdos.number_energies)));
+      for (uint e = 0; e < xdos.number_energies; e++) {
+        for (int d = 0; d < norbitals - 1; d++) {
+          for (int i = d * (2 + d) + 2; i < d * (d + 4) + 5; i++) {
+            for (uint s = 0; s < xdos.spin + 1; s++) {
+              dospart[d][s][e] += xdos.vDOS[pdos][i][s][e];
+            }
+          }
+        }
+      }
+      for (int d = 0; d < norbitals - 1; d++) dos.push_back(dospart[d]);
+    } else {
+      dos = xdos.vDOS[pdos];
+    }
+  } else if (projection == "LM") {
+    // Safety check
+    if (!xdos.lmResolved) {
+      string function = "plotter::generateDosPlot()";
+      string message = "Projection scheme LM chosen, but DOSCAR is not lm-resolved.";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    }
+    for (uint i = 1; i < xdos.vDOS[pdos].size(); i++) {
+      labels.push_back("$" + LM_ORBITALS[i-1] + "$");
+    }
+    dos = xdos.vDOS[pdos];
   } else if (projection == "ATOMS") {
     xstructure xstr = getStructureWithNames(plotoptions);
     if (pdos == 0) {
       dos.push_back(xdos.vDOS[0][0]);
-      labels.push_back("total");
       if (xdos.vDOS.size() > 1) {
         pflow::PerformFullSymmetry(xstr);
         int iat;
@@ -660,7 +708,6 @@ void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plot
     }
   } else if (projection == "NONE") {  // Total DOS only without projections
     dos.push_back(xdos.vDOS[0][0]);
-    labels.push_back("total");
   } else {
     string function = "plotter::genertateDosPlot()";
     string message = "Unknown projection scheme " + projection + ".";

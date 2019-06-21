@@ -425,7 +425,7 @@ void PhononDispersionCalculator::writePHEIGENVAL() {
           << std::setw(15) << potim << std::endl;
   
   outfile << std::setw(23) << std::setprecision(15) << _temperature << std::endl;
-  outfile << "  CAR" << std::endl;
+  outfile << "  PHON" << std::endl;
   outfile << " " << _pc.getSystemName() << std::endl;
 
   uint nbranch = _pc.getNumberOfBranches();

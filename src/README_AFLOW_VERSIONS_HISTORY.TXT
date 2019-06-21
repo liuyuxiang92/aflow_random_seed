@@ -1,5 +1,18 @@
 3.1.225 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
+        -- Added vector version of RemoveComments. (ME)
+        -- RemoveControlCharactersFromStringstream now also removes carriage returns because they break string additions. (ME)
+        -- SPIN_REMOVE_RELAX_2 did not remove spin after the second relaxation; this is fixed now. (ME)
+        -- Removed bug that prevented certain NBANDS errors from being fixed while an NBANDS warning was present in vasp.out (ME)
+        -- APL and AAPL now read forces from qmvasp file. (ME)
+        -- AAPL_KPPRA added to aflow_modules. (ME)
+        -- Minor APL code clean-ups. (ME)
+        -- Added new plotter functions for band structures, phonons, and thermal properties. (ME)
+        -- Changed xDOSCAR, xEIGENVAL, and xKPOINTS to be compatible with new plotter. (ME)
+        -- Added functionality to APL that outputs phonon DOS and dispersion in
+        -- VASP format for new plotter functions. (ME)
+        -- Fixed bug for the path builder for path with - and | as separators. (ME)
+        -- Fixed xDOSCAR reader to be more general. (ME)
         -- patched change_tolerance() bug for double& tolerance return (DX)
         -- added functions to find pointLineIntersection() and linePlaneIntersection() (CO)
         -- added function to find 3D rotation between two 3D vectors (CO)

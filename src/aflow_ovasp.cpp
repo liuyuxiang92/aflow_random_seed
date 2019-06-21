@@ -3573,6 +3573,8 @@ xDOSCAR::xDOSCAR() {
   vDOS.clear();viDOS.clear();
   // vDOSs.clear();vDOSp.clear();vDOSd.clear(); OBSOLETE ME190614 - not used
   partial = false; // ME190614
+  isLSCOUPLING = false;  // ME190620
+  lmResolved = false;  // ME190620
 }  
 
 xDOSCAR::~xDOSCAR() {
@@ -3610,7 +3612,7 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   number_energies=b.number_energies;
   denergy=b.denergy;  
   venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i));
-  venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i));
+  //venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i)); OBSOLETE ME190620 - duplicate
   //vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i)); OBSOLETE ME190614
   vDOS.clear(); vDOS = b.vDOS;  // ME190614
   viDOS.clear(); for(uint i=0;i<b.viDOS.size();i++) viDOS.push_back(b.viDOS.at(i));
@@ -3619,6 +3621,8 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   //vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));  OBSOLETE ME190614 - not used
   //vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));  OBSOLETE ME190614 - not used
   partial = b.partial;  // ME190614
+  isLSCOUPLING = b.isLSCOUPLING;  // ME190620
+  lmResolved = b.lmResolved;  // ME190620
 }
 
 const xDOSCAR& xDOSCAR::operator=(const xDOSCAR& b) {  // operator= PUBLIC
@@ -3699,6 +3703,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
+    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190620 - what kind of DOSCAR?
     if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190508 - clean title
     if(iline==5) {
       // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
@@ -3723,9 +3728,92 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   double dos;
   if (partial) {
     aurostd::string2tokens(vcontent.at(number_energies + 7), tokens, " ");
-    norbitals = (tokens.size() - 1)/(spin + 1);
+    int ncols = (int) tokens.size() - 1;  // Don't count the energy column
+    if (carstring == "CAR") {  // VASP DOSCAR
+      // Determine whether the DOSCAR is lm-resolved and/or has spin-orbit coupling (SOC)
+      if (ncols == 16) {
+        // If the DOSCAR has 16 columns, the variables cannot be properly resolved.
+        // It could either lm-resolved with f-electrons and without spin polarization,
+        // or it is not lm-resolved with f-electrons and SOC. We need another input file
+        // to resolve this. The former case is VERY unlikely since calculations with
+        // f-electrons typically require spin polarization. So, SOC is the default.
+        // First, try and find filename extensions
+        vector<string> vstr;
+        string ext = "";
+        if (aurostd::substring2bool(filename, "DOSCAR.")) { 
+          aurostd::string2tokens(filename, vstr, ".");
+          for (uint i = 1; i < vstr.size(); i++) ext += "." + vstr[i];
+        } else if (aurostd::substring2bool(filename, "DOSCAR_")) {
+          aurostd::string2tokens(filename, vstr, "_");
+          for (uint i = 1; i < vstr.size(); i++) ext += "_" + vstr[i];
+        }
+        vstr.clear();
+        // Try INCAR first because it's the smallest file
+        if (aurostd::EFileExist("INCAR" + ext) || aurostd::FileExist("INCAR" + ext)) {
+          aurostd::efile2vectorstring("INCAR" + ext, vstr);
+          aurostd::RemoveComments(vstr);
+          for (uint i = 0; i < vstr.size(); i++) {
+            if (aurostd::substring2bool(vstr[i], "LSORBIT")) {
+              vector<string> tokens;
+              aurostd::string2tokens(vstr[i], tokens, " =");
+              tokens[1] = aurostd::toupper(tokens[1]);
+              if ((tokens[1][0] == 'T') || (aurostd::substring2bool(tokens[1], "TRUE"))) {
+                isLSCOUPLING = true;
+              } else {
+                isLSCOUPLING = false;
+              }
+              break;
+            }
+          }
+        // No INCAR found. Try vasprun.xml
+        } else if (aurostd::EFileExist("vasprun.xml" + ext) || aurostd::FileExist("vasprun.xml" + ext)) {
+          aurostd::efile2vectorstring("vasprun.xml" + ext, vstr);
+          for (uint i = 0; i < vstr.size(); i++) {
+            if (aurostd::substring2bool(vstr[i], "LSORBIT")) {
+              isLSCOUPLING = !(aurostd::substring2bool(vstr[i], "F"));  // Only contains "F" if LSORBIT is false
+              break;
+            }
+          }
+        // At last, try OUTCAR
+        } else if (aurostd::EFileExist("OUTCAR" + ext) || aurostd::FileExist("OUTCAR" + ext)) {
+          aurostd::efile2vectorstring("vasprun.xml" + ext, vstr);
+          for (uint i = 0; i < vstr.size(); i++) {
+            if (aurostd::substring2bool(vstr[i], "LSORBIT")) {
+              isLSCOUPLING = !(aurostd::substring2bool(vstr[i], "F"));  // Only contains "F" if LSORBIT is false
+              break;
+            }
+          }
+        // Nothing found, assume SOC (more likely case)
+        } else {
+          std::cerr << "WARNING: Could not determine whether the DOSCAR is lm-resolved"
+                    << " or contains spin-orbit coupling. AFLOW will assume that the"
+                    << " DOSCAR is lm-resolved. If this is not the case, please put an"
+                    << " INCAR" << ext << ", a vasprun.xml " << ext << ", or an"
+                    << " OUTCAR" << ext << " file into the working directory and try again" << std::endl;
+          isLSCOUPLING = true;
+        }
+        lmResolved = !(isLSCOUPLING);  // With 16 columns, it cannot be both
+      } else {
+        // Otherwise, the number of columns per spin smaller than 10 without
+        // SOC, except for lm-resolved DOS with f-electrons (32 columns)
+        isLSCOUPLING = ((ncols/(spin + 1) > 10) && (ncols != 32));
+      }
+      if (isLSCOUPLING) norbitals = ncols/4;
+      else norbitals = (ncols)/(spin + 1);
+      // Since VASP always prints s, p, and d orbitals, lm-resolved
+      // DOSCARS contain at least 9 oribtals
+      lmResolved = (norbitals > 8);
+    } else if (carstring == "PHON") {  // APL DOSCAR
+      norbitals = ncols;
+      isLSCOUPLING = false;
+      lmResolved = true;
+    }
   }
-  vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(spin + 1, deque<double>(number_energies, 0.0))));
+  if (isLSCOUPLING) {  // ME190620 - LSCOUPLING has four spin channels
+    vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(4, deque<double>(number_energies, 0.0))));
+  } else {
+    vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(spin + 1, deque<double>(number_energies, 0.0))));
+  }
   venergy.resize(number_energies);
   viDOS.assign(spin + 1, deque<double>(number_energies, 0.0));
   // Read data
@@ -3740,6 +3828,14 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         for (uint i = 0; i < (spin + 1); i++) {
           vDOS[0][0][i][e] = aurostd::string2utype<double>(tokens[i + 1]);
           viDOS[i][e] = aurostd::string2utype<double>(tokens[i + spin + 2]);
+        }
+        e++;
+      } else if (isLSCOUPLING) {  // ME190620 - LSCOUPLING has four spin channels
+        for (uint i = 0; i < 4 * norbitals; i++) {
+          dos = aurostd::string2utype<double>(tokens[i + 1]);
+          vDOS[d][i/4 + 1][i % 4][e] = dos;
+          vDOS[d][0][i % 4][e] += dos;
+          vDOS[0][i/4 + 1][i % 4][e] += dos;
         }
         e++;
       } else {
@@ -3892,6 +3988,7 @@ xEIGENVAL::xEIGENVAL() {
   vweight.clear();
   vkpoint.clear();
   venergy.clear();
+  carstring = "";  // ME190620
 }  
 
 xEIGENVAL::~xEIGENVAL() {
@@ -4014,6 +4111,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
+    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline)); // ME190620 - what kind of EIGENVAL file?
     if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190614 - clean title
     if(iline==5 && tokens.size()>=3) {
       uint i=0;

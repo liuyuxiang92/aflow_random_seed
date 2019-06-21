@@ -1976,10 +1976,12 @@ namespace aflowlib {
       // [OBSOLETE]  estructure::PLOT_BANDDOS("./");
       // [OBSOLETE]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
       aurostd::xoption opts, plotoptions;
+      opts.push_attached("PLOT_DOS", "./,,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
       opts.push_attached("PLOT_BANDDOS", "./,,,1.75"); // 1.75 prevents plot legend from overlapping with DOS
+      opts.push_attached("PLOT_PDOS", "./,-1,,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
       opts.push_attached("PLOTTER::PRINT", "png");
-      opts.flag("PLOTTER::WEB", true);
-      opts.push_attached("PLOT_PDOS", "./,-1,,,1.5");  // 1.5 is enough to prevent plot legend from overlapping with DOS
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_DOS");
+      plotter::PLOT_DOS(plotoptions);
       plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_BANDDOS");
       plotter::PLOT_BANDDOS(plotoptions);
       plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_PDOS");

@@ -1980,7 +1980,7 @@ LATTICES = (the ones with "")
   aflow --platonSG_number[=EQUAL | EXACT][,ang,d1,d2,d3] < POSCAR
         Same as above but prints ONLY the space group number.	  
 
-  aflow --plotband | --plotbands[=directory[,Emin]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--title=]
+  aflow --plotband | --plotbands[=directory[,Emin[,Emax]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--title=]
         Generate bandstructure plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory:
          DOSCAR.static
@@ -2024,14 +2024,16 @@ LATTICES = (the ones with "")
          Emax: The maximum value of the DOS plot. Default value 10
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
 
-  aflow --plotbanddos | [=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=orbitals|atoms|none] [--title=]
+  aflow --plotbanddos [=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
         Generate combined bandstructure and DOS plot using GNUPLOT and pdfLaTeX
-        This function equals to "aflow --plotband" & ""aflow --plotdos"
         The following files must reside in the directory
 	 DOSCAR.static
 	 EIGENVAL.bands
 	 KPOINTS.bands
 	 POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
          Emin: The minimum value of the DOS plot. Default value: -10
@@ -2041,16 +2043,19 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
-         --projection: Determines whether the DOS is projected along the atoms, orbitals, or not at all (default: orbitals)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
         Examples:
           aflow --plotbanddos=/common/DATA/ZnO,-8,6,1.5
           aflow --plotbanddos=./ --print=png --projection=atoms
 
-  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=orbitals|atoms|none] [--title=]
+  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
         Generate DOS plot using GNUPLOT and pdfLaTeX
-        The following files must reside in the directory:
+        The following file must reside in the directory:
          DOSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
          Emin: The minimum value of the DOS plot. Default value: -10
@@ -2060,7 +2065,7 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
-         --projection: Determines whether the DOS is projected along the atoms, orbitals, or not at all (default: orbitals)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
         Examples:
          aflow --plotdos=/common/DATA/ZnO,-8,6
@@ -2076,11 +2081,14 @@ LATTICES = (the ones with "")
          Emax: The maximum value of the DOS plot. Default value: 10
          DOSSCALE: The scale value of the DOS plot. Default value: 1.2
  
-  aflow --plotpdos | --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=orbitals|none] [--title=]
+  aflow --plotpdos | --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
         Generate atom-projected DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	  	DOSCAR.static
 	  	POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
          Number atom: The atom index. Default value -1 (plot all inequivalent)
@@ -2091,17 +2099,20 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
-         --projection: Determines whether the DOS is projected along the orbitals (default: orbitals)
+         --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
         Examples:
          aflow --plotpdos=/common/DATA/ZnO,-1,-8,6,1.2
          aflow --plotpdos=./,2 --print=png
 
-  aflow --plotpdosall | --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=orbitals|none] [--title=]
-        Generate atom-projected DOS plots of all inequivalent atoms using GNUPLOT
+  aflow --plotpdosall | --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+        Generate atom-projected DOS plots of all inequivalent atoms using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	  	DOSCAR.static
 	  	POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
          Emin: The minimum value of the DOS plot. Default value: -10
@@ -2111,7 +2122,7 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
-         --projection: Determines whether the DOS is projected along the orbitals (default: orbitals)
+         --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
          --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
         Examples:
          aflow --plotpdosall=/common/DATA/ZnO,-1,-8,6,1.2

@@ -428,14 +428,14 @@ void DOSCalculator::writePHDOSCAR() {
           << std::setw(15) << potim << std::endl;
   
   outfile << std::setw(23) << std::setprecision(15) << _temperature << std::endl;
-  outfile << "  CAR" << std::endl;
+  outfile << "  PHON" << std::endl;
   outfile << " " << _system << std::endl;
 
   int ndos = (int) _dos.size();
   double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
   double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
   double conv = factorTHz2Raw * factorRaw2meV/1000;
-  stringstream dosline;  // Will be reused for partial DOS
+  stringstream dosline;  // Will be reused for projected DOS
   dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << (_maxFreq * conv)
           << std::fixed << std::setw(15) << (_minFreq * conv)
           << std::setprecision(0) << "  " << ndos

@@ -383,18 +383,18 @@ void RunPhonons_APL_181216(_xinput& xinput,
         } else if (START_RELAX != 1) {
           logger << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
           logger << "Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << "." << apl::endl;
-      }
+        }
       } else {
         USER_RELAX = false;
         logger << apl::warning << "RELAX option only supported for VASP. Relaxations will be skipped." << apl::endl;
-        }
-          }
+      }
+    }
 
     // Correct user engine
     if (USER_ENGINE == "GSA") {
       logger << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM)." << apl::endl;
       USER_ENGINE = "DM";
-            }
+    }
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
       message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
       message += "See README_AFLOW_APL.TXT for more information.";
@@ -421,12 +421,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
         USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_type;
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
-      tokens.clear();
+        tokens.clear();
         if (!USER_DC_INITCOORDS_FRAC.empty()) {
           apl::tokenize(USER_DC_INITCOORDS_FRAC, tokens, string(" ;"));
         } else {
           apl::tokenize(USER_DC_INITCOORDS_CART, tokens, string(" ;"));
-    }
+        }
         uint ncoords = tokens.size();
         tokens.clear();
         apl::tokenize(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  // ME190427 - also break along semicolon
@@ -435,12 +435,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
           message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
           message += "See README_AFLOW_APL.TXT for more information.";
           throw apl::APLRuntimeError(message);
-      }
+        }
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
         message += "See README_AFLOW_APL.TXT for more information.";
         throw apl::APLRuntimeError(message);
-    }
+      }
     }
 
     // DOS

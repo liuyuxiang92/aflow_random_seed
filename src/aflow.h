@@ -2917,6 +2917,11 @@ class xDOSCAR {
   //[OBSOLETE]  deque<deque<double> > vDOSd;                                  // vDOSd.at(energy_number).at(spin)
   deque<deque<deque<deque<double> > > > vDOS;                   // vDOS.at(atom).at(orbital).at(spin).at(energy_number); 0 = total for atoms and orbitals
   // ME190614 - END
+  // ME190620 - BEGIN
+  bool isLSCOUPLING;  // Contains spin-orbit coupling
+  bool lmResolved;  // Is it lm-resolved?
+  string carstring;  // The fourth line of the DOSCAR
+  // ME190620 - END
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
@@ -2945,6 +2950,7 @@ class xEIGENVAL {
   deque<double> vweight;                                        // vweight.at(kpoint number)
   deque<xvector<double> > vkpoint;                              // vkpoint.at(kpoint number)[1,2,3]=xyz.
   deque<deque<deque<double> > > venergy;                        // venergy.at(kpoint number).at(band number).at(spin number)
+  string carstring;  // ME190620 - the fourth line of the EIGENVAL file
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
