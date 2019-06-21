@@ -401,7 +401,7 @@ bool PhononDispersionCalculator::isExactQPoint(const xvector<double>& qpoint,
 // Write the eigenvalues into a VASP EIGENVAL-formatted file
 void PhononDispersionCalculator::writePHEIGENVAL() {
   string filename = DEFAULT_APL_PHEIGENVAL_FILE;
-  _logger << "Writing phonon eigenvalues file " << filename << "." << apl::endl;
+  _logger << "Writing phonon eigenvalues into file " << filename << "." << apl::endl;
   stringstream outfile;
   // Header
   int nions = (int) _pc.getInputCellStructure().atoms.size();
