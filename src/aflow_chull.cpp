@@ -11041,7 +11041,7 @@ void ConvexHull::writeWebApp() const {
   // creating name of output file
   input=aurostd::joinWDelimiter(m_velements,"");
   //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
-  main_JSON_file="aflow_"+input+"_hull.json";
+  main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
   species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
   //for (uint i = 0; i < m_velements.size(); i++) {
   //  main_JSON_file.append(m_velements[i]);
@@ -11211,6 +11211,12 @@ void ConvexHull::writeWebApp() const {
           distances_data_JSON_ss << ",";
           // entropic temperature, row 5
           distances_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
         } else {
           // enthalpy of formation, row 4
           // no need for precision for next few columns, leave it same way as
@@ -11223,6 +11229,19 @@ void ConvexHull::writeWebApp() const {
           num_ss << chull::T_S(entry);
           distances_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
           num_ss.str("");
+          
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+          distances_data_JSON_ss << ",";
+          
+          num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",_json_);
+          distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+          distances_data_JSON_ss << ",";
+          num_ss.str("");
+          
+          num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",_json_);
+          distances_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+          num_ss.str("");
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
         }
         distances_data_JSON_ss << "}";
         distances_data_JSON_vs.push_back(distances_data_JSON_ss.str());
@@ -11254,6 +11273,12 @@ void ConvexHull::writeWebApp() const {
           hull_points_data_JSON_ss << ",";
           // entropic temperature, row 5
           hull_points_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+          hull_points_data_JSON_ss << ",";
+          hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          hull_points_data_JSON_ss << ",";
+          hull_points_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
         } else {
           // enthalpy of formation, row 4
           // no need for precision for next few columns, leave it same way as
@@ -11266,6 +11291,19 @@ void ConvexHull::writeWebApp() const {
           num_ss << chull::T_S(entry);
           hull_points_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
           num_ss.str("");
+
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+          hull_points_data_JSON_ss << ",";
+
+          num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",_json_);
+          hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+          hull_points_data_JSON_ss << ",";
+          num_ss.str("");
+
+          num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",_json_);
+          hull_points_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+          num_ss.str("");
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
         }
         hull_points_data_JSON_ss << "}";
         hull_points_data_JSON_vs.push_back(hull_points_data_JSON_ss.str());
@@ -11367,6 +11405,12 @@ void ConvexHull::writeWebApp() const {
       vertices_data_JSON_ss << ",";
       // entropic temperature, row 5
       vertices_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+      vertices_data_JSON_ss << ",";
+      vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+      vertices_data_JSON_ss << ",";
+      vertices_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
     } else {
       // enthalpy of formation, row 4
       // no need for precision for next few columns, leave it same way as
@@ -11379,6 +11423,19 @@ void ConvexHull::writeWebApp() const {
       num_ss << chull::T_S(entry);
       vertices_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
       num_ss.str("");
+
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+      vertices_data_JSON_ss << ",";
+      
+      num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",_json_);
+      vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+      vertices_data_JSON_ss << ",";
+      num_ss.str("");
+      
+      num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",_json_);
+      vertices_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+      num_ss.str("");
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
     }
     vertices_data_JSON_ss << "}";
     vertices_data_JSON_vs.push_back(vertices_data_JSON_ss.str());
