@@ -248,8 +248,8 @@ void TCONDCalculator::buildQpoints(const xvector<int>& qgrid) {
       vector<int> sym(1, 0);  // Identity is always invariant
       for (uint symop = 1; symop < pcell.pgroupk_xtal.size(); symop++) {
         fpos_trans = pcell.pgroupk_xtal[symop].Uf * qpoints[q].fpos;
-        if (SYM::AtomFPOSMatch(fpos_trans, qpoints[q].fpos, 
-                               kcell.c2f, kcell.f2c,  kcell.skewed, tol)) {
+        if (SYM::FPOSMatch(fpos_trans, qpoints[q].fpos, 
+                           kcell.lattice, kcell.f2c, kcell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
           sym.push_back(symop);
         }
       }
@@ -321,8 +321,8 @@ void TCONDCalculator::getIrreducibleQpoints(int startIndex, int endIndex,
       for (uint symop = 0; symop < pcell.pgroupk_xtal.size(); symop++) {
         for (uint iq = 0; iq < iqpts.size(); iq++) {
           fpos_trans = pcell.pgroupk_xtal[symop].Uf * qpoints[iqpts[iq][0]].fpos;
-          if (SYM::AtomFPOSMatch(fpos_trans, qpoints[q].fpos,
-                                 kcell.c2f, kcell.f2c, kcell.skewed, tol)) {
+          if (SYM::FPOSMatch(fpos_trans, qpoints[q].fpos,
+                             kcell.lattice, kcell.f2c, kcell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
             append = false;
             qpoints[q].symop = symop;
             iqpts[iq].push_back(q);
@@ -362,8 +362,8 @@ vector<vector<int> >
       for (uint symop = 0; symop < pcell.pgroupk_xtal.size(); symop++) {
         for (uint iq = 0; iq < irred.size(); iq++) {
           fpos_trans = pcell.pgroupk_xtal[symop].Uf * qpoints[irred[iq][0]].fpos;
-          if (SYM::AtomFPOSMatch(fpos_trans, qpoints[iqpts[i][j][0]].fpos,
-                                 kcell.c2f, kcell.f2c, kcell.skewed, tol)) {
+          if (SYM::FPOSMatch(fpos_trans, qpoints[iqpts[i][j][0]].fpos,
+                             kcell.lattice, kcell.f2c, kcell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
             append = false;
             for (uint q = 0; q < iqpts[i][j].size(); q++) {
               irred[iq].push_back(iqpts[i][j][q]);
@@ -752,9 +752,12 @@ void TCONDCalculator::getPhaseVectors(vector<xvector<int> >& clusters, int order
         int at_eq = _sc.sc2pcMap(atoms[i]);
         int at_eq_sc = _sc.pc2scMap(at_eq);
         xvector<double> min_vec;
-        min_vec = SYM::minimumCartesianVector(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
-                                              _pc._clusters[o].scell.atoms[atoms[0]].cpos,
-                                              _pc._clusters[o].scell.lattice);
+        //DX 20190613 [OBSOLETE - changed function name] min_vec = SYM::minimumCartesianVector(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
+        //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
+        //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.lattice);
+        min_vec = SYM::minimizeDistanceCartesianMethod(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
+                                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
+                                                       _pc._clusters[o].scell.lattice); //DX 20190613
         min_vec += _pc._clusters[o].scell.atoms[atoms[0]].cpos;
         min_vec -= _pc._clusters[o].scell.atoms[at_eq_sc].cpos;
         vectors.push_back(min_vec);

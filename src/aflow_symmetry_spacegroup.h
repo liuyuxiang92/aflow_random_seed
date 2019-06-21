@@ -542,8 +542,8 @@ namespace SYM {
   bool GCD_conventional_atomic_basis(deque<_atom>& conventional_basis_atoms, deque<deque<_atom> >& prim_split_atom_types, int& prim_GCD);
   //[CO 180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew);
   //[CO 180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew, double& tol);
-  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& c2f_orig, xmatrix<double>& f2c_new, bool& skew, double& tol);
-  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& c2f_orig, xmatrix<double>& f2c_new, bool& skew, double& tol);
+  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
+  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
   deque<deque<_atom> > groupSymmetryEquivalentAtoms(deque<_atom>& atoms, xmatrix<double>& lattice, vector<xmatrix<double> >& sym_ops,
 						    vector<xvector<double> >& translations, double& min_dist, double& tol); //DX 20190215
   deque<deque<_atom> > shiftSymmetryEquivalentAtoms(deque<deque<_atom> >& equivalent_atoms, xmatrix<double>& lattice, xvector<double>& translation, double& min_dist, double& tol);

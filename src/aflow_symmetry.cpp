@@ -557,18 +557,24 @@ namespace SYM {
 // where atoms are close to the edge of the unit cell wall). Requires atoms to 
 // be the same type
 namespace SYM {
-  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  //overload //DX 20190620
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, bool skew, double tol){
+    xmatrix<double> f2c=trasp(lattice);
+    return AtomsMapped(a, b, lattice, f2c, skew, tol);
+  }
+    
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(a.spin_is_given){ // DX 9/21/17 - magnetic symmetry
       bool spins_match = (aurostd::abs(a.spin-b.spin)<=tol);
-      return a.type==b.type&&spins_match&&AtomFPOSMatch(a,b,c2f,f2c,skew,tol);
+      return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else if(a.noncoll_spin_is_given){ // DX 12/5/17 - magnetic sym (non-collinear)
       bool spins_match = (aurostd::abs(a.noncoll_spin(1)-b.noncoll_spin(1))<=tol && aurostd::abs(a.noncoll_spin(2)-b.noncoll_spin(2))<=tol &&
                           aurostd::abs(a.noncoll_spin(3)-b.noncoll_spin(3))<=tol);
-      return a.type==b.type&&spins_match&&AtomFPOSMatch(a,b,c2f,f2c,skew,tol);
+      return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else {
-      return AtomFPOSMatch(a,b,c2f,f2c,skew,tol)&&a.type==b.type;  
+      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
     }
   }
 } // namespace SYM
@@ -588,96 +594,61 @@ namespace SYM {
   }
 } // namespace SYM
 
+//DX 20190612 - START
+
 // ******************************************************************************
-// Minimize Cartesian Distance 
+// minimize distance - Cartesian method (ROBUST)
 // ******************************************************************************
 // Calculates the minimum distance between a pair of Cartesian coordinates. 
 // Here, we consider all images of the second coordinate and find the minimum distance
 // with respect to the first coordinate. 
-// This is the alternative to the PBC function (below). If the tolerance is larger than 
-// the skewed tolerance, then PBC is not robust enough and this function is used instead.
-// Note: This function takes a bit longer than PBC, but we do not loose robustness.
+// This is the alternative to the "fractional method" (below). 
+// If the tolerance is larger than the skewed tolerance, then fractional method 
+// may give incorrect minimum distances and this function must be used instead.
+// Note: This function takes a bit longer than fractional method, but it is robust.
+
 namespace SYM {
-  bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
-                                 const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice){
     xvector<int> ijk;
-    bool restriction = false;
-    return minimizeCartesianDistance(coord1, coord2, out, c2f, f2c, ijk, restriction, tol);
+    return minimizeDistanceCartesianMethod(cpos1,cpos2,lattice,ijk);
   }
-} /// namespace SYM
+}
 
 namespace SYM {
-  bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
-                                 const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
-    xmatrix<double> lattice = trasp(f2c);
-    xvector<double> min_vec;
-    double min_mod=minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
-    if(restriction){
-      if(aurostd::abs(ijk(1))>3 || aurostd::abs(ijk(2))>3 || aurostd::abs(ijk(3))>3){
-        return false;
-      }
-    }
-    out = c2f*min_vec;
-    return (min_mod<tol);
-  }
-} //namespace SYM
+  xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice, xvector<int>& ijk){
 
-namespace SYM {
-// ******************************************************************************
-// minimumCartesianDistance()
-// ******************************************************************************
-// Finds minimum distance between two cartesian coordinates in periodic cell
-// min_vec is full cartesian vector distances
-// ijk are the indices of the cell of the minimum distance image
-// ME 180730: minimumCartesianVector returns the smallest vector between two atoms.
-double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice){
-    xvector<double> min_vec;
-    xvector<int> ijk;
-    return minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
-}
-
-double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice, 
-    xvector<double>& min_vec,xvector<int>& ijk){
-   min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
-   return aurostd::modulus(min_vec);
-}
-    
-xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
-                                       const xmatrix<double>& lattice) {
-  xvector<int> ijk;
-  xvector<double> min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
-  return min_vec;
-}
-
-xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
-                                       const xmatrix<double>& lattice, xvector<int>& ijk) {
-    xvector<double> tmp, min_vec;
-    double mod_tmp;
-
+    // ---------------------------------------------------------------------------
+    // determine dimensions to produce uniform sphere; account for skewness 
     double radius=RadiusSphereLattice(lattice);
     xvector<int> dims(3);
     dims=LatticeDimensionSphere(lattice,radius);
 
-    // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - START
-    // DX 4/23/18 - only calculate multiplication once (time-saver)
+    // ---------------------------------------------------------------------------
+    // multiply lattice vectors by index once and store - faster
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
     for(int a=-dims[1];a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a);} // DX calc once and store
     for(int b=-dims[2];b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b);} // DX calc once and store
     for(int c=-dims[3];c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c);} // DX calc once and store
 
-    xvector<double> incell_dist = coord1-coord2;
-
-    min_vec = coord1-coord2;
+    // ---------------------------------------------------------------------------
+    // calculate original distance between points and make temporary variables 
+    xvector<double> incell_dist = cpos1-cpos2;
+    xvector<double> min_vec = incell_dist;
     double min_mod = aurostd::modulus(min_vec);
 
-    // DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+    xvector<double> tmp;
+    double mod_tmp;
+
+    // ---------------------------------------------------------------------------
+    // consider other periodic images within the grid-sphere 
+    // vector stored in each loop to save computation; fewer duplicate operations
     for(uint i=0;i<l1.size();i++){
-      xvector<double> a_component = incell_dist + l1[i];    // DX : coord1-coord2+a*lattice(1)
+      xvector<double> a_component = incell_dist + l1[i];    // DX : cpos1-cpos2+a*lattice(1)
       for(uint j=0;j<l2.size();j++){
-        xvector<double> ab_component = a_component + l2[j]; // DX : coord1-coord2+a*lattice(1) + (b+lattice(2))
+        xvector<double> ab_component = a_component + l2[j]; // DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2))
         for(uint k=0;k<l3.size();k++){
-          tmp = ab_component + l3[k];                       // DX : coord1-coord2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
+          tmp = ab_component + l3[k];                       // DX : cpos1-cpos2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
           mod_tmp = aurostd::modulus(tmp);
           if(mod_tmp<min_mod){
             min_mod = mod_tmp;
@@ -689,8 +660,8 @@ xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvec
         }
       }
     }
-    // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - END
 
+    // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - END
     // DX 4/23/18 [OBSOLETE] min_vec = coord1-coord2;
     // DX 4/23/18 [OBSOLETE] double min_mod = aurostd::modulus(min_vec);
     // DX 4/23/18 [OBSOLETE] for(int a=-dims[1];a<=dims[1];a++){
@@ -709,59 +680,249 @@ xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvec
     // DX 4/23/18 [OBSOLETE]   }
     // DX 4/23/18 [OBSOLETE] }
     //DX 20180903 needs to return min_vec : return min_mod;
+
     return min_vec; //DX 20180903 needs to return min_vec
     }
 } //namespace SYM
 
 // ******************************************************************************
-// Periodic Boundary Conditions (PBC)
+// minimize distance - fractional method (FAST)
 // ******************************************************************************
-// Minimizes fractional vector component by component.  This may not give the 
-// the true minimum distance in Cartesian. HOWEVER, it is safe to assume if the
-// mapping tolerance is small.  A heuristic maximum tolerance is the suprenum of 
-// the off-diagonal elements of the metric tensor (this is a well-tested quanitity).
+// Minimizes fractional space distance vector component by component.  
+// This may not give the the true minimum distance when transforming back to a 
+// E and take the modulus of minimum cpos distanceuclidean space (Cartesian). 
+// HOWEVER, this method is safe to use if the mapping tolerance is small.  
+// A heuristic maximum tolerance is the suprenum of 
+// the normalized off-diagonal elements of the metric tensor (this is a well-tested quanitity).
 // For more information, contact David Hicks (d.hicks@duke.edu).
+
+// ---------------------------------------------------------------------------
+// overloads 
 namespace SYM {
-  bool PBC(xvector<double>& v_in){
+  xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fpos1, const xvector<double>& fpos2){
     xvector<int> ijk;
-    bool restriction = false;
-    return PBC(v_in, ijk, restriction);
+    xvector<double> fdiff = fpos1-fpos2;
+    return minimizeDistanceFractionalMethod(fdiff, ijk);
   }
 } /// namespace SYM
 
 namespace SYM {
-  bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction){
-    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
-    for(uint i=1; i<4; i++){
-      while(v_in(i)>0.5){
-        v_in(i) = v_in(i)-1;
-        ijk(i)-=1;
-      }
-      while(v_in(i)<=-0.5){
-        v_in(i) = v_in(i)+1;
-        ijk(i)+=1;
-      }
-      if(aurostd::abs(ijk(i))>3 && restriction){
-        //DEBUGGER
-        //cerr << "ijk(i): " << ijk(i) << endl;
-        //cerr << "ERROR (PBC Function): More than three cells away!" << endl;
-        //exit(1);
-        return false;
-      }
-    }
-    return true;
+  xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff){
+    xvector<int> ijk;
+    return minimizeDistanceFractionalMethod(fdiff, ijk);
   }
 } /// namespace SYM
+
+// ---------------------------------------------------------------------------
+namespace SYM {
+  xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff, xvector<int>& ijk){
+    
+    // ---------------------------------------------------------------------------
+    // loop over each component and bring close to origin 
+    // (i.e., between -0.5 and 0.5 in fractional coordinates)
+
+    xvector<double> min_diff = fdiff;
+    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
+    for(uint i=1; i<4; i++){
+      while(min_diff(i)>0.5){
+        min_diff(i) = min_diff(i)-1;
+        ijk(i)-=1;
+      }
+      while(min_diff(i)<=-0.5){
+        min_diff(i) = min_diff(i)+1;
+        ijk(i)+=1;
+      }
+    }
+  return min_diff;
+  }
+}
+
+//DX 20190612 - END
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Minimize Cartesian Distance 
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Calculates the minimum distance between a pair of Cartesian coordinates. 
+//DX 20190613 [OBSOLETE] // Here, we consider all images of the second coordinate and find the minimum distance
+//DX 20190613 [OBSOLETE] // with respect to the first coordinate. 
+//DX 20190613 [OBSOLETE] // This is the alternative to the PBC function (below). If the tolerance is larger than 
+//DX 20190613 [OBSOLETE] // the skewed tolerance, then PBC is not robust enough and this function is used instead.
+//DX 20190613 [OBSOLETE] // Note: This function takes a bit longer than PBC, but we do not loose robustness.
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
+//DX 20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX 20190613 [OBSOLETE]     xvector<int> ijk;
+//DX 20190613 [OBSOLETE]     bool restriction = false;
+//DX 20190613 [OBSOLETE]     return minimizeCartesianDistance(coord1, coord2, out, c2f, f2c, ijk, restriction, tol);
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } /// namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, 
+//DX 20190613 [OBSOLETE]                                  const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+//DX 20190613 [OBSOLETE]     xmatrix<double> lattice = trasp(f2c);
+//DX 20190613 [OBSOLETE]     xvector<double> min_vec;
+//DX 20190613 [OBSOLETE]     double min_mod=minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
+//DX 20190613 [OBSOLETE]     if(restriction){
+//DX 20190613 [OBSOLETE]       if(aurostd::abs(ijk(1))>3 || aurostd::abs(ijk(2))>3 || aurostd::abs(ijk(3))>3){
+//DX 20190613 [OBSOLETE]         return false;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     out = c2f*min_vec;
+//DX 20190613 [OBSOLETE]     return (min_mod<tol);
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } //namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // minimumCartesianDistance()
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Finds minimum distance between two cartesian coordinates in periodic cell
+//DX 20190613 [OBSOLETE] // min_vec is full cartesian vector distances
+//DX 20190613 [OBSOLETE] // ijk are the indices of the cell of the minimum distance image
+//DX 20190613 [OBSOLETE] // ME 180730: minimumCartesianVector returns the smallest vector between two atoms.
+//DX 20190613 [OBSOLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice){
+//DX 20190613 [OBSOLETE]     xvector<double> min_vec;
+//DX 20190613 [OBSOLETE]     xvector<int> ijk;
+//DX 20190613 [OBSOLETE]     return minimumCartesianDistance(coord1,coord2,lattice,min_vec,ijk);
+//DX 20190613 [OBSOLETE] }
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice, 
+//DX 20190613 [OBSOLETE]     xvector<double>& min_vec,xvector<int>& ijk){
+//DX 20190613 [OBSOLETE]    min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
+//DX 20190613 [OBSOLETE]    return aurostd::modulus(min_vec);
+//DX 20190613 [OBSOLETE] }
+//DX 20190613 [OBSOLETE]     
+//DX 20190613 [OBSOLETE] xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
+//DX 20190613 [OBSOLETE]                                        const xmatrix<double>& lattice) {
+//DX 20190613 [OBSOLETE]   xvector<int> ijk;
+//DX 20190613 [OBSOLETE]   xvector<double> min_vec = minimumCartesianVector(coord1, coord2, lattice, ijk);
+//DX 20190613 [OBSOLETE]   return min_vec;
+//DX 20190613 [OBSOLETE] }
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] xvector<double> minimumCartesianVector(const xvector<double>& coord1, const xvector<double>& coord2,
+//DX 20190613 [OBSOLETE]                                        const xmatrix<double>& lattice, xvector<int>& ijk) {
+//DX 20190613 [OBSOLETE]     xvector<double> tmp, min_vec;
+//DX 20190613 [OBSOLETE]     double mod_tmp;
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     double radius=RadiusSphereLattice(lattice);
+//DX 20190613 [OBSOLETE]     xvector<int> dims(3);
+//DX 20190613 [OBSOLETE]     dims=LatticeDimensionSphere(lattice,radius);
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - START
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - only calculate multiplication once (time-saver)
+//DX 20190613 [OBSOLETE]     vector<xvector<double> > l1, l2, l3;
+//DX 20190613 [OBSOLETE]     vector<int> a_index, b_index, c_index;
+//DX 20190613 [OBSOLETE]     for(int a=-dims[1];a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a);} // DX calc once and store
+//DX 20190613 [OBSOLETE]     for(int b=-dims[2];b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b);} // DX calc once and store
+//DX 20190613 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c);} // DX calc once and store
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     xvector<double> incell_dist = coord1-coord2;
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     min_vec = coord1-coord2;
+//DX 20190613 [OBSOLETE]     double min_mod = aurostd::modulus(min_vec);
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+//DX 20190613 [OBSOLETE]     for(uint i=0;i<l1.size();i++){
+//DX 20190613 [OBSOLETE]       xvector<double> a_component = incell_dist + l1[i];    // DX : coord1-coord2+a*lattice(1)
+//DX 20190613 [OBSOLETE]       for(uint j=0;j<l2.size();j++){
+//DX 20190613 [OBSOLETE]         xvector<double> ab_component = a_component + l2[j]; // DX : coord1-coord2+a*lattice(1) + (b+lattice(2))
+//DX 20190613 [OBSOLETE]         for(uint k=0;k<l3.size();k++){
+//DX 20190613 [OBSOLETE]           tmp = ab_component + l3[k];                       // DX : coord1-coord2+a*lattice(1) + (b+lattice(2)) + (c+lattice(3))
+//DX 20190613 [OBSOLETE]           mod_tmp = aurostd::modulus(tmp);
+//DX 20190613 [OBSOLETE]           if(mod_tmp<min_mod){
+//DX 20190613 [OBSOLETE]             min_mod = mod_tmp;
+//DX 20190613 [OBSOLETE]             min_vec = tmp;
+//DX 20190613 [OBSOLETE]             ijk(1) = a_index[i];
+//DX 20190613 [OBSOLETE]             ijk(2) = b_index[j];
+//DX 20190613 [OBSOLETE]             ijk(3) = c_index[k];
+//DX 20190613 [OBSOLETE]           } 
+//DX 20190613 [OBSOLETE]         }
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 - FASTER MIN CART DISTANCE CALCULATOR - END
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] min_vec = coord1-coord2;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] double min_mod = aurostd::modulus(min_vec);
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] for(int a=-dims[1];a<=dims[1];a++){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]   for(int b=-dims[2];b<=dims[2];b++){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]     for(int c=-dims[3];c<=dims[3];c++){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       tmp = coord1-coord2+a*lattice(1)+b*lattice(2)+c*lattice(3);
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       mod_tmp = aurostd::modulus(tmp);
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       if(mod_tmp<min_mod){
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         min_mod = mod_tmp;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         min_vec = tmp;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         ijk(1) = a;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         ijk(2) = b;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]         ijk(3) = c;
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]       } 
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE]     // DX 4/23/18 [OBSOLETE] }
+//DX 20190613 [OBSOLETE]     //DX 20180903 needs to return min_vec : return min_mod;
+//DX 20190613 [OBSOLETE]     return min_vec; //DX 20180903 needs to return min_vec
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE] } //namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Periodic Boundary Conditions (PBC)
+//DX 20190613 [OBSOLETE] // ******************************************************************************
+//DX 20190613 [OBSOLETE] // Minimizes fractional vector component by component.  This may not give the 
+//DX 20190613 [OBSOLETE] // the true minimum distance in Cartesian. HOWEVER, it is safe to assume if the
+//DX 20190613 [OBSOLETE] // mapping tolerance is small.  A heuristic maximum tolerance is the suprenum of 
+//DX 20190613 [OBSOLETE] // the off-diagonal elements of the metric tensor (this is a well-tested quanitity).
+//DX 20190613 [OBSOLETE] // For more information, contact David Hicks (d.hicks@duke.edu).
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool PBC(xvector<double>& v_in){
+//DX 20190613 [OBSOLETE]     xvector<int> ijk;
+//DX 20190613 [OBSOLETE]     bool restriction = false;
+//DX 20190613 [OBSOLETE]     return PBC(v_in, ijk, restriction);
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } /// namespace SYM
+//DX 20190613 [OBSOLETE] 
+//DX 20190613 [OBSOLETE] namespace SYM {
+//DX 20190613 [OBSOLETE]   bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction){
+//DX 20190613 [OBSOLETE]     //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
+//DX 20190613 [OBSOLETE]     for(uint i=1; i<4; i++){
+//DX 20190613 [OBSOLETE]       while(v_in(i)>0.5){
+//DX 20190613 [OBSOLETE]         v_in(i) = v_in(i)-1;
+//DX 20190613 [OBSOLETE]         ijk(i)-=1;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]       while(v_in(i)<=-0.5){
+//DX 20190613 [OBSOLETE]         v_in(i) = v_in(i)+1;
+//DX 20190613 [OBSOLETE]         ijk(i)+=1;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]       if(aurostd::abs(ijk(i))>3 && restriction){
+//DX 20190613 [OBSOLETE]         //DEBUGGER
+//DX 20190613 [OBSOLETE]         //cerr << "ijk(i): " << ijk(i) << endl;
+//DX 20190613 [OBSOLETE]         //cerr << "ERROR (PBC Function): More than three cells away!" << endl;
+//DX 20190613 [OBSOLETE]         //exit(1);
+//DX 20190613 [OBSOLETE]         return false;
+//DX 20190613 [OBSOLETE]       }
+//DX 20190613 [OBSOLETE]     }
+//DX 20190613 [OBSOLETE]     return true;
+//DX 20190613 [OBSOLETE]   }
+//DX 20190613 [OBSOLETE] } /// namespace SYM
 
 // ******************************************************************************
 // FPOSMatch
 // ******************************************************************************
 // Determine if atoms in fractional coordinates are the same (also considers cases
 // where atoms are close to the edge of the unit cell wall)
+
+// --------------------------------------------------------
+// FPOSMatch: match element of deque<_atom> to _atom 
+
+// overload //DX 20190620 
 namespace SYM {
-  bool AtomFPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, bool skew, double tol){
+    xmatrix<double> f2c=trasp(lattice);
+    return FPOSMatch(atom_set,atom2,match_type,lattice,f2c,skew,tol);
+  }
+  
+  bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, 
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
     for(uint i=0;i<atom_set.size();i++){
-      if(AtomFPOSMatch(atom_set[i],atom2,c2f,f2c,skew,tol)){
+      if(FPOSMatch(atom_set[i],atom2,lattice,f2c,skew,tol)){ //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
         match_type = atom_set[i].type;
         return TRUE;
       }
@@ -770,9 +931,19 @@ namespace SYM {
   }
 } //namespace SYM
 
+// --------------------------------------------------------
+// FPOSMatch: match _atom to _atom 
+
+// overload //DX 20190620 
 namespace SYM {
-  bool AtomFPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
-    return AtomFPOSMatch(atom1.fpos,atom2.fpos,c2f,f2c,skew,tol);
+  bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, bool skew, double tol){ 
+    xmatrix<double> f2c=trasp(lattice);
+    return FPOSMatch(atom1,atom2,lattice,f2c,skew,tol);
+  }
+  
+  bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, 
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
+    return FPOSMatch(atom1.fpos,atom2.fpos,lattice,f2c,skew,tol); //DX 20190619 - added lattice to input and remove "Atom" prefix in name
     /*xvector<double> fdiff = atom1.fpos - atom2.fpos;
       if(skew){
       return minimizeCartesianDistance(atom1.cpos,atom2.cpos,fdiff,c2f,f2c,tol);
@@ -784,82 +955,144 @@ namespace SYM {
   }
 } // namespace SYM
 
+// --------------------------------------------------------
+// FPOSMatch: match fpos to fpos
+// overload //DX 20190620
 namespace SYM {
-  xvector<double> FPOSDistance(const xvector<double>& fpos1,const xvector<double>& fpos2,
+  bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice, bool skew, double tol){
+    xmatrix<double> f2c=trasp(lattice);
+    return FPOSMatch(fpos1,fpos2,lattice,f2c,skew,tol);
+  }
+  
+  bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
+      const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
+    string soliloquy="SYM::FPOSMatch():";
+
+    //DX 20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
+    if(XHOST.SKEW_TEST){
+      //DX 20190613 [OBOSLETE] xvector<double> pbc_fdiff = fdiff;
+      //DX 20190613 [OBOSLETE] PBC(pbc_fdiff);
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
+      double min_fdiff_dist = aurostd::modulus(f2c*min_fdiff);
+      xvector<double> cpos1 = f2c*fpos1;
+      xvector<double> cpos2 = f2c*fpos2;
+      //DX 20190613 [OBOSLETE] minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
+      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1, cpos2, lattice); //DX 20190613
+      double min_cdiff_dist = aurostd::modulus(min_cdiff); //DX 20190613 - changed variable names
+      stringstream message; 
+      if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)<_ZERO_TOL_){
+        message << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(soliloquy, message, cerr, _LOGGER_MESSAGE_);
+      }
+      if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist<=tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
+        message << soliloquy << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
+      }
+      if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist>tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
+        message << soliloquy << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
+      }
+      if((min_cdiff_dist<=tol)!=(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
+        message << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+      }
+      if((min_cdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)!=(min_fdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)){
+        message << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+      }
+    }
+    double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX 20190620
+    //DX 20190620 [moved into CPOSDistFromFPOS()] if(skew){
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> cpos1 = f2c*fpos1;
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> cpos2 = f2c*fpos2;
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   //DX 20190613 [OBSOLETE] return minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()] }
+    //DX 20190620 [moved into CPOSDistFromFPOS()] else {
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   //DX 20190613 [OBSOLETE] PBC(fdiff);
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(f2c*min_fdiff); //DX 20190613
+    //DX 20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_dist=" << min_dist << endl;}
+    //DX 20190620 [moved into CPOSDistFromFPOS()] }
+    return (min_dist<tol); //DX 20190613
+  }
+} // namespace SYM
+
+// ******************************************************************************
+// FPOSDistance
+// ******************************************************************************
+namespace SYM {
+  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,bool skew){
     xmatrix<double> f2c=trasp(lattice);xmatrix<double> c2f=inverse(trasp(lattice));
-    return FPOSDistance(fpos1,fpos2,lattice,c2f,f2c,skew);
+    return FPOSDistFromFPOS(fpos1,fpos2,lattice,c2f,f2c,skew);
   }
-  xvector<double> FPOSDistance(const xvector<double>& fpos1,const xvector<double>& fpos2,
+  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO190525
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="SYM::FPOSDistance():";
-    xvector<double> fdiff;
-    if(skew){
-      xvector<double> cpos1=f2c*fpos1;
-      xvector<double> cpos2=f2c*fpos2;
-      xvector<int> ijk;
-      xvector<double> cdiff=SYM::minimumCartesianVector(cpos1,cpos2,lattice,ijk);
-      fdiff=c2f*cdiff;
-    }else{
-      if(LDEBUG){
-        cerr << soliloquy << " fpos1=" << fpos1 << endl;
-        cerr << soliloquy << " fpos2=" << fpos2 << endl;
-      }
-      fdiff=fpos1-fpos2;
-      if(LDEBUG){cerr << soliloquy << " fdiff=" << fdiff << endl;}
-      PBC(fdiff);
-      if(LDEBUG){cerr << soliloquy << " PBC(fdiff)=" << fdiff << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " fpos1=" << fpos1 << endl;
+      cerr << soliloquy << " fpos2=" << fpos2 << endl;
     }
-    return fdiff;
-  }
-  bool AtomFPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="SYM::AtomFPOSMatch():";
-    xvector<double> fdiff = fpos1 - fpos2;
-    if(LDEBUG){cerr << soliloquy << " fdiff=" << fdiff << endl;}
-    if(XHOST.SKEW_TEST){
-      xvector<double> pbc_fdiff = fdiff;
-      PBC(pbc_fdiff);
-      double pbc_cart = aurostd::modulus(f2c*pbc_fdiff);
-      xvector<double> cpos1 = f2c*fpos1;
-      xvector<double> cpos2 = f2c*fpos2;
-      minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
-      double cart_diff = aurostd::modulus(f2c*fdiff);
-      if((cart_diff<=tol)==(pbc_cart<=tol) && aurostd::abs(cart_diff-pbc_cart)<_ZERO_TOL_){
-        cerr << "SYM::AtomFPOSMatch::CLEAR: minimum distances equal, and mappings same -- globally optimized: " << cart_diff << " | bring-in-cell: " << pbc_cart << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-      }
-      if((cart_diff<=tol)==(pbc_cart<=tol) && cart_diff<=tol && aurostd::abs(cart_diff-pbc_cart)>_ZERO_TOL_){
-        cerr << "SYM::AtomFPOSMatch::WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << cart_diff << " | bring-in-cell: " << pbc_cart << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-      }
-      if((cart_diff<=tol)==(pbc_cart<=tol) && cart_diff>tol && aurostd::abs(cart_diff-pbc_cart)>_ZERO_TOL_){
-        cerr << "SYM::AtomFPOSMatch::WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << cart_diff << " | bring-in-cell: " << pbc_cart << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-      }
-      if((cart_diff<=tol)!=(pbc_cart<=tol) && aurostd::abs(cart_diff-pbc_cart)>_ZERO_TOL_){
-        cerr << "SYM::AtomFPOSMatch::ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << cart_diff << " | bring-in-cell: " << pbc_cart << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-        exit(0);
-      }
-      if((cart_diff-XHOST.SKEW_TOL<_ZERO_TOL_)!=(pbc_cart-XHOST.SKEW_TOL<_ZERO_TOL_)){
-        cerr << "SYM::AtomFPOSMatch::THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << cart_diff << " | bring-in-cell: " << pbc_cart << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-        exit(0);
-      }
-    }
+    xvector<double> min_fdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
-      return minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
+      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX 20190613
+      min_fdiff = c2f*min_cdiff;
     }
     else {
-      PBC(fdiff);
-      if(LDEBUG){cerr << soliloquy << " PBC(fdiff)=" << fdiff << endl;}
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
+      if(LDEBUG){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
+      if(LDEBUG){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
     }
-    if(LDEBUG){
-      cerr << soliloquy << " f2c*PBC(fdiff)=" << f2c*fdiff << endl;
-      cerr << soliloquy << " map=" << (aurostd::modulus(f2c*fdiff)<tol) << endl;
-    }
-    return (aurostd::modulus(f2c*fdiff)<tol);
+    return min_fdiff;
   }
-} // namespace SYM
+}
+
+// ******************************************************************************
+// CPOSDistFromFPOS
+// ******************************************************************************
+// minimize the difference between two FPOS positions and returns the minimum
+// distance in Cartesian coordinates
+// (why fpos input?: minimizing fpos is faster (minimizeDistanceFractionalMethod()); 
+//  we want to promote speed-up by avoiding c2f*fpos operation twice in else-statement)
+namespace SYM {
+  xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
+      const xmatrix<double>& lattice,bool skew){
+    xmatrix<double> f2c=trasp(lattice);
+    return CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew);
+  }
+  xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
+      const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO190525
+    bool VERBOSE=FALSE; //using LDEBUG would pollute output
+    string soliloquy="SYM::CPOSDistance():";
+    if(VERBOSE){
+      cerr << soliloquy << " fpos1=" << fpos1 << endl;
+      cerr << soliloquy << " fpos2=" << fpos2 << endl;
+    }
+    xvector<double> min_cdiff;
+    if(skew){
+      xvector<double> cpos1 = f2c*fpos1;
+      xvector<double> cpos2 = f2c*fpos2;
+      min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX 20190613
+      if(VERBOSE){cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;}
+      if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
+    }
+    else {
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX 20190613
+      min_cdiff = f2c*min_fdiff;
+      if(VERBOSE){cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
+      if(VERBOSE){cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
+      if(VERBOSE){cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;}
+    }
+    return min_cdiff;
+  }
+}
 
 // ******************************************************************************
 // validateAtomPosition
@@ -871,15 +1104,22 @@ namespace SYM {
     return validateAtomPosition(atom.cpos,atom.fpos,c2f,f2c,skew,_eps_);
   }
   bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
-    xvector<double> fdiff = (c2f*cpos)-fpos;
+    //DX 20190613 [OBSOLETE] xvector<double> fdiff = (c2f*cpos)-fpos;
+    double min_dist = 1e9;
     if(skew){
-      xvector<double> tmp = f2c*fpos;
-      minimizeCartesianDistance(cpos,tmp,fdiff,c2f,f2c,_eps_);
+      //DX 20190613 [OBSOLETE] minimizeCartesianDistance(cpos,tmp,fdiff,c2f,f2c,_eps_);
+      xvector<double> tmp_cpos = f2c*fpos;
+      xmatrix<double> lattice = trasp(f2c); //DX 20190613 
+      xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos,tmp_cpos,lattice); //DX 20190613
+      min_dist = aurostd::modulus(min_cdiff); //DX 20190613
     }
     else {
-      PBC(fdiff);
+      //DX 20190613 [OBSOLETE] PBC(fdiff);
+      xvector<double> tmp_fpos = c2f*cpos; //DX 20190613
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(tmp_fpos,fpos); //DX 20190613
+      min_dist = aurostd::modulus(f2c*min_fdiff); //DX 20190613
     }
-    return modulus(f2c*fdiff)<=_eps_;
+    return min_dist<=_eps_; //DX 20190613
   }
 } // namespace SYM
 
@@ -899,15 +1139,22 @@ namespace SYM {
 
 // MapAtomWithBasis (xvector<_atom>) with mapping index
 namespace SYM {
-  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& c2f, const xmatrix<double>& f2c, 
-                       bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  //overload //DX 20190620
+  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
+                        bool skew, double tol, uint& mapped_index,bool fast){ 
+    xmatrix<double> f2c=trasp(lattice);
+    return MapAtomWithBasis(vec, a, map_types, index_to_check, lattice, f2c, skew, tol, mapped_index, fast);
+  }
+
+  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
+                        const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
         if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
-        if(AtomsMapped(a,vec[index_to_check[i]],c2f,f2c,skew,tol)){ //type specific
+        if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input 
           count++;
           mapped_index=i;
             if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
@@ -917,7 +1164,7 @@ namespace SYM {
     } else {
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
-        if(AtomFPOSMatch(a,vec[index_to_check[i]],c2f,f2c,skew,tol)){ //type specific
+        if(FPOSMatch(a,vec[index_to_check[i]],lattice,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
           if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
@@ -942,15 +1189,22 @@ namespace SYM {
 
 // MapAtomWithBasis (deque<_atom>) with mappping index
 namespace SYM {
-  bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& c2f, const xmatrix<double>& f2c, 
-                       bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  //overload //DX 20190620
+  bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
+                        bool skew, double tol, uint& mapped_index,bool fast){ 
+    xmatrix<double> f2c=trasp(lattice);
+    return MapAtomWithBasis(deq, a, map_types, index_to_check, lattice, f2c, skew, tol, mapped_index, fast);
+  }
+
+  bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice,
+                        const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
         if(a.type==deq[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
-        if(AtomsMapped(a,deq[index_to_check[i]],c2f,f2c,skew,tol)){ 
+        if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input
           count++;
           mapped_index=i;
             if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
@@ -960,7 +1214,7 @@ namespace SYM {
     } else {
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
-        if(AtomFPOSMatch(a,deq[index_to_check[i]],c2f,f2c,skew,tol)){ 
+        if(FPOSMatch(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
           count++;
           mapped_index=i;
           if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
@@ -980,10 +1234,16 @@ namespace SYM {
 // Map an atom to a set of atoms
 // MapAtom (deque<_atom> and _atom)
 namespace SYM {
-  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  //DX 20190620
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - replace f2c and c2f with lattice
+    xmatrix<double> f2c=trasp(lattice);
+    return MapAtom(a_deq, b, map_types, lattice, f2c, skew, tol);
+  } 
+  
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     for(uint i=0;i<a_deq.size();i++){
       //_atom a = a_deq[i];
-      if(MapAtom(a_deq[i], b, map_types, c2f, f2c, skew, tol)){
+      if(MapAtom(a_deq[i], b, map_types, lattice, f2c, skew, tol)){ //DX 20190619 - replace f2c and c2f with lattice
         return TRUE;
       }
     }
@@ -993,10 +1253,16 @@ namespace SYM {
 
 // MapAtom (vector<_atom> and _atom)
 namespace SYM {
-  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  //overload //DX 20190620
+  bool MapAtom(const vector<_atom>& a_vec, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){
+    xmatrix<double> f2c=trasp(lattice);
+    return MapAtom(a_vec, b, map_types, lattice, f2c, skew, tol);
+  }
+
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     for(uint i=0;i<a_vec.size();i++){
       //_atom a = a_vec[i];
-      if(MapAtom(a_vec[i], b, map_types, c2f, f2c, skew, tol)){
+      if(MapAtom(a_vec[i], b, map_types, lattice, f2c, skew, tol)){ //DX 20190619 - replace f2c and c2f with lattice
         return TRUE;
       }
     }
@@ -1012,10 +1278,16 @@ namespace SYM {
 // MapAtom (xvector and xvector)
 // NOT TYPE SPECIFIC BY IT'S VERY NATURE
 namespace SYM {
-  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  //overload //DX 20190620
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, bool skew, double tol){
+    xmatrix<double> f2c=trasp(lattice);
+    return MapAtom(a, b, lattice, f2c, skew, tol);
+  }
+
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     //_atom a_atom; a_atom.fpos=a; a_atom.cpos=f2c*a;
     //_atom b_atom; b_atom.fpos=b; b_atom.cpos=f2c*b;
-    if(AtomFPOSMatch(a, b, c2f, f2c, skew, tol)){
+    if(FPOSMatch(a, b, lattice, f2c, skew, tol)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
       return TRUE;
     }
     return FALSE;
@@ -1024,11 +1296,16 @@ namespace SYM {
 
 // MapAtom (_atom and _atom)
 namespace SYM { 
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - replace f2c and c2f with lattice
+    xmatrix<double> f2c=trasp(lattice);
+    return MapAtom(a, b, map_types, lattice, f2c, skew, tol);
+  }
+  
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(map_types){
-      return AtomsMapped(a,b,c2f,f2c,skew,tol); //type specific
+      return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX 20190619 - replace f2c and c2f with lattice
     } else {
-      return AtomFPOSMatch(a.fpos,b.fpos,c2f,f2c,skew,tol);
+      return FPOSMatch(a.fpos,b.fpos,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
   }
 } // namespace SYM
@@ -1160,16 +1437,23 @@ namespace SYM {
       bool matched = false;
       for(uint ii=0;ii<xstr.fgroup.size();ii++){
         if(aurostd::identical(xstr.fgroup[ii].Uf,xstr.fgroup[0].Uf)){ // DX 12/7/17 use default xmatrix identical tol
-	  xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j];
+	  //DX 20190613 [OBSOLETE] xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j];
+          double min_dist = 1e9;
 	  if(skew){
 	    xvector<double> tmp1 = xstr.f2c*xstr.fgroup[ii].ftau;
 	    xvector<double> tmp2 = xstr.f2c*compressed_lattice_points[j];
-	    minimizeCartesianDistance(tmp1,tmp2,fdiff,xstr.c2f,xstr.f2c,xstr.sym_eps);
+	    xvector<double> min_cdiff = minimizeDistanceCartesianMethod(tmp1,tmp2,xstr.lattice); //DX 20190613
+            min_dist = aurostd::modulus(min_cdiff); //DX 20190613
+	    //DX 20190613 [OBSOLETE] minimizeCartesianDistance(tmp1,tmp2,fdiff,xstr.c2f,xstr.f2c,xstr.sym_eps);
 	  }
 	  else {
-	    PBC(fdiff);
+	    xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j]; //DX 20190613
+	    xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+            min_dist = aurostd::modulus(xstr.f2c*min_fdiff); //DX 20190613
+	    //DX 20190613 [OBSOLETE] PBC(fdiff);
 	  }
-	  if(aurostd::modulus(xstr.f2c*fdiff)<=xstr.sym_eps){
+	  //DX 20190613 [OBSOLETE] if(aurostd::modulus(xstr.f2c*fdiff)<=xstr.sym_eps){
+	  if(min_dist<=xstr.sym_eps){ //DX 20190613
 	    matched = true;
 	    break;
 	  }
@@ -1375,9 +1659,12 @@ namespace SYM {
       cerr << "f2c " << f2c << endl;
       xvector<double>fdiff=(c2f*atom_in.cpos)-atom_in.fpos;
       cerr << "(c2f*cpos)-fpos = " << (c2f*atom_in.cpos)-atom_in.fpos << endl;
-      PBC(fdiff);
-      cerr << "PBC(fdiff) = " << fdiff << endl;
-      cerr << "modulus(f2c*fdiff) = " << modulus(f2c*fdiff) << " <? " << _eps_ <<endl;
+      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+      cerr << "minimizeDistanceFractionalMethod(fdiff) = " << min_fdiff << endl; //DX 20190613
+      cerr << "modulus(f2c*min_fdiff) = " << modulus(f2c*min_fdiff) << " <? " << _eps_ <<endl; //DX 20190613
+      //DX 20190613 [OBSOLETE] PBC(fdiff);
+      //DX 20190613 [OBSOLETE] cerr << "PBC(fdiff) = " << fdiff << endl;
+      //DX 20160613 [OBSOLETE] cerr << "modulus(f2c*fdiff) = " << modulus(f2c*fdiff) << " <? " << _eps_ <<endl;
       }
       return false;
     }
@@ -1948,8 +2235,7 @@ namespace SYM {
         return FALSE;
       }
       //tatom.fpos=BringInCell(tatom.fpos);
-      //if(AtomFPOSMatch(a,tatom,str.c2f,str.f2c,skew,tol)){
-      if(AtomsMapped(a,tatom,str.c2f,str.f2c,skew,tol)){  //TYPE SPECIFIC BY DEFAULT
+      if(AtomsMapped(a,tatom,str.lattice,str.f2c,skew,tol)){  //TYPE SPECIFIC BY DEFAULT //DX 20190619 - lattice and f2c as input
         return TRUE;
       }
     }
@@ -4757,7 +5043,7 @@ namespace SYM {
         tmp.type = atoms[k].type;*/
       // DX TEST
       uint mapped_index=0;
-      if(MapAtomWithBasis(atoms, tmp, map_types, index_to_check, c2f, f2c, skew, tolerance, mapped_index,true)){
+      if(MapAtomWithBasis(atoms, tmp, map_types, index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
@@ -4856,7 +5142,7 @@ namespace SYM {
         tmp.name = atoms[k].name;
         tmp.type = atoms[k].type;*/
       // DX TEST
-      if(MapAtom(atoms,tmp,map_types,c2f,f2c,skew,tolerance)){
+      if(MapAtom(atoms,tmp,map_types,lattice,f2c,skew,tolerance)){ //DX 20190619 - lattice and f2c as input
         transformedcrystal.push_back(tmp);
         index_to_check.push_back(k);
       }
@@ -4887,7 +5173,7 @@ namespace SYM {
     // ===== If each atom is mapped to another atom (i.e. onto), we need to check if each mapping is unique (i.e. one-to-one) ===== //
     for(uint ix=0;ix<atoms.size();ix++){
       uint mapped_index=0;
-      if(MapAtomWithBasis(transformedcrystal, atoms[ix], map_types,index_to_check, c2f, f2c, skew, tolerance, mapped_index,true)){
+      if(MapAtomWithBasis(transformedcrystal, atoms[ix], map_types,index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
         basis_atoms_map.push_back(index_to_check[mapped_index]);
         basis_types_map.push_back(atoms[index_to_check[mapped_index]].type);
         if(fast){ //If you use fast, you should have verified that no atoms overlap (which is most of the time, hopefully)
@@ -6851,7 +7137,7 @@ namespace SYM {
               return FALSE;
             }
             tatom.fpos=mod_one_xvec(tatom.fpos);
-            fgroup_map=MapAtom(tatom, a.atoms[eat], FALSE,a.c2f, a.f2c, skew, _eps_);
+            fgroup_map=MapAtom(tatom, a.atoms[eat], FALSE, a.lattice, a.f2c, skew, _eps_); //DX 20190619 - lattice and f2c as input
           }
           if(fgroup_map){
             fSymOp=a.fgroup[fg];

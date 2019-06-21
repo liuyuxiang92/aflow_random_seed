@@ -2060,6 +2060,10 @@ namespace pflow {
   "<< x<<" --cif < POSCAR \n\
   "<< x<<" --clean -D DIRECTORY \n\
   "<< x<<" --clean_all < LIST_DIRECTORIES \n\
+  "<< x<<" --compare_material=POSCAR1,POSCAR2 [--np=xx (default 1)] [--print]\n\
+  "<< x<<" --compare_structure=POSCAR1,POSCAR2 [--np=xx (default 1)] [--print]\n\
+  "<< x<<" --compare_material_directory|--compare_material_dir [-D \"PATH\"] [--np=xx (default 1)]\n\
+  "<< x<<" --compare_structure_directory|--compare_structure_dir [-D \"PATH\"] [--np=xx (default 1)]\n\
   "<< x<<" --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [chull_options] [--destination=[DIRECTORY]] \n\
     chull_options: \n\
                  \n\
@@ -2447,13 +2451,6 @@ namespace pflow {
  TERNARY CONVEX HULL (only for duke.edu computers) \n\
   "<< x<<" --terdata=A:B:C  [--fonts=XX | --keep=eps | --print=jpg | --print=gif | --print=png] \n\
   "<< x<<" --terdata_exist list \n\
-  \n\
- COMPARE STRUCTURES \n\
-  "<< x<<" Refer to aflow --readme=compare\n\
-  "<< x<<" --compare_material=POSCAR1,POSCAR2 [--np=xx (default 8)] [--print]\n\
-  "<< x<<" --compare_structure=POSCAR1,POSCAR2 [--np=xx (default 8)] [--print]\n\
-  "<< x<<" --compare_material_directory|--compare_material_dir [-D \"PATH\"] [--np=xx (default 8)]\n\
-  "<< x<<" --compare_structure_directory|--compare_structure_dir [-D \"PATH\"] [--np=xx (default 8)]\n\
   \n\
 ******* END POSTPROCESSING MODE ******************************************************************** \n\
   " << endl;
