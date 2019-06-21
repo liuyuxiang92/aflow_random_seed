@@ -979,22 +979,26 @@ namespace SYM {
       //DX 20190613 [OBOSLETE] minimizeCartesianDistance(cpos1,cpos2,fdiff,c2f,f2c,tol);
       xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1, cpos2, lattice); //DX 20190613
       double min_cdiff_dist = aurostd::modulus(min_cdiff); //DX 20190613 - changed variable names
+      stringstream message; 
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)<_ZERO_TOL_){
-        cerr << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
+        message << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(soliloquy, message, cerr, _LOGGER_MESSAGE_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist<=tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
-        cerr << soliloquy << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
+        message << soliloquy << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist>tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
-        cerr << soliloquy << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
+        message << soliloquy << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)!=(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
-        cerr << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-        exit(0);
+        message << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
       }
       if((min_cdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)!=(min_fdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)){
-        cerr << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL << endl;
-        exit(0);
+        message << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
       }
     }
     double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX 20190620
@@ -1150,7 +1154,7 @@ namespace SYM {
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
         if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
-        if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+        if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input 
           count++;
           mapped_index=i;
             if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
