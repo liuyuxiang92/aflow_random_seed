@@ -3681,8 +3681,6 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   string line;
   uint ndos = 1;  // ME190614
   if(filename=="") filename="stringstream";
-  // crunchig to eat the info
-  //for(uint iline=0;iline<vcontent.size();iline++) {
   for(uint iline = 0; iline < 7;iline++) { // ME190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
     // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;

@@ -5792,7 +5792,7 @@ namespace aflowlib {
       oss << "<div id=\"small_figure\" style=\'display:flex;justify-content:center;\'>" << endl;
       if(aentry.vfiles_WEB.size()>0) 
 	for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-	  if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "pdos")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  // ME190621 - include new file name convention
+	  if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "_dos_")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  // ME190621 - include new file name convention
 	    oss << "<img class=\"pic_small\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of pdos_" << label << "\" style='background:white; margin: 0 auto;height:0%;' >" << endl;
       oss << "</div>" << endl;
       oss << "</li></ul>" << endl;
@@ -5823,7 +5823,7 @@ namespace aflowlib {
       }
       if(aentry.vfiles_WEB.size()>0) {
 	for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
-	  if((aentry.vfiles_WEB.at(i)==label+"_dos.png") || (aentry.vfiles_WEB.at(i) == label + "dos.png")) {
+	  if((aentry.vfiles_WEB.at(i)==label+"_DOS.png") || (aentry.vfiles_WEB.at(i) == label + "_dos.png")) {
             oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"DOS of " << label << "\"  ></li>" << endl;
             break;
           }
@@ -5832,7 +5832,7 @@ namespace aflowlib {
       // ME190621 - END
       if(aentry.vfiles_WEB.size()>0) 
 	for(uint iline=0;iline<aentry.vfiles_WEB.size();iline++)
-	  if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "pdos"))  // ME190621 - include new file name convention
+	  if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "_dos_"))  // ME190621 - include new file name convention
 	    if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"png"))
 	      oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(iline) << "\" alt=\"Band Structure of pdos_" << label << "\"  ></li>" << endl;
       oss << "</ul>" << endl;
