@@ -14,5 +14,5 @@ matrix:
       compiler: gcc
 script:
   - cd src
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ];   then make     ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then make mac ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ];   then make -j 2 ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then make mac  ; fi
