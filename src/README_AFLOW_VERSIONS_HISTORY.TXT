@@ -27,6 +27,10 @@
         -- added general getPeaks() function to AUROSTD (CO)
         -- calculated X-ray amplitude on-the-fly, no need to pass it around (CO)
         -- moved double lambda to end of inputs and default to 1.5418 Cooper K-alpha (CO)
+        -- patched RemoveControlCodeCharactersFromString() for return carriage (CO)
+        -- added width_maximum to getPeaks() to resolve arbitrarily-defined peaks (CO)
+        -- made x-ray analysis code more modular (CO)
+        -- added --plot_xray_file option (CO)
 3.1.224 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.224.tar.xz
         -- Fixed bug that didn't allow users to override the standard lattice phonon dispersion path. (ME)

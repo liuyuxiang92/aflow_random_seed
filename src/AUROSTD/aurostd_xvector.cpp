@@ -2592,11 +2592,11 @@ namespace aurostd {
 }
 
 namespace aurostd {
-  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,uint smoothing_iterations,uint avg_window,double significance_multiplier){  //CO190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,uint smoothing_iterations,uint avg_window,int width_maximum,double significance_multiplier){  //CO190620
     xvector<utype> signal_smooth;
-    return getPeaks(signal,signal_smooth,smoothing_iterations,avg_window,significance_multiplier);
+    return getPeaks(signal,signal_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);
   }
-  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,xvector<utype>& signal_smooth,uint smoothing_iterations,uint avg_window,double significance_multiplier){  //CO190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,xvector<utype>& signal_smooth,uint smoothing_iterations,uint avg_window,int width_maximum,double significance_multiplier){  //CO190620
     //using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
     //raw data is X
     //smooth data via moving average to get Y
@@ -2604,8 +2604,16 @@ namespace aurostd {
     //detect peaks when (X-Y)>multiplier*sigma
 
     //smooth data
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy="aurostd::getPeaks():";
+
+    if(LDEBUG){
+      cerr << soliloquy << " smoothing_iterations=" << smoothing_iterations << endl;
+      cerr << soliloquy << " avg_window=" << avg_window << endl;
+      cerr << soliloquy << " width_maximum=" << width_maximum << endl;
+      cerr << soliloquy << " significance_multiplier=" << significance_multiplier << endl;
+    }
+
     signal_smooth=signal;
     for(uint i=0;i<smoothing_iterations;i++){signal_smooth=aurostd::moving_average(signal_smooth,avg_window);}
     xvector<utype> diff=signal-signal_smooth;
@@ -2615,7 +2623,11 @@ namespace aurostd {
     bool local_maximum=false;
     bool significant=false;
     for(int i=signal.lrows;i<=signal.urows;i++){
-      local_maximum=(i>signal.lrows && i<signal.urows && signal[i]>signal[i-1] && signal[i]>signal[i+1]);
+      local_maximum=true;
+      for(int j=1;j<=width_maximum&&local_maximum;j++){
+        if(!((i-j)>=signal.lrows && (i+j)<=signal.urows && signal[i]>signal[i-j] && signal[i]>signal[i+j])){local_maximum=false;}
+      }
+      //[CO190620 - now width_maximum is a parameter]local_maximum=((i-1)>=signal.lrows && (i+1)<=signal.urows && signal[i]>signal[i-1] && signal[i]>signal[i+1]);
       significant=(diff[i]>significance_multiplier*sigma);
       if(local_maximum && significant){
         peak_indices.push_back(i);

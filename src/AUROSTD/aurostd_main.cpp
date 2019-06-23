@@ -880,7 +880,7 @@ namespace aurostd {
   // ***************************************************************************
   // Function removeControlCodeCharactersFromString
   // ***************************************************************************
-  bool RemoveControlCodeCharactersFromString(string& in, string& out){
+  bool RemoveControlCodeCharactersFromString(const string& in, string& out){  //CO190620
       
     // removes control code and backspace characters (e.g., NUL, DEL, etc.)
     // only keep printable characters (i.e., digits, letters, punctuation, and spaces) 
@@ -917,12 +917,9 @@ namespace aurostd {
 
     //stringstream tmp; tmp << ss_in.str();
     while(ss_in.get(c)){
-      if(isprint(c) || isspace(c) || (c != '\r')) {  // ME190614
-        ss_out << c;
-      }
-      else{
-        detected_control_char = true;
-      }
+      //[CO190620 - still doesn't work]if(isprint(c) || isspace(c) || (c != '\r')) {  // ME190614
+      if((isprint(c) || isspace(c) || FALSE) && ((c != '\r') || FALSE)) {ss_out << c;}  //CO190620 - add more cases before FALSE
+      else{detected_control_char = true;}
     }
     //uint count=0;
     //while(tmp.get(c1) && ss_out.get(c2)){
