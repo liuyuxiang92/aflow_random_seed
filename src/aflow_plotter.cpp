@@ -326,13 +326,13 @@ static const string ESTRUCTURE_COLORS[ESTRUCTURE_NCOLORS] = {
     "#4C72B0",  // blue
     "#55A868",  // green
     "#C44E52",  // red
-    "#8172B2",  // purple
     "#CCB974",  // yellow
+    "#8172B2",  // purple
     "#64B5CD",  // light blue
     "#E08000",  // orange
     "#006060",  // blue-green
-    "#BE80FF",  // light purple
-    "#A06000"   // brown
+    "#A06000",  // brown
+    "#BE80FF"   // light purple
 };
 static const string ISPIN_COLORS[2] = {"#000000", "#C44E52"};
 static const string ORBITALS[4] = {"s", "p", "d", "f"};
@@ -609,7 +609,7 @@ string getLatticeFromKpointsTitle(const string& title) {
 // Shift the energies in an xEIGENVAL object so that the Fermi energy is at
 // zero. This is not necessary for xDOSCAR because it has a separate vector
 // for that purpose.
-void shiftEfermiToZero(xEIGENVAL& xeigen, const double& Efermi) {
+void shiftEfermiToZero(xEIGENVAL& xeigen, double Efermi) {
   for (uint k = 0; k < xeigen.number_kpoints; k++) {
     for (uint b = 0; b < xeigen.number_bands; b++) {
       for (uint s = 0; s < xeigen.spin + 1; s++) {
@@ -621,7 +621,7 @@ void shiftEfermiToZero(xEIGENVAL& xeigen, const double& Efermi) {
 
 //setEMinMax//////////////////////////////////////////////////////////////////
 // Sets the minimum and maximum energy values for electronic structure plots.
-void setEMinMax(xoption& plotoptions, const double& Emin, const double& Emax) {
+void setEMinMax(xoption& plotoptions, double Emin, double Emax) {
   if (plotoptions.getattachedscheme("XMIN").empty()) {
     if (plotoptions.flag("NOSHIFT")) {
       plotoptions.push_attached("XMIN", aurostd::utype2string<double>(Emin));
@@ -1375,7 +1375,7 @@ static const string MATRIX_LABELS[9] = {"xx", "yx", "zx",
 //plotSingleFromSet///////////////////////////////////////////////////////////
 // Plots a single column from a dataset.
 void plotSingleFromSet(xoption& plotoptions, stringstream& out,
-                       const vector<vector<double> >& data_set, const int& col) {
+                       const vector<vector<double> >& data_set, int col) {
   setFileName(plotoptions);
   setTitle(plotoptions);
   

@@ -3232,8 +3232,8 @@ namespace plotter {
   // Helper functions
   xstructure getStructureWithNames(const aurostd::xoption&);
   string getLatticeFromKpointsTitle(const string&);
-  void shiftEfermiToZero(xEIGENVAL&, const double&);
-  void setEMinMax(aurostd::xoption&, const double&, const double&);
+  void shiftEfermiToZero(xEIGENVAL&, double);
+  void setEMinMax(aurostd::xoption&, double, double);
 
   // DOS
   void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&);
@@ -3268,7 +3268,7 @@ namespace plotter {
   void PLOT_TCOND(aurostd::xoption&, stringstream&);
 
   // General plots -----------------------------------------------------------
-  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, const int&);
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int);
   void plotMatrix(xoption& plotoptions, stringstream&);
   void setPlotLabels(aurostd::xoption&, const string&, const string&, const string&, const string&);
   vector<vector<double> > readAflowDataFile(aurostd::xoption&);
