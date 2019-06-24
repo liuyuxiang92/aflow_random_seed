@@ -26,11 +26,13 @@ namespace apl {
 // ///////////////////////////////////////////////////////////////////////////
 
 //DOSCalculator::DOSCalculator(IPhononCalculator& pc, IReciprocalPointGrid& rg, Logger& l)  OBSOLETE ME190423
-DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string method)
+DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string method,
+                             const vector<xvector<double> >& projections)  // ME190624
     : _pc(pc), _rg(rg), _logger(l) {
   clear();
   _bzmethod = method;
   _system = _pc.getSystemName();  // ME190614
+  _projections = projections;
   calculateFrequencies();
 }
 

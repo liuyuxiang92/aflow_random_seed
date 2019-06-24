@@ -307,12 +307,14 @@ void RunPhonons_APL_181216(_xinput& xinput,
   /***************************** READ PARAMETERS *****************************/
 
   string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO190114 - initialize everything
+  string USER_DOS_PROJECTIONS_SCHEME = "";  // ME190624
   string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO190114 - initialize everything
   bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false; //CO190114 - initialize everything
   bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO190114 - initialize everything
   double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO190114 - initialize everything  
   int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO190114 - initialize everything
   vector<int> USER_DOS_MESH(3);
+  vector<xvector<double> > USER_DOS_PROJECTIONS;
   for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
     const string& key = kflags.KBIN_MODULE_OPTIONS.aplflags[i].keyword;
     logger << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme << apl::endl;
@@ -348,9 +350,10 @@ void RunPhonons_APL_181216(_xinput& xinput,
     if (key == "DOSMETHOD") {USER_DOS_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
     if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
+    if (key == "DOSPROJECTIONS") {USER_DOS_PROJECTIONS_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
     if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      }
+  }
 
   /***************************** CHECK PARAMETERS *****************************/
 
@@ -466,6 +469,20 @@ void RunPhonons_APL_181216(_xinput& xinput,
         USER_DOS_MESH[1] = aurostd::string2utype<int>(tokens[1]);
         USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
       }
+      if (USER_DOS_PROJECTIONS_SCHEME != "OFF") {
+        aurostd::string2tokens(USER_DOS_PROJECTIONS_SCHEME, tokens, "; ");
+        for (uint i = 0; i < tokens.size(); i++) {
+          vector<double> proj;
+          aurostd::string2tokens(tokens[i], proj, ", ");
+          if (proj.size() == 3) {
+            USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
+          } else {
+            message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS. ";
+            message += "See README_AFLOW_APL.TXT for the correct format.";
+            throw apl::APLRuntimeError(message);
+          }
+        }
+      }
     }
 
     // TPT
@@ -554,6 +571,16 @@ void RunPhonons_APL_181216(_xinput& xinput,
     logger << " mesh with " << USER_DOS_NPOINTS << " bins.";
     if (USER_DOS_METHOD == "RS")
       logger << " A smearing value of " << USER_DOS_SMEAR << " eV will be used.";
+    if ((USER_DOS_PROJECTIONS.size() == 0) || (USER_DOS_METHOD == "RS")) {
+      logger << " Projected phonon DOS will NOT be calculated.";
+    } else {
+      logger << " Porjected phonon DOS will be calculated along the directions ";
+      for (uint i = 0; i < USER_DOS_PROJECTIONS.size(); i++) {
+        logger << "[";
+        for (int j = 1; j < 4; j++) logger << USER_DOS_PROJECTIONS[i][j] << ((j < 3)?", ":"");
+        logger << "]" << ((i < USER_DOS_PROJECTIONS.size() - 1)?", ":".");
+      }
+    }
     logger << apl::endl;
   } else {
     logger << "Phonon DOS will NOT be calculated." << apl::endl;
@@ -1516,7 +1543,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
         //  dosc.reset(new apl::DOSRootSamplingMethod(*phcalc, qmesh, logger));
         //}
         
-        apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD);
+        apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
 
         // ME190428 - END
         // Calculate DOS
@@ -1589,7 +1616,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
               //  dosc.reset( new apl::DOSRootSamplingMethod(*phcalc,qmesh,logger) );
               //}
               
-              apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD);
+              apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
               // ME190428 - END
               // Calculate DOS
               dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
@@ -1741,7 +1768,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       //}
 
       // Calculate DOS
-      apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD);
+      apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
       // ME190428 - END
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) {

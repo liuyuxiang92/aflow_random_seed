@@ -1386,6 +1386,7 @@ class DOSCalculator {  // ME190424
   std::vector<double> _dos;
   std::vector<double> _idos;  // ME190614
   std::vector<vector<vector<double> > > _projectedDOS; // ME190614 - projectedDOS.at(atom).at(direction).at(frequency)
+  std::vector<xvector<double> > _projections;  // ME190624 - the projection directions for the DOS
   double _temperature;  // ME190614
   //CO - START
  //private:
@@ -1397,7 +1398,7 @@ class DOSCalculator {  // ME190424
 
  public:
 //  DOSCalculator(IPhononCalculator&, IReciprocalPointGrid&, Logger&);  OBSOLETE ME190417
-  DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string);  // ME190423
+  DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
   virtual ~DOSCalculator();
   // ME190423 - START
   //virtual void rawCalc(int) {} OBSOLETE ME190419
