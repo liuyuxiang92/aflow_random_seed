@@ -2926,6 +2926,7 @@ class xDOSCAR {
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  void writeFile(string="");  // ME190623
  private:                                                        //
   void free();                                                  // free space
   void copy(const xDOSCAR& b);                                  //
@@ -2942,6 +2943,8 @@ class xEIGENVAL {
   // CONTENT
   string content;vector<string> vcontent;string filename;       // the content, and lines of it
   string title;
+  uint number_atoms;  // ME190623
+  uint number_loops;  // ME190623
   uint spin;
   double Vol,POTIM;
   xvector<double> lattice;
@@ -2957,6 +2960,7 @@ class xEIGENVAL {
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
   double energy_max;  // ME190614
   double energy_min;  // ME190614
+  void writeFile(string="");  // ME190623
  private:                                                        //
   void free();                                                  // free space
   void copy(const xEIGENVAL& b);                                //
@@ -3071,6 +3075,8 @@ class xKPOINTS {
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  void writeFile(string="");  // ME190623
+  string createStandardTitlePath(const xstructure&);  // ME190623
  private:                       //
   void free();                 // free space
   void copy(const xKPOINTS& b); //

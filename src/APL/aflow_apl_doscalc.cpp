@@ -404,60 +404,43 @@ void DOSCalculator::writePDOS() {
 void DOSCalculator::writePHDOSCAR() {
   string filename = DEFAULT_APL_PHDOSCAR_FILE;
   _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
-  stringstream outfile;
-  // Header
-  int nions = (int) _pc.getInputCellStructure().atoms.size();
-  bool partial = (_projectedDOS.size() > 0);
-  outfile << std::setw(4) << nions
-          << std::setw(4) << nions
-          << std::setw(4) << partial
-          << std::setw(4) << 0 << std::endl;
-  double vol, a, b, c, potim;
-  vol = GetVolume(_pc.getInputCellStructure())/nions;
-  a = _pc.getInputCellStructure().a * 1E-10;
-  b = _pc.getInputCellStructure().b * 1E-10;
-  c = _pc.getInputCellStructure().c * 1E-10;
-  potim = 0.5E-15;
-  outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-  outfile << std::fixed;
-  outfile << std::setprecision(7) << std::scientific;
-  outfile << std::setw(15) << vol
-          << std::setw(15) << a
-          << std::setw(15) << b
-          << std::setw(15) << c
-          << std::setw(15) << potim << std::endl;
+  xDOSCAR xdos = createDOSCAR();
+  xdos.writeFile(filename);
+}
   
-  outfile << std::setw(23) << std::setprecision(15) << _temperature << std::endl;
-  outfile << "  PHON" << std::endl;
-  outfile << " " << _system << std::endl;
+xDOSCAR DOSCalculator::createDOSCAR() {
+  xDOSCAR xdos;
+  // Header values
+  xdos.number_atoms = _pc.getInputCellStructure().atoms.size();
+  xdos.partial = (_projectedDOS.size() > 0);
+  xdos.Vol = GetVolume(_pc.getInputCellStructure())/xdos.number_atoms;
+  xvector<double> lattice;
+  lattice[1] = _pc.getInputCellStructure().a * 1E-10;
+  lattice[2] = _pc.getInputCellStructure().b * 1E-10;
+  lattice[3] = _pc.getInputCellStructure().c * 1E-10;
+  xdos.lattice = lattice;
+  xdos.POTIM = 0.5E-15;
+  xdos.temperature = _temperature;
+  xdos.carstring = "PHON";
+  xdos.title = _system;
 
-  int ndos = (int) _dos.size();
+  // Data
   double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
   double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
   double conv = factorTHz2Raw * factorRaw2meV/1000;
-  stringstream dosline;  // Will be reused for projected DOS
-  dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << (_maxFreq * conv)
-          << std::fixed << std::setw(15) << (_minFreq * conv)
-          << std::setprecision(0) << "  " << ndos
-          << std::setprecision(8) << std::fixed << std::setw(15) << 0.0  // phonon DOS have no EFERMI
-          << std::setprecision(8) << std::fixed << std::setw(15) << 1.0 << std::endl;
-  outfile << dosline.str();
+  xdos.energy_max = _maxFreq * conv;
+  xdos.energy_min = _minFreq * conv;
+  xdos.number_energies = _dos.size();
+  xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
+  xdos.venergy = aurostd::vector2deque(_bins);
+  for (uint i = 0; i < xdos.number_energies; i++) xdos.venergy[i] *= conv;
+  xdos.viDOS.resize(1);
+  xdos.viDOS[0] = aurostd::vector2deque(_idos);
+  deque<deque<deque<deque<double> > > > vDOS(1, deque<deque<deque<double> > >(1, deque<deque<double> >(1)));
+  vDOS[0][0][0] = aurostd::vector2deque<double>(_dos);
+  xdos.vDOS = vDOS;
 
-  // Data
-  outfile << std::setprecision(4);
-  for (int k = 0; k < ndos; k++) {
-    outfile << std::setw(12) << _bins[k] * conv 
-            << std::setw(12) << _dos[k]
-            << std::setw(12) << _idos[k] << std::endl;
-  }
-
-  // Write file
-  aurostd::stringstream2file(outfile, filename);
-  if (!aurostd::FileExist(filename)) {
-    string function = "DOSCalculator::writePHDOSCAR()";
-    string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
-  }
+  return xdos;
 }
 
 // ///////////////////////////////////////////////////////////////////////////

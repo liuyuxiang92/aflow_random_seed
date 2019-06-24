@@ -402,68 +402,58 @@ bool PhononDispersionCalculator::isExactQPoint(const xvector<double>& qpoint,
 void PhononDispersionCalculator::writePHEIGENVAL() {
   string filename = DEFAULT_APL_PHEIGENVAL_FILE;
   _logger << "Writing phonon eigenvalues into file " << filename << "." << apl::endl;
-  stringstream outfile;
-  // Header
-  int nions = (int) _pc.getInputCellStructure().atoms.size();
-  outfile << std::setw(4) << nions
-          << std::setw(4) << nions
-          << std::setw(4) << 0
-          << std::setw(4) << 1 << std::endl;
-  double vol, a, b, c, potim;
-  vol = GetVolume(_pc.getInputCellStructure())/nions;
-  a = _pc.getInputCellStructure().a * 1E-10;
-  b = _pc.getInputCellStructure().b * 1E-10;
-  c = _pc.getInputCellStructure().c * 1E-10;
-  potim = 0.5E-15;
-  outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-  outfile << std::fixed;
-  outfile << std::setprecision(7) << std::scientific;
-  outfile << std::setw(15) << vol
-          << std::setw(15) << a
-          << std::setw(15) << b
-          << std::setw(15) << c
-          << std::setw(15) << potim << std::endl;
-  
-  outfile << std::setw(23) << std::setprecision(15) << _temperature << std::endl;
-  outfile << "  PHON" << std::endl;
-  outfile << " " << _pc.getSystemName() << std::endl;
+  xEIGENVAL xeigen = createEIGENVAL();
+  xeigen.writeFile(filename);
+  // Also write PHKPOINTS and PHPOSCAR file
+  writePHPOSCAR();  // Structure required for plotting
+  writePHKPOINTS();
+}
 
-  uint nbranch = _pc.getNumberOfBranches();
-  uint nqpts = _freqs.size();
-  outfile << std::dec << std::setw(4) << 0 << "  " << nqpts << std::setw(4) << nbranch << std::endl;
+xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
+  xEIGENVAL xeigen;
+  stringstream outfile;
+  // Header values
+  xeigen.number_atoms = _pc.getInputCellStructure().atoms.size();
+  xeigen.number_loops = 0;
+  xeigen.spin = 0;
+  xeigen.Vol = GetVolume(_pc.getInputCellStructure())/xeigen.number_atoms;
+  xvector<double> lattice(3);
+  lattice[1] = _pc.getInputCellStructure().a * 1E-10;
+  lattice[2] = _pc.getInputCellStructure().b * 1E-10;
+  lattice[3] = _pc.getInputCellStructure().c * 1E-10;
+  xeigen.lattice = lattice;
+  xeigen.POTIM = 0.5E-15;
+  xeigen.temperature = _temperature;
+  xeigen.carstring = "PHON";
+  xeigen.title = _pc.getSystemName();
+  xeigen.number_electrons = 0;
+  for (uint at = 0; at < xeigen.number_atoms; at++) {
+    xeigen.number_electrons += _pc.getInputCellStructure().species_pp_ZVAL[at];
+  }
+  xeigen.number_kpoints = _freqs.size();
+  xeigen.number_bands = _pc.getNumberOfBranches();
   
+  // Data
   double weight = 1.0/_freqs.size();
   double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
   double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
   double conv = factorTHz2Raw * factorRaw2meV/1000;
   apl::PathBuilder::StoreEnumType store = _pb.getStore();
-  xvector<double> qpt(3);
   xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc.getInputCellStructure().lattice)));
 
-  for (uint q = 0; q < nqpts; q++) {
-    if (store == apl::PathBuilder::CARTESIAN_LATTICE) qpt = c2f * _qpoints[q];
-    else qpt = _qpoints[q];
-    outfile << " " << std::endl;  // Space MUST be there or the xEIGENVAL reader breaks!
-    for (int i = 1; i < 4; i++) {
-      outfile << std::scientific << std::setprecision(8) << "  " << qpt[i];
-    }
-    outfile << std::scientific << std::setprecision(8) << "  " << weight << std::endl;
-    for (uint br = 1; br <= nbranch; br++) {
-      outfile << std::dec << std::setprecision(0) << std::setw(4) << br
-              << std::setprecision(8) << std::fixed << std::setw(15) << (conv * _freqs[q][br]) << std::endl;
+  xeigen.vweight.assign(xeigen.number_kpoints, weight);
+  xeigen.vkpoint.resize(xeigen.number_kpoints, xvector<double>(3));
+  xeigen.venergy.resize(xeigen.number_kpoints, deque<deque<double> >(xeigen.number_bands, deque<double>(1)));
+
+  for (uint q = 0; q < xeigen.number_kpoints; q++) {
+    if (store == apl::PathBuilder::CARTESIAN_LATTICE) xeigen.vkpoint[q] = c2f * _qpoints[q];
+    else xeigen.vkpoint[q] = _qpoints[q];
+    for (uint br = 0; br < xeigen.number_bands; br++) {
+      xeigen.venergy[q][br][0] = conv * _freqs[q][br + 1];
     }
   }
   
-  // Write file
-  aurostd::stringstream2file(outfile, filename);
-  if (!aurostd::FileExist(filename)) {
-    string function = "PhononDispersionCalculator::writePHEIGENVAL()";
-    string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
-  }
-  // Also write PHKPOINTS and PHPOSCAR file
-  writePHPOSCAR();  // Structure required for plotting
-  writePHKPOINTS();
+  return xeigen;
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -485,7 +475,8 @@ void PhononDispersionCalculator::writePHPOSCAR() {
 
 // Write the k-point path into a VASP KPOINTS-formatted file
 void PhononDispersionCalculator::writePHKPOINTS() {
-  _pb.writePHKPOINTS(_pc.getSupercell());
+  xKPOINTS xkpts = _pb.createKPOINTS(_pc.getSupercell());
+  xkpts.writeFile(DEFAULT_APL_PHKPOINTS_FILE);
 }
 
 // ///////////////////////////////////////////////////////////////////////////

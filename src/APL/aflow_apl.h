@@ -1102,8 +1102,7 @@ class PathBuilder {
   std::vector<aurostd::xvector<double> > getPath(ModeEnumType, const string&);
   double getPathLength();
   double getPathLength(uint);
-  void writePHKPOINTS(const Supercell&);  // ME190614
-  void writePHKPOINTS(const Supercell&, const vector<xvector<double> >&, const vector<string>&);  // ME190614
+  xKPOINTS createKPOINTS(const Supercell&);  // ME190614
 };
 }  // namespace apl
 
@@ -1136,6 +1135,7 @@ class PhononDispersionCalculator {
   bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
   std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PINKU]
   // ME190614 - START
+  xEIGENVAL createEIGENVAL();
   void writePHEIGENVAL();
   void writePHPOSCAR();
   void writePHKPOINTS();
@@ -1409,6 +1409,7 @@ class DOSCalculator {  // ME190424
   void clear();
   void writePDOS();
   void writePDOS(string, string);  //[PINKU]
+  xDOSCAR createDOSCAR();  // ME190614
   void writePHDOSCAR();  // ME190614
   // Interface IDOSCalculator
   std::vector<double> getBins();

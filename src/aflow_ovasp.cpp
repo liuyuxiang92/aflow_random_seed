@@ -3963,6 +3963,79 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   return TRUE;
 }
 
+// ME190623 - BEGIN
+void xDOSCAR::writeFile(string outfile) {
+  if (outfile.empty()) outfile = filename;  // Choose xDOSCAR filename if no filename given
+  if (outfile.empty() || (outfile == "stringstream") || (outfile == "string")) {
+    string function = "xDOSCAR::writeFile()";
+    string message = "Could not write DOSCAR file. No file name given.";
+    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+  }
+
+  stringstream xdos;
+  // Header
+  xdos << std::setw(4) << number_atoms
+       << std::setw(4) << number_atoms
+       << std::setw(4) << partial
+       << std::setw(4) << 0 << std::endl;
+  xdos << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  xdos << std::setprecision(7) << std::scientific;
+  xdos << std::setw(15) << Vol;
+  for (int i = 1; i < 4; i++) xdos << std::setw(15) << lattice[i];
+  xdos << std::setw(15) << POTIM << std::endl;
+  xdos << "  " << std::setprecision(15) << temperature << std::endl;
+  xdos << "  " << carstring << std::endl;
+  xdos << " " << title << std::endl;
+
+  stringstream dosline;  // Will be reused for projected DOS
+  dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << energy_max
+          << std::fixed << std::setw(15) << energy_min
+          << std::setprecision(0) << "  " << number_energies
+          << std::setprecision(8) << std::fixed << std::setw(15) << Efermi
+          << std::setprecision(8) << std::fixed << std::setw(15) << 1.0;
+  xdos << dosline.str() << std::endl;
+
+  // Data
+  xdos << std::setprecision(4);
+  for (uint e = 0; e < number_energies; e++) {
+    xdos << std::setw(12) << venergy[e];
+    // Do not use vDOS.size() because it will mess up DOSCARs with spin-orbit coupling
+    for (uint s = 0; s < spin + 1; s++) {
+      xdos << std::setw(12) << vDOS[0][0][s][e];
+    }
+    for (uint s = 0; s < spin + 1; s++) {
+      xdos << std::setw(12) << viDOS[s][e];
+    }
+    xdos << std::endl;
+  }
+
+  for (uint p = 1; p < vDOS.size(); p++) {
+    xdos << dosline.str() << std::endl;
+    for (uint e = 0; e < number_energies; e++) {
+      xdos << std::setw(12) << venergy[e];
+      for (uint o = 1; o < vDOS[p].size(); o++) {  // Do not output the total
+        for (uint s = 0; s < vDOS[p][o].size(); s++) {
+          xdos << std::setw(12) << vDOS[p][o][s][e];
+        }
+      }
+      xdos << std::endl;
+    }
+  }
+
+  if (xdos.str().empty()) {
+    string function = "xDOSCAR::writeFile()";
+    string message = "Could not write DOSCAR file. Nothing to write.";
+    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  }
+  aurostd::stringstream2file(xdos, outfile);
+  if (!aurostd::FileExist(outfile)) {
+    string function = "xDOSCAR::writeFile()";
+    string message = "Cannot open output file " + outfile + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+}
+// ME190623 - END
+
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
@@ -3987,6 +4060,8 @@ xEIGENVAL::xEIGENVAL() {
   vkpoint.clear();
   venergy.clear();
   carstring = "";  // ME190620
+  number_atoms = 0;  // ME190623
+  number_loops = 0;  // ME190623
 }  
 
 xEIGENVAL::~xEIGENVAL() {
@@ -4035,6 +4110,9 @@ void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
       temp.push_back(b.venergy.at(i).at(j));
     venergy.push_back(temp);
   }  
+  carstring = b.carstring;  // ME190620
+  number_atoms = b.number_atoms;  // ME190623
+  number_loops = b.number_loops;  // ME190623
 }
 
 const xEIGENVAL& xEIGENVAL::operator=(const xEIGENVAL& b) {  // operator= PUBLIC
@@ -4099,7 +4177,11 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for(uint iline=0;iline<vcontent.size();iline++) {
     aurostd::string2tokens(vcontent.at(iline),tokens);
     //    cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
-    if(iline==0 && tokens.size()==4)  spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
+    if(iline==0 && tokens.size()==4) {
+      number_atoms = aurostd::string2utype<int>(tokens[0]);  // ME190623
+      number_loops = aurostd::string2utype<int>(tokens[2]);  // ME190623
+      spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
+    }
     if(iline==1 && tokens.size()>=5) {
       uint i=0;
       Vol=aurostd::string2utype<double>(tokens.at(i++));
@@ -4182,6 +4264,60 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
+}
+
+void xEIGENVAL::writeFile(string outfile) {
+  if (outfile.empty()) outfile = filename;  // Choose xDOSCAR filename if no filename given
+  if (outfile.empty() || (outfile == "stringstream") || (outfile == "string")) {
+    string function = "xEIGENVAL::writeFile()";
+    string message = "Could not write EIGENVAL file. No file name given.";
+    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+  }
+
+  stringstream xeigen;
+  // Header
+  xeigen << std::setw(4) << number_atoms
+         << std::setw(4) << number_atoms
+         << std::setw(4) << number_loops
+         << std::setw(4) << (spin + 1) << std::endl;
+  xeigen << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  xeigen << std::setprecision(7) << std::scientific;
+  xeigen << std::setw(15) << Vol;
+  for (int i = 1; i < 4; i++) xeigen << std::setw(15) << lattice[i];
+  xeigen << std::setw(15) << POTIM << std::endl;
+  xeigen << "  " << std::setprecision(15) << temperature << std::endl;
+  xeigen << "  " << carstring << std::endl;
+  xeigen << " " << title << std::endl;
+  xeigen << std::dec << std::setw(4) << number_electrons
+                     << "  " << std::setw(4) << number_kpoints
+                     << std::setw(4) << number_bands << std::endl;
+
+  // Data
+  for (uint k = 0; k < number_kpoints; k++) {
+    xeigen << " " << std::endl;  // space MUST be there or the EIGENVAL reader will fail
+    xeigen << std::scientific << std::setprecision(8);
+    for (int i = 1; i < 4; i++) xeigen << "  " << vkpoint[k][i];
+    xeigen << "  " << vweight[k] << std::endl;
+    for (uint br = 0; br < number_bands; br++) {
+      xeigen << std::dec << std::setprecision(0) << std::setw(4) << (br + 1);
+      for (uint s = 0; s < spin + 1; s++) {
+        xeigen << std::setprecision(8) << std::fixed << std::setw(15) << venergy[k][br][s];
+      }
+      xeigen << std::endl;
+    }
+  }
+
+  if (xeigen.str().empty()) {
+    string function = "xEIGENVAL::writeFile()";
+    string message = "Could not write EIGENVAL file. Nothing to write.";
+    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  }
+  aurostd::stringstream2file(xeigen, outfile);
+  if (!aurostd::FileExist(outfile)) {
+    string function = "xEIGENVAL::writeFile()";
+    string message = "Cannot open output file " + outfile + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
 }
 
 //---------------------------------------------------------------------------------
@@ -7236,6 +7372,97 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
+
+// ME190623 - BEGIN
+void xKPOINTS::writeFile(string outfile) {
+  if (outfile.empty()) outfile = filename;  // Choose xKPOINTS filename if no filename given
+  if (outfile.empty() || (outfile == "stringstream") || (outfile == "string")) {
+    string function = "xKPOINTS::writeFile()";
+    string message = "Could not write KPOINTS file. No file name given.";
+    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+  }
+  stringstream xkpts;
+  if (is_KPOINTS_NNN) {
+    xkpts << title << std::endl;
+    xkpts << mode << std::endl;
+    xkpts << grid_type << std::endl;
+    aurostd::joinWDelimiter(nnn_kpoints, " ");
+    if (aurostd::iszero(ooo_kpoints)) {
+      xkpts << "0 0 0" << std::endl;  // No need to print all those decimal places if zero
+    } else {
+      for (int i = 1; i < 4; i++) {
+        xkpts << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+        xkpts << std::setprecision(4) << std::fixed << std::setw(9) << ooo_kpoints[i];
+      }
+      xkpts << std::endl;
+    }
+  } else if (is_KPOINTS_PATH) {
+    xkpts << title << std::endl;
+    xkpts << path_grid << std::endl;
+    xkpts << grid_type << std::endl;
+    xkpts << path_mode << std::endl;
+    for (uint i = 0; i < vpath.size(); i++) {
+      for (int j = 1; j < 4; j++) {
+        xkpts << std::setprecision(4) << std::fixed << std::setw(9) << vkpoints[i][j];
+      }
+      xkpts << "  ! " << vpath[i] << std::endl;
+      if ((i % 2 == 1) && (i < vpath.size() - 1)) xkpts << std::endl;
+    }
+  }
+  if (xkpts.str().empty()) {
+    string function = "xKPOINTS::writeFile()";
+    string message = "Could not write KPOINTS file. Nothing to write.";
+    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  }
+  aurostd::stringstream2file(xkpts, outfile);
+  if (!aurostd::FileExist(outfile)) {
+    string function = "xKPOINTS::writeFile()";
+    string message = "Cannot open output file " + outfile + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+}
+
+string xKPOINTS::createStandardTitlePath(const xstructure& xstr) {
+  // Lattice part
+  string stdtitle = xstr.bravais_lattice_type;
+  if (stdtitle == "CUB") stdtitle += " (simple cubic) ";
+  else if (stdtitle == "FCC") stdtitle += " (face-centered cubic) ";
+  else if (stdtitle == "BCC") stdtitle += " (body-centered cubic) ";
+  else if (stdtitle == "TET") stdtitle += " (tetragonal) ";
+  else if (stdtitle == "BCT") stdtitle += " (body-centered tetragonal) ";
+  else if (stdtitle == "BCT1") stdtitle += " (body-centered tetragonal c < a) ";
+  else if (stdtitle == "BCT2") stdtitle += " (body-centered tetragonal a < c) ";
+  else if (stdtitle == "ORC") stdtitle += " (orthorhombic) ";
+  else if (stdtitle == "ORCF") stdtitle += " (face-centered orthorhombic) ";
+  else if (stdtitle == "ORCF1") stdtitle += " (face-centered orthorhombic 1/a^2 > 1/b^2+1/c^2) ";
+  else if (stdtitle == "ORCF2") stdtitle += " (face-centered orthorhombic 1/a^2 < 1/b^2+1/c^2) ";
+  else if (stdtitle == "ORCF3") stdtitle += " (face-centered orthorhombic 1/a^2 = 1/b^2+1/c^2) ";
+  else if (stdtitle == "ORCI") stdtitle += " (body-centered orthorhombic a < b < c) ";
+  else if (stdtitle == "ORCC") stdtitle += " (C-centered orthorhombic a < b) ";
+  else if (stdtitle == "HEX") stdtitle += " (hexagonal) ";
+  else if (stdtitle == "RHL") stdtitle += " (rhombohedral) ";
+  else if (stdtitle == "RHL1") stdtitle += " (rhombohedral alpha < 90) ";
+  else if (stdtitle == "RHL2") stdtitle += " (rhombohedral alpha > 90) ";
+  else if (stdtitle == "MCL") stdtitle += " (monoclinic) ";
+  else if (stdtitle == "MCLC") stdtitle += " (C-centered monoclinic) ";
+  else if (stdtitle == "MCLC1") stdtitle += " (C-centered monoclinic kgamma > 90) ";
+  else if (stdtitle == "MCLC2") stdtitle += " (C-centered monoclinic kgamma = 90) ";
+  else if (stdtitle == "MCLC3") stdtitle += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2<1) ";
+  else if (stdtitle == "MCLC4") stdtitle += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2=1) ";
+  else if (stdtitle == "MCLC5") stdtitle += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2>1) ";
+  else if ((stdtitle == "TRI") || (aurostd::toupper(stdtitle) == "TRI1A") || (aurostd::toupper(stdtitle) == "TRI1B") || (aurostd::toupper(stdtitle) == "TRI2A") || (aurostd::toupper(stdtitle) == "TRI2B")) stdtitle += " (triclinic) ";
+
+  // Path part
+  stdtitle += vpath[0];
+  for (uint i = 2; i < vpath.size(); i+= 2) {
+    stdtitle += "-" + vpath[i-1];
+    if (vpath[i-1] != vpath[i]) stdtitle += "|" + vpath[i];
+  }
+  stdtitle += "-" + vpath.back();
+  return stdtitle;
+}
+
+// ME190623 - END
 
 //---------------------------------------------------------------------------------
 // class xCHGCAR
