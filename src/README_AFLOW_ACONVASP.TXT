@@ -1980,22 +1980,26 @@ LATTICES = (the ones with "")
   aflow --platonSG_number[=EQUAL | EXACT][,ang,d1,d2,d3] < POSCAR
         Same as above but prints ONLY the space group number.	  
 
-  aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
-        Generate bandstructure plot using GNUPLOT
-        In this function, the spin-polarized DOS plot can be generated!
+  aflow --plotband | --plotbands[=directory[,Emin[,Emax]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--title=]
+        Generate bandstructure plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory:
          DOSCAR.static
          EIGENVAL.bands
          KPOINTS.bands
-         OUTCAR.static
+         POSCAR.static
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
-        Example:
-         aflow --plotband=/common/DATA/ZnO,-8,6  or
-         aflow --plotband=/common/DATA/ZnO,-8,6,1.2
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in EIGENVAL file)
+        Examples:
+         aflow --plotband=/common/DATA/ZnO,-8,6
+         aflow --plotband=./ --print=gpl --print=png --title=ZnO
+
   aflow --plotband2[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         In this function, the DOS is the sum of spin-up and spin-down!
         The following files must reside in the directory
@@ -2019,57 +2023,111 @@ LATTICES = (the ones with "")
          Emin: The minimum value of the DOS plot. Default value -10
          Emax: The maximum value of the DOS plot. Default value 10
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
-  aflow --plotbanddos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
-        Generate bandstructure plot and DOS plot using GNUPLOT
-        This function equals to "aflow --plotband" & ""aflow --plotdos"
+
+  aflow --plotbanddos [=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
+        Generate combined bandstructure and DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	 DOSCAR.static
 	 EIGENVAL.bands
 	 KPOINTS.bands
-	 OUTCAR.static
+	 POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
-  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
-        Generate DOS plot using GNUPLOT
-        The following files must reside in the directory:
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
+        Examples:
+          aflow --plotbanddos=/common/DATA/ZnO,-8,6,1.5
+          aflow --plotbanddos=./ --print=png --projection=atoms
+
+  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
+        Generate DOS plot using GNUPLOT and pdfLaTeX
+        The following file must reside in the directory:
          DOSCAR.static
-         OUTCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
         Examples:
          aflow --plotdos=/common/DATA/ZnO,-8,6
-         aflow --plotdos=/common/DATA/ZnO,-8,6,1.2
+         aflow --plotdos=./ --print=png --projection=atoms
+
   aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         Generate DOS plot using GNUPLOT
-        The following files must reside in the directory
+        The following file must reside in the directory
          DOSCAR.static
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: 1.2
  
-  aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
-        Generate PDOS plot using GNUPLOT
+  aflow --plotpdos | --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+        Generate atom-projected DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	  	DOSCAR.static
-	  	OUTCAR.static
+	  	POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
-         Number atom: default = 1
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
-        Example:
-         aflow --plotpedos=/common/DATA/ZnO,1
-         aflow --plotpedos=/common/DATA/ZnO,1,-8,6
-         aflow --plotpedos=/common/DATA/ZnO,1,-8,6,1.2
+         Number atom: The atom index. Default value -1 (plot all inequivalent)
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
+        Examples:
+         aflow --plotpdos=/common/DATA/ZnO,-1,-8,6,1.2
+         aflow --plotpdos=./,2 --print=png
+
+  aflow --plotpdosall | --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+        Generate atom-projected DOS plots of all inequivalent atoms using GNUPLOT and pdfLaTeX
+        The following files must reside in the directory
+	  	DOSCAR.static
+	  	POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
+        Examples:
+         aflow --plotpdosall=/common/DATA/ZnO,-1,-8,6,1.2
+         aflow --plotpdosall=./ --print=png
+
   aflow --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         Usage: aflow  --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         Generate PDOS plots of all the inquivalent atoms using GNUPLOT.
@@ -2084,39 +2142,106 @@ LATTICES = (the ones with "")
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
         Use --keep=gnuplot (--keep=GPL) to keep the GNU plot code.
 
-  aflow --plotphonondispersion | --pphdis ( --rcm | --meV | --THz |  --hz ) [--print=eps | --print=pdf | --print=png | --print=jpg | --print=gif ] DIRECTORY
-        Usage:  aflow --pphdis --rcm /common/DATA/ZnO
- 	  Generate Phonon dispersion, phonon DoS, F_vib, S_vib, and C_v plots in .eps form using
- 	  GNUPLOT.  The flags [ --rcm | --meV | --THz |  --hz ] specifies the units used in the graphs; --rcm is default.
-	  	--rcm   reciprocal centimeters
-		--meV   mili-electron Volts
-		--THz   teraHertz
-		--hz    Hertz
-	  The optional flags [--print=pdf | --print=png | --print=jpg | --print=gif ] will trigger the conversion from .eps to the requested type.
- 	  The following files must reside in DIRECTORY as in the AFLOW written form or compressed files
- 	  	PDIS
- 		PDOS
- 		THERMO
-	  If the files are found compressed, the compressed files are preserved and temporary files are written and discarded.
- 	  The generation of these files is controlled by the commands
- 	      [AFLOW_APL]DC
- 	      [AFLOW_APL]DOS
- 	      [AFLOW_APL]TP
-        See README_APL, especially 3). for more details.
+  aflow --plotphdisp | --plotphonondispersion | --pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+        Plot the phonon dispersion using GNUPLOT and pdfLaTex
+        The following files must reside in the directory
+                PHDOSCAR
+                PHEIGENVAL
+                PHKPOINTS
+                PHPOSCAR
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the plot. Default value: minimum frequency
+         Emax: The maximum value of the plot. Default value: maximum frequency
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
+         --unit: the unit of the phonon frequencies/energies (default: THz)
+        Example:
+         aflow --plotphdisp=./  --print=png --unit=cm-1
+        
+  aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+        Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
+        The following files must reside in the directory
+                PHDOSCAR
+                PHEIGENVAL
+                PHKPOINTS
+                PHPOSCAR
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the DOS plot. Default value: minimum frequency
+         Emax: The maximum value of the DOS plot. Default value: maximum frequency
+         DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in PHDOSCAR file)
+         --unit: the unit of the phonon frequencies/energies (default: THz)
+        Example:
+         aflow --plotphdispdos=./  --print=png --unit=cm-1
+ 	  
+  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+        Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
+        The following files must reside in the directory
+                PHDOSCAR
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the plot. Default value: minimum frequency
+         Emax: The maximum value of the plot. Default value: maximum frequency
+         DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in PHDOSCAR file)
+         --unit: the unit of the phonon frequencies/energies (default: THz)
+        Example:
+         aflow --plotphdos=./  --print=png --unit=cm-1
+
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+        Plots the APL thermal properties such as vibrational free energy, entropy, and heat capacity
+        using GNUPLOT and pdfLaTeX.
+        The following file must reside in the directory:
+                aflow.apl.thermal_properties.out
+        Defaults.
+         Directory: default = ./
+         Tmin: The minimum temperature of the plot. Default value: 0 K
+         Tmax: The maximum temperature of the plot. Default value: maximum temperature
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+        Example:
+         aflow --plotthermo=./,100,300
+
+  aflow --plotcond | --plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+        Plots the AAPL thermal conductivity using GNUPLOT and pdfLaTeX.
+        The following file must reside in the directory:
+                aflow.aapl.thermal_conductivity.out
+        Defaults.
+         Directory: default = ./
+         Tmin: The minimum temperature of the plot. Default value: 0 K
+         Tmax: The maximum temperature of the plot. Default value: maximum temperature
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+        Example:
+         aflow --plottcond=./,100,300
 
   aflow --pocc_dos[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
         Generate density of states (DOS) plot at different temperature for a partial occupation structure.
-        If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2 eV.
+        If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2.
         Example: aflow --pocc_dos=./,300
         More details about how to do this can be found in "README_AFLOW_POCC.TXT".
   aflow --pocc_mag[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
         Calculate magnetic moment at different temperature for a partial occupation structure.
- 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2 eV.
+ 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2.
         Example: aflow --pocc_mag=./,300
         More details about how to do this can be found in "README_AFLOW_POCC.TXT".
   aflow --pocc_bandgap[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
         Calculate band gap at different temperature for a partial occupation structure.
- 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2 eV.
+ 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2.
         Example: aflow --pocc_bandgap=./,300
         More details about how to do this can be found in "README_AFLOW_POCC.TXT".
 

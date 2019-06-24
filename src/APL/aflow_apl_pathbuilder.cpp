@@ -45,6 +45,12 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
+  // ME190614
+  const apl::PathBuilder::StoreEnumType& PathBuilder::getStore() const {
+    return _store;
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
 
   void PathBuilder::addPoint(const string& l, int dim, ...) {
     va_list arguments;
@@ -147,7 +153,7 @@ namespace apl {
 	  for(int j = 1; j <= (int)_nPointsPerSubPath; j++) {
 	      xvector<double> p = startPoint + j*dPoint;
 	      _path.push_back(p);
-	    }
+	  }
 	}
       }
       //_path.push_back(endPoint);
@@ -422,7 +428,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void PathBuilder::defineCustomPoints(const string& coords,const string& labels,const Supercell& sc,bool CARESTIAN_COORDS){ //CO 180409
+  void PathBuilder::defineCustomPoints(const string& coords,const string& labels,const Supercell& sc,bool CARTESIAN_COORDS){ //CO 180409
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="PathBuilder::defineCustomPoints():";
     vector<string> vcoords,vlabels;
@@ -438,11 +444,11 @@ namespace apl {
     for(uint i=0;i<vcoords.size();i++){
       aurostd::string2tokens<double>(vcoords[i],coordinate,",");
       if(coordinate.size()!=3){throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3");}
-      if(LDEBUG){cerr << soliloquy << " found point " << vlabels[i] << ": (" << (CARESTIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
+      if(LDEBUG){cerr << soliloquy << " found point " << vlabels[i] << ": (" << (CARTESIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
       addPoint(vlabels[i],3,coordinate[0],coordinate[1],coordinate[2]);
     }
 
-    if(!CARESTIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
+    if(!CARTESIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
     
     //set lattices
     cartesianLattice = sc.getSupercellStructure().lattice;
@@ -496,5 +502,44 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
+
+  // ME190614
+  // Writes the k-points path into a VASP KPOINTS-formatted file
+  xKPOINTS PathBuilder::createKPOINTS(const Supercell& sc) {
+    vector<xvector<double> > points(2 * (_points.size() - 1), xvector<double>(3));
+    vector<string> labels(2 * (_points.size() - 1));
+    if (_mode == SINGLE_POINT_MODE) {
+      points[0] = _points[0];
+      labels[0] = _labels[0];
+      for (uint i = 1; i < _points.size() - 1; i++) {
+        points[2 * i - 1] = _points[i];
+        points[2 * i] = _points[i];
+        labels[2 * i - 1] = _labels[i];
+        labels[2 * i] = _labels[i];
+      }
+      points.back() = _points.back();
+      labels.back() = _labels.back();
+    } else {
+      points = _points;
+      labels = _labels;
+    }
+    // Convert to reciprocal coordinates
+    if (_store == CARTESIAN_LATTICE) {
+      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getInputStructure().lattice)));
+      for (uint i = 0; i < points.size(); i++) points[i] = c2f * points[i];
+    }
+
+    xKPOINTS xkpts;
+    xkpts.is_KPOINTS_PATH = true;
+    xkpts.is_KPOINTS_NNN = false;
+    xkpts.vpath = labels;
+    xkpts.vkpoints = points;
+    xkpts.title = xkpts.createStandardTitlePath(sc.getPrimitiveStructure());
+    xkpts.path_grid = _path.size()/(_points.size()/2);
+    xkpts.grid_type = "Line-mode";
+    xkpts.path_mode = "reciprocal";
+
+    return xkpts;
+  }
 
 } // namespace apl

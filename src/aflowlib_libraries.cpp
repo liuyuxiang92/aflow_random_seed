@@ -1167,7 +1167,7 @@ namespace aflowlib {
       if(perform_BANDS) {
 	if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands") || aurostd::EFileExist(directory_RAW+"/EIGENVAL.bands")) {
 	  // return FALSE;
-	  cout << "aflowlib::LIB2RAW: directory is skip because of BANDS: " << directory_RAW << endl;
+	  cout << "aflowlib::LIB2RAW: directory is skipped because of BANDS: " << directory_RAW << endl;
 	  return FALSE;
 	  //  exit(0);
 	}
@@ -1485,7 +1485,8 @@ namespace aflowlib {
 	if(flag_WEB) {
 	  string system_name=KBIN::ExtractSystemName(directory_LIB);
 	  cout << "aflowlib::LIB2RAW: linking SYSTEM=" << system_name << endl;
-	  if(aurostd::FileExist(directory_RAW+"/"+system_name+".png"))
+	  if(aurostd::FileExist(directory_RAW+"/"+system_name+".png")
+             || aurostd::FileExist(directory_RAW + "/" + system_name + "_banddos.png"))  // ME190621 - new file name convention
 	    aurostd::LinkFile(directory_RAW+"/*png",directory_WEB);            // LINK
 	  if(aurostd::FileExist(directory_RAW+"/"+system_name+".cif"))
 	    aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK
@@ -1927,6 +1928,21 @@ namespace aflowlib {
     }
 
     if(flag_use_GNUPLOT) { // GNUPLOT STUFF NEW KESONG-STEFANO
+      // ME190614 - BEGIN
+      // This has to come first because FIXBANDS messes up the EIGENVAL files
+      aurostd::xoption opts, plotoptions;
+      opts.push_attached("PLOT_DOS", directory_RAW + ",,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
+      opts.push_attached("PLOT_BANDDOS", directory_RAW + ",,,1.75"); // 1.75 is typically enough to prevent plot legend from overlapping with DOS
+      opts.push_attached("PLOT_PDOS", directory_RAW + ",-1,,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
+      opts.push_attached("PLOTTER::PRINT", "png");
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_DOS");
+      plotter::PLOT_DOS(plotoptions);
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_BANDDOS");
+      plotter::PLOT_BANDDOS(plotoptions);
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_PDOS", true);
+      plotter::PLOT_PDOS(plotoptions);
+      // ME190614 - END
+
       // KESONG WRITE THE CODE HERE
       cout << MESSAGE << " GNUPLOT start: " << directory_RAW << endl;
       // WRITE plotbz.sh
@@ -1971,8 +1987,9 @@ namespace aflowlib {
       // [OBSOLETE]  directory.push_back("./");
       // [OBSOLETE]  estructure::PLOT_BANDDOS(directory);
       // [OBSOLETE]  estructure::PLOT_PEDOSALL_AFLOWLIB(directory, aflags);
-      estructure::PLOT_BANDDOS("./");
-      estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
+
+      // [OBSOLETE - ME190614]  estructure::PLOT_BANDDOS("./");
+      // [OBSOLETE - ME190614]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
 
       chdir(work_dir);  //Go to the working direcotry
     }

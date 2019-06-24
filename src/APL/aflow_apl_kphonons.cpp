@@ -383,18 +383,18 @@ void RunPhonons_APL_181216(_xinput& xinput,
         } else if (START_RELAX != 1) {
           logger << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
           logger << "Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << "." << apl::endl;
-      }
+        }
       } else {
         USER_RELAX = false;
         logger << apl::warning << "RELAX option only supported for VASP. Relaxations will be skipped." << apl::endl;
-        }
-          }
+      }
+    }
 
     // Correct user engine
     if (USER_ENGINE == "GSA") {
       logger << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM)." << apl::endl;
       USER_ENGINE = "DM";
-            }
+    }
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
       message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
       message += "See README_AFLOW_APL.TXT for more information.";
@@ -421,12 +421,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
         USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_type;
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
-      tokens.clear();
+        tokens.clear();
         if (!USER_DC_INITCOORDS_FRAC.empty()) {
           apl::tokenize(USER_DC_INITCOORDS_FRAC, tokens, string(" ;"));
         } else {
           apl::tokenize(USER_DC_INITCOORDS_CART, tokens, string(" ;"));
-    }
+        }
         uint ncoords = tokens.size();
         tokens.clear();
         apl::tokenize(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  // ME190427 - also break along semicolon
@@ -435,12 +435,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
           message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
           message += "See README_AFLOW_APL.TXT for more information.";
           throw apl::APLRuntimeError(message);
-      }
+        }
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
         message += "See README_AFLOW_APL.TXT for more information.";
         throw apl::APLRuntimeError(message);
-    }
+      }
     }
 
     // DOS
@@ -1561,9 +1561,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
                   }
                 }
                 // ME190501 Allow user to override path
-                  if(!USER_DC_USERPATH.empty()) {  // Set path
-                    pdisc.setPath(USER_DC_USERPATH);
-                  }
+                if(!USER_DC_USERPATH.empty()) {  // Set path
+                  pdisc.setPath(USER_DC_USERPATH);
+                }
 
                 std::vector< xvector<double> > qpoints=pdisc.get_qpoints();
                 store.create_pdispath(qpoints);
@@ -1676,15 +1676,16 @@ void RunPhonons_APL_181216(_xinput& xinput,
         }
       }
       // ME190501 Allow user to override path
-        if(!USER_DC_USERPATH.empty()){  // Set path
-          pdisc.setPath(USER_DC_USERPATH);
-        }
+      if(!USER_DC_USERPATH.empty()){  // Set path
+        pdisc.setPath(USER_DC_USERPATH);
+      }
 
       // Calculate frequencies on path
       pdisc.calc(frequencyFormat);
 
       // Write results into PDIS file
       pdisc.writePDIS();
+      pdisc.writePHEIGENVAL();  // ME190614
 	//QHA/SCQHA/QHA3P  START //PN180705
 	//////////////////////////////////////////////////////////////////////
         ptr_hsq.reset(new apl::PhononHSQpoints(logger));
@@ -1745,6 +1746,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) {
         dosc.writePDOS();
+        dosc.writePHDOSCAR();  // ME190614
       }
 
       // Calculate thermal properties
@@ -3815,7 +3817,6 @@ void RunPhonons_APL_180101(_xinput& xinput,
       bool awakeAnharmIFCs;
       for (uint i = 0; i < phcalc->_clusters.size(); i++) {
         string ifcs_hib_file = DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
-        //[ME181226] std::cout << ifcs_hib_file << std::endl;
         if (USER_HIBERNATE_OPTION.option) {
           awakeAnharmIFCs = (aurostd::EFileExist(ifcs_hib_file) ||
                              aurostd::FileExist(ifcs_hib_file));
