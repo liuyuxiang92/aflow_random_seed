@@ -2926,7 +2926,7 @@ class xDOSCAR {
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-  void writeFile(string="");  // ME190623
+  friend ostream& operator<<(ostream&, const xDOSCAR&);  // ME190623
  private:                                                        //
   void free();                                                  // free space
   void copy(const xDOSCAR& b);                                  //
@@ -2960,7 +2960,7 @@ class xEIGENVAL {
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
   double energy_max;  // ME190614
   double energy_min;  // ME190614
-  void writeFile(string="");  // ME190623
+  friend ostream& operator<<(ostream&, const xEIGENVAL&);  // ME190623
  private:                                                        //
   void free();                                                  // free space
   void copy(const xEIGENVAL& b);                                //
@@ -3075,7 +3075,7 @@ class xKPOINTS {
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
-  void writeFile(string="");  // ME190623
+  friend ostream& operator<<(ostream&, const xKPOINTS&);  // ME190623
   string createStandardTitlePath(const xstructure&);  // ME190623
  private:                       //
   void free();                 // free space

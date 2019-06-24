@@ -402,8 +402,15 @@ bool PhononDispersionCalculator::isExactQPoint(const xvector<double>& qpoint,
 void PhononDispersionCalculator::writePHEIGENVAL() {
   string filename = DEFAULT_APL_PHEIGENVAL_FILE;
   _logger << "Writing phonon eigenvalues into file " << filename << "." << apl::endl;
-  xEIGENVAL xeigen = createEIGENVAL();
-  xeigen.writeFile(filename);
+  stringstream eigenval;
+  eigenval << createEIGENVAL();
+  aurostd::stringstream2file(eigenval, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+
   // Also write PHKPOINTS and PHPOSCAR file
   writePHPOSCAR();  // Structure required for plotting
   writePHKPOINTS();
@@ -475,8 +482,15 @@ void PhononDispersionCalculator::writePHPOSCAR() {
 
 // Write the k-point path into a VASP KPOINTS-formatted file
 void PhononDispersionCalculator::writePHKPOINTS() {
-  xKPOINTS xkpts = _pb.createKPOINTS(_pc.getSupercell());
-  xkpts.writeFile(DEFAULT_APL_PHKPOINTS_FILE);
+  string filename = DEFAULT_APL_PHKPOINTS_FILE;
+  stringstream kpoints;
+  kpoints << _pb.createKPOINTS(_pc.getSupercell());
+  aurostd::stringstream2file(kpoints, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHKPOINTS()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
 }
 
 // ///////////////////////////////////////////////////////////////////////////

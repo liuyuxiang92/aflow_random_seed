@@ -3964,75 +3964,56 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 }
 
 // ME190623 - BEGIN
-void xDOSCAR::writeFile(string outfile) {
-  if (outfile.empty()) outfile = filename;  // Choose xDOSCAR filename if no filename given
-  if (outfile.empty() || (outfile == "stringstream") || (outfile == "string")) {
-    string function = "xDOSCAR::writeFile()";
-    string message = "Could not write DOSCAR file. No file name given.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
-  }
-
-  stringstream xdos;
+ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
   // Header
-  xdos << std::setw(4) << number_atoms
-       << std::setw(4) << number_atoms
-       << std::setw(4) << partial
-       << std::setw(4) << 0 << std::endl;
-  xdos << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-  xdos << std::setprecision(7) << std::scientific;
-  xdos << std::setw(15) << Vol;
-  for (int i = 1; i < 4; i++) xdos << std::setw(15) << lattice[i];
-  xdos << std::setw(15) << POTIM << std::endl;
-  xdos << "  " << std::setprecision(15) << temperature << std::endl;
-  xdos << "  " << carstring << std::endl;
-  xdos << " " << title << std::endl;
+  oss << std::setw(4) << xdos.number_atoms
+      << std::setw(4) << xdos.number_atoms
+      << std::setw(4) << xdos.partial
+      << std::setw(4) << 0 << std::endl;
+  oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  oss << std::setprecision(7) << std::scientific;
+  oss << std::setw(15) << xdos.Vol;
+  for (int i = 1; i < 4; i++) oss << std::setw(15) << xdos.lattice[i];
+  oss << std::setw(15) << xdos.POTIM << std::endl;
+  oss << "  " << std::setprecision(15) << xdos.temperature << std::endl;
+  oss << "  " << xdos.carstring << std::endl;
+  oss << " " << xdos.title << std::endl;
 
   stringstream dosline;  // Will be reused for projected DOS
-  dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << energy_max
-          << std::fixed << std::setw(15) << energy_min
-          << std::setprecision(0) << "  " << number_energies
-          << std::setprecision(8) << std::fixed << std::setw(15) << Efermi
+  dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << xdos.energy_max
+          << std::fixed << std::setw(15) << xdos.energy_min
+          << std::setprecision(0) << "  " << xdos.number_energies
+          << std::setprecision(8) << std::fixed << std::setw(15) << xdos.Efermi
           << std::setprecision(8) << std::fixed << std::setw(15) << 1.0;
-  xdos << dosline.str() << std::endl;
+  oss << dosline.str() << std::endl;
 
   // Data
-  xdos << std::setprecision(4);
-  for (uint e = 0; e < number_energies; e++) {
-    xdos << std::setw(12) << venergy[e];
+  oss << std::setprecision(4);
+  for (uint e = 0; e < xdos.number_energies; e++) {
+    oss << std::setw(12) << xdos.venergy[e];
     // Do not use vDOS.size() because it will mess up DOSCARs with spin-orbit coupling
-    for (uint s = 0; s < spin + 1; s++) {
-      xdos << std::setw(12) << vDOS[0][0][s][e];
+    for (uint s = 0; s < xdos.spin + 1; s++) {
+      oss << std::setw(12) << xdos.vDOS[0][0][s][e];
     }
-    for (uint s = 0; s < spin + 1; s++) {
-      xdos << std::setw(12) << viDOS[s][e];
+    for (uint s = 0; s < xdos.spin + 1; s++) {
+      oss << std::setw(12) << xdos.viDOS[s][e];
     }
-    xdos << std::endl;
+    oss << std::endl;
   }
 
-  for (uint p = 1; p < vDOS.size(); p++) {
-    xdos << dosline.str() << std::endl;
-    for (uint e = 0; e < number_energies; e++) {
-      xdos << std::setw(12) << venergy[e];
-      for (uint o = 1; o < vDOS[p].size(); o++) {  // Do not output the total
-        for (uint s = 0; s < vDOS[p][o].size(); s++) {
-          xdos << std::setw(12) << vDOS[p][o][s][e];
+  for (uint p = 1; p < xdos.vDOS.size(); p++) {
+    oss << dosline.str() << std::endl;
+    for (uint e = 0; e < xdos.number_energies; e++) {
+      oss << std::setw(12) << xdos.venergy[e];
+      for (uint o = 1; o < xdos.vDOS[p].size(); o++) {  // Do not output the total
+        for (uint s = 0; s < xdos.vDOS[p][o].size(); s++) {
+          oss << std::setw(12) << xdos.vDOS[p][o][s][e];
         }
       }
-      xdos << std::endl;
+      oss << std::endl;
     }
   }
-
-  if (xdos.str().empty()) {
-    string function = "xDOSCAR::writeFile()";
-    string message = "Could not write DOSCAR file. Nothing to write.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
-  }
-  aurostd::stringstream2file(xdos, outfile);
-  if (!aurostd::FileExist(outfile)) {
-    string function = "xDOSCAR::writeFile()";
-    string message = "Cannot open output file " + outfile + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
-  }
+  return oss;
 }
 // ME190623 - END
 
@@ -4266,58 +4247,39 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   return TRUE;
 }
 
-void xEIGENVAL::writeFile(string outfile) {
-  if (outfile.empty()) outfile = filename;  // Choose xDOSCAR filename if no filename given
-  if (outfile.empty() || (outfile == "stringstream") || (outfile == "string")) {
-    string function = "xEIGENVAL::writeFile()";
-    string message = "Could not write EIGENVAL file. No file name given.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
-  }
-
-  stringstream xeigen;
+ostream& operator<<(ostream& oss, const xEIGENVAL& xeigen) {
   // Header
-  xeigen << std::setw(4) << number_atoms
-         << std::setw(4) << number_atoms
-         << std::setw(4) << number_loops
-         << std::setw(4) << (spin + 1) << std::endl;
-  xeigen << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-  xeigen << std::setprecision(7) << std::scientific;
-  xeigen << std::setw(15) << Vol;
-  for (int i = 1; i < 4; i++) xeigen << std::setw(15) << lattice[i];
-  xeigen << std::setw(15) << POTIM << std::endl;
-  xeigen << "  " << std::setprecision(15) << temperature << std::endl;
-  xeigen << "  " << carstring << std::endl;
-  xeigen << " " << title << std::endl;
-  xeigen << std::dec << std::setw(4) << number_electrons
-                     << "  " << std::setw(4) << number_kpoints
-                     << std::setw(4) << number_bands << std::endl;
+  oss << std::setw(4) << xeigen.number_atoms
+      << std::setw(4) << xeigen.number_atoms
+      << std::setw(4) << xeigen.number_loops
+      << std::setw(4) << (xeigen.spin + 1) << std::endl;
+  oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  oss << std::setprecision(7) << std::scientific;
+  oss << std::setw(15) << xeigen.Vol;
+  for (int i = 1; i < 4; i++) oss << std::setw(15) << xeigen.lattice[i];
+  oss << std::setw(15) << xeigen.POTIM << std::endl;
+  oss << "  " << std::setprecision(15) << xeigen.temperature << std::endl;
+  oss << "  " << xeigen.carstring << std::endl;
+  oss << " " << xeigen.title << std::endl;
+  oss << std::dec << std::setw(4) << xeigen.number_electrons
+                     << "  " << std::setw(4) << xeigen.number_kpoints
+                     << std::setw(4) << xeigen.number_bands << std::endl;
 
   // Data
-  for (uint k = 0; k < number_kpoints; k++) {
-    xeigen << " " << std::endl;  // space MUST be there or the EIGENVAL reader will fail
-    xeigen << std::scientific << std::setprecision(8);
-    for (int i = 1; i < 4; i++) xeigen << "  " << vkpoint[k][i];
-    xeigen << "  " << vweight[k] << std::endl;
-    for (uint br = 0; br < number_bands; br++) {
-      xeigen << std::dec << std::setprecision(0) << std::setw(4) << (br + 1);
-      for (uint s = 0; s < spin + 1; s++) {
-        xeigen << std::setprecision(8) << std::fixed << std::setw(15) << venergy[k][br][s];
+  for (uint k = 0; k < xeigen.number_kpoints; k++) {
+    oss << " " << std::endl;  // space MUST be there or the EIGENVAL reader will fail
+    oss << std::scientific << std::setprecision(8);
+    for (int i = 1; i < 4; i++) oss << "  " << xeigen.vkpoint[k][i];
+    oss << "  " << xeigen.vweight[k] << std::endl;
+    for (uint br = 0; br < xeigen.number_bands; br++) {
+      oss << std::dec << std::setprecision(0) << std::setw(4) << (br + 1);
+      for (uint s = 0; s < xeigen.spin + 1; s++) {
+        oss << std::setprecision(8) << std::fixed << std::setw(15) << xeigen.venergy[k][br][s];
       }
-      xeigen << std::endl;
+      oss << std::endl;
     }
   }
-
-  if (xeigen.str().empty()) {
-    string function = "xEIGENVAL::writeFile()";
-    string message = "Could not write EIGENVAL file. Nothing to write.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
-  }
-  aurostd::stringstream2file(xeigen, outfile);
-  if (!aurostd::FileExist(outfile)) {
-    string function = "xEIGENVAL::writeFile()";
-    string message = "Cannot open output file " + outfile + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
-  }
+  return oss;
 }
 
 //---------------------------------------------------------------------------------
@@ -7374,52 +7336,35 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 }
 
 // ME190623 - BEGIN
-void xKPOINTS::writeFile(string outfile) {
-  if (outfile.empty()) outfile = filename;  // Choose xKPOINTS filename if no filename given
-  if (outfile.empty() || (outfile == "stringstream") || (outfile == "string")) {
-    string function = "xKPOINTS::writeFile()";
-    string message = "Could not write KPOINTS file. No file name given.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
-  }
-  stringstream xkpts;
-  if (is_KPOINTS_NNN) {
-    xkpts << title << std::endl;
-    xkpts << mode << std::endl;
-    xkpts << grid_type << std::endl;
-    aurostd::joinWDelimiter(nnn_kpoints, " ");
-    if (aurostd::iszero(ooo_kpoints)) {
-      xkpts << "0 0 0" << std::endl;  // No need to print all those decimal places if zero
+ostream& operator<<(ostream& oss, const xKPOINTS& xkpts) {
+  if (xkpts.is_KPOINTS_NNN) {
+    oss << xkpts.title << std::endl;
+    oss << xkpts.mode << std::endl;
+    oss << xkpts.grid_type << std::endl;
+    oss << aurostd::joinWDelimiter(xkpts.nnn_kpoints, " ") << std::endl;
+    if (aurostd::iszero(xkpts.ooo_kpoints)) {
+      oss << "0 0 0" << std::endl;  // No need to print all those decimal places if zero
     } else {
+      oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
       for (int i = 1; i < 4; i++) {
-        xkpts << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-        xkpts << std::setprecision(4) << std::fixed << std::setw(9) << ooo_kpoints[i];
+        oss << std::scientific << std::setprecision(4) << std::setw(9) << xkpts.ooo_kpoints[i];
       }
-      xkpts << std::endl;
+      oss << std::endl;
     }
-  } else if (is_KPOINTS_PATH) {
-    xkpts << title << std::endl;
-    xkpts << path_grid << std::endl;
-    xkpts << grid_type << std::endl;
-    xkpts << path_mode << std::endl;
-    for (uint i = 0; i < vpath.size(); i++) {
+  } else if (xkpts.is_KPOINTS_PATH) {
+    oss << xkpts.title << std::endl;
+    oss << xkpts.path_grid << std::endl;
+    oss << xkpts.grid_type << std::endl;
+    oss << xkpts.path_mode << std::endl;
+    for (uint i = 0; i < xkpts.vpath.size(); i++) {
       for (int j = 1; j < 4; j++) {
-        xkpts << std::setprecision(4) << std::fixed << std::setw(9) << vkpoints[i][j];
+        oss << std::setprecision(4) << std::fixed << std::setw(9) << xkpts.vkpoints[i][j];
       }
-      xkpts << "  ! " << vpath[i] << std::endl;
-      if ((i % 2 == 1) && (i < vpath.size() - 1)) xkpts << std::endl;
+      oss << "  ! " << xkpts.vpath[i] << std::endl;
+      if ((i % 2 == 1) && (i < xkpts.vpath.size() - 1)) oss << std::endl;
     }
   }
-  if (xkpts.str().empty()) {
-    string function = "xKPOINTS::writeFile()";
-    string message = "Could not write KPOINTS file. Nothing to write.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
-  }
-  aurostd::stringstream2file(xkpts, outfile);
-  if (!aurostd::FileExist(outfile)) {
-    string function = "xKPOINTS::writeFile()";
-    string message = "Cannot open output file " + outfile + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
-  }
+  return oss;
 }
 
 string xKPOINTS::createStandardTitlePath(const xstructure& xstr) {

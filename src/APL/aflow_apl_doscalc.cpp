@@ -404,8 +404,14 @@ void DOSCalculator::writePDOS() {
 void DOSCalculator::writePHDOSCAR() {
   string filename = DEFAULT_APL_PHDOSCAR_FILE;
   _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
-  xDOSCAR xdos = createDOSCAR();
-  xdos.writeFile(filename);
+  stringstream doscar;
+  doscar << createDOSCAR();
+  aurostd::stringstream2file(doscar, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
 }
   
 xDOSCAR DOSCalculator::createDOSCAR() {
