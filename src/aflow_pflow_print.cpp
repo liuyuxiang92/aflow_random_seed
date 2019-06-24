@@ -3477,7 +3477,7 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
   pflow::matrix<double> data;
-  pflow::GetXrayData(str,dist,sf,lambda,scatt_fact,mass,twoB_vec,ids,data); //CO190620 - intmax can be grabbed later
+  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
 
   //get intmax
   double intmax=1e-8;

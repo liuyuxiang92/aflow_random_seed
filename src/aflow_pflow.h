@@ -23,7 +23,7 @@ static const char _LOGGER_OPTION_ = 'O';
 static const char _LOGGER_RAW_ = 'R';
 static const char _LOGGER_MESSAGE_ = 'M';
 
-#define XRAY_THETA_TOL 1e-5;  //CO190409
+#define XRAY_THETA_TOL 1e-5;                                  //CO190409
 
 //[MOVED to aflow.h]// LOADENTRIES DEFAULTS
 //[MOVED to aflow.h]static const uint _AFLOW_LIB_MAX_ = 10;  //LIB11 does not exist yet, modify accordingly
@@ -428,15 +428,15 @@ namespace pflow {
   void READ_XRAY_DATA(const string& filename,vector<double>& v_twotheta,vector<double>& intensity); //CO190620
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,istream& input); //CO190409
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const xstructure& str);  //CO190409
-  void PRINT_XRAY_DATA_PLOT(istream& input,double lambda,const string& directory="");  //CO190409
-  void PRINT_XRAY_DATA_PLOT(const xstructure& str,double lambda,const string& directory="");  //CO190409
+  void PRINT_XRAY_DATA_PLOT(istream& input,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="");  //CO190409
+  void PRINT_XRAY_DATA_PLOT(const xstructure& str,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="");  //CO190409
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const string& directory="");  //CO190620
   void PRINT_XRAY_DATA_PLOT(const string& filename,const string& directory="");  //CO190620
   void PRINT_XRAY_DATA_PLOT(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& directory=""); //CO190620
   void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input,bool force_generic_title=false); //CO190409
   void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str,bool force_generic_title=false); //CO190409
-  void PLOT_XRAY(istream& input,double lambda=1.5418,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
-  void PLOT_XRAY(const xstructure& str,double lambda=1.5418,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
+  void PLOT_XRAY(istream& input,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
+  void PLOT_XRAY(const xstructure& str,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
   void PLOT_XRAY(const aurostd::xoption& vpflow,const string& title="",const string& directory="",bool keep_gp=false);  //CO190620
   void PLOT_XRAY(const string& filename,const string& title="",const string& directory="",bool keep_gp=false); //CO190620
   void PLOT_XRAY(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& title="",const string& directory="",bool keep_gp=false);  //CO190620
@@ -497,7 +497,7 @@ void PrintXYZws(const xstructure& a,ostream& oss=cout);
 void PrintXYZInSphere(const xstructure& a,const double& radius,ostream& oss=cout);
 
 // aflow_pflow_funcs.cpp
-double DebyeWallerFactor(const double& theta,const double& lambda,const double& temp,const double& debye_temp,const double& mass);
+double DebyeWallerFactor(double theta,double temp,double debye_temp,double mass,double lambda=XRAY_RADIATION_COPPER_Kalpha);
 string getGenericTitleXStructure(const xstructure& xstr,bool latex=false); //CO190520
 xvector<double> balanceChemicalEquation(const vector<xvector<double> >& _lhs,const vector<xvector<double> >& _rhs,
     bool normalize,double tol); //CO 180817
@@ -525,14 +525,14 @@ namespace pflow { //CO190601
 } // namespace pflow
 
 namespace pflow {
-  void GetXray2ThetaIntensity(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,double lambda=1.5418); //CO190520
-  vector<uint> GetXrayPeaks(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_intensity_smooth,double lambda=1.5418); //CO190520  //CO190620 - v_peaks_amplitude not needed
+  void GetXray2ThetaIntensity(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
+  vector<uint> GetXrayPeaks(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_intensity_smooth,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520  //CO190620 - v_peaks_amplitude not needed
   vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth); //CO190520  //CO190620 - v_peaks_amplitude not needed
-  void GetXray(const xstructure& str,vector<double>& dist,vector<double>& sf,double lambda,
-	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec); //CO190520
-  void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,double lambda,
+  void GetXray(const xstructure& str,vector<double>& dist,vector<double>& sf,
+	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
+  void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,
         vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
-        vector<vector<double> >& ids,pflow::matrix<double>& data);  //CO190409  //CO190620 - intmax can be grabbed later
+        vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO190409  //CO190620 - intmax can be grabbed later
   void GetRDF(xstructure str,const double& rmax,const int& nbins,matrix<double>& rdf_all);
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,
 		    const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);

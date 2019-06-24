@@ -31,6 +31,8 @@
         -- added width_maximum to getPeaks() to resolve arbitrarily-defined peaks (CO)
         -- made x-ray analysis code more modular (CO)
         -- added --plot_xray_file option (CO)
+        -- patched moving_average function (!= convolution with box_filter) (CO)
+        -- defaulted lambda=Cu_Ka for XRD functions (CO)
 3.1.224 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.224.tar.xz
         -- Fixed bug that didn't allow users to override the standard lattice phonon dispersion path. (ME)

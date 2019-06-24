@@ -28,6 +28,9 @@
 #define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
 #define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
 
+//XRD
+#define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO190622
+
 //moved from avasp.cpp for broader access (chull.cpp)
 #define SPECIE_TRANSITION_METALS string("Ag,Au,Cd,Co,Cr_pv,Cu_pv,Fe_pv,Hf_pv,Hg,Ir,La,Mn_pv,Mo_pv,Nb_sv,Ni_pv,Os_pv,Pd_pv,Pt,Re_pv,Rh_pv,Ru_pv,Sc_sv,Ta_pv,Tc_pv,Ti_sv,V_sv,W_pv,Y_sv,Zn,Zr_sv")
 #define SPECIE_RAW_LIB2U SPECIE_TRANSITION_METALS
@@ -3892,7 +3895,7 @@ xvector<double> GetCDispFromOrigin(const _atom& atom);
 double GetDistFromOrigin(const _atom& atom);
 //void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 _atom ConvertAtomToLat(const _atom& in_at,const xmatrix<double>& lattice);
-double GetXrayScattFactor(const string& name,const double& lambda,bool clean=true); //CO190322
+double GetXrayScattFactor(const string& name,double lambda=XRAY_RADIATION_COPPER_Kalpha,bool clean=true); //CO190322
 xmatrix<double> RecipLat(const xmatrix<double>& lat);
 double Normal(const double& x,const double& mu,const double& sigma);
 xstructure SetLat(const xstructure& a,const xmatrix<double>& in_lat);

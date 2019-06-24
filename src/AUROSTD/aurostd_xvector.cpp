@@ -2526,40 +2526,68 @@ namespace aurostd {
 }
 // ----------------------------------------------------------------------------
 // ----------------------------------------- implementation for extra data type
-
+#define DEBUG_CONVOLUTION 0
 namespace aurostd {
   //CO190419 - convolution and moving average
   //see 'doc conv' in matlab
   //also see numerical recipes in C 2nd edition, page 538
   template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,int SHAPE) {
+    vector<uint> sum_counts;
+    return convolution(signal,response,sum_counts,SHAPE);
+  }
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,vector<uint>& sum_counts,int SHAPE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::convolution():";
+    if(LDEBUG){
+      cerr << soliloquy << " signal=" << signal << endl;
+      cerr << soliloquy << " response=" << response << endl;
+    }
     if(signal.lrows!=response.lrows){throw aurostd::xerror(soliloquy,"signal.lrows!=response.lrows",_INDEX_MISMATCH_);}
     int lrows=signal.lrows; //fixed
     int size=signal.rows+response.rows-1;
+    vector<uint> sum_counts_full((uint)size,0);
     xvector<utype> conv(size+(lrows-1),lrows);conv.clear();  //set it all to 0
     vector<int> ind_zero_padding; //keep indices that require zero-padding for 'valid'
     int ind=0;
-    for(int j=conv.lrows;j<=conv.urows;j++){
-      for(int k=response.lrows;k<=response.urows;k++){
-        ind=j-k+1;
-        if(ind>=signal.lrows && ind<=signal.urows){ //instead of zero-padding, we can check if the signal index is valid
-          conv[j]+=signal[ind]*response[k];
-        }else{ind_zero_padding.push_back(j);} //keep j that require zero-padding (invalid indices), contains duplicates, but don't do work unless needed
+    bool k_added=false;
+    for(int k=conv.lrows;k<=conv.urows;k++){
+      k_added=false;
+      for(int j=signal.lrows;j<=signal.urows;j++){
+        ind=k-j+1;
+        if(j>=signal.lrows && j<=signal.urows &&
+           ind>=response.lrows && ind<=response.urows){ //instead of zero-padding, we can check if the response index is valid
+#if DEBUG_CONVOLUTION
+          cerr << soliloquy << " k=" << k << " j=" << j << " ind=" << ind << endl;
+#endif
+          conv[k]+=signal[j]*response[ind];
+          sum_counts_full[k]++;
+        }else{ //keep k that require zero-padding (invalid indices), contains duplicates, but don't do work unless needed
+          if(k_added==false){
+            ind_zero_padding.push_back(k);
+            k_added=true;
+          }
+        }
       }
     }
     if(LDEBUG){cerr << soliloquy << " full conv=" << conv << endl;}
-    if(SHAPE==CONV_SHAPE_FULL){return conv;}
+    if(SHAPE==CONV_SHAPE_FULL){
+      sum_counts.clear();for(uint i=0;i<sum_counts_full.size();i++){sum_counts.push_back(sum_counts_full[i]);}  //full copy
+      return conv;
+    }
     if(SHAPE==CONV_SHAPE_SAME){ //same - same size as signal, pick middle of full conv
       xvector<utype> conv_shape(signal.urows,signal.lrows);
       int ind1=((conv.rows-signal.rows)+1)/2+lrows;  //https://stackoverflow.com/questions/2745074/fast-ceiling-of-an-integer-division-in-c-c
       int ind2=lrows;
       if(LDEBUG){
-        cerr << soliloquy << " ind1=" << ind1 << endl;
+        cerr << soliloquy << " ind1=" << ind1 << " conv[ind1]=" << conv[ind1] << endl;
         cerr << soliloquy << " ind2=" << ind2 << endl;
       }
-      for(int i=ind1;i<=ind1+signal.rows-1;i++){conv_shape[ind2++]=conv[i];}
-      if(LDEBUG){cerr << soliloquy << " same conv=" << conv << endl;}
+      sum_counts.clear();
+      for(int i=ind1;i<=ind1+signal.rows-1;i++){
+        conv_shape[ind2++]=conv[i];
+        sum_counts.push_back(sum_counts_full[i]);
+      }
+      if(LDEBUG){cerr << soliloquy << " same conv=" << conv_shape << endl;}
       return conv_shape;
     }
     else if(SHAPE==CONV_SHAPE_VALID){ //valid - only that section of conv that does NOT require zero-padding
@@ -2568,10 +2596,14 @@ namespace aurostd {
       size=conv.rows-ind_zero_padding.size();
       xvector<utype> conv_shape(size+(lrows-1),lrows);
       int ind2=lrows;
+      sum_counts.clear();
       for(int i=conv.lrows;i<=conv.urows;i++){
-        if(!aurostd::withinList(ind_zero_padding,i)){conv_shape[ind2++]=conv[i];}
+        if(!aurostd::withinList(ind_zero_padding,i)){
+          conv_shape[ind2++]=conv[i];
+          sum_counts.push_back(sum_counts_full[i]);
+        }
       }
-      if(LDEBUG){cerr << soliloquy << " valid conv=" << conv << endl;}
+      if(LDEBUG){cerr << soliloquy << " valid conv=" << conv_shape << endl;}
       return conv_shape;
     }
     else{throw aurostd::xerror(soliloquy,"SHAPE specification unknown",_INPUT_UNKNOWN_);}
@@ -2584,8 +2616,18 @@ namespace aurostd {
       cerr << soliloquy << " _signal=" << signal << endl;
       cerr << soliloquy << " window=" << window << endl;
     }
-    xvector<utype> response=box_filter_xv<utype>(window,signal.lrows);
-    xvector<utype> avg=convolution(signal,response,CONV_SHAPE_SAME);
+    //CO190622 - box_filter screws up edges
+    //the averaging needs to be truncated for the edges
+    //do NOT average beforehand
+    //[CO190622 - box_filter screws up edges]xvector<utype> response=box_filter_xv<utype>(window,signal.lrows);  //note, padding response with 0s to make len same as signal will yield NO difference
+    vector<uint> sum_counts;
+    xvector<utype> response=ones_xv<utype>(window+(signal.lrows-1),signal.lrows);  //note, padding response with 0s to make len same as signal will yield NO difference
+    xvector<utype> avg=convolution(signal,response,sum_counts,CONV_SHAPE_SAME);
+    if(LDEBUG){
+      cerr << soliloquy << " response=" << response << endl;
+      cerr << soliloquy << " sum_counts=" << aurostd::joinWDelimiter(sum_counts,",") << endl;
+    }
+    for(int i=avg.lrows;i<=avg.urows;i++){avg[i]/=(utype)sum_counts[i-avg.lrows];}
     if(LDEBUG){cerr << soliloquy << " avg=" << avg << endl;}
     return avg;
   }
@@ -2604,7 +2646,7 @@ namespace aurostd {
     //detect peaks when (X-Y)>multiplier*sigma
 
     //smooth data
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::getPeaks():";
 
     if(LDEBUG){

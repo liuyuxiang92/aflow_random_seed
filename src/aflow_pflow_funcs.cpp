@@ -24,9 +24,9 @@
 // factors f, not f^2.  DW^2 would be the appropriate term to modulate
 // the intensity, but DW is appropriate to modulate the scattering factors
 // (see Warren,eq.3.24).
-double DebyeWallerFactor(const double& theta, const double& lambda,
-			 const double& temp, const double& debye_temp,
-			 const double& mass) {
+double DebyeWallerFactor(double theta,
+			 double temp, double debye_temp,
+			 double mass,double lambda) {
   double st=sin(theta);
   double h=PLANCKSCONSTANT_h; //ME181020
   double twoB=h*h*temp*12.0/(mass*KBOLTZ*debye_temp*debye_temp);
@@ -1423,7 +1423,7 @@ void GetXray2ThetaIntensity(const xstructure& str,
   //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
   vector<vector<double> > ids;
   pflow::matrix<double> data;
-  pflow::GetXrayData(str,dist,sf,lambda,scatt_fact,mass,twoB_vec,ids,data); //CO190620 - intmax can be grabbed later
+  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
 
   v_twotheta.clear();
 
@@ -1592,17 +1592,18 @@ namespace pflow {
 void GetXrayData(const xstructure& str,
          vector<double>& dist,
          vector<double>& sf,
-	       double lambda,vector<double>& scatt_fact,
+         vector<double>& scatt_fact,
 	       vector<double>& mass,vector<double>& twoB_vec,
          vector<vector<double> >& ids,
-         pflow::matrix<double>& data) { //CO190520  //CO190620 - intmax can be grabbed later
+         pflow::matrix<double>& data,
+	       double lambda) { //CO190520  //CO190620 - intmax can be grabbed later
   //int num_atoms=str.atoms.size();
   //  vector<string> names=str.GetNames();
   //vector<double> dist,sf;
   //vector<double> scatt_fact(num_atoms,0.0);
   //vector<double> mass(num_atoms,0.0);
   //vector<double> twoB_vec(num_atoms,0.0);
-  pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
+  pflow::GetXray(str,dist,sf,scatt_fact,mass,twoB_vec,lambda);
 
   double tol=1.0E-5;
   //int w1=4; // int
@@ -1829,8 +1830,8 @@ void GetXrayData(const xstructure& str,
 // updated by Corey Oses 190520
 namespace pflow {
   void GetXray(const xstructure& str, vector<double>& dist,vector<double>& sf,
-	       double lambda, vector<double>& scatt_fact, //CO190520
-	       vector<double>& mass, vector<double>& twoB_vec) {
+	       vector<double>& scatt_fact, //CO190520
+	       vector<double>& mass, vector<double>& twoB_vec,double lambda) {
     string soliloquy="pflow::GetXray():"; //CO190322
     stringstream message; //CO190322
     // Get data from str.
@@ -1885,36 +1886,36 @@ namespace pflow {
   
     for(int i0=-kmx;i0<=kmx;i0++) {
       for(int i1=-kmx;i1<=kmx;i1++) {
-	for(int i2=-kmx;i2<=kmx;i2++) {
+        for(int i2=-kmx;i2<=kmx;i2++) {
           ii0=i0+kmx;
           ii1=i1+kmx;
           ii2=i2+kmx;
           id=ii2+ii1*len+ii0*len*len; //this is index that converts 3D HKL search to 1D
-	  sfr=0.0;
-	  sfi=0.0;
+          sfr=0.0;
+          sfi=0.0;
           for(int ic=1;ic<=3;ic++){rv(ic)=i0*rlat(1,ic)+i1*rlat(2,ic)+i2*rlat(3,ic);}
           rvnorm=modulus(rv);
-	  if(rvnorm>0.0) dist[id]=TWOPI/rvnorm;
-	  for(int iat=0;iat<num_atoms;iat++) {
-	    // Get Debye Waller factor.
-	    dw=1;
-	    if(dist[id]>0) {
+          if(rvnorm>0.0) dist[id]=TWOPI/rvnorm;
+          for(int iat=0;iat<num_atoms;iat++) {
+            // Get Debye Waller factor.
+            dw=1;
+            if(dist[id]>0) {
               term=lambda/(2.0*dist[id]);
               if(term<=1) { //angle, must be less than equal to 1 or domain error occurs
                 theta=std::asin(term);  //radians
                 theta*=360.0/TWOPI; // rad->degrees
-		dw=DebyeWallerFactor(theta,lambda*1.0E-10,temp,debye_temp,mass[iat]);
-	      }
-	    }
+                dw=DebyeWallerFactor(theta,temp,debye_temp,mass[iat],lambda*1.0E-10);
+              }
+            }
             const _atom& atom=sstr.atoms[iat];
-	    //  double gdotr=i0*fpos[iat][0]+i1*fpos[iat][1]+i2*fpos[iat][2];
+            //  double gdotr=i0*fpos[iat][0]+i1*fpos[iat][1]+i2*fpos[iat][2];
             gdotr=i0*atom.fpos(1)+i1*atom.fpos(2)+i2*atom.fpos(3);
             gdotr*=TWOPI;
             sfr+=dw*scatt_fact[iat]*std::cos(gdotr);
             sfi-=dw*scatt_fact[iat]*std::sin(gdotr);
-	  }
+          }
           sf[id]=(sfr*sfr)+(sfi*sfi); //sum the squares, vector addition
-	} // i2
+        } // i2
       } // i1
     } // i0
   }

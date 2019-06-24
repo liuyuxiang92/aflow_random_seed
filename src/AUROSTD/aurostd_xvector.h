@@ -524,6 +524,7 @@ namespace aurostd { //CO190419
   template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO 171202
   template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO 171202, absolute deviation around the median (MAD)
   template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,int SHAPE=CONV_SHAPE_FULL); //CO190419
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,vector<uint>& sum_counts,int SHAPE=CONV_SHAPE_FULL); //CO190419
   template<class utype> xvector<utype> moving_average(const xvector<utype>& signal,int window); //CO190419
 }
 
