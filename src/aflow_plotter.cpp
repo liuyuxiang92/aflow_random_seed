@@ -1420,11 +1420,11 @@ void plotMatrix(xoption& plotoptions, stringstream& out) {
 void setPlotLabels(xoption& plotoptions,
                    const string& xlabel, const string& xunit,
                    const string& ylabel, const string& yunit) {
-  plotoptions.pop_attached("XALBEL");
+  plotoptions.pop_attached("XLABEL");
   plotoptions.push_attached("XLABEL", xlabel);
   plotoptions.pop_attached("XUNIT");
   plotoptions.push_attached("XUNIT", xunit);
-  plotoptions.pop_attached("YALBEL");
+  plotoptions.pop_attached("YLABEL");
   plotoptions.push_attached("YLABEL", ylabel);
   plotoptions.pop_attached("YUNIT");
   plotoptions.push_attached("YUNIT", yunit);
