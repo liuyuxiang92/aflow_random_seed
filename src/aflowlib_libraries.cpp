@@ -5384,7 +5384,7 @@ namespace aflowlib {
 // ***************************************************************************
 namespace aflowlib {
   uint _OLD_vaspfile2stringstream(const string& str_dir, const string& FILE, stringstream& sss) {
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
     vector<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
 
