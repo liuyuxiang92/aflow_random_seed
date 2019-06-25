@@ -276,7 +276,6 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
       else title += ", " + lattice + ")";
-      title = aurostd::fixStringLatex(title, false, false);
     } else {  // Title not in proptype format
       return default_title;
     }
