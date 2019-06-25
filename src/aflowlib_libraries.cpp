@@ -5499,6 +5499,13 @@ namespace aflowlib {
 	  return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
 	}
       }
+      // ME190626 - Check for PHPOSCAR
+      string phposcar = "PHPOSCAR";
+      if (aurostd::FileExist(phposcar) || aurostd::EFileExist(phposcar, phposcar)) {
+        aurostd::efile2stringstream(str_dir + "/" + phposcar, sss);
+        if (LDEBUG) cerr << "aflowlib::vaspfile2stringstream FOUND FILE=" << str_dir << "/" << phposcar << "]" << endl;
+        return aurostd::CleanFileName(str_dir + "/" + phposcar);
+      }
       cerr<< FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!"<<endl;
       exit(1);
     }

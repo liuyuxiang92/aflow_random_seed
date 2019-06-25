@@ -271,6 +271,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     vector<string> tokens;
     aurostd::string2tokens(default_title, tokens, ".");
     if (tokens.size() == 2) {
+      for (int i = 0; i < 2; i++) tokens[i] = aurostd::fixStringLatex(tokens[i], false, false);
       title = formatCompoundLATEX(tokens[0]) + " (" + tokens[1];
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
