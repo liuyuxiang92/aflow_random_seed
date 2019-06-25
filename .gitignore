@@ -62,3 +62,8 @@ src/aflow_data_extra.cpp
 # OS-specific
 *.swp
 .DS_Store
+
+# handing files over to Stefano
+src/FILES_CHANGED.txt
+src/zip_modified_aflow_files.sh
+src/MODIFIED_FILES_*.zip
