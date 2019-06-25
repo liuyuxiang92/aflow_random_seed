@@ -5384,7 +5384,7 @@ namespace aflowlib {
 // ***************************************************************************
 namespace aflowlib {
   uint _OLD_vaspfile2stringstream(const string& str_dir, const string& FILE, stringstream& sss) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
     vector<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
 
@@ -5498,6 +5498,13 @@ namespace aflowlib {
 	  if(LDEBUG) cerr << "aflowlib::vaspfile2stringstream: FOUND FILE=" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
 	  return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
 	}
+      }
+      // ME190626 - Check for PHPOSCAR
+      string phposcar = "PHPOSCAR";
+      if (aurostd::FileExist(phposcar) || aurostd::EFileExist(phposcar, phposcar)) {
+        aurostd::efile2stringstream(str_dir + "/" + phposcar, sss);
+        if (LDEBUG) cerr << "aflowlib::vaspfile2stringstream FOUND FILE=" << str_dir << "/" << phposcar << "]" << endl;
+        return aurostd::CleanFileName(str_dir + "/" + phposcar);
       }
       cerr<< FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!"<<endl;
       exit(1);
