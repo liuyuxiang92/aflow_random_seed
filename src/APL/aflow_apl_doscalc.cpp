@@ -416,6 +416,7 @@ void DOSCalculator::writePHDOSCAR() {
   
 xDOSCAR DOSCalculator::createDOSCAR() {
   xDOSCAR xdos;
+  xdos.spin = 0;
   // Header values
   xdos.number_atoms = _pc.getInputCellStructure().atoms.size();
   xdos.partial = (_projectedDOS.size() > 0);
