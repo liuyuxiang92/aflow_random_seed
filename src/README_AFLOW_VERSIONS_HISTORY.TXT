@@ -1,3 +1,9 @@
+3.1.225 - 2019/06/26
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
+        -- Added projected phonon DOS calculations. (ME)
+        -- Linear tetrahedron method does not reduce upon construction anymore (necessary for projected DOS).
+        -- Cleaned up code and added more comments to QMesh and LTMethod files. (ME)
+
 3.1.225 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)

@@ -448,11 +448,19 @@ mesh, the number of energy points, and the smearing width.
 
 Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
 
-        [AFLOW_APL]DOSPROJECTIONS=1,0,0;0,1,0;0,0,1
+        [AFLOW_APL]DOSPROJECTIONS_CART=1,0,0;0,1,0;0,0,1
+                                 or
+        [AFLOW_APL]DOSPROJECTIONS_FRAC=-1,1,1;1,-1,1;1,1,-1
+
+Where DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC give the projection directions in Cartesian and
+fractional coordinates, respectively. It is not possible to choose both options. If neither options
+is populated, projected DOS will not be calculated.
 
 Each projection vector triplet needs to be separated by a semicolon, and the coordinates inside the
 triplets must be separated by commas. The projection vectors have to be given in Cartesian
-coordinates. The default vectors are the Cartesian axes, i.e. 1,0,0;0,1,0;0,0,1.
+coordinates. Per default, both are turned off.
+
+Projected DOS are currently only available for the linear tetrahedron method.
 
 3.3. Thermodynamic Properties
 

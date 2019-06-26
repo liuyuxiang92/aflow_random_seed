@@ -665,6 +665,7 @@ class IPhononCalculator {
  public:
   virtual ~IPhononCalculator() {}
   virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&) = 0;
+  virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &) = 0;  // ME190624
   virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &,
                                        vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME 180827
   virtual double getEPS() = 0;  //CO
@@ -805,6 +806,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   //******* END ME ************
   // Interface
   xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
+  xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME190624
   xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&, 
                                vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
   double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
@@ -1255,30 +1257,30 @@ class QMesh {
     void writeQpoints(string, bool=true);
     void writeIrredQpoints(string, bool=true);
 
-    const int& getnIQPs() const;
-    const int& getnQPs() const;
-    const int& getGrid(const int&) const;
+    int getnIQPs() const;
+    int getnQPs() const;
+    int getGrid(int) const;
     const xvector<int>& getGrid() const;
-    const _qpoint& getIrredQPoint(const int&) const;
-    const _qpoint& getIrredQPoint(const int&, const int&, const int&) const;
+    const _qpoint& getIrredQPoint(int) const;
+    const _qpoint& getIrredQPoint(int, int, int) const;
     vector<xvector<double> > getIrredQPointsCPOS() const;
     vector<xvector<double> > getIrredQPointsFPOS() const;
-    const int& getIrredQPointIndex(const int&) const;
-    const int& getIrredQPointIndex(const int&, const int&, const int&) const;
-    const _qpoint& getQPoint(const int&) const;
-    const _qpoint& getQPoint(const int&, const int&, const int&) const;
-    const int& getQPointIndex(const int&, const int&, const int&) const;
+    int getIrredQPointIndex(int) const;
+    int getIrredQPointIndex(int, int, int) const;
+    const _qpoint& getQPoint(int) const;
+    const _qpoint& getQPoint(int, int, int) const;
+    int getQPointIndex(int, int, int) const;
     vector<xvector<double> > getQPointsCPOS() const;
     vector<xvector<double> > getQPointsFPOS() const;
-    const int& getIbzqpt(const int&) const;
-    const int& getIbzqpt(const int&, const int&, const int&) const;
+    int getIbzqpt(int) const;
+    int getIbzqpt(int, int, int) const;
     const vector<int>& getIbzqpts() const;
     const vector<_qpoint>& getPoints() const;
     const _kcell& getReciprocalCell() const;
     const xvector<double>& getShift() const;
     const vector<int>& getWeights() const;
-    const bool& isReduced() const;
-    const bool& isGammaCentered() const;
+    bool isReduced() const;
+    bool isGammaCentered() const;
 
   private:
     void free();
@@ -1313,30 +1315,40 @@ class LTMethod {
     LTMethod& operator=(const LTMethod&);
     ~LTMethod();
 
+    void makeIrreducible();  // ME190625
+
     const vector<vector<int> >& getTetrahedra() const;
-    const vector<int>& getTetrahedron(const int&) const;
-    const int& getCorner(const int&, const int&) const;
-    const int& getCornerIrred(const int&, const int&) const;
-    const int& getnTetrahedra() const;
-    const double& getVolumePerTetrahedron() const;
+    const vector<int>& getTetrahedron(int) const;
+    const vector<int>& getIrredTetrahedron(int) const;
+    int getCorner(int, int) const;
+    // const int& getCornerIrred(const int&, const int&) const; OBSOLETE ME1906
+    vector<vector<int> > getIrreducibleTetrahedra() const;  // ME190625
+    vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;  // ME190625
+
+    int getnTetrahedra() const;
+    int getnIrredTetrahedra() const;
+    double getVolumePerTetrahedron() const;
     const vector<int>& getWeights() const;
-    const int& getWeight(const int&) const;
+    int getWeight(int) const;
+    bool isReduced() const;
   private:
     void free();
 
     QMesh& _qm;
     Logger& _logger;  // The APL logger
 
-    vector<vector<int> > _irredTetrahedra;  // The corners of the irreducible tetrahedra
+    vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME190625
+    vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME190625
+    bool _reduced;  // ME190625
     int _nTetra;  // The number of tetrahedra
+    int _nIrredTetra;  // The number of irreducible tetrahedra - ME190625
     double _volumePerTetrahedron;  // The relative volume of each tetrahedron
     vector<int> _weights;  // The weights of each irreducible tetrahedron
 
     void generateTetrahedra();
     vector<vector<xvector<int> > > initializeTetrahedra();
     void findMostCompact(vector<vector<xvector<int> > >&);
-    void getIrreducibleTetrahedra(const vector<vector<xvector<int> > >&);
-    
+    void generateAllTetrahedra(const vector<vector<xvector<int> > >&);  // ME190625
 };
 }  // namespace apl
 
@@ -1385,8 +1397,9 @@ class DOSCalculator {  // ME190424
   std::vector<double> _bins;
   std::vector<double> _dos;
   std::vector<double> _idos;  // ME190614
+  std::vector<xmatrix<xcomplex<double> > > _eigen;  // ME190624 - eigenvectors for projected DOS
   std::vector<vector<vector<double> > > _projectedDOS; // ME190614 - projectedDOS.at(atom).at(direction).at(frequency)
-  std::vector<xvector<double> > _projections;  // ME190624 - the projection directions for the DOS
+  std::vector<xvector<double> > _projections;  // ME190626 - the projection directions for the DOS in Cartesian coordinates
   double _temperature;  // ME190614
   //CO - START
  //private:

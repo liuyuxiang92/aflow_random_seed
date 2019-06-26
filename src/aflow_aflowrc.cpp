@@ -477,8 +477,6 @@
 #define         DEFAULT_APL_DOSMESH                           XHOST.adefault.getattachedscheme("DEFAULT_APL_DOSMESH")
 #define AFLOWRC_DEFAULT_APL_DOSPOINTS                         2000
 #define         DEFAULT_APL_DOSPOINTS                         XHOST.adefault.getattachedutype<int>("DEFAULT_APL_DOSPOINTS")
-#define AFLOWRC_DEFAULT_APL_DOSPROJECTIONS                    string("1,0,0;0,1,0;0,0,1")  // ME190624
-#define         DEFAULT_APL_DOSPROJECTIONS                    XHOST.adefault.getattachedscheme("DEFAULT_APL_DOSPROJECTIONS")  // ME190624
 #define AFLOWRC_DEFAULT_APL_DOSSMEAR                          0.0
 #define         DEFAULT_APL_DOSSMEAR                          XHOST.adefault.getattachedutype<double>("DEFAULT_APL_DOSSMEAR")
 #define AFLOWRC_DEFAULT_APL_TP                                TRUE
@@ -1115,7 +1113,6 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DOSMETHOD",AFLOWRC_DEFAULT_APL_DOSMETHOD);
     aflowrc::load_default("DEFAULT_APL_DOSMESH",AFLOWRC_DEFAULT_APL_DOSMESH);  // ME190624
     aflowrc::load_default("DEFAULT_APL_DOSPOINTS",AFLOWRC_DEFAULT_APL_DOSPOINTS);
-    aflowrc::load_default("DEFAULT_APL_DOSPROJECTIONS",AFLOWRC_DEFAULT_APL_DOSPROJECTIONS);
     aflowrc::load_default("DEFAULT_APL_DOSSMEAR",AFLOWRC_DEFAULT_APL_DOSSMEAR);
     aflowrc::load_default("DEFAULT_APL_TP",AFLOWRC_DEFAULT_APL_TP);
     aflowrc::load_default("DEFAULT_APL_TPT",AFLOWRC_DEFAULT_APL_TPT);
@@ -1557,7 +1554,6 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DOSMETHOD=\"" << AFLOWRC_DEFAULT_APL_DOSMETHOD << "\"" << endl;
     aflowrc << "DEFAULT_APL_DOSMESH=\"" << AFLOWRC_DEFAULT_APL_DOSMESH << "\"" << endl;  // ME190626
     aflowrc << "DEFAULT_APL_DOSPOINTS=" << AFLOWRC_DEFAULT_APL_DOSPOINTS << endl;
-    aflowrc << "DEFAULT_APL_DOSPROJECTIONS=\"" << AFLOWRC_DEFAULT_APL_DOSPROJECTIONS << "\"" << endl;
     aflowrc << "DEFAULT_APL_DOSSMEAR=" << AFLOWRC_DEFAULT_APL_DOSSMEAR << endl;
     aflowrc << "DEFAULT_APL_TP=" << AFLOWRC_DEFAULT_APL_TP << endl;
     aflowrc << "DEFAULT_APL_TPT=\"" << AFLOWRC_DEFAULT_APL_TPT << "\"" << endl;
@@ -1973,7 +1969,6 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSMETHOD\")=\"" << DEFAULT_APL_DOSMETHOD << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSMESH\")=\"" << DEFAULT_APL_DOSMESH << "\"" << endl;  // ME190624
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSPOINTS\")=" << DEFAULT_APL_DOSPOINTS << endl;  // ME190112
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSPROJECTIONS\")=\"" << DEFAULT_APL_DOSPROJECTIONS << "\"" << endl;  // ME190624
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DOSSMEAR\")=" << DEFAULT_APL_DOSSMEAR << endl;  // ME190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TP\")=" << DEFAULT_APL_TP << endl;  // ME190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TPT\")=\"" << DEFAULT_APL_TPT << "\"" << endl;
