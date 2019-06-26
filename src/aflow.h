@@ -3215,7 +3215,7 @@ namespace plotter {
   void setFileName(aurostd::xoption&, string="");
   void setTitle(aurostd::xoption&);
   string formatDefaultPlotTitle(const aurostd::xoption&);
-  string formatCompoundLATEX(const string&);
+  string formatCompoundLATEX(string);
 
   // Electronic structure ----------------------------------------------------
   // Plot functions

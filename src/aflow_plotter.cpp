@@ -271,7 +271,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     vector<string> tokens;
     aurostd::string2tokens(default_title, tokens, ".");
     if (tokens.size() == 2) {
-      for (int i = 0; i < 2; i++) tokens[i] = aurostd::fixStringLatex(tokens[i], false, false);
+      tokens[1] = aurostd::fixStringLatex(tokens[1], false, false);  // Compound should not habe special characters after formatting
       title = formatCompoundLATEX(tokens[0]) + " (" + tokens[1];
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
@@ -292,7 +292,22 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
   return title;
 }
 
-string formatCompoundLATEX(const string& compound) {
+string formatCompoundLATEX(string compound) {
+  // First, remove any kind of pseudopotential information
+  if (aurostd::substring2bool(compound, ":")) {
+    string::size_type t;
+    t = compound.find_first_of(':');
+    compound = compound.substr(0, t);
+  }
+  if (aurostd::substring2bool(compound, "_")) {
+    string pps = "_d,_h,_pv,_s,_sv,_3,_2,_2_n";
+    vector<string> tokens;
+    aurostd::string2tokens(pps, tokens, ",");
+    for (uint i = 0; i < tokens.size(); i++) {
+      compound = aurostd::RemoveSubString(compound, tokens[i]);
+    }
+  }
+
   string latex;
   bool sub = false;  // $_{ open?
   for (uint i = 0; i < compound.size(); i++) {
