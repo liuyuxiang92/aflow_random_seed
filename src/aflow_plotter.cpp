@@ -278,7 +278,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
       aflowlib::GetAllPrototypeLabels(protos, "anrl");
       if (aurostd::withinList(protos, proto)) {
         if (tokens.size() == 3) proto += "." + tokens[2];
-        vector<string> elements = getElementsFromString(tokens[0]);
+        vector<string> elements = pflow::stringElements2VectorElements(tokens[0], std::cerr, true);
         vector<double> composition = getCompositionFromANRLProtoype(proto);
         proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
         title = formatCompoundLATEX(elements, composition) + " (" + proto;
@@ -384,38 +384,6 @@ vector<double> getCompositionFromANRLProtoype(const string& prototype) {
   return composition;
 }
 
-//getElementsFromString///////////////////////////////////////////////////////
-// Extracts the elements form an AFLOW-formatted element string.
-vector<string> getElementsFromString(string compound) {
-  // First, remove any kind of pseudopotential information
-  if (aurostd::substring2bool(compound, ":")) {
-    string::size_type t;
-    t = compound.find_first_of(':');
-    compound = compound.substr(0, t);
-  }
-  if (aurostd::substring2bool(compound, "_")) {
-    string pps = "_pv,_sv,_d,_h,_s,_2_n,_3,_2";
-    vector<string> tokens;
-    aurostd::string2tokens(pps, tokens, ",");
-    for (uint i = 0; i < tokens.size(); i++) {
-      compound = aurostd::RemoveSubString(compound, tokens[i]);
-    }
-  }
-  string el;
-  vector<string> elements;
-  for (uint i = 0; i < compound.size(); i++) {
-    if (isupper(compound[i])) {
-      if (!el.empty()) elements.push_back(el);
-      el = compound[i];
-    } else {
-      el += compound[i];
-    }
-  }
-  // Get the last element
-  if (!el.empty()) elements.push_back(el);
-  return elements;
-}
-
 //formatDefaultTitlePOCC//////////////////////////////////////////////////////
 // Converts a POCC-formatted title into a plot title. It currently only works
 // if the POCC string consists only of P-designations.
@@ -426,10 +394,10 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
   t = default_title.find(":POCC");
   string proto = default_title.substr(0, t);  // Contains compound and prototype
   string pocc = default_title.substr(t + 5, default_title.size() - t + 1);  // POCC string + ARUN
-  bool treat_as_prototype = false;
+  bool generic = false;
   // Need _S because S could theoretically also be a decorator
-  if (aurostd::substring2bool(pocc, "_S")) treat_as_prototype = true;
-  pocc = pocc.substr(1, pocc.size());  // Remove the leadaing _
+  if (aurostd::substring2bool(pocc, "_S")) generic = true;
+  pocc = pocc.substr(1, pocc.size());  // Remove the leading _
 
   // Get the HNF matrix string
   vector<string> tokens;
@@ -468,7 +436,7 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
       aurostd::string2tokens(poscartitle, vstr, ":");  // Remove any ARUNs
       composition = getCompositionFromPoccString(vstr[0], broken);
     } catch (aurostd::xerror& excpt) {
-      treat_as_prototype = true;
+      generic = true;
     }
   }
 
@@ -476,16 +444,16 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
   string compound;
   aurostd::string2tokens(proto, tokens, ".");
   proto = tokens[1];
-  if (!treat_as_prototype) {
-    vector<string> elements = getElementsFromString(tokens[0]);
+  if (!generic) {
+    vector<string> elements = pflow::stringElements2VectorElements(tokens[0], std::cerr, true);
     if (elements.size() != composition.size()) {
-      treat_as_prototype = true;
+      generic = true;
       broken = true;
     } else {
       compound = formatCompoundLATEX(elements, composition);
     }
   }
-  if (treat_as_prototype) {  // Broken or unsupported string, so use a very generric title
+  if (generic) {  // Broken or unsupported string, so use a very generric title
     compound = aurostd::fixStringLatex(tokens[0], false, false);
     if (!broken) proto += ".POCC:" + pocc;  // Only add POCC string if not broken
   }

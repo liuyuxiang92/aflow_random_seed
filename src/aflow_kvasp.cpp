@@ -2683,7 +2683,7 @@ namespace KBIN {
           bool nbands_error = (!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The number of bands has been changed from the values supplied")
                          && !aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","now  NBANDS  ="));
           // Need explicit check or else the NPAR warning prevents this NBANDS error from being corrected
-          nbands_error = aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons");
+          nbands_error = nbands_error || aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons");
           xwarning.flag("NBANDS", nbands_error);
         }
 	xwarning.flag("LRF_COMMUTATOR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LRF_COMMUTATOR internal error: the vector")); // GET ALL TIMES
