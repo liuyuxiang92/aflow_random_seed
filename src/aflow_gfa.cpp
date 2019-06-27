@@ -26,7 +26,7 @@
 #define _CON_TOL_ 1.3 //Tolerance when calculating connectivity (multiplying constant < sqrt(2))
 
 //gfa
-#define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
+// [OBSOLETE] #define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
 #define KbT 0.025 // 0.0267 for operating in the human body, originally room temp - 0.025 
 
 /********DEFINITIONS**********/
@@ -1038,7 +1038,7 @@ namespace pflow {
 
   //************** Function for computing GFA (end)
 
-  void CalculateGFA(aurostd::xoption& vpflow, string alloy, string AE_file_read){
+  void CalculateGFA(aurostd::xoption& vpflow, string alloy, string AE_file_read, double fe_cut){
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190424
     string soliloquy="pflow::CalculateGFA():";  //CO190424
 
@@ -1106,7 +1106,7 @@ namespace pflow {
 	}
 	if(j==LIB_entries.size()-1 && equal_E==false){
 	  entries_less_dup++;
-	  if(tEForm[i] < _ZTOL_){
+	  if(tEForm[i] < fe_cut){
 	    entries_size++;
 	    tAUID.push_back(LIB_entries[i].auid);
 	    VStoichiometry.push_back(LIB_entries[i].vstoichiometry);
@@ -1311,7 +1311,7 @@ namespace pflow {
     EntryData.open(Entryfilename.c_str());
     
     EntryData << endl << LIB_entries.size() << " entries loaded. " << endl << entries_less_dup << " entries remain after removing duplicates."
-	      << endl << entries_size << " entries have formation enthalpy < " << _ZTOL_ << " eV." << endl;
+	      << endl << entries_size << " entries have formation enthalpy < " << fe_cut << " eV." << endl;
     
     entries_size=VStoichE.size();
     
