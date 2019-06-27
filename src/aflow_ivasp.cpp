@@ -5105,14 +5105,6 @@ namespace KBIN {
 	POSCARfile=file_poscar_tmp;
       }
     }
-    // ME190626 - try PHPOSCAR
-    for(uint iext=0;iext<vext.size();iext++) {
-      if(!found_POSCAR && aurostd::FileExist(directory+"/PHPOSCAR"+vext.at(iext))) {
-	found_POSCAR=TRUE;
-	aurostd::execute(vcat.at(iext)+" "+directory+"/PHPOSCAR"+vext.at(iext)+" > "+file_poscar_tmp);
-	POSCARfile=file_poscar_tmp;
-      }
-    }
     if(!found_POSCAR)  {
       cerr <<"ERROR - KBIN:ExtractAtomicSpecies:: No POSCAR[.bands|.static|.relax2|.relax1][.EXT] found in the directory, aborting." << endl;
       exit(0);

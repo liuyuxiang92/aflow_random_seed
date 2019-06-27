@@ -267,18 +267,35 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     } else { // Title not in ICSD format
       return default_title;
     }
+  } else if (aurostd::substring2bool(default_title, "POCC")) {  // Check if in POCC format
+    title = formatDefaultTitlePOCC(plotoptions);
   } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
     vector<string> tokens;
     aurostd::string2tokens(default_title, tokens, ".");
-    if (tokens.size() == 2) {
-      tokens[1] = aurostd::fixStringLatex(tokens[1], false, false);  // Compound should not habe special characters after formatting
-      title = formatCompoundLATEX(tokens[0]) + " (" + tokens[1];
-      string lattice = plotoptions.getattachedscheme("LATTICE");
-      if (lattice.empty()) title += ")";
-      else title += ", " + lattice + ")";
-    } else {  // Title not in proptype format
-      return default_title;
+    if ((tokens.size() == 2) || (tokens.size() == 3)) {
+      string proto = tokens[1];
+      vector<string> protos;
+      aflowlib::GetAllPrototypeLabels(protos, "anrl");
+      if (aurostd::withinList(protos, proto)) {
+        if (tokens.size() == 3) proto += "." + tokens[2];
+        vector<string> elements = getElementsFromString(tokens[0]);
+        vector<double> composition = getCompositionFromANRLProtoype(proto);
+        proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
+        title = formatCompoundLATEX(elements, composition) + " (" + proto;
+      } else {
+        aflowlib::GetAllPrototypeLabels(protos, "all");
+        if (aurostd::withinList(protos, proto)) {
+          if (tokens.size() == 3) proto += "." + tokens[2];
+          proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
+          title = formatCompoundLATEX(tokens[0]) + " (" + proto;
+        } else {  // Title not in prototype format
+          return default_title;
+        }
+      }
     }
+    string lattice = plotoptions.getattachedscheme("LATTICE");
+    if (lattice.empty()) title += ")";
+    else title += ", " + lattice + ")";
   } else {  // Not an AFLOW-formatted default
     return default_title;
   }
@@ -292,29 +309,25 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
   return title;
 }
 
-string formatCompoundLATEX(string compound) {
-  // First, remove any kind of pseudopotential information
-  if (aurostd::substring2bool(compound, ":")) {
-    string::size_type t;
-    t = compound.find_first_of(':');
-    compound = compound.substr(0, t);
+//formatCompoundLATEX/////////////////////////////////////////////////////////
+// Converts a chemical formula into LaTeX.
+string formatCompoundLATEX(const vector<string>& elements, const vector<double>& composition) {
+  string compound;
+  for (uint i = 0; i < elements.size(); i++) {
+    compound += elements[i] + aurostd::utype2string<double>(composition[i]);
   }
-  if (aurostd::substring2bool(compound, "_")) {
-    string pps = "_d,_h,_pv,_s,_sv,_3,_2,_2_n";
-    vector<string> tokens;
-    aurostd::string2tokens(pps, tokens, ",");
-    for (uint i = 0; i < tokens.size(); i++) {
-      compound = aurostd::RemoveSubString(compound, tokens[i]);
-    }
-  }
+  return formatCompoundLATEX(compound);
+}
 
+
+string formatCompoundLATEX(const string& compound) {
   string latex;
   bool sub = false;  // $_{ open?
   for (uint i = 0; i < compound.size(); i++) {
     if (isdigit(compound[i]) && !sub) {
       latex += "$_{";
       sub = true;
-    } else if (isalpha(compound[i]) && sub) {
+    } else if (!isdigit(compound[i]) && (compound[i] != '.') && sub) {
       latex += "}$";
       sub = false;
     }
@@ -325,6 +338,228 @@ string formatCompoundLATEX(string compound) {
   // Remove sub-1 from chemical formula
   latex = aurostd::RemoveSubString(latex, "$_{1}$");
   return latex;
+}
+
+//getCompositionFromANRLPrototype/////////////////////////////////////////////
+// Gets the composition from an ANRL prototype string.
+vector<double> getCompositionFromANRLProtoype(const string& prototype) {
+  vector<string> tokens;
+  string compound, seq;
+  // Determine element sequence
+  aurostd::string2tokens(prototype, tokens, ".");
+  // If there is a . in the prototype string, the element sequence is given explicitly
+  if (tokens.size() == 2) seq = tokens[1];
+  aurostd::string2tokens(prototype, tokens, "_");
+  // If not explicitly given, determine element sequence from the prototype name
+  compound = tokens[0];
+  if (seq.empty()) {
+    for (uint i = 0; i < compound.size(); i++) {
+      if (isalpha(compound[i])) seq += compound[i];
+    }
+  }
+  vector<int> sequence(seq.size());
+  for (uint i = 0; i < seq.size(); i++) {
+    sequence[i] = (int) seq[i] - 65;
+  }
+
+  // Now determine the composition
+  string c;
+  vector<int> comp;
+  for (uint i = 1; i < compound.size(); i++) {  // First char is never a number
+    if (isdigit(compound[i])) {
+      c += compound[i];
+    } else {
+      if (c.empty()) comp.push_back(1);
+      else comp.push_back(aurostd::string2utype<int>(c));
+    }
+  }
+  if (c.empty()) comp.push_back(1);
+  else comp.push_back(aurostd::string2utype<int>(c));
+
+  // Finally, sort to match sequence
+  vector<double> composition(comp.size());
+  for (uint i = 0; i < composition.size(); i++) {
+    composition[i] = comp[sequence[i]];
+  }
+  return composition;
+}
+
+//getElementsFromString///////////////////////////////////////////////////////
+// Extracts the elements form an AFLOW-formatted element string.
+vector<string> getElementsFromString(string compound) {
+  // First, remove any kind of pseudopotential information
+  if (aurostd::substring2bool(compound, ":")) {
+    string::size_type t;
+    t = compound.find_first_of(':');
+    compound = compound.substr(0, t);
+  }
+  if (aurostd::substring2bool(compound, "_")) {
+    string pps = "_pv,_sv,_d,_h,_s,_2_n,_3,_2";
+    vector<string> tokens;
+    aurostd::string2tokens(pps, tokens, ",");
+    for (uint i = 0; i < tokens.size(); i++) {
+      compound = aurostd::RemoveSubString(compound, tokens[i]);
+    }
+  }
+  string el;
+  vector<string> elements;
+  for (uint i = 0; i < compound.size(); i++) {
+    if (isupper(compound[i])) {
+      if (!el.empty()) elements.push_back(el);
+      el = compound[i];
+    } else {
+      el += compound[i];
+    }
+  }
+  // Get the last element
+  if (!el.empty()) elements.push_back(el);
+  return elements;
+}
+
+//formatDefaultTitlePOCC//////////////////////////////////////////////////////
+// Converts a POCC-formatted title into a plot title. It currently only works
+// if the POCC string consists only of P-designations.
+string formatDefaultTitlePOCC(const xoption& plotoptions) {
+  string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
+  //Get all the pieces of the default title
+  string::size_type t;
+  t = default_title.find(":POCC");
+  string proto = default_title.substr(0, t);  // Contains compound and prototype
+  string pocc = default_title.substr(t + 5, default_title.size() - t + 1);  // POCC string + ARUN
+  bool treat_as_prototype = false;
+  // Need _S because S could theoretically also be a decorator
+  if (aurostd::substring2bool(pocc, "_S")) treat_as_prototype = true;
+  pocc = pocc.substr(1, pocc.size());  // Remove the leadaing _
+
+  // Get the HNF matrix string
+  vector<string> tokens;
+  string hnf;
+  if (aurostd::substring2bool(pocc, ":")) {  // Is there an ARUN?
+    aurostd::string2tokens(pocc, tokens, ":");
+    pocc = tokens[0];  // Remove ARUN from pocc
+    vector<string> arun;
+    aurostd::string2tokens(tokens[1], arun, "_");
+    hnf = arun.back();
+  }
+
+  // Try to extract the composition from the POCC string and check whether
+  // the string is incomplete. While the composition is only supported for
+  // P-designations, the algorithm should still run to test for incomplete
+  // strings.
+  bool broken = false;
+  vector<double> composition = getCompositionFromPoccString(pocc, broken);
+  if (broken) {  // If broken, extract the POCC string from the POSCAR title
+    try {
+      stringstream ss;
+      vector<string> vstr;
+      string directory = plotoptions.getattachedscheme("DIRECTORY");
+      string extension = plotoptions.getattachedscheme("EXTENSION");
+      if (aurostd::substring2bool(extension, "phdisp") || (extension == "phdos")) {
+        aurostd::efile2vectorstring("PHPOSCAR", vstr);
+      } else {
+        aurostd::efile2vectorstring(aflowlib::vaspfile2stringstream(directory, "POSCAR", ss), vstr);
+      }
+      // The POCC string is inside the first item
+      string poscartitle = vstr[0];
+      aurostd::string2tokens(poscartitle, vstr, " ");
+      // Only take what is needed by the algorithm
+      t = vstr[0].find(":POCC_");
+      poscartitle = vstr[0].substr(t + 6, poscartitle.size() - t + 1);
+      aurostd::string2tokens(poscartitle, vstr, ":");  // Remove any ARUNs
+      composition = getCompositionFromPoccString(vstr[0], broken);
+    } catch (aurostd::xerror& excpt) {
+      treat_as_prototype = true;
+    }
+  }
+
+  // Separate elements and prototype
+  string compound;
+  aurostd::string2tokens(proto, tokens, ".");
+  proto = tokens[1];
+  if (!treat_as_prototype) {
+    vector<string> elements = getElementsFromString(tokens[0]);
+    if (elements.size() != composition.size()) {
+      treat_as_prototype = true;
+      broken = true;
+    } else {
+      compound = formatCompoundLATEX(elements, composition);
+    }
+  }
+  if (treat_as_prototype) {  // Broken or unsupported string, so use a very generric title
+    compound = aurostd::fixStringLatex(tokens[0], false, false);
+    if (!broken) proto += ".POCC:" + pocc;  // Only add POCC string if not broken
+  }
+  proto = aurostd::fixStringLatex(proto, false, false);
+
+  // Finish title
+  string title = compound + " (" + proto;
+  if (!hnf.empty()) title += ":" + hnf;
+  string lattice = plotoptions.getattachedscheme("LATTICE");
+  if (lattice.empty()) title += ")";
+  else title += ", " + lattice + ")";
+  return title;
+}
+
+//getCompositionFromPoccString////////////////////////////////////////////////
+// Returns a composition from a POCC string. It also tests whether the POCC
+// string is complete, which is not always the case due to VASP's character
+// limit for titles.
+vector<double> getCompositionFromPoccString(const string& pocc_string, bool& broken) {
+  broken = false;
+  double SITE_TOL = 0.001;
+  // Get each site
+  vector<string> tokens;
+  aurostd::string2tokens(pocc_string, tokens, "_");
+  vector<string> site, st;
+  // Get the composition of each individual site. Do not add yet - it needs
+  // to be site-resolved for some checks to work.
+  vector<vector<std::pair<int, double> > > sites(tokens.size());
+  int max_index = 0;  // tracks how many decorators can be found in the string
+  for (uint i = 0; i < tokens.size(); i++) {
+    // Loop over all deocrations on the site
+    aurostd::string2tokens(tokens[i], site, "-");
+    if (site.size() == 1) { // There must be at least one site (first element is designator)
+      broken = true;
+      break;
+    } else {
+      for (uint j = 1; j < site.size(); j++) {
+        aurostd::string2tokens(site[j], st, "x");
+        if (st.size() == 2) {  // Format is e.g. Ax0.5, so there must be two elements
+          std::pair<int, double> s;
+          s.first = (int) st[1][0] - 65;  // [0] is to convert to char
+          s.second = aurostd::string2utype<double>(st[0]);
+          sites[i].push_back(s);
+          if (s.first > max_index) max_index = s.first;
+        } else {
+          broken = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // Determine the composition and check for consistency: no element must
+  // can a value of zero and all sites have to add to 1 within a tolerance
+  double sum;
+  vector<double> composition(max_index + 1);
+  for (uint i = 0; i < sites.size(); i++) {
+    sum = 0.0;
+    for (uint j = 0; j < sites[i].size(); j++) {
+      composition[sites[i][j].first] += sites[i][j].second;
+      sum += sites[i][j].second;
+    }
+    if (std::abs(sum - 1.0) < SITE_TOL) broken = true;
+  }
+  if (!broken) {
+    for (uint i = 0; i < composition.size(); i++) {
+      if (composition[i] == 0.0) {
+        broken = true;
+        break;
+      }
+    }
+  }
+
+  return composition;
 }
 
 } // namespace plotter
@@ -566,9 +801,14 @@ void PLOT_BANDDOS(xoption& plotoptions, stringstream& out) {
 xstructure getStructureWithNames(const xoption& plotoptions) {
   string directory = plotoptions.getattachedscheme("DIRECTORY");
   std::stringstream poscar;
-  aflowlib::vaspfile2stringstream(directory, "POSCAR", poscar);
+  if (plotoptions.getattachedscheme("EXTENSION") == "phdos") {
+    aurostd::efile2stringstream(DEFAULT_APL_PHPOSCAR_FILE, poscar);
+  } else {
+    aflowlib::vaspfile2stringstream(directory, "POSCAR", poscar);
+  }
   xstructure xstr(poscar);
   if (xstr.is_vasp4_poscar_format) {
+    // No special case for phonons needed because PHPOSCAR is always in VASP5 format
     vector<string> atoms = KBIN::ExtractAtomicSpecies(directory);
     for (uint i = 0; i < atoms.size(); i++) {
       xstr.atoms[i].name = atoms[i];

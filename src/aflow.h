@@ -3215,7 +3215,12 @@ namespace plotter {
   void setFileName(aurostd::xoption&, string="");
   void setTitle(aurostd::xoption&);
   string formatDefaultPlotTitle(const aurostd::xoption&);
-  string formatCompoundLATEX(string);
+  string formatCompoundLATEX(const vector<string>&, const vector<double>&);
+  string formatCompoundLATEX(const string&);
+  vector<double> getCompositionFromANRLProtoype(const string& prototype);
+  vector<string> getElementsFromString(string compound);
+  string formatDefaultTitlePOCC(const aurostd::xoption&);
+  vector<double> getCompositionFromPoccString(const string&, bool&);
 
   // Electronic structure ----------------------------------------------------
   // Plot functions

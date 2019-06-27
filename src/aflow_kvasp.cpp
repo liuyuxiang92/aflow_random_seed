@@ -2677,10 +2677,15 @@ namespace KBIN {
 	xwarning.flag("EDDDAV",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Error EDDDAV: Call to ZHEGV failed. Returncode"));
 	xwarning.flag("ZPOTRF",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LAPACK: Routine ZPOTRF failed"));
       //ME190620 - Avoid changing NBANDS in the aflow.in file just because VASP throws the warning that NBANDS is changed because of NPAR. However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
-	xwarning.flag("NBANDS", aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NBANDS") && // GET ALL TIMES
-				((aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons")) // ME190611 - or else the "avoid self healing" can prevent this NBANDS error from being found
-                                || (!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The number of bands has been changed from the values supplied") &&  // AVOID SELF HEALING
-				!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","now  NBANDS  ="))) );  // AVOID SELF HEALING
+        if (aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out", "NBANDS")) {
+          // The NBANDS warning due to NPAR is not an error we want to fix, so set to
+          // false if found
+          bool nbands_error = (!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The number of bands has been changed from the values supplied")
+                         && !aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","now  NBANDS  ="));
+          // Need explicit check or else the NPAR warning prevents this NBANDS error from being corrected
+          nbands_error = aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons");
+          xwarning.flag("NBANDS", nbands_error);
+        }
 	xwarning.flag("LRF_COMMUTATOR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LRF_COMMUTATOR internal error: the vector")); // GET ALL TIMES
 	xwarning.flag("EXCCOR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","ERROR FEXCF: supplied exchange-correlation table")); // look for problem at the correlation
 	xwarning.flag("NATOMS",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The distance between some ions is very small")); // look for problem for distance
