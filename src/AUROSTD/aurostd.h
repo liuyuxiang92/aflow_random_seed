@@ -312,11 +312,6 @@ namespace aurostd {
   //string RemoveCharacter(const string& s, const char character, const char toogle) __xprototype;
   string RemoveSubStringFirst(const string& str_orig, const string& str_rm) __xprototype;
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
-  // ME190628 - BEGIN
-  string RemoveSubStringAfter(const string&, const string&, bool=false) __xprototype;
-  string GetSubStringAfter(const string&, const string&) __xprototype;
-  std::pair<string, string> CutString(const string&, const string&) __xprototype;
-  // ME190628 - END
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);

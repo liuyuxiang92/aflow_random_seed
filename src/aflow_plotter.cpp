@@ -260,7 +260,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     vector<string> tokens;
     aurostd::string2tokens(default_title, tokens, "_");
     if (tokens.size() == 3) {
-      title = pflow::prettyPrintCompound(tokens[0], 'n', true, 'l') + " (ICSD \\#" + tokens[2];
+      title = pflow::prettyPrintCompound(tokens[0], _none_, true, _latex_) + " (ICSD \\#" + tokens[2];
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
       else title += ", " + lattice + ")";
@@ -281,13 +281,13 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
         vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
         vector<double> composition = getCompositionFromANRLProtoype(proto);
         proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-        title = pflow::prettyPrintCompound(elements, composition, 'n', true, 'l') + " (" + proto;
+        title = pflow::prettyPrintCompound(elements, composition, _none_, true, _latex_) + " (" + proto;
       } else {
         aflowlib::GetAllPrototypeLabels(protos, "all");
         if (aurostd::withinList(protos, proto)) {
           if (tokens.size() == 3) proto += "." + tokens[2];
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-          title = pflow::prettyPrintCompound(tokens[0], 'n', true, 'l') + " (" + proto;
+          title = pflow::prettyPrintCompound(tokens[0], _none_, true, _latex_) + " (" + proto;
         } else {  // Title not in prototype format
           return default_title;
         }
@@ -314,8 +314,10 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
 vector<double> getCompositionFromANRLProtoype(const string& prototype) {
   // Determine element sequence
   // If there is a . in the prototype string, the element sequence is given explicitly
-  string seq = aurostd::GetSubStringAfter(prototype, ".");
-  string compound = aurostd::RemoveSubStringAfter(prototype, "_");
+  string::size_type t = prototype.find(".");
+  string seq = prototype.substr(t + 1, string::npos);
+  t = prototype.find("_");
+  string compound = prototype.substr(0, t);
   // If not explicitly given, determine element sequence from the prototype name
   if (seq.empty()) {
     for (uint i = 0; i < compound.size(); i++) {
@@ -345,9 +347,9 @@ vector<double> getCompositionFromANRLProtoype(const string& prototype) {
 string formatDefaultTitlePOCC(const xoption& plotoptions) {
   string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
   //Get all the pieces of the default title
-  std::pair<string, string> str_cut = aurostd::CutString(default_title, ":POCC");
-  string proto = str_cut.first;  // Contains compound and prototype
-  string pocc = str_cut.second;  // POCC string + ARUN
+  string::size_type t = default_title.find(":POCC");
+  string proto = default_title.substr(0, t);  // Contains compound and prototype
+  string pocc = default_title.substr(t + 5, string::npos);  // POCC string + ARUN
   bool generic = false;
   // Need _S because S could theoretically also be a decorator
   if (aurostd::substring2bool(pocc, "_S")) generic = true;
@@ -357,9 +359,10 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
   vector<string> tokens;
   string hnf;
   if (aurostd::substring2bool(pocc, ":")) {  // Is there an ARUN?
-    str_cut = aurostd::CutString(pocc, ":");
-    pocc = str_cut.first;  // Remove ARUN from pocc
-    aurostd::string2tokens(str_cut.second, tokens, "_");
+    t = pocc.find(":");
+    hnf = pocc.substr(t + 1, string::npos);
+    pocc = pocc.substr(0, t);  // Remove ARUN from pocc
+    aurostd::string2tokens(hnf, tokens, "_");
     hnf = tokens.back();
   }
 
@@ -381,10 +384,13 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
         aurostd::efile2vectorstring(aflowlib::vaspfile2stringstream(directory, "POSCAR", ss), vstr);
       }
       // The POCC string is inside the first item
-      string poscartitle = aurostd::RemoveSubStringAfter(vstr[0], " ");
+      t = vstr[0].find(" ");
+      string poscartitle = vstr[0].substr(0, t);
       // Only take what is needed by the algorithm
-      poscartitle = aurostd::GetSubStringAfter(poscartitle, ":POCC_");
-      poscartitle = aurostd::RemoveSubStringAfter(poscartitle, ":");  // Remove any ARUNs
+      t = poscartitle.find(":POCC_");
+      poscartitle = poscartitle.substr(t + 6, string::npos);
+      t = poscartitle.find(":");
+      poscartitle = poscartitle.substr(0, t);
       composition = getCompositionFromPoccString(poscartitle, broken);
     } catch (aurostd::xerror& excpt) {
       generic = true;
@@ -392,16 +398,17 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
   }
 
   // Separate elements and prototype
-  string compound;
-  str_cut = aurostd::CutString(proto, ".");
-  proto = str_cut.second;
+  string compound, el;
+  t = proto.find(".");
+  el = proto.substr(0, t);
+  proto = proto.substr(t + 1, string::npos);
   if (!generic) {
-    vector<string> elements = pflow::stringElements2VectorElements(str_cut.first);
+    vector<string> elements = pflow::stringElements2VectorElements(el);
     if (elements.size() != composition.size()) {
       generic = true;
       broken = true;
     } else {
-      compound = pflow::prettyPrintCompound(elements, composition, 'n', true, 'l');
+      compound = pflow::prettyPrintCompound(elements, composition, _none_, true, _latex_);
     }
   }
   if (generic) {  // Broken or unsupported string, so use a very generric title
@@ -433,7 +440,6 @@ vector<double> getCompositionFromPoccString(const string& pocc_string, bool& bro
   // to be site-resolved for some checks to work.
   vector<vector<std::pair<int, double> > > sites(tokens.size());
   std::pair<int, double> s;
-  std::pair<string, string> str_cut;
   vector<string> site;
   int max_index = 0;  // tracks how many decorators can be found in the string
   for (uint i = 0; i < tokens.size(); i++) {
@@ -444,7 +450,13 @@ vector<double> getCompositionFromPoccString(const string& pocc_string, bool& bro
       break;
     } else {
       for (uint j = 1; j < site.size(); j++) {
-        str_cut = aurostd::CutString(site[j], "x");
+        string::size_type t;
+        std::pair<string, string> str_cut;
+        t = site[j].find("x");
+        if (t != string::npos) {
+          str_cut.first = site[j].substr(0, t);
+          str_cut.second = site[j].substr(t + 1, string::npos);
+        }
         // Format is e.g. Ax0.5, so there must be two elements
         if (str_cut.first.empty() || str_cut.second.empty()) {
           broken = true;

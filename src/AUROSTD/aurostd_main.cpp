@@ -1353,43 +1353,6 @@ namespace aurostd {
     return t;
   }
 
-  // ME190628 - BEGIN
-  // ***************************************************************************
-  // Function RemoveSubStringAfter
-  // ***************************************************************************
-  // Removes the substring after a pattern.
-  string RemoveSubStringAfter(const string& str_orig, const string& str_rm, bool include) {
-    string::size_type t = str_orig.find(str_rm);
-    // Include the pattern in the final result?
-    if (include) t += str_rm.size();
-    return str_orig.substr(0, t);
-  }
-
-
-  // ***************************************************************************
-  // Function GetSubStringAfter
-  // ***************************************************************************
-  // Return the substring after a pattern.
-  string GetSubStringAfter(const string& str_orig, const string& str_rm) {
-    string::size_type t = str_orig.find(str_rm);
-    if (t == string::npos) return "";
-    else return str_orig.substr(t + str_rm.size(), str_orig.size() - t + 1);
-  }
-
-  // ***************************************************************************
-  // Function CutString
-  // ***************************************************************************
-  // Cuts a string in two with another string as the delimiter
-  std::pair<string, string> CutString(const string& str_orig, const string& str_cut) {
-    std::pair<string, string> str_out;
-    string::size_type t = str_orig.find(str_cut);
-    str_out.first = str_orig.substr(0, t);
-    if (t == string::npos) str_out.second = "";
-    else str_out.second = str_orig.substr(t + str_cut.size(), str_orig.size() - t + 1);
-    return str_out;
-  }
-  // ME190628 - END
-
   
   // ***************************************************************************
   // Function DirectoryMake

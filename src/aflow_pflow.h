@@ -870,15 +870,6 @@ namespace pflow {
 
 //ME190628 - prettyPrintCompound from CHULL
 namespace pflow {
-  // Reduction modes
-  const char _frac_ = 'f';  // fractional
-  const char _gcd_ = 'g';  // gcd
-  const char _none_ = 'n'; // none
-
-  // Output formats
-  const char _gnuplot_ = 'g';  // gnuplot (postscript)
-  const char _latex_ = 'l';  // LaTeX
-
   // Precision for pretty printing
   const int COEF_PRECISION = 4;
 

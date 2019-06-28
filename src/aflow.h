@@ -23,6 +23,25 @@
 #define _XPROTO_TOO_CLOSE_ERROR_ 0.60 // was 0.75
 #define _XPROTO_ZERO_VOL_ 1.0e-6  //CO190218
 
+//ME190628 BEGIN - moved from CHULL for broader access
+// Output formats
+#define _apool_         'a'  // apool
+#define _json_          'j'  // standard json
+#define _pdf_           'p'  // pdf
+#define _txt_           't'  // plain text
+#define _web_           'w'  // web json
+#define _latex_         'l'  // latex
+#define _gnuplot_       'g'  // gnuplot
+#define _jupyterthree_  'y'  // jupyter python 3
+#define _jupytertwo_    'z'  // jupyter python 2
+
+// Reduction modes
+#define _frac_          'f'  //fractional
+#define _gcd_           'g'  //gcd
+#define _none_          'n'  //none
+// ME190628 END
+
+
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO 180509
 #define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
