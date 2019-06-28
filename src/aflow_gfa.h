@@ -12,7 +12,7 @@ namespace pflow {
 
   //Calculation functions
 
-  void CalculateGFA(aurostd::xoption& vpflow,string input,string AE_file_read,double fe_cut);
+  void CalculateGFA(aurostd::xoption& vpflow, const string& input, const string& AE_file_read, double fe_cut);
 
 }
 
