@@ -5,6 +5,7 @@
         -- integrated N+1_enthalpy_gain and stability criterion to --output=web (WS)
         -- added CCE functionality (RF)
         -- added CCE readme (RF)
+        -- Added additional string manipulation functions to AUROSTD. (ME)
         -- Added vector version of RemoveComments. (ME)
         -- RemoveControlCharactersFromStringstream now also removes carriage returns because they break string additions. (ME)
         -- SPIN_REMOVE_RELAX_2 did not remove spin after the second relaxation; this is fixed now. (ME)

@@ -849,8 +849,8 @@ namespace chull {
       //writer functions
       string prettyPrintCompound(const ChullPoint& point,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
       string prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
+      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
+      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
       string getICSDNumber(uint i_point,bool remove_suffix=true) const;
       string getICSDNumber(const ChullPoint& point,bool remove_suffix=true) const;
       string getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix=true) const;

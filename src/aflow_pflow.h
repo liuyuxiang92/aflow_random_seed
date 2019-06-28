@@ -286,7 +286,9 @@ namespace pflow {
   ////////////////////////////////////////////////////////////////////////////////
   // returns UNSORTED vector<string> from string
   vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true);
+  vector<string> stringElements2VectorElements(const string&, vector<double>&, ostream& oss=cout, bool clean=true);  // ME190628
   vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>&, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true);  // ME190628
   ////////////////////////////////////////////////////////////////////////////////
   // functions for making input alphabetic
   // PdMn -> MnPd, does it by CAPITAL letters
@@ -865,6 +867,26 @@ namespace pflow {
 namespace pflow {
   void BZMAX(istream& input);
 }
+
+//ME190628 - prettyPrintCompound from CHULL
+namespace pflow {
+  // Reduction modes
+  const char _frac_ = 'f';  // fractional
+  const char _gcd_ = 'g';  // gcd
+  const char _none_ = 'n'; // none
+
+  // Output formats
+  const char _gnuplot_ = 'g';  // gnuplot (postscript)
+  const char _latex_ = 'l';  // LaTeX
+
+  // Precision for pretty printing
+  const int COEF_PRECISION = 4;
+
+  string prettyPrintCompound(const string&, char=_gcd_, bool=true, char=_latex_);
+  string prettyPrintCompound(const vector<string>&, const vector<double>&, char=_gcd_, bool=true, char=_latex_);
+  string prettyPrintCompound(const vector<string>&, const aurostd::xvector<double>&, char=_gcd_, bool=true, char=_latex_);
+
+}  // namespace pflow
 
 #endif
 // ***************************************************************************
