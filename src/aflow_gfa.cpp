@@ -1038,7 +1038,7 @@ namespace pflow {
 
   //************** Function for computing GFA (end)
 
-  void CalculateGFA(aurostd::xoption& vpflow, string alloy, string AE_file_read, double fe_cut){
+  void CalculateGFA(aurostd::xoption& vpflow, const string& alloy, const string& AE_file_read, double fe_cut){
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190424
     string soliloquy="pflow::CalculateGFA():";  //CO190424
 
