@@ -234,10 +234,12 @@ class ClusterSet {
     ~ClusterSet();  // Destructor
     const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
 
+    vector<_cluster> clusters;
     vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
     double cutoff;  // Cutoff radius in Angstroms
     vector<xvector<double> > distortion_vectors;  // List of distortion vectors
-    vector<vector<_cluster> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.
+    vector<_ineq_distortions> higher_order_ineq_distortions;  // ME190531 - for 3rd derivatives of higher order processes
+    vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  // ME190520
     vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
     vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
     int nifcs;  // Number of force constants for each set of atoms.
@@ -250,6 +252,7 @@ class ClusterSet {
     xvector<int> sc_dim;  // Dimensions of the supercell.
     vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
 
+    const _cluster& getCluster(const int& i) const;  // ME190520
     void build(int);
     void buildDistortions();
     void writeClusterSetToFile(const string&);
@@ -264,12 +267,12 @@ class ClusterSet {
     vector<vector<int> > getPermutations(const int&);
 
     // Clusters
-    void getInequivalentClusters(vector<_cluster>&, vector<vector<_cluster> >&);
+    void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
     int getNumUniqueAtoms(const vector<int>&);
     vector<int> getComposition(const vector<int>&);
     bool sameComposition(const vector<int>&, const vector<int>&);
     int equivalenceCluster(const vector<int>&, const vector<int>&,
-                           const vector<vector<int> >&, const vector<vector<_cluster> >&);
+                           const vector<vector<int> >&, const vector<vector<int> >&);
     vector<int> translateToPcell(const vector<int>&, int);
     int comparePermutations(const vector<int>&, const vector<int>&);
     bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
@@ -288,6 +291,7 @@ class ClusterSet {
     int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
                                const vector<vector<vector<int> > >&, const vector<int>&);
     vector<int> getTransformationMap(const int&, const int&);
+    vector<_ineq_distortions> getHigherOrderDistortions();
 
     // Linear Combinations
     vector<_linearCombinations> getLinearCombinations();
@@ -302,6 +306,7 @@ class ClusterSet {
     string writeLinearCombinations(const _linearCombinations&);
     string writeInequivalentDistortions();
     string writeIneqDist(const _ineq_distortions&);
+    string writeHigherOrderDistortions();
 
     void readClusterSetFromFile(const string&);
     bool checkCompatibility(uint&, const vector<string>&);
@@ -309,12 +314,14 @@ class ClusterSet {
     vector<_cluster> readClusters(uint&, const vector<string>&);
     _linearCombinations readLinearCombinations(uint&, const vector<string>&);
     void readInequivalentDistortions(uint&, const vector<string>&);
+    _ineq_distortions readIneqDist(uint&, const vector<string>&);
+    void readHigherOrderDistortions(uint&, const vector<string>&);
 };
 
 class AnharmonicIFCs {
 // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
  public:
-    AnharmonicIFCs(const vector<_xinput>&, ClusterSet&, const double&,
+    AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
                    const aurostd::xoption&, Logger&);  // ME190501
     AnharmonicIFCs(const string&, ClusterSet&, const double&,
                    const aurostd::xoption&, Logger&);  // ME190501
@@ -324,7 +331,7 @@ class AnharmonicIFCs {
     ClusterSet& clst;  // Reference to the corresponding ClusterSet
     vector<vector<int> > cart_indices;  // A list of all Cartesian indices
     double distortion_magnitude;  // The magnitude of the distortions in Angstroms
-    aurostd::xtensor<double> force_constants;  // Symmetrized IFCs
+    vector<vector<double> > force_constants;  // Symmetrized IFCs - ME190520
     int max_iter;  // Number of iterations for the sum rules
     double mixing_coefficient;  // The mixing coefficient for the SCF procedure
     int order;  // The order of the IFCs
@@ -338,41 +345,45 @@ class AnharmonicIFCs {
     void free();
     vector<vector<int> > getCartesianIndices();
 
-    vector<aurostd::xtensor<double> > storeForces(const vector<_xinput>&);
-    aurostd::xtensor<double> getForces(int, int&, vector<_xinput>);
+    vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
+    vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
     int getTransformedAtom(const vector<int>&, const int&);
-    aurostd::xtensor<double> calculateUnsymmetrizedIFCs(const _ineq_distortions&, 
-                                                        const aurostd::xtensor<double>&);
-    double calculateIFC(const aurostd::xtensor<double>&, int,
-                        const vector<int>&, const vector<int>&);
+    void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
+    vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
+                                                       const vector<vector<vector<xvector<double> > > >&);
+//    double calculateIFC(const vector<vector<xvector<double> > >&, int,
+    double finiteDifference(const vector<vector<xvector<double> > >&, int,
+                            const vector<int>&, const vector<int>&);
 
     // Symmetrization Functions
-    aurostd::xtensor<double> symmetrizeIFCs(const vector<aurostd::xtensor<double> >&);
-    typedef vector<std::pair<vector<vector<int> >, vector<double> > > tform;
-    typedef vector<vector<vector<vector<vector<int> > > > > v5int;
-    void getTensorTransformations(v5int&, vector<vector<tform> >&);
-    aurostd::xtensor<double> initializeIFCTensor(const vector<aurostd::xtensor<double> >&);
-    aurostd::xtensor<double> initializeDeviationsFromZero();
+    vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
+    typedef vector<std::pair<vector<int>, vector<double> > > tform;
+    typedef vector<vector<vector<vector<int> > > > v4int;
+    void getTensorTransformations(v4int&, vector<vector<tform> >&);
+    //vector<vector<double> > initializeIFCTensor(const vector<aurostd::xtensor<double> >&);  - OBSOLETE ME190522
+    //aurostd::xtensor<double> initializeDeviationsFromZero(); - OBSOLETE ME190521
     vector<vector<int> > getReducedClusters();
-    vector<vector<vector<int> > > getAllClusters(v5int&);
-    void applyLinCombs(aurostd::xtensor<double>&);
-    void transformIFCs(const vector<vector<tform> >&, aurostd::xtensor<double>&);
-    void applyPermutations(vector<int>, aurostd::xtensor<double>&);
-    void calcSums(const vector<vector<int> >&, const aurostd::xtensor<double>&,
-                  aurostd::xtensor<double>&, aurostd::xtensor<double>&);
-    void correctIFCs(aurostd::xtensor<double>&, const aurostd::xtensor<double>&,
-                     const aurostd::xtensor<double>&,
-                     const vector<vector<vector<int> > >, const v5int&);
-    aurostd::xtensor<double> getCorrectionTerms(vector<int>,
-                                                const aurostd::xtensor<double>&,
-                                                const aurostd::xtensor<double>&,
-                                                const aurostd::xtensor<double>&);
+    // vector<vector<vector<int> > > getAllClusters(v5int&); - OBSOLETE ME190521
+    void applyLinCombs(vector<vector<double> >&);
+    void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
+    void applyPermutations(vector<int>, vector<vector<double> >&);
+    void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
+                  vector<vector<double> >&, vector<vector<double> >&);
+    void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
+                     const vector<vector<double> >&,
+                     const vector<vector<int> >&, const v4int&);
+    vector<double> getCorrectionTerms(const int&,
+                                      const vector<vector<int> >&,
+                                      const vector<vector<double> >&,
+                                      const vector<vector<double> >&,
+                                      const vector<vector<double> >&);
+    uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
 
     // File I/O
     string writeParameters();
     string writeIFCs();
     bool checkCompatibility(uint&, const vector<string>&);
-    aurostd::xtensor<double> readIFCs(uint&, const vector<string>&);
+    vector<vector<double> > readIFCs(uint&, const vector<string>&);
 };
 
 }  //namespace apl
@@ -798,7 +809,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   string buildRunNameAAPL(const vector<int>&, const vector<int>&,
                              const int&, const int&, const int&);// ME190108
   void applyDistortionsAAPL(_xinput&, const vector<aurostd::xvector<double> >&,
-                            const vector<int>&, const vector<int>&);
+                            const vector<int>&, const vector<int>&, double scale=1.0);
   void calculateAnharmonicIFCs(ClusterSet&);
   void readAnharmonicIFCs(const string&, ClusterSet&);
   void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME190114
@@ -1572,10 +1583,9 @@ class TCONDCalculator {
     void calculateScattering(int, int, int, vector<vector<vector<double> > >&,
                              vector<vector<vector<vector<int> > > >&);
     double getSigma(const vector<int>&, int);
-    void getPhaseVectors(vector<xvector<int> >&, int, vector<vector<xvector<double> > >&);
+    vector<vector<xvector<double> > > getPhaseVectors(int);
     void calculateScatteringMatrix(int, int, int,
                                    vector<xcomplex<double> >&,
-                                   const vector<xvector<int> >&,
                                    const vector<vector<xvector<double> > >&);
     void calculateIntrTransProbs(int, int, int, const vector<double>&,
                                  const vector<xcomplex<double> >&);

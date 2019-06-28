@@ -1,7 +1,7 @@
 //****************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                  Marco Esters - Duke University 2017                    *
+// *                  Marco Esters - Duke University 2018                    *
 // *                                                                         *
 //****************************************************************************
 // Written by Marco Esters, 2018. Based on work by Jose J. Plata (AFLOW AAPL,
@@ -564,9 +564,7 @@ void TCONDCalculator::calculateTransitionProbabilities(int order) {
   procs.clear();
 
   // Calculate the real space vectors for the phases
-  vector<xvector<int> > clusters;  // use xvector to index IFC tensor faster
-  vector<vector<xvector<double> > > phase_vectors;
-  getPhaseVectors(clusters, order, phase_vectors);
+  vector<vector<xvector<double> > > phase_vectors = getPhaseVectors(order);
 
   // Calculate scatting matrices
   _logger << "Calculating scattering matrix" << apl::endl;
@@ -582,15 +580,14 @@ void TCONDCalculator::calculateTransitionProbabilities(int order) {
     endIndex = thread_dist[icpu][1];
     threads.push_back(new std::thread(&TCONDCalculator::calculateScatteringMatrix,
                                       this, startIndex, endIndex, order,
-                                      std::ref(scatt_mat), clusters, phase_vectors));
+                                      std::ref(scatt_mat), phase_vectors));
   }
   finishMPI(threads, _logger);
 #else
   calculateScatteringMatrix(0, processes[o].size(), order,
-                            scatt_mat, clusters, phase_vectors);
+                            scatt_mat, phase_vectors);
 #endif
 
-  clusters.clear();
   phase_vectors.clear();
 
   // Calculate scattering rates without occupation numbers
@@ -624,7 +621,7 @@ void TCONDCalculator::calculateScattering(int startIndex, int endIndex, int orde
                                           vector<vector<vector<vector<int> > > >& procs) {
   // Initialize
   int q, qi, bri, nparams;
-  double freqsum, sigma;
+  double freqsum, sigma, weight;
   nparams = order - 2 + 2 * order;
   xvector<int> qsum(3), qfin(3);
   xcombos signs_combo(2, order - 2, 'C', true);
@@ -696,7 +693,8 @@ void TCONDCalculator::calculateScattering(int startIndex, int endIndex, int orde
               // Finally, test if frequencies fulfill scattering condition
               if (!zerofreq) {
                 sigma = getSigma(process, order);
-                if (std::abs(freqsum) < 2 * sigma) {
+                weight = gaussian(order, sigma, process);
+                if ((weight > _ZERO_TOL_) && (std::abs(freqsum) < 2 * sigma)) {
                   sigmas[iq][br].push_back(sigma);
                   procs[iq][br].push_back(process);
                 }
@@ -741,66 +739,49 @@ double TCONDCalculator::getSigma(const vector<int>& process, int order) {
 // a list of clusters, including all permutations. Calculating them now saves
 // time because the permutations do not need to be recalculated later with
 // each iteration.
-void TCONDCalculator::getPhaseVectors(vector<xvector<int> >& clusters, int order,
-                                      vector<vector<xvector<double> > >& phase_vectors) {
+vector<vector<xvector<double> > > TCONDCalculator::getPhaseVectors(int order) {
   int o = order - 3;
-  for (uint ineq = 0; ineq < _pc._clusters[o].ineq_clusters.size(); ineq++) {
-    for (uint c = 0; c < _pc._clusters[o].ineq_clusters[ineq].size(); c++) {
-      vector<int> atoms = _pc._clusters[o].ineq_clusters[ineq][c].atoms;
-      vector<xvector<double> > vectors;
-      for (uint i = 1; i < atoms.size(); i++) {
-        int at_eq = _sc.sc2pcMap(atoms[i]);
-        int at_eq_sc = _sc.pc2scMap(at_eq);
-        xvector<double> min_vec;
-        //DX 20190613 [OBSOLETE - changed function name] min_vec = SYM::minimumCartesianVector(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
-        //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
-        //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.lattice);
-        min_vec = SYM::minimizeDistanceCartesianMethod(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
-                                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
-                                                       _pc._clusters[o].scell.lattice); //DX 20190613
-        min_vec += _pc._clusters[o].scell.atoms[atoms[0]].cpos;
-        min_vec -= _pc._clusters[o].scell.atoms[at_eq_sc].cpos;
-        vectors.push_back(min_vec);
-      }
-      vector<int> perm_atoms(atoms.size() - 1);
-      for (uint i = 0; i < perm_atoms.size(); i++) {
-        perm_atoms[i] = atoms[i+1];
-      }
-      xcombos permut(perm_atoms);
-      while (permut.increment()) {
-        vector<int> permutation = permut.getCombo();
-        vector<int> clust(atoms.size());
-        vector<xvector<double> > vec(vectors.size());
-        clust[0] = _sc.sc2pcMap(atoms[0]);  // transfer to pcell
-        for (uint i = 0; i < permutation.size(); i++) {
-          clust[i+1] = permutation[i];
-          vec[i] = vectors[permut.m_indices[i]];
-        }
-        clusters.push_back(aurostd::vector2xvector(clust));
-        phase_vectors.push_back(vec);
-      }
+  uint nclusters = _pc._clusters[o].clusters.size();
+  vector<vector<xvector<double> > > phase_vectors(nclusters, vector<xvector<double> >(order - 1));
+  for (uint c = 0; c < nclusters; c++) {
+    const vector<int>& atoms = _pc._clusters[o].clusters[c].atoms;
+    for (int i = 1; i < order; i++) {
+      int at_eq = _sc.sc2pcMap(atoms[i]);
+      int at_eq_sc = _sc.pc2scMap(at_eq);
+      xvector<double> min_vec;
+      //DX 20190613 [OBSOLETE - changed function name] min_vec = SYM::minimumCartesianVector(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
+      //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
+      //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.lattice);
+      min_vec = SYM::minimizeDistanceCartesianMethod(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
+                                                     _pc._clusters[o].scell.atoms[atoms[0]].cpos,
+                                                     _pc._clusters[o].scell.lattice); //DX 20190613
+      min_vec += _pc._clusters[o].scell.atoms[atoms[0]].cpos;
+      min_vec -= _pc._clusters[o].scell.atoms[at_eq_sc].cpos;
+      phase_vectors[c][i - 1] = min_vec;
     }
   }
+  return phase_vectors;
 }
 
 //calculateScatteringMatrix///////////////////////////////////////////////////
 // Calculates the scattering matrix for each valid scattering process.
 void TCONDCalculator::calculateScatteringMatrix(int startIndex, int endIndex, int order,
                                                 vector<xcomplex<double> >& scatt_mat,
-                                                const vector<xvector<int> >& clusters,
                                                 const vector<vector<xvector<double> > >& phase_vectors) {
   int o = order - 3;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
   uint nprocs = processes[o].size() - 1;  // For the progress bar
 #endif
 
+  const vector<_cluster>& clusters = _pc._clusters[o].clusters;
+  const vector<int>& sc2pcMap = _pc._clusters[o].sc2pcMap;
   uint nclusters = clusters.size();
 
   // Cartesian indices for the force constant tensor
-  vector<xvector<int> > cart_indices;
-  xcombos cart(3, clusters[0].rows, 'E', true);
+  vector<vector<int> > cart_indices;
+  xcombos cart(3, order, 'E', true);
   while (cart.increment()) {
-    cart_indices.push_back(aurostd::vector2xvector(cart.getCombo()));
+    cart_indices.push_back(cart.getCombo());
   }
   uint ncart = cart_indices.size();
   int iq, q, br, e;
@@ -811,9 +792,9 @@ void TCONDCalculator::calculateScatteringMatrix(int startIndex, int endIndex, in
     for (uint c = 0; c < nclusters; c++) {
       // Calculate prefactor
       double phase = 0.0;
-      double mass = _sc.getAtomMass(_sc.pc2scMap(clusters[c][1]));
+      double mass = _sc.getAtomMass(clusters[c].atoms[0]);
       for (int j = 0; j < order - 1; j++) {
-        mass *= _sc.getAtomMass(clusters[c][j+2]);
+        mass *= _sc.getAtomMass(clusters[c].atoms[j+1]);
         q = processes[o][i][2 * j + order];
         kpoint = qpoints[q].cpos;
         if ((j == order - 2) || (processes[o][i][j] == 1)){
@@ -828,12 +809,12 @@ void TCONDCalculator::calculateScatteringMatrix(int startIndex, int endIndex, in
         // Calculate product of eigenvectors
         iq = processes[o][i][order - 2];
         q = irred_qpoints[iq][0];
-        e = clusters[c][1] * 3 + cart_indices[crt][1] + 1;
+        e = sc2pcMap[clusters[c].atoms[0]] * 3 + cart_indices[crt][0] + 1;
         br = processes[o][i][order - 1] + 1;
         eigen = eigenvectors[q][e][br];
         for (int j = 0; j < order - 1; j++) {
           q = processes[o][i][2 * j + order];
-          e = _sc.sc2pcMap(clusters[c][j+2]) * 3 + cart_indices[crt][j+2] + 1;
+          e = _sc.sc2pcMap(clusters[c].atoms[j+1]) * 3 + cart_indices[crt][j+1] + 1;
           br = processes[o][i][2 * j + order + 1] + 1;
           if ((j == order - 2) || (processes[o][i][j] == 1)) {
             eigen *= conj(eigenvectors[q][e][br]);
@@ -843,8 +824,7 @@ void TCONDCalculator::calculateScatteringMatrix(int startIndex, int endIndex, in
         }
 
         // Calculate scattering matrix contribution
-        double ifc = (double) _pc._anharmonicIFCs[o].force_constants(clusters[c])(cart_indices[crt]);
-        matrix += prefactor * ifc * eigen;
+        matrix += prefactor * _pc._anharmonicIFCs[o].force_constants[c][crt] * eigen;
       }
     }
     scatt_mat[i] = matrix;

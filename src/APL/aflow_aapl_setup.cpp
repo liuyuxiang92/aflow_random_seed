@@ -69,14 +69,24 @@ bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
   for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
     nruns += clst.ineq_distortions[ineq].distortions.size();
   }
-  vector<_xinput> xinp(nruns);
+  if (clst.order == 4) {
+    for (uint ineq = 0; ineq < clst.higher_order_ineq_distortions.size(); ineq++) {
+      nruns += clst.higher_order_ineq_distortions[ineq].distortions.size();
+    }
+  }
+  
+  vector<_xinput> x;
+  xInputsAAPL.push_back(x);
+  vector<_xinput>& xinp = xInputsAAPL.back();
+  xinp.assign(nruns, _xInput);
+  
+  std::cout << "allocated" << std::endl;
 
   int idxRun = 0;
   for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
     const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;  // ME190108 - Declare to make code more legible
     const _ineq_distortions& idist = clst.ineq_distortions[ineq];  // ME190108 - Declare to make code more legible
     for (uint dist = 0; dist < idist.distortions.size(); dist++) {
-      xinp[idxRun] = _xInput;
       const vector<int>& distortions = idist.distortions[dist][0];  // ME190108 Declare to make code more legible
 
       // ME 190109 - add title
@@ -100,10 +110,42 @@ bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
       // Create aflow.in files if they don't exist. Stagebreak is true as soon
       // as one aflow.in file was created.
       stagebreak = (createAflowInPhonons(xinp[idxRun]) || stagebreak);
-        idxRun++;
+      idxRun++;
     }
   }
-  xInputsAAPL.push_back(xinp);
+  if (clst.order == 4) {
+    for (uint ineq = 0; ineq < clst.higher_order_ineq_distortions.size(); ineq++) {
+      const _ineq_distortions& idist = clst.higher_order_ineq_distortions[ineq];
+      const vector<int>& atoms = idist.atoms;
+      for (uint dist = 0; dist < idist.distortions.size(); dist++) {
+        xinp[idxRun] = _xInput;
+        const vector<int>& distortions = idist.distortions[dist][0];
+        xstructure& xstr = xinp[idxRun].getXStr();
+        xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title);
+
+        if (xstr.title.empty()) {
+          xstr.buildGenericTitle(true, false);
+        }
+        xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
+  
+        // ME 190113 - make sure that POSCAR has the correct format
+        if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
+            (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
+          xstr.is_vasp5_poscar_format = false;
+        }
+  
+        // Set up runname and generate distorted structure
+        xinp[idxRun].xvasp.AVASP_arun_runname = buildRunNameAAPL(distortions, atoms, clst.order, idxRun, nruns);
+        xinp[idxRun].xvasp.AVASP_arun_runname += "_3rd";
+        applyDistortionsAAPL(xinp[idxRun], clst.distortion_vectors, distortions, atoms, 2.0);
+  
+        // Create aflow.in files if they don't exist. Stagebreak is true as soon
+        // as one aflow.in file was created.
+        stagebreak = (createAflowInPhonons(xinp[idxRun]) || stagebreak);
+        idxRun++;
+      }
+    }
+  }
   return stagebreak;
 }
 
@@ -135,7 +177,7 @@ string PhononCalculator::buildRunNameAAPL(const vector<int>& distortions,
 void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
                                             const vector<xvector<double> >& distortion_vectors,
                                             const vector<int>& distortions,
-                                            const vector<int>& atoms) {
+                                            const vector<int>& atoms, double scale) {
   xinp.setXStr(_supercell.getSupercellStructureLight());  // Light copy because we don't need symmetry, etc.
   xstructure& xstr = xinp.getXStr();  // ME 190109
   for (uint at = 0; at < atoms.size(); at++) {
@@ -153,7 +195,7 @@ void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
       if (abs(dist_cart(i)) < _ZERO_TOL_) {
         dist_cart(i) = 0.0;
       } else {
-        dist_cart(i) /= std::abs(dist_cart(i));
+        dist_cart(i) *= scale/std::abs(dist_cart(i));
       }
     }
     dist_cart *= DISTORTION_MAGNITUDE;

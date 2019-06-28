@@ -30,9 +30,14 @@ static const string _AAPL_IFCS_ERR_PREFIX_ = "apl::AnharmonicIFCs::";
 // tform represents a tensor transformation containing the index and the
 // coefficients. vector<vector<int> > holds the indices, vector<double>
 // the coefficients.
-typedef vector<std::pair<vector<vector<int> >, vector<double> > > tform;
-// v5int defined for brevity
-typedef vector<vector<vector<vector<vector<int> > > > > v5int;
+typedef vector<std::pair<vector<int>, vector<double> > > tform;
+// v4int defined for brevity
+typedef vector<vector<vector<vector<int> > > > v4int;
+
+// Coefficients for the finite difference method
+static const double C12[2][3] = {{0.5,  0.0, -0.5},
+                                 {1.0, -2.0,  1.0}};
+static const double C3[5] = {-0.5, 1.0, 0.0, -1.0, 0.5};
 
 /************************ CONSTRUCTORS/DESTRUCTOR ***************************/
 
@@ -40,7 +45,7 @@ namespace apl {
 
 //Constructors////////////////////////////////////////////////////////////////
 // Default constructor
-AnharmonicIFCs::AnharmonicIFCs(const vector<_xinput>& xInp,
+AnharmonicIFCs::AnharmonicIFCs(vector<_xinput>& xInp,
                                ClusterSet& _clst,
                                const double& dist_mag, 
                                const aurostd::xoption& options,  // ME190501
@@ -53,17 +58,11 @@ AnharmonicIFCs::AnharmonicIFCs(const vector<_xinput>& xInp,
   sumrule_threshold = aurostd::string2utype<double>(options.getattachedscheme("THRESHOLD"));  // ME190501
   cart_indices = getCartesianIndices();
 
-  _logger << "Reading forces for anharmonic IFCs from VASP calculations." << apl::endl;
-  vector<aurostd::xtensor<double> > force_tensors = storeForces(xInp);
+  vector<vector<vector<xvector<double> > > > force_tensors;
+  force_tensors = storeForces(xInp);
 
   _logger << "Caulating anharmonic IFCs." << apl::endl;
-  vector<aurostd::xtensor<double> > ifcs_unsym(force_tensors.size());
-  for (uint f = 0; f < force_tensors.size(); f++) {
-    aurostd::xtensor<double> ifcs = calculateUnsymmetrizedIFCs(clst.ineq_distortions[f],
-                                                               force_tensors[f]);
-    ifcs_unsym[f] = ifcs;
-  }
-
+  vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
   force_tensors.clear();
 
   _logger << "Symmetrizing IFCs." << apl::endl;
@@ -140,53 +139,95 @@ vector<vector<int> > AnharmonicIFCs::getCartesianIndices() {
 //storeForces/////////////////////////////////////////////////////////////////
 // Stores the forces from the VASP calculations. Each item in the vector holds
 // the force tensor for a set of distorted atoms.
-vector<aurostd::xtensor<double> > AnharmonicIFCs::storeForces(const vector<_xinput>& xInp) {
-  vector<aurostd::xtensor<double> > force_tensors;
+vector<vector<vector<xvector<double> > > > AnharmonicIFCs::storeForces(vector<_xinput>& xInp) {
+  vector<vector<vector<xvector<double> > > > force_tensors(clst.ineq_distortions.size());
   int idxRun = 0;
   for (uint id = 0; id < clst.ineq_distortions.size(); id++) {
-    aurostd::xtensor<double> forces = getForces(id, idxRun, xInp);
-    force_tensors.push_back(forces);
+    force_tensors[id] = getForces(id, idxRun, xInp);
   }
+  if (clst.order == 4) addHigherOrderForces(force_tensors, idxRun, xInp);
   return force_tensors;
 }
 
 //getForces///////////////////////////////////////////////////////////////////
 // Retrieves all forces from the calculations. Also transforms the forces
 // into the forces of the equivalent distortions.
-aurostd::xtensor<double> AnharmonicIFCs::getForces(int id, int& idxRun,
-                                                   vector<_xinput> xInp) {
-  _ineq_distortions ineq_dists = clst.ineq_distortions[id];
+vector<vector<xvector<double> > > AnharmonicIFCs::getForces(int id, int& idxRun,
+                                                            vector<_xinput>& xInp) {
+  const _ineq_distortions& ineq_dists = clst.ineq_distortions[id];
   int natoms = (int) clst.scell.atoms.size();
-  uint ndim = ineq_dists.atoms.size() + 2;  // No. distortions x no. atoms x 3 Cart. dimensions
-  vector<int> tensor_shape(ndim, 5);  // Tensor dimensions
-  tensor_shape[ndim-2] = natoms - 1;
-  tensor_shape[ndim-1] = 2;
-  vector<int> zeros(ndim, 0);  // Makes tensor use zero-based indices
-  aurostd::xtensor<double> force_tensor(tensor_shape, zeros);
+  vector<int> powers(order - 1, 1);
+  int ndist = 1;
+  for (int i = 0; i < order - 1; i++) {
+    ndist *= 6;
+    for (int j = 0; j < order - 2 - i; j++) {
+      powers[i] *= 6;
+    }
+  }
+  vector<vector<xvector<double> > > force_tensor(ndist, vector<xvector<double> >(natoms, xvector<double>(3)));
 
-  int attrans, fg;
-  vector<int> indices;
+  int attrans, fg, index;
   for (uint ineq = 0; ineq < ineq_dists.distortions.size(); ineq++) {
     // For the inequivalent distortion, just read the forces from VASP 
-    vector<xvector<double> > qmforces = xInp[idxRun].getXStr().qm_forces;
-    indices = ineq_dists.distortions[ineq][0];
+    const vector<xvector<double> >& qmforces = xInp[idxRun].getXStr().qm_forces;
+    index = 0;
+    for (int ind = 0; ind < order - 1; ind++) {
+      index += powers[ind] * ineq_dists.distortions[ineq][0][ind];
+    }
     for (int at = 0; at < natoms; at++) { 
-      force_tensor(indices)[at] = qmforces[at];
+      force_tensor[index][at] = qmforces[at];
     }
     for (uint i = 1; i < ineq_dists.distortions[ineq].size(); i++) {
       // For each equivalent distortion, transform the forces using symmetry
       vector<xvector<double> > qmforces_trans(natoms, xvector<double>(3));
-      indices = ineq_dists.distortions[ineq][i];
+      index = 0;
+      for (int ind = 0; ind < order - 1; ind++) {
+        index += powers[ind] * ineq_dists.distortions[ineq][i][ind];
+      }
       fg = ineq_dists.rotations[ineq][i];
-      vector<int> transformation_map = ineq_dists.transformation_maps[ineq][i];
+      const vector<int>& transformation_map = ineq_dists.transformation_maps[ineq][i];
       for (int at = 0; at < natoms; at++) {
         attrans = getTransformedAtom(transformation_map, at);
-        force_tensor(indices)[at] = clst.pcell.fgroup[fg].Uc * qmforces[attrans];
+        force_tensor[index][at] = clst.pcell.fgroup[fg].Uc * qmforces[attrans];
       }
     }
     idxRun++;
   }
   return force_tensor;
+}
+
+void AnharmonicIFCs::addHigherOrderForces(vector<vector<vector<xvector<double> > > >& force_tensor,
+                                          int& idxRun, vector<_xinput>& xInp) {
+  const vector<_ineq_distortions>& ineq_dists = clst.higher_order_ineq_distortions;
+  uint ndist = force_tensor[0].size();
+  uint natoms = clst.scell.atoms.size();
+  vector<xvector<double> > forces(natoms, xvector<double>(3));
+  for (uint ineq = 0; ineq < ineq_dists.size(); ineq++) {
+    uint idist;
+    int at = ineq_dists[ineq].atoms[0];
+    for (idist = 0; idist < clst.ineq_distortions.size(); idist++) {
+      int a;
+      for (a = 0; a < clst.order - 1; a++) {
+        if (clst.ineq_distortions[idist].atoms[a] != at) break;
+      }
+      if (a == clst.order - 1) break;
+    }
+    for (int i = 0; i < 6; i++) force_tensor[idist].push_back(forces);
+
+    for (uint dist = 0; dist < ineq_dists[ineq].distortions.size(); dist++) {
+      const vector<xvector<double> >& qmforces = xInp[idxRun].getXStr().qm_forces;
+      int d = ineq_dists[ineq].distortions[dist][0][0];
+      force_tensor[idist][ndist + d][at] = qmforces[at];
+      int fg;
+      for (uint i = 1; i < ineq_dists[ineq].distortions[dist].size(); i++) {
+        d = ineq_dists[ineq].distortions[dist][i][0];
+        fg = ineq_dists[ineq].rotations[dist][i];
+        force_tensor[idist][ndist + d][at] = clst.pcell.fgroup[fg].Uc * qmforces[at];
+      }
+      xInp[idxRun].clear();
+      idxRun++;
+    }
+  }
 }
 
 //getTransformedAtom//////////////////////////////////////////////////////////
@@ -209,23 +250,21 @@ int AnharmonicIFCs::getTransformedAtom(const vector<int>& symmap, const int& at)
 // BEGIN Calculate unsymmetrized force constants
 //calculateUnsymmetrizedIFCs//////////////////////////////////////////////////
 // Calculates the IFCs of the inequivalent clusters from the forces.
-aurostd::xtensor<double>
-    AnharmonicIFCs::calculateUnsymmetrizedIFCs(const _ineq_distortions& idist,
-                                               const aurostd::xtensor<double>& forces) {
-  // Initialize tensor
-  vector<int> tensor_shape(order + 1, 2), zeros(order + 1, 0);
-  uint natoms = clst.scell.atoms.size();
-  tensor_shape[0] = natoms - 1;
-  aurostd::xtensor<double> ifcs(tensor_shape, zeros);
-
-  // Calculate force constants from the forces
-  vector<int> cart_coords;
-  for (uint c = 0; c < idist.clusters.size(); c++) {
-    int at, cl;
-    cl = idist.clusters[c];
-    at = clst.ineq_clusters[cl][0].atoms[order - 1];
-    for (int i = 0; i < clst.nifcs; i++) {
-      ifcs[at](cart_indices[i]) = calculateIFC(forces, at, cart_indices[i], idist.atoms);
+vector<vector<double> >
+    AnharmonicIFCs::calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>& idist,
+                                               const vector<vector<vector<xvector<double> > > >& forces) {
+  vector<vector<double> > ifcs(clst.clusters.size(), vector<double>(cart_indices.size()));
+  int at, cl, ic;
+  double denom = std::pow(distortion_magnitude, order - 1);
+  for (uint f = 0; f < forces.size(); f++) {
+    for (uint c = 0; c < idist[f].clusters.size(); c++) {
+      ic = idist[f].clusters[c];
+      cl = clst.ineq_clusters[ic][0];
+      at = clst.getCluster(cl).atoms[order - 1];
+      for (int cart = 0; cart < clst.nifcs; cart++) {
+        //ifcs[cl][cart] = calculateIFC(forces[f], at, cart_indices[cart], idist[f].atoms);
+        ifcs[cl][cart] = finiteDifference(forces[f], at, cart_indices[cart], idist[f].atoms)/denom;
+      }
     }
   }
   return ifcs;
@@ -244,50 +283,69 @@ aurostd::xtensor<double>
 // gets distorted into the same direction multiple times, the distortion
 // length needs to be adjusted so that the total length is the same as the
 // distortion magnitude chosen by the user.
-double AnharmonicIFCs::calculateIFC(const aurostd::xtensor<double>& forces, int at,
-                                    const vector<int>& cart_ind, const vector<int>& atoms) {
-  double ifc, num, denom, sign;
-  // Numerator
-  num = 0.0;
-  uint ncart = cart_ind.size();
-  vector<int> dist(ncart - 1), dist_signs(ncart - 1);
-  int c = cart_ind[ncart - 1];
-  xcombos bitenum(2, ncart - 1, 'E', true);  // Bit enumerator indicating the signs of the distortions
-  while (bitenum.increment()) {
-    for (uint i = 0; i < ncart; i++) {
-      dist[i] = cart_ind[i];
+double AnharmonicIFCs::finiteDifference(const vector<vector<xvector<double> > >& forces, int at,
+                                        const vector<int>& cart_ind, const vector<int>& atoms) {
+  vector<int> powers(order - 1, 1);
+  for (int i = 0; i < order - 2; i++) {
+    for (int j = 0; j < order - 2 - i; j++) {
+      powers[i] *= 6;
     }
-    dist_signs = bitenum.getCombo();
-    sign = 1.0;
-    for (uint d = 0; d < dist.size(); d++) {
-      if (dist_signs[d] != 0) {
-        dist[d] += 3;
-        sign *= -1.0;
-      }
-    }
-    num -= sign*forces(dist)[at][c]; // Subtract because negative force is needed for IFCs
-  }
-  
-  // Denominator
-  int atom, count, cart;
-  denom = 1.0;
-  for (uint at = 0, natoms = atoms.size(); at < natoms; at++) {
-    atom = atoms[at];
-    cart = cart_ind[at];
-    count = 1;
-    denom *= distortion_magnitude;
-    while ((at + count < natoms) &&
-           (atoms[at+count] == atom) &&
-           (cart_ind[at+count] == cart)) {
-      count++;
-      denom *= distortion_magnitude;
-    }
-    denom *= 2.0/((double) count);
-    at += count - 1;
   }
 
-  ifc = num/denom;
-  return ifc;
+  vector<int> derivatives;
+  int count;
+  for (uint a = 0; a < atoms.size(); a++) {
+    count = 1;
+    while (((int) a + count < order - 1) &&
+           (atoms[a + count] == atoms[a]) &&
+           (cart_ind[a + count] == cart_ind[a])) {
+      count++;
+    }
+    derivatives.push_back(count);
+    a += count - 1;
+  }
+  
+  double diff = 0.0;
+  vector<int> atm(order - 1);
+  if (derivatives[0] == 3) {
+    vector<int> dists(5);
+    int pwr = 0;
+    for (int i = 0; i < order - 1; i++) pwr += powers[i];
+    dists[0] = clst.nifcs + cart_ind[0];
+    dists[1] = cart_ind[0] * pwr;
+    // No need to occupy dists[2] because C3[2] is zero
+    dists[3] = (cart_ind[0] + 3) * pwr;
+    dists[4] = clst.nifcs + cart_ind[0] + 3;
+    for (int i = 0; i < 5; i++) {
+      if (C3[i] != 0.0) diff -= C3[i] * forces[dists[i]][at][cart_ind[order - 1] + 1];
+    }
+  } else {
+    uint nder = derivatives.size();
+    vector<int> index(nder);
+    xcombos ind(3, nder, 'E', true);
+    double coeff;
+    int d, dist;
+    while (ind.increment()) {
+      coeff = 1.0;
+      index = ind.getCombo();
+      for (uint i = 0; i < nder; i++) {
+        coeff *= C12[derivatives[i] - 1][index[i]];
+      }
+      if (coeff != 0.0) {
+        dist = 0;
+        d = 0;
+        for (uint i = 0; i < nder; i++) {
+          for (int j = 0; j < derivatives[i]; j++) {
+            if (index[i] == 1) dist += powers[d] * (cart_ind[d] + 3 * j);
+            else dist += powers[d] * (cart_ind[d] + 3 * index[i]/2);
+            d++;
+          }
+        }
+        diff -= coeff * forces[dist][at][cart_ind[order - 1] + 1];
+      }
+    }
+  }
+  return diff;
 }
 // END Calculate unsymmetrized force constants
 
@@ -309,20 +367,17 @@ namespace apl {
 //    linearly dependent IFCs. If none are above the threshold or too many
 //    iterations have been performed, stop the iteration procedure.
 //
-// Check the typedefs at the beginning of the file for tform and v5int
-aurostd::xtensor<double>
-    AnharmonicIFCs::symmetrizeIFCs(const vector<aurostd::xtensor<double> >& ifcs_unsym) {
+// Check the typedefs at the beginning of the file for tform and v4int
+vector<vector<double> > AnharmonicIFCs::symmetrizeIFCs(vector<vector<double> > ifcs) {
   // Initialize tensors
-  aurostd::xtensor<double> ifcs = initializeIFCTensor(ifcs_unsym);
-  aurostd::xtensor<double> dev_from_zero = initializeDeviationsFromZero();
-  aurostd::xtensor<double> abssum = dev_from_zero;
   vector<vector<int> > reduced_clusters = getReducedClusters();
+  vector<vector<double> > dev_from_zero(reduced_clusters.size(), vector<double>(cart_indices.size()));
+  vector<vector<double> > abssum = dev_from_zero;
 
   // Tensor transformations
   vector<vector<tform> > transformations(clst.ineq_clusters.size());
-  v5int eq_ifcs(clst.ineq_clusters.size());
+  v4int eq_ifcs(clst.ineq_clusters.size());
   getTensorTransformations(eq_ifcs, transformations);
-  vector<vector<vector<int> > > all_clusters = getAllClusters(eq_ifcs);
 
   // Do iterations
   int num_iter = 0;
@@ -341,7 +396,14 @@ aurostd::xtensor<double>
 
     // 3. Determine deviations from zero
     calcSums(reduced_clusters, ifcs, dev_from_zero, abssum);
-    max_err = aurostd::max(aurostd::abs(dev_from_zero));
+
+    max_err = -1E30;
+    for (uint i = 0; i < dev_from_zero.size(); i++) {
+      for (uint j = 0; j < dev_from_zero[i].size(); j++) {
+        if (std::abs(dev_from_zero[i][j]) > max_err) max_err = std::abs(dev_from_zero[i][j]);
+      }
+    }
+
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
     std::cout << std::setw(15) << num_iter;
     std::cout << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
@@ -349,7 +411,7 @@ aurostd::xtensor<double>
 
     // 4. Correct IFCs
     if (max_err > sumrule_threshold) {
-      correctIFCs(ifcs, dev_from_zero, abssum, all_clusters, eq_ifcs);
+      correctIFCs(ifcs, dev_from_zero, abssum, reduced_clusters, eq_ifcs);
     }
     num_iter++;
   } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
@@ -365,51 +427,6 @@ aurostd::xtensor<double>
 }
 
 // BEGIN Initializers
-//initializeIFCTensor/////////////////////////////////////////////////////////
-// Initializes the IFC tensor by populating the values for the inequivalent
-// clusters with the unsymmetriced IFCs.
-aurostd::xtensor<double>
-    AnharmonicIFCs::initializeIFCTensor(const vector<aurostd::xtensor<double> >& ifcs_unsym) {
-  // Initialize tensor
-  uint natoms_pcell, natoms_scell;
-  natoms_pcell = clst.pcell.atoms.size();
-  natoms_scell = clst.scell.atoms.size();
-  vector<int> tensor_shape(2*order);
-  tensor_shape[0] = natoms_pcell - 1;  // The first atom has to be in the primitive cell
-  for (int i = 1; i < order; i++) {
-    tensor_shape[i] = natoms_scell - 1;
-  }
-  for (int i = order; i < 2*order; i++) {
-    tensor_shape[i] = 2;
-  }
-  vector<int> zeros(2*order, 0); // Make tensor use zero-based indices
-  aurostd::xtensor<double> tensor_init(tensor_shape, zeros);
-
-  // Populate tensor with unsymmetrized IFCs
-  for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
-    vector<int> atoms = clst.ineq_distortions[ineq].atoms;
-    atoms[0] = clst.sc2pcMap[atoms[0]];  // Transform to pcell
-    tensor_init(atoms) = ifcs_unsym[ineq];
-  }
-  return tensor_init;
-} 
-
-//initializeDeviationsFromZero////////////////////////////////////////////////
-// Initializes the tensor that holds all sum rule errors. Note that all sizes
-// need to be subtracted by 1 to get 0-based indexing.
-aurostd::xtensor<double> AnharmonicIFCs::initializeDeviationsFromZero() {
-  vector<int> tensor_shape(2*order - 1), zeros(2*order - 1);
-  tensor_shape[0] = clst.pcell.atoms.size() - 1;
-  for (int i = 1; i < order - 1; i++) {
-    tensor_shape[i] = clst.scell.atoms.size() - 1;
-  }
-  for (int i = order - 1; i < 2*order - 1; i++) {
-    tensor_shape[i] = 2;
-  }
-  aurostd::xtensor<double> deviations(tensor_shape, zeros);
-  return deviations;
-}
-
 //getReducedClusters//////////////////////////////////////////////////////////
 // Determines, for each set of inequivalent clusters, a uinque set of clusters
 // that do not contain the last atom of the clusters. This set is important
@@ -417,29 +434,25 @@ aurostd::xtensor<double> AnharmonicIFCs::initializeDeviationsFromZero() {
 // within a set of inequivalent clusters.
 vector<vector<int> > AnharmonicIFCs::getReducedClusters() {
   vector<vector<int> > reduced_clusters;
-  for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
-    for (uint c = 0; c < clst.ineq_clusters[ineq].size(); c++) {
-      vector<int> cluster(order - 1);
-      cluster[0] = clst.sc2pcMap[clst.ineq_clusters[ineq][c].atoms[0]];  // transfer to pcell
-      for (int i = 1; i < order - 1; i++) {
-        cluster[i] = clst.ineq_clusters[ineq][c].atoms[i];
-      }
-      bool append = true;
-      for (uint r = 0; r < reduced_clusters.size(); r++) {
-        append = false;
-        for (int i = 0; i < order - 1; i++) {
-          if (cluster[i] != reduced_clusters[r][i]) {
-            append = true;
-            i = order;
-          }
-        }
-        if (!append) {  // If append stays false, the reduced cluster is not new
-          r = reduced_clusters.size();
+  vector<int> cluster(order - 1);
+  for (uint c = 0; c < clst.clusters.size(); c++) {
+    const vector<int>& atoms = clst.clusters[c].atoms;
+    bool append = true;
+    for (uint r = 0; r < reduced_clusters.size(); r++) {
+      append = false;
+      for (int i = 0; i < order - 1; i++) {
+        if (atoms[i] != reduced_clusters[r][i]) {
+          append = true;
+          i = order;
         }
       }
-      if (append) {
-        reduced_clusters.push_back(cluster);
+      if (!append) {  // If append stays false, the reduced cluster is not new
+        r = reduced_clusters.size();
       }
+    }
+    if (append) {
+      for (int i = 0; i < order - 1; i++) cluster[i] = atoms[i];
+      reduced_clusters.push_back(cluster);
     }
   }
   return reduced_clusters;
@@ -452,27 +465,26 @@ vector<vector<int> > AnharmonicIFCs::getReducedClusters() {
 // calculate the corrections.
 //
 // Check the typedefs at the beginning of the file for tform and v5int
-void AnharmonicIFCs::getTensorTransformations(v5int& eq_ifcs,
+void AnharmonicIFCs::getTensorTransformations(v4int& eq_ifcs,
                                               vector<vector<tform> >& transformations) {
-  typedef vector<vector<vector<vector<int> > > > v4int;
   for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
     vector<tform> transform(clst.ineq_clusters[ineq].size() - 1);
-    v4int eq(clst.nifcs, vector<vector<vector<int> > >(clst.ineq_clusters[ineq].size()));
+    vector<vector<vector<int> > > eq(clst.nifcs, vector<vector<int> >(clst.ineq_clusters[ineq].size()));
     int ind = 0;
     for (int crt = 0; crt < clst.nifcs; crt++) {
-      eq[ind][0].push_back(cart_indices[crt]);
+      eq[ind][0].push_back(crt);
       ind++;
     }
     for (uint c = 1; c < clst.ineq_clusters[ineq].size(); c++) {
       tform trf;
-      _cluster cluster_trans = clst.ineq_clusters[ineq][c];
+      _cluster cluster_trans = clst.getCluster(clst.ineq_clusters[ineq][c]);
       int fg, perm, rw, cl, p;
       vector<int> atoms_trans = cluster_trans.atoms;
       atoms_trans[0] = clst.sc2pcMap[atoms_trans[0]];  // transfer to pcell
       fg = cluster_trans.fgroup;
       perm = cluster_trans.permutation;
       for (int itrans = 0; itrans < clst.nifcs; itrans++) {
-        std::pair<vector<vector<int> >, vector<double> > t;
+        std::pair<vector<int>, vector<double> > t;
         int ind_orig = 0;
         for (int iorig = 0; iorig < clst.nifcs; iorig++) {
           double coeff = 1.0;
@@ -487,9 +499,9 @@ void AnharmonicIFCs::getTensorTransformations(v5int& eq_ifcs,
             }
           }
           if (abs(coeff) > _ZERO_TOL_) {
-            t.first.push_back(cart_indices[iorig]);
+            t.first.push_back(iorig);
             t.second.push_back(coeff);
-            eq[ind_orig][c].push_back(cart_indices[itrans]);
+            eq[ind_orig][c].push_back(itrans);
           }
           ind_orig++;
         }
@@ -502,73 +514,23 @@ void AnharmonicIFCs::getTensorTransformations(v5int& eq_ifcs,
   }
 }
 
-//getAllClusters//////////////////////////////////////////////////////////////
-// ineq_clusters of ClusterSets do not contain permutations, but they are
-// important for the correction procedure. This function expands the clusters
-// to contain all permutations. It also updates eq_ifcs.
-//
-// See the top of this file for the typedef of v5int.
-vector<vector<vector<int> > > AnharmonicIFCs::getAllClusters(v5int& eq_ifcs) {
-  vector<vector<vector<int> > > all_clusters(clst.ineq_clusters.size());
-  for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
-    // First append the original clusters. This is necessary to maintain a
-    // one-to-one mapping with eq_ifcs.
-    for (uint c = 0; c < clst.ineq_clusters[ineq].size(); c++) {
-      all_clusters[ineq].push_back(clst.ineq_clusters[ineq][c].atoms);
-    }
-    // Now do the permutations
-    for (uint c = 0; c < clst.ineq_clusters[ineq].size(); c++) {
-      vector<int> atoms_orig(all_clusters[ineq][c].size() - 1);
-      vector<int> atoms_permut(all_clusters[ineq][c].size());
-      atoms_permut[0] = all_clusters[ineq][c][0];
-      for (uint at = 0; at < atoms_orig.size(); at++) {
-        atoms_orig[at] = all_clusters[ineq][c][at+1];
-      }
-      xcombos perm(atoms_orig);
-      ++perm;  // The first permutation is the original, so it can be skipped
-      while (perm.increment()) {
-        vector<int> permut = perm.getCombo();
-        for (uint iperm = 0; iperm < permut.size(); iperm++) {
-          atoms_permut[iperm+1] = permut[iperm];
-        }
-        all_clusters[ineq].push_back(atoms_permut);
-        // Update eq_ifcs
-        for (uint eq = 0; eq < eq_ifcs[ineq].size(); eq++) {
-          vector<vector<int> > eq_indices;
-          for (uint i = 0; i < eq_ifcs[ineq][eq][c].size(); i++) {
-            vector<int> indices_orig = eq_ifcs[ineq][eq][c][i];
-            vector<int> indices_permut(permut.size() + 1);
-            indices_permut[0] = indices_orig[0];
-            for (uint j = 1; j < eq_ifcs[ineq][eq][c][i].size(); j++) {
-              indices_permut[j] = indices_orig[perm.m_indices[j-1] + 1];
-            }
-            eq_indices.push_back(indices_permut);
-          }
-          eq_ifcs[ineq][eq].push_back(eq_indices);
-        }
-      }
-    }
-  }
-  return all_clusters;
-}
-
 // END Initializers
 
 // BEGIN Iterations
 //applyLinCombs///////////////////////////////////////////////////////////////
 // Sets the lineraly dependent IFCs according to the obtained linear
 // combinations.
-void AnharmonicIFCs::applyLinCombs(aurostd::xtensor<double>& ifcs) {
+void AnharmonicIFCs::applyLinCombs(vector<vector<double> >& ifcs) {
+  int c, cart_ind, cart_ind_indep;
   for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
-    vector<int> atoms = clst.ineq_clusters[ineq][0].atoms;
-    atoms[0] = clst.sc2pcMap[atoms[0]];  // transfer to pcell
+    c = clst.ineq_clusters[ineq][0];
     _linearCombinations lcomb = clst.linear_combinations[ineq];
     for (uint d = 0; d < lcomb.dependent.size(); d++) {
-      vector<int> cart_ind = cart_indices[lcomb.dependent[d]];
-      ifcs(atoms)(cart_ind) = 0.0;  // reset
+      cart_ind = lcomb.dependent[d];
+      ifcs[c][cart_ind] = 0.0;  // reset
       for (uint lc = 0; lc < lcomb.indices[d].size(); lc++) {
-        vector<int> cart_ind_indep = cart_indices[lcomb.indices[d][lc]];
-        ifcs(atoms)(cart_ind) += lcomb.coefficients[d][lc] * ifcs(atoms)(cart_ind_indep);
+        cart_ind_indep = lcomb.indices[d][lc];
+        ifcs[c][cart_ind] += lcomb.coefficients[d][lc] * ifcs[c][cart_ind_indep];
       }
     }
   }
@@ -581,52 +543,22 @@ void AnharmonicIFCs::applyLinCombs(aurostd::xtensor<double>& ifcs) {
 //
 // See the top of this file for the typedef of tform.
 void AnharmonicIFCs::transformIFCs(const vector<vector<tform> >& transformations,
-                                   aurostd::xtensor<double>& ifcs) {
+                                   vector<vector<double> >& ifcs) {
+  int clst_orig, clst_trans, cart_indices_orig;
+  double coeff;
   for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
-    vector<int> atoms_orig = clst.ineq_clusters[ineq][0].atoms;
-    applyPermutations(atoms_orig, ifcs);
-    atoms_orig[0] = clst.sc2pcMap[atoms_orig[0]];  // transfer to pcell
+    clst_orig = clst.ineq_clusters[ineq][0];
     for (uint c = 1; c < clst.ineq_clusters[ineq].size(); c++) {
-      vector<int> atoms_trans = clst.ineq_clusters[ineq][c].atoms;
-      atoms_trans[0] = clst.sc2pcMap[atoms_trans[0]];  // transfer to pcell
+      clst_trans = clst.ineq_clusters[ineq][c];
       for (int itrans = 0; itrans < clst.nifcs; itrans++) {
-        ifcs(atoms_trans)(cart_indices[itrans]) = 0.0;  // reset
-        std::pair<vector<vector<int> >, vector<double> > transf = transformations[ineq][c-1][itrans];
+        ifcs[clst_trans][itrans] = 0.0;  // reset
+        const std::pair<vector<int>, vector<double> >& transf = transformations[ineq][c-1][itrans];
         for (uint t = 0; t < transf.first.size(); t++) {
-          vector<int> cart_indices_orig = transf.first[t];
-          double coeff = transf.second[t];
-          ifcs(atoms_trans)(cart_indices[itrans]) += coeff * ifcs(atoms_orig)(cart_indices_orig);
+          cart_indices_orig = transf.first[t];
+          coeff = transf.second[t];
+          ifcs[clst_trans][itrans] += coeff * ifcs[clst_orig][cart_indices_orig];
         }
       }
-      atoms_trans[0] = clst.pc2scMap[atoms_trans[0]];  // transfer to scell for applyPermutations
-      applyPermutations(atoms_trans, ifcs);
-    }
-  }
-}
-
-//applyPermutations///////////////////////////////////////////////////////////
-// Applies permutation symmetry to the force constants. The first index is not
-// included in the permutations to keep the first atom in the primitive cell.
-void AnharmonicIFCs::applyPermutations(vector<int> atoms,
-                                       aurostd::xtensor<double>& ifcs) {
-  atoms[0] = clst.sc2pcMap[atoms[0]];  // transfer to pcell
-  vector<int> atoms_orig(order - 1);
-  for (int i = 1; i < order; i++) {
-    atoms_orig[i-1] = atoms[i];
-  }
-  xcombos permut(atoms_orig);
-  ++permut;  // The first permutation is the original, so it can be skipped
-  while (permut.increment()) {
-    vector<int> atoms_permut = permut.getCombo();
-    for (int crt = 0; crt < clst.nifcs; crt++) {
-      vector<int> indices = cart_indices[crt];
-      vector<int> indices_permut(indices.size());
-      indices_permut[0] = indices[0];
-      for (uint i = 1; i < indices_permut.size(); i++) {
-        int perm_ind = permut.m_indices[i-1];
-        indices_permut[i] = indices[perm_ind + 1];
-      }
-      ifcs[atoms[0]](atoms_permut)(indices_permut) = ifcs(atoms)(indices);
     }
   }
 }
@@ -636,19 +568,19 @@ void AnharmonicIFCs::applyPermutations(vector<int> atoms,
 // for each reduced cluster. Both are used for the correction of the IFCs
 // while the deviations from zero are also used as errors for the sum rules.
 void AnharmonicIFCs::calcSums(const vector<vector<int> >& reduced_clusters,
-                              const aurostd::xtensor<double>& ifcs, 
-                              aurostd::xtensor<double>& dev_from_zero,
-                              aurostd::xtensor<double>& abssum) {
-  uint natoms = clst.scell.atoms.size();
-  for (uint r = 0; r < reduced_clusters.size(); r++) {
-    vector<int> tensor_shape(order, 2), zeros(order, 0);
-    aurostd::xtensor<double> dev(tensor_shape, zeros), asum(tensor_shape, zeros);
-    for (uint at = 0; at < natoms; at++) {
-      dev += ifcs(reduced_clusters[r])[at];
-      asum += abs(ifcs(reduced_clusters[r])[at]);
+                              const vector<vector<double> >& ifcs,
+                              vector<vector<double> >& dev_from_zero,
+                              vector<vector<double> >& abssum) {
+  dev_from_zero.assign(reduced_clusters.size(), vector<double>(clst.nifcs, 0));
+  abssum.assign(reduced_clusters.size(), vector<double>(clst.nifcs, 0));
+  for (uint i = 0; i < clst.ineq_clusters.size(); i++) {
+    for (uint j = 0; j < clst.ineq_clusters[i].size(); j++) {
+      uint r = findReducedCluster(reduced_clusters, clst.getCluster(clst.ineq_clusters[i][j]).atoms);
+      for (int c = 0; c < clst.nifcs; c++) {
+        dev_from_zero[r][c] += ifcs[clst.ineq_clusters[i][j]][c];
+        abssum[r][c] += abs(ifcs[clst.ineq_clusters[i][j]][c]);
+      }
     }
-    dev_from_zero(reduced_clusters[r]) = dev;
-    abssum(reduced_clusters[r]) = asum;
   }
 }
 
@@ -656,63 +588,51 @@ void AnharmonicIFCs::calcSums(const vector<vector<int> >& reduced_clusters,
 // Corrects the IFCs the comply with the sum rule using weighted averages.
 //
 // Check the typedef at the beginning of the file for v5int.
-void AnharmonicIFCs::correctIFCs(aurostd::xtensor<double>& ifcs,
-                                 const aurostd::xtensor<double>& dev_from_zero, 
-                                 const aurostd::xtensor<double>& abssum,
-                                 const vector<vector<vector<int> > > all_clusters,
-                                 const v5int& eq_ifcs) {
-  for (uint ineq = 0; ineq < all_clusters.size(); ineq++) {
-    uint nclusters = all_clusters[ineq].size();
-    vector<int> ineq_cluster = all_clusters[ineq][0];
-    ineq_cluster[0] = clst.sc2pcMap[ineq_cluster[0]];  // transfer to pcell
+void AnharmonicIFCs::correctIFCs(vector<vector<double> >& ifcs,
+                                 const vector<vector<double> >& dev_from_zero, 
+                                 const vector<vector<double> >& abssum,
+                                 const vector<vector<int> >& reduced_clusters,
+                                 const v4int& eq_ifcs) {
+  vector<int> eq;
+  for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
+    uint nclusters = clst.ineq_clusters[ineq].size();
+    int ic = clst.ineq_clusters[ineq][0];
     // Calculate correction terms
-    vector<aurostd::xtensor<double> > correction_terms(nclusters);
+    vector<vector<double> > correction_terms(nclusters);
     for (uint c = 0; c < nclusters; c++) {
-      correction_terms[c] = getCorrectionTerms(all_clusters[ineq][c],
-                                               ifcs, dev_from_zero, abssum);
+      correction_terms[c] = getCorrectionTerms(clst.ineq_clusters[ineq][c],
+                                               reduced_clusters, ifcs,
+                                               dev_from_zero, abssum);
     }
-
+    
     // Correct the linearly independent IFCs
-    _linearCombinations lcomb = clst.linear_combinations[ineq];
-    vector<vector<int> > indices;
-    uint nindep = lcomb.independent.size();
-    indices.resize(nindep);
-    for (uint i = 0; i < nindep; i++) {
-      indices[i] = cart_indices[lcomb.independent[i]];
-    }
-    for (uint i = 0; i < indices.size(); i++) {
-      int neq = 0;
+    const _linearCombinations& lcomb = clst.linear_combinations[ineq];
+    const vector<int>& indep = lcomb.independent;
+    for (uint i = 0; i < indep.size(); i++) {
+      int neq = 0, cl;
       double corrected_ifc = 0.0;
       for (uint c = 0; c < nclusters; c++) {
-        vector<int> cluster = all_clusters[ineq][c];
-        cluster[0] = clst.sc2pcMap[cluster[0]];  // transfer to pcell
-        vector<vector<int> > eq;
-        eq = eq_ifcs[ineq][lcomb.independent[i]][c];
+        cl = clst.ineq_clusters[ineq][c];
+        eq = eq_ifcs[ineq][indep[i]][c];
         uint eqsize = eq.size();
         for (uint e = 0; e < eqsize; e++) {
-          if (ifcs(cluster)(eq[e]) != 0.0) {
+          if (ifcs[cl][eq[e]] != 0.0) {
             neq++;
-            corrected_ifc += correction_terms[c](eq[e]) * ifcs(ineq_cluster)(indices[i]) / ifcs(cluster)(eq[e]);
+            corrected_ifc += correction_terms[c][eq[e]] * ifcs[ic][indep[i]] / ifcs[cl][eq[e]];
           }
         }
         for (uint dep = 0; dep < lcomb.indep2depMap[i].size(); dep++) {
-          int dependent = lcomb.indep2depMap[i][dep];
-          eq = eq_ifcs[ineq][dependent][c];
+          eq = eq_ifcs[ineq][lcomb.indep2depMap[i][dep]][c];
           for (uint e = 0; e < eqsize; e++) {
-            if (ifcs(cluster)(eq[e]) != 0.0) {
+            if (ifcs[cl][eq[e]] != 0.0) {
               neq++;
-              corrected_ifc += correction_terms[c](eq[e]) * ifcs(ineq_cluster)(indices[i]) / ifcs(cluster)(eq[e]);
+              corrected_ifc += correction_terms[c][eq[e]] * ifcs[ic][indep[i]] / ifcs[cl][eq[e]];
             }
           }
         }
       }
       if (neq > 0) {
-        if (mixing_coefficient == 0.0) { // faster (less tensor operations)
-          ifcs(ineq_cluster)(indices[i]) = corrected_ifc/((double) neq);
-        } else {
-          ifcs(ineq_cluster)(indices[i]) *= mixing_coefficient;
-          ifcs(ineq_cluster)(indices[i]) += (1 - mixing_coefficient) * corrected_ifc/((double) neq);
-        }
+        ifcs[ic][indep[i]] = mixing_coefficient * ifcs[ic][indep[i]] + (1 - mixing_coefficient) * corrected_ifc/((double) neq);
       }
     }
   }
@@ -720,30 +640,34 @@ void AnharmonicIFCs::correctIFCs(aurostd::xtensor<double>& ifcs,
 
 //getCorrectionTerms//////////////////////////////////////////////////////////
 // Calculates the correction term for each IFC.
-aurostd::xtensor<double>
-    AnharmonicIFCs::getCorrectionTerms(vector<int> atoms,
-                                       const aurostd::xtensor<double>& ifcs,
-                                       const aurostd::xtensor<double>& dev_from_zero,
-                                       const aurostd::xtensor<double>& abssum) {
-  atoms[0] = clst.sc2pcMap[atoms[0]];  // transfer to pcell
-  aurostd::xtensor<double> correction_terms = ifcs(atoms);
-  uint natoms = atoms.size();
-  vector<int> reduced_cluster(natoms - 1);
-  for (uint at = 0; at < natoms; at++) {
-    reduced_cluster[at] = atoms[at];
-  }
-  aurostd::xtensor<double> correction = abs(ifcs(atoms));
+vector<double>
+    AnharmonicIFCs::getCorrectionTerms(const int& c,
+                                       const vector<vector<int> >& reduced_clusters,
+                                       const vector<vector<double> >& ifcs,
+                                       const vector<vector<double> >& dev_from_zero,
+                                       const vector<vector<double> >& abssum) {
+  vector<double> correction_terms = ifcs[c];
+  vector<double> correction(clst.nifcs);
+  for (int i = 0; i < clst.nifcs; i++) correction[i] = std::abs(correction_terms[i]);
+  uint r = findReducedCluster(reduced_clusters, clst.getCluster(c).atoms);
   for (int crt = 0; crt < clst.nifcs; crt++) {
-    if (abssum(reduced_cluster)(cart_indices[crt]) != 0.0) {
-      double factor = dev_from_zero(reduced_cluster)(cart_indices[crt]);
-      factor /= abssum(reduced_cluster)(cart_indices[crt]);
-      correction(cart_indices[crt]) *= factor;
-    } else {
-      correction(cart_indices[crt]) = 0.0;
-    }
+    if (abssum[r][crt] != 0.0) correction[crt] *= dev_from_zero[r][crt]/abssum[r][crt];
+    else correction[crt] = 0.0;
+    correction_terms[crt] -= correction[crt];
   }
-  correction_terms -= correction;
   return correction_terms;
+}
+
+uint AnharmonicIFCs::findReducedCluster(const vector<vector<int> >& reduced_clusters,
+                                        const vector<int>& atoms) {
+  for (uint r = 0; r < reduced_clusters.size(); r++) {
+    int at;
+    for (at = 0; at < order - 1; at++) {
+      if (reduced_clusters[r][at] != atoms[at]) break;
+    }
+    if (at == order - 1) return r;
+  }
+  return -1;
 }
 
 // END Iterations
@@ -855,7 +779,12 @@ string AnharmonicIFCs::writeIFCs() {
   string tab = " ";
   int precision = 15;
   int extra = 5; // first digit, decimal point, minus sign + 2 spaces
-  double max_ifc = max(abs(force_constants));
+  double max_ifc = -1E30;
+  for (uint i = 0; i < force_constants.size(); i++) {
+    for (uint j = 0; j < force_constants[i].size(); j++) {
+      if (std::abs(force_constants[i][j]) > max_ifc) max_ifc = std::abs(force_constants[i][j]);
+    }
+  }
   int width = (int) log10(max_ifc);
   if (width < 0) {
     width = precision + extra;
@@ -864,39 +793,29 @@ string AnharmonicIFCs::writeIFCs() {
   }
 
   ifcs << tab << "<force_constants>" << std::endl;
-  uint natoms_pcell = clst.pcell.atoms.size();
-  uint natoms_scell = clst.scell.atoms.size();
-  for (uint a = 0; a < natoms_pcell; a++) {
-    int pcat = clst.pc2scMap[a];
-    xcombos ats(natoms_scell, order - 1, 'E', true);
-    while (ats.increment()) {
-      vector<int> atoms = ats.getCombo();
-      ifcs << tab << tab << "<varray atoms=\"" << pcat;
-      for (uint at = 0; at < atoms.size(); at++) {
-        ifcs << " " << atoms[at];
+  for (uint c = 0; c < clst.clusters.size(); c++) {
+    ifcs << tab << tab << "<varray atoms=\""
+         << aurostd::joinWDelimiter(clst.clusters[c].atoms, " ") << "\">" << std::endl;
+    int crt = 0;
+    for (int i = 0; i < clst.nifcs/9; i++) {
+      ifcs << tab << tab << tab << "<varray slice=\"" << cart_indices[crt][0];
+      for (int j = 1; j < order - 2; j++) {
+        ifcs << " " << cart_indices[crt][j];
       }
       ifcs << "\">" << std::endl;
-      xcombos crt(3, order - 2, 'E', true);
-      while (crt.increment()) {
-        vector<int> cart_ind = crt.getCombo();
-        ifcs << tab << tab << tab << "<varray slice=\"" << cart_ind[0];
-        for (uint c = 1; c < cart_ind.size(); c++) {
-          ifcs << " " << cart_ind[c];
+      for (int j = 0; j < 3; j++) {
+        ifcs << tab << tab << tab << tab << "<v>";
+        for (int k = 0; k < 3; k++) {
+          ifcs << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+          ifcs << std::setprecision(precision);
+          ifcs << std::setw(width) << force_constants[c][crt];
+          crt++;
         }
-        ifcs << "\">" << std::endl;
-        for (int i = 0; i < 3; i++) {
-          ifcs << tab << tab << tab << tab << "<v>";
-          for (int j =0; j < 3; j++) {
-            ifcs << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-            ifcs << std::setprecision(precision);
-            ifcs << std::setw(width) << force_constants[a](atoms)(cart_ind)[i][j];
-          }
-          ifcs << "</v>" << std::endl;
-        }
-        ifcs << tab << tab << tab << "</varray>" << std::endl;
+        ifcs << "</v>" << std::endl;
       }
-      ifcs << tab << tab << "</varray>" << std::endl;
+      ifcs << tab << tab << tab << "</varray>" << std::endl;
     }
+    ifcs << tab << tab << "</varray>" << std::endl;
   }
   ifcs << tab << "</force_constants>" << std::endl;
   return ifcs.str();
@@ -1242,29 +1161,15 @@ bool AnharmonicIFCs::checkCompatibility(uint& line_count,
 
 //readIFCs////////////////////////////////////////////////////////////////////
 // Reads the IFCs from the hibernate file.
-aurostd::xtensor<double> AnharmonicIFCs::readIFCs(uint& line_count,
-                                                  const vector<string>& vlines) {
+vector<vector<double> > AnharmonicIFCs::readIFCs(uint& line_count,
+                                                 const vector<string>& vlines) {
   string function = _AAPL_IFCS_ERR_PREFIX_ + "readIFCs";
   string line, message;
   vector<int> atoms(order), slice(order - 2);
   vector<string> tokens;
   int t;
   uint vsize = vlines.size();
-
-  // Initialize tensor
-  uint natoms_pcell, natoms_scell;
-  natoms_pcell = clst.pcell.atoms.size();
-  natoms_scell = clst.scell.atoms.size();
-  vector<int> tensor_shape(2 * order);
-  tensor_shape[0] = natoms_pcell - 1;  // The first atom has to be in the primitive cell
-  for (int i = 1; i < order; i++) {
-    tensor_shape[i] = natoms_scell - 1;
-  }
-  for (int i = order; i < 2 * order; i++) {
-    tensor_shape[i] = 2;
-  }
-  vector<int> zeros(2 * order, 0); // Make tensor use zero-based indices
-  aurostd::xtensor<double> ifcs(tensor_shape, zeros);
+  vector<vector<double> > ifcs;
 
   // Find force_constants tag
   while (true) {
@@ -1279,6 +1184,7 @@ aurostd::xtensor<double> AnharmonicIFCs::readIFCs(uint& line_count,
   }
 
   // Read IFCs
+  vector<double> ifc;
   while (line.find("/force_constants") == string::npos) {
     if (line_count == vsize) {
       message = "force_constants tag incomplete.";
@@ -1286,23 +1192,8 @@ aurostd::xtensor<double> AnharmonicIFCs::readIFCs(uint& line_count,
     }
     line = vlines[line_count++];
     if (line.find("atoms") != string::npos) {
-      t = line.find_first_of("\"") + 1;
-      tokenize(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
-      for (int at = 0; at < order; at++) {
-        int atom = aurostd::string2utype<int>(tokens[at]);
-        if (at == 0) {
-          atom = clst.sc2pcMap[atom];
-        }
-        atoms[at] = atom;
-      }
-      tokens.clear();
+      ifc.clear();
     } else if (line.find("slice") != string::npos) {
-      t = line.find_first_of("\"") + 1;
-      tokenize(line.substr(t, line.find_last_of("\"") - t), tokens, string(" "));
-      for (uint sl = 0; sl < slice.size(); sl++) {
-        slice[sl] = aurostd::string2utype<int>(tokens[sl]);
-      }
-      tokens.clear();
       // If a slice is found, populate tensor
       for (int i = 0; i < 3; i++) {
         line = vlines[line_count++];
@@ -1310,10 +1201,13 @@ aurostd::xtensor<double> AnharmonicIFCs::readIFCs(uint& line_count,
         tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
         for (int j = 0; j < 3; j++) {
           double val = aurostd::string2utype<double>(tokens[j]);
-          ifcs(atoms)(slice)[i][j] = val; 
+          ifc.push_back(val);
         }
         tokens.clear();
       }
+      line_count++;
+    } else if (line.find("</varray>") != string::npos) {
+      ifcs.push_back(ifc);
     }
   }
 
