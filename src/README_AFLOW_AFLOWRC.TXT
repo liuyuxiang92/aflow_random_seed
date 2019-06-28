@@ -955,6 +955,19 @@ DEFAULT_CHULL_LATEX_BOLD_LABELS
   default: -1
   choices -1 (default), 0 (false), or 1 (true)
 
+DEFAULT_CHULL_PNG_RESOLUTION
+  description: Default resolution for conversion pdf to png (convert via ImageMagick).
+  type: integer
+  default: 300
+
+####################################################################################################
+DEFAULTS GFA
+
+DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF
+  description: Default cutoff formation enthalpy (in eV) for systems included in the GFA analysis.
+  type: double
+  default: 0.05
+
 ####################################################################################################
 DEFAULTS POCC
 

@@ -28,6 +28,7 @@
         -- added overloads for mapping functions (DX) 
         -- fixed bug in in xstructure2json in LIB2RAW runs; store corresponding structure from relaxations (DX) 
         -- read species for xstructure2json in LIB2RAW runs (DX) 
+        -- added DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF to aflow.rc (CO)
         -- added functions to find pointLineIntersection() and linePlaneIntersection() (CO)
         -- added function to find 3D rotation between two 3D vectors (CO)
         -- remapped const utype& tol -> utype tol in function inputs (CO)

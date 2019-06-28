@@ -7227,7 +7227,8 @@ namespace pflow {	//DF190329
     
     string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     string AE_file_read = vpflow.getattachedscheme("GFA::AE_FILE");
-    double fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::CUT")); //DF190619
+    //[CO190628 - AFLOWRC default]double fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::CUT")); //DF190619
+    double fe_cut=DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF;
 
     if(!vpflow.flag("PFLOW::ALLOY")) {
       cerr << endl << "ERROR:  Must specify an alloy system; e.g.: --alloy=CaMg" << endl << endl; exit(0);
@@ -7246,9 +7247,10 @@ namespace pflow {	//DF190329
     }
     else {cout << endl << "Reading atomic environments from file: " << AE_file_read << "." << endl;}
     
-    if(!vpflow.flag("GFA::CUT")) {  //DF190619
-      fe_cut = 0.05;
-    }
+    //[CO190628 - AFLOWRC default]if(!vpflow.flag("GFA::CUT")) {  //DF190619
+    //[CO190628 - AFLOWRC default]  fe_cut = 0.05;
+    //[CO190628 - AFLOWRC default]}
+    if(vpflow.flag("GFA::CUT")) {fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::CUT"));} //CO190628
     cout << endl << "Using " << fe_cut << " eV formation enthalpy cutoff for structures to include in the analysis." << endl;
     
     pflow::CalculateGFA(vpflow, alloy, AE_file_read, fe_cut); //DF190619

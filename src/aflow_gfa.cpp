@@ -27,7 +27,9 @@
 
 //gfa
 // [OBSOLETE] #define _ZTOL_ 0.05 //Tolerance for positive formation enthalpies - was originally 0.05
-#define KbT 0.025 // 0.0267 for operating in the human body, originally room temp - 0.025 
+//[CO190628]#define KbT 0.025 // setting for room temperature - 0.025, could also be human body temperature - 0.0267
+#define TEMPERATURE 300 //CO190628
+#define KbT KBOLTZEV*TEMPERATURE // setting for room temperature - 0.025, could also be human body temperature - 0.0267 //CO190628
 
 /********DEFINITIONS**********/
 
