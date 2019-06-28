@@ -20,6 +20,12 @@ namespace apl {
     _isGammaEwaldPrecomputed = false;
 //    DOtar = false;  OBSOLETE - ME 181024
     xInputsAAPL.clear();
+    // ME190614 - Add system for VASP-style output files
+    if ((_xFlags.AFLOW_MODE_VASP) && (!_xFlags.vflags.AFLOW_SYSTEM.content_string.empty())) {
+      _system = _xFlags.vflags.AFLOW_SYSTEM.content_string;
+    } else {
+      _system = _supercell.getInputStructure().title;
+    }
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -782,8 +788,8 @@ namespace apl {
               }
 	    }
           }
-	    }
 	}
+      }
     }
 
     //
@@ -1077,11 +1083,11 @@ namespace apl {
                   if (_isPolarMaterial && (aurostd::modulus(kpoint) > _AFLOW_APL_EPS_)) {
                     xcomplex<double> nac = ((double) neq) * phase * dDynMat_NAC[d](3 * ipc1 + ix, 3 * ipc2 + iy);
                     dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += nac;
-	    }
-	  }
-	}
-      }
-    }
+                  }
+                }
+              }
+            }
+          }
 	}
       }
     }
@@ -2062,6 +2068,11 @@ namespace apl {
 
   uint PhononCalculator::getNumberOfBranches() {
     return (3 * _supercell.getInputStructure().atoms.size());
+  }
+
+  // ME190614
+  string PhononCalculator::getSystemName() {
+    return _system;
   }
 
   // ///////////////////////////////////////////////////////////////////////////

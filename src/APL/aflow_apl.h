@@ -673,6 +673,7 @@ class IPhononCalculator {
   virtual const xstructure& getInputCellStructure() = 0;
   virtual const xstructure& getSuperCellStructure() = 0;
   virtual uint getNumberOfBranches() = 0;
+  virtual string getSystemName() = 0;  // ME190614
   // **** BEGIN PINKU ******
   virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&) = 0;
   virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
@@ -707,6 +708,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   _kflags& _kbinFlags;
   _xflags& _xFlags; //_vflags& _vaspFlags;
   string& _AflowIn;
+  string _system;  // ME190614 - for VASP-style output files
 
   // Our standard and common output system
   Logger& _logger;
@@ -811,6 +813,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   const xstructure& getSuperCellStructure();
   double getEPS();  //CO
   uint getNumberOfBranches();
+  string getSystemName();  // ME190614
   /* friend void runVASPCalculationsBE(apl::PhononCalculator*); */
   /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
   /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
@@ -1087,6 +1090,7 @@ class PathBuilder {
   void takeAflowElectronicPath(const string&,const Supercell&);//, const xstructure&, const xstructure&);
   void setMode(ModeEnumType);
   void setStore(StoreEnumType);
+  const StoreEnumType& getStore() const;  // ME190614
   void setDensity(int);
   int getDensity();
   uint getPathSize();
@@ -1098,6 +1102,7 @@ class PathBuilder {
   std::vector<aurostd::xvector<double> > getPath(ModeEnumType, const string&);
   double getPathLength();
   double getPathLength(uint);
+  xKPOINTS createKPOINTS(const Supercell&);  // ME190614
 };
 }  // namespace apl
 
@@ -1112,6 +1117,7 @@ class PhononDispersionCalculator {
   std::vector<xvector<double> > _qpoints;
   std::vector<xvector<double> > _freqs;
   IPCFreqFlags _frequencyFormat;
+  double _temperature;  // ME190614
   //[OBSOLETE PN180705]vector<double> path;       //[PINKU]
   //[OBSOLETE PN180705]vector<int> path_segment;  //[PINKU]
  private:
@@ -1128,6 +1134,13 @@ class PhononDispersionCalculator {
   void writePDIS();
   bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
   std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PINKU]
+  // ME190614 - START
+  xEIGENVAL createEIGENVAL();
+  void writePHEIGENVAL();
+  void writePHPOSCAR();
+  void writePHKPOINTS();
+  string _system;
+  // ME19614 - STOP
   //[OBSOLETE PN180705]std::vector<double> get_path() { return path; }                   //[PINKU]
   //[OBSOLETE PN180705]std::vector<int> get_path_segment() { return path_segment; }      //[PINKU]
 };
@@ -1371,13 +1384,16 @@ class DOSCalculator {  // ME190424
   double _halfStepDOS;
   std::vector<double> _bins;
   std::vector<double> _dos;
+  std::vector<double> _idos;  // ME190614
+  std::vector<vector<vector<double> > > _projectedDOS; // ME190614 - projectedDOS.at(atom).at(direction).at(frequency)
+  double _temperature;  // ME190614
   //CO - START
  //private:
   void calculateInOneThread(int, int);
   //CO - END
  protected:
   void calculateFrequencies();
-  void smearWithGaussian(vector<double>&, double, double);
+  void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
  public:
 //  DOSCalculator(IPhononCalculator&, IReciprocalPointGrid&, Logger&);  OBSOLETE ME190417
@@ -1393,10 +1409,13 @@ class DOSCalculator {  // ME190424
   void clear();
   void writePDOS();
   void writePDOS(string, string);  //[PINKU]
+  xDOSCAR createDOSCAR();  // ME190614
+  void writePHDOSCAR();  // ME190614
   // Interface IDOSCalculator
   std::vector<double> getBins();
   std::vector<double> getDOS();
   bool hasNegativeFrequencies();
+  string _system;  // ME190614
 };
 }  // namespace apl
 
@@ -1590,7 +1609,7 @@ class TCONDCalculator {
     string tempDepRatesString(string, double, const vector<vector<double> >&);
     void writeTempDepRatesFile(string, const string&);
     void writeThermalConductivity();
-    void writeThermalConductivityPlot();
+    // void writeThermalConductivityPlot(); OBSOLETE ME190614
 };
 
 }  // namespace apl

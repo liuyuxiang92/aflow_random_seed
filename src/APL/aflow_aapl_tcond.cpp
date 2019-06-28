@@ -248,8 +248,8 @@ void TCONDCalculator::buildQpoints(const xvector<int>& qgrid) {
       vector<int> sym(1, 0);  // Identity is always invariant
       for (uint symop = 1; symop < pcell.pgroupk_xtal.size(); symop++) {
         fpos_trans = pcell.pgroupk_xtal[symop].Uf * qpoints[q].fpos;
-        if (SYM::AtomFPOSMatch(fpos_trans, qpoints[q].fpos, 
-                               kcell.c2f, kcell.f2c,  kcell.skewed, tol)) {
+        if (SYM::FPOSMatch(fpos_trans, qpoints[q].fpos, 
+                           kcell.lattice, kcell.f2c, kcell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
           sym.push_back(symop);
         }
       }
@@ -321,8 +321,8 @@ void TCONDCalculator::getIrreducibleQpoints(int startIndex, int endIndex,
       for (uint symop = 0; symop < pcell.pgroupk_xtal.size(); symop++) {
         for (uint iq = 0; iq < iqpts.size(); iq++) {
           fpos_trans = pcell.pgroupk_xtal[symop].Uf * qpoints[iqpts[iq][0]].fpos;
-          if (SYM::AtomFPOSMatch(fpos_trans, qpoints[q].fpos,
-                                 kcell.c2f, kcell.f2c, kcell.skewed, tol)) {
+          if (SYM::FPOSMatch(fpos_trans, qpoints[q].fpos,
+                             kcell.lattice, kcell.f2c, kcell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
             append = false;
             qpoints[q].symop = symop;
             iqpts[iq].push_back(q);
@@ -362,8 +362,8 @@ vector<vector<int> >
       for (uint symop = 0; symop < pcell.pgroupk_xtal.size(); symop++) {
         for (uint iq = 0; iq < irred.size(); iq++) {
           fpos_trans = pcell.pgroupk_xtal[symop].Uf * qpoints[irred[iq][0]].fpos;
-          if (SYM::AtomFPOSMatch(fpos_trans, qpoints[iqpts[i][j][0]].fpos,
-                                 kcell.c2f, kcell.f2c, kcell.skewed, tol)) {
+          if (SYM::FPOSMatch(fpos_trans, qpoints[iqpts[i][j][0]].fpos,
+                             kcell.lattice, kcell.f2c, kcell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
             append = false;
             for (uint q = 0; q < iqpts[i][j].size(); q++) {
               irred[iq].push_back(iqpts[i][j][q]);
@@ -752,9 +752,12 @@ void TCONDCalculator::getPhaseVectors(vector<xvector<int> >& clusters, int order
         int at_eq = _sc.sc2pcMap(atoms[i]);
         int at_eq_sc = _sc.pc2scMap(at_eq);
         xvector<double> min_vec;
-        min_vec = SYM::minimumCartesianVector(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
-                                              _pc._clusters[o].scell.atoms[atoms[0]].cpos,
-                                              _pc._clusters[o].scell.lattice);
+        //DX 20190613 [OBSOLETE - changed function name] min_vec = SYM::minimumCartesianVector(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
+        //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
+        //DX 20190613 [OBSOLETE - changed function name]                                       _pc._clusters[o].scell.lattice);
+        min_vec = SYM::minimizeDistanceCartesianMethod(_pc._clusters[o].scell.atoms[atoms[i]].cpos,
+                                                       _pc._clusters[o].scell.atoms[atoms[0]].cpos,
+                                                       _pc._clusters[o].scell.lattice); //DX 20190613
         min_vec += _pc._clusters[o].scell.atoms[atoms[0]].cpos;
         min_vec -= _pc._clusters[o].scell.atoms[at_eq_sc].cpos;
         vectors.push_back(min_vec);
@@ -1033,7 +1036,7 @@ void TCONDCalculator::calculateThermalConductivity() {
   }
   writeTempDepRatesFile(DEFAULT_AAPL_RATES_FILE, stream_total.str());
   writeThermalConductivity();
-  writeThermalConductivityPlot();
+  //writeThermalConductivityPlot();  OBSOLETE ME190614
 }
 
 //getIsotopeRates/////////////////////////////////////////////////////////////
@@ -1585,16 +1588,20 @@ void TCONDCalculator::writeThermalConductivity() {
 
   // Header
   output << AFLOWIN_SEPARATION_LINE << std::endl;
+  if (!_pc.getSystemName().empty()) {  // ME190614
+    output << "[AAPL_THERMAL_CONDUCTIVITY]SYSTEM=" << _pc.getSystemName() << std::endl;
+  }
   output << "[AAPL_THERMAL_CONDUCTIVITY]START" << std::endl;
   output << std::setw(8) << "# T (K)";
   output << std::setw(75) << " ";
   output << "Thermal Conductivity (W/m*K)" << std::endl;
-  output << std::setw(8) << " ";
+  output << "#" << std::setw(8) << " ";  // ME190614
   string xyz [] = {"x", "y", "z"};
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       output << std::setw(7) << " ";
-      string k = "k(" + xyz[i] + "," + xyz[j] + ")";
+      // ME190614 - Write columns first to make compatible with gnuplot
+      string k = "k(" + xyz[j] + "," + xyz[i] + ")";
       output << k;
       output << std::setw(7) << " ";
     }
@@ -1607,7 +1614,8 @@ void TCONDCalculator::writeThermalConductivity() {
     for (int i = 1; i < 4; i++) {
       for (int j = 1; j < 4; j++) {
         output << std::setw(2) << " ";
-        output << std::setprecision(10) << std::scientific << thermal_conductivity[t][i][j];
+        // ME190614 - Write columns first to make compatible with gnuplot
+        output << std::setprecision(10) << std::scientific << thermal_conductivity[t][j][i];
         output << std::setw(2) << " ";
       }
     }
@@ -1620,82 +1628,6 @@ void TCONDCalculator::writeThermalConductivity() {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity";
     string message = "Could not write thermal conductivities to file.";
-    throw xerror(function, message, _FILE_ERROR_);
-  }
-}
-
-//writeThermalConductivityPlot////////////////////////////////////////////////
-// Write a gnuplot script for the thermal conductivity tensor as a function
-// of temperature into a file.
-void TCONDCalculator::writeThermalConductivityPlot() {
-  stringstream output;
-  string filename = DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_PLOT_FILE;
-  string tcondfile = DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE;
-  string font = DEFAULT_GNUPLOT_EPS_FONT;
-  string font_it = DEFAULT_GNUPLOT_EPS_FONT_ITALICS;
-  string font_greek = DEFAULT_GNUPLOT_GREEK_FONT_ITALICS;
-
-  output << "#!/usr/bin/gnuplot" << std::endl << std::endl;
-  output << "reset" << std::endl << std::endl;
-  output << "set terminal postscript eps size 3.5,2.75 enhanced color\\" << std::endl;
-  output << "  font '" << font << ",20' linewidth 2" << std::endl;
-  output << "set output 'thermal_conductivity.eps'" << std::endl << std::endl;
-  // The color palette was designed to be accessible for people with color
-  // vision deficiencies. When changing the colors, please make sure that
-  // the colors are still distinguishable for everyone!
-  output << "# line styles" << std::endl;
-  output << " set style line 10 lt 1 lc rgb '#000000' lw 2 pt 17 ps 1.5 # black" << std::endl;
-  output << " set style line 11 lt 1 lc rgb '#004949' lw 2 pt 35 ps 1.5 # dark green" << std::endl;
-  output << " set style line 12 lt 1 lc rgb '#009292' lw 2 pt 51 ps 1.5 # light green" << std::endl;
-  output << " set style line 13 lt 1 lc rgb '#490092' lw 2 pt 44 ps 1.5 # purple" << std::endl;
-  output << " set style line 14 lt 1 lc rgb '#b66dff' lw 2 pt 18 ps 1.5 # lavender" << std::endl;
-  output << " set style line 15 lt 1 lc rgb '#6db6ff' lw 2 pt  9 ps 1.5 # light blue" << std::endl;
-  output << " set style line 16 lt 1 lc rgb '#924900' lw 2 pt 60 ps 1.5 # brown" << std::endl;
-  output << " set style line 17 lt 1 lc rgb '#d55e00' lw 2 pt 11 ps 1.5 # orange" << std::endl;
-  output << " set style line 18 lt 1 lc rgb '#edb120' lw 2 pt 20 ps 1.5 # yellow" << std::endl;
-  output << std::endl;
-  output << "# Axes" << std::endl;
-  output << " set style line 101 lc rgb '#000000' lt 1" << std::endl;
-  output << " set border 3 back ls 101" << std::endl;
-  output << " set tics nomirror out" << std::endl;
-  output << " set xtics font '" << font << ",12'" << std::endl;
-  output << " set ytics font '" << font << ",12'" << std::endl;
-  output << std::endl;
-  output << "# Grid" << std::endl;
-  output << " set style line 102 lc rgb '#808080' lt 0 lw 1" << std::endl;
-  output << " set grid back ls 102" << std::endl;
-  output << std::endl;
-  output << "# Labels" << std::endl;
-  output << " set xlabel '{/" << font_it << " T} (K)'" << std::endl;
-  output << " set ylabel '{/" << font_greek << " k} (W/m K)'" << std::endl;
-  output << " set yrange [-1:]" << std::endl;
-  output << " set key below spacing 1.1" << std::endl;
-  // Spacing between key and xlabel, necessary for gnuplot version 5 and above
-  output << " set bmargin 7" << std::endl;
-  output << std::endl;
-  output << "# Data" << std::endl;
-  output << " plot \"" << tcondfile << "\" u 1:2  w lp ls 10";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " xx}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:3  w lp ls 11";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " xy}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:4  w lp ls 12";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " xz}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:5  w lp ls 13";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " yx}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:6  w lp ls 14";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " yy}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:7  w lp ls 15";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " yz}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:8  w lp ls 16";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " zx}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:9  w lp ls 17";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " zy}\",\\" << std::endl;
-  output << "      \"" << tcondfile << "\" u 1:10 w lp ls 18";
-  output << " title \"{/" << font_greek << " k}^{/" << font_it << " zz}\"" << std::endl;
-  aurostd::stringstream2file(output, filename);
-  if (!aurostd::FileExist(filename)) {
-    string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivityPlot";
-    string message = "Could not write thermal conductivity plot to file.";
     throw xerror(function, message, _FILE_ERROR_);
   }
 }

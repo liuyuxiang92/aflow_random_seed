@@ -1167,7 +1167,7 @@ namespace aflowlib {
       if(perform_BANDS) {
 	if(aurostd::FileExist(directory_RAW+"/EIGENVAL.bands") || aurostd::EFileExist(directory_RAW+"/EIGENVAL.bands")) {
 	  // return FALSE;
-	  cout << "aflowlib::LIB2RAW: directory is skip because of BANDS: " << directory_RAW << endl;
+	  cout << "aflowlib::LIB2RAW: directory is skipped because of BANDS: " << directory_RAW << endl;
 	  return FALSE;
 	  //  exit(0);
 	}
@@ -1485,7 +1485,8 @@ namespace aflowlib {
 	if(flag_WEB) {
 	  string system_name=KBIN::ExtractSystemName(directory_LIB);
 	  cout << "aflowlib::LIB2RAW: linking SYSTEM=" << system_name << endl;
-	  if(aurostd::FileExist(directory_RAW+"/"+system_name+".png"))
+	  if(aurostd::FileExist(directory_RAW+"/"+system_name+".png")
+             || aurostd::FileExist(directory_RAW + "/" + system_name + "_banddos.png"))  // ME190621 - new file name convention
 	    aurostd::LinkFile(directory_RAW+"/*png",directory_WEB);            // LINK
 	  if(aurostd::FileExist(directory_RAW+"/"+system_name+".cif"))
 	    aurostd::LinkFile(directory_RAW+"/*cif",directory_WEB);            // LINK
@@ -1927,6 +1928,21 @@ namespace aflowlib {
     }
 
     if(flag_use_GNUPLOT) { // GNUPLOT STUFF NEW KESONG-STEFANO
+      // ME190614 - BEGIN
+      // This has to come first because FIXBANDS messes up the EIGENVAL files
+      aurostd::xoption opts, plotoptions;
+      opts.push_attached("PLOT_DOS", directory_RAW + ",,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
+      opts.push_attached("PLOT_BANDDOS", directory_RAW + ",,,1.75"); // 1.75 is typically enough to prevent plot legend from overlapping with DOS
+      opts.push_attached("PLOT_PDOS", directory_RAW + ",-1,,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
+      opts.push_attached("PLOTTER::PRINT", "png");
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_DOS");
+      plotter::PLOT_DOS(plotoptions);
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_BANDDOS");
+      plotter::PLOT_BANDDOS(plotoptions);
+      plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_PDOS", true);
+      plotter::PLOT_PDOS(plotoptions);
+      // ME190614 - END
+
       // KESONG WRITE THE CODE HERE
       cout << MESSAGE << " GNUPLOT start: " << directory_RAW << endl;
       // WRITE plotbz.sh
@@ -1971,8 +1987,9 @@ namespace aflowlib {
       // [OBSOLETE]  directory.push_back("./");
       // [OBSOLETE]  estructure::PLOT_BANDDOS(directory);
       // [OBSOLETE]  estructure::PLOT_PEDOSALL_AFLOWLIB(directory, aflags);
-      estructure::PLOT_BANDDOS("./");
-      estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
+
+      // [OBSOLETE - ME190614]  estructure::PLOT_BANDDOS("./");
+      // [OBSOLETE - ME190614]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
 
       chdir(work_dir);  //Go to the working direcotry
     }
@@ -2251,6 +2268,7 @@ namespace aflowlib {
     // aurostd::StringSubst(directory_LIB,"/./","/");
     // aurostd::StringSubst(directory_RAW,"/./","/");
     vector<string> vspecies;aurostd::string2tokens(data.species,vspecies,",");
+    deque<string> deq_species;aurostd::string2tokens(data.species,deq_species,","); //DX 20190620
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Thermodynamics - begin " << directory_LIB << endl;
     if(LDEBUG) cerr << "directory_LIB=\"" << directory_LIB << "\"" << endl;
     if(LDEBUG) cerr << "directory_RAW=\"" << directory_RAW << "\"" << endl;
@@ -2613,6 +2631,7 @@ namespace aflowlib {
     if(str_orig.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
       xstructure _str_orig(directory_RAW+"/POSCAR.orig",IOVASP_AUTO);
       str_orig=_str_orig;
+      str_orig.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_orig.ReScale(1.0);
       /*xstr_js.str("");xstr_js << xstructure2json(str_orig);aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_orig.json");*/
     } // CO 171025
@@ -2622,9 +2641,10 @@ namespace aflowlib {
     if(str_relax.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
       xstructure _str_relax(directory_RAW+"/CONTCAR.relax",IOVASP_AUTO);
       str_relax=_str_relax;
+      str_relax.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_relax.ReScale(1.0);
       xstr_js.str("");
-      xstr_js << xstructure2json(str_orig);
+      xstr_js << xstructure2json(str_relax); //DX 20190620 - bug fix; orig->relax
       aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax.json");
     } // CO 171025
  
@@ -2633,9 +2653,10 @@ namespace aflowlib {
    if(str_relax.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/CONTCAR.static")) {
       xstructure _str_relax(directory_RAW+"/CONTCAR.static",IOVASP_AUTO);
       str_relax=_str_relax;
+      str_relax.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_relax.ReScale(1.0);
       xstr_js.str("");
-      xstr_js << xstructure2json(str_orig);
+      xstr_js << xstructure2json(str_relax); //DX 20190620 - bug fix; orig->relax
       aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax.json");
     } // CO 171025
  
@@ -2644,9 +2665,10 @@ namespace aflowlib {
    if(aurostd::FileExist(directory_RAW+"/CONTCAR.relax1")) {
       xstructure _str_relax1(directory_RAW+"/CONTCAR.relax1",IOVASP_AUTO);
       str_relax1=_str_relax1;
+      str_relax1.SetSpecies(deq_species); //DX 20190620 - add species to xstructure
       str_relax1.ReScale(1.0);
       xstr_js.str("");
-      xstr_js << xstructure2json(str_orig);
+      xstr_js << xstructure2json(str_relax1); //DX 20190620 - bug fix; orig->relax1
       aurostd::stringstream2file(xstr_js,directory_RAW+"/"+system_name+"_structure_relax1.json");
     } // CO 171025
     // do the extractions

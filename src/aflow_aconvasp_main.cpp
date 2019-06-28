@@ -319,7 +319,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
           else {vpflow.flag("CHULL::JSON_DOC",TRUE);}    //turn on
         } else if(out_form.at(0)=='W'){
           vpflow.flag("CHULL::WEB_DOC",TRUE);     //turn on
-          vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",TRUE); //the app cannot handle more than one g-state in the visualization
+          //[WS190620 - stability criterion error otherwise for Pd1]vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",TRUE); //the app cannot handle more than one g-state in the visualization
           vpflow.flag("FORCE",TRUE); //just include everything!
           //vpflow.flag("CHULL::INCLUDE_UNRELIABLE",TRUE); //we include colors on the website
         } else if(out_form.at(0)=='L'||(out_form.at(0)=='P'&&out_form!="PNG")||out_form=="PDF"){    //Latex or Pdf
@@ -800,17 +800,32 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE]  vpflow.flag("PLATON",aurostd::args2flag(argv,cmds,"--platon") && argv.at(1)=="--platon");
   vpflow.args2addattachedscheme(argv,cmds,"PLATON","--platon=",""); 
 
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND","--plotband=","./");
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND","--plotband=|--plotbands=","./");  // M190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDSPINSPLIT","--plotband_spinsplit=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=","./");
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=","./");
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos","./");  // ME190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOS","--plotdos=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOSWEB","--plotdosweb=","./");
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOS","--plotpedos=","./,1");
-  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOSALL","--plotpedosall=","./");
+//  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOS","--plotpedos=","./,1"); OBSOLETE ME190614
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOS","--plotpedos=|--plotpdos=","./");  // ME190614
+//  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOSALL","--plotpedosall=","./"); OBSOLETE ME190614;
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOSALL","--plotpedosall=|--plotpdosall=","./");  // ME190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOSALL_AFLOWLIB","--plotpedos_nonequivalent=","./");
-  
-  vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
+  // ME190614 - BEGIN
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO","--plotthermo=","./");
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_TCOND","--plottcond=|--plotthermalconductivity=","./");
+  //[OBSOLETE] vpflow.flag("PLOTPHDISP",aurostd::args2flag(argv,cmds,"--plotphonondispersion|--pphdis"));
+  vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDOS", "--plotphdos=", "./");
+  vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISP", "--plotphdisp=|--plotphonondispersion=|==pphdis=", "./");
+  vpflow.args2addattachedscheme(argv, cmds, "PLOT_PHDISPDOS", "--plotphdispdos=", "./");
+  // Additional DOS/band structure options
+  vpflow.flag("PLOTTER::NOSHIFT", aurostd::args2flag(argv, cmds, "--noshift"));
+  vpflow.flag("PLOTTER::NOWATERMARK", aurostd::args2flag(argv, cmds, "--nowatermark"));
+  vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::PROJECTION", "--projection=", "ORBITALS");
+  vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::UNIT", "--unit=", "EV");
+  vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::PRINT", "--print=", "pdf");
+  vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::TITLE", "--title=", "");
+  // ME190614 - END
 
   vpflow.flag("POCC",aurostd::args2flag(argv,cmds,"--pocc") && argv.at(1)=="--pocc");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
@@ -1659,16 +1674,28 @@ namespace pflow {
       if(vpflow.flag("BANDSDATA2JSON")) {estructure::BANDSDATA_JSON(vpflow,cout); _PROGRAMRUN=true;} //Eric G
       // End serializers
 
-      if(vpflow.flag("PLOT_BAND")) {estructure::PLOT_BAND(vpflow.getattachedscheme("PLOT_BAND")); _PROGRAMRUN=true;} 
+      //if(vpflow.flag("PLOT_BAND")) {estructure::PLOT_BAND(vpflow.getattachedscheme("PLOT_BAND")); _PROGRAMRUN=true;} OBSOLETE ME190614
       if(vpflow.flag("PLOT_BANDSPINSPLIT")) {estructure::PLOT_BAND_SPINSPLIT(vpflow.getattachedscheme("PLOT_BANDSPINSPLIT")); _PROGRAMRUN=true;} 
       if(vpflow.flag("PLOT_BAND2")) {estructure::PLOT_BAND2(vpflow.getattachedscheme("PLOT_BAND2")); _PROGRAMRUN=true;} 
-      if(vpflow.flag("PLOT_BANDDOS")) {estructure::PLOT_BANDDOS(vpflow.getattachedscheme("PLOT_BANDDOS")); _PROGRAMRUN=true;} 
-      if(vpflow.flag("PLOT_DOS")) {estructure::PLOT_DOS(vpflow.getattachedscheme("PLOT_DOS")); _PROGRAMRUN=true;} 
+      //if(vpflow.flag("PLOT_BANDDOS")) {estructure::PLOT_BANDDOS(vpflow.getattachedscheme("PLOT_BANDDOS")); _PROGRAMRUN=true;} OBSOLETE ME190614
+      //if(vpflow.flag("PLOT_DOS")) {estructure::PLOT_DOS(vpflow.getattachedscheme("PLOT_DOS")); _PROGRAMRUN=true;} OBSOLETE ME190614
       if(vpflow.flag("PLOT_DOSWEB")) {estructure::PLOT_DOSWEB(vpflow.getattachedscheme("PLOT_DOSWEB")); _PROGRAMRUN=true;} 
       if(vpflow.flag("PLOT_PEDOS")) {estructure::PLOT_PEDOS(vpflow.getattachedscheme("PLOT_PEDOS")); _PROGRAMRUN=true;} 
-      if(vpflow.flag("PLOT_PEDOSALL")) {estructure::PLOT_PEDOSALL(vpflow.getattachedscheme("PLOT_PEDOSALL")); _PROGRAMRUN=true;} 
-      if(vpflow.flag("PLOT_PEDOSALL_AFLOWLIB")) {estructure::PLOT_PEDOSALL_AFLOWLIB(vpflow.getattachedscheme("PLOT_PEDOSALL_AFLOWLIB"), aflags); _PROGRAMRUN=true;} 
+      if(vpflow.flag("PLOT_PEDOSALL")) {estructure::PLOT_PEDOSALL(vpflow.getattachedscheme("PLOT_PEDOSALL")); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_PEDOSALL_AFLOWLIB")) {estructure::PLOT_PEDOSALL_AFLOWLIB(vpflow.getattachedscheme("PLOT_PEDOSALL_AFLOWLIB"), aflags); _PROGRAMRUN=true;}
+      // ME190614 - BEGIN
+      if(vpflow.flag("PLOT_BAND")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_BAND"); plotter::PLOT_BAND(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_DOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_DOS"); plotter::PLOT_DOS(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_BANDDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_BANDDOS"); plotter::PLOT_BANDDOS(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_PDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOS",true); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_PDOSALL")) {aurostd::xoption pltopts=plotter::getPlotOptionsEStructure(vpflow,"PLOT_PDOSALL",false); pltopts.push_attached("DATASET", "-1"); plotter::PLOT_PDOS(pltopts); _PROGRAMRUN=true;}
       if(vpflow.flag("PLOTPHDISP")) {pflow::PLOT_PHDISP(argv); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_PHDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDOS"); plotter::PLOT_PHDOS(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_PHDISP")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISP"); plotter::PLOT_PHDISP(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_PHDISPDOS")) {aurostd::xoption pltopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_PHDISPDOS"); plotter::PLOT_PHDISPDOS(pltopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_THERMO")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_THERMO"); plotter::PLOT_THERMO(plotopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_TCOND")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_TCOND"); plotter::PLOT_TCOND(plotopts); _PROGRAMRUN=true;}
+      // ME190614 - END
       if(vpflow.flag("PROTOS_ICSD")) {cout<<aflowlib::PrototypesIcsdHelp(vpflow.getattachedscheme("PROTOS_ICSD"));cout<<aflow::Banner("BANNER_BIG");exit(1);}
       // if(POCCUPATION) {pflow::POCCUPATION(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("POCC_DOS")) {pocc::POCC_DOS(cout,vpflow.getattachedscheme("POCC_DOS")); _PROGRAMRUN=true;} 
@@ -2062,6 +2089,10 @@ namespace pflow {
   "<< x<<" --cif < POSCAR \n\
   "<< x<<" --clean -D DIRECTORY \n\
   "<< x<<" --clean_all < LIST_DIRECTORIES \n\
+  "<< x<<" --compare_material=POSCAR1,POSCAR2 [--np=xx (default 1)] [--print]\n\
+  "<< x<<" --compare_structure=POSCAR1,POSCAR2 [--np=xx (default 1)] [--print]\n\
+  "<< x<<" --compare_material_directory|--compare_material_dir [-D \"PATH\"] [--np=xx (default 1)]\n\
+  "<< x<<" --compare_structure_directory|--compare_structure_dir [-D \"PATH\"] [--np=xx (default 1)]\n\
   "<< x<<" --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [chull_options] [--destination=[DIRECTORY]] \n\
     chull_options: \n\
                  \n\
@@ -2178,16 +2209,19 @@ namespace pflow {
   "<< x<<" --pearson_symbol | --pearson < POSCAR \n\
   "<< x<<" --platon[=EQUAL | EXACT][,ang,d1,d2,d3] < POSCAR | platonSG \n\
   "<< x<<" --platonSG[_label,_number][=EQUAL | EXACT][,ang,d1,d2,d3] < POSCAR \n\
-  "<< x<<" --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
+  "<< x<<" --plotband | --plotbands[=directory[,Emin[,Emax]]]] [--keep=gpl] [--print=pdf|gif|eps|jpg|png] [--title=] \n\
   "<< x<<" --plotband_spinsplit[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
-  "<< x<<" --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
-  "<< x<<" --plotbanddos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
-  "<< x<<" --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
+  "<< x<<" --plotbanddos | --plotbandsdos[=directory[,Emin[,Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=] \n\
+  "<< x<<" --plotdos[=directory[,Emin[,Emax[,DOSSCALE]]]]] [--print=pdf|eps|gif|jpg|png] [--keep=gpl] [--noshift] [--projection=atoms|lm|none|orbitals] [--title=]\n\
   "<< x<<" --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] \n\
-  "<< x<<" --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
-  "<< x<<" --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] \n\
+  "<< x<<" --plotpdos | --plotpedos[=directory[,atom[,Emin[,Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=] \n\
+  "<< x<<" --plotpdosall | --plotpedosall[=directory[,Emin[,Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=] \n\
   "<< x<<" --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] \n\
-  "<< x<<" --plotphonondispersion | --pphdis ( --rcm | --meV | --THz |  --hz ) [--print=eps | --print=pdf | --print=png | --print=jpg | --print=gif ] DIRECTORY\n\
+  "<< x<<" --plotphdisp | --plotphonondispersion | --pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] \n\
+  "<< x<<" --plotphdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] \n\
+  "<< x<<" --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] \n\
+  "<< x<<" --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] \n\
+  "<< x<<" --plotcond | --plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] \n\
   "<< x<<" --pomass[=directory] \n\
   "<< x<<" --pomass_atom[=directory] \n\
   "<< x<<" --pomass_cell[=directory] \n\
@@ -2449,13 +2483,6 @@ namespace pflow {
  TERNARY CONVEX HULL (only for duke.edu computers) \n\
   "<< x<<" --terdata=A:B:C  [--fonts=XX | --keep=eps | --print=jpg | --print=gif | --print=png] \n\
   "<< x<<" --terdata_exist list \n\
-  \n\
- COMPARE STRUCTURES \n\
-  "<< x<<" Refer to aflow --readme=compare\n\
-  "<< x<<" --compare_material=POSCAR1,POSCAR2 [--np=xx (default 8)] [--print]\n\
-  "<< x<<" --compare_structure=POSCAR1,POSCAR2 [--np=xx (default 8)] [--print]\n\
-  "<< x<<" --compare_material_directory|--compare_material_dir [-D \"PATH\"] [--np=xx (default 8)]\n\
-  "<< x<<" --compare_structure_directory|--compare_structure_dir [-D \"PATH\"] [--np=xx (default 8)]\n\
   \n\
 ******* END POSTPROCESSING MODE ******************************************************************** \n\
   " << endl;

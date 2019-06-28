@@ -19,6 +19,7 @@ namespace apl {
 // ///////////////////////////////////////////////////////////////////////////
 
 PhononDispersionCalculator::PhononDispersionCalculator(IPhononCalculator& pc, Logger& l) : _pc(pc), _logger(l) {
+  _system = _pc.getSystemName();  // ME190614
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -32,6 +33,7 @@ PhononDispersionCalculator::~PhononDispersionCalculator() {
 void PhononDispersionCalculator::clear() {
   _qpoints.clear();
   _freqs.clear();
+  _temperature = 0.0;  // ME190614
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -44,7 +46,7 @@ void PhononDispersionCalculator::initPathCoords(  //CO 180406
   if(USER_DC_INITCOORDS.empty() || USER_DC_INITLABELS.empty()){throw APLRuntimeError("apl::PhononDispersionCalculator::initPathCoords; Inputs are empty.");}
   _pb.defineCustomPoints(USER_DC_INITCOORDS,USER_DC_INITLABELS,_pc.getSupercell(),CARTESIAN_COORDS);
   _pb.setDensity(USER_DC_NPOINTS);
-  _qpoints = _pb.getPath(); // Get points
+  //_qpoints = _pb.getPath(); // Get points // OBSOLETE ME190429 - this function should just define points; there is no path to set or get
 }
 
 void PhononDispersionCalculator::initPathLattice(const string& USER_DC_INITLATTICE,int USER_DC_NPOINTS){
@@ -95,10 +97,32 @@ void PhononDispersionCalculator::initPathLattice(const string& USER_DC_INITLATTI
 void PhononDispersionCalculator::setPath(const string& USER_DC_OWNPATH) {
   // Get user's path...
   if (!USER_DC_OWNPATH.empty()) {
-    if (USER_DC_OWNPATH.find('|') != string::npos)
-      _qpoints = _pb.getPath(apl::PathBuilder::COUPLE_POINT_MODE, USER_DC_OWNPATH);
-    else
+    if (USER_DC_OWNPATH.find('|') != string::npos) {
+      // ME190614 - START
+      // This breaks "mixed" paths such as G-X-W-L|K-U (interprets as G-X|W-L|K-U
+      // _qpoints = _pb.getPath(apl::PathBuilder::COUPLE_POINT_MODE, USER_DC_OWNPATH);
+      vector<string> tokens, tokens_pt;
+      aurostd::string2tokens(USER_DC_OWNPATH, tokens, "-");
+      string path;
+      if (tokens[0].find('|') != string::npos) {
+        string function = "PhononDispersionCalculator::setPath()";
+        string message = "Cannot have | in the first path coordinate";
+        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+      } else {
+        path = tokens[0];
+      }
+      for (uint i = 1; i < tokens.size(); i++) {
+        if ((tokens[i].find('|') != string::npos) || (i == tokens.size() - 1)) {
+          path += '-' + tokens[i];
+        } else {
+          path += '-' + tokens[i] + '|' + tokens[i];
+        }
+      }
+      _qpoints = _pb.getPath(apl::PathBuilder::COUPLE_POINT_MODE, path);
+      // ME190614 - END
+    } else {
       _qpoints = _pb.getPath(apl::PathBuilder::SINGLE_POINT_MODE, USER_DC_OWNPATH);
+    }
   }
 }
 
@@ -205,7 +229,7 @@ void PhononDispersionCalculator::writePDIS() {
   // Write header
   outfile << "# Phonon dispersion curves calculated by Aflow" << std::endl;
   outfile << "#" << std::endl;
-  outfile << "# <system>    \"" << _pc.getSuperCellStructure().title << "\"" << std::endl;
+  outfile << "# <system>    \"" << _system << "\"" << std::endl;  // ME190614 - use system name, not structure title
   outfile << "#" << std::endl;
   outfile << "# <units>     " << _frequencyFormat << std::endl;
   outfile << "# <nbranches> " << _pc.getNumberOfBranches() << std::endl;
@@ -372,5 +396,104 @@ bool PhononDispersionCalculator::isExactQPoint(const xvector<double>& qpoint,
 }
 
 // ///////////////////////////////////////////////////////////////////////////
+
+// ME190614 - START
+// Write the eigenvalues into a VASP EIGENVAL-formatted file
+void PhononDispersionCalculator::writePHEIGENVAL() {
+  string filename = DEFAULT_APL_PHEIGENVAL_FILE;
+  _logger << "Writing phonon eigenvalues into file " << filename << "." << apl::endl;
+  stringstream eigenval;
+  eigenval << createEIGENVAL();
+  aurostd::stringstream2file(eigenval, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+
+  // Also write PHKPOINTS and PHPOSCAR file
+  writePHPOSCAR();  // Structure required for plotting
+  writePHKPOINTS();
+}
+
+xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
+  xEIGENVAL xeigen;
+  stringstream outfile;
+  // Header values
+  xeigen.number_atoms = _pc.getInputCellStructure().atoms.size();
+  xeigen.number_loops = 0;
+  xeigen.spin = 0;
+  xeigen.Vol = GetVolume(_pc.getInputCellStructure())/xeigen.number_atoms;
+  xvector<double> lattice(3);
+  lattice[1] = _pc.getInputCellStructure().a * 1E-10;
+  lattice[2] = _pc.getInputCellStructure().b * 1E-10;
+  lattice[3] = _pc.getInputCellStructure().c * 1E-10;
+  xeigen.lattice = lattice;
+  xeigen.POTIM = 0.5E-15;
+  xeigen.temperature = _temperature;
+  xeigen.carstring = "PHON";
+  xeigen.title = _pc.getSystemName();
+  xeigen.number_electrons = 0;
+  for (uint at = 0; at < xeigen.number_atoms; at++) {
+    xeigen.number_electrons += _pc.getInputCellStructure().species_pp_ZVAL[at];
+  }
+  xeigen.number_kpoints = _freqs.size();
+  xeigen.number_bands = _pc.getNumberOfBranches();
+  
+  // Data
+  double weight = 1.0/_freqs.size();
+  double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
+  double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+  double conv = factorTHz2Raw * factorRaw2meV/1000;
+  apl::PathBuilder::StoreEnumType store = _pb.getStore();
+  xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(_pc.getInputCellStructure().lattice)));
+
+  xeigen.vweight.assign(xeigen.number_kpoints, weight);
+  xeigen.vkpoint.resize(xeigen.number_kpoints, xvector<double>(3));
+  xeigen.venergy.resize(xeigen.number_kpoints, deque<deque<double> >(xeigen.number_bands, deque<double>(1)));
+
+  for (uint q = 0; q < xeigen.number_kpoints; q++) {
+    if (store == apl::PathBuilder::CARTESIAN_LATTICE) xeigen.vkpoint[q] = c2f * _qpoints[q];
+    else xeigen.vkpoint[q] = _qpoints[q];
+    for (uint br = 0; br < xeigen.number_bands; br++) {
+      xeigen.venergy[q][br][0] = conv * _freqs[q][br + 1];
+    }
+  }
+  
+  return xeigen;
+}
+
+// ///////////////////////////////////////////////////////////////////////////
+
+// Write the structure into a VASP POSCAR-formatted file
+void PhononDispersionCalculator::writePHPOSCAR() {
+  string filename = DEFAULT_APL_PHPOSCAR_FILE;
+  stringstream poscar;
+  poscar << _pc.getInputCellStructure();
+  aurostd::stringstream2file(poscar, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+}
+
+// ///////////////////////////////////////////////////////////////////////////
+
+// Write the k-point path into a VASP KPOINTS-formatted file
+void PhononDispersionCalculator::writePHKPOINTS() {
+  string filename = DEFAULT_APL_PHKPOINTS_FILE;
+  stringstream kpoints;
+  kpoints << _pb.createKPOINTS(_pc.getSupercell());
+  aurostd::stringstream2file(kpoints, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHKPOINTS()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+}
+
+// ///////////////////////////////////////////////////////////////////////////
+// ME190614 - END
 
 }  // namespace apl

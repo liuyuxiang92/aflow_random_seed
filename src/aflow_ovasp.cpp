@@ -3571,7 +3571,10 @@ xDOSCAR::xDOSCAR() {
   venergy.clear();
   venergy.clear();
   vDOS.clear();viDOS.clear();
-  vDOSs.clear();vDOSp.clear();vDOSd.clear();
+  // vDOSs.clear();vDOSp.clear();vDOSd.clear(); OBSOLETE ME190614 - not used
+  partial = false; // ME190614
+  isLSCOUPLING = false;  // ME190620
+  lmResolved = false;  // ME190620
 }  
 
 xDOSCAR::~xDOSCAR() {
@@ -3585,9 +3588,9 @@ void xDOSCAR::free() {
   venergy.clear(); 
   vDOS.clear();
   viDOS.clear();
-  vDOSs.clear();
-  vDOSp.clear();
-  vDOSd.clear();
+  // vDOSs.clear();  OBSOLETE ME190614 - not used
+  // vDOSp.clear();  OBSOLETE ME190614 - not used
+  // vDOSd.clear();  OBSOLETE ME190614 - not used
 }
 
 void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
@@ -3609,13 +3612,17 @@ void xDOSCAR::copy(const xDOSCAR& b) { // copy PRIVATE
   number_energies=b.number_energies;
   denergy=b.denergy;  
   venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i));
-  venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i));
-  vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i));
+  //venergy.clear(); for(uint i=0;i<b.venergy.size();i++) venergy.push_back(b.venergy.at(i)); OBSOLETE ME190620 - duplicate
+  //vDOS.clear(); for(uint i=0;i<b.vDOS.size();i++) vDOS.push_back(b.vDOS.at(i)); OBSOLETE ME190614
+  vDOS.clear(); vDOS = b.vDOS;  // ME190614
   viDOS.clear(); for(uint i=0;i<b.viDOS.size();i++) viDOS.push_back(b.viDOS.at(i));
-  vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));
-  vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));
-  vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));
-  vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));
+  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME190614 - not used
+  //vDOSs.clear(); for(uint i=0;i<b.vDOSs.size();i++) vDOSs.push_back(b.vDOSs.at(i));  OBSOLETE ME190614 - not used
+  //vDOSp.clear(); for(uint i=0;i<b.vDOSp.size();i++) vDOSp.push_back(b.vDOSp.at(i));  OBSOLETE ME190614 - not used
+  //vDOSd.clear(); for(uint i=0;i<b.vDOSd.size();i++) vDOSd.push_back(b.vDOSd.at(i));  OBSOLETE ME190614 - not used
+  partial = b.partial;  // ME190614
+  isLSCOUPLING = b.isLSCOUPLING;  // ME190620
+  lmResolved = b.lmResolved;  // ME190620
 }
 
 const xDOSCAR& xDOSCAR::operator=(const xDOSCAR& b) {  // operator= PUBLIC
@@ -3672,12 +3679,19 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   vector<string> vline,tokens;
   aurostd::string2vectorstring(content,vcontent);
   string line;
+  uint ndos = 1;  // ME190614
   if(filename=="") filename="stringstream";
-  // crunchig to eat the info
-  for(uint iline=0;iline<vcontent.size();iline++) {
+  for(uint iline = 0; iline < 7;iline++) { // ME190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
     // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
     // WRONG if(iline==0 && tokens.size()==4)  spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
+    // ME190614 - START
+    if (iline == 0 && tokens.size() >= 4) {
+      number_atoms = aurostd::string2utype<uint>(tokens[1]);
+      partial = aurostd::string2utype<bool>(tokens[2]);
+      if (partial) ndos += number_atoms;
+    }
+    // ME190614 - END
     if(iline==1 && tokens.size()>=5) {
       uint i=0;
       Vol=aurostd::string2utype<double>(tokens.at(i++));
@@ -3687,7 +3701,8 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
-    if(iline==4) title=vcontent.at(iline);
+    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190620 - what kind of DOSCAR?
+    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190508 - clean title
     if(iline==5) {
       // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
       energy_max=aurostd::string2utype<double>(tokens.at(0));
@@ -3697,43 +3712,180 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
     if(iline==6 && tokens.size()==4) {spin=0;RWIGS=TRUE;}
     if(iline==6 && tokens.size()==7) {spin=1;RWIGS=TRUE;}
-    if(iline>=6 && iline < number_energies + 6 ) {
-      aurostd::string2tokens(vcontent.at(iline),tokens);
-      uint i=0;
-      if(tokens.size()==3 || tokens.size()==5) {
-	RWIGS=FALSE;
-	if(tokens.size()==3) spin=0;
-	if(tokens.size()==5) spin=1;
-	venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	//vDOS
-	deque<double> entryDOS;
-	entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==5) entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	vDOS.push_back(entryDOS);
-	//viDOS
-	deque<double> entryiDOS;
-	entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==5) entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	viDOS.push_back(entryiDOS);
-      }
-      if(tokens.size()==4 || tokens.size()==7) {
-	RWIGS=TRUE;
-	if(tokens.size()==4) spin=0;
-	if(tokens.size()==7) spin=1;
-	venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	//vDOS s p d
-	deque<double> entryDOSs,entryDOSp,entryDOSd;
-	entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==7) entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==7) entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	if(tokens.size()==7) entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
-	vDOSs.push_back(entryDOSs);
-	vDOSp.push_back(entryDOSp);
-	vDOSd.push_back(entryDOSd);
-      }
+    // ME190614 - START
+    if (iline == 6) {
+      if (tokens.size() == 3) spin = 0;
+      if (tokens.size() == 5) spin = 1;
     }
+    // ME190614 - END
+  }
+  // Done reading header
+  // ME190614 - START
+  uint norbitals = 0;
+  int d = 0, e = 0;
+  double dos;
+  if (partial) {
+    aurostd::string2tokens(vcontent.at(number_energies + 7), tokens, " ");
+    int ncols = (int) tokens.size() - 1;  // Don't count the energy column
+    if (carstring == "CAR") {  // VASP DOSCAR
+      // Determine whether the DOSCAR is lm-resolved and/or has spin-orbit coupling (SOC)
+      if (ncols == 16) {
+        // If the DOSCAR has 16 columns, the variables cannot be properly resolved.
+        // It could either lm-resolved with f-electrons and without spin polarization,
+        // or it is not lm-resolved with f-electrons and SOC. We need another input file
+        // to resolve this. The former case is VERY unlikely since calculations with
+        // f-electrons typically require spin polarization. So, SOC is the default.
+        // First, try and find filename extensions
+        vector<string> vstr;
+        string ext = "";
+        if (aurostd::substring2bool(filename, "DOSCAR.")) { 
+          aurostd::string2tokens(filename, vstr, ".");
+          for (uint i = 1; i < vstr.size(); i++) ext += "." + vstr[i];
+        } else if (aurostd::substring2bool(filename, "DOSCAR_")) {
+          aurostd::string2tokens(filename, vstr, "_");
+          for (uint i = 1; i < vstr.size(); i++) ext += "_" + vstr[i];
+        }
+        vstr.clear();
+        // Try INCAR first because it's the smallest file
+        if (aurostd::EFileExist("INCAR" + ext) || aurostd::FileExist("INCAR" + ext)) {
+          aurostd::efile2vectorstring("INCAR" + ext, vstr);
+          aurostd::RemoveComments(vstr);
+          for (uint i = 0; i < vstr.size(); i++) {
+            if (aurostd::substring2bool(vstr[i], "LSORBIT")) {
+              vector<string> tokens;
+              aurostd::string2tokens(vstr[i], tokens, " =");
+              tokens[1] = aurostd::toupper(tokens[1]);
+              if ((tokens[1][0] == 'T') || (aurostd::substring2bool(tokens[1], "TRUE"))) {
+                isLSCOUPLING = true;
+              } else {
+                isLSCOUPLING = false;
+              }
+              break;
+            }
+          }
+        // No INCAR found. Try vasprun.xml
+        } else if (aurostd::EFileExist("vasprun.xml" + ext) || aurostd::FileExist("vasprun.xml" + ext)) {
+          aurostd::efile2vectorstring("vasprun.xml" + ext, vstr);
+          for (uint i = 0; i < vstr.size(); i++) {
+            if (aurostd::substring2bool(vstr[i], "LSORBIT")) {
+              isLSCOUPLING = !(aurostd::substring2bool(vstr[i], "F"));  // Only contains "F" if LSORBIT is false
+              break;
+            }
+          }
+        // At last, try OUTCAR
+        } else if (aurostd::EFileExist("OUTCAR" + ext) || aurostd::FileExist("OUTCAR" + ext)) {
+          aurostd::efile2vectorstring("vasprun.xml" + ext, vstr);
+          for (uint i = 0; i < vstr.size(); i++) {
+            if (aurostd::substring2bool(vstr[i], "LSORBIT")) {
+              isLSCOUPLING = !(aurostd::substring2bool(vstr[i], "F"));  // Only contains "F" if LSORBIT is false
+              break;
+            }
+          }
+        // Nothing found, assume SOC (more likely case)
+        } else {
+          std::cerr << "WARNING: Could not determine whether the DOSCAR is lm-resolved"
+                    << " or contains spin-orbit coupling. AFLOW will assume that the"
+                    << " DOSCAR is lm-resolved. If this is not the case, please put an"
+                    << " INCAR" << ext << ", a vasprun.xml " << ext << ", or an"
+                    << " OUTCAR" << ext << " file into the working directory and try again" << std::endl;
+          isLSCOUPLING = true;
+        }
+        lmResolved = !(isLSCOUPLING);  // With 16 columns, it cannot be both
+      } else {
+        // Otherwise, the number of columns per spin smaller than 10 without
+        // SOC, except for lm-resolved DOS with f-electrons (32 columns)
+        isLSCOUPLING = ((ncols/(spin + 1) > 10) && (ncols != 32));
+      }
+      if (isLSCOUPLING) norbitals = ncols/4;
+      else norbitals = (ncols)/(spin + 1);
+      // Since VASP always prints s, p, and d orbitals, lm-resolved
+      // DOSCARS contain at least 9 oribtals
+      lmResolved = (norbitals > 8);
+    } else if (carstring == "PHON") {  // APL DOSCAR
+      norbitals = ncols;
+      isLSCOUPLING = false;
+      lmResolved = true;
+    }
+  }
+  if (isLSCOUPLING) {  // ME190620 - LSCOUPLING has four spin channels
+    vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(4, deque<double>(number_energies, 0.0))));
+  } else {
+    vDOS.assign(ndos, deque<deque<deque<double> > >(norbitals + 1, deque<deque<double> >(spin + 1, deque<double>(number_energies, 0.0))));
+  }
+  venergy.resize(number_energies);
+  viDOS.assign(spin + 1, deque<double>(number_energies, 0.0));
+  // Read data
+  for (uint iline = 6; iline < vcontent.size(); iline++) {
+    if (iline == (d + 1) * number_energies + 6 + d) {
+      d++;
+      e = 0;
+    } else {
+      aurostd::string2tokens(vcontent.at(iline),tokens);
+      if (d == 0) {
+        venergy[e] = aurostd::string2utype<double>(tokens[0]);
+        for (uint i = 0; i < (spin + 1); i++) {
+          vDOS[0][0][i][e] = aurostd::string2utype<double>(tokens[i + 1]);
+          viDOS[i][e] = aurostd::string2utype<double>(tokens[i + spin + 2]);
+        }
+        e++;
+      } else if (isLSCOUPLING) {  // ME190620 - LSCOUPLING has four spin channels
+        for (uint i = 0; i < 4 * norbitals; i++) {
+          dos = aurostd::string2utype<double>(tokens[i + 1]);
+          vDOS[d][i/4 + 1][i % 4][e] = dos;
+          vDOS[d][0][i % 4][e] += dos;
+          vDOS[0][i/4 + 1][i % 4][e] += dos;
+        }
+        e++;
+      } else {
+        for (uint i = 0; i < (spin + 1) * norbitals; i++) {
+          dos = aurostd::string2utype<double>(tokens[i + 1]);
+          vDOS[d][i/(spin + 1) + 1][i % (spin + 1)][e] = dos;
+          vDOS[d][0][i % (spin + 1)][e] += dos;
+          vDOS[0][i/(spin + 1) + 1][i % (spin + 1)][e] += dos;
+        }
+        e++;
+      }
+      // ME190614 - The procedure below makes too many assumptions about how the
+      // DOSCAR file is structured and fails for f-elements.
+      //[OBSOLETE]    if(iline>=6 && iline < number_energies + 6 ) {
+      //[OBSOLETE]      aurostd::string2tokens(vcontent.at(iline),tokens);
+      //[OBSOLETE]      uint i=0;
+      //[OBSOLETE]      if(tokens.size()==3 || tokens.size()==5) {
+      //[OBSOLETE]	RWIGS=FALSE;
+      //[OBSOLETE]	if(tokens.size()==3) spin=0;
+      //[OBSOLETE]	if(tokens.size()==5) spin=1;
+      //[OBSOLETE]	if (venergy.size() <= number_energies) venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));  // ME190507
+      //[OBSOLETE]	//vDOS
+      //[OBSOLETE]	deque<double> entryDOS;
+      //[OBSOLETE]	entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==5) entryDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	vDOS.push_back(entryDOS);
+      //[OBSOLETE]	//viDOS
+      //[OBSOLETE]	deque<double> entryiDOS;
+      //[OBSOLETE]	entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==5) entryiDOS.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	viDOS.push_back(entryiDOS);
+      //[OBSOLETE]      }
+      //[OBSOLETE]      if(tokens.size()==4 || tokens.size()==7) {
+      //[OBSOLETE]	RWIGS=TRUE;
+      //[OBSOLETE]	if(tokens.size()==4) spin=0;
+      //[OBSOLETE]	if(tokens.size()==7) spin=1;
+      //[OBSOLETE]	venergy.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	//vDOS s p d
+      //[OBSOLETE]	deque<double> entryDOSs,entryDOSp,entryDOSd;
+      //[OBSOLETE]	entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==7) entryDOSs.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==7) entryDOSp.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	if(tokens.size()==7) entryDOSd.push_back(aurostd::string2utype<double>(tokens.at(i++)));
+      //[OBSOLETE]	vDOSs.push_back(entryDOSs);
+      //[OBSOLETE]	vDOSp.push_back(entryDOSp);
+      //[OBSOLETE]	vDOSd.push_back(entryDOSd);
+      //[OBSOLETE]      }
+      //[OBSOLETE]    }
+    }
+    // ME190614 - END
   }
   // fix denergy
   denergy=venergy.at(1)-venergy.at(0);
@@ -3791,13 +3943,15 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: energy_max=" << energy_max << " energy_min=" << energy_min << endl;
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: denergy=" << denergy << endl;
   if(LVERBOSE) cout << "xDOSCAR::GetProperties: venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;
+  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  // ME190614 - new vDOS format
+  if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  // ME190614 - new viDOS format
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME190614
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
-  if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;
+  //if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME190614
   // if(LVERBOSE) cout << "xDOSCAR::GetProperties: vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
@@ -3808,6 +3962,60 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
+
+// ME190623 - BEGIN
+ostream& operator<<(ostream& oss, const xDOSCAR& xdos) {
+  // Header
+  oss << std::setw(4) << xdos.number_atoms
+      << std::setw(4) << xdos.number_atoms
+      << std::setw(4) << xdos.partial
+      << std::setw(4) << 0 << std::endl;
+  oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  oss << std::setprecision(7) << std::scientific;
+  oss << std::setw(15) << xdos.Vol;
+  for (int i = 1; i < 4; i++) oss << std::setw(15) << xdos.lattice[i];
+  oss << std::setw(15) << xdos.POTIM << std::endl;
+  oss << "  " << std::setprecision(15) << xdos.temperature << std::endl;
+  oss << "  " << xdos.carstring << std::endl;
+  oss << " " << xdos.title << std::endl;
+
+  stringstream dosline;  // Will be reused for projected DOS
+  dosline << std::dec << std::fixed << std::setprecision(8) << std::setw(15) << xdos.energy_max
+          << std::fixed << std::setw(15) << xdos.energy_min
+          << std::setprecision(0) << "  " << xdos.number_energies
+          << std::setprecision(8) << std::fixed << std::setw(15) << xdos.Efermi
+          << std::setprecision(8) << std::fixed << std::setw(15) << 1.0;
+  oss << dosline.str() << std::endl;
+
+  // Data
+  oss << std::setprecision(4);
+  for (uint e = 0; e < xdos.number_energies; e++) {
+    oss << std::setw(12) << xdos.venergy[e];
+    // Do not use vDOS.size() because it will mess up DOSCARs with spin-orbit coupling
+    for (uint s = 0; s < xdos.spin + 1; s++) {
+      oss << std::setw(12) << xdos.vDOS[0][0][s][e];
+    }
+    for (uint s = 0; s < xdos.spin + 1; s++) {
+      oss << std::setw(12) << xdos.viDOS[s][e];
+    }
+    oss << std::endl;
+  }
+
+  for (uint p = 1; p < xdos.vDOS.size(); p++) {
+    oss << dosline.str() << std::endl;
+    for (uint e = 0; e < xdos.number_energies; e++) {
+      oss << std::setw(12) << xdos.venergy[e];
+      for (uint o = 1; o < xdos.vDOS[p].size(); o++) {  // Do not output the total
+        for (uint s = 0; s < xdos.vDOS[p][o].size(); s++) {
+          oss << std::setw(12) << xdos.vDOS[p][o][s][e];
+        }
+      }
+      oss << std::endl;
+    }
+  }
+  return oss;
+}
+// ME190623 - END
 
 // ***************************************************************************
 // ***************************************************************************
@@ -3827,9 +4035,14 @@ xEIGENVAL::xEIGENVAL() {
   number_electrons=0;
   number_kpoints=0;
   number_bands=0;
+  energy_max = -1e30;  // ME190614
+  energy_min = 1e30;  // ME190614
   vweight.clear();
   vkpoint.clear();
   venergy.clear();
+  carstring = "";  // ME190620
+  number_atoms = 0;  // ME190623
+  number_loops = 0;  // ME190623
 }  
 
 xEIGENVAL::~xEIGENVAL() {
@@ -3865,6 +4078,8 @@ void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
   number_electrons=b.number_electrons;
   number_kpoints=b.number_kpoints;
   number_bands=b.number_bands;
+  energy_min = b.energy_min;  // ME190614
+  energy_max = b.energy_max;  // ME190614
   vweight.clear(); 
   for(uint i=0;i<b.vweight.size();i++) vweight.push_back(b.vweight.at(i));
   vkpoint.clear(); 
@@ -3876,6 +4091,9 @@ void xEIGENVAL::copy(const xEIGENVAL& b) { // copy PRIVATE
       temp.push_back(b.venergy.at(i).at(j));
     venergy.push_back(temp);
   }  
+  carstring = b.carstring;  // ME190620
+  number_atoms = b.number_atoms;  // ME190623
+  number_loops = b.number_loops;  // ME190623
 }
 
 const xEIGENVAL& xEIGENVAL::operator=(const xEIGENVAL& b) {  // operator= PUBLIC
@@ -3940,7 +4158,11 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for(uint iline=0;iline<vcontent.size();iline++) {
     aurostd::string2tokens(vcontent.at(iline),tokens);
     //    cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
-    if(iline==0 && tokens.size()==4)  spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
+    if(iline==0 && tokens.size()==4) {
+      number_atoms = aurostd::string2utype<int>(tokens[0]);  // ME190623
+      number_loops = aurostd::string2utype<int>(tokens[2]);  // ME190623
+      spin=aurostd::string2utype<int>(tokens.at(tokens.size()-1))-1;
+    }
     if(iline==1 && tokens.size()>=5) {
       uint i=0;
       Vol=aurostd::string2utype<double>(tokens.at(i++));
@@ -3950,7 +4172,8 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       POTIM=aurostd::string2utype<double>(tokens.at(i++));
     }
     if(iline==2) temperature=aurostd::string2utype<double>(vcontent.at(iline));
-    if(iline==4) title=vcontent.at(iline);
+    if(iline==3) carstring = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline)); // ME190620 - what kind of EIGENVAL file?
+    if(iline==4) title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vcontent.at(iline));  // ME190614 - clean title
     if(iline==5 && tokens.size()>=3) {
       uint i=0;
       number_electrons=aurostd::string2utype<uint>(tokens.at(i++));
@@ -3972,11 +4195,19 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	iline++; // move to energies
 	deque<double> keigenval;
 	deque<deque<double> > knenergy;
+        double eigen;  // ME190614
 	for(uint kline=0;kline<number_bands&&iline<vcontent.size();kline++,iline++) {
 	  aurostd::string2tokens(vcontent.at(iline),tokens);
 	  keigenval.clear();
-	  for(uint i=1;i<tokens.size();i++)
-	    keigenval.push_back(aurostd::string2utype<double>(tokens.at(i)));  // build one eigenvalue
+	  for(uint i=1;i<tokens.size();i++) {
+            // ME190614 - START
+            eigen = aurostd::string2utype<double>(tokens[i]);
+            if (eigen < energy_min) energy_min = eigen;
+            if (eigen > energy_max) energy_max = eigen;
+            keigenval.push_back(eigen);
+	    //[OBSOLETE] keigenval.push_back(aurostd::string2utype<double>(tokens.at(i)));  // build one eigenvalue
+            // ME190614 - END
+          }
 	  knenergy.push_back(keigenval);
 	}
 	venergy.push_back(knenergy);
@@ -4014,6 +4245,41 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
+}
+
+ostream& operator<<(ostream& oss, const xEIGENVAL& xeigen) {
+  // Header
+  oss << std::setw(4) << xeigen.number_atoms
+      << std::setw(4) << xeigen.number_atoms
+      << std::setw(4) << xeigen.number_loops
+      << std::setw(4) << (xeigen.spin + 1) << std::endl;
+  oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+  oss << std::setprecision(7) << std::scientific;
+  oss << std::setw(15) << xeigen.Vol;
+  for (int i = 1; i < 4; i++) oss << std::setw(15) << xeigen.lattice[i];
+  oss << std::setw(15) << xeigen.POTIM << std::endl;
+  oss << "  " << std::setprecision(15) << xeigen.temperature << std::endl;
+  oss << "  " << xeigen.carstring << std::endl;
+  oss << " " << xeigen.title << std::endl;
+  oss << std::dec << std::setw(4) << xeigen.number_electrons
+                     << "  " << std::setw(4) << xeigen.number_kpoints
+                     << std::setw(4) << xeigen.number_bands << std::endl;
+
+  // Data
+  for (uint k = 0; k < xeigen.number_kpoints; k++) {
+    oss << " " << std::endl;  // space MUST be there or the EIGENVAL reader will fail
+    oss << std::scientific << std::setprecision(8);
+    for (int i = 1; i < 4; i++) oss << "  " << xeigen.vkpoint[k][i];
+    oss << "  " << xeigen.vweight[k] << std::endl;
+    for (uint br = 0; br < xeigen.number_bands; br++) {
+      oss << std::dec << std::setprecision(0) << std::setw(4) << (br + 1);
+      for (uint s = 0; s < xeigen.spin + 1; s++) {
+        oss << std::setprecision(8) << std::fixed << std::setw(15) << xeigen.venergy[k][br][s];
+      }
+      oss << std::endl;
+    }
+  }
+  return oss;
 }
 
 //---------------------------------------------------------------------------------
@@ -6840,6 +7106,7 @@ xKPOINTS::xKPOINTS() {
   path_mode="";                 // for aflowlib_libraries.cpp
   path="";                      // for aflowlib_libraries.cpp
   vpath.clear();                // for aflowlib_libraries.cpp
+  vkpoints.clear();             // ME190614
   path_grid=0;                  // for aflowlib_libraries.cpp
 }        
 
@@ -6853,6 +7120,7 @@ void xKPOINTS::free() {
   nnn_kpoints.clear();          // for aflowlib_libraries.cpp
   ooo_kpoints.clear();          // for aflowlib_libraries.cpp
   vpath.clear();                // for aflowlib_libraries.cpp
+  vkpoints.clear();             // ME190614
 }
 
 void xKPOINTS::copy(const xKPOINTS& b) { // copy PRIVATE
@@ -6871,6 +7139,7 @@ void xKPOINTS::copy(const xKPOINTS& b) { // copy PRIVATE
   path_mode=b.path_mode;
   path=b.path;
   vpath=b.vpath;
+  vkpoints = b.vkpoints;  // ME190614
   path_grid=b.path_grid;
 }
 
@@ -6987,6 +7256,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       path_grid=aurostd::string2utype<int>(vcontent.at(1));
       grid_type=vcontent.at(2);
       path_mode=vcontent.at(3);
+      xvector<double> kpt(3);  // ME190614
       for(uint iline=4;iline<vcontent.size();iline++) {
 	aurostd::StringSubst(vcontent.at(iline),"!","@");
 	if(aurostd::substring2bool(vcontent.at(iline),"@")) { // avoid removing ! as comment
@@ -6996,8 +7266,11 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 	    for(uint k=0;k<tokens.size();k++) {
 	      if(tokens.at(k)=="@" && k+1<tokens.size()) {
 		vpath.push_back(tokens.at(k+1));
-	      }
+	      } else if (k < 3) {  // ME190614
+                kpt[k+1] = aurostd::string2utype<double>(tokens[k]);
+              }
 	    }
+            vkpoints.push_back(kpt);  // ME190614
 	  }
 	}
       }
@@ -7061,6 +7334,80 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(ERROR_flag) return FALSE;
   return TRUE;
 }
+
+// ME190623 - BEGIN
+ostream& operator<<(ostream& oss, const xKPOINTS& xkpts) {
+  if (xkpts.is_KPOINTS_NNN) {
+    oss << xkpts.title << std::endl;
+    oss << xkpts.mode << std::endl;
+    oss << xkpts.grid_type << std::endl;
+    oss << aurostd::joinWDelimiter(xkpts.nnn_kpoints, " ") << std::endl;
+    if (aurostd::iszero(xkpts.ooo_kpoints)) {
+      oss << "0 0 0" << std::endl;  // No need to print all those decimal places if zero
+    } else {
+      oss << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+      for (int i = 1; i < 4; i++) {
+        oss << std::scientific << std::setprecision(4) << std::setw(9) << xkpts.ooo_kpoints[i];
+      }
+      oss << std::endl;
+    }
+  } else if (xkpts.is_KPOINTS_PATH) {
+    oss << xkpts.title << std::endl;
+    oss << xkpts.path_grid << std::endl;
+    oss << xkpts.grid_type << std::endl;
+    oss << xkpts.path_mode << std::endl;
+    for (uint i = 0; i < xkpts.vpath.size(); i++) {
+      for (int j = 1; j < 4; j++) {
+        oss << std::setprecision(4) << std::fixed << std::setw(9) << xkpts.vkpoints[i][j];
+      }
+      oss << "  ! " << xkpts.vpath[i] << std::endl;
+      if ((i % 2 == 1) && (i < xkpts.vpath.size() - 1)) oss << std::endl;
+    }
+  }
+  return oss;
+}
+
+string xKPOINTS::createStandardTitlePath(const xstructure& xstr) {
+  // Lattice part
+  string stdtitle = xstr.bravais_lattice_type;
+  if (stdtitle == "CUB") stdtitle += " (simple cubic) ";
+  else if (stdtitle == "FCC") stdtitle += " (face-centered cubic) ";
+  else if (stdtitle == "BCC") stdtitle += " (body-centered cubic) ";
+  else if (stdtitle == "TET") stdtitle += " (tetragonal) ";
+  else if (stdtitle == "BCT") stdtitle += " (body-centered tetragonal) ";
+  else if (stdtitle == "BCT1") stdtitle += " (body-centered tetragonal c < a) ";
+  else if (stdtitle == "BCT2") stdtitle += " (body-centered tetragonal a < c) ";
+  else if (stdtitle == "ORC") stdtitle += " (orthorhombic) ";
+  else if (stdtitle == "ORCF") stdtitle += " (face-centered orthorhombic) ";
+  else if (stdtitle == "ORCF1") stdtitle += " (face-centered orthorhombic 1/a^2 > 1/b^2+1/c^2) ";
+  else if (stdtitle == "ORCF2") stdtitle += " (face-centered orthorhombic 1/a^2 < 1/b^2+1/c^2) ";
+  else if (stdtitle == "ORCF3") stdtitle += " (face-centered orthorhombic 1/a^2 = 1/b^2+1/c^2) ";
+  else if (stdtitle == "ORCI") stdtitle += " (body-centered orthorhombic a < b < c) ";
+  else if (stdtitle == "ORCC") stdtitle += " (C-centered orthorhombic a < b) ";
+  else if (stdtitle == "HEX") stdtitle += " (hexagonal) ";
+  else if (stdtitle == "RHL") stdtitle += " (rhombohedral) ";
+  else if (stdtitle == "RHL1") stdtitle += " (rhombohedral alpha < 90) ";
+  else if (stdtitle == "RHL2") stdtitle += " (rhombohedral alpha > 90) ";
+  else if (stdtitle == "MCL") stdtitle += " (monoclinic) ";
+  else if (stdtitle == "MCLC") stdtitle += " (C-centered monoclinic) ";
+  else if (stdtitle == "MCLC1") stdtitle += " (C-centered monoclinic kgamma > 90) ";
+  else if (stdtitle == "MCLC2") stdtitle += " (C-centered monoclinic kgamma = 90) ";
+  else if (stdtitle == "MCLC3") stdtitle += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2<1) ";
+  else if (stdtitle == "MCLC4") stdtitle += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2=1) ";
+  else if (stdtitle == "MCLC5") stdtitle += " (C-centered monoclinic kgamma < 90, bcos(alpha)/c+(bsin(alpha)/a)^2>1) ";
+  else if ((stdtitle == "TRI") || (aurostd::toupper(stdtitle) == "TRI1A") || (aurostd::toupper(stdtitle) == "TRI1B") || (aurostd::toupper(stdtitle) == "TRI2A") || (aurostd::toupper(stdtitle) == "TRI2B")) stdtitle += " (triclinic) ";
+
+  // Path part
+  stdtitle += vpath[0];
+  for (uint i = 2; i < vpath.size(); i+= 2) {
+    stdtitle += "-" + vpath[i-1];
+    if (vpath[i-1] != vpath[i]) stdtitle += "|" + vpath[i];
+  }
+  stdtitle += "-" + vpath.back();
+  return stdtitle;
+}
+
+// ME190623 - END
 
 //---------------------------------------------------------------------------------
 // class xCHGCAR

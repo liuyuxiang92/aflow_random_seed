@@ -2133,8 +2133,8 @@ xstructure LatticeReduction(const xstructure& a);
 xmatrix<double> LatticeReduction(const xmatrix<double>& lattice);
 // CO 170807 - START
 //DX 20190214 [OBSOLETE] deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew); //CO190520 - removed pointers for bools and doubles, added const where possible
-deque<_atom> foldAtomsInCell(const xstructure& a, const xmatrix<double>& lattice_new, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-deque<_atom> foldAtomsInCell(const deque<_atom>& atoms, const xmatrix<double>& lattice_orig, const xmatrix<double>& lattice_new, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const xstructure& a, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - added check_min_dists bool
+deque<_atom> foldAtomsInCell(const deque<_atom>& atoms, const xmatrix<double>& lattice_orig, const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists=true); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 = added check_min_dists bool
 xstructure GetPrimitiveVASP(const xstructure& a);
 xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 // CO 170807 - STOP
@@ -2907,18 +2907,29 @@ class xDOSCAR {
   double energy_max;
   double energy_min;
   uint number_energies;
+  uint number_atoms;  // ME190614
+  bool partial;  // ME190614
   double denergy;
   deque<double> venergy;                                        // venergy.at(energy_number) 
   deque<double> venergyEf;                                      // venergyEf.at(energy_number) 
-  deque<deque<double> > vDOS;                                   // vDOS.at(energy_number).at(spin)
-  deque<deque<double> > viDOS;                                  // viDOS.at(energy_number).at(spin)
-  deque<deque<double> > vDOSs;                                  // vDOSs.at(energy_number).at(spin)
-  deque<deque<double> > vDOSp;                                  // vDOSp.at(energy_number).at(spin)
-  deque<deque<double> > vDOSd;                                  // vDOSd.at(energy_number).at(spin)
+  // ME190614 - BEGIN
+  //[OBSOLETE]  deque<deque<double> > vDOS;                                   // vDOS.at(energy_number).at(spin)
+  deque<deque<double> > viDOS;                                  // viDOS.at(spin).at(energy_number)
+  //[OBSOLETE]  deque<deque<double> > vDOSs;                                  // vDOSs.at(energy_number).at(spin)
+  //[OBSOLETE]  deque<deque<double> > vDOSp;                                  // vDOSp.at(energy_number).at(spin)
+  //[OBSOLETE]  deque<deque<double> > vDOSd;                                  // vDOSd.at(energy_number).at(spin)
+  deque<deque<deque<deque<double> > > > vDOS;                   // vDOS.at(atom).at(orbital).at(spin).at(energy_number); 0 = total for atoms and orbitals
+  // ME190614 - END
+  // ME190620 - BEGIN
+  bool isLSCOUPLING;  // Contains spin-orbit coupling
+  bool lmResolved;  // Is it lm-resolved?
+  string carstring;  // The fourth line of the DOSCAR
+  // ME190620 - END
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  friend ostream& operator<<(ostream&, const xDOSCAR&);  // ME190623
  private:                                                        //
   void free();                                                  // free space
   void copy(const xDOSCAR& b);                                  //
@@ -2935,6 +2946,8 @@ class xEIGENVAL {
   // CONTENT
   string content;vector<string> vcontent;string filename;       // the content, and lines of it
   string title;
+  uint number_atoms;  // ME190623
+  uint number_loops;  // ME190623
   uint spin;
   double Vol,POTIM;
   xvector<double> lattice;
@@ -2943,10 +2956,14 @@ class xEIGENVAL {
   deque<double> vweight;                                        // vweight.at(kpoint number)
   deque<xvector<double> > vkpoint;                              // vkpoint.at(kpoint number)[1,2,3]=xyz.
   deque<deque<deque<double> > > venergy;                        // venergy.at(kpoint number).at(band number).at(spin number)
+  string carstring;  // ME190620 - the fourth line of the EIGENVAL file
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  double energy_max;  // ME190614
+  double energy_min;  // ME190614
+  friend ostream& operator<<(ostream&, const xEIGENVAL&);  // ME190623
  private:                                                        //
   void free();                                                  // free space
   void copy(const xEIGENVAL& b);                                //
@@ -3056,10 +3073,13 @@ class xKPOINTS {
   xvector<double> ooo_kpoints; // ORIGIN                         // triplet of origin
   int nkpoints;                                                  // total kpoints
   string path_mode,path;vector<string> vpath;int path_grid;      // path if any
+  vector<xvector<double> > vkpoints;                             // ME190614 - k-point coordinates of the path
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);       // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  friend ostream& operator<<(ostream&, const xKPOINTS&);  // ME190623
+  string createStandardTitlePath(const xstructure&);  // ME190623
  private:                       //
   void free();                 // free space
   void copy(const xKPOINTS& b); //
@@ -3184,6 +3204,80 @@ bool is_equal_position_kEn_str      (const kEn_st& k1, const kEn_st& k2);
 bool near_to                        (const xvector<double> & k1, const xvector<double> & k2, const vector<double> & max_distance);
 // [OBSOLETE] bool GetEffectiveMass(xOUTCAR& outcar,xDOSCAR& doscar,xEIGENVAL& eigenval,xstructure xstr,ostream& oss,const bool& osswrite);
 //-------------------------------------------------------------------------------------------------
+// ME190614 - plotter functions
+namespace plotter {
+  // Plot setup --------------------------------------------------------------
+  // Plot options
+  aurostd::xoption getPlotOptions(const aurostd::xoption&, const string&, bool=false);
+  aurostd::xoption getPlotOptionsEStructure(const aurostd::xoption&, const string&, bool=false);
+  aurostd::xoption getPlotOptionsPhonons(const aurostd::xoption&, const string&);
+
+  // Plot functions
+  void generateHeader(stringstream&, const aurostd::xoption&, bool=false);
+  void savePlotGNUPLOT(const aurostd::xoption&, const stringstream&);
+  void setFileName(aurostd::xoption&, string="");
+  void setTitle(aurostd::xoption&);
+  string formatDefaultPlotTitle(const aurostd::xoption&);
+  string formatCompoundLATEX(const string&);
+
+  // Electronic structure ----------------------------------------------------
+  // Plot functions
+  void PLOT_DOS(aurostd::xoption&);
+  void PLOT_DOS(aurostd::xoption&, stringstream&);
+  void PLOT_PDOS(aurostd::xoption&);
+  void PLOT_PDOS(aurostd::xoption&, stringstream&);
+  void PLOT_BAND(aurostd::xoption&);
+  void PLOT_BAND(aurostd::xoption&, stringstream&);
+  void BANDDOS2JSON(ostream&, string);
+  void PLOT_BANDDOS(aurostd::xoption&);
+  void PLOT_BANDDOS(aurostd::xoption&, stringstream&);
+
+  // Helper functions
+  xstructure getStructureWithNames(const aurostd::xoption&);
+  string getLatticeFromKpointsTitle(const string&);
+  void shiftEfermiToZero(xEIGENVAL&, double);
+  void setEMinMax(aurostd::xoption&, double, double);
+
+  // DOS
+  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&);
+
+  // Bands
+  void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
+  string convertKPointLabel(const string&, const string&);
+  string convertKPointLetter(string, const string&);
+
+  // Gnuplot
+  void generateDosPlotGNUPLOT(stringstream&, const xDOSCAR&, const deque<double>&,
+                              const deque<deque<deque<double> > >&, const vector<string>&, const aurostd::xoption&);
+  void generateBandPlotGNUPLOT(stringstream&, const xEIGENVAL&, const vector<double>&,
+                               const vector<double>&, const vector<string>&, const aurostd::xoption&);
+  string getFormattedUnit(const string&);
+
+  // Phonons -----------------------------------------------------------------
+  void PLOT_PHDOS(aurostd::xoption&);
+  void PLOT_PHDOS(aurostd::xoption&, stringstream&);
+  void PLOT_PHDISP(aurostd::xoption&);
+  void PLOT_PHDISP(aurostd::xoption&, stringstream&);
+  void PLOT_PHDISPDOS(aurostd::xoption&);
+  void PLOT_PHDISPDOS(aurostd::xoption&, stringstream&);
+  void convertEnergies(xEIGENVAL&, const string&);
+  void convertEnergies(xDOSCAR&, const string&);
+  double getEnergyConversionFactor(const string&);
+
+  // Properties plotter ------------------------------------------------------
+  void PLOT_THERMO(aurostd::xoption&);
+  void PLOT_THERMO(aurostd::xoption&, stringstream&);
+  void PLOT_TCOND(aurostd::xoption&);
+  void PLOT_TCOND(aurostd::xoption&, stringstream&);
+
+  // General plots -----------------------------------------------------------
+  void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int);
+  void plotMatrix(xoption& plotoptions, stringstream&);
+  void setPlotLabels(aurostd::xoption&, const string&, const string&, const string&, const string&);
+  vector<vector<double> > readAflowDataFile(aurostd::xoption&);
+  void generatePlotGNUPLOT(stringstream&, const xoption&, const vector<vector<double> >&);
+}
+
 //-------------------------------------------------------------------------------------------------
 // aflow_estructure_dos.cpp
 
@@ -3461,33 +3555,51 @@ namespace SYM {
   bool CalculateFactorGroup(ofstream& FileMESSAGE,xstructure& a,_aflags& aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");     // FACTOR GROUP     _FGROUP_
   bool CalculateFactorGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt");      // FACTOR GROUP      _FGROUP_
   // DX - START
-  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol);   //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice);
-  double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice,xvector<double>& min_vec,xvector<int>& ijk);
-  xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
-                                         const xmatrix<double>&);  // ME 180730
-  xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
-                                         const xmatrix<double>&, xvector<int>&);  // ME180730
-  bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction);
-  bool PBC(xvector<double>& v_in);
-  xvector<double> FPOSDistance(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //CO190525
-  xvector<double> FPOSDistance(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew=false);  //CO190525
-  bool AtomFPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool AtomFPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool AtomFPOSMatch(const xvector<double>& atom1, const xvector<double>& atom2, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, bool skew, double tol); //DX 20190620
+  bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol);   //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice); //DX 20190613
+  xvector<double> minimizeDistanceCartesianMethod(const xvector<double>& cpos1, const xvector<double>& cpos2, const xmatrix<double>& lattice, xvector<int>& ijk); //DX 20190613
+  xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fpos1, const xvector<double>& fpos2); //DX 20190613
+  xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff); //DX 20190613
+  xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff, xvector<int>& ijk); //DX 20190613
+  //DX 20190613 [OBOSLETE] bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+  //DX 20190613 [OBOSLETE] bool minimizeCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, xvector<double>& out, const xmatrix<double>& c2f, const xmatrix<double>& f2c, xvector<int>& ijk, bool& restriction, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+  //DX 20190613 [OBOSLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice);
+  //DX 20190613 [OBOSLETE] double minimumCartesianDistance(const xvector<double>& coord1, const xvector<double>& coord2, const xmatrix<double>& lattice,xvector<double>& min_vec,xvector<int>& ijk);
+  //DX 20190613 [OBOSLETE] xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
+  //DX 20190613 [OBOSLETE]                                        const xmatrix<double>&);  // ME 180730
+  //DX 20190613 [OBOSLETE] xvector<double> minimumCartesianVector(const xvector<double>&, const xvector<double>&,
+  //DX 20190613 [OBOSLETE]                                        const xmatrix<double>&, xvector<int>&);  // ME180730
+  //DX 20190613 [OBOSLETE] bool PBC(xvector<double>& v_in, xvector<int>& ijk, bool& restriction);
+  //DX 20190613 [OBOSLETE] bool PBC(xvector<double>& v_in);
+  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //CO190525
+  xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew=false);  //CO190525
+  xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,bool skew=false);  //DX 20190620
+  xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew=false); //DX 20190620
+  
+  bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //DX 20190620 - overload
+  bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //DX 20190620 - overload 
+  bool FPOSMatch(const xvector<double>& atom1, const xvector<double>& atom2, const xmatrix<double>& lattice, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  bool FPOSMatch(const xvector<double>& atom1, const xvector<double>& atom2, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //DX 20190620 - overload 
   bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_); //CO190520 - removed pointers for bools and doubles, added const where possible
   bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool MapAtom(const deque<_atom>& a_vec, const _atom& b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtom(const deque<_atom>& a_vec, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol); //DX 20190620
+  bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol); //DX 20190620
+  bool MapAtom(const vector<_atom> a_vec, const _atom b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, bool skew, double tol); //DX 20190620
+  bool MapAtom(const xvector<double>& a, const xvector<double>& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, bool skew, double tol); //DX 20190620 
+  bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
   bool BringInCellTolABC(xstructure& a, xvector<double> tol_abc_res);
   //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(vector<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol,bool fast=true);    //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true);   //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, bool skew, double tol, uint& mapped_index,bool fast=true); //DX 20190620
+  bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true);   //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
   //[CO190515 - not needed and is ambiguous with overload]bool MapAtomWithBasis(deque<_atom>& vec, _atom& a, bool map_types, deque<uint>& index_to_check, xmatrix<double>& c2f, xmatrix<double>& f2c, bool skew, double tol,bool fast=true); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool MapAtomWithBasis(const deque<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& c2f, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true); //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool MapAtomWithBasis(const deque<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, bool skew, double tol, uint& mapped_index,bool fast=true); //DX 20190620
+  bool MapAtomWithBasis(const deque<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast=true); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
   bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol); //CO190520 - removed pointers for bools and doubles, added const where possible
   double minimumDistance(const xstructure& xstr);
   double minimumDistance(const deque<_atom>& atoms, const xmatrix<double>& lattice,double scale=1.0);

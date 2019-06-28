@@ -5258,7 +5258,8 @@ void xstructure::RemoveFractionalCopies(double tol) {
       flag_remove=false;
       for(iat2=iat1+1;iat2<atoms.size()&&flag_remove==FALSE;iat2++){
         xvector<double> fdiff = atoms.at(iat1).fpos-atoms.at(iat2).fpos; //DX 5/3/18 - account for PBC
-        SYM::PBC(fdiff); //DX 5/3/18 - account for PBC
+        fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+        //DX 20190613 [OBSOLETE] SYM::PBC(fdiff); //DX 5/3/18 - account for PBC
         if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) { //DX 5/3/18 - account for PBC and perform in Cartesian space
 	//DX 5/3/18 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE) {
 	  flag_remove=TRUE;
@@ -9179,7 +9180,7 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX 20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX 20190214 [OBSOLETE]}
 
-deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol) { //CO190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="foldAtomsInCell():";
 
@@ -9213,10 +9214,10 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
   }
   const deque<_atom> atoms=*ptr_atoms;
 
-  return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol);
+  return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol,check_min_dists); //DX 20190619 = added check_min_dists bool
 }
 
-deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol) {  
+deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX 20190619 - added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="foldAtomsInCell():";
   
@@ -9252,7 +9253,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //[OBSOLETE]if(duplicate_atom == false) {
-    if(!SYM::MapAtom(atoms_in_cell,tmp,false,c2f_new,f2c_new,skew,tol)){
+      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX 20190619 - lattice_new and f2c_new as input
       //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
       //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
       atoms_in_cell.push_back(atoms[j]);
@@ -9263,13 +9264,15 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     //[CO190520 - this case is not needed]}
   }
 
-  double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
-  double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
-  if(LDEBUG){
-    cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
-    cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
+  if(check_min_dists){ //DX 20190613
+    double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
+    double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
+    if(LDEBUG){
+      cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
+      cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
+    }
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
   }
-  if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
 
   return atoms_in_cell;
 }
@@ -9821,7 +9824,8 @@ bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double
     for(uint jat=0;jat<a.atoms.size();jat++) {
       if(types[iat]==types[jat]) {
         diff=ftpos-a.atoms.at(jat).fpos;
-        SYM::PBC(diff); //DX 20190317 - need to use PBC for comparing difference vectors
+        diff = SYM::minimizeDistanceFractionalMethod(diff); //DX 20190613
+        //DX 20190613 [OBSOLETE] SYM::PBC(diff); //DX 20190317 - need to use PBC for comparing difference vectors
         // If the translated atom maps onto another and its type is the same as the atom mapped onto then increment.
         if(aurostd::modulus(diff)< tolerance ) CntGoodTrans++;
       }
@@ -11008,7 +11012,8 @@ bool inCell(xvector<double>& pos_vec){
 bool alreadyInCell(_atom& atom, deque<_atom> atoms){
   for(uint i=0;i<atoms.size();i++){ 
     xvector<double> fdiff = atom.fpos-atoms[i].fpos;
-    SYM::PBC(fdiff);
+    fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+    //DX 20190613 [OBSOLETE] SYM::PBC(fdiff);
     if(aurostd::abs(fdiff(1))<_ZERO_TOL_ && 
        aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
        aurostd::abs(fdiff(3))<_ZERO_TOL_){
@@ -13507,7 +13512,9 @@ string xstructure2json(xstructure& xstr) {
  
   // SPECIES 
   if(xstr.species.size()){
-    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapDeqEntries(xstr.species,"\""),",") << "]" << eendl;
+    deque<string> cleaned_species; //DX 20190612 - cleaned species names
+    for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX 20190612 - cleaned species names
+    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapDeqEntries(cleaned_species,"\""),",") << "]" << eendl; //DX 20190612 - cleaned species names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"species\":null" << eendl;}
   }
@@ -13561,7 +13568,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
   // NAME 
   if(atom.name.size()){
-    sscontent_json << "\"name\":\"" << atom.name << "\"" << eendl;
+    sscontent_json << "\"name\":\"" << KBIN::VASP_PseudoPotential_CleanName(atom.name) << "\"" << eendl; //DX 20190612 - added function to clean names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"name\":null" << eendl;}
   }

@@ -2420,7 +2420,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
   uint starting_atom=AUROSTD_MAX_UINT;
   for(uint i=0;i<atoms.size();i++){
     if(LDEBUG){cerr << soliloquy << " checking atoms[i=" << i << "].fpos=" << atoms[i].fpos << endl;}
-    if(SYM::AtomFPOSMatch(fpos_starting,atoms[i].fpos,c2f,f2c,skew,sym_eps)){starting_atom=i;break;}
+    if(SYM::FPOSMatch(fpos_starting,atoms[i].fpos,lattice,f2c,skew,sym_eps)){starting_atom=i;break;} //DX 20190619 - lattice and f2c as input
   }
   if(starting_atom==AUROSTD_MAX_UINT){
     if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}
@@ -2494,7 +2494,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
       if(LDEBUG){cerr << soliloquy << " dist_rorigin=" << dist_rorigin << endl;}
       cpos_final+=cdiff;
       fpos_final=BringInCell(c2f*cpos_final);
-      dist_rorigin_new=aurostd::modulus(f2c*SYM::FPOSDistance(fpos_final,atoms[ind_min].fpos,lattice,c2f,f2c,skew));  //using fpos_final as a check
+      dist_rorigin_new=aurostd::modulus(f2c*SYM::FPOSDistFromFPOS(fpos_final,atoms[ind_min].fpos,lattice,c2f,f2c,skew));  //using fpos_final as a check //DX 20190620 - changed function name
       if(LDEBUG){
         cerr << soliloquy << " cpos_final(post)=" << cpos_final << endl;
         cerr << soliloquy << " fpos_final(post)=" << fpos_final << endl;
