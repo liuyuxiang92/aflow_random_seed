@@ -1139,7 +1139,6 @@ class PhononDispersionCalculator {
   // ME190614 - START
   xEIGENVAL createEIGENVAL();
   void writePHEIGENVAL();
-  void writePHPOSCAR();
   void writePHKPOINTS();
   string _system;
   // ME19614 - STOP

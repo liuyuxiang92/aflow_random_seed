@@ -1169,6 +1169,26 @@ DEFAULT_APL_HSKPTS_FILE
   type: string
   default: "hskpoints.out"
 
+DEFAULT_APL_PHDOSCAR_FILE
+  description: Output file for the phonon DOS in VASP DOSCAR format.
+  type: string
+  default: "PHDOSCAR"
+
+DEFAULT_APL_PHPOSCAR_FILE
+  description: Output file for the unit cell of the phonon calcultions in VASP5 POSCAR format.
+  type: string
+  default: "PHPOSCAR"
+
+DEFAULT_APL_PHKPOINTS_FILE
+  description: Output file for the phonon dispersion path in VASP KPOINTS format.
+  type: string
+  default: "PHKPOINTS"
+
+DEFAULT_APL_PHEIGENVAL_FILE
+  description: Output file for the phonon dispersion in VASP EIGENVAL format.
+  type: string
+  default: "PHEIGENVAL"
+
 ####################################################################################################
 DEFAULTS AAPL
 
