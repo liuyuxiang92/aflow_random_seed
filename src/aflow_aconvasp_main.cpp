@@ -14346,7 +14346,7 @@ namespace pflow {
     if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
     vector<double> v_twotheta,v_intensity;
     GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
     
     string title=aurostd::fixStringLatex(str.title,true,false);  //double_back_slash==true (gnuplot), not symmetry sting
     if(1||force_generic_title){title.clear();}  //force generic
