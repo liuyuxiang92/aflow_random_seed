@@ -1552,41 +1552,41 @@ public:
   {return a[0]>b[0];} // Sorts in increasing order.
 };
 
-// ***************************************************************************
-// PrintXRAY hkl_cmp
-// ***************************************************************************
-// This function sorts hkl
-class hkl_cmp{
-public:
-  int operator()(const vector<int>& a, const vector<int>& b)
-  {
-    if(a[0]!=b[0]){return a[0]>b[0];}
-    if(a[1]!=b[1]){return a[1]>b[1];}
-    //if(a[2]!=b[2]){return a[2]>b[2];}
-    return a[2]>b[2];   //return something...
-    //[CO190620 - what if h, k,or l is bigger than 10?]int na=a[0]*100+a[1]*10+a[2];
-    //[CO190620 - what if h, k,or l is bigger than 10?]int nb=b[0]*100+b[1]*10+b[2];
-    //[CO190620 - what if h, k,or l is bigger than 10?]return na>nb;
-  }
-};
-//      int t=1,f=1;
-//      if(a[0]<b[0]) {
-//	return false;
-//      }
-//      else {
-//	if(a[1]<b[1]) {
-//	  return false;
-//	}
-//	else {
-//	  if(a[2]<b[2]) {
-//	    return false;
-//	  }
-//	  else {
-//	    return true;
-//	  }
-//	}
-//      }
-//    }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// PrintXRAY hkl_cmp
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// This function sorts hkl
+//[CO190629 - replaced with aurostd::compareVecElements<int>]class hkl_cmp{
+//[CO190629 - replaced with aurostd::compareVecElements<int>]public:
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  int operator()(const vector<int>& a, const vector<int>& b)
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    if(a[0]!=b[0]){return a[0]>b[0];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    if(a[1]!=b[1]){return a[1]>b[1];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //if(a[2]!=b[2]){return a[2]>b[2];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    return a[2]>b[2];   //return something...
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]int na=a[0]*100+a[1]*10+a[2];
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]int nb=b[0]*100+b[1]*10+b[2];
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]return na>nb;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]};
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      int t=1,f=1;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      if(a[0]<b[0]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	if(a[1]<b[1]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  if(a[2]<b[2]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	    return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	    return true;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//    }
 
 namespace pflow {
 void GetXrayData(const xstructure& str,
@@ -1740,7 +1740,8 @@ void GetXrayData(const xstructure& str,
         else { // Store one hkl, dist, total sf, multiplicity of point in data vector and then reset hkl_list vector to new hkl.
           vector<double> datav(6);
           // Sort hkl
-          sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
+          //[CO190629 - waste of a class]sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
+          sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order (greater go first)
           datav[0]=(double) hkl_list[0][0];  
           datav[1]=(double) hkl_list[0][1];  
           datav[2]=(double) hkl_list[0][2];  

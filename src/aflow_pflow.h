@@ -433,8 +433,8 @@ namespace pflow {
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const string& directory="");  //CO190620
   void PRINT_XRAY_DATA_PLOT(const string& filename,const string& directory="");  //CO190620
   void PRINT_XRAY_DATA_PLOT(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& directory=""); //CO190620
-  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input,bool force_generic_title=false); //CO190409
-  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str,bool force_generic_title=false); //CO190409
+  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input); //CO190409
+  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str); //CO190409
   void PLOT_XRAY(istream& input,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
   void PLOT_XRAY(const xstructure& str,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
   void PLOT_XRAY(const aurostd::xoption& vpflow,const string& title="",const string& directory="",bool keep_gp=false);  //CO190620

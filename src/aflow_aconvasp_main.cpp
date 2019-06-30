@@ -1237,6 +1237,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"XRAY","--xray=","");
   vpflow.args2addattachedscheme(argv,cmds,"XRAY_PEAKS","--xray_peaks=",""); //CO190520
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_XRAY","--plot_xray=",""); //CO190520
+  vpflow.flag("PLOT_XRAY::FORCE_GENERIC_TITLE",aurostd::args2flag(argv,cmds,"--force_generic_title|--force_title|--title"));  //CO190629
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_XRAY_FILE","--plot_xray_file=",""); //CO190520
   // [OBSOLETE] vpflow.flag("XYZ",aurostd::args2flag(argv,cmds,"--xyz"));
   vpflow.args2addattachedscheme(argv,cmds,"XYZ","--xyz=","");
@@ -14334,8 +14335,8 @@ namespace pflow {
 
     if(LDEBUG) cerr << soliloquy <<" END" << endl;  
   }
-  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input,bool force_generic_title) {xstructure str(input,IOAFLOW_AUTO);return PLOT_XRAY(vpflow,str,force_generic_title);} //CO190520
-  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str,bool force_generic_title) {double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("PLOT_XRAY"));string directory=vpflow.getattachedscheme("PLOT_XRAY::DIRECTORY");bool keep_gp=vpflow.flag("PLOT_XRAY::KEEP_GP");return PLOT_XRAY(str,lambda,directory,keep_gp,force_generic_title);} //don't use XHOST.vflag_control.getattachedscheme("DIRECTORY") for directory, might interfere with LIB2RAW //CO190520
+  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input) {xstructure str(input,IOAFLOW_AUTO);return PLOT_XRAY(vpflow,str);} //CO190520
+  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str) {bool force_generic_title=vpflow.flag("PLOT_XRAY::FORCE_GENERIC_TITLE");double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("PLOT_XRAY"));string directory=vpflow.getattachedscheme("PLOT_XRAY::DIRECTORY");bool keep_gp=vpflow.flag("PLOT_XRAY::KEEP_GP");return PLOT_XRAY(str,lambda,directory,keep_gp,force_generic_title);} //don't use XHOST.vflag_control.getattachedscheme("DIRECTORY") for directory, might interfere with LIB2RAW //CO190520
   void PLOT_XRAY(istream& input,double lambda,const string& directory,bool keep_gp,bool force_generic_title) {xstructure str(input,IOAFLOW_AUTO);return PLOT_XRAY(str,lambda,directory,keep_gp,force_generic_title);} //CO190520
   void PLOT_XRAY(const xstructure& str,double lambda,const string& directory,bool keep_gp,bool force_generic_title) { //CO190520
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -14349,7 +14350,7 @@ namespace pflow {
     if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
     
     string title=aurostd::fixStringLatex(str.title,true,false);  //double_back_slash==true (gnuplot), not symmetry sting
-    if(1||force_generic_title){title.clear();}  //force generic
+    if(0||force_generic_title){title.clear();}  //force generic
     if(title.empty()){title=getGenericTitleXStructure(str,true);}  //latex
     if(LDEBUG) {cerr << soliloquy << " title=\"" << title << "\"" << endl;}
     

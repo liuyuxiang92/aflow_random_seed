@@ -518,20 +518,25 @@ namespace aurostd {
 }
 
 namespace aurostd { //CO190419
+  template<class utype> bool compareVecElements(const vector<utype>& a,const vector<utype>& b);
+  template<class utype> bool compareXVecElements(const aurostd::xvector<utype>& a,const aurostd::xvector<utype>& b);
+}
+
+namespace aurostd { //CO190419
   //SOME STATS STUFF
   template<class utype> utype mean(const xvector<utype>& a); //CO190520
   template<class utype> utype stddev(const xvector<utype>& a); //CO190520
   template<class utype> void getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3);  //CO 171202
   template<class utype> utype getMAD(const xvector<utype>& _a,utype median=(utype)AUROSTD_NAN);   //CO 171202, absolute deviation around the median (MAD)
-  template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,int SHAPE=CONV_SHAPE_FULL); //CO190419
-  template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,vector<uint>& sum_counts,int SHAPE=CONV_SHAPE_FULL); //CO190419
-  template<class utype> xvector<utype> moving_average(const xvector<utype>& signal,int window); //CO190419
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,int SHAPE=CONV_SHAPE_FULL); //CO190419
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,vector<uint>& sum_counts,int SHAPE=CONV_SHAPE_FULL); //CO190419
+  template<class utype> xvector<utype> moving_average(const xvector<utype>& signal_input,int window); //CO190419
 }
 
 namespace aurostd { //CO190620
   //signal processing
-  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO190620
-  template<class utype> vector<int> getPeaks(const xvector<utype>& signal,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO190620
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO190620
 }
 
 // ----------------------------------------------------------------------------
