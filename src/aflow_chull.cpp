@@ -6422,44 +6422,44 @@ string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,ch
     pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return entry.compound;
   }
-  return prettyPrintCompound(entry.vspecies,entry.vcomposition,reduce_mode,exclude1,mode);
+  return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,reduce_mode,exclude1,mode);  // ME190628
 }
 
-string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) const {  // overload
-  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),reduce_mode,exclude1,mode);
-}
+//[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) const {  // overload
+//[ME190628 - moved to pflow_funcs.cpp]   return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),reduce_mode,exclude1,mode);
+//[ME190628 - moved to pflow_funcs.cpp] }
 
-string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) const {  // main function
-  // creates compound_label for LaTeX and text docs, like adding $_{}$
-  // 2-D, we usually want reduce_mode=_gcd_ true for convex points, and _none_ elsewhere
-  string soliloquy="ConvexHull::prettyPrintCompound():";
-  uint precision=COEF_PRECISION;
-  stringstream output;output.precision(precision);
-  if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(soliloquy,"vspecies.size() != vcomposition.rows");}
-  // special case, unary
-  if(vspecies.size() == 1) {
-    output << vspecies[0];
-    if(!exclude1) {output << (reduce_mode==_gcd_?1:vcomposition[vcomposition.lrows]);}
-    return output.str();
-  }
-  xvector<double> comp=vcomposition;
-  if(reduce_mode==_gcd_){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  else if(reduce_mode==_frac_){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
-  else if(reduce_mode==_none_){;}
-  else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(soliloquy,"Empty composition");}
-  for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
-    output << vspecies[i];
-    if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
-      if(mode==_latex_) {output << "$_{";
-      } else if(mode==_gnuplot_){output<< "_{";}
-      output << comp[i+comp.lrows];
-      if(mode==_latex_) {output << "}$";}
-      else if(mode==_gnuplot_){output<< "}";}
-    }
-  }
-  return output.str();
-}
+//[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) const {  // main function
+//[ME190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
+//[ME190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want reduce_mode=_gcd_ true for convex points, and _none_ elsewhere
+//[ME190628 - moved to pflow_funcs.cpp]   string soliloquy="ConvexHull::prettyPrintCompound():";
+//[ME190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
+//[ME190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
+//[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(soliloquy,"vspecies.size() != vcomposition.rows");}
+//[ME190628 - moved to pflow_funcs.cpp]   // special case, unary
+//[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size() == 1) {
+//[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[0];
+//[ME190628 - moved to pflow_funcs.cpp]     if(!exclude1) {output << (reduce_mode==_gcd_?1:vcomposition[vcomposition.lrows]);}
+//[ME190628 - moved to pflow_funcs.cpp]     return output.str();
+//[ME190628 - moved to pflow_funcs.cpp]   }
+//[ME190628 - moved to pflow_funcs.cpp]   xvector<double> comp=vcomposition;
+//[ME190628 - moved to pflow_funcs.cpp]   if(reduce_mode==_gcd_){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+//[ME190628 - moved to pflow_funcs.cpp]   else if(reduce_mode==_frac_){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+//[ME190628 - moved to pflow_funcs.cpp]   else if(reduce_mode==_none_){;}
+//[ME190628 - moved to pflow_funcs.cpp]   else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+//[ME190628 - moved to pflow_funcs.cpp]   if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(soliloquy,"Empty composition");}
+//[ME190628 - moved to pflow_funcs.cpp]   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
+//[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[i];
+//[ME190628 - moved to pflow_funcs.cpp]     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
+//[ME190628 - moved to pflow_funcs.cpp]       if(mode==_latex_) {output << "$_{";
+//[ME190628 - moved to pflow_funcs.cpp]       } else if(mode==_gnuplot_){output<< "_{";}
+//[ME190628 - moved to pflow_funcs.cpp]       output << comp[i+comp.lrows];
+//[ME190628 - moved to pflow_funcs.cpp]       if(mode==_latex_) {output << "}$";}
+//[ME190628 - moved to pflow_funcs.cpp]       else if(mode==_gnuplot_){output<< "}";}
+//[ME190628 - moved to pflow_funcs.cpp]     }
+//[ME190628 - moved to pflow_funcs.cpp]   }
+//[ME190628 - moved to pflow_funcs.cpp]   return output.str();
+//[ME190628 - moved to pflow_funcs.cpp] }
 
 string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const{
   string soliloquy="ConvexHull::getICSDNumber():";

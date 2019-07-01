@@ -2053,6 +2053,7 @@ LATTICES = (the ones with "")
         Generate DOS plot using GNUPLOT and pdfLaTeX
         The following file must reside in the directory:
          DOSCAR.static
+         POSCAR.static (in VASP 5 format for atom-projected DOS)
         NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
               with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
               vasprun.xml.static, or OUTCAR.static are required as well.
