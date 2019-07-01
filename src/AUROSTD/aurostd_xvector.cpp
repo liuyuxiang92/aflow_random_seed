@@ -2447,19 +2447,38 @@ namespace aurostd {  // namespace aurostd
 
 //CO190629 - START
 namespace aurostd {  // namespace aurostd
-  //for vector, we can always have i default to 0
-  //but for xvector, keep overload without i distinct from the one with i
-  //that way it works for arbitrary lrows
+  //sort by a particular index ONLY
+  //using bool ascending MAY become slow for long containers, as it needs to check the bool with every comparison
+  //split out into separate classes (compareVecElementAscending() vs. compareVecElementDescending()) for those cases
+  //I don't believe this is a practical problem though
+  template<class utype> 
+    compareVecElement<utype>::compareVecElement(uint ind,bool ascending) : m_uindex_sort((uint)ind),m_iindex_sort((int)ind),m_ascending_sort(ascending) {} //CO190629
+  template<class utype> 
+    bool compareVecElement<utype>::operator() (const vector<utype>& a,const vector<utype>& b) { //CO190629
+      if(a.size()!=b.size()){throw aurostd::xerror("compareVecElement::operator()():","a.size()!=b.size()",_INDEX_MISMATCH_);}
+      if(m_uindex_sort>=a.size()){throw aurostd::xerror("compareVecElement::operator()():","index_sort>=a.size()",_INDEX_BOUNDS_);}
+      if(m_ascending_sort){return a[m_uindex_sort]<b[m_uindex_sort];}
+      return a[m_uindex_sort]>b[m_uindex_sort]; //descending sort
+  }
+  template<class utype> 
+    bool compareVecElement<utype>::operator() (const xvector<utype>& a,const xvector<utype>& b) { //CO190629
+      if(a.lrows!=b.lrows){throw aurostd::xerror("compareVecElement::operator()():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
+      if(a.rows!=b.rows){throw aurostd::xerror("compareVecElement::operator()():","a.rows!=b.rows",_INDEX_MISMATCH_);}
+      if(m_iindex_sort<a.lrows||m_iindex_sort>a.urows){throw aurostd::xerror("compareVecElement::operator()():","index_sort<a.lrows||index_sort>a.urows",_INDEX_BOUNDS_);}
+      if(m_ascending_sort){return a[m_iindex_sort]<b[m_iindex_sort];}
+      return a[m_iindex_sort]>b[m_iindex_sort]; //descending sort
+  }
+  //sort by all indices in increasing order
   template<class utype>
     bool compareVecElements(const vector<utype>& a,const vector<utype>& b) { //CO190629
-      if(a.size()!=b.size()){throw aurostd::xerror("compare():","a.size()!=b.size()",_INDEX_MISMATCH_);}
+      if(a.size()!=b.size()){throw aurostd::xerror("compareVecElements():","a.size()!=b.size()",_INDEX_MISMATCH_);}
       for(uint i=0;i<a.size();i++){if(a[i]!=b[i]){return a[i]<b[i];}}
       return false;
     }
   template<class utype>
     bool compareXVecElements(const aurostd::xvector<utype>& a,const aurostd::xvector<utype>& b) { //CO190629
-      if(a.lrows!=b.lrows){throw aurostd::xerror("compare():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
-      if(a.rows!=b.rows){throw aurostd::xerror("compare():","a.rows!=b.rows",_INDEX_MISMATCH_);}
+      if(a.lrows!=b.lrows){throw aurostd::xerror("compareXVecElements():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
+      if(a.rows!=b.rows){throw aurostd::xerror("compareXVecElements():","a.rows!=b.rows",_INDEX_MISMATCH_);}
       for(int i=a.lrows;i<=a.urows;i++){if(a[i]!=b[i]){return a[i]<b[i];}}
       return false;
     }

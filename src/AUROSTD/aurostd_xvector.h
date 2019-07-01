@@ -518,6 +518,17 @@ namespace aurostd {
 }
 
 namespace aurostd { //CO190419
+  template<class utype>
+    class compareVecElement {
+      public:
+        compareVecElement(uint ind=0,bool ascending=true);
+        bool operator() (const vector<utype>& a,const vector<utype>& b);
+        bool operator() (const xvector<utype>& a,const xvector<utype>& b);
+      private:
+        uint m_uindex_sort; //keep in memory so we don't rely on many conversions per sort
+        int m_iindex_sort;  //keep in memory so we don't rely on many conversions per sort
+        bool m_ascending_sort;  //m_ascending_sort==true is ascending sort, ==false is descending sort, NB this can be different than using rbegin()/rend(), see sort(ids...) in XRD analysis in aflow_pflow_funcs.cpp 
+    };
   template<class utype> bool compareVecElements(const vector<utype>& a,const vector<utype>& b);
   template<class utype> bool compareXVecElements(const aurostd::xvector<utype>& a,const aurostd::xvector<utype>& b);
 }

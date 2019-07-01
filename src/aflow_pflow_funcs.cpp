@@ -1457,7 +1457,7 @@ vector<uint> GetXrayPeaks(const xstructure& str,
   return GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
 }
 vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO190520 //CO190620 - v_peaks_amplitude not needed
-  bool LDEBUG=(TRUE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="GetXrayPeaks():";
 
   if(v_twotheta.size()<2){throw aurostd::xerror(soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
@@ -1542,15 +1542,15 @@ vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>&
 }
 } // namespace pflow
 
-// ***************************************************************************
-// PrintXRAY ids_cmp
-// ***************************************************************************
-// This function sorts by theta (reverse sort by distance)
-class ids_cmp{
-public:
-  int operator()(const vector<double>& a, const vector<double>& b)
-  {return a[0]>b[0];} // Sorts in increasing order.
-};
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// PrintXRAY ids_cmp
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// This function sorts by theta (reverse sort by distance)
+//[CO190629 - replaced with aurostd::compareVecElements<double>]class ids_cmp{
+//[CO190629 - replaced with aurostd::compareVecElements<double>]public:
+//[CO190629 - replaced with aurostd::compareVecElements<double>]  int operator()(const vector<double>& a, const vector<double>& b)
+//[CO190629 - replaced with aurostd::compareVecElements<double>]  {return a[0]>b[0];} // Sorts in increasing order.
+//[CO190629 - replaced with aurostd::compareVecElements<double>]};
 
 //[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
 //[CO190629 - replaced with aurostd::compareVecElements<int>]// PrintXRAY hkl_cmp
@@ -1635,7 +1635,10 @@ void GetXrayData(const xstructure& str,
     } // i1
   } // i0
 
-  sort(ids.begin(),ids.end(),ids_cmp());
+  //[CO190629 - waste of a class]sort(ids.begin(),ids.end(),ids_cmp());
+  //[CO190629 - does NOT work, sort ONLY by 0th index]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElements<double>);  //CO190629 - note that it is in descending order by distance (greater go first)
+  //[CO190629 - rbegin()/rend() != descending sort, this WILL change results]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElement<double>(0));  //CO190629 - note that it is in descending order by distance (greater go first)
+  sort(ids.begin(),ids.end(),aurostd::compareVecElement<double>(0,false));  //CO190629 - note that it is in descending order by distance (greater go first)
 
   // Add corrections to all the amplitudes.
   // Get max amplitude for normalizing and percentages.
@@ -1741,7 +1744,7 @@ void GetXrayData(const xstructure& str,
           vector<double> datav(6);
           // Sort hkl
           //[CO190629 - waste of a class]sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
-          sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order (greater go first)
+          sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order by hkl (greater go first)
           datav[0]=(double) hkl_list[0][0];  
           datav[1]=(double) hkl_list[0][1];  
           datav[2]=(double) hkl_list[0][2];  
