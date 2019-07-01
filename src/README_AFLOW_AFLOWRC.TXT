@@ -956,6 +956,12 @@ DEFAULT_CHULL_LATEX_BOLD_LABELS
   choices -1 (default), 0 (false), or 1 (true)
 
 ####################################################################################################
+ARUN_DIRECTORY_PREFIX
+  description: Default prefix for ARUN directories.
+  type: string
+  default: "ARUN."
+
+####################################################################################################
 DEFAULTS POCC
 
 DEFAULT_POCC_SITE_TOL
