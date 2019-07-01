@@ -1,3 +1,12 @@
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *                  Marco Esters - Duke University 2019                    *
+// *                                                                         *
+//****************************************************************************
+
+// This class describes a mesh of q-points.
+
 #include "aflow_apl.h"
 
 #define _DEBUG_APL_QMESH_ false
@@ -9,6 +18,12 @@ using std::string;
 static const string _APL_QMESH_ERR_PREFIX_ = "apl::QMesh::";
 
 namespace apl {
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                         CONSTRUCTORS/DESTRUCTORS                         //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
 QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, Logger& l, bool gamma_centered) : _logger(l) {
   free();
@@ -77,6 +92,14 @@ void QMesh::free() {
   _weights.clear();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                          Q-POINT FUNCTIONS                               //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+//setGrid/////////////////////////////////////////////////////////////////////
+// Sets up the grid size
 void QMesh::setGrid(const xvector<int>& grid) {
   _qptGrid = grid;
   _nQPs = _qptGrid[1] * _qptGrid[2] * _qptGrid[3];
@@ -84,6 +107,8 @@ void QMesh::setGrid(const xvector<int>& grid) {
   _qptMap.assign(_qptGrid[1], vector<vector<int> >(_qptGrid[2], vector<int>(_qptGrid[3])));
 }
 
+//setupReciprocalCell/////////////////////////////////////////////////////////
+// Sets up the reciprocal cell that belongs to the q-mesh.
 void QMesh::setupReciprocalCell(xstructure xs) {
   _recCell.rlattice = xs.lattice;
   _recCell.lattice = ReciprocalLattice(_recCell.rlattice);
@@ -102,7 +127,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
   // Calculate the point group of the reciprocal cell. This requires some dummy
   // ofstream objects to parse into the function. These objects will be removed
   // when CalculatePointGroupKCrystal is redesigned to work without ofstreams.
-  if (!xs.pgroupk_xtal_calculated) {
+  if (!xs.pgroupk_calculated) {  // ME190625 - need pgrouk, not pgrouk_xtal
     ofstream FileDevNull("/dev/null");
     if (!FileDevNull.is_open()) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
@@ -113,22 +138,26 @@ void QMesh::setupReciprocalCell(xstructure xs) {
     _aflags aflags;
     aflags.QUIET = true;
     xs.LatticeReduction_avoid = true;
-    SYM::CalculatePointGroupKCrystal(FileDevNull, xs, aflags, false,
+    SYM::CalculatePointGroupKlattice(FileDevNull, xs, aflags, false,  // ME190625
                                      false, _logger.getOutputStream());
     FileDevNull.clear();
     FileDevNull.close();
-    if (!xs.pgroupk_xtal_calculated) {
+    if (!xs.pgroupk_calculated) {  // ME190625
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
       string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
       throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
     }
   }
-  _recCell.pgroup = xs.pgroupk_xtal;
+  _recCell.pgroup = xs.pgroupk;  // ME190625
 }
 
+//generateGridPoints//////////////////////////////////////////////////////////
+// Generates all the grid points. No reductions is performed yet since not
+// every purpose requires the irreducible q-points.
 void QMesh::generateGridPoints(bool force_gamma) {
   _logger << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh." << apl::endl;
   _qpoints.resize(_nQPs);
+  _ibzqpts.resize(_nQPs);  // Before making the mesh irreducible, treat all q-points as irreducible q-points
   _weights.assign(_nQPs, 1);
 
   // Use Monkhorst-Pack formula to generate a mesh - do not center yet. Cartesian
@@ -150,6 +179,7 @@ void QMesh::generateGridPoints(bool force_gamma) {
         qpt.irredQpt = q;
         _qptMap[p-1][r-1][s-1] = q;
         _qpoints[q] = qpt;
+        _ibzqpts[q] = q;
         q++;
       }
     }
@@ -178,6 +208,9 @@ void QMesh::generateGridPoints(bool force_gamma) {
   }
 }
 
+//shiftMesh///////////////////////////////////////////////////////////////////
+// Shifts the entire q-point mesh along a specific vector. This is useful to
+// center the q-point mesh around the Gamma point.
 void QMesh::shiftMesh(const xvector<double>& shift) {
   for (int q = 0; q < _nQPs; q++) {
     _qpoints[q].fpos -= shift;
@@ -185,6 +218,8 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
   }
 }
 
+//moveToBZ////////////////////////////////////////////////////////////////////
+// Moves a q-point into the first Brillouin zone.
 void QMesh::moveToBZ(xvector<double>& qpt) {
   for (int i = 1; i < 4; i++) {
     if (qpt[i] > 0.5) qpt[i] -= 1.0;
@@ -192,6 +227,8 @@ void QMesh::moveToBZ(xvector<double>& qpt) {
   }
 }
 
+//makeIrreducible/////////////////////////////////////////////////////////////
+// Makes the q-point mesh irreducible
 void QMesh::makeIrreducible() {
   _logger << "Determining irreducible q-points." << apl::endl;
   _logger.initProgressBar("Irreducible q-points");
@@ -240,15 +277,21 @@ void QMesh::makeIrreducible() {
   _logger << "Found " << _nIQPs << " irreducible qpoints." << apl::endl;
 }
 
-const int& QMesh::getnIQPs() const {
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                            GETTER FUNCTIONS                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+int QMesh::getnIQPs() const {
   return _nIQPs;
 }
 
-const int& QMesh::getnQPs() const {
+int QMesh::getnQPs() const {
   return _nQPs;
 }
 
-const int& QMesh::getGrid(const int& i) const {
+int QMesh::getGrid(int i) const {
   return _qptGrid[i];
 }
 
@@ -256,19 +299,19 @@ const xvector<int>& QMesh::getGrid() const {
   return _qptGrid;
 }
 
-const _qpoint& QMesh::getIrredQPoint(const int& i) const {
+const _qpoint& QMesh::getIrredQPoint(int i) const {
   return _qpoints[_qpoints[i].irredQpt];
 }
 
-const _qpoint& QMesh::getIrredQPoint(const int& i, const int& j, const int& k) const {
+const _qpoint& QMesh::getIrredQPoint(int i, int j, int k) const {
   return _qpoints[_qpoints[_qptMap[i][j][k]].irredQpt];
 }
 
-const int& QMesh::getIrredQPointIndex(const int& i) const {
+int QMesh::getIrredQPointIndex(int i) const {
   return _qpoints[i].irredQpt;
 }
 
-const int& QMesh::getIrredQPointIndex(const int& i, const int& j, const int& k) const {
+int QMesh::getIrredQPointIndex(int i, int j, int k) const {
   return _qpoints[_qptMap[i][j][k]].irredQpt;
 }
 
@@ -288,15 +331,15 @@ vector<xvector<double> > QMesh::getIrredQPointsFPOS() const {
   return fpos;
 }
 
-const _qpoint& QMesh::getQPoint(const int& i) const {
+const _qpoint& QMesh::getQPoint(int i) const {
   return _qpoints[i];
 }
 
-const _qpoint& QMesh::getQPoint(const int& i, const int& j, const int& k) const {
+const _qpoint& QMesh::getQPoint(int i, int j, int k) const {
   return _qpoints[_qptMap[i][j][k]];
 }
 
-const int& QMesh::getQPointIndex(const int& i, const int& j, const int& k) const {
+int QMesh::getQPointIndex(int i, int j, int k) const {
   return _qptMap[i][j][k];
 }
 
@@ -316,11 +359,11 @@ vector<xvector<double> > QMesh::getQPointsFPOS() const {
   return fpos;
 }
 
-const int& QMesh::getIbzqpt(const int& i) const {
+int QMesh::getIbzqpt(int i) const {
   return _qpoints[i].ibzqpt;
 }
 
-const int& QMesh::getIbzqpt(const int& i, const int& j, const int& k) const {
+int QMesh::getIbzqpt(int i, int j, int k) const {
   return _qpoints[_qptMap[i][j][k]].ibzqpt;
 }
 
@@ -344,13 +387,19 @@ const vector<int>& QMesh::getWeights() const {
   return _weights;
 }
 
-const bool& QMesh::isReduced() const {
+bool QMesh::isReduced() const {
   return _reduced;
 }
 
-const bool& QMesh::isGammaCentered() const {
+bool QMesh::isGammaCentered() const {
   return _isGammaCentered;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                                FILE I/O                                  //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
 
 //writeQpoints////////////////////////////////////////////////////////////////
 // Writes the Cartesian coordinates of each q-point into a file.
@@ -431,3 +480,10 @@ void QMesh::writeIrredQpoints(string filename, bool cartesian) {
 }
 
 } // namespace apl
+
+//****************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *                  Marco Esters - Duke University 2019                    *
+// *                                                                         *
+//****************************************************************************
