@@ -405,17 +405,32 @@ void DOSCalculator::writePHDOSCAR() {
   string filename = DEFAULT_APL_PHDOSCAR_FILE;
   _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
   stringstream doscar;
-  doscar << createDOSCAR();
+  xDOSCAR xdos = createDOSCAR();
+  doscar << xdos;
   aurostd::stringstream2file(doscar, filename);
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHPOSCAR()";
     string message = "Cannot open output file " + filename + ".";
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
+  if (xdos.partial) {  // Write PHDOSCAR if there are projected DOS
+    filename = DEFAULT_APL_PHPOSCAR_FILE;
+    xstructure xstr = _pc.getInputCellStructure();
+    xstr.is_vasp5_poscar_format = true;
+    stringstream poscar;
+    poscar << xstr;
+    aurostd::stringstream2file(poscar, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "PhononDispersionCalculator::writePHPOSCAR()";
+      string message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
+    }
+  }
 }
   
 xDOSCAR DOSCalculator::createDOSCAR() {
   xDOSCAR xdos;
+  xdos.spin = 0;
   // Header values
   xdos.number_atoms = _pc.getInputCellStructure().atoms.size();
   xdos.partial = (_projectedDOS.size() > 0);

@@ -5465,8 +5465,12 @@ namespace aflowlib {
 	  return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
 	}
       }
-      cerr<< FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!"<<endl;
-      exit(1);
+      // ME190627 - BEGIN
+      // [OBSOLETE] cerr<< FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!"<<endl;
+      // [OBSOLETE] exit(1);
+      string message = FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!";
+      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      // ME190627 - END
     }
     if(!gfound && (FILE=="DOSCAR")) {
       gfound=TRUE;
@@ -5482,8 +5486,12 @@ namespace aflowlib {
 	  return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
 	}
       }
-      cerr<< FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!" << endl;
-      exit(1);
+      // ME190627 - BEGIN
+      // [OBSOLETE] cerr<< FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!" << endl;
+      // [OBSOLETE] exit(1);
+      string message = FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!";
+      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      // ME190627 - END
     }
     if(!gfound && (FILE=="POSCAR")) {
       gfound=TRUE;
@@ -5499,8 +5507,12 @@ namespace aflowlib {
 	  return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
 	}
       }
-      cerr<< FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!"<<endl;
-      exit(1);
+      // ME190627 - BEGIN
+      // [OBSOLETE] cerr<< FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!"<<endl;
+      // [OBSOLETE] exit(1);
+      string message = FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!";
+      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      // ME190627 - END
     }
     if(!gfound) {
       if(LDEBUG) cerr << "aflowlib::vaspfile2stringstream: FILE=" << FILE << endl;
@@ -5515,8 +5527,12 @@ namespace aflowlib {
 	  return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
 	}
       }
-      cerr<< FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!" << endl;
-      exit(1);
+      // ME190627 - BEGIN
+      // [OBSOLETE] cerr<< FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!" << endl;
+      // [OBSOLETE] exit(1);
+      string message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";
+      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      // ME190627 - END
     }
     if(LDEBUG) cerr << "vaspfile2stringstream: END" << endl;
     return string("");
