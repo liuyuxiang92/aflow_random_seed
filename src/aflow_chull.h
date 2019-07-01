@@ -16,20 +16,20 @@ const char _std_ = 'S';  // standard aflow/vasp units
 const char _m_ = 'm';    // convert to milli-
 
 // FORMATS
-const char _apool_ = 'a';  // apool
-const char _json_ = 'j';   // standard json
-const char _pdf_ = 'p';    // pdf
-const char _txt_ = 't';    // plain text
-const char _web_ = 'w';    // web json
-const char _latex_ = 'l';    // latex
-const char _gnuplot_ = 'g';  // gnuplot
-const char _jupyterthree_ = 'y';  // jupyter python 3
-const char _jupytertwo_ = 'z'; // jupyter python 2
+//[ME190628 - moved to aflow.h] const char _apool_ = 'a';  // apool
+//[ME190628 - moved to aflow.h] const char _json_ = 'j';   // standard json
+//[ME190628 - moved to aflow.h] const char _pdf_ = 'p';    // pdf
+//[ME190628 - moved to aflow.h] const char _txt_ = 't';    // plain text
+//[ME190628 - moved to aflow.h] const char _web_ = 'w';    // web json
+//[ME190628 - moved to aflow.h] const char _latex_ = 'l';    // latex
+//[ME190628 - moved to aflow.h] const char _gnuplot_ = 'g';  // gnuplot
+//[ME190628 - moved to aflow.h] const char _jupyterthree_ = 'y';  // jupyter python 3
+//[ME190628 - moved to aflow.h] const char _jupytertwo_ = 'z'; // jupyter python 2
 
 // REDUCTION MODES
-const char _frac_ = 'f';  //fractional
-const char _gcd_ = 'g';   //gcd
-const char _none_ = 'n';  //none
+//[ME190628 - moved to aflow.h] const char _frac_ = 'f';  //fractional
+//[ME190628 - moved to aflow.h] const char _gcd_ = 'g';   //gcd
+//[ME190628 - moved to aflow.h] const char _none_ = 'n';  //none
 
 // DEFAULTS
 const int CHULL_PRECISION = 8;                          //must be less than _precision_ in aflow_xatom.cpp, which is currently set to 14
@@ -849,8 +849,8 @@ namespace chull {
       //writer functions
       string prettyPrintCompound(const ChullPoint& point,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
       string prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
+      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
+      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
       string getICSDNumber(uint i_point,bool remove_suffix=true) const;
       string getICSDNumber(const ChullPoint& point,bool remove_suffix=true) const;
       string getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix=true) const;

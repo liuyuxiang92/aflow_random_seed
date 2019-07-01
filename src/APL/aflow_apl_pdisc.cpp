@@ -406,14 +406,24 @@ void PhononDispersionCalculator::writePHEIGENVAL() {
   eigenval << createEIGENVAL();
   aurostd::stringstream2file(eigenval, filename);
   if (!aurostd::FileExist(filename)) {
-    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string function = "PhononDispersionCalculator::writePHEIGENVAL()";
     string message = "Cannot open output file " + filename + ".";
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
 
   // Also write PHKPOINTS and PHPOSCAR file
-  writePHPOSCAR();  // Structure required for plotting
   writePHKPOINTS();
+  filename = DEFAULT_APL_PHPOSCAR_FILE;
+  xstructure xstr = _pc.getInputCellStructure();
+  xstr.is_vasp5_poscar_format = true;
+  stringstream poscar;
+  poscar << xstr;
+  aurostd::stringstream2file(poscar, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
 }
 
 xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
@@ -461,21 +471,6 @@ xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
   }
   
   return xeigen;
-}
-
-// ///////////////////////////////////////////////////////////////////////////
-
-// Write the structure into a VASP POSCAR-formatted file
-void PhononDispersionCalculator::writePHPOSCAR() {
-  string filename = DEFAULT_APL_PHPOSCAR_FILE;
-  stringstream poscar;
-  poscar << _pc.getInputCellStructure();
-  aurostd::stringstream2file(poscar, filename);
-  if (!aurostd::FileExist(filename)) {
-    string function = "PhononDispersionCalculator::writePHPOSCAR()";
-    string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
-  }
 }
 
 // ///////////////////////////////////////////////////////////////////////////

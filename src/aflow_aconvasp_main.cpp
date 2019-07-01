@@ -9659,11 +9659,25 @@ namespace pflow {
     ofstream FileMESSAGE;
     return stringElements2VectorElements(input, FileMESSAGE, oss, clean);
   }
+
+  // ME190628 - added variant that also determines the composition
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss, bool clean) {
+    ofstream FileMESSAGE;
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean);
+  }
+
   vector<string> stringElements2VectorElements(
-					       const string& _input, ofstream& FileMESSAGE, ostream& oss, bool clean) {  // main function
+					       const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean) {  // overload
+    vector<double> vcomposition;
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean);
+  }
+
+  vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
+                                               ofstream& FileMESSAGE, ostream& oss, bool clean) { // main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "pflow::stringElements2VectorElements():";
     vector<string> velements;
+    vcomposition.clear();  // ME190628
 
     //////////////////////////////////////////////////////////////////////////////
     // START Checks for correct input by counting number of uppercase letters
@@ -9744,8 +9758,28 @@ namespace pflow {
 	//}
 	if(LDEBUG) {cerr << soliloquy << " element found: " << auxstr << endl;}
 	velements.push_back(auxstr);
+      // ME190628 - get composition, too
+      } else if (isdigit(input[i])) {
+        auxstr.clear();
+        auxstr += input[i++];
+        while ((i < input.size()) && (isdigit(input[i]) || (input[i] == '.'))) {
+          auxstr += input[i++];
+        }
+        i--;
+        if (LDEBUG) {
+          std::cerr << soliloquy << " found element count: " << auxstr << " of element " << (velements.size() - 1) << ".";
+          if (vcomposition.size() != velements.size()) {
+            std::cerr << " Will add ones to elements " << vcomposition.size() << " to " << (velements.size() - 2) << ".";
+          }
+          std::cerr << std::endl;
+        }
+        // Add implicit ones
+        for (uint i = vcomposition.size(); i < velements.size() - 1; i++) vcomposition.push_back(1);
+        vcomposition.push_back(aurostd::string2utype<double>(auxstr));
       }
     }
+    // Add implicit ones
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Parsing input
