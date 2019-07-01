@@ -569,7 +569,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("GFA::INIT",aurostd::args2flag(argv,cmds,"--gfa|--glass_forming_ability")); //DF190329 - GFA
   if(vpflow.flag("GFA::INIT")){	//DF190329
     vpflow.args2addattachedscheme(argv,cmds,"GFA::AE_FILE","--atomic_environments_file=|--ae_file=|aef=","none");	//DF190329
-    vpflow.args2addattachedscheme(argv,cmds,"GFA::CUT","--cutoff_energy=|--cut=","0.05"); //DF190619
+    vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF190619
   }	//DF190329
   
   vpflow.flag("GULP",aurostd::args2flag(argv,cmds,"--gulp"));
@@ -7227,7 +7227,7 @@ namespace pflow {	//DF190329
     
     string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     string AE_file_read = vpflow.getattachedscheme("GFA::AE_FILE");
-    //[CO190628 - AFLOWRC default]double fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::CUT")); //DF190619
+    //[CO190628 - AFLOWRC default]double fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::FORMATION_ENTHALPY_CUTOFF")); //DF190619
     double fe_cut=DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF;
 
     if(!vpflow.flag("PFLOW::ALLOY")) {
@@ -7247,10 +7247,10 @@ namespace pflow {	//DF190329
     }
     else {cout << endl << "Reading atomic environments from file: " << AE_file_read << "." << endl;}
     
-    //[CO190628 - AFLOWRC default]if(!vpflow.flag("GFA::CUT")) {  //DF190619
+    //[CO190628 - AFLOWRC default]if(!vpflow.flag("GFA::FORMATION_ENTHALPY_CUTOFF")) {  //DF190619
     //[CO190628 - AFLOWRC default]  fe_cut = 0.05;
     //[CO190628 - AFLOWRC default]}
-    if(vpflow.flag("GFA::CUT")) {fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::CUT"));} //CO190628
+    if(vpflow.flag("GFA::FORMATION_ENTHALPY_CUTOFF")) {fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::FORMATION_ENTHALPY_CUTOFF"));} //CO190628
     cout << endl << "Using " << fe_cut << " eV formation enthalpy cutoff for structures to include in the analysis." << endl;
     
     pflow::CalculateGFA(vpflow, alloy, AE_file_read, fe_cut); //DF190619
