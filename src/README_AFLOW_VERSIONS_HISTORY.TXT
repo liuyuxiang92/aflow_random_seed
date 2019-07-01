@@ -65,6 +65,7 @@
         -- changed signal -> signal_input so it does not get confused with std::signal (CO)
         -- added --force_generic_title to PLOT_XRAY (CO)
         -- removed ids_cmp and hkl_cmp classes (CO)
+        -- added filetype and vector_reduction_type enums (CO)
         (AFLOW: aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowrc.cpp, cce.cpp, cce.h, chull.cpp, compare_structure_function.cpp, data.cpp, init.cpp, kvasp.cpp, Makefile, modules.cpp, ovasp.cpp, pflow_funcs.cpp, pflow.h, plotter.cpp, pocc.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_CCE.TXT, surface.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, xatom.cpp, xclasses.cpp)
         (AGL: agl_electronic.cpp)
         (APL: aapl_cluster.cpp, aapl_tcond.cpp, apl_dirphoncalc.cpp, apl_doscalc.cpp, apl.h, apl_kphonons.cpp, apl_lrphoncalc.cpp, apl_pathbuilder.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_supercell.cpp, apl_thermalpc.cpp, README_AFLOW_APL.TXT)

@@ -7055,20 +7055,19 @@ namespace pflow {
 
 static const double ZERO_TOL = 1E-8;  // from CHULL
 
-string prettyPrintCompound(const string& compound, char reduce_mode, bool exclude1, char mode) {
+string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO190629
   vector<double> vcomposition;
   vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
-  return prettyPrintCompound(vspecies, vcomposition, reduce_mode, exclude1, mode);
+  return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO190629
 }
 
 // Moved here from the ConvexHull class
-string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) {  // overload
-  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),reduce_mode,exclude1,mode);
+string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO190629
+  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO190629
 }
 
-string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) {  // main function
-  // creates compound_label for LaTeX and text docs, like adding $_{}$
-  // 2-D, we usually want reduce_mode=_gcd_ true for convex points, and _none_ elsewhere
+string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO19062
+  // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
   string soliloquy="pflow::prettyPrintCompound():";
   uint precision=COEF_PRECISION;
   stringstream output;output.precision(precision);
@@ -7076,23 +7075,23 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
   // special case, unary
   if(vspecies.size() == 1) {
     output << vspecies[0];
-    if(!exclude1) {output << (reduce_mode==_gcd_?1:vcomposition[vcomposition.lrows]);}
+    if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
     return output.str();
   }
   xvector<double> comp=vcomposition;
-  if(reduce_mode==_gcd_){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  else if(reduce_mode==_frac_){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
-  else if(reduce_mode==_none_){;}
+  if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+  else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+  else if(vred==no_vrt){;}
   else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
   if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
     output << vspecies[i];
     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
-      if(mode==_latex_) {output << "$_{";
-      } else if(mode==_gnuplot_){output<< "_{";}
+      if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
+      } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
       output << comp[i+comp.lrows];
-      if(mode==_latex_) {output << "}$";}
-      else if(mode==_gnuplot_){output<< "}";}
+      if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
+      else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
     }
   }
   return output.str();

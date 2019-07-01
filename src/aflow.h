@@ -25,20 +25,38 @@
 
 //ME190628 BEGIN - moved from CHULL for broader access
 // Output formats
-#define _apool_         'a'  // apool
-#define _json_          'j'  // standard json
-#define _pdf_           'p'  // pdf
-#define _txt_           't'  // plain text
-#define _web_           'w'  // web json
-#define _latex_         'l'  // latex
-#define _gnuplot_       'g'  // gnuplot
-#define _jupyterthree_  'y'  // jupyter python 3
-#define _jupytertwo_    'z'  // jupyter python 2
+enum filetype {   //CO190629
+//GENERAL FILE TYPES
+  txt_ft,         //general plain text
+  json_ft,
+  csv_ft,
+  latex_ft,
+  gnuplot_ft,
+  jupyter2_ft,    //python 2 jupyter
+  jupyter3_ft,    //python 3 jupyter
+//CHULL SPECIFIC
+  chull_apool_ft,
+  chull_web_ft,
+};
+//[CO190629 - obsolete with enum filetype]#define _apool_         'a'  // apool
+//[CO190629 - obsolete with enum filetype]#define _json_          'j'  // standard json
+//[CO190629 - obsolete with enum filetype]#define _pdf_           'p'  // pdf
+//[CO190629 - obsolete with enum filetype]#define _txt_           't'  // plain text
+//[CO190629 - obsolete with enum filetype]#define _web_           'w'  // web json
+//[CO190629 - obsolete with enum filetype]#define _latex_         'l'  // latex
+//[CO190629 - obsolete with enum filetype]#define _gnuplot_       'g'  // gnuplot
+//[CO190629 - obsolete with enum filetype]#define _jupyterthree_  'y'  // jupyter python 3
+//[CO190629 - obsolete with enum filetype]#define _jupytertwo_    'z'  // jupyter python 2
 
-// Reduction modes
-#define _frac_          'f'  //fractional
-#define _gcd_           'g'  //gcd
-#define _none_          'n'  //none
+// Vector reduction types
+enum vector_reduction_type {   //CO190629
+  frac_vrt,   //reduce to fractions (normalized to 1)
+  gcd_vrt,    //reduce by gcd
+  no_vrt,     //no reduction
+};
+//[CO190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
+//[CO190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
+//[CO190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 // ME190628 END
 
 
