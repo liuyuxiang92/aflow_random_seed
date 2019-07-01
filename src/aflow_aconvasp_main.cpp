@@ -1238,6 +1238,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"XRAY","--xray=","");
   vpflow.args2addattachedscheme(argv,cmds,"XRAY_PEAKS","--xray_peaks=",""); //CO190520
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_XRAY","--plot_xray=",""); //CO190520
+  vpflow.flag("PLOT_XRAY::FORCE_GENERIC_TITLE",aurostd::args2flag(argv,cmds,"--force_generic_title|--force_title|--title"));  //CO190629
+  vpflow.args2addattachedscheme(argv,cmds,"PLOT_XRAY_FILE","--plot_xray_file=",""); //CO190520
   // [OBSOLETE] vpflow.flag("XYZ",aurostd::args2flag(argv,cmds,"--xyz"));
   vpflow.args2addattachedscheme(argv,cmds,"XYZ","--xyz=","");
   vpflow.flag("XYZWS",aurostd::args2flag(argv,cmds,"--xyzwignerseitz|--xyzws"));
@@ -1809,6 +1811,7 @@ namespace pflow {
       if(vpflow.flag("XRAY")) {pflow::XRAY(vpflow.getattachedscheme("XRAY"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("XRAY_PEAKS")) {pflow::XRAY_PEAKS(vpflow,cin); _PROGRAMRUN=true;} //CO190520
       if(vpflow.flag("PLOT_XRAY")) {pflow::PLOT_XRAY(vpflow,cin); _PROGRAMRUN=true;} //CO190520
+      if(vpflow.flag("PLOT_XRAY_FILE")) {pflow::PLOT_XRAY(vpflow); _PROGRAMRUN=true;} //CO190520
       if(vpflow.flag("XRD_DIST")) {pflow::GetAtomicPlaneDist(vpflow.getattachedscheme("XRD_DIST"),cin); _PROGRAMRUN=true;}
       // Y
       // Z
@@ -14210,20 +14213,31 @@ namespace pflow {
     
     double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("XRAY_PEAKS"));
     if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
-    if(lambda<=0.0){
-      init::ErrorOption(cout,"","pflow::XRAY","aflow --xray_peaks=lambda < POSCAR");
-      exit(0);
-    }
+    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
+    
+    cout << aflow::Banner("BANNER_TINY") << endl;
  
     xstructure a(input,IOAFLOW_AUTO);
 
-    vector<double> v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude;
-    GetXrayPeaks(a,lambda,v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude);
+    vector<double> v_twotheta,v_intensity,v_intensity_smooth;
+    vector<uint> peak_indices=GetXrayPeaks(a,v_twotheta,v_intensity,v_intensity_smooth,lambda);
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
     
-    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_peaks_twotheta.size()!=v_peaks_amplitude.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_amplitude.size()",_VALUE_ILLEGAL_);}
+    //get amplitude
+    vector<double> v_amplitude,v_peaks_amplitude;
+    double intmax=1e-8;
+    for(uint i=0;i<v_intensity.size();i++){if(v_intensity[i]>intmax){intmax=v_intensity[i];}}
+    for(uint i=0;i<v_intensity.size();i++){v_amplitude.push_back(100*v_intensity[i]/intmax);}
 
-    cout << aflow::Banner("BANNER_TINY") << endl;
+    //match peak_indices to peaks
+    vector<double> v_peaks_twotheta,v_peaks_intensity;
+    for(uint i=0;i<peak_indices.size();i++){
+      v_peaks_twotheta.push_back(v_twotheta[peak_indices[i]]);
+      v_peaks_intensity.push_back(v_intensity[peak_indices[i]]);
+      v_peaks_amplitude.push_back(v_amplitude[peak_indices[i]]);
+    }
+    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
 
     cout << "X-Ray Peaks:" << endl;
     cout << "Two-Theta=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_peaks_twotheta,5,false),",") << endl; //no roff
@@ -14232,37 +14246,98 @@ namespace pflow {
 
     if(LDEBUG) cerr << soliloquy <<" END" << endl;  
   }
+  void READ_XRAY_DATA(const string& filename,vector<double>& v_twotheta,vector<double>& v_intensity){ //CO190620
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::READ_XRAY_DATA():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+
+    if(filename.empty()){throw aurostd::xerror(soliloquy,"No filename provided",_FILE_ERROR_);}
+    if(!aurostd::FileExist(filename)){throw aurostd::xerror(soliloquy,"File does not exist: ",_FILE_NOT_FOUND_);}
+    if(aurostd::FileEmpty(filename)){throw aurostd::xerror(soliloquy,"File empty: ",_FILE_ERROR_);}
+
+    vector<string> data_file_lines;
+    aurostd::file2vectorstring(filename,data_file_lines);
+    string line="";
+    string::size_type loc;
+    vector<double> tokens;
+    for(uint i=0;i<data_file_lines.size();i++){
+      line=data_file_lines[i];
+      loc=line.find("#");line=line.substr(0,loc);
+      aurostd::RemoveControlCodeCharactersFromString(line,line);
+      line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line);
+      if(!line.empty()){
+        aurostd::string2tokens<double>(line,tokens,",");  //csv style
+        //if(tokens.size()!=2){throw aurostd::xerror(soliloquy,"Line[i="+aurostd::utype2string(i)+"] has "+aurostd::utype2string(tokens.size())+" tokens (expected 2): line=\""+line+"\"",_FILE_WRONG_FORMAT_);}
+        if(tokens.size()!=2){throw aurostd::xerror(soliloquy,"Line[i="+aurostd::utype2string(i)+"] has "+aurostd::utype2string(tokens.size())+" tokens (expected 2)",_FILE_WRONG_FORMAT_);}
+        v_twotheta.push_back(tokens[0]);
+        v_intensity.push_back(tokens[1]);
+      }
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " v_twotheta.size()=" << v_twotheta.size() << endl;
+      cerr << soliloquy << " v_intensity.size()=" << v_intensity.size() << endl;
+    }
+  }
 #define XRAY_DATA_PLOT_FILE "aflow_xray_data_plot_file.txt"
 #define XRAY_DATA_PEAKS_FILE "aflow_xray_data_peaks_file.txt"
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,istream& input) {xstructure str(input,IOAFLOW_AUTO);return PRINT_XRAY_DATA_PLOT(vpflow,str);} //CO190520
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const xstructure& str) {double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("PRINT_XRAY_DATA_PLOT"));string directory=vpflow.getattachedscheme("PRINT_XRAY_DATA_PLOT::DIRECTORY");return PRINT_XRAY_DATA_PLOT(str,lambda,directory);} //don't use XHOST.vflag_control.getattachedscheme("DIRECTORY") for directory, might interfere with LIB2RAW //CO190520
   void PRINT_XRAY_DATA_PLOT(istream& input,double lambda,const string& directory) {xstructure str(input,IOAFLOW_AUTO);return PRINT_XRAY_DATA_PLOT(str,lambda,directory);} //CO190520
-  void PRINT_XRAY_DATA_PLOT(const xstructure& str,double lambda,const string& _directory) { //CO190520
+  void PRINT_XRAY_DATA_PLOT(const xstructure& str,double lambda,const string& directory) { //CO190520
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::PRINT_XRAY_DATA_PLOT():";
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;  
     
     if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
-    if(lambda<=0.0){
-      init::ErrorOption(cout,"","pflow::XRAY","aflow --plot_xray=lambda < POSCAR");
-      exit(0);
-    }
+    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
+    vector<double> v_twotheta,v_intensity;
+    GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
+    return PRINT_XRAY_DATA_PLOT(v_twotheta,v_intensity,directory);
+  }
+  void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const string& directory) { //CO190520
+    //assume a file input from vpflow
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::PRINT_XRAY_DATA_PLOT():";
+
+    string filename=vpflow.getattachedscheme("PLOT_XRAY_FILE");
+    if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+
+    return PRINT_XRAY_DATA_PLOT(filename,directory);
+  }
+  void PRINT_XRAY_DATA_PLOT(const string& filename,const string& directory) { //CO190520
+    vector<double> v_twotheta,v_intensity;
+    READ_XRAY_DATA(filename,v_twotheta,v_intensity);
+    return PRINT_XRAY_DATA_PLOT(v_twotheta,v_intensity,directory);
+  }
+  void PRINT_XRAY_DATA_PLOT(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& _directory) {  //CO190620
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::PRINT_XRAY_DATA_PLOT():";
+    
     string directory=_directory;
     if(directory.empty()){directory=".";}
     if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
     
-    vector<double> v_twotheta,v_intensity,v_amplitude;
-    GetXray2ThetaIntensity(str,lambda,v_twotheta,v_intensity,v_amplitude);
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_twotheta.size()!=v_amplitude.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_amplitude.size()",_VALUE_ILLEGAL_);}
-    
-    vector<double> v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude;
-    GetXrayPeaks(str,lambda,v_intensity_smooth,v_peaks_twotheta,v_peaks_intensity,v_peaks_amplitude);
-    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
-    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_peaks_twotheta.size()!=v_peaks_amplitude.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_amplitude.size()",_VALUE_ILLEGAL_);}
-    
     cout << aflow::Banner("BANNER_TINY") << endl;
+    
+    vector<double> v_intensity_smooth;
+    vector<uint> peak_indices=GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
+    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
+    
+    //get amplitude
+    vector<double> v_amplitude,v_peaks_amplitude;
+    double intmax=1e-8;
+    for(uint i=0;i<v_intensity.size();i++){if(v_intensity[i]>intmax){intmax=v_intensity[i];}}
+    for(uint i=0;i<v_intensity.size();i++){v_amplitude.push_back(100*v_intensity[i]/intmax);}
+
+    //match peak_indices to peaks
+    vector<double> v_peaks_twotheta,v_peaks_intensity;
+    for(uint i=0;i<peak_indices.size();i++){
+      v_peaks_twotheta.push_back(v_twotheta[peak_indices[i]]);
+      v_peaks_intensity.push_back(v_intensity[peak_indices[i]]);
+      v_peaks_amplitude.push_back(v_amplitude[peak_indices[i]]);
+    }
+    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_INDEX_MISMATCH_);}
 
     stringstream data_file_ss;
     string data_file;
@@ -14303,10 +14378,43 @@ namespace pflow {
 
     if(LDEBUG) cerr << soliloquy <<" END" << endl;  
   }
-  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input,bool force_generic_title) {xstructure str(input,IOAFLOW_AUTO);return PLOT_XRAY(vpflow,str,force_generic_title);} //CO190520
-  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str,bool force_generic_title) {double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("PLOT_XRAY"));string directory=vpflow.getattachedscheme("PLOT_XRAY::DIRECTORY");bool keep_gp=vpflow.flag("PLOT_XRAY::KEEP_GP");return PLOT_XRAY(str,lambda,directory,keep_gp,force_generic_title);} //don't use XHOST.vflag_control.getattachedscheme("DIRECTORY") for directory, might interfere with LIB2RAW //CO190520
+  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input) {xstructure str(input,IOAFLOW_AUTO);return PLOT_XRAY(vpflow,str);} //CO190520
+  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str) {bool force_generic_title=vpflow.flag("PLOT_XRAY::FORCE_GENERIC_TITLE");double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("PLOT_XRAY"));string directory=vpflow.getattachedscheme("PLOT_XRAY::DIRECTORY");bool keep_gp=vpflow.flag("PLOT_XRAY::KEEP_GP");return PLOT_XRAY(str,lambda,directory,keep_gp,force_generic_title);} //don't use XHOST.vflag_control.getattachedscheme("DIRECTORY") for directory, might interfere with LIB2RAW //CO190520
   void PLOT_XRAY(istream& input,double lambda,const string& directory,bool keep_gp,bool force_generic_title) {xstructure str(input,IOAFLOW_AUTO);return PLOT_XRAY(str,lambda,directory,keep_gp,force_generic_title);} //CO190520
-  void PLOT_XRAY(const xstructure& str,double lambda,const string& _directory,bool keep_gp,bool force_generic_title) { //CO190520
+  void PLOT_XRAY(const xstructure& str,double lambda,const string& directory,bool keep_gp,bool force_generic_title) { //CO190520
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::PLOT_XRAY():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;  
+    
+    if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
+    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
+    vector<double> v_twotheta,v_intensity;
+    GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
+    
+    string title=aurostd::fixStringLatex(str.title,true,false);  //double_back_slash==true (gnuplot), not symmetry sting
+    if(0||force_generic_title){title.clear();}  //force generic
+    if(title.empty()){title=getGenericTitleXStructure(str,true);}  //latex
+    if(LDEBUG) {cerr << soliloquy << " title=\"" << title << "\"" << endl;}
+    
+    return PLOT_XRAY(v_twotheta,v_intensity,title,directory,keep_gp);
+  }
+  void PLOT_XRAY(const aurostd::xoption& vpflow,const string& title,const string& directory,bool keep_gp) { //CO190520
+    //assume a file input from vpflow
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::PLOT_XRAY():";
+
+    string filename=vpflow.getattachedscheme("PLOT_XRAY_FILE");
+    if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+
+    return PLOT_XRAY(filename,title,directory,keep_gp);
+  }
+  void PLOT_XRAY(const string& filename,const string& title,const string& directory,bool keep_gp) { //CO190520
+    vector<double> v_twotheta,v_intensity;
+    READ_XRAY_DATA(filename,v_twotheta,v_intensity);
+    return PLOT_XRAY(v_twotheta,v_intensity,title,directory,keep_gp);
+  }
+  void PLOT_XRAY(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& _title,const string& _directory,bool keep_gp) {  //CO190620
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::PLOT_XRAY():";
     stringstream message;
@@ -14321,11 +14429,6 @@ namespace pflow {
       throw aurostd::xerror(soliloquy,message,_RUNTIME_INIT_);
     }
     
-    if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
-    if(lambda<=0.0){
-      init::ErrorOption(cout,"","pflow::XRAY","aflow --plot_xray=lambda < POSCAR");
-      exit(0);
-    }
     string directory=_directory;
     if(directory.empty()){directory=".";}
     if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
@@ -14334,7 +14437,7 @@ namespace pflow {
 
     string PLOT_tmp_dir=aurostd::TmpDirectoryCreate("XRAY_PLOT");
     chdir(PLOT_tmp_dir.c_str());
-    PRINT_XRAY_DATA_PLOT(str,lambda,".");
+    PRINT_XRAY_DATA_PLOT(v_twotheta,v_intensity,".");
 
     bool plot_intensity=true; //else plot amplitude
 
@@ -14363,9 +14466,8 @@ namespace pflow {
       cerr << soliloquy << " exp=" << exp << endl;
     }
     
-    string title=aurostd::fixStringLatex(str.title,true,false);  //double_back_slash==true (gnuplot), not symmetry sting
-    if(1||force_generic_title){title.clear();}  //force generic
-    if(title.empty()){title=getGenericTitleXStructure(str,true);}  //latex
+    string title=aurostd::fixStringLatex(_title,true,false);  //double_back_slash==true (gnuplot), not symmetry sting
+    if(title.empty()){title="X-Ray Plot";}
     if(LDEBUG) {cerr << soliloquy << " title=\"" << title << "\"" << endl;}
 
     stringstream plot_file_ss;
@@ -14404,7 +14506,7 @@ namespace pflow {
     ofstream FileMESSAGE;
     _aflags aflags;aflags.Directory=directory;
 
-    if(1||keep_gp){
+    if(0||keep_gp){
       if(aurostd::FileExist(XRAY_DATA_PLOT_FILE)){files2move.push_back(PLOT_tmp_dir+"/"+XRAY_DATA_PLOT_FILE);}
       else {message << XRAY_DATA_PLOT_FILE << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
       if(aurostd::FileExist(XRAY_DATA_PEAKS_FILE)){files2move.push_back(PLOT_tmp_dir+"/"+XRAY_DATA_PEAKS_FILE);}

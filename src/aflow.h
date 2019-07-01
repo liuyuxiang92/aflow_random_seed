@@ -25,20 +25,38 @@
 
 //ME190628 BEGIN - moved from CHULL for broader access
 // Output formats
-#define _apool_         'a'  // apool
-#define _json_          'j'  // standard json
-#define _pdf_           'p'  // pdf
-#define _txt_           't'  // plain text
-#define _web_           'w'  // web json
-#define _latex_         'l'  // latex
-#define _gnuplot_       'g'  // gnuplot
-#define _jupyterthree_  'y'  // jupyter python 3
-#define _jupytertwo_    'z'  // jupyter python 2
+enum filetype {   //CO190629
+//GENERAL FILE TYPES
+  txt_ft,         //general plain text
+  json_ft,
+  csv_ft,
+  latex_ft,
+  gnuplot_ft,
+  jupyter2_ft,    //python 2 jupyter
+  jupyter3_ft,    //python 3 jupyter
+//CHULL SPECIFIC
+  chull_apool_ft,
+  chull_web_ft,
+};
+//[CO190629 - obsolete with enum filetype]#define _apool_         'a'  // apool
+//[CO190629 - obsolete with enum filetype]#define _json_          'j'  // standard json
+//[CO190629 - obsolete with enum filetype]#define _pdf_           'p'  // pdf
+//[CO190629 - obsolete with enum filetype]#define _txt_           't'  // plain text
+//[CO190629 - obsolete with enum filetype]#define _web_           'w'  // web json
+//[CO190629 - obsolete with enum filetype]#define _latex_         'l'  // latex
+//[CO190629 - obsolete with enum filetype]#define _gnuplot_       'g'  // gnuplot
+//[CO190629 - obsolete with enum filetype]#define _jupyterthree_  'y'  // jupyter python 3
+//[CO190629 - obsolete with enum filetype]#define _jupytertwo_    'z'  // jupyter python 2
 
-// Reduction modes
-#define _frac_          'f'  //fractional
-#define _gcd_           'g'  //gcd
-#define _none_          'n'  //none
+// Vector reduction types
+enum vector_reduction_type {   //CO190629
+  frac_vrt,   //reduce to fractions (normalized to 1)
+  gcd_vrt,    //reduce by gcd
+  no_vrt,     //no reduction
+};
+//[CO190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
+//[CO190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
+//[CO190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 // ME190628 END
 
 
@@ -46,6 +64,9 @@
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO 180509
 #define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
 #define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
+
+//XRD
+#define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO190622
 
 //moved from avasp.cpp for broader access (chull.cpp)
 #define SPECIE_TRANSITION_METALS string("Ag,Au,Cd,Co,Cr_pv,Cu_pv,Fe_pv,Hf_pv,Hg,Ir,La,Mn_pv,Mo_pv,Nb_sv,Ni_pv,Os_pv,Pd_pv,Pt,Re_pv,Rh_pv,Ru_pv,Sc_sv,Ta_pv,Tc_pv,Ti_sv,V_sv,W_pv,Y_sv,Zn,Zr_sv")
@@ -4025,7 +4046,7 @@ xvector<double> GetCDispFromOrigin(const _atom& atom);
 double GetDistFromOrigin(const _atom& atom);
 //void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 _atom ConvertAtomToLat(const _atom& in_at,const xmatrix<double>& lattice);
-double GetXrayScattFactor(const string& name,const double& lambda,bool clean=true); //CO190322
+double GetXrayScattFactor(const string& name,double lambda=XRAY_RADIATION_COPPER_Kalpha,bool clean=true); //CO190322
 xmatrix<double> RecipLat(const xmatrix<double>& lat);
 double Normal(const double& x,const double& mu,const double& sigma);
 xstructure SetLat(const xstructure& a,const xmatrix<double>& in_lat);

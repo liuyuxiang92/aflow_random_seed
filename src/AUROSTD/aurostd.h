@@ -285,7 +285,7 @@ namespace aurostd {
   uint ProgressBar(std::ostream& oss,string prelim,double j,bool VERBOSE_PERCENTAGE,bool VERBOSE_ROLLER,bool VERBOSE_CURSOR);
   uint ProgressBar(std::ostream& oss,string prelim,double j);  
   //about cleaning up strings
-  bool RemoveControlCodeCharactersFromString(string& in, string& out); //DX 20190516
+  bool RemoveControlCodeCharactersFromString(const string& in, string& out); //DX 20190516  //CO190620
   bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out); //DX 20190516
   bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file=true); //DX 20190516
   bool isNullByte(char c); //DX190131

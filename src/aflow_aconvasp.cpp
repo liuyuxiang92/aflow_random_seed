@@ -620,7 +620,7 @@ namespace pflow {
 // **************************************************************************
 // Function GetXrayScattFactor
 // **************************************************************************
-double GetXrayScattFactor(const string& _name, const double& lambda,bool clean) {
+double GetXrayScattFactor(const string& _name,double lambda,bool clean) {
   string name=_name;  //CO190322
   if(clean){name=KBIN::VASP_PseudoPotential_CleanName(name);} //CO190322
   if(lambda) {;} // phony just to keep lambda busy

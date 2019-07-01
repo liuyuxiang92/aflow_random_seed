@@ -24,9 +24,9 @@
 // factors f, not f^2.  DW^2 would be the appropriate term to modulate
 // the intensity, but DW is appropriate to modulate the scattering factors
 // (see Warren,eq.3.24).
-double DebyeWallerFactor(const double& theta, const double& lambda,
-			 const double& temp, const double& debye_temp,
-			 const double& mass) {
+double DebyeWallerFactor(double theta,
+			 double temp, double debye_temp,
+			 double mass,double lambda) {
   double st=sin(theta);
   double h=PLANCKSCONSTANT_h; //ME181020
   double twoB=h*h*temp*12.0/(mass*KBOLTZ*debye_temp*debye_temp);
@@ -1406,6 +1406,427 @@ void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSym
 }
 
 // ***************************************************************************
+// GetXRAY HELPER FUNCTIONS
+// ***************************************************************************
+// Corey Oses 190620
+namespace pflow {
+void GetXray2ThetaIntensity(const xstructure& str,
+    vector<double>& v_twotheta,
+    vector<double>& v_intensity,
+    double lambda) { //CO190520 //CO190620 - v_amplitude can be calculated later
+  int num_atoms=str.atoms.size();
+  //  vector<string> names=str.GetNames();
+  vector<double> dist,sf;
+  vector<double> scatt_fact(num_atoms,0.0);
+  vector<double> mass(num_atoms,0.0);
+  vector<double> twoB_vec(num_atoms,0.0);
+  //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
+  vector<vector<double> > ids;
+  pflow::matrix<double> data;
+  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
+
+  v_twotheta.clear();
+
+  double tol=XRAY_THETA_TOL;
+
+  for(uint i=0;i<data.size();i++) {
+    double theta=0;
+    if(data[i][3]>0) {
+      double term=lambda/(2.0*data[i][3]);
+      if(term<=1) {
+        theta=asin(term);
+        theta=theta*360.0/TWOPI; // rad->degrees
+        if(theta>tol){
+          v_twotheta.push_back(2.0*theta);
+          v_intensity.push_back(data[i][4]);
+        } // if theta<tol
+      } // if term<=1
+    } // if dist>0
+  } // for
+}
+
+vector<uint> GetXrayPeaks(const xstructure& str,
+    vector<double>& v_twotheta,
+    vector<double>& v_intensity,
+    vector<double>& v_intensity_smooth,
+    double lambda) { //CO190520 //CO190620 - v_peaks_amplitude not needed
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="GetXrayPeaks():";
+  if(LDEBUG){cerr << soliloquy << " input str=" << endl;cerr << str << endl;}
+  GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
+  return GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
+}
+vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO190520 //CO190620 - v_peaks_amplitude not needed
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="GetXrayPeaks():";
+
+  if(v_twotheta.size()<2){throw aurostd::xerror(soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
+  if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+
+  xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
+  uint smoothing_iterations=4,avg_window=4;int width_maximum=1;double significance_multiplier=1.0;  //defaults
+
+  //fix avg_window to derive from degree separation, not points
+  double twotheta_smoothing=5.0;  //avg over 5 degrees
+  double twotheta_diff=(v_twotheta[1]-v_twotheta[0]);
+  double davg_window=twotheta_smoothing/twotheta_diff;
+  avg_window=max(avg_window,(uint)davg_window);
+  if(LDEBUG){
+    cerr << soliloquy << " twotheta_smoothing=" << twotheta_smoothing << endl;
+    cerr << soliloquy << " twotheta_diff=" << twotheta_diff << endl;
+    cerr << soliloquy << " davg_window=" << davg_window << endl;
+    cerr << soliloquy << " avg_window=" << avg_window << endl;
+  }
+
+  //COREY COME BACK, plug in 20-120 range
+  vector<int> _peak_indices=aurostd::getPeaks(xv_intensity,xv_intensity_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);  //indices wrt xvector (starts at 1), need to convert
+  v_intensity_smooth=aurostd::xvector2vector<double>(xv_intensity_smooth);
+  vector<uint> peak_indices;for(uint i=0;i<_peak_indices.size();i++){peak_indices.push_back(_peak_indices[i]-xv_intensity.lrows);} //shift indices for xvector -> vector conversion
+
+  if(LDEBUG){
+    cerr << soliloquy << " _peak_indices=" << aurostd::joinWDelimiter(_peak_indices,",") << endl;
+    cerr << soliloquy << "  peak_indices=" << aurostd::joinWDelimiter(peak_indices,",") << endl;
+  }
+
+  return peak_indices;
+
+  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_twotheta.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_intensity.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]//using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
+  //[CO190620 - moved to aurostd::getPeaks()]//raw data is X
+  //[CO190620 - moved to aurostd::getPeaks()]//smooth data via moving average to get Y
+  //[CO190620 - moved to aurostd::getPeaks()]//stddev(X-Y) is sigma
+  //[CO190620 - moved to aurostd::getPeaks()]//detect peaks when (X-Y)>multiplier*sigma
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]//smooth data
+  //[CO190620 - moved to aurostd::getPeaks()]uint smoothing_iterations=4;int avg_window=4;
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity);
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity_smooth=xv_intensity;
+  //[CO190620 - moved to aurostd::getPeaks()]for(uint i=0;i<smoothing_iterations;i++){xv_intensity_smooth=aurostd::moving_average(xv_intensity_smooth,avg_window);}
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> diff=xv_intensity-xv_intensity_smooth;
+  //[CO190620 - moved to aurostd::getPeaks()]double sigma=aurostd::stddev(diff);
+  //[CO190620 - moved to aurostd::getPeaks()]double multiplier=1;
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]bool local_maximum=false;
+  //[CO190620 - moved to aurostd::getPeaks()]bool significant=false;
+  //[CO190620 - moved to aurostd::getPeaks()]for(int i=xv_intensity.lrows;i<=xv_intensity.urows;i++){
+  //[CO190620 - moved to aurostd::getPeaks()]  local_maximum=(i>xv_intensity.lrows && i<xv_intensity.urows && xv_intensity[i]>xv_intensity[i-1] && xv_intensity[i]>xv_intensity[i+1]);
+  //[CO190620 - moved to aurostd::getPeaks()]  significant=(diff[i]>multiplier*sigma);
+  //[CO190620 - moved to aurostd::getPeaks()]  if(local_maximum && significant){
+  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_twotheta.push_back(v_twotheta[i-xv_intensity.lrows]);
+  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_intensity.push_back(v_intensity[i-xv_intensity.lrows]);
+  //[CO190620 - moved to aurostd::getPeaks()]    if(LDEBUG) {cerr << soliloquy << " PEAK[two-theta=" << v_twotheta[i-xv_intensity.lrows] << "]=" << xv_intensity[i] << endl;}
+  //[CO190620 - moved to aurostd::getPeaks()]  }
+  //[CO190620 - moved to aurostd::getPeaks()]}
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth=aurostd::xvector2vector(xv_intensity_smooth);
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]if(0){  //don't bother sorting
+  //[CO190620 - moved to aurostd::getPeaks()]  for(uint i=0;i<v_peaks_twotheta.size();i++){
+  //[CO190620 - moved to aurostd::getPeaks()]    for(uint j=i+1;j<v_peaks_twotheta.size();j++){
+  //[CO190620 - moved to aurostd::getPeaks()]      if(v_peaks_intensity[j]>v_peaks_intensity[i]){  //CO190620 - use intensity vs. amplitude
+  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_twotheta=v_peaks_twotheta[i];
+  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_intensity=v_peaks_intensity[i];
+  //[CO190620 - moved to aurostd::getPeaks()]        
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[i]=v_peaks_twotheta[j];
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[i]=v_peaks_intensity[j];
+  //[CO190620 - moved to aurostd::getPeaks()]        
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[j]=tmp_twotheta;
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[j]=tmp_intensity;
+  //[CO190620 - moved to aurostd::getPeaks()]      }
+  //[CO190620 - moved to aurostd::getPeaks()]    }
+  //[CO190620 - moved to aurostd::getPeaks()]  }
+  //[CO190620 - moved to aurostd::getPeaks()]}
+}
+} // namespace pflow
+
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// PrintXRAY ids_cmp
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// This function sorts by theta (reverse sort by distance)
+//[CO190629 - replaced with aurostd::compareVecElements<double>]class ids_cmp{
+//[CO190629 - replaced with aurostd::compareVecElements<double>]public:
+//[CO190629 - replaced with aurostd::compareVecElements<double>]  int operator()(const vector<double>& a, const vector<double>& b)
+//[CO190629 - replaced with aurostd::compareVecElements<double>]  {return a[0]>b[0];} // Sorts in increasing order.
+//[CO190629 - replaced with aurostd::compareVecElements<double>]};
+
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// PrintXRAY hkl_cmp
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// This function sorts hkl
+//[CO190629 - replaced with aurostd::compareVecElements<int>]class hkl_cmp{
+//[CO190629 - replaced with aurostd::compareVecElements<int>]public:
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  int operator()(const vector<int>& a, const vector<int>& b)
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    if(a[0]!=b[0]){return a[0]>b[0];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    if(a[1]!=b[1]){return a[1]>b[1];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //if(a[2]!=b[2]){return a[2]>b[2];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    return a[2]>b[2];   //return something...
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]int na=a[0]*100+a[1]*10+a[2];
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]int nb=b[0]*100+b[1]*10+b[2];
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]return na>nb;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]};
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      int t=1,f=1;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      if(a[0]<b[0]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	if(a[1]<b[1]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  if(a[2]<b[2]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	    return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	    return true;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//    }
+
+namespace pflow {
+void GetXrayData(const xstructure& str,
+         vector<double>& dist,
+         vector<double>& sf,
+         vector<double>& scatt_fact,
+	       vector<double>& mass,vector<double>& twoB_vec,
+         vector<vector<double> >& ids,
+         pflow::matrix<double>& data,
+	       double lambda) { //CO190520  //CO190620 - intmax can be grabbed later
+  //int num_atoms=str.atoms.size();
+  //  vector<string> names=str.GetNames();
+  //vector<double> dist,sf;
+  //vector<double> scatt_fact(num_atoms,0.0);
+  //vector<double> mass(num_atoms,0.0);
+  //vector<double> twoB_vec(num_atoms,0.0);
+  pflow::GetXray(str,dist,sf,scatt_fact,mass,twoB_vec,lambda);
+
+  double tol=1.0E-5;
+  //int w1=4; // int
+  //int w2=12; // some doubles
+  //int w3=20; // Integrated intensities
+  int tlen=sf.size();
+  int len=Nint(std::pow((double) tlen,(double) 1.0/3.0));
+  int kmx=(len-1)/2; // len should be odd.
+
+  // Sort by theta (reverse sort by distance).
+  // Define an id pointer to sort.
+  vector<double> v(5);
+  // pflow::matrix<double> ids(tlen,v);
+  //vector<vector<double> > ids(tlen,v);  //CO190409
+  ids.resize(tlen,v);
+  for(int i0=-kmx;i0<=kmx;i0++) {
+    for(int i1=-kmx;i1<=kmx;i1++) {
+      for(int i2=-kmx;i2<=kmx;i2++) {
+        int ii0=i0+kmx;
+        int ii1=i1+kmx;
+        int ii2=i2+kmx;
+        int id=ii2+ii1*len+ii0*len*len;
+        ids[id][0]=dist[id];
+        ids[id][1]=id;
+        ids[id][2]=i0;
+        ids[id][3]=i1;
+        ids[id][4]=i2;
+      } // i2
+    } // i1
+  } // i0
+
+  //[CO190629 - waste of a class]sort(ids.begin(),ids.end(),ids_cmp());
+  //[CO190629 - does NOT work, sort ONLY by 0th index]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElements<double>);  //CO190629 - note that it is in descending order by distance (greater go first)
+  //[CO190629 - rbegin()/rend() != descending sort, this WILL change results]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElement<double>(0));  //CO190629 - note that it is in descending order by distance (greater go first)
+  sort(ids.begin(),ids.end(),aurostd::compareVecElement<double>(0,false));  //CO190629 - note that it is in descending order by distance (greater go first)
+
+  // Add corrections to all the amplitudes.
+  // Get max amplitude for normalizing and percentages.
+  double ampmax=1E-8;
+  for(int i0=-kmx;i0<=kmx;i0++) {
+    for(int i1=-kmx;i1<=kmx;i1++) {
+      for(int i2=-kmx;i2<=kmx;i2++) {
+        int ii0=i0+kmx;
+        int ii1=i1+kmx;
+        int ii2=i2+kmx;
+        int id1=ii2+ii1*len+ii0*len*len;
+        int id=(int) ids[id1][1];
+        ii0=(int) ids[id1][2];
+        ii1=(int) ids[id1][3];
+        ii2=(int) ids[id1][4];
+        double theta=0;
+        if(dist[id]>0) {
+          double term=lambda/(2.0*dist[id]);
+          if(term<=1) {
+            theta=asin(term);
+            if(theta>tol) {
+              sf[id]=sf[id]*CorrectionFactor(theta);
+              if(sf[id]>ampmax) {ampmax=sf[id];}
+            } // if theta>tol
+          } // if term<=1
+        } // if dist>0
+      } // i2
+    } // i1
+  } // i0
+
+  //[CO190520 - printing moved to PrintXray()]// Print out all data.
+  //[CO190520 - printing moved to PrintXray()]oss << "Wavelength (Ang) = " << lambda << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO190329
+  //[CO190520 - printing moved to PrintXray()]for(uint iat=0;iat<(uint) num_atoms;iat++) {
+  //[CO190520 - printing moved to PrintXray()]  oss <<setw(4)<<iat+1<<" "<<setw(4)<<str.atoms.at(iat).cleanname << " ";
+  //[CO190520 - printing moved to PrintXray()]  if(str.atoms.at(iat).cleanname.length()>1) oss << " ";
+  //[CO190520 - printing moved to PrintXray()]  oss <<setw(w2)<<scatt_fact[iat]<<setw(w2)<<KILOGRAM2AMU*mass[iat]<<setw(w2)<<1E+20*twoB_vec[iat]/2.0<<endl;
+  //[CO190520 - printing moved to PrintXray()]}
+  //[CO190520 - printing moved to PrintXray()]oss << "******************** All data ********************" << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Intensity            h    k    l    dist         keyword " << endl;
+  //[CO190520 - printing moved to PrintXray()]for(int i0=-kmx;i0<=kmx;i0++) {
+  //[CO190520 - printing moved to PrintXray()]  for(int i1=-kmx;i1<=kmx;i1++) {
+  //[CO190520 - printing moved to PrintXray()]    for(int i2=-kmx;i2<=kmx;i2++) {
+  //[CO190520 - printing moved to PrintXray()]      int ii0=i0+kmx;
+  //[CO190520 - printing moved to PrintXray()]      int ii1=i1+kmx;
+  //[CO190520 - printing moved to PrintXray()]      int ii2=i2+kmx;
+  //[CO190520 - printing moved to PrintXray()]      int id1=ii2+ii1*len+ii0*len*len;
+  //[CO190520 - printing moved to PrintXray()]      int id=(int) ids[id1][1];
+  //[CO190520 - printing moved to PrintXray()]      ii0=(int) ids[id1][2];
+  //[CO190520 - printing moved to PrintXray()]      ii1=(int) ids[id1][3];
+  //[CO190520 - printing moved to PrintXray()]      ii2=(int) ids[id1][4];
+  //[CO190520 - printing moved to PrintXray()]      double theta=0;
+  //[CO190520 - printing moved to PrintXray()]      if(dist[id]>0) {
+  //[CO190520 - printing moved to PrintXray()]        double term=lambda/(2.0*dist[id]);
+  //[CO190520 - printing moved to PrintXray()]        if(term<=1) {
+  //[CO190520 - printing moved to PrintXray()]          theta=asin(term);
+  //[CO190520 - printing moved to PrintXray()]          theta=theta*360.0/TWOPI; // rad->degrees
+  //[CO190520 - printing moved to PrintXray()]          if(theta>tol) oss
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w3)<<sf[id]<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii0<<" " // h
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii1<<" " // k
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii2<<" " // l
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<dist[id]<<" " // dist
+  //[CO190520 - printing moved to PrintXray()]                          << "SINGLE"
+  //[CO190520 - printing moved to PrintXray()]                          << endl;
+  //[CO190520 - printing moved to PrintXray()]        } // if term<=1
+  //[CO190520 - printing moved to PrintXray()]      } // if dist>0
+  //[CO190520 - printing moved to PrintXray()]    } // i2
+  //[CO190520 - printing moved to PrintXray()]  } // i1
+  //[CO190520 - printing moved to PrintXray()]} // i0
+
+  // Now group everything at the same distance together and only store one entry for each distance.
+  // Choose hkl such that h is the largest, k the second, and l the third.
+  // Multiply the sf by the number of degenerate points at that distance.
+  // Get max integrated intensity for normalizations and percentages.
+  //[CO190620 - not needed here]double intmax=1E-8;
+  double odist=dist[(int)ids[0][1]]; // Initialize odsit to first distance.
+  double osf=sf[(int)ids[0][1]]; // Initialize osf to first distance.
+  vector<vector<int> > hkl_list;
+  vector<int> hkl(3);
+  //pflow::matrix<double> data;
+  for(int i0=-kmx;i0<=kmx;i0++) {
+    for(int i1=-kmx;i1<=kmx;i1++) {
+      for(int i2=-kmx;i2<=kmx;i2++) {
+        int ii0=i0+kmx;
+        int ii1=i1+kmx;
+        int ii2=i2+kmx;
+        int id1=ii2+ii1*len+ii0*len*len;
+        int id=(int) ids[id1][1];
+        ii0=(int) ids[id1][2];
+        ii1=(int) ids[id1][3];
+        ii2=(int) ids[id1][4];
+        double pdist=dist[id]; // Get present distance.
+        // Create vector of all the hkl values with the same distance
+        if(fabs(pdist-odist)<tol) { // Add present h,k,l to hkl_list.
+          hkl[0]=ii0;		    
+          hkl[1]=ii1;		    
+          hkl[2]=ii2;		    
+          hkl_list.push_back(hkl);
+        }
+        else { // Store one hkl, dist, total sf, multiplicity of point in data vector and then reset hkl_list vector to new hkl.
+          vector<double> datav(6);
+          // Sort hkl
+          //[CO190629 - waste of a class]sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
+          sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order by hkl (greater go first)
+          datav[0]=(double) hkl_list[0][0];  
+          datav[1]=(double) hkl_list[0][1];  
+          datav[2]=(double) hkl_list[0][2];  
+          datav[3]=odist;
+          datav[4]=osf*hkl_list.size();
+          datav[5]=hkl_list.size();
+          data.push_back(datav);
+          //[CO190620 - not needed here]if(datav[4]>intmax) {intmax=datav[4];}
+          vector<int> v(0);
+          hkl_list= vector<vector<int> > (0,v);
+          hkl[0]=ii0;		    
+          hkl[1]=ii1;		    
+          hkl[2]=ii2;		    
+          hkl_list.push_back(hkl);
+        }
+        odist=pdist;
+        osf=sf[id];
+      } // i2
+    } // i1
+  } // i0
+
+  //[CO190520 - printing moved to PrintXray()]// Output grouped data
+  //[CO190520 - printing moved to PrintXray()]oss << "******************** Grouped data ********************" << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      IntIntensity         %ofMaxInt    h    k    l    dist         mult. correction    keyword " << endl;
+  //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
+  //[CO190520 - printing moved to PrintXray()]  double theta=0;
+  //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
+  //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
+  //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
+  //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
+  //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
+  //[CO190520 - printing moved to PrintXray()]      if(theta>tol) oss
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w3)<<setprecision(2)<<data[i][4]<<setprecision(PREC_DEFAULT)<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // % max sf
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][0]<<" " // h
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][1]<<" " // k
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][2]<<" " // l
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<data[i][3]<<" " // dist
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(5)<<(int)data[i][5]<<" " // mult.
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<CorrectionFactor(theta*TWOPI/360.0)<<" " // correction.
+  //[CO190520 - printing moved to PrintXray()]                      << " GROUP"
+  //[CO190520 - printing moved to PrintXray()]                      << endl;
+  //[CO190520 - printing moved to PrintXray()]    } // if term<=1
+  //[CO190520 - printing moved to PrintXray()]  } // if dist>0
+  //[CO190520 - printing moved to PrintXray()]} // for
+
+  //[CO190520 - printing moved to PrintXray()]// Output data to plot
+  //[CO190520 - printing moved to PrintXray()]oss << "******************** To Plot data ********************" << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Amplitude    keyword " << endl;
+  //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
+  //[CO190520 - printing moved to PrintXray()]  double theta=0;
+  //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
+  //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
+  //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
+  //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
+  //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
+  //[CO190520 - printing moved to PrintXray()]      if(theta>tol) {
+  //[CO190520 - printing moved to PrintXray()]        // initial 0.
+  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+  //[CO190520 - printing moved to PrintXray()]            << endl;
+  //[CO190520 - printing moved to PrintXray()]        // true value of sf/intmax.
+  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+  //[CO190520 - printing moved to PrintXray()]            << endl;
+  //[CO190520 - printing moved to PrintXray()]        // final 0.
+  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+  //[CO190520 - printing moved to PrintXray()]            << endl;
+  //[CO190520 - printing moved to PrintXray()]        // tpx
+  //[CO190520 - printing moved to PrintXray()]      } // if theta<tol
+  //[CO190520 - printing moved to PrintXray()]    } // if term<=1
+  //[CO190520 - printing moved to PrintXray()]  } // if dist>0
+  //[CO190520 - printing moved to PrintXray()]} // for
+} // end routine
+} // namespace pflow
+
+// ***************************************************************************
 // GetXRAY
 // ***************************************************************************
 // This function gets XRAY following the convasp framework.
@@ -1413,8 +1834,8 @@ void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSym
 // updated by Corey Oses 190520
 namespace pflow {
   void GetXray(const xstructure& str, vector<double>& dist,vector<double>& sf,
-	       double lambda, vector<double>& scatt_fact, //CO190520
-	       vector<double>& mass, vector<double>& twoB_vec) {
+	       vector<double>& scatt_fact, //CO190520
+	       vector<double>& mass, vector<double>& twoB_vec,double lambda) {
     string soliloquy="pflow::GetXray():"; //CO190322
     stringstream message; //CO190322
     // Get data from str.
@@ -1469,36 +1890,36 @@ namespace pflow {
   
     for(int i0=-kmx;i0<=kmx;i0++) {
       for(int i1=-kmx;i1<=kmx;i1++) {
-	for(int i2=-kmx;i2<=kmx;i2++) {
+        for(int i2=-kmx;i2<=kmx;i2++) {
           ii0=i0+kmx;
           ii1=i1+kmx;
           ii2=i2+kmx;
           id=ii2+ii1*len+ii0*len*len; //this is index that converts 3D HKL search to 1D
-	  sfr=0.0;
-	  sfi=0.0;
+          sfr=0.0;
+          sfi=0.0;
           for(int ic=1;ic<=3;ic++){rv(ic)=i0*rlat(1,ic)+i1*rlat(2,ic)+i2*rlat(3,ic);}
           rvnorm=modulus(rv);
-	  if(rvnorm>0.0) dist[id]=TWOPI/rvnorm;
-	  for(int iat=0;iat<num_atoms;iat++) {
-	    // Get Debye Waller factor.
-	    dw=1;
-	    if(dist[id]>0) {
+          if(rvnorm>0.0) dist[id]=TWOPI/rvnorm;
+          for(int iat=0;iat<num_atoms;iat++) {
+            // Get Debye Waller factor.
+            dw=1;
+            if(dist[id]>0) {
               term=lambda/(2.0*dist[id]);
               if(term<=1) { //angle, must be less than equal to 1 or domain error occurs
                 theta=std::asin(term);  //radians
                 theta*=360.0/TWOPI; // rad->degrees
-		dw=DebyeWallerFactor(theta,lambda*1.0E-10,temp,debye_temp,mass[iat]);
-	      }
-	    }
+                dw=DebyeWallerFactor(theta,temp,debye_temp,mass[iat],lambda*1.0E-10);
+              }
+            }
             const _atom& atom=sstr.atoms[iat];
-	    //  double gdotr=i0*fpos[iat][0]+i1*fpos[iat][1]+i2*fpos[iat][2];
+            //  double gdotr=i0*fpos[iat][0]+i1*fpos[iat][1]+i2*fpos[iat][2];
             gdotr=i0*atom.fpos(1)+i1*atom.fpos(2)+i2*atom.fpos(3);
             gdotr*=TWOPI;
             sfr+=dw*scatt_fact[iat]*std::cos(gdotr);
             sfi-=dw*scatt_fact[iat]*std::sin(gdotr);
-	  }
+          }
           sf[id]=(sfr*sfr)+(sfi*sfi); //sum the squares, vector addition
-	} // i2
+        } // i2
       } // i1
     } // i0
   }
@@ -6634,20 +7055,19 @@ namespace pflow {
 
 static const double ZERO_TOL = 1E-8;  // from CHULL
 
-string prettyPrintCompound(const string& compound, char reduce_mode, bool exclude1, char mode) {
+string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO190629
   vector<double> vcomposition;
   vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
-  return prettyPrintCompound(vspecies, vcomposition, reduce_mode, exclude1, mode);
+  return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO190629
 }
 
 // Moved here from the ConvexHull class
-string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) {  // overload
-  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),reduce_mode,exclude1,mode);
+string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO190629
+  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO190629
 }
 
-string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) {  // main function
-  // creates compound_label for LaTeX and text docs, like adding $_{}$
-  // 2-D, we usually want reduce_mode=_gcd_ true for convex points, and _none_ elsewhere
+string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO19062
+  // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
   string soliloquy="pflow::prettyPrintCompound():";
   uint precision=COEF_PRECISION;
   stringstream output;output.precision(precision);
@@ -6655,23 +7075,23 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
   // special case, unary
   if(vspecies.size() == 1) {
     output << vspecies[0];
-    if(!exclude1) {output << (reduce_mode==_gcd_?1:vcomposition[vcomposition.lrows]);}
+    if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
     return output.str();
   }
   xvector<double> comp=vcomposition;
-  if(reduce_mode==_gcd_){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  else if(reduce_mode==_frac_){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
-  else if(reduce_mode==_none_){;}
+  if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+  else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+  else if(vred==no_vrt){;}
   else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
   if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
     output << vspecies[i];
     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
-      if(mode==_latex_) {output << "$_{";
-      } else if(mode==_gnuplot_){output<< "_{";}
+      if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
+      } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
       output << comp[i+comp.lrows];
-      if(mode==_latex_) {output << "}$";}
-      else if(mode==_gnuplot_){output<< "}";}
+      if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
+      else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
     }
   }
   return output.str();

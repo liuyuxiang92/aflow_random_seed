@@ -1,4 +1,4 @@
-3.1.225 - 2019/05/20
+3.1.225 - 2019/06/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)
         -- changed output name for --output=web to aflow_ALLOY_hull_web.json (WS)
@@ -52,6 +52,20 @@
         -- removed pocc progress bar in web_mode (CO)
         -- added FPOSDistance() for skew considerations (CO)
         -- reduced dims considered for GetSuperCell(), RadiusSphereLattice and LatticeDimensionSphere() are enough (CO)
+        -- added general getPeaks() function to AUROSTD (CO)
+        -- calculated X-ray amplitude on-the-fly, no need to pass it around (CO)
+        -- moved double lambda to end of inputs and default to 1.5418 Copper K-alpha (CO)
+        -- patched RemoveControlCodeCharactersFromString() for carriage return (CO)
+        -- added width_maximum to getPeaks() to resolve arbitrarily defined peaks (CO)
+        -- made x-ray analysis code more modular (CO)
+        -- added --plot_xray_file option (CO)
+        -- patched moving_average function (!= convolution with box_filter) (CO)
+        -- defaulted lambda=Cu_Ka for XRD functions (CO)
+        -- added compareVecElements(), compareXVecElements(), and class compareVecElement(ind) to sort vector<vector<utype> > and vector<xvector<utype> > and retire classes ids_cmp and hkl_cmp (CO)
+        -- changed signal -> signal_input so it does not get confused with std::signal (CO)
+        -- added --force_generic_title to PLOT_XRAY (CO)
+        -- removed ids_cmp and hkl_cmp classes (CO)
+        -- added filetype and vector_reduction_type enums (CO)
         (AFLOW: aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowrc.cpp, cce.cpp, cce.h, chull.cpp, compare_structure_function.cpp, data.cpp, init.cpp, kvasp.cpp, Makefile, modules.cpp, ovasp.cpp, pflow_funcs.cpp, pflow.h, plotter.cpp, pocc.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_CCE.TXT, surface.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, xatom.cpp, xclasses.cpp)
         (AGL: agl_electronic.cpp)
         (APL: aapl_cluster.cpp, aapl_tcond.cpp, apl_dirphoncalc.cpp, apl_doscalc.cpp, apl.h, apl_kphonons.cpp, apl_lrphoncalc.cpp, apl_pathbuilder.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_supercell.cpp, apl_thermalpc.cpp, README_AFLOW_APL.TXT)
