@@ -569,6 +569,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("GFA::INIT",aurostd::args2flag(argv,cmds,"--gfa|--glass_forming_ability")); //DF190329 - GFA
   if(vpflow.flag("GFA::INIT")){	//DF190329
     vpflow.args2addattachedscheme(argv,cmds,"GFA::AE_FILE","--atomic_environments_file=|--ae_file=|aef=","none");	//DF190329
+    vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF190619
   }	//DF190329
   
   vpflow.flag("GULP",aurostd::args2flag(argv,cmds,"--gulp"));
@@ -2155,7 +2156,7 @@ namespace pflow {
   "<< x<<" --findsymSG[_label,_number][=tolerance_relative: default " << DEFAULT_FINDSYM_TOL << "] < POSCAR \n\
   "<< x<<" --frac [-f,-d,--fract,--fractional,--direct] < POSCAR \n\
   "<< x<<" --getTEMP [--runstat | --runbar | --refresh=X | --warning_beep=T | --warning_halt=T ] \n\
-  "<< x<<" --gfa --alloy=CaCu [--ae_file=All_atomic_environments_read.dat] \n\
+  "<< x<<" --gfa --alloy=CaCu [--ae_file=All_atomic_environments_read.dat] [--cutoff_energy=0.05] \n\
   "<< x<<" --gulp < POSCAR \n\
   "<< x<<" --identical < POSCAR \n\
   "<< x<<" --incell < POSCAR \n\
@@ -7226,12 +7227,14 @@ namespace pflow {	//DF190329
     
     string alloy = vpflow.getattachedscheme("PFLOW::ALLOY");
     string AE_file_read = vpflow.getattachedscheme("GFA::AE_FILE");
+    //[CO190628 - AFLOWRC default]double fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::FORMATION_ENTHALPY_CUTOFF")); //DF190619
+    double fe_cut=DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF;
 
     if(!vpflow.flag("PFLOW::ALLOY")) {
       cerr << endl << "ERROR:  Must specify an alloy system; e.g.: --alloy=CaMg" << endl << endl; exit(0);
     }
 
-    cout << endl << "Calculating glass-forming ability for " << alloy << endl;
+    cout << endl << "Calculating glass-forming ability for " << alloy << "." << endl;
 
     if(!vpflow.flag("GFA::AE_FILE")) {
       AE_file_read = "none";
@@ -7242,9 +7245,15 @@ namespace pflow {	//DF190329
       cout << endl << "Can't find " << AE_file_read << ". Will calculate all atomic environments." << endl;
       AE_file_read = "none";
     }
-    else {cout << endl << "Reading atomic environments from file: " << AE_file_read << endl;}
+    else {cout << endl << "Reading atomic environments from file: " << AE_file_read << "." << endl;}
     
-    pflow::CalculateGFA(vpflow, alloy, AE_file_read);
+    //[CO190628 - AFLOWRC default]if(!vpflow.flag("GFA::FORMATION_ENTHALPY_CUTOFF")) {  //DF190619
+    //[CO190628 - AFLOWRC default]  fe_cut = 0.05;
+    //[CO190628 - AFLOWRC default]}
+    if(vpflow.flag("GFA::FORMATION_ENTHALPY_CUTOFF")) {fe_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("GFA::FORMATION_ENTHALPY_CUTOFF"));} //CO190628
+    cout << endl << "Using " << fe_cut << " eV formation enthalpy cutoff for structures to include in the analysis." << endl;
+    
+    pflow::CalculateGFA(vpflow, alloy, AE_file_read, fe_cut); //DF190619
   }
 } // namespace pflow
 
