@@ -2063,26 +2063,31 @@ void RunPhonons_APL_181216(_xinput& xinput,
         }
       }
 
+      // Get q-points
+      logger << "Preparing a q-mesh of " << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << "." << apl::endl;
+      apl::QMesh qmtcond(USER_THERMALGRID, phcalc->getInputCellStructure(), logger, true);
+      qmtcond.makeIrreducible();
+
       // Do the thermal conductivity calculation
       logger << "Starting thermal conductivity calculations." << apl::endl;
-      apl::TCONDCalculator tcond(*phcalc, supercell, logger);
+      apl::TCONDCalculator tcond(*phcalc, qmtcond, logger);
 
       tcond.setCalculationOptions(USER_BTE, USER_ISOTOPE,
                                   USER_CUMULATIVEK, USER_AAPL_FOURTH_ORDER,
                                   USER_BOUNDARY, USER_NANO_SIZE, USER_TCT_TSTART,
                                   USER_TCT_TEND, USER_TCT_TSTEP);
-
-      // Get q-points
-      logger << "Preparing a q-mesh of " << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << "." << apl::endl;
-      tcond.buildQpoints(aurostd::vector2xvector(USER_THERMALGRID));
+      for (int i = 3; i < 5; i++) {
+        std::cout << i << std::endl;
+        tcond.getLastQPoint(i);
+      }
 
       // Calculate lattice thermal conductivity
-      tcond.calculateFrequenciesGroupVelocities();
-      tcond.calculateTransitionProbabilities(3);
-      if (USER_AAPL_FOURTH_ORDER) {
-        tcond.calculateTransitionProbabilities(4);
-    }
-      tcond.calculateThermalConductivity();
+//      tcond.calculateFrequenciesGroupVelocities();
+//      tcond.calculateTransitionProbabilities(3);
+//      if (USER_AAPL_FOURTH_ORDER) {
+//        tcond.calculateTransitionProbabilities(4);
+//      }
+//      tcond.calculateThermalConductivity();
  
       tcond.clear();
     }

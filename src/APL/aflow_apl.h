@@ -1241,7 +1241,6 @@ struct _qpoint {
   xvector<double> fpos;  // Fractional coordinates of the q-point
   int irredQpt;  // The irreducible q-point this q-point belongs to
   int ibzqpt;  // The index of the irreducible q-point in the _ibzqpt vector
-  xvector<int> indices;
   int symop;  // Symmetry operation to transform the irreducible q-point into this q-point
 };
 
@@ -1279,6 +1278,8 @@ class QMesh {
     int getIrredQPointIndex(int, int, int) const;
     const _qpoint& getQPoint(int) const;
     const _qpoint& getQPoint(int, int, int) const;
+    const _qpoint& getQPoint(const xvector<double>&) const;  // ME190701
+    int getQPointIndex(xvector<double>) const;  // ME190701
     int getQPointIndex(int, int, int) const;
     vector<xvector<double> > getQPointsCPOS() const;
     vector<xvector<double> > getQPointsFPOS() const;
@@ -1287,6 +1288,7 @@ class QMesh {
     const vector<int>& getIbzqpts() const;
     const vector<_qpoint>& getPoints() const;
     const _kcell& getReciprocalCell() const;
+    bool isShifted() const;
     const xvector<double>& getShift() const;
     const vector<int>& getWeights() const;
     bool isReduced() const;
@@ -1306,6 +1308,7 @@ class QMesh {
     vector<_qpoint> _qpoints;  // The q-points of the mesh
     _kcell _recCell;  // The reciprocal cell
     bool _reduced;  // Indicates whether the q-point mesh has been reduced
+    bool _shifted;  // Indicated whether the q-point mesh has been shifted
     xvector<double> _shift;  // The shift vector of the mesh
     vector<int> _weights;  // The weights of each irreducible q-point
 
@@ -1313,7 +1316,7 @@ class QMesh {
     void setupReciprocalCell(xstructure);
     void generateGridPoints(bool);
     void shiftMesh(const xvector<double>&);
-    void moveToBZ(xvector<double>&);
+    void moveToBZ(xvector<double>&) const;
 };
 }  // namespace apl
 
@@ -1522,18 +1525,6 @@ class ThermalPropertiesCalculator {
 
 namespace apl {
 
-struct _TCONDOptions {
-  bool rta_only;  // Use RTA only
-  bool calc_isotopes;  // Use isotope correction
-  bool calc_cumulative;  // Calculate cumulative thermal conductivity
-  bool calc_boundary;  // Use grain boundary correction
-  bool fourth_order;  // Include fourth order corrections
-  double grain_size;  // Grain size in the boundary correction
-  double temp_start;  // Starting temperature
-  double temp_end;  // Final temperature
-  double temp_step;  // Temperature step size
-};
-
 //[ME190520 - MOVED UP]struct _qpoint {
 //[ME190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
 //[ME190520 - MOVED UP]  xvector<double> fpos;  // Fractional coordinates of the q-point
@@ -1551,47 +1542,37 @@ struct _TCONDOptions {
 class TCONDCalculator {
 // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
  public:
-    TCONDCalculator(PhononCalculator&, Supercell&, Logger&);
+    TCONDCalculator(PhononCalculator&, QMesh&, Logger&);
     ~TCONDCalculator();
     void clear();
 
-    _TCONDOptions calc_options;  // Options for the the thermal conductivity calculation
+    aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
     vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
     vector<vector<double> > freq;  // The frequencies at each q-point
     vector<vector<xvector<double> > > gvel;  // The group velocities
-    vector<vector<int> > irred_qpoints;  // Irreducible q-points with their equivalent points
     vector<vector<int> > irred_qpts_symops;  // List of invariant operations for the irreducible q-points
-    _kcell kcell;  // The reciprocal cell
     int nBranches;  // The number of branches in the phonon spectrum
     int nIQPs;  // The total number of irreducible q-points in the grid
     int nQPs;  // The total number of q-points in the grid
     xstructure pcell;  // The real space primitive cell
     vector<vector<vector<int> > > processes;  // The q-point and branch indices of the scattering processes
     vector<vector<double> > intr_trans_probs;  // The intrinsic transition probabilities
-    vector<_qpoint> qpoints;  // The q-points
-    xvector<int> qptgrid;  // The number of q-points in each dimension
-    vector<vector<vector<int> > > qptmap;  // Map assigning grid points to a q-point
     vector<double> temperatures;  // The temperatures for the thermal conductivity calculations
     vector<xmatrix<double> > thermal_conductivity;  // The thermal conductivity values
 
     void setCalculationOptions(string, bool, bool, bool, bool,
                                double, double, double, double);
-    void buildQpoints(const xvector<int>&);
     void calculateFrequenciesGroupVelocities();
     void calculateTransitionProbabilities(int);
     void calculateThermalConductivity();
 
+    vector<vector<vector<int> > > getLastQPoint(int);
   private:
     PhononCalculator& _pc;  // Reference to the phonon calculator
-    Supercell& _sc;  // Reference to the supercell
-    Logger& _logger;  // The AFLOW logger
+    QMesh& _qm;  // Reference to the q-point mesh
+    Logger& _logger;  // The APL logger
 
     void free();
-
-    _kcell setupReciprocalCell();
-    vector<_qpoint> getQpointsFromGrid();
-    void getIrreducibleQpoints(int, int, vector<vector<int> >&);
-    vector<vector<int> > meldIrredQpoints(const vector<vector<vector<int> > >&);
 
     void calculateFreqGvel(int, int);
     void calculateScattering(int, int, int, vector<vector<vector<double> > >&,

@@ -56,6 +56,7 @@ QMesh& QMesh::operator=(const QMesh& that) {
     _qpoints = that._qpoints;
     _recCell = that._recCell;
     _reduced = that._reduced;
+    _shifted = that._shifted;  // ME190701
     _shift = that._shift;
     _weights = that._weights;
   }
@@ -88,6 +89,7 @@ void QMesh::free() {
   _recCell.f2c = zeroMatrix;
   _recCell.skewed = false;
   _recCell.pgroup.clear();
+  _shifted = false;  // ME190701
   _shift = zerodbl;
   _weights.clear();
 }
@@ -231,6 +233,7 @@ void QMesh::moveToBZ(xvector<double>& qpt) {
 //makeIrreducible/////////////////////////////////////////////////////////////
 // Makes the q-point mesh irreducible
 void QMesh::makeIrreducible() {
+  if (_reduced) return;  // ME190701 - don't reduce if it's already reduced
   _logger << "Determining irreducible q-points." << apl::endl;
   _logger.initProgressBar("Irreducible q-points");
 
@@ -340,6 +343,22 @@ const _qpoint& QMesh::getQPoint(int i, int j, int k) const {
   return _qpoints[_qptMap[i][j][k]];
 }
 
+const _qpoint& QMesh::getQPoint(const xvector<double>& fpos) const {
+  return _qpoints[getQPointIndex(fpos)];
+}
+
+// ME190701
+int QMesh::getQPointIndex(xvector<double> fpos) const {
+  // Shift back to original Monkhorst-Pack positions
+  if (_shifted) fpos += _shift;
+  moveToBZ(fpos);
+  // invert Monkhorst-Pack formula;
+  int p = (int) (fpos[1] * 2 * _qptGrid[1] + _qptGrid[1] + 1)/2;
+  int r = (int) (fpos[2] * 2 * _qptGrid[2] + _qptGrid[2] + 1)/2;
+  int s = (int) (fpos[3] * 2 * _qptGrid[3] + _qptGrid[3] + 1)/2;
+  return _qptMap[p - 1][r - 1][s - 1];
+}
+
 int QMesh::getQPointIndex(int i, int j, int k) const {
   return _qptMap[i][j][k];
 }
@@ -378,6 +397,11 @@ const vector<_qpoint>& QMesh::getPoints() const {
 
 const _kcell& QMesh::getReciprocalCell() const {
   return _recCell;
+}
+
+// ME190701
+bool QMesh::isShifted() const {
+  return _shifted;
 }
 
 const xvector<double>& QMesh::getShift() const {
