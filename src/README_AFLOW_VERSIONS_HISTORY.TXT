@@ -1,8 +1,9 @@
-3.1.225 - 2019/06/26
+3.1.225 - 2019/07/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- Added projected phonon DOS calculations. (ME)
         -- Linear tetrahedron method does not reduce upon construction anymore (necessary for projected DOS).
         -- Cleaned up code and added more comments to QMesh and LTMethod files. (ME)
+        -- Made moveToBZ inside QMesh more robust. (ME)
 
 3.1.225 - 2019/05/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz

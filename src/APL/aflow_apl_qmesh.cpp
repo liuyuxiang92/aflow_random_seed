@@ -220,10 +220,11 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
 
 //moveToBZ////////////////////////////////////////////////////////////////////
 // Moves a q-point into the first Brillouin zone.
+// ME190702 - made more robust
 void QMesh::moveToBZ(xvector<double>& qpt) {
   for (int i = 1; i < 4; i++) {
-    if (qpt[i] > 0.5) qpt[i] -= 1.0;
-    if (qpt[i] <= -0.5) qpt[i] += 1.0;
+    while (qpt[i] - 0.5 > _ZERO_TOL_) qpt[i] -= 1.0;
+    while (qpt[i] + 0.5 < _ZERO_TOL_) qpt[i] += 1.0;
   }
 }
 
