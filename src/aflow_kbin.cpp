@@ -244,6 +244,7 @@ namespace KBIN {
     ostringstream aus;
     ifstream FileAUS;
     _aflags aflags;
+    aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");  //CO190629 - a good default until we get down into vDirectory
     aurostd::StringstreamClean(aus);
     bool _VERBOSE_=FALSE;
     int XHOST_AFLOW_RUNXnumber_multiplier=3;
