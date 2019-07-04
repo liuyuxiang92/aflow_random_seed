@@ -11555,7 +11555,7 @@ namespace pflow {
     stringstream message;
     vector<POCCSiteSpecification> vpss;
     if(pocc_sites.empty()){return vpss;}
-    vector<string> tokens;
+    vector<string> tokens,tokenstmp;
     string designation;
     char mode;
     string _site;
@@ -11611,8 +11611,12 @@ namespace pflow {
       }
       //replace P IFF positions.size()==1
       if(pss.mode!='P' && pss.positions.size()==1){
-        pss.input_string[0]='P';
+        //[CO190629 - need to replace designation + position]pss.input_string[0]='P';
         pss.mode='P';
+        //CO190629 START - small bug, need to change pss.input_string to map SPECIES 3 to POSITION X
+        tokenstmp.clear();for(uint it=1;it<tokens.size();it++){tokenstmp.push_back(tokens[it]);} //skip 0, this is being changed
+        pss.input_string="P"+aurostd::utype2string(pss.positions[0])+"-"+aurostd::joinWDelimiter(tokenstmp,"-");
+        //CO190629 STOP - small bug, need to change pss.input_string to map SPECIES 3 to POSITION X
       }
       if(LDEBUG) {
         cerr << soliloquy << " creating new POCCSiteSpecification():" << endl;
