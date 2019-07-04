@@ -948,12 +948,16 @@ double GetPearsonCoefficient(const int& iat) {
 }
 
 // **************************************************************************
-// Function GetCompoundAttenuationLenght
+// Function GetCompoundAttenuationLength
 // **************************************************************************
-double GetCompoundAttenuationLenght(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
   if(species.size()!=composition.size()) {
-    cerr << "ERROR - GetCompoundAttenuationLenght: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
-    exit(0);}
+    //[CO190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
+    //[CO190629 - no exit()]exit(0);
+    stringstream message; //CO190629
+    message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO190629
+    throw aurostd::xerror("GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
+  }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
   for(uint i=0;i<species.size();i++) {
@@ -965,14 +969,14 @@ double GetCompoundAttenuationLenght(const vector<string>& species,const vector<d
   return (double) numerator/denominator; // in cm
 }
 
-double GetCompoundAttenuationLenght(const deque<string>& _species,const deque<int>& _composition,const double& density) { // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density) { // density in g/cm^3, return in cm
   vector<double> composition;
   for(uint i=0;i<_composition.size();i++) 
     composition.push_back(double(_composition.at(i)));
   vector<string> species;
   for(uint i=0;i<_species.size();i++) 
     species.push_back(string(_species.at(i)));
-  return GetCompoundAttenuationLenght(species,composition,density);
+  return GetCompoundAttenuationLength(species,composition,density);
 }
 
 // **************************************************************************
@@ -1075,7 +1079,7 @@ uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vect
     for(uint j=0;j<letters.length();j++)
       if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
   
-  cerr << alloy << endl; exit(0);
+  cerr << alloy << endl; exit(0); //CO190629 - need to clean this exit(), but this function looks unused...
 
   speciesX.clear();
   for(uint i=0;i<alloy.length();i++) {
@@ -2189,6 +2193,7 @@ void xstructure::ClearSpecies() { // CO 180420 - helps with pocc, match with Add
 ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="XSTRUCTURE::operator<<():";
+  stringstream message;
   int a_iomode=a.iomode;
   //  DEBUG=TRUE;
   // ----------------------------------------------------------------------
@@ -2539,7 +2544,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(a.atoms.at(iat).name_is_given==TRUE) {
 	oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
-	cerr << "QE needs atoms species names" << endl; exit(0);
+	      //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
+	      message << "QE needs atoms species names";  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
       }
       for(uint j=1;j<=3;j++) {
 	//  oss << " ";
@@ -3019,6 +3026,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // this is also a constructor so everything should look well defined
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="XSTRUCTURE>>:";
+  stringstream message;
 
   if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
   if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
@@ -3039,29 +3047,35 @@ istream& operator>>(istream& cinput, xstructure& a) {
   //CO 180702 - detect NO input
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
-  if(input_no_spaces.empty()){cerr << soliloquy << " No input..." << endl; exit(0);}  // CO 180702
+  if(input_no_spaces.empty()){
+    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+  }  // CO 180702
 
   if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
   // now clean for comments, tabs, double spaces ... etc
   // CO 180409 - fixing for issues with # at the beginning of the line
   string::size_type loc;  // CO 180409
   for(uint i=1;i<vinput.size();i++) { // not 1st line
-    //aurostd::string2tokens(vinput.at(i),tokens,"//");  // stefano   // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput.at(i)=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //aurostd::string2tokens(vinput.at(i),tokens,"#");  // stefano    // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput.at(i)=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //aurostd::string2tokens(vinput.at(i),tokens,"!");  // for QE     // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput.at(i)=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"//");  // stefano   // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"#");  // stefano    // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"!");  // for QE     // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
     if(i>0){  // CO 180409
-      loc=vinput.at(i).find("//");vinput.at(i)=vinput.at(i).substr(0,loc);
-      loc=vinput.at(i).find('#');vinput.at(i)=vinput.at(i).substr(0,loc);
-      loc=vinput.at(i).find("!");vinput.at(i)=vinput.at(i).substr(0,loc);
+      loc=vinput[i].find("//");vinput[i]=vinput[i].substr(0,loc);
+      loc=vinput[i].find('#');vinput[i]=vinput[i].substr(0,loc);
+      loc=vinput[i].find("!");vinput[i]=vinput[i].substr(0,loc);
     }
-    DeStupidizer(vinput.at(i));
+    DeStupidizer(vinput[i]);
   }
-  if(vinput.size()==0) {cerr << soliloquy << " No input..." << endl; exit(0);}  // CO 180420
+  if(vinput.size()==0) {
+    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+  }  // CO 180420
   
-  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput.at(i) << " " << "[X]" << endl;   exit(0);
+  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
   string sstring,stmp;
   bool IOMODE_found=FALSE;
   vector<double> poccaus; // partial occupation local host
@@ -3094,30 +3108,33 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR" << endl;
     uint QE=0;
     bool QE_ERROR=FALSE;
-    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput.at(i) << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"&system",true)+aurostd::substring2bool(vinput.at(i),"&SYSTEM",true); // DX 1/23/18 - added true to clean the spaces in string
+    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"&system",true)+aurostd::substring2bool(vinput[i],"&SYSTEM",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(&system)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"ibrav=",true)+aurostd::substring2bool(vinput.at(i),"IBRAV=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ibrav=",true)+aurostd::substring2bool(vinput[i],"IBRAV=",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ibrav)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"nat=",true)+aurostd::substring2bool(vinput.at(i),"NAT=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"nat=",true)+aurostd::substring2bool(vinput[i],"NAT=",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(nat)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"ntyp=",true)+aurostd::substring2bool(vinput.at(i),"NTYP=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ntyp=",true)+aurostd::substring2bool(vinput[i],"NTYP=",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ntyp)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"atomic_positions",true)+aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"atomic_positions",true)+aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ATOMIC_POSITIONS)=" << QE << endl;
     
     for(uint i=0;i<vinput.size()&&QE==5;i++) {
-      if(aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS") && 
-	 !aurostd::substring2bool(vinput.at(i),"crystal","CRYSTAL") && 
-	 !aurostd::substring2bool(vinput.at(i),"bohr","BOHR") && // DX added
-	 !aurostd::substring2bool(vinput.at(i),"angstrom","ANGSTROM")) {
-	cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput.at(i) << "\"" << endl;QE_ERROR=TRUE;
+      if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && 
+	 !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
+	 !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
+	 !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
+	cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
-      if( aurostd::substring2bool(vinput.at(i),"&system")) {
-	//	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput.at(i) << "\"" << endl;QE_ERROR=TRUE;
+      if( aurostd::substring2bool(vinput[i],"&system")) {
+	//	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
     }
-    if(QE==5 && QE_ERROR) {cerr << soliloquy << " QE input errors..." << endl; exit(0);}
+    if(QE==5 && QE_ERROR) {
+      //[CO190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
+      throw aurostd::xerror(soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
+    }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
       if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR = TRUE" << endl;
@@ -3129,15 +3146,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " CIF DETECTOR" << endl;
     uint CIF=0;
-    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput.at(i) << endl;
+    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput.at(i),"loop_",true)){ CIF+=1; break;}
+      if(aurostd::substring2bool(vinput[i],"loop_",true)){ CIF+=1; break;}
     }
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput.at(i),"_atom_site_",true)){ CIF+=1; break;}
+      if(aurostd::substring2bool(vinput[i],"_atom_site_",true)){ CIF+=1; break;}
     }
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput.at(i),"_cell_length_",true)){ CIF+=1; break;}
+      if(aurostd::substring2bool(vinput[i],"_cell_length_",true)){ CIF+=1; break;}
     }
     if(CIF==3){
       a.iomode=IOCIF; 
@@ -3191,26 +3208,39 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(lat_found || atom_found){
           if(lat_found && tokens_line.size()<4){  //could be more, but not less
-            cerr << soliloquy << " AIMS input error, ";
-            cerr << "lattice_vector ";
-            cerr << "at line[" << i+1 << "] is ill-defined" << endl;
-            cerr << "line: " << vinput[i] << endl;
-            exit(1);
+            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO190629 - no exit()]cerr << "lattice_vector ";
+            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
+            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO190629 - no exit()]exit(1);
+            message << " AIMS input error, ";  //CO196029
+            message << "lattice_vector "; //CO190629
+            message << "at line[" << i+1 << "] is ill-defined" << endl; //CO190629
+            message << "line: " << vinput[i] << endl; //CO190629
+            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
-            cerr << soliloquy << " AIMS input error, ";
-            cerr << "atom position ";
-            cerr << "at line[" << i+1 << "] "; //CO 180627
-            if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO 180627
-            else {cerr << "is ill-defined" << endl;} //CO 180627
-            cerr << "line: " << vinput[i] << endl;
-            exit(1);
+            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO190629 - no exit()]cerr << "atom position ";
+            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO 180627
+            //[CO190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO 180627
+            //[CO190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO 180627
+            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO190629 - no exit()]exit(1);
+            message << " AIMS input error, "; //CO190629
+            message << "atom position "; //CO190629
+            message << "at line[" << i+1 << "] "; //CO190629
+            if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO190629
+            else {message << "is ill-defined" << endl;} //CO190629
+            message << "line: " << vinput[i] << endl;  //CO190629
+            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
           }
         }
       }
       if(!atom_found_anywhere){
-        cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
-        exit(1);
+        //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
+        //[CO190629 - no exit()]exit(1);
+        throw aurostd::xerror(soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -3226,14 +3256,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
-              exit(1);
+              //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
+              //[CO190629 - no exit()]exit(1);
+              throw aurostd::xerror(soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
-          exit(1);
+          //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
+          //[CO190629 - no exit()]exit(1);
+          throw aurostd::xerror(soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
         }
       }
     }
@@ -3276,25 +3308,34 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- TITLE
     // input.getline(stmp,MAX_TITLE_SIZE);title=stmp;
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     a.title=vinput.at(iline++);
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing second line in poscar" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
     a.scale=0.0;
@@ -3307,9 +3348,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // oss << sstring << endl;
     // -------------- UNIT CELL
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -3327,16 +3371,22 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.lattice(1,3)=aurostd::string2utype<double>(tokens[2]);
       stringstream input_tmp;
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -3393,29 +3443,61 @@ istream& operator>>(istream& cinput, xstructure& a) {
     clear(a.origin);
     // ---------------------------------------------------------------
     // -------------- CHECK VASP4 VASP5 and CHECK DIRECT/CARTESIANS STUFF
-    if(a.iomode==IOVASP_POSCAR) stmp=vinput.at(6);
-    if(a.iomode==IOVASP_ABCCAR) stmp=vinput.at(4);
-    if(a.iomode==IOVASP_WYCKCAR) stmp=vinput.at(4);
+    //CO190629 - shift to line with Direct/Cartesian to find POCC specification
+    //don't worry about setting Selective Dynamics yet (but be aware of it)
+    if(a.iomode==IOVASP_POSCAR) stmp=vinput[6]; //true for VASP4, change if VASP5 later
+    if(a.iomode==IOVASP_ABCCAR) stmp=vinput[4];
+    if(a.iomode==IOVASP_WYCKCAR) stmp=vinput[4];
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      //[CO190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO190629
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
     }
-  
-    if(tokens.at(0)[0]=='S' || tokens.at(0)[0]=='s' || tokens.at(0)[0]=='D' || tokens.at(0)[0]=='d' || tokens.at(0)[0]=='C' || tokens.at(0)[0]=='c') {
-      // VASP 4
-      a.is_vasp4_poscar_format=TRUE;
-      a.is_vasp5_poscar_format=FALSE;
-    } else {
+
+    // VASP 4
+    a.is_vasp4_poscar_format=TRUE;
+    a.is_vasp5_poscar_format=FALSE;
+    
+    if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       // VASP 5
       a.is_vasp4_poscar_format=FALSE;
       a.is_vasp5_poscar_format=TRUE;
+      //Kesong Yang identified this bug, we need to shift the line if vasp5, also if selective dynamics
+      uint ijline=0;
+      if(a.iomode==IOVASP_POSCAR) ijline=7;
+      if(a.iomode==IOVASP_ABCCAR) ijline=5;
+      if(a.iomode==IOVASP_WYCKCAR) ijline=5;
+      if(tokens[0][0]=='S' || tokens[0][0]=='s'){ijline++;} //selective dynamics
+      stmp=vinput.at(ijline);
+      aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
+      aurostd::string2tokens(stmp,tokens);  //now we should have D/C line
     }
+    
+    if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+    }
+  
+    //[CO190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
+    //[CO190629 - OBSOLETE]  // VASP 4
+    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
+    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=FALSE;
+    //[CO190629 - OBSOLETE]} else {
+    //[CO190629 - OBSOLETE]  // VASP 5
+    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
+    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
+    //[CO190629 - OBSOLETE]}
+    
     a.partial_occupation_flag=FALSE;
 
-    for(uint j=1;j<tokens.size();j++) if(tokens.at(j)[0]=='P' || tokens.at(j)[0]=='P') a.partial_occupation_flag=TRUE;
+    for(uint j=1;j<tokens.size();j++) if(tokens[j][0]=='P' || tokens[j][0]=='p') a.partial_occupation_flag=TRUE;
     //if(a.scale_second==0.0) { // CO 180409
     a.partial_occupation_HNF=0; // nothing defined // CO 180409
     a.partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  // CO 170803 - site tol
@@ -3442,11 +3524,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     //if(a.partial_occupation_flag && a.scale_third.isentry){a.partial_occupation_site_tol=a.scale_third.content_double;} // CO 170803 - site tol
 
+    //last line was last lattice vector/geometry line
     if(a.is_vasp5_poscar_format) {
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -3454,8 +3540,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- ATOMS
     // Number of atoms of each type and total number of atoms.
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -3466,9 +3555,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     tmpns=aurostd::RemoveWhiteSpaces(stmp);
     if(string(tmpns).size()==0) {
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -3480,53 +3572,59 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //    a.partial_occupation_flag=FALSE;
     for(uint i=0;i<tokens_i.size()&&!a.partial_occupation_flag;i++)
       if(aurostd::substring2bool(tokens_i.at(i),"*") || aurostd::substring2bool(tokens_i.at(i),"+"))
-	a.partial_occupation_flag=TRUE;
+        a.partial_occupation_flag=TRUE;
     // -------------- no partial occupation
     if(a.partial_occupation_flag==FALSE) {
       if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION = FALSE" << endl;
       for(uint i=0;i<tokens_i.size();i++) {
-	number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
-	a.num_each_type.push_back(number); num_atoms+=number;
-	for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
-	for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+        number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
+        a.num_each_type.push_back(number); num_atoms+=number;
+        for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
+        for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
       }
     }
     // -------------- yes partial occupation
     if(a.partial_occupation_flag==TRUE) {
       if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION = TRUE" << endl;
       for(uint i=0;i<tokens_i.size();i++) {
-	if(!aurostd::substring2bool(tokens_i.at(i),"*") && !aurostd::substring2bool(tokens_i.at(i),"+")) { // NO POCC KEYWORD
-	  number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
-	  a.num_each_type.push_back(number); num_atoms+=number;
-	  for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
-	  for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
-	} else {
-	  aurostd::string2tokens(tokens_i.at(i),tokens_j,"+");if(LDEBUG) cerr << "tokens_j.size()=" << tokens_j.size() << endl;
-	  number=0;int nnumber;
-	  for(uint j=0;j<tokens_j.size();j++) {
-	    aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
-	    if(tokens_k.size()==0) {
-	      oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
-	      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	      exit(0);
-	    }
-	    nnumber=aurostd::string2utype<int>(tokens_k.at(0));
-	    if(tokens_k.size()==1) dpocc=1.0;
-	    if(tokens_k.size()==2) {dpocc=aurostd::string2utype<double>(tokens_k.at(1));} // SOMETHING FOR ROUNDING DPOCC UP TO FRACTIONS....
-	    number+=nnumber; num_atoms+=nnumber;
-	    for(uint l=0;l<(uint) nnumber;l++) poccaus.push_back(dpocc);
-	    for(uint l=0;l<(uint) nnumber;l++) {
-	      if(tokens_k.size()==1) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_); // no specie number
-	      if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
-	    }
-	    if(tokens_k.size()>=3) {
-	      oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
-	      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	      exit(0);
-	    }
-	  } // loop on +
-	  a.num_each_type.push_back(number);
-	}
+        if(!aurostd::substring2bool(tokens_i.at(i),"*") && !aurostd::substring2bool(tokens_i.at(i),"+")) { // NO POCC KEYWORD
+          number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
+          a.num_each_type.push_back(number); num_atoms+=number;
+          for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
+          for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+        } else {
+          aurostd::string2tokens(tokens_i.at(i),tokens_j,"+");if(LDEBUG) cerr << "tokens_j.size()=" << tokens_j.size() << endl;
+          number=0;int nnumber;
+          for(uint j=0;j<tokens_j.size();j++) {
+            aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
+            if(tokens_k.size()==0) {
+              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
+              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            }
+            nnumber=aurostd::string2utype<int>(tokens_k.at(0));
+            if(tokens_k.size()==1) dpocc=1.0;
+            if(tokens_k.size()==2) {dpocc=aurostd::string2utype<double>(tokens_k.at(1));} // SOMETHING FOR ROUNDING DPOCC UP TO FRACTIONS....
+            number+=nnumber; num_atoms+=nnumber;
+            for(uint l=0;l<(uint) nnumber;l++) poccaus.push_back(dpocc);
+            for(uint l=0;l<(uint) nnumber;l++) {
+              if(tokens_k.size()==1) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_); // no specie number
+              if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
+            }
+            if(tokens_k.size()>=3) {
+              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
+              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            }
+          } // loop on +
+          a.num_each_type.push_back(number);
+        }
       }
       if(LDEBUG) {cerr << "P(" << poccaus.size()<< ") = ";for(uint j=0;j<poccaus.size();j++) cerr << poccaus.at(j) << " ";cerr << endl;}
     }
@@ -3538,9 +3636,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     string stmp;
     if(LDEBUG) cerr << soliloquy << " DEBUG [1]" << endl;
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -3548,50 +3649,62 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::string2tokens(stmp,stmp_tokens);
     // Note that if there are spaces at the beginning of the line we have to remove them.
     if(stmp_tokens.size()==0) {
-      oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     } else {
       if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
       a.order_parameter_structure=FALSE;
       if(sstmp[0]=='S' || sstmp[0]=='s') {
-	a.isd=TRUE;
-	if(vinput.size()-1<iline){
-	  oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}  // CO 180420 - check for missing lines
-	stmp=vinput.at(iline++);
-	sstmp=aurostd::RemoveSpaces(stmp);
+        a.isd=TRUE;
+        if(vinput.size()-1<iline){
+          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "missing line[" << iline << "]" << endl; //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }  // CO 180420 - check for missing lines
+        stmp=vinput.at(iline++);
+        sstmp=aurostd::RemoveSpaces(stmp);
       }
       if(LDEBUG) cerr << soliloquy << " DEBUG [3]" << endl;
       if(sstmp[0]=='D' || sstmp[0]=='d') {
-	//	cerr << "FRAC" << endl;
-	a.coord_type[0]=sstmp[0];
-	a.coord_flag=_COORDS_FRACTIONAL_;
+        //	cerr << "FRAC" << endl;
+        a.coord_type[0]=sstmp[0];
+        a.coord_flag=_COORDS_FRACTIONAL_;
       } else {
-	if(sstmp[0]=='C' || sstmp[0]=='c') {
-	  //	  cerr << "CART" << endl;
-	  a.coord_type[0]=sstmp[0];
-	  a.coord_flag=_COORDS_CARTESIAN_;
-	  if(a.iomode==IOVASP_WYCKCAR) {
-	    oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
-	    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	    exit(0);
-	  }
-	} else {
-	  oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}
+        if(sstmp[0]=='C' || sstmp[0]=='c') {
+          //	  cerr << "CART" << endl;
+          a.coord_type[0]=sstmp[0];
+          a.coord_flag=_COORDS_CARTESIAN_;
+          if(a.iomode==IOVASP_WYCKCAR) {
+            //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
+            //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+            //[CO190629 - no exit()]exit(0);
+            message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO190629
+            for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          }
+        } else {
+          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Did not find coordinate type D/d or C/c." << endl;  //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }
       }
       a.coord_type[1]='\0';
       if(stmp_tokens.size()>1) {
-	for(uint ipos=1;ipos<stmp_tokens.size();ipos++) {
-	  if(stmp_tokens.at(ipos)[0]=='O' || stmp_tokens.at(ipos)[0]=='o') a.order_parameter_structure=TRUE;
-	  //	  if(stmp_tokens.at(ipos)[0]=='P' || stmp_tokens.at(ipos)[0]=='p') a.partial_occupation_flag=TRUE;
-	}
+        for(uint ipos=1;ipos<stmp_tokens.size();ipos++) {
+          if(stmp_tokens.at(ipos)[0]=='O' || stmp_tokens.at(ipos)[0]=='o') a.order_parameter_structure=TRUE;
+          //	  if(stmp_tokens.at(ipos)[0]=='P' || stmp_tokens.at(ipos)[0]=='p') a.partial_occupation_flag=TRUE;
+        }
       }
       if(LDEBUG) cerr << soliloquy << " DEBUG a.order_parameter_structure=" << a.order_parameter_structure << endl;
     }
@@ -3625,32 +3738,38 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(itype=0;itype<a.num_each_type.size();itype++) {
       //  cerr << a.num_each_type.at(itype) << endl;
       for(j=0;j<(uint) a.num_each_type.at(itype);j++) {
-	if(LDEBUG) cerr << soliloquy << " DEBUG [5] itype,j=" << itype << "," << j << endl;
-	//	bool plug_atom=TRUE;
+        if(LDEBUG) cerr << soliloquy << " DEBUG [5] itype,j=" << itype << "," << j << endl;
+        //	bool plug_atom=TRUE;
         iat++; // it startf from -1 so the first is ZERO
         //  cerr << iat << " type=" << itype << endl;
         //  for(int iat=1;iat<=(num_atoms);iat++) {
         // cerr << iat << " " << (num_atoms) << endl;
         _atom atom;                                        // create new atom
         string stmp;
-  	stmp=vinput.at(iline++);
-	if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
-	if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
-	  oss << "ERROR:  Unsufficient number of atom lines." << endl;
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}  
-	if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
+        stmp=vinput.at(iline++);
+        if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
+        if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
+          //[CO190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Insufficient number of atom lines." << endl;  //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }  
+        if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
-	aurostd::StringSubst(stmp,"\t"," ");
-	std::vector<string> stmp_tokens;
-	aurostd::string2tokens(stmp,stmp_tokens);
-	if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
-	if(stmp_tokens.size()<3) {
-	  oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO 180409
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}  
+        aurostd::StringSubst(stmp,"\t"," ");
+        std::vector<string> stmp_tokens;
+        aurostd::string2tokens(stmp,stmp_tokens);
+        if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
+        if(stmp_tokens.size()<3) {
+          //[CO190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO 180409
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }  
 
         int id=0;
         string name;
@@ -3671,83 +3790,89 @@ istream& operator>>(istream& cinput, xstructure& a) {
         atom.basis=iat;     // position in the basis
         atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
         atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
-	atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
+        atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
         atom.spin=0.0;
         atom.noncoll_spin.clear(); // DX 12/5/17 - non-collinear spin
         atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
-	atom.order_parameter_value=0;
-	atom.order_parameter_atom=FALSE;
-	atom.partial_occupation_value=1.0;
-	atom.partial_occupation_flag=FALSE;
-	//	plug_atom=TRUE;   // not used
-	// NO ORDER PARAMETER
-	if(LDEBUG) cerr << soliloquy << " DEBUG [7]" << endl;
-	if(a.order_parameter_structure==FALSE) {
-	  // stmp_tokens.size() = 4 (plus possible comments).
-	  // Read in the names.
-	  if(stmp_tokens.size()==4 || (stmp_tokens.size()>=4 && a.isd==0)) {
-	    atom.name=stmp_tokens.at(id++);
-	    atom.CleanName();
-	    atom.CleanSpin();
-	    atom.name_is_given=TRUE;
-	  }
-	  // stmp_tokens.size()=6
-	  if(a.isd!=0 && stmp_tokens.size()==6) {
-	    string sdt;
-	    for(int ic=1;ic<=3;ic++)
-	      sdt=sdt+stmp_tokens.at(id++);
-	    atom.sd=sdt;
-	  }
-	  // stmp_tokens.size()=7
-	  if(a.isd==TRUE && stmp_tokens.size()>=7) {
-	    string sdt;
-	    for(int ic=1;ic<=3;ic++)
-	      sdt=sdt+stmp_tokens.at(id++);
-	    atom.sd=sdt;
-	    atom.name=stmp_tokens.at(id++);
-	    atom.CleanName();
-	    atom.CleanSpin();
-	    atom.name_is_given=TRUE;
-	  }
-	}
-	// ORDER PARAMETER
-	if(a.order_parameter_structure==TRUE) {
-	  if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
-	    if(a.order_parameter_structure==TRUE) {
-	      cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
-	      cerr << "  x y z Name OrderParameter "                     << endl;
-	      cerr << " where x,y,z are the coordinates " << endl;
-	      cerr << " Name is the symbol of the atom  " << endl;
-	      cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
-	      cerr << " good luck" << endl;
-	      exit(0);
-	    }
-	  }
-	  if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
-	    atom.name=stmp_tokens.at(id);
-	    atom.CleanName();atom.CleanSpin();
-	    atom.name_is_given=TRUE;
-	    id++;
-	    if(a.order_parameter_structure==TRUE) {
-	      if(stmp_tokens.at(id)=="-") {
-		atom.order_parameter_value=0;
-		atom.order_parameter_atom=FALSE;
-	      } else {
-		if(stmp_tokens.at(id)=="*") {
-		  atom.order_parameter_value=0;
-		  atom.order_parameter_atom=TRUE;
-		} else {
-		  atom.order_parameter_value=atoi(stmp_tokens.at(id).c_str());
-		  atom.order_parameter_atom=TRUE;
-		  a.order_parameter_sum+=atom.order_parameter_value;
-		}
-	      }
-	      id++;
-	    }
-	  }
-	}
-	if(LDEBUG) cerr << soliloquy << " DEBUG [8]" << endl;
-	// now plug atom into the atomlist
+        atom.order_parameter_value=0;
+        atom.order_parameter_atom=FALSE;
+        atom.partial_occupation_value=1.0;
+        atom.partial_occupation_flag=FALSE;
+        //	plug_atom=TRUE;   // not used
+        // NO ORDER PARAMETER
+        if(LDEBUG) cerr << soliloquy << " DEBUG [7]" << endl;
+        if(a.order_parameter_structure==FALSE) {
+          // stmp_tokens.size() = 4 (plus possible comments).
+          // Read in the names.
+          if(stmp_tokens.size()==4 || (stmp_tokens.size()>=4 && a.isd==0)) {
+            atom.name=stmp_tokens.at(id++);
+            atom.CleanName();
+            atom.CleanSpin();
+            atom.name_is_given=TRUE;
+          }
+          // stmp_tokens.size()=6
+          if(a.isd!=0 && stmp_tokens.size()==6) {
+            string sdt;
+            for(int ic=1;ic<=3;ic++)
+              sdt=sdt+stmp_tokens.at(id++);
+            atom.sd=sdt;
+          }
+          // stmp_tokens.size()=7
+          if(a.isd==TRUE && stmp_tokens.size()>=7) {
+            string sdt;
+            for(int ic=1;ic<=3;ic++)
+              sdt=sdt+stmp_tokens.at(id++);
+            atom.sd=sdt;
+            atom.name=stmp_tokens.at(id++);
+            atom.CleanName();
+            atom.CleanSpin();
+            atom.name_is_given=TRUE;
+          }
+        }
+        // ORDER PARAMETER
+        if(a.order_parameter_structure==TRUE) {
+          if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
+            if(a.order_parameter_structure==TRUE) {
+              //[CO190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
+              //[CO190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
+              //[CO190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
+              //[CO190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
+              //[CO190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
+              //[CO190629 - no exit()]cerr << " good luck" << endl;
+              //[CO190629 - no exit()]exit(0);
+              message << "With the order parameter you must specify " << endl;  //CO190629
+              message << "  x y z Name OrderParameter "                     << endl;  //CO190629
+              message << " where x,y,z are the coordinates " << endl; //CO190629
+              message << " Name is the symbol of the atom  " << endl; //CO190629
+              message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO190629
+              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            }
+          }
+          if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
+            atom.name=stmp_tokens.at(id);
+            atom.CleanName();atom.CleanSpin();
+            atom.name_is_given=TRUE;
+            id++;
+            if(a.order_parameter_structure==TRUE) {
+              if(stmp_tokens.at(id)=="-") {
+                atom.order_parameter_value=0;
+                atom.order_parameter_atom=FALSE;
+              } else {
+                if(stmp_tokens.at(id)=="*") {
+                  atom.order_parameter_value=0;
+                  atom.order_parameter_atom=TRUE;
+                } else {
+                  atom.order_parameter_value=atoi(stmp_tokens.at(id).c_str());
+                  atom.order_parameter_atom=TRUE;
+                  a.order_parameter_sum+=atom.order_parameter_value;
+                }
+              }
+              id++;
+            }
+          }
+        }
+        if(LDEBUG) cerr << soliloquy << " DEBUG [8]" << endl;
+        // now plug atom into the atomlist
         //      cerr <<  atom.name << endl;
         //      cerr <<  atom.cleanname << endl;
         //      cerr <<  atom.name_is_given << endl;
@@ -3774,7 +3899,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     iline=vinput.size();
     // DX 1/23/18 - added nat - START
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"NAT=",true)){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NAT=",true)){
         vector<string> comma_tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
@@ -3788,25 +3913,25 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     // DX 1/23/18 - added nat - END
     for(uint i=0;i<vinput.size();i++){
-      // DX 1/23/18 [OBSOLETE]  if(aurostd::substring2bool(vinput.at(i),"CELL_PARAMETERS") && 
-      // DX 1/23/18 [OBSOLETE]    aurostd::substring2bool(vinput.at(i),"angstrom","ANGSTROM")) {iline=i+1;jline=i;}
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"CELL_PARAMETERS")){ // DX 1/24/17 - added aurostd::toupper
-        if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ANGSTROM")){
+      // DX 1/23/18 [OBSOLETE]  if(aurostd::substring2bool(vinput[i],"CELL_PARAMETERS") && 
+      // DX 1/23/18 [OBSOLETE]    aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {iline=i+1;jline=i;}
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELL_PARAMETERS")){ // DX 1/24/17 - added aurostd::toupper
+        if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")){
           iline=i+1;jline=i;
         }
-        else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ALAT")){ // DX 2/15/18 - added alat bool
+        else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ALAT")){ // DX 2/15/18 - added alat bool
           iline=i+1;jline=i;                                                     // DX 2/15/18 - added alat bool
           alat = true;                                                           // DX 2/15/18 - added alat bool
         }
         // DX 1/23/18 - added bohr - START
-        else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"BOHR")){
+        else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")){
           iline=i+1;jline=i;
           bohr_lat = true;
         }
         // DX 1/23/18 - added bohr - END
       }
       // DX 1/23/18 - added ibrav - START
-      else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"IBRAV=",true)){
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"IBRAV=",true)){
         vector<string> comma_tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
@@ -3825,7 +3950,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
       // celldm variant
       for(uint i=0;i<vinput.size();i++){
-        if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"CELLDM")){
+        if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
           vector<string> comma_tokens; 
           aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
@@ -3846,7 +3971,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(celldm_count == 0){
         isabc = true;
 	for(uint i=0;i<vinput.size();i++){
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"A=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3859,7 +3984,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"B=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3872,7 +3997,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"C=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3885,7 +4010,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"COSAB=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3898,7 +4023,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"COSAC=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3911,7 +4036,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"COSBC=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3973,18 +4098,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // cerr << "vinput.size()=" << vinput.size() << endl;
     // NOW ADD ATOMS
     for(uint i=0;i<vinput.size();i++) {
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput.at(i),"crystal","CRYSTAL")) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"CRYSTAL")) { // DX 1/24/18 - added aurostd::toupper
+      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL")) {
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) { // DX 1/24/18 - added aurostd::toupper
 	iline=i+1;a.coord_flag=_COORDS_FRACTIONAL_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
       }
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput.at(i),"angstrom","ANGSTROM")) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ANGSTROM")) { // DX 1/24/18 - added aurostd::toupper
+      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) { // DX 1/24/18 - added aurostd::toupper
 	iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
       }
       // DX 1/24/18 -- added Bohr case - START
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"BOHR")) { // DX 1/24/18 - added aurostd::toupper
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")) { // DX 1/24/18 - added aurostd::toupper
 	iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
         bohr_pos = true;
@@ -3996,14 +4121,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
       _atom atom;                                        // create new atom
       string stmp;
       xvector<double> v(3);clear(v);
-      stmp=vinput.at(i);       stmp=aurostd::RemoveCharacter(vinput.at(i),'\t');aurostd::StringSubst(stmp,"\t"," ");
+      stmp=vinput[i];       stmp=aurostd::RemoveCharacter(vinput[i],'\t');aurostd::StringSubst(stmp,"\t"," ");
       std::vector<string> stmp_tokens;
       aurostd::string2tokens(stmp,stmp_tokens);
       if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
       if(stmp_tokens.size()<4) {
-	oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO 180409
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO 180409
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  
       int id=0;
       string name;
@@ -4078,16 +4206,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.spacegroupnumberoption=0;
     // get space group
     for(uint i=0;i<vinput.size();i++) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SYMMETRY_INT_TABLES_NUMBER")){ // converted to upper to be case insensitive
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SYMMETRY_INT_TABLES_NUMBER")){ // converted to upper to be case insensitive
         vector<string> tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput.at(i))),tokens,"_SYMMETRY_INT_TABLES_NUMBER"); // converted to upper to be case insensitive
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SYMMETRY_INT_TABLES_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
 	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
-      else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SPACE_GROUP_IT_NUMBER")){ // converted to upper to be case insensitive
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_IT_NUMBER")){ // converted to upper to be case insensitive
         vector<string> tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput.at(i))),tokens,"_SPACE_GROUP_IT_NUMBER"); // converted to upper to be case insensitive
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SPACE_GROUP_IT_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
 	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
@@ -4096,9 +4224,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // get space group setting
     string spacegroup_Hall="";
     for(uint i=0;i<vinput.size();i++) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive
         vector<string> tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput.at(i))),tokens,"_SPACE_GROUP_NAME_HALL"); // converted to upper to be case insensitive
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SPACE_GROUP_NAME_HALL"); // converted to upper to be case insensitive
         if(tokens.size()==1){
 	  spacegroup_Hall = aurostd::string2utype<uint>(tokens.at(0));
         }
@@ -4126,13 +4254,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
 //      bool found_symops=FALSE;
 //      cerr << "wyckoff_multiplicities[1]: " << wyckoff_multiplicities[1] << endl;
 //      for(uint i=0;i<vinput.size();i++) {
-//	if(aurostd::substring2bool(vinput.at(i),"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput.at(i),"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
+//	if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
 //	  found_symops=TRUE;
 //	}
 //	else if(found_symops && multiplicity_count<wyckoff_multiplicities[1]){
 //	  multiplicity_count+=1;
 //	  vector<string> tokens; 
-//	  aurostd::string2tokens(vinput.at(i),tokens," ");
+//	  aurostd::string2tokens(vinput[i],tokens," ");
 //	  if(tokens.size()==2){
 //	    spacegroup_symop_xyz.push_back(tokens[1]);
 //	  }
@@ -4154,13 +4282,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
       int multiplicity_count=0;
       bool found_symops=FALSE;
       for(uint i=0;i<vinput.size();i++) {
-	if(aurostd::substring2bool(vinput.at(i),"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput.at(i),"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
+	if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
 	  found_symops=TRUE;
 	}
 	else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
 	  multiplicity_count+=1;
 	  vector<string> tokens; 
-	  aurostd::string2tokens(vinput.at(i),tokens," ");
+	  aurostd::string2tokens(vinput[i],tokens," ");
     // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
     tokens.erase(tokens.begin()+0); //erase symop index, not needed
     string symop = aurostd::joinWDelimiter(tokens,"");
@@ -4208,38 +4336,45 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	}
       }
       else {
-	oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
-            << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
+        //[CO190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO190629
+          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }
     }
     if(!found_setting){
-      oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
 
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
       vector<string> tokens;
       aurostd::string2tokens(vinput[i],tokens," ");
-      if(aurostd::substring2bool(vinput.at(i),"_cell_length_a") && tokens.size()==2){
+      if(aurostd::substring2bool(vinput[i],"_cell_length_a") && tokens.size()==2){
         a.a = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_length_b") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_length_b") && tokens.size()==2){
         a.b = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_length_c") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_length_c") && tokens.size()==2){
         a.c = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_angle_alpha") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_angle_alpha") && tokens.size()==2){
         a.alpha = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_angle_beta") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_angle_beta") && tokens.size()==2){
         a.beta = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_angle_gamma") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_angle_gamma") && tokens.size()==2){
         a.gamma = aurostd::string2utype<double>(tokens[1]); 
       }
     }
@@ -4251,12 +4386,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     bool found_atom_site_labels=FALSE;    
     for(uint i=0;i<vinput.size();i++) {
       //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso loop - START
-      if(aurostd::substring2bool(vinput.at(i),"loop")){
+      if(aurostd::substring2bool(vinput[i],"loop")){
         found_atom_site_labels = FALSE;
       }
-      if(aurostd::substring2bool(vinput.at(i),"_atom_site") && !aurostd::substring2bool(vinput.at(i),"aniso")){
+      if(aurostd::substring2bool(vinput[i],"_atom_site") && !aurostd::substring2bool(vinput[i],"aniso")){
         found_atom_site_labels=TRUE;
-        atom_site_fields.push_back(vinput.at(i));
+        atom_site_fields.push_back(vinput[i]);
       }
       //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso_U loop - END
       else if(found_atom_site_labels == TRUE && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0){
@@ -4278,9 +4413,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           tmp.cpos=a.f2c*tmp.fpos;
           a.AddAtom(tmp);
         } else {
-          oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
+          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
         }
       }
     }
@@ -4474,9 +4612,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } else {
     // have partial
     if(poccaus.size()!=a.atoms.size()) {
-      oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -4547,14 +4688,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   if(a.is_vasp5_poscar_format==TRUE) {
     a.species.clear();a.species_pp.clear();a.species_pp_type.clear();a.species_pp_version.clear();a.species_pp_ZVAL.clear();a.species_pp_vLDAU.clear();a.species_volume.clear();a.species_mass.clear();
-    if(a.iomode==IOVASP_POSCAR) aurostd::string2tokens((vinput.at(5)),tokens);
-    if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput.at(3)),tokens);
-    if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput.at(3)),tokens);
+    if(a.iomode==IOVASP_POSCAR) aurostd::string2tokens((vinput[5]),tokens);
+    if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput[3]),tokens);
+    if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.num_each_type.size()!=tokens.size()) {
-      oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
-      oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
-      oss << "      tokens.size()=" << tokens.size() << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
+      //[CO190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
+      //[CO190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "You need to specify the same number of species and atoms types" << endl;  //CO190629
+      message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO190629
+      message << "      tokens.size()=" << tokens.size() << endl; //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -4678,19 +4823,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
 #endif
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
-    oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
-    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-    exit(0);
+    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
+    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
-    oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
-    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-    exit(0);
+    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
+    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
-    oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
-    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-    exit(0);
+    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
+    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   
   // ---------------------------------------------------------------
@@ -12994,30 +13148,30 @@ int ijk2l(const xstructure& str,const xvector<int>& ijk) {
 }
 
 // **************************************************************************
-// AQEgeom2aims AQEgeom2abinit AQEgeom2qe AQEgeom2vasp
+// input2AIMSxstr input2ABINITxstr input2QExstr input2VASPxstr
 // ***************************************************************************
-xstructure AQEgeom2aims(istream& input) {
+xstructure input2AIMSxstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) 
   a.xstructure2aims();
   return a;
 }
 
-xstructure AQEgeom2abinit(istream& input) {
+xstructure input2ABINITxstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) 
   a.xstructure2abinit();
   return a;
 }
 
-xstructure AQEgeom2qe(istream& input) {
+xstructure input2QExstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) 
   a.xstructure2qe();
   return a;
 }
 
-xstructure AQEgeom2vasp(istream& input) {
+xstructure input2VASPxstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
@@ -13457,7 +13611,7 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
   for(uint i=0;i<elements.size();i++) {
     //  cout << "scanning " << elements.at(i) << endl;
     for(uint j=1;j<vinput.size();j++) {
-      aurostd::string2tokens(vinput.at(j),tokens);
+      aurostd::string2tokens(vinput[j],tokens);
       if(tokens.size()==7) {
 	if(tokens.at(1)==elements.at(i)) {
 	  cout << "   ";

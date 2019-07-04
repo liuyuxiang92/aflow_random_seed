@@ -2964,7 +2964,7 @@ namespace aflowlib {
 
     // scintillation_attenuation_length
     data.scintillation_attenuation_length=0.0;
-    data.scintillation_attenuation_length=GetCompoundAttenuationLenght(str_relax.species,str_relax.num_each_type,(double) data.density);
+    data.scintillation_attenuation_length=GetCompoundAttenuationLength(str_relax.species,str_relax.num_each_type,(double) data.density);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SCINTILLATION_ATTENUATION_LENGTH (cm) = " << data.scintillation_attenuation_length << endl;
 
     // [UNUSED] if(AFLOWLIB_VERBOSE) cout << MESSAGE << " PSEUDOPOTENTIAL species_pp_type = " << data.species_pp_type << endl;
