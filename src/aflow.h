@@ -1171,8 +1171,8 @@ double GetPearsonCoefficient(const int&);
 double GetAtomXrayScatt(const string& symbol);
 double GetAtomXrayScatt(const uint& atnum);
 vector<string> GetGroupOfAtoms(string& group_name); //DX 20181220 
-double GetCompoundAttenuationLenght(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
-double GetCompoundAttenuationLenght(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
 // DX and CO - START
 //DX 20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  // RHT
 // DX and CO - END
@@ -2282,10 +2282,10 @@ int ijk2l(const xstructure& str,const xvector<int>& ijk);
 xvector<double> r_lattice(const xstructure& str,const int &l);
 xvector<double> r_lattice(const xstructure& str,const int &i,const int &j,const int &k);
 xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
-xstructure AQEgeom2aims(istream& input);
-xstructure AQEgeom2abinit(istream& input);
-xstructure AQEgeom2qe(istream& input);
-xstructure AQEgeom2vasp(istream& input);
+xstructure input2AIMSxstr(istream& input);
+xstructure input2ABINITxstr(istream& input);
+xstructure input2QExstr(istream& input);
+xstructure input2VASPxstr(istream& input);
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes

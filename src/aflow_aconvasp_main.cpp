@@ -1487,8 +1487,8 @@ namespace pflow {
     // *********************************************************************
     if(argv.size()>=2 && !_PROGRAMRUN) {
       // A
-      if(vpflow.flag("ABINIT")) {cout << AQEgeom2abinit(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("AIMS")) {cout << AQEgeom2aims(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("ABINIT")) {cout << input2ABINITxstr(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("AIMS")) {cout << input2AIMSxstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ABCCAR")) {cout << pflow::ABCCAR(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ACE")) {pflow::ACE(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWIN")) {cout << pflow::AFLOWIN(cin); _PROGRAMRUN=true;}
@@ -1738,7 +1738,7 @@ namespace pflow {
       if(vpflow.flag("PRIM2")) {cout << pflow::PRIM(cin,2); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM3")) {cout << pflow::PRIM(cin,3); _PROGRAMRUN=true;}
       // Q
-      if(vpflow.flag("QE")) {cout << AQEgeom2qe(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("QDEL")) {sflow::QDEL(vpflow.getattachedscheme("QDEL")); _PROGRAMRUN=true;} // NEW
       if(vpflow.flag("QMVASP")) {pflow::QMVASP(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("QSUB")) {sflow::QSUB(vpflow.getattachedscheme("QSUB")); _PROGRAMRUN=true;} // NEW
@@ -1801,7 +1801,7 @@ namespace pflow {
       // U
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
-      if(vpflow.flag("VASP")) {cout << AQEgeom2vasp(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("VASP")) {cout << input2VASPxstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::PLUS_EQUAL")) {cout << pflow::VOLUME("VOLUME::PLUS_EQUAL,"+vpflow.getattachedscheme("VOLUME::PLUS_EQUAL"),cin); _PROGRAMRUN=true;} 
@@ -11555,7 +11555,7 @@ namespace pflow {
     stringstream message;
     vector<POCCSiteSpecification> vpss;
     if(pocc_sites.empty()){return vpss;}
-    vector<string> tokens;
+    vector<string> tokens,tokenstmp;
     string designation;
     char mode;
     string _site;
@@ -11611,8 +11611,12 @@ namespace pflow {
       }
       //replace P IFF positions.size()==1
       if(pss.mode!='P' && pss.positions.size()==1){
-        pss.input_string[0]='P';
+        //[CO190629 - need to replace designation + position]pss.input_string[0]='P';
         pss.mode='P';
+        //CO190629 START - small bug, need to change pss.input_string to map SPECIES 3 to POSITION X
+        tokenstmp.clear();for(uint it=1;it<tokens.size();it++){tokenstmp.push_back(tokens[it]);} //skip 0, this is being changed
+        pss.input_string="P"+aurostd::utype2string(pss.positions[0])+"-"+aurostd::joinWDelimiter(tokenstmp,"-");
+        //CO190629 STOP - small bug, need to change pss.input_string to map SPECIES 3 to POSITION X
       }
       if(LDEBUG) {
         cerr << soliloquy << " creating new POCCSiteSpecification():" << endl;

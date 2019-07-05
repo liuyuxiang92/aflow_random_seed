@@ -1013,12 +1013,24 @@ patch_makefile1: Makefile
 patch_makefile2: Makefile
 	cat Makefile | sed "s/\-O1//g" | sed "s/\-O2//g" | sed "s/\-O3//g" > M	
 	mv M Makefile
-#ME190313 - only execute check if md5sum is present
 check:
-	-if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else ./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum; echo "#ffb9c5681045fb80f391e9a931f21d1"; fi
+	$(MAKE) proto_check
+	$(MAKE) slab_check
+proto_check:
+	@echo "Performing 'aflow --proto' test"
+	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
+		PROTO4SUM=$$(./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum | cut -d ' ' -f1) && \
+		[ "$${PROTO4SUM#*ffb9c5681045fb80f391e9a931f21d1}" != "$$PROTO4SUM" ] && \
+		echo "'aflow --proto' check pass!" && return 0 || \
+		echo "'aflow --proto' test failed. Check compilation of aflow and aflow_data." && return 1; \
+	fi
+#ME190313 - only execute check if md5sum is present
+#	-if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else ./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum; echo "#ffb9c5681045fb80f391e9a931f21d1"; fi
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
+slab_check:
+	./aflow --slab_test
 www:	web
 clean:
 	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`

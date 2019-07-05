@@ -501,7 +501,7 @@ int main(int _argc,char **_argv) {
   if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
   if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
   if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
-  if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {Arun=TRUE;slab::slabTest();}  //CO190601
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO190601  //CO190629 if TRUE(==1), return 0 (normal)
   if(!Arun && XHOST.vflag_control.flag("MACHINE"))  {Arun=TRUE;init::InitMachine(TRUE,argv,cmds,cout);}
   
   // **************************************************************
@@ -660,7 +660,7 @@ int main(int _argc,char **_argv) {
   }
   // **************************************************************
   // END
-  return (int) !Arun; //Arun==TRUE is 1, so flip because return 0 is normal
+  return (Arun?0:1); //Arun==TRUE is 1, so flip because return 0 is normal  //CO190629 - more explicit return 0
 }
   // CO 180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
