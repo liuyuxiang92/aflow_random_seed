@@ -307,6 +307,9 @@ namespace aurostd {
   string RemoveComments(const string& s) __xprototype;
   vector<string> RemoveComments(const vector<string>&) __xprototype;  // ME190614
   string RemoveCharacter(const string& s, const char character) __xprototype;
+  string RemoveCharacterFromTheBack(const string& s, const char character); __xprototype; //DX 20190708
+  string RemoveCharacterFromTheFront(const string& s, const char character); __xprototype; //DX 20190708
+  string RemoveCharacterFromTheFrontAndBack(const string& s, const char character); __xprototype; //DX 20190708
   string RemoveNumbers(const string& s) __xprototype;
   string RemoveRounding(const string& s) __xprototype;
   //string RemoveCharacter(const string& s, const char character, const char toogle) __xprototype;

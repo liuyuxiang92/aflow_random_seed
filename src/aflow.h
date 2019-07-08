@@ -2057,6 +2057,7 @@ vector<string> GetCleanNames(const xstructure& a);
 vector<double> GetSpins(const xstructure& a);
 string GetElementName(string stringin);
 string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX 20180526 - add directory
+int GetSpaceGroupNumber(string& spacegroupsymbol, string directory=""); //DX 20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // DX 9/1/17 //DX 20180526 - add directory
 string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX 9/1/17 //DX 20180526 - add directory //DX 20180806 - added setting

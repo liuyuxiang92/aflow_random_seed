@@ -2563,6 +2563,105 @@ namespace SYM {
 } //namespace SYM
 //DX 20190128 -END
 
+// DX 20190708 - START
+// ******************************************************************************
+// reorderWyckoffPosition
+// ******************************************************************************
+namespace SYM {
+  string reorderWyckoffPosition(const string& orig_position){
+
+    // reorder Wyckoff position to a standard format (necessary for string comparisons) 
+    // put variables first (e.g., 1/2+x -> x+1/2)
+    // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
+    // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
+    // this function will be circumvented when symbolic math is integrated
+    // DX 20190708
+
+    string soliloquy = "SYM::reorderWyckoffPosition()";
+    stringstream message;
+
+    // ---------------------------------------------------------------------------
+    // split position via commas 
+    vector<string> tokens;
+    aurostd::string2tokens(orig_position,tokens,",");
+
+    if(tokens.size()!=3){ 
+      message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+    }
+    
+    // ---------------------------------------------------------------------------
+    // split position into x,y,z components (via commas)
+    string reordered_position = "";
+	  vector<string> eqn;
+    for(uint i=0;i<tokens.size();i++){
+
+      stringstream ss_eqn;
+      string coordinate = "";
+      vector<string> vec_coord;
+      double running_double = 0.0;
+      bool double_only = false;
+      
+      // ---------------------------------------------------------------------------
+      // split into equation entities (number, variable) 
+      vector<sdouble> sd_coordinate = simplify(tokens[i]);
+      for(uint j=0;j<sd_coordinate.size();j++){
+        sdouble sd_num = sd_coordinate[j];
+        // ---------------------------------------------------------------------------
+        // if a variable with positive unit factor (1x -> x) 
+	      if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
+	        ss_eqn << sd_num.chr;
+	        vec_coord.push_back(ss_eqn.str());
+        }
+        // ---------------------------------------------------------------------------
+        // if a variable with negative unit factor (-1x -> -x)
+        else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
+          ss_eqn << "-" << sd_num.chr;
+          vec_coord.push_back(ss_eqn.str());
+        }
+        // ---------------------------------------------------------------------------
+        // if a number (no variable)
+        else if(sd_num.chr == '\0'){
+          running_double+=sd_num.dbl;
+          double_only = true;
+        }
+        // ---------------------------------------------------------------------------
+        // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
+        else {
+          ss_eqn << sd_num.dbl << sd_num.chr;
+          vec_coord.push_back(ss_eqn.str());
+        }
+        ss_eqn.str("");
+	    }
+
+      // ---------------------------------------------------------------------------
+      // reduce double, i.e., bring in cell 
+      while(running_double>1.0){
+        running_double-=1.0;
+      }
+      if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
+        running_double-=1.0;
+      }
+      if(double_only){
+        string running_frac = dbl2frac(running_double,false);
+        ss_eqn << running_frac;
+        vec_coord.push_back(ss_eqn.str());
+        ss_eqn.str("");
+      }
+      coordinate = aurostd::joinWDelimiter(vec_coord,"+");
+      // ---------------------------------------------------------------------------
+      // clean up cases of -+ or +-
+      coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
+      coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
+      eqn.push_back(coordinate);
+    }
+    reordered_position = aurostd::joinWDelimiter(eqn,",");
+
+    return reordered_position;
+  }
+}
+// DX 20190708 - END
+
 // ******************************************************************************
 // shiftWyckoffPositions 
 // ******************************************************************************
