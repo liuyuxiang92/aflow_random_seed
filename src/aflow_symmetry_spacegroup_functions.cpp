@@ -2593,7 +2593,7 @@ namespace SYM {
     // ---------------------------------------------------------------------------
     // split position into x,y,z components (via commas)
     string reordered_position = "";
-	  vector<string> eqn;
+    vector<string> eqn;
     for(uint i=0;i<tokens.size();i++){
 
       stringstream ss_eqn;
@@ -2609,7 +2609,7 @@ namespace SYM {
         sdouble sd_num = sd_coordinate[j];
         // ---------------------------------------------------------------------------
         // if a variable with positive unit factor (1x -> x) 
-	      if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
+        if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
 	        ss_eqn << sd_num.chr;
 	        vec_coord.push_back(ss_eqn.str());
         }
@@ -2635,11 +2635,9 @@ namespace SYM {
 	    }
 
       // ---------------------------------------------------------------------------
-      // reduce double, i.e., bring in cell 
-      while(running_double>1.0){
-        running_double-=1.0;
-      }
-      if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
+      // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
+      // (constants in Wyckoff position are always positive)
+      while(running_double>1.0 || aurostd::abs(running_double-1.0) < _ZERO_TOL_){
         running_double-=1.0;
       }
       if(double_only){

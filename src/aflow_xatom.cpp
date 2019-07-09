@@ -4225,11 +4225,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
         vector<string> tokens; 
         aurostd::string2tokens(vinput.at(i),tokens);
         if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_H-M"){
-          tokens.erase(tokens.begin()+0);
+          tokens.erase(tokens.begin());
           string spacegroupsymbol = aurostd::joinWDelimiter(tokens,"");
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\''); //clean
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\"'); //clean
-	        a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol);
+          a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol);
         }
       }
       //DX 20190708 - added another space group variant - END
@@ -4241,7 +4241,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         vector<string> tokens; 
         //DX 20190708 - fix Hall reader - START
         if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_H-M"){
-          tokens.erase(tokens.begin()+0);
+          tokens.erase(tokens.begin());
           spacegroup_Hall = aurostd::joinWDelimiter(tokens," "); //need a space here for Hall designation
           spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\''); //clean
           spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\"'); //clean
@@ -4311,7 +4311,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	  vector<string> tokens; 
 	  aurostd::string2tokens(vinput[i],tokens," ");
     // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
-    if(found_symop_id){ tokens.erase(tokens.begin()+0); } //erase symop index, not needed //DX 20190708 - enclose in if-statement
+    if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX 20190708 - enclose in if-statement
     string symop = aurostd::joinWDelimiter(tokens,"");
     symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
     symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
@@ -4328,15 +4328,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
       // compare cif and aflow's general position
       uint match_count=0;
       if(general_wyckoff_position.size()==spacegroup_symop_xyz.size()){
-	      for(uint i=0;i<general_wyckoff_position.size();i++){
+        for(uint i=0;i<general_wyckoff_position.size();i++){
           bool match_found = false;
-	        for(uint j=0;j<spacegroup_symop_xyz.size();j++){
-	          if(general_wyckoff_position[i]==spacegroup_symop_xyz[j]){
+          for(uint j=0;j<spacegroup_symop_xyz.size();j++){
+            if(general_wyckoff_position[i]==spacegroup_symop_xyz[j]){
               match_found = true;
-	            match_count+=1;
+              match_count+=1;
               break;
-	          }
-	        }
+            }
+          }
           if(!match_found){
             if(LDEBUG) {
               cerr << "WARNING: Could not match " << i << ": " << general_wyckoff_position[i] << " to any symop in CIF. Trying other setting (if exists)." << endl;
@@ -5624,465 +5624,466 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
     throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  P1 #1
     spacegroup="P1";}
-  if(spacegroupnumber==2) { // ------------------- 2  P-1 #2
+  else if(spacegroupnumber==2) { // ------------------- 2  P-1 #2
     spacegroup="P-1";}
-  if(spacegroupnumber==3) { // ------------------- 3  P2 #3
+  else if(spacegroupnumber==3) { // ------------------- 3  P2 #3
     spacegroup="P2";}
-  if(spacegroupnumber==4) { // ------------------- 4  P2_{1} #4
+  else if(spacegroupnumber==4) { // ------------------- 4  P2_{1} #4
     spacegroup="P2_{1}";}
-  if(spacegroupnumber==5) { // ------------------- 5  C2 #5
+  else if(spacegroupnumber==5) { // ------------------- 5  C2 #5
     spacegroup="C2";}
-  if(spacegroupnumber==6) { // ------------------- 6  Pm #6
+  else if(spacegroupnumber==6) { // ------------------- 6  Pm #6
     spacegroup="Pm";}
-  if(spacegroupnumber==7) { // ------------------- 7  Pc #7
+  else if(spacegroupnumber==7) { // ------------------- 7  Pc #7
     spacegroup="Pc";}
-  if(spacegroupnumber==8) { // ------------------- 8  Cm #8
+  else if(spacegroupnumber==8) { // ------------------- 8  Cm #8
     spacegroup="Cm";}
-  if(spacegroupnumber==9) { // ------------------- 9  Cc #9
+  else if(spacegroupnumber==9) { // ------------------- 9  Cc #9
     spacegroup="Cc";}
-  if(spacegroupnumber==10) { // ------------------- 10  P2/m #10
+  else if(spacegroupnumber==10) { // ------------------- 10  P2/m #10
     spacegroup="P2/m";}
-  if(spacegroupnumber==11) { // ------------------- 11  P2_{1}/m #11
+  else if(spacegroupnumber==11) { // ------------------- 11  P2_{1}/m #11
     spacegroup="P2_{1}/m";}
-  if(spacegroupnumber==12) { // ------------------- 12  C2/m #12
+  else if(spacegroupnumber==12) { // ------------------- 12  C2/m #12
     spacegroup="C2/m";}
-  if(spacegroupnumber==13) { // ------------------- 13  P2/c #13
+  else if(spacegroupnumber==13) { // ------------------- 13  P2/c #13
     spacegroup="P2/c";}
-  if(spacegroupnumber==14) { // ------------------- 14  P2_{1}/c #14
+  else if(spacegroupnumber==14) { // ------------------- 14  P2_{1}/c #14
     spacegroup="P2_{1}/c";}
-  if(spacegroupnumber==15) { // ------------------- 15  C2/c #15
+  else if(spacegroupnumber==15) { // ------------------- 15  C2/c #15
     spacegroup="C2/c";}
-  if(spacegroupnumber==16) { // ------------------- 16  P222 #16
+  else if(spacegroupnumber==16) { // ------------------- 16  P222 #16
     spacegroup="P222";}
-  if(spacegroupnumber==17) { // ------------------- 17  P222_{1} #17
+  else if(spacegroupnumber==17) { // ------------------- 17  P222_{1} #17
     spacegroup="P222_{1}";}
-  if(spacegroupnumber==18) { // ------------------- 18  P2_{1}2_{1}2 #18
+  else if(spacegroupnumber==18) { // ------------------- 18  P2_{1}2_{1}2 #18
     spacegroup="P2_{1}2_{1}2";}
-  if(spacegroupnumber==19) { // ------------------- 19  P2_{1}2_{1}2_{1} #19
+  else if(spacegroupnumber==19) { // ------------------- 19  P2_{1}2_{1}2_{1} #19
     spacegroup="P2_{1}2_{1}2_{1}";}
-  if(spacegroupnumber==20) { // ------------------- 20  C222_{1} #20
+  else if(spacegroupnumber==20) { // ------------------- 20  C222_{1} #20
     spacegroup="C222_{1}";}
-  if(spacegroupnumber==21) { // ------------------- 21  C222 #21
+  else if(spacegroupnumber==21) { // ------------------- 21  C222 #21
     spacegroup="C222";}
-  if(spacegroupnumber==22) { // ------------------- 22  F222 #22
+  else if(spacegroupnumber==22) { // ------------------- 22  F222 #22
     spacegroup="F222";}
-  if(spacegroupnumber==23) { // ------------------- 23  I222 #23
+  else if(spacegroupnumber==23) { // ------------------- 23  I222 #23
     spacegroup="I222";}
-  if(spacegroupnumber==24) { // ------------------- 24  I2_{1}2_{1}2_{1} #24
+  else if(spacegroupnumber==24) { // ------------------- 24  I2_{1}2_{1}2_{1} #24
     spacegroup="I2_{1}2_{1}2_{1}";}
-  if(spacegroupnumber==25) { // ------------------- 25  Pmm2 #25
+  else if(spacegroupnumber==25) { // ------------------- 25  Pmm2 #25
     spacegroup="Pmm2";}
-  if(spacegroupnumber==26) { // ------------------- 26  Pmc2_{1} #26
+  else if(spacegroupnumber==26) { // ------------------- 26  Pmc2_{1} #26
     spacegroup="Pmc2_{1}";}
-  if(spacegroupnumber==27) { // ------------------- 27  Pcc2 #27
+  else if(spacegroupnumber==27) { // ------------------- 27  Pcc2 #27
     spacegroup="Pcc2";}
-  if(spacegroupnumber==28) { // ------------------- 28  Pma2 #28
+  else if(spacegroupnumber==28) { // ------------------- 28  Pma2 #28
     spacegroup="Pma2";}
-  if(spacegroupnumber==29) { // ------------------- 29  Pca2_{1} #29
+  else if(spacegroupnumber==29) { // ------------------- 29  Pca2_{1} #29
     spacegroup="Pca2_{1}";}
-  if(spacegroupnumber==30) { // ------------------- 30  Pnc2 #30
+  else if(spacegroupnumber==30) { // ------------------- 30  Pnc2 #30
     spacegroup="Pnc2";}
-  if(spacegroupnumber==31) { // ------------------- 31  Pmn2_{1} #31
+  else if(spacegroupnumber==31) { // ------------------- 31  Pmn2_{1} #31
     spacegroup="Pmn2_{1}";}
-  if(spacegroupnumber==32) { // ------------------- 32  Pba2 #32
+  else if(spacegroupnumber==32) { // ------------------- 32  Pba2 #32
     spacegroup="Pba2";}
-  if(spacegroupnumber==33) { // ------------------- 33  Pna2_{1} #33
+  else if(spacegroupnumber==33) { // ------------------- 33  Pna2_{1} #33
     spacegroup="Pna2_{1}";}
-  if(spacegroupnumber==34) { // ------------------- 34  Pnn2 #34
+  else if(spacegroupnumber==34) { // ------------------- 34  Pnn2 #34
     spacegroup="Pnn2";}
-  if(spacegroupnumber==35) { // ------------------- 35  Cmm2 #35
+  else if(spacegroupnumber==35) { // ------------------- 35  Cmm2 #35
     spacegroup="Cmm2";}
-  if(spacegroupnumber==36) { // ------------------- 36  Cmc2_{1} #36
+  else if(spacegroupnumber==36) { // ------------------- 36  Cmc2_{1} #36
     spacegroup="Cmc2_{1}";}
-  if(spacegroupnumber==37) { // ------------------- 37  Ccc2 #37
+  else if(spacegroupnumber==37) { // ------------------- 37  Ccc2 #37
     spacegroup="Ccc2";}
-  if(spacegroupnumber==38) { // ------------------- 38  Amm2 #38
+  else if(spacegroupnumber==38) { // ------------------- 38  Amm2 #38
     spacegroup="Amm2";}
-  if(spacegroupnumber==39) { // ------------------- 39  Aem2 #39
+  else if(spacegroupnumber==39) { // ------------------- 39  Aem2 #39
     spacegroup="Aem2";}
-  if(spacegroupnumber==40) { // ------------------- 40  Ama2 #40
+  else if(spacegroupnumber==40) { // ------------------- 40  Ama2 #40
     spacegroup="Ama2";}
-  if(spacegroupnumber==41) { // ------------------- 41  Aea2 #41
+  else if(spacegroupnumber==41) { // ------------------- 41  Aea2 #41
     spacegroup="Aea2";}
-  if(spacegroupnumber==42) { // ------------------- 42  Fmm2 #42
+  else if(spacegroupnumber==42) { // ------------------- 42  Fmm2 #42
     spacegroup="Fmm2";}
-  if(spacegroupnumber==43) { // ------------------- 43  Fdd2 #43
+  else if(spacegroupnumber==43) { // ------------------- 43  Fdd2 #43
     spacegroup="Fdd2";}
-  if(spacegroupnumber==44) { // ------------------- 44  Imm2 #44
+  else if(spacegroupnumber==44) { // ------------------- 44  Imm2 #44
     spacegroup="Imm2";}
-  if(spacegroupnumber==45) { // ------------------- 45  Iba2 #45
+  else if(spacegroupnumber==45) { // ------------------- 45  Iba2 #45
     spacegroup="Iba2";}
-  if(spacegroupnumber==46) { // ------------------- 46  Ima2 #46
+  else if(spacegroupnumber==46) { // ------------------- 46  Ima2 #46
     spacegroup="Ima2";}
-  if(spacegroupnumber==47) { // ------------------- 47  Pmmm #47
+  else if(spacegroupnumber==47) { // ------------------- 47  Pmmm #47
     spacegroup="Pmmm";}
-  if(spacegroupnumber==48) { // ------------------- 48  Pnnn #48
+  else if(spacegroupnumber==48) { // ------------------- 48  Pnnn #48
     spacegroup="Pnnn";}
-  if(spacegroupnumber==49) { // ------------------- 49  Pccm #49
+  else if(spacegroupnumber==49) { // ------------------- 49  Pccm #49
     spacegroup="Pccm";}
-  if(spacegroupnumber==50) { // ------------------- 50  Pban #50
+  else if(spacegroupnumber==50) { // ------------------- 50  Pban #50
     spacegroup="Pban";}
-  if(spacegroupnumber==51) { // ------------------- 51  Pmma #51
+  else if(spacegroupnumber==51) { // ------------------- 51  Pmma #51
     spacegroup="Pmma";}
-  if(spacegroupnumber==52) { // ------------------- 52  Pnna #52
+  else if(spacegroupnumber==52) { // ------------------- 52  Pnna #52
     spacegroup="Pnna";}
-  if(spacegroupnumber==53) { // ------------------- 53  Pmna #53
+  else if(spacegroupnumber==53) { // ------------------- 53  Pmna #53
     spacegroup="Pmna";}
-  if(spacegroupnumber==54) { // ------------------- 54  Pcca #54
+  else if(spacegroupnumber==54) { // ------------------- 54  Pcca #54
     spacegroup="Pcca";}
-  if(spacegroupnumber==55) { // ------------------- 55  Pbam #55
+  else if(spacegroupnumber==55) { // ------------------- 55  Pbam #55
     spacegroup="Pbam";}
-  if(spacegroupnumber==56) { // ------------------- 56  Pccn #56
+  else if(spacegroupnumber==56) { // ------------------- 56  Pccn #56
     spacegroup="Pccn";}
-  if(spacegroupnumber==57) { // ------------------- 57  Pbcm #57
+  else if(spacegroupnumber==57) { // ------------------- 57  Pbcm #57
     spacegroup="Pbcm";}
-  if(spacegroupnumber==58) { // ------------------- 58  Pnnm #58
+  else if(spacegroupnumber==58) { // ------------------- 58  Pnnm #58
     spacegroup="Pnnm";}
-  if(spacegroupnumber==59) { // ------------------- 59  Pmmn #59
+  else if(spacegroupnumber==59) { // ------------------- 59  Pmmn #59
     spacegroup="Pmmn";}
-  if(spacegroupnumber==60) { // ------------------- 60  Pbcn #60
+  else if(spacegroupnumber==60) { // ------------------- 60  Pbcn #60
     spacegroup="Pbcn";}
-  if(spacegroupnumber==61) { // ------------------- 61  Pbca #61
+  else if(spacegroupnumber==61) { // ------------------- 61  Pbca #61
     spacegroup="Pbca";}
-  if(spacegroupnumber==62) { // ------------------- 62  Pnma #62
+  else if(spacegroupnumber==62) { // ------------------- 62  Pnma #62
     spacegroup="Pnma";}
-  if(spacegroupnumber==63) { // ------------------- 63  Cmcm #63
+  else if(spacegroupnumber==63) { // ------------------- 63  Cmcm #63
     spacegroup="Cmcm";}
-  if(spacegroupnumber==64) { // ------------------- 64  Cmce #64
+  else if(spacegroupnumber==64) { // ------------------- 64  Cmce #64
     spacegroup="Cmce";}
-  if(spacegroupnumber==65) { // ------------------- 65  Cmmm #65
+  else if(spacegroupnumber==65) { // ------------------- 65  Cmmm #65
     spacegroup="Cmmm";}
-  if(spacegroupnumber==66) { // ------------------- 66  Cccm #66
+  else if(spacegroupnumber==66) { // ------------------- 66  Cccm #66
     spacegroup="Cccm";}
-  if(spacegroupnumber==67) { // ------------------- 67  Cmme #67
+  else if(spacegroupnumber==67) { // ------------------- 67  Cmme #67
     spacegroup="Cmme";}
-  if(spacegroupnumber==68) { // ------------------- 68  Ccce #68
+  else if(spacegroupnumber==68) { // ------------------- 68  Ccce #68
     spacegroup="Ccce";}
-  if(spacegroupnumber==69) { // ------------------- 69  Fmmm #69
+  else if(spacegroupnumber==69) { // ------------------- 69  Fmmm #69
     spacegroup="Fmmm";}
-  if(spacegroupnumber==70) { // ------------------- 70  Fddd #70
+  else if(spacegroupnumber==70) { // ------------------- 70  Fddd #70
     spacegroup="Fddd";}
-  if(spacegroupnumber==71) { // ------------------- 71  Immm #71
+  else if(spacegroupnumber==71) { // ------------------- 71  Immm #71
     spacegroup="Immm";}
-  if(spacegroupnumber==72) { // ------------------- 72  Ibam #72
+  else if(spacegroupnumber==72) { // ------------------- 72  Ibam #72
     spacegroup="Ibam";}
-  if(spacegroupnumber==73) { // ------------------- 73  Ibca #73
+  else if(spacegroupnumber==73) { // ------------------- 73  Ibca #73
     spacegroup="Ibca";}
-  if(spacegroupnumber==74) { // ------------------- 74  Imma #74
+  else if(spacegroupnumber==74) { // ------------------- 74  Imma #74
     spacegroup="Imma";}
-  if(spacegroupnumber==75) { // ------------------- 75  P4 #75
+  else if(spacegroupnumber==75) { // ------------------- 75  P4 #75
     spacegroup="P4";}
-  if(spacegroupnumber==76) { // ------------------- 76  P4_{1} #76
+  else if(spacegroupnumber==76) { // ------------------- 76  P4_{1} #76
     spacegroup="P4_{1}";}
-  if(spacegroupnumber==77) { // ------------------- 77  P4_{2} #77
+  else if(spacegroupnumber==77) { // ------------------- 77  P4_{2} #77
     spacegroup="P4_{2}";}
-  if(spacegroupnumber==78) { // ------------------- 78  P4_{3} #78
+  else if(spacegroupnumber==78) { // ------------------- 78  P4_{3} #78
     spacegroup="P4_{3}";}
-  if(spacegroupnumber==79) { // ------------------- 79  I4 #79
+  else if(spacegroupnumber==79) { // ------------------- 79  I4 #79
     spacegroup="I4";}
-  if(spacegroupnumber==80) { // ------------------- 80  I4_{1} #80
+  else if(spacegroupnumber==80) { // ------------------- 80  I4_{1} #80
     spacegroup="I4_{1}";}
-  if(spacegroupnumber==81) { // ------------------- 81  P-4 #81
+  else if(spacegroupnumber==81) { // ------------------- 81  P-4 #81
     spacegroup="P-4";}
-  if(spacegroupnumber==82) { // ------------------- 82  I-4 #82
+  else if(spacegroupnumber==82) { // ------------------- 82  I-4 #82
     spacegroup="I-4";}
-  if(spacegroupnumber==83) { // ------------------- 83  P4/m #83
+  else if(spacegroupnumber==83) { // ------------------- 83  P4/m #83
     spacegroup="P4/m";}
-  if(spacegroupnumber==84) { // ------------------- 84  P4_{2}/m #84
+  else if(spacegroupnumber==84) { // ------------------- 84  P4_{2}/m #84
     spacegroup="P4_{2}/m";}
-  if(spacegroupnumber==85) { // ------------------- 85  P4/n #85
+  else if(spacegroupnumber==85) { // ------------------- 85  P4/n #85
     spacegroup="P4/n";}
-  if(spacegroupnumber==86) { // ------------------- 86  P4_{2}/n #86
+  else if(spacegroupnumber==86) { // ------------------- 86  P4_{2}/n #86
     spacegroup="P4_{2}/n";}
-  if(spacegroupnumber==87) { // ------------------- 87  I4/m #87
+  else if(spacegroupnumber==87) { // ------------------- 87  I4/m #87
     spacegroup="I4/m";}
-  if(spacegroupnumber==88) { // ------------------- 88  I4_{1}/a #88
+  else if(spacegroupnumber==88) { // ------------------- 88  I4_{1}/a #88
     spacegroup="I4_{1}/a";}
-  if(spacegroupnumber==89) { // ------------------- 89  P422 #89
+  else if(spacegroupnumber==89) { // ------------------- 89  P422 #89
     spacegroup="P422";}
-  if(spacegroupnumber==90) { // ------------------- 90  P42_{1}2 #90
+  else if(spacegroupnumber==90) { // ------------------- 90  P42_{1}2 #90
     spacegroup="P42_{1}2";}
-  if(spacegroupnumber==91) { // ------------------- 91  P4_{1}22 #91
+  else if(spacegroupnumber==91) { // ------------------- 91  P4_{1}22 #91
     spacegroup="P4_{1}22";}
-  if(spacegroupnumber==92) { // ------------------- 92  P4_{1}2_{1}2 #92
+  else if(spacegroupnumber==92) { // ------------------- 92  P4_{1}2_{1}2 #92
     spacegroup="P4_{1}2_{1}2";}
-  if(spacegroupnumber==93) { // ------------------- 93  P4_{2}22 #93
+  else if(spacegroupnumber==93) { // ------------------- 93  P4_{2}22 #93
     spacegroup="P4_{2}22";}
-  if(spacegroupnumber==94) { // ------------------- 94  P4_{2}2_{1}2 #94
+  else if(spacegroupnumber==94) { // ------------------- 94  P4_{2}2_{1}2 #94
     spacegroup="P4_{2}2_{1}2";}
-  if(spacegroupnumber==95) { // ------------------- 95  P4_{3}22 #95
+  else if(spacegroupnumber==95) { // ------------------- 95  P4_{3}22 #95
     spacegroup="P4_{3}22";}
-  if(spacegroupnumber==96) { // ------------------- 96  P4_{3}2_{1}2 #96
+  else if(spacegroupnumber==96) { // ------------------- 96  P4_{3}2_{1}2 #96
     spacegroup="P4_{3}2_{1}2";}
-  if(spacegroupnumber==97) { // ------------------- 97  I422 #97
+  else if(spacegroupnumber==97) { // ------------------- 97  I422 #97
     spacegroup="I422";}
-  if(spacegroupnumber==98) { // ------------------- 98  I4_{1}22 #98
+  else if(spacegroupnumber==98) { // ------------------- 98  I4_{1}22 #98
     spacegroup="I4_{1}22";}
-  if(spacegroupnumber==99) { // ------------------- 99  P4mm #99
+  else if(spacegroupnumber==99) { // ------------------- 99  P4mm #99
     spacegroup="P4mm";}
-  if(spacegroupnumber==100) { // ------------------- 100  P4bm #100
+  else if(spacegroupnumber==100) { // ------------------- 100  P4bm #100
     spacegroup="P4bm";}
-  if(spacegroupnumber==101) { // ------------------- 101  P4_{2}cm #101
+  else if(spacegroupnumber==101) { // ------------------- 101  P4_{2}cm #101
     spacegroup="P4_{2}cm";}
-  if(spacegroupnumber==102) { // ------------------- 102  P4_{2}nm #102
+  else if(spacegroupnumber==102) { // ------------------- 102  P4_{2}nm #102
     spacegroup="P4_{2}nm";}
-  if(spacegroupnumber==103) { // ------------------- 103  P4cc #103
+  else if(spacegroupnumber==103) { // ------------------- 103  P4cc #103
     spacegroup="P4cc";}
-  if(spacegroupnumber==104) { // ------------------- 104  P4nc #104
+  else if(spacegroupnumber==104) { // ------------------- 104  P4nc #104
     spacegroup="P4nc";}
-  if(spacegroupnumber==105) { // ------------------- 105  P4_{2}mc #105
+  else if(spacegroupnumber==105) { // ------------------- 105  P4_{2}mc #105
     spacegroup="P4_{2}mc";}
-  if(spacegroupnumber==106) { // ------------------- 106  P4_{2}bc #106
+  else if(spacegroupnumber==106) { // ------------------- 106  P4_{2}bc #106
     spacegroup="P4_{2}bc";}
-  if(spacegroupnumber==107) { // ------------------- 107  I4mm #107
+  else if(spacegroupnumber==107) { // ------------------- 107  I4mm #107
     spacegroup="I4mm";}
-  if(spacegroupnumber==108) { // ------------------- 108  I4cm #108
+  else if(spacegroupnumber==108) { // ------------------- 108  I4cm #108
     spacegroup="I4cm";}
-  if(spacegroupnumber==109) { // ------------------- 109  I4_{1}md #109
+  else if(spacegroupnumber==109) { // ------------------- 109  I4_{1}md #109
     spacegroup="I4_{1}md";}
-  if(spacegroupnumber==110) { // ------------------- 110  I4_{1}cd #110
+  else if(spacegroupnumber==110) { // ------------------- 110  I4_{1}cd #110
     spacegroup="I4_{1}cd";}
-  if(spacegroupnumber==111) { // ------------------- 111  P-42m #111
+  else if(spacegroupnumber==111) { // ------------------- 111  P-42m #111
     spacegroup="P-42m";}
-  if(spacegroupnumber==112) { // ------------------- 112  P-42c #112
+  else if(spacegroupnumber==112) { // ------------------- 112  P-42c #112
     spacegroup="P-42c";}
-  if(spacegroupnumber==113) { // ------------------- 113  P-42_{1}m #113
+  else if(spacegroupnumber==113) { // ------------------- 113  P-42_{1}m #113
     spacegroup="P-42_{1}m";}
-  if(spacegroupnumber==114) { // ------------------- 114  P-42_{1}c #114
+  else if(spacegroupnumber==114) { // ------------------- 114  P-42_{1}c #114
     spacegroup="P-42_{1}c";}
-  if(spacegroupnumber==115) { // ------------------- 115  P-4m2 #115
+  else if(spacegroupnumber==115) { // ------------------- 115  P-4m2 #115
     spacegroup="P-4m2";}
-  if(spacegroupnumber==116) { // ------------------- 116  P-4c2 #116
+  else if(spacegroupnumber==116) { // ------------------- 116  P-4c2 #116
     spacegroup="P-4c2";}
-  if(spacegroupnumber==117) { // ------------------- 117  P-4b2 #117
+  else if(spacegroupnumber==117) { // ------------------- 117  P-4b2 #117
     spacegroup="P-4b2";}
-  if(spacegroupnumber==118) { // ------------------- 118  P-4n2 #118
+  else if(spacegroupnumber==118) { // ------------------- 118  P-4n2 #118
     spacegroup="P-4n2";}
-  if(spacegroupnumber==119) { // ------------------- 119  I-4m2 #119
+  else if(spacegroupnumber==119) { // ------------------- 119  I-4m2 #119
     spacegroup="I-4m2";}
-  if(spacegroupnumber==120) { // ------------------- 120  I-4c2 #120
+  else if(spacegroupnumber==120) { // ------------------- 120  I-4c2 #120
     spacegroup="I-4c2";}
-  if(spacegroupnumber==121) { // ------------------- 121  I-42m #121
+  else if(spacegroupnumber==121) { // ------------------- 121  I-42m #121
     spacegroup="I-42m";}
-  if(spacegroupnumber==122) { // ------------------- 122  I-42d #122
+  else if(spacegroupnumber==122) { // ------------------- 122  I-42d #122
     spacegroup="I-42d";}
-  if(spacegroupnumber==123) { // ------------------- 123  P4/mmm #123
+  else if(spacegroupnumber==123) { // ------------------- 123  P4/mmm #123
     spacegroup="P4/mmm";}
-  if(spacegroupnumber==124) { // ------------------- 124  P4/mcc #124
+  else if(spacegroupnumber==124) { // ------------------- 124  P4/mcc #124
     spacegroup="P4/mcc";}
-  if(spacegroupnumber==125) { // ------------------- 125  P4/nbm #125
+  else if(spacegroupnumber==125) { // ------------------- 125  P4/nbm #125
     spacegroup="P4/nbm";}
-  if(spacegroupnumber==126) { // ------------------- 126  P4/nnc #126
+  else if(spacegroupnumber==126) { // ------------------- 126  P4/nnc #126
     spacegroup="P4/nnc";}
-  if(spacegroupnumber==127) { // ------------------- 127  P4/mbm #127
+  else if(spacegroupnumber==127) { // ------------------- 127  P4/mbm #127
     spacegroup="P4/mbm";}
-  if(spacegroupnumber==128) { // ------------------- 128  P4/mnc #128
+  else if(spacegroupnumber==128) { // ------------------- 128  P4/mnc #128
     spacegroup="P4/mnc";}
-  if(spacegroupnumber==129) { // ------------------- 129  P4/nmm #129
+  else if(spacegroupnumber==129) { // ------------------- 129  P4/nmm #129
     spacegroup="P4/nmm";}
-  if(spacegroupnumber==130) { // ------------------- 130  P4/ncc #130
+  else if(spacegroupnumber==130) { // ------------------- 130  P4/ncc #130
     spacegroup="P4/ncc";}
-  if(spacegroupnumber==131) { // ------------------- 131  P4_{2}/mmc #131
+  else if(spacegroupnumber==131) { // ------------------- 131  P4_{2}/mmc #131
     spacegroup="P4_{2}/mmc";}
-  if(spacegroupnumber==132) { // ------------------- 132  P4_{2}/mcm #132
+  else if(spacegroupnumber==132) { // ------------------- 132  P4_{2}/mcm #132
     spacegroup="P4_{2}/mcm";}
-  if(spacegroupnumber==133) { // ------------------- 133  P4_{2}/nbc #133
+  else if(spacegroupnumber==133) { // ------------------- 133  P4_{2}/nbc #133
     spacegroup="P4_{2}/nbc";}
-  if(spacegroupnumber==134) { // ------------------- 134  P4_{2}/nnm #134
+  else if(spacegroupnumber==134) { // ------------------- 134  P4_{2}/nnm #134
     spacegroup="P4_{2}/nnm";}
-  if(spacegroupnumber==135) { // ------------------- 135  P4_{2}/mbc #135
+  else if(spacegroupnumber==135) { // ------------------- 135  P4_{2}/mbc #135
     spacegroup="P4_{2}/mbc";}
-  if(spacegroupnumber==136) { // ------------------- 136  P4_{2}/mnm #136
+  else if(spacegroupnumber==136) { // ------------------- 136  P4_{2}/mnm #136
     spacegroup="P4_{2}/mnm";}
-  if(spacegroupnumber==137) { // ------------------- 137  P4_{2}/nmc #137
+  else if(spacegroupnumber==137) { // ------------------- 137  P4_{2}/nmc #137
     spacegroup="P4_{2}/nmc";}
-  if(spacegroupnumber==138) { // ------------------- 138  P4_{2}/ncm #138
+  else if(spacegroupnumber==138) { // ------------------- 138  P4_{2}/ncm #138
     spacegroup="P4_{2}/ncm";}
-  if(spacegroupnumber==139) { // ------------------- 139  I4/mmm #139
+  else if(spacegroupnumber==139) { // ------------------- 139  I4/mmm #139
     spacegroup="I4/mmm";}
-  if(spacegroupnumber==140) { // ------------------- 140  I4/mcm #140
+  else if(spacegroupnumber==140) { // ------------------- 140  I4/mcm #140
     spacegroup="I4/mcm";}
-  if(spacegroupnumber==141) { // ------------------- 141  I4_{1}/amd #141
+  else if(spacegroupnumber==141) { // ------------------- 141  I4_{1}/amd #141
     spacegroup="I4_{1}/amd";}
-  if(spacegroupnumber==142) { // ------------------- 142  I4_{1}/acd #142
+  else if(spacegroupnumber==142) { // ------------------- 142  I4_{1}/acd #142
     spacegroup="I4_{1}/acd";}
-  if(spacegroupnumber==143) { // ------------------- 143  P3 #143
+  else if(spacegroupnumber==143) { // ------------------- 143  P3 #143
     spacegroup="P3";}
-  if(spacegroupnumber==144) { // ------------------- 144  P3_{1} #144
+  else if(spacegroupnumber==144) { // ------------------- 144  P3_{1} #144
     spacegroup="P3_{1}";}
-  if(spacegroupnumber==145) { // ------------------- 145  P3_{2} #145
+  else if(spacegroupnumber==145) { // ------------------- 145  P3_{2} #145
     spacegroup="P3_{2}";}
-  if(spacegroupnumber==146) { // ------------------- 146  R3 #146
+  else if(spacegroupnumber==146) { // ------------------- 146  R3 #146
     spacegroup="R3";}
-  if(spacegroupnumber==147) { // ------------------- 147  P-3 #147
+  else if(spacegroupnumber==147) { // ------------------- 147  P-3 #147
     spacegroup="P-3";}
-  if(spacegroupnumber==148) { // ------------------- 148  R-3 #148
+  else if(spacegroupnumber==148) { // ------------------- 148  R-3 #148
     spacegroup="R-3";}
-  if(spacegroupnumber==149) { // ------------------- 149  P312 #149
+  else if(spacegroupnumber==149) { // ------------------- 149  P312 #149
     spacegroup="P312";}
-  if(spacegroupnumber==150) { // ------------------- 150  P321 #150
+  else if(spacegroupnumber==150) { // ------------------- 150  P321 #150
     spacegroup="P321";}
-  if(spacegroupnumber==151) { // ------------------- 151  P3_{1}12 #151
+  else if(spacegroupnumber==151) { // ------------------- 151  P3_{1}12 #151
     spacegroup="P3_{1}12";}
-  if(spacegroupnumber==152) { // ------------------- 152  P3_{1}21 #152
+  else if(spacegroupnumber==152) { // ------------------- 152  P3_{1}21 #152
     spacegroup="P3_{1}21";}
-  if(spacegroupnumber==153) { // ------------------- 153  P3_{2}12 #153
+  else if(spacegroupnumber==153) { // ------------------- 153  P3_{2}12 #153
     spacegroup="P3_{2}12";}
-  if(spacegroupnumber==154) { // ------------------- 154  P3_{2}21 #154
+  else if(spacegroupnumber==154) { // ------------------- 154  P3_{2}21 #154
     spacegroup="P3_{2}21";}
-  if(spacegroupnumber==155) { // ------------------- 155  R32 #155
+  else if(spacegroupnumber==155) { // ------------------- 155  R32 #155
     spacegroup="R32";}
-  if(spacegroupnumber==156) { // ------------------- 156  P3m1 #156
+  else if(spacegroupnumber==156) { // ------------------- 156  P3m1 #156
     spacegroup="P3m1";}
-  if(spacegroupnumber==157) { // ------------------- 157  P31m #157
+  else if(spacegroupnumber==157) { // ------------------- 157  P31m #157
     spacegroup="P31m";}
-  if(spacegroupnumber==158) { // ------------------- 158  P3c1 #158
+  else if(spacegroupnumber==158) { // ------------------- 158  P3c1 #158
     spacegroup="P3c1";}
-  if(spacegroupnumber==159) { // ------------------- 159  P31c #159
+  else if(spacegroupnumber==159) { // ------------------- 159  P31c #159
     spacegroup="P31c";}
-  if(spacegroupnumber==160) { // ------------------- 160  R3m #160
+  else if(spacegroupnumber==160) { // ------------------- 160  R3m #160
     spacegroup="R3m";}
-  if(spacegroupnumber==161) { // ------------------- 161  R3c #161
+  else if(spacegroupnumber==161) { // ------------------- 161  R3c #161
     spacegroup="R3c";}
-  if(spacegroupnumber==162) { // ------------------- 162  P-31m #162
+  else if(spacegroupnumber==162) { // ------------------- 162  P-31m #162
     spacegroup="P-31m";}
-  if(spacegroupnumber==163) { // ------------------- 163  P-31c #163
+  else if(spacegroupnumber==163) { // ------------------- 163  P-31c #163
     spacegroup="P-31c";}
-  if(spacegroupnumber==164) { // ------------------- 164  P-3m1 #164
+  else if(spacegroupnumber==164) { // ------------------- 164  P-3m1 #164
     spacegroup="P-3m1";}
-  if(spacegroupnumber==165) { // ------------------- 165  P-3c1 #165
+  else if(spacegroupnumber==165) { // ------------------- 165  P-3c1 #165
     spacegroup="P-3c1";}
-  if(spacegroupnumber==166) { // ------------------- 166  R-3m #166
+  else if(spacegroupnumber==166) { // ------------------- 166  R-3m #166
     spacegroup="R-3m";}
-  if(spacegroupnumber==167) { // ------------------- 167  R-3c #167
+  else if(spacegroupnumber==167) { // ------------------- 167  R-3c #167
     spacegroup="R-3c";}
-  if(spacegroupnumber==168) { // ------------------- 168  P6 #168
+  else if(spacegroupnumber==168) { // ------------------- 168  P6 #168
     spacegroup="P6";}
-  if(spacegroupnumber==169) { // ------------------- 169  P6_{1} #169
+  else if(spacegroupnumber==169) { // ------------------- 169  P6_{1} #169
     spacegroup="P6_{1}";}
-  if(spacegroupnumber==170) { // ------------------- 170  P6_{5} #170
+  else if(spacegroupnumber==170) { // ------------------- 170  P6_{5} #170
     spacegroup="P6_{5}";}
-  if(spacegroupnumber==171) { // ------------------- 171  P6_{2} #171
+  else if(spacegroupnumber==171) { // ------------------- 171  P6_{2} #171
     spacegroup="P6_{2}";}
-  if(spacegroupnumber==172) { // ------------------- 172  P6_{4} #172
+  else if(spacegroupnumber==172) { // ------------------- 172  P6_{4} #172
     spacegroup="P6_{4}";}
-  if(spacegroupnumber==173) { // ------------------- 173  P6_{3} #173
+  else if(spacegroupnumber==173) { // ------------------- 173  P6_{3} #173
     spacegroup="P6_{3}";}
-  if(spacegroupnumber==174) { // ------------------- 174  P-6 #174
+  else if(spacegroupnumber==174) { // ------------------- 174  P-6 #174
     spacegroup="P-6";}
-  if(spacegroupnumber==175) { // ------------------- 175  P6/m #175
+  else if(spacegroupnumber==175) { // ------------------- 175  P6/m #175
     spacegroup="P6/m";}
-  if(spacegroupnumber==176) { // ------------------- 176  P6_{3}/m #176
+  else if(spacegroupnumber==176) { // ------------------- 176  P6_{3}/m #176
     spacegroup="P6_{3}/m";}
-  if(spacegroupnumber==177) { // ------------------- 177  P622 #177
+  else if(spacegroupnumber==177) { // ------------------- 177  P622 #177
     spacegroup="P622";}
-  if(spacegroupnumber==178) { // ------------------- 178  P6_{1}22 #178
+  else if(spacegroupnumber==178) { // ------------------- 178  P6_{1}22 #178
     spacegroup="P6_{1}22";}
-  if(spacegroupnumber==179) { // ------------------- 179  P6_{5}22 #179
+  else if(spacegroupnumber==179) { // ------------------- 179  P6_{5}22 #179
     spacegroup="P6_{5}22";}
-  if(spacegroupnumber==180) { // ------------------- 180  P6_{2}22 #180
+  else if(spacegroupnumber==180) { // ------------------- 180  P6_{2}22 #180
     spacegroup="P6_{2}22";}
-  if(spacegroupnumber==181) { // ------------------- 181  P6_{4}22 #181
+  else if(spacegroupnumber==181) { // ------------------- 181  P6_{4}22 #181
     spacegroup="P6_{4}22";}
-  if(spacegroupnumber==182) { // ------------------- 182  P6_{3}22 #182
+  else if(spacegroupnumber==182) { // ------------------- 182  P6_{3}22 #182
     spacegroup="P6_{3}22";}
-  if(spacegroupnumber==183) { // ------------------- 183  P6mm #183
+  else if(spacegroupnumber==183) { // ------------------- 183  P6mm #183
     spacegroup="P6mm";}
-  if(spacegroupnumber==184) { // ------------------- 184  P6cc #184
+  else if(spacegroupnumber==184) { // ------------------- 184  P6cc #184
     spacegroup="P6cc";}
-  if(spacegroupnumber==185) { // ------------------- 185  P6_{3}cm #185
+  else if(spacegroupnumber==185) { // ------------------- 185  P6_{3}cm #185
     spacegroup="P6_{3}cm";}
-  if(spacegroupnumber==186) { // ------------------- 186  P6_{3}mc #186
+  else if(spacegroupnumber==186) { // ------------------- 186  P6_{3}mc #186
     spacegroup="P6_{3}mc";}
-  if(spacegroupnumber==187) { // ------------------- 187  P-6m2 #187
+  else if(spacegroupnumber==187) { // ------------------- 187  P-6m2 #187
     spacegroup="P-6m2";}
-  if(spacegroupnumber==188) { // ------------------- 188  P-6c2 #188
+  else if(spacegroupnumber==188) { // ------------------- 188  P-6c2 #188
     spacegroup="P-6c2";}
-  if(spacegroupnumber==189) { // ------------------- 189  P-62m #189
+  else if(spacegroupnumber==189) { // ------------------- 189  P-62m #189
     spacegroup="P-62m";}
-  if(spacegroupnumber==190) { // ------------------- 190  P-62c #190
+  else if(spacegroupnumber==190) { // ------------------- 190  P-62c #190
     spacegroup="P-62c";}
-  if(spacegroupnumber==191) { // ------------------- 191  P6/mmm #191
+  else if(spacegroupnumber==191) { // ------------------- 191  P6/mmm #191
     spacegroup="P6/mmm";}
-  if(spacegroupnumber==192) { // ------------------- 192  P6/mcc #192
+  else if(spacegroupnumber==192) { // ------------------- 192  P6/mcc #192
     spacegroup="P6/mcc";}
-  if(spacegroupnumber==193) { // ------------------- 193  P6_{3}/mcm #193
+  else if(spacegroupnumber==193) { // ------------------- 193  P6_{3}/mcm #193
     spacegroup="P6_{3}/mcm";}
-  if(spacegroupnumber==194) { // ------------------- 194  P6_{3}/mmc #194
+  else if(spacegroupnumber==194) { // ------------------- 194  P6_{3}/mmc #194
     spacegroup="P6_{3}/mmc";}
-  if(spacegroupnumber==195) { // ------------------- 195  P23 #195
+  else if(spacegroupnumber==195) { // ------------------- 195  P23 #195
     spacegroup="P23";}
-  if(spacegroupnumber==196) { // ------------------- 196  F23 #196
+  else if(spacegroupnumber==196) { // ------------------- 196  F23 #196
     spacegroup="F23";}
-  if(spacegroupnumber==197) { // ------------------- 197  I23 #197
+  else if(spacegroupnumber==197) { // ------------------- 197  I23 #197
     spacegroup="I23";}
-  if(spacegroupnumber==198) { // ------------------- 198  P2_{1}3 #198
+  else if(spacegroupnumber==198) { // ------------------- 198  P2_{1}3 #198
     spacegroup="P2_{1}3";}
-  if(spacegroupnumber==199) { // ------------------- 199  I2_{1}3 #199
+  else if(spacegroupnumber==199) { // ------------------- 199  I2_{1}3 #199
     spacegroup="I2_{1}3";}
-  if(spacegroupnumber==200) { // ------------------- 200  Pm-3 #200
+  else if(spacegroupnumber==200) { // ------------------- 200  Pm-3 #200
     spacegroup="Pm-3";}
-  if(spacegroupnumber==201) { // ------------------- 201  Pn-3 #201
+  else if(spacegroupnumber==201) { // ------------------- 201  Pn-3 #201
     spacegroup="Pn-3";}
-  if(spacegroupnumber==202) { // ------------------- 202  Fm-3 #202
+  else if(spacegroupnumber==202) { // ------------------- 202  Fm-3 #202
     spacegroup="Fm-3";}
-  if(spacegroupnumber==203) { // ------------------- 203  Fd-3 #203
+  else if(spacegroupnumber==203) { // ------------------- 203  Fd-3 #203
     spacegroup="Fd-3";}
-  if(spacegroupnumber==204) { // ------------------- 204  Im-3 #204
+  else if(spacegroupnumber==204) { // ------------------- 204  Im-3 #204
     spacegroup="Im-3";}
-  if(spacegroupnumber==205) { // ------------------- 205  Pa-3 #205
+  else if(spacegroupnumber==205) { // ------------------- 205  Pa-3 #205
     spacegroup="Pa-3";}
-  if(spacegroupnumber==206) { // ------------------- 206  Ia-3 #206
+  else if(spacegroupnumber==206) { // ------------------- 206  Ia-3 #206
     spacegroup="Ia-3";}
-  if(spacegroupnumber==207) { // ------------------- 207  P432 #207
+  else if(spacegroupnumber==207) { // ------------------- 207  P432 #207
     spacegroup="P432";}
-  if(spacegroupnumber==208) { // ------------------- 208  P4_{2}32 #208
+  else if(spacegroupnumber==208) { // ------------------- 208  P4_{2}32 #208
     spacegroup="P4_{2}32";}
-  if(spacegroupnumber==209) { // ------------------- 209  F432 #209
+  else if(spacegroupnumber==209) { // ------------------- 209  F432 #209
     spacegroup="F432";}
-  if(spacegroupnumber==210) { // ------------------- 210  F4_{1}32 #210
+  else if(spacegroupnumber==210) { // ------------------- 210  F4_{1}32 #210
     spacegroup="F4_{1}32";}
-  if(spacegroupnumber==211) { // ------------------- 211  I432 #211
+  else if(spacegroupnumber==211) { // ------------------- 211  I432 #211
     spacegroup="I432";}
-  if(spacegroupnumber==212) { // ------------------- 212  P4_{3}32 #212
+  else if(spacegroupnumber==212) { // ------------------- 212  P4_{3}32 #212
     spacegroup="P4_{3}32";}
-  if(spacegroupnumber==213) { // ------------------- 213  P4_{1}32 #213
+  else if(spacegroupnumber==213) { // ------------------- 213  P4_{1}32 #213
     spacegroup="P4_{1}32";}
-  if(spacegroupnumber==214) { // ------------------- 214  I4_{1}32 #214
+  else if(spacegroupnumber==214) { // ------------------- 214  I4_{1}32 #214
     spacegroup="I4_{1}32";}
-  if(spacegroupnumber==215) { // ------------------- 215  P-43m #215
+  else if(spacegroupnumber==215) { // ------------------- 215  P-43m #215
     spacegroup="P-43m";}
-  if(spacegroupnumber==216) { // ------------------- 216  F-43m #216
+  else if(spacegroupnumber==216) { // ------------------- 216  F-43m #216
     spacegroup="F-43m";}
-  if(spacegroupnumber==217) { // ------------------- 217  I-43m #217
+  else if(spacegroupnumber==217) { // ------------------- 217  I-43m #217
     spacegroup="I-43m";}
-  if(spacegroupnumber==218) { // ------------------- 218  P-43n #218
+  else if(spacegroupnumber==218) { // ------------------- 218  P-43n #218
     spacegroup="P-43n";}
-  if(spacegroupnumber==219) { // ------------------- 219  F-43c #219
+  else if(spacegroupnumber==219) { // ------------------- 219  F-43c #219
     spacegroup="F-43c";}
-  if(spacegroupnumber==220) { // ------------------- 220  I-43d #220
+  else if(spacegroupnumber==220) { // ------------------- 220  I-43d #220
     spacegroup="I-43d";}
-  if(spacegroupnumber==221) { // ------------------- 221  Pm-3m #221
+  else if(spacegroupnumber==221) { // ------------------- 221  Pm-3m #221
     spacegroup="Pm-3m";}
-  if(spacegroupnumber==222) { // ------------------- 222  Pn-3n #222
+  else if(spacegroupnumber==222) { // ------------------- 222  Pn-3n #222
     spacegroup="Pn-3n";}
-  if(spacegroupnumber==223) { // ------------------- 223  Pm-3n #223
+  else if(spacegroupnumber==223) { // ------------------- 223  Pm-3n #223
     spacegroup="Pm-3n";}
-  if(spacegroupnumber==224) { // ------------------- 224  Pn-3m #224
+  else if(spacegroupnumber==224) { // ------------------- 224  Pn-3m #224
     spacegroup="Pn-3m";}
-  if(spacegroupnumber==225) { // ------------------- 225  Fm-3m #225
+  else if(spacegroupnumber==225) { // ------------------- 225  Fm-3m #225
     spacegroup="Fm-3m";}
-  if(spacegroupnumber==226) { // ------------------- 226  Fm-3c #226
+  else if(spacegroupnumber==226) { // ------------------- 226  Fm-3c #226
     spacegroup="Fm-3c";}
-  if(spacegroupnumber==227) { // ------------------- 227  Fd-3m #227
+  else if(spacegroupnumber==227) { // ------------------- 227  Fd-3m #227
     spacegroup="Fd-3m";}
-  if(spacegroupnumber==228) { // ------------------- 228  Fd-3c #228
+  else if(spacegroupnumber==228) { // ------------------- 228  Fd-3c #228
     spacegroup="Fd-3c";}
-  if(spacegroupnumber==229) { // ------------------- 229  Im-3m #229
+  else if(spacegroupnumber==229) { // ------------------- 229  Im-3m #229
     spacegroup="Im-3m";}
-  if(spacegroupnumber==230) { // ------------------- 230  Ia-3d #230
+  else if(spacegroupnumber==230) { // ------------------- 230  Ia-3d #230
     spacegroup="Ia-3d";}
   // done
   return spacegroup;
@@ -6103,470 +6104,471 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupsymbol=="P1") {  // ------------------- 1  P1 #1                                                                                 
     spacegroupnumber=1;}
-  if(spacegroupsymbol=="P-1") {  // ------------------- 2  P-1 #2
+  else if(spacegroupsymbol=="P-1") {  // ------------------- 2  P-1 #2
     spacegroupnumber=2;}
-  if(spacegroupsymbol=="P2") {  // ------------------- 3  P2 #3
+  else if(spacegroupsymbol=="P2") {  // ------------------- 3  P2 #3
     spacegroupnumber=3;}
-  if(spacegroupsymbol=="P2_{1}" || spacegroupsymbol=="P2_1") {  // ------------------- 4  P2_{1}#4
+  else if(spacegroupsymbol=="P2_{1}" || spacegroupsymbol=="P2_1") {  // ------------------- 4  P2_{1}#4
     spacegroupnumber=4;}
-  if(spacegroupsymbol=="C2") {  // ------------------- 5  C2 #5
+  else if(spacegroupsymbol=="C2") {  // ------------------- 5  C2 #5
     spacegroupnumber=5;}
-  if(spacegroupsymbol=="Pm") {  // ------------------- 6  Pm #6
+  else if(spacegroupsymbol=="Pm") {  // ------------------- 6  Pm #6
     spacegroupnumber=6;}
-  if(spacegroupsymbol=="Pc") {  // ------------------- 7  Pc #7
+  else if(spacegroupsymbol=="Pc") {  // ------------------- 7  Pc #7
     spacegroupnumber=7;}
-  if(spacegroupsymbol=="Cm") {  // ------------------- 8  Cm #8
+  else if(spacegroupsymbol=="Cm") {  // ------------------- 8  Cm #8
     spacegroupnumber=8;}
-  if(spacegroupsymbol=="Cc") {  // ------------------- 9  Cc #9
+  else if(spacegroupsymbol=="Cc") {  // ------------------- 9  Cc #9
     spacegroupnumber=9;}
-  if(spacegroupsymbol=="P2/m") {  // ------------------- 10  P2/m #10
+  else if(spacegroupsymbol=="P2/m") {  // ------------------- 10  P2/m #10
     spacegroupnumber=10;}
-  if(spacegroupsymbol=="P2_{1}/m" || spacegroupsymbol=="P2_1/m") {  // ------------------- 11  P2_{1}/m #11
+  else if(spacegroupsymbol=="P2_{1}/m" || spacegroupsymbol=="P2_1/m") {  // ------------------- 11  P2_{1}/m #11
     spacegroupnumber=11;}
-  if(spacegroupsymbol=="C2/m") {  // ------------------- 12  C2/m #12
+  else if(spacegroupsymbol=="C2/m") {  // ------------------- 12  C2/m #12
     spacegroupnumber=12;}
-  if(spacegroupsymbol=="P2/c") {  // ------------------- 13  P2/c #13
+  else if(spacegroupsymbol=="P2/c") {  // ------------------- 13  P2/c #13
     spacegroupnumber=13;}
-  if(spacegroupsymbol=="P2_{1}/c" || spacegroupsymbol=="P2_1/c") {  // ------------------- 14  P2_{1}/c #14
+  else if(spacegroupsymbol=="P2_{1}/c" || spacegroupsymbol=="P2_1/c") {  // ------------------- 14  P2_{1}/c #14
     spacegroupnumber=14;}
-  if(spacegroupsymbol=="C2/c") {  // ------------------- 15  C2/c #15
+  else if(spacegroupsymbol=="C2/c") {  // ------------------- 15  C2/c #15
     spacegroupnumber=15;}
-  if(spacegroupsymbol=="P222") {  // ------------------- 16  P222 #16
+  else if(spacegroupsymbol=="P222") {  // ------------------- 16  P222 #16
     spacegroupnumber=16;}
-  if(spacegroupsymbol=="P222_{1}" || spacegroupsymbol=="P222_1") {  // ------------------- 17  P222_{1}#17
+  else if(spacegroupsymbol=="P222_{1}" || spacegroupsymbol=="P222_1") {  // ------------------- 17  P222_{1}#17
     spacegroupnumber=17;}
-  if(spacegroupsymbol=="P2_{1}2_{1}2" || spacegroupsymbol=="P2_12_12") {  // ------------------- 18  P2_{1}2_{1}2 #18
+  else if(spacegroupsymbol=="P2_{1}2_{1}2" || spacegroupsymbol=="P2_12_12") {  // ------------------- 18  P2_{1}2_{1}2 #18
     spacegroupnumber=18;}
-  if(spacegroupsymbol=="P2_{1}2_{1}2_{1}" || spacegroupsymbol=="P2_12_12_1") {  // ------------------- 19  P2_{1}2_{1}2_{1}#19
+  else if(spacegroupsymbol=="P2_{1}2_{1}2_{1}" || spacegroupsymbol=="P2_12_12_1") {  // ------------------- 19  P2_{1}2_{1}2_{1}#19
     spacegroupnumber=19;}
-  if(spacegroupsymbol=="C222_{1}" || spacegroupsymbol=="C222_1") {  // ------------------- 20  C222_{1}#20
+  else if(spacegroupsymbol=="C222_{1}" || spacegroupsymbol=="C222_1") {  // ------------------- 20  C222_{1}#20
     spacegroupnumber=20;}
-  if(spacegroupsymbol=="C222") {  // ------------------- 21  C222 #21
+  else if(spacegroupsymbol=="C222") {  // ------------------- 21  C222 #21
     spacegroupnumber=21;}
-  if(spacegroupsymbol=="F222") {  // ------------------- 22  F222 #22
+  else if(spacegroupsymbol=="F222") {  // ------------------- 22  F222 #22
     spacegroupnumber=22;}
-  if(spacegroupsymbol=="I222") {  // ------------------- 23  I222 #23
+  else if(spacegroupsymbol=="I222") {  // ------------------- 23  I222 #23
     spacegroupnumber=23;}
-  if(spacegroupsymbol=="I2_{1}2_{1}2_{1}" || spacegroupsymbol=="I2_12_12_1") {  // ------------------- 24  I2_{1}2_{1}2_{1}#24
+  else if(spacegroupsymbol=="I2_{1}2_{1}2_{1}" || spacegroupsymbol=="I2_12_12_1") {  // ------------------- 24  I2_{1}2_{1}2_{1}#24
     spacegroupnumber=24;}
-  if(spacegroupsymbol=="Pmm2") {  // ------------------- 25  Pmm2 #25
+  else if(spacegroupsymbol=="Pmm2") {  // ------------------- 25  Pmm2 #25
     spacegroupnumber=25;}
-  if(spacegroupsymbol=="Pmc2_{1}" || spacegroupsymbol=="Pmc2_1") {  // ------------------- 26  Pmc2_{1}#26
+  else if(spacegroupsymbol=="Pmc2_{1}" || spacegroupsymbol=="Pmc2_1") {  // ------------------- 26  Pmc2_{1}#26
     spacegroupnumber=26;}
-  if(spacegroupsymbol=="Pcc2") {  // ------------------- 27  Pcc2 #27
+  else if(spacegroupsymbol=="Pcc2") {  // ------------------- 27  Pcc2 #27
     spacegroupnumber=27;}
-  if(spacegroupsymbol=="Pma2") {  // ------------------- 28  Pma2 #28
+  else if(spacegroupsymbol=="Pma2") {  // ------------------- 28  Pma2 #28
     spacegroupnumber=28;}
-  if(spacegroupsymbol=="Pca2_{1}" || spacegroupsymbol=="Pca2_1") {  // ------------------- 29  Pca2_{1}#29
+  else if(spacegroupsymbol=="Pca2_{1}" || spacegroupsymbol=="Pca2_1") {  // ------------------- 29  Pca2_{1}#29
     spacegroupnumber=29;}
-  if(spacegroupsymbol=="Pnc2") {  // ------------------- 30  Pnc2 #30
+  else if(spacegroupsymbol=="Pnc2") {  // ------------------- 30  Pnc2 #30
     spacegroupnumber=30;}
-  if(spacegroupsymbol=="Pmn2_{1}" || spacegroupsymbol=="Pmn2_1") {  // ------------------- 31  Pmn2_{1}#31
+  else if(spacegroupsymbol=="Pmn2_{1}" || spacegroupsymbol=="Pmn2_1") {  // ------------------- 31  Pmn2_{1}#31
     spacegroupnumber=31;}
-  if(spacegroupsymbol=="Pba2") {  // ------------------- 32  Pba2 #32
+  else if(spacegroupsymbol=="Pba2") {  // ------------------- 32  Pba2 #32
     spacegroupnumber=32;}
-  if(spacegroupsymbol=="Pna2_{1}" || spacegroupsymbol=="Pna2_1") {  // ------------------- 33  Pna2_{1}#33
+  else if(spacegroupsymbol=="Pna2_{1}" || spacegroupsymbol=="Pna2_1") {  // ------------------- 33  Pna2_{1}#33
     spacegroupnumber=33;}
-  if(spacegroupsymbol=="Pnn2") {  // ------------------- 34  Pnn2 #34
+  else if(spacegroupsymbol=="Pnn2") {  // ------------------- 34  Pnn2 #34
     spacegroupnumber=34;}
-  if(spacegroupsymbol=="Cmm2") {  // ------------------- 35  Cmm2 #35
+  else if(spacegroupsymbol=="Cmm2") {  // ------------------- 35  Cmm2 #35
     spacegroupnumber=35;}
-  if(spacegroupsymbol=="Cmc2_{1}" || spacegroupsymbol=="Cmc2_1") {  // ------------------- 36  Cmc2_{1}#36
+  else if(spacegroupsymbol=="Cmc2_{1}" || spacegroupsymbol=="Cmc2_1") {  // ------------------- 36  Cmc2_{1}#36
     spacegroupnumber=36;}
-  if(spacegroupsymbol=="Ccc2") {  // ------------------- 37  Ccc2 #37
+  else if(spacegroupsymbol=="Ccc2") {  // ------------------- 37  Ccc2 #37
     spacegroupnumber=37;}
-  if(spacegroupsymbol=="Amm2") {  // ------------------- 38  Amm2 #38
+  else if(spacegroupsymbol=="Amm2") {  // ------------------- 38  Amm2 #38
     spacegroupnumber=38;}
-  if(spacegroupsymbol=="Aem2") {  // ------------------- 39  Aem2 #39
+  else if(spacegroupsymbol=="Aem2") {  // ------------------- 39  Aem2 #39
     spacegroupnumber=39;}
-  if(spacegroupsymbol=="Ama2") {  // ------------------- 40  Ama2 #40
+  else if(spacegroupsymbol=="Ama2") {  // ------------------- 40  Ama2 #40
     spacegroupnumber=40;}
-  if(spacegroupsymbol=="Aea2") {  // ------------------- 41  Aea2 #41
+  else if(spacegroupsymbol=="Aea2") {  // ------------------- 41  Aea2 #41
     spacegroupnumber=41;}
-  if(spacegroupsymbol=="Fmm2") {  // ------------------- 42  Fmm2 #42
+  else if(spacegroupsymbol=="Fmm2") {  // ------------------- 42  Fmm2 #42
     spacegroupnumber=42;}
-  if(spacegroupsymbol=="Fdd2") {  // ------------------- 43  Fdd2 #43
+  else if(spacegroupsymbol=="Fdd2") {  // ------------------- 43  Fdd2 #43
     spacegroupnumber=43;}
-  if(spacegroupsymbol=="Imm2") {  // ------------------- 44  Imm2 #44
+  else if(spacegroupsymbol=="Imm2") {  // ------------------- 44  Imm2 #44
     spacegroupnumber=44;}
-  if(spacegroupsymbol=="Iba2") {  // ------------------- 45  Iba2 #45
+  else if(spacegroupsymbol=="Iba2") {  // ------------------- 45  Iba2 #45
     spacegroupnumber=45;}
-  if(spacegroupsymbol=="Ima2") {  // ------------------- 46  Ima2 #46
+  else if(spacegroupsymbol=="Ima2") {  // ------------------- 46  Ima2 #46
     spacegroupnumber=46;}
-  if(spacegroupsymbol=="Pmmm") {  // ------------------- 47  Pmmm #47
+  else if(spacegroupsymbol=="Pmmm") {  // ------------------- 47  Pmmm #47
     spacegroupnumber=47;}
-  if(spacegroupsymbol=="Pnnn") {  // ------------------- 48  Pnnn #48
+  else if(spacegroupsymbol=="Pnnn") {  // ------------------- 48  Pnnn #48
     spacegroupnumber=48;}
-  if(spacegroupsymbol=="Pccm") {  // ------------------- 49  Pccm #49
+  else if(spacegroupsymbol=="Pccm") {  // ------------------- 49  Pccm #49
     spacegroupnumber=49;}
-  if(spacegroupsymbol=="Pban") {  // ------------------- 50  Pban #50
+  else if(spacegroupsymbol=="Pban") {  // ------------------- 50  Pban #50
     spacegroupnumber=50;}
-  if(spacegroupsymbol=="Pmma") {  // ------------------- 51  Pmma #51
+  else if(spacegroupsymbol=="Pmma") {  // ------------------- 51  Pmma #51
     spacegroupnumber=51;}
-  if(spacegroupsymbol=="Pnna") {  // ------------------- 52  Pnna #52
+  else if(spacegroupsymbol=="Pnna") {  // ------------------- 52  Pnna #52
     spacegroupnumber=52;}
-  if(spacegroupsymbol=="Pmna") {  // ------------------- 53  Pmna #53
+  else if(spacegroupsymbol=="Pmna") {  // ------------------- 53  Pmna #53
     spacegroupnumber=53;}
-  if(spacegroupsymbol=="Pcca") {  // ------------------- 54  Pcca #54
+  else if(spacegroupsymbol=="Pcca") {  // ------------------- 54  Pcca #54
     spacegroupnumber=54;}
-  if(spacegroupsymbol=="Pbam") {  // ------------------- 55  Pbam #55
+  else if(spacegroupsymbol=="Pbam") {  // ------------------- 55  Pbam #55
     spacegroupnumber=55;}
-  if(spacegroupsymbol=="Pccn") {  // ------------------- 56  Pccn #56
+  else if(spacegroupsymbol=="Pccn") {  // ------------------- 56  Pccn #56
     spacegroupnumber=56;}
-  if(spacegroupsymbol=="Pbcm") {  // ------------------- 57  Pbcm #57
+  else if(spacegroupsymbol=="Pbcm") {  // ------------------- 57  Pbcm #57
     spacegroupnumber=57;}
-  if(spacegroupsymbol=="Pnnm") {  // ------------------- 58  Pnnm #58
+  else if(spacegroupsymbol=="Pnnm") {  // ------------------- 58  Pnnm #58
     spacegroupnumber=58;}
-  if(spacegroupsymbol=="Pmmn") {  // ------------------- 59  Pmmn #59
+  else if(spacegroupsymbol=="Pmmn") {  // ------------------- 59  Pmmn #59
     spacegroupnumber=59;}
-  if(spacegroupsymbol=="Pbcn") {  // ------------------- 60  Pbcn #60
+  else if(spacegroupsymbol=="Pbcn") {  // ------------------- 60  Pbcn #60
     spacegroupnumber=60;}
-  if(spacegroupsymbol=="Pbca") {  // ------------------- 61  Pbca #61
+  else if(spacegroupsymbol=="Pbca") {  // ------------------- 61  Pbca #61
     spacegroupnumber=61;}
-  if(spacegroupsymbol=="Pnma") {  // ------------------- 62  Pnma #62
+  else if(spacegroupsymbol=="Pnma") {  // ------------------- 62  Pnma #62
     spacegroupnumber=62;}
-  if(spacegroupsymbol=="Cmcm") {  // ------------------- 63  Cmcm #63
+  else if(spacegroupsymbol=="Cmcm") {  // ------------------- 63  Cmcm #63
     spacegroupnumber=63;}
-  if(spacegroupsymbol=="Cmce") {  // ------------------- 64  Cmce #64
+  else if(spacegroupsymbol=="Cmce") {  // ------------------- 64  Cmce #64
     spacegroupnumber=64;}
-  if(spacegroupsymbol=="Cmmm") {  // ------------------- 65  Cmmm #65
+  else if(spacegroupsymbol=="Cmmm") {  // ------------------- 65  Cmmm #65
     spacegroupnumber=65;}
-  if(spacegroupsymbol=="Cccm") {  // ------------------- 66  Cccm #66
+  else if(spacegroupsymbol=="Cccm") {  // ------------------- 66  Cccm #66
     spacegroupnumber=66;}
-  if(spacegroupsymbol=="Cmme") {  // ------------------- 67  Cmme #67
+  else if(spacegroupsymbol=="Cmme") {  // ------------------- 67  Cmme #67
     spacegroupnumber=67;}
-  if(spacegroupsymbol=="Ccce") {  // ------------------- 68  Ccce #68
+  else if(spacegroupsymbol=="Ccce") {  // ------------------- 68  Ccce #68
     spacegroupnumber=68;}
-  if(spacegroupsymbol=="Fmmm") {  // ------------------- 69  Fmmm #69
+  else if(spacegroupsymbol=="Fmmm") {  // ------------------- 69  Fmmm #69
     spacegroupnumber=69;}
-  if(spacegroupsymbol=="Fddd") {  // ------------------- 70  Fddd #70
+  else if(spacegroupsymbol=="Fddd") {  // ------------------- 70  Fddd #70
     spacegroupnumber=70;}
-  if(spacegroupsymbol=="Immm") {  // ------------------- 71  Immm #71
+  else if(spacegroupsymbol=="Immm") {  // ------------------- 71  Immm #71
     spacegroupnumber=71;}
-  if(spacegroupsymbol=="Ibam") {  // ------------------- 72  Ibam #72
+  else if(spacegroupsymbol=="Ibam") {  // ------------------- 72  Ibam #72
     spacegroupnumber=72;}
-  if(spacegroupsymbol=="Ibca") {  // ------------------- 73  Ibca #73
+  else if(spacegroupsymbol=="Ibca") {  // ------------------- 73  Ibca #73
     spacegroupnumber=73;}
-  if(spacegroupsymbol=="Imma") {  // ------------------- 74  Imma #74
+  else if(spacegroupsymbol=="Imma") {  // ------------------- 74  Imma #74
     spacegroupnumber=74;}
-  if(spacegroupsymbol=="P4") {  // ------------------- 75  P4 #75
+  else if(spacegroupsymbol=="P4") {  // ------------------- 75  P4 #75
     spacegroupnumber=75;}
-  if(spacegroupsymbol=="P4_{1}" || spacegroupsymbol=="P4_1") {  // ------------------- 76  P4_{1}#76
+  else if(spacegroupsymbol=="P4_{1}" || spacegroupsymbol=="P4_1") {  // ------------------- 76  P4_{1}#76
     spacegroupnumber=76;}
-  if(spacegroupsymbol=="P4_{2}" || spacegroupsymbol=="P4_2") {  // ------------------- 77  P4_{2}#77
+  else if(spacegroupsymbol=="P4_{2}" || spacegroupsymbol=="P4_2") {  // ------------------- 77  P4_{2}#77
     spacegroupnumber=77;}
-  if(spacegroupsymbol=="P4_{3}" || spacegroupsymbol=="P4_2") {  // ------------------- 78  P4_{3}#78
+  else if(spacegroupsymbol=="P4_{3}" || spacegroupsymbol=="P4_2") {  // ------------------- 78  P4_{3}#78
     spacegroupnumber=78;}
-  if(spacegroupsymbol=="I4") {  // ------------------- 79  I4 #79
+  else if(spacegroupsymbol=="I4") {  // ------------------- 79  I4 #79
     spacegroupnumber=79;}
-  if(spacegroupsymbol=="I4_{1}" || spacegroupsymbol=="I4_1") {  // ------------------- 80  I4_{1}#80
+  else if(spacegroupsymbol=="I4_{1}" || spacegroupsymbol=="I4_1") {  // ------------------- 80  I4_{1}#80
     spacegroupnumber=80;}
-  if(spacegroupsymbol=="P-4") {  // ------------------- 81  P-4 #81
+  else if(spacegroupsymbol=="P-4") {  // ------------------- 81  P-4 #81
     spacegroupnumber=81;}
-  if(spacegroupsymbol=="I-4") {  // ------------------- 82  I-4 #82
+  else if(spacegroupsymbol=="I-4") {  // ------------------- 82  I-4 #82
     spacegroupnumber=82;}
-  if(spacegroupsymbol=="P4/m") {  // ------------------- 83  P4/m #83
+  else if(spacegroupsymbol=="P4/m") {  // ------------------- 83  P4/m #83
     spacegroupnumber=83;}
-  if(spacegroupsymbol=="P4_{2}/m" || spacegroupsymbol=="P4_2/m") {  // ------------------- 84  P4_{2}/m #84
+  else if(spacegroupsymbol=="P4_{2}/m" || spacegroupsymbol=="P4_2/m") {  // ------------------- 84  P4_{2}/m #84
     spacegroupnumber=84;}
-  if(spacegroupsymbol=="P4/n") {  // ------------------- 85  P4/n #85
+  else if(spacegroupsymbol=="P4/n") {  // ------------------- 85  P4/n #85
     spacegroupnumber=85;}
-  if(spacegroupsymbol=="P4_{2}/n" || spacegroupsymbol=="P4_2/n") {  // ------------------- 86  P4_{2}/n #86
+  else if(spacegroupsymbol=="P4_{2}/n" || spacegroupsymbol=="P4_2/n") {  // ------------------- 86  P4_{2}/n #86
     spacegroupnumber=86;}
-  if(spacegroupsymbol=="I4/m") {  // ------------------- 87  I4/m #87
+  else if(spacegroupsymbol=="I4/m") {  // ------------------- 87  I4/m #87
     spacegroupnumber=87;}
-  if(spacegroupsymbol=="I4_{1}/a" || spacegroupsymbol=="I4_1/a") {  // ------------------- 88  I4_{1}/a #88
+  else if(spacegroupsymbol=="I4_{1}/a" || spacegroupsymbol=="I4_1/a") {  // ------------------- 88  I4_{1}/a #88
     spacegroupnumber=88;}
-  if(spacegroupsymbol=="P422") {  // ------------------- 89  P422 #89
+  else if(spacegroupsymbol=="P422") {  // ------------------- 89  P422 #89
     spacegroupnumber=89;}
-  if(spacegroupsymbol=="P42_{1}2" || spacegroupsymbol=="P42_12") {  // ------------------- 90  P42_{1}2 #90
+  else if(spacegroupsymbol=="P42_{1}2" || spacegroupsymbol=="P42_12") {  // ------------------- 90  P42_{1}2 #90
     spacegroupnumber=90;}
-  if(spacegroupsymbol=="P4_{1}22" || spacegroupsymbol=="P4_122") {  // ------------------- 91  P4_{1}22 #91
+  else if(spacegroupsymbol=="P4_{1}22" || spacegroupsymbol=="P4_122") {  // ------------------- 91  P4_{1}22 #91
     spacegroupnumber=91;}
-  if(spacegroupsymbol=="P4_{1}2_{1}2" || spacegroupsymbol=="P4_12_12") {  // ------------------- 92  P4_{1}2_{1}2 #92
+  else if(spacegroupsymbol=="P4_{1}2_{1}2" || spacegroupsymbol=="P4_12_12") {  // ------------------- 92  P4_{1}2_{1}2 #92
     spacegroupnumber=92;}
-  if(spacegroupsymbol=="P4_{2}22" || spacegroupsymbol=="P4_222") {  // ------------------- 93  P4_{2}22 #93
+  else if(spacegroupsymbol=="P4_{2}22" || spacegroupsymbol=="P4_222") {  // ------------------- 93  P4_{2}22 #93
     spacegroupnumber=93;}
-  if(spacegroupsymbol=="P4_{2}2_{1}2" || spacegroupsymbol=="P4_22_12") {  // ------------------- 94  P4_{2}2_{1}2 #94
+  else if(spacegroupsymbol=="P4_{2}2_{1}2" || spacegroupsymbol=="P4_22_12") {  // ------------------- 94  P4_{2}2_{1}2 #94
     spacegroupnumber=94;}
-  if(spacegroupsymbol=="P4_{3}22" || spacegroupsymbol=="P4_322") {  // ------------------- 95  P4_{3}22 #95
+  else if(spacegroupsymbol=="P4_{3}22" || spacegroupsymbol=="P4_322") {  // ------------------- 95  P4_{3}22 #95
     spacegroupnumber=95;}
-  if(spacegroupsymbol=="P4_{3}2_{1}2" || spacegroupsymbol=="P4_32_12") {  // ------------------- 96  P4_{3}2_{1}2 #96
+  else if(spacegroupsymbol=="P4_{3}2_{1}2" || spacegroupsymbol=="P4_32_12") {  // ------------------- 96  P4_{3}2_{1}2 #96
     spacegroupnumber=96;}
-  if(spacegroupsymbol=="I422") {  // ------------------- 97  I422 #97
+  else if(spacegroupsymbol=="I422") {  // ------------------- 97  I422 #97
     spacegroupnumber=97;}
-  if(spacegroupsymbol=="I4_{1}22" || spacegroupsymbol=="I4_122") {  // ------------------- 98  I4_{1}22 #98
+  else if(spacegroupsymbol=="I4_{1}22" || spacegroupsymbol=="I4_122") {  // ------------------- 98  I4_{1}22 #98
     spacegroupnumber=98;}
-  if(spacegroupsymbol=="P4mm") {  // ------------------- 99  P4mm #99
+  else if(spacegroupsymbol=="P4mm") {  // ------------------- 99  P4mm #99
     spacegroupnumber=99;}
-  if(spacegroupsymbol=="P4bm") {  // ------------------- 100  P4bm #100
+  else if(spacegroupsymbol=="P4bm") {  // ------------------- 100  P4bm #100
     spacegroupnumber=100;}
-  if(spacegroupsymbol=="P4_{2}cm" || spacegroupsymbol=="P4_2cm") {  // ------------------- 101  P4_{2}cm #101
+  else if(spacegroupsymbol=="P4_{2}cm" || spacegroupsymbol=="P4_2cm") {  // ------------------- 101  P4_{2}cm #101
     spacegroupnumber=101;}
-  if(spacegroupsymbol=="P4_{2}nm" || spacegroupsymbol=="P4_2nm") {  // ------------------- 102  P4_{2}nm #102
+  else if(spacegroupsymbol=="P4_{2}nm" || spacegroupsymbol=="P4_2nm") {  // ------------------- 102  P4_{2}nm #102
     spacegroupnumber=102;}
-  if(spacegroupsymbol=="P4cc") {  // ------------------- 103  P4cc #103
+  else if(spacegroupsymbol=="P4cc") {  // ------------------- 103  P4cc #103
     spacegroupnumber=103;}
-  if(spacegroupsymbol=="P4nc") {  // ------------------- 104  P4nc #104
+  else if(spacegroupsymbol=="P4nc") {  // ------------------- 104  P4nc #104
     spacegroupnumber=104;}
-  if(spacegroupsymbol=="P4_{2}mc" || spacegroupsymbol=="P4_2mc") {  // ------------------- 105  P4_{2}mc #105
+  else if(spacegroupsymbol=="P4_{2}mc" || spacegroupsymbol=="P4_2mc") {  // ------------------- 105  P4_{2}mc #105
     spacegroupnumber=105;}
-  if(spacegroupsymbol=="P4_{2}bc" || spacegroupsymbol=="P4_2bc") {  // ------------------- 106  P4_{2}bc #106
+  else if(spacegroupsymbol=="P4_{2}bc" || spacegroupsymbol=="P4_2bc") {  // ------------------- 106  P4_{2}bc #106
     spacegroupnumber=106;}
-  if(spacegroupsymbol=="I4mm") {  // ------------------- 107  I4mm #107
+  else if(spacegroupsymbol=="I4mm") {  // ------------------- 107  I4mm #107
     spacegroupnumber=107;}
-  if(spacegroupsymbol=="I4cm") {  // ------------------- 108  I4cm #108
+  else if(spacegroupsymbol=="I4cm") {  // ------------------- 108  I4cm #108
     spacegroupnumber=108;}
-  if(spacegroupsymbol=="I4_{1}md" || spacegroupsymbol=="I4_1md") {  // ------------------- 109  I4_{1}md #109
+  else if(spacegroupsymbol=="I4_{1}md" || spacegroupsymbol=="I4_1md") {  // ------------------- 109  I4_{1}md #109
     spacegroupnumber=109;}
-  if(spacegroupsymbol=="I4_{1}cd" || spacegroupsymbol=="I4_1cd") {  // ------------------- 110  I4_{1}cd #110
+  else if(spacegroupsymbol=="I4_{1}cd" || spacegroupsymbol=="I4_1cd") {  // ------------------- 110  I4_{1}cd #110
     spacegroupnumber=110;}
-  if(spacegroupsymbol=="P-42m") {  // ------------------- 111  P-42m #111
+  else if(spacegroupsymbol=="P-42m") {  // ------------------- 111  P-42m #111
     spacegroupnumber=111;}
-  if(spacegroupsymbol=="P-42c") {  // ------------------- 112  P-42c #112
+  else if(spacegroupsymbol=="P-42c") {  // ------------------- 112  P-42c #112
     spacegroupnumber=112;}
-  if(spacegroupsymbol=="P-42_{1}m" || spacegroupsymbol=="P-42_1m") {  // ------------------- 113  P-42_{1}m #113
+  else if(spacegroupsymbol=="P-42_{1}m" || spacegroupsymbol=="P-42_1m") {  // ------------------- 113  P-42_{1}m #113
     spacegroupnumber=113;}
-  if(spacegroupsymbol=="P-42_{1}c" || spacegroupsymbol=="P-42_1c") {  // ------------------- 114  P-42_{1}c #114
+  else if(spacegroupsymbol=="P-42_{1}c" || spacegroupsymbol=="P-42_1c") {  // ------------------- 114  P-42_{1}c #114
     spacegroupnumber=114;}
-  if(spacegroupsymbol=="P-4m2") {  // ------------------- 115  P-4m2 #115
+  else if(spacegroupsymbol=="P-4m2") {  // ------------------- 115  P-4m2 #115
     spacegroupnumber=115;}
-  if(spacegroupsymbol=="P-4c2") {  // ------------------- 116  P-4c2 #116
+  else if(spacegroupsymbol=="P-4c2") {  // ------------------- 116  P-4c2 #116
     spacegroupnumber=116;}
-  if(spacegroupsymbol=="P-4b2") {  // ------------------- 117  P-4b2 #117
+  else if(spacegroupsymbol=="P-4b2") {  // ------------------- 117  P-4b2 #117
     spacegroupnumber=117;}
-  if(spacegroupsymbol=="P-4n2") {  // ------------------- 118  P-4n2 #118
+  else if(spacegroupsymbol=="P-4n2") {  // ------------------- 118  P-4n2 #118
     spacegroupnumber=118;}
-  if(spacegroupsymbol=="I-4m2") {  // ------------------- 119  I-4m2 #119
+  else if(spacegroupsymbol=="I-4m2") {  // ------------------- 119  I-4m2 #119
     spacegroupnumber=119;}
-  if(spacegroupsymbol=="I-4c2") {  // ------------------- 120  I-4c2 #120
+  else if(spacegroupsymbol=="I-4c2") {  // ------------------- 120  I-4c2 #120
     spacegroupnumber=120;}
-  if(spacegroupsymbol=="I-42m") {  // ------------------- 121  I-42m #121
+  else if(spacegroupsymbol=="I-42m") {  // ------------------- 121  I-42m #121
     spacegroupnumber=121;}
-  if(spacegroupsymbol=="I-42d") {  // ------------------- 122  I-42d #122
+  else if(spacegroupsymbol=="I-42d") {  // ------------------- 122  I-42d #122
     spacegroupnumber=122;}
-  if(spacegroupsymbol=="P4/mmm") {  // ------------------- 123  P4/mmm #123
+  else if(spacegroupsymbol=="P4/mmm") {  // ------------------- 123  P4/mmm #123
     spacegroupnumber=123;}
-  if(spacegroupsymbol=="P4/mcc") {  // ------------------- 124  P4/mcc #124
+  else if(spacegroupsymbol=="P4/mcc") {  // ------------------- 124  P4/mcc #124
     spacegroupnumber=124;}
-  if(spacegroupsymbol=="P4/nbm") {  // ------------------- 125  P4/nbm #125
+  else if(spacegroupsymbol=="P4/nbm") {  // ------------------- 125  P4/nbm #125
     spacegroupnumber=125;}
-  if(spacegroupsymbol=="P4/nnc") {  // ------------------- 126  P4/nnc #126
+  else if(spacegroupsymbol=="P4/nnc") {  // ------------------- 126  P4/nnc #126
     spacegroupnumber=126;}
-  if(spacegroupsymbol=="P4/mbm") {  // ------------------- 127  P4/mbm #127
+  else if(spacegroupsymbol=="P4/mbm") {  // ------------------- 127  P4/mbm #127
     spacegroupnumber=127;}
-  if(spacegroupsymbol=="P4/mnc") {  // ------------------- 128  P4/mnc #128
+  else if(spacegroupsymbol=="P4/mnc") {  // ------------------- 128  P4/mnc #128
     spacegroupnumber=128;}
-  if(spacegroupsymbol=="P4/nmm") {  // ------------------- 129  P4/nmm #129
+  else if(spacegroupsymbol=="P4/nmm") {  // ------------------- 129  P4/nmm #129
     spacegroupnumber=129;}
-  if(spacegroupsymbol=="P4/ncc") {  // ------------------- 130  P4/ncc #130
+  else if(spacegroupsymbol=="P4/ncc") {  // ------------------- 130  P4/ncc #130
     spacegroupnumber=130;}
-  if(spacegroupsymbol=="P4_{2}/mmc" || spacegroupsymbol=="P4_2/mmc") {  // ------------------- 131  P4_{2}/mmc #131
+  else if(spacegroupsymbol=="P4_{2}/mmc" || spacegroupsymbol=="P4_2/mmc") {  // ------------------- 131  P4_{2}/mmc #131
     spacegroupnumber=131;}
-  if(spacegroupsymbol=="P4_{2}/mcm" || spacegroupsymbol=="P4_2/mcm") {  // ------------------- 132  P4_{2}/mcm #132
+  else if(spacegroupsymbol=="P4_{2}/mcm" || spacegroupsymbol=="P4_2/mcm") {  // ------------------- 132  P4_{2}/mcm #132
     spacegroupnumber=132;}
-  if(spacegroupsymbol=="P4_{2}/nbc" || spacegroupsymbol=="P4_2/nbc") {  // ------------------- 133  P4_{2}/nbc #133
+  else if(spacegroupsymbol=="P4_{2}/nbc" || spacegroupsymbol=="P4_2/nbc") {  // ------------------- 133  P4_{2}/nbc #133
     spacegroupnumber=133;}
-  if(spacegroupsymbol=="P4_{2}/nnm" || spacegroupsymbol=="P4_2/nnm") {  // ------------------- 134  P4_{2}/nnm #134
+  else if(spacegroupsymbol=="P4_{2}/nnm" || spacegroupsymbol=="P4_2/nnm") {  // ------------------- 134  P4_{2}/nnm #134
     spacegroupnumber=134;}
-  if(spacegroupsymbol=="P4_{2}/mbc" || spacegroupsymbol=="P4_2/mbc") {  // ------------------- 135  P4_{2}/mbc #135
+  else if(spacegroupsymbol=="P4_{2}/mbc" || spacegroupsymbol=="P4_2/mbc") {  // ------------------- 135  P4_{2}/mbc #135
     spacegroupnumber=135;}
-  if(spacegroupsymbol=="P4_{2}/mnm" || spacegroupsymbol=="P4_2/mnm") {  // ------------------- 136  P4_{2}/mnm #136
+  else if(spacegroupsymbol=="P4_{2}/mnm" || spacegroupsymbol=="P4_2/mnm") {  // ------------------- 136  P4_{2}/mnm #136
     spacegroupnumber=136;}
-  if(spacegroupsymbol=="P4_{2}/nmc" || spacegroupsymbol=="P4_2/nmc") {  // ------------------- 137  P4_{2}/nmc #137
+  else if(spacegroupsymbol=="P4_{2}/nmc" || spacegroupsymbol=="P4_2/nmc") {  // ------------------- 137  P4_{2}/nmc #137
     spacegroupnumber=137;}
-  if(spacegroupsymbol=="P4_{2}/ncm" || spacegroupsymbol=="P4_2/ncm") {  // ------------------- 138  P4_{2}/ncm #138
+  else if(spacegroupsymbol=="P4_{2}/ncm" || spacegroupsymbol=="P4_2/ncm") {  // ------------------- 138  P4_{2}/ncm #138
     spacegroupnumber=138;}
-  if(spacegroupsymbol=="I4/mmm") {  // ------------------- 139  I4/mmm #139
+  else if(spacegroupsymbol=="I4/mmm") {  // ------------------- 139  I4/mmm #139
     spacegroupnumber=139;}
-  if(spacegroupsymbol=="I4/mcm") {  // ------------------- 140  I4/mcm #140
+  else if(spacegroupsymbol=="I4/mcm") {  // ------------------- 140  I4/mcm #140
     spacegroupnumber=140;}
-  if(spacegroupsymbol=="I4_{1}/amd" || spacegroupsymbol=="I4_1/amd") {  // ------------------- 141  I4_{1}/amd #141
+  else if(spacegroupsymbol=="I4_{1}/amd" || spacegroupsymbol=="I4_1/amd") {  // ------------------- 141  I4_{1}/amd #141
     spacegroupnumber=141;}
-  if(spacegroupsymbol=="I4_{1}/acd" || spacegroupsymbol=="I4_1/acd") {  // ------------------- 142  I4_{1}/acd #142
+  else if(spacegroupsymbol=="I4_{1}/acd" || spacegroupsymbol=="I4_1/acd") {  // ------------------- 142  I4_{1}/acd #142
     spacegroupnumber=142;}
-  if(spacegroupsymbol=="P3") {  // ------------------- 143  P3 #143
+  else if(spacegroupsymbol=="P3") {  // ------------------- 143  P3 #143
     spacegroupnumber=143;}
-  if(spacegroupsymbol=="P3_{1}" || spacegroupsymbol=="P3_1") {  // ------------------- 144  P3_{1}#144
+  else if(spacegroupsymbol=="P3_{1}" || spacegroupsymbol=="P3_1") {  // ------------------- 144  P3_{1}#144
     spacegroupnumber=144;}
-  if(spacegroupsymbol=="P3_{2}" || spacegroupsymbol=="P3_2") {  // ------------------- 145  P3_{2}#145
+  else if(spacegroupsymbol=="P3_{2}" || spacegroupsymbol=="P3_2") {  // ------------------- 145  P3_{2}#145
     spacegroupnumber=145;}
-  if(spacegroupsymbol=="R3") {  // ------------------- 146  R3 #146
+  else if(spacegroupsymbol=="R3") {  // ------------------- 146  R3 #146
     spacegroupnumber=146;}
-  if(spacegroupsymbol=="P-3") {  // ------------------- 147  P-3 #147
+  else if(spacegroupsymbol=="P-3") {  // ------------------- 147  P-3 #147
     spacegroupnumber=147;}
-  if(spacegroupsymbol=="R-3") {  // ------------------- 148  R-3 #148
+  else if(spacegroupsymbol=="R-3") {  // ------------------- 148  R-3 #148
     spacegroupnumber=148;}
-  if(spacegroupsymbol=="P312") {  // ------------------- 149  P312 #149
+  else if(spacegroupsymbol=="P312") {  // ------------------- 149  P312 #149
     spacegroupnumber=149;}
-  if(spacegroupsymbol=="P321") {  // ------------------- 150  P321 #150
+  else if(spacegroupsymbol=="P321") {  // ------------------- 150  P321 #150
     spacegroupnumber=150;}
-  if(spacegroupsymbol=="P3_{1}12" || spacegroupsymbol=="P3_112") {  // ------------------- 151  P3_{1}12 #151
+  else if(spacegroupsymbol=="P3_{1}12" || spacegroupsymbol=="P3_112") {  // ------------------- 151  P3_{1}12 #151
     spacegroupnumber=151;}
-  if(spacegroupsymbol=="P3_{1}21" || spacegroupsymbol=="P3_121") {  // ------------------- 152  P3_{1}21 #152
+  else if(spacegroupsymbol=="P3_{1}21" || spacegroupsymbol=="P3_121") {  // ------------------- 152  P3_{1}21 #152
     spacegroupnumber=152;}
-  if(spacegroupsymbol=="P3_{2}12" || spacegroupsymbol=="P3_212") {  // ------------------- 153  P3_{2}12 #153
+  else if(spacegroupsymbol=="P3_{2}12" || spacegroupsymbol=="P3_212") {  // ------------------- 153  P3_{2}12 #153
     spacegroupnumber=153;}
-  if(spacegroupsymbol=="P3_{2}21" || spacegroupsymbol=="P3_221") {  // ------------------- 154  P3_{2}21 #154
+  else if(spacegroupsymbol=="P3_{2}21" || spacegroupsymbol=="P3_221") {  // ------------------- 154  P3_{2}21 #154
     spacegroupnumber=154;}
-  if(spacegroupsymbol=="R32") {  // ------------------- 155  R32 #155
+  else if(spacegroupsymbol=="R32") {  // ------------------- 155  R32 #155
     spacegroupnumber=155;}
-  if(spacegroupsymbol=="P3m1") {  // ------------------- 156  P3m1 #156
+  else if(spacegroupsymbol=="P3m1") {  // ------------------- 156  P3m1 #156
     spacegroupnumber=156;}
-  if(spacegroupsymbol=="P31m") {  // ------------------- 157  P31m #157
+  else if(spacegroupsymbol=="P31m") {  // ------------------- 157  P31m #157
     spacegroupnumber=157;}
-  if(spacegroupsymbol=="P3c1") {  // ------------------- 158  P3c1 #158
+  else if(spacegroupsymbol=="P3c1") {  // ------------------- 158  P3c1 #158
     spacegroupnumber=158;}
-  if(spacegroupsymbol=="P31c") {  // ------------------- 159  P31c #159
+  else if(spacegroupsymbol=="P31c") {  // ------------------- 159  P31c #159
     spacegroupnumber=159;}
-  if(spacegroupsymbol=="R3m") {  // ------------------- 160  R3m #160
+  else if(spacegroupsymbol=="R3m") {  // ------------------- 160  R3m #160
     spacegroupnumber=160;}
-  if(spacegroupsymbol=="R3c") {  // ------------------- 161  R3c #161
+  else if(spacegroupsymbol=="R3c") {  // ------------------- 161  R3c #161
     spacegroupnumber=161;}
-  if(spacegroupsymbol=="P-31m") {  // ------------------- 162  P-31m #162
+  else if(spacegroupsymbol=="P-31m") {  // ------------------- 162  P-31m #162
     spacegroupnumber=162;}
-  if(spacegroupsymbol=="P-31c") {  // ------------------- 163  P-31c #163
+  else if(spacegroupsymbol=="P-31c") {  // ------------------- 163  P-31c #163
     spacegroupnumber=163;}
-  if(spacegroupsymbol=="P-3m1") {  // ------------------- 164  P-3m1 #164
+  else if(spacegroupsymbol=="P-3m1") {  // ------------------- 164  P-3m1 #164
     spacegroupnumber=164;}
-  if(spacegroupsymbol=="P-3c1") {  // ------------------- 165  P-3c1 #165
+  else if(spacegroupsymbol=="P-3c1") {  // ------------------- 165  P-3c1 #165
     spacegroupnumber=165;}
-  if(spacegroupsymbol=="R-3m") {  // ------------------- 166  R-3m #166
+  else if(spacegroupsymbol=="R-3m") {  // ------------------- 166  R-3m #166
     spacegroupnumber=166;}
-  if(spacegroupsymbol=="R-3c") {  // ------------------- 167  R-3c #167
+  else if(spacegroupsymbol=="R-3c") {  // ------------------- 167  R-3c #167
     spacegroupnumber=167;}
-  if(spacegroupsymbol=="P6") {  // ------------------- 168  P6 #168
+  else if(spacegroupsymbol=="P6") {  // ------------------- 168  P6 #168
     spacegroupnumber=168;}
-  if(spacegroupsymbol=="P6_{1}" || spacegroupsymbol=="P6_1") {  // ------------------- 169  P6_{1}#169
+  else if(spacegroupsymbol=="P6_{1}" || spacegroupsymbol=="P6_1") {  // ------------------- 169  P6_{1}#169
     spacegroupnumber=169;}
-  if(spacegroupsymbol=="P6_{5}" || spacegroupsymbol=="P6_5") {  // ------------------- 170  P6_{5}#170
+  else if(spacegroupsymbol=="P6_{5}" || spacegroupsymbol=="P6_5") {  // ------------------- 170  P6_{5}#170
     spacegroupnumber=170;}
-  if(spacegroupsymbol=="P6_{2}" || spacegroupsymbol=="P6_2") {  // ------------------- 171  P6_{2}#171
+  else if(spacegroupsymbol=="P6_{2}" || spacegroupsymbol=="P6_2") {  // ------------------- 171  P6_{2}#171
     spacegroupnumber=171;}
-  if(spacegroupsymbol=="P6_{4}" || spacegroupsymbol=="P6_4") {  // ------------------- 172  P6_{4}#172
+  else if(spacegroupsymbol=="P6_{4}" || spacegroupsymbol=="P6_4") {  // ------------------- 172  P6_{4}#172
     spacegroupnumber=172;}
-  if(spacegroupsymbol=="P6_{3}" || spacegroupsymbol=="P6_3") {  // ------------------- 173  P6_{3}#173
+  else if(spacegroupsymbol=="P6_{3}" || spacegroupsymbol=="P6_3") {  // ------------------- 173  P6_{3}#173
     spacegroupnumber=173;}
-  if(spacegroupsymbol=="P-6") {  // ------------------- 174  P-6 #174
+  else if(spacegroupsymbol=="P-6") {  // ------------------- 174  P-6 #174
     spacegroupnumber=174;}
-  if(spacegroupsymbol=="P6/m") {  // ------------------- 175  P6/m #175
+  else if(spacegroupsymbol=="P6/m") {  // ------------------- 175  P6/m #175
     spacegroupnumber=175;}
-  if(spacegroupsymbol=="P6_{3}/m" || spacegroupsymbol=="P6_3/m") {  // ------------------- 176  P6_{3}/m #176
+  else if(spacegroupsymbol=="P6_{3}/m" || spacegroupsymbol=="P6_3/m") {  // ------------------- 176  P6_{3}/m #176
     spacegroupnumber=176;}
-  if(spacegroupsymbol=="P622") {  // ------------------- 177  P622 #177
+  else if(spacegroupsymbol=="P622") {  // ------------------- 177  P622 #177
     spacegroupnumber=177;}
-  if(spacegroupsymbol=="P6_{1}22" || spacegroupsymbol=="P6_122") {  // ------------------- 178  P6_{1}22 #178
+  else if(spacegroupsymbol=="P6_{1}22" || spacegroupsymbol=="P6_122") {  // ------------------- 178  P6_{1}22 #178
     spacegroupnumber=178;}
-  if(spacegroupsymbol=="P6_{5}22" || spacegroupsymbol=="P6_522") {  // ------------------- 179  P6_{5}22 #179
+  else if(spacegroupsymbol=="P6_{5}22" || spacegroupsymbol=="P6_522") {  // ------------------- 179  P6_{5}22 #179
     spacegroupnumber=179;}
-  if(spacegroupsymbol=="P6_{2}22" || spacegroupsymbol=="P6_222") {  // ------------------- 180  P6_{2}22 #180
+  else if(spacegroupsymbol=="P6_{2}22" || spacegroupsymbol=="P6_222") {  // ------------------- 180  P6_{2}22 #180
     spacegroupnumber=180;}
-  if(spacegroupsymbol=="P6_{4}22" || spacegroupsymbol=="P6_422") {  // ------------------- 181  P6_{4}22 #181
+  else if(spacegroupsymbol=="P6_{4}22" || spacegroupsymbol=="P6_422") {  // ------------------- 181  P6_{4}22 #181
     spacegroupnumber=181;}
-  if(spacegroupsymbol=="P6_{3}22" || spacegroupsymbol=="P6_322") {  // ------------------- 182  P6_{3}22 #182
+  else if(spacegroupsymbol=="P6_{3}22" || spacegroupsymbol=="P6_322") {  // ------------------- 182  P6_{3}22 #182
     spacegroupnumber=182;}
-  if(spacegroupsymbol=="P6mm") {  // ------------------- 183  P6mm #183
+  else if(spacegroupsymbol=="P6mm") {  // ------------------- 183  P6mm #183
     spacegroupnumber=183;}
-  if(spacegroupsymbol=="P6cc") {  // ------------------- 184  P6cc #184
+  else if(spacegroupsymbol=="P6cc") {  // ------------------- 184  P6cc #184
     spacegroupnumber=184;}
-  if(spacegroupsymbol=="P6_{3}cm" || spacegroupsymbol=="P6_3cm") {  // ------------------- 185  P6_{3}cm #185
+  else if(spacegroupsymbol=="P6_{3}cm" || spacegroupsymbol=="P6_3cm") {  // ------------------- 185  P6_{3}cm #185
     spacegroupnumber=185;}
-  if(spacegroupsymbol=="P6_{3}mc" || spacegroupsymbol=="P6_3mc") {  // ------------------- 186  P6_{3}mc #186
+  else if(spacegroupsymbol=="P6_{3}mc" || spacegroupsymbol=="P6_3mc") {  // ------------------- 186  P6_{3}mc #186
     spacegroupnumber=186;}
-  if(spacegroupsymbol=="P-6m2") {  // ------------------- 187  P-6m2 #187
+  else if(spacegroupsymbol=="P-6m2") {  // ------------------- 187  P-6m2 #187
     spacegroupnumber=187;}
-  if(spacegroupsymbol=="P-6c2") {  // ------------------- 188  P-6c2 #188
+  else if(spacegroupsymbol=="P-6c2") {  // ------------------- 188  P-6c2 #188
     spacegroupnumber=188;}
-  if(spacegroupsymbol=="P-62m") {  // ------------------- 189  P-62m #189
+  else if(spacegroupsymbol=="P-62m") {  // ------------------- 189  P-62m #189
     spacegroupnumber=189;}
-  if(spacegroupsymbol=="P-62c") {  // ------------------- 190  P-62c #190
+  else if(spacegroupsymbol=="P-62c") {  // ------------------- 190  P-62c #190
     spacegroupnumber=190;}
-  if(spacegroupsymbol=="P6/mmm") {  // ------------------- 191  P6/mmm #191
+  else if(spacegroupsymbol=="P6/mmm") {  // ------------------- 191  P6/mmm #191
     spacegroupnumber=191;}
-  if(spacegroupsymbol=="P6/mcc") {  // ------------------- 192  P6/mcc #192
+  else if(spacegroupsymbol=="P6/mcc") {  // ------------------- 192  P6/mcc #192
     spacegroupnumber=192;}
-  if(spacegroupsymbol=="P6_{3}/mcm" || spacegroupsymbol=="P6_3/mcm") {  // ------------------- 193  P6_{3}/mcm #193
+  else if(spacegroupsymbol=="P6_{3}/mcm" || spacegroupsymbol=="P6_3/mcm") {  // ------------------- 193  P6_{3}/mcm #193
     spacegroupnumber=193;}
-  if(spacegroupsymbol=="P6_{3}/mmc" || spacegroupsymbol=="P6_3/mmc") {  // ------------------- 194  P6_{3}/mmc #194
+  else if(spacegroupsymbol=="P6_{3}/mmc" || spacegroupsymbol=="P6_3/mmc") {  // ------------------- 194  P6_{3}/mmc #194
     spacegroupnumber=194;}
-  if(spacegroupsymbol=="P23") {  // ------------------- 195  P23 #195
+  else if(spacegroupsymbol=="P23") {  // ------------------- 195  P23 #195
     spacegroupnumber=195;}
-  if(spacegroupsymbol=="F23") {  // ------------------- 196  F23 #196
+  else if(spacegroupsymbol=="F23") {  // ------------------- 196  F23 #196
     spacegroupnumber=196;}
-  if(spacegroupsymbol=="I23") {  // ------------------- 197  I23 #197
+  else if(spacegroupsymbol=="I23") {  // ------------------- 197  I23 #197
     spacegroupnumber=197;}
-  if(spacegroupsymbol=="P2_{1}3" || spacegroupsymbol=="P2_13") {  // ------------------- 198  P2_{1}3 #198
+  else if(spacegroupsymbol=="P2_{1}3" || spacegroupsymbol=="P2_13") {  // ------------------- 198  P2_{1}3 #198
     spacegroupnumber=198;}
-  if(spacegroupsymbol=="I2_{1}3" || spacegroupsymbol=="I2_13") {  // ------------------- 199  I2_{1}3 #199
+  else if(spacegroupsymbol=="I2_{1}3" || spacegroupsymbol=="I2_13") {  // ------------------- 199  I2_{1}3 #199
     spacegroupnumber=199;}
-  if(spacegroupsymbol=="Pm-3") {  // ------------------- 200  Pm-3 #200
+  else if(spacegroupsymbol=="Pm-3") {  // ------------------- 200  Pm-3 #200
     spacegroupnumber=200;}
-  if(spacegroupsymbol=="Pn-3") {  // ------------------- 201  Pn-3 #201
+  else if(spacegroupsymbol=="Pn-3") {  // ------------------- 201  Pn-3 #201
     spacegroupnumber=201;}
-  if(spacegroupsymbol=="Fm-3") {  // ------------------- 202  Fm-3 #202
+  else if(spacegroupsymbol=="Fm-3") {  // ------------------- 202  Fm-3 #202
     spacegroupnumber=202;}
-  if(spacegroupsymbol=="Fd-3") {  // ------------------- 203  Fd-3 #203
+  else if(spacegroupsymbol=="Fd-3") {  // ------------------- 203  Fd-3 #203
     spacegroupnumber=203;}
-  if(spacegroupsymbol=="Im-3") {  // ------------------- 204  Im-3 #204
+  else if(spacegroupsymbol=="Im-3") {  // ------------------- 204  Im-3 #204
     spacegroupnumber=204;}
-  if(spacegroupsymbol=="Pa-3") {  // ------------------- 205  Pa-3 #205
+  else if(spacegroupsymbol=="Pa-3") {  // ------------------- 205  Pa-3 #205
     spacegroupnumber=205;}
-  if(spacegroupsymbol=="Ia-3") {  // ------------------- 206  Ia-3 #206
+  else if(spacegroupsymbol=="Ia-3") {  // ------------------- 206  Ia-3 #206
     spacegroupnumber=206;}
-  if(spacegroupsymbol=="P432") {  // ------------------- 207  P432 #207
+  else if(spacegroupsymbol=="P432") {  // ------------------- 207  P432 #207
     spacegroupnumber=207;}
-  if(spacegroupsymbol=="P4_{2}32" || spacegroupsymbol=="P4_232") {  // ------------------- 208  P4_{2}32 #208
+  else if(spacegroupsymbol=="P4_{2}32" || spacegroupsymbol=="P4_232") {  // ------------------- 208  P4_{2}32 #208
     spacegroupnumber=208;}
-  if(spacegroupsymbol=="F432") {  // ------------------- 209  F432 #209
+  else if(spacegroupsymbol=="F432") {  // ------------------- 209  F432 #209
     spacegroupnumber=209;}
-  if(spacegroupsymbol=="F4_{1}32" || spacegroupsymbol=="F4_132") {  // ------------------- 210  F4_{1}32 #210
+  else if(spacegroupsymbol=="F4_{1}32" || spacegroupsymbol=="F4_132") {  // ------------------- 210  F4_{1}32 #210
     spacegroupnumber=210;}
-  if(spacegroupsymbol=="I432") {  // ------------------- 211  I432 #211
+  else if(spacegroupsymbol=="I432") {  // ------------------- 211  I432 #211
     spacegroupnumber=211;}
-  if(spacegroupsymbol=="P4_{3}32" || spacegroupsymbol=="P4_332") {  // ------------------- 212  P4_{3}32 #212
+  else if(spacegroupsymbol=="P4_{3}32" || spacegroupsymbol=="P4_332") {  // ------------------- 212  P4_{3}32 #212
     spacegroupnumber=212;}
-  if(spacegroupsymbol=="P4_{1}32" || spacegroupsymbol=="P4_132") {  // ------------------- 213  P4_{1}32 #213
+  else if(spacegroupsymbol=="P4_{1}32" || spacegroupsymbol=="P4_132") {  // ------------------- 213  P4_{1}32 #213
     spacegroupnumber=213;}
-  if(spacegroupsymbol=="I4_{1}32" || spacegroupsymbol=="I4_132") {  // ------------------- 214  I4_{1}32 #214
+  else if(spacegroupsymbol=="I4_{1}32" || spacegroupsymbol=="I4_132") {  // ------------------- 214  I4_{1}32 #214
     spacegroupnumber=214;}
-  if(spacegroupsymbol=="P-43m") {  // ------------------- 215  P-43m #215
+  else if(spacegroupsymbol=="P-43m") {  // ------------------- 215  P-43m #215
     spacegroupnumber=215;}
-  if(spacegroupsymbol=="F-43m") {  // ------------------- 216  F-43m #216
+  else if(spacegroupsymbol=="F-43m") {  // ------------------- 216  F-43m #216
     spacegroupnumber=216;}
-  if(spacegroupsymbol=="I-43m") {  // ------------------- 217  I-43m #217
+  else if(spacegroupsymbol=="I-43m") {  // ------------------- 217  I-43m #217
     spacegroupnumber=217;}
-  if(spacegroupsymbol=="P-43n") {  // ------------------- 218  P-43n #218
+  else if(spacegroupsymbol=="P-43n") {  // ------------------- 218  P-43n #218
     spacegroupnumber=218;}
-  if(spacegroupsymbol=="F-43c") {  // ------------------- 219  F-43c #219
+  else if(spacegroupsymbol=="F-43c") {  // ------------------- 219  F-43c #219
     spacegroupnumber=219;}
-  if(spacegroupsymbol=="I-43d") {  // ------------------- 220  I-43d #220
+  else if(spacegroupsymbol=="I-43d") {  // ------------------- 220  I-43d #220
     spacegroupnumber=220;}
-  if(spacegroupsymbol=="Pm-3m") {  // ------------------- 221  Pm-3m #221
+  else if(spacegroupsymbol=="Pm-3m") {  // ------------------- 221  Pm-3m #221
     spacegroupnumber=221;}
-  if(spacegroupsymbol=="Pn-3n") {  // ------------------- 222  Pn-3n #222
+  else if(spacegroupsymbol=="Pn-3n") {  // ------------------- 222  Pn-3n #222
     spacegroupnumber=222;}
-  if(spacegroupsymbol=="Pm-3n") {  // ------------------- 223  Pm-3n #223
+  else if(spacegroupsymbol=="Pm-3n") {  // ------------------- 223  Pm-3n #223
     spacegroupnumber=223;}
-  if(spacegroupsymbol=="Pn-3m") {  // ------------------- 224  Pn-3m #224
+  else if(spacegroupsymbol=="Pn-3m") {  // ------------------- 224  Pn-3m #224
     spacegroupnumber=224;}
-  if(spacegroupsymbol=="Fm-3m") {  // ------------------- 225  Fm-3m #225
+  else if(spacegroupsymbol=="Fm-3m") {  // ------------------- 225  Fm-3m #225
     spacegroupnumber=225;}
-  if(spacegroupsymbol=="Fm-3c") {  // ------------------- 226  Fm-3c #226
+  else if(spacegroupsymbol=="Fm-3c") {  // ------------------- 226  Fm-3c #226
     spacegroupnumber=226;}
-  if(spacegroupsymbol=="Fd-3m") {  // ------------------- 227  Fd-3m #227
+  else if(spacegroupsymbol=="Fd-3m") {  // ------------------- 227  Fd-3m #227
     spacegroupnumber=227;}
-  if(spacegroupsymbol=="Fd-3c") {  // ------------------- 228  Fd-3c #228
+  else if(spacegroupsymbol=="Fd-3c") {  // ------------------- 228  Fd-3c #228
     spacegroupnumber=228;}
-  if(spacegroupsymbol=="Im-3m") {  // ------------------- 229  Im-3m #229
+  else if(spacegroupsymbol=="Im-3m") {  // ------------------- 229  Im-3m #229
     spacegroupnumber=229;}
-  if(spacegroupsymbol=="Ia-3d") {  // ------------------- 230  Ia-3d #230                                                                           
+  else if(spacegroupsymbol=="Ia-3d") {  // ------------------- 230  Ia-3d #230                                                                           
     spacegroupnumber=230;}
   // done
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) {
-    message << "routine: space group specified invalid (1-230); perhaps non-ITC setting: ";
-    message << "space group symbol=" << spacegroupsymbol << ", space group number=" << spacegroupnumber << " [dir=" << directory << "].";
+  else{
+    message << "routine: space group specified invalid; perhaps non-ITC setting: ";
+    message << "space group symbol=" << spacegroupsymbol << " [dir=" << directory << "].";
     throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
   }
   return spacegroupnumber;
@@ -6585,465 +6587,466 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
     throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  C_{1}^{1} #1
     spacegroup="C_{1}^{1}";}
-  if(spacegroupnumber==2) { // ------------------- 2  C_{i}^{1} #2
+  else if(spacegroupnumber==2) { // ------------------- 2  C_{i}^{1} #2
     spacegroup="C_{i}^{1}";}
-  if(spacegroupnumber==3) { // ------------------- 3  C_{2}^{1} #3
+  else if(spacegroupnumber==3) { // ------------------- 3  C_{2}^{1} #3
     spacegroup="C_{2}^{1}";}
-  if(spacegroupnumber==4) { // ------------------- 4  C_{2}^{2} #4
+  else if(spacegroupnumber==4) { // ------------------- 4  C_{2}^{2} #4
     spacegroup="C_{2}^{2}";}
-  if(spacegroupnumber==5) { // ------------------- 5  C_{2}^{3} #5
+  else if(spacegroupnumber==5) { // ------------------- 5  C_{2}^{3} #5
     spacegroup="C_{2}^{3}";}
-  if(spacegroupnumber==6) { // ------------------- 6  C_{s}^{1} #6
+  else if(spacegroupnumber==6) { // ------------------- 6  C_{s}^{1} #6
     spacegroup="C_{s}^{1}";}
-  if(spacegroupnumber==7) { // ------------------- 7  C_{s}^{2} #7
+  else if(spacegroupnumber==7) { // ------------------- 7  C_{s}^{2} #7
     spacegroup="C_{s}^{2}";}
-  if(spacegroupnumber==8) { // ------------------- 8  C_{s}^{3} #8
+  else if(spacegroupnumber==8) { // ------------------- 8  C_{s}^{3} #8
     spacegroup="C_{s}^{3}";}
-  if(spacegroupnumber==9) { // ------------------- 9  C_{s}^{4} #9
+  else if(spacegroupnumber==9) { // ------------------- 9  C_{s}^{4} #9
     spacegroup="C_{s}^{4}";}
-  if(spacegroupnumber==10) { // ------------------- 10  C_{2h}^{1} #10
+  else if(spacegroupnumber==10) { // ------------------- 10  C_{2h}^{1} #10
     spacegroup="C_{2h}^{1}";}
-  if(spacegroupnumber==11) { // ------------------- 11  C_{2h}^{2} #11
+  else if(spacegroupnumber==11) { // ------------------- 11  C_{2h}^{2} #11
     spacegroup="C_{2h}^{2}";}
-  if(spacegroupnumber==12) { // ------------------- 12  C_{2h}^{3} #12
+  else if(spacegroupnumber==12) { // ------------------- 12  C_{2h}^{3} #12
     spacegroup="C_{2h}^{3}";}
-  if(spacegroupnumber==13) { // ------------------- 13  C_{2h}^{4} #13
+  else if(spacegroupnumber==13) { // ------------------- 13  C_{2h}^{4} #13
     spacegroup="C_{2h}^{4}";}
-  if(spacegroupnumber==14) { // ------------------- 14  C_{2h}^{5} #14
+  else if(spacegroupnumber==14) { // ------------------- 14  C_{2h}^{5} #14
     spacegroup="C_{2h}^{5}";}
-  if(spacegroupnumber==15) { // ------------------- 15  C_{2h}^{6} #15
+  else if(spacegroupnumber==15) { // ------------------- 15  C_{2h}^{6} #15
     spacegroup="C_{2h}^{6}";}
-  if(spacegroupnumber==16) { // ------------------- 16  D_{2}^{1} #16
+  else if(spacegroupnumber==16) { // ------------------- 16  D_{2}^{1} #16
     spacegroup="D_{2}^{1}";}
-  if(spacegroupnumber==17) { // ------------------- 17  D_{2}^{2} #17
+  else if(spacegroupnumber==17) { // ------------------- 17  D_{2}^{2} #17
     spacegroup="D_{2}^{2}";}
-  if(spacegroupnumber==18) { // ------------------- 18  D_{2}^{3} #18
+  else if(spacegroupnumber==18) { // ------------------- 18  D_{2}^{3} #18
     spacegroup="D_{2}^{3}";}
-  if(spacegroupnumber==19) { // ------------------- 19  D_{2}^{4} #19
+  else if(spacegroupnumber==19) { // ------------------- 19  D_{2}^{4} #19
     spacegroup="D_{2}^{4}";}
-  if(spacegroupnumber==20) { // ------------------- 20  D_{2}^{5} #20
+  else if(spacegroupnumber==20) { // ------------------- 20  D_{2}^{5} #20
     spacegroup="D_{2}^{5}";}
-  if(spacegroupnumber==21) { // ------------------- 21  D_{2}^{6} #21
+  else if(spacegroupnumber==21) { // ------------------- 21  D_{2}^{6} #21
     spacegroup="D_{2}^{6}";}
-  if(spacegroupnumber==22) { // ------------------- 22  D_{2}^{7} #22
+  else if(spacegroupnumber==22) { // ------------------- 22  D_{2}^{7} #22
     spacegroup="D_{2}^{7}";}
-  if(spacegroupnumber==23) { // ------------------- 23  D_{2}^{8} #23
+  else if(spacegroupnumber==23) { // ------------------- 23  D_{2}^{8} #23
     spacegroup="D_{2}^{8}";}
-  if(spacegroupnumber==24) { // ------------------- 24  D_{2}^{9} #24
+  else if(spacegroupnumber==24) { // ------------------- 24  D_{2}^{9} #24
     spacegroup="D_{2}^{9}";}
-  if(spacegroupnumber==25) { // ------------------- 25  C_{2v}^{1} #25
+  else if(spacegroupnumber==25) { // ------------------- 25  C_{2v}^{1} #25
     spacegroup="C_{2v}^{1}";}
-  if(spacegroupnumber==26) { // ------------------- 26  C_{2v}^{2} #26
+  else if(spacegroupnumber==26) { // ------------------- 26  C_{2v}^{2} #26
     spacegroup="C_{2v}^{2}";}
-  if(spacegroupnumber==27) { // ------------------- 27  C_{2v}^{3} #27
+  else if(spacegroupnumber==27) { // ------------------- 27  C_{2v}^{3} #27
     spacegroup="C_{2v}^{3}";}
-  if(spacegroupnumber==28) { // ------------------- 28  C_{2v}^{4} #28
+  else if(spacegroupnumber==28) { // ------------------- 28  C_{2v}^{4} #28
     spacegroup="C_{2v}^{4}";}
-  if(spacegroupnumber==29) { // ------------------- 29  C_{2v}^{5} #29
+  else if(spacegroupnumber==29) { // ------------------- 29  C_{2v}^{5} #29
     spacegroup="C_{2v}^{5}";}
-  if(spacegroupnumber==30) { // ------------------- 30  C_{2v}^{6} #30
+  else if(spacegroupnumber==30) { // ------------------- 30  C_{2v}^{6} #30
     spacegroup="C_{2v}^{6}";}
-  if(spacegroupnumber==31) { // ------------------- 31  C_{2v}^{7} #31
+  else if(spacegroupnumber==31) { // ------------------- 31  C_{2v}^{7} #31
     spacegroup="C_{2v}^{7}";}
-  if(spacegroupnumber==32) { // ------------------- 32  C_{2v}^{8} #32
+  else if(spacegroupnumber==32) { // ------------------- 32  C_{2v}^{8} #32
     spacegroup="C_{2v}^{8}";}
-  if(spacegroupnumber==33) { // ------------------- 33  C_{2v}^{9} #33
+  else if(spacegroupnumber==33) { // ------------------- 33  C_{2v}^{9} #33
     spacegroup="C_{2v}^{9}";}
-  if(spacegroupnumber==34) { // ------------------- 34  C_{2v}^{10} #34
+  else if(spacegroupnumber==34) { // ------------------- 34  C_{2v}^{10} #34
     spacegroup="C_{2v}^{10}";}
-  if(spacegroupnumber==35) { // ------------------- 35  C_{2v}^{11} #35
+  else if(spacegroupnumber==35) { // ------------------- 35  C_{2v}^{11} #35
     spacegroup="C_{2v}^{11}";}
-  if(spacegroupnumber==36) { // ------------------- 36  C_{2v}^{12} #36
+  else if(spacegroupnumber==36) { // ------------------- 36  C_{2v}^{12} #36
     spacegroup="C_{2v}^{12}";}
-  if(spacegroupnumber==37) { // ------------------- 37  C_{2v}^{13} #37
+  else if(spacegroupnumber==37) { // ------------------- 37  C_{2v}^{13} #37
     spacegroup="C_{2v}^{13}";}
-  if(spacegroupnumber==38) { // ------------------- 38  C_{2v}^{14} #38
+  else if(spacegroupnumber==38) { // ------------------- 38  C_{2v}^{14} #38
     spacegroup="C_{2v}^{14}";}
-  if(spacegroupnumber==39) { // ------------------- 39  C_{2v}^{15} #39
+  else if(spacegroupnumber==39) { // ------------------- 39  C_{2v}^{15} #39
     spacegroup="C_{2v}^{15}";}
-  if(spacegroupnumber==40) { // ------------------- 40  C_{2v}^{16} #40
+  else if(spacegroupnumber==40) { // ------------------- 40  C_{2v}^{16} #40
     spacegroup="C_{2v}^{16}";}
-  if(spacegroupnumber==41) { // ------------------- 41  C_{2v}^{17} #41
+  else if(spacegroupnumber==41) { // ------------------- 41  C_{2v}^{17} #41
     spacegroup="C_{2v}^{17}";}
-  if(spacegroupnumber==42) { // ------------------- 42  C_{2v}^{18} #42
+  else if(spacegroupnumber==42) { // ------------------- 42  C_{2v}^{18} #42
     spacegroup="C_{2v}^{18}";}
-  if(spacegroupnumber==43) { // ------------------- 43  C_{2v}^{19} #43
+  else if(spacegroupnumber==43) { // ------------------- 43  C_{2v}^{19} #43
     spacegroup="C_{2v}^{19}";}
-  if(spacegroupnumber==44) { // ------------------- 44  C_{2v}^{20} #44
+  else if(spacegroupnumber==44) { // ------------------- 44  C_{2v}^{20} #44
     spacegroup="C_{2v}^{20}";}
-  if(spacegroupnumber==45) { // ------------------- 45  C_{2v}^{21} #45
+  else if(spacegroupnumber==45) { // ------------------- 45  C_{2v}^{21} #45
     spacegroup="C_{2v}^{21}";}
-  if(spacegroupnumber==46) { // ------------------- 46  C_{2v}^{22} #46
+  else if(spacegroupnumber==46) { // ------------------- 46  C_{2v}^{22} #46
     spacegroup="C_{2v}^{22}";}
-  if(spacegroupnumber==47) { // ------------------- 47  D_{2h}^{1} #47
+  else if(spacegroupnumber==47) { // ------------------- 47  D_{2h}^{1} #47
     spacegroup="D_{2h}^{1}";}
-  if(spacegroupnumber==48) { // ------------------- 48  D_{2h}^{2} #48
+  else if(spacegroupnumber==48) { // ------------------- 48  D_{2h}^{2} #48
     spacegroup="D_{2h}^{2}";}
-  if(spacegroupnumber==49) { // ------------------- 49  D_{2h}^{3} #49
+  else if(spacegroupnumber==49) { // ------------------- 49  D_{2h}^{3} #49
     spacegroup="D_{2h}^{3}";}
-  if(spacegroupnumber==50) { // ------------------- 50  D_{2h}^{4} #50
+  else if(spacegroupnumber==50) { // ------------------- 50  D_{2h}^{4} #50
     spacegroup="D_{2h}^{4}";}
-  if(spacegroupnumber==51) { // ------------------- 51  D_{2h}^{5} #51
+  else if(spacegroupnumber==51) { // ------------------- 51  D_{2h}^{5} #51
     spacegroup="D_{2h}^{5}";}
-  if(spacegroupnumber==52) { // ------------------- 52  D_{2h}^{6} #52
+  else if(spacegroupnumber==52) { // ------------------- 52  D_{2h}^{6} #52
     spacegroup="D_{2h}^{6}";}
-  if(spacegroupnumber==53) { // ------------------- 53  D_{2h}^{7} #53
+  else if(spacegroupnumber==53) { // ------------------- 53  D_{2h}^{7} #53
     spacegroup="D_{2h}^{7}";}
-  if(spacegroupnumber==54) { // ------------------- 54  D_{2h}^{8} #54
+  else if(spacegroupnumber==54) { // ------------------- 54  D_{2h}^{8} #54
     spacegroup="D_{2h}^{8}";}
-  if(spacegroupnumber==55) { // ------------------- 55  D_{2h}^{9} #55
+  else if(spacegroupnumber==55) { // ------------------- 55  D_{2h}^{9} #55
     spacegroup="D_{2h}^{9}";}
-  if(spacegroupnumber==56) { // ------------------- 56  D_{2h}^{10} #56
+  else if(spacegroupnumber==56) { // ------------------- 56  D_{2h}^{10} #56
     spacegroup="D_{2h}^{10}";}
-  if(spacegroupnumber==57) { // ------------------- 57  D_{2h}^{11} #57
+  else if(spacegroupnumber==57) { // ------------------- 57  D_{2h}^{11} #57
     spacegroup="D_{2h}^{11}";}
-  if(spacegroupnumber==58) { // ------------------- 58  D_{2h}^{12} #58
+  else if(spacegroupnumber==58) { // ------------------- 58  D_{2h}^{12} #58
     spacegroup="D_{2h}^{12}";}
-  if(spacegroupnumber==59) { // ------------------- 59  D_{2h}^{13} #59
+  else if(spacegroupnumber==59) { // ------------------- 59  D_{2h}^{13} #59
     spacegroup="D_{2h}^{13}";}
-  if(spacegroupnumber==60) { // ------------------- 60  D_{2h}^{14} #60
+  else if(spacegroupnumber==60) { // ------------------- 60  D_{2h}^{14} #60
     spacegroup="D_{2h}^{14}";}
-  if(spacegroupnumber==61) { // ------------------- 61  D_{2h}^{15} #61
+  else if(spacegroupnumber==61) { // ------------------- 61  D_{2h}^{15} #61
     spacegroup="D_{2h}^{15}";}
-  if(spacegroupnumber==62) { // ------------------- 62  D_{2h}^{16} #62
+  else if(spacegroupnumber==62) { // ------------------- 62  D_{2h}^{16} #62
     spacegroup="D_{2h}^{16}";}
-  if(spacegroupnumber==63) { // ------------------- 63  D_{2h}^{17} #63
+  else if(spacegroupnumber==63) { // ------------------- 63  D_{2h}^{17} #63
     spacegroup="D_{2h}^{17}";}
-  if(spacegroupnumber==64) { // ------------------- 64  D_{2h}^{18} #64
+  else if(spacegroupnumber==64) { // ------------------- 64  D_{2h}^{18} #64
     spacegroup="D_{2h}^{18}";}
-  if(spacegroupnumber==65) { // ------------------- 65  D_{2h}^{19} #65
+  else if(spacegroupnumber==65) { // ------------------- 65  D_{2h}^{19} #65
     spacegroup="D_{2h}^{19}";}
-  if(spacegroupnumber==66) { // ------------------- 66  D_{2h}^{20} #66
+  else if(spacegroupnumber==66) { // ------------------- 66  D_{2h}^{20} #66
     spacegroup="D_{2h}^{20}";}
-  if(spacegroupnumber==67) { // ------------------- 67  D_{2h}^{21} #67
+  else if(spacegroupnumber==67) { // ------------------- 67  D_{2h}^{21} #67
     spacegroup="D_{2h}^{21}";}
-  if(spacegroupnumber==68) { // ------------------- 68  D_{2h}^{22} #68
+  else if(spacegroupnumber==68) { // ------------------- 68  D_{2h}^{22} #68
     spacegroup="D_{2h}^{22}";}
-  if(spacegroupnumber==69) { // ------------------- 69  D_{2h}^{23} #69
+  else if(spacegroupnumber==69) { // ------------------- 69  D_{2h}^{23} #69
     spacegroup="D_{2h}^{23}";}
-  if(spacegroupnumber==70) { // ------------------- 70  D_{2h}^{24} #70
+  else if(spacegroupnumber==70) { // ------------------- 70  D_{2h}^{24} #70
     spacegroup="D_{2h}^{24}";}
-  if(spacegroupnumber==71) { // ------------------- 71  D_{2h}^{25} #71
+  else if(spacegroupnumber==71) { // ------------------- 71  D_{2h}^{25} #71
     spacegroup="D_{2h}^{25}";}
-  if(spacegroupnumber==72) { // ------------------- 72  D_{2h}^{26} #72
+  else if(spacegroupnumber==72) { // ------------------- 72  D_{2h}^{26} #72
     spacegroup="D_{2h}^{26}";}
-  if(spacegroupnumber==73) { // ------------------- 73  D_{2h}^{27} #73
+  else if(spacegroupnumber==73) { // ------------------- 73  D_{2h}^{27} #73
     spacegroup="D_{2h}^{27}";}
-  if(spacegroupnumber==74) { // ------------------- 74  D_{2h}^{28} #74
+  else if(spacegroupnumber==74) { // ------------------- 74  D_{2h}^{28} #74
     spacegroup="D_{2h}^{28}";}
-  if(spacegroupnumber==75) { // ------------------- 75  C_{4}^{1} #75
+  else if(spacegroupnumber==75) { // ------------------- 75  C_{4}^{1} #75
     spacegroup="C_{4}^{1}";}
-  if(spacegroupnumber==76) { // ------------------- 76  C_{4}^{2} #76
+  else if(spacegroupnumber==76) { // ------------------- 76  C_{4}^{2} #76
     spacegroup="C_{4}^{2}";}
-  if(spacegroupnumber==77) { // ------------------- 77  C_{4}^{3} #77
+  else if(spacegroupnumber==77) { // ------------------- 77  C_{4}^{3} #77
     spacegroup="C_{4}^{3}";}
-  if(spacegroupnumber==78) { // ------------------- 78  C_{4}^{4} #78
+  else if(spacegroupnumber==78) { // ------------------- 78  C_{4}^{4} #78
     spacegroup="C_{4}^{4}";}
-  if(spacegroupnumber==79) { // ------------------- 79  C_{4}^{5} #79
+  else if(spacegroupnumber==79) { // ------------------- 79  C_{4}^{5} #79
     spacegroup="C_{4}^{5}";}
-  if(spacegroupnumber==80) { // ------------------- 80  C_{4}^{6} #80
+  else if(spacegroupnumber==80) { // ------------------- 80  C_{4}^{6} #80
     spacegroup="C_{4}^{6}";}
-  if(spacegroupnumber==81) { // ------------------- 81  S_{4}^{1} #81
+  else if(spacegroupnumber==81) { // ------------------- 81  S_{4}^{1} #81
     spacegroup="S_{4}^{1}";}
-  if(spacegroupnumber==82) { // ------------------- 82  S_{4}^{2} #82
+  else if(spacegroupnumber==82) { // ------------------- 82  S_{4}^{2} #82
     spacegroup="S_{4}^{2}";}
-  if(spacegroupnumber==83) { // ------------------- 83  C_{4h}^{1} #83
+  else if(spacegroupnumber==83) { // ------------------- 83  C_{4h}^{1} #83
     spacegroup="C_{4h}^{1}";}
-  if(spacegroupnumber==84) { // ------------------- 84  C_{4h}^{2} #84
+  else if(spacegroupnumber==84) { // ------------------- 84  C_{4h}^{2} #84
     spacegroup="C_{4h}^{2}";}
-  if(spacegroupnumber==85) { // ------------------- 85  C_{4h}^{3} #85
+  else if(spacegroupnumber==85) { // ------------------- 85  C_{4h}^{3} #85
     spacegroup="C_{4h}^{3}";}
-  if(spacegroupnumber==86) { // ------------------- 86  C_{4h}^{4} #86
+  else if(spacegroupnumber==86) { // ------------------- 86  C_{4h}^{4} #86
     spacegroup="C_{4h}^{4}";}
-  if(spacegroupnumber==87) { // ------------------- 87  C_{4h}^{5} #87
+  else if(spacegroupnumber==87) { // ------------------- 87  C_{4h}^{5} #87
     spacegroup="C_{4h}^{5}";}
-  if(spacegroupnumber==88) { // ------------------- 88  C_{4h}^{6} #88
+  else if(spacegroupnumber==88) { // ------------------- 88  C_{4h}^{6} #88
     spacegroup="C_{4h}^{6}";}
-  if(spacegroupnumber==89) { // ------------------- 89  D_{4}^{1} #89
+  else if(spacegroupnumber==89) { // ------------------- 89  D_{4}^{1} #89
     spacegroup="D_{4}^{1}";}
-  if(spacegroupnumber==90) { // ------------------- 90  D_{4}^{2} #90
+  else if(spacegroupnumber==90) { // ------------------- 90  D_{4}^{2} #90
     spacegroup="D_{4}^{2}";}
-  if(spacegroupnumber==91) { // ------------------- 91  D_{4}^{3} #91
+  else if(spacegroupnumber==91) { // ------------------- 91  D_{4}^{3} #91
     spacegroup="D_{4}^{3}";}
-  if(spacegroupnumber==92) { // ------------------- 92  D_{4}^{4} #92
+  else if(spacegroupnumber==92) { // ------------------- 92  D_{4}^{4} #92
     spacegroup="D_{4}^{4}";}
-  if(spacegroupnumber==93) { // ------------------- 93  D_{4}^{5} #93
+  else if(spacegroupnumber==93) { // ------------------- 93  D_{4}^{5} #93
     spacegroup="D_{4}^{5}";}
-  if(spacegroupnumber==94) { // ------------------- 94  D_{4}^{6} #94
+  else if(spacegroupnumber==94) { // ------------------- 94  D_{4}^{6} #94
     spacegroup="D_{4}^{6}";}
-  if(spacegroupnumber==95) { // ------------------- 95  D_{4}^{7} #95
+  else if(spacegroupnumber==95) { // ------------------- 95  D_{4}^{7} #95
     spacegroup="D_{4}^{7}";}
-  if(spacegroupnumber==96) { // ------------------- 96  D_{4}^{8} #96
+  else if(spacegroupnumber==96) { // ------------------- 96  D_{4}^{8} #96
     spacegroup="D_{4}^{8}";}
-  if(spacegroupnumber==97) { // ------------------- 97  D_{4}^{9} #97
+  else if(spacegroupnumber==97) { // ------------------- 97  D_{4}^{9} #97
     spacegroup="D_{4}^{9}";}
-  if(spacegroupnumber==98) { // ------------------- 98  D_{4}^{10} #98
+  else if(spacegroupnumber==98) { // ------------------- 98  D_{4}^{10} #98
     spacegroup="D_{4}^{10}";}
-  if(spacegroupnumber==99) { // ------------------- 99  C_{4v}^{1} #99
+  else if(spacegroupnumber==99) { // ------------------- 99  C_{4v}^{1} #99
     spacegroup="C_{4v}^{1}";}
-  if(spacegroupnumber==100) { // ------------------- 100  C_{4v}^{2} #100
+  else if(spacegroupnumber==100) { // ------------------- 100  C_{4v}^{2} #100
     spacegroup="C_{4v}^{2}";}
-  if(spacegroupnumber==101) { // ------------------- 101  C_{4v}^{3} #101
+  else if(spacegroupnumber==101) { // ------------------- 101  C_{4v}^{3} #101
     spacegroup="C_{4v}^{3}";}
-  if(spacegroupnumber==102) { // ------------------- 102  C_{4v}^{4} #102
+  else if(spacegroupnumber==102) { // ------------------- 102  C_{4v}^{4} #102
     spacegroup="C_{4v}^{4}";}
-  if(spacegroupnumber==103) { // ------------------- 103  C_{4v}^{5} #103
+  else if(spacegroupnumber==103) { // ------------------- 103  C_{4v}^{5} #103
     spacegroup="C_{4v}^{5}";}
-  if(spacegroupnumber==104) { // ------------------- 104  C_{4v}^{6} #104
+  else if(spacegroupnumber==104) { // ------------------- 104  C_{4v}^{6} #104
     spacegroup="C_{4v}^{6}";}
-  if(spacegroupnumber==105) { // ------------------- 105  C_{4v}^{7} #105
+  else if(spacegroupnumber==105) { // ------------------- 105  C_{4v}^{7} #105
     spacegroup="C_{4v}^{7}";}
-  if(spacegroupnumber==106) { // ------------------- 106  C_{4v}^{8} #106
+  else if(spacegroupnumber==106) { // ------------------- 106  C_{4v}^{8} #106
     spacegroup="C_{4v}^{8}";}
-  if(spacegroupnumber==107) { // ------------------- 107  C_{4v}^{9} #107
+  else if(spacegroupnumber==107) { // ------------------- 107  C_{4v}^{9} #107
     spacegroup="C_{4v}^{9}";}
-  if(spacegroupnumber==108) { // ------------------- 108  C_{4v}^{10} #108
+  else if(spacegroupnumber==108) { // ------------------- 108  C_{4v}^{10} #108
     spacegroup="C_{4v}^{10}";}
-  if(spacegroupnumber==109) { // ------------------- 109  C_{4v}^{11} #109
+  else if(spacegroupnumber==109) { // ------------------- 109  C_{4v}^{11} #109
     spacegroup="C_{4v}^{11}";}
-  if(spacegroupnumber==110) { // ------------------- 110  C_{4v}^{12} #110
+  else if(spacegroupnumber==110) { // ------------------- 110  C_{4v}^{12} #110
     spacegroup="C_{4v}^{12}";}
-  if(spacegroupnumber==111) { // ------------------- 111  D_{2d}^{1} #111
+  else if(spacegroupnumber==111) { // ------------------- 111  D_{2d}^{1} #111
     spacegroup="D_{2d}^{1}";}
-  if(spacegroupnumber==112) { // ------------------- 112  D_{2d}^{2} #112
+  else if(spacegroupnumber==112) { // ------------------- 112  D_{2d}^{2} #112
     spacegroup="D_{2d}^{2}";}
-  if(spacegroupnumber==113) { // ------------------- 113  D_{2d}^{3} #113
+  else if(spacegroupnumber==113) { // ------------------- 113  D_{2d}^{3} #113
     spacegroup="D_{2d}^{3}";}
-  if(spacegroupnumber==114) { // ------------------- 114  D_{2d}^{4} #114
+  else if(spacegroupnumber==114) { // ------------------- 114  D_{2d}^{4} #114
     spacegroup="D_{2d}^{4}";}
-  if(spacegroupnumber==115) { // ------------------- 115  D_{2d}^{5} #115
+  else if(spacegroupnumber==115) { // ------------------- 115  D_{2d}^{5} #115
     spacegroup="D_{2d}^{5}";}
-  if(spacegroupnumber==116) { // ------------------- 116  D_{2d}^{6} #116
+  else if(spacegroupnumber==116) { // ------------------- 116  D_{2d}^{6} #116
     spacegroup="D_{2d}^{6}";}
-  if(spacegroupnumber==117) { // ------------------- 117  D_{2d}^{7} #117
+  else if(spacegroupnumber==117) { // ------------------- 117  D_{2d}^{7} #117
     spacegroup="D_{2d}^{7}";}
-  if(spacegroupnumber==118) { // ------------------- 118  D_{2d}^{8} #118
+  else if(spacegroupnumber==118) { // ------------------- 118  D_{2d}^{8} #118
     spacegroup="D_{2d}^{8}";}
-  if(spacegroupnumber==119) { // ------------------- 119  D_{2d}^{9} #119
+  else if(spacegroupnumber==119) { // ------------------- 119  D_{2d}^{9} #119
     spacegroup="D_{2d}^{9}";}
-  if(spacegroupnumber==120) { // ------------------- 120  D_{2d}^{10} #120
+  else if(spacegroupnumber==120) { // ------------------- 120  D_{2d}^{10} #120
     spacegroup="D_{2d}^{10}";}
-  if(spacegroupnumber==121) { // ------------------- 121  D_{2d}^{11} #121
+  else if(spacegroupnumber==121) { // ------------------- 121  D_{2d}^{11} #121
     spacegroup="D_{2d}^{11}";}
-  if(spacegroupnumber==122) { // ------------------- 122  D_{2d}^{12} #122
+  else if(spacegroupnumber==122) { // ------------------- 122  D_{2d}^{12} #122
     spacegroup="D_{2d}^{12}";}
-  if(spacegroupnumber==123) { // ------------------- 123  D_{4h}^{1} #123
+  else if(spacegroupnumber==123) { // ------------------- 123  D_{4h}^{1} #123
     spacegroup="D_{4h}^{1}";}
-  if(spacegroupnumber==124) { // ------------------- 124  D_{4h}^{2} #124
+  else if(spacegroupnumber==124) { // ------------------- 124  D_{4h}^{2} #124
     spacegroup="D_{4h}^{2}";}
-  if(spacegroupnumber==125) { // ------------------- 125  D_{4h}^{3} #125
+  else if(spacegroupnumber==125) { // ------------------- 125  D_{4h}^{3} #125
     spacegroup="D_{4h}^{3}";}
-  if(spacegroupnumber==126) { // ------------------- 126  D_{4h}^{4} #126
+  else if(spacegroupnumber==126) { // ------------------- 126  D_{4h}^{4} #126
     spacegroup="D_{4h}^{4}";}
-  if(spacegroupnumber==127) { // ------------------- 127  D_{4h}^{5} #127
+  else if(spacegroupnumber==127) { // ------------------- 127  D_{4h}^{5} #127
     spacegroup="D_{4h}^{5}";}
-  if(spacegroupnumber==128) { // ------------------- 128  D_{4h}^{6} #128
+  else if(spacegroupnumber==128) { // ------------------- 128  D_{4h}^{6} #128
     spacegroup="D_{4h}^{6}";}
-  if(spacegroupnumber==129) { // ------------------- 129  D_{4h}^{7} #129
+  else if(spacegroupnumber==129) { // ------------------- 129  D_{4h}^{7} #129
     spacegroup="D_{4h}^{7}";}
-  if(spacegroupnumber==130) { // ------------------- 130  D_{4h}^{8} #130
+  else if(spacegroupnumber==130) { // ------------------- 130  D_{4h}^{8} #130
     spacegroup="D_{4h}^{8}";}
-  if(spacegroupnumber==131) { // ------------------- 131  D_{4h}^{9} #131
+  else if(spacegroupnumber==131) { // ------------------- 131  D_{4h}^{9} #131
     spacegroup="D_{4h}^{9}";}
-  if(spacegroupnumber==132) { // ------------------- 132  D_{4h}^{10} #132
+  else if(spacegroupnumber==132) { // ------------------- 132  D_{4h}^{10} #132
     spacegroup="D_{4h}^{10}";}
-  if(spacegroupnumber==133) { // ------------------- 133  D_{4h}^{11} #133
+  else if(spacegroupnumber==133) { // ------------------- 133  D_{4h}^{11} #133
     spacegroup="D_{4h}^{11}";}
-  if(spacegroupnumber==134) { // ------------------- 134  D_{4h}^{12} #134
+  else if(spacegroupnumber==134) { // ------------------- 134  D_{4h}^{12} #134
     spacegroup="D_{4h}^{12}";}
-  if(spacegroupnumber==135) { // ------------------- 135  D_{4h}^{13} #135
+  else if(spacegroupnumber==135) { // ------------------- 135  D_{4h}^{13} #135
     spacegroup="D_{4h}^{13}";}
-  if(spacegroupnumber==136) { // ------------------- 136  D_{4h}^{14} #136
+  else if(spacegroupnumber==136) { // ------------------- 136  D_{4h}^{14} #136
     spacegroup="D_{4h}^{14}";}
-  if(spacegroupnumber==137) { // ------------------- 137  D_{4h}^{15} #137
+  else if(spacegroupnumber==137) { // ------------------- 137  D_{4h}^{15} #137
     spacegroup="D_{4h}^{15}";}
-  if(spacegroupnumber==138) { // ------------------- 138  D_{4h}^{16} #138
+  else if(spacegroupnumber==138) { // ------------------- 138  D_{4h}^{16} #138
     spacegroup="D_{4h}^{16}";}
-  if(spacegroupnumber==139) { // ------------------- 139  D_{4h}^{17} #139
+  else if(spacegroupnumber==139) { // ------------------- 139  D_{4h}^{17} #139
     spacegroup="D_{4h}^{17}";}
-  if(spacegroupnumber==140) { // ------------------- 140  D_{4h}^{18} #140
+  else if(spacegroupnumber==140) { // ------------------- 140  D_{4h}^{18} #140
     spacegroup="D_{4h}^{18}";}
-  if(spacegroupnumber==141) { // ------------------- 141  D_{4h}^{19} #141
+  else if(spacegroupnumber==141) { // ------------------- 141  D_{4h}^{19} #141
     spacegroup="D_{4h}^{19}";}
-  if(spacegroupnumber==142) { // ------------------- 142  D_{4h}^{20} #142
+  else if(spacegroupnumber==142) { // ------------------- 142  D_{4h}^{20} #142
     spacegroup="D_{4h}^{20}";}
-  if(spacegroupnumber==143) { // ------------------- 143  C_{3}^{1} #143
+  else if(spacegroupnumber==143) { // ------------------- 143  C_{3}^{1} #143
     spacegroup="C_{3}^{1}";}
-  if(spacegroupnumber==144) { // ------------------- 144  C_{3}^{2} #144
+  else if(spacegroupnumber==144) { // ------------------- 144  C_{3}^{2} #144
     spacegroup="C_{3}^{2}";}
-  if(spacegroupnumber==145) { // ------------------- 145  C_{3}^{3} #145
+  else if(spacegroupnumber==145) { // ------------------- 145  C_{3}^{3} #145
     spacegroup="C_{3}^{3}";}
-  if(spacegroupnumber==146) { // ------------------- 146  C_{3}^{4} #146
+  else if(spacegroupnumber==146) { // ------------------- 146  C_{3}^{4} #146
     spacegroup="C_{3}^{4}";}
-  if(spacegroupnumber==147) { // ------------------- 147  C_{3i}^{1} #147
+  else if(spacegroupnumber==147) { // ------------------- 147  C_{3i}^{1} #147
     spacegroup="C_{3i}^{1}";}
-  if(spacegroupnumber==148) { // ------------------- 148  C_{3i}^{2} #148
+  else if(spacegroupnumber==148) { // ------------------- 148  C_{3i}^{2} #148
     spacegroup="C_{3i}^{2}";}
-  if(spacegroupnumber==149) { // ------------------- 149  D_{3}^{1} #149
+  else if(spacegroupnumber==149) { // ------------------- 149  D_{3}^{1} #149
     spacegroup="D_{3}^{1}";}
-  if(spacegroupnumber==150) { // ------------------- 150  D_{3}^{2} #150
+  else if(spacegroupnumber==150) { // ------------------- 150  D_{3}^{2} #150
     spacegroup="D_{3}^{2}";}
-  if(spacegroupnumber==151) { // ------------------- 151  D_{3}^{3} #151
+  else if(spacegroupnumber==151) { // ------------------- 151  D_{3}^{3} #151
     spacegroup="D_{3}^{3}";}
-  if(spacegroupnumber==152) { // ------------------- 152  D_{3}^{4} #152
+  else if(spacegroupnumber==152) { // ------------------- 152  D_{3}^{4} #152
     spacegroup="D_{3}^{4}";}
-  if(spacegroupnumber==153) { // ------------------- 153  D_{3}^{5} #153
+  else if(spacegroupnumber==153) { // ------------------- 153  D_{3}^{5} #153
     spacegroup="D_{3}^{5}";}
-  if(spacegroupnumber==154) { // ------------------- 154  D_{3}^{6} #154
+  else if(spacegroupnumber==154) { // ------------------- 154  D_{3}^{6} #154
     spacegroup="D_{3}^{6}";}
-  if(spacegroupnumber==155) { // ------------------- 155  D_{3}^{7} #155
+  else if(spacegroupnumber==155) { // ------------------- 155  D_{3}^{7} #155
     spacegroup="D_{3}^{7}";}
-  if(spacegroupnumber==156) { // ------------------- 156  C_{3v}^{1} #156
+  else if(spacegroupnumber==156) { // ------------------- 156  C_{3v}^{1} #156
     spacegroup="C_{3v}^{1}";}
-  if(spacegroupnumber==157) { // ------------------- 157  C_{3v}^{2} #157
+  else if(spacegroupnumber==157) { // ------------------- 157  C_{3v}^{2} #157
     spacegroup="C_{3v}^{2}";}
-  if(spacegroupnumber==158) { // ------------------- 158  C_{3v}^{3} #158
+  else if(spacegroupnumber==158) { // ------------------- 158  C_{3v}^{3} #158
     spacegroup="C_{3v}^{3}";}
-  if(spacegroupnumber==159) { // ------------------- 159  C_{3v}^{4} #159
+  else if(spacegroupnumber==159) { // ------------------- 159  C_{3v}^{4} #159
     spacegroup="C_{3v}^{4}";}
-  if(spacegroupnumber==160) { // ------------------- 160  C_{3v}^{5} #160
+  else if(spacegroupnumber==160) { // ------------------- 160  C_{3v}^{5} #160
     spacegroup="C_{3v}^{5}";}
-  if(spacegroupnumber==161) { // ------------------- 161  C_{3v}^{6} #161
+  else if(spacegroupnumber==161) { // ------------------- 161  C_{3v}^{6} #161
     spacegroup="C_{3v}^{6}";}
-  if(spacegroupnumber==162) { // ------------------- 162  D_{3d}^{1} #162
+  else if(spacegroupnumber==162) { // ------------------- 162  D_{3d}^{1} #162
     spacegroup="D_{3d}^{1}";}
-  if(spacegroupnumber==163) { // ------------------- 163  D_{3d}^{2} #163
+  else if(spacegroupnumber==163) { // ------------------- 163  D_{3d}^{2} #163
     spacegroup="D_{3d}^{2}";}
-  if(spacegroupnumber==164) { // ------------------- 164  D_{3d}^{3} #164
+  else if(spacegroupnumber==164) { // ------------------- 164  D_{3d}^{3} #164
     spacegroup="D_{3d}^{3}";}
-  if(spacegroupnumber==165) { // ------------------- 165  D_{3d}^{4} #165
+  else if(spacegroupnumber==165) { // ------------------- 165  D_{3d}^{4} #165
     spacegroup="D_{3d}^{4}";}
-  if(spacegroupnumber==166) { // ------------------- 166  D_{3d}^{5} #166
+  else if(spacegroupnumber==166) { // ------------------- 166  D_{3d}^{5} #166
     spacegroup="D_{3d}^{5}";}
-  if(spacegroupnumber==167) { // ------------------- 167  D_{3d}^{6} #167
+  else if(spacegroupnumber==167) { // ------------------- 167  D_{3d}^{6} #167
     spacegroup="D_{3d}^{6}";}
-  if(spacegroupnumber==168) { // ------------------- 168  C_{6}^{1} #168
+  else if(spacegroupnumber==168) { // ------------------- 168  C_{6}^{1} #168
     spacegroup="C_{6}^{1}";}
-  if(spacegroupnumber==169) { // ------------------- 169  C_{6}^{2} #169
+  else if(spacegroupnumber==169) { // ------------------- 169  C_{6}^{2} #169
     spacegroup="C_{6}^{2}";}
-  if(spacegroupnumber==170) { // ------------------- 170  C_{6}^{3} #170
+  else if(spacegroupnumber==170) { // ------------------- 170  C_{6}^{3} #170
     spacegroup="C_{6}^{3}";}
-  if(spacegroupnumber==171) { // ------------------- 171  C_{6}^{4} #171
+  else if(spacegroupnumber==171) { // ------------------- 171  C_{6}^{4} #171
     spacegroup="C_{6}^{4}";}
-  if(spacegroupnumber==172) { // ------------------- 172  C_{6}^{5} #172
+  else if(spacegroupnumber==172) { // ------------------- 172  C_{6}^{5} #172
     spacegroup="C_{6}^{5}";}
-  if(spacegroupnumber==173) { // ------------------- 173  C_{6}^{6} #173
+  else if(spacegroupnumber==173) { // ------------------- 173  C_{6}^{6} #173
     spacegroup="C_{6}^{6}";}
-  if(spacegroupnumber==174) { // ------------------- 174  C_{3h}^{1} #174
+  else if(spacegroupnumber==174) { // ------------------- 174  C_{3h}^{1} #174
     spacegroup="C_{3h}^{1}";}
-  if(spacegroupnumber==175) { // ------------------- 175  C_{6h}^{1} #175
+  else if(spacegroupnumber==175) { // ------------------- 175  C_{6h}^{1} #175
     spacegroup="C_{6h}^{1}";}
-  if(spacegroupnumber==176) { // ------------------- 176  C_{6h}^{2} #176
+  else if(spacegroupnumber==176) { // ------------------- 176  C_{6h}^{2} #176
     spacegroup="C_{6h}^{2}";}
-  if(spacegroupnumber==177) { // ------------------- 177  D_{6}^{1} #177
+  else if(spacegroupnumber==177) { // ------------------- 177  D_{6}^{1} #177
     spacegroup="D_{6}^{1}";}
-  if(spacegroupnumber==178) { // ------------------- 178  D_{6}^{2} #178
+  else if(spacegroupnumber==178) { // ------------------- 178  D_{6}^{2} #178
     spacegroup="D_{6}^{2}";}
-  if(spacegroupnumber==179) { // ------------------- 179  D_{6}^{3} #179
+  else if(spacegroupnumber==179) { // ------------------- 179  D_{6}^{3} #179
     spacegroup="D_{6}^{3}";}
-  if(spacegroupnumber==180) { // ------------------- 180  D_{6}^{4} #180
+  else if(spacegroupnumber==180) { // ------------------- 180  D_{6}^{4} #180
     spacegroup="D_{6}^{4}";}
-  if(spacegroupnumber==181) { // ------------------- 181  D_{6}^{5} #181
+  else if(spacegroupnumber==181) { // ------------------- 181  D_{6}^{5} #181
     spacegroup="D_{6}^{5}";}
-  if(spacegroupnumber==182) { // ------------------- 182  D_{6}^{6} #182
+  else if(spacegroupnumber==182) { // ------------------- 182  D_{6}^{6} #182
     spacegroup="D_{6}^{6}";}
-  if(spacegroupnumber==183) { // ------------------- 183  C_{6v}^{1} #183
+  else if(spacegroupnumber==183) { // ------------------- 183  C_{6v}^{1} #183
     spacegroup="C_{6v}^{1}";}
-  if(spacegroupnumber==184) { // ------------------- 184  C_{6v}^{2} #184
+  else if(spacegroupnumber==184) { // ------------------- 184  C_{6v}^{2} #184
     spacegroup="C_{6v}^{2}";}
-  if(spacegroupnumber==185) { // ------------------- 185  C_{6v}^{3} #185
+  else if(spacegroupnumber==185) { // ------------------- 185  C_{6v}^{3} #185
     spacegroup="C_{6v}^{3}";}
-  if(spacegroupnumber==186) { // ------------------- 186  C_{6v}^{4} #186
+  else if(spacegroupnumber==186) { // ------------------- 186  C_{6v}^{4} #186
     spacegroup="C_{6v}^{4}";}
-  if(spacegroupnumber==187) { // ------------------- 187  D_{3h}^{1} #187
+  else if(spacegroupnumber==187) { // ------------------- 187  D_{3h}^{1} #187
     spacegroup="D_{3h}^{1}";}
-  if(spacegroupnumber==188) { // ------------------- 188  D_{3h}^{2} #188
+  else if(spacegroupnumber==188) { // ------------------- 188  D_{3h}^{2} #188
     spacegroup="D_{3h}^{2}";}
-  if(spacegroupnumber==189) { // ------------------- 189  D_{3h}^{3} #189
+  else if(spacegroupnumber==189) { // ------------------- 189  D_{3h}^{3} #189
     spacegroup="D_{3h}^{3}";}
-  if(spacegroupnumber==190) { // ------------------- 190  D_{3h}^{4} #190
+  else if(spacegroupnumber==190) { // ------------------- 190  D_{3h}^{4} #190
     spacegroup="D_{3h}^{4}";}
-  if(spacegroupnumber==191) { // ------------------- 191  D_{6h}^{1} #191
+  else if(spacegroupnumber==191) { // ------------------- 191  D_{6h}^{1} #191
     spacegroup="D_{6h}^{1}";}
-  if(spacegroupnumber==192) { // ------------------- 192  D_{6h}^{2} #192
+  else if(spacegroupnumber==192) { // ------------------- 192  D_{6h}^{2} #192
     spacegroup="D_{6h}^{2}";}
-  if(spacegroupnumber==193) { // ------------------- 193  D_{6h}^{3} #193
+  else if(spacegroupnumber==193) { // ------------------- 193  D_{6h}^{3} #193
     spacegroup="D_{6h}^{3}";}
-  if(spacegroupnumber==194) { // ------------------- 194  D_{6h}^{4} #194
+  else if(spacegroupnumber==194) { // ------------------- 194  D_{6h}^{4} #194
     spacegroup="D_{6h}^{4}";}
-  if(spacegroupnumber==195) { // ------------------- 195  T^{1} #195
+  else if(spacegroupnumber==195) { // ------------------- 195  T^{1} #195
     spacegroup="T^{1}";}
-  if(spacegroupnumber==196) { // ------------------- 196  T^{2} #196
+  else if(spacegroupnumber==196) { // ------------------- 196  T^{2} #196
     spacegroup="T^{2}";}
-  if(spacegroupnumber==197) { // ------------------- 197  T^{3} #197
+  else if(spacegroupnumber==197) { // ------------------- 197  T^{3} #197
     spacegroup="T^{3}";}
-  if(spacegroupnumber==198) { // ------------------- 198  T^{4} #198
+  else if(spacegroupnumber==198) { // ------------------- 198  T^{4} #198
     spacegroup="T^{4}";}
-  if(spacegroupnumber==199) { // ------------------- 199  T^{5} #199
+  else if(spacegroupnumber==199) { // ------------------- 199  T^{5} #199
     spacegroup="T^{5}";}
-  if(spacegroupnumber==200) { // ------------------- 200  T_{h}^{1} #200
+  else if(spacegroupnumber==200) { // ------------------- 200  T_{h}^{1} #200
     spacegroup="T_{h}^{1}";}
-  if(spacegroupnumber==201) { // ------------------- 201  T_{h}^{2} #201
+  else if(spacegroupnumber==201) { // ------------------- 201  T_{h}^{2} #201
     spacegroup="T_{h}^{2}";}
-  if(spacegroupnumber==202) { // ------------------- 202  T_{h}^{3} #202
+  else if(spacegroupnumber==202) { // ------------------- 202  T_{h}^{3} #202
     spacegroup="T_{h}^{3}";}
-  if(spacegroupnumber==203) { // ------------------- 203  T_{h}^{4} #203
+  else if(spacegroupnumber==203) { // ------------------- 203  T_{h}^{4} #203
     spacegroup="T_{h}^{4}";}
-  if(spacegroupnumber==204) { // ------------------- 204  T_{h}^{5} #204
+  else if(spacegroupnumber==204) { // ------------------- 204  T_{h}^{5} #204
     spacegroup="T_{h}^{5}";}
-  if(spacegroupnumber==205) { // ------------------- 205  T_{h}^{6} #205
+  else if(spacegroupnumber==205) { // ------------------- 205  T_{h}^{6} #205
     spacegroup="T_{h}^{6}";}
-  if(spacegroupnumber==206) { // ------------------- 206  T_{h}^{7} #206
+  else if(spacegroupnumber==206) { // ------------------- 206  T_{h}^{7} #206
     spacegroup="T_{h}^{7}";}
-  if(spacegroupnumber==207) { // ------------------- 207  O^{1} #207
+  else if(spacegroupnumber==207) { // ------------------- 207  O^{1} #207
     spacegroup="O^{1}";}
-  if(spacegroupnumber==208) { // ------------------- 208  O^{2} #208
+  else if(spacegroupnumber==208) { // ------------------- 208  O^{2} #208
     spacegroup="O^{2}";}
-  if(spacegroupnumber==209) { // ------------------- 209  O^{3} #209
+  else if(spacegroupnumber==209) { // ------------------- 209  O^{3} #209
     spacegroup="O^{3}";}
-  if(spacegroupnumber==210) { // ------------------- 210  O^{4} #210
+  else if(spacegroupnumber==210) { // ------------------- 210  O^{4} #210
     spacegroup="O^{4}";}
-  if(spacegroupnumber==211) { // ------------------- 211  O^{5} #211
+  else if(spacegroupnumber==211) { // ------------------- 211  O^{5} #211
     spacegroup="O^{5}";}
-  if(spacegroupnumber==212) { // ------------------- 212  O^{6} #212
+  else if(spacegroupnumber==212) { // ------------------- 212  O^{6} #212
     spacegroup="O^{6}";}
-  if(spacegroupnumber==213) { // ------------------- 213  O^{7} #213
+  else if(spacegroupnumber==213) { // ------------------- 213  O^{7} #213
     spacegroup="O^{7}";}
-  if(spacegroupnumber==214) { // ------------------- 214  O^{8} #214
+  else if(spacegroupnumber==214) { // ------------------- 214  O^{8} #214
     spacegroup="O^{8}";}
-  if(spacegroupnumber==215) { // ------------------- 215  T_{d}^{1} #215
+  else if(spacegroupnumber==215) { // ------------------- 215  T_{d}^{1} #215
     spacegroup="T_{d}^{1}";}
-  if(spacegroupnumber==216) { // ------------------- 216  T_{d}^{2} #216
+  else if(spacegroupnumber==216) { // ------------------- 216  T_{d}^{2} #216
     spacegroup="T_{d}^{2}";}
-  if(spacegroupnumber==217) { // ------------------- 217  T_{d}^{3} #217
+  else if(spacegroupnumber==217) { // ------------------- 217  T_{d}^{3} #217
     spacegroup="T_{d}^{3}";}
-  if(spacegroupnumber==218) { // ------------------- 218  T_{d}^{4} #218
+  else if(spacegroupnumber==218) { // ------------------- 218  T_{d}^{4} #218
     spacegroup="T_{d}^{4}";}
-  if(spacegroupnumber==219) { // ------------------- 219  T_{d}^{5} #219
+  else if(spacegroupnumber==219) { // ------------------- 219  T_{d}^{5} #219
     spacegroup="T_{d}^{5}";}
-  if(spacegroupnumber==220) { // ------------------- 220  T_{d}^{6} #220
+  else if(spacegroupnumber==220) { // ------------------- 220  T_{d}^{6} #220
     spacegroup="T_{d}^{6}";}
-  if(spacegroupnumber==221) { // ------------------- 221  O_{h}^{1} #221
+  else if(spacegroupnumber==221) { // ------------------- 221  O_{h}^{1} #221
     spacegroup="O_{h}^{1}";}
-  if(spacegroupnumber==222) { // ------------------- 222  O_{h}^{2} #222
+  else if(spacegroupnumber==222) { // ------------------- 222  O_{h}^{2} #222
     spacegroup="O_{h}^{2}";}
-  if(spacegroupnumber==223) { // ------------------- 223  O_{h}^{3} #223
+  else if(spacegroupnumber==223) { // ------------------- 223  O_{h}^{3} #223
     spacegroup="O_{h}^{3}";}
-  if(spacegroupnumber==224) { // ------------------- 224  O_{h}^{4} #224
+  else if(spacegroupnumber==224) { // ------------------- 224  O_{h}^{4} #224
     spacegroup="O_{h}^{4}";}
-  if(spacegroupnumber==225) { // ------------------- 225  O_{h}^{5} #225
+  else if(spacegroupnumber==225) { // ------------------- 225  O_{h}^{5} #225
     spacegroup="O_{h}^{5}";}
-  if(spacegroupnumber==226) { // ------------------- 226  O_{h}^{6} #226
+  else if(spacegroupnumber==226) { // ------------------- 226  O_{h}^{6} #226
     spacegroup="O_{h}^{6}";}
-  if(spacegroupnumber==227) { // ------------------- 227  O_{h}^{7} #227
+  else if(spacegroupnumber==227) { // ------------------- 227  O_{h}^{7} #227
     spacegroup="O_{h}^{7}";}
-  if(spacegroupnumber==228) { // ------------------- 228  O_{h}^{8} #228
+  else if(spacegroupnumber==228) { // ------------------- 228  O_{h}^{8} #228
     spacegroup="O_{h}^{8}";}
-  if(spacegroupnumber==229) { // ------------------- 229  O_{h}^{9} #229
+  else if(spacegroupnumber==229) { // ------------------- 229  O_{h}^{9} #229
     spacegroup="O_{h}^{9}";}
-  if(spacegroupnumber==230) { // ------------------- 230  O_{h}^{10} #230
+  else if(spacegroupnumber==230) { // ------------------- 230  O_{h}^{10} #230
     spacegroup="O_{h}^{10}";}
   // done
   return spacegroup;
@@ -7081,527 +7084,528 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
     throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  P 1 #1
     spacegroup="P 1";}
-  if(spacegroupnumber==2) { // ------------------- 2  -P 1 #2
+  else if(spacegroupnumber==2) { // ------------------- 2  -P 1 #2
     spacegroup="-P 1";}
-  if(spacegroupnumber==3) { // ------------------- 3  P 2y #3
+  else if(spacegroupnumber==3) { // ------------------- 3  P 2y #3
     spacegroup="P 2y";}
-  if(spacegroupnumber==4) { // ------------------- 4  P 2yb #4
+  else if(spacegroupnumber==4) { // ------------------- 4  P 2yb #4
     spacegroup="P 2yb";}
-  if(spacegroupnumber==5) { // ------------------- 5  C 2y #5
+  else if(spacegroupnumber==5) { // ------------------- 5  C 2y #5
     spacegroup="C 2y";}
-  if(spacegroupnumber==6) { // ------------------- 6  P -2y #6
+  else if(spacegroupnumber==6) { // ------------------- 6  P -2y #6
     spacegroup="P -2y";}
-  if(spacegroupnumber==7) { // ------------------- 7  P -2yc #7
+  else if(spacegroupnumber==7) { // ------------------- 7  P -2yc #7
     spacegroup="P -2yc";}
-  if(spacegroupnumber==8) { // ------------------- 8  C -2y #8
+  else if(spacegroupnumber==8) { // ------------------- 8  C -2y #8
     spacegroup="C -2y";}
-  if(spacegroupnumber==9) { // ------------------- 9  C -2yc #9
+  else if(spacegroupnumber==9) { // ------------------- 9  C -2yc #9
     spacegroup="C -2yc";}
-  if(spacegroupnumber==10) { // ------------------- 10  -P 2y #10
+  else if(spacegroupnumber==10) { // ------------------- 10  -P 2y #10
     spacegroup="-P 2y";}
-  if(spacegroupnumber==11) { // ------------------- 11  -P 2yb #11
+  else if(spacegroupnumber==11) { // ------------------- 11  -P 2yb #11
     spacegroup="-P 2yb";}
-  if(spacegroupnumber==12) { // ------------------- 12  -C 2y #12
+  else if(spacegroupnumber==12) { // ------------------- 12  -C 2y #12
     spacegroup="-C 2y";}
-  if(spacegroupnumber==13) { // ------------------- 13  -P 2yc #13
+  else if(spacegroupnumber==13) { // ------------------- 13  -P 2yc #13
     spacegroup="-P 2yc";}
-  if(spacegroupnumber==14) { // ------------------- 14  -P 2ybc #14
+  else if(spacegroupnumber==14) { // ------------------- 14  -P 2ybc #14
     spacegroup="-P 2ybc";}
-  if(spacegroupnumber==15) { // ------------------- 15  -C 2yc #15
+  else if(spacegroupnumber==15) { // ------------------- 15  -C 2yc #15
     spacegroup="-C 2yc";}
-  if(spacegroupnumber==16) { // ------------------- 16  P 2 2 #16
+  else if(spacegroupnumber==16) { // ------------------- 16  P 2 2 #16
     spacegroup="P 2 2";}
-  if(spacegroupnumber==17) { // ------------------- 17  P 2c 2 #17
+  else if(spacegroupnumber==17) { // ------------------- 17  P 2c 2 #17
     spacegroup="P 2c 2";}
-  if(spacegroupnumber==18) { // ------------------- 18  P 2 2ab #18
+  else if(spacegroupnumber==18) { // ------------------- 18  P 2 2ab #18
     spacegroup="P 2 2ab";}
-  if(spacegroupnumber==19) { // ------------------- 19  P 2ac 2ab #19
+  else if(spacegroupnumber==19) { // ------------------- 19  P 2ac 2ab #19
     spacegroup="P 2ac 2ab";}
-  if(spacegroupnumber==20) { // ------------------- 20  C 2c 2 #20
+  else if(spacegroupnumber==20) { // ------------------- 20  C 2c 2 #20
     spacegroup="C 2c 2";}
-  if(spacegroupnumber==21) { // ------------------- 21  C 2 2 #21
+  else if(spacegroupnumber==21) { // ------------------- 21  C 2 2 #21
     spacegroup="C 2 2";}
-  if(spacegroupnumber==22) { // ------------------- 22  F 2 2 #22
+  else if(spacegroupnumber==22) { // ------------------- 22  F 2 2 #22
     spacegroup="F 2 2";}
-  if(spacegroupnumber==23) { // ------------------- 23  I 2 2 #23
+  else if(spacegroupnumber==23) { // ------------------- 23  I 2 2 #23
     spacegroup="I 2 2";}
-  if(spacegroupnumber==24) { // ------------------- 24  I 2b 2c #24
+  else if(spacegroupnumber==24) { // ------------------- 24  I 2b 2c #24
     spacegroup="I 2b 2c";}
-  if(spacegroupnumber==25) { // ------------------- 25  P 2 -2 #25
+  else if(spacegroupnumber==25) { // ------------------- 25  P 2 -2 #25
     spacegroup="P 2 -2";}
-  if(spacegroupnumber==26) { // ------------------- 26  P 2c -2 #26
+  else if(spacegroupnumber==26) { // ------------------- 26  P 2c -2 #26
     spacegroup="P 2c -2";}
-  if(spacegroupnumber==27) { // ------------------- 27  P 2 -2c #27
+  else if(spacegroupnumber==27) { // ------------------- 27  P 2 -2c #27
     spacegroup="P 2 -2c";}
-  if(spacegroupnumber==28) { // ------------------- 28  P 2 -2a #28
+  else if(spacegroupnumber==28) { // ------------------- 28  P 2 -2a #28
     spacegroup="P 2 -2a";}
-  if(spacegroupnumber==29) { // ------------------- 29  P 2c -2ac #29
+  else if(spacegroupnumber==29) { // ------------------- 29  P 2c -2ac #29
     spacegroup="P 2c -2ac";}
-  if(spacegroupnumber==30) { // ------------------- 30  P 2 -2bc #30
+  else if(spacegroupnumber==30) { // ------------------- 30  P 2 -2bc #30
     spacegroup="P 2 -2bc";}
-  if(spacegroupnumber==31) { // ------------------- 31  P 2ac -2 #31
+  else if(spacegroupnumber==31) { // ------------------- 31  P 2ac -2 #31
     spacegroup="P 2ac -2";}
-  if(spacegroupnumber==32) { // ------------------- 32  P 2 -2ab #32
+  else if(spacegroupnumber==32) { // ------------------- 32  P 2 -2ab #32
     spacegroup="P 2 -2ab";}
-  if(spacegroupnumber==33) { // ------------------- 33  P 2c -2n #33
+  else if(spacegroupnumber==33) { // ------------------- 33  P 2c -2n #33
     spacegroup="P 2c -2n";}
-  if(spacegroupnumber==34) { // ------------------- 34  P 2 -2n #34
+  else if(spacegroupnumber==34) { // ------------------- 34  P 2 -2n #34
     spacegroup="P 2 -2n";}
-  if(spacegroupnumber==35) { // ------------------- 35  C 2 -2 #35
+  else if(spacegroupnumber==35) { // ------------------- 35  C 2 -2 #35
     spacegroup="C 2 -2";}
-  if(spacegroupnumber==36) { // ------------------- 36  C 2c -2 #36
+  else if(spacegroupnumber==36) { // ------------------- 36  C 2c -2 #36
     spacegroup="C 2c -2";}
-  if(spacegroupnumber==37) { // ------------------- 37  C 2 -2c #37
+  else if(spacegroupnumber==37) { // ------------------- 37  C 2 -2c #37
     spacegroup="C 2 -2c";}
-  if(spacegroupnumber==38) { // ------------------- 38  A 2 -2 #38
+  else if(spacegroupnumber==38) { // ------------------- 38  A 2 -2 #38
     spacegroup="A 2 -2";}
-  if(spacegroupnumber==39) { // ------------------- 39  A 2 -2c #39
+  else if(spacegroupnumber==39) { // ------------------- 39  A 2 -2c #39
     spacegroup="A 2 -2c";}
-  if(spacegroupnumber==40) { // ------------------- 40  A 2 -2a #40
+  else if(spacegroupnumber==40) { // ------------------- 40  A 2 -2a #40
     spacegroup="A 2 -2a";}
-  if(spacegroupnumber==41) { // ------------------- 41  A 2 -2ac #41
+  else if(spacegroupnumber==41) { // ------------------- 41  A 2 -2ac #41
     spacegroup="A 2 -2ac";}
-  if(spacegroupnumber==42) { // ------------------- 42  F 2 -2 #42
+  else if(spacegroupnumber==42) { // ------------------- 42  F 2 -2 #42
     spacegroup="F 2 -2";}
-  if(spacegroupnumber==43) { // ------------------- 43  F 2 -2d #43
+  else if(spacegroupnumber==43) { // ------------------- 43  F 2 -2d #43
     spacegroup="F 2 -2d";}
-  if(spacegroupnumber==44) { // ------------------- 44  I 2 -2 #44
+  else if(spacegroupnumber==44) { // ------------------- 44  I 2 -2 #44
     spacegroup="I 2 -2";}
-  if(spacegroupnumber==45) { // ------------------- 45  I 2 -2c #45
+  else if(spacegroupnumber==45) { // ------------------- 45  I 2 -2c #45
     spacegroup="I 2 -2c";}
-  if(spacegroupnumber==46) { // ------------------- 46  I 2 -2a #46
+  else if(spacegroupnumber==46) { // ------------------- 46  I 2 -2a #46
     spacegroup="I 2 -2a";}
-  if(spacegroupnumber==47) { // ------------------- 47  -P 2 2 #47
+  else if(spacegroupnumber==47) { // ------------------- 47  -P 2 2 #47
     spacegroup="-P 2 2";}
-  if(spacegroupnumber==48 && setting==1) { // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
+  else if(spacegroupnumber==48 && setting==1) { // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
     spacegroup="P 2 2 -1n";}
-  if(spacegroupnumber==48 && setting==2) { // ------------------- 48  -P 2ab 2bc #48 (setting 2)
+  else if(spacegroupnumber==48 && setting==2) { // ------------------- 48  -P 2ab 2bc #48 (setting 2)
     spacegroup="-P 2ab 2bc";}
-  if(spacegroupnumber==49) { // ------------------- 49  -P 2 2c #49
+  else if(spacegroupnumber==49) { // ------------------- 49  -P 2 2c #49
     spacegroup="-P 2 2c";}
-  if(spacegroupnumber==50 && setting==1) { // ------------------- 50  -P P 2 2 -1ab #50 (setting 1)
+  else if(spacegroupnumber==50 && setting==1) { // ------------------- 50  -P P 2 2 -1ab #50 (setting 1)
     spacegroup="P 2 2 -1ab";}
-  if(spacegroupnumber==50 && setting==2) { // ------------------- 50  -P 2ab 2b #50 (setting 2)
+  else if(spacegroupnumber==50 && setting==2) { // ------------------- 50  -P 2ab 2b #50 (setting 2)
     spacegroup="-P 2ab 2b";}
-  if(spacegroupnumber==51) { // ------------------- 51  -P 2a 2a #51
+  else if(spacegroupnumber==51) { // ------------------- 51  -P 2a 2a #51
     spacegroup="-P 2a 2a";}
-  if(spacegroupnumber==52) { // ------------------- 52  -P 2a 2bc #52
+  else if(spacegroupnumber==52) { // ------------------- 52  -P 2a 2bc #52
     spacegroup="-P 2a 2bc";}
-  if(spacegroupnumber==53) { // ------------------- 53  -P 2ac 2 #53
+  else if(spacegroupnumber==53) { // ------------------- 53  -P 2ac 2 #53
     spacegroup="-P 2ac 2";}
-  if(spacegroupnumber==54) { // ------------------- 54  -P 2a 2ac #54
+  else if(spacegroupnumber==54) { // ------------------- 54  -P 2a 2ac #54
     spacegroup="-P 2a 2ac";}
-  if(spacegroupnumber==55) { // ------------------- 55  -P 2 2ab #55
+  else if(spacegroupnumber==55) { // ------------------- 55  -P 2 2ab #55
     spacegroup="-P 2 2ab";}
-  if(spacegroupnumber==56) { // ------------------- 56  -P 2ab 2ac #56
+  else if(spacegroupnumber==56) { // ------------------- 56  -P 2ab 2ac #56
     spacegroup="-P 2ab 2ac";}
-  if(spacegroupnumber==57) { // ------------------- 57  -P 2c 2b #57
+  else if(spacegroupnumber==57) { // ------------------- 57  -P 2c 2b #57
     spacegroup="-P 2c 2b";}
-  if(spacegroupnumber==58) { // ------------------- 58  -P 2 2n #58
+  else if(spacegroupnumber==58) { // ------------------- 58  -P 2 2n #58
     spacegroup="-P 2 2n";}
-  if(spacegroupnumber==59 && setting==1) { // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
+  else if(spacegroupnumber==59 && setting==1) { // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
     spacegroup="P 2 2ab -1ab";}
-  if(spacegroupnumber==59 && setting==2) { // ------------------- 59  -P 2ab 2a #59 (setting 2)
+  else if(spacegroupnumber==59 && setting==2) { // ------------------- 59  -P 2ab 2a #59 (setting 2)
     spacegroup="-P 2ab 2a";}
-  if(spacegroupnumber==60) { // ------------------- 60  -P 2n 2ab #60
+  else if(spacegroupnumber==60) { // ------------------- 60  -P 2n 2ab #60
     spacegroup="-P 2n 2ab";}
-  if(spacegroupnumber==61) { // ------------------- 61  -P 2ac 2ab #61
+  else if(spacegroupnumber==61) { // ------------------- 61  -P 2ac 2ab #61
     spacegroup="-P 2ac 2ab";}
-  if(spacegroupnumber==62) { // ------------------- 62  -P 2ac 2n #62
+  else if(spacegroupnumber==62) { // ------------------- 62  -P 2ac 2n #62
     spacegroup="-P 2ac 2n";}
-  if(spacegroupnumber==63) { // ------------------- 63  -C 2c 2 #63
+  else if(spacegroupnumber==63) { // ------------------- 63  -C 2c 2 #63
     spacegroup="-C 2c 2";}
-  if(spacegroupnumber==64) { // ------------------- 64  -C 2bc 2 #64
+  else if(spacegroupnumber==64) { // ------------------- 64  -C 2bc 2 #64
     spacegroup="-C 2bc 2";}
-  if(spacegroupnumber==65) { // ------------------- 65  -C 2 2 #65
+  else if(spacegroupnumber==65) { // ------------------- 65  -C 2 2 #65
     spacegroup="-C 2 2";}
-  if(spacegroupnumber==66) { // ------------------- 66  -C 2 2c #66
+  else if(spacegroupnumber==66) { // ------------------- 66  -C 2 2c #66
     spacegroup="-C 2 2c";}
-  if(spacegroupnumber==67) { // ------------------- 67  -C 2b 2 #67
+  else if(spacegroupnumber==67) { // ------------------- 67  -C 2b 2 #67
     spacegroup="-C 2b 2";}
-  if(spacegroupnumber==68 && setting==1) { // ------------------- 68  C 2 2 -1bc #68 (setting 1)
+  else if(spacegroupnumber==68 && setting==1) { // ------------------- 68  C 2 2 -1bc #68 (setting 1)
     spacegroup="C 2 2 -1bc";}
-  if(spacegroupnumber==68 && setting==2) { // ------------------- 68  -C 2b 2bc #68 (setting 2)
+  else if(spacegroupnumber==68 && setting==2) { // ------------------- 68  -C 2b 2bc #68 (setting 2)
     spacegroup="-C 2b 2bc";}
-  if(spacegroupnumber==69) { // ------------------- 69  -F 2 2 #69
+  else if(spacegroupnumber==69) { // ------------------- 69  -F 2 2 #69
     spacegroup="-F 2 2";}
-  if(spacegroupnumber==70 && setting==1) { // ------------------- 70  F 2 2 -1d #70 (setting 1)
+  else if(spacegroupnumber==70 && setting==1) { // ------------------- 70  F 2 2 -1d #70 (setting 1)
     spacegroup="F 2 2 -1d";}
-  if(spacegroupnumber==70 && setting==2) { // ------------------- 70  -F 2uv 2vw #70 (setting 2)
+  else if(spacegroupnumber==70 && setting==2) { // ------------------- 70  -F 2uv 2vw #70 (setting 2)
     spacegroup="-F 2uv 2vw";}
-  if(spacegroupnumber==71) { // ------------------- 71  -I 2 2 #71
+  else if(spacegroupnumber==71) { // ------------------- 71  -I 2 2 #71
     spacegroup="-I 2 2";}
-  if(spacegroupnumber==72) { // ------------------- 72  -I 2 2c #72
+  else if(spacegroupnumber==72) { // ------------------- 72  -I 2 2c #72
     spacegroup="-I 2 2c";}
-  if(spacegroupnumber==73) { // ------------------- 73  -I 2b 2c #73
+  else if(spacegroupnumber==73) { // ------------------- 73  -I 2b 2c #73
     spacegroup="-I 2b 2c";}
-  if(spacegroupnumber==74) { // ------------------- 74  -I 2b 2 #74
+  else if(spacegroupnumber==74) { // ------------------- 74  -I 2b 2 #74
     spacegroup="-I 2b 2";}
-  if(spacegroupnumber==75) { // ------------------- 75  P 4 #75
+  else if(spacegroupnumber==75) { // ------------------- 75  P 4 #75
     spacegroup="P 4";}
-  if(spacegroupnumber==76) { // ------------------- 76  P 4w #76
+  else if(spacegroupnumber==76) { // ------------------- 76  P 4w #76
     spacegroup="P 4w";}
-  if(spacegroupnumber==77) { // ------------------- 77  P 4c #77
+  else if(spacegroupnumber==77) { // ------------------- 77  P 4c #77
     spacegroup="P 4c";}
-  if(spacegroupnumber==78) { // ------------------- 78  P 4cw #78
+  else if(spacegroupnumber==78) { // ------------------- 78  P 4cw #78
     spacegroup="P 4cw";}
-  if(spacegroupnumber==79) { // ------------------- 79  I 4 #79
+  else if(spacegroupnumber==79) { // ------------------- 79  I 4 #79
     spacegroup="I 4";}
-  if(spacegroupnumber==80) { // ------------------- 80  I 4bw #80
+  else if(spacegroupnumber==80) { // ------------------- 80  I 4bw #80
     spacegroup="I 4bw";}
-  if(spacegroupnumber==81) { // ------------------- 81  P -4 #81
+  else if(spacegroupnumber==81) { // ------------------- 81  P -4 #81
     spacegroup="P -4";}
-  if(spacegroupnumber==82) { // ------------------- 82  I -4 #82
+  else if(spacegroupnumber==82) { // ------------------- 82  I -4 #82
     spacegroup="I -4";}
-  if(spacegroupnumber==83) { // ------------------- 83  -P 4 #83
+  else if(spacegroupnumber==83) { // ------------------- 83  -P 4 #83
     spacegroup="-P 4";}
-  if(spacegroupnumber==84) { // ------------------- 84  -P 4c #84
+  else if(spacegroupnumber==84) { // ------------------- 84  -P 4c #84
     spacegroup="-P 4c";}
-  if(spacegroupnumber==85 && setting==1) { // ------------------- 85  P 4ab -1ab #85 (setting 1)
+  else if(spacegroupnumber==85 && setting==1) { // ------------------- 85  P 4ab -1ab #85 (setting 1)
     spacegroup="P 4ab -1ab";}
-  if(spacegroupnumber==85 && setting==2) { // ------------------- 85  -P 4a #85 (setting 2)
+  else if(spacegroupnumber==85 && setting==2) { // ------------------- 85  -P 4a #85 (setting 2)
     spacegroup="-P 4a";}
-  if(spacegroupnumber==86 && setting==1) { // ------------------- 86  P 4n -1n #86 (setting 1)
+  else if(spacegroupnumber==86 && setting==1) { // ------------------- 86  P 4n -1n #86 (setting 1)
     spacegroup="P 4n -1n";}
-  if(spacegroupnumber==86 && setting==2) { // ------------------- 86  -P 4bc #86 (setting 2)
+  else if(spacegroupnumber==86 && setting==2) { // ------------------- 86  -P 4bc #86 (setting 2)
      spacegroup="-P 4bc";}
-  if(spacegroupnumber==87) { // ------------------- 87  -I 4 #87
+  else if(spacegroupnumber==87) { // ------------------- 87  -I 4 #87
     spacegroup="-I 4";}
-  if(spacegroupnumber==88 && setting==1) { // ------------------- 88  I 4bw -1bw #88 (setting 1)
+  else if(spacegroupnumber==88 && setting==1) { // ------------------- 88  I 4bw -1bw #88 (setting 1)
     spacegroup="I 4bw -1bw";}
-  if(spacegroupnumber==88 && setting==2) { // ------------------- 88  -I 4ad #88 (setting 2)
+  else if(spacegroupnumber==88 && setting==2) { // ------------------- 88  -I 4ad #88 (setting 2)
     spacegroup="-I 4ad";}
-  if(spacegroupnumber==89) { // ------------------- 89  P 4 2 #89
+  else if(spacegroupnumber==89) { // ------------------- 89  P 4 2 #89
     spacegroup="P 4 2";}
-  if(spacegroupnumber==90) { // ------------------- 90  P 4ab 2ab #90
+  else if(spacegroupnumber==90) { // ------------------- 90  P 4ab 2ab #90
     spacegroup="P 4ab 2ab";}
-  if(spacegroupnumber==91) { // ------------------- 91  P 4w 2c #91
+  else if(spacegroupnumber==91) { // ------------------- 91  P 4w 2c #91
     spacegroup="P 4w 2c";}
-  if(spacegroupnumber==92) { // ------------------- 92  P 4abw 2nw #92
+  else if(spacegroupnumber==92) { // ------------------- 92  P 4abw 2nw #92
     spacegroup="P 4abw 2nw";}
-  if(spacegroupnumber==93) { // ------------------- 93  P 4c 2 #93
+  else if(spacegroupnumber==93) { // ------------------- 93  P 4c 2 #93
     spacegroup="P 4c 2";}
-  if(spacegroupnumber==94) { // ------------------- 94  P 4n 2n #94
+  else if(spacegroupnumber==94) { // ------------------- 94  P 4n 2n #94
     spacegroup="P 4n 2n";}
-  if(spacegroupnumber==95) { // ------------------- 95  P 4cw 2c #95
+  else if(spacegroupnumber==95) { // ------------------- 95  P 4cw 2c #95
     spacegroup="P 4cw 2c";}
-  if(spacegroupnumber==96) { // ------------------- 96  P 4nw 2abw #96
+  else if(spacegroupnumber==96) { // ------------------- 96  P 4nw 2abw #96
     spacegroup="P 4nw 2abw";}
-  if(spacegroupnumber==97) { // ------------------- 97  I 4 2 #97
+  else if(spacegroupnumber==97) { // ------------------- 97  I 4 2 #97
     spacegroup="I 4 2";}
-  if(spacegroupnumber==98) { // ------------------- 98  I 4bw 2bw #98
+  else if(spacegroupnumber==98) { // ------------------- 98  I 4bw 2bw #98
     spacegroup="I 4bw 2bw";}
-  if(spacegroupnumber==99) { // ------------------- 99  P 4 -2 #99
+  else if(spacegroupnumber==99) { // ------------------- 99  P 4 -2 #99
     spacegroup="P 4 -2";}
-  if(spacegroupnumber==100) { // ------------------- 100  P 4 -2ab #100
+  else if(spacegroupnumber==100) { // ------------------- 100  P 4 -2ab #100
     spacegroup="P 4 -2ab";}
-  if(spacegroupnumber==101) { // ------------------- 101  P 4c -2c #101
+  else if(spacegroupnumber==101) { // ------------------- 101  P 4c -2c #101
     spacegroup="P 4c -2c";}
-  if(spacegroupnumber==102) { // ------------------- 102  P 4n -2n #102
+  else if(spacegroupnumber==102) { // ------------------- 102  P 4n -2n #102
     spacegroup="P 4n -2n";}
-  if(spacegroupnumber==103) { // ------------------- 103  P 4 -2c #103
+  else if(spacegroupnumber==103) { // ------------------- 103  P 4 -2c #103
     spacegroup="P 4 -2c";}
-  if(spacegroupnumber==104) { // ------------------- 104  P 4 -2n #104
+  else if(spacegroupnumber==104) { // ------------------- 104  P 4 -2n #104
     spacegroup="P 4 -2n";}
-  if(spacegroupnumber==105) { // ------------------- 105  P 4c -2 #105
+  else if(spacegroupnumber==105) { // ------------------- 105  P 4c -2 #105
     spacegroup="P 4c -2";}
-  if(spacegroupnumber==106) { // ------------------- 106  P 4c -2ab #106
+  else if(spacegroupnumber==106) { // ------------------- 106  P 4c -2ab #106
     spacegroup="P 4c -2ab";}
-  if(spacegroupnumber==107) { // ------------------- 107  I 4 -2 #107
+  else if(spacegroupnumber==107) { // ------------------- 107  I 4 -2 #107
     spacegroup="I 4 -2";}
-  if(spacegroupnumber==108) { // ------------------- 108  I 4 -2c #108
+  else if(spacegroupnumber==108) { // ------------------- 108  I 4 -2c #108
     spacegroup="I 4 -2c";}
-  if(spacegroupnumber==109) { // ------------------- 109  I 4bw -2 #109
+  else if(spacegroupnumber==109) { // ------------------- 109  I 4bw -2 #109
     spacegroup="I 4bw -2";}
-  if(spacegroupnumber==110) { // ------------------- 110  I 4bw -2c #110
+  else if(spacegroupnumber==110) { // ------------------- 110  I 4bw -2c #110
     spacegroup="I 4bw -2c";}
-  if(spacegroupnumber==111) { // ------------------- 111  P -4 2 #111
+  else if(spacegroupnumber==111) { // ------------------- 111  P -4 2 #111
     spacegroup="P -4 2";}
-  if(spacegroupnumber==112) { // ------------------- 112  P -4 2c #112
+  else if(spacegroupnumber==112) { // ------------------- 112  P -4 2c #112
     spacegroup="P -4 2c";}
-  if(spacegroupnumber==113) { // ------------------- 113  P -4 2ab #113
+  else if(spacegroupnumber==113) { // ------------------- 113  P -4 2ab #113
     spacegroup="P -4 2ab";}
-  if(spacegroupnumber==114) { // ------------------- 114  P -4 2n #114
+  else if(spacegroupnumber==114) { // ------------------- 114  P -4 2n #114
     spacegroup="P -4 2n";}
-  if(spacegroupnumber==115) { // ------------------- 115  P -4 -2 #115
+  else if(spacegroupnumber==115) { // ------------------- 115  P -4 -2 #115
     spacegroup="P -4 -2";}
-  if(spacegroupnumber==116) { // ------------------- 116  P -4 -2c #116
+  else if(spacegroupnumber==116) { // ------------------- 116  P -4 -2c #116
     spacegroup="P -4 -2c";}
-  if(spacegroupnumber==117) { // ------------------- 117  P -4 -2ab #117
+  else if(spacegroupnumber==117) { // ------------------- 117  P -4 -2ab #117
     spacegroup="P -4 -2ab";}
-  if(spacegroupnumber==118) { // ------------------- 118  P -4 -2n #118
+  else if(spacegroupnumber==118) { // ------------------- 118  P -4 -2n #118
     spacegroup="P -4 -2n";}
-  if(spacegroupnumber==119) { // ------------------- 119  I -4 -2 #119
+  else if(spacegroupnumber==119) { // ------------------- 119  I -4 -2 #119
     spacegroup="I -4 -2";}
-  if(spacegroupnumber==120) { // ------------------- 120  I -4 -2c #120
+  else if(spacegroupnumber==120) { // ------------------- 120  I -4 -2c #120
     spacegroup="I -4 -2c";}
-  if(spacegroupnumber==121) { // ------------------- 121  I -4 2 #121
+  else if(spacegroupnumber==121) { // ------------------- 121  I -4 2 #121
     spacegroup="I -4 2";}
-  if(spacegroupnumber==122) { // ------------------- 122  I -4 2bw #122
+  else if(spacegroupnumber==122) { // ------------------- 122  I -4 2bw #122
     spacegroup="I -4 2bw";}
-  if(spacegroupnumber==123) { // ------------------- 123  -P 4 2 #123
+  else if(spacegroupnumber==123) { // ------------------- 123  -P 4 2 #123
     spacegroup="-P 4 2";}
-  if(spacegroupnumber==124) { // ------------------- 124  -P 4 2c #124
+  else if(spacegroupnumber==124) { // ------------------- 124  -P 4 2c #124
     spacegroup="-P 4 2c";}
-  if(spacegroupnumber==125 && setting==1) { // ------------------- 125  P 4 2 -1ab #125 (setting 1)
+  else if(spacegroupnumber==125 && setting==1) { // ------------------- 125  P 4 2 -1ab #125 (setting 1)
     spacegroup="P 4 2 -1ab";}
-  if(spacegroupnumber==125 && setting==2) { // ------------------- 125  -P 4a 2b #125 (setting 2)
+  else if(spacegroupnumber==125 && setting==2) { // ------------------- 125  -P 4a 2b #125 (setting 2)
     spacegroup="-P 4a 2b";}
-  if(spacegroupnumber==126 && setting==1) { // ------------------- 126  P 4 2 -1n #126 (setting 1)
+  else if(spacegroupnumber==126 && setting==1) { // ------------------- 126  P 4 2 -1n #126 (setting 1)
     spacegroup="P 4 2 -1n";}
-  if(spacegroupnumber==126 && setting==2) { // ------------------- 126  -P 4a 2bc #126 (setting 2)
+  else if(spacegroupnumber==126 && setting==2) { // ------------------- 126  -P 4a 2bc #126 (setting 2)
     spacegroup="-P 4a 2bc";}
-  if(spacegroupnumber==127) { // ------------------- 127  -P 4 2ab #127
+  else if(spacegroupnumber==127) { // ------------------- 127  -P 4 2ab #127
     spacegroup="-P 4 2ab";}
-  if(spacegroupnumber==128) { // ------------------- 128  -P 4 2n #128
+  else if(spacegroupnumber==128) { // ------------------- 128  -P 4 2n #128
     spacegroup="-P 4 2n";}
-  if(spacegroupnumber==129 && setting==1) { // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
+  else if(spacegroupnumber==129 && setting==1) { // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
     spacegroup="P 4ab 2ab -1ab";}
-  if(spacegroupnumber==129 && setting==2) { // ------------------- 129  -P 4a 2a #129 (setting 2)
+  else if(spacegroupnumber==129 && setting==2) { // ------------------- 129  -P 4a 2a #129 (setting 2)
     spacegroup="-P 4a 2a";}
-  if(spacegroupnumber==130 && setting==1) { // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
+  else if(spacegroupnumber==130 && setting==1) { // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
     spacegroup="P 4ab 2n -1ab";}
-  if(spacegroupnumber==130 && setting==2) { // ------------------- 130  -P 4a 2ac #130 (setting 2)
+  else if(spacegroupnumber==130 && setting==2) { // ------------------- 130  -P 4a 2ac #130 (setting 2)
     spacegroup="-P 4a 2ac";}
-  if(spacegroupnumber==131) { // ------------------- 131  -P 4c 2 #131
+  else if(spacegroupnumber==131) { // ------------------- 131  -P 4c 2 #131
     spacegroup="-P 4c 2";}
-  if(spacegroupnumber==132) { // ------------------- 132  -P 4c 2c #132
+  else if(spacegroupnumber==132) { // ------------------- 132  -P 4c 2c #132
     spacegroup="-P 4c 2c";}
-  if(spacegroupnumber==133 && setting==1) { // ------------------- 133  P 4n 2c -1n #133 (setting 1)
+  else if(spacegroupnumber==133 && setting==1) { // ------------------- 133  P 4n 2c -1n #133 (setting 1)
     spacegroup="P 4n 2c -1n";}
-  if(spacegroupnumber==133 && setting==2) { // ------------------- 133  -P 4ac 2b #133 (setting 2)
+  else if(spacegroupnumber==133 && setting==2) { // ------------------- 133  -P 4ac 2b #133 (setting 2)
    spacegroup="-P 4ac 2b";}
-  if(spacegroupnumber==134 && setting==1) { // ------------------- 134  -P 4ac 2bc #134 (setting 1)
+  else if(spacegroupnumber==134 && setting==1) { // ------------------- 134  -P 4ac 2bc #134 (setting 1)
     spacegroup="P 4n 2 -1n";}
-  if(spacegroupnumber==134 && setting==2) { // ------------------- 134  -P 4ac 2bc #134 (setting 2)
+  else if(spacegroupnumber==134 && setting==2) { // ------------------- 134  -P 4ac 2bc #134 (setting 2)
     spacegroup="-P 4ac 2bc";}
-  if(spacegroupnumber==135) { // ------------------- 135  -P 4c 2ab #135
+  else if(spacegroupnumber==135) { // ------------------- 135  -P 4c 2ab #135
     spacegroup="-P 4c 2ab";}
-  if(spacegroupnumber==136) { // ------------------- 136  -P 4n 2n #136
+  else if(spacegroupnumber==136) { // ------------------- 136  -P 4n 2n #136
     spacegroup="-P 4n 2n";}
-  if(spacegroupnumber==137 && setting==1) { // ------------------- 137  P 4n 2n -1n #137 (setting 1)
+  else if(spacegroupnumber==137 && setting==1) { // ------------------- 137  P 4n 2n -1n #137 (setting 1)
     spacegroup="P 4n 2n -1n";}
-  if(spacegroupnumber==137 && setting==2) { // ------------------- 137  -P 4ac 2a #137 (setting 2)
+  else if(spacegroupnumber==137 && setting==2) { // ------------------- 137  -P 4ac 2a #137 (setting 2)
     spacegroup="-P 4ac 2a";}
-  if(spacegroupnumber==138 && setting==1) { // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
+  else if(spacegroupnumber==138 && setting==1) { // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
     spacegroup="P 4n 2ab -1n";}
-  if(spacegroupnumber==138 && setting==2) { // ------------------- 138  -P 4ac 2ac #138 (setting 2)
+  else if(spacegroupnumber==138 && setting==2) { // ------------------- 138  -P 4ac 2ac #138 (setting 2)
     spacegroup="-P 4ac 2ac";}
-  if(spacegroupnumber==139) { // ------------------- 139  -I 4 2 #139
+  else if(spacegroupnumber==139) { // ------------------- 139  -I 4 2 #139
     spacegroup="-I 4 2";}
-  if(spacegroupnumber==140) { // ------------------- 140  -I 4 2c #140
+  else if(spacegroupnumber==140) { // ------------------- 140  -I 4 2c #140
     spacegroup="-I 4 2c";}
-  if(spacegroupnumber==141 && setting==1) { // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
+  else if(spacegroupnumber==141 && setting==1) { // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
     spacegroup="I 4bw 2bw -1bw";}
-  if(spacegroupnumber==141 && setting==2) { // ------------------- 141  -I 4bd 2 #141 (setting 2)
+  else if(spacegroupnumber==141 && setting==2) { // ------------------- 141  -I 4bd 2 #141 (setting 2)
     spacegroup="-I 4bd 2";}
-  if(spacegroupnumber==142 && setting==1) { // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
+  else if(spacegroupnumber==142 && setting==1) { // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
     spacegroup="I 4bw 2aw -1bw";}
-  if(spacegroupnumber==142 && setting==2) { // ------------------- 142  -I 4bd 2c #142 (setting 2)
+  else if(spacegroupnumber==142 && setting==2) { // ------------------- 142  -I 4bd 2c #142 (setting 2)
     spacegroup="-I 4bd 2c";}
-  if(spacegroupnumber==143) { // ------------------- 143  P 3 #143
+  else if(spacegroupnumber==143) { // ------------------- 143  P 3 #143
     spacegroup="P 3";}
-  if(spacegroupnumber==144) { // ------------------- 144  P 31 #144
+  else if(spacegroupnumber==144) { // ------------------- 144  P 31 #144
     spacegroup="P 31";}
-  if(spacegroupnumber==145) { // ------------------- 145  P 32 #145
+  else if(spacegroupnumber==145) { // ------------------- 145  P 32 #145
     spacegroup="P 32";}
-  if(spacegroupnumber==146 && setting==1) { // ------------------- 146  P 3* #146 (setting 1, rhl)
+  else if(spacegroupnumber==146 && setting==1) { // ------------------- 146  P 3* #146 (setting 1, rhl)
     spacegroup="P 3*";}
-  if(spacegroupnumber==146 && setting==2) { // ------------------- 146  R 3 #146 (setting 2, hex)
+  else if(spacegroupnumber==146 && setting==2) { // ------------------- 146  R 3 #146 (setting 2, hex)
     spacegroup="R 3";}
-  if(spacegroupnumber==147) { // ------------------- 147  -P 3 #147
+  else if(spacegroupnumber==147) { // ------------------- 147  -P 3 #147
     spacegroup="-P 3";}
-  if(spacegroupnumber==148 && setting==1) { // ------------------- 148  -P 3* #148 (setting 1, rhl)
+  else if(spacegroupnumber==148 && setting==1) { // ------------------- 148  -P 3* #148 (setting 1, rhl)
     spacegroup="-P 3*";}
-  if(spacegroupnumber==148 && setting==2) { // ------------------- 148  -R 3 #148 (setting 2, hex)
+  else if(spacegroupnumber==148 && setting==2) { // ------------------- 148  -R 3 #148 (setting 2, hex)
     spacegroup="-R 3";}
-  if(spacegroupnumber==149) { // ------------------- 149  P 3 2 #149
+  else if(spacegroupnumber==149) { // ------------------- 149  P 3 2 #149
     spacegroup="P 3 2";}
-  if(spacegroupnumber==150) { // ------------------- 150  P 3 2'' #150
+  else if(spacegroupnumber==150) { // ------------------- 150  P 3 2'' #150
     spacegroup="P 3 2''";}
-  if(spacegroupnumber==151) { // ------------------- 151  P 31 2c (0 0 1) #151
+  else if(spacegroupnumber==151) { // ------------------- 151  P 31 2c (0 0 1) #151
     spacegroup="P 31 2c (0 0 1)";}
-  if(spacegroupnumber==152) { // ------------------- 152  P 31 2'' #152
+  else if(spacegroupnumber==152) { // ------------------- 152  P 31 2'' #152
     spacegroup="P 31 2''";}
-  if(spacegroupnumber==153) { // ------------------- 153  P 32 2c (0 0 -1) #153
+  else if(spacegroupnumber==153) { // ------------------- 153  P 32 2c (0 0 -1) #153
     spacegroup="P 32 2c (0 0 -1)";}
-  if(spacegroupnumber==154) { // ------------------- 154  P 32 2'' #154
+  else if(spacegroupnumber==154) { // ------------------- 154  P 32 2'' #154
     spacegroup="P 32 2''";}
-  if(spacegroupnumber==155 && setting==1) { // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
+  else if(spacegroupnumber==155 && setting==1) { // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
     spacegroup="P 3* 2";}
-  if(spacegroupnumber==155 && setting==2) { // ------------------- 155  R 3 2'' #155 (setting 2, hex)
+  else if(spacegroupnumber==155 && setting==2) { // ------------------- 155  R 3 2'' #155 (setting 2, hex)
     spacegroup="R 3 2''";}
-  if(spacegroupnumber==156) { // ------------------- 156  P 3 -2'' #156
+  else if(spacegroupnumber==156) { // ------------------- 156  P 3 -2'' #156
     spacegroup="P 3 -2''";}
-  if(spacegroupnumber==157) { // ------------------- 157  P 3 -2 #157
+  else if(spacegroupnumber==157) { // ------------------- 157  P 3 -2 #157
     spacegroup="P 3 -2";}
-  if(spacegroupnumber==158) { // ------------------- 158  P 3 -2''c #158
+  else if(spacegroupnumber==158) { // ------------------- 158  P 3 -2''c #158
     spacegroup="P 3 -2''c";}
-  if(spacegroupnumber==159) { // ------------------- 159  P 3 -2c #159
+  else if(spacegroupnumber==159) { // ------------------- 159  P 3 -2c #159
     spacegroup="P 3 -2c";}
-  if(spacegroupnumber==160 && setting==1) { // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
+  else if(spacegroupnumber==160 && setting==1) { // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
     spacegroup="P 3* -2";}
-  if(spacegroupnumber==160 && setting==2) { // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
+  else if(spacegroupnumber==160 && setting==2) { // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
     spacegroup="R 3 -2''";}
-  if(spacegroupnumber==161 && setting==1) { // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
+  else if(spacegroupnumber==161 && setting==1) { // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
     spacegroup="P 3* -2n";}
-  if(spacegroupnumber==161 && setting==2) { // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
+  else if(spacegroupnumber==161 && setting==2) { // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
     spacegroup="R 3 -2''c";}
-  if(spacegroupnumber==162) { // ------------------- 162  -P 3 2 #162
+  else if(spacegroupnumber==162) { // ------------------- 162  -P 3 2 #162
     spacegroup="-P 3 2";}
-  if(spacegroupnumber==163) { // ------------------- 163  -P 3 2c #163
+  else if(spacegroupnumber==163) { // ------------------- 163  -P 3 2c #163
     spacegroup="-P 3 2c";}
-  if(spacegroupnumber==164) { // ------------------- 164  -P 3 2'' #164
+  else if(spacegroupnumber==164) { // ------------------- 164  -P 3 2'' #164
     spacegroup="-P 3 2''";}
-  if(spacegroupnumber==165) { // ------------------- 165  -P 3 2''c #165
+  else if(spacegroupnumber==165) { // ------------------- 165  -P 3 2''c #165
     spacegroup="-P 3 2''c";}
-  if(spacegroupnumber==166 && setting==1) { // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
+  else if(spacegroupnumber==166 && setting==1) { // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
     spacegroup="-P 3* 2";}
-  if(spacegroupnumber==166 && setting==2) { // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
+  else if(spacegroupnumber==166 && setting==2) { // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
     spacegroup="-R 3 2''";}
-  if(spacegroupnumber==167 && setting==1) { // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
+  else if(spacegroupnumber==167 && setting==1) { // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
     spacegroup="-P 3* 2n";}
-  if(spacegroupnumber==167 && setting==2) { // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
+  else if(spacegroupnumber==167 && setting==2) { // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
     spacegroup="-R 3 2''c";}
-  if(spacegroupnumber==168) { // ------------------- 168  P 6 #168
+  else if(spacegroupnumber==168) { // ------------------- 168  P 6 #168
     spacegroup="P 6";}
-  if(spacegroupnumber==169) { // ------------------- 169  P 61 #169
+  else if(spacegroupnumber==169) { // ------------------- 169  P 61 #169
     spacegroup="P 61";}
-  if(spacegroupnumber==170) { // ------------------- 170  P 65 #170
+  else if(spacegroupnumber==170) { // ------------------- 170  P 65 #170
     spacegroup="P 65";}
-  if(spacegroupnumber==171) { // ------------------- 171  P 62 #171
+  else if(spacegroupnumber==171) { // ------------------- 171  P 62 #171
     spacegroup="P 62";}
-  if(spacegroupnumber==172) { // ------------------- 172  P 64 #172
+  else if(spacegroupnumber==172) { // ------------------- 172  P 64 #172
     spacegroup="P 64";}
-  if(spacegroupnumber==173) { // ------------------- 173  P 6c #173
+  else if(spacegroupnumber==173) { // ------------------- 173  P 6c #173
     spacegroup="P 6c";}
-  if(spacegroupnumber==174) { // ------------------- 174  P -6 #174
+  else if(spacegroupnumber==174) { // ------------------- 174  P -6 #174
     spacegroup="P -6";}
-  if(spacegroupnumber==175) { // ------------------- 175  -P 6 #175
+  else if(spacegroupnumber==175) { // ------------------- 175  -P 6 #175
     spacegroup="-P 6";}
-  if(spacegroupnumber==176) { // ------------------- 176  -P 6c #176
+  else if(spacegroupnumber==176) { // ------------------- 176  -P 6c #176
     spacegroup="-P 6c";}
-  if(spacegroupnumber==177) { // ------------------- 177  P 6 2 #177
+  else if(spacegroupnumber==177) { // ------------------- 177  P 6 2 #177
     spacegroup="P 6 2";}
-  if(spacegroupnumber==178) { // ------------------- 178  P 61 2 (0 0 -1) #178
+  else if(spacegroupnumber==178) { // ------------------- 178  P 61 2 (0 0 -1) #178
     spacegroup="P 61 2 (0 0 -1)";}
-  if(spacegroupnumber==179) { // ------------------- 179  P 65 2 (0 0 1) #179
+  else if(spacegroupnumber==179) { // ------------------- 179  P 65 2 (0 0 1) #179
     spacegroup="P 65 2 (0 0 1)";}
-  if(spacegroupnumber==180) { // ------------------- 180  P 62 2c (0 0 1) #180
+  else if(spacegroupnumber==180) { // ------------------- 180  P 62 2c (0 0 1) #180
     spacegroup="P 62 2c (0 0 1)";}
-  if(spacegroupnumber==181) { // ------------------- 181  P 64 2c (0 0 -1) #181
+  else if(spacegroupnumber==181) { // ------------------- 181  P 64 2c (0 0 -1) #181
     spacegroup="P 64 2c (0 0 -1)";}
-  if(spacegroupnumber==182) { // ------------------- 182  P 6c 2c #182
+  else if(spacegroupnumber==182) { // ------------------- 182  P 6c 2c #182
     spacegroup="P 6c 2c";}
-  if(spacegroupnumber==183) { // ------------------- 183  P 6 -2 #183
+  else if(spacegroupnumber==183) { // ------------------- 183  P 6 -2 #183
     spacegroup="P 6 -2";}
-  if(spacegroupnumber==184) { // ------------------- 184  P 6 -2c #184
+  else if(spacegroupnumber==184) { // ------------------- 184  P 6 -2c #184
     spacegroup="P 6 -2c";}
-  if(spacegroupnumber==185) { // ------------------- 185  P 6c -2 #185
+  else if(spacegroupnumber==185) { // ------------------- 185  P 6c -2 #185
     spacegroup="P 6c -2";}
-  if(spacegroupnumber==186) { // ------------------- 186  P 6c -2c #186
+  else if(spacegroupnumber==186) { // ------------------- 186  P 6c -2c #186
     spacegroup="P 6c -2c";}
-  if(spacegroupnumber==187) { // ------------------- 187  P -6 2 #187
+  else if(spacegroupnumber==187) { // ------------------- 187  P -6 2 #187
     spacegroup="P -6 2";}
-  if(spacegroupnumber==188) { // ------------------- 188  P -6c 2 #188
+  else if(spacegroupnumber==188) { // ------------------- 188  P -6c 2 #188
     spacegroup="P -6c 2";}
-  if(spacegroupnumber==189) { // ------------------- 189  P -6 -2 #189
+  else if(spacegroupnumber==189) { // ------------------- 189  P -6 -2 #189
     spacegroup="P -6 -2";}
-  if(spacegroupnumber==190) { // ------------------- 190  P -6c -2c #190
+  else if(spacegroupnumber==190) { // ------------------- 190  P -6c -2c #190
     spacegroup="P -6c -2c";}
-  if(spacegroupnumber==191) { // ------------------- 191  -P 6 2 #191
+  else if(spacegroupnumber==191) { // ------------------- 191  -P 6 2 #191
     spacegroup="-P 6 2";}
-  if(spacegroupnumber==192) { // ------------------- 192  -P 6 2c #192
+  else if(spacegroupnumber==192) { // ------------------- 192  -P 6 2c #192
     spacegroup="-P 6 2c";}
-  if(spacegroupnumber==193) { // ------------------- 193  -P 6c 2 #193
+  else if(spacegroupnumber==193) { // ------------------- 193  -P 6c 2 #193
     spacegroup="-P 6c 2";}
-  if(spacegroupnumber==194) { // ------------------- 194  -P 6c 2c #194
+  else if(spacegroupnumber==194) { // ------------------- 194  -P 6c 2c #194
     spacegroup="-P 6c 2c";}
-  if(spacegroupnumber==195) { // ------------------- 195  P 2 2 3 #195
+  else if(spacegroupnumber==195) { // ------------------- 195  P 2 2 3 #195
     spacegroup="P 2 2 3";}
-  if(spacegroupnumber==196) { // ------------------- 196  F 2 2 3 #196
+  else if(spacegroupnumber==196) { // ------------------- 196  F 2 2 3 #196
     spacegroup="F 2 2 3";}
-  if(spacegroupnumber==197) { // ------------------- 197  I 2 2 3 #197
+  else if(spacegroupnumber==197) { // ------------------- 197  I 2 2 3 #197
     spacegroup="I 2 2 3";}
-  if(spacegroupnumber==198) { // ------------------- 198  P 2ac 2ab 3 #198
+  else if(spacegroupnumber==198) { // ------------------- 198  P 2ac 2ab 3 #198
     spacegroup="P 2ac 2ab 3";}
-  if(spacegroupnumber==199) { // ------------------- 199  I 2b 2c 3 #199
+  else if(spacegroupnumber==199) { // ------------------- 199  I 2b 2c 3 #199
     spacegroup="I 2b 2c 3";}
-  if(spacegroupnumber==200) { // ------------------- 200  -P 2 2 3 #200
+  else if(spacegroupnumber==200) { // ------------------- 200  -P 2 2 3 #200
     spacegroup="-P 2 2 3";}
-  if(spacegroupnumber==201 && setting==1) { // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
+  else if(spacegroupnumber==201 && setting==1) { // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
     spacegroup="P 2 2 3 -1n";}
-  if(spacegroupnumber==201 && setting==2) { // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
+  else if(spacegroupnumber==201 && setting==2) { // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
    spacegroup="-P 2ab 2bc 3";}
-  if(spacegroupnumber==202) { // ------------------- 202  -F 2 2 3 #202
+  else if(spacegroupnumber==202) { // ------------------- 202  -F 2 2 3 #202
     spacegroup="-F 2 2 3";}
-  if(spacegroupnumber==203 && setting==1) { // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
+  else if(spacegroupnumber==203 && setting==1) { // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
     spacegroup="F 2 2 3 -1d";}
-  if(spacegroupnumber==203 && setting==2) { // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
+  else if(spacegroupnumber==203 && setting==2) { // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
     spacegroup="-F 2uv 2vw 3";}
-  if(spacegroupnumber==204) { // ------------------- 204  -I 2 2 3 #204
+  else if(spacegroupnumber==204) { // ------------------- 204  -I 2 2 3 #204
     spacegroup="-I 2 2 3";}
-  if(spacegroupnumber==205) { // ------------------- 205  -P 2ac 2ab 3 #205
+  else if(spacegroupnumber==205) { // ------------------- 205  -P 2ac 2ab 3 #205
     spacegroup="-P 2ac 2ab 3";}
-  if(spacegroupnumber==206) { // ------------------- 206  -I 2b 2c 3 #206
+  else if(spacegroupnumber==206) { // ------------------- 206  -I 2b 2c 3 #206
     spacegroup="-I 2b 2c 3";}
-  if(spacegroupnumber==207) { // ------------------- 207  P 4 2 3 #207
+  else if(spacegroupnumber==207) { // ------------------- 207  P 4 2 3 #207
     spacegroup="P 4 2 3";}
-  if(spacegroupnumber==208) { // ------------------- 208  P 4n 2 3 #208
+  else if(spacegroupnumber==208) { // ------------------- 208  P 4n 2 3 #208
     spacegroup="P 4n 2 3";}
-  if(spacegroupnumber==209) { // ------------------- 209  F 4 2 3 #209
+  else if(spacegroupnumber==209) { // ------------------- 209  F 4 2 3 #209
     spacegroup="F 4 2 3";}
-  if(spacegroupnumber==210) { // ------------------- 210  F 4d 2 3 #210
+  else if(spacegroupnumber==210) { // ------------------- 210  F 4d 2 3 #210
     spacegroup="F 4d 2 3";}
-  if(spacegroupnumber==211) { // ------------------- 211  I 4 2 3 #211
+  else if(spacegroupnumber==211) { // ------------------- 211  I 4 2 3 #211
     spacegroup="I 4 2 3";}
-  if(spacegroupnumber==212) { // ------------------- 212  P 4acd 2ab 3 #212
+  else if(spacegroupnumber==212) { // ------------------- 212  P 4acd 2ab 3 #212
     spacegroup="P 4acd 2ab 3";}
-  if(spacegroupnumber==213) { // ------------------- 213  P 4bd 2ab 3 #213
+  else if(spacegroupnumber==213) { // ------------------- 213  P 4bd 2ab 3 #213
     spacegroup="P 4bd 2ab 3";}
-  if(spacegroupnumber==214) { // ------------------- 214  I 4bd 2c 3 #214
+  else if(spacegroupnumber==214) { // ------------------- 214  I 4bd 2c 3 #214
     spacegroup="I 4bd 2c 3";}
-  if(spacegroupnumber==215) { // ------------------- 215  P -4 2 3 #215
+  else if(spacegroupnumber==215) { // ------------------- 215  P -4 2 3 #215
     spacegroup="P -4 2 3";}
-  if(spacegroupnumber==216) { // ------------------- 216  F -4 2 3 #216
+  else if(spacegroupnumber==216) { // ------------------- 216  F -4 2 3 #216
     spacegroup="F -4 2 3";}
-  if(spacegroupnumber==217) { // ------------------- 217  I -4 2 3 #217
+  else if(spacegroupnumber==217) { // ------------------- 217  I -4 2 3 #217
     spacegroup="I -4 2 3";}
-  if(spacegroupnumber==218) { // ------------------- 218  P -4n 2 3 #218
+  else if(spacegroupnumber==218) { // ------------------- 218  P -4n 2 3 #218
     spacegroup="P -4n 2 3";}
-  if(spacegroupnumber==219) { // ------------------- 219  F -4c 2 3 #219
+  else if(spacegroupnumber==219) { // ------------------- 219  F -4c 2 3 #219
     spacegroup="F -4c 2 3";}
-  if(spacegroupnumber==220) { // ------------------- 220  I -4bd 2c 3 #220
+  else if(spacegroupnumber==220) { // ------------------- 220  I -4bd 2c 3 #220
     spacegroup="I -4bd 2c 3";}
-  if(spacegroupnumber==221) { // ------------------- 221  -P 4 2 3 #221
+  else if(spacegroupnumber==221) { // ------------------- 221  -P 4 2 3 #221
     spacegroup="-P 4 2 3";}
-  if(spacegroupnumber==222 && setting==1) { // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
+  else if(spacegroupnumber==222 && setting==1) { // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
     spacegroup="P 4 2 3 -1n";}
-  if(spacegroupnumber==222 && setting==2) { // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
+  else if(spacegroupnumber==222 && setting==2) { // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
     spacegroup="-P 4a 2bc 3";}
-  if(spacegroupnumber==223) { // ------------------- 223  -P 4n 2 3 #223
+  else if(spacegroupnumber==223) { // ------------------- 223  -P 4n 2 3 #223
     spacegroup="-P 4n 2 3";}
-  if(spacegroupnumber==224 && setting==1) { // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
+  else if(spacegroupnumber==224 && setting==1) { // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
     spacegroup="P 4n 2 3 -1n";}
-  if(spacegroupnumber==224 && setting==2) { // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
+  else if(spacegroupnumber==224 && setting==2) { // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
     spacegroup="-P 4bc 2bc 3";}
-  if(spacegroupnumber==225) { // ------------------- 225  -F 4 2 3 #225
+  else if(spacegroupnumber==225) { // ------------------- 225  -F 4 2 3 #225
     spacegroup="-F 4 2 3";}
-  if(spacegroupnumber==226) { // ------------------- 226  -F 4c 2 3 #226
+  else if(spacegroupnumber==226) { // ------------------- 226  -F 4c 2 3 #226
     spacegroup="-F 4c 2 3";}
-  if(spacegroupnumber==227 && setting==1) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
+  else if(spacegroupnumber==227 && setting==1) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
     spacegroup="F 4d 2 3 -1d";}
-  if(spacegroupnumber==227 && setting==2) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
+  else if(spacegroupnumber==227 && setting==2) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
     spacegroup="-F 4vw 2vw 3";}
-  if(spacegroupnumber==228 && setting==1) { // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
+  else if(spacegroupnumber==228 && setting==1) { // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
     spacegroup="F 4d 2 3 -1cd";}
-  if(spacegroupnumber==228 && setting==2) { // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
+  else if(spacegroupnumber==228 && setting==2) { // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
     spacegroup="-F 4cvw 2vw 3";}
-  if(spacegroupnumber==229) { // ------------------- 229  -I 4 2 3 #229
+  else if(spacegroupnumber==229) { // ------------------- 229  -I 4 2 3 #229
     spacegroup="-I 4 2 3";}
-  if(spacegroupnumber==230) { // ------------------- 230  -I 4bd 2c 3 #230
+  else if(spacegroupnumber==230) { // ------------------- 230  -I 4bd 2c 3 #230
     spacegroup="-I 4bd 2c 3";}
   // done
   return spacegroup;
@@ -7612,48 +7616,49 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
 // ***************************************************************************
 string GetLaueLabel(string& point_group) {
   string laue = "";
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   // -1 
   if (point_group=="1" || point_group=="-1"){
     laue = "-1";
   }
   // 2/m
-  if (point_group=="2" || point_group=="m" || point_group=="2/m"){
+  else if(point_group=="2" || point_group=="m" || point_group=="2/m"){
     laue = "2/m";
   }
   // mmm
-  if (point_group=="222" || point_group=="mm2" || point_group=="mmm"){
+  else if(point_group=="222" || point_group=="mm2" || point_group=="mmm"){
     laue = "mmm";
   }
   // 4/m
-  if (point_group=="4" || point_group=="-4" || point_group=="4/m"){
+  else if(point_group=="4" || point_group=="-4" || point_group=="4/m"){
     laue = "4/m";
   }
   // 4/mmmm
-  if (point_group=="422" || point_group=="4mm" || point_group=="-42m" || point_group=="-4m2" || point_group=="4/mmm"){
+  else if(point_group=="422" || point_group=="4mm" || point_group=="-42m" || point_group=="-4m2" || point_group=="4/mmm"){
     laue = "4/mmm";
   }
   // -3
-  if (point_group=="3" || point_group=="-3"){
+  else if(point_group=="3" || point_group=="-3"){
     laue = "-3";
   }
   // -3m
-  if (point_group=="312" || point_group=="321" || point_group=="32" || point_group=="31m" || point_group=="3m1" || point_group=="-31m" || point_group=="-3m1" || point_group=="-3m" || point_group=="3m"){
+  else if(point_group=="312" || point_group=="321" || point_group=="32" || point_group=="31m" || point_group=="3m1" || point_group=="-31m" || point_group=="-3m1" || point_group=="-3m" || point_group=="3m"){
     laue = "-3m";
   }
   // 6/m
-  if (point_group=="6" || point_group=="-6" || point_group=="6/m"){
+  else if(point_group=="6" || point_group=="-6" || point_group=="6/m"){
     laue = "6/m";
   }
   // 6/mmm
-  if (point_group=="622" || point_group=="6mm" || point_group=="-6m2" || point_group=="-62m" || point_group=="6/mmm"){
+  else if(point_group=="622" || point_group=="6mm" || point_group=="-6m2" || point_group=="-62m" || point_group=="6/mmm"){
     laue = "6/mmm";
   }
   // m-3
-  if (point_group=="23" || point_group=="m-3"){
+  else if(point_group=="23" || point_group=="m-3"){
     laue = "m-3";
   }
   // m-3m
-  if (point_group=="432" || point_group=="-43m" || point_group=="m-3m"){
+  else if(point_group=="432" || point_group=="-43m" || point_group=="m-3m"){
     laue = "m-3m";
   }
   return laue;
