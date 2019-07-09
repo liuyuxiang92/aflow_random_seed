@@ -6091,7 +6091,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
 // ***************************************************************************
 // GetSpaceGroupNumber
 // ***************************************************************************
-int GetSpaceGroupNumber(string& spacegroupsymbol, string directory) {
+int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   // DX 20190708
   string soliloquy = "aflow_xatom.cpp::GetSpaceGroupNumber()";
   stringstream message;
