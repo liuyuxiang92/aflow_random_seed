@@ -6567,7 +6567,7 @@ int GetSpaceGroupNumber(string& spacegroupsymbol, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) {
     message << "routine: space group specified invalid (1-230); perhaps non-ITC setting: ";
     message << "space group symbol=" << spacegroupsymbol << ", space group number=" << spacegroupnumber << " [dir=" << directory << "].";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
   }
   return spacegroupnumber;
 }
