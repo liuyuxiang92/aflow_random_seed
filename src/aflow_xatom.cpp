@@ -7078,7 +7078,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   }
   if(setting < 1 || setting > 2) {
     message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //DX 20190708 - for xerror
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   if(spacegroupnumber==1) { // ------------------- 1  P 1 #1
