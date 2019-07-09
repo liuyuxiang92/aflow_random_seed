@@ -4300,30 +4300,29 @@ istream& operator>>(istream& cinput, xstructure& a) {
       bool found_symops=FALSE;
       bool found_symop_id=FALSE; //DX 20190708
       for(uint i=0;i<vinput.size();i++) {
-	if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
-	  found_symops=TRUE;
-	}
-  else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX 20190708 
-	  found_symop_id=TRUE;
-	}
-	else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
-	  multiplicity_count+=1;
-	  vector<string> tokens; 
-	  aurostd::string2tokens(vinput[i],tokens," ");
-    // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
-    if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX 20190708 - enclose in if-statement
-    string symop = aurostd::joinWDelimiter(tokens,"");
-    symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
-    symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
-    symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
-    symop = SYM::reorderWyckoffPosition(symop); //DX 20190708 - standardize order of equation (variable first, then number)
-	  spacegroup_symop_xyz.push_back(symop);
-    //if(tokens.size()==2){
-	  //  spacegroup_symop_xyz.push_back(tokens[1]);
-	  //}
-    // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
-	
-	}
+        if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
+          found_symops=TRUE;
+        }
+        else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX 20190708
+          found_symop_id=TRUE;
+        }
+        else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
+          multiplicity_count+=1;
+          vector<string> tokens; 
+          aurostd::string2tokens(vinput[i],tokens," ");
+          // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
+          if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX 20190708 - enclose in if-statement
+          string symop = aurostd::joinWDelimiter(tokens,"");
+          symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
+          symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
+          symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
+          symop = SYM::reorderWyckoffPosition(symop); //DX 20190708 - standardize order of equation (variable first, then number)
+          spacegroup_symop_xyz.push_back(symop);
+          //if(tokens.size()==2){
+          //  spacegroup_symop_xyz.push_back(tokens[1]);
+          //}
+          // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
+        }
       }
       // compare cif and aflow's general position
       uint match_count=0;

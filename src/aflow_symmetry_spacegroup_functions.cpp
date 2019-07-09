@@ -2610,8 +2610,8 @@ namespace SYM {
         // ---------------------------------------------------------------------------
         // if a variable with positive unit factor (1x -> x) 
         if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
-	        ss_eqn << sd_num.chr;
-	        vec_coord.push_back(ss_eqn.str());
+          ss_eqn << sd_num.chr;
+          vec_coord.push_back(ss_eqn.str());
         }
         // ---------------------------------------------------------------------------
         // if a variable with negative unit factor (-1x -> -x)
@@ -2632,7 +2632,7 @@ namespace SYM {
           vec_coord.push_back(ss_eqn.str());
         }
         ss_eqn.str("");
-	    }
+      }
 
       // ---------------------------------------------------------------------------
       // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
