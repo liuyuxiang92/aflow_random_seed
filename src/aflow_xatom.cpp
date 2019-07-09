@@ -6100,7 +6100,7 @@ int GetSpaceGroupNumber(string& spacegroupsymbol, string directory) {
      spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
   }
   // OK
   if(spacegroupsymbol=="P1") {  // ------------------- 1  P1 #1                                                                                 
