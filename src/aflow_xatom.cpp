@@ -7062,7 +7062,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //DX 20190708 - for xerror
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   if(setting==0){ //signals default //DX 20180807
