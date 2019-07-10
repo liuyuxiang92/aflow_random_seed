@@ -2637,7 +2637,7 @@ namespace SYM {
       // ---------------------------------------------------------------------------
       // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
       // (constants in Wyckoff position are always positive)
-      while(running_double>1.0 || aurostd::abs(running_double-1.0) < _ZERO_TOL_){
+      while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
         running_double-=1.0;
       }
       if(double_only){
