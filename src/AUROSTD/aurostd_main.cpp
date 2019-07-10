@@ -1061,12 +1061,12 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) if(s[i]!=' ' && s[i]!='\t') ss+=s[i];
     return ss;
   }
-  string RemoveWhiteSpaces(const string& s, const char toogle) {
+  string RemoveWhiteSpaces(const string& s, const char toggle) {  //CO190710
     if(s.size()==0) return s;  // nothing to do
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toogle) copy=!copy;
+      if(s[i]==toggle) copy=!copy;  //CO190710
       if(copy) if(s[i]!=' ' && s[i]!='\t') ss+=s[i];
       if(!copy) ss+=s[i];
     }
@@ -1123,12 +1123,12 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) if(s[i]!=' ') ss+=s[i];
     return ss;
   }
-  string RemoveSpaces(const string& s, const char toogle) {
+  string RemoveSpaces(const string& s, const char toggle) { //CO190710
     if(s.size()==0) return s;  // nothing to do
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toogle) copy=!copy;
+      if(s[i]==toggle) copy=!copy;  //CO190710
       if(copy) if(s[i]!=' ') ss+=s[i];
       if(!copy) ss+=s[i];
     }
@@ -1159,12 +1159,12 @@ namespace aurostd {
     for (uint i=0;i<s.size();i++) if(s[i]!='\t') ss+=s[i];
     return ss;
   }
-  string RemoveTabs(const string& s, const char toogle) {
+  string RemoveTabs(const string& s, const char toggle) { //CO190710
     if(s.size()==0) return s;  // nothing to do
     string ss;
     bool copy=TRUE;
     for (uint i=0;i<s.size();i++) {
-      if(s[i]==toogle) copy=!copy;
+      if(s[i]==toggle) copy=!copy;  //CO190710
       if(copy) if(s[i]!='\t') ss+=s[i];
       if(!copy) ss+=s[i];
     }
