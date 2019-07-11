@@ -1291,6 +1291,45 @@ namespace aurostd {
     }
     return ss;
   }
+  
+  // ***************************************************************************
+  // Function RemoveCharacterFromTheBack
+  // ***************************************************************************
+  // Remove character from the back of a string. DX (Hicks)
+  string RemoveCharacterFromTheBack(const string& s, const char character) {
+    if(s.size()==0) return s;  // nothing to do
+    string ss=s;
+    if(ss[ss.size()-1]==character) {
+      ss.erase(ss.size()-1,1);
+    }
+    return ss;
+  }
+
+  // ***************************************************************************
+  // Function RemoveCharacterFromTheFront
+  // ***************************************************************************
+  // Removes character from the front of a string. DX (Hicks)
+  string RemoveCharacterFromTheFront(const string& s, const char character) {
+    if(s.size()==0) return s;  // nothing to do
+    string ss=s;
+    if(ss[0]==character) {
+      ss.erase(0,1);
+    }
+    return ss;
+  }
+  
+  // ***************************************************************************
+  // Function RemoveCharacterFromTheFrontAndBack
+  // ***************************************************************************
+  // Removes character from the front and back of a string. DX (Hicks)
+  string RemoveCharacterFromTheFrontAndBack(const string& s, const char character) {
+    if(s.size()==0) return s;  // nothing to do
+    string ss=s;
+    ss=RemoveCharacterFromTheBack(ss,character);
+    if(s.size()==0) return s; // cannot remove anything else
+    ss=RemoveCharacterFromTheFront(ss,character);
+    return ss;
+  }
 
   // ***************************************************************************
   // Function RemoveNumbers
