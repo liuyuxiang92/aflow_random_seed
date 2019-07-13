@@ -5111,6 +5111,24 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 
   //get label_raw, may contain ","
   string label_raw=(reverse?PARAMS->ucell.back():PARAMS->ucell.front());
+    
+  // DX 20190708 - START 
+  // add default permutation to label if not included in input //DX 20190708
+  vector<string> orig_labels, new_labels, anrl_tokens, perm_tokens;
+  aurostd::string2tokens(label_raw,orig_labels,",");
+  for(uint i=0;i<orig_labels.size();i++){
+    if(aurostd::string2tokens(orig_labels[i],anrl_tokens,"_")>=4) {
+      if(aurostd::string2tokens(orig_labels[i],perm_tokens,".")==1) {
+        string default_permutation = aurostd::RemoveNumbers(anrl_tokens[0]);
+        new_labels.push_back(orig_labels[i]+"."+default_permutation);
+        if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << new_labels[new_labels.size()-1] << endl;
+      }
+      else{ new_labels.push_back(orig_labels[i]); }
+    }
+    else{ new_labels.push_back(orig_labels[i]); }
+  }
+  label_raw = aurostd::joinWDelimiter(new_labels,",");
+  // DX 20190708 - END
 
   //get nspecies
   uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label_raw); //PARAMS->ucell.at(0)); //CO181226
