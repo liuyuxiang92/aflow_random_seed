@@ -8265,8 +8265,8 @@ namespace pflow {
     message << "Loading entries for: " << aurostd::joinWDelimiter(velements, ",");
     pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
-    if(vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) {
-      message << "Loading alphabetized entries ONLY";
+    if(vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) {
+      message << "Loading NON-alphabetized entries as well";
       pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
 
@@ -8366,7 +8366,7 @@ namespace pflow {
           for(uint k=0;k<_entries[i].size() && !found;k++){
             if(_entries[i][k].size()) {
               vspecies=_entries[i][k][0].vspecies;
-              if(!vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")){sort(vspecies.begin(),vspecies.end());}
+              if(vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")){sort(vspecies.begin(),vspecies.end());}
               if(vspecies == combinations[j]){
                 entries[i][j]=_entries[i][k];
                 found=true;
@@ -9082,6 +9082,8 @@ namespace pflow {
     uint nary;
     uint total_count = 0;
     string::size_type loc;
+    vector<string> input_velements;
+    vector<double> input_vcomposition;
     if(isICSD) {
       bool double_check_icsd = false;  //NOT NECESSARY for ICSD since we load from the calculation layer
       string symmetry_path, clean_icsd;
@@ -9101,7 +9103,7 @@ namespace pflow {
           loc=icsds[j].find("_ICSD_");
           if(loc!=string::npos){    //found a good ICSD
             clean_icsd = icsds[j].substr(0,loc);  //get just compound
-            if(compoundsBelong(velements, clean_icsd, FileMESSAGE, oss, false, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL"), composition_string)) {  // NOT recommended, these are BS entries // no need to clean, ICSD compound format is already clean of pps
+            if(compoundsBelong(velements, clean_icsd, input_velements, input_vcomposition, FileMESSAGE, oss, false, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL"), composition_string)) {  // NOT recommended, these are BS entries // no need to clean, ICSD compound format is already clean of pps
               // url2aflowlib has bad printing to screen options, so we mimic here
 
               //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
@@ -9117,13 +9119,13 @@ namespace pflow {
                    //(aurostd::FileExist(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
                    (aurostd::FileNotEmpty(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
                    (_aflowlib_tmp.file2aflowlib(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
                   )
                   :
                   //if load_from_api, check this bool
                   (
                    (_aflowlib_tmp.url2aflowlib(symmetry_path + "/" + icsds[j], message, false) > 0) &&
-                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
                   )) {
                 nary = _aflowlib_tmp.vspecies.size();
                 if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
@@ -9157,7 +9159,7 @@ namespace pflow {
         if(load_from_common && !aurostd::IsDirectory(calculation_path)) { continue; }
         loc=systems[i].find(":");
         clean_system=systems[i].substr(0,loc);  //even if we don't find it, simply copy string
-        if(compoundsBelong(velements, clean_system, FileMESSAGE, oss, false, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL"), pp_string, true)) {  // NOT recommended, these are BS entries  // no need to clean, already done  //use short_pp_string_AFLOW_database
+        if(compoundsBelong(velements, clean_system, input_velements, input_vcomposition, FileMESSAGE, oss, false, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL"), pp_string, true)) {  // NOT recommended, these are BS entries  // no need to clean, already done  //use short_pp_string_AFLOW_database
           if(load_from_common) {aurostd::DirectoryLS(calculation_path, calculations);}
           else {aurostd::url2tokens(calculation_path + "/?aflowlib_entries", calculations, ",");}
           if(calculations.size() && calculations[0]=="<!DOCTYPE"){ //CO 180627
@@ -9180,13 +9182,13 @@ namespace pflow {
                  //(aurostd::FileExist(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
                  (aurostd::FileNotEmpty(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
                  (_aflowlib_tmp.file2aflowlib(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
                 )
                 :
                 //if load_from_api, check this bool
                 (
                  (_aflowlib_tmp.url2aflowlib(calculation_path + "/" + calculations[j], message, false) > 0) &&
-                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
                 )) {
               nary = _aflowlib_tmp.vspecies.size();
               if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
@@ -9464,16 +9466,22 @@ namespace pflow {
   // let's you know if input (or elements) belongs on hull of velements
   // if sort_elements==True, will sort(elements) first before matching with velements, 
   // sorting is generally NOT preferred as it would match unsorted compounds from database (NOT good)
-  // NOTE, this will NOT sort velements, it is assumed for speed
-  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements, input, FileMESSAGE, oss, clean, sort_elements, c_desig, shortcut_pp_string_AFLOW_database);
+    return compoundsBelong(velements2check,input,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
   }
-  bool compoundsBelong(const vector<string>& velements, const string& input,
-		       ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    ofstream FileMESSAGE;
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
+  }
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    vector<string> input_velements;
+    vector<double> input_vcomposition;
+    return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
+  }
+  bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy="pflow::compoundsBelong():";
-    vector<string> elements;
     if(c_desig==pp_string && shortcut_pp_string_AFLOW_database==true){
       //pp_string parsing is slow because of LONG list of strings to substitute in VASP_PseudoPotential_CleanName()
       //instead, we are safe with faster composition_string parsing IFF we only remove _GW, which will confuse elementsFromCompositionString()
@@ -9484,35 +9492,42 @@ namespace pflow {
       string input_new=input;
       //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO190712
       KBIN::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
-      elements = stringElements2VectorElements(input_new, FileMESSAGE, oss, clean, sort_elements, composition_string, false); //use composition_string (FASTER) //do not keep_pp
+      input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, oss, clean, sort_elements, composition_string, false); //use composition_string (FASTER) //do not keep_pp
     }else{  //default
-      elements = stringElements2VectorElements(input, FileMESSAGE, oss, clean, sort_elements, c_desig, false); //do not keep_pp
+      input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, false); //do not keep_pp
     }
-    if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(elements,"\""),",") << endl;}
-    return compoundsBelong(velements, elements, FileMESSAGE, oss, false); //already sorted
+    if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(input_velements,"\""),",") << endl;}
+    return compoundsBelong(velements2check, input_velements, FileMESSAGE, oss, false); //already sorted
   }
-  bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ostream& oss, bool sort_elements) {
+  bool compoundsBelong(const vector<string>& velements2check, const vector<string>& input_velements, ostream& oss, bool sort_elements) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements, elements, FileMESSAGE, oss, sort_elements);
+    return compoundsBelong(velements2check, input_velements, FileMESSAGE, oss, sort_elements);
   }
-  bool compoundsBelong(const vector<string>& velements, const vector<string>& _elements, ofstream& FileMESSAGE, ostream& oss, bool sort_elements) {
+  bool compoundsBelong(const vector<string>& velements2check, const vector<string>& input_velements, ofstream& FileMESSAGE, ostream& oss, bool sort_elements) {
     string soliloquy="pflow::compoundsBelong():";
     stringstream message;
-    if(_elements.size()>velements.size()){return false;}  //fast return
-    //simply check if all elements are in velements (in order, sort if necessary)
-    vector<string> elements=_elements;
-    if(sort_elements){sort(elements.begin(),elements.end());}
-    bool found;
-    uint starting_index = 0;  //ensures we search in order
-    if(velements.size()==0||elements.size()==0){  //null case, simply return false
-      message << "Invalid input (velements.size()==" << velements.size() << ",elements.size()==" << elements.size() << ")";
+    if(velements2check.size()==0||input_velements.size()==0){  //null case, simply return false
+      message << "Invalid input (velements2check.size()==" << velements2check.size() << ",input_velements.size()==" << input_velements.size() << ")";
       pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
-    for (uint i = 0; i < elements.size(); i++) {
+    if(input_velements.size()>velements2check.size()){return false;}  //fast return
+    if(sort_elements){  //call recursion if sort needed
+      vector<string> velements2check_sorted;
+      vector<string> input_velements_sorted;
+      for(uint i=0;i<velements2check.size();i++){velements2check_sorted.push_back(velements2check[i]);}
+      for(uint i=0;i<input_velements.size();i++){input_velements_sorted.push_back(input_velements[i]);}
+      sort(velements2check_sorted.begin(),velements2check_sorted.end());
+      sort(input_velements_sorted.begin(),input_velements_sorted.end());
+      return compoundsBelong(velements2check_sorted,input_velements_sorted,FileMESSAGE,oss,false);
+    }
+    //check if all input_velements are in velements2check (in order)
+    bool found;
+    uint starting_index = 0;  //ensures we search in order
+    for (uint i = 0; i < input_velements.size(); i++) {
       found = false;
-      for (uint j = starting_index; j < velements.size() && !found; j++) {
-        if(elements[i] == velements[j]) { found = true; starting_index = j+1; }  //start search at the next velement
+      for (uint j = starting_index; j < velements2check.size() && !found; j++) {
+        if(input_velements[i] == velements2check[j]) { found = true; starting_index = j+1; }  //start search at the next velement
       }
       if(!found) { return false; }
     }
@@ -10004,14 +10019,13 @@ namespace pflow {
     if(entry_output) {
       vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT", true);
       if(!silent) {
-	message << "PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT set to TRUE";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        message << "PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT set to TRUE";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
     }
-    vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",
-		true);  // un-alphabetized entries are crap
+    //[CO190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL", true);  // un-alphabetized entries are crap
     if(!silent) {
-      message << "PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL set to TRUE";
+      message << "PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL set to TRUE";
       pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
     vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE", true);  //if loading ternary, also load relevant binaries and unaries
@@ -10029,33 +10043,33 @@ namespace pflow {
       load_lib_flag_name="PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
       vpflow.flag(load_lib_flag_name, true);
       if(!silent) {
-	message << load_lib_flag_name+" set to TRUE";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        message << load_lib_flag_name << " set to TRUE";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
     } else {
       if(input == "A") {
-	//get appropriate size, slightly inefficient (as we got this before), but it's cheap
-	//string system = vpflow.getattachedscheme("PFLOW::ALLOY");  // CO 170908 - don't want to have to set this everytime
-	//vector<string> velements = pflow::stringElements2VectorElements(system, oss, FileMESSAGE);  //un-sorted, okay
-	string lib_count_string,load_lib_flag_name;
-	//for (uint i = 0; i < velements.size() && i <= _AFLOW_LIB_MAX_; i++) { // CO 170908 - simply load all, LoadEntries() limits appropriately by velements.size()
-	for (uint lib = 1; lib <= _AFLOW_LIB_MAX_; lib++) {
-	  //if(i == 0) { continue; }  //skip LIB1 by default  // CO 180316 - DON'T skip LIB1, Mn unary can be very skewed
-	  lib_count_string = aurostd::utype2string(lib);
-	  load_lib_flag_name="PFLOW::LOAD_ENTRIES_LOAD_LIB"+lib_count_string;
-	  vpflow.flag(load_lib_flag_name, true);
-	  if(!silent) {
-	    message << load_lib_flag_name+" set to TRUE";
-	    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-	  }
-	}
+        //get appropriate size, slightly inefficient (as we got this before), but it's cheap
+        //string system = vpflow.getattachedscheme("PFLOW::ALLOY");  // CO 170908 - don't want to have to set this everytime
+        //vector<string> velements = pflow::stringElements2VectorElements(system, oss, FileMESSAGE);  //un-sorted, okay
+        string lib_count_string,load_lib_flag_name;
+        //for (uint i = 0; i < velements.size() && i <= _AFLOW_LIB_MAX_; i++) { // CO 170908 - simply load all, LoadEntries() limits appropriately by velements.size()
+        for (uint lib = 1; lib <= _AFLOW_LIB_MAX_; lib++) {
+          //if(i == 0) { continue; }  //skip LIB1 by default  // CO 180316 - DON'T skip LIB1, Mn unary can be very skewed
+          lib_count_string = aurostd::utype2string(lib);
+          load_lib_flag_name="PFLOW::LOAD_ENTRIES_LOAD_LIB"+lib_count_string;
+          vpflow.flag(load_lib_flag_name, true);
+          if(!silent) {
+            message << load_lib_flag_name << " set to TRUE";
+            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          }
+        }
       }
       if(input == "A" || input == "ICSD") { //|| input == "icsd") {
-	vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_ICSD", true);
-	if(!silent) {
-	  message << "PFLOW::LOAD_ENTRIES_LOAD_ICSD set to TRUE";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-	}
+        vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_ICSD", true);
+        if(!silent) {
+          message << "PFLOW::LOAD_ENTRIES_LOAD_ICSD set to TRUE";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        }
       }
     }
   }

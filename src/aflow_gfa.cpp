@@ -1070,7 +1070,7 @@ namespace pflow {
       vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_LIB3", true);
     }
     vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE", true);
-    vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",true);  
+    //[CO190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",true);  
     vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES",true);
 
     bool quiet=XHOST.QUIET;
