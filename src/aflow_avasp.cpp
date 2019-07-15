@@ -1370,6 +1370,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 
   // FIX THE SPECIES IF AUTO_PSEUDOPOTENTIALS
   if(xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS")) {
+    if(LDEBUG){cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_AUTO_PSEUDOPOTENTIALS\")==1" << endl;}
     if(1 && xvasp.str.species.size()==2) // AlMg potpaw_GGA
       if((KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(0))=="Ga" && KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(1))=="Mg") ||
 	 (KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(0))=="Ge" && KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(1))=="Mg") ||
@@ -5028,6 +5029,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(!pocc_tol_raw.empty()){aurostd::string2tokens(pocc_tol_raw,pocc_tol_sets,",");}
   else {pocc_tol_sets.push_back("");} //so that it enters the for loop later just once
 
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NOAUTOPP")) xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE); //CO190712
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);

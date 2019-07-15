@@ -1056,8 +1056,9 @@ namespace pflow {
     vector<aflowlib::_aflowlib_entry> LIB_entries;
     chull::ConvexHull the_hull;
     vector<chull::ChullPoint> Vpoint, vcpt;
-    vector<string> species=makeAlphabeticVector(alloy);
-    string input=makeAlphabeticString(alloy);
+    ostream& oss=cout;
+    vector<string> species=stringElements2VectorElements(alloy,oss,true,true,pp_string,false);  //clean and sort, do not keep_pp //[CO190712 - OBSOLETE]getAlphabeticVectorString(alloy);
+    string input=aurostd::joinWDelimiter(species,""); //getAlphabeticString(alloy); //CO190712
     vector<chull::CoordGroup> VCoordGroup;
     
     uint dimension=species.size();
@@ -1069,7 +1070,7 @@ namespace pflow {
       vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_LIB3", true);
     }
     vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE", true);
-    vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",true);  
+    //[CO190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL",true);  
     vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES",true);
 
     bool quiet=XHOST.QUIET;

@@ -59,6 +59,23 @@ enum vector_reduction_type {   //CO190629
 //[CO190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 // ME190628 END
 
+//compound specification is how a compound is specified
+//composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
+//for instance, H1.25 can be a pseudopotential and NOT a composition
+enum compound_designation {
+  composition_string,
+  pp_string,
+};
+
+//CO190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
+const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+                                     ",_GW"    //CO190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
+                                     ",_ZORA"  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
+                                     ",_LDApU" //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
+                                     ",_AE"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+                                     ",_NC2"   //CO190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
+                                     ",_200eV"
+                                     "";
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO 180509
@@ -2667,6 +2684,10 @@ namespace KBIN {
   bool VASP_Modify_POTCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_POTCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   string VASP_PseudoPotential_CleanName(const string& specieIN);
+  string VASP_PseudoPotential_CleanName_190712(const string& specieIN); //CO190712
+  string VASP_PseudoPotential_CleanName_190101(const string& specieIN); //CO190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO190712
+  bool VASP_PseudoPotential_CleanName_TEST(void); //CO190712
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
   bool VASP_SplitAlloySpecies(string alloy_in, string &specieA, string &specieB);

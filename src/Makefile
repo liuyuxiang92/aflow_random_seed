@@ -1015,6 +1015,8 @@ patch_makefile2: Makefile
 	mv M Makefile
 check:
 	$(MAKE) proto_check
+check_full:
+	$(MAKE) proto_check
 	$(MAKE) slab_check
 proto_check:
 	@echo "Performing 'aflow --proto' test"

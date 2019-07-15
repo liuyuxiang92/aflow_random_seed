@@ -107,23 +107,51 @@ namespace KBIN {
 // PseudoPotential_CleanName
 // gets rid of all junk in the name
 namespace KBIN {
-  string VASP_PseudoPotential_CleanName(const string& speciesIN) {
+  string VASP_PseudoPotential_CleanName(const string& speciesIN) {return VASP_PseudoPotential_CleanName_190712(speciesIN);} //CO190712
+  string VASP_PseudoPotential_CleanName_190712(const string& speciesIN) { //CO190712
+    //the old function assumed only a single species input
+    //now, the species input can be a full species string: Mn_pvPt, etc.
+    //need to remove ALL instances of pp info
+    //no longer need for loops
+    //also, this new function leverages InPlace substitution, instead of creating new strings every time (FASTER)
+    
+    string species=speciesIN;
+    VASP_PseudoPotential_CleanName_InPlace(species);
+    return species;
+  }
+  string VASP_PseudoPotential_CleanName_190101(const string& speciesIN) {
     string species=speciesIN;
     uint i,imax=2;
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_GW");  //CO190712
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_new");  //CO190712
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_AE");  //CO190712
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_sv");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_pv");
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_d2");  //CO190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.05May2010/As_d2_GW
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_d");
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");  //CO190712 - BEFORE _s
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_s");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_200eV");
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");
+    //[CO190712 - moved up before _s]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_soft");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_2_n");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_h");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_1");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_2");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_3");
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.75"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25"); //CO190712 - before all other decimal numbers
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.5"); //CO190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");  //CO190712 - before 0.5
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".25");  //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".42"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".58"); //CO190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".5");
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");
-    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25");
+    //[CO190712 - moved up 0.5]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,".75");
+    //[CO190712 - moved up before all other decimal numbers]for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"1.25");
 
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"+1");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"+3");
@@ -144,7 +172,222 @@ namespace KBIN {
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
     // COREY - END
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"__"); //CO190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
+    for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_");  //CO190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
     return species;
+  }
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only) { //CO190712
+    //WARNING: to anyone adding to this list, BE CAREFUL to avoid adding entries that contain capital letters
+    //they must be added to CAPITAL_LETTERS_PP_LIST in aflow.h
+    //these pp suffixes cause problems when parsing compounds (capital letters)
+    
+    vector<string> vCAPITAL_LETTERS_PP;
+    aurostd::string2tokens(CAPITAL_LETTERS_PP_LIST,vCAPITAL_LETTERS_PP,",");
+    for(uint i=0;i<vCAPITAL_LETTERS_PP.size();i++){//capital letter ones to watch out for when parsing compounds
+      aurostd::RemoveSubStringInPlace(species,vCAPITAL_LETTERS_PP[i]);
+    }
+    
+    if(capital_letters_only==false){
+      aurostd::RemoveSubStringInPlace(species,"_old");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Si_h_old
+      aurostd::RemoveSubStringInPlace(species,".old");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Mg_pv.old
+      aurostd::RemoveSubStringInPlace(species,"_vnew");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pd_vnew
+      aurostd::RemoveSubStringInPlace(species,"_new2");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Ti_sv_new2
+      aurostd::RemoveSubStringInPlace(species,"_new");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Au_new
+      
+      aurostd::RemoveSubStringInPlace(species,"_pvf");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Cu_pvf
+      aurostd::RemoveSubStringInPlace(species,"_rel");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pb_d_rel
+      aurostd::RemoveSubStringInPlace(species,"_ref");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Ge_d_GW_ref
+      aurostd::RemoveSubStringInPlace(species,"_local");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/C_local
+      aurostd::RemoveSubStringInPlace(species,"_nopc");  //CO190712 - potpaw_LDA/potpaw_PBE.20100505/Si_nopc
+      aurostd::RemoveSubStringInPlace(species,".nrel");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Ga_pv_GW.nrel
+      aurostd::RemoveSubStringInPlace(species,"_nr");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/C_h_nr
+      aurostd::RemoveSubStringInPlace(species,"_nc");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/H_nc_GW
+      aurostd::RemoveSubStringInPlace(species,"_n");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/As_GW_n
+      aurostd::RemoveSubStringInPlace(species,"_parsv");  //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Mg_pv_parsv_GW
+      aurostd::RemoveSubStringInPlace(species,"_sv2");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Li_sv2
+      aurostd::RemoveSubStringInPlace(species,"_sv");
+      aurostd::RemoveSubStringInPlace(species,"_vs"); //CO190712 - potpaw_PBE/potpaw_PBE.20100506/N_vs
+      aurostd::RemoveSubStringInPlace(species,"_pv");
+      aurostd::RemoveSubStringInPlace(species,"_dr");  //CO190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.20100505/Pb_dr
+      aurostd::RemoveSubStringInPlace(species,"_d3");  //CO190712 - BEFORE _d //potpaw_PBE/potpaw_PBE.20100506/Ge_d3
+      aurostd::RemoveSubStringInPlace(species,"_d2");  //CO190712 - BEFORE _d //potpaw_LDA/potpaw_LDA.05May2010/As_d2_GW
+      aurostd::RemoveSubStringInPlace(species,"_d");
+      aurostd::RemoveSubStringInPlace(species,"_soft");  //CO190712 - BEFORE _s
+      aurostd::RemoveSubStringInPlace(species,"_s");
+      //[CO190712 - OBSOLETE really _n and _2]aurostd::RemoveSubStringInPlace(species,"_2_n");
+      aurostd::RemoveSubStringInPlace(species,"_h");
+      aurostd::RemoveSubStringInPlace(species,"_f");  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Cu_f
+      
+      aurostd::RemoveSubStringInPlace(species,"_1");
+      aurostd::RemoveSubStringInPlace(species,"_2");
+      aurostd::RemoveSubStringInPlace(species,"_3");
+      
+      aurostd::RemoveSubStringInPlace(species,"1.75"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
+      aurostd::RemoveSubStringInPlace(species,"1.66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
+      aurostd::RemoveSubStringInPlace(species,"1.33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
+      aurostd::RemoveSubStringInPlace(species,"1.25"); //CO190712 - before all other decimal numbers
+      aurostd::RemoveSubStringInPlace(species,"1.5"); //CO190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
+      aurostd::RemoveSubStringInPlace(species,".75");  //CO190712 - before 0.5
+      aurostd::RemoveSubStringInPlace(species,".25");  //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
+      aurostd::RemoveSubStringInPlace(species,".66"); //CO190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
+      aurostd::RemoveSubStringInPlace(species,".33"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
+      aurostd::RemoveSubStringInPlace(species,".42"); //CO190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
+      aurostd::RemoveSubStringInPlace(species,".58"); //CO190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
+      aurostd::RemoveSubStringInPlace(species,".5");
+
+      aurostd::RemoveSubStringInPlace(species,"+1");
+      aurostd::RemoveSubStringInPlace(species,"+3");
+      aurostd::RemoveSubStringInPlace(species,"+5");
+      aurostd::RemoveSubStringInPlace(species,"+7");
+      aurostd::RemoveSubStringInPlace(species,"-1");
+      aurostd::RemoveSubStringInPlace(species,"-3");
+      aurostd::RemoveSubStringInPlace(species,"-5");
+      aurostd::RemoveSubStringInPlace(species,"-7");
+      
+      //from AFLOW.org database
+      aurostd::RemoveSubStringInPlace(species,"pot_LDA/");
+      aurostd::RemoveSubStringInPlace(species,"pot_GGA/");
+      aurostd::RemoveSubStringInPlace(species,"pot_PBE/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_GGA/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_LDA.54/");
+      aurostd::RemoveSubStringInPlace(species,"potpaw_PBE.54/");
+      
+      //general database
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_LDA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_GGA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POT_PBE+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_GGA+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN+"/");
+      aurostd::RemoveSubStringInPlace(species,DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN+"/");
+      
+      aurostd::RemoveSubStringInPlace(species,"__"); //CO190712 - BEFORE _ - potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW__
+      aurostd::RemoveSubStringInPlace(species,"_");  //CO190712  //potpaw_LDA/potpaw_LDA.05May2010/Si_sv_GW_
+    }
+  }
+}
+
+namespace KBIN {
+  bool VASP_PseudoPotential_CleanName_TEST(void){ //CO190712
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="KBIN::VASP_PseudoPotential_CleanName_TEST():";
+    stringstream message;
+    
+    ostream& oss=cout;
+    ofstream FileMESSAGE;
+    _aflags aflags; aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");
+
+    string compound_to_test="";
+    vector<string> velements;
+    vector<double> vcomposition;
+
+    compound_to_test="W_sv_GWCs_sv_GWCr_sv_GWPt_ZORALi_AE_GW2";
+    bool keep_pp=false;
+    velements=pflow::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,oss,false,true,pp_string,keep_pp);
+    if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+    if(aurostd::joinWDelimiter(velements,"")!="CrCsLiPtW"){
+      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;
+    }
+    
+    compound_to_test="W_sv_GWCs_sv_GWCr_sv_GWPt_ZORALi_AE_GW2";
+    keep_pp=true;
+    velements=pflow::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,oss,false,true,pp_string,keep_pp);
+    if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+    if(aurostd::joinWDelimiter(velements,"")!="Cr_sv_GWCs_sv_GWLi_AE_GW2Pt_ZORAW_sv_GW"){
+      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;
+    }
+    
+    compound_to_test="H1.25";
+    keep_pp=false;
+    velements=pflow::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,oss,false,true,pp_string,keep_pp);
+    if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+    if(aurostd::joinWDelimiter(velements,"")!="H"){
+      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;
+    }
+    
+    compound_to_test="H1.25";
+    keep_pp=true;
+    velements=pflow::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,oss,false,true,pp_string,keep_pp);
+    if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+    if(aurostd::joinWDelimiter(velements,"")!="H1.25"){
+      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;
+    }
+    
+    compound_to_test="Mn.5W5H1.25";
+    keep_pp=false;
+    velements=pflow::stringElements2VectorElements(compound_to_test,vcomposition,FileMESSAGE,oss,false,true,composition_string,keep_pp);
+    if(LDEBUG){cerr << soliloquy << " compound_to_test=\"" << compound_to_test << "\", velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << ", vcomposition=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vcomposition,5),",") << endl;}
+    if(!(aurostd::joinWDelimiter(velements,"")=="HMnW" && vcomposition.size()==3 && aurostd::isequal(vcomposition[0],1.25) && aurostd::isequal(vcomposition[1],0.5) && aurostd::isequal(vcomposition[2],5.0) )){
+      message << "stringElements2VectorElements() failed [" << compound_to_test << " with keep_pp=" << keep_pp << "]";
+      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;
+    }
+
+    //return true;
+    
+    //full test of pp available
+    vector<string> directories_2_search;
+    vector<string> potcar_paths;
+    vector<string> path_parts;
+    vector<string> element_parts,_element_parts;
+    string element_raw="",element_clean="";
+    string element="",suffix="";
+    aurostd::string2tokens(DEFAULT_VASP_POTCAR_DIRECTORIES,directories_2_search,",");
+    for(uint i=0;i<directories_2_search.size();i++){
+      if(aurostd::IsDirectory(directories_2_search[i])){
+        const string& dir=directories_2_search[i];
+        if(LDEBUG){cerr << soliloquy << " searching dir=" << dir << endl;}
+        aurostd::string2vectorstring(aurostd::execute2string("find "+dir+" -name POTCAR*"),potcar_paths);
+        if(LDEBUG){cerr << soliloquy << " potcar_paths=" << aurostd::joinWDelimiter(potcar_paths," ") << endl;}
+        for(uint j=0;j<potcar_paths.size();j++){
+          if(!aurostd::RemoveWhiteSpacesFromTheBack(potcar_paths[j]).empty()){
+            const string& potcar_path=potcar_paths[j];
+            aurostd::string2tokens(potcar_path,path_parts,"/");
+            if(aurostd::withinList(path_parts,"TESTS")){continue;}  //skip VASP/TESTS
+            if(aurostd::withinList(path_parts,"BENCHS")){continue;}  //skip VASP/BENCHS
+            if(path_parts.size()<2){continue;}
+            element_raw=path_parts[path_parts.size()-2];
+            if(aurostd::substring2bool(element_raw,"runelements")){continue;} //garbage pp
+            if(aurostd::substring2bool(element_raw,"Free")){continue;} //garbage pp
+            if(LDEBUG){cerr << soliloquy << " element_raw=" << element_raw << endl;}
+            aurostd::string2tokens(element_raw,element_parts,"_");
+            if(element_parts.size()==0){continue;}
+            element=suffix="";
+            if(element_parts.size()>1){
+              _element_parts.clear();
+              for(uint k=1;k<element_parts.size();k++){_element_parts.push_back(element_parts[k]);} //skip element
+              suffix="_"+aurostd::joinWDelimiter(_element_parts,"_");
+            }
+            element=element_parts[0];
+            element=KBIN::VASP_PseudoPotential_CleanName(element);  //clean H1.25
+            if(LDEBUG){cerr << soliloquy << " element=\"" << element << "\", suffix=\"" << suffix << "\"" << endl;}
+            element_clean=KBIN::VASP_PseudoPotential_CleanName(element_raw);
+            if(element!=element_clean){ //idempotent
+              message << "\"" << element << "\" != \"" << element_clean << "\" == KBIN::VASP_PseudoPotential_CleanName(\"" << element_raw << "\")";
+              pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              return false;
+            }
+            if(GetAtomNumber(element)==0){
+              message << "(GetAtomNumber(\"" << element << "\")==0 [element_raw=\"" << element_raw << "\",element_clean=\"" << element_clean << "\"" << "]";
+              pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return true;
   }
 }
 
