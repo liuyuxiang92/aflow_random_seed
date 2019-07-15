@@ -277,8 +277,8 @@ namespace pflow {
   vector<vector<string> > elementalCombinations(const vector<string>& velements, uint nary);
   ////////////////////////////////////////////////////////////////////////////////
   //easy way to think about it:  do compounds belong to the hull?
-  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool sort_input=false, bool clean=true);
-  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool sort_input=false, bool clean=true);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ostream& oss=cout, bool sort_elements=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ofstream& FileMESSAGE, ostream& oss=cout, bool sort_elements=false);
   ////////////////////////////////////////////////////////////////////////////////
@@ -286,18 +286,23 @@ namespace pflow {
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   ////////////////////////////////////////////////////////////////////////////////
-  // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true);
-  vector<string> stringElements2VectorElements(const string&, vector<double>&, ostream& oss=cout, bool clean=true);  // ME190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>&, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true);  // ME190628
+  vector<string> getElements(const string& _input); //CO190712
+  void elementsFromCompositionString(const string& input);  //CO190712
+  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition); //CO190712
+  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO190712
   ////////////////////////////////////////////////////////////////////////////////
-  // functions for making input alphabetic
-  // PdMn -> MnPd, does it by CAPITAL letters
-  string makeAlphabeticString(const string& input, ostream& oss=cout);
-  string makeAlphabeticString(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
-  vector<string> makeAlphabeticVector(const string& input, ostream& oss=cout);
-  vector<string> makeAlphabeticVector(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
+  // returns UNSORTED vector<string> from string
+  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  ////////////////////////////////////////////////////////////////////////////////
+  //[CO190712 - OBSOLETE]// functions for making input alphabetic
+  //[CO190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters
+  //[CO190712 - OBSOLETE]string getAlphabeticString(const string& input, ostream& oss=cout);
+  //[CO190712 - OBSOLETE]string getAlphabeticString(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
+  //[CO190712 - OBSOLETE]vector<string> getAlphabeticVectorString(const string& input, ostream& oss=cout);
+  //[CO190712 - OBSOLETE]vector<string> getAlphabeticVectorString(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
   ////////////////////////////////////////////////////////////////////////////////
   // sets default flags
   void defaultLoadEntriesFlags(aurostd::xoption& vpflow, ostream& oss=cout, string input="A", bool entry_output=true, bool silent=false);

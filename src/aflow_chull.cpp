@@ -256,7 +256,8 @@ namespace chull {
       aurostd::xcombos xc(vsizes,'E');
       while(xc.increment()){
         velements=xc.applyCombo(vcomponents);
-        if(verbose_elimination){velements=pflow::makeAlphabeticVector(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
+        if(verbose_elimination){velements=pflow::stringElements2VectorElements(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss,true,true,pp_string,false);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO190712
+        //[CO190712 - OBSOLETE]if(verbose_elimination){velements=pflow::getAlphabeticVectorString(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
         std::sort(velements.begin(),velements.end());
         original_input=aurostd::joinWDelimiter(velements,"");
         std::sort(velements.begin(),velements.end());velements.erase( std::unique( velements.begin(), velements.end() ), velements.end() );  //MnMnPd is same as MnPd
@@ -271,7 +272,8 @@ namespace chull {
     } else {  //simple list mode
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
-        velements=pflow::makeAlphabeticVector(tokens_comma[i], FileMESSAGE,oss);
+        velements=pflow::stringElements2VectorElements(tokens_comma[i],FileMESSAGE,oss,true,true,pp_string,false);  //clean and sort, do not keep_pp  //CO190712
+        //[CLO190712 - OBSOLETE]velements=pflow::getAlphabeticVectorString(tokens_comma[i], FileMESSAGE,oss);
         nary=velements.size();
         original_input=aurostd::joinWDelimiter(velements,"");
         std::sort(velements.begin(),velements.end());velements.erase( std::unique( velements.begin(), velements.end() ), velements.end() );  //MnMnPd is same as MnPd
@@ -315,7 +317,8 @@ namespace chull {
     for(uint i=0,fl_size_i=vinputs.size();i<fl_size_i;i++) {
       // go through each request
       // create log specific to that request
-      velements = pflow::makeAlphabeticVector(vinputs[i], FileMESSAGE,oss);
+      velements = pflow::stringElements2VectorElements(vinputs[i],FileMESSAGE,oss,true,true,pp_string,false); //clean and sort, do not keep_pp  //CO190712
+      //[CO190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
       if(!velements.size()){
         message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
         pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -3397,7 +3400,8 @@ void ConvexHull::loadPoints(string alloy) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::loadPoints():";
   if(LDEBUG) {cerr << soliloquy << " initializing alloy, compound=" << alloy << endl;}
-  vector<string> velements = pflow::makeAlphabeticVector(alloy, *p_FileMESSAGE, *p_oss);
+  vector<string> velements = pflow::stringElements2VectorElements(alloy, *p_FileMESSAGE, *p_oss, true, true, pp_string, false); //clean and sort, do not keep_pp  //CO190712
+  //[CO190712 - OBSOLETE]vector<string> velements = pflow::getAlphabeticVectorString(alloy, *p_FileMESSAGE, *p_oss);
   return loadPoints(velements);
 }
 

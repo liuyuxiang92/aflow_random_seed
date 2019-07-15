@@ -7816,7 +7816,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     // DX 12/7/17 - added generator_coefficients - START
     // generator coefficients
     if(group[i].generator.lrows){
-      sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
+      sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
     } else {
       if(PRINT_NULL){ sscontent_json << "\"generator_coefficients\":null" << eendl;}
     }
@@ -7854,7 +7854,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // axis
     if(group[i].axis.lrows){
-      sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
+      sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
     } else {
       if(PRINT_NULL){ sscontent_json << "\"axis\":null" << eendl;}
     }
@@ -7862,7 +7862,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // quaternion vector
     if(group[i].quaternion_vector.lrows){
-      sscontent_json << "\"quaternion_vector\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].quaternion_vector,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"quaternion_vector\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].quaternion_vector,5,roff),",") << "]" << eendl;
     } else {
       if(PRINT_NULL){ sscontent_json << "\"quaternion_vector\":null" << eendl;}
     }
@@ -7892,7 +7892,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // ctau
     if(group[i].ctau.rows && (group_str == "fgroup" || group_str == "sgroup")){
-      sscontent_json << "\"ctau\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ctau,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ctau\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctau,5,roff),",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ctau\":null" << eendl;}
     }
@@ -7900,7 +7900,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // ftau
     if(group[i].ftau.rows && (group_str == "fgroup" || group_str == "sgroup")){
-      sscontent_json << "\"ftau\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ftau,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ftau\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ftau,5,roff),",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ftau\":null" << eendl;}
     }
@@ -7924,7 +7924,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     
     // ctrasl
     if(group[i].ctrasl.rows && group_str == "sgroup"){
-      sscontent_json << "\"ctrasl\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ctrasl,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ctrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctrasl,5,roff),",") << "]" << eendl;
     } else if (group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ctrasl\":null" << eendl;}
     }
@@ -7932,7 +7932,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // ftrasl
     if(group[i].ftrasl.rows && group_str == "sgroup"){
-      sscontent_json << "\"ftrasl\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ftrasl,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ftrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ftrasl,5,roff),",") << "]" << eendl;
     } else if (group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ftrasl\":null" << eendl;}
     }

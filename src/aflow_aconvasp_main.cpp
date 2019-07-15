@@ -8251,7 +8251,7 @@ namespace pflow {
   bool loadEntries(
 		   aurostd::xoption& vpflow, vector<string>& velements, string server,
 		   vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // main function
+       ofstream& FileMESSAGE, ostream& oss) {  // main function
 
     string soliloquy = "pflow::loadEntries():";
     stringstream message;
@@ -8280,20 +8280,20 @@ namespace pflow {
       bool load_from_common = pflow::loadFromCommon(vpflow);
 
       if( load_from_common ) {
-	message << "Loading entries from COMMON";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        message << "Loading entries from COMMON";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       } else {
-	if(server == "materials.duke.edu") {
-	  message << "Using materials.duke.edu as server";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-	} else if(server == "aflowlib.duke.edu") {
-	  message << "Using aflowlib.duke.edu as server";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-	} else {
-	  message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	  return false;  //entries;
-	}
+        if(server == "materials.duke.edu") {
+          message << "Using materials.duke.edu as server";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        } else if(server == "aflowlib.duke.edu") {
+          message << "Using aflowlib.duke.edu as server";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        } else {
+          message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          return false;  //entries;
+        }
       }
 
       string lib_name;
@@ -8305,21 +8305,21 @@ namespace pflow {
       //////////////////////////////////////////////////////////////////////////////
 
       for (uint lib = 1; lib <= velements.size() && lib <= _AFLOW_LIB_MAX_; lib++) {
-	lib_count_string = aurostd::utype2string(lib);
-	lib_name = std::string("LIB") + lib_count_string;
-	load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
-	if(vpflow.flag(load_lib_flag_name)) {
-	  message << "Loading " + lib_name;
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-	  combinations = pflow::elementalCombinations(velements, lib);
-	  for (uint i = 0; i < combinations.size(); i++) {
-	    if(!loadAndMergeLIBX(vpflow, combinations[i], lib_count_string, server, _entries, FileMESSAGE, oss)) {
-	      message << "Merging entries for " + lib_name + " failed";
-	      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	      return false;
-	    }
-	  }
-	}
+        lib_count_string = aurostd::utype2string(lib);
+        lib_name = std::string("LIB") + lib_count_string;
+        load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
+        if(vpflow.flag(load_lib_flag_name)) {
+          message << "Loading " + lib_name;
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          combinations = pflow::elementalCombinations(velements, lib);
+          for (uint i = 0; i < combinations.size(); i++) {
+            if(!loadAndMergeLIBX(vpflow, combinations[i], lib_count_string, server, _entries, FileMESSAGE, oss)) {
+              message << "Merging entries for " + lib_name + " failed";
+              pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              return false;
+            }
+          }
+        }
       }
 
       //////////////////////////////////////////////////////////////////////////////
@@ -8333,13 +8333,13 @@ namespace pflow {
       lib_name = std::string("ICSD");
       load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
       if(vpflow.flag(load_lib_flag_name)) {
-	message << "Loading " + lib_name;
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-	if(!loadAndMergeLIBX(vpflow, velements, lib_name, server, _entries, FileMESSAGE, oss)) {
-	  message << "Merging entries for " + lib_name + " failed";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	  return false;
-	}
+        message << "Loading " + lib_name;
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        if(!loadAndMergeLIBX(vpflow, velements, lib_name, server, _entries, FileMESSAGE, oss)) {
+          message << "Merging entries for " + lib_name + " failed";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          return false;
+        }
       }
 
       //////////////////////////////////////////////////////////////////////////////
@@ -8358,22 +8358,22 @@ namespace pflow {
       entries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
       combinations = pflow::elementalCombinations(velements, i+1);
       for(uint j=0;j<combinations.size();j++){
-	entries[i].push_back(vector<aflowlib::_aflowlib_entry>(0));
+        entries[i].push_back(vector<aflowlib::_aflowlib_entry>(0));
       }
       for(uint j=0;j<combinations.size();j++){
-	found=false;
-	if(_entries.size()>i){
-	  for(uint k=0;k<_entries[i].size() && !found;k++){
-	    if(_entries[i][k].size()) {
-	      vspecies=_entries[i][k][0].vspecies;
-	      if(!vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")){sort(vspecies.begin(),vspecies.end());}
-	      if(vspecies == combinations[j]){
-		entries[i][j]=_entries[i][k];
-		found=true;
-	      }
-	    }
-	  }
-	}
+        found=false;
+        if(_entries.size()>i){
+          for(uint k=0;k<_entries[i].size() && !found;k++){
+            if(_entries[i][k].size()) {
+              vspecies=_entries[i][k][0].vspecies;
+              if(!vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")){sort(vspecies.begin(),vspecies.end());}
+              if(vspecies == combinations[j]){
+                entries[i][j]=_entries[i][k];
+                found=true;
+              }
+            }
+          }
+        }
       }
     }
 
@@ -8391,9 +8391,9 @@ namespace pflow {
     for (uint i = 0; i < entries.size(); i++) {
       sizes.push_back(0);
       for (uint j = 0; j < entries.at(i).size(); j++) {
-	for (uint k = 0; k < entries.at(i).at(j).size(); k++) {
-	  sizes.at(i)++;
-	}
+        for (uint k = 0; k < entries.at(i).at(j).size(); k++) {
+          sizes.at(i)++;
+        }
       }
       totalNum += sizes.at(i);
     }
@@ -8430,14 +8430,14 @@ namespace pflow {
   // server,ostream& oss,ofstream& FileMESSAGE)
   // ***************************************************************************
   bool loadEntries(
-		   vector<string>& velements, vector<vector<aflowlib::_aflowlib_entry> >& entries, ostream& oss) {  // overload
+      vector<string>& velements, vector<vector<aflowlib::_aflowlib_entry> >& entries, ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(velements, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   vector<string>& velements,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<string>& velements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8447,32 +8447,32 @@ namespace pflow {
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   vector<string>& velements, string server,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ostream& oss) {  // overload
+      vector<string>& velements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   vector<string>& velements, string server,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<string>& velements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string soliloquy = "pflow::loadEntries():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, std::string("A"));
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ostream& oss) {  // overload
+      aurostd::xoption& vpflow, vector<string>& velements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(vpflow, velements, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // overload
+      aurostd::xoption& vpflow, vector<string>& velements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8482,16 +8482,16 @@ namespace pflow {
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements, string server,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ostream& oss) {  // overload
+      aurostd::xoption& vpflow, vector<string>& velements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements, string server,
-		   vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // main function
+      aurostd::xoption& vpflow, vector<string>& velements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // main function
 
     vector<vector<vector<aflowlib::_aflowlib_entry> > > naries;
     if(!loadEntries(vpflow, velements, server, naries, FileMESSAGE, oss)) { return false; }
@@ -8506,14 +8506,14 @@ namespace pflow {
   // velements,string server,ostream& oss,ofstream& FileMESSAGE)
   // ***************************************************************************
   bool loadEntries(
-		   vector<string>& velements, vector<aflowlib::_aflowlib_entry>& entries, ostream& oss) {  // overload
+      vector<string>& velements, vector<aflowlib::_aflowlib_entry>& entries, ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(velements, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   vector<string>& velements,
-		   vector<aflowlib::_aflowlib_entry>& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<string>& velements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8523,30 +8523,30 @@ namespace pflow {
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   vector<string>& velements, string server, vector<aflowlib::_aflowlib_entry>& entries, ostream& oss) {  // overload
+      vector<string>& velements, string server, vector<aflowlib::_aflowlib_entry>& entries, ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   vector<string>& velements, string server,
-		   vector<aflowlib::_aflowlib_entry>& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<string>& velements, string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string soliloquy = "pflow::loadEntries():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, std::string("A"));
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements,
-		   vector<aflowlib::_aflowlib_entry>& entries,
-		   ostream& oss) {  // overload
+      aurostd::xoption& vpflow, vector<string>& velements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(vpflow, velements, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements,
-		   vector<aflowlib::_aflowlib_entry>& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // overload
+      aurostd::xoption& vpflow, vector<string>& velements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8556,16 +8556,16 @@ namespace pflow {
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements, string server,
-		   vector<aflowlib::_aflowlib_entry>& entries,
-		   ostream& oss) {  // overload
+      aurostd::xoption& vpflow, vector<string>& velements, string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadEntries(vpflow, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadEntries(
-		   aurostd::xoption& vpflow, vector<string>& velements, string server,
-		   vector<aflowlib::_aflowlib_entry>& entries,
-		   ofstream& FileMESSAGE, ostream& oss) {  // main function
+      aurostd::xoption& vpflow, vector<string>& velements, string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // main function
 
     vector<vector<vector<aflowlib::_aflowlib_entry> > > naries;
     if(!loadEntries(vpflow, velements, server, naries, FileMESSAGE, oss)) { return false; }
@@ -8582,9 +8582,9 @@ namespace pflow {
   // ***************************************************************************
   bool loadFromCommon(aurostd::xoption& vpflow){
     bool load_from_common = (!vpflow.flag("PFLOW::LOAD_API") &&
-			     (aurostd::substring2bool(XHOST.hostname, "nietzsche") ||
-			      aurostd::substring2bool(XHOST.hostname, "aflowlib") ||
-			      aurostd::substring2bool(XHOST.hostname, "habana")));
+        (aurostd::substring2bool(XHOST.hostname, "nietzsche") ||
+         aurostd::substring2bool(XHOST.hostname, "aflowlib") ||
+         aurostd::substring2bool(XHOST.hostname, "habana")));
     return load_from_common;
   }
 }  // namespace pflow
@@ -8597,74 +8597,74 @@ namespace pflow {
   // ***************************************************************************
   //helper function for loadEntries, loads select library, LIB can be "LIB2" or "2" or "ICSD"
   bool loadAndMergeLIBX(string combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
     ofstream FileMESSAGE;
     return loadAndMergeLIBX(combination, LIB, server, naries, FileMESSAGE, oss);
   }
   bool loadAndMergeLIBX(string _combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
     vector<string> combination;
     combination.push_back(_combination);
     return loadAndMergeLIBX(combination, LIB, server, naries, FileMESSAGE, oss);
   }
   bool loadAndMergeLIBX(vector<string>& combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
     ofstream FileMESSAGE;
     return loadAndMergeLIBX(combination, LIB, server, naries, FileMESSAGE, oss);
   }
   bool loadAndMergeLIBX(vector<string>& combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
     string soliloquy = "pflow::loadAndMergeLIBX():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, LIB);
     return loadAndMergeLIBX(vpflow, combination, LIB, server, naries, oss);
   }
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, string combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
     ofstream FileMESSAGE;
     return loadAndMergeLIBX(vpflow, combination, LIB, server, naries, FileMESSAGE, oss);
   }
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, string _combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
     vector<string> combination;
     combination.push_back(_combination);
     return loadAndMergeLIBX(vpflow, combination, LIB, server, naries, FileMESSAGE, oss);
   }
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, vector<string>& combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ostream& oss) {
     ofstream FileMESSAGE;
     return loadAndMergeLIBX(vpflow, combination, LIB, server, naries, FileMESSAGE, oss);
   }
   bool loadAndMergeLIBX(aurostd::xoption& vpflow, vector<string>& combination, string LIB, string server,
-			vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, ofstream& FileMESSAGE, ostream& oss) {
     string soliloquy = "pflow::loadAndMergeLIBX()";
     stringstream message;
 
     //get directory info
     _aflags aflags;aflags.Directory=chull::getPath(); //default
     if(vpflow.flag("CHULL::PATH")){aflags.Directory=chull::getPath(vpflow,FileMESSAGE,oss);}
-  
+
     LIB = aurostd::toupper(LIB);  //removes ALL ambiguity with case
     vector<vector<aflowlib::_aflowlib_entry> > v_temp;
     if(!loadLIBX(vpflow, LIB, combination, server, v_temp, FileMESSAGE, oss)) { return false; }
     if(vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE")) {
       for (uint i = 0; i < v_temp.size() - 1; i++) {
-	if(!mergeEntries(naries, v_temp[i], false)) {  //e.g. for ternary MnPdPt, there are 3 binary combinations
-	  if(LIB == "ICSD") { // or LIB == "icsd") {
-	    message << "Merging entries for ICSD (" + aurostd::utype2string(i + 1) + "-naries) failed";
-	  } else {
-	    message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(i + 1) + "-naries) failed";
-	  }
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	  return false;
-	}
+        if(!mergeEntries(naries, v_temp[i], false)) {  //e.g. for ternary MnPdPt, there are 3 binary combinations
+          if(LIB == "ICSD") { // or LIB == "icsd") {
+            message << "Merging entries for ICSD (" + aurostd::utype2string(i + 1) + "-naries) failed";
+          } else {
+            message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(i + 1) + "-naries) failed";
+          }
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          return false;
+        }
       }
     }
     if(!mergeEntries(naries, v_temp[v_temp.size() - 1], true)) {  //e.g. for ternary MnPdPt, there is only ONE ternary combination
       if(LIB == "ICSD") { // or LIB == "icsd") {
-	message << "Merging entries for ICSD (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
+        message << "Merging entries for ICSD (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
       } else {
-	message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
+        message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
       }
       pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
@@ -8682,14 +8682,14 @@ namespace pflow {
   // and whether entries are loaded into vector<> or vector<vector<> > (unaries vs. binaries, etc.)
   // loadLIBX string elements
   bool loadLIBX(string LIB, string elements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, elements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, string elements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8699,32 +8699,32 @@ namespace pflow {
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, string elements, string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, string elements, string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string soliloquy = "pflow::loadLIBX():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, LIB);
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      string elements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, elements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string LIB,
+      string elements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8734,22 +8734,23 @@ namespace pflow {
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements, string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      string elements, string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements, string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string LIB,
+      string elements, string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
 
     string soliloquy = "pflow::loadLIBX():";
     vector<string> velements =
-      pflow::makeAlphabeticVector(elements, FileMESSAGE, oss);
+      stringElements2VectorElements(elements, FileMESSAGE, oss, true, true, composition_string, false); //clean and sort, do not keep_pp  //CO190712
+      //[CO190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   // ***************************************************************************
@@ -8758,14 +8759,14 @@ namespace pflow {
   // ***************************************************************************
   // loadLIBX vector elements
   bool loadLIBX(string LIB, vector<string>& velements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, velements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, vector<string>& velements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8775,34 +8776,34 @@ namespace pflow {
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, vector<string>& velements,
-		string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, vector<string>& velements,
-		string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string soliloquy = "pflow::loadLIBX():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, LIB);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		vector<string>& velements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      vector<string>& velements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, velements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		vector<string>& velements,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string LIB,
+      vector<string>& velements,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8812,18 +8813,18 @@ namespace pflow {
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		vector<string>& velements,
-		string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      vector<string>& velements,
+      string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(
-		aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server,
-		vector<aflowlib::_aflowlib_entry>& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // main function
+      aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server,
+      vector<aflowlib::_aflowlib_entry>& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // main function
 
     string soliloquy = "pflow::loadLIBX():";
     stringstream message;
@@ -8839,14 +8840,14 @@ namespace pflow {
   // ***************************************************************************
   // loadLIBX string elements
   bool loadLIBX(string LIB, string elements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, elements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, string elements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8856,32 +8857,32 @@ namespace pflow {
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, string elements, string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, string elements, string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string soliloquy = "pflow::loadLIBX():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, LIB);
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      string elements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, elements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string LIB,
+      string elements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8891,22 +8892,23 @@ namespace pflow {
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements, string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      string elements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, elements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		string elements, string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string LIB,
+      string elements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
 
     string soliloquy = "pflow::loadLIBX():";
     vector<string> velements =
-      pflow::makeAlphabeticVector(elements, FileMESSAGE, oss);
+      stringElements2VectorElements(elements, FileMESSAGE, oss, true, true, composition_string, false); //clean and sort, do not keep_pp  //CO190712
+      //[CO190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   // ***************************************************************************
@@ -8915,14 +8917,14 @@ namespace pflow {
   // ***************************************************************************
   // loadLIBX vector elements
   bool loadLIBX(string LIB, vector<string>& velements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, velements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, vector<string>& velements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8932,34 +8934,34 @@ namespace pflow {
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, vector<string>& velements,
-		string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(string LIB, vector<string>& velements,
-		string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string soliloquy = "pflow::loadLIBX():";
     aurostd::xoption vpflow;
     pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, LIB);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		vector<string>& velements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      vector<string>& velements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, velements, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		vector<string>& velements,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // overload
+      string LIB,
+      vector<string>& velements,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // overload
     string server;
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
       server = XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER");
@@ -8969,26 +8971,26 @@ namespace pflow {
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(aurostd::xoption& vpflow,
-		string LIB,
-		vector<string>& velements,
-		string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ostream& oss) {  // overload
+      string LIB,
+      vector<string>& velements,
+      string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ostream& oss) {  // overload
     ofstream FileMESSAGE;
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
   bool loadLIBX(
-		aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server,
-		vector<vector<aflowlib::_aflowlib_entry> >& entries,
-		ofstream& FileMESSAGE, ostream& oss) {  // main function
+      aurostd::xoption& vpflow, string LIB, vector<string>& velements, string server,
+      vector<vector<aflowlib::_aflowlib_entry> >& entries,
+      ofstream& FileMESSAGE, ostream& oss) {  // main function
 
     string soliloquy = "pflow::loadLIBX():";
     stringstream message;
-  
+
     //get directory info
     _aflags aflags;aflags.Directory=chull::getPath(); //default
     if(vpflow.flag("CHULL::PATH")){aflags.Directory=chull::getPath(vpflow,FileMESSAGE,oss);}
-  
+
     //vector<vector<aflowlib::_aflowlib_entry> > entries;
     for (uint i = 0; i < velements.size(); i++) {
       entries.push_back(vector<aflowlib::_aflowlib_entry>(0));
@@ -9008,25 +9010,25 @@ namespace pflow {
       string lib_count_string;
       //make robust so input can be "LIB2" or "2"
       if(aurostd::substring2bool(LIB, "LIB")) {
-	lib_name = LIB;
-	lib_count_string = aurostd::RemoveSubString(LIB, "LIB");
+        lib_name = LIB;
+        lib_count_string = aurostd::RemoveSubString(LIB, "LIB");
       } else {
-	lib_name = "LIB" + LIB;
-	lib_count_string = LIB;
+        lib_name = "LIB" + LIB;
+        lib_count_string = LIB;
       }
       //check validity of input
       for (uint i = 0; i < lib_count_string.size(); i++) {
-	if(!isdigit(lib_count_string[i])) {
-	  message << "Unknown LIB specification (" << LIB << "), should be \"LIB1\", \"LIB2\", or \"1\", \"2\", etc.";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	  return false;  //entries;
-	}
+        if(!isdigit(lib_count_string[i])) {
+          message << "Unknown LIB specification (" << LIB << "), should be \"LIB1\", \"LIB2\", or \"1\", \"2\", etc.";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          return false;  //entries;
+        }
       }
       uint lib_count_uint = aurostd::string2utype<int>(lib_count_string);
       if(velements.size() != lib_count_uint) {
-	message << "LIB" << lib_count_uint << " loads " << lib_count_uint << "-naries ONLY";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	return false;  //entries;
+        message << "LIB" << lib_count_uint << " loads " << lib_count_uint << "-naries ONLY";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        return false;  //entries;
       }
     }
 
@@ -9039,37 +9041,37 @@ namespace pflow {
     string LIB_path;  //will be actual directory path or URL, depending on machine
     if(load_from_common) {
       if(!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX")) {
-	message << "Loading entries from COMMON";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        message << "Loading entries from COMMON";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
       LIB_path = "/common/" + lib_name + "/RAW/";
       if(!aurostd::IsDirectory(LIB_path)) {
-	load_from_common = false;
-	message << LIB_path << " does not exist! Cannot load from COMMON, switching to API";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-	override_load_from_common = true;
+        load_from_common = false;
+        message << LIB_path << " does not exist! Cannot load from COMMON, switching to API";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        override_load_from_common = true;
       }
     }
     if(!load_from_common) {
       if(server == "materials.duke.edu") {
-	if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
-	  message << "Using materials.duke.edu as server";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-	}
+        if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
+          message << "Using materials.duke.edu as server";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        }
       } else if(server == "aflowlib.duke.edu") {
-	if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
-	  message << "Using aflowlib.duke.edu as server";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
-	}
+        if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
+          message << "Using aflowlib.duke.edu as server";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        }
       } else {
-	message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-	pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	return false;  //entries;
+        message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        return false;  //entries;
       }
       if(isICSD) {
-	LIB_path = server + "/AFLOWDATA/ICSD_WEB/";
+        LIB_path = server + "/AFLOWDATA/ICSD_WEB/";
       } else {
-	LIB_path = server + "/AFLOWDATA/" + lib_name + "_RAW/";
+        LIB_path = server + "/AFLOWDATA/" + lib_name + "_RAW/";
       }
     }
 
@@ -9085,59 +9087,59 @@ namespace pflow {
       string symmetry_path, clean_icsd;
       vector<string> icsds, tokens, elements;
       for (uint i = 0; i < symmetries.size(); i++) {
-	symmetry_path = LIB_path + symmetries[i];
-	if(load_from_common && !aurostd::IsDirectory(symmetry_path)) { continue; }
-	//not many symmetries, so this boolean placement won't impact much
-	if(load_from_common) {aurostd::DirectoryLS(symmetry_path, icsds);}
-	else {aurostd::url2tokens(symmetry_path + "/?aflowlib_entries", icsds, ",");}
-  if(icsds.size() && icsds[0]=="<!DOCTYPE"){ //CO 180627
-	  message << "REST-API appears to be down";
-	  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	  return false;
-  }
-	for (uint j = 0; j < icsds.size(); j++) {
-	  loc=icsds[j].find("_ICSD_");
-	  if(loc!=string::npos){    //found a good ICSD
-	    clean_icsd = icsds[j].substr(0,loc);  //get just compound
-	    if(compoundsBelong(velements, clean_icsd, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL"), false)) {  // NOT recommended, these are BS entries // no need to clean, already done
-	      // url2aflowlib has bad printing to screen options, so we mimic here
+        symmetry_path = LIB_path + symmetries[i];
+        if(load_from_common && !aurostd::IsDirectory(symmetry_path)) { continue; }
+        //not many symmetries, so this boolean placement won't impact much
+        if(load_from_common) {aurostd::DirectoryLS(symmetry_path, icsds);}
+        else {aurostd::url2tokens(symmetry_path + "/?aflowlib_entries", icsds, ",");}
+        if(icsds.size() && icsds[0]=="<!DOCTYPE"){ //CO 180627
+          message << "REST-API appears to be down";
+          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          return false;
+        }
+        for (uint j = 0; j < icsds.size(); j++) {
+          loc=icsds[j].find("_ICSD_");
+          if(loc!=string::npos){    //found a good ICSD
+            clean_icsd = icsds[j].substr(0,loc);  //get just compound
+            if(compoundsBelong(velements, clean_icsd, FileMESSAGE, oss, false, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL"), composition_string)) {  // NOT recommended, these are BS entries // no need to clean, ICSD compound format is already clean of pps
+              // url2aflowlib has bad printing to screen options, so we mimic here
 
-	      //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
+              //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
               message << "Loading " << (load_from_common ? "path" : "url") << "=" << symmetry_path << "/" << icsds[j];
-	      pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
-	      //}
-	      //complicated ternary operator, returns bool, but necessary to avoid double code
-	      if(
-		 (load_from_common)
-		 ?
-		 //if load_from_common, check this bool
-		 (
-		  //(aurostd::FileExist(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-		  (aurostd::FileNotEmpty(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-		  (_aflowlib_tmp.file2aflowlib(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-		  (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
-		  )
-		 :
-		 //if load_from_api, check this bool
-		 (
-		  (_aflowlib_tmp.url2aflowlib(symmetry_path + "/" + icsds[j], message, false) > 0) &&
-		  (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
-		  )) {
-		nary = _aflowlib_tmp.vspecies.size();
-		if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
-		entries[nary - 1].push_back(_aflowlib_tmp);
-		total_count++;
-		if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
-		  if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  // CO 171202 - let it decided whether to load from common or not
-		    entries[nary - 1].pop_back();
-		    total_count--;
-		  }
-		}
-	      }
-	      message.str("");
-	    }
-	  }
-	}
+              pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+              //}
+              //complicated ternary operator, returns bool, but necessary to avoid double code
+              if(
+                  (load_from_common)
+                  ?
+                  //if load_from_common, check this bool
+                  (
+                   //(aurostd::FileExist(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                   (aurostd::FileNotEmpty(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                   (_aflowlib_tmp.file2aflowlib(symmetry_path + "/" + icsds[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
+                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                  )
+                  :
+                  //if load_from_api, check this bool
+                  (
+                   (_aflowlib_tmp.url2aflowlib(symmetry_path + "/" + icsds[j], message, false) > 0) &&
+                   (double_check_icsd ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe, NOT NECESSARY for ICSD since we load from the calculation layer
+                  )) {
+                nary = _aflowlib_tmp.vspecies.size();
+                if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
+                entries[nary - 1].push_back(_aflowlib_tmp);
+                total_count++;
+                if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
+                  if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  // CO 171202 - let it decided whether to load from common or not
+                    entries[nary - 1].pop_back();
+                    total_count--;
+                  }
+                }
+              }
+              message.str("");
+            }
+          }
+        }
       }
     } else {
       bool double_check_lib = true;  //while NOT NECESSARY for ICSD, LIBs are screwed up sometimes
@@ -9146,60 +9148,60 @@ namespace pflow {
       if(load_from_common) {aurostd::DirectoryLS(LIB_path, systems);}
       else {aurostd::url2tokens(LIB_path + "/?aflowlib_entries", systems, ",");}
       if(systems.size() && systems[0]=="<!DOCTYPE"){ //CO 180627
-	      message << "REST-API appears to be down";
-	      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	      return false;
+        message << "REST-API appears to be down";
+        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        return false;
       }
       for (uint i = 0; i < systems.size(); i++) {
-	calculation_path = LIB_path + systems[i];
-	if(load_from_common && !aurostd::IsDirectory(calculation_path)) { continue; }
-	loc=systems[i].find(":");
-	clean_system=systems[i].substr(0,loc);  //even if we don't find it, simply copy string
-	if(compoundsBelong(velements, clean_system, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL"), false)) {  // NOT recommended, these are BS entries  // no need to clean, already done
-	  if(load_from_common) {aurostd::DirectoryLS(calculation_path, calculations);}
-	  else {aurostd::url2tokens(calculation_path + "/?aflowlib_entries", calculations, ",");}
-    if(calculations.size() && calculations[0]=="<!DOCTYPE"){ //CO 180627
-	    message << "REST-API appears to be down";
-	    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-	    return false;
-    }
-	  for (uint j = 0; j < calculations.size(); j++) {
-	    if(load_from_common && !aurostd::IsDirectory(calculation_path + "/" + calculations[j])) { continue; }
-	    //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
+        calculation_path = LIB_path + systems[i];
+        if(load_from_common && !aurostd::IsDirectory(calculation_path)) { continue; }
+        loc=systems[i].find(":");
+        clean_system=systems[i].substr(0,loc);  //even if we don't find it, simply copy string
+        if(compoundsBelong(velements, clean_system, FileMESSAGE, oss, false, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL"), pp_string, true)) {  // NOT recommended, these are BS entries  // no need to clean, already done  //use short_pp_string_AFLOW_database
+          if(load_from_common) {aurostd::DirectoryLS(calculation_path, calculations);}
+          else {aurostd::url2tokens(calculation_path + "/?aflowlib_entries", calculations, ",");}
+          if(calculations.size() && calculations[0]=="<!DOCTYPE"){ //CO 180627
+            message << "REST-API appears to be down";
+            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+            return false;
+          }
+          for (uint j = 0; j < calculations.size(); j++) {
+            if(load_from_common && !aurostd::IsDirectory(calculation_path + "/" + calculations[j])) { continue; }
+            //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
             message << "Loading " << (load_from_common ? "path" : "url") << "=" << calculation_path << "/" << calculations[j];
-	    pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
-	    //}
-	    //complicated ternary operator, returns bool, but necessary to avoid double code
-	    if(
-	       (load_from_common)
-	       ?
-	       //if load_from_common, check this bool
-	       (
-		//(aurostd::FileExist(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-		(aurostd::FileNotEmpty(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
-		(_aflowlib_tmp.file2aflowlib(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
-		(double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
-		)
-	       :
-	       //if load_from_api, check this bool
-	       (
-		(_aflowlib_tmp.url2aflowlib(calculation_path + "/" + calculations[j], message, false) > 0) &&
-		(double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
-		)) {
-	      nary = _aflowlib_tmp.vspecies.size();
-	      if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
-	      entries[nary - 1].push_back(_aflowlib_tmp);
-	      total_count++;
-	      if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
-		if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  // CO 171202 - let it decided whether to load from common or not
-		  entries[nary - 1].pop_back();
-		  total_count--;
-		}
-	      }
-	    }
-	    message.str("");
-	  }
-	}
+            pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+            //}
+            //complicated ternary operator, returns bool, but necessary to avoid double code
+            if(
+                (load_from_common)
+                ?
+                //if load_from_common, check this bool
+                (
+                 //(aurostd::FileExist(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                 (aurostd::FileNotEmpty(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) &&
+                 (_aflowlib_tmp.file2aflowlib(calculation_path + "/" + calculations[j] + "/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT, message) > 0) &&
+                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                )
+                :
+                //if load_from_api, check this bool
+                (
+                 (_aflowlib_tmp.url2aflowlib(calculation_path + "/" + calculations[j], message, false) > 0) &&
+                 (double_check_lib ? compoundsBelong(velements, _aflowlib_tmp.vspecies, FileMESSAGE, oss, !vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL")) : true)  //sometimes we find odd entries in the wrong LIBS, better to be safe
+                )) {
+              nary = _aflowlib_tmp.vspecies.size();
+              if(entries.size() < nary) { continue; }  //this entry is garbage (wrong directory)
+              entries[nary - 1].push_back(_aflowlib_tmp);
+              total_count++;
+              if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES")) {
+                if(!loadXstructures(entries[nary - 1].back(),FileMESSAGE,oss,vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_XSTRUCTURES_RELAXED_ONLY"))) {  // CO 171202 - let it decided whether to load from common or not
+                  entries[nary - 1].pop_back();
+                  total_count--;
+                }
+              }
+            }
+            message.str("");
+          }
+        }
       }
     }
     //////////////////////////////////////////////////////////////////////////
@@ -9209,15 +9211,15 @@ namespace pflow {
     // Raises PureA and PureB flags
     if(velements.size() == 2) {
       if(entries.size() && entries[0].size()) {
-	for (uint j = 0; j < entries[0].size(); j++) {
-	  if(entries[0][j].vstoichiometry.size() == 1) {
-	    if(entries[0][j].species == velements.at(0)) {
-	      entries[0][j].pureA = true;
-	    } else if(entries[0][j].species == velements.at(1)) {
-	      entries[0][j].pureB = true;
-	    }
-	  }
-	}
+        for (uint j = 0; j < entries[0].size(); j++) {
+          if(entries[0][j].vstoichiometry.size() == 1) {
+            if(entries[0][j].species == velements.at(0)) {
+              entries[0][j].pureA = true;
+            } else if(entries[0][j].species == velements.at(1)) {
+              entries[0][j].pureB = true;
+            }
+          }
+        }
       }
     }
 
@@ -9250,7 +9252,7 @@ namespace pflow {
   //next outer - species match, Mn, Pd, MnPd, etc.
   //inner most - entries
   bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-		    vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries) {
     for (uint i = 0; i < new_entries.size(); i++) {
       if(!mergeEntries(naries, new_entries[i], true)) { return false; }  //structured data
     }
@@ -9258,20 +9260,20 @@ namespace pflow {
   }
 
   bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-		    vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type) {
+      vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type) {
     for (uint i = 0; i < new_entries.size(); i++) {
       if(naries.size() <= i + 1) {
-	naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+        naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
       }
       if(!mergeEntries(naries[i], new_entries[i], assume_same_type, true)) {  //triple vector<> naries implies this structure
-	return false;
+        return false;
       }
     }
     return true;
   }
 
   bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-		    vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type) {
+      vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type) {
     if(!new_entries.size()) { return true; }
     int match1, match2;
     if(assume_same_type) {
@@ -9279,21 +9281,21 @@ namespace pflow {
       for (uint i = 1; i < new_entries.size(); i++) { naries[match1][match2].push_back(new_entries[i]); }
     } else {
       for (uint i = 0; i < new_entries.size(); i++) {
-	if(!new_entries[i].vspecies.size()) { return false; }  //what the heck is this?
-	if(!mergeEntries(naries, new_entries[i], match1, match2)) { return false; }
+        if(!new_entries[i].vspecies.size()) { return false; }  //what the heck is this?
+        if(!mergeEntries(naries, new_entries[i], match1, match2)) { return false; }
       }
     }
     return true;
   }
 
   bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-		    aflowlib::_aflowlib_entry& new_entry) {
+      aflowlib::_aflowlib_entry& new_entry) {
     int match1 = -1;
     int match2 = -1;
     return mergeEntries(naries, new_entry, match1, match2);
   }
   bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-		    aflowlib::_aflowlib_entry& new_entry, int& match1, int& match2) {
+      aflowlib::_aflowlib_entry& new_entry, int& match1, int& match2) {
     if(!new_entry.vspecies.size()) { return false; }    //what the heck is this?
     while (naries.size() < new_entry.vspecies.size()) {  //assumes new_entries all have the same vspecies.size()
       naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
@@ -9310,8 +9312,8 @@ namespace pflow {
   //if sort_by_species and we are coming from LIBs (assume_same_type==true), then we don't need to check every entry, we already
   //know they have the same type (binary of same species)
   bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-		    vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type,
-		    bool sort_by_species) {
+      vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type,
+      bool sort_by_species) {
     for (uint i = 0; i < new_entries.size(); i++) {
       if(!mergeEntries(naries, new_entries[i], assume_same_type, sort_by_species)) { return false; }
     }
@@ -9319,7 +9321,7 @@ namespace pflow {
   }
 
   bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-		    vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type, bool sort_by_species) {
+      vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type, bool sort_by_species) {
     if(!new_entries.size()) { return true; }
     int match;
     if(assume_same_type) {
@@ -9327,7 +9329,7 @@ namespace pflow {
       for (uint i = 1; i < new_entries.size(); i++) { naries[match].push_back(new_entries[i]); }
     } else {
       for (uint i = 0; i < new_entries.size(); i++) {
-	if(!mergeEntries(naries, new_entries[i], match, sort_by_species)) { return false; }
+        if(!mergeEntries(naries, new_entries[i], match, sort_by_species)) { return false; }
       }
     }
     return true;
@@ -9339,30 +9341,30 @@ namespace pflow {
   //otherwise, naries is the total entries (similar to naries above), where second layer
   //is unaries, binary, etc. (no layer with different species)
   bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-		    aflowlib::_aflowlib_entry& new_entry, bool sort_by_species) {
+      aflowlib::_aflowlib_entry& new_entry, bool sort_by_species) {
     int match = -1;
     return mergeEntries(naries, new_entry, match, sort_by_species);
   }
 
   bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-		    aflowlib::_aflowlib_entry& new_entry, int& match, bool sort_by_species) {
+      aflowlib::_aflowlib_entry& new_entry, int& match, bool sort_by_species) {
     if(!new_entry.vspecies.size()) { return false; }
     match = -1;
     if(sort_by_species) {
       //all of naries is unary, binary, etc., now just need to match species
       for (uint i = 0; i < naries.size() && match == -1; i++) {
-	//test of stupidity
-	if(naries[i][0].vspecies.size() != new_entry.vspecies.size()) { return false; }
-	if(naries[i][0].vspecies == new_entry.vspecies) { match = i; }
+        //test of stupidity
+        if(naries[i][0].vspecies.size() != new_entry.vspecies.size()) { return false; }
+        if(naries[i][0].vspecies == new_entry.vspecies) { match = i; }
       }
       if(match == -1) {
-	naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
-	match = naries.size() - 1;
+        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+        match = naries.size() - 1;
       }
     } else {
       //just need to create space for unary, binary, etc.
       while (naries.size() < new_entry.vspecies.size()) {
-	naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
       }
       match = new_entry.vspecies.size() - 1;
     }
@@ -9372,7 +9374,7 @@ namespace pflow {
 
   //start combining
   bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-		    vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries, bool sort_by_species) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries, bool sort_by_species) {
     for (uint i = 0; i < new_entries.size(); i++) {
       if(!mergeEntries(naries, new_entries[i], true, sort_by_species)) { return false; }
     }
@@ -9380,17 +9382,17 @@ namespace pflow {
   }
 
   bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-		    vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries) {
+      vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries) {
     for (uint i = 0; i < new_entries.size(); i++) {
       for (uint j = 0; j < new_entries[i].size(); j++) {
-	if(!mergeEntries(naries, new_entries[i][j])) { return false; }
+        if(!mergeEntries(naries, new_entries[i][j])) { return false; }
       }
     }
     return true;
   }
 
   bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-		    vector<vector<aflowlib::_aflowlib_entry> >& new_entries) {
+      vector<vector<aflowlib::_aflowlib_entry> >& new_entries) {
     for (uint i = 0; i < new_entries.size(); i++) {
       if(!mergeEntries(naries, new_entries[i])) { return false; }
     }
@@ -9399,7 +9401,7 @@ namespace pflow {
 
   //trivial
   bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-		    vector<aflowlib::_aflowlib_entry>& new_entries) {
+      vector<aflowlib::_aflowlib_entry>& new_entries) {
     for (uint i = 0; i < new_entries.size(); i++) {
       if(!mergeEntries(naries, new_entries[i])) { return false; }
     }
@@ -9408,7 +9410,7 @@ namespace pflow {
 
   //trivial
   bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-		    aflowlib::_aflowlib_entry& new_entry) {
+      aflowlib::_aflowlib_entry& new_entry) {
     naries.push_back(new_entry);
     return true;
   }
@@ -9463,22 +9465,31 @@ namespace pflow {
   // if sort_elements==True, will sort(elements) first before matching with velements, 
   // sorting is generally NOT preferred as it would match unsorted compounds from database (NOT good)
   // NOTE, this will NOT sort velements, it is assumed for speed
-  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss, bool sort_input, bool clean) {
+  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
     ofstream FileMESSAGE;
-    return compoundsBelong(velements, input, FileMESSAGE, oss, sort_input, clean);
+    return compoundsBelong(velements, input, FileMESSAGE, oss, clean, sort_elements, c_desig, shortcut_pp_string_AFLOW_database);
   }
   bool compoundsBelong(const vector<string>& velements, const string& input,
-		       ofstream& FileMESSAGE, ostream& oss, bool sort_input, bool clean) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+		       ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy="pflow::compoundsBelong():";
     vector<string> elements;
-    elements = stringElements2VectorElements(input, FileMESSAGE, oss, clean);
-    if(LDEBUG) {
-      cerr << soliloquy << " elements = ";
-      for(uint i=0;i<elements.size();i++){cerr << elements[i] << " ";} 
-      cerr << endl;
+    if(c_desig==pp_string && shortcut_pp_string_AFLOW_database==true){
+      //pp_string parsing is slow because of LONG list of strings to substitute in VASP_PseudoPotential_CleanName()
+      //instead, we are safe with faster composition_string parsing IFF we only remove _GW, which will confuse elementsFromCompositionString()
+      //all other characters are eliminated because we only look for A-Z a-z from substrings created from capital letters
+      //these must be directory strings from REST-API/AFLUX
+      //otherwise, we also need to be careful of "potpaw_PBE/Mn_pv" species (for example) inside aflow.in (LEGACY)
+      //compoundsBelong is only used for loadEntries() (as of 190712)
+      string input_new=input;
+      //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO190712
+      KBIN::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
+      elements = stringElements2VectorElements(input_new, FileMESSAGE, oss, clean, sort_elements, composition_string, false); //use composition_string (FASTER) //do not keep_pp
+    }else{  //default
+      elements = stringElements2VectorElements(input, FileMESSAGE, oss, clean, sort_elements, c_desig, false); //do not keep_pp
     }
-    return compoundsBelong(velements, elements, FileMESSAGE, oss, sort_input);
+    if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(elements,"\""),",") << endl;}
+    return compoundsBelong(velements, elements, FileMESSAGE, oss, false); //already sorted
   }
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ostream& oss, bool sort_elements) {
     ofstream FileMESSAGE;
@@ -9501,7 +9512,7 @@ namespace pflow {
     for (uint i = 0; i < elements.size(); i++) {
       found = false;
       for (uint j = starting_index; j < velements.size() && !found; j++) {
-	if(elements[i] == velements[j]) { found = true; starting_index = j+1; }  //start search at the next velement
+        if(elements[i] == velements[j]) { found = true; starting_index = j+1; }  //start search at the next velement
       }
       if(!found) { return false; }
     }
@@ -9544,79 +9555,79 @@ namespace pflow {
     if(is_url_path){aurostd::url2tokens(path + "/?files", files, ",");}
     else {aurostd::DirectoryLS(path,files);}
     if((!aurostd::substring2bool(files, "POSCAR.relax1") &&
-	!aurostd::substring2bool(files, "POSCAR.orig") && !relaxed_only) ||
-       (!aurostd::substring2bool(files, "POSCAR.relax2") &&
-	!aurostd::substring2bool(files, "CONTCAR.relax1") && !relaxed_only) ||
-       (!aurostd::substring2bool(files, "CONTCAR.relax") &&
-	!aurostd::substring2bool(files, "CONTCAR.relax2"))) {
+          !aurostd::substring2bool(files, "POSCAR.orig") && !relaxed_only) ||
+        (!aurostd::substring2bool(files, "POSCAR.relax2") &&
+         !aurostd::substring2bool(files, "CONTCAR.relax1") && !relaxed_only) ||
+        (!aurostd::substring2bool(files, "CONTCAR.relax") &&
+         !aurostd::substring2bool(files, "CONTCAR.relax2"))) {
       message << "path=" << path << " missing structure files. Ignoring entry";
       pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     } else {
       if (!relaxed_only) {
-	//////////////////////////////////////////////////////////////////////////
-	// START Loading original structures
-	//////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // START Loading original structures
+        //////////////////////////////////////////////////////////////////////////
 
-	if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.orig")) {
+        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.orig")) {
           ss.str("");
-	  if ( (is_url_path ? 
-		aurostd::url2stringstream(path + "/POSCAR.orig",ss,false) : 
+          if ( (is_url_path ? 
+                aurostd::url2stringstream(path + "/POSCAR.orig",ss,false) : 
                 aurostd::file2stringstream(path + "/POSCAR.orig",ss)) ) {
-	    xstrAux = xstructure(ss, IOVASP_AUTO);
-	  }
-	}
-	if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax1")) {
+            xstrAux = xstructure(ss, IOVASP_AUTO);
+          }
+        }
+        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax1")) {
           ss.str("");
-	  if ( (is_url_path ? 
-		aurostd::url2stringstream(path + "/POSCAR.relax1",ss,false) :
+          if ( (is_url_path ? 
+                aurostd::url2stringstream(path + "/POSCAR.relax1",ss,false) :
                 aurostd::file2stringstream(path + "/POSCAR.relax1",ss)) ) {
-	    xstrAux = xstructure(ss, IOVASP_AUTO);
-	  }
+            xstrAux = xstructure(ss, IOVASP_AUTO);
+          }
         }
         if (!xstrAux.atoms.size()) {
-	  pflow::logger(soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
           return false;
-	}
-	entry.vstr.push_back(xstrAux);
-	xstrAux.Clear();
-	if(LDEBUG) {cerr << soliloquy << " loaded ORIGINAL structure" << endl;}
+        }
+        entry.vstr.push_back(xstrAux);
+        xstrAux.Clear();
+        if(LDEBUG) {cerr << soliloquy << " loaded ORIGINAL structure" << endl;}
 
-	//////////////////////////////////////////////////////////////////////////
-	// END Loading original structures
-	//////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // END Loading original structures
+        //////////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////////
-	// START Loading singularly-relaxed structures
-	//////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // START Loading singularly-relaxed structures
+        //////////////////////////////////////////////////////////////////////////
 
-	if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax2")) {
+        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax2")) {
           ss.str("");
-	  if ( (is_url_path ? 
-		aurostd::url2stringstream(path + "/POSCAR.relax2",ss,false) :
+          if ( (is_url_path ? 
+                aurostd::url2stringstream(path + "/POSCAR.relax2",ss,false) :
                 aurostd::file2stringstream(path + "/POSCAR.relax2",ss)) ) {
-	    xstrAux = xstructure(ss, IOVASP_AUTO);
-	  }
-	}
-	if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax1")) {
+            xstrAux = xstructure(ss, IOVASP_AUTO);
+          }
+        }
+        if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax1")) {
           ss.str("");
-	  if ( (is_url_path ? 
-		aurostd::url2stringstream(path + "/CONTCAR.relax1",ss,false) :
+          if ( (is_url_path ? 
+                aurostd::url2stringstream(path + "/CONTCAR.relax1",ss,false) :
                 aurostd::file2stringstream(path + "/CONTCAR.relax1",ss)) ) {
-	    xstrAux = xstructure(ss, IOVASP_AUTO);
-	  }
+            xstrAux = xstructure(ss, IOVASP_AUTO);
+          }
         }
         if (!xstrAux.atoms.size()) {
-	  pflow::logger(soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
           return false;
-	}
-	entry.vstr.push_back(xstrAux);
-	xstrAux.Clear();
-	if(LDEBUG) {cerr << soliloquy << " loaded RELAX1 structure" << endl;}
+        }
+        entry.vstr.push_back(xstrAux);
+        xstrAux.Clear();
+        if(LDEBUG) {cerr << soliloquy << " loaded RELAX1 structure" << endl;}
 
-	//////////////////////////////////////////////////////////////////////////
-	// END Loading singularly-relaxed structures
-	//////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // END Loading singularly-relaxed structures
+        //////////////////////////////////////////////////////////////////////////
       }
 
       ////////////////////////////////////////////////////////////////////////////
@@ -9625,22 +9636,22 @@ namespace pflow {
 
       if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax")) {
         ss.str("");
-	if ( (is_url_path ? 
-	      aurostd::url2stringstream(path + "/CONTCAR.relax",ss,false): 
+        if ( (is_url_path ? 
+              aurostd::url2stringstream(path + "/CONTCAR.relax",ss,false): 
               aurostd::file2stringstream(path + "/CONTCAR.relax",ss)) ) {
-	  xstrAux = xstructure(ss, IOVASP_AUTO);
-	}
+          xstrAux = xstructure(ss, IOVASP_AUTO);
+        }
       }
       if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax2")) {
         ss.str("");
-	if ( (is_url_path ? 
-	      aurostd::url2stringstream(path + "/CONTCAR.relax2",ss,false) :
+        if ( (is_url_path ? 
+              aurostd::url2stringstream(path + "/CONTCAR.relax2",ss,false) :
               aurostd::file2stringstream(path + "/CONTCAR.relax2",ss)) ) {
-	  xstrAux = xstructure(ss, IOVASP_AUTO);
-	}
+          xstrAux = xstructure(ss, IOVASP_AUTO);
+        }
       }
       if (!xstrAux.atoms.size()) {
-	pflow::logger(soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
       entry.vstr.push_back(xstrAux);
@@ -9658,31 +9669,180 @@ namespace pflow {
 
 // functions for making input alphabetic
 namespace pflow {
+  vector<string> getElements(const string& input){ //CO190712 //borrowed from XATOM_SplitAlloySpecies() //slow since we create many strings, but definitely works
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::getElements():";
+    if(LDEBUG){cerr << soliloquy << " original input=\"" << input << "\"" << endl;}
+    string alloy=input;
+    //[CO190712 - no need for multiple passes anymore]for(uint i=1;i<=2;i++){alloy=KBIN::VASP_PseudoPotential_CleanName(alloy);} //be certain you clean everything, especially _GW (worst offender)
+    KBIN::VASP_PseudoPotential_CleanName_InPlace(alloy); //be certain you clean everything, especially _GW (worst offender)
+    aurostd::RemoveNumbersInPlace(alloy);              // remove composition
+    if(LDEBUG){cerr << soliloquy << " cleaned input=\"" << alloy << "\"" << endl;}
+    vector<string> vspecies;
+    for(uint i=0;i<alloy.length();i++) {
+      if(alloy[i]>='A' && alloy[i]<='Z') vspecies.push_back("");
+      vspecies.back()+=alloy[i];
+    }
+    if(LDEBUG){cerr << soliloquy << " vspecies pre ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
+    for(uint i=0;i<vspecies.size();i++){aurostd::CleanStringASCII_InPlace(vspecies[i]);}
+    if(LDEBUG){cerr << soliloquy << " vspecies post ASCII clean=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vspecies,"\""),",") << endl;}
+    return vspecies;
+  }
+  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
+  //this assumes a very simple Mn2Pd5, non-stoich is ok (e.g., Mn2.5Pd5)
+  //no pseudo potential specification
+  //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
+  //this is FASTER than getElements(), but not as robust for general input (specialized)
+  void elementsFromCompositionString(const string& input,vector<string>& velements){vector<double> vcomposition;return elementsFromCompositionString(input,velements,vcomposition);}  //CO190712
+  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition){ //CO190712
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = "pflow::getElementsFromCompositionString():";
+    velements.clear();
+    vcomposition.clear();  // ME190628
+    
+    //////////////////////////////////////////////////////////////////////////////
+    // START Checks for correct input by counting number of uppercase letters
+    //////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " original input=" << input << endl;}
+
+    // CO 180409 - running through input twice, no need, simply check at the end
+    //uint numberOfElements = 0;
+    //for (uint i = 0; i < input.size(); i++) {
+    //  if(isupper(input[i])) {
+    //    numberOfElements++;
+    //  }
+    //}
+    //if(numberOfElements == 0) {
+    //  pflow::logger(soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  return velements;
+    //}
+
+    //////////////////////////////////////////////////////////////////////////////
+    // END Checks for correct input by counting number of uppercase letters
+    //////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
+    // START Parsing input
+    //////////////////////////////////////////////////////////////////////////////
+
+    // CO 180316 - fixed this function to be simpler, too complicated before
+    string auxstr;
+    for (uint i = 0; i < input.size(); i++) {
+      if(isupper(input[i])) {
+        auxstr.clear();
+        auxstr+=input[i++];
+        while (((i < input.size()) && (input[i]>='a' && input[i]<='z') )){auxstr+=input[i++];}
+        i--;  //very important since we increase at the top of the loop (equivalent to i+j-1)
+        //while (((i < input.size()) && isalpha(input[i]) && !isupper(input[i]))){auxstr+=input[i++];}
+        //while(!(clean && !isalpha(input[i]))){ //(input[i]=='_' || input[i]==':' || input[i]=='.' || isdigit(input[i])))) {
+        //isalpha() saves us from all issues with VASP_PseudoPotential_CleanName() except, e.g., potpaw_PBE/Na, we took care of that above
+        //if(clean){
+        //  auxstr = KBIN::VASP_PseudoPotential_CleanName(auxstr);  //fix vasp pp
+        //  // CO 180409 - again, no need to run through essentially a third time, we already cut at these characters
+        //  //look for bad characters and cut the string
+        //  //for(uint j=1;j<auxstr.size();j++){
+        //  //  if(auxstr[j]=='_' || auxstr[j]==':' || isdigit(auxstr[j])){auxstr=auxstr.substr(0,j);break;}  //fix aflow stuff like ':'
+        //  //}
+        //}
+        if(LDEBUG) {cerr << soliloquy << " element found: " << auxstr << endl;}
+        velements.push_back(auxstr);
+        // ME190628 - get composition, too
+      } else if ( (input[i]>='0' && input[i]<='9') || (input[i] == '.')) {  //CO190712 - just in case we have H.25 (not good form but try to catch anyway, never produced by aflow automatically)
+        auxstr.clear();
+        auxstr += input[i++];
+        while ((i < input.size()) && ( (input[i]>='0' && input[i]<='9') || (input[i] == '.'))) {auxstr += input[i++];}
+        i--;
+        if (LDEBUG) {
+          std::cerr << soliloquy << " found element count: " << auxstr << " of element " << (velements.size() - 1) << ".";
+          if (vcomposition.size() != velements.size()) {
+            std::cerr << " Will add ones to elements " << vcomposition.size() << " to " << (velements.size() - 2) << ".";
+          }
+          std::cerr << std::endl;
+        }
+        // Add implicit ones
+        for (uint i = vcomposition.size(); i < velements.size() - 1; i++){vcomposition.push_back(1.0);}
+        vcomposition.push_back(aurostd::string2utype<double>(auxstr));
+      }
+    }
+    // Add implicit ones
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
+  }
+  
+  //use only as a supplement for stringElements2VectorElements(), do NOT use outside
+  //this assumes Mn_pvPt
+  //no composition information
+  //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
+  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp){ //CO190712
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="pflow::getElementsFromPPString():";
+    velements=getElements(input);
+    if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+    if(keep_pp==false){return;}
+  
+    //copy info into vspecies and clear velements
+    vector<string> vspecies;
+    for(uint i=0;i<velements.size();i++){vspecies.push_back(velements[i]);}
+    velements.clear();
+
+    //simply parse string around these elements
+    string::size_type loc1=0,loc2=string::npos;
+    vector<string> vCAPITAL_LETTERS_PP;
+    aurostd::string2tokens(CAPITAL_LETTERS_PP_LIST,vCAPITAL_LETTERS_PP,",");
+    bool found_CAPITAL_LETTERS_PP=false;
+    bool found_CAPITAL_LETTERS=false;
+    for(uint i=0;i<vspecies.size();i++){
+      if((i+1)>=vspecies.size()){loc2=string::npos;}
+      else{loc2=input.find(vspecies[i+1],loc1);}
+      while(loc2!=string::npos){
+        found_CAPITAL_LETTERS_PP=false;
+        for(uint j=0;j<vCAPITAL_LETTERS_PP.size()&&found_CAPITAL_LETTERS_PP==false;j++){
+          if((loc2-(vCAPITAL_LETTERS_PP[j].size()-1))<input.size()){continue;}
+          found_CAPITAL_LETTERS=true;
+          for(uint k=0;k<vCAPITAL_LETTERS_PP[j].size()&&found_CAPITAL_LETTERS==true;k++){
+            if(input[loc2-k]!=vCAPITAL_LETTERS_PP[j][vCAPITAL_LETTERS_PP[j].size()-k-1]){found_CAPITAL_LETTERS=false;}
+          }
+          if(found_CAPITAL_LETTERS){found_CAPITAL_LETTERS_PP=true;}
+        }
+        if(found_CAPITAL_LETTERS_PP==false){break;}
+        //[OBSOLETE] Do not pick W from _GW (tungsten)
+        //[OBSOLETE]if (!( (loc2-2)<input.size() && (input[loc2] == 'W') && (input[loc2-1] == 'G') && (input[loc2-2] == '_') )){break;} //(loc2-2)<input.size() because loc2 is utype, it's always >0, loc2-2 can wrap around to a big number though
+        loc2=input.find(vspecies[i],loc2+1);
+      }
+      if(LDEBUG){cerr << soliloquy << " loc1=" << loc1 << ", loc2=" << loc2 << endl;}
+      velements.push_back(input.substr(loc1,loc2-loc1));  //loc2-loc1 because it is the distance
+      loc1=loc2;
+    }
+    
+    if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
+
+  }
+
   // ***************************************************************************
   // pflow::stringElements2VectorElements(string input,ostream&
   // oss,ofstream& FileMESSAGE)
   // ***************************************************************************
   // returns UNSORTED vector<string> from string
   vector<string> stringElements2VectorElements(const string& input,
-					       ostream& oss, bool clean) {  // overload
+					       ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {  // overload
     ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, FileMESSAGE, oss, clean);
+    return stringElements2VectorElements(input, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
   }
 
   // ME190628 - added variant that also determines the composition
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss, bool clean) {
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {
     ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean);
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
   }
 
   vector<string> stringElements2VectorElements(
-					       const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean) {  // overload
+					       const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {  // overload
     vector<double> vcomposition;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean);
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
   }
 
   vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
-                                               ofstream& FileMESSAGE, ostream& oss, bool clean) { // main function
+                                               ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) { // main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "pflow::stringElements2VectorElements():";
     vector<string> velements;
@@ -9701,7 +9861,7 @@ namespace pflow {
 
     string input=_input;
 
-    if(clean){input=KBIN::VASP_PseudoPotential_CleanName(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
+    if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){KBIN::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
 
     if(!isupper(input[0])) {
       pflow::logger(soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -9746,102 +9906,82 @@ namespace pflow {
     // START Parsing input
     //////////////////////////////////////////////////////////////////////////////
 
-    // CO 180316 - fixed this function to be simpler, too complicated before
-    string auxstr;
-    for (uint i = 0; i < input.size(); i++) {
-      if(isupper(input[i])) {
-	auxstr.clear();
-	auxstr+=input[i++];
-	while (((i < input.size()) && !isupper(input[i])) && isalpha(input[i])){ //!(clean && !isalpha(input[i]))){ //(input[i]=='_' || input[i]==':' || input[i]=='.' || isdigit(input[i])))) {
-	  auxstr+=input[i++];
-	}
-	i--;  //very important since we increase at the top of the loop (equivalent to i+j-1)
-	//isalpha() saves us from all issues with VASP_PseudoPotential_CleanName() except, e.g., potpaw_PBE/Na, we took care of that above
-	//if(clean){
-	//  auxstr = KBIN::VASP_PseudoPotential_CleanName(auxstr);  //fix vasp pp
-	//  // CO 180409 - again, no need to run through essentially a third time, we already cut at these characters
-	//  //look for bad characters and cut the string
-	//  //for(uint j=1;j<auxstr.size();j++){
-	//  //  if(auxstr[j]=='_' || auxstr[j]==':' || isdigit(auxstr[j])){auxstr=auxstr.substr(0,j);break;}  //fix aflow stuff like ':'
-	//  //}
-	//}
-	if(LDEBUG) {cerr << soliloquy << " element found: " << auxstr << endl;}
-	velements.push_back(auxstr);
-      // ME190628 - get composition, too
-      } else if (isdigit(input[i])) {
-        auxstr.clear();
-        auxstr += input[i++];
-        while ((i < input.size()) && (isdigit(input[i]) || (input[i] == '.'))) {
-          auxstr += input[i++];
-        }
-        i--;
-        if (LDEBUG) {
-          std::cerr << soliloquy << " found element count: " << auxstr << " of element " << (velements.size() - 1) << ".";
-          if (vcomposition.size() != velements.size()) {
-            std::cerr << " Will add ones to elements " << vcomposition.size() << " to " << (velements.size() - 2) << ".";
-          }
-          std::cerr << std::endl;
-        }
-        // Add implicit ones
-        for (uint i = vcomposition.size(); i < velements.size() - 1; i++) vcomposition.push_back(1);
-        vcomposition.push_back(aurostd::string2utype<double>(auxstr));
-      }
+    if(c_desig==composition_string){elementsFromCompositionString(input,velements,vcomposition);}
+    else if(c_desig==pp_string){elementsFromPPString(input,velements,keep_pp);}
+    else{
+      throw aurostd::xerror(soliloquy,"Unknown compound designation",_INPUT_ILLEGAL_);
     }
+        
+    if(clean){
+      for(uint i=0;i<velements.size();i++){aurostd::CleanStringASCII_InPlace(velements[i]);}  //CO190712 - extra cleaning from XATOM_SplitAlloySpecies
+    }
+    
     // Add implicit ones
-    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1);
+    for (uint i = vcomposition.size(); i < velements.size(); i++) vcomposition.push_back(1.0);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Parsing input
     //////////////////////////////////////////////////////////////////////////////
 
-    if(velements.size()==0){pflow::logger(soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);}
+    if(velements.size()==0){pflow::logger(soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
+
+    if(sort_elements && velements.size()>1){
+      string etmp="";
+      double ctmp=0.0;
+      for(uint i=0;i<velements.size()-1;i++){
+        for(uint j=i+1;j<velements.size();j++){
+          if(velements[i]>velements[j]){
+            etmp=velements[j];  //fix old j
+            velements[j]=velements[i];  //swap
+            velements[i]=etmp;  //set i to old j
+            ctmp=vcomposition[j]; //fix old j
+            vcomposition[j]=vcomposition[i];  //swap
+            vcomposition[i]=ctmp; //set i to old j
+          }
+        }
+      }
+    }
+
     return velements;
   }
 }  // namespace pflow
 
-namespace pflow {
-  // ***************************************************************************
-  // pflow::makeAlphabeticVector(string input,ostream& oss,ofstream&
-  // FileMESSAGE)
-  // ***************************************************************************
-  // PdMn -> MnPd, does it by CAPITAL letters
-  vector<string> makeAlphabeticVector(const string& input,
-				      ostream& oss) {  // overload
-    ofstream FileMESSAGE;
-    return makeAlphabeticVector(input, FileMESSAGE, oss);
-  }
-  vector<string> makeAlphabeticVector(const string& input,
-				      ofstream& FileMESSAGE, ostream& oss) {  // main function
-    string soliloquy = "pflow::makeAlphabeticVector():";
-    vector<string> velements = stringElements2VectorElements(input, FileMESSAGE, oss);
-    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
-    return velements;
-  }
-  // ***************************************************************************
-  // pflow::makeAlphabeticString(string input,ostream& oss,ofstream&
-  // FileMESSAGE)
-  // ***************************************************************************
-  // PdMn -> MnPd, does it by CAPITAL letters
-  string makeAlphabeticString(const string& input, ostream& oss) {  // overload
-    ofstream FileMESSAGE;
-    return makeAlphabeticString(input, FileMESSAGE, oss);
-  }
-  string makeAlphabeticString(const string& input,
-			      ofstream& FileMESSAGE, ostream& oss) {  // main function
-    string soliloquy = "pflow::makeAlphabeticString():";
-    stringstream message;
-    string corrected = "";
-    vector<string> velements = stringElements2VectorElements(input, FileMESSAGE, oss);
-    if(!velements.size()) {
-      message << "stringElements2VectorElements() failed (input==" << input << ")";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_);
-      return corrected;
-    }
-    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
-    for (uint i = 0; i < velements.size(); i++) {corrected += velements.at(i);}
-    return corrected;
-  }
-}  // namespace pflow
+//[CO190712 - OBSOLETE]namespace pflow {
+//[CO190712 - OBSOLETE]  // ***************************************************************************
+//[CO190712 - OBSOLETE]  // pflow::getAlphabeticVectorString(string input,ostream& oss,ofstream&
+//[CO190712 - OBSOLETE]  // FileMESSAGE)
+//[CO190712 - OBSOLETE]  // ***************************************************************************
+//[CO190712 - OBSOLETE]  // PdMn -> MnPd, does it by CAPITAL letters
+//[CO190712 - OBSOLETE]  vector<string> getAlphabeticVectorString(const string& input,
+//[CO190712 - OBSOLETE]				      ostream& oss) {  // overload
+//[CO190712 - OBSOLETE]    ofstream FileMESSAGE;
+//[CO190712 - OBSOLETE]    return getAlphabeticVectorString(input, FileMESSAGE, oss);
+//[CO190712 - OBSOLETE]  }
+//[CO190712 - OBSOLETE]  vector<string> getAlphabeticVectorString(const string& input,
+//[CO190712 - OBSOLETE]				      ofstream& FileMESSAGE, ostream& oss) {  // main function
+//[CO190712 - OBSOLETE]    string soliloquy = "pflow::getAlphabeticVectorString():";
+//[CO190712 - OBSOLETE]    vector<string> velements = stringElements2VectorElements(input, FileMESSAGE, oss);
+//[CO190712 - OBSOLETE]    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
+//[CO190712 - OBSOLETE]    return velements;
+//[CO190712 - OBSOLETE]  }
+//[CO190712 - OBSOLETE]  // ***************************************************************************
+//[CO190712 - OBSOLETE]  // pflow::getAlphabeticString(string input,ostream& oss,ofstream&
+//[CO190712 - OBSOLETE]  // FileMESSAGE)
+//[CO190712 - OBSOLETE]  // ***************************************************************************
+//[CO190712 - OBSOLETE]  // PdMn -> MnPd, does it by CAPITAL letters
+//[CO190712 - OBSOLETE]  string getAlphabeticString(const string& input, ostream& oss) {  // overload
+//[CO190712 - OBSOLETE]    ofstream FileMESSAGE;
+//[CO190712 - OBSOLETE]    return getAlphabeticString(input, FileMESSAGE, oss);
+//[CO190712 - OBSOLETE]  }
+//[CO190712 - OBSOLETE]  string getAlphabeticString(const string& input,
+//[CO190712 - OBSOLETE]			      ofstream& FileMESSAGE, ostream& oss) {  // main function
+//[CO190712 - OBSOLETE]    string soliloquy = "pflow::getAlphabeticString():";
+//[CO190712 - OBSOLETE]    stringstream message;
+//[CO190712 - OBSOLETE]    vector<string> velements = stringElements2VectorElements(input, FileMESSAGE, oss);
+//[CO190712 - OBSOLETE]    sort(velements.begin(), velements.end());  // quicksort is much faster than insertion sort
+//[CO190712 - OBSOLETE]    return auorstd::joinWDelimiter(velements,"");
+//[CO190712 - OBSOLETE]  }
+//[CO190712 - OBSOLETE]}  // namespace pflow
 
 namespace pflow {
   //***************************************************************************//

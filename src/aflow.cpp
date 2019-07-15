@@ -303,6 +303,10 @@ int main(int _argc,char **_argv) {
  
   bool Arun=FALSE;
   if(!Arun && aurostd::args2flag(argv,cmds,"--prx|--prx="))  {Arun=TRUE;PERFORM_PRX(cout);}
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_getpp")) {
+    if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
+    return 1;
+  }
   if(!Arun && aurostd::args2flag(argv,cmds,"--test_stefano")) {
     uint y=2017,m=11;
     m+=1;
