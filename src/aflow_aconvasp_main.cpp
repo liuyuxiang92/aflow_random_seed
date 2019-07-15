@@ -9471,7 +9471,7 @@ namespace pflow {
   }
   bool compoundsBelong(const vector<string>& velements, const string& input,
 		       ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::compoundsBelong():";
     vector<string> elements;
     if(c_desig==pp_string && shortcut_pp_string_AFLOW_database==true){
@@ -9774,7 +9774,7 @@ namespace pflow {
   //no composition information
   //no junk at the end (_ICSD_, :LDAU2, :PAW_PBE, .OLD, etc.), pre-process before
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp){ //CO190712
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::getElementsFromPPString():";
     velements=getElements(input);
     if(LDEBUG){cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(velements,"\""),",") << endl;}
