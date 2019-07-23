@@ -1322,7 +1322,7 @@ namespace SYM {
 	      //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
       } else {
         xvector<double> rhs_frac_xvec = SYM::minimizeDistanceFractionalMethod(rhs_tmp); //DX 20190613
-        rhs_cart_xvec = f2c * rhs_tmp; //DX 20190613
+        rhs_cart_xvec = f2c * rhs_frac_xvec; //DX 20190718 - rhs_frac_xvec not rhs_tmp //DX 20190613
 	      //DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
       }
       //DX 20190613 [OBSOLETE] rhs_cart_xvec = f2c * rhs_tmp;
@@ -2441,55 +2441,59 @@ namespace SYM {
     vector<vector<vector<vector<sdouble> > > > testvvvsd = convert_wyckoff_pos_sd(testvvvstring);
     for (uint j = 0; j < testvvvsd.size(); j++) {
       for (uint m = 0; m < testvvvsd[j].size(); m++) {
-	string equation = "";
-	vector<string> eqn;
-	for (uint k = 0; k < 3; k++) { 
-	  stringstream ss_eqn;
-	  string coordinate = "";
-	  vector<string> vec_coord;
-	  double running_double = 0.0;
-	  bool double_only = false; //DX 20190128 
-	  for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
-	    if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
-	      ss_eqn << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
-	      ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr == '\0'){
-	      running_double+=testvvvsd[j][m][k][l].dbl;
-              double_only = true; //DX 20190128
-	    }
-	    else {
-	      //running_double+=testvvvsd[j][m][k][l].dbl;
-	      ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    ss_eqn.str("");
-	  }
-	  while(running_double>1.0){
-	    running_double-=1.0;
-	  }
-	  if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
-	    running_double-=1.0;
-	  }
-	  //DX 20190129 [OBSOLETE] if(aurostd::abs(running_double) > _ZERO_TOL_){
-	  if(double_only){ //DX 20190129
-	    string running_frac = dbl2frac(running_double,false);
-	    ss_eqn << running_frac;
-	    vec_coord.push_back(ss_eqn.str());
-	    ss_eqn.str("");
-	  }
-	  coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-	  // clean up cases of -+ or +-
-	  coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-	  coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-	  eqn.push_back(coordinate);
-	}
-	equation = aurostd::joinWDelimiter(eqn,",");
-	general_positions.push_back(equation);
+        string equation = "";
+        vector<string> eqn;
+        for (uint k = 0; k < 3; k++) { 
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k]));
+
+//DX 20190823 [OBSOLETE - moved into function]    stringstream ss_eqn;
+//DX 20190823 [OBSOLETE - moved into function]	  string coordinate = "";
+//DX 20190823 [OBSOLETE - moved into function]	  vector<string> vec_coord;
+//DX 20190823 [OBSOLETE - moved into function]	  double running_double = 0.0;
+//DX 20190823 [OBSOLETE - moved into function]	  bool double_only = false; //DX 20190128 
+//DX 20190823 [OBSOLETE - moved into function]	  for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
+//DX 20190823 [OBSOLETE - moved into function]	    if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]	      ss_eqn << testvvvsd[j][m][k][l].chr;
+//DX 20190823 [OBSOLETE - moved into function]	      vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]	    }
+//DX 20190823 [OBSOLETE - moved into function]	    else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]	      ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
+//DX 20190823 [OBSOLETE - moved into function]	      vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]	    }
+//DX 20190823 [OBSOLETE - moved into function]	    else if(testvvvsd[j][m][k][l].chr == '\0'){
+//DX 20190823 [OBSOLETE - moved into function]	      running_double+=testvvvsd[j][m][k][l].dbl;
+//DX 20190823 [OBSOLETE - moved into function]              double_only = true; //DX 20190128
+//DX 20190823 [OBSOLETE - moved into function]	    }
+//DX 20190823 [OBSOLETE - moved into function]	    else {
+//DX 20190823 [OBSOLETE - moved into function]	      //running_double+=testvvvsd[j][m][k][l].dbl;
+//DX 20190823 [OBSOLETE - moved into function]	      ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
+//DX 20190823 [OBSOLETE - moved into function]	      vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]	    }
+//DX 20190823 [OBSOLETE - moved into function]	    ss_eqn.str("");
+//DX 20190823 [OBSOLETE - moved into function]	  }
+//DX 20190823 [OBSOLETE - moved into function]	  while(running_double>1.0){
+//DX 20190823 [OBSOLETE - moved into function]	    running_double-=1.0;
+//DX 20190823 [OBSOLETE - moved into function]	  }
+//DX 20190823 [OBSOLETE - moved into function]	  if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]	    running_double-=1.0;
+//DX 20190823 [OBSOLETE - moved into function]	  }
+//DX 20190823 [OBSOLETE - moved into function]	  //DX 20190129 [OBSOLETE] if(aurostd::abs(running_double) > _ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]	  if(double_only){ //DX 20190129
+//DX 20190823 [OBSOLETE - moved into function]      if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
+//DX 20190823 [OBSOLETE - moved into function]        string running_frac = dbl2frac(running_double,false);
+//DX 20190823 [OBSOLETE - moved into function]        ss_eqn << running_frac;
+//DX 20190823 [OBSOLETE - moved into function]        vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]        ss_eqn.str("");
+//DX 20190823 [OBSOLETE - moved into function]      }
+//DX 20190823 [OBSOLETE - moved into function]    }
+//DX 20190823 [OBSOLETE - moved into function]	  coordinate = aurostd::joinWDelimiter(vec_coord,"+");
+//DX 20190823 [OBSOLETE - moved into function]	  // clean up cases of -+ or +-
+//DX 20190823 [OBSOLETE - moved into function]	  coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
+//DX 20190823 [OBSOLETE - moved into function]	  coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
+//DX 20190823 [OBSOLETE - moved into function]	  eqn.push_back(coordinate);
+        }
+        equation = aurostd::joinWDelimiter(eqn,",");
+        general_positions.push_back(equation);
       }
     }
     return general_positions;
@@ -2508,60 +2512,137 @@ namespace SYM {
     vector<vector<vector<vector<sdouble> > > > testvvvsd = convert_wyckoff_pos_sd(testvvvstring);
     for (uint j = 0; j < testvvvsd.size(); j++) {
       for (uint m = 0; m < testvvvsd[j].size(); m++) {
-	string equation = "";
-	vector<string> eqn;
-	for (uint k = 0; k < 3; k++) { 
-	  stringstream ss_eqn;
-	  string coordinate = "";
-	  vector<string> vec_coord;
-	  double running_double = 0.0;
-    bool double_only = false;
-	  for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
-	    if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
-	      ss_eqn << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
-	      ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr == '\0'){
-	      running_double+=testvvvsd[j][m][k][l].dbl;
-        double_only = true;
-	    }
-	    else {
-	      //running_double+=testvvvsd[j][m][k][l].dbl;
-	      ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    ss_eqn.str("");
-	  }
-	  while(running_double>1.0){
-	    running_double-=1.0;
-	  }
-	  if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
-	    running_double-=1.0;
-	  }
-	  if(double_only){
-	    string running_frac = dbl2frac(running_double,false);
-	    ss_eqn << running_frac;
-	    vec_coord.push_back(ss_eqn.str());
-	    ss_eqn.str("");
-	  }
-	  coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-	  // clean up cases of -+ or +-
-	  coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-	  coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-	  eqn.push_back(coordinate);
-	}
-	equation = aurostd::joinWDelimiter(eqn,",");
-	positions.push_back(equation);
+        string equation = "";
+        vector<string> eqn;
+        for (uint k = 0; k < 3; k++) { 
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k]));
+//DX 20190823 [OBSOLETE - moved into function]          stringstream ss_eqn;
+//DX 20190823 [OBSOLETE - moved into function]          string coordinate = "";
+//DX 20190823 [OBSOLETE - moved into function]          vector<string> vec_coord;
+//DX 20190823 [OBSOLETE - moved into function]          double running_double = 0.0;
+//DX 20190823 [OBSOLETE - moved into function]          bool double_only = false;
+//DX 20190823 [OBSOLETE - moved into function]          for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
+//DX 20190823 [OBSOLETE - moved into function]            if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << testvvvsd[j][m][k][l].chr;
+//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]            }
+//DX 20190823 [OBSOLETE - moved into function]            else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
+//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]            }
+//DX 20190823 [OBSOLETE - moved into function]            else if(testvvvsd[j][m][k][l].chr == '\0'){
+//DX 20190823 [OBSOLETE - moved into function]              running_double+=testvvvsd[j][m][k][l].dbl;
+//DX 20190823 [OBSOLETE - moved into function]              double_only = true;
+//DX 20190823 [OBSOLETE - moved into function]            }
+//DX 20190823 [OBSOLETE - moved into function]            else {
+//DX 20190823 [OBSOLETE - moved into function]              //running_double+=testvvvsd[j][m][k][l].dbl;
+//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
+//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]            }
+//DX 20190823 [OBSOLETE - moved into function]            ss_eqn.str("");
+//DX 20190823 [OBSOLETE - moved into function]          }
+//DX 20190823 [OBSOLETE - moved into function]          while(running_double>1.0){
+//DX 20190823 [OBSOLETE - moved into function]            running_double-=1.0;
+//DX 20190823 [OBSOLETE - moved into function]          }
+//DX 20190823 [OBSOLETE - moved into function]          if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]            running_double-=1.0;
+//DX 20190823 [OBSOLETE - moved into function]          }
+//DX 20190823 [OBSOLETE - moved into function]          if(double_only){
+//DX 20190823 [OBSOLETE - moved into function]            if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
+//DX 20190823 [OBSOLETE - moved into function]              string running_frac = dbl2frac(running_double,false);
+//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << running_frac;
+//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]              ss_eqn.str("");
+//DX 20190823 [OBSOLETE - moved into function]            }
+//DX 20190823 [OBSOLETE - moved into function]          }
+//DX 20190823 [OBSOLETE - moved into function]          coordinate = aurostd::joinWDelimiter(vec_coord,"+");
+//DX 20190823 [OBSOLETE - moved into function]          // clean up cases of -+ or +-
+//DX 20190823 [OBSOLETE - moved into function]          coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
+//DX 20190823 [OBSOLETE - moved into function]          coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
+//DX 20190823 [OBSOLETE - moved into function]          eqn.push_back(coordinate);
+        }
+        equation = aurostd::joinWDelimiter(eqn,",");
+        positions.push_back(equation);
       }
     }
     return positions;
   }
 } //namespace SYM
 //DX 20190128 -END
+
+// DX 20190723 - START
+// ******************************************************************************
+// formatWyckoffPosition
+// ******************************************************************************
+namespace SYM {
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate){
+
+    // put variables first (e.g., 1/2+x -> x+1/2)
+    // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
+    // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
+    // this function will be circumvented when symbolic math is integrated
+    // DX 20190723
+
+    string soliloquy = "SYM::formatWyckoffPosition()";
+    
+    stringstream ss_eqn;
+    string coordinate = "";
+    vector<string> vec_coord;
+    double running_double = 0.0;
+    bool double_only = false;
+
+    for(uint j=0;j<sd_coordinate.size();j++){
+      sdouble sd_num = sd_coordinate[j];
+      // ---------------------------------------------------------------------------
+      // if a variable with positive unit factor (1x -> x) 
+      if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
+        ss_eqn << sd_num.chr;
+        vec_coord.push_back(ss_eqn.str());
+      }
+      // ---------------------------------------------------------------------------
+      // if a variable with negative unit factor (-1x -> -x)
+      else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
+        ss_eqn << "-" << sd_num.chr;
+        vec_coord.push_back(ss_eqn.str());
+      }
+      // ---------------------------------------------------------------------------
+      // if a number (no variable)
+      else if(sd_num.chr == '\0'){
+        running_double+=sd_num.dbl;
+        double_only = true;
+      }
+      // ---------------------------------------------------------------------------
+      // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
+      else {
+        ss_eqn << sd_num.dbl << sd_num.chr;
+        vec_coord.push_back(ss_eqn.str());
+      }
+      ss_eqn.str("");
+    }
+
+    // ---------------------------------------------------------------------------
+    // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
+    // (constants in Wyckoff position are always positive)
+    while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
+      running_double-=1.0;
+    }
+    if(double_only){
+      if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
+        string running_frac = dbl2frac(running_double,false);
+        ss_eqn << running_frac;
+        vec_coord.push_back(ss_eqn.str());
+        ss_eqn.str("");
+      }
+    }
+    coordinate = aurostd::joinWDelimiter(vec_coord,"+");
+    // ---------------------------------------------------------------------------
+    // clean up cases of -+ or +-
+    coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
+    coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
+    
+    return coordinate;
+  }
+}
 
 // DX 20190708 - START
 // ******************************************************************************
@@ -2596,62 +2677,66 @@ namespace SYM {
     vector<string> eqn;
     for(uint i=0;i<tokens.size();i++){
 
-      stringstream ss_eqn;
-      string coordinate = "";
-      vector<string> vec_coord;
-      double running_double = 0.0;
-      bool double_only = false;
-      
+//DX 20190823 [OBSOLETE - moved into function]      stringstream ss_eqn;
+//DX 20190823 [OBSOLETE - moved into function]      string coordinate = "";
+//DX 20190823 [OBSOLETE - moved into function]      vector<string> vec_coord;
+//DX 20190823 [OBSOLETE - moved into function]      double running_double = 0.0;
+//DX 20190823 [OBSOLETE - moved into function]      bool double_only = false;
+
       // ---------------------------------------------------------------------------
       // split into equation entities (number, variable) 
       vector<sdouble> sd_coordinate = simplify(tokens[i]);
-      for(uint j=0;j<sd_coordinate.size();j++){
-        sdouble sd_num = sd_coordinate[j];
-        // ---------------------------------------------------------------------------
-        // if a variable with positive unit factor (1x -> x) 
-        if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
-          ss_eqn << sd_num.chr;
-          vec_coord.push_back(ss_eqn.str());
-        }
-        // ---------------------------------------------------------------------------
-        // if a variable with negative unit factor (-1x -> -x)
-        else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
-          ss_eqn << "-" << sd_num.chr;
-          vec_coord.push_back(ss_eqn.str());
-        }
-        // ---------------------------------------------------------------------------
-        // if a number (no variable)
-        else if(sd_num.chr == '\0'){
-          running_double+=sd_num.dbl;
-          double_only = true;
-        }
-        // ---------------------------------------------------------------------------
-        // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
-        else {
-          ss_eqn << sd_num.dbl << sd_num.chr;
-          vec_coord.push_back(ss_eqn.str());
-        }
-        ss_eqn.str("");
-      }
+      eqn.push_back(SYM::formatWyckoffPosition(sd_coordinate));
 
-      // ---------------------------------------------------------------------------
-      // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
-      // (constants in Wyckoff position are always positive)
-      while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
-        running_double-=1.0;
-      }
-      if(double_only){
-        string running_frac = dbl2frac(running_double,false);
-        ss_eqn << running_frac;
-        vec_coord.push_back(ss_eqn.str());
-        ss_eqn.str("");
-      }
-      coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-      // ---------------------------------------------------------------------------
-      // clean up cases of -+ or +-
-      coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-      coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-      eqn.push_back(coordinate);
+//DX 20190823 [OBSOLETE - moved into function]      for(uint j=0;j<sd_coordinate.size();j++){
+//DX 20190823 [OBSOLETE - moved into function]        sdouble sd_num = sd_coordinate[j];
+//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
+//DX 20190823 [OBSOLETE - moved into function]        // if a variable with positive unit factor (1x -> x) 
+//DX 20190823 [OBSOLETE - moved into function]        if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << sd_num.chr;
+//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]        }
+//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
+//DX 20190823 [OBSOLETE - moved into function]        // if a variable with negative unit factor (-1x -> -x)
+//DX 20190823 [OBSOLETE - moved into function]        else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
+//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << "-" << sd_num.chr;
+//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]        }
+//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
+//DX 20190823 [OBSOLETE - moved into function]        // if a number (no variable)
+//DX 20190823 [OBSOLETE - moved into function]        else if(sd_num.chr == '\0'){
+//DX 20190823 [OBSOLETE - moved into function]          running_double+=sd_num.dbl;
+//DX 20190823 [OBSOLETE - moved into function]          double_only = true;
+//DX 20190823 [OBSOLETE - moved into function]        }
+//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
+//DX 20190823 [OBSOLETE - moved into function]        // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
+//DX 20190823 [OBSOLETE - moved into function]        else {
+//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << sd_num.dbl << sd_num.chr;
+//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]        }
+//DX 20190823 [OBSOLETE - moved into function]        ss_eqn.str("");
+//DX 20190823 [OBSOLETE - moved into function]      }
+//DX 20190823 [OBSOLETE - moved into function]
+//DX 20190823 [OBSOLETE - moved into function]      // ---------------------------------------------------------------------------
+//DX 20190823 [OBSOLETE - moved into function]      // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
+//DX 20190823 [OBSOLETE - moved into function]      // (constants in Wyckoff position are always positive)
+//DX 20190823 [OBSOLETE - moved into function]      while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
+//DX 20190823 [OBSOLETE - moved into function]        running_double-=1.0;
+//DX 20190823 [OBSOLETE - moved into function]      }
+//DX 20190823 [OBSOLETE - moved into function]      if(double_only){
+//DX 20190823 [OBSOLETE - moved into function]        if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
+//DX 20190823 [OBSOLETE - moved into function]          string running_frac = dbl2frac(running_double,false);
+//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << running_frac;
+//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
+//DX 20190823 [OBSOLETE - moved into function]          ss_eqn.str("");
+//DX 20190823 [OBSOLETE - moved into function]        }
+//DX 20190823 [OBSOLETE - moved into function]      }
+//DX 20190823 [OBSOLETE - moved into function]      coordinate = aurostd::joinWDelimiter(vec_coord,"+");
+//DX 20190823 [OBSOLETE - moved into function]      // ---------------------------------------------------------------------------
+//DX 20190823 [OBSOLETE - moved into function]      // clean up cases of -+ or +-
+//DX 20190823 [OBSOLETE - moved into function]      coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
+//DX 20190823 [OBSOLETE - moved into function]      coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
+//DX 20190823 [OBSOLETE - moved into function]      eqn.push_back(coordinate);
     }
     reordered_position = aurostd::joinWDelimiter(eqn,",");
 
