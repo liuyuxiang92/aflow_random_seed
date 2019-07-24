@@ -1461,11 +1461,15 @@ namespace aurostd {
   // Similar to RemoveSubString, but does NOT create a new string (costly if done MANY times)
   // Corey Oses 190712
   void RemoveSubStringInPlace(string& t, const string& str_rm) {
-    string::size_type i;
-    while(t.find(str_rm)!=string::npos) {
-      i = t.find(str_rm);
-      if(i != std::string::npos) t.erase(i, str_rm.length( ));
-    };
+    string::size_type i = t.find(str_rm); //CO190712 - fewer operations
+    while(i != string::npos) {  //CO190712 - fewer operations
+      t.erase(i, str_rm.length( )); //CO190712 - fewer operations
+      i = t.find(str_rm); //CO190712 - fewer operations
+    }
+    //[CO190712 - OBSOLETE]while(t.find(str_rm)!=string::npos) {
+    //[CO190712 - OBSOLETE]  i = t.find(str_rm);
+    //[CO190712 - OBSOLETE]  if(i != std::string::npos) t.erase(i, str_rm.length( ));
+    //[CO190712 - OBSOLETE]};
   }
   
   // ***************************************************************************

@@ -9480,7 +9480,7 @@ namespace pflow {
     return compoundsBelong(velements2check,input,input_velements,input_vcomposition,FileMESSAGE,oss,clean,sort_elements,c_desig,shortcut_pp_string_AFLOW_database);
   }
   bool compoundsBelong(const vector<string>& velements2check, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool shortcut_pp_string_AFLOW_database) {
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="pflow::compoundsBelong():";
     if(c_desig==pp_string && shortcut_pp_string_AFLOW_database==true){
       //pp_string parsing is slow because of LONG list of strings to substitute in VASP_PseudoPotential_CleanName()
