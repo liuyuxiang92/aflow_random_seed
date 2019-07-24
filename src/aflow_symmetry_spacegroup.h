@@ -529,7 +529,7 @@ namespace SYM {
   char whichchar(string str_in);
   double whichnum(string str_in);
   double frac2dbl(string str);  //expand to cover case when input is e.g., ".5"
-  string dbl2frac(double a, bool sign_prefix=true);
+  //DX 20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
   void multiply(vector<string> A, vector<string> B);
   void xstring(ostream& output, xmatrix<double> a);
   void cleanupstring(string& str);  //eliminates blank spaces before and after string

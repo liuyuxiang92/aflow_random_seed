@@ -2628,7 +2628,7 @@ namespace SYM {
     }
     if(double_only){
       if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
-        string running_frac = dbl2frac(running_double,false);
+        string running_frac = aurostd::dbl2frac(running_double,false); //DX 20190724 - now namespace aurostd
         ss_eqn << running_frac;
         vec_coord.push_back(ss_eqn.str());
         ss_eqn.str("");
@@ -3423,76 +3423,84 @@ namespace SYM {
   }
 } //namespace SYM
 
-// ******************************************************************************
-// dbl2frac Double to Fraction (Overloaded)
-// ******************************************************************************
-namespace SYM {
-  string dbl2frac(double a, bool sign_prefix) {
-    string out;
-    bool neg = false;
-    double tol = _ZERO_TOL_;
-    if(a < 0) {
-      neg = true;
-      a = aurostd::abs(a);
-    }
-    if(aurostd::abs(a) < tol) {
-      out = "0";
-    }
-    if(aurostd::abs(a - .25) < tol) {
-      out = "1/4";
-    }
-    if(aurostd::abs(a - .5) < tol) {
-      out = "1/2";
-    }
-    if(aurostd::abs(a - .75) < tol) {
-      out = "3/4";
-    }
-    if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
-      out = "1/3";
-    }
-    if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
-      out = "2/3";
-    }
-    if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
-      out = "1/6";
-    }
-    if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX 20180726 - added
-      out = "5/6"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
-      out = "1/8";
-    }
-    if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
-      out = "3/8";
-    }
-    if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
-      out = "5/8";
-    }
-    if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
-      out = "7/8";
-    }
-    if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "1/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "5/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "7/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "11/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(sign_prefix){
-    if(neg == true) {
-      out = "-" + out;
-    } else {
-      out = "+" + out;
-      }
-    }
-    return out;
-  }
-} //namespace SYM
+//DX 20190724 [MOVED TO AUROSTD]// ******************************************************************************
+//DX 20190724 [MOVED TO AUROSTD]// dbl2frac Double to Fraction (Overloaded)
+//DX 20190724 [MOVED TO AUROSTD]// ******************************************************************************
+//DX 20190724 [MOVED TO AUROSTD]namespace SYM {
+//DX 20190724 [MOVED TO AUROSTD]  string dbl2frac(double a, bool sign_prefix) {
+//DX 20190724 [MOVED TO AUROSTD]
+//DX 20190724 [MOVED TO AUROSTD]    string function_name = "SYM::dbl2frac()";
+//DX 20190724 [MOVED TO AUROSTD]    stringstream message;
+//DX 20190724 [MOVED TO AUROSTD]
+//DX 20190724 [MOVED TO AUROSTD]    string out;
+//DX 20190724 [MOVED TO AUROSTD]    bool neg = false;
+//DX 20190724 [MOVED TO AUROSTD]    double tol = _ZERO_TOL_;
+//DX 20190724 [MOVED TO AUROSTD]    if(a < 0) {
+//DX 20190724 [MOVED TO AUROSTD]      neg = true;
+//DX 20190724 [MOVED TO AUROSTD]      a = aurostd::abs(a);
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "0";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - .25) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "1/4";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - .5) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "1/2";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - .75) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "3/4";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "1/3";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "2/3";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "1/6";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]      out = "5/6"; //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "1/8";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "3/8";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "5/8";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "7/8";
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]      out = "1/12"; //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]      out = "5/12"; //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]      out = "7/12"; //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]      out = "11/12"; //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
+//DX 20190724 [MOVED TO AUROSTD]    if(out.size()==0){
+//DX 20190724 [MOVED TO AUROSTD]      message << "Could not find hard-coded fraction for the double " << a << ".";
+//DX 20190724 [MOVED TO AUROSTD]      throw aurostd::xerror(function_name),message,_VALUE_ERROR_);
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    if(sign_prefix){
+//DX 20190724 [MOVED TO AUROSTD]    if(neg == true) {
+//DX 20190724 [MOVED TO AUROSTD]      out = "-" + out;
+//DX 20190724 [MOVED TO AUROSTD]    } else {
+//DX 20190724 [MOVED TO AUROSTD]      out = "+" + out;
+//DX 20190724 [MOVED TO AUROSTD]      }
+//DX 20190724 [MOVED TO AUROSTD]    }
+//DX 20190724 [MOVED TO AUROSTD]    return out;
+//DX 20190724 [MOVED TO AUROSTD]  }
+//DX 20190724 [MOVED TO AUROSTD]} //namespace SYM
 
 // ******************************************************************************
 // dbl2frac Double to Fraction (Overloaded)

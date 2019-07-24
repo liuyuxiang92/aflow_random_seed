@@ -716,6 +716,7 @@ namespace aurostd {
   string latex2html(const string& str) __xprototype;
   string latex2txt(const string& str) __xprototype;
   string fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string);  //CO190419
+  string dbl2frac(double a, bool sign_prefix=true); //DX 20190724
 }
 
 
