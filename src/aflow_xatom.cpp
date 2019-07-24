@@ -4375,7 +4375,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
       throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
-
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
       vector<string> tokens;
@@ -4404,24 +4403,43 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.partial_occupation_flag = FALSE;
     // get atoms
     vector<string> atom_site_fields;
-    bool found_atom_site_labels=FALSE;    
+    bool found_atom_site_labels=FALSE;
+    bool already_storing_atoms=FALSE;
     for(uint i=0;i<vinput.size();i++) {
       //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso loop - START
       if(aurostd::substring2bool(vinput[i],"loop")){
         found_atom_site_labels = FALSE;
       }
       if(aurostd::substring2bool(vinput[i],"_atom_site") && !aurostd::substring2bool(vinput[i],"aniso")){
+        if(already_storing_atoms){ break; } //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         found_atom_site_labels=TRUE;
+        atom_site_fields.push_back(vinput[i]);
+      }
+      else if(found_atom_site_labels && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0 && 
+          vinput[i][0]=='_' && !aurostd::substring2bool(vinput[i],"aniso")){ //DX 20190718 - to account for non-standard fields, e.g., _sm_ (Springer Materials) fields; not standard, but abundant
+        if(already_storing_atoms){ break; } //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         atom_site_fields.push_back(vinput[i]);
       }
       //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso_U loop - END
       else if(found_atom_site_labels == TRUE && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0){
         vector<string> tokens;
         aurostd::string2tokens(vinput[i],tokens," ");
+        //DX 20190718 - check tokens first; Springer Materials has extra spaces - START
+        for(uint t=0;t<tokens.size();t++){
+          if(aurostd::RemoveWhiteSpaces(tokens[t])[0]=='\'' && aurostd::RemoveWhiteSpaces(tokens[t])[tokens[t].size()-1]!='\''){
+            if(t+1<tokens.size()){
+              if(aurostd::RemoveWhiteSpaces(tokens[t+1])[0]!='\'' && aurostd::RemoveWhiteSpaces(tokens[t+1])[tokens[t+1].size()-1]=='\''){
+                tokens[t]+="_"+tokens[t+1];
+                tokens.erase(tokens.begin()+t+1);
+              }
+            }
+          }
+        }
+        //DX 20190718 - check tokens first; Springer Materials has extra spaces - END
         if(tokens.size()==atom_site_fields.size()){
           _atom tmp;
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = tokens[t]; tmp.name_is_given=TRUE; }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
@@ -4433,6 +4451,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           }
           tmp.cpos=a.f2c*tmp.fpos;
           a.AddAtom(tmp);
+          already_storing_atoms=TRUE; //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
           //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
           //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
@@ -6110,7 +6129,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=2;}
   else if(spacegroupsymbol=="P2") {  // ------------------- 3  P2 #3
     spacegroupnumber=3;}
-  else if(spacegroupsymbol=="P2_{1}" || spacegroupsymbol=="P2_1") {  // ------------------- 4  P2_{1}#4
+  else if(spacegroupsymbol=="P2_{1}" || spacegroupsymbol=="P2_1" || spacegroupsymbol=="P21") {  // ------------------- 4  P2_{1}#4
     spacegroupnumber=4;}
   else if(spacegroupsymbol=="C2") {  // ------------------- 5  C2 #5
     spacegroupnumber=5;}
@@ -6124,25 +6143,25 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=9;}
   else if(spacegroupsymbol=="P2/m") {  // ------------------- 10  P2/m #10
     spacegroupnumber=10;}
-  else if(spacegroupsymbol=="P2_{1}/m" || spacegroupsymbol=="P2_1/m") {  // ------------------- 11  P2_{1}/m #11
+  else if(spacegroupsymbol=="P2_{1}/m" || spacegroupsymbol=="P2_1/m" || spacegroupsymbol=="P21/m") {  // ------------------- 11  P2_{1}/m #11
     spacegroupnumber=11;}
   else if(spacegroupsymbol=="C2/m") {  // ------------------- 12  C2/m #12
     spacegroupnumber=12;}
   else if(spacegroupsymbol=="P2/c") {  // ------------------- 13  P2/c #13
     spacegroupnumber=13;}
-  else if(spacegroupsymbol=="P2_{1}/c" || spacegroupsymbol=="P2_1/c") {  // ------------------- 14  P2_{1}/c #14
+  else if(spacegroupsymbol=="P2_{1}/c" || spacegroupsymbol=="P2_1/c" || spacegroupsymbol=="P21/c") {  // ------------------- 14  P2_{1}/c #14
     spacegroupnumber=14;}
   else if(spacegroupsymbol=="C2/c") {  // ------------------- 15  C2/c #15
     spacegroupnumber=15;}
   else if(spacegroupsymbol=="P222") {  // ------------------- 16  P222 #16
     spacegroupnumber=16;}
-  else if(spacegroupsymbol=="P222_{1}" || spacegroupsymbol=="P222_1") {  // ------------------- 17  P222_{1}#17
+  else if(spacegroupsymbol=="P222_{1}" || spacegroupsymbol=="P222_1" || spacegroupsymbol=="P2221") {  // ------------------- 17  P222_{1}#17
     spacegroupnumber=17;}
-  else if(spacegroupsymbol=="P2_{1}2_{1}2" || spacegroupsymbol=="P2_12_12") {  // ------------------- 18  P2_{1}2_{1}2 #18
+  else if(spacegroupsymbol=="P2_{1}2_{1}2" || spacegroupsymbol=="P2_12_12" || spacegroupsymbol=="P21212") {  // ------------------- 18  P2_{1}2_{1}2 #18
     spacegroupnumber=18;}
-  else if(spacegroupsymbol=="P2_{1}2_{1}2_{1}" || spacegroupsymbol=="P2_12_12_1") {  // ------------------- 19  P2_{1}2_{1}2_{1}#19
+  else if(spacegroupsymbol=="P2_{1}2_{1}2_{1}" || spacegroupsymbol=="P2_12_12_1" || spacegroupsymbol=="P212121") {  // ------------------- 19  P2_{1}2_{1}2_{1}#19
     spacegroupnumber=19;}
-  else if(spacegroupsymbol=="C222_{1}" || spacegroupsymbol=="C222_1") {  // ------------------- 20  C222_{1}#20
+  else if(spacegroupsymbol=="C222_{1}" || spacegroupsymbol=="C222_1" || spacegroupsymbol=="C2221") {  // ------------------- 20  C222_{1}#20
     spacegroupnumber=20;}
   else if(spacegroupsymbol=="C222") {  // ------------------- 21  C222 #21
     spacegroupnumber=21;}
@@ -6150,31 +6169,31 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=22;}
   else if(spacegroupsymbol=="I222") {  // ------------------- 23  I222 #23
     spacegroupnumber=23;}
-  else if(spacegroupsymbol=="I2_{1}2_{1}2_{1}" || spacegroupsymbol=="I2_12_12_1") {  // ------------------- 24  I2_{1}2_{1}2_{1}#24
+  else if(spacegroupsymbol=="I2_{1}2_{1}2_{1}" || spacegroupsymbol=="I2_12_12_1" || spacegroupsymbol=="I212121") {  // ------------------- 24  I2_{1}2_{1}2_{1}#24
     spacegroupnumber=24;}
   else if(spacegroupsymbol=="Pmm2") {  // ------------------- 25  Pmm2 #25
     spacegroupnumber=25;}
-  else if(spacegroupsymbol=="Pmc2_{1}" || spacegroupsymbol=="Pmc2_1") {  // ------------------- 26  Pmc2_{1}#26
+  else if(spacegroupsymbol=="Pmc2_{1}" || spacegroupsymbol=="Pmc2_1" || spacegroupsymbol=="Pmc21") {  // ------------------- 26  Pmc2_{1}#26
     spacegroupnumber=26;}
   else if(spacegroupsymbol=="Pcc2") {  // ------------------- 27  Pcc2 #27
     spacegroupnumber=27;}
   else if(spacegroupsymbol=="Pma2") {  // ------------------- 28  Pma2 #28
     spacegroupnumber=28;}
-  else if(spacegroupsymbol=="Pca2_{1}" || spacegroupsymbol=="Pca2_1") {  // ------------------- 29  Pca2_{1}#29
+  else if(spacegroupsymbol=="Pca2_{1}" || spacegroupsymbol=="Pca2_1" || spacegroupsymbol=="Pca21") {  // ------------------- 29  Pca2_{1}#29
     spacegroupnumber=29;}
   else if(spacegroupsymbol=="Pnc2") {  // ------------------- 30  Pnc2 #30
     spacegroupnumber=30;}
-  else if(spacegroupsymbol=="Pmn2_{1}" || spacegroupsymbol=="Pmn2_1") {  // ------------------- 31  Pmn2_{1}#31
+  else if(spacegroupsymbol=="Pmn2_{1}" || spacegroupsymbol=="Pmn2_1" || spacegroupsymbol=="Pmn21") {  // ------------------- 31  Pmn2_{1}#31
     spacegroupnumber=31;}
   else if(spacegroupsymbol=="Pba2") {  // ------------------- 32  Pba2 #32
     spacegroupnumber=32;}
-  else if(spacegroupsymbol=="Pna2_{1}" || spacegroupsymbol=="Pna2_1") {  // ------------------- 33  Pna2_{1}#33
+  else if(spacegroupsymbol=="Pna2_{1}" || spacegroupsymbol=="Pna2_1" || spacegroupsymbol=="Pna21") {  // ------------------- 33  Pna2_{1}#33
     spacegroupnumber=33;}
   else if(spacegroupsymbol=="Pnn2") {  // ------------------- 34  Pnn2 #34
     spacegroupnumber=34;}
   else if(spacegroupsymbol=="Cmm2") {  // ------------------- 35  Cmm2 #35
     spacegroupnumber=35;}
-  else if(spacegroupsymbol=="Cmc2_{1}" || spacegroupsymbol=="Cmc2_1") {  // ------------------- 36  Cmc2_{1}#36
+  else if(spacegroupsymbol=="Cmc2_{1}" || spacegroupsymbol=="Cmc2_1" || spacegroupsymbol=="Cmc21") {  // ------------------- 36  Cmc2_{1}#36
     spacegroupnumber=36;}
   else if(spacegroupsymbol=="Ccc2") {  // ------------------- 37  Ccc2 #37
     spacegroupnumber=37;}
@@ -6254,15 +6273,15 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=74;}
   else if(spacegroupsymbol=="P4") {  // ------------------- 75  P4 #75
     spacegroupnumber=75;}
-  else if(spacegroupsymbol=="P4_{1}" || spacegroupsymbol=="P4_1") {  // ------------------- 76  P4_{1}#76
+  else if(spacegroupsymbol=="P4_{1}" || spacegroupsymbol=="P4_1" || spacegroupsymbol=="P41") {  // ------------------- 76  P4_{1}#76
     spacegroupnumber=76;}
-  else if(spacegroupsymbol=="P4_{2}" || spacegroupsymbol=="P4_2") {  // ------------------- 77  P4_{2}#77
+  else if(spacegroupsymbol=="P4_{2}" || spacegroupsymbol=="P4_2" || spacegroupsymbol=="P42") {  // ------------------- 77  P4_{2}#77
     spacegroupnumber=77;}
-  else if(spacegroupsymbol=="P4_{3}" || spacegroupsymbol=="P4_2") {  // ------------------- 78  P4_{3}#78
+  else if(spacegroupsymbol=="P4_{3}" || spacegroupsymbol=="P4_3" || spacegroupsymbol=="P43") {  // ------------------- 78  P4_{3}#78
     spacegroupnumber=78;}
   else if(spacegroupsymbol=="I4") {  // ------------------- 79  I4 #79
     spacegroupnumber=79;}
-  else if(spacegroupsymbol=="I4_{1}" || spacegroupsymbol=="I4_1") {  // ------------------- 80  I4_{1}#80
+  else if(spacegroupsymbol=="I4_{1}" || spacegroupsymbol=="I4_1" || spacegroupsymbol=="I41") {  // ------------------- 80  I4_{1}#80
     spacegroupnumber=80;}
   else if(spacegroupsymbol=="P-4") {  // ------------------- 81  P-4 #81
     spacegroupnumber=81;}
@@ -6270,67 +6289,67 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=82;}
   else if(spacegroupsymbol=="P4/m") {  // ------------------- 83  P4/m #83
     spacegroupnumber=83;}
-  else if(spacegroupsymbol=="P4_{2}/m" || spacegroupsymbol=="P4_2/m") {  // ------------------- 84  P4_{2}/m #84
+  else if(spacegroupsymbol=="P4_{2}/m" || spacegroupsymbol=="P4_2/m" || spacegroupsymbol=="P42/m") {  // ------------------- 84  P4_{2}/m #84
     spacegroupnumber=84;}
   else if(spacegroupsymbol=="P4/n") {  // ------------------- 85  P4/n #85
     spacegroupnumber=85;}
-  else if(spacegroupsymbol=="P4_{2}/n" || spacegroupsymbol=="P4_2/n") {  // ------------------- 86  P4_{2}/n #86
+  else if(spacegroupsymbol=="P4_{2}/n" || spacegroupsymbol=="P4_2/n" || spacegroupsymbol=="P42/n") {  // ------------------- 86  P4_{2}/n #86
     spacegroupnumber=86;}
   else if(spacegroupsymbol=="I4/m") {  // ------------------- 87  I4/m #87
     spacegroupnumber=87;}
-  else if(spacegroupsymbol=="I4_{1}/a" || spacegroupsymbol=="I4_1/a") {  // ------------------- 88  I4_{1}/a #88
+  else if(spacegroupsymbol=="I4_{1}/a" || spacegroupsymbol=="I4_1/a" || spacegroupsymbol=="I41/a") {  // ------------------- 88  I4_{1}/a #88
     spacegroupnumber=88;}
   else if(spacegroupsymbol=="P422") {  // ------------------- 89  P422 #89
     spacegroupnumber=89;}
-  else if(spacegroupsymbol=="P42_{1}2" || spacegroupsymbol=="P42_12") {  // ------------------- 90  P42_{1}2 #90
+  else if(spacegroupsymbol=="P42_{1}2" || spacegroupsymbol=="P42_12" || spacegroupsymbol=="P4212") {  // ------------------- 90  P42_{1}2 #90
     spacegroupnumber=90;}
-  else if(spacegroupsymbol=="P4_{1}22" || spacegroupsymbol=="P4_122") {  // ------------------- 91  P4_{1}22 #91
+  else if(spacegroupsymbol=="P4_{1}22" || spacegroupsymbol=="P4_122" || spacegroupsymbol=="P4122") {  // ------------------- 91  P4_{1}22 #91
     spacegroupnumber=91;}
-  else if(spacegroupsymbol=="P4_{1}2_{1}2" || spacegroupsymbol=="P4_12_12") {  // ------------------- 92  P4_{1}2_{1}2 #92
+  else if(spacegroupsymbol=="P4_{1}2_{1}2" || spacegroupsymbol=="P4_12_12" || spacegroupsymbol=="P41212") {  // ------------------- 92  P4_{1}2_{1}2 #92
     spacegroupnumber=92;}
-  else if(spacegroupsymbol=="P4_{2}22" || spacegroupsymbol=="P4_222") {  // ------------------- 93  P4_{2}22 #93
+  else if(spacegroupsymbol=="P4_{2}22" || spacegroupsymbol=="P4_222" || spacegroupsymbol=="P4222") {  // ------------------- 93  P4_{2}22 #93
     spacegroupnumber=93;}
-  else if(spacegroupsymbol=="P4_{2}2_{1}2" || spacegroupsymbol=="P4_22_12") {  // ------------------- 94  P4_{2}2_{1}2 #94
+  else if(spacegroupsymbol=="P4_{2}2_{1}2" || spacegroupsymbol=="P4_22_12" || spacegroupsymbol=="P42212") {  // ------------------- 94  P4_{2}2_{1}2 #94
     spacegroupnumber=94;}
-  else if(spacegroupsymbol=="P4_{3}22" || spacegroupsymbol=="P4_322") {  // ------------------- 95  P4_{3}22 #95
+  else if(spacegroupsymbol=="P4_{3}22" || spacegroupsymbol=="P4_322" || spacegroupsymbol=="P4322") {  // ------------------- 95  P4_{3}22 #95
     spacegroupnumber=95;}
-  else if(spacegroupsymbol=="P4_{3}2_{1}2" || spacegroupsymbol=="P4_32_12") {  // ------------------- 96  P4_{3}2_{1}2 #96
+  else if(spacegroupsymbol=="P4_{3}2_{1}2" || spacegroupsymbol=="P4_32_12" || spacegroupsymbol=="P43212") {  // ------------------- 96  P4_{3}2_{1}2 #96
     spacegroupnumber=96;}
   else if(spacegroupsymbol=="I422") {  // ------------------- 97  I422 #97
     spacegroupnumber=97;}
-  else if(spacegroupsymbol=="I4_{1}22" || spacegroupsymbol=="I4_122") {  // ------------------- 98  I4_{1}22 #98
+  else if(spacegroupsymbol=="I4_{1}22" || spacegroupsymbol=="I4_122" || spacegroupsymbol=="I4122") {  // ------------------- 98  I4_{1}22 #98
     spacegroupnumber=98;}
   else if(spacegroupsymbol=="P4mm") {  // ------------------- 99  P4mm #99
     spacegroupnumber=99;}
   else if(spacegroupsymbol=="P4bm") {  // ------------------- 100  P4bm #100
     spacegroupnumber=100;}
-  else if(spacegroupsymbol=="P4_{2}cm" || spacegroupsymbol=="P4_2cm") {  // ------------------- 101  P4_{2}cm #101
+  else if(spacegroupsymbol=="P4_{2}cm" || spacegroupsymbol=="P4_2cm" || spacegroupsymbol=="P42cm") {  // ------------------- 101  P4_{2}cm #101
     spacegroupnumber=101;}
-  else if(spacegroupsymbol=="P4_{2}nm" || spacegroupsymbol=="P4_2nm") {  // ------------------- 102  P4_{2}nm #102
+  else if(spacegroupsymbol=="P4_{2}nm" || spacegroupsymbol=="P4_2nm" || spacegroupsymbol=="P42nm") {  // ------------------- 102  P4_{2}nm #102
     spacegroupnumber=102;}
   else if(spacegroupsymbol=="P4cc") {  // ------------------- 103  P4cc #103
     spacegroupnumber=103;}
   else if(spacegroupsymbol=="P4nc") {  // ------------------- 104  P4nc #104
     spacegroupnumber=104;}
-  else if(spacegroupsymbol=="P4_{2}mc" || spacegroupsymbol=="P4_2mc") {  // ------------------- 105  P4_{2}mc #105
+  else if(spacegroupsymbol=="P4_{2}mc" || spacegroupsymbol=="P4_2mc" || spacegroupsymbol=="P42mc") {  // ------------------- 105  P4_{2}mc #105
     spacegroupnumber=105;}
-  else if(spacegroupsymbol=="P4_{2}bc" || spacegroupsymbol=="P4_2bc") {  // ------------------- 106  P4_{2}bc #106
+  else if(spacegroupsymbol=="P4_{2}bc" || spacegroupsymbol=="P4_2bc" || spacegroupsymbol=="P42bc") {  // ------------------- 106  P4_{2}bc #106
     spacegroupnumber=106;}
   else if(spacegroupsymbol=="I4mm") {  // ------------------- 107  I4mm #107
     spacegroupnumber=107;}
   else if(spacegroupsymbol=="I4cm") {  // ------------------- 108  I4cm #108
     spacegroupnumber=108;}
-  else if(spacegroupsymbol=="I4_{1}md" || spacegroupsymbol=="I4_1md") {  // ------------------- 109  I4_{1}md #109
+  else if(spacegroupsymbol=="I4_{1}md" || spacegroupsymbol=="I4_1md" || spacegroupsymbol=="I41md") {  // ------------------- 109  I4_{1}md #109
     spacegroupnumber=109;}
-  else if(spacegroupsymbol=="I4_{1}cd" || spacegroupsymbol=="I4_1cd") {  // ------------------- 110  I4_{1}cd #110
+  else if(spacegroupsymbol=="I4_{1}cd" || spacegroupsymbol=="I4_1cd" || spacegroupsymbol=="I41cd") {  // ------------------- 110  I4_{1}cd #110
     spacegroupnumber=110;}
   else if(spacegroupsymbol=="P-42m") {  // ------------------- 111  P-42m #111
     spacegroupnumber=111;}
   else if(spacegroupsymbol=="P-42c") {  // ------------------- 112  P-42c #112
     spacegroupnumber=112;}
-  else if(spacegroupsymbol=="P-42_{1}m" || spacegroupsymbol=="P-42_1m") {  // ------------------- 113  P-42_{1}m #113
+  else if(spacegroupsymbol=="P-42_{1}m" || spacegroupsymbol=="P-42_1m" || spacegroupsymbol=="P-421m") {  // ------------------- 113  P-42_{1}m #113
     spacegroupnumber=113;}
-  else if(spacegroupsymbol=="P-42_{1}c" || spacegroupsymbol=="P-42_1c") {  // ------------------- 114  P-42_{1}c #114
+  else if(spacegroupsymbol=="P-42_{1}c" || spacegroupsymbol=="P-42_1c" || spacegroupsymbol=="P-421c") {  // ------------------- 114  P-42_{1}c #114
     spacegroupnumber=114;}
   else if(spacegroupsymbol=="P-4m2") {  // ------------------- 115  P-4m2 #115
     spacegroupnumber=115;}
@@ -6364,35 +6383,35 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=129;}
   else if(spacegroupsymbol=="P4/ncc") {  // ------------------- 130  P4/ncc #130
     spacegroupnumber=130;}
-  else if(spacegroupsymbol=="P4_{2}/mmc" || spacegroupsymbol=="P4_2/mmc") {  // ------------------- 131  P4_{2}/mmc #131
+  else if(spacegroupsymbol=="P4_{2}/mmc" || spacegroupsymbol=="P4_2/mmc" || spacegroupsymbol=="P42/mmc") {  // ------------------- 131  P4_{2}/mmc #131
     spacegroupnumber=131;}
-  else if(spacegroupsymbol=="P4_{2}/mcm" || spacegroupsymbol=="P4_2/mcm") {  // ------------------- 132  P4_{2}/mcm #132
+  else if(spacegroupsymbol=="P4_{2}/mcm" || spacegroupsymbol=="P4_2/mcm" || spacegroupsymbol=="P42/mcm") {  // ------------------- 132  P4_{2}/mcm #132
     spacegroupnumber=132;}
-  else if(spacegroupsymbol=="P4_{2}/nbc" || spacegroupsymbol=="P4_2/nbc") {  // ------------------- 133  P4_{2}/nbc #133
+  else if(spacegroupsymbol=="P4_{2}/nbc" || spacegroupsymbol=="P4_2/nbc" || spacegroupsymbol=="P42/nbc") {  // ------------------- 133  P4_{2}/nbc #133
     spacegroupnumber=133;}
-  else if(spacegroupsymbol=="P4_{2}/nnm" || spacegroupsymbol=="P4_2/nnm") {  // ------------------- 134  P4_{2}/nnm #134
+  else if(spacegroupsymbol=="P4_{2}/nnm" || spacegroupsymbol=="P4_2/nnm" || spacegroupsymbol=="P42/nnm") {  // ------------------- 134  P4_{2}/nnm #134
     spacegroupnumber=134;}
-  else if(spacegroupsymbol=="P4_{2}/mbc" || spacegroupsymbol=="P4_2/mbc") {  // ------------------- 135  P4_{2}/mbc #135
+  else if(spacegroupsymbol=="P4_{2}/mbc" || spacegroupsymbol=="P4_2/mbc" || spacegroupsymbol=="P42/mbc") {  // ------------------- 135  P4_{2}/mbc #135
     spacegroupnumber=135;}
-  else if(spacegroupsymbol=="P4_{2}/mnm" || spacegroupsymbol=="P4_2/mnm") {  // ------------------- 136  P4_{2}/mnm #136
+  else if(spacegroupsymbol=="P4_{2}/mnm" || spacegroupsymbol=="P4_2/mnm" || spacegroupsymbol=="P42/mnm") {  // ------------------- 136  P4_{2}/mnm #136
     spacegroupnumber=136;}
-  else if(spacegroupsymbol=="P4_{2}/nmc" || spacegroupsymbol=="P4_2/nmc") {  // ------------------- 137  P4_{2}/nmc #137
+  else if(spacegroupsymbol=="P4_{2}/nmc" || spacegroupsymbol=="P4_2/nmc" || spacegroupsymbol=="P42/nmc") {  // ------------------- 137  P4_{2}/nmc #137
     spacegroupnumber=137;}
-  else if(spacegroupsymbol=="P4_{2}/ncm" || spacegroupsymbol=="P4_2/ncm") {  // ------------------- 138  P4_{2}/ncm #138
+  else if(spacegroupsymbol=="P4_{2}/ncm" || spacegroupsymbol=="P4_2/ncm" || spacegroupsymbol=="P42/ncm") {  // ------------------- 138  P4_{2}/ncm #138
     spacegroupnumber=138;}
   else if(spacegroupsymbol=="I4/mmm") {  // ------------------- 139  I4/mmm #139
     spacegroupnumber=139;}
   else if(spacegroupsymbol=="I4/mcm") {  // ------------------- 140  I4/mcm #140
     spacegroupnumber=140;}
-  else if(spacegroupsymbol=="I4_{1}/amd" || spacegroupsymbol=="I4_1/amd") {  // ------------------- 141  I4_{1}/amd #141
+  else if(spacegroupsymbol=="I4_{1}/amd" || spacegroupsymbol=="I4_1/amd" || spacegroupsymbol=="I41/amd") {  // ------------------- 141  I4_{1}/amd #141
     spacegroupnumber=141;}
-  else if(spacegroupsymbol=="I4_{1}/acd" || spacegroupsymbol=="I4_1/acd") {  // ------------------- 142  I4_{1}/acd #142
+  else if(spacegroupsymbol=="I4_{1}/acd" || spacegroupsymbol=="I4_1/acd" || spacegroupsymbol=="I41/acd") {  // ------------------- 142  I4_{1}/acd #142
     spacegroupnumber=142;}
   else if(spacegroupsymbol=="P3") {  // ------------------- 143  P3 #143
     spacegroupnumber=143;}
-  else if(spacegroupsymbol=="P3_{1}" || spacegroupsymbol=="P3_1") {  // ------------------- 144  P3_{1}#144
+  else if(spacegroupsymbol=="P3_{1}" || spacegroupsymbol=="P3_1" || spacegroupsymbol=="P31") {  // ------------------- 144  P3_{1}#144
     spacegroupnumber=144;}
-  else if(spacegroupsymbol=="P3_{2}" || spacegroupsymbol=="P3_2") {  // ------------------- 145  P3_{2}#145
+  else if(spacegroupsymbol=="P3_{2}" || spacegroupsymbol=="P3_2" || spacegroupsymbol=="P32") {  // ------------------- 145  P3_{2}#145
     spacegroupnumber=145;}
   else if(spacegroupsymbol=="R3") {  // ------------------- 146  R3 #146
     spacegroupnumber=146;}
@@ -6404,13 +6423,13 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=149;}
   else if(spacegroupsymbol=="P321") {  // ------------------- 150  P321 #150
     spacegroupnumber=150;}
-  else if(spacegroupsymbol=="P3_{1}12" || spacegroupsymbol=="P3_112") {  // ------------------- 151  P3_{1}12 #151
+  else if(spacegroupsymbol=="P3_{1}12" || spacegroupsymbol=="P3_112" || spacegroupsymbol=="P3112") {  // ------------------- 151  P3_{1}12 #151
     spacegroupnumber=151;}
-  else if(spacegroupsymbol=="P3_{1}21" || spacegroupsymbol=="P3_121") {  // ------------------- 152  P3_{1}21 #152
+  else if(spacegroupsymbol=="P3_{1}21" || spacegroupsymbol=="P3_121" || spacegroupsymbol=="P3121") {  // ------------------- 152  P3_{1}21 #152
     spacegroupnumber=152;}
-  else if(spacegroupsymbol=="P3_{2}12" || spacegroupsymbol=="P3_212") {  // ------------------- 153  P3_{2}12 #153
+  else if(spacegroupsymbol=="P3_{2}12" || spacegroupsymbol=="P3_212" || spacegroupsymbol=="P3212") {  // ------------------- 153  P3_{2}12 #153
     spacegroupnumber=153;}
-  else if(spacegroupsymbol=="P3_{2}21" || spacegroupsymbol=="P3_221") {  // ------------------- 154  P3_{2}21 #154
+  else if(spacegroupsymbol=="P3_{2}21" || spacegroupsymbol=="P3_221" || spacegroupsymbol=="P3221") {  // ------------------- 154  P3_{2}21 #154
     spacegroupnumber=154;}
   else if(spacegroupsymbol=="R32") {  // ------------------- 155  R32 #155
     spacegroupnumber=155;}
@@ -6440,41 +6459,41 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=167;}
   else if(spacegroupsymbol=="P6") {  // ------------------- 168  P6 #168
     spacegroupnumber=168;}
-  else if(spacegroupsymbol=="P6_{1}" || spacegroupsymbol=="P6_1") {  // ------------------- 169  P6_{1}#169
+  else if(spacegroupsymbol=="P6_{1}" || spacegroupsymbol=="P6_1" || spacegroupsymbol=="P61") {  // ------------------- 169  P6_{1}#169
     spacegroupnumber=169;}
-  else if(spacegroupsymbol=="P6_{5}" || spacegroupsymbol=="P6_5") {  // ------------------- 170  P6_{5}#170
+  else if(spacegroupsymbol=="P6_{5}" || spacegroupsymbol=="P6_5" || spacegroupsymbol=="P65") {  // ------------------- 170  P6_{5}#170
     spacegroupnumber=170;}
-  else if(spacegroupsymbol=="P6_{2}" || spacegroupsymbol=="P6_2") {  // ------------------- 171  P6_{2}#171
+  else if(spacegroupsymbol=="P6_{2}" || spacegroupsymbol=="P6_2" || spacegroupsymbol=="P62") {  // ------------------- 171  P6_{2}#171
     spacegroupnumber=171;}
-  else if(spacegroupsymbol=="P6_{4}" || spacegroupsymbol=="P6_4") {  // ------------------- 172  P6_{4}#172
+  else if(spacegroupsymbol=="P6_{4}" || spacegroupsymbol=="P6_4" || spacegroupsymbol=="P64") {  // ------------------- 172  P6_{4}#172
     spacegroupnumber=172;}
-  else if(spacegroupsymbol=="P6_{3}" || spacegroupsymbol=="P6_3") {  // ------------------- 173  P6_{3}#173
+  else if(spacegroupsymbol=="P6_{3}" || spacegroupsymbol=="P6_3" || spacegroupsymbol=="P63") {  // ------------------- 173  P6_{3}#173
     spacegroupnumber=173;}
   else if(spacegroupsymbol=="P-6") {  // ------------------- 174  P-6 #174
     spacegroupnumber=174;}
   else if(spacegroupsymbol=="P6/m") {  // ------------------- 175  P6/m #175
     spacegroupnumber=175;}
-  else if(spacegroupsymbol=="P6_{3}/m" || spacegroupsymbol=="P6_3/m") {  // ------------------- 176  P6_{3}/m #176
+  else if(spacegroupsymbol=="P6_{3}/m" || spacegroupsymbol=="P6_3/m" || spacegroupsymbol=="P63/m") {  // ------------------- 176  P6_{3}/m #176
     spacegroupnumber=176;}
   else if(spacegroupsymbol=="P622") {  // ------------------- 177  P622 #177
     spacegroupnumber=177;}
-  else if(spacegroupsymbol=="P6_{1}22" || spacegroupsymbol=="P6_122") {  // ------------------- 178  P6_{1}22 #178
+  else if(spacegroupsymbol=="P6_{1}22" || spacegroupsymbol=="P6_122" || spacegroupsymbol=="P6122") {  // ------------------- 178  P6_{1}22 #178
     spacegroupnumber=178;}
-  else if(spacegroupsymbol=="P6_{5}22" || spacegroupsymbol=="P6_522") {  // ------------------- 179  P6_{5}22 #179
+  else if(spacegroupsymbol=="P6_{5}22" || spacegroupsymbol=="P6_522" || spacegroupsymbol=="P6522") {  // ------------------- 179  P6_{5}22 #179
     spacegroupnumber=179;}
-  else if(spacegroupsymbol=="P6_{2}22" || spacegroupsymbol=="P6_222") {  // ------------------- 180  P6_{2}22 #180
+  else if(spacegroupsymbol=="P6_{2}22" || spacegroupsymbol=="P6_222" || spacegroupsymbol=="P6222") {  // ------------------- 180  P6_{2}22 #180
     spacegroupnumber=180;}
-  else if(spacegroupsymbol=="P6_{4}22" || spacegroupsymbol=="P6_422") {  // ------------------- 181  P6_{4}22 #181
+  else if(spacegroupsymbol=="P6_{4}22" || spacegroupsymbol=="P6_422" || spacegroupsymbol=="P6422") {  // ------------------- 181  P6_{4}22 #181
     spacegroupnumber=181;}
-  else if(spacegroupsymbol=="P6_{3}22" || spacegroupsymbol=="P6_322") {  // ------------------- 182  P6_{3}22 #182
+  else if(spacegroupsymbol=="P6_{3}22" || spacegroupsymbol=="P6_322" || spacegroupsymbol=="P6322") {  // ------------------- 182  P6_{3}22 #182
     spacegroupnumber=182;}
   else if(spacegroupsymbol=="P6mm") {  // ------------------- 183  P6mm #183
     spacegroupnumber=183;}
   else if(spacegroupsymbol=="P6cc") {  // ------------------- 184  P6cc #184
     spacegroupnumber=184;}
-  else if(spacegroupsymbol=="P6_{3}cm" || spacegroupsymbol=="P6_3cm") {  // ------------------- 185  P6_{3}cm #185
+  else if(spacegroupsymbol=="P6_{3}cm" || spacegroupsymbol=="P6_3cm" || spacegroupsymbol=="P63cm") {  // ------------------- 185  P6_{3}cm #185
     spacegroupnumber=185;}
-  else if(spacegroupsymbol=="P6_{3}mc" || spacegroupsymbol=="P6_3mc") {  // ------------------- 186  P6_{3}mc #186
+  else if(spacegroupsymbol=="P6_{3}mc" || spacegroupsymbol=="P6_3mc" || spacegroupsymbol=="P63mc") {  // ------------------- 186  P6_{3}mc #186
     spacegroupnumber=186;}
   else if(spacegroupsymbol=="P-6m2") {  // ------------------- 187  P-6m2 #187
     spacegroupnumber=187;}
@@ -6488,9 +6507,9 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=191;}
   else if(spacegroupsymbol=="P6/mcc") {  // ------------------- 192  P6/mcc #192
     spacegroupnumber=192;}
-  else if(spacegroupsymbol=="P6_{3}/mcm" || spacegroupsymbol=="P6_3/mcm") {  // ------------------- 193  P6_{3}/mcm #193
+  else if(spacegroupsymbol=="P6_{3}/mcm" || spacegroupsymbol=="P6_3/mcm" || spacegroupsymbol=="P63/mcm") {  // ------------------- 193  P6_{3}/mcm #193
     spacegroupnumber=193;}
-  else if(spacegroupsymbol=="P6_{3}/mmc" || spacegroupsymbol=="P6_3/mmc") {  // ------------------- 194  P6_{3}/mmc #194
+  else if(spacegroupsymbol=="P6_{3}/mmc" || spacegroupsymbol=="P6_3/mmc" || spacegroupsymbol=="P63/mmc") {  // ------------------- 194  P6_{3}/mmc #194
     spacegroupnumber=194;}
   else if(spacegroupsymbol=="P23") {  // ------------------- 195  P23 #195
     spacegroupnumber=195;}
@@ -6498,9 +6517,9 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=196;}
   else if(spacegroupsymbol=="I23") {  // ------------------- 197  I23 #197
     spacegroupnumber=197;}
-  else if(spacegroupsymbol=="P2_{1}3" || spacegroupsymbol=="P2_13") {  // ------------------- 198  P2_{1}3 #198
+  else if(spacegroupsymbol=="P2_{1}3" || spacegroupsymbol=="P2_13" || spacegroupsymbol=="P213") {  // ------------------- 198  P2_{1}3 #198
     spacegroupnumber=198;}
-  else if(spacegroupsymbol=="I2_{1}3" || spacegroupsymbol=="I2_13") {  // ------------------- 199  I2_{1}3 #199
+  else if(spacegroupsymbol=="I2_{1}3" || spacegroupsymbol=="I2_13" || spacegroupsymbol=="I213") {  // ------------------- 199  I2_{1}3 #199
     spacegroupnumber=199;}
   else if(spacegroupsymbol=="Pm-3") {  // ------------------- 200  Pm-3 #200
     spacegroupnumber=200;}
@@ -6518,19 +6537,19 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
     spacegroupnumber=206;}
   else if(spacegroupsymbol=="P432") {  // ------------------- 207  P432 #207
     spacegroupnumber=207;}
-  else if(spacegroupsymbol=="P4_{2}32" || spacegroupsymbol=="P4_232") {  // ------------------- 208  P4_{2}32 #208
+  else if(spacegroupsymbol=="P4_{2}32" || spacegroupsymbol=="P4_232" || spacegroupsymbol=="P4232") {  // ------------------- 208  P4_{2}32 #208
     spacegroupnumber=208;}
   else if(spacegroupsymbol=="F432") {  // ------------------- 209  F432 #209
     spacegroupnumber=209;}
-  else if(spacegroupsymbol=="F4_{1}32" || spacegroupsymbol=="F4_132") {  // ------------------- 210  F4_{1}32 #210
+  else if(spacegroupsymbol=="F4_{1}32" || spacegroupsymbol=="F4_132" || spacegroupsymbol=="F4132") {  // ------------------- 210  F4_{1}32 #210
     spacegroupnumber=210;}
   else if(spacegroupsymbol=="I432") {  // ------------------- 211  I432 #211
     spacegroupnumber=211;}
-  else if(spacegroupsymbol=="P4_{3}32" || spacegroupsymbol=="P4_332") {  // ------------------- 212  P4_{3}32 #212
+  else if(spacegroupsymbol=="P4_{3}32" || spacegroupsymbol=="P4_332" || spacegroupsymbol=="P4332") {  // ------------------- 212  P4_{3}32 #212
     spacegroupnumber=212;}
-  else if(spacegroupsymbol=="P4_{1}32" || spacegroupsymbol=="P4_132") {  // ------------------- 213  P4_{1}32 #213
+  else if(spacegroupsymbol=="P4_{1}32" || spacegroupsymbol=="P4_132" || spacegroupsymbol=="P4132") {  // ------------------- 213  P4_{1}32 #213
     spacegroupnumber=213;}
-  else if(spacegroupsymbol=="I4_{1}32" || spacegroupsymbol=="I4_132") {  // ------------------- 214  I4_{1}32 #214
+  else if(spacegroupsymbol=="I4_{1}32" || spacegroupsymbol=="I4_132" || spacegroupsymbol=="I4132") {  // ------------------- 214  I4_{1}32 #214
     spacegroupnumber=214;}
   else if(spacegroupsymbol=="P-43m") {  // ------------------- 215  P-43m #215
     spacegroupnumber=215;}
