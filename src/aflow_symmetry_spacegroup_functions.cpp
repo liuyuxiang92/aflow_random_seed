@@ -2444,53 +2444,7 @@ namespace SYM {
         string equation = "";
         vector<string> eqn;
         for (uint k = 0; k < 3; k++) { 
-          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k]));
-
-//DX 20190823 [OBSOLETE - moved into function]    stringstream ss_eqn;
-//DX 20190823 [OBSOLETE - moved into function]	  string coordinate = "";
-//DX 20190823 [OBSOLETE - moved into function]	  vector<string> vec_coord;
-//DX 20190823 [OBSOLETE - moved into function]	  double running_double = 0.0;
-//DX 20190823 [OBSOLETE - moved into function]	  bool double_only = false; //DX 20190128 
-//DX 20190823 [OBSOLETE - moved into function]	  for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
-//DX 20190823 [OBSOLETE - moved into function]	    if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]	      ss_eqn << testvvvsd[j][m][k][l].chr;
-//DX 20190823 [OBSOLETE - moved into function]	      vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]	    }
-//DX 20190823 [OBSOLETE - moved into function]	    else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]	      ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
-//DX 20190823 [OBSOLETE - moved into function]	      vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]	    }
-//DX 20190823 [OBSOLETE - moved into function]	    else if(testvvvsd[j][m][k][l].chr == '\0'){
-//DX 20190823 [OBSOLETE - moved into function]	      running_double+=testvvvsd[j][m][k][l].dbl;
-//DX 20190823 [OBSOLETE - moved into function]              double_only = true; //DX 20190128
-//DX 20190823 [OBSOLETE - moved into function]	    }
-//DX 20190823 [OBSOLETE - moved into function]	    else {
-//DX 20190823 [OBSOLETE - moved into function]	      //running_double+=testvvvsd[j][m][k][l].dbl;
-//DX 20190823 [OBSOLETE - moved into function]	      ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
-//DX 20190823 [OBSOLETE - moved into function]	      vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]	    }
-//DX 20190823 [OBSOLETE - moved into function]	    ss_eqn.str("");
-//DX 20190823 [OBSOLETE - moved into function]	  }
-//DX 20190823 [OBSOLETE - moved into function]	  while(running_double>1.0){
-//DX 20190823 [OBSOLETE - moved into function]	    running_double-=1.0;
-//DX 20190823 [OBSOLETE - moved into function]	  }
-//DX 20190823 [OBSOLETE - moved into function]	  if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]	    running_double-=1.0;
-//DX 20190823 [OBSOLETE - moved into function]	  }
-//DX 20190823 [OBSOLETE - moved into function]	  //DX 20190129 [OBSOLETE] if(aurostd::abs(running_double) > _ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]	  if(double_only){ //DX 20190129
-//DX 20190823 [OBSOLETE - moved into function]      if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
-//DX 20190823 [OBSOLETE - moved into function]        string running_frac = dbl2frac(running_double,false);
-//DX 20190823 [OBSOLETE - moved into function]        ss_eqn << running_frac;
-//DX 20190823 [OBSOLETE - moved into function]        vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]        ss_eqn.str("");
-//DX 20190823 [OBSOLETE - moved into function]      }
-//DX 20190823 [OBSOLETE - moved into function]    }
-//DX 20190823 [OBSOLETE - moved into function]	  coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-//DX 20190823 [OBSOLETE - moved into function]	  // clean up cases of -+ or +-
-//DX 20190823 [OBSOLETE - moved into function]	  coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-//DX 20190823 [OBSOLETE - moved into function]	  coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-//DX 20190823 [OBSOLETE - moved into function]	  eqn.push_back(coordinate);
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k])); //DX 20190723 - condensed lines below (in previous version) into function
         }
         equation = aurostd::joinWDelimiter(eqn,",");
         general_positions.push_back(equation);
@@ -2515,51 +2469,7 @@ namespace SYM {
         string equation = "";
         vector<string> eqn;
         for (uint k = 0; k < 3; k++) { 
-          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k]));
-//DX 20190823 [OBSOLETE - moved into function]          stringstream ss_eqn;
-//DX 20190823 [OBSOLETE - moved into function]          string coordinate = "";
-//DX 20190823 [OBSOLETE - moved into function]          vector<string> vec_coord;
-//DX 20190823 [OBSOLETE - moved into function]          double running_double = 0.0;
-//DX 20190823 [OBSOLETE - moved into function]          bool double_only = false;
-//DX 20190823 [OBSOLETE - moved into function]          for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
-//DX 20190823 [OBSOLETE - moved into function]            if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << testvvvsd[j][m][k][l].chr;
-//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]            }
-//DX 20190823 [OBSOLETE - moved into function]            else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
-//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]            }
-//DX 20190823 [OBSOLETE - moved into function]            else if(testvvvsd[j][m][k][l].chr == '\0'){
-//DX 20190823 [OBSOLETE - moved into function]              running_double+=testvvvsd[j][m][k][l].dbl;
-//DX 20190823 [OBSOLETE - moved into function]              double_only = true;
-//DX 20190823 [OBSOLETE - moved into function]            }
-//DX 20190823 [OBSOLETE - moved into function]            else {
-//DX 20190823 [OBSOLETE - moved into function]              //running_double+=testvvvsd[j][m][k][l].dbl;
-//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
-//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]            }
-//DX 20190823 [OBSOLETE - moved into function]            ss_eqn.str("");
-//DX 20190823 [OBSOLETE - moved into function]          }
-//DX 20190823 [OBSOLETE - moved into function]          while(running_double>1.0){
-//DX 20190823 [OBSOLETE - moved into function]            running_double-=1.0;
-//DX 20190823 [OBSOLETE - moved into function]          }
-//DX 20190823 [OBSOLETE - moved into function]          if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]            running_double-=1.0;
-//DX 20190823 [OBSOLETE - moved into function]          }
-//DX 20190823 [OBSOLETE - moved into function]          if(double_only){
-//DX 20190823 [OBSOLETE - moved into function]            if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
-//DX 20190823 [OBSOLETE - moved into function]              string running_frac = dbl2frac(running_double,false);
-//DX 20190823 [OBSOLETE - moved into function]              ss_eqn << running_frac;
-//DX 20190823 [OBSOLETE - moved into function]              vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]              ss_eqn.str("");
-//DX 20190823 [OBSOLETE - moved into function]            }
-//DX 20190823 [OBSOLETE - moved into function]          }
-//DX 20190823 [OBSOLETE - moved into function]          coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-//DX 20190823 [OBSOLETE - moved into function]          // clean up cases of -+ or +-
-//DX 20190823 [OBSOLETE - moved into function]          coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-//DX 20190823 [OBSOLETE - moved into function]          coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-//DX 20190823 [OBSOLETE - moved into function]          eqn.push_back(coordinate);
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k])); //DX 20190723 - condensed lines below (in previous version) into function
         }
         equation = aurostd::joinWDelimiter(eqn,",");
         positions.push_back(equation);
@@ -2676,67 +2586,10 @@ namespace SYM {
     string reordered_position = "";
     vector<string> eqn;
     for(uint i=0;i<tokens.size();i++){
-
-//DX 20190823 [OBSOLETE - moved into function]      stringstream ss_eqn;
-//DX 20190823 [OBSOLETE - moved into function]      string coordinate = "";
-//DX 20190823 [OBSOLETE - moved into function]      vector<string> vec_coord;
-//DX 20190823 [OBSOLETE - moved into function]      double running_double = 0.0;
-//DX 20190823 [OBSOLETE - moved into function]      bool double_only = false;
-
       // ---------------------------------------------------------------------------
       // split into equation entities (number, variable) 
       vector<sdouble> sd_coordinate = simplify(tokens[i]);
-      eqn.push_back(SYM::formatWyckoffPosition(sd_coordinate));
-
-//DX 20190823 [OBSOLETE - moved into function]      for(uint j=0;j<sd_coordinate.size();j++){
-//DX 20190823 [OBSOLETE - moved into function]        sdouble sd_num = sd_coordinate[j];
-//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
-//DX 20190823 [OBSOLETE - moved into function]        // if a variable with positive unit factor (1x -> x) 
-//DX 20190823 [OBSOLETE - moved into function]        if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << sd_num.chr;
-//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]        }
-//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
-//DX 20190823 [OBSOLETE - moved into function]        // if a variable with negative unit factor (-1x -> -x)
-//DX 20190823 [OBSOLETE - moved into function]        else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
-//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << "-" << sd_num.chr;
-//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]        }
-//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
-//DX 20190823 [OBSOLETE - moved into function]        // if a number (no variable)
-//DX 20190823 [OBSOLETE - moved into function]        else if(sd_num.chr == '\0'){
-//DX 20190823 [OBSOLETE - moved into function]          running_double+=sd_num.dbl;
-//DX 20190823 [OBSOLETE - moved into function]          double_only = true;
-//DX 20190823 [OBSOLETE - moved into function]        }
-//DX 20190823 [OBSOLETE - moved into function]        // ---------------------------------------------------------------------------
-//DX 20190823 [OBSOLETE - moved into function]        // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
-//DX 20190823 [OBSOLETE - moved into function]        else {
-//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << sd_num.dbl << sd_num.chr;
-//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]        }
-//DX 20190823 [OBSOLETE - moved into function]        ss_eqn.str("");
-//DX 20190823 [OBSOLETE - moved into function]      }
-//DX 20190823 [OBSOLETE - moved into function]
-//DX 20190823 [OBSOLETE - moved into function]      // ---------------------------------------------------------------------------
-//DX 20190823 [OBSOLETE - moved into function]      // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
-//DX 20190823 [OBSOLETE - moved into function]      // (constants in Wyckoff position are always positive)
-//DX 20190823 [OBSOLETE - moved into function]      while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
-//DX 20190823 [OBSOLETE - moved into function]        running_double-=1.0;
-//DX 20190823 [OBSOLETE - moved into function]      }
-//DX 20190823 [OBSOLETE - moved into function]      if(double_only){
-//DX 20190823 [OBSOLETE - moved into function]        if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
-//DX 20190823 [OBSOLETE - moved into function]          string running_frac = dbl2frac(running_double,false);
-//DX 20190823 [OBSOLETE - moved into function]          ss_eqn << running_frac;
-//DX 20190823 [OBSOLETE - moved into function]          vec_coord.push_back(ss_eqn.str());
-//DX 20190823 [OBSOLETE - moved into function]          ss_eqn.str("");
-//DX 20190823 [OBSOLETE - moved into function]        }
-//DX 20190823 [OBSOLETE - moved into function]      }
-//DX 20190823 [OBSOLETE - moved into function]      coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-//DX 20190823 [OBSOLETE - moved into function]      // ---------------------------------------------------------------------------
-//DX 20190823 [OBSOLETE - moved into function]      // clean up cases of -+ or +-
-//DX 20190823 [OBSOLETE - moved into function]      coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-//DX 20190823 [OBSOLETE - moved into function]      coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-//DX 20190823 [OBSOLETE - moved into function]      eqn.push_back(coordinate);
+      eqn.push_back(SYM::formatWyckoffPosition(sd_coordinate)); //DX 20190723 - condensed lines below (in previous version) into function
     }
     reordered_position = aurostd::joinWDelimiter(eqn,",");
 
@@ -3423,84 +3276,7 @@ namespace SYM {
   }
 } //namespace SYM
 
-//DX 20190724 [MOVED TO AUROSTD]// ******************************************************************************
-//DX 20190724 [MOVED TO AUROSTD]// dbl2frac Double to Fraction (Overloaded)
-//DX 20190724 [MOVED TO AUROSTD]// ******************************************************************************
-//DX 20190724 [MOVED TO AUROSTD]namespace SYM {
-//DX 20190724 [MOVED TO AUROSTD]  string dbl2frac(double a, bool sign_prefix) {
-//DX 20190724 [MOVED TO AUROSTD]
-//DX 20190724 [MOVED TO AUROSTD]    string function_name = "SYM::dbl2frac()";
-//DX 20190724 [MOVED TO AUROSTD]    stringstream message;
-//DX 20190724 [MOVED TO AUROSTD]
-//DX 20190724 [MOVED TO AUROSTD]    string out;
-//DX 20190724 [MOVED TO AUROSTD]    bool neg = false;
-//DX 20190724 [MOVED TO AUROSTD]    double tol = _ZERO_TOL_;
-//DX 20190724 [MOVED TO AUROSTD]    if(a < 0) {
-//DX 20190724 [MOVED TO AUROSTD]      neg = true;
-//DX 20190724 [MOVED TO AUROSTD]      a = aurostd::abs(a);
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "0";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - .25) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "1/4";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - .5) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "1/2";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - .75) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "3/4";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "1/3";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "2/3";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "1/6";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]      out = "5/6"; //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "1/8";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "3/8";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "5/8";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "7/8";
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]      out = "1/12"; //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]      out = "5/12"; //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]      out = "7/12"; //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]      out = "11/12"; //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    } //DX 20180726 - added
-//DX 20190724 [MOVED TO AUROSTD]    if(out.size()==0){
-//DX 20190724 [MOVED TO AUROSTD]      message << "Could not find hard-coded fraction for the double " << a << ".";
-//DX 20190724 [MOVED TO AUROSTD]      throw aurostd::xerror(function_name),message,_VALUE_ERROR_);
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    if(sign_prefix){
-//DX 20190724 [MOVED TO AUROSTD]    if(neg == true) {
-//DX 20190724 [MOVED TO AUROSTD]      out = "-" + out;
-//DX 20190724 [MOVED TO AUROSTD]    } else {
-//DX 20190724 [MOVED TO AUROSTD]      out = "+" + out;
-//DX 20190724 [MOVED TO AUROSTD]      }
-//DX 20190724 [MOVED TO AUROSTD]    }
-//DX 20190724 [MOVED TO AUROSTD]    return out;
-//DX 20190724 [MOVED TO AUROSTD]  }
-//DX 20190724 [MOVED TO AUROSTD]} //namespace SYM
+//DX 20190724 [MOVED TO AUROSTD] - dbl2frac() Double to Fraction (Overloaded)
 
 // ******************************************************************************
 // dbl2frac Double to Fraction (Overloaded)
