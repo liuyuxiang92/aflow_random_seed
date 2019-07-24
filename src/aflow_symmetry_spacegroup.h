@@ -464,6 +464,7 @@ namespace SYM {
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position);
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity);
   vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity); //DX 20190128 
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate); //DX 20190723
   string reorderWyckoffPosition(const string& orig_position); //DX 20190708
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, xvector<double>& new_shift);
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring,
@@ -528,7 +529,7 @@ namespace SYM {
   char whichchar(string str_in);
   double whichnum(string str_in);
   double frac2dbl(string str);  //expand to cover case when input is e.g., ".5"
-  string dbl2frac(double a, bool sign_prefix=true);
+  //DX 20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
   void multiply(vector<string> A, vector<string> B);
   void xstring(ostream& output, xmatrix<double> a);
   void cleanupstring(string& str);  //eliminates blank spaces before and after string

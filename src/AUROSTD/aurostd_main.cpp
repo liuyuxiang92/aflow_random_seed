@@ -4917,6 +4917,91 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// FUNCTION DOUBLE2FRACTION
+// DX 20190824 (moved from aflow_symmetry_spacegroup_functions.cpp)
+// hard-coded variant until generic converter is integrated
+
+// ******************************************************************************
+// dbl2frac Double to Fraction (Overloaded)
+// ******************************************************************************
+namespace aurostd {
+  string dbl2frac(double a, bool sign_prefix) {
+
+    string soliloquy = "aurostd::dbl2frac()";
+    stringstream message;
+
+    string out;
+    bool neg = false;
+    double tol = _ZERO_TOL_;
+    if(a < 0) {
+      neg = true;
+      a = aurostd::abs(a);
+    }
+    else if(aurostd::abs(a) < tol) {
+      out = "0";
+    }
+    else if(aurostd::abs(a - .25) < tol) {
+      out = "1/4";
+    }
+    else if(aurostd::abs(a - .5) < tol) {
+      out = "1/2";
+    }
+    else if(aurostd::abs(a - .75) < tol) {
+      out = "3/4";
+    }
+    else if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
+      out = "1/3";
+    }
+    else if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
+      out = "2/3";
+    }
+    else if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
+      out = "1/6";
+    }
+    else if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX 20180726 - added
+      out = "5/6"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
+      out = "1/8";
+    }
+    else if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
+      out = "3/8";
+    }
+    else if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
+      out = "5/8";
+    }
+    else if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
+      out = "7/8";
+    }
+    else if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "1/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "5/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "7/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX 20180726 - added
+      out = "11/12"; //DX 20180726 - added
+    } //DX 20180726 - added
+    else {
+      message << "Could not find hard-coded fraction for the double " << a << ".";
+      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    }
+    if(sign_prefix){
+      if(neg == true) {
+        out = "-" + out;
+      } 
+      else {
+        out = "+" + out;
+      }
+    }
+    return out;
+  }
+} //namespace SYM
+
+// ***************************************************************************
 // SORT WORLD
 // ----------------------------------------------------------------------------
 // sort for vector (starting from xvector)

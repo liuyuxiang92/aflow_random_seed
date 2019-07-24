@@ -2201,14 +2201,14 @@ namespace SYM {
       if(aurostd::abs(a.shift(i)) < tol) {
 	shift_string.push_back("");
       } else {
-	shift_string.push_back(dbl2frac(a.shift(i)));
+	shift_string.push_back(aurostd::dbl2frac(a.shift(i))); //DX 20190724 - now namespace aurostd
       }
     }
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(a.screwglide(i)) < tol) {
 	screwglide_string.push_back("0");
       } else {
-	screwglide_string.push_back(dbl2frac(a.screwglide(i)));
+	screwglide_string.push_back(aurostd::dbl2frac(a.screwglide(i))); //DX 20190724 - now namespace aurostd
       }
     }
     if(!havechar(a.symbol, 'm') && !havechar(a.symbol, 'n') && !havechar(a.symbol, 'd') && !havechar(a.symbol, 'a') && !havechar(a.symbol, 'c') && !havechar(a.symbol, 'b')) {
@@ -2291,7 +2291,7 @@ namespace SYM {
       if(a.symbol == "-1") {
 	output << a.symbol << " " << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       } else if(a.symbol == "1") {
-	output << a.symbol << " " << dbl2frac(a.shift(1)) << "," << dbl2frac(a.shift(2)) << "," << dbl2frac(a.shift(3));
+	output << a.symbol << " " << aurostd::dbl2frac(a.shift(1)) << "," << aurostd::dbl2frac(a.shift(2)) << "," << aurostd::dbl2frac(a.shift(3)); //DX 20190724 - now namespace aurostd
       } else {
 	output << a.symbol << " " << diross.str() << ";" << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       }
