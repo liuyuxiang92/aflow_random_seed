@@ -4990,10 +4990,11 @@ namespace aurostd {
       throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
     }
     if(sign_prefix){
-    if(neg == true) {
-      out = "-" + out;
-    } else {
-      out = "+" + out;
+      if(neg == true) {
+        out = "-" + out;
+      } 
+      else {
+        out = "+" + out;
       }
     }
     return out;
