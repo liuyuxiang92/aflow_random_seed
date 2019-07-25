@@ -203,6 +203,7 @@ void QMesh::generateGridPoints(bool force_gamma) {
     gamma = true;
   }
   _isGammaCentered = gamma;
+  _shifted = !aurostd::iszero(shift);  // ME190701
 
   // Obtain Cartesian coordinates
   for (int q = 0; q < _nQPs; q++) {
@@ -223,7 +224,7 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
 //moveToBZ////////////////////////////////////////////////////////////////////
 // Moves a q-point into the first Brillouin zone.
 // ME190702 - made more robust
-void QMesh::moveToBZ(xvector<double>& qpt) {
+void QMesh::moveToBZ(xvector<double>& qpt) const {
   for (int i = 1; i < 4; i++) {
     while (qpt[i] - 0.5 > _ZERO_TOL_) qpt[i] -= 1.0;
     while (qpt[i] + 0.5 < _ZERO_TOL_) qpt[i] += 1.0;
@@ -353,9 +354,9 @@ int QMesh::getQPointIndex(xvector<double> fpos) const {
   if (_shifted) fpos += _shift;
   moveToBZ(fpos);
   // invert Monkhorst-Pack formula;
-  int p = (int) (fpos[1] * 2 * _qptGrid[1] + _qptGrid[1] + 1)/2;
-  int r = (int) (fpos[2] * 2 * _qptGrid[2] + _qptGrid[2] + 1)/2;
-  int s = (int) (fpos[3] * 2 * _qptGrid[3] + _qptGrid[3] + 1)/2;
+  int p = (int) aurostd::nint((fpos[1] * 2 * _qptGrid[1] + _qptGrid[1] + 1)/2);
+  int r = (int) aurostd::nint((fpos[2] * 2 * _qptGrid[2] + _qptGrid[2] + 1)/2);
+  int s = (int) aurostd::nint((fpos[3] * 2 * _qptGrid[3] + _qptGrid[3] + 1)/2);
   return _qptMap[p - 1][r - 1][s - 1];
 }
 

@@ -80,8 +80,6 @@ bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
   vector<_xinput>& xinp = xInputsAAPL.back();
   xinp.assign(nruns, _xInput);
   
-  std::cout << "allocated" << std::endl;
-
   int idxRun = 0;
   for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
     const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;  // ME190108 - Declare to make code more legible

@@ -559,6 +559,16 @@ namespace aurostd {
     void eigen(const xmatrix<utype> &ain,xvector<utype> &wr,xvector<utype> &wi) __xprototype;
   // Finds all eigenvalues of matrix a[1..n][1..n]. The real and imaginary parts
   // of the eigenvalues are returned in wr[1..n] and wi[1..n], respectively.
+  // ME190718 - BEGIN
+  template<class utype>
+    utype l1_norm(const xmatrix<utype>&);
+  template<class utype>
+    double l2_norm(const xmatrix<utype>&);
+  template<class utype>
+    double frobenius_norm(const xmatrix<utype>&);
+  template<class utype>
+    utype linf_norm(const xmatrix<utype>&);
+  // ME190718 - END
 }
 
 

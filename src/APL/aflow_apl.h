@@ -597,18 +597,20 @@ class Supercell {
                      bool = true);
   int buildSuitableForShell(int, bool, bool VERBOSE);
   void setupShellRestrictions(int);
-  bool isShellRestricted();
-  int getMaxShellID();
-  int getNumberOfAtoms();
-  int getNumberOfUniqueAtoms();
-  int getNumberOfEquivalentAtomsOfType(int); //CO190218
-  int getUniqueAtomID(int);
-  int getUniqueAtomID(int, int);
-  const _atom& getUniqueAtom(int);
-  string getUniqueAtomSymbol(int);
-  double getUniqueAtomMass(int);
-  double getAtomMass(int);
-  int getAtomNumber(int);
+  // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
+  bool isShellRestricted() const;
+  int getMaxShellID() const;
+  int getNumberOfAtoms() const;
+  int getNumberOfUniqueAtoms() const;
+  int getNumberOfEquivalentAtomsOfType(int) const; //CO190218
+  int getUniqueAtomID(int) const;
+  int getUniqueAtomID(int, int) const;
+  const _atom& getUniqueAtom(int) const;
+  string getUniqueAtomSymbol(int) const;
+  double getUniqueAtomMass(int) const;
+  double getAtomMass(int) const;
+  int getAtomNumber(int) const;
+  // ME190715 END
   const xstructure& getSupercellStructure() const;
   const xstructure& getSupercellStructureLight() const;
   const xstructure& getPrimitiveStructure() const;
@@ -627,17 +629,19 @@ class Supercell {
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
                             int&, xvector<xcomplex<double> >&, bool);  // ME 180828
-  int pc2scMap(int);
-  int sc2pcMap(int);
+  // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
+  int pc2scMap(int) const;
+  int sc2pcMap(int) const;
   void center(int);
   //CO - START
   void center_original(void);
   //corey
-  const vector<vector<_sym_op> >& getAGROUP(void);
-  const vector<_sym_op>& getFGROUP(void);
-  const vector<_sym_op>& getAGROUP(int);
-  bool isDerivativeStructure();
-  double getEPS(void);
+  const vector<vector<_sym_op> >& getAGROUP(void) const;
+  const vector<_sym_op>& getFGROUP(void) const;
+  const vector<_sym_op>& getAGROUP(int) const;
+  bool isDerivativeStructure() const;
+  double getEPS(void) const;
+  // ME190715 - END
   // CO - END
   // **** BEGIN JJPR *****
   xvector<int> scell;
@@ -1566,11 +1570,12 @@ class TCONDCalculator {
     void calculateTransitionProbabilities(int);
     void calculateThermalConductivity();
 
-    vector<vector<vector<int> > > getLastQPoint(int);
+    void calculateScatteringProcesses(int);
   private:
     PhononCalculator& _pc;  // Reference to the phonon calculator
     QMesh& _qm;  // Reference to the q-point mesh
     Logger& _logger;  // The APL logger
+    string tmpdir;
 
     void free();
 
@@ -1614,6 +1619,45 @@ class TCONDCalculator {
     void writeTempDepRatesFile(string, const string&);
     void writeThermalConductivity();
     // void writeThermalConductivityPlot(); OBSOLETE ME190614
+
+    void getLastQPoint(int, int, int);
+//    vector<vector<vector<xcomplex<double> > > > calculatePhases();
+    vector<vector<vector<vector<xcomplex<double> > > > > calculatePhases();
+    vector<vector<int> > calculateInvariantSymOps();
+    double calculateIntegrationWeights(int, const LTMethod&);
+    void calculateWeightsLT(const LTMethod&, int, int, int, vector<double>&);
+    vector<double> getWeightsLT(const LTMethod&, double, const vector<double>&);
+    double integrate(const LTMethod&, double, const vector<double>&, const vector<double>&);
+//    void calculateTransitionProbabilities(const vector<vector<vector<xcomplex<double> > > >&);
+//    void calculateTransitionProbabilitiesPhonon(int, int, int, const vector<vector<vector<xcomplex<double> > > >&);
+    void calculateTransitionProbabilities(const vector<vector<vector<vector<xcomplex<double> > > > >&);
+    void calculateTransitionProbabilitiesPhonon(int, int, int, const vector<vector<vector<vector<xcomplex<double> > > > >&);
+    void calculateTransitionProbabilitiesIsotope(const LTMethod&, int, int, vector<vector<double> >&);
+    void calculateTransitionProbabilitiesBoundary();
+    void getProcess(ifstream&, vector<int>&, vector<int>&);
+    void getProcess(int, ifstream&, ifstream&, vector<bool>&, vector<int>&, vector<int>&);
+
+    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&);
+    double getOccupationTerm(int, const vector<vector<double> >&, const vector<bool>&,
+                             const vector<int>&, const vector<int>&);
+    vector<vector<double> > getRates(double);
+    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<double> >&,
+                             const vector<vector<int> >&, vector<vector<xvector<double> > >&);
+    void calculateDelta(int, int, const vector<vector<int> >&, const vector<vector<double> >&,
+                        const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+    void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+    void calculateAnharmonicRates(int, double, const vector<vector<double> >&);
+    void calcAnharmRates(int, int, int, const vector<vector<double> >&, vector<vector<double> >&);
+    
+    void openTmpFile(ofstream&, const string&);
+    void openTmpFile(ifstream&, const string&);
+    void closeTmpFile(ofstream&, const string&);
+    void closeTmpFile(ifstream&, const string&);
+    void writeRatesToTmpFile(const string&, const vector<vector<double> >&);
+    vector<vector<double> > readRatesFromTmpFile(const string&);
+    void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
+    void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
+    void writeDataBlock(stringstream&, const vector<vector<double> >&);
 };
 
 }  // namespace apl

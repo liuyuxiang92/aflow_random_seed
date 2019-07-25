@@ -2072,22 +2072,19 @@ void RunPhonons_APL_181216(_xinput& xinput,
       logger << "Starting thermal conductivity calculations." << apl::endl;
       apl::TCONDCalculator tcond(*phcalc, qmtcond, logger);
 
-      tcond.setCalculationOptions(USER_BTE, USER_ISOTOPE,
-                                  USER_CUMULATIVEK, USER_AAPL_FOURTH_ORDER,
-                                  USER_BOUNDARY, USER_NANO_SIZE, USER_TCT_TSTART,
-                                  USER_TCT_TEND, USER_TCT_TSTEP);
-      for (int i = 3; i < 5; i++) {
-        std::cout << i << std::endl;
-        tcond.getLastQPoint(i);
-      }
+      // Set calculation options
+      tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));
+      tcond.calc_options.flag("ISOTOPE", USER_ISOTOPE);
+      tcond.calc_options.flag("BOUNDARY", USER_BOUNDARY);
+      tcond.calc_options.flag("CUMULATIVE", USER_CUMULATIVEK);
+      tcond.calc_options.flag("FOURTH_ORDER", USER_AAPL_FOURTH_ORDER);
+      tcond.calc_options.push_attached("GRAIN_SIZE", aurostd::utype2string<double>(USER_NANO_SIZE));
+      tcond.calc_options.push_attached("TSTART", aurostd::utype2string<double>(USER_TCT_TSTART));
+      tcond.calc_options.push_attached("TEND", aurostd::utype2string<double>(USER_TCT_TEND));
+      tcond.calc_options.push_attached("TSTEP", aurostd::utype2string<double>(USER_TCT_TSTEP));
+      tcond.calc_options.push_attached("KZIP_BIN", kflags.KZIP_BIN);
 
-      // Calculate lattice thermal conductivity
-//      tcond.calculateFrequenciesGroupVelocities();
-//      tcond.calculateTransitionProbabilities(3);
-//      if (USER_AAPL_FOURTH_ORDER) {
-//        tcond.calculateTransitionProbabilities(4);
-//      }
-//      tcond.calculateThermalConductivity();
+      tcond.calculateThermalConductivity();
  
       tcond.clear();
     }

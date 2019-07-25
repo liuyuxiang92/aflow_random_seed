@@ -266,6 +266,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
+  // ME190718 - norms
+  aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
 
   //[ME 180627 START]

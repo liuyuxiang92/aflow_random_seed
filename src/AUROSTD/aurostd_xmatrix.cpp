@@ -3536,6 +3536,54 @@ namespace aurostd {
   }
 }
 
+
+//*****************************************************************************
+// MATRIX NORMS - ME190718
+//*****************************************************************************
+
+namespace aurostd {
+  template<class utype>
+  utype l1_norm(const xmatrix<utype>& m) {
+    xvector<utype> vals(m.lcols, m.ucols);
+    for (int i = m.lcols; i <= m.ucols; i++) {
+      for (int j = m.lrows; j <= m.urows; j++) {
+        vals[i] += abs(m[j][i]);
+      }
+    }
+    return max(vals);
+  }
+
+  template<class utype>
+  double frobenius_norm(const xmatrix<utype>& m) {
+    double norm = 0;
+    for (int i = m.lrows; i <= m.urows; i++) {
+      for (int j = m.lcols; j <= m.ucols; j++) {
+        norm += abs(m[i][j]) * abs(m[i][j]);
+      }
+    }
+    return sqrt(norm);
+  }
+
+  template<class utype>
+  double l2_norm(const xmatrix<utype>& m) {
+    xvector<utype> wr(m.rows), wi(m.rows);
+    eigen(m, wr, wi);
+    eigen((trasp(m)*m), wr, wi);
+    return sqrt(max(wr));
+  }
+
+  template<class utype>
+  utype linf_norm(const xmatrix<utype>& m) {
+    xvector<utype> vals(m.lrows, m.urows);
+    for (int i = m.lrows; i <= m.urows; i++) {
+      for (int j = m.lcols; j <= m.ucols; j++) {
+        vals[i] += abs(m[i][j]);
+      }
+    }
+    return max(vals);
+  }
+}
+
 //*****************************************************************************
 // ---------------------------------------------------------- aurostd::cematrix
 namespace aurostd { // namespace aurostd

@@ -858,11 +858,13 @@ void Supercell::setupShellRestrictions(int MAX_NN_SHELLS) {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-bool Supercell::isShellRestricted() {
+// ME190715 - added const to use function with const Supercell &
+bool Supercell::isShellRestricted() const {
   return _isShellRestricted;
 }
 
-int Supercell::getMaxShellID() {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getMaxShellID() const {
   return _maxShellID;
 }
 
@@ -987,19 +989,22 @@ const xstructure& Supercell::getInputStructureLight() const {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::getNumberOfAtoms() {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getNumberOfAtoms() const {
   return _scStructure.atoms.size();
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::getNumberOfUniqueAtoms() {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getNumberOfUniqueAtoms() const {
   return _scStructure.iatoms.size();
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::getNumberOfEquivalentAtomsOfType(int i) { //CO190218
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO190218
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.iatoms.size())
     throw APLRuntimeError("apl::Supercell::getNumberOfEquivalentAtomsOfType: Wrong index."); //CO190218
@@ -1009,7 +1014,8 @@ int Supercell::getNumberOfEquivalentAtomsOfType(int i) { //CO190218
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::getUniqueAtomID(int i) {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getUniqueAtomID(int i) const {
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.iatoms.size())
     throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index.");
@@ -1019,7 +1025,8 @@ int Supercell::getUniqueAtomID(int i) {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::getUniqueAtomID(int i, int j) {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getUniqueAtomID(int i, int j) const {
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.iatoms.size())
     throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index 1.");
@@ -1032,7 +1039,8 @@ int Supercell::getUniqueAtomID(int i, int j) {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-const _atom& Supercell::getUniqueAtom(int i) {
+// ME190715 - added const to use function with const Supercell &
+const _atom& Supercell::getUniqueAtom(int i) const {
   return _scStructure.atoms[getUniqueAtomID(i)];
 }
 
@@ -1543,11 +1551,13 @@ const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID,
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::pc2scMap(int i) {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::pc2scMap(int i) const {
   return _pc2scMap[i];
 }
 
-int Supercell::sc2pcMap(int i) {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::sc2pcMap(int i) const {
   return _sc2pcMap[i];
 }
 
@@ -1599,35 +1609,41 @@ void Supercell::center_original(void) {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-const vector<_sym_op>& Supercell::getFGROUP(void) {
+// ME190715 - added const to use function with const Supercell &
+const vector<_sym_op>& Supercell::getFGROUP(void) const {
   return _scStructure.fgroup;
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
-const vector<vector<_sym_op> >& Supercell::getAGROUP(void) {
+// ME190715 - added const to use function with const Supercell &
+const vector<vector<_sym_op> >& Supercell::getAGROUP(void) const {
   return _scStructure.agroup;
 }
-const vector<_sym_op>& Supercell::getAGROUP(int i) {
+// ME190715 - added const to use function with const Supercell &
+const vector<_sym_op>& Supercell::getAGROUP(int i) const {
   return _scStructure.agroup[i];
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
-double Supercell::getEPS(void) {
+// ME190715 - added const to use function with const Supercell &
+double Supercell::getEPS(void) const {
   return _sym_eps;
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
-bool Supercell::isDerivativeStructure(void) {
+// ME190715 - added const to use function with const Supercell &
+bool Supercell::isDerivativeStructure(void) const {
   return _derivative_structure;
 }
 //CO - END
 
 // ///////////////////////////////////////////////////////////////////////////
 
-string Supercell::getUniqueAtomSymbol(int i) {
+// ME190715 - added const to use function with const Supercell &
+string Supercell::getUniqueAtomSymbol(int i) const {
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.iatoms.size()) {
     throw APLRuntimeError("apl::Supercell::getUniqueAtomSymbol(): Wrong index.");
@@ -1638,7 +1654,8 @@ string Supercell::getUniqueAtomSymbol(int i) {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-double Supercell::getUniqueAtomMass(int i) {
+// ME190715 - added const to use function with const Supercell &
+double Supercell::getUniqueAtomMass(int i) const {
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.iatoms.size()) {
     throw APLRuntimeError("apl::Supercell::getUniqueAtomMass(): Wrong index.");
@@ -1656,8 +1673,8 @@ double Supercell::getUniqueAtomMass(int i) {
 }
 
 // ///////////////////////////////////////////////////////////////////////////
-
-double Supercell::getAtomMass(int i) {
+// ME190715 - added const to use function with const Supercell &
+double Supercell::getAtomMass(int i) const {
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.atoms.size()) {
     throw APLRuntimeError("apl::Supercell::getAtomMass(): Wrong index.");
@@ -1669,7 +1686,8 @@ double Supercell::getAtomMass(int i) {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::getAtomNumber(int i) {
+// ME190715 - added const to use function with const Supercell &
+int Supercell::getAtomNumber(int i) const {
 #ifndef __OPTIMIZE
   if (i >= (int)_scStructure.atoms.size()) {
     throw APLRuntimeError("apl::Supercell::getAtomNumber(): Wrong index.");
@@ -1710,8 +1728,8 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
     for (int i = 1; i < 4; i++) {
       derivative[i].re = 0.0;
       derivative[i].im = 0.0;
-          }
-        }
+    }
+  }
 
   // Count in all atoms which sit on this shell
   if (!_isShellRestricted || (rshell <= _maxShellRadius[centerID] + _AFLOW_APL_EPS_)) {
