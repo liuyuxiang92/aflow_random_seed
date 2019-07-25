@@ -1127,24 +1127,24 @@ class _atom_type_cmp {                                   // sorting through type
 };
 
 #define NUM_ELEMENTS (103+1)  // up to Uranium
-extern std::vector<string> vatom_symbol;             // store starting from ONE
-extern std::vector<string> vatom_name;               // store starting from ONE
-extern std::vector<double> vatom_mass;               // store starting from ONE
-extern std::vector<double> vatom_volume;             // store starting from ONE
-extern std::vector<int> vatom_valence_iupac;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<int> vatom_valence_std;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> vatom_radius;             // store starting from ONE - Saxena
-extern std::vector<double> vatom_radius_covalent;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j // DX and CO - 9/4/17
-extern std::vector<double> vatom_electronegativity;  // store starting from ONE - Saxena
-extern std::vector<string> vatom_crystal;            // store starting from ONE - Ashcroft Mermin
-extern std::vector<double> vatom_xray_scatt;              // store starting from ONE
-extern std::vector<double> vatom_pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-extern std::vector<double> vatom_pearson_coefficient;         // ME 181020
+extern std::vector<string> atom_symbol_vec;             // store starting from ONE
+extern std::vector<string> atom_name_vec;               // store starting from ONE
+extern std::vector<double> atom_mass_vec;               // store starting from ONE
+extern std::vector<double> atom_volume_vec;             // store starting from ONE
+extern std::vector<int> atom_valence_iupac_vec;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+extern std::vector<int> atom_valence_std_vec;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+extern std::vector<double> atom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> atom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> atom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> atom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> atom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> atom_radius_vec;             // store starting from ONE - Saxena
+extern std::vector<double> atom_radius_covalent_vec;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j // DX and CO - 9/4/17
+extern std::vector<double> atom_electronegativity_vec;  // store starting from ONE - Saxena
+extern std::vector<string> atom_crystal_vec;            // store starting from ONE - Ashcroft Mermin
+extern std::vector<double> xray_scatt_vec;              // store starting from ONE
+extern std::vector<double> pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+extern std::vector<double> pearson_coefficient;         // ME 181020
 
 void atoms_initialize(void);
 uint GetAtomNumber(const string& symbol);
@@ -3670,7 +3670,7 @@ namespace SYM {
   bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, double tolerance); //CO190520 - removed pointers for bools and doubles, added const where possible
   bool checkAngle(double& mod_v1, double& mod_v2, double angle1, double angle2, bool& is_deg, double tolerance); //CO190520 - removed pointers for bools and doubles, added const where possible
   // DX 9/5/17 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance, int& count , double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190524 - need pointer for tolerance, otherwise it will not update
+  bool change_tolerance(xstructure& xstr, double tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
   double mod_one(double d); // DX 
@@ -4166,10 +4166,6 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 // ----------------------------------------------------------------------------
 // aflowlib.h stuff
 #include "aflow_pflow.h"
-
-// ----------------------------------------------------------------------------
-// aflow_xelement.h stuff
-#include "aflow_xelement.h"
 
 #endif
 // ***************************************************************************

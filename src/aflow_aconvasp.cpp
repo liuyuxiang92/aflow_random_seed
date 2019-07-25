@@ -626,8 +626,8 @@ double GetXrayScattFactor(const string& _name,double lambda,bool clean) {
   if(lambda) {;} // phony just to keep lambda busy
   // Does not use lambda for now.
   double scatt_fact=0.0;
-  for(uint iat=0;iat<vatom_name.size();iat++)
-    if(name==vatom_name[iat] || name==vatom_symbol[iat]) scatt_fact=vatom_xray_scatt[iat];
+  for(uint iat=0;iat<atom_name_vec.size();iat++)
+    if(name==atom_name_vec[iat] || name==atom_symbol_vec[iat]) scatt_fact=xray_scatt_vec[iat];
   return scatt_fact;
 }
 

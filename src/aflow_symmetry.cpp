@@ -322,7 +322,7 @@ namespace SYM {
 // Tolerance scan for symmetry analysis
 namespace SYM {
   // DX 9/5/17 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible,  //DX 20190524 - need pointer for change tolerance, otherwise it will not update
+  bool change_tolerance(xstructure& xstr, double tolerance, double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible
     // Scans between 5*orig_tol/10.0 on upper end and 5*orig_tol/10 on the right
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // DX 20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
