@@ -194,7 +194,7 @@ void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
   // Execute gnuplot and pdflatex
   aurostd::stringstream2file(gpfile, filename + ".plt");
   aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
-  aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex > /dev/null");
+  aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
   // Convert to the desired format if not pdf
   if (format != "pdf") {
     aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
