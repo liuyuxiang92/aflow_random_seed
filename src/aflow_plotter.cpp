@@ -260,7 +260,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     vector<string> tokens;
     aurostd::string2tokens(default_title, tokens, "_");
     if (tokens.size() == 3) {
-      title = pflow::prettyPrintCompound(tokens[0], _none_, true, _latex_) + " (ICSD \\#" + tokens[2];
+      title = pflow::prettyPrintCompound(tokens[0], no_vrt, true, latex_ft) + " (ICSD \\#" + tokens[2];  //_none_ //_latex_ //CO190629
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
       else title += ", " + lattice + ")";
@@ -281,13 +281,13 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
         vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
         vector<double> composition = getCompositionFromANRLProtoype(proto);
         proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-        title = pflow::prettyPrintCompound(elements, composition, _none_, true, _latex_) + " (" + proto;
+        title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO190629
       } else {
         aflowlib::GetAllPrototypeLabels(protos, "all");
         if (aurostd::withinList(protos, proto)) {
           if (tokens.size() == 3) proto += "." + tokens[2];
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-          title = pflow::prettyPrintCompound(tokens[0], _none_, true, _latex_) + " (" + proto;
+          title = pflow::prettyPrintCompound(tokens[0], no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO190629
         } else {  // Title not in prototype format
           return default_title;
         }
@@ -408,7 +408,7 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
       generic = true;
       broken = true;
     } else {
-      compound = pflow::prettyPrintCompound(elements, composition, _none_, true, _latex_);
+      compound = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft);  //_none_ //_latex_ //CO190629
     }
   }
   if (generic) {  // Broken or unsupported string, so use a very generric title

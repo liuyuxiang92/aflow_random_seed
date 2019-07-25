@@ -399,6 +399,10 @@
 #define AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION                              300
 #define         DEFAULT_CHULL_PNG_RESOLUTION                              XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_PNG_RESOLUTION")
 
+// DEFAULT GFA
+#define AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     0.05  //CO190628
+#define         DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     XHOST.adefault.getattachedutype<double>("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF")  //CO190628
+
 // DEFAULT ARUN
 #define AFLOWRC_ARUN_DIRECTORY_PREFIX                         string("ARUN.")
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
@@ -1070,6 +1074,9 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_CHULL_LATEX_BOLD_LABELS",AFLOWRC_DEFAULT_CHULL_LATEX_BOLD_LABELS); 
     aflowrc::load_default("DEFAULT_CHULL_PNG_RESOLUTION",AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION); 
 
+    // DEFAULT GFA  //CO190628
+    aflowrc::load_default("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF",AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF); //CO190628
+
     // DEFAULT ARUN
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
 
@@ -1511,6 +1518,10 @@ namespace aflowrc {
     aflowrc << "DEFAULT_CHULL_LATEX_BOLD_LABELS=" << AFLOWRC_DEFAULT_CHULL_LATEX_BOLD_LABELS << " // -1 - default: no bold unless the compound is a ternary, 0 - FALSE, 1 - TRUE" << endl;
     aflowrc << "DEFAULT_CHULL_PNG_RESOLUTION=" << AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION << " // INT" << endl;
 
+    aflowrc << " " << endl; //CO190628
+    aflowrc << "// DEFAULTS GFA" << endl; //CO190628
+    aflowrc << "DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF=" << AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << " // DOUBLE in eV" << endl; //CO190628
+    
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS ARUN" << endl;
     aflowrc << "ARUN_DIRECTORY_PREFIX=\"" << AFLOWRC_ARUN_DIRECTORY_PREFIX << "\"" << endl;
@@ -1928,6 +1939,9 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_CHULL_LATEX_ROTATE_LABELS\")=" << DEFAULT_CHULL_LATEX_ROTATE_LABELS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_LATEX_BOLD_LABELS\")=" << DEFAULT_CHULL_LATEX_BOLD_LABELS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_PNG_RESOLUTION\")=" << DEFAULT_CHULL_PNG_RESOLUTION << endl;
+    
+    if(LDEBUG) oss << "// DEFAULTS GFA" << endl;  //CO190628
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF\")=" << DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << endl;  //CO190628
     
     if(LDEBUG) oss << "// DEFAULTS ARUN" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;

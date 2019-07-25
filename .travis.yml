@@ -16,3 +16,4 @@ script:
   - cd src
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ];   then make -j 4 ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then make mac  ; fi
+  - make check_full

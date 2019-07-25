@@ -285,13 +285,16 @@ namespace aurostd {
   uint ProgressBar(std::ostream& oss,string prelim,double j,bool VERBOSE_PERCENTAGE,bool VERBOSE_ROLLER,bool VERBOSE_CURSOR);
   uint ProgressBar(std::ostream& oss,string prelim,double j);  
   //about cleaning up strings
-  bool RemoveControlCodeCharactersFromString(string& in, string& out); //DX 20190516
+  bool RemoveControlCodeCharactersFromString(const string& in, string& out); //DX 20190516  //CO190620
   bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out); //DX 20190516
   bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file=true); //DX 20190516
   bool isNullByte(char c); //DX190131
   string removeNullBytes(string in); //DX190131
   bool RemoveBinaryCharactersFromFile(string directory, string filename); //DX 20190211
   string CleanStringASCII(const string& s) __xprototype;
+  string CleanStringASCII_190712(const string& s) __xprototype; //CO190712
+  string CleanStringASCII_190101(const string& s) __xprototype; //CO190712
+  void CleanStringASCII_InPlace(string& s) __xprototype;  //CO190712
   string CGI_StringClean(const string& stringIN) __xprototype;
   string RemoveWhiteSpaces(const string& s) __xprototype;
   string RemoveWhiteSpaces(const string& s, const char toogle) __xprototype;
@@ -307,11 +310,20 @@ namespace aurostd {
   string RemoveComments(const string& s) __xprototype;
   vector<string> RemoveComments(const vector<string>&) __xprototype;  // ME190614
   string RemoveCharacter(const string& s, const char character) __xprototype;
-  string RemoveNumbers(const string& s) __xprototype;
+  void RemoveCharacterInPlace(string& s, const char character) __xprototype;  //CO190712
+  string RemoveCharacterFromTheBack(const string& s, const char character); __xprototype; //DX 20190708
+  string RemoveCharacterFromTheFront(const string& s, const char character); __xprototype; //DX 20190708
+  string RemoveCharacterFromTheFrontAndBack(const string& s, const char character); __xprototype; //DX 20190708
+  string RemoveNumbers(const string& s) __xprototype; //CO190712
+  string RemoveNumbers_190712(const string& s) __xprototype;  //CO10712
+  string RemoveNumbers_190101(const string& s) __xprototype;  //CO190712
+  void RemoveNumbersInPlace(string& s) __xprototype;  //CO190712
   string RemoveRounding(const string& s) __xprototype;
   //string RemoveCharacter(const string& s, const char character, const char toogle) __xprototype;
   string RemoveSubStringFirst(const string& str_orig, const string& str_rm) __xprototype;
+  void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO190712
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
+  void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO190712
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);
@@ -704,6 +716,7 @@ namespace aurostd {
   string latex2html(const string& str) __xprototype;
   string latex2txt(const string& str) __xprototype;
   string fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string);  //CO190419
+  string dbl2frac(double a, bool sign_prefix=true); //DX 20190724
 }
 
 

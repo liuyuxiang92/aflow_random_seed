@@ -1322,7 +1322,7 @@ namespace SYM {
 	      //DX 20190613 [OBSOLETE] SYM::minimizeCartesianDistance(origin, rhs_cart_xvec, rhs_tmp, c2f, f2c, tol); //DX 20190215
       } else {
         xvector<double> rhs_frac_xvec = SYM::minimizeDistanceFractionalMethod(rhs_tmp); //DX 20190613
-        rhs_cart_xvec = f2c * rhs_tmp; //DX 20190613
+        rhs_cart_xvec = f2c * rhs_frac_xvec; //DX 20190718 - rhs_frac_xvec not rhs_tmp //DX 20190613
 	      //DX 20190613 [OBSOLETE] SYM::PBC(rhs_tmp);
       }
       //DX 20190613 [OBSOLETE] rhs_cart_xvec = f2c * rhs_tmp;
@@ -2441,55 +2441,13 @@ namespace SYM {
     vector<vector<vector<vector<sdouble> > > > testvvvsd = convert_wyckoff_pos_sd(testvvvstring);
     for (uint j = 0; j < testvvvsd.size(); j++) {
       for (uint m = 0; m < testvvvsd[j].size(); m++) {
-	string equation = "";
-	vector<string> eqn;
-	for (uint k = 0; k < 3; k++) { 
-	  stringstream ss_eqn;
-	  string coordinate = "";
-	  vector<string> vec_coord;
-	  double running_double = 0.0;
-	  bool double_only = false; //DX 20190128 
-	  for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
-	    if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
-	      ss_eqn << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
-	      ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr == '\0'){
-	      running_double+=testvvvsd[j][m][k][l].dbl;
-              double_only = true; //DX 20190128
-	    }
-	    else {
-	      //running_double+=testvvvsd[j][m][k][l].dbl;
-	      ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    ss_eqn.str("");
-	  }
-	  while(running_double>1.0){
-	    running_double-=1.0;
-	  }
-	  if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
-	    running_double-=1.0;
-	  }
-	  //DX 20190129 [OBSOLETE] if(aurostd::abs(running_double) > _ZERO_TOL_){
-	  if(double_only){ //DX 20190129
-	    string running_frac = dbl2frac(running_double,false);
-	    ss_eqn << running_frac;
-	    vec_coord.push_back(ss_eqn.str());
-	    ss_eqn.str("");
-	  }
-	  coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-	  // clean up cases of -+ or +-
-	  coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-	  coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-	  eqn.push_back(coordinate);
-	}
-	equation = aurostd::joinWDelimiter(eqn,",");
-	general_positions.push_back(equation);
+        string equation = "";
+        vector<string> eqn;
+        for (uint k = 0; k < 3; k++) { 
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k])); //DX 20190723 - condensed lines below (in previous version) into function
+        }
+        equation = aurostd::joinWDelimiter(eqn,",");
+        general_positions.push_back(equation);
       }
     }
     return general_positions;
@@ -2508,60 +2466,137 @@ namespace SYM {
     vector<vector<vector<vector<sdouble> > > > testvvvsd = convert_wyckoff_pos_sd(testvvvstring);
     for (uint j = 0; j < testvvvsd.size(); j++) {
       for (uint m = 0; m < testvvvsd[j].size(); m++) {
-	string equation = "";
-	vector<string> eqn;
-	for (uint k = 0; k < 3; k++) { 
-	  stringstream ss_eqn;
-	  string coordinate = "";
-	  vector<string> vec_coord;
-	  double running_double = 0.0;
-    bool double_only = false;
-	  for (uint l = 0; l < testvvvsd[j][m][k].size(); l++) {
-	    if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl-1)<_ZERO_TOL_){
-	      ss_eqn << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr != '\0' && aurostd::abs(testvvvsd[j][m][k][l].dbl+1)<_ZERO_TOL_){
-	      ss_eqn << "-" << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    else if(testvvvsd[j][m][k][l].chr == '\0'){
-	      running_double+=testvvvsd[j][m][k][l].dbl;
-        double_only = true;
-	    }
-	    else {
-	      //running_double+=testvvvsd[j][m][k][l].dbl;
-	      ss_eqn << testvvvsd[j][m][k][l].dbl << testvvvsd[j][m][k][l].chr;
-	      vec_coord.push_back(ss_eqn.str());
-	    }
-	    ss_eqn.str("");
-	  }
-	  while(running_double>1.0){
-	    running_double-=1.0;
-	  }
-	  if(aurostd::abs(running_double-1.0) < _ZERO_TOL_){
-	    running_double-=1.0;
-	  }
-	  if(double_only){
-	    string running_frac = dbl2frac(running_double,false);
-	    ss_eqn << running_frac;
-	    vec_coord.push_back(ss_eqn.str());
-	    ss_eqn.str("");
-	  }
-	  coordinate = aurostd::joinWDelimiter(vec_coord,"+");
-	  // clean up cases of -+ or +-
-	  coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
-	  coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
-	  eqn.push_back(coordinate);
-	}
-	equation = aurostd::joinWDelimiter(eqn,",");
-	positions.push_back(equation);
+        string equation = "";
+        vector<string> eqn;
+        for (uint k = 0; k < 3; k++) { 
+          eqn.push_back(SYM::formatWyckoffPosition(testvvvsd[j][m][k])); //DX 20190723 - condensed lines below (in previous version) into function
+        }
+        equation = aurostd::joinWDelimiter(eqn,",");
+        positions.push_back(equation);
       }
     }
     return positions;
   }
 } //namespace SYM
 //DX 20190128 -END
+
+// DX 20190723 - START
+// ******************************************************************************
+// formatWyckoffPosition
+// ******************************************************************************
+namespace SYM {
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate){
+
+    // put variables first (e.g., 1/2+x -> x+1/2)
+    // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
+    // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
+    // this function will be circumvented when symbolic math is integrated
+    // DX 20190723
+
+    string soliloquy = "SYM::formatWyckoffPosition()";
+    
+    stringstream ss_eqn;
+    string coordinate = "";
+    vector<string> vec_coord;
+    double running_double = 0.0;
+    bool double_only = false;
+
+    for(uint j=0;j<sd_coordinate.size();j++){
+      sdouble sd_num = sd_coordinate[j];
+      // ---------------------------------------------------------------------------
+      // if a variable with positive unit factor (1x -> x) 
+      if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl-1)<_ZERO_TOL_){
+        ss_eqn << sd_num.chr;
+        vec_coord.push_back(ss_eqn.str());
+      }
+      // ---------------------------------------------------------------------------
+      // if a variable with negative unit factor (-1x -> -x)
+      else if(sd_num.chr != '\0' && aurostd::abs(sd_num.dbl+1)<_ZERO_TOL_){
+        ss_eqn << "-" << sd_num.chr;
+        vec_coord.push_back(ss_eqn.str());
+      }
+      // ---------------------------------------------------------------------------
+      // if a number (no variable)
+      else if(sd_num.chr == '\0'){
+        running_double+=sd_num.dbl;
+        double_only = true;
+      }
+      // ---------------------------------------------------------------------------
+      // if a variable with a scale (2x -> 2x or -0.5x -> -0.5x) 
+      else {
+        ss_eqn << sd_num.dbl << sd_num.chr;
+        vec_coord.push_back(ss_eqn.str());
+      }
+      ss_eqn.str("");
+    }
+
+    // ---------------------------------------------------------------------------
+    // reduce double, i.e., bring-in-cell; consider positive numbers only, negative numbers are not possible
+    // (constants in Wyckoff position are always positive)
+    while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
+      running_double-=1.0;
+    }
+    if(double_only){
+      if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
+        string running_frac = aurostd::dbl2frac(running_double,false); //DX 20190724 - now namespace aurostd
+        ss_eqn << running_frac;
+        vec_coord.push_back(ss_eqn.str());
+        ss_eqn.str("");
+      }
+    }
+    coordinate = aurostd::joinWDelimiter(vec_coord,"+");
+    // ---------------------------------------------------------------------------
+    // clean up cases of -+ or +-
+    coordinate = aurostd::StringSubst(coordinate,"-+","-"); 
+    coordinate = aurostd::StringSubst(coordinate,"+-","-"); 
+    
+    return coordinate;
+  }
+}
+
+// DX 20190708 - START
+// ******************************************************************************
+// reorderWyckoffPosition
+// ******************************************************************************
+namespace SYM {
+  string reorderWyckoffPosition(const string& orig_position){
+
+    // reorder Wyckoff position to a standard format (necessary for string comparisons) 
+    // put variables first (e.g., 1/2+x -> x+1/2)
+    // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
+    // convert doubles to fractions, if possible (e.g., 0.5 -> 1/2)
+    // this function will be circumvented when symbolic math is integrated
+    // DX 20190708
+
+    string soliloquy = "SYM::reorderWyckoffPosition()";
+    stringstream message;
+
+    // ---------------------------------------------------------------------------
+    // split position via commas 
+    vector<string> tokens;
+    aurostd::string2tokens(orig_position,tokens,",");
+
+    if(tokens.size()!=3){ 
+      message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+    }
+    
+    // ---------------------------------------------------------------------------
+    // split position into x,y,z components (via commas)
+    string reordered_position = "";
+    vector<string> eqn;
+    for(uint i=0;i<tokens.size();i++){
+      // ---------------------------------------------------------------------------
+      // split into equation entities (number, variable) 
+      vector<sdouble> sd_coordinate = simplify(tokens[i]);
+      eqn.push_back(SYM::formatWyckoffPosition(sd_coordinate)); //DX 20190723 - condensed lines below (in previous version) into function
+    }
+    reordered_position = aurostd::joinWDelimiter(eqn,",");
+
+    return reordered_position;
+  }
+}
+// DX 20190708 - END
 
 // ******************************************************************************
 // shiftWyckoffPositions 
@@ -3241,76 +3276,7 @@ namespace SYM {
   }
 } //namespace SYM
 
-// ******************************************************************************
-// dbl2frac Double to Fraction (Overloaded)
-// ******************************************************************************
-namespace SYM {
-  string dbl2frac(double a, bool sign_prefix) {
-    string out;
-    bool neg = false;
-    double tol = _ZERO_TOL_;
-    if(a < 0) {
-      neg = true;
-      a = aurostd::abs(a);
-    }
-    if(aurostd::abs(a) < tol) {
-      out = "0";
-    }
-    if(aurostd::abs(a - .25) < tol) {
-      out = "1/4";
-    }
-    if(aurostd::abs(a - .5) < tol) {
-      out = "1/2";
-    }
-    if(aurostd::abs(a - .75) < tol) {
-      out = "3/4";
-    }
-    if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
-      out = "1/3";
-    }
-    if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
-      out = "2/3";
-    }
-    if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
-      out = "1/6";
-    }
-    if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX 20180726 - added
-      out = "5/6"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
-      out = "1/8";
-    }
-    if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
-      out = "3/8";
-    }
-    if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
-      out = "5/8";
-    }
-    if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
-      out = "7/8";
-    }
-    if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "1/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "5/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "7/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX 20180726 - added
-      out = "11/12"; //DX 20180726 - added
-    } //DX 20180726 - added
-    if(sign_prefix){
-    if(neg == true) {
-      out = "-" + out;
-    } else {
-      out = "+" + out;
-      }
-    }
-    return out;
-  }
-} //namespace SYM
+//DX 20190724 [MOVED TO AUROSTD] - dbl2frac() Double to Fraction (Overloaded)
 
 // ******************************************************************************
 // dbl2frac Double to Fraction (Overloaded)

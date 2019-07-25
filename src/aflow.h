@@ -25,27 +25,65 @@
 
 //ME190628 BEGIN - moved from CHULL for broader access
 // Output formats
-#define _apool_         'a'  // apool
-#define _json_          'j'  // standard json
-#define _pdf_           'p'  // pdf
-#define _txt_           't'  // plain text
-#define _web_           'w'  // web json
-#define _latex_         'l'  // latex
-#define _gnuplot_       'g'  // gnuplot
-#define _jupyterthree_  'y'  // jupyter python 3
-#define _jupytertwo_    'z'  // jupyter python 2
+enum filetype {   //CO190629
+//GENERAL FILE TYPES
+  txt_ft,         //general plain text
+  json_ft,
+  csv_ft,
+  latex_ft,
+  gnuplot_ft,
+  jupyter2_ft,    //python 2 jupyter
+  jupyter3_ft,    //python 3 jupyter
+//CHULL SPECIFIC
+  chull_apool_ft,
+  chull_web_ft,
+};
+//[CO190629 - obsolete with enum filetype]#define _apool_         'a'  // apool
+//[CO190629 - obsolete with enum filetype]#define _json_          'j'  // standard json
+//[CO190629 - obsolete with enum filetype]#define _pdf_           'p'  // pdf
+//[CO190629 - obsolete with enum filetype]#define _txt_           't'  // plain text
+//[CO190629 - obsolete with enum filetype]#define _web_           'w'  // web json
+//[CO190629 - obsolete with enum filetype]#define _latex_         'l'  // latex
+//[CO190629 - obsolete with enum filetype]#define _gnuplot_       'g'  // gnuplot
+//[CO190629 - obsolete with enum filetype]#define _jupyterthree_  'y'  // jupyter python 3
+//[CO190629 - obsolete with enum filetype]#define _jupytertwo_    'z'  // jupyter python 2
 
-// Reduction modes
-#define _frac_          'f'  //fractional
-#define _gcd_           'g'  //gcd
-#define _none_          'n'  //none
+// Vector reduction types
+enum vector_reduction_type {   //CO190629
+  frac_vrt,   //reduce to fractions (normalized to 1)
+  gcd_vrt,    //reduce by gcd
+  no_vrt,     //no reduction
+};
+//[CO190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
+//[CO190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
+//[CO190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 // ME190628 END
 
+//compound specification is how a compound is specified
+//composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
+//for instance, H1.25 can be a pseudopotential and NOT a composition
+enum compound_designation {
+  composition_string,
+  pp_string,
+};
+
+//CO190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
+const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+                                     ",_GW"    //CO190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
+                                     ",_ZORA"  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
+                                     ",_LDApU" //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
+                                     ",_AE"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+                                     ",_NC2"   //CO190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
+                                     ",_200eV"
+                                     "";
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO 180509
 #define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
 #define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
+
+//XRD
+#define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO190622
 
 //moved from avasp.cpp for broader access (chull.cpp)
 #define SPECIE_TRANSITION_METALS string("Ag,Au,Cd,Co,Cr_pv,Cu_pv,Fe_pv,Hf_pv,Hg,Ir,La,Mn_pv,Mo_pv,Nb_sv,Ni_pv,Os_pv,Pd_pv,Pt,Re_pv,Rh_pv,Ru_pv,Sc_sv,Ta_pv,Tc_pv,Ti_sv,V_sv,W_pv,Y_sv,Zn,Zr_sv")
@@ -1089,24 +1127,24 @@ class _atom_type_cmp {                                   // sorting through type
 };
 
 #define NUM_ELEMENTS (103+1)  // up to Uranium
-extern std::vector<string> atom_symbol_vec;             // store starting from ONE
-extern std::vector<string> atom_name_vec;               // store starting from ONE
-extern std::vector<double> atom_mass_vec;               // store starting from ONE
-extern std::vector<double> atom_volume_vec;             // store starting from ONE
-extern std::vector<int> atom_valence_iupac_vec;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<int> atom_valence_std_vec;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<double> atom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_radius_vec;             // store starting from ONE - Saxena
-extern std::vector<double> atom_radius_covalent_vec;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j // DX and CO - 9/4/17
-extern std::vector<double> atom_electronegativity_vec;  // store starting from ONE - Saxena
-extern std::vector<string> atom_crystal_vec;            // store starting from ONE - Ashcroft Mermin
-extern std::vector<double> xray_scatt_vec;              // store starting from ONE
-extern std::vector<double> pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-extern std::vector<double> pearson_coefficient;         // ME 181020
+extern std::vector<string> vatom_symbol;             // store starting from ONE
+extern std::vector<string> vatom_name;               // store starting from ONE
+extern std::vector<double> vatom_mass;               // store starting from ONE
+extern std::vector<double> vatom_volume;             // store starting from ONE
+extern std::vector<int> vatom_valence_iupac;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+extern std::vector<int> vatom_valence_std;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_radius;             // store starting from ONE - Saxena
+extern std::vector<double> vatom_radius_covalent;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j // DX and CO - 9/4/17
+extern std::vector<double> vatom_electronegativity;  // store starting from ONE - Saxena
+extern std::vector<string> vatom_crystal;            // store starting from ONE - Ashcroft Mermin
+extern std::vector<double> vatom_xray_scatt;              // store starting from ONE
+extern std::vector<double> vatom_pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+extern std::vector<double> vatom_pearson_coefficient;         // ME 181020
 
 void atoms_initialize(void);
 uint GetAtomNumber(const string& symbol);
@@ -1150,8 +1188,8 @@ double GetPearsonCoefficient(const int&);
 double GetAtomXrayScatt(const string& symbol);
 double GetAtomXrayScatt(const uint& atnum);
 vector<string> GetGroupOfAtoms(string& group_name); //DX 20181220 
-double GetCompoundAttenuationLenght(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
-double GetCompoundAttenuationLenght(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
 // DX and CO - START
 //DX 20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  // RHT
 // DX and CO - END
@@ -2036,6 +2074,7 @@ vector<string> GetCleanNames(const xstructure& a);
 vector<double> GetSpins(const xstructure& a);
 string GetElementName(string stringin);
 string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX 20180526 - add directory
+int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX 20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // DX 9/1/17 //DX 20180526 - add directory
 string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX 9/1/17 //DX 20180526 - add directory //DX 20180806 - added setting
@@ -2261,10 +2300,10 @@ int ijk2l(const xstructure& str,const xvector<int>& ijk);
 xvector<double> r_lattice(const xstructure& str,const int &l);
 xvector<double> r_lattice(const xstructure& str,const int &i,const int &j,const int &k);
 xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
-xstructure AQEgeom2aims(istream& input);
-xstructure AQEgeom2abinit(istream& input);
-xstructure AQEgeom2qe(istream& input);
-xstructure AQEgeom2vasp(istream& input);
+xstructure input2AIMSxstr(istream& input);
+xstructure input2ABINITxstr(istream& input);
+xstructure input2QExstr(istream& input);
+xstructure input2VASPxstr(istream& input);
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
@@ -2645,6 +2684,10 @@ namespace KBIN {
   bool VASP_Modify_POTCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_POTCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   string VASP_PseudoPotential_CleanName(const string& specieIN);
+  string VASP_PseudoPotential_CleanName_190712(const string& specieIN); //CO190712
+  string VASP_PseudoPotential_CleanName_190101(const string& specieIN); //CO190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO190712
+  bool VASP_PseudoPotential_CleanName_TEST(void); //CO190712
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
   bool VASP_SplitAlloySpecies(string alloy_in, string &specieA, string &specieB);
@@ -4025,7 +4068,7 @@ xvector<double> GetCDispFromOrigin(const _atom& atom);
 double GetDistFromOrigin(const _atom& atom);
 //void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 _atom ConvertAtomToLat(const _atom& in_at,const xmatrix<double>& lattice);
-double GetXrayScattFactor(const string& name,const double& lambda,bool clean=true); //CO190322
+double GetXrayScattFactor(const string& name,double lambda=XRAY_RADIATION_COPPER_Kalpha,bool clean=true); //CO190322
 xmatrix<double> RecipLat(const xmatrix<double>& lat);
 double Normal(const double& x,const double& mu,const double& sigma);
 xstructure SetLat(const xstructure& a,const xmatrix<double>& in_lat);
@@ -4123,6 +4166,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 // ----------------------------------------------------------------------------
 // aflowlib.h stuff
 #include "aflow_pflow.h"
+
+// ----------------------------------------------------------------------------
+// aflow_xelement.h stuff
+#include "aflow_xelement.h"
 
 #endif
 // ***************************************************************************

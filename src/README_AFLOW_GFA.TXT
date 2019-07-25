@@ -14,12 +14,12 @@ and Eric Perim.
 
 Citation info: - D.C. Ford, D. Hicks, C. Oses, C. Toher, and S. Curtarolo, 
                	 Metallic glasses for biodegradable implants, submitted (2019);
-		 arXiv: 1902.00485.
+		             arXiv: 1902.00485.
                - E. Perim, D. Lee, Y. Liu, C. Toher, P. Gong, Y. Li, W. N.
-	       	 Simmons, O. Levy, J.J. Vlassak, J. Schroers, and S. Curtarolo,
-	       	 Spectral descriptors for bulk metallic glasses based on the
-	       	 thermodynamics of competing crystalline phases, Nat. Commun. 7
-	       	 (2016) 12315.
+	       	       Simmons, O. Levy, J.J. Vlassak, J. Schroers, and S. Curtarolo,
+	       	       Spectral descriptors for bulk metallic glasses based on the
+	       	       thermodynamics of competing crystalline phases, Nat. Commun. 7
+	       	       (2016) 12315.
 		 
 ********************************************************************************
 
@@ -56,44 +56,49 @@ remove duplicate structures from the analysis.
 ********************************************************************************
 
 USAGE:
-     aflow --gfa --alloy=xx --ae_file=yy > output.out
+  aflow --gfa --alloy=XX --ae_file=YY --cutoff_energy=ZZ > output.out
 
-     	   xx is the case sensitive alloy system (e.g. CaCu)
+    XX is the case sensitive alloy system (e.g. CaCu).
 
-	   yy is the name of a file containing the atomic environments for the
-	   system (e.g. All_atomic_environments_read.dat).  The name must not be
-	   All_atomic_environments.dat.  The code will calculate the atomic
-	   environments if no file is specified.
+    YY is the name of a file containing the atomic environments for the
+	  system (e.g. All_atomic_environments_read.dat).  The name must not be
+	  All_atomic_environments.dat.  The code will calculate the atomic
+	  environments if no file is specified.
 
-	   It is suggested to direct the standard out to a file (e.g. output.out)
-	   because it contains useful information about the calculation that
-	   you may want to keep.  
+    ZZ is the formation enthalpy per atom in eV to use as a cutoff for
+    including structures in the analysis.  Set this based on the
+    expected glass transition temperature of the system.  The default is
+    0.05 eV ~ 580 K.
+
+  It is suggested to direct the standard out to a file (e.g. output.out)
+	because it contains useful information about the calculation that
+	you may want to keep.  
            
 ********************************************************************************
 
 OUTPUT:
-	standard out - contains information about the calculation, such as which
-	   atomic environments were read/calculated and the GFA calculation at each
-	   stoichiometry (weights, number of combinations (pseudostructures), etc.)
+  standard out - contains information about the calculation, such as which
+    atomic environments were read/calculated and the GFA calculation at each
+	  stoichiometry (weights, number of combinations (pseudostructures), etc.)
 	   
-	GFA_entries.dat - contains the stoichiometries and formation enthalpies
-	   of the structures used in the GFA calculation.
+  GFA_entries.dat - contains the stoichiometries and formation enthalpies
+	  of the structures used in the GFA calculation.
 
-	GFA_xx.dat - contains the GFA at each stoichiometry on the grid for the
-	   alloy system.
+  GFA_xx.dat - contains the GFA at each stoichiometry on the grid for the
+	  alloy system.
 
-        All_atomic_environments.dat - contains the atomic environments for each
-	   species in each structure used in the GFA calculation. The format is:
+  All_atomic_environments.dat - contains the atomic environments for each
+	  species in each structure used in the GFA calculation. The format is:
 
-           AUID = aaaa   atom = species
-	   # atoms  # environments
-	   # types of vertices in each environment (one entry for each environment)
-	   # occurrences of each environment (one entry for each environment)
-	   # each vertex   # triangles   # squares (# types vertices x 3 entries)
+    AUID = aaaa   atom = species
+	  # atoms  # environments
+	  # types of vertices in each environment (one entry for each environment)
+	  # occurrences of each environment (one entry for each environment)
+	  # each vertex   # triangles   # squares (# types vertices x 3 entries)
 
-	   For a description of atomic environments, see P. Villars, Factors
-	   governing crystal structures, in: J.H. Westbrook, R.L. Fleisher (Eds.),
-	   Crystal Structures of Intermetallic Compounds, Wiley, New York, 2000,
-	   pp. 1-49.
+	  For a description of atomic environments, see P. Villars, Factors
+	  governing crystal structures, in: J.H. Westbrook, R.L. Fleisher (Eds.),
+	  Crystal Structures of Intermetallic Compounds, Wiley, New York, 2000,
+	  pp. 1-49.
 	   
 ********************************************************************************

@@ -5667,7 +5667,7 @@ namespace aflowlib {
     // ***************************************************************************
     // SCINTILLATION
     if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::SCINTILLATION") && !directory.empty()) {
-      double scintillation_attenuation_length=GetCompoundAttenuationLenght(aentry.vspecies,aentry.vcomposition,aentry.density);
+      double scintillation_attenuation_length=GetCompoundAttenuationLength(aentry.vspecies,aentry.vcomposition,aentry.density);
      // oss << line_rule << endl; //JPO 180731
       oss << "<!-- Scintillation properties: BEGIN -->" << endl;
      // oss << "<div class=\"scintillation\">" << endl; //JPO 180731
