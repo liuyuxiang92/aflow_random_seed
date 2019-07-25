@@ -72,6 +72,11 @@ namespace aflowlib {
 
 // will be moved near LI2RAW
 namespace aflowlib {
+  uint MOSFET(int mode,bool VERBOSE);
+}
+
+    // will be moved near LI2RAW
+namespace aflowlib {
   uint LIB2SCRUB(string library,bool VERBOSE) {
     if(VERBOSE) cerr << "aflowlib::LIB2SCRUB BEGIN" << endl;
     vector<string> vlib;
@@ -113,8 +118,8 @@ namespace aflowlib {
       vector<string> vremoveALL;
       aurostd::string2tokens("aflow.in~,agl_aflow.in~,WAVECAR.xz,REPORT.xz,POTCAR.relax1.xz,POTCAR.relax2.xz,POTCAR.relax3.xz,POTCAR.static.xz,POTCAR.bands.xz,AECCAR0.xz,AECCAR1.xz,AECCAR2.xz,AECCAR1.static.xz,AECCAR0.bands.xz,AECCAR1.bands.xz,AECCAR2.bands.xz,AECCAR0.relax1.xz,AECCAR1.relax1.xz,AECCAR2.relax1.xz,AECCAR0.relax2.xz,AECCAR1.relax2.xz,AECCAR2.relax2.xz",vremoveALL,",");
 
-      vector<string> vremoveLIB7;
-      aurostd::string2tokens("CHGCAR,CHG,EIGENVAL,PROCAR",vremoveLIB7,",");
+      vector<string> vremoveLIB6_LIB7;
+      aurostd::string2tokens("CHGCAR,CHG,EIGENVAL,PROCAR",vremoveLIB6_LIB7,",");
 
 
       for(uint j=0;j<list2found.size();j++) {
@@ -169,15 +174,16 @@ namespace aflowlib {
 	  }
 	}
 	
-	// check REMOVE LIB7
-	if(vlib.at(i)=="LIB7")
+	// check REMOVE LIB6_LIB7
+	//	if(vlib.at(i)=="LIB5" || vlib.at(i)=="LIB6" || vlib.at(i)=="LIB7")
+	if(vlib.at(i)=="LIB6" || vlib.at(i)=="LIB7")
 	  {
-	  //	  cerr << "LIB7" << endl;
-	  for(uint k=0;k<vremoveLIB7.size();k++) {
+	  //	  cerr << "LIB6_LIB7" << endl;
+	  for(uint k=0;k<vremoveLIB6_LIB7.size();k++) {
 	    string FILE_relax1,FILE_relax2,FILE_static;
-	    FILE_relax1=directory_LIB+"/"+vremoveLIB7.at(k)+".relax1.xz";
-	    FILE_relax2=directory_LIB+"/"+vremoveLIB7.at(k)+".relax2.xz";
-	    FILE_static=directory_LIB+"/"+vremoveLIB7.at(k)+".static.xz";
+	    FILE_relax1=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".relax1.xz";
+	    FILE_relax2=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".relax2.xz";
+	    FILE_static=directory_LIB+"/"+vremoveLIB6_LIB7.at(k)+".static.xz";
 	    if(aurostd::FileExist(FILE_static)) {
 	      if(aurostd::FileExist(FILE_relax1)) {
 		//   cerr << "aflowlib::LIB2SCRUB removing " << FILE_relax1 << endl;
@@ -297,6 +303,7 @@ int main(int _argc,char **_argv) {
   // INITIALIZE ***************************************************
   // INIT LOOK UP TABLES
   atoms_initialize();
+  elements_initialize();
   // spacegroup::SpaceGroupInitialize(); only if necessary
   // INFORMATION **************************************************
   AFLOW_PTHREADS::FLAG=AFLOW_PTHREADS::Check_Threads(argv,!XHOST.QUIET);
@@ -461,6 +468,11 @@ int main(int _argc,char **_argv) {
  if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
    //  XHOST.DEBUG=TRUE;
    aflowlib::LIB2SCRUB(aurostd::args2attachedstring(argv,"--scrub=","ALL"),TRUE);
+   exit(0);
+ }
+ if(!Arun && (aurostd::args2flag(argv,cmds,"--mosfet") || aurostd::args2attachedflag(argv,"--mosfet="))) {
+   //  XHOST.DEBUG=TRUE;
+   aflowlib::MOSFET(aurostd::args2attachedutype<int>(argv,"--mosfet=",0),TRUE);
    exit(0);
  }
 		  
@@ -955,8 +967,8 @@ namespace aflow {
       oss << "*                                                                                                  *" << endl;
       oss << "*     Use of AFLOW software and repositories welcomes references to the following publications:    *" << endl;
       oss << "*                                                                                                  *" << endl;
-      oss << "*  Friedrich et al. npj Comput. Mater. VV, PP (2019) 10.1038/s41524-019-0192-1       (CCE)         *" << endl;
-      oss << "*  Hicks et al.     Comp. Mat. Sci. VV, PP (2019)    10.1016/j.commatsci.2018.10.043 (ANRL proto2) *" << endl;
+      oss << "*  Friedrich et al. npj Comput. Mater. 5, 59 (2019)  10.1038/s41524-019-0192-1       (CCE)         *" << endl;
+      oss << "*  Hicks et al.     Comp. Mat. Sci. 161, S1 (2019)   10.1016/j.commatsci.2018.10.043 (ANRL proto2) *" << endl;
       oss << "*  Oses et al.      J. Chem. Inf. Model. (2018)      10.1021/acs.jcim.8b00393        (AFLOW-CHULL) *" << endl;
       oss << "*  Gossett et al.   Comp. Mat. Sci. 152, 134 (2018)  10.1016/j.commatsci.2018.03.075 (AFLOW-ML)    *" << endl;
       oss << "*  Hicks et al.     Acta Cryst. A74, 184-203 (2018)  10.1107/S2053273318003066       (AFLOW-SYM)   *" << endl;
@@ -1048,3 +1060,178 @@ namespace aflow {
 // command:
 // xzcat /common/NIST/$1ary.icsd.xz | pflow --icsd_nobrokenbasis |
 // pflow --icsd_nopartialocc | pflow --icsd2proto > README_LIBRARY_ICSD$1.TXT
+
+
+
+
+// will be moved near LI2RAW
+namespace aflowlib {
+  uint MOSFET(int mode,bool VERBOSE) {
+    if(VERBOSE) cerr << "aflowlib::MOSFET BEGIN" << endl;
+    if(VERBOSE) cerr << "aflowlib::MOSFET **********************************" << endl;
+    if(VERBOSE) cerr << "aflowlib::MOSFET TESTING mode=" << mode << endl;
+    // IRFP240
+    vector<double> vNMOSFET;
+    aurostd::string2tokens("3.782,3.765,3.803,3.816,3.909,3.795,3.790,3.809,3.822,3.802,3.815,3.820",vNMOSFET,",");
+    // IRFP9240
+    vector<double> vPMOSFET;
+    aurostd::string2tokens("3.752,3.756,3.775,3.752,3.764,3.762,3.782,3.761,3.752,3.751,3.750,3.768,3.747,3.783,3.786,3.780,3.778,3.788,3.786,3.749,3.757,3.776,3.774,3.776,3.737,3.778,3.746,3.724,3.724,3.743,3.766,3.763,3.810,3.783,3.800",vPMOSFET,",");
+
+    vector<uint> i(9);
+    vector<double> mos(9);
+    // TEST N-CHANNEL
+    if(mode==1) {
+      double errorN=1.0;
+      for(i[1]=0;i[1]<vNMOSFET.size();i[1]++) { mos[1]=vNMOSFET.at(i[1]);
+	for(i[2]=i[1]+1;i[2]<vNMOSFET.size();i[2]++) { mos[2]=vNMOSFET.at(i[2]);
+	  double errN=0.0,weight=0.0;
+	  for(uint ie=1;ie<2;ie++) {
+	    for(uint je=ie+1;je<=2;je++) {
+	      errN+=abs(mos[ie]-mos[je]);
+	      weight+=1.0;
+	    }
+	  }
+	  errN/=weight;   
+	  if(errN<errorN) {
+	    errorN=errN;
+	    cerr << mos[1] << "(" << i[1] << ") " << mos[2] << "(" << i[2] << ") " << errorN << endl;
+	  }
+	}
+      }
+    }
+    // TEST P-CHAPPEL
+    if(mode==2) {
+      double errorP=1.0;
+      for(i[1]=0;i[1]<vPMOSFET.size();i[1]++) { mos[1]=vPMOSFET.at(i[1]);
+	for(i[2]=i[1]+1;i[2]<vPMOSFET.size();i[2]++) { mos[2]=vPMOSFET.at(i[2]);
+	  double errP=0.0,weight=0.0;
+	  for(uint ie=1;ie<2;ie++) {
+	    for(uint je=ie+1;je<=2;je++) {
+	      errP+=abs(mos[ie]-mos[je]);
+	      weight+=1.0;
+	    }
+	  }
+	  errP/=weight;   
+	  if(errP<errorP) {
+	    errorP=errP;
+	    cerr << mos[1] << "(" << i[1] << ") " << mos[2] << "(" << i[2] << ") " << errorP << endl;
+	  }
+	}
+      }
+    }
+    // TEST N-CHANNEL
+    if(mode==3) {
+      double errorN=1.0;
+      for(i[1]=0;i[1]<vNMOSFET.size();i[1]++) { mos[1]=vNMOSFET.at(i[1]);
+	for(i[2]=i[1]+1;i[2]<vNMOSFET.size();i[2]++) { mos[2]=vNMOSFET.at(i[2]);
+	  for(i[3]=0;i[3]<vNMOSFET.size();i[3]++) { mos[3]=vPMOSFET.at(i[5]);
+	    for(i[4]=i[3]+1;i[4]<vNMOSFET.size();i[4]++) { mos[4]=vPMOSFET.at(i[6]);
+	      double errN=0.0,weight=0.0;
+	      for(uint ie=1;ie<3;ie++) {
+		for(uint je=ie+1;je<=3;je++) {
+		  errN+=abs(mos[ie]-mos[je]);
+		  weight+=1.0;
+		}
+	      }
+	      errN/=weight;   
+	      if(errN<errorN) {
+		errorN=errN;
+		cerr << mos[1] << "(" << i[1] << ") " << mos[2] << "(" << i[2] << ") " << mos[3] << "(" << i[3] << ") " << mos[4] << "(" << i[4] << ") " << errorN << endl;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+   
+    // TEST N-CHANNEL
+    if(mode==4) {
+      double errorN=1.0;
+      for(i[1]=0;i[1]<vNMOSFET.size();i[1]++) { mos[1]=vNMOSFET.at(i[1]);
+	for(i[2]=i[1]+1;i[2]<vNMOSFET.size();i[2]++) { mos[2]=vNMOSFET.at(i[2]);
+	  for(i[3]=i[2]+1;i[3]<vNMOSFET.size();i[3]++) { mos[3]=vNMOSFET.at(i[3]);
+	    for(i[4]=i[3]+1;i[4]<vNMOSFET.size();i[4]++) { mos[4]=vNMOSFET.at(i[4]);
+	      double errN=0.0,weight=0.0;
+	      for(uint ie=1;ie<4;ie++) {
+		for(uint je=ie+1;je<=4;je++) {
+		  errN+=abs(mos[ie]-mos[je]);
+		  weight+=1.0;
+		}
+	      }
+	      errN/=weight;   
+	      if(errN<errorN) {
+		errorN=errN;
+		cerr << mos[1] << "(" << i[1] << ") " << mos[2] << "(" << i[2] << ") " << mos[3] << "(" << i[3] << ") " << mos[4] << "(" << i[4] << ") " << errorN << endl;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    // TEST P-CHAPPEL
+    if(mode==5) {
+      double errorP=1.0;
+      for(i[1]=0;i[1]<vPMOSFET.size();i[1]++) { mos[1]=vPMOSFET.at(i[1]);
+	for(i[2]=i[1]+1;i[2]<vPMOSFET.size();i[2]++) { mos[2]=vPMOSFET.at(i[2]);
+	  for(i[3]=i[2]+1;i[3]<vPMOSFET.size();i[3]++) { mos[3]=vPMOSFET.at(i[3]);
+	    for(i[4]=i[3]+1;i[4]<vPMOSFET.size();i[4]++) { mos[4]=vPMOSFET.at(i[4]);
+	      double errP=0.0,weight=0.0;
+	      for(uint ie=1;ie<4;ie++) {
+		for(uint je=ie+1;je<=4;je++) {
+		  errP+=abs(mos[ie]-mos[je]);
+		  weight+=1.0;
+		}
+	      }
+	      errP/=weight;   
+	      if(errP<errorP) {
+		errorP=errP;
+		cerr << mos[1] << "(" << i[1] << ") " << mos[2] << "(" << i[2] << ") " << mos[3] << "(" << i[3] << ") " << mos[4] << "(" << i[4] << ") " << errorP << endl;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+   // TEST N-CHANNEL
+    if(mode==6) {
+      double errorN=1.0;
+      for(i[1]=0;i[1]<vNMOSFET.size();i[1]++) { mos[1]=vNMOSFET.at(i[1]);
+	for(i[2]=i[1]+1;i[2]<vNMOSFET.size();i[2]++) { mos[2]=vNMOSFET.at(i[2]);
+	  for(i[3]=i[2]+1;i[3]<vNMOSFET.size();i[3]++) { mos[3]=vNMOSFET.at(i[3]);
+	    for(i[4]=i[3]+1;i[4]<vNMOSFET.size();i[4]++) { mos[4]=vNMOSFET.at(i[4]);
+	      for(i[5]=0;i[5]<vNMOSFET.size();i[5]++) { mos[5]=vPMOSFET.at(i[5]);
+		for(i[6]=i[5]+1;i[6]<vNMOSFET.size();i[6]++) { mos[6]=vPMOSFET.at(i[6]);
+		  for(i[7]=i[6]+1;i[7]<vNMOSFET.size();i[7]++) { mos[7]=vPMOSFET.at(i[7]);
+		    for(i[8]=i[7]+1;i[8]<vNMOSFET.size();i[8]++) { mos[8]=vPMOSFET.at(i[8]);
+		      double errN=0.0,weight=0.0;
+		      for(uint ie=1;ie<8;ie++) {
+			for(uint je=ie+1;je<=8;je++) {
+			  errN+=abs(mos[ie]-mos[je]);
+			  weight+=1.0;
+			}
+		      }
+		      errN/=weight;   
+		      if(errN<errorN) {
+			errorN=errN;
+			cerr << mos[1] << "(" << i[1] << ") " << mos[2] << "(" << i[2] << ") " << mos[3] << "(" << i[3] << ") " << mos[4] << "(" << i[4] << ") " << mos[5] << "(" << i[5] << ") " << mos[6] << "(" << i[6] << ") " << mos[7] << "(" << i[7] << ") " << mos[8] << "(" << i[8] << ") " << errorN << endl;
+		      }
+		    }
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+   
+    if(VERBOSE) cerr << "aflowlib::MOSFET END" << endl;
+    return vNMOSFET.size()+vPMOSFET.size();
+  }
+}
+
+// ***************************************************************************
+// *                                                                         *
+// *         aflow - Automatic FLOW for materials discovery project          *
+// *                                                                         *
+// ***************************************************************************
