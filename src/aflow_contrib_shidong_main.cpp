@@ -82,9 +82,9 @@ namespace pflow {
       _ceatom species_tmp;
       species_tmp.name = tokens.at(i-3+1);
 
-      for (uint j=1; j<vatom_symbol.size(); j++) {
-	if(species_tmp.name==vatom_symbol.at(j)) {
-	  species_tmp.volume = vatom_volume.at(j);
+      for (uint j=1; j<atom_symbol_vec.size(); j++) {
+	if(species_tmp.name==atom_symbol_vec.at(j)) {
+	  species_tmp.volume = atom_volume_vec.at(j);
 	  break;
 	}
       }
@@ -606,9 +606,9 @@ namespace pflow {
 	_ceatom species_tmp;
 	species_tmp.name = a.species.at(i);
 
-	for (uint j=1; j<vatom_symbol.size(); j++) {
-	  if(species_tmp.name==vatom_symbol.at(j)) {
-	    species_tmp.volume = vatom_volume.at(j);
+	for (uint j=1; j<atom_symbol_vec.size(); j++) {
+	  if(species_tmp.name==atom_symbol_vec.at(j)) {
+	    species_tmp.volume = atom_volume_vec.at(j);
 	    break;
 	  }
 	}
@@ -649,9 +649,9 @@ namespace pflow {
 	_ceatom species_tmp;
 	species_tmp.name = tokens.at(i-2);
 
-	for (uint j=1; j<vatom_symbol.size(); j++) {
-	  if(species_tmp.name==vatom_symbol.at(j)) {
-	    species_tmp.volume = vatom_volume.at(j);
+	for (uint j=1; j<atom_symbol_vec.size(); j++) {
+	  if(species_tmp.name==atom_symbol_vec.at(j)) {
+	    species_tmp.volume = atom_volume_vec.at(j);
 	    break;
 	  }
 	}
@@ -725,9 +725,9 @@ namespace pflow {
 	_ceatom species_tmp;
 	species_tmp.name = tokens.at(i-2);
 
-	for (uint j=1; j<vatom_symbol.size(); j++) {
-	  if(species_tmp.name==vatom_symbol.at(j)) {
-	    species_tmp.volume = vatom_volume.at(j);
+	for (uint j=1; j<atom_symbol_vec.size(); j++) {
+	  if(species_tmp.name==atom_symbol_vec.at(j)) {
+	    species_tmp.volume = atom_volume_vec.at(j);
 	    break;
 	  }
 	}

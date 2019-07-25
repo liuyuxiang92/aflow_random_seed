@@ -234,7 +234,7 @@ void _atom::CleanName(void) {
   if((name2[0]>=65 && name2[0]<=90)) name2[0]+=-97+65;
   cleanname=name1+name2;
   atomic_number=0;
-  for(uint j=0;j< vatom_symbol.size();j++) if(cleanname==vatom_symbol.at(j)) atomic_number=j;
+  for(uint j=0;j< atom_symbol_vec.size();j++) if(cleanname==atom_symbol_vec.at(j)) atomic_number=j;
 }
 
 void _atom::CleanSpin(void) {
@@ -252,42 +252,42 @@ void _atom::ClearSymmetry(void) { //CO190219
   (*this).num_equivalents=0;
 }
 
-std::vector<string> vatom_symbol(NUM_ELEMENTS);        // store starting from ONE
-std::vector<string> vatom_name(NUM_ELEMENTS);          // store starting from ONE
-std::vector<double> vatom_mass(NUM_ELEMENTS);          // store starting from ONE
-std::vector<double> vatom_volume(NUM_ELEMENTS);        // store starting from ONE
-std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);    // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-std::vector<int> vatom_valence_std(NUM_ELEMENTS);      // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
-std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);   // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<string> atom_symbol_vec(NUM_ELEMENTS);        // store starting from ONE
+std::vector<string> atom_name_vec(NUM_ELEMENTS);          // store starting from ONE
+std::vector<double> atom_mass_vec(NUM_ELEMENTS);          // store starting from ONE
+std::vector<double> atom_volume_vec(NUM_ELEMENTS);        // store starting from ONE
+std::vector<int> atom_valence_iupac_vec(NUM_ELEMENTS);    // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+std::vector<int> atom_valence_std_vec(NUM_ELEMENTS);      // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+std::vector<double> atom_miedema_phi_star(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+std::vector<double> atom_miedema_nws(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<double> atom_miedema_Vm(NUM_ELEMENTS);        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<double> atom_miedema_gamma_s(NUM_ELEMENTS);   // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<double> atom_miedema_BVm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-std::vector<double> vatom_radius(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE // DX and CO - 9/4/17 
-std::vector<double> vatom_electronegativity(NUM_ELEMENTS);        // store starting from ONE
-std::vector<string> vatom_crystal(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);         // store starting from ONE
-std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);         // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);    // ME181020 Pearson mass deviation coefficient
+std::vector<double> atom_radius_vec(NUM_ELEMENTS);        // store starting from ONE
+std::vector<double> atom_radius_covalent_vec(NUM_ELEMENTS);// store starting from ONE // DX and CO - 9/4/17 
+std::vector<double> atom_electronegativity_vec(NUM_ELEMENTS);        // store starting from ONE
+std::vector<string> atom_crystal_vec(NUM_ELEMENTS);        // store starting from ONE
+std::vector<double> xray_scatt_vec(NUM_ELEMENTS);         // store starting from ONE
+std::vector<double> pettifor_scale(NUM_ELEMENTS);         // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+std::vector<double> pearson_coefficient(NUM_ELEMENTS);    // ME181020 Pearson mass deviation coefficient
 
 void atoms_initialize(void) {
   for(int i=0;i<NUM_ELEMENTS;i++) {       // clear
-    vatom_xray_scatt.at(i)=(double)i-1;      // shift+1
-    vatom_mass.at(i)=AMU2KILOGRAM;      // masses in kilos
-    vatom_volume.at(i)=NNN;             // atomic volume in A^3 from the FCC vasp table and/or successive calculations
-    vatom_valence_iupac.at(i)=NNN;            // IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
-    vatom_valence_std.at(i)=NNN;            // stanmdard: number electrons minus closed shell at leff (noble gas)
-    vatom_miedema_phi_star.at(i)=NNN;                 // Miedema Rule Table 1a Physica 100B (1980) 1-28   (phi^\star in (V))
-    vatom_miedema_nws.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   n_{ws}^{1/3} in (d.u.)^1/3
-    vatom_miedema_Vm.at(i)=NNN;                       // Miedema Rule Table 1a Physica 100B (1980) 1-28   V_m^{2/3} in (cm^2)
-    vatom_miedema_gamma_s.at(i)=NNN;                  // Miedema Rule Table 1a Physica 100B (1980) 1-28   \gamma_s^0 in (mJ/m^2)
-    vatom_miedema_BVm.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   BV_m (kJ/mole)
-    vatom_radius.at(i)=NNN;             // Saxena (nm)
-    vatom_radius_covalent.at(i)=NNN;    // Codero (Angstroms) // DX and CO - 9/4/17
-    vatom_electronegativity.at(i)=NNN;  // Saxena
-    vatom_crystal.at(i)="nnn";          // Ashcroft-Mermin
+    xray_scatt_vec.at(i)=(double)i-1;      // shift+1
+    atom_mass_vec.at(i)=AMU2KILOGRAM;      // masses in kilos
+    atom_volume_vec.at(i)=NNN;             // atomic volume in A^3 from the FCC vasp table and/or successive calculations
+    atom_valence_iupac_vec.at(i)=NNN;            // IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
+    atom_valence_std_vec.at(i)=NNN;            // stanmdard: number electrons minus closed shell at leff (noble gas)
+    atom_miedema_phi_star.at(i)=NNN;                 // Miedema Rule Table 1a Physica 100B (1980) 1-28   (phi^\star in (V))
+    atom_miedema_nws.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   n_{ws}^{1/3} in (d.u.)^1/3
+    atom_miedema_Vm.at(i)=NNN;                       // Miedema Rule Table 1a Physica 100B (1980) 1-28   V_m^{2/3} in (cm^2)
+    atom_miedema_gamma_s.at(i)=NNN;                  // Miedema Rule Table 1a Physica 100B (1980) 1-28   \gamma_s^0 in (mJ/m^2)
+    atom_miedema_BVm.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   BV_m (kJ/mole)
+    atom_radius_vec.at(i)=NNN;             // Saxena (nm)
+    atom_radius_covalent_vec.at(i)=NNN;    // Codero (Angstroms) // DX and CO - 9/4/17
+    atom_electronegativity_vec.at(i)=NNN;  // Saxena
+    atom_crystal_vec.at(i)="nnn";          // Ashcroft-Mermin
   }
 
   // Xray_scatt_vector All data collected from the NIST online tables
@@ -301,153 +301,153 @@ void atoms_initialize(void) {
 
   int i;
   // ROW 0
-  i=0; vatom_symbol[i]="XX"; vatom_name[i]="UNDEFINED";    vatom_mass[i]*=0.00;      vatom_volume[i]=NNN;      vatom_valence_std[i]=0; vatom_valence_iupac[i]=0;   vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN;  vatom_crystal[i]="nnn"; vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=0; vatom_pearson_coefficient[i]=0.0;
+  i=0; atom_symbol_vec[i]="XX"; atom_name_vec[i]="UNDEFINED";    atom_mass_vec[i]*=0.00;      atom_volume_vec[i]=NNN;      atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=0;   atom_miedema_phi_star[i]=NNN;   atom_miedema_nws[i]=NNN;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=NNN;    atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN;  atom_crystal_vec[i]="nnn"; pettifor_scale[i]=0; xray_scatt_vec[i]=0; pearson_coefficient[i]=0.0;
 
   // ROW 1
   // s-electron systems
-  i++; vatom_symbol[i]="H";  vatom_name[i]="Hydrogen";     vatom_mass[i]*=1.0079;    vatom_volume[i]= 0.75110; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=5.2;   vatom_miedema_nws[i]=1.5;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.046;  vatom_radius_covalent[i]=0.31;   vatom_electronegativity[i]=2.10;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=1.000;vatom_pearson_coefficient[i]=0.00011460743;  // H volume wrong *dimer*   MIEDEMA = PAUL VAN DER PUT book
-  i++; vatom_symbol[i]="He"; vatom_name[i]="Helium";       vatom_mass[i]*=4.0026;    vatom_volume[i]= -1.000;  vatom_valence_std[i]=0; vatom_valence_iupac[i]=0;  vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=0.28;   vatom_electronegativity[i]=NNN;   vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=2.000; vatom_pearson_coefficient[i]=8.32328E-8;  // He
+  i++; atom_symbol_vec[i]="H";  atom_name_vec[i]="Hydrogen";     atom_mass_vec[i]*=1.0079;    atom_volume_vec[i]= 0.75110; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1;  atom_miedema_phi_star[i]=5.2;   atom_miedema_nws[i]=1.5;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.046;  atom_radius_covalent_vec[i]=0.31;   atom_electronegativity_vec[i]=2.10;  atom_crystal_vec[i]="hex";  pettifor_scale[i]=0; xray_scatt_vec[i]=1.000;pearson_coefficient[i]=0.00011460743;  // H volume wrong *dimer*   MIEDEMA = PAUL VAN DER PUT book
+  i++; atom_symbol_vec[i]="He"; atom_name_vec[i]="Helium";       atom_mass_vec[i]*=4.0026;    atom_volume_vec[i]= -1.000;  atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=0;  atom_miedema_phi_star[i]=NNN;   atom_miedema_nws[i]=NNN;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=NNN;    atom_radius_covalent_vec[i]=0.28;   atom_electronegativity_vec[i]=NNN;   atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0; xray_scatt_vec[i]=2.000; pearson_coefficient[i]=8.32328E-8;  // He
 
   // ROW2
   // s-electron systems
-  i++; vatom_symbol[i]="Li"; vatom_name[i]="Lithium";      vatom_mass[i]*=6.941;     vatom_volume[i]=20.24110; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=2.85;  vatom_miedema_nws[i]=0.98;  vatom_miedema_Vm[i]=5.5;  vatom_miedema_gamma_s[i]= 530;   vatom_miedema_BVm[i]=1.5;   vatom_radius[i]=0.152;  vatom_radius_covalent[i]=1.28;   vatom_electronegativity[i]=0.98;  vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.45; vatom_xray_scatt[i]=3.00145; vatom_pearson_coefficient[i]=0.0014588232;  // Li
-  i++; vatom_symbol[i]="Be"; vatom_name[i]="Beryllium";    vatom_mass[i]*=9.0122;    vatom_volume[i]= 7.83290; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=4.20;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.9;  vatom_miedema_gamma_s[i]=1900;   vatom_miedema_BVm[i]=4.9;   vatom_radius[i]=0.114;  vatom_radius_covalent[i]=0.96;   vatom_electronegativity[i]=1.57;  vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.50; vatom_pearson_coefficient[i]=0.0;  // Be
+  i++; atom_symbol_vec[i]="Li"; atom_name_vec[i]="Lithium";      atom_mass_vec[i]*=6.941;     atom_volume_vec[i]=20.24110; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1;  atom_miedema_phi_star[i]=2.85;  atom_miedema_nws[i]=0.98;  atom_miedema_Vm[i]=5.5;  atom_miedema_gamma_s[i]= 530;   atom_miedema_BVm[i]=1.5;   atom_radius_vec[i]=0.152;  atom_radius_covalent_vec[i]=1.28;   atom_electronegativity_vec[i]=0.98;  atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.45; xray_scatt_vec[i]=3.00145; pearson_coefficient[i]=0.0014588232;  // Li
+  i++; atom_symbol_vec[i]="Be"; atom_name_vec[i]="Beryllium";    atom_mass_vec[i]*=9.0122;    atom_volume_vec[i]= 7.83290; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2;  atom_miedema_phi_star[i]=4.20;  atom_miedema_nws[i]=1.60;  atom_miedema_Vm[i]=2.9;  atom_miedema_gamma_s[i]=1900;   atom_miedema_BVm[i]=4.9;   atom_radius_vec[i]=0.114;  atom_radius_covalent_vec[i]=0.96;   atom_electronegativity_vec[i]=1.57;  atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.50; pearson_coefficient[i]=0.0;  // Be
   // p-electron systems
-  i++; vatom_symbol[i]="B";  vatom_name[i]="Boron";        vatom_mass[i]*=10.81;     vatom_volume[i]= 5.88420; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3;  vatom_miedema_phi_star[i]=4.75;  vatom_miedema_nws[i]=1.55;  vatom_miedema_Vm[i]=2.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.097;  vatom_radius_covalent[i]=0.84;   vatom_electronegativity[i]=2.04;  vatom_crystal[i]="tet";  vatom_pettifor_scale[i]=2.00; vatom_pearson_coefficient[i]=0.00135391428;  // B
-  i++; vatom_symbol[i]="C";  vatom_name[i]="Carbon";       vatom_mass[i]*=12.011;    vatom_volume[i]= 5.59490; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4;  vatom_miedema_phi_star[i]=6.20;  vatom_miedema_nws[i]=1.90;  vatom_miedema_Vm[i]=1.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.077;  vatom_radius_covalent[i]=0.76;   vatom_electronegativity[i]=2.55;  vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=2.50; vatom_xray_scatt[i]=6.019; vatom_pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - 9/4/17 vatom_radius_covalent uses sp3 hybridization (most common)
-  i++; vatom_symbol[i]="N";  vatom_name[i]="Nitrogen";     vatom_mass[i]*=14.0067;   vatom_volume[i]= 7.59940; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5;  vatom_miedema_phi_star[i]=7.00;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.2;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.071;  vatom_radius_covalent[i]=0.71;   vatom_electronegativity[i]=3.04;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=3.00; vatom_pearson_coefficient[i]=0.00001857771; // N JUNKAI CHANGED VALENCE
-  i++; vatom_symbol[i]="O";  vatom_name[i]="Oxygen";       vatom_mass[i]*=15.9994;   vatom_volume[i]= 7.78230; vatom_valence_std[i]=6; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=6.97;  vatom_miedema_nws[i]=1.70;  vatom_miedema_Vm[i]=2.656;vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.060;  vatom_radius_covalent[i]=0.66;   vatom_electronegativity[i]=3.44;  vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=3.50; vatom_xray_scatt[i]=8.052; vatom_pearson_coefficient[i]=0.00003358805;  // O Table 27 of JUNKAI
-  i++; vatom_symbol[i]="F";  vatom_name[i]="Fluorine";     vatom_mass[i]*=18.9984;   vatom_volume[i]= 9.99090; vatom_valence_std[i]=7; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=0.57;   vatom_electronegativity[i]=3.98;  vatom_crystal[i]="mcl";  vatom_pettifor_scale[i]=4.00; vatom_pearson_coefficient[i]=0.0;  // F
-  i++; vatom_symbol[i]="Ne";vatom_name[i]="Neon";        vatom_mass[i]*=20.179;   vatom_volume[i]=19.9052; vatom_valence_std[i]=0; vatom_valence_iupac[i]=0; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=0.58;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00082783369; // Ne volume calculated with fcc-pawpbe
+  i++; atom_symbol_vec[i]="B";  atom_name_vec[i]="Boron";        atom_mass_vec[i]*=10.81;     atom_volume_vec[i]= 5.88420; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3;  atom_miedema_phi_star[i]=4.75;  atom_miedema_nws[i]=1.55;  atom_miedema_Vm[i]=2.8;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.097;  atom_radius_covalent_vec[i]=0.84;   atom_electronegativity_vec[i]=2.04;  atom_crystal_vec[i]="tet";  pettifor_scale[i]=2.00; pearson_coefficient[i]=0.00135391428;  // B
+  i++; atom_symbol_vec[i]="C";  atom_name_vec[i]="Carbon";       atom_mass_vec[i]*=12.011;    atom_volume_vec[i]= 5.59490; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4;  atom_miedema_phi_star[i]=6.20;  atom_miedema_nws[i]=1.90;  atom_miedema_Vm[i]=1.8;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.077;  atom_radius_covalent_vec[i]=0.76;   atom_electronegativity_vec[i]=2.55;  atom_crystal_vec[i]="dia";  pettifor_scale[i]=2.50; xray_scatt_vec[i]=6.019; pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - 9/4/17 atom_radius_covalent_vec uses sp3 hybridization (most common)
+  i++; atom_symbol_vec[i]="N";  atom_name_vec[i]="Nitrogen";     atom_mass_vec[i]*=14.0067;   atom_volume_vec[i]= 7.59940; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5;  atom_miedema_phi_star[i]=7.00;  atom_miedema_nws[i]=1.60;  atom_miedema_Vm[i]=2.2;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.071;  atom_radius_covalent_vec[i]=0.71;   atom_electronegativity_vec[i]=3.04;  atom_crystal_vec[i]="hex";  pettifor_scale[i]=3.00; pearson_coefficient[i]=0.00001857771; // N JUNKAI CHANGED VALENCE
+  i++; atom_symbol_vec[i]="O";  atom_name_vec[i]="Oxygen";       atom_mass_vec[i]*=15.9994;   atom_volume_vec[i]= 7.78230; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=2;  atom_miedema_phi_star[i]=6.97;  atom_miedema_nws[i]=1.70;  atom_miedema_Vm[i]=2.656;atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.060;  atom_radius_covalent_vec[i]=0.66;   atom_electronegativity_vec[i]=3.44;  atom_crystal_vec[i]="cub";  pettifor_scale[i]=3.50; xray_scatt_vec[i]=8.052; pearson_coefficient[i]=0.00003358805;  // O Table 27 of JUNKAI
+  i++; atom_symbol_vec[i]="F";  atom_name_vec[i]="Fluorine";     atom_mass_vec[i]*=18.9984;   atom_volume_vec[i]= 9.99090; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=1;  atom_miedema_phi_star[i]=NNN;   atom_miedema_nws[i]=NNN;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=NNN;    atom_radius_covalent_vec[i]=0.57;   atom_electronegativity_vec[i]=3.98;  atom_crystal_vec[i]="mcl";  pettifor_scale[i]=4.00; pearson_coefficient[i]=0.0;  // F
+  i++; atom_symbol_vec[i]="Ne";atom_name_vec[i]="Neon";        atom_mass_vec[i]*=20.179;   atom_volume_vec[i]=19.9052; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=0; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.160; atom_radius_covalent_vec[i]=0.58;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.00082783369; // Ne volume calculated with fcc-pawpbe
 
   // ROW3
   // s-electron systems
-  i++; vatom_symbol[i]="Na";vatom_name[i]="Sodium";      vatom_mass[i]*=22.9898;  vatom_volume[i]=36.9135; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=2.70; vatom_miedema_nws[i]=0.82; vatom_miedema_Vm[i]=8.3; vatom_miedema_gamma_s[i]= 260;  vatom_miedema_BVm[i]=1.6;  vatom_radius[i]=0.186; vatom_radius_covalent[i]=1.66;   vatom_electronegativity[i]=0.93; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.40; vatom_pearson_coefficient[i]=0.0;  // Na
-  i++; vatom_symbol[i]="Mg";vatom_name[i]="Magnesium";   vatom_mass[i]*=24.305;   vatom_volume[i]=22.8178; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=3.45; vatom_miedema_nws[i]=1.17; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]= 790;  vatom_miedema_BVm[i]=5.0;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=1.41;   vatom_electronegativity[i]=1.31; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.28; vatom_pearson_coefficient[i]=0.00073988271;  // Mg
+  i++; atom_symbol_vec[i]="Na";atom_name_vec[i]="Sodium";      atom_mass_vec[i]*=22.9898;  atom_volume_vec[i]=36.9135; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=2.70; atom_miedema_nws[i]=0.82; atom_miedema_Vm[i]=8.3; atom_miedema_gamma_s[i]= 260;  atom_miedema_BVm[i]=1.6;  atom_radius_vec[i]=0.186; atom_radius_covalent_vec[i]=1.66;   atom_electronegativity_vec[i]=0.93; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.40; pearson_coefficient[i]=0.0;  // Na
+  i++; atom_symbol_vec[i]="Mg";atom_name_vec[i]="Magnesium";   atom_mass_vec[i]*=24.305;   atom_volume_vec[i]=22.8178; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=3.45; atom_miedema_nws[i]=1.17; atom_miedema_Vm[i]=5.8; atom_miedema_gamma_s[i]= 790;  atom_miedema_BVm[i]=5.0;  atom_radius_vec[i]=0.160; atom_radius_covalent_vec[i]=1.41;   atom_electronegativity_vec[i]=1.31; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.28; pearson_coefficient[i]=0.00073988271;  // Mg
   // p-electron systems
-  i++; vatom_symbol[i]="Al";vatom_name[i]="Aluminium";   vatom_mass[i]*=26.9815;  vatom_volume[i]=16.4000; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=4.20; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.6; vatom_miedema_gamma_s[i]=1200;  vatom_miedema_BVm[i]=7.2;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.21;   vatom_electronegativity[i]=1.61; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.66; vatom_pearson_coefficient[i]=0.0;  // Al
-  i++; vatom_symbol[i]="Si";vatom_name[i]="Silicon";     vatom_mass[i]*=28.0855;  vatom_volume[i]=14.3536; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.70; vatom_miedema_nws[i]=1.50; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=1290;  vatom_miedema_BVm[i]=11.9; vatom_radius[i]=0.117; vatom_radius_covalent[i]=1.11;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=1.92; vatom_xray_scatt[i]=14.43; vatom_pearson_coefficient[i]=0.00020046752; // Si ???
-  i++; vatom_symbol[i]="P"; vatom_name[i]="Phosphorus";  vatom_mass[i]*=30.9738;  vatom_volume[i]=14.1995; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.5;  vatom_miedema_nws[i]=1.65; vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.109; vatom_radius_covalent[i]=1.07;   vatom_electronegativity[i]=2.19; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=2.18; vatom_xray_scatt[i]=15.3133; vatom_pearson_coefficient[i]=0.0; // P   MIEDEMA = PAUL VAN DER PUT book
-  i++; vatom_symbol[i]="S"; vatom_name[i]="Sulphur";     vatom_mass[i]*=32.06;    vatom_volume[i]=15.7301; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.6;  vatom_miedema_nws[i]=1.46; vatom_miedema_Vm[i]=4.376;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.106; vatom_radius_covalent[i]=1.05;   vatom_electronegativity[i]=2.58; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.44; vatom_pearson_coefficient[i]=0.00016807795;  // S Table 27 of JUNKAI
-  i++; vatom_symbol[i]="Cl";vatom_name[i]="Chlorine";    vatom_mass[i]*=35.453;   vatom_volume[i]=21.2947; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.32;  vatom_miedema_nws[i]=0.34;  vatom_miedema_Vm[i]=6.71; vatom_miedema_gamma_s[i]= 1013;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.107; vatom_radius_covalent[i]=1.02;   vatom_electronegativity[i]=3.16; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.70; vatom_pearson_coefficient[i]=0.00058238731;  // Cl interpolation phi_star, nws, Vm, gamma  JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ar";vatom_name[i]="Argon";       vatom_mass[i]*=39.948;   vatom_volume[i]=22.000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.192; vatom_radius_covalent[i]=1.06;   vatom_electronegativity[i]=NNN;  vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00003509919;  // Ar guessed volume, must double check from results  JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Al";atom_name_vec[i]="Aluminium";   atom_mass_vec[i]*=26.9815;  atom_volume_vec[i]=16.4000; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=4.20; atom_miedema_nws[i]=1.39; atom_miedema_Vm[i]=4.6; atom_miedema_gamma_s[i]=1200;  atom_miedema_BVm[i]=7.2;  atom_radius_vec[i]=0.143; atom_radius_covalent_vec[i]=1.21;   atom_electronegativity_vec[i]=1.61; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.66; pearson_coefficient[i]=0.0;  // Al
+  i++; atom_symbol_vec[i]="Si";atom_name_vec[i]="Silicon";     atom_mass_vec[i]*=28.0855;  atom_volume_vec[i]=14.3536; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.70; atom_miedema_nws[i]=1.50; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=1290;  atom_miedema_BVm[i]=11.9; atom_radius_vec[i]=0.117; atom_radius_covalent_vec[i]=1.11;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="dia";  pettifor_scale[i]=1.92; xray_scatt_vec[i]=14.43; pearson_coefficient[i]=0.00020046752; // Si ???
+  i++; atom_symbol_vec[i]="P"; atom_name_vec[i]="Phosphorus";  atom_mass_vec[i]*=30.9738;  atom_volume_vec[i]=14.1995; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=5.5;  atom_miedema_nws[i]=1.65; atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.109; atom_radius_covalent_vec[i]=1.07;   atom_electronegativity_vec[i]=2.19; atom_crystal_vec[i]="cub";  pettifor_scale[i]=2.18; xray_scatt_vec[i]=15.3133; pearson_coefficient[i]=0.0; // P   MIEDEMA = PAUL VAN DER PUT book
+  i++; atom_symbol_vec[i]="S"; atom_name_vec[i]="Sulphur";     atom_mass_vec[i]*=32.06;    atom_volume_vec[i]=15.7301; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.6;  atom_miedema_nws[i]=1.46; atom_miedema_Vm[i]=4.376;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.106; atom_radius_covalent_vec[i]=1.05;   atom_electronegativity_vec[i]=2.58; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.44; pearson_coefficient[i]=0.00016807795;  // S Table 27 of JUNKAI
+  i++; atom_symbol_vec[i]="Cl";atom_name_vec[i]="Chlorine";    atom_mass_vec[i]*=35.453;   atom_volume_vec[i]=21.2947; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.32;  atom_miedema_nws[i]=0.34;  atom_miedema_Vm[i]=6.71; atom_miedema_gamma_s[i]= 1013;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.107; atom_radius_covalent_vec[i]=1.02;   atom_electronegativity_vec[i]=3.16; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.70; pearson_coefficient[i]=0.00058238731;  // Cl interpolation phi_star, nws, Vm, gamma  JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Ar";atom_name_vec[i]="Argon";       atom_mass_vec[i]*=39.948;   atom_volume_vec[i]=22.000; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.192; atom_radius_covalent_vec[i]=1.06;   atom_electronegativity_vec[i]=NNN;  atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.00003509919;  // Ar guessed volume, must double check from results  JUNKAI CHANGED VALENCE    
 
   // ROW4
   // s-electron systems
-  i++; vatom_symbol[i]="K"; vatom_name[i]="Potassium";   vatom_mass[i]*=39.0983;  vatom_volume[i]=73.9091; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=2.25; vatom_miedema_nws[i]=0.65; vatom_miedema_Vm[i]=12.8;vatom_miedema_gamma_s[i]= 150;  vatom_miedema_BVm[i]=1.5;  vatom_radius[i]=0.231; vatom_radius_covalent[i]=2.03;   vatom_electronegativity[i]=0.82; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.35; vatom_pearson_coefficient[i]=0.000164;  // K
-  i++; vatom_symbol[i]="Ca";vatom_name[i]="Calcium";     vatom_mass[i]*=40.08;    vatom_volume[i]=42.1927; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=2.55; vatom_miedema_nws[i]=0.91; vatom_miedema_Vm[i]=8.8; vatom_miedema_gamma_s[i]= 490;  vatom_miedema_BVm[i]=4.0;  vatom_radius[i]=0.197; vatom_radius_covalent[i]=1.76;   vatom_electronegativity[i]=1.00; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.60; vatom_pearson_coefficient[i]=0.000297564;  // Ca
+  i++; atom_symbol_vec[i]="K"; atom_name_vec[i]="Potassium";   atom_mass_vec[i]*=39.0983;  atom_volume_vec[i]=73.9091; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=2.25; atom_miedema_nws[i]=0.65; atom_miedema_Vm[i]=12.8;atom_miedema_gamma_s[i]= 150;  atom_miedema_BVm[i]=1.5;  atom_radius_vec[i]=0.231; atom_radius_covalent_vec[i]=2.03;   atom_electronegativity_vec[i]=0.82; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.35; pearson_coefficient[i]=0.000164;  // K
+  i++; atom_symbol_vec[i]="Ca";atom_name_vec[i]="Calcium";     atom_mass_vec[i]*=40.08;    atom_volume_vec[i]=42.1927; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=2.55; atom_miedema_nws[i]=0.91; atom_miedema_Vm[i]=8.8; atom_miedema_gamma_s[i]= 490;  atom_miedema_BVm[i]=4.0;  atom_radius_vec[i]=0.197; atom_radius_covalent_vec[i]=1.76;   atom_electronegativity_vec[i]=1.00; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.60; pearson_coefficient[i]=0.000297564;  // Ca
   // d-electron systems: transition metals
-  i++; vatom_symbol[i]="Sc";vatom_name[i]="Scandium";    vatom_mass[i]*=44.9559;  vatom_volume[i]=24.6739; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.25; vatom_miedema_nws[i]=1.27; vatom_miedema_Vm[i]=6.1; vatom_miedema_gamma_s[i]=1200;  vatom_miedema_BVm[i]=6.6;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=1.70;   vatom_electronegativity[i]=1.36; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.74; vatom_xray_scatt[i]=21.34; vatom_pearson_coefficient[i]=0.0;  // Sc
-  i++; vatom_symbol[i]="Ti";vatom_name[i]="Titanium";    vatom_mass[i]*=47.9;     vatom_volume[i]=17.1035; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.65; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=4.8; vatom_miedema_gamma_s[i]=2050;  vatom_miedema_BVm[i]=11.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.60;   vatom_electronegativity[i]=1.54; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.79; vatom_xray_scatt[i]=22.24; vatom_pearson_coefficient[i]=0.000286456;  // Ti
-  i++; vatom_symbol[i]="V"; vatom_name[i]="Vanadium";    vatom_mass[i]*=50.9415;  vatom_volume[i]=13.2086; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.25; vatom_miedema_nws[i]=1.64; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2600;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.132; vatom_radius_covalent[i]=1.53;   vatom_electronegativity[i]=1.63; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.84; vatom_pearson_coefficient[i]=9.54831E-07;  // V
-  i++; vatom_symbol[i]="Cr";vatom_name[i]="Chromium";    vatom_mass[i]*=51.996;   vatom_volume[i]=11.4136; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.74; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2400;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.66; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.89; vatom_xray_scatt[i]=23.84; vatom_pearson_coefficient[i]=0.00013287;  // Cr
-  i++; vatom_symbol[i]="Mn";vatom_name[i]="Manganese";   vatom_mass[i]*=54.93805; vatom_volume[i]=10.6487; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.61; vatom_miedema_Vm[i]=3.8; vatom_miedema_gamma_s[i]=1600;  vatom_miedema_BVm[i]=4.4;  vatom_radius[i]=0.112; vatom_radius_covalent[i]=1.61;   vatom_electronegativity[i]=1.55; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=0.94; vatom_xray_scatt[i]=24.46; vatom_pearson_coefficient[i]=1.67276E-32;  // vatom_xray_scatt[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent)   
-  i++; vatom_symbol[i]="Fe";vatom_name[i]="Iron";        vatom_mass[i]*=55.847;   vatom_volume[i]=10.2315; vatom_valence_std[i]=8; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.93; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.124; vatom_radius_covalent[i]=1.52;   vatom_electronegativity[i]=1.83; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.99; vatom_xray_scatt[i]=24.85; vatom_pearson_coefficient[i]=9.17912E-05;  // vatom_xray_scatt[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent) 
-  i++; vatom_symbol[i]="Co";vatom_name[i]="Cobalt";      vatom_mass[i]*=58.9332;  vatom_volume[i]=10.3205; vatom_valence_std[i]=9; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.10; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=13.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.26;   vatom_electronegativity[i]=1.88; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.04; vatom_xray_scatt[i]=24.59; vatom_pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses low spin configuration (most frequent)   
-  i++; vatom_symbol[i]="Ni";vatom_name[i]="Nickel";      vatom_mass[i]*=58.69;    vatom_volume[i]=10.8664; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2450;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.24;   vatom_electronegativity[i]=1.91; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.09; vatom_xray_scatt[i]=25.02; vatom_pearson_coefficient[i]=0.000430773;  // Ni
-  i++; vatom_symbol[i]="Cu";vatom_name[i]="Copper";      vatom_mass[i]*=63.546;   vatom_volume[i]=12.0159; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=1850;  vatom_miedema_BVm[i]=9.3;  vatom_radius[i]=0.128; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.20; vatom_xray_scatt[i]=27.03; vatom_pearson_coefficient[i]=0.00021086;  // Cu JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Zn";vatom_name[i]="Zinc";        vatom_mass[i]*=65.38;    vatom_volume[i]=15.0827; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.32; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=1020;  vatom_miedema_BVm[i]=5.5;  vatom_radius[i]=0.133; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.65; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.44; vatom_xray_scatt[i]=28.44; vatom_pearson_coefficient[i]=0.000595597;  // Zn
+  i++; atom_symbol_vec[i]="Sc";atom_name_vec[i]="Scandium";    atom_mass_vec[i]*=44.9559;  atom_volume_vec[i]=24.6739; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.25; atom_miedema_nws[i]=1.27; atom_miedema_Vm[i]=6.1; atom_miedema_gamma_s[i]=1200;  atom_miedema_BVm[i]=6.6;  atom_radius_vec[i]=0.160; atom_radius_covalent_vec[i]=1.70;   atom_electronegativity_vec[i]=1.36; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.74; xray_scatt_vec[i]=21.34; pearson_coefficient[i]=0.0;  // Sc
+  i++; atom_symbol_vec[i]="Ti";atom_name_vec[i]="Titanium";    atom_mass_vec[i]*=47.9;     atom_volume_vec[i]=17.1035; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.65; atom_miedema_nws[i]=1.47; atom_miedema_Vm[i]=4.8; atom_miedema_gamma_s[i]=2050;  atom_miedema_BVm[i]=11.0; atom_radius_vec[i]=0.147; atom_radius_covalent_vec[i]=1.60;   atom_electronegativity_vec[i]=1.54; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.79; xray_scatt_vec[i]=22.24; pearson_coefficient[i]=0.000286456;  // Ti
+  i++; atom_symbol_vec[i]="V"; atom_name_vec[i]="Vanadium";    atom_mass_vec[i]*=50.9415;  atom_volume_vec[i]=13.2086; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.25; atom_miedema_nws[i]=1.64; atom_miedema_Vm[i]=4.1; atom_miedema_gamma_s[i]=2600;  atom_miedema_BVm[i]=14.0; atom_radius_vec[i]=0.132; atom_radius_covalent_vec[i]=1.53;   atom_electronegativity_vec[i]=1.63; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.84; pearson_coefficient[i]=9.54831E-07;  // V
+  i++; atom_symbol_vec[i]="Cr";atom_name_vec[i]="Chromium";    atom_mass_vec[i]*=51.996;   atom_volume_vec[i]=11.4136; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.65; atom_miedema_nws[i]=1.74; atom_miedema_Vm[i]=3.7; atom_miedema_gamma_s[i]=2400;  atom_miedema_BVm[i]=14.0; atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=1.66; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.89; xray_scatt_vec[i]=23.84; pearson_coefficient[i]=0.00013287;  // Cr
+  i++; atom_symbol_vec[i]="Mn";atom_name_vec[i]="Manganese";   atom_mass_vec[i]*=54.93805; atom_volume_vec[i]=10.6487; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=4.45; atom_miedema_nws[i]=1.61; atom_miedema_Vm[i]=3.8; atom_miedema_gamma_s[i]=1600;  atom_miedema_BVm[i]=4.4;  atom_radius_vec[i]=0.112; atom_radius_covalent_vec[i]=1.61;   atom_electronegativity_vec[i]=1.55; atom_crystal_vec[i]="cub";  pettifor_scale[i]=0.94; xray_scatt_vec[i]=24.46; pearson_coefficient[i]=1.67276E-32;  // xray_scatt_vec[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 atom_radius_covalent_vec[i] uses high spin configuration (most frequent)   
+  i++; atom_symbol_vec[i]="Fe";atom_name_vec[i]="Iron";        atom_mass_vec[i]*=55.847;   atom_volume_vec[i]=10.2315; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.93; atom_miedema_nws[i]=1.77; atom_miedema_Vm[i]=3.7; atom_miedema_gamma_s[i]=2550;  atom_miedema_BVm[i]=12.0; atom_radius_vec[i]=0.124; atom_radius_covalent_vec[i]=1.52;   atom_electronegativity_vec[i]=1.83; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.99; xray_scatt_vec[i]=24.85; pearson_coefficient[i]=9.17912E-05;  // xray_scatt_vec[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 atom_radius_covalent_vec[i] uses high spin configuration (most frequent) 
+  i++; atom_symbol_vec[i]="Co";atom_name_vec[i]="Cobalt";      atom_mass_vec[i]*=58.9332;  atom_volume_vec[i]=10.3205; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=5.10; atom_miedema_nws[i]=1.75; atom_miedema_Vm[i]=3.5; atom_miedema_gamma_s[i]=2550;  atom_miedema_BVm[i]=13.0; atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.26;   atom_electronegativity_vec[i]=1.88; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.04; xray_scatt_vec[i]=24.59; pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 atom_radius_covalent_vec[i] uses low spin configuration (most frequent)   
+  i++; atom_symbol_vec[i]="Ni";atom_name_vec[i]="Nickel";      atom_mass_vec[i]*=58.69;    atom_volume_vec[i]=10.8664; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=5.20; atom_miedema_nws[i]=1.75; atom_miedema_Vm[i]=3.5; atom_miedema_gamma_s[i]=2450;  atom_miedema_BVm[i]=12.0; atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.24;   atom_electronegativity_vec[i]=1.91; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.09; xray_scatt_vec[i]=25.02; pearson_coefficient[i]=0.000430773;  // Ni
+  i++; atom_symbol_vec[i]="Cu";atom_name_vec[i]="Copper";      atom_mass_vec[i]*=63.546;   atom_volume_vec[i]=12.0159; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.55; atom_miedema_nws[i]=1.47; atom_miedema_Vm[i]=3.7; atom_miedema_gamma_s[i]=1850;  atom_miedema_BVm[i]=9.3;  atom_radius_vec[i]=0.128; atom_radius_covalent_vec[i]=1.32;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.20; xray_scatt_vec[i]=27.03; pearson_coefficient[i]=0.00021086;  // Cu JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Zn";atom_name_vec[i]="Zinc";        atom_mass_vec[i]*=65.38;    atom_volume_vec[i]=15.0827; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=4.10; atom_miedema_nws[i]=1.32; atom_miedema_Vm[i]=4.4; atom_miedema_gamma_s[i]=1020;  atom_miedema_BVm[i]=5.5;  atom_radius_vec[i]=0.133; atom_radius_covalent_vec[i]=1.22;   atom_electronegativity_vec[i]=1.65; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.44; xray_scatt_vec[i]=28.44; pearson_coefficient[i]=0.000595597;  // Zn
   // p-electron systems
-  i++; vatom_symbol[i]="Ga";vatom_name[i]="Gallium";     vatom_mass[i]*=69.737;   vatom_volume[i]=18.9039; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.31; vatom_miedema_Vm[i]=5.2; vatom_miedema_gamma_s[i]= 830;  vatom_miedema_BVm[i]=6.7;  vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.81; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=1.68; vatom_pearson_coefficient[i]=0.000197588;  // Ga
-  i++; vatom_symbol[i]="Ge";vatom_name[i]="Germanium";   vatom_mass[i]*=72.59;    vatom_volume[i]=19.2948; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.37; vatom_miedema_Vm[i]=4.6; vatom_miedema_gamma_s[i]=1030;  vatom_miedema_BVm[i]=10.5; vatom_radius[i]=0.122; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.01; vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=1.92; vatom_pearson_coefficient[i]=0.00058782;  // Ge
-  i++; vatom_symbol[i]="As";vatom_name[i]="Arsenic";     vatom_mass[i]*=74.9216;  vatom_volume[i]=19.0677; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.80; vatom_miedema_nws[i]=1.44; vatom_miedema_Vm[i]=5.2; vatom_miedema_gamma_s[i]=1000;  vatom_miedema_BVm[i]=5.1;  vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.19;   vatom_electronegativity[i]=2.18; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.16; vatom_pearson_coefficient[i]=0.0;  // As
-  i++; vatom_symbol[i]="Se";vatom_name[i]="Selenium";    vatom_mass[i]*=78.96;    vatom_volume[i]=20.3733; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.17; vatom_miedema_nws[i]=1.40; vatom_miedema_Vm[i]=5.172;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.116; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.55; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.40; vatom_pearson_coefficient[i]=0.00046279;  // Se Table 27 of JUNKAI
-  i++; vatom_symbol[i]="Br";vatom_name[i]="Bromine";     vatom_mass[i]*=79.904;   vatom_volume[i]=26.3292; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.35; vatom_miedema_Vm[i]=7.31; vatom_miedema_gamma_s[i]= 943;  vatom_miedema_BVm[i]=3.4;  vatom_radius[i]=0.119; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.96; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.64; vatom_pearson_coefficient[i]=0.000156277;  // Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Kr";vatom_name[i]="Krypton";     vatom_mass[i]*=83.8;     vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.197; vatom_radius_covalent[i]=1.16;   vatom_electronegativity[i]=3; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000248482;  // Kr
+  i++; atom_symbol_vec[i]="Ga";atom_name_vec[i]="Gallium";     atom_mass_vec[i]*=69.737;   atom_volume_vec[i]=18.9039; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=4.10; atom_miedema_nws[i]=1.31; atom_miedema_Vm[i]=5.2; atom_miedema_gamma_s[i]= 830;  atom_miedema_BVm[i]=6.7;  atom_radius_vec[i]=0.135; atom_radius_covalent_vec[i]=1.22;   atom_electronegativity_vec[i]=1.81; atom_crystal_vec[i]="orc";  pettifor_scale[i]=1.68; pearson_coefficient[i]=0.000197588;  // Ga
+  i++; atom_symbol_vec[i]="Ge";atom_name_vec[i]="Germanium";   atom_mass_vec[i]*=72.59;    atom_volume_vec[i]=19.2948; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.55; atom_miedema_nws[i]=1.37; atom_miedema_Vm[i]=4.6; atom_miedema_gamma_s[i]=1030;  atom_miedema_BVm[i]=10.5; atom_radius_vec[i]=0.122; atom_radius_covalent_vec[i]=1.20;   atom_electronegativity_vec[i]=2.01; atom_crystal_vec[i]="dia";  pettifor_scale[i]=1.92; pearson_coefficient[i]=0.00058782;  // Ge
+  i++; atom_symbol_vec[i]="As";atom_name_vec[i]="Arsenic";     atom_mass_vec[i]*=74.9216;  atom_volume_vec[i]=19.0677; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.80; atom_miedema_nws[i]=1.44; atom_miedema_Vm[i]=5.2; atom_miedema_gamma_s[i]=1000;  atom_miedema_BVm[i]=5.1;  atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.19;   atom_electronegativity_vec[i]=2.18; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=2.16; pearson_coefficient[i]=0.0;  // As
+  i++; atom_symbol_vec[i]="Se";atom_name_vec[i]="Selenium";    atom_mass_vec[i]*=78.96;    atom_volume_vec[i]=20.3733; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.17; atom_miedema_nws[i]=1.40; atom_miedema_Vm[i]=5.172;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.116; atom_radius_covalent_vec[i]=1.20;   atom_electronegativity_vec[i]=2.55; atom_crystal_vec[i]="hex";  pettifor_scale[i]=2.40; pearson_coefficient[i]=0.00046279;  // Se Table 27 of JUNKAI
+  i++; atom_symbol_vec[i]="Br";atom_name_vec[i]="Bromine";     atom_mass_vec[i]*=79.904;   atom_volume_vec[i]=26.3292; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.20; atom_miedema_nws[i]=1.35; atom_miedema_Vm[i]=7.31; atom_miedema_gamma_s[i]= 943;  atom_miedema_BVm[i]=3.4;  atom_radius_vec[i]=0.119; atom_radius_covalent_vec[i]=1.20;   atom_electronegativity_vec[i]=2.96; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.64; pearson_coefficient[i]=0.000156277;  // Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Kr";atom_name_vec[i]="Krypton";     atom_mass_vec[i]*=83.8;     atom_volume_vec[i]=-1.0000; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.197; atom_radius_covalent_vec[i]=1.16;   atom_electronegativity_vec[i]=3; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.000248482;  // Kr
 
   // ROW5
   // s-electron systems
-  i++; vatom_symbol[i]="Rb";vatom_name[i]="Rubidium";    vatom_mass[i]*=85.4678;  vatom_volume[i]=91.2738; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=2.10; vatom_miedema_nws[i]=0.60; vatom_miedema_Vm[i]=14.6;vatom_miedema_gamma_s[i]= 120;  vatom_miedema_BVm[i]=1.8;  vatom_radius[i]=0.251; vatom_radius_covalent[i]=2.20;   vatom_electronegativity[i]=0.82; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.30; vatom_pearson_coefficient[i]=0.000109697;  // Rb
-  i++; vatom_symbol[i]="Sr";vatom_name[i]="Strontium";   vatom_mass[i]*=87.62;    vatom_volume[i]=55.4105; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=2.40; vatom_miedema_nws[i]=0.84; vatom_miedema_Vm[i]=10.2;vatom_miedema_gamma_s[i]= 430;  vatom_miedema_BVm[i]=3.9;  vatom_radius[i]=0.215; vatom_radius_covalent[i]=1.95;   vatom_electronegativity[i]=0.95; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.55; vatom_pearson_coefficient[i]=6.09969E-05;  // Sr
+  i++; atom_symbol_vec[i]="Rb";atom_name_vec[i]="Rubidium";    atom_mass_vec[i]*=85.4678;  atom_volume_vec[i]=91.2738; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=2.10; atom_miedema_nws[i]=0.60; atom_miedema_Vm[i]=14.6;atom_miedema_gamma_s[i]= 120;  atom_miedema_BVm[i]=1.8;  atom_radius_vec[i]=0.251; atom_radius_covalent_vec[i]=2.20;   atom_electronegativity_vec[i]=0.82; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.30; pearson_coefficient[i]=0.000109697;  // Rb
+  i++; atom_symbol_vec[i]="Sr";atom_name_vec[i]="Strontium";   atom_mass_vec[i]*=87.62;    atom_volume_vec[i]=55.4105; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=2.40; atom_miedema_nws[i]=0.84; atom_miedema_Vm[i]=10.2;atom_miedema_gamma_s[i]= 430;  atom_miedema_BVm[i]=3.9;  atom_radius_vec[i]=0.215; atom_radius_covalent_vec[i]=1.95;   atom_electronegativity_vec[i]=0.95; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.55; pearson_coefficient[i]=6.09969E-05;  // Sr
   // d-electron systems: transition metals
-  i++; vatom_symbol[i]="Y"; vatom_name[i]="Yttrium";     vatom_mass[i]*=88.9059;  vatom_volume[i]=32.4546; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20; vatom_miedema_nws[i]=1.21; vatom_miedema_Vm[i]=7.3; vatom_miedema_gamma_s[i]=1100;  vatom_miedema_BVm[i]=7.2;  vatom_radius[i]=0.181; vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=1.22; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.70; vatom_pearson_coefficient[i]=0.0;  // Y
-  i++; vatom_symbol[i]="Zr";vatom_name[i]="Zirconium";   vatom_mass[i]*=91.22;    vatom_volume[i]=23.2561; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.40; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]=1950;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.158; vatom_radius_covalent[i]=1.75;   vatom_electronegativity[i]=1.33; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.76; vatom_pearson_coefficient[i]=0.000342629;  // Zr
-  i++; vatom_symbol[i]="Nb";vatom_name[i]="Niobium";     vatom_mass[i]*=92.9064;  vatom_volume[i]=18.3132; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.00; vatom_miedema_nws[i]=1.62; vatom_miedema_Vm[i]=4.9; vatom_miedema_gamma_s[i]=2700;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.64;   vatom_electronegativity[i]=1.60; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.82; vatom_pearson_coefficient[i]=0.0;  // Nb
-  i++; vatom_symbol[i]="Mo";vatom_name[i]="Molybdenum";  vatom_mass[i]*=95.94;    vatom_volume[i]=15.6175; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=2950;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.136; vatom_radius_covalent[i]=1.54;   vatom_electronegativity[i]=2.16; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.88; vatom_pearson_coefficient[i]=0.000598128;  // Mo
-  i++; vatom_symbol[i]="Tc";vatom_name[i]="Technetium";  vatom_mass[i]*=98.9062;  vatom_volume[i]=14.4670; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.30; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.47;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=0.0;  //Tc JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ru";vatom_name[i]="Ruthenium";   vatom_mass[i]*=101.07;   vatom_volume[i]=13.8390; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.46;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.00; vatom_pearson_coefficient[i]=0.000406665;  //Ru JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Rh";vatom_name[i]="Rhodium";     vatom_mass[i]*=102.9055; vatom_volume[i]=14.1731; vatom_valence_std[i]=9; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.76; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2750;  vatom_miedema_BVm[i]=23.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.42;   vatom_electronegativity[i]=2.28; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.06; vatom_pearson_coefficient[i]=1.90706E-32;  // Rh
-  i++; vatom_symbol[i]="Pd";vatom_name[i]="Palladium";   vatom_mass[i]*=106.4;    vatom_volume[i]=15.4596; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.45; vatom_miedema_nws[i]=1.67; vatom_miedema_Vm[i]=4.3; vatom_miedema_gamma_s[i]=2100;  vatom_miedema_BVm[i]=16.0; vatom_radius[i]=0.137; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.12; vatom_pearson_coefficient[i]=0.000309478;  // Pd
-  i++; vatom_symbol[i]="Ag";vatom_name[i]="Silver";      vatom_mass[i]*=107.8682; vatom_volume[i]=18.0678; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1250;  vatom_miedema_BVm[i]=10.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.45;   vatom_electronegativity[i]=1.93; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.18; vatom_xray_scatt[i]=47.18; vatom_pearson_coefficient[i]=8.57985E-05;  // Ag JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Cd";vatom_name[i]="Cadmium";     vatom_mass[i]*=112.41;   vatom_volume[i]=22.0408; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.05; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=5.5; vatom_miedema_gamma_s[i]= 780;  vatom_miedema_BVm[i]=6.10; vatom_radius[i]=0.150; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=1.69; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.36; vatom_pearson_coefficient[i]=0.000271603;  // Cd
+  i++; atom_symbol_vec[i]="Y"; atom_name_vec[i]="Yttrium";     atom_mass_vec[i]*=88.9059;  atom_volume_vec[i]=32.4546; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20; atom_miedema_nws[i]=1.21; atom_miedema_Vm[i]=7.3; atom_miedema_gamma_s[i]=1100;  atom_miedema_BVm[i]=7.2;  atom_radius_vec[i]=0.181; atom_radius_covalent_vec[i]=1.90;   atom_electronegativity_vec[i]=1.22; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.70; pearson_coefficient[i]=0.0;  // Y
+  i++; atom_symbol_vec[i]="Zr";atom_name_vec[i]="Zirconium";   atom_mass_vec[i]*=91.22;    atom_volume_vec[i]=23.2561; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.40; atom_miedema_nws[i]=1.39; atom_miedema_Vm[i]=5.8; atom_miedema_gamma_s[i]=1950;  atom_miedema_BVm[i]=12.0; atom_radius_vec[i]=0.158; atom_radius_covalent_vec[i]=1.75;   atom_electronegativity_vec[i]=1.33; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.76; pearson_coefficient[i]=0.000342629;  // Zr
+  i++; atom_symbol_vec[i]="Nb";atom_name_vec[i]="Niobium";     atom_mass_vec[i]*=92.9064;  atom_volume_vec[i]=18.3132; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.00; atom_miedema_nws[i]=1.62; atom_miedema_Vm[i]=4.9; atom_miedema_gamma_s[i]=2700;  atom_miedema_BVm[i]=18.0; atom_radius_vec[i]=0.143; atom_radius_covalent_vec[i]=1.64;   atom_electronegativity_vec[i]=1.60; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.82; pearson_coefficient[i]=0.0;  // Nb
+  i++; atom_symbol_vec[i]="Mo";atom_name_vec[i]="Molybdenum";  atom_mass_vec[i]*=95.94;    atom_volume_vec[i]=15.6175; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.65; atom_miedema_nws[i]=1.77; atom_miedema_Vm[i]=4.4; atom_miedema_gamma_s[i]=2950;  atom_miedema_BVm[i]=26.0; atom_radius_vec[i]=0.136; atom_radius_covalent_vec[i]=1.54;   atom_electronegativity_vec[i]=2.16; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.88; pearson_coefficient[i]=0.000598128;  // Mo
+  i++; atom_symbol_vec[i]="Tc";atom_name_vec[i]="Technetium";  atom_mass_vec[i]*=98.9062;  atom_volume_vec[i]=14.4670; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.30; atom_miedema_nws[i]=1.81; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=3050;  atom_miedema_BVm[i]=26.0; atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.47;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.94; pearson_coefficient[i]=0.0;  //Tc JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Ru";atom_name_vec[i]="Ruthenium";   atom_mass_vec[i]*=101.07;   atom_volume_vec[i]=13.8390; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.83; atom_miedema_Vm[i]=4.1; atom_miedema_gamma_s[i]=3050;  atom_miedema_BVm[i]=26.0; atom_radius_vec[i]=0.134; atom_radius_covalent_vec[i]=1.46;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.00; pearson_coefficient[i]=0.000406665;  //Ru JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Rh";atom_name_vec[i]="Rhodium";     atom_mass_vec[i]*=102.9055; atom_volume_vec[i]=14.1731; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.76; atom_miedema_Vm[i]=4.1; atom_miedema_gamma_s[i]=2750;  atom_miedema_BVm[i]=23.0; atom_radius_vec[i]=0.134; atom_radius_covalent_vec[i]=1.42;   atom_electronegativity_vec[i]=2.28; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.06; pearson_coefficient[i]=1.90706E-32;  // Rh
+  i++; atom_symbol_vec[i]="Pd";atom_name_vec[i]="Palladium";   atom_mass_vec[i]*=106.4;    atom_volume_vec[i]=15.4596; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=5.45; atom_miedema_nws[i]=1.67; atom_miedema_Vm[i]=4.3; atom_miedema_gamma_s[i]=2100;  atom_miedema_BVm[i]=16.0; atom_radius_vec[i]=0.137; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.12; pearson_coefficient[i]=0.000309478;  // Pd
+  i++; atom_symbol_vec[i]="Ag";atom_name_vec[i]="Silver";      atom_mass_vec[i]*=107.8682; atom_volume_vec[i]=18.0678; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.45; atom_miedema_nws[i]=1.39; atom_miedema_Vm[i]=4.7; atom_miedema_gamma_s[i]=1250;  atom_miedema_BVm[i]=10.0; atom_radius_vec[i]=0.144; atom_radius_covalent_vec[i]=1.45;   atom_electronegativity_vec[i]=1.93; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.18; xray_scatt_vec[i]=47.18; pearson_coefficient[i]=8.57985E-05;  // Ag JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Cd";atom_name_vec[i]="Cadmium";     atom_mass_vec[i]*=112.41;   atom_volume_vec[i]=22.0408; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=4.05; atom_miedema_nws[i]=1.24; atom_miedema_Vm[i]=5.5; atom_miedema_gamma_s[i]= 780;  atom_miedema_BVm[i]=6.10; atom_radius_vec[i]=0.150; atom_radius_covalent_vec[i]=1.44;   atom_electronegativity_vec[i]=1.69; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.36; pearson_coefficient[i]=0.000271603;  // Cd
   // p-electron systems
-  i++; vatom_symbol[i]="In";vatom_name[i]="Indium";      vatom_mass[i]*=114.82;   vatom_volume[i]=27.5233; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.90; vatom_miedema_nws[i]=1.17; vatom_miedema_Vm[i]=6.3; vatom_miedema_gamma_s[i]= 690;  vatom_miedema_BVm[i]=6.4;  vatom_radius[i]=0.157; vatom_radius_covalent[i]=1.42;   vatom_electronegativity[i]=1.78; vatom_crystal[i]="fct";  vatom_pettifor_scale[i]=1.60; vatom_pearson_coefficient[i]=1.24494E-05;  // In
-  i++; vatom_symbol[i]="Sn";vatom_name[i]="Tin";         vatom_mass[i]*=118.69;   vatom_volume[i]=27.5555; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.15; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=6.4; vatom_miedema_gamma_s[i]= 710;  vatom_miedema_BVm[i]=8.8;  vatom_radius[i]=0.158; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.96; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=1.84; vatom_pearson_coefficient[i]=0.000334085;  // Sn
-  i++; vatom_symbol[i]="Sb";vatom_name[i]="Antimony";    vatom_mass[i]*=121.75;   vatom_volume[i]=27.1823; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.40; vatom_miedema_nws[i]=1.26; vatom_miedema_Vm[i]=6.6; vatom_miedema_gamma_s[i]= 680;  vatom_miedema_BVm[i]=7.0;  vatom_radius[i]=0.161; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.05; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.08; vatom_pearson_coefficient[i]=6.60751E-05;  // Sb
-  i++; vatom_symbol[i]="Te";vatom_name[i]="Tellurium";   vatom_mass[i]*=127.6;    vatom_volume[i]=28.1993; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.72; vatom_miedema_nws[i]=1.31;vatom_miedema_Vm[i]=6.439;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.38;   vatom_electronegativity[i]=2.10; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.32; vatom_pearson_coefficient[i]=0.000283934;  // Te Table 27 of JUNKAI
-  i++; vatom_symbol[i]="I"; vatom_name[i]="Iodine";     vatom_mass[i]*=126.9045; vatom_volume[i]=34.9784;  vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.33; vatom_miedema_nws[i]=0.17;  vatom_miedema_Vm[i]=8.72;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;vatom_radius[i]=0.136; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.66; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.56; vatom_pearson_coefficient[i]=0.0;  // I interpolation phi_star, nws, Vm,
-  i++; vatom_symbol[i]="Xe";vatom_name[i]="Xenon";       vatom_mass[i]*=131.3;    vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.218; vatom_radius_covalent[i]=1.40;   vatom_electronegativity[i]=2.60; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000267781;  //Xe JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="In";atom_name_vec[i]="Indium";      atom_mass_vec[i]*=114.82;   atom_volume_vec[i]=27.5233; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.90; atom_miedema_nws[i]=1.17; atom_miedema_Vm[i]=6.3; atom_miedema_gamma_s[i]= 690;  atom_miedema_BVm[i]=6.4;  atom_radius_vec[i]=0.157; atom_radius_covalent_vec[i]=1.42;   atom_electronegativity_vec[i]=1.78; atom_crystal_vec[i]="fct";  pettifor_scale[i]=1.60; pearson_coefficient[i]=1.24494E-05;  // In
+  i++; atom_symbol_vec[i]="Sn";atom_name_vec[i]="Tin";         atom_mass_vec[i]*=118.69;   atom_volume_vec[i]=27.5555; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.15; atom_miedema_nws[i]=1.24; atom_miedema_Vm[i]=6.4; atom_miedema_gamma_s[i]= 710;  atom_miedema_BVm[i]=8.8;  atom_radius_vec[i]=0.158; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=1.96; atom_crystal_vec[i]="bct";  pettifor_scale[i]=1.84; pearson_coefficient[i]=0.000334085;  // Sn
+  i++; atom_symbol_vec[i]="Sb";atom_name_vec[i]="Antimony";    atom_mass_vec[i]*=121.75;   atom_volume_vec[i]=27.1823; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.40; atom_miedema_nws[i]=1.26; atom_miedema_Vm[i]=6.6; atom_miedema_gamma_s[i]= 680;  atom_miedema_BVm[i]=7.0;  atom_radius_vec[i]=0.161; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=2.05; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=2.08; pearson_coefficient[i]=6.60751E-05;  // Sb
+  i++; atom_symbol_vec[i]="Te";atom_name_vec[i]="Tellurium";   atom_mass_vec[i]*=127.6;    atom_volume_vec[i]=28.1993; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.72; atom_miedema_nws[i]=1.31;atom_miedema_Vm[i]=6.439;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.143; atom_radius_covalent_vec[i]=1.38;   atom_electronegativity_vec[i]=2.10; atom_crystal_vec[i]="hex";  pettifor_scale[i]=2.32; pearson_coefficient[i]=0.000283934;  // Te Table 27 of JUNKAI
+  i++; atom_symbol_vec[i]="I"; atom_name_vec[i]="Iodine";     atom_mass_vec[i]*=126.9045; atom_volume_vec[i]=34.9784;  atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.33; atom_miedema_nws[i]=0.17;  atom_miedema_Vm[i]=8.72;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;atom_radius_vec[i]=0.136; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=2.66; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.56; pearson_coefficient[i]=0.0;  // I interpolation phi_star, nws, Vm,
+  i++; atom_symbol_vec[i]="Xe";atom_name_vec[i]="Xenon";       atom_mass_vec[i]*=131.3;    atom_volume_vec[i]=-1.0000; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.218; atom_radius_covalent_vec[i]=1.40;   atom_electronegativity_vec[i]=2.60; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.000267781;  //Xe JUNKAI CHANGED VALENCE    
 
   // ROW6
   // s-electron systems
-  i++; vatom_symbol[i]="Cs";vatom_name[i]="Cesium";      vatom_mass[i]*=132.9054; vatom_volume[i]=117.281; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=1.95; vatom_miedema_nws[i]=0.55; vatom_miedema_Vm[i]=16.8;vatom_miedema_gamma_s[i]=  95;  vatom_miedema_BVm[i]=1.4;  vatom_radius[i]=0.265; vatom_radius_covalent[i]=2.44;   vatom_electronegativity[i]=0.79; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.25; vatom_pearson_coefficient[i]=0.0;  // Cs
-  i++; vatom_symbol[i]="Ba";vatom_name[i]="Barium";      vatom_mass[i]*=137.33;   vatom_volume[i]=62.6649; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=2.32; vatom_miedema_nws[i]=0.81; vatom_miedema_Vm[i]=11.3;vatom_miedema_gamma_s[i]= 370;  vatom_miedema_BVm[i]=3.9;  vatom_radius[i]=0.217; vatom_radius_covalent[i]=2.15;   vatom_electronegativity[i]=0.89; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.50; vatom_pearson_coefficient[i]=6.23705E-05;  // Ba
+  i++; atom_symbol_vec[i]="Cs";atom_name_vec[i]="Cesium";      atom_mass_vec[i]*=132.9054; atom_volume_vec[i]=117.281; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=1.95; atom_miedema_nws[i]=0.55; atom_miedema_Vm[i]=16.8;atom_miedema_gamma_s[i]=  95;  atom_miedema_BVm[i]=1.4;  atom_radius_vec[i]=0.265; atom_radius_covalent_vec[i]=2.44;   atom_electronegativity_vec[i]=0.79; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.25; pearson_coefficient[i]=0.0;  // Cs
+  i++; atom_symbol_vec[i]="Ba";atom_name_vec[i]="Barium";      atom_mass_vec[i]*=137.33;   atom_volume_vec[i]=62.6649; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=2.32; atom_miedema_nws[i]=0.81; atom_miedema_Vm[i]=11.3;atom_miedema_gamma_s[i]= 370;  atom_miedema_BVm[i]=3.9;  atom_radius_vec[i]=0.217; atom_radius_covalent_vec[i]=2.15;   atom_electronegativity_vec[i]=0.89; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.50; pearson_coefficient[i]=6.23705E-05;  // Ba
   // d-electron systems: transition metals
-  i++; vatom_symbol[i]="La";vatom_name[i]="Lanthanium";  vatom_mass[i]*=138.9055; vatom_volume[i]=36.8495; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.05;/*3.17*/ vatom_miedema_nws[i]=1.09;/*1.18*/ vatom_miedema_Vm[i]=8.0;/*7.98*/ vatom_miedema_gamma_s[i]= 900;  vatom_miedema_BVm[i]=5.5;  vatom_radius[i]=0.187; vatom_radius_covalent[i]=2.07;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7480; vatom_pearson_coefficient[i]=4.65323E-08;  // La
+  i++; atom_symbol_vec[i]="La";atom_name_vec[i]="Lanthanium";  atom_mass_vec[i]*=138.9055; atom_volume_vec[i]=36.8495; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.05;/*3.17*/ atom_miedema_nws[i]=1.09;/*1.18*/ atom_miedema_Vm[i]=8.0;/*7.98*/ atom_miedema_gamma_s[i]= 900;  atom_miedema_BVm[i]=5.5;  atom_radius_vec[i]=0.187; atom_radius_covalent_vec[i]=2.07;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7480; pearson_coefficient[i]=4.65323E-08;  // La
   // lantanidies
-  i++; vatom_symbol[i]="Ce";vatom_name[i]="Cerium";      vatom_mass[i]*=140.12;   vatom_volume[i]=26.4729; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.18;  vatom_miedema_nws[i]=1.19;  vatom_miedema_Vm[i]=7.76; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.04;   vatom_electronegativity[i]=1.12; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.7460; vatom_pearson_coefficient[i]=2.24956E-05;  // Ce pettifor linear interpolation // miedema from Alonso-March.
-  i++; vatom_symbol[i]="Pr";vatom_name[i]="Praseodymium";vatom_mass[i]*=140.9077; vatom_volume[i]=36.4987; vatom_valence_std[i]=5; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.56; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.183; vatom_radius_covalent[i]=2.03;   vatom_electronegativity[i]=1.13; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7440; vatom_pearson_coefficient[i]=0.0;  // Pr pettifor linear interpolation
-  i++; vatom_symbol[i]="Nd";vatom_name[i]="Neodymium";   vatom_mass[i]*=144.24;   vatom_volume[i]=29.6719; vatom_valence_std[i]=6; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.51; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.01;   vatom_electronegativity[i]=1.14; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7420; vatom_pearson_coefficient[i]=0.000231599;  // Nd pettifor linear interpolation JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Pm";vatom_name[i]="Promethium";  vatom_mass[i]*=146.92;   vatom_volume[i]=34.6133; vatom_valence_std[i]=7; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.43; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.99;   vatom_electronegativity[i]=1.13; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7400; vatom_pearson_coefficient[i]=0.0;  // Pm pettifor linear interpolation
-  i++; vatom_symbol[i]="Sm";vatom_name[i]="Samarium";    vatom_mass[i]*=150.4;    vatom_volume[i]=33.9484; vatom_valence_std[i]=8; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.37; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.181; vatom_radius_covalent[i]=1.98;   vatom_electronegativity[i]=1.17; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=0.7380; vatom_pearson_coefficient[i]=0.000334686;  // Sm pettifor linear interpolation
-  i++; vatom_symbol[i]="Eu";vatom_name[i]="Europium";    vatom_mass[i]*=151.96;   vatom_volume[i]=43.1719; vatom_valence_std[i]=9; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.36; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.204; vatom_radius_covalent[i]=1.98;   vatom_electronegativity[i]=1.20; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.7360; vatom_pearson_coefficient[i]=4.32857E-05;  // Eu pettifor linear interpolation
-  i++; vatom_symbol[i]="Gd";vatom_name[i]="Gadolinium";  vatom_mass[i]*=157.25;   vatom_volume[i]=32.5777; vatom_valence_std[i]=10; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.34; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.180; vatom_radius_covalent[i]=1.96;   vatom_electronegativity[i]=1.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7340; vatom_pearson_coefficient[i]=0.000127674;  // Gd pettifor linear interpolation
-  i++; vatom_symbol[i]="Tb";vatom_name[i]="Terbium";     vatom_mass[i]*=158.9254; vatom_volume[i]=32.0200; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.20; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.94;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7320; vatom_pearson_coefficient[i]=0.0;  // Tb pettifor linear interpolation
-  i++; vatom_symbol[i]="Dy";vatom_name[i]="Dysprosium";  vatom_mass[i]*=162.5;    vatom_volume[i]=31.5096; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.12; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.22; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7300; vatom_pearson_coefficient[i]=5.20771E-05;  // Dy pettifor linear interpolation JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ho";vatom_name[i]="Holmium";     vatom_mass[i]*=164.9304; vatom_volume[i]=31.0155; vatom_valence_std[i]=13; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.06; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.176; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.23; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7280; vatom_pearson_coefficient[i]=2.96961E-32;  // Ho pettifor linear interpolation
-  i++; vatom_symbol[i]="Er";vatom_name[i]="Erbium";      vatom_mass[i]*=167.26;   vatom_volume[i]=30.5431; vatom_valence_std[i]=14; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.98; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.175; vatom_radius_covalent[i]=1.89;   vatom_electronegativity[i]=1.24; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7260; vatom_pearson_coefficient[i]=7.24618E-05;  // Er pettifor linear interpolation
-  i++; vatom_symbol[i]="Tm";vatom_name[i]="Thulium";     vatom_mass[i]*=168.9342; vatom_volume[i]=30.0016; vatom_valence_std[i]=15; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.90; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.174; vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=1.25; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7240; vatom_pearson_coefficient[i]=0.0;  // Tm pettifor linear interpolation JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Yb";vatom_name[i]="Ytterbium";   vatom_mass[i]*=173.04;   vatom_volume[i]=39.4395; vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.86; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.193; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.7220; vatom_pearson_coefficient[i]=8.54557E-05;  // Yb pettifor linear interpolation
-  i++; vatom_symbol[i]="Lu";vatom_name[i]="Lutetium";    vatom_mass[i]*=174.967;  vatom_volume[i]=29.3515; vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.24;  vatom_miedema_Vm[i]=6.81; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.173; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=1.27; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7200; vatom_pearson_coefficient[i]=8.27273E-07;  // Lu
+  i++; atom_symbol_vec[i]="Ce";atom_name_vec[i]="Cerium";      atom_mass_vec[i]*=140.12;   atom_volume_vec[i]=26.4729; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.18;  atom_miedema_nws[i]=1.19;  atom_miedema_Vm[i]=7.76; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.182; atom_radius_covalent_vec[i]=2.04;   atom_electronegativity_vec[i]=1.12; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.7460; pearson_coefficient[i]=2.24956E-05;  // Ce pettifor linear interpolation // miedema from Alonso-March.
+  i++; atom_symbol_vec[i]="Pr";atom_name_vec[i]="Praseodymium";atom_mass_vec[i]*=140.9077; atom_volume_vec[i]=36.4987; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.19;  atom_miedema_nws[i]=1.20;  atom_miedema_Vm[i]=7.56; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.183; atom_radius_covalent_vec[i]=2.03;   atom_electronegativity_vec[i]=1.13; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7440; pearson_coefficient[i]=0.0;  // Pr pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Nd";atom_name_vec[i]="Neodymium";   atom_mass_vec[i]*=144.24;   atom_volume_vec[i]=29.6719; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.19;  atom_miedema_nws[i]=1.20;  atom_miedema_Vm[i]=7.51; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.182; atom_radius_covalent_vec[i]=2.01;   atom_electronegativity_vec[i]=1.14; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7420; pearson_coefficient[i]=0.000231599;  // Nd pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Pm";atom_name_vec[i]="Promethium";  atom_mass_vec[i]*=146.92;   atom_volume_vec[i]=34.6133; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.19;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.43; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.99;   atom_electronegativity_vec[i]=1.13; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7400; pearson_coefficient[i]=0.0;  // Pm pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Sm";atom_name_vec[i]="Samarium";    atom_mass_vec[i]*=150.4;    atom_volume_vec[i]=33.9484; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.37; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.181; atom_radius_covalent_vec[i]=1.98;   atom_electronegativity_vec[i]=1.17; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=0.7380; pearson_coefficient[i]=0.000334686;  // Sm pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Eu";atom_name_vec[i]="Europium";    atom_mass_vec[i]*=151.96;   atom_volume_vec[i]=43.1719; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.36; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.204; atom_radius_covalent_vec[i]=1.98;   atom_electronegativity_vec[i]=1.20; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.7360; pearson_coefficient[i]=4.32857E-05;  // Eu pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Gd";atom_name_vec[i]="Gadolinium";  atom_mass_vec[i]*=157.25;   atom_volume_vec[i]=32.5777; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.34; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.180; atom_radius_covalent_vec[i]=1.96;   atom_electronegativity_vec[i]=1.20; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7340; pearson_coefficient[i]=0.000127674;  // Gd pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Tb";atom_name_vec[i]="Terbium";     atom_mass_vec[i]*=158.9254; atom_volume_vec[i]=32.0200; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.21;  atom_miedema_nws[i]=1.22;  atom_miedema_Vm[i]=7.20; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.177; atom_radius_covalent_vec[i]=1.94;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7320; pearson_coefficient[i]=0.0;  // Tb pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Dy";atom_name_vec[i]="Dysprosium";  atom_mass_vec[i]*=162.5;    atom_volume_vec[i]=31.5096; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.21;  atom_miedema_nws[i]=1.22;  atom_miedema_Vm[i]=7.12; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.177; atom_radius_covalent_vec[i]=1.92;   atom_electronegativity_vec[i]=1.22; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7300; pearson_coefficient[i]=5.20771E-05;  // Dy pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Ho";atom_name_vec[i]="Holmium";     atom_mass_vec[i]*=164.9304; atom_volume_vec[i]=31.0155; atom_valence_std_vec[i]=13; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.22;  atom_miedema_Vm[i]=7.06; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.176; atom_radius_covalent_vec[i]=1.92;   atom_electronegativity_vec[i]=1.23; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7280; pearson_coefficient[i]=2.96961E-32;  // Ho pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Er";atom_name_vec[i]="Erbium";      atom_mass_vec[i]*=167.26;   atom_volume_vec[i]=30.5431; atom_valence_std_vec[i]=14; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.23;  atom_miedema_Vm[i]=6.98; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.175; atom_radius_covalent_vec[i]=1.89;   atom_electronegativity_vec[i]=1.24; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7260; pearson_coefficient[i]=7.24618E-05;  // Er pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Tm";atom_name_vec[i]="Thulium";     atom_mass_vec[i]*=168.9342; atom_volume_vec[i]=30.0016; atom_valence_std_vec[i]=15; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.23;  atom_miedema_Vm[i]=6.90; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.174; atom_radius_covalent_vec[i]=1.90;   atom_electronegativity_vec[i]=1.25; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7240; pearson_coefficient[i]=0.0;  // Tm pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Yb";atom_name_vec[i]="Ytterbium";   atom_mass_vec[i]*=173.04;   atom_volume_vec[i]=39.4395; atom_valence_std_vec[i]=16; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.23;  atom_miedema_Vm[i]=6.86; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.193; atom_radius_covalent_vec[i]=1.87;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.7220; pearson_coefficient[i]=8.54557E-05;  // Yb pettifor linear interpolation
+  i++; atom_symbol_vec[i]="Lu";atom_name_vec[i]="Lutetium";    atom_mass_vec[i]*=174.967;  atom_volume_vec[i]=29.3515; atom_valence_std_vec[i]=17; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.24;  atom_miedema_Vm[i]=6.81; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.173; atom_radius_covalent_vec[i]=1.87;   atom_electronegativity_vec[i]=1.27; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7200; pearson_coefficient[i]=8.27273E-07;  // Lu
   // d-electron systems: transition metalsnnn";
-  i++; vatom_symbol[i]="Hf";vatom_name[i]="Hafnium";     vatom_mass[i]*=178.49;   vatom_volume[i]=22.0408; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.55; vatom_miedema_nws[i]=1.43; vatom_miedema_Vm[i]=5.6; vatom_miedema_gamma_s[i]=2200;  vatom_miedema_BVm[i]=15.0; vatom_radius[i]=0.159; vatom_radius_covalent[i]=1.75;   vatom_electronegativity[i]=1.30; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.775; vatom_pearson_coefficient[i]=5.25384E-05;  // Hf
-  i++; vatom_symbol[i]="Ta";vatom_name[i]="Tantalum";    vatom_mass[i]*=180.9479; vatom_volume[i]=18.1100; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.05; vatom_miedema_nws[i]=1.63; vatom_miedema_Vm[i]=4.9; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=22.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.70;   vatom_electronegativity[i]=1.50; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.83; vatom_pearson_coefficient[i]=3.66845E-09;  // Ta
-  i++; vatom_symbol[i]="W"; vatom_name[i]="Tungsten";    vatom_mass[i]*=183.85;   vatom_volume[i]=15.9387; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.80; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.5; vatom_miedema_gamma_s[i]=3300;  vatom_miedema_BVm[i]=31.0; vatom_radius[i]=0.137; vatom_radius_covalent[i]=1.62;   vatom_electronegativity[i]=2.36; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.885; vatom_pearson_coefficient[i]=6.96679E-05;  // W
-  i++; vatom_symbol[i]="Re";vatom_name[i]="Rhenium";     vatom_mass[i]*=186.2;    vatom_volume[i]=14.8941; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.86; vatom_miedema_Vm[i]=4.3; vatom_miedema_gamma_s[i]=3650;  vatom_miedema_BVm[i]=33.0; vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.51;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=2.70849E-05;  // Re
-  i++; vatom_symbol[i]="Os";vatom_name[i]="Osmium";      vatom_mass[i]*=190.2;    vatom_volume[i]=14.2403; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.85; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3500;  vatom_miedema_BVm[i]=35.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.995; vatom_pearson_coefficient[i]=7.45234E-05;  // Os JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Ir";vatom_name[i]="Iridium";     vatom_mass[i]*=192.22;   vatom_volume[i]=14.5561; vatom_valence_std[i]=9; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.55; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3100;  vatom_miedema_BVm[i]=25.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.41;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.05; vatom_pearson_coefficient[i]=2.53787E-05;  // Ir JUNKAI CHANGED VALENCE    
-  i++; vatom_symbol[i]="Pt";vatom_name[i]="Platinum";    vatom_mass[i]*=195.09;   vatom_volume[i]=15.7298; vatom_valence_std[i]=10; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.65; vatom_miedema_nws[i]=1.78; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.36;   vatom_electronegativity[i]=2.28; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.105; vatom_pearson_coefficient[i]=3.39206E-05;  // Pt
-  i++; vatom_symbol[i]="Au";vatom_name[i]="Gold";        vatom_mass[i]*=196.9665; vatom_volume[i]=18.1904; vatom_valence_std[i]=11; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.15; vatom_miedema_nws[i]=1.57; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1550;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.36;   vatom_electronegativity[i]=2.54; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.16; vatom_xray_scatt[i]=74.99; vatom_pearson_coefficient[i]=2.08217E-32;  // Au
-  i++; vatom_symbol[i]="Hg";vatom_name[i]="Mercury";     vatom_mass[i]*=200.59;   vatom_volume[i]=29.7156; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.20; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=4.0;  vatom_radius[i]=0.150; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=2.00; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=1.32; vatom_pearson_coefficient[i]=6.52519E-05;  // Hg
+  i++; atom_symbol_vec[i]="Hf";atom_name_vec[i]="Hafnium";     atom_mass_vec[i]*=178.49;   atom_volume_vec[i]=22.0408; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.55; atom_miedema_nws[i]=1.43; atom_miedema_Vm[i]=5.6; atom_miedema_gamma_s[i]=2200;  atom_miedema_BVm[i]=15.0; atom_radius_vec[i]=0.159; atom_radius_covalent_vec[i]=1.75;   atom_electronegativity_vec[i]=1.30; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.775; pearson_coefficient[i]=5.25384E-05;  // Hf
+  i++; atom_symbol_vec[i]="Ta";atom_name_vec[i]="Tantalum";    atom_mass_vec[i]*=180.9479; atom_volume_vec[i]=18.1100; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.05; atom_miedema_nws[i]=1.63; atom_miedema_Vm[i]=4.9; atom_miedema_gamma_s[i]=3050;  atom_miedema_BVm[i]=22.0; atom_radius_vec[i]=0.147; atom_radius_covalent_vec[i]=1.70;   atom_electronegativity_vec[i]=1.50; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.83; pearson_coefficient[i]=3.66845E-09;  // Ta
+  i++; atom_symbol_vec[i]="W"; atom_name_vec[i]="Tungsten";    atom_mass_vec[i]*=183.85;   atom_volume_vec[i]=15.9387; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.80; atom_miedema_nws[i]=1.81; atom_miedema_Vm[i]=4.5; atom_miedema_gamma_s[i]=3300;  atom_miedema_BVm[i]=31.0; atom_radius_vec[i]=0.137; atom_radius_covalent_vec[i]=1.62;   atom_electronegativity_vec[i]=2.36; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.885; pearson_coefficient[i]=6.96679E-05;  // W
+  i++; atom_symbol_vec[i]="Re";atom_name_vec[i]="Rhenium";     atom_mass_vec[i]*=186.2;    atom_volume_vec[i]=14.8941; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.86; atom_miedema_Vm[i]=4.3; atom_miedema_gamma_s[i]=3650;  atom_miedema_BVm[i]=33.0; atom_radius_vec[i]=0.138; atom_radius_covalent_vec[i]=1.51;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.94; pearson_coefficient[i]=2.70849E-05;  // Re
+  i++; atom_symbol_vec[i]="Os";atom_name_vec[i]="Osmium";      atom_mass_vec[i]*=190.2;    atom_volume_vec[i]=14.2403; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.85; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=3500;  atom_miedema_BVm[i]=35.0; atom_radius_vec[i]=0.135; atom_radius_covalent_vec[i]=1.44;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.995; pearson_coefficient[i]=7.45234E-05;  // Os JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Ir";atom_name_vec[i]="Iridium";     atom_mass_vec[i]*=192.22;   atom_volume_vec[i]=14.5561; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=5.55; atom_miedema_nws[i]=1.83; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=3100;  atom_miedema_BVm[i]=25.0; atom_radius_vec[i]=0.135; atom_radius_covalent_vec[i]=1.41;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.05; pearson_coefficient[i]=2.53787E-05;  // Ir JUNKAI CHANGED VALENCE    
+  i++; atom_symbol_vec[i]="Pt";atom_name_vec[i]="Platinum";    atom_mass_vec[i]*=195.09;   atom_volume_vec[i]=15.7298; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.65; atom_miedema_nws[i]=1.78; atom_miedema_Vm[i]=4.4; atom_miedema_gamma_s[i]=2550;  atom_miedema_BVm[i]=18.0; atom_radius_vec[i]=0.138; atom_radius_covalent_vec[i]=1.36;   atom_electronegativity_vec[i]=2.28; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.105; pearson_coefficient[i]=3.39206E-05;  // Pt
+  i++; atom_symbol_vec[i]="Au";atom_name_vec[i]="Gold";        atom_mass_vec[i]*=196.9665; atom_volume_vec[i]=18.1904; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=5.15; atom_miedema_nws[i]=1.57; atom_miedema_Vm[i]=4.7; atom_miedema_gamma_s[i]=1550;  atom_miedema_BVm[i]=18.0; atom_radius_vec[i]=0.144; atom_radius_covalent_vec[i]=1.36;   atom_electronegativity_vec[i]=2.54; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.16; xray_scatt_vec[i]=74.99; pearson_coefficient[i]=2.08217E-32;  // Au
+  i++; atom_symbol_vec[i]="Hg";atom_name_vec[i]="Mercury";     atom_mass_vec[i]*=200.59;   atom_volume_vec[i]=29.7156; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.20; atom_miedema_nws[i]=1.24; atom_miedema_Vm[i]=5.8; atom_miedema_gamma_s[i]= 610;  atom_miedema_BVm[i]=4.0;  atom_radius_vec[i]=0.150; atom_radius_covalent_vec[i]=1.32;   atom_electronegativity_vec[i]=2.00; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=1.32; pearson_coefficient[i]=6.52519E-05;  // Hg
   // p-electron systems
-  i++; vatom_symbol[i]="Tl";vatom_name[i]="Thallium";    vatom_mass[i]*=204.37;   vatom_volume[i]=31.0721; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.90; vatom_miedema_nws[i]=1.12; vatom_miedema_Vm[i]=6.6; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=6.2;  vatom_radius[i]=0.171; vatom_radius_covalent[i]=1.45;   vatom_electronegativity[i]=1.62; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.56; vatom_pearson_coefficient[i]=1.99659E-05;  // Tl electronegativity  2.04=>1.62
-  i++; vatom_symbol[i]="Pb";vatom_name[i]="Lead";        vatom_mass[i]*=207.2;    vatom_volume[i]=31.6649; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.15; vatom_miedema_Vm[i]=6.9; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=7.9;  vatom_radius[i]=0.175; vatom_radius_covalent[i]=1.46;   vatom_electronegativity[i]=2.33; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.80; vatom_pearson_coefficient[i]=1.94378E-05;  // Pb
-  i++; vatom_symbol[i]="Bi";vatom_name[i]="Bismuth";     vatom_mass[i]*=208.9804; vatom_volume[i]=31.5691; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.15; vatom_miedema_nws[i]=1.16; vatom_miedema_Vm[i]=7.2; vatom_miedema_gamma_s[i]= 550;  vatom_miedema_BVm[i]=6.7;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=1.48;   vatom_electronegativity[i]=2.02; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.04; vatom_pearson_coefficient[i]=0.0;  // Bi
-  i++; vatom_symbol[i]="Po";vatom_name[i]="Polonium";    vatom_mass[i]*=209.98;   vatom_volume[i]=NNN;     vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.140; vatom_radius_covalent[i]=1.40;   vatom_electronegativity[i]=2.00; vatom_crystal[i]="sc";  vatom_pettifor_scale[i]=2.28; vatom_pearson_coefficient[i]=0.0;  // Po
-  i++; vatom_symbol[i]="At";vatom_name[i]="Astatine";    vatom_mass[i]*=210;      vatom_volume[i]=NNN;     vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.50;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=2.52; vatom_pearson_coefficient[i]=0.0;  // At
-  i++; vatom_symbol[i]="Rn";vatom_name[i]="Radon";       vatom_mass[i]*=222;      vatom_volume[i]=NNN;     vatom_valence_std[i]=0; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.50;   vatom_electronegativity[i]=2.2; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Rn
+  i++; atom_symbol_vec[i]="Tl";atom_name_vec[i]="Thallium";    atom_mass_vec[i]*=204.37;   atom_volume_vec[i]=31.0721; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.90; atom_miedema_nws[i]=1.12; atom_miedema_Vm[i]=6.6; atom_miedema_gamma_s[i]= 610;  atom_miedema_BVm[i]=6.2;  atom_radius_vec[i]=0.171; atom_radius_covalent_vec[i]=1.45;   atom_electronegativity_vec[i]=1.62; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.56; pearson_coefficient[i]=1.99659E-05;  // Tl electronegativity  2.04=>1.62
+  i++; atom_symbol_vec[i]="Pb";atom_name_vec[i]="Lead";        atom_mass_vec[i]*=207.2;    atom_volume_vec[i]=31.6649; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.10; atom_miedema_nws[i]=1.15; atom_miedema_Vm[i]=6.9; atom_miedema_gamma_s[i]= 610;  atom_miedema_BVm[i]=7.9;  atom_radius_vec[i]=0.175; atom_radius_covalent_vec[i]=1.46;   atom_electronegativity_vec[i]=2.33; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.80; pearson_coefficient[i]=1.94378E-05;  // Pb
+  i++; atom_symbol_vec[i]="Bi";atom_name_vec[i]="Bismuth";     atom_mass_vec[i]*=208.9804; atom_volume_vec[i]=31.5691; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.15; atom_miedema_nws[i]=1.16; atom_miedema_Vm[i]=7.2; atom_miedema_gamma_s[i]= 550;  atom_miedema_BVm[i]=6.7;  atom_radius_vec[i]=0.182; atom_radius_covalent_vec[i]=1.48;   atom_electronegativity_vec[i]=2.02; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=2.04; pearson_coefficient[i]=0.0;  // Bi
+  i++; atom_symbol_vec[i]="Po";atom_name_vec[i]="Polonium";    atom_mass_vec[i]*=209.98;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.140; atom_radius_covalent_vec[i]=1.40;   atom_electronegativity_vec[i]=2.00; atom_crystal_vec[i]="sc";  pettifor_scale[i]=2.28; pearson_coefficient[i]=0.0;  // Po
+  i++; atom_symbol_vec[i]="At";atom_name_vec[i]="Astatine";    atom_mass_vec[i]*=210;      atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.50;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=2.52; pearson_coefficient[i]=0.0;  // At
+  i++; atom_symbol_vec[i]="Rn";atom_name_vec[i]="Radon";       atom_mass_vec[i]*=222;      atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.50;   atom_electronegativity_vec[i]=2.2; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Rn
 
   // ROW7
   // s-electron systems
-  i++; vatom_symbol[i]="Fr";vatom_name[i]="Francium";    vatom_mass[i]*=223.02;   vatom_volume[i]=NNN;     vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.60;   vatom_electronegativity[i]=0.70; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Fr
-  i++; vatom_symbol[i]="Ra";vatom_name[i]="Radium";      vatom_mass[i]*=226.0254; vatom_volume[i]=-1.0000; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.21;   vatom_electronegativity[i]=0.89; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Ra
+  i++; atom_symbol_vec[i]="Fr";atom_name_vec[i]="Francium";    atom_mass_vec[i]*=223.02;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.60;   atom_electronegativity_vec[i]=0.70; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Fr
+  i++; atom_symbol_vec[i]="Ra";atom_name_vec[i]="Radium";      atom_mass_vec[i]*=226.0254; atom_volume_vec[i]=-1.0000; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.21;   atom_electronegativity_vec[i]=0.89; atom_crystal_vec[i]="bct";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Ra
   // d-electron systems: transition metals
-  i++; vatom_symbol[i]="Ac";vatom_name[i]="Actinium";    vatom_mass[i]*=227.03;   vatom_volume[i]=45.2437; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.15;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Ac
+  i++; atom_symbol_vec[i]="Ac";atom_name_vec[i]="Actinium";    atom_mass_vec[i]*=227.03;   atom_volume_vec[i]=45.2437; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.15;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Ac
   // actinidies
-  i++; vatom_symbol[i]="Th";vatom_name[i]="Thorium";     vatom_mass[i]*=232.0381; vatom_volume[i]=31.9586; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.30; vatom_miedema_nws[i]=1.28; vatom_miedema_Vm[i]=7.3; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.180; vatom_radius_covalent[i]=2.06;   vatom_electronegativity[i]=1.30; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=86.64; vatom_pearson_coefficient[i]=0.0; // Th
-  i++; vatom_symbol[i]="Pa";vatom_name[i]="Protoactinium";vatom_mass[i]*=231.04;  vatom_volume[i]=NNN;     vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.00;   vatom_electronegativity[i]=1.50; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Pa
-  i++; vatom_symbol[i]="U"; vatom_name[i]="Uranium";     vatom_mass[i]*=238.03;   vatom_volume[i]=NNN;     vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.96;   vatom_electronegativity[i]=1.38; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=1.15611E-06;  // U
-  i++; vatom_symbol[i]="Np";vatom_name[i]="Neptunium";   vatom_mass[i]*=237.05;   vatom_volume[i]=NNN;     vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0;  vatom_pearson_coefficient[i]=0.0;  // Np
-  i++; vatom_symbol[i]="Pu"; vatom_name[i]="Plutonium";  vatom_mass[i]*=244.06;   vatom_volume[i]=NNN;     vatom_valence_std[i]=8; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Pu
-  i++; vatom_symbol[i]="Am";vatom_name[i]="Americium";   vatom_mass[i]*=243.06;   vatom_volume[i]=NNN;     vatom_valence_std[i]=9; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.80;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Am
-  i++; vatom_symbol[i]="Cm"; vatom_name[i]="Curium";     vatom_mass[i]*=247.07;   vatom_volume[i]=NNN;     vatom_valence_std[i]=10; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=1.69;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Cm
+  i++; atom_symbol_vec[i]="Th";atom_name_vec[i]="Thorium";     atom_mass_vec[i]*=232.0381; atom_volume_vec[i]=31.9586; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.30; atom_miedema_nws[i]=1.28; atom_miedema_Vm[i]=7.3; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.180; atom_radius_covalent_vec[i]=2.06;   atom_electronegativity_vec[i]=1.30; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; xray_scatt_vec[i]=86.64; pearson_coefficient[i]=0.0; // Th
+  i++; atom_symbol_vec[i]="Pa";atom_name_vec[i]="Protoactinium";atom_mass_vec[i]*=231.04;  atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.00;   atom_electronegativity_vec[i]=1.50; atom_crystal_vec[i]="bct";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Pa
+  i++; atom_symbol_vec[i]="U"; atom_name_vec[i]="Uranium";     atom_mass_vec[i]*=238.03;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.138; atom_radius_covalent_vec[i]=1.96;   atom_electronegativity_vec[i]=1.38; atom_crystal_vec[i]="orc";  pettifor_scale[i]=0; pearson_coefficient[i]=1.15611E-06;  // U
+  i++; atom_symbol_vec[i]="Np";atom_name_vec[i]="Neptunium";   atom_mass_vec[i]*=237.05;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.90;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0;  pearson_coefficient[i]=0.0;  // Np
+  i++; atom_symbol_vec[i]="Pu"; atom_name_vec[i]="Plutonium";  atom_mass_vec[i]*=244.06;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=1.87;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Pu
+  i++; atom_symbol_vec[i]="Am";atom_name_vec[i]="Americium";   atom_mass_vec[i]*=243.06;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.80;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Am
+  i++; atom_symbol_vec[i]="Cm"; atom_name_vec[i]="Curium";     atom_mass_vec[i]*=247.07;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=1.69;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Cm
 
-  i++; vatom_symbol[i]="Bk"; vatom_name[i]="Berkelium";  vatom_mass[i]*=247.07;   vatom_volume[i]=NNN;     vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Bk
-  i++; vatom_symbol[i]="Cf"; vatom_name[i]="Californium";vatom_mass[i]*=251.08;   vatom_volume[i]=NNN;     vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Cf
-  i++; vatom_symbol[i]="Es"; vatom_name[i]="Einsteinium";vatom_mass[i]*=252.08;   vatom_volume[i]=NNN;     vatom_valence_std[i]=13; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Es
-  i++; vatom_symbol[i]="Fm"; vatom_name[i]="Fermium";    vatom_mass[i]*=257.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=14; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Fm
-  i++; vatom_symbol[i]="Md"; vatom_name[i]="Mendelevium";vatom_mass[i]*=258.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=15; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Md
-  i++; vatom_symbol[i]="No"; vatom_name[i]="Nobelium";   vatom_mass[i]*=259.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // No
-  i++; vatom_symbol[i]="Lr"; vatom_name[i]="Lawrencium"; vatom_mass[i]*=262.11;   vatom_volume[i]=NNN;     vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Lr
+  i++; atom_symbol_vec[i]="Bk"; atom_name_vec[i]="Berkelium";  atom_mass_vec[i]*=247.07;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Bk
+  i++; atom_symbol_vec[i]="Cf"; atom_name_vec[i]="Californium";atom_mass_vec[i]*=251.08;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Cf
+  i++; atom_symbol_vec[i]="Es"; atom_name_vec[i]="Einsteinium";atom_mass_vec[i]*=252.08;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=13; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Es
+  i++; atom_symbol_vec[i]="Fm"; atom_name_vec[i]="Fermium";    atom_mass_vec[i]*=257.1;    atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=14; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Fm
+  i++; atom_symbol_vec[i]="Md"; atom_name_vec[i]="Mendelevium";atom_mass_vec[i]*=258.1;    atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=15; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Md
+  i++; atom_symbol_vec[i]="No"; atom_name_vec[i]="Nobelium";   atom_mass_vec[i]*=259.1;    atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=16; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // No
+  i++; atom_symbol_vec[i]="Lr"; atom_name_vec[i]="Lawrencium"; atom_mass_vec[i]*=262.11;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=17; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Lr
 
   /*
     int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
     for(uint j=1;j<93;j++) {
-    int test=vatom_valence_std[j];
+    int test=atom_valence_std_vec[j];
     if(j<=9 && test>=5) {test=test-8;} // first row
     if(j<=17 && test>=5) {test=test-8;} // second row
     //   if(test!=valence_wahyu[j]) 
-    cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
+    cerr << atom_symbol_vec[j] << " " << atom_valence_std_vec[j] << " " <<  test  << " " << valence_wahyu[j];
     if(test!=valence_wahyu[j]) cerr << "   ****   ";
     cerr << endl;
     }
@@ -456,55 +456,55 @@ void atoms_initialize(void) {
 
 
   //   for(int i=1;i<90;i++) {
-  //     cerr << i << " " <<  vatom_symbol[i] << " " << vatom_pettifor_scale[i] << endl;
+  //     cerr << i << " " <<  atom_symbol_vec[i] << " " << pettifor_scale[i] << endl;
   //   }
-  // cerr << i << " " << vatom_symbol[i] << endl; exit(0);
+  // cerr << i << " " << atom_symbol_vec[i] << endl; exit(0);
 
   // aconvasp stuff
   // All data collected from the NIST online tables:
   // http://physics.nist.gov/PhysRefData/FFast/html/form.html
   // All data are ideally for f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
   // These are for E=7.9026keV (Cu-alpha is wavelength=1.5418A, E=8.0416keV).
-  vatom_xray_scatt[1+2]=3.00145E+00; // Li
-  vatom_xray_scatt[1+14]=1.53133E+01; // P
-  vatom_xray_scatt[1+24]=2.43589E+01; // Mn
-  vatom_xray_scatt[1+25]=2.46830E+01; // Fe
+  xray_scatt_vec[1+2]=3.00145E+00; // Li
+  xray_scatt_vec[1+14]=1.53133E+01; // P
+  xray_scatt_vec[1+24]=2.43589E+01; // Mn
+  xray_scatt_vec[1+25]=2.46830E+01; // Fe
 
   // All data collected from the online tables:
   // http://www-cxro.lbl.gov/optical_constants/pert_form.html
   // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
-  vatom_xray_scatt[1+0]=1.000; // H
-  vatom_xray_scatt[1+1]=2.000; // He
-  vatom_xray_scatt[1+2]=3.001; // Li
-  vatom_xray_scatt[1+6]=6.019; // C
-  vatom_xray_scatt[1+7]=8.052; // O
-  vatom_xray_scatt[1+13]=14.43; // P
-  vatom_xray_scatt[1+14]=15.30; // P
-  vatom_xray_scatt[1+20]=21.34; // Sc
-  vatom_xray_scatt[1+21]=22.24; // Ti
-  vatom_xray_scatt[1+23]=23.84; // Cr
-  vatom_xray_scatt[1+24]=24.46; // Mn
-  vatom_xray_scatt[1+25]=24.85; // Fe
-  vatom_xray_scatt[1+26]=24.59; // Co
-  vatom_xray_scatt[1+27]=25.02; // Ni
-  vatom_xray_scatt[1+28]=27.03; // Cu
-  vatom_xray_scatt[1+29]=28.44; // Zn
-  vatom_xray_scatt[1+46]=47.18; // Ag
-  vatom_xray_scatt[1+78]=74.99; // Au
-  vatom_xray_scatt[1+89]=86.64; // Th
+  xray_scatt_vec[1+0]=1.000; // H
+  xray_scatt_vec[1+1]=2.000; // He
+  xray_scatt_vec[1+2]=3.001; // Li
+  xray_scatt_vec[1+6]=6.019; // C
+  xray_scatt_vec[1+7]=8.052; // O
+  xray_scatt_vec[1+13]=14.43; // P
+  xray_scatt_vec[1+14]=15.30; // P
+  xray_scatt_vec[1+20]=21.34; // Sc
+  xray_scatt_vec[1+21]=22.24; // Ti
+  xray_scatt_vec[1+23]=23.84; // Cr
+  xray_scatt_vec[1+24]=24.46; // Mn
+  xray_scatt_vec[1+25]=24.85; // Fe
+  xray_scatt_vec[1+26]=24.59; // Co
+  xray_scatt_vec[1+27]=25.02; // Ni
+  xray_scatt_vec[1+28]=27.03; // Cu
+  xray_scatt_vec[1+29]=28.44; // Zn
+  xray_scatt_vec[1+46]=47.18; // Ag
+  xray_scatt_vec[1+78]=74.99; // Au
+  xray_scatt_vec[1+89]=86.64; // Th
 
   // Atomic masses
   // All indices are the atomic number shifted back by one.
   // All masses are in kilograms
 
   // not useful anymore all the masses are declared
-  //  vatom_mass=vector<double> (NUM_ELEMENTS,0.0);
+  //  atom_mass_vec=vector<double> (NUM_ELEMENTS,0.0);
   //  for(i=0;i<NUM_ELEMENTS;i++) {
-  //    vatom_mass[i]=(double)(2*i)*AMU2KILOGRAM;
+  //    atom_mass_vec[i]=(double)(2*i)*AMU2KILOGRAM;
   //  }
-  //  vatom_mass[1+0]=1.0079*AMU2KILOGRAM; //H
-  //  vatom_mass[1+7]=15.9994*AMU2KILOGRAM; //O
-  //  vatom_mass[1+24]=54.93805*AMU2KILOGRAM; //Mn
+  //  atom_mass_vec[1+0]=1.0079*AMU2KILOGRAM; //H
+  //  atom_mass_vec[1+7]=15.9994*AMU2KILOGRAM; //O
+  //  atom_mass_vec[1+24]=54.93805*AMU2KILOGRAM; //Mn
 
   // finish and copy
   
@@ -516,9 +516,9 @@ void atoms_initialize(void) {
 // **************************************************************************
 uint GetAtomNumber(const string& symbol) {
   for(uint iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
       return (uint) iat;
-  cerr << "GetAtomNumber symbol not found symbol=" << symbol << "  vatom_name.size()=" << vatom_name.size() << endl;
+  cerr << "GetAtomNumber symbol not found symbol=" << symbol << "  atom_name_vec.size()=" << atom_name_vec.size() << endl;
   return 0; // no symbol found
 }
 
@@ -527,16 +527,16 @@ uint GetAtomNumber(const string& symbol) {
 // **************************************************************************
 std::string GetAtomName(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_name.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_name_vec.at(iat);
   return symbol;
 }
 std::string GetAtomName(const uint& atnum) {
-  if(atnum>=vatom_name.size() || atnum<=0) {
-    cerr << "GetAtomName out of boundary  atnum=" << atnum << "  vatom_name.size()=" << vatom_name.size() << endl;
+  if(atnum>=atom_name_vec.size() || atnum<=0) {
+    cerr << "GetAtomName out of boundary  atnum=" << atnum << "  atom_name_vec.size()=" << atom_name_vec.size() << endl;
     return "not found";
   }
-  return vatom_name.at(atnum);
+  return atom_name_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -544,16 +544,16 @@ std::string GetAtomName(const uint& atnum) {
 // **************************************************************************
 std::string GetAtomSymbol(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_symbol.at(iat))
-      return vatom_symbol.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_symbol_vec.at(iat))
+      return atom_symbol_vec.at(iat);
   return symbol;
 }
 std::string GetAtomSymbol(const uint& atnum) {
-  if(atnum>=vatom_symbol.size() || atnum<=0) {
-    cerr << "GetAtomSymbol out of boundary  atnum=" << atnum << "  vatom_symbol.size()=" << vatom_symbol.size() << endl;
+  if(atnum>=atom_symbol_vec.size() || atnum<=0) {
+    cerr << "GetAtomSymbol out of boundary  atnum=" << atnum << "  atom_symbol_vec.size()=" << atom_symbol_vec.size() << endl;
     return "not found";
   }
-  return vatom_symbol.at(atnum);
+  return atom_symbol_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -563,17 +563,16 @@ double GetAtomMass(const string& _symbol,bool clean) { //CO181128
   string symbol=_symbol; //CO181128
   if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO181128
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_mass.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_mass_vec.at(iat);
   return (double) NNN;
 }
-
 double GetAtomMass(const uint& atnum) {
-  if(atnum>=vatom_mass.size() || atnum<=0) {
-    cerr << "GetAtomMass out of boundary  atnum=" << atnum << "  vatom_mass.size()=" << vatom_mass.size() << endl;
+  if(atnum>=atom_mass_vec.size() || atnum<=0) {
+    cerr << "GetAtomMass out of boundary  atnum=" << atnum << "  atom_mass_vec.size()=" << atom_mass_vec.size() << endl;
     return (double) NNN;
   }
-  return vatom_mass.at(atnum);
+  return atom_mass_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -623,16 +622,16 @@ double GetAtomVolume(const string& _symbol,bool clean) { //CO181128
   string symbol=_symbol; //CO181128
   if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO181128
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_volume.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_volume_vec.at(iat);
   return (double) NNN;
 }
 double GetAtomVolume(const uint& atnum) {
-  if(atnum>=vatom_volume.size() || atnum<=0) {
-    cerr << "GetAtomVolume out of boundary  atnum=" << atnum << "  vatom_volume.size()=" << vatom_volume.size() << endl;
+  if(atnum>=atom_volume_vec.size() || atnum<=0) {
+    cerr << "GetAtomVolume out of boundary  atnum=" << atnum << "  atom_volume_vec.size()=" << atom_volume_vec.size() << endl;
     return (double) NNN;
   }
-  return vatom_volume.at(atnum);
+  return atom_volume_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -640,17 +639,17 @@ double GetAtomVolume(const uint& atnum) {
 // **************************************************************************
 int GetAtomValenceIupac(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_valence_iupac.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_valence_iupac_vec.at(iat);
   return (int) NNN;
 }
 
 int GetAtomValenceIupac(const uint& atnum) {
-  if(atnum>=vatom_valence_iupac.size() || atnum<=0) {
-    cerr << "GetAtomValenceIupac out of boundary  atnum=" << atnum << "  vatom_valence_iupac.size()=" << vatom_valence_iupac.size() << endl;
+  if(atnum>=atom_valence_iupac_vec.size() || atnum<=0) {
+    cerr << "GetAtomValenceIupac out of boundary  atnum=" << atnum << "  atom_valence_iupac_vec.size()=" << atom_valence_iupac_vec.size() << endl;
     return (int) NNN;
   }
-  return vatom_valence_iupac.at(atnum);
+  return atom_valence_iupac_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -658,17 +657,17 @@ int GetAtomValenceIupac(const uint& atnum) {
 // **************************************************************************
 int GetAtomValenceStd(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_valence_std.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_valence_std_vec.at(iat);
   return (int) NNN;
 }
 
 int GetAtomValenceStd(const uint& atnum) {
-  if(atnum>=vatom_valence_std.size() || atnum<=0) {
-    cerr << "GetAtomValenceStd out of boundary  atnum=" << atnum << "  vatom_valence_std.size()=" << vatom_valence_std.size() << endl;
+  if(atnum>=atom_valence_std_vec.size() || atnum<=0) {
+    cerr << "GetAtomValenceStd out of boundary  atnum=" << atnum << "  atom_valence_std_vec.size()=" << atom_valence_std_vec.size() << endl;
     return (int) NNN;
   }
-  return vatom_valence_std.at(atnum);
+  return atom_valence_std_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -676,16 +675,16 @@ int GetAtomValenceStd(const uint& atnum) {
 // **************************************************************************
 double GetAtomRadius(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_radius.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_radius_vec.at(iat);
   return (double) NNN;
 }
 double GetAtomRadius(const uint& atnum) {
-  if(atnum>=vatom_radius.size() || atnum<=0) {
-    cerr << "GetAtomRadius out of boundary  atnum=" << atnum << "  vatom_radius.size()=" << vatom_radius.size() << endl;
+  if(atnum>=atom_radius_vec.size() || atnum<=0) {
+    cerr << "GetAtomRadius out of boundary  atnum=" << atnum << "  atom_radius_vec.size()=" << atom_radius_vec.size() << endl;
     return (double) NNN;
   }
-  return vatom_radius.at(atnum);
+  return atom_radius_vec.at(atnum);
 }
 
 // DX and CO - 9/4/17 - START 
@@ -694,16 +693,16 @@ double GetAtomRadius(const uint& atnum) {
 // **************************************************************************
 double GetAtomRadiusCovalent(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_radius_covalent.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_radius_covalent_vec.at(iat);
   return (double) NNN;
 }
 double GetAtomRadiusCovalent(const uint& atnum) {
-  if(atnum>=vatom_radius_covalent.size() || atnum<=0) {
-    cerr << "GetAtomRadiusCovalent out of boundary  atnum=" << atnum << "  vatom_radius_covalent.size()=" << vatom_radius_covalent.size() << endl;
+  if(atnum>=atom_radius_covalent_vec.size() || atnum<=0) {
+    cerr << "GetAtomRadiusCovalent out of boundary  atnum=" << atnum << "  atom_radius_covalent_vec.size()=" << atom_radius_covalent_vec.size() << endl;
     return (double) NNN;
   }
-  return vatom_radius_covalent.at(atnum);
+  return atom_radius_covalent_vec.at(atnum);
 }
 // DX and CO - 9/4/17 - END 
 
@@ -712,16 +711,16 @@ double GetAtomRadiusCovalent(const uint& atnum) {
 // **************************************************************************
 double GetAtomElectronegativity(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_electronegativity.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_electronegativity_vec.at(iat);
   return (double) NNN;
 }
 double GetAtomElectronegativity(const uint& atnum) {
-  if(atnum>=vatom_electronegativity.size() || atnum<=0) {
-    cerr << "GetAtomElectronegativity out of boundary  atnum=" << atnum << "  vatom_electronegativity.size()=" << vatom_electronegativity.size() << endl;
+  if(atnum>=atom_electronegativity_vec.size() || atnum<=0) {
+    cerr << "GetAtomElectronegativity out of boundary  atnum=" << atnum << "  atom_electronegativity_vec.size()=" << atom_electronegativity_vec.size() << endl;
     return (double) NNN;
   }
-  return vatom_electronegativity.at(atnum);
+  return atom_electronegativity_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -729,16 +728,16 @@ double GetAtomElectronegativity(const uint& atnum) {
 // **************************************************************************
 string GetAtomCrystal(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_crystal.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return atom_crystal_vec.at(iat);
   return (string) "nnn";
 }
 string GetAtomCrystal(const uint& atnum) {
-  if(atnum>=vatom_crystal.size() || atnum<=0) {
-    cerr << "GetAtomCrystal out of boundary  atnum=" << atnum << "  vatom_crystal.size()=" << vatom_crystal.size() << endl;
+  if(atnum>=atom_crystal_vec.size() || atnum<=0) {
+    cerr << "GetAtomCrystal out of boundary  atnum=" << atnum << "  atom_crystal_vec.size()=" << atom_crystal_vec.size() << endl;
     return (string) "nnn";
   }
-  return vatom_crystal.at(atnum);
+  return atom_crystal_vec.at(atnum);
 }
 
 // **************************************************************************
@@ -746,17 +745,17 @@ string GetAtomCrystal(const uint& atnum) {
 // **************************************************************************
 double GetAtomPettiforScale(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_pettifor_scale.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return pettifor_scale.at(iat);
   return 0.0;
 }
 
 double GetAtomPettiforScale(const uint& atnum) {
-  if(atnum>=vatom_crystal.size() || atnum<=0) {
-    cerr << "GetAtomPettiforScale out of boundary  atnum=" << atnum << "  vatom_crystal.size()=" << vatom_crystal.size() << endl;
+  if(atnum>=atom_crystal_vec.size() || atnum<=0) {
+    cerr << "GetAtomPettiforScale out of boundary  atnum=" << atnum << "  atom_crystal_vec.size()=" << atom_crystal_vec.size() << endl;
     return 0.0;
   }
-  return vatom_pettifor_scale.at(atnum);
+  return pettifor_scale.at(atnum);
 }
 
 bool GetAtomPettiforScale(const vector<string>& vsymbol,vector<double>& vvalue) {
@@ -853,16 +852,16 @@ bool SortAtomsPettiforScale(vector<string> &vsymbol) {
 // **************************************************************************
 double GetAtomXrayScatt(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
-      return vatom_xray_scatt.at(iat);
+    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+      return xray_scatt_vec.at(iat);
   return (double) NNN;
 }
 double GetAtomXrayScatt(const uint& atnum) {
-  if(atnum>=vatom_xray_scatt.size() || atnum<=0) {
-    cerr << "GetAtomXrayScatt out of boundary  atnum=" << atnum << "  vatom_xray_scatt.size()=" << vatom_xray_scatt.size() << endl;
+  if(atnum>=xray_scatt_vec.size() || atnum<=0) {
+    cerr << "GetAtomXrayScatt out of boundary  atnum=" << atnum << "  xray_scatt_vec.size()=" << xray_scatt_vec.size() << endl;
     return (double) NNN;
   }
-  return vatom_xray_scatt.at(atnum);
+  return xray_scatt_vec.at(atnum);
 }
 
 //DX 20181220 - get group of atoms - START 
@@ -934,7 +933,7 @@ vector<string> GetGroupOfAtoms(string& group_name){
 // **************************************************************************
 double GetPearsonCoefficient(const string& symbol) {
   for (int iat = 0; iat < NUM_ELEMENTS; iat++) {
-    if (symbol == vatom_symbol[iat] || symbol == vatom_name[iat]) {
+    if (symbol == atom_symbol_vec[iat] || symbol == atom_name_vec[iat]) {
       return GetPearsonCoefficient(iat);
     }
   }
@@ -945,7 +944,7 @@ double GetPearsonCoefficient(const string& symbol) {
 }
 
 double GetPearsonCoefficient(const int& iat) {
-  return vatom_pearson_coefficient.at(iat);
+  return pearson_coefficient.at(iat);
 }
 
 // **************************************************************************
@@ -5418,8 +5417,8 @@ vector<double> GetSpins(const xstructure& a) {
 string GetElementName(string stringin) {
   // need to clean up the _pv stuff of VASP
   for(uint i=0;i<NUM_ELEMENTS;i++)
-    if(stringin==vatom_symbol.at(i))
-      return vatom_name.at(i);
+    if(stringin==atom_symbol_vec.at(i))
+      return atom_name_vec.at(i);
   return "NotFound";
 }
 
@@ -12238,7 +12237,7 @@ void xstructure::FakeNames(void) {
     for(int j=0;j<num_each_type.at(itype);j++) {
       //    if(atoms.at(iatom).name_is_given==FALSE)
       {
-	atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
+	atoms.at(iatom).name=atom_symbol_vec[2+atoms.at(iatom).type];
 	if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
 	//	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
 	atoms.at(iatom).CleanName();
