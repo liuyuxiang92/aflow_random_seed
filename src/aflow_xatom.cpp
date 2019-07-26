@@ -234,7 +234,7 @@ void _atom::CleanName(void) {
   if((name2[0]>=65 && name2[0]<=90)) name2[0]+=-97+65;
   cleanname=name1+name2;
   atomic_number=0;
-  for(uint j=0;j< atom_symbol_vec.size();j++) if(cleanname==atom_symbol_vec.at(j)) atomic_number=j;
+  for(uint j=0;j< vatom_symbol.size();j++) if(cleanname==vatom_symbol.at(j)) atomic_number=j;
 }
 
 void _atom::CleanSpin(void) {
@@ -252,42 +252,42 @@ void _atom::ClearSymmetry(void) { //CO190219
   (*this).num_equivalents=0;
 }
 
-std::vector<string> atom_symbol_vec(NUM_ELEMENTS);        // store starting from ONE
-std::vector<string> atom_name_vec(NUM_ELEMENTS);          // store starting from ONE
-std::vector<double> atom_mass_vec(NUM_ELEMENTS);          // store starting from ONE
-std::vector<double> atom_volume_vec(NUM_ELEMENTS);        // store starting from ONE
-std::vector<int> atom_valence_iupac_vec(NUM_ELEMENTS);    // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-std::vector<int> atom_valence_std_vec(NUM_ELEMENTS);      // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-std::vector<double> atom_miedema_phi_star(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
-std::vector<double> atom_miedema_nws(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> atom_miedema_Vm(NUM_ELEMENTS);        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> atom_miedema_gamma_s(NUM_ELEMENTS);   // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-std::vector<double> atom_miedema_BVm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<string> vatom_symbol(NUM_ELEMENTS);        // store starting from ONE
+std::vector<string> vatom_name(NUM_ELEMENTS);          // store starting from ONE
+std::vector<double> vatom_mass(NUM_ELEMENTS);          // store starting from ONE
+std::vector<double> vatom_volume(NUM_ELEMENTS);        // store starting from ONE
+std::vector<int> vatom_valence_iupac(NUM_ELEMENTS);    // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+std::vector<int> vatom_valence_std(NUM_ELEMENTS);      // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+std::vector<double> vatom_miedema_phi_star(NUM_ELEMENTS);  // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28  
+std::vector<double> vatom_miedema_nws(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<double> vatom_miedema_Vm(NUM_ELEMENTS);        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<double> vatom_miedema_gamma_s(NUM_ELEMENTS);   // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+std::vector<double> vatom_miedema_BVm(NUM_ELEMENTS);       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
 // for lanthines from J.A. Alonso and N.H. March. Electrons in Metals and Alloys, Academic Press, London (1989) (except La)
-std::vector<double> atom_radius_vec(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> atom_radius_covalent_vec(NUM_ELEMENTS);// store starting from ONE // DX and CO - 9/4/17 
-std::vector<double> atom_electronegativity_vec(NUM_ELEMENTS);        // store starting from ONE
-std::vector<string> atom_crystal_vec(NUM_ELEMENTS);        // store starting from ONE
-std::vector<double> xray_scatt_vec(NUM_ELEMENTS);         // store starting from ONE
-std::vector<double> pettifor_scale(NUM_ELEMENTS);         // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-std::vector<double> pearson_coefficient(NUM_ELEMENTS);    // ME181020 Pearson mass deviation coefficient
+std::vector<double> vatom_radius(NUM_ELEMENTS);        // store starting from ONE
+std::vector<double> vatom_radius_covalent(NUM_ELEMENTS);// store starting from ONE // DX and CO - 9/4/17 
+std::vector<double> vatom_electronegativity(NUM_ELEMENTS);        // store starting from ONE
+std::vector<string> vatom_crystal(NUM_ELEMENTS);        // store starting from ONE
+std::vector<double> vatom_xray_scatt(NUM_ELEMENTS);         // store starting from ONE
+std::vector<double> vatom_pettifor_scale(NUM_ELEMENTS);         // store starting from ONE Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+std::vector<double> vatom_pearson_coefficient(NUM_ELEMENTS);    // ME181020 Pearson mass deviation coefficient
 
 void atoms_initialize(void) {
   for(int i=0;i<NUM_ELEMENTS;i++) {       // clear
-    xray_scatt_vec.at(i)=(double)i-1;      // shift+1
-    atom_mass_vec.at(i)=AMU2KILOGRAM;      // masses in kilos
-    atom_volume_vec.at(i)=NNN;             // atomic volume in A^3 from the FCC vasp table and/or successive calculations
-    atom_valence_iupac_vec.at(i)=NNN;            // IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
-    atom_valence_std_vec.at(i)=NNN;            // stanmdard: number electrons minus closed shell at leff (noble gas)
-    atom_miedema_phi_star.at(i)=NNN;                 // Miedema Rule Table 1a Physica 100B (1980) 1-28   (phi^\star in (V))
-    atom_miedema_nws.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   n_{ws}^{1/3} in (d.u.)^1/3
-    atom_miedema_Vm.at(i)=NNN;                       // Miedema Rule Table 1a Physica 100B (1980) 1-28   V_m^{2/3} in (cm^2)
-    atom_miedema_gamma_s.at(i)=NNN;                  // Miedema Rule Table 1a Physica 100B (1980) 1-28   \gamma_s^0 in (mJ/m^2)
-    atom_miedema_BVm.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   BV_m (kJ/mole)
-    atom_radius_vec.at(i)=NNN;             // Saxena (nm)
-    atom_radius_covalent_vec.at(i)=NNN;    // Codero (Angstroms) // DX and CO - 9/4/17
-    atom_electronegativity_vec.at(i)=NNN;  // Saxena
-    atom_crystal_vec.at(i)="nnn";          // Ashcroft-Mermin
+    vatom_xray_scatt.at(i)=(double)i-1;      // shift+1
+    vatom_mass.at(i)=AMU2KILOGRAM;      // masses in kilos
+    vatom_volume.at(i)=NNN;             // atomic volume in A^3 from the FCC vasp table and/or successive calculations
+    vatom_valence_iupac.at(i)=NNN;            // IUPAC Maximum number of univalent atoms that may combine with an atom of the element under consideration, or with a fragment, or for which an atom of this element can be substituted.
+    vatom_valence_std.at(i)=NNN;            // stanmdard: number electrons minus closed shell at leff (noble gas)
+    vatom_miedema_phi_star.at(i)=NNN;                 // Miedema Rule Table 1a Physica 100B (1980) 1-28   (phi^\star in (V))
+    vatom_miedema_nws.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   n_{ws}^{1/3} in (d.u.)^1/3
+    vatom_miedema_Vm.at(i)=NNN;                       // Miedema Rule Table 1a Physica 100B (1980) 1-28   V_m^{2/3} in (cm^2)
+    vatom_miedema_gamma_s.at(i)=NNN;                  // Miedema Rule Table 1a Physica 100B (1980) 1-28   \gamma_s^0 in (mJ/m^2)
+    vatom_miedema_BVm.at(i)=NNN;                      // Miedema Rule Table 1a Physica 100B (1980) 1-28   BV_m (kJ/mole)
+    vatom_radius.at(i)=NNN;             // Saxena (nm)
+    vatom_radius_covalent.at(i)=NNN;    // Codero (Angstroms) // DX and CO - 9/4/17
+    vatom_electronegativity.at(i)=NNN;  // Saxena
+    vatom_crystal.at(i)="nnn";          // Ashcroft-Mermin
   }
 
   // Xray_scatt_vector All data collected from the NIST online tables
@@ -301,153 +301,153 @@ void atoms_initialize(void) {
 
   int i;
   // ROW 0
-  i=0; atom_symbol_vec[i]="XX"; atom_name_vec[i]="UNDEFINED";    atom_mass_vec[i]*=0.00;      atom_volume_vec[i]=NNN;      atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=0;   atom_miedema_phi_star[i]=NNN;   atom_miedema_nws[i]=NNN;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=NNN;    atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN;  atom_crystal_vec[i]="nnn"; pettifor_scale[i]=0; xray_scatt_vec[i]=0; pearson_coefficient[i]=0.0;
+  i=0; vatom_symbol[i]="XX"; vatom_name[i]="UNDEFINED";    vatom_mass[i]*=0.00;      vatom_volume[i]=NNN;      vatom_valence_std[i]=0; vatom_valence_iupac[i]=0;   vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN;  vatom_crystal[i]="nnn"; vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=0; vatom_pearson_coefficient[i]=0.0;
 
   // ROW 1
   // s-electron systems
-  i++; atom_symbol_vec[i]="H";  atom_name_vec[i]="Hydrogen";     atom_mass_vec[i]*=1.0079;    atom_volume_vec[i]= 0.75110; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1;  atom_miedema_phi_star[i]=5.2;   atom_miedema_nws[i]=1.5;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.046;  atom_radius_covalent_vec[i]=0.31;   atom_electronegativity_vec[i]=2.10;  atom_crystal_vec[i]="hex";  pettifor_scale[i]=0; xray_scatt_vec[i]=1.000;pearson_coefficient[i]=0.00011460743;  // H volume wrong *dimer*   MIEDEMA = PAUL VAN DER PUT book
-  i++; atom_symbol_vec[i]="He"; atom_name_vec[i]="Helium";       atom_mass_vec[i]*=4.0026;    atom_volume_vec[i]= -1.000;  atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=0;  atom_miedema_phi_star[i]=NNN;   atom_miedema_nws[i]=NNN;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=NNN;    atom_radius_covalent_vec[i]=0.28;   atom_electronegativity_vec[i]=NNN;   atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0; xray_scatt_vec[i]=2.000; pearson_coefficient[i]=8.32328E-8;  // He
+  i++; vatom_symbol[i]="H";  vatom_name[i]="Hydrogen";     vatom_mass[i]*=1.0079;    vatom_volume[i]= 0.75110; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=5.2;   vatom_miedema_nws[i]=1.5;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.046;  vatom_radius_covalent[i]=0.31;   vatom_electronegativity[i]=2.10;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=1.000;vatom_pearson_coefficient[i]=0.00011460743;  // H volume wrong *dimer*   MIEDEMA = PAUL VAN DER PUT book
+  i++; vatom_symbol[i]="He"; vatom_name[i]="Helium";       vatom_mass[i]*=4.0026;    vatom_volume[i]= -1.000;  vatom_valence_std[i]=0; vatom_valence_iupac[i]=0;  vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=0.28;   vatom_electronegativity[i]=NNN;   vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=2.000; vatom_pearson_coefficient[i]=8.32328E-8;  // He
 
   // ROW2
   // s-electron systems
-  i++; atom_symbol_vec[i]="Li"; atom_name_vec[i]="Lithium";      atom_mass_vec[i]*=6.941;     atom_volume_vec[i]=20.24110; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1;  atom_miedema_phi_star[i]=2.85;  atom_miedema_nws[i]=0.98;  atom_miedema_Vm[i]=5.5;  atom_miedema_gamma_s[i]= 530;   atom_miedema_BVm[i]=1.5;   atom_radius_vec[i]=0.152;  atom_radius_covalent_vec[i]=1.28;   atom_electronegativity_vec[i]=0.98;  atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.45; xray_scatt_vec[i]=3.00145; pearson_coefficient[i]=0.0014588232;  // Li
-  i++; atom_symbol_vec[i]="Be"; atom_name_vec[i]="Beryllium";    atom_mass_vec[i]*=9.0122;    atom_volume_vec[i]= 7.83290; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2;  atom_miedema_phi_star[i]=4.20;  atom_miedema_nws[i]=1.60;  atom_miedema_Vm[i]=2.9;  atom_miedema_gamma_s[i]=1900;   atom_miedema_BVm[i]=4.9;   atom_radius_vec[i]=0.114;  atom_radius_covalent_vec[i]=0.96;   atom_electronegativity_vec[i]=1.57;  atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.50; pearson_coefficient[i]=0.0;  // Be
+  i++; vatom_symbol[i]="Li"; vatom_name[i]="Lithium";      vatom_mass[i]*=6.941;     vatom_volume[i]=20.24110; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=2.85;  vatom_miedema_nws[i]=0.98;  vatom_miedema_Vm[i]=5.5;  vatom_miedema_gamma_s[i]= 530;   vatom_miedema_BVm[i]=1.5;   vatom_radius[i]=0.152;  vatom_radius_covalent[i]=1.28;   vatom_electronegativity[i]=0.98;  vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.45; vatom_xray_scatt[i]=3.00145; vatom_pearson_coefficient[i]=0.0014588232;  // Li
+  i++; vatom_symbol[i]="Be"; vatom_name[i]="Beryllium";    vatom_mass[i]*=9.0122;    vatom_volume[i]= 7.83290; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=4.20;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.9;  vatom_miedema_gamma_s[i]=1900;   vatom_miedema_BVm[i]=4.9;   vatom_radius[i]=0.114;  vatom_radius_covalent[i]=0.96;   vatom_electronegativity[i]=1.57;  vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.50; vatom_pearson_coefficient[i]=0.0;  // Be
   // p-electron systems
-  i++; atom_symbol_vec[i]="B";  atom_name_vec[i]="Boron";        atom_mass_vec[i]*=10.81;     atom_volume_vec[i]= 5.88420; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3;  atom_miedema_phi_star[i]=4.75;  atom_miedema_nws[i]=1.55;  atom_miedema_Vm[i]=2.8;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.097;  atom_radius_covalent_vec[i]=0.84;   atom_electronegativity_vec[i]=2.04;  atom_crystal_vec[i]="tet";  pettifor_scale[i]=2.00; pearson_coefficient[i]=0.00135391428;  // B
-  i++; atom_symbol_vec[i]="C";  atom_name_vec[i]="Carbon";       atom_mass_vec[i]*=12.011;    atom_volume_vec[i]= 5.59490; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4;  atom_miedema_phi_star[i]=6.20;  atom_miedema_nws[i]=1.90;  atom_miedema_Vm[i]=1.8;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.077;  atom_radius_covalent_vec[i]=0.76;   atom_electronegativity_vec[i]=2.55;  atom_crystal_vec[i]="dia";  pettifor_scale[i]=2.50; xray_scatt_vec[i]=6.019; pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - 9/4/17 atom_radius_covalent_vec uses sp3 hybridization (most common)
-  i++; atom_symbol_vec[i]="N";  atom_name_vec[i]="Nitrogen";     atom_mass_vec[i]*=14.0067;   atom_volume_vec[i]= 7.59940; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5;  atom_miedema_phi_star[i]=7.00;  atom_miedema_nws[i]=1.60;  atom_miedema_Vm[i]=2.2;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.071;  atom_radius_covalent_vec[i]=0.71;   atom_electronegativity_vec[i]=3.04;  atom_crystal_vec[i]="hex";  pettifor_scale[i]=3.00; pearson_coefficient[i]=0.00001857771; // N JUNKAI CHANGED VALENCE
-  i++; atom_symbol_vec[i]="O";  atom_name_vec[i]="Oxygen";       atom_mass_vec[i]*=15.9994;   atom_volume_vec[i]= 7.78230; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=2;  atom_miedema_phi_star[i]=6.97;  atom_miedema_nws[i]=1.70;  atom_miedema_Vm[i]=2.656;atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=0.060;  atom_radius_covalent_vec[i]=0.66;   atom_electronegativity_vec[i]=3.44;  atom_crystal_vec[i]="cub";  pettifor_scale[i]=3.50; xray_scatt_vec[i]=8.052; pearson_coefficient[i]=0.00003358805;  // O Table 27 of JUNKAI
-  i++; atom_symbol_vec[i]="F";  atom_name_vec[i]="Fluorine";     atom_mass_vec[i]*=18.9984;   atom_volume_vec[i]= 9.99090; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=1;  atom_miedema_phi_star[i]=NNN;   atom_miedema_nws[i]=NNN;   atom_miedema_Vm[i]=NNN;  atom_miedema_gamma_s[i]= NNN;   atom_miedema_BVm[i]=NNN;   atom_radius_vec[i]=NNN;    atom_radius_covalent_vec[i]=0.57;   atom_electronegativity_vec[i]=3.98;  atom_crystal_vec[i]="mcl";  pettifor_scale[i]=4.00; pearson_coefficient[i]=0.0;  // F
-  i++; atom_symbol_vec[i]="Ne";atom_name_vec[i]="Neon";        atom_mass_vec[i]*=20.179;   atom_volume_vec[i]=19.9052; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=0; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.160; atom_radius_covalent_vec[i]=0.58;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.00082783369; // Ne volume calculated with fcc-pawpbe
+  i++; vatom_symbol[i]="B";  vatom_name[i]="Boron";        vatom_mass[i]*=10.81;     vatom_volume[i]= 5.88420; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3;  vatom_miedema_phi_star[i]=4.75;  vatom_miedema_nws[i]=1.55;  vatom_miedema_Vm[i]=2.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.097;  vatom_radius_covalent[i]=0.84;   vatom_electronegativity[i]=2.04;  vatom_crystal[i]="tet";  vatom_pettifor_scale[i]=2.00; vatom_pearson_coefficient[i]=0.00135391428;  // B
+  i++; vatom_symbol[i]="C";  vatom_name[i]="Carbon";       vatom_mass[i]*=12.011;    vatom_volume[i]= 5.59490; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4;  vatom_miedema_phi_star[i]=6.20;  vatom_miedema_nws[i]=1.90;  vatom_miedema_Vm[i]=1.8;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.077;  vatom_radius_covalent[i]=0.76;   vatom_electronegativity[i]=2.55;  vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=2.50; vatom_xray_scatt[i]=6.019; vatom_pearson_coefficient[i]=0.00007387218;   // C  // DX and CO - 9/4/17 vatom_radius_covalent uses sp3 hybridization (most common)
+  i++; vatom_symbol[i]="N";  vatom_name[i]="Nitrogen";     vatom_mass[i]*=14.0067;   vatom_volume[i]= 7.59940; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5;  vatom_miedema_phi_star[i]=7.00;  vatom_miedema_nws[i]=1.60;  vatom_miedema_Vm[i]=2.2;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.071;  vatom_radius_covalent[i]=0.71;   vatom_electronegativity[i]=3.04;  vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=3.00; vatom_pearson_coefficient[i]=0.00001857771; // N JUNKAI CHANGED VALENCE
+  i++; vatom_symbol[i]="O";  vatom_name[i]="Oxygen";       vatom_mass[i]*=15.9994;   vatom_volume[i]= 7.78230; vatom_valence_std[i]=6; vatom_valence_iupac[i]=2;  vatom_miedema_phi_star[i]=6.97;  vatom_miedema_nws[i]=1.70;  vatom_miedema_Vm[i]=2.656;vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=0.060;  vatom_radius_covalent[i]=0.66;   vatom_electronegativity[i]=3.44;  vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=3.50; vatom_xray_scatt[i]=8.052; vatom_pearson_coefficient[i]=0.00003358805;  // O Table 27 of JUNKAI
+  i++; vatom_symbol[i]="F";  vatom_name[i]="Fluorine";     vatom_mass[i]*=18.9984;   vatom_volume[i]= 9.99090; vatom_valence_std[i]=7; vatom_valence_iupac[i]=1;  vatom_miedema_phi_star[i]=NNN;   vatom_miedema_nws[i]=NNN;   vatom_miedema_Vm[i]=NNN;  vatom_miedema_gamma_s[i]= NNN;   vatom_miedema_BVm[i]=NNN;   vatom_radius[i]=NNN;    vatom_radius_covalent[i]=0.57;   vatom_electronegativity[i]=3.98;  vatom_crystal[i]="mcl";  vatom_pettifor_scale[i]=4.00; vatom_pearson_coefficient[i]=0.0;  // F
+  i++; vatom_symbol[i]="Ne";vatom_name[i]="Neon";        vatom_mass[i]*=20.179;   vatom_volume[i]=19.9052; vatom_valence_std[i]=0; vatom_valence_iupac[i]=0; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=0.58;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00082783369; // Ne volume calculated with fcc-pawpbe
 
   // ROW3
   // s-electron systems
-  i++; atom_symbol_vec[i]="Na";atom_name_vec[i]="Sodium";      atom_mass_vec[i]*=22.9898;  atom_volume_vec[i]=36.9135; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=2.70; atom_miedema_nws[i]=0.82; atom_miedema_Vm[i]=8.3; atom_miedema_gamma_s[i]= 260;  atom_miedema_BVm[i]=1.6;  atom_radius_vec[i]=0.186; atom_radius_covalent_vec[i]=1.66;   atom_electronegativity_vec[i]=0.93; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.40; pearson_coefficient[i]=0.0;  // Na
-  i++; atom_symbol_vec[i]="Mg";atom_name_vec[i]="Magnesium";   atom_mass_vec[i]*=24.305;   atom_volume_vec[i]=22.8178; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=3.45; atom_miedema_nws[i]=1.17; atom_miedema_Vm[i]=5.8; atom_miedema_gamma_s[i]= 790;  atom_miedema_BVm[i]=5.0;  atom_radius_vec[i]=0.160; atom_radius_covalent_vec[i]=1.41;   atom_electronegativity_vec[i]=1.31; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.28; pearson_coefficient[i]=0.00073988271;  // Mg
+  i++; vatom_symbol[i]="Na";vatom_name[i]="Sodium";      vatom_mass[i]*=22.9898;  vatom_volume[i]=36.9135; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=2.70; vatom_miedema_nws[i]=0.82; vatom_miedema_Vm[i]=8.3; vatom_miedema_gamma_s[i]= 260;  vatom_miedema_BVm[i]=1.6;  vatom_radius[i]=0.186; vatom_radius_covalent[i]=1.66;   vatom_electronegativity[i]=0.93; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.40; vatom_pearson_coefficient[i]=0.0;  // Na
+  i++; vatom_symbol[i]="Mg";vatom_name[i]="Magnesium";   vatom_mass[i]*=24.305;   vatom_volume[i]=22.8178; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=3.45; vatom_miedema_nws[i]=1.17; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]= 790;  vatom_miedema_BVm[i]=5.0;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=1.41;   vatom_electronegativity[i]=1.31; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.28; vatom_pearson_coefficient[i]=0.00073988271;  // Mg
   // p-electron systems
-  i++; atom_symbol_vec[i]="Al";atom_name_vec[i]="Aluminium";   atom_mass_vec[i]*=26.9815;  atom_volume_vec[i]=16.4000; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=4.20; atom_miedema_nws[i]=1.39; atom_miedema_Vm[i]=4.6; atom_miedema_gamma_s[i]=1200;  atom_miedema_BVm[i]=7.2;  atom_radius_vec[i]=0.143; atom_radius_covalent_vec[i]=1.21;   atom_electronegativity_vec[i]=1.61; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.66; pearson_coefficient[i]=0.0;  // Al
-  i++; atom_symbol_vec[i]="Si";atom_name_vec[i]="Silicon";     atom_mass_vec[i]*=28.0855;  atom_volume_vec[i]=14.3536; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.70; atom_miedema_nws[i]=1.50; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=1290;  atom_miedema_BVm[i]=11.9; atom_radius_vec[i]=0.117; atom_radius_covalent_vec[i]=1.11;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="dia";  pettifor_scale[i]=1.92; xray_scatt_vec[i]=14.43; pearson_coefficient[i]=0.00020046752; // Si ???
-  i++; atom_symbol_vec[i]="P"; atom_name_vec[i]="Phosphorus";  atom_mass_vec[i]*=30.9738;  atom_volume_vec[i]=14.1995; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=5.5;  atom_miedema_nws[i]=1.65; atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.109; atom_radius_covalent_vec[i]=1.07;   atom_electronegativity_vec[i]=2.19; atom_crystal_vec[i]="cub";  pettifor_scale[i]=2.18; xray_scatt_vec[i]=15.3133; pearson_coefficient[i]=0.0; // P   MIEDEMA = PAUL VAN DER PUT book
-  i++; atom_symbol_vec[i]="S"; atom_name_vec[i]="Sulphur";     atom_mass_vec[i]*=32.06;    atom_volume_vec[i]=15.7301; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.6;  atom_miedema_nws[i]=1.46; atom_miedema_Vm[i]=4.376;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.106; atom_radius_covalent_vec[i]=1.05;   atom_electronegativity_vec[i]=2.58; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.44; pearson_coefficient[i]=0.00016807795;  // S Table 27 of JUNKAI
-  i++; atom_symbol_vec[i]="Cl";atom_name_vec[i]="Chlorine";    atom_mass_vec[i]*=35.453;   atom_volume_vec[i]=21.2947; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.32;  atom_miedema_nws[i]=0.34;  atom_miedema_Vm[i]=6.71; atom_miedema_gamma_s[i]= 1013;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.107; atom_radius_covalent_vec[i]=1.02;   atom_electronegativity_vec[i]=3.16; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.70; pearson_coefficient[i]=0.00058238731;  // Cl interpolation phi_star, nws, Vm, gamma  JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Ar";atom_name_vec[i]="Argon";       atom_mass_vec[i]*=39.948;   atom_volume_vec[i]=22.000; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.192; atom_radius_covalent_vec[i]=1.06;   atom_electronegativity_vec[i]=NNN;  atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.00003509919;  // Ar guessed volume, must double check from results  JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Al";vatom_name[i]="Aluminium";   vatom_mass[i]*=26.9815;  vatom_volume[i]=16.4000; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=4.20; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.6; vatom_miedema_gamma_s[i]=1200;  vatom_miedema_BVm[i]=7.2;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.21;   vatom_electronegativity[i]=1.61; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.66; vatom_pearson_coefficient[i]=0.0;  // Al
+  i++; vatom_symbol[i]="Si";vatom_name[i]="Silicon";     vatom_mass[i]*=28.0855;  vatom_volume[i]=14.3536; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.70; vatom_miedema_nws[i]=1.50; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=1290;  vatom_miedema_BVm[i]=11.9; vatom_radius[i]=0.117; vatom_radius_covalent[i]=1.11;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=1.92; vatom_xray_scatt[i]=14.43; vatom_pearson_coefficient[i]=0.00020046752; // Si ???
+  i++; vatom_symbol[i]="P"; vatom_name[i]="Phosphorus";  vatom_mass[i]*=30.9738;  vatom_volume[i]=14.1995; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.5;  vatom_miedema_nws[i]=1.65; vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.109; vatom_radius_covalent[i]=1.07;   vatom_electronegativity[i]=2.19; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=2.18; vatom_xray_scatt[i]=15.3133; vatom_pearson_coefficient[i]=0.0; // P   MIEDEMA = PAUL VAN DER PUT book
+  i++; vatom_symbol[i]="S"; vatom_name[i]="Sulphur";     vatom_mass[i]*=32.06;    vatom_volume[i]=15.7301; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.6;  vatom_miedema_nws[i]=1.46; vatom_miedema_Vm[i]=4.376;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.106; vatom_radius_covalent[i]=1.05;   vatom_electronegativity[i]=2.58; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.44; vatom_pearson_coefficient[i]=0.00016807795;  // S Table 27 of JUNKAI
+  i++; vatom_symbol[i]="Cl";vatom_name[i]="Chlorine";    vatom_mass[i]*=35.453;   vatom_volume[i]=21.2947; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.32;  vatom_miedema_nws[i]=0.34;  vatom_miedema_Vm[i]=6.71; vatom_miedema_gamma_s[i]= 1013;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.107; vatom_radius_covalent[i]=1.02;   vatom_electronegativity[i]=3.16; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.70; vatom_pearson_coefficient[i]=0.00058238731;  // Cl interpolation phi_star, nws, Vm, gamma  JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ar";vatom_name[i]="Argon";       vatom_mass[i]*=39.948;   vatom_volume[i]=22.000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.192; vatom_radius_covalent[i]=1.06;   vatom_electronegativity[i]=NNN;  vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.00003509919;  // Ar guessed volume, must double check from results  JUNKAI CHANGED VALENCE    
 
   // ROW4
   // s-electron systems
-  i++; atom_symbol_vec[i]="K"; atom_name_vec[i]="Potassium";   atom_mass_vec[i]*=39.0983;  atom_volume_vec[i]=73.9091; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=2.25; atom_miedema_nws[i]=0.65; atom_miedema_Vm[i]=12.8;atom_miedema_gamma_s[i]= 150;  atom_miedema_BVm[i]=1.5;  atom_radius_vec[i]=0.231; atom_radius_covalent_vec[i]=2.03;   atom_electronegativity_vec[i]=0.82; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.35; pearson_coefficient[i]=0.000164;  // K
-  i++; atom_symbol_vec[i]="Ca";atom_name_vec[i]="Calcium";     atom_mass_vec[i]*=40.08;    atom_volume_vec[i]=42.1927; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=2.55; atom_miedema_nws[i]=0.91; atom_miedema_Vm[i]=8.8; atom_miedema_gamma_s[i]= 490;  atom_miedema_BVm[i]=4.0;  atom_radius_vec[i]=0.197; atom_radius_covalent_vec[i]=1.76;   atom_electronegativity_vec[i]=1.00; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.60; pearson_coefficient[i]=0.000297564;  // Ca
+  i++; vatom_symbol[i]="K"; vatom_name[i]="Potassium";   vatom_mass[i]*=39.0983;  vatom_volume[i]=73.9091; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=2.25; vatom_miedema_nws[i]=0.65; vatom_miedema_Vm[i]=12.8;vatom_miedema_gamma_s[i]= 150;  vatom_miedema_BVm[i]=1.5;  vatom_radius[i]=0.231; vatom_radius_covalent[i]=2.03;   vatom_electronegativity[i]=0.82; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.35; vatom_pearson_coefficient[i]=0.000164;  // K
+  i++; vatom_symbol[i]="Ca";vatom_name[i]="Calcium";     vatom_mass[i]*=40.08;    vatom_volume[i]=42.1927; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=2.55; vatom_miedema_nws[i]=0.91; vatom_miedema_Vm[i]=8.8; vatom_miedema_gamma_s[i]= 490;  vatom_miedema_BVm[i]=4.0;  vatom_radius[i]=0.197; vatom_radius_covalent[i]=1.76;   vatom_electronegativity[i]=1.00; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.60; vatom_pearson_coefficient[i]=0.000297564;  // Ca
   // d-electron systems: transition metals
-  i++; atom_symbol_vec[i]="Sc";atom_name_vec[i]="Scandium";    atom_mass_vec[i]*=44.9559;  atom_volume_vec[i]=24.6739; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.25; atom_miedema_nws[i]=1.27; atom_miedema_Vm[i]=6.1; atom_miedema_gamma_s[i]=1200;  atom_miedema_BVm[i]=6.6;  atom_radius_vec[i]=0.160; atom_radius_covalent_vec[i]=1.70;   atom_electronegativity_vec[i]=1.36; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.74; xray_scatt_vec[i]=21.34; pearson_coefficient[i]=0.0;  // Sc
-  i++; atom_symbol_vec[i]="Ti";atom_name_vec[i]="Titanium";    atom_mass_vec[i]*=47.9;     atom_volume_vec[i]=17.1035; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.65; atom_miedema_nws[i]=1.47; atom_miedema_Vm[i]=4.8; atom_miedema_gamma_s[i]=2050;  atom_miedema_BVm[i]=11.0; atom_radius_vec[i]=0.147; atom_radius_covalent_vec[i]=1.60;   atom_electronegativity_vec[i]=1.54; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.79; xray_scatt_vec[i]=22.24; pearson_coefficient[i]=0.000286456;  // Ti
-  i++; atom_symbol_vec[i]="V"; atom_name_vec[i]="Vanadium";    atom_mass_vec[i]*=50.9415;  atom_volume_vec[i]=13.2086; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.25; atom_miedema_nws[i]=1.64; atom_miedema_Vm[i]=4.1; atom_miedema_gamma_s[i]=2600;  atom_miedema_BVm[i]=14.0; atom_radius_vec[i]=0.132; atom_radius_covalent_vec[i]=1.53;   atom_electronegativity_vec[i]=1.63; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.84; pearson_coefficient[i]=9.54831E-07;  // V
-  i++; atom_symbol_vec[i]="Cr";atom_name_vec[i]="Chromium";    atom_mass_vec[i]*=51.996;   atom_volume_vec[i]=11.4136; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.65; atom_miedema_nws[i]=1.74; atom_miedema_Vm[i]=3.7; atom_miedema_gamma_s[i]=2400;  atom_miedema_BVm[i]=14.0; atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=1.66; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.89; xray_scatt_vec[i]=23.84; pearson_coefficient[i]=0.00013287;  // Cr
-  i++; atom_symbol_vec[i]="Mn";atom_name_vec[i]="Manganese";   atom_mass_vec[i]*=54.93805; atom_volume_vec[i]=10.6487; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=4.45; atom_miedema_nws[i]=1.61; atom_miedema_Vm[i]=3.8; atom_miedema_gamma_s[i]=1600;  atom_miedema_BVm[i]=4.4;  atom_radius_vec[i]=0.112; atom_radius_covalent_vec[i]=1.61;   atom_electronegativity_vec[i]=1.55; atom_crystal_vec[i]="cub";  pettifor_scale[i]=0.94; xray_scatt_vec[i]=24.46; pearson_coefficient[i]=1.67276E-32;  // xray_scatt_vec[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 atom_radius_covalent_vec[i] uses high spin configuration (most frequent)   
-  i++; atom_symbol_vec[i]="Fe";atom_name_vec[i]="Iron";        atom_mass_vec[i]*=55.847;   atom_volume_vec[i]=10.2315; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.93; atom_miedema_nws[i]=1.77; atom_miedema_Vm[i]=3.7; atom_miedema_gamma_s[i]=2550;  atom_miedema_BVm[i]=12.0; atom_radius_vec[i]=0.124; atom_radius_covalent_vec[i]=1.52;   atom_electronegativity_vec[i]=1.83; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.99; xray_scatt_vec[i]=24.85; pearson_coefficient[i]=9.17912E-05;  // xray_scatt_vec[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 atom_radius_covalent_vec[i] uses high spin configuration (most frequent) 
-  i++; atom_symbol_vec[i]="Co";atom_name_vec[i]="Cobalt";      atom_mass_vec[i]*=58.9332;  atom_volume_vec[i]=10.3205; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=5.10; atom_miedema_nws[i]=1.75; atom_miedema_Vm[i]=3.5; atom_miedema_gamma_s[i]=2550;  atom_miedema_BVm[i]=13.0; atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.26;   atom_electronegativity_vec[i]=1.88; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.04; xray_scatt_vec[i]=24.59; pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 atom_radius_covalent_vec[i] uses low spin configuration (most frequent)   
-  i++; atom_symbol_vec[i]="Ni";atom_name_vec[i]="Nickel";      atom_mass_vec[i]*=58.69;    atom_volume_vec[i]=10.8664; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=5.20; atom_miedema_nws[i]=1.75; atom_miedema_Vm[i]=3.5; atom_miedema_gamma_s[i]=2450;  atom_miedema_BVm[i]=12.0; atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.24;   atom_electronegativity_vec[i]=1.91; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.09; xray_scatt_vec[i]=25.02; pearson_coefficient[i]=0.000430773;  // Ni
-  i++; atom_symbol_vec[i]="Cu";atom_name_vec[i]="Copper";      atom_mass_vec[i]*=63.546;   atom_volume_vec[i]=12.0159; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.55; atom_miedema_nws[i]=1.47; atom_miedema_Vm[i]=3.7; atom_miedema_gamma_s[i]=1850;  atom_miedema_BVm[i]=9.3;  atom_radius_vec[i]=0.128; atom_radius_covalent_vec[i]=1.32;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.20; xray_scatt_vec[i]=27.03; pearson_coefficient[i]=0.00021086;  // Cu JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Zn";atom_name_vec[i]="Zinc";        atom_mass_vec[i]*=65.38;    atom_volume_vec[i]=15.0827; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=4.10; atom_miedema_nws[i]=1.32; atom_miedema_Vm[i]=4.4; atom_miedema_gamma_s[i]=1020;  atom_miedema_BVm[i]=5.5;  atom_radius_vec[i]=0.133; atom_radius_covalent_vec[i]=1.22;   atom_electronegativity_vec[i]=1.65; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.44; xray_scatt_vec[i]=28.44; pearson_coefficient[i]=0.000595597;  // Zn
+  i++; vatom_symbol[i]="Sc";vatom_name[i]="Scandium";    vatom_mass[i]*=44.9559;  vatom_volume[i]=24.6739; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.25; vatom_miedema_nws[i]=1.27; vatom_miedema_Vm[i]=6.1; vatom_miedema_gamma_s[i]=1200;  vatom_miedema_BVm[i]=6.6;  vatom_radius[i]=0.160; vatom_radius_covalent[i]=1.70;   vatom_electronegativity[i]=1.36; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.74; vatom_xray_scatt[i]=21.34; vatom_pearson_coefficient[i]=0.0;  // Sc
+  i++; vatom_symbol[i]="Ti";vatom_name[i]="Titanium";    vatom_mass[i]*=47.9;     vatom_volume[i]=17.1035; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.65; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=4.8; vatom_miedema_gamma_s[i]=2050;  vatom_miedema_BVm[i]=11.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.60;   vatom_electronegativity[i]=1.54; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.79; vatom_xray_scatt[i]=22.24; vatom_pearson_coefficient[i]=0.000286456;  // Ti
+  i++; vatom_symbol[i]="V"; vatom_name[i]="Vanadium";    vatom_mass[i]*=50.9415;  vatom_volume[i]=13.2086; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.25; vatom_miedema_nws[i]=1.64; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2600;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.132; vatom_radius_covalent[i]=1.53;   vatom_electronegativity[i]=1.63; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.84; vatom_pearson_coefficient[i]=9.54831E-07;  // V
+  i++; vatom_symbol[i]="Cr";vatom_name[i]="Chromium";    vatom_mass[i]*=51.996;   vatom_volume[i]=11.4136; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.74; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2400;  vatom_miedema_BVm[i]=14.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.66; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.89; vatom_xray_scatt[i]=23.84; vatom_pearson_coefficient[i]=0.00013287;  // Cr
+  i++; vatom_symbol[i]="Mn";vatom_name[i]="Manganese";   vatom_mass[i]*=54.93805; vatom_volume[i]=10.6487; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.61; vatom_miedema_Vm[i]=3.8; vatom_miedema_gamma_s[i]=1600;  vatom_miedema_BVm[i]=4.4;  vatom_radius[i]=0.112; vatom_radius_covalent[i]=1.61;   vatom_electronegativity[i]=1.55; vatom_crystal[i]="cub";  vatom_pettifor_scale[i]=0.94; vatom_xray_scatt[i]=24.46; vatom_pearson_coefficient[i]=1.67276E-32;  // vatom_xray_scatt[i]=24.3589; Mn JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent)   
+  i++; vatom_symbol[i]="Fe";vatom_name[i]="Iron";        vatom_mass[i]*=55.847;   vatom_volume[i]=10.2315; vatom_valence_std[i]=8; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.93; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.124; vatom_radius_covalent[i]=1.52;   vatom_electronegativity[i]=1.83; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.99; vatom_xray_scatt[i]=24.85; vatom_pearson_coefficient[i]=9.17912E-05;  // vatom_xray_scatt[i]=24.6830; Fe JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses high spin configuration (most frequent) 
+  i++; vatom_symbol[i]="Co";vatom_name[i]="Cobalt";      vatom_mass[i]*=58.9332;  vatom_volume[i]=10.3205; vatom_valence_std[i]=9; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.10; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=13.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.26;   vatom_electronegativity[i]=1.88; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.04; vatom_xray_scatt[i]=24.59; vatom_pearson_coefficient[i]=0.0;  // Co JUNKAI CHANGED VALENCE // DX and CO - 9/4/17 vatom_radius_covalent[i] uses low spin configuration (most frequent)   
+  i++; vatom_symbol[i]="Ni";vatom_name[i]="Nickel";      vatom_mass[i]*=58.69;    vatom_volume[i]=10.8664; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.75; vatom_miedema_Vm[i]=3.5; vatom_miedema_gamma_s[i]=2450;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.24;   vatom_electronegativity[i]=1.91; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.09; vatom_xray_scatt[i]=25.02; vatom_pearson_coefficient[i]=0.000430773;  // Ni
+  i++; vatom_symbol[i]="Cu";vatom_name[i]="Copper";      vatom_mass[i]*=63.546;   vatom_volume[i]=12.0159; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.47; vatom_miedema_Vm[i]=3.7; vatom_miedema_gamma_s[i]=1850;  vatom_miedema_BVm[i]=9.3;  vatom_radius[i]=0.128; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.20; vatom_xray_scatt[i]=27.03; vatom_pearson_coefficient[i]=0.00021086;  // Cu JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Zn";vatom_name[i]="Zinc";        vatom_mass[i]*=65.38;    vatom_volume[i]=15.0827; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.32; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=1020;  vatom_miedema_BVm[i]=5.5;  vatom_radius[i]=0.133; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.65; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.44; vatom_xray_scatt[i]=28.44; vatom_pearson_coefficient[i]=0.000595597;  // Zn
   // p-electron systems
-  i++; atom_symbol_vec[i]="Ga";atom_name_vec[i]="Gallium";     atom_mass_vec[i]*=69.737;   atom_volume_vec[i]=18.9039; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=4.10; atom_miedema_nws[i]=1.31; atom_miedema_Vm[i]=5.2; atom_miedema_gamma_s[i]= 830;  atom_miedema_BVm[i]=6.7;  atom_radius_vec[i]=0.135; atom_radius_covalent_vec[i]=1.22;   atom_electronegativity_vec[i]=1.81; atom_crystal_vec[i]="orc";  pettifor_scale[i]=1.68; pearson_coefficient[i]=0.000197588;  // Ga
-  i++; atom_symbol_vec[i]="Ge";atom_name_vec[i]="Germanium";   atom_mass_vec[i]*=72.59;    atom_volume_vec[i]=19.2948; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.55; atom_miedema_nws[i]=1.37; atom_miedema_Vm[i]=4.6; atom_miedema_gamma_s[i]=1030;  atom_miedema_BVm[i]=10.5; atom_radius_vec[i]=0.122; atom_radius_covalent_vec[i]=1.20;   atom_electronegativity_vec[i]=2.01; atom_crystal_vec[i]="dia";  pettifor_scale[i]=1.92; pearson_coefficient[i]=0.00058782;  // Ge
-  i++; atom_symbol_vec[i]="As";atom_name_vec[i]="Arsenic";     atom_mass_vec[i]*=74.9216;  atom_volume_vec[i]=19.0677; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.80; atom_miedema_nws[i]=1.44; atom_miedema_Vm[i]=5.2; atom_miedema_gamma_s[i]=1000;  atom_miedema_BVm[i]=5.1;  atom_radius_vec[i]=0.125; atom_radius_covalent_vec[i]=1.19;   atom_electronegativity_vec[i]=2.18; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=2.16; pearson_coefficient[i]=0.0;  // As
-  i++; atom_symbol_vec[i]="Se";atom_name_vec[i]="Selenium";    atom_mass_vec[i]*=78.96;    atom_volume_vec[i]=20.3733; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.17; atom_miedema_nws[i]=1.40; atom_miedema_Vm[i]=5.172;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.116; atom_radius_covalent_vec[i]=1.20;   atom_electronegativity_vec[i]=2.55; atom_crystal_vec[i]="hex";  pettifor_scale[i]=2.40; pearson_coefficient[i]=0.00046279;  // Se Table 27 of JUNKAI
-  i++; atom_symbol_vec[i]="Br";atom_name_vec[i]="Bromine";     atom_mass_vec[i]*=79.904;   atom_volume_vec[i]=26.3292; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.20; atom_miedema_nws[i]=1.35; atom_miedema_Vm[i]=7.31; atom_miedema_gamma_s[i]= 943;  atom_miedema_BVm[i]=3.4;  atom_radius_vec[i]=0.119; atom_radius_covalent_vec[i]=1.20;   atom_electronegativity_vec[i]=2.96; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.64; pearson_coefficient[i]=0.000156277;  // Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Kr";atom_name_vec[i]="Krypton";     atom_mass_vec[i]*=83.8;     atom_volume_vec[i]=-1.0000; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.197; atom_radius_covalent_vec[i]=1.16;   atom_electronegativity_vec[i]=3; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.000248482;  // Kr
+  i++; vatom_symbol[i]="Ga";vatom_name[i]="Gallium";     vatom_mass[i]*=69.737;   vatom_volume[i]=18.9039; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.31; vatom_miedema_Vm[i]=5.2; vatom_miedema_gamma_s[i]= 830;  vatom_miedema_BVm[i]=6.7;  vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.22;   vatom_electronegativity[i]=1.81; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=1.68; vatom_pearson_coefficient[i]=0.000197588;  // Ga
+  i++; vatom_symbol[i]="Ge";vatom_name[i]="Germanium";   vatom_mass[i]*=72.59;    vatom_volume[i]=19.2948; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.55; vatom_miedema_nws[i]=1.37; vatom_miedema_Vm[i]=4.6; vatom_miedema_gamma_s[i]=1030;  vatom_miedema_BVm[i]=10.5; vatom_radius[i]=0.122; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.01; vatom_crystal[i]="dia";  vatom_pettifor_scale[i]=1.92; vatom_pearson_coefficient[i]=0.00058782;  // Ge
+  i++; vatom_symbol[i]="As";vatom_name[i]="Arsenic";     vatom_mass[i]*=74.9216;  vatom_volume[i]=19.0677; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.80; vatom_miedema_nws[i]=1.44; vatom_miedema_Vm[i]=5.2; vatom_miedema_gamma_s[i]=1000;  vatom_miedema_BVm[i]=5.1;  vatom_radius[i]=0.125; vatom_radius_covalent[i]=1.19;   vatom_electronegativity[i]=2.18; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.16; vatom_pearson_coefficient[i]=0.0;  // As
+  i++; vatom_symbol[i]="Se";vatom_name[i]="Selenium";    vatom_mass[i]*=78.96;    vatom_volume[i]=20.3733; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.17; vatom_miedema_nws[i]=1.40; vatom_miedema_Vm[i]=5.172;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.116; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.55; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.40; vatom_pearson_coefficient[i]=0.00046279;  // Se Table 27 of JUNKAI
+  i++; vatom_symbol[i]="Br";vatom_name[i]="Bromine";     vatom_mass[i]*=79.904;   vatom_volume[i]=26.3292; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.20; vatom_miedema_nws[i]=1.35; vatom_miedema_Vm[i]=7.31; vatom_miedema_gamma_s[i]= 943;  vatom_miedema_BVm[i]=3.4;  vatom_radius[i]=0.119; vatom_radius_covalent[i]=1.20;   vatom_electronegativity[i]=2.96; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.64; vatom_pearson_coefficient[i]=0.000156277;  // Br interpolation phi_star, nws, Vm, gamma, BVm JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Kr";vatom_name[i]="Krypton";     vatom_mass[i]*=83.8;     vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.197; vatom_radius_covalent[i]=1.16;   vatom_electronegativity[i]=3; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000248482;  // Kr
 
   // ROW5
   // s-electron systems
-  i++; atom_symbol_vec[i]="Rb";atom_name_vec[i]="Rubidium";    atom_mass_vec[i]*=85.4678;  atom_volume_vec[i]=91.2738; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=2.10; atom_miedema_nws[i]=0.60; atom_miedema_Vm[i]=14.6;atom_miedema_gamma_s[i]= 120;  atom_miedema_BVm[i]=1.8;  atom_radius_vec[i]=0.251; atom_radius_covalent_vec[i]=2.20;   atom_electronegativity_vec[i]=0.82; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.30; pearson_coefficient[i]=0.000109697;  // Rb
-  i++; atom_symbol_vec[i]="Sr";atom_name_vec[i]="Strontium";   atom_mass_vec[i]*=87.62;    atom_volume_vec[i]=55.4105; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=2.40; atom_miedema_nws[i]=0.84; atom_miedema_Vm[i]=10.2;atom_miedema_gamma_s[i]= 430;  atom_miedema_BVm[i]=3.9;  atom_radius_vec[i]=0.215; atom_radius_covalent_vec[i]=1.95;   atom_electronegativity_vec[i]=0.95; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.55; pearson_coefficient[i]=6.09969E-05;  // Sr
+  i++; vatom_symbol[i]="Rb";vatom_name[i]="Rubidium";    vatom_mass[i]*=85.4678;  vatom_volume[i]=91.2738; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=2.10; vatom_miedema_nws[i]=0.60; vatom_miedema_Vm[i]=14.6;vatom_miedema_gamma_s[i]= 120;  vatom_miedema_BVm[i]=1.8;  vatom_radius[i]=0.251; vatom_radius_covalent[i]=2.20;   vatom_electronegativity[i]=0.82; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.30; vatom_pearson_coefficient[i]=0.000109697;  // Rb
+  i++; vatom_symbol[i]="Sr";vatom_name[i]="Strontium";   vatom_mass[i]*=87.62;    vatom_volume[i]=55.4105; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=2.40; vatom_miedema_nws[i]=0.84; vatom_miedema_Vm[i]=10.2;vatom_miedema_gamma_s[i]= 430;  vatom_miedema_BVm[i]=3.9;  vatom_radius[i]=0.215; vatom_radius_covalent[i]=1.95;   vatom_electronegativity[i]=0.95; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.55; vatom_pearson_coefficient[i]=6.09969E-05;  // Sr
   // d-electron systems: transition metals
-  i++; atom_symbol_vec[i]="Y"; atom_name_vec[i]="Yttrium";     atom_mass_vec[i]*=88.9059;  atom_volume_vec[i]=32.4546; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20; atom_miedema_nws[i]=1.21; atom_miedema_Vm[i]=7.3; atom_miedema_gamma_s[i]=1100;  atom_miedema_BVm[i]=7.2;  atom_radius_vec[i]=0.181; atom_radius_covalent_vec[i]=1.90;   atom_electronegativity_vec[i]=1.22; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.70; pearson_coefficient[i]=0.0;  // Y
-  i++; atom_symbol_vec[i]="Zr";atom_name_vec[i]="Zirconium";   atom_mass_vec[i]*=91.22;    atom_volume_vec[i]=23.2561; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.40; atom_miedema_nws[i]=1.39; atom_miedema_Vm[i]=5.8; atom_miedema_gamma_s[i]=1950;  atom_miedema_BVm[i]=12.0; atom_radius_vec[i]=0.158; atom_radius_covalent_vec[i]=1.75;   atom_electronegativity_vec[i]=1.33; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.76; pearson_coefficient[i]=0.000342629;  // Zr
-  i++; atom_symbol_vec[i]="Nb";atom_name_vec[i]="Niobium";     atom_mass_vec[i]*=92.9064;  atom_volume_vec[i]=18.3132; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.00; atom_miedema_nws[i]=1.62; atom_miedema_Vm[i]=4.9; atom_miedema_gamma_s[i]=2700;  atom_miedema_BVm[i]=18.0; atom_radius_vec[i]=0.143; atom_radius_covalent_vec[i]=1.64;   atom_electronegativity_vec[i]=1.60; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.82; pearson_coefficient[i]=0.0;  // Nb
-  i++; atom_symbol_vec[i]="Mo";atom_name_vec[i]="Molybdenum";  atom_mass_vec[i]*=95.94;    atom_volume_vec[i]=15.6175; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.65; atom_miedema_nws[i]=1.77; atom_miedema_Vm[i]=4.4; atom_miedema_gamma_s[i]=2950;  atom_miedema_BVm[i]=26.0; atom_radius_vec[i]=0.136; atom_radius_covalent_vec[i]=1.54;   atom_electronegativity_vec[i]=2.16; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.88; pearson_coefficient[i]=0.000598128;  // Mo
-  i++; atom_symbol_vec[i]="Tc";atom_name_vec[i]="Technetium";  atom_mass_vec[i]*=98.9062;  atom_volume_vec[i]=14.4670; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.30; atom_miedema_nws[i]=1.81; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=3050;  atom_miedema_BVm[i]=26.0; atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.47;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.94; pearson_coefficient[i]=0.0;  //Tc JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Ru";atom_name_vec[i]="Ruthenium";   atom_mass_vec[i]*=101.07;   atom_volume_vec[i]=13.8390; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.83; atom_miedema_Vm[i]=4.1; atom_miedema_gamma_s[i]=3050;  atom_miedema_BVm[i]=26.0; atom_radius_vec[i]=0.134; atom_radius_covalent_vec[i]=1.46;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.00; pearson_coefficient[i]=0.000406665;  //Ru JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Rh";atom_name_vec[i]="Rhodium";     atom_mass_vec[i]*=102.9055; atom_volume_vec[i]=14.1731; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.76; atom_miedema_Vm[i]=4.1; atom_miedema_gamma_s[i]=2750;  atom_miedema_BVm[i]=23.0; atom_radius_vec[i]=0.134; atom_radius_covalent_vec[i]=1.42;   atom_electronegativity_vec[i]=2.28; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.06; pearson_coefficient[i]=1.90706E-32;  // Rh
-  i++; atom_symbol_vec[i]="Pd";atom_name_vec[i]="Palladium";   atom_mass_vec[i]*=106.4;    atom_volume_vec[i]=15.4596; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=5.45; atom_miedema_nws[i]=1.67; atom_miedema_Vm[i]=4.3; atom_miedema_gamma_s[i]=2100;  atom_miedema_BVm[i]=16.0; atom_radius_vec[i]=0.137; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.12; pearson_coefficient[i]=0.000309478;  // Pd
-  i++; atom_symbol_vec[i]="Ag";atom_name_vec[i]="Silver";      atom_mass_vec[i]*=107.8682; atom_volume_vec[i]=18.0678; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.45; atom_miedema_nws[i]=1.39; atom_miedema_Vm[i]=4.7; atom_miedema_gamma_s[i]=1250;  atom_miedema_BVm[i]=10.0; atom_radius_vec[i]=0.144; atom_radius_covalent_vec[i]=1.45;   atom_electronegativity_vec[i]=1.93; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.18; xray_scatt_vec[i]=47.18; pearson_coefficient[i]=8.57985E-05;  // Ag JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Cd";atom_name_vec[i]="Cadmium";     atom_mass_vec[i]*=112.41;   atom_volume_vec[i]=22.0408; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=4.05; atom_miedema_nws[i]=1.24; atom_miedema_Vm[i]=5.5; atom_miedema_gamma_s[i]= 780;  atom_miedema_BVm[i]=6.10; atom_radius_vec[i]=0.150; atom_radius_covalent_vec[i]=1.44;   atom_electronegativity_vec[i]=1.69; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.36; pearson_coefficient[i]=0.000271603;  // Cd
+  i++; vatom_symbol[i]="Y"; vatom_name[i]="Yttrium";     vatom_mass[i]*=88.9059;  vatom_volume[i]=32.4546; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20; vatom_miedema_nws[i]=1.21; vatom_miedema_Vm[i]=7.3; vatom_miedema_gamma_s[i]=1100;  vatom_miedema_BVm[i]=7.2;  vatom_radius[i]=0.181; vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=1.22; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.70; vatom_pearson_coefficient[i]=0.0;  // Y
+  i++; vatom_symbol[i]="Zr";vatom_name[i]="Zirconium";   vatom_mass[i]*=91.22;    vatom_volume[i]=23.2561; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.40; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]=1950;  vatom_miedema_BVm[i]=12.0; vatom_radius[i]=0.158; vatom_radius_covalent[i]=1.75;   vatom_electronegativity[i]=1.33; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.76; vatom_pearson_coefficient[i]=0.000342629;  // Zr
+  i++; vatom_symbol[i]="Nb";vatom_name[i]="Niobium";     vatom_mass[i]*=92.9064;  vatom_volume[i]=18.3132; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.00; vatom_miedema_nws[i]=1.62; vatom_miedema_Vm[i]=4.9; vatom_miedema_gamma_s[i]=2700;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.64;   vatom_electronegativity[i]=1.60; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.82; vatom_pearson_coefficient[i]=0.0;  // Nb
+  i++; vatom_symbol[i]="Mo";vatom_name[i]="Molybdenum";  vatom_mass[i]*=95.94;    vatom_volume[i]=15.6175; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.65; vatom_miedema_nws[i]=1.77; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=2950;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.136; vatom_radius_covalent[i]=1.54;   vatom_electronegativity[i]=2.16; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.88; vatom_pearson_coefficient[i]=0.000598128;  // Mo
+  i++; vatom_symbol[i]="Tc";vatom_name[i]="Technetium";  vatom_mass[i]*=98.9062;  vatom_volume[i]=14.4670; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.30; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.47;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=0.0;  //Tc JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ru";vatom_name[i]="Ruthenium";   vatom_mass[i]*=101.07;   vatom_volume[i]=13.8390; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=26.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.46;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.00; vatom_pearson_coefficient[i]=0.000406665;  //Ru JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Rh";vatom_name[i]="Rhodium";     vatom_mass[i]*=102.9055; vatom_volume[i]=14.1731; vatom_valence_std[i]=9; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.76; vatom_miedema_Vm[i]=4.1; vatom_miedema_gamma_s[i]=2750;  vatom_miedema_BVm[i]=23.0; vatom_radius[i]=0.134; vatom_radius_covalent[i]=1.42;   vatom_electronegativity[i]=2.28; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.06; vatom_pearson_coefficient[i]=1.90706E-32;  // Rh
+  i++; vatom_symbol[i]="Pd";vatom_name[i]="Palladium";   vatom_mass[i]*=106.4;    vatom_volume[i]=15.4596; vatom_valence_std[i]=10; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=5.45; vatom_miedema_nws[i]=1.67; vatom_miedema_Vm[i]=4.3; vatom_miedema_gamma_s[i]=2100;  vatom_miedema_BVm[i]=16.0; vatom_radius[i]=0.137; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.12; vatom_pearson_coefficient[i]=0.000309478;  // Pd
+  i++; vatom_symbol[i]="Ag";vatom_name[i]="Silver";      vatom_mass[i]*=107.8682; vatom_volume[i]=18.0678; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.45; vatom_miedema_nws[i]=1.39; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1250;  vatom_miedema_BVm[i]=10.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.45;   vatom_electronegativity[i]=1.93; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.18; vatom_xray_scatt[i]=47.18; vatom_pearson_coefficient[i]=8.57985E-05;  // Ag JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Cd";vatom_name[i]="Cadmium";     vatom_mass[i]*=112.41;   vatom_volume[i]=22.0408; vatom_valence_std[i]=12; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=4.05; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=5.5; vatom_miedema_gamma_s[i]= 780;  vatom_miedema_BVm[i]=6.10; vatom_radius[i]=0.150; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=1.69; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.36; vatom_pearson_coefficient[i]=0.000271603;  // Cd
   // p-electron systems
-  i++; atom_symbol_vec[i]="In";atom_name_vec[i]="Indium";      atom_mass_vec[i]*=114.82;   atom_volume_vec[i]=27.5233; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.90; atom_miedema_nws[i]=1.17; atom_miedema_Vm[i]=6.3; atom_miedema_gamma_s[i]= 690;  atom_miedema_BVm[i]=6.4;  atom_radius_vec[i]=0.157; atom_radius_covalent_vec[i]=1.42;   atom_electronegativity_vec[i]=1.78; atom_crystal_vec[i]="fct";  pettifor_scale[i]=1.60; pearson_coefficient[i]=1.24494E-05;  // In
-  i++; atom_symbol_vec[i]="Sn";atom_name_vec[i]="Tin";         atom_mass_vec[i]*=118.69;   atom_volume_vec[i]=27.5555; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.15; atom_miedema_nws[i]=1.24; atom_miedema_Vm[i]=6.4; atom_miedema_gamma_s[i]= 710;  atom_miedema_BVm[i]=8.8;  atom_radius_vec[i]=0.158; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=1.96; atom_crystal_vec[i]="bct";  pettifor_scale[i]=1.84; pearson_coefficient[i]=0.000334085;  // Sn
-  i++; atom_symbol_vec[i]="Sb";atom_name_vec[i]="Antimony";    atom_mass_vec[i]*=121.75;   atom_volume_vec[i]=27.1823; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.40; atom_miedema_nws[i]=1.26; atom_miedema_Vm[i]=6.6; atom_miedema_gamma_s[i]= 680;  atom_miedema_BVm[i]=7.0;  atom_radius_vec[i]=0.161; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=2.05; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=2.08; pearson_coefficient[i]=6.60751E-05;  // Sb
-  i++; atom_symbol_vec[i]="Te";atom_name_vec[i]="Tellurium";   atom_mass_vec[i]*=127.6;    atom_volume_vec[i]=28.1993; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.72; atom_miedema_nws[i]=1.31;atom_miedema_Vm[i]=6.439;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.143; atom_radius_covalent_vec[i]=1.38;   atom_electronegativity_vec[i]=2.10; atom_crystal_vec[i]="hex";  pettifor_scale[i]=2.32; pearson_coefficient[i]=0.000283934;  // Te Table 27 of JUNKAI
-  i++; atom_symbol_vec[i]="I"; atom_name_vec[i]="Iodine";     atom_mass_vec[i]*=126.9045; atom_volume_vec[i]=34.9784;  atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.33; atom_miedema_nws[i]=0.17;  atom_miedema_Vm[i]=8.72;atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;atom_radius_vec[i]=0.136; atom_radius_covalent_vec[i]=1.39;   atom_electronegativity_vec[i]=2.66; atom_crystal_vec[i]="orc";  pettifor_scale[i]=2.56; pearson_coefficient[i]=0.0;  // I interpolation phi_star, nws, Vm,
-  i++; atom_symbol_vec[i]="Xe";atom_name_vec[i]="Xenon";       atom_mass_vec[i]*=131.3;    atom_volume_vec[i]=-1.0000; atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.218; atom_radius_covalent_vec[i]=1.40;   atom_electronegativity_vec[i]=2.60; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.000267781;  //Xe JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="In";vatom_name[i]="Indium";      vatom_mass[i]*=114.82;   vatom_volume[i]=27.5233; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.90; vatom_miedema_nws[i]=1.17; vatom_miedema_Vm[i]=6.3; vatom_miedema_gamma_s[i]= 690;  vatom_miedema_BVm[i]=6.4;  vatom_radius[i]=0.157; vatom_radius_covalent[i]=1.42;   vatom_electronegativity[i]=1.78; vatom_crystal[i]="fct";  vatom_pettifor_scale[i]=1.60; vatom_pearson_coefficient[i]=1.24494E-05;  // In
+  i++; vatom_symbol[i]="Sn";vatom_name[i]="Tin";         vatom_mass[i]*=118.69;   vatom_volume[i]=27.5555; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.15; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=6.4; vatom_miedema_gamma_s[i]= 710;  vatom_miedema_BVm[i]=8.8;  vatom_radius[i]=0.158; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=1.96; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=1.84; vatom_pearson_coefficient[i]=0.000334085;  // Sn
+  i++; vatom_symbol[i]="Sb";vatom_name[i]="Antimony";    vatom_mass[i]*=121.75;   vatom_volume[i]=27.1823; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.40; vatom_miedema_nws[i]=1.26; vatom_miedema_Vm[i]=6.6; vatom_miedema_gamma_s[i]= 680;  vatom_miedema_BVm[i]=7.0;  vatom_radius[i]=0.161; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.05; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.08; vatom_pearson_coefficient[i]=6.60751E-05;  // Sb
+  i++; vatom_symbol[i]="Te";vatom_name[i]="Tellurium";   vatom_mass[i]*=127.6;    vatom_volume[i]=28.1993; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.72; vatom_miedema_nws[i]=1.31;vatom_miedema_Vm[i]=6.439;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.143; vatom_radius_covalent[i]=1.38;   vatom_electronegativity[i]=2.10; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=2.32; vatom_pearson_coefficient[i]=0.000283934;  // Te Table 27 of JUNKAI
+  i++; vatom_symbol[i]="I"; vatom_name[i]="Iodine";     vatom_mass[i]*=126.9045; vatom_volume[i]=34.9784;  vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.33; vatom_miedema_nws[i]=0.17;  vatom_miedema_Vm[i]=8.72;vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;vatom_radius[i]=0.136; vatom_radius_covalent[i]=1.39;   vatom_electronegativity[i]=2.66; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=2.56; vatom_pearson_coefficient[i]=0.0;  // I interpolation phi_star, nws, Vm,
+  i++; vatom_symbol[i]="Xe";vatom_name[i]="Xenon";       vatom_mass[i]*=131.3;    vatom_volume[i]=-1.0000; vatom_valence_std[i]=0; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.218; vatom_radius_covalent[i]=1.40;   vatom_electronegativity[i]=2.60; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.000267781;  //Xe JUNKAI CHANGED VALENCE    
 
   // ROW6
   // s-electron systems
-  i++; atom_symbol_vec[i]="Cs";atom_name_vec[i]="Cesium";      atom_mass_vec[i]*=132.9054; atom_volume_vec[i]=117.281; atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=1.95; atom_miedema_nws[i]=0.55; atom_miedema_Vm[i]=16.8;atom_miedema_gamma_s[i]=  95;  atom_miedema_BVm[i]=1.4;  atom_radius_vec[i]=0.265; atom_radius_covalent_vec[i]=2.44;   atom_electronegativity_vec[i]=0.79; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.25; pearson_coefficient[i]=0.0;  // Cs
-  i++; atom_symbol_vec[i]="Ba";atom_name_vec[i]="Barium";      atom_mass_vec[i]*=137.33;   atom_volume_vec[i]=62.6649; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=2.32; atom_miedema_nws[i]=0.81; atom_miedema_Vm[i]=11.3;atom_miedema_gamma_s[i]= 370;  atom_miedema_BVm[i]=3.9;  atom_radius_vec[i]=0.217; atom_radius_covalent_vec[i]=2.15;   atom_electronegativity_vec[i]=0.89; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.50; pearson_coefficient[i]=6.23705E-05;  // Ba
+  i++; vatom_symbol[i]="Cs";vatom_name[i]="Cesium";      vatom_mass[i]*=132.9054; vatom_volume[i]=117.281; vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=1.95; vatom_miedema_nws[i]=0.55; vatom_miedema_Vm[i]=16.8;vatom_miedema_gamma_s[i]=  95;  vatom_miedema_BVm[i]=1.4;  vatom_radius[i]=0.265; vatom_radius_covalent[i]=2.44;   vatom_electronegativity[i]=0.79; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.25; vatom_pearson_coefficient[i]=0.0;  // Cs
+  i++; vatom_symbol[i]="Ba";vatom_name[i]="Barium";      vatom_mass[i]*=137.33;   vatom_volume[i]=62.6649; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=2.32; vatom_miedema_nws[i]=0.81; vatom_miedema_Vm[i]=11.3;vatom_miedema_gamma_s[i]= 370;  vatom_miedema_BVm[i]=3.9;  vatom_radius[i]=0.217; vatom_radius_covalent[i]=2.15;   vatom_electronegativity[i]=0.89; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.50; vatom_pearson_coefficient[i]=6.23705E-05;  // Ba
   // d-electron systems: transition metals
-  i++; atom_symbol_vec[i]="La";atom_name_vec[i]="Lanthanium";  atom_mass_vec[i]*=138.9055; atom_volume_vec[i]=36.8495; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.05;/*3.17*/ atom_miedema_nws[i]=1.09;/*1.18*/ atom_miedema_Vm[i]=8.0;/*7.98*/ atom_miedema_gamma_s[i]= 900;  atom_miedema_BVm[i]=5.5;  atom_radius_vec[i]=0.187; atom_radius_covalent_vec[i]=2.07;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7480; pearson_coefficient[i]=4.65323E-08;  // La
+  i++; vatom_symbol[i]="La";vatom_name[i]="Lanthanium";  vatom_mass[i]*=138.9055; vatom_volume[i]=36.8495; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.05;/*3.17*/ vatom_miedema_nws[i]=1.09;/*1.18*/ vatom_miedema_Vm[i]=8.0;/*7.98*/ vatom_miedema_gamma_s[i]= 900;  vatom_miedema_BVm[i]=5.5;  vatom_radius[i]=0.187; vatom_radius_covalent[i]=2.07;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7480; vatom_pearson_coefficient[i]=4.65323E-08;  // La
   // lantanidies
-  i++; atom_symbol_vec[i]="Ce";atom_name_vec[i]="Cerium";      atom_mass_vec[i]*=140.12;   atom_volume_vec[i]=26.4729; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.18;  atom_miedema_nws[i]=1.19;  atom_miedema_Vm[i]=7.76; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.182; atom_radius_covalent_vec[i]=2.04;   atom_electronegativity_vec[i]=1.12; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.7460; pearson_coefficient[i]=2.24956E-05;  // Ce pettifor linear interpolation // miedema from Alonso-March.
-  i++; atom_symbol_vec[i]="Pr";atom_name_vec[i]="Praseodymium";atom_mass_vec[i]*=140.9077; atom_volume_vec[i]=36.4987; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.19;  atom_miedema_nws[i]=1.20;  atom_miedema_Vm[i]=7.56; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.183; atom_radius_covalent_vec[i]=2.03;   atom_electronegativity_vec[i]=1.13; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7440; pearson_coefficient[i]=0.0;  // Pr pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Nd";atom_name_vec[i]="Neodymium";   atom_mass_vec[i]*=144.24;   atom_volume_vec[i]=29.6719; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.19;  atom_miedema_nws[i]=1.20;  atom_miedema_Vm[i]=7.51; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.182; atom_radius_covalent_vec[i]=2.01;   atom_electronegativity_vec[i]=1.14; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7420; pearson_coefficient[i]=0.000231599;  // Nd pettifor linear interpolation JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Pm";atom_name_vec[i]="Promethium";  atom_mass_vec[i]*=146.92;   atom_volume_vec[i]=34.6133; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.19;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.43; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.99;   atom_electronegativity_vec[i]=1.13; atom_crystal_vec[i]="hex";  pettifor_scale[i]=0.7400; pearson_coefficient[i]=0.0;  // Pm pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Sm";atom_name_vec[i]="Samarium";    atom_mass_vec[i]*=150.4;    atom_volume_vec[i]=33.9484; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.37; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.181; atom_radius_covalent_vec[i]=1.98;   atom_electronegativity_vec[i]=1.17; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=0.7380; pearson_coefficient[i]=0.000334686;  // Sm pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Eu";atom_name_vec[i]="Europium";    atom_mass_vec[i]*=151.96;   atom_volume_vec[i]=43.1719; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.36; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.204; atom_radius_covalent_vec[i]=1.98;   atom_electronegativity_vec[i]=1.20; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.7360; pearson_coefficient[i]=4.32857E-05;  // Eu pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Gd";atom_name_vec[i]="Gadolinium";  atom_mass_vec[i]*=157.25;   atom_volume_vec[i]=32.5777; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.20;  atom_miedema_nws[i]=1.21;  atom_miedema_Vm[i]=7.34; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.180; atom_radius_covalent_vec[i]=1.96;   atom_electronegativity_vec[i]=1.20; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7340; pearson_coefficient[i]=0.000127674;  // Gd pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Tb";atom_name_vec[i]="Terbium";     atom_mass_vec[i]*=158.9254; atom_volume_vec[i]=32.0200; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.21;  atom_miedema_nws[i]=1.22;  atom_miedema_Vm[i]=7.20; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.177; atom_radius_covalent_vec[i]=1.94;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7320; pearson_coefficient[i]=0.0;  // Tb pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Dy";atom_name_vec[i]="Dysprosium";  atom_mass_vec[i]*=162.5;    atom_volume_vec[i]=31.5096; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.21;  atom_miedema_nws[i]=1.22;  atom_miedema_Vm[i]=7.12; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.177; atom_radius_covalent_vec[i]=1.92;   atom_electronegativity_vec[i]=1.22; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7300; pearson_coefficient[i]=5.20771E-05;  // Dy pettifor linear interpolation JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Ho";atom_name_vec[i]="Holmium";     atom_mass_vec[i]*=164.9304; atom_volume_vec[i]=31.0155; atom_valence_std_vec[i]=13; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.22;  atom_miedema_Vm[i]=7.06; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.176; atom_radius_covalent_vec[i]=1.92;   atom_electronegativity_vec[i]=1.23; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7280; pearson_coefficient[i]=2.96961E-32;  // Ho pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Er";atom_name_vec[i]="Erbium";      atom_mass_vec[i]*=167.26;   atom_volume_vec[i]=30.5431; atom_valence_std_vec[i]=14; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.23;  atom_miedema_Vm[i]=6.98; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.175; atom_radius_covalent_vec[i]=1.89;   atom_electronegativity_vec[i]=1.24; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7260; pearson_coefficient[i]=7.24618E-05;  // Er pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Tm";atom_name_vec[i]="Thulium";     atom_mass_vec[i]*=168.9342; atom_volume_vec[i]=30.0016; atom_valence_std_vec[i]=15; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.23;  atom_miedema_Vm[i]=6.90; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.174; atom_radius_covalent_vec[i]=1.90;   atom_electronegativity_vec[i]=1.25; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7240; pearson_coefficient[i]=0.0;  // Tm pettifor linear interpolation JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Yb";atom_name_vec[i]="Ytterbium";   atom_mass_vec[i]*=173.04;   atom_volume_vec[i]=39.4395; atom_valence_std_vec[i]=16; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.23;  atom_miedema_Vm[i]=6.86; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.193; atom_radius_covalent_vec[i]=1.87;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0.7220; pearson_coefficient[i]=8.54557E-05;  // Yb pettifor linear interpolation
-  i++; atom_symbol_vec[i]="Lu";atom_name_vec[i]="Lutetium";    atom_mass_vec[i]*=174.967;  atom_volume_vec[i]=29.3515; atom_valence_std_vec[i]=17; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.22;  atom_miedema_nws[i]=1.24;  atom_miedema_Vm[i]=6.81; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.173; atom_radius_covalent_vec[i]=1.87;   atom_electronegativity_vec[i]=1.27; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.7200; pearson_coefficient[i]=8.27273E-07;  // Lu
+  i++; vatom_symbol[i]="Ce";vatom_name[i]="Cerium";      vatom_mass[i]*=140.12;   vatom_volume[i]=26.4729; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.18;  vatom_miedema_nws[i]=1.19;  vatom_miedema_Vm[i]=7.76; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.04;   vatom_electronegativity[i]=1.12; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.7460; vatom_pearson_coefficient[i]=2.24956E-05;  // Ce pettifor linear interpolation // miedema from Alonso-March.
+  i++; vatom_symbol[i]="Pr";vatom_name[i]="Praseodymium";vatom_mass[i]*=140.9077; vatom_volume[i]=36.4987; vatom_valence_std[i]=5; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.56; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.183; vatom_radius_covalent[i]=2.03;   vatom_electronegativity[i]=1.13; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7440; vatom_pearson_coefficient[i]=0.0;  // Pr pettifor linear interpolation
+  i++; vatom_symbol[i]="Nd";vatom_name[i]="Neodymium";   vatom_mass[i]*=144.24;   vatom_volume[i]=29.6719; vatom_valence_std[i]=6; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.20;  vatom_miedema_Vm[i]=7.51; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=2.01;   vatom_electronegativity[i]=1.14; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7420; vatom_pearson_coefficient[i]=0.000231599;  // Nd pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Pm";vatom_name[i]="Promethium";  vatom_mass[i]*=146.92;   vatom_volume[i]=34.6133; vatom_valence_std[i]=7; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.19;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.43; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.99;   vatom_electronegativity[i]=1.13; vatom_crystal[i]="hex";  vatom_pettifor_scale[i]=0.7400; vatom_pearson_coefficient[i]=0.0;  // Pm pettifor linear interpolation
+  i++; vatom_symbol[i]="Sm";vatom_name[i]="Samarium";    vatom_mass[i]*=150.4;    vatom_volume[i]=33.9484; vatom_valence_std[i]=8; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.37; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.181; vatom_radius_covalent[i]=1.98;   vatom_electronegativity[i]=1.17; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=0.7380; vatom_pearson_coefficient[i]=0.000334686;  // Sm pettifor linear interpolation
+  i++; vatom_symbol[i]="Eu";vatom_name[i]="Europium";    vatom_mass[i]*=151.96;   vatom_volume[i]=43.1719; vatom_valence_std[i]=9; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.36; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.204; vatom_radius_covalent[i]=1.98;   vatom_electronegativity[i]=1.20; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.7360; vatom_pearson_coefficient[i]=4.32857E-05;  // Eu pettifor linear interpolation
+  i++; vatom_symbol[i]="Gd";vatom_name[i]="Gadolinium";  vatom_mass[i]*=157.25;   vatom_volume[i]=32.5777; vatom_valence_std[i]=10; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.20;  vatom_miedema_nws[i]=1.21;  vatom_miedema_Vm[i]=7.34; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.180; vatom_radius_covalent[i]=1.96;   vatom_electronegativity[i]=1.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7340; vatom_pearson_coefficient[i]=0.000127674;  // Gd pettifor linear interpolation
+  i++; vatom_symbol[i]="Tb";vatom_name[i]="Terbium";     vatom_mass[i]*=158.9254; vatom_volume[i]=32.0200; vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.20; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.94;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7320; vatom_pearson_coefficient[i]=0.0;  // Tb pettifor linear interpolation
+  i++; vatom_symbol[i]="Dy";vatom_name[i]="Dysprosium";  vatom_mass[i]*=162.5;    vatom_volume[i]=31.5096; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.21;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.12; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.177; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.22; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7300; vatom_pearson_coefficient[i]=5.20771E-05;  // Dy pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ho";vatom_name[i]="Holmium";     vatom_mass[i]*=164.9304; vatom_volume[i]=31.0155; vatom_valence_std[i]=13; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.22;  vatom_miedema_Vm[i]=7.06; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.176; vatom_radius_covalent[i]=1.92;   vatom_electronegativity[i]=1.23; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7280; vatom_pearson_coefficient[i]=2.96961E-32;  // Ho pettifor linear interpolation
+  i++; vatom_symbol[i]="Er";vatom_name[i]="Erbium";      vatom_mass[i]*=167.26;   vatom_volume[i]=30.5431; vatom_valence_std[i]=14; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.98; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.175; vatom_radius_covalent[i]=1.89;   vatom_electronegativity[i]=1.24; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7260; vatom_pearson_coefficient[i]=7.24618E-05;  // Er pettifor linear interpolation
+  i++; vatom_symbol[i]="Tm";vatom_name[i]="Thulium";     vatom_mass[i]*=168.9342; vatom_volume[i]=30.0016; vatom_valence_std[i]=15; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.90; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.174; vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=1.25; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7240; vatom_pearson_coefficient[i]=0.0;  // Tm pettifor linear interpolation JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Yb";vatom_name[i]="Ytterbium";   vatom_mass[i]*=173.04;   vatom_volume[i]=39.4395; vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.23;  vatom_miedema_Vm[i]=6.86; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.193; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0.7220; vatom_pearson_coefficient[i]=8.54557E-05;  // Yb pettifor linear interpolation
+  i++; vatom_symbol[i]="Lu";vatom_name[i]="Lutetium";    vatom_mass[i]*=174.967;  vatom_volume[i]=29.3515; vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.22;  vatom_miedema_nws[i]=1.24;  vatom_miedema_Vm[i]=6.81; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.173; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=1.27; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.7200; vatom_pearson_coefficient[i]=8.27273E-07;  // Lu
   // d-electron systems: transition metalsnnn";
-  i++; atom_symbol_vec[i]="Hf";atom_name_vec[i]="Hafnium";     atom_mass_vec[i]*=178.49;   atom_volume_vec[i]=22.0408; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.55; atom_miedema_nws[i]=1.43; atom_miedema_Vm[i]=5.6; atom_miedema_gamma_s[i]=2200;  atom_miedema_BVm[i]=15.0; atom_radius_vec[i]=0.159; atom_radius_covalent_vec[i]=1.75;   atom_electronegativity_vec[i]=1.30; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.775; pearson_coefficient[i]=5.25384E-05;  // Hf
-  i++; atom_symbol_vec[i]="Ta";atom_name_vec[i]="Tantalum";    atom_mass_vec[i]*=180.9479; atom_volume_vec[i]=18.1100; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.05; atom_miedema_nws[i]=1.63; atom_miedema_Vm[i]=4.9; atom_miedema_gamma_s[i]=3050;  atom_miedema_BVm[i]=22.0; atom_radius_vec[i]=0.147; atom_radius_covalent_vec[i]=1.70;   atom_electronegativity_vec[i]=1.50; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.83; pearson_coefficient[i]=3.66845E-09;  // Ta
-  i++; atom_symbol_vec[i]="W"; atom_name_vec[i]="Tungsten";    atom_mass_vec[i]*=183.85;   atom_volume_vec[i]=15.9387; atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=4.80; atom_miedema_nws[i]=1.81; atom_miedema_Vm[i]=4.5; atom_miedema_gamma_s[i]=3300;  atom_miedema_BVm[i]=31.0; atom_radius_vec[i]=0.137; atom_radius_covalent_vec[i]=1.62;   atom_electronegativity_vec[i]=2.36; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0.885; pearson_coefficient[i]=6.96679E-05;  // W
-  i++; atom_symbol_vec[i]="Re";atom_name_vec[i]="Rhenium";     atom_mass_vec[i]*=186.2;    atom_volume_vec[i]=14.8941; atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.86; atom_miedema_Vm[i]=4.3; atom_miedema_gamma_s[i]=3650;  atom_miedema_BVm[i]=33.0; atom_radius_vec[i]=0.138; atom_radius_covalent_vec[i]=1.51;   atom_electronegativity_vec[i]=1.90; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.94; pearson_coefficient[i]=2.70849E-05;  // Re
-  i++; atom_symbol_vec[i]="Os";atom_name_vec[i]="Osmium";      atom_mass_vec[i]*=190.2;    atom_volume_vec[i]=14.2403; atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=5.40; atom_miedema_nws[i]=1.85; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=3500;  atom_miedema_BVm[i]=35.0; atom_radius_vec[i]=0.135; atom_radius_covalent_vec[i]=1.44;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=0.995; pearson_coefficient[i]=7.45234E-05;  // Os JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Ir";atom_name_vec[i]="Iridium";     atom_mass_vec[i]*=192.22;   atom_volume_vec[i]=14.5561; atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=5.55; atom_miedema_nws[i]=1.83; atom_miedema_Vm[i]=4.2; atom_miedema_gamma_s[i]=3100;  atom_miedema_BVm[i]=25.0; atom_radius_vec[i]=0.135; atom_radius_covalent_vec[i]=1.41;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.05; pearson_coefficient[i]=2.53787E-05;  // Ir JUNKAI CHANGED VALENCE    
-  i++; atom_symbol_vec[i]="Pt";atom_name_vec[i]="Platinum";    atom_mass_vec[i]*=195.09;   atom_volume_vec[i]=15.7298; atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=5.65; atom_miedema_nws[i]=1.78; atom_miedema_Vm[i]=4.4; atom_miedema_gamma_s[i]=2550;  atom_miedema_BVm[i]=18.0; atom_radius_vec[i]=0.138; atom_radius_covalent_vec[i]=1.36;   atom_electronegativity_vec[i]=2.28; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.105; pearson_coefficient[i]=3.39206E-05;  // Pt
-  i++; atom_symbol_vec[i]="Au";atom_name_vec[i]="Gold";        atom_mass_vec[i]*=196.9665; atom_volume_vec[i]=18.1904; atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=5.15; atom_miedema_nws[i]=1.57; atom_miedema_Vm[i]=4.7; atom_miedema_gamma_s[i]=1550;  atom_miedema_BVm[i]=18.0; atom_radius_vec[i]=0.144; atom_radius_covalent_vec[i]=1.36;   atom_electronegativity_vec[i]=2.54; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.16; xray_scatt_vec[i]=74.99; pearson_coefficient[i]=2.08217E-32;  // Au
-  i++; atom_symbol_vec[i]="Hg";atom_name_vec[i]="Mercury";     atom_mass_vec[i]*=200.59;   atom_volume_vec[i]=29.7156; atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.20; atom_miedema_nws[i]=1.24; atom_miedema_Vm[i]=5.8; atom_miedema_gamma_s[i]= 610;  atom_miedema_BVm[i]=4.0;  atom_radius_vec[i]=0.150; atom_radius_covalent_vec[i]=1.32;   atom_electronegativity_vec[i]=2.00; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=1.32; pearson_coefficient[i]=6.52519E-05;  // Hg
+  i++; vatom_symbol[i]="Hf";vatom_name[i]="Hafnium";     vatom_mass[i]*=178.49;   vatom_volume[i]=22.0408; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.55; vatom_miedema_nws[i]=1.43; vatom_miedema_Vm[i]=5.6; vatom_miedema_gamma_s[i]=2200;  vatom_miedema_BVm[i]=15.0; vatom_radius[i]=0.159; vatom_radius_covalent[i]=1.75;   vatom_electronegativity[i]=1.30; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.775; vatom_pearson_coefficient[i]=5.25384E-05;  // Hf
+  i++; vatom_symbol[i]="Ta";vatom_name[i]="Tantalum";    vatom_mass[i]*=180.9479; vatom_volume[i]=18.1100; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.05; vatom_miedema_nws[i]=1.63; vatom_miedema_Vm[i]=4.9; vatom_miedema_gamma_s[i]=3050;  vatom_miedema_BVm[i]=22.0; vatom_radius[i]=0.147; vatom_radius_covalent[i]=1.70;   vatom_electronegativity[i]=1.50; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.83; vatom_pearson_coefficient[i]=3.66845E-09;  // Ta
+  i++; vatom_symbol[i]="W"; vatom_name[i]="Tungsten";    vatom_mass[i]*=183.85;   vatom_volume[i]=15.9387; vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=4.80; vatom_miedema_nws[i]=1.81; vatom_miedema_Vm[i]=4.5; vatom_miedema_gamma_s[i]=3300;  vatom_miedema_BVm[i]=31.0; vatom_radius[i]=0.137; vatom_radius_covalent[i]=1.62;   vatom_electronegativity[i]=2.36; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0.885; vatom_pearson_coefficient[i]=6.96679E-05;  // W
+  i++; vatom_symbol[i]="Re";vatom_name[i]="Rhenium";     vatom_mass[i]*=186.2;    vatom_volume[i]=14.8941; vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.86; vatom_miedema_Vm[i]=4.3; vatom_miedema_gamma_s[i]=3650;  vatom_miedema_BVm[i]=33.0; vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.51;   vatom_electronegativity[i]=1.90; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.94; vatom_pearson_coefficient[i]=2.70849E-05;  // Re
+  i++; vatom_symbol[i]="Os";vatom_name[i]="Osmium";      vatom_mass[i]*=190.2;    vatom_volume[i]=14.2403; vatom_valence_std[i]=8; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.40; vatom_miedema_nws[i]=1.85; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3500;  vatom_miedema_BVm[i]=35.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.44;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=0.995; vatom_pearson_coefficient[i]=7.45234E-05;  // Os JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Ir";vatom_name[i]="Iridium";     vatom_mass[i]*=192.22;   vatom_volume[i]=14.5561; vatom_valence_std[i]=9; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=5.55; vatom_miedema_nws[i]=1.83; vatom_miedema_Vm[i]=4.2; vatom_miedema_gamma_s[i]=3100;  vatom_miedema_BVm[i]=25.0; vatom_radius[i]=0.135; vatom_radius_covalent[i]=1.41;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.05; vatom_pearson_coefficient[i]=2.53787E-05;  // Ir JUNKAI CHANGED VALENCE    
+  i++; vatom_symbol[i]="Pt";vatom_name[i]="Platinum";    vatom_mass[i]*=195.09;   vatom_volume[i]=15.7298; vatom_valence_std[i]=10; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=5.65; vatom_miedema_nws[i]=1.78; vatom_miedema_Vm[i]=4.4; vatom_miedema_gamma_s[i]=2550;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.36;   vatom_electronegativity[i]=2.28; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.105; vatom_pearson_coefficient[i]=3.39206E-05;  // Pt
+  i++; vatom_symbol[i]="Au";vatom_name[i]="Gold";        vatom_mass[i]*=196.9665; vatom_volume[i]=18.1904; vatom_valence_std[i]=11; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=5.15; vatom_miedema_nws[i]=1.57; vatom_miedema_Vm[i]=4.7; vatom_miedema_gamma_s[i]=1550;  vatom_miedema_BVm[i]=18.0; vatom_radius[i]=0.144; vatom_radius_covalent[i]=1.36;   vatom_electronegativity[i]=2.54; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.16; vatom_xray_scatt[i]=74.99; vatom_pearson_coefficient[i]=2.08217E-32;  // Au
+  i++; vatom_symbol[i]="Hg";vatom_name[i]="Mercury";     vatom_mass[i]*=200.59;   vatom_volume[i]=29.7156; vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.20; vatom_miedema_nws[i]=1.24; vatom_miedema_Vm[i]=5.8; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=4.0;  vatom_radius[i]=0.150; vatom_radius_covalent[i]=1.32;   vatom_electronegativity[i]=2.00; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=1.32; vatom_pearson_coefficient[i]=6.52519E-05;  // Hg
   // p-electron systems
-  i++; atom_symbol_vec[i]="Tl";atom_name_vec[i]="Thallium";    atom_mass_vec[i]*=204.37;   atom_volume_vec[i]=31.0721; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=3.90; atom_miedema_nws[i]=1.12; atom_miedema_Vm[i]=6.6; atom_miedema_gamma_s[i]= 610;  atom_miedema_BVm[i]=6.2;  atom_radius_vec[i]=0.171; atom_radius_covalent_vec[i]=1.45;   atom_electronegativity_vec[i]=1.62; atom_crystal_vec[i]="hcp";  pettifor_scale[i]=1.56; pearson_coefficient[i]=1.99659E-05;  // Tl electronegativity  2.04=>1.62
-  i++; atom_symbol_vec[i]="Pb";atom_name_vec[i]="Lead";        atom_mass_vec[i]*=207.2;    atom_volume_vec[i]=31.6649; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=4.10; atom_miedema_nws[i]=1.15; atom_miedema_Vm[i]=6.9; atom_miedema_gamma_s[i]= 610;  atom_miedema_BVm[i]=7.9;  atom_radius_vec[i]=0.175; atom_radius_covalent_vec[i]=1.46;   atom_electronegativity_vec[i]=2.33; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=1.80; pearson_coefficient[i]=1.94378E-05;  // Pb
-  i++; atom_symbol_vec[i]="Bi";atom_name_vec[i]="Bismuth";     atom_mass_vec[i]*=208.9804; atom_volume_vec[i]=31.5691; atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=4.15; atom_miedema_nws[i]=1.16; atom_miedema_Vm[i]=7.2; atom_miedema_gamma_s[i]= 550;  atom_miedema_BVm[i]=6.7;  atom_radius_vec[i]=0.182; atom_radius_covalent_vec[i]=1.48;   atom_electronegativity_vec[i]=2.02; atom_crystal_vec[i]="rhl";  pettifor_scale[i]=2.04; pearson_coefficient[i]=0.0;  // Bi
-  i++; atom_symbol_vec[i]="Po";atom_name_vec[i]="Polonium";    atom_mass_vec[i]*=209.98;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.140; atom_radius_covalent_vec[i]=1.40;   atom_electronegativity_vec[i]=2.00; atom_crystal_vec[i]="sc";  pettifor_scale[i]=2.28; pearson_coefficient[i]=0.0;  // Po
-  i++; atom_symbol_vec[i]="At";atom_name_vec[i]="Astatine";    atom_mass_vec[i]*=210;      atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.50;   atom_electronegativity_vec[i]=2.20; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=2.52; pearson_coefficient[i]=0.0;  // At
-  i++; atom_symbol_vec[i]="Rn";atom_name_vec[i]="Radon";       atom_mass_vec[i]*=222;      atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=0; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.50;   atom_electronegativity_vec[i]=2.2; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Rn
+  i++; vatom_symbol[i]="Tl";vatom_name[i]="Thallium";    vatom_mass[i]*=204.37;   vatom_volume[i]=31.0721; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=3.90; vatom_miedema_nws[i]=1.12; vatom_miedema_Vm[i]=6.6; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=6.2;  vatom_radius[i]=0.171; vatom_radius_covalent[i]=1.45;   vatom_electronegativity[i]=1.62; vatom_crystal[i]="hcp";  vatom_pettifor_scale[i]=1.56; vatom_pearson_coefficient[i]=1.99659E-05;  // Tl electronegativity  2.04=>1.62
+  i++; vatom_symbol[i]="Pb";vatom_name[i]="Lead";        vatom_mass[i]*=207.2;    vatom_volume[i]=31.6649; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=4.10; vatom_miedema_nws[i]=1.15; vatom_miedema_Vm[i]=6.9; vatom_miedema_gamma_s[i]= 610;  vatom_miedema_BVm[i]=7.9;  vatom_radius[i]=0.175; vatom_radius_covalent[i]=1.46;   vatom_electronegativity[i]=2.33; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=1.80; vatom_pearson_coefficient[i]=1.94378E-05;  // Pb
+  i++; vatom_symbol[i]="Bi";vatom_name[i]="Bismuth";     vatom_mass[i]*=208.9804; vatom_volume[i]=31.5691; vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=4.15; vatom_miedema_nws[i]=1.16; vatom_miedema_Vm[i]=7.2; vatom_miedema_gamma_s[i]= 550;  vatom_miedema_BVm[i]=6.7;  vatom_radius[i]=0.182; vatom_radius_covalent[i]=1.48;   vatom_electronegativity[i]=2.02; vatom_crystal[i]="rhl";  vatom_pettifor_scale[i]=2.04; vatom_pearson_coefficient[i]=0.0;  // Bi
+  i++; vatom_symbol[i]="Po";vatom_name[i]="Polonium";    vatom_mass[i]*=209.98;   vatom_volume[i]=NNN;     vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.140; vatom_radius_covalent[i]=1.40;   vatom_electronegativity[i]=2.00; vatom_crystal[i]="sc";  vatom_pettifor_scale[i]=2.28; vatom_pearson_coefficient[i]=0.0;  // Po
+  i++; vatom_symbol[i]="At";vatom_name[i]="Astatine";    vatom_mass[i]*=210;      vatom_volume[i]=NNN;     vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.50;   vatom_electronegativity[i]=2.20; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=2.52; vatom_pearson_coefficient[i]=0.0;  // At
+  i++; vatom_symbol[i]="Rn";vatom_name[i]="Radon";       vatom_mass[i]*=222;      vatom_volume[i]=NNN;     vatom_valence_std[i]=0; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.50;   vatom_electronegativity[i]=2.2; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Rn
 
   // ROW7
   // s-electron systems
-  i++; atom_symbol_vec[i]="Fr";atom_name_vec[i]="Francium";    atom_mass_vec[i]*=223.02;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=1; atom_valence_iupac_vec[i]=1; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.60;   atom_electronegativity_vec[i]=0.70; atom_crystal_vec[i]="bcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Fr
-  i++; atom_symbol_vec[i]="Ra";atom_name_vec[i]="Radium";      atom_mass_vec[i]*=226.0254; atom_volume_vec[i]=-1.0000; atom_valence_std_vec[i]=2; atom_valence_iupac_vec[i]=2; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.21;   atom_electronegativity_vec[i]=0.89; atom_crystal_vec[i]="bct";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Ra
+  i++; vatom_symbol[i]="Fr";vatom_name[i]="Francium";    vatom_mass[i]*=223.02;   vatom_volume[i]=NNN;     vatom_valence_std[i]=1; vatom_valence_iupac[i]=1; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.60;   vatom_electronegativity[i]=0.70; vatom_crystal[i]="bcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Fr
+  i++; vatom_symbol[i]="Ra";vatom_name[i]="Radium";      vatom_mass[i]*=226.0254; vatom_volume[i]=-1.0000; vatom_valence_std[i]=2; vatom_valence_iupac[i]=2; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.21;   vatom_electronegativity[i]=0.89; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Ra
   // d-electron systems: transition metals
-  i++; atom_symbol_vec[i]="Ac";atom_name_vec[i]="Actinium";    atom_mass_vec[i]*=227.03;   atom_volume_vec[i]=45.2437; atom_valence_std_vec[i]=3; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.15;   atom_electronegativity_vec[i]=1.10; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Ac
+  i++; vatom_symbol[i]="Ac";vatom_name[i]="Actinium";    vatom_mass[i]*=227.03;   vatom_volume[i]=45.2437; vatom_valence_std[i]=3; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.15;   vatom_electronegativity[i]=1.10; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Ac
   // actinidies
-  i++; atom_symbol_vec[i]="Th";atom_name_vec[i]="Thorium";     atom_mass_vec[i]*=232.0381; atom_volume_vec[i]=31.9586; atom_valence_std_vec[i]=4; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=3.30; atom_miedema_nws[i]=1.28; atom_miedema_Vm[i]=7.3; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.180; atom_radius_covalent_vec[i]=2.06;   atom_electronegativity_vec[i]=1.30; atom_crystal_vec[i]="fcc";  pettifor_scale[i]=0; xray_scatt_vec[i]=86.64; pearson_coefficient[i]=0.0; // Th
-  i++; atom_symbol_vec[i]="Pa";atom_name_vec[i]="Protoactinium";atom_mass_vec[i]*=231.04;  atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=5; atom_valence_iupac_vec[i]=5; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=2.00;   atom_electronegativity_vec[i]=1.50; atom_crystal_vec[i]="bct";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Pa
-  i++; atom_symbol_vec[i]="U"; atom_name_vec[i]="Uranium";     atom_mass_vec[i]*=238.03;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=6; atom_valence_iupac_vec[i]=6; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=0.138; atom_radius_covalent_vec[i]=1.96;   atom_electronegativity_vec[i]=1.38; atom_crystal_vec[i]="orc";  pettifor_scale[i]=0; pearson_coefficient[i]=1.15611E-06;  // U
-  i++; atom_symbol_vec[i]="Np";atom_name_vec[i]="Neptunium";   atom_mass_vec[i]*=237.05;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=7; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.90;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0;  pearson_coefficient[i]=0.0;  // Np
-  i++; atom_symbol_vec[i]="Pu"; atom_name_vec[i]="Plutonium";  atom_mass_vec[i]*=244.06;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=8; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=1.87;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Pu
-  i++; atom_symbol_vec[i]="Am";atom_name_vec[i]="Americium";   atom_mass_vec[i]*=243.06;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=9; atom_valence_iupac_vec[i]=7; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN;   atom_radius_covalent_vec[i]=1.80;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Am
-  i++; atom_symbol_vec[i]="Cm"; atom_name_vec[i]="Curium";     atom_mass_vec[i]*=247.07;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=10; atom_valence_iupac_vec[i]=8; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=1.69;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Cm
+  i++; vatom_symbol[i]="Th";vatom_name[i]="Thorium";     vatom_mass[i]*=232.0381; vatom_volume[i]=31.9586; vatom_valence_std[i]=4; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=3.30; vatom_miedema_nws[i]=1.28; vatom_miedema_Vm[i]=7.3; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.180; vatom_radius_covalent[i]=2.06;   vatom_electronegativity[i]=1.30; vatom_crystal[i]="fcc";  vatom_pettifor_scale[i]=0; vatom_xray_scatt[i]=86.64; vatom_pearson_coefficient[i]=0.0; // Th
+  i++; vatom_symbol[i]="Pa";vatom_name[i]="Protoactinium";vatom_mass[i]*=231.04;  vatom_volume[i]=NNN;     vatom_valence_std[i]=5; vatom_valence_iupac[i]=5; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=2.00;   vatom_electronegativity[i]=1.50; vatom_crystal[i]="bct";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Pa
+  i++; vatom_symbol[i]="U"; vatom_name[i]="Uranium";     vatom_mass[i]*=238.03;   vatom_volume[i]=NNN;     vatom_valence_std[i]=6; vatom_valence_iupac[i]=6; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=0.138; vatom_radius_covalent[i]=1.96;   vatom_electronegativity[i]=1.38; vatom_crystal[i]="orc";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=1.15611E-06;  // U
+  i++; vatom_symbol[i]="Np";vatom_name[i]="Neptunium";   vatom_mass[i]*=237.05;   vatom_volume[i]=NNN;     vatom_valence_std[i]=7; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.90;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0;  vatom_pearson_coefficient[i]=0.0;  // Np
+  i++; vatom_symbol[i]="Pu"; vatom_name[i]="Plutonium";  vatom_mass[i]*=244.06;   vatom_volume[i]=NNN;     vatom_valence_std[i]=8; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=1.87;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Pu
+  i++; vatom_symbol[i]="Am";vatom_name[i]="Americium";   vatom_mass[i]*=243.06;   vatom_volume[i]=NNN;     vatom_valence_std[i]=9; vatom_valence_iupac[i]=7; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN;   vatom_radius_covalent[i]=1.80;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Am
+  i++; vatom_symbol[i]="Cm"; vatom_name[i]="Curium";     vatom_mass[i]*=247.07;   vatom_volume[i]=NNN;     vatom_valence_std[i]=10; vatom_valence_iupac[i]=8; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=1.69;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Cm
 
-  i++; atom_symbol_vec[i]="Bk"; atom_name_vec[i]="Berkelium";  atom_mass_vec[i]*=247.07;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=11; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Bk
-  i++; atom_symbol_vec[i]="Cf"; atom_name_vec[i]="Californium";atom_mass_vec[i]*=251.08;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=12; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Cf
-  i++; atom_symbol_vec[i]="Es"; atom_name_vec[i]="Einsteinium";atom_mass_vec[i]*=252.08;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=13; atom_valence_iupac_vec[i]=4; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Es
-  i++; atom_symbol_vec[i]="Fm"; atom_name_vec[i]="Fermium";    atom_mass_vec[i]*=257.1;    atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=14; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Fm
-  i++; atom_symbol_vec[i]="Md"; atom_name_vec[i]="Mendelevium";atom_mass_vec[i]*=258.1;    atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=15; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Md
-  i++; atom_symbol_vec[i]="No"; atom_name_vec[i]="Nobelium";   atom_mass_vec[i]*=259.1;    atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=16; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // No
-  i++; atom_symbol_vec[i]="Lr"; atom_name_vec[i]="Lawrencium"; atom_mass_vec[i]*=262.11;   atom_volume_vec[i]=NNN;     atom_valence_std_vec[i]=17; atom_valence_iupac_vec[i]=3; atom_miedema_phi_star[i]=NNN;  atom_miedema_nws[i]=NNN;  atom_miedema_Vm[i]=NNN; atom_miedema_gamma_s[i]= NNN;  atom_miedema_BVm[i]=NNN;  atom_radius_vec[i]=NNN; atom_radius_covalent_vec[i]=NNN;   atom_electronegativity_vec[i]=NNN; atom_crystal_vec[i]="nnn";  pettifor_scale[i]=0; pearson_coefficient[i]=0.0;  // Lr
+  i++; vatom_symbol[i]="Bk"; vatom_name[i]="Berkelium";  vatom_mass[i]*=247.07;   vatom_volume[i]=NNN;     vatom_valence_std[i]=11; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Bk
+  i++; vatom_symbol[i]="Cf"; vatom_name[i]="Californium";vatom_mass[i]*=251.08;   vatom_volume[i]=NNN;     vatom_valence_std[i]=12; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Cf
+  i++; vatom_symbol[i]="Es"; vatom_name[i]="Einsteinium";vatom_mass[i]*=252.08;   vatom_volume[i]=NNN;     vatom_valence_std[i]=13; vatom_valence_iupac[i]=4; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Es
+  i++; vatom_symbol[i]="Fm"; vatom_name[i]="Fermium";    vatom_mass[i]*=257.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=14; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Fm
+  i++; vatom_symbol[i]="Md"; vatom_name[i]="Mendelevium";vatom_mass[i]*=258.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=15; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Md
+  i++; vatom_symbol[i]="No"; vatom_name[i]="Nobelium";   vatom_mass[i]*=259.1;    vatom_volume[i]=NNN;     vatom_valence_std[i]=16; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // No
+  i++; vatom_symbol[i]="Lr"; vatom_name[i]="Lawrencium"; vatom_mass[i]*=262.11;   vatom_volume[i]=NNN;     vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Lr
 
   /*
     int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
     for(uint j=1;j<93;j++) {
-    int test=atom_valence_std_vec[j];
+    int test=vatom_valence_std[j];
     if(j<=9 && test>=5) {test=test-8;} // first row
     if(j<=17 && test>=5) {test=test-8;} // second row
     //   if(test!=valence_wahyu[j]) 
-    cerr << atom_symbol_vec[j] << " " << atom_valence_std_vec[j] << " " <<  test  << " " << valence_wahyu[j];
+    cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
     if(test!=valence_wahyu[j]) cerr << "   ****   ";
     cerr << endl;
     }
@@ -456,55 +456,55 @@ void atoms_initialize(void) {
 
 
   //   for(int i=1;i<90;i++) {
-  //     cerr << i << " " <<  atom_symbol_vec[i] << " " << pettifor_scale[i] << endl;
+  //     cerr << i << " " <<  vatom_symbol[i] << " " << vatom_pettifor_scale[i] << endl;
   //   }
-  // cerr << i << " " << atom_symbol_vec[i] << endl; exit(0);
+  // cerr << i << " " << vatom_symbol[i] << endl; exit(0);
 
   // aconvasp stuff
   // All data collected from the NIST online tables:
   // http://physics.nist.gov/PhysRefData/FFast/html/form.html
   // All data are ideally for f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
   // These are for E=7.9026keV (Cu-alpha is wavelength=1.5418A, E=8.0416keV).
-  xray_scatt_vec[1+2]=3.00145E+00; // Li
-  xray_scatt_vec[1+14]=1.53133E+01; // P
-  xray_scatt_vec[1+24]=2.43589E+01; // Mn
-  xray_scatt_vec[1+25]=2.46830E+01; // Fe
+  vatom_xray_scatt[1+2]=3.00145E+00; // Li
+  vatom_xray_scatt[1+14]=1.53133E+01; // P
+  vatom_xray_scatt[1+24]=2.43589E+01; // Mn
+  vatom_xray_scatt[1+25]=2.46830E+01; // Fe
 
   // All data collected from the online tables:
   // http://www-cxro.lbl.gov/optical_constants/pert_form.html
   // All data are f1 values for Cu-alpha (wavelength=1.5418A, E=8.0416keV).
-  xray_scatt_vec[1+0]=1.000; // H
-  xray_scatt_vec[1+1]=2.000; // He
-  xray_scatt_vec[1+2]=3.001; // Li
-  xray_scatt_vec[1+6]=6.019; // C
-  xray_scatt_vec[1+7]=8.052; // O
-  xray_scatt_vec[1+13]=14.43; // P
-  xray_scatt_vec[1+14]=15.30; // P
-  xray_scatt_vec[1+20]=21.34; // Sc
-  xray_scatt_vec[1+21]=22.24; // Ti
-  xray_scatt_vec[1+23]=23.84; // Cr
-  xray_scatt_vec[1+24]=24.46; // Mn
-  xray_scatt_vec[1+25]=24.85; // Fe
-  xray_scatt_vec[1+26]=24.59; // Co
-  xray_scatt_vec[1+27]=25.02; // Ni
-  xray_scatt_vec[1+28]=27.03; // Cu
-  xray_scatt_vec[1+29]=28.44; // Zn
-  xray_scatt_vec[1+46]=47.18; // Ag
-  xray_scatt_vec[1+78]=74.99; // Au
-  xray_scatt_vec[1+89]=86.64; // Th
+  vatom_xray_scatt[1+0]=1.000; // H
+  vatom_xray_scatt[1+1]=2.000; // He
+  vatom_xray_scatt[1+2]=3.001; // Li
+  vatom_xray_scatt[1+6]=6.019; // C
+  vatom_xray_scatt[1+7]=8.052; // O
+  vatom_xray_scatt[1+13]=14.43; // P
+  vatom_xray_scatt[1+14]=15.30; // P
+  vatom_xray_scatt[1+20]=21.34; // Sc
+  vatom_xray_scatt[1+21]=22.24; // Ti
+  vatom_xray_scatt[1+23]=23.84; // Cr
+  vatom_xray_scatt[1+24]=24.46; // Mn
+  vatom_xray_scatt[1+25]=24.85; // Fe
+  vatom_xray_scatt[1+26]=24.59; // Co
+  vatom_xray_scatt[1+27]=25.02; // Ni
+  vatom_xray_scatt[1+28]=27.03; // Cu
+  vatom_xray_scatt[1+29]=28.44; // Zn
+  vatom_xray_scatt[1+46]=47.18; // Ag
+  vatom_xray_scatt[1+78]=74.99; // Au
+  vatom_xray_scatt[1+89]=86.64; // Th
 
   // Atomic masses
   // All indices are the atomic number shifted back by one.
   // All masses are in kilograms
 
   // not useful anymore all the masses are declared
-  //  atom_mass_vec=vector<double> (NUM_ELEMENTS,0.0);
+  //  vatom_mass=vector<double> (NUM_ELEMENTS,0.0);
   //  for(i=0;i<NUM_ELEMENTS;i++) {
-  //    atom_mass_vec[i]=(double)(2*i)*AMU2KILOGRAM;
+  //    vatom_mass[i]=(double)(2*i)*AMU2KILOGRAM;
   //  }
-  //  atom_mass_vec[1+0]=1.0079*AMU2KILOGRAM; //H
-  //  atom_mass_vec[1+7]=15.9994*AMU2KILOGRAM; //O
-  //  atom_mass_vec[1+24]=54.93805*AMU2KILOGRAM; //Mn
+  //  vatom_mass[1+0]=1.0079*AMU2KILOGRAM; //H
+  //  vatom_mass[1+7]=15.9994*AMU2KILOGRAM; //O
+  //  vatom_mass[1+24]=54.93805*AMU2KILOGRAM; //Mn
 
   // finish and copy
   
@@ -516,9 +516,9 @@ void atoms_initialize(void) {
 // **************************************************************************
 uint GetAtomNumber(const string& symbol) {
   for(uint iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
       return (uint) iat;
-  cerr << "GetAtomNumber symbol not found symbol=" << symbol << "  atom_name_vec.size()=" << atom_name_vec.size() << endl;
+  cerr << "GetAtomNumber symbol not found symbol=" << symbol << "  vatom_name.size()=" << vatom_name.size() << endl;
   return 0; // no symbol found
 }
 
@@ -527,16 +527,16 @@ uint GetAtomNumber(const string& symbol) {
 // **************************************************************************
 std::string GetAtomName(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_name_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_name.at(iat);
   return symbol;
 }
 std::string GetAtomName(const uint& atnum) {
-  if(atnum>=atom_name_vec.size() || atnum<=0) {
-    cerr << "GetAtomName out of boundary  atnum=" << atnum << "  atom_name_vec.size()=" << atom_name_vec.size() << endl;
+  if(atnum>=vatom_name.size() || atnum<=0) {
+    cerr << "GetAtomName out of boundary  atnum=" << atnum << "  vatom_name.size()=" << vatom_name.size() << endl;
     return "not found";
   }
-  return atom_name_vec.at(atnum);
+  return vatom_name.at(atnum);
 }
 
 // **************************************************************************
@@ -544,16 +544,16 @@ std::string GetAtomName(const uint& atnum) {
 // **************************************************************************
 std::string GetAtomSymbol(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_symbol_vec.at(iat))
-      return atom_symbol_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_symbol.at(iat))
+      return vatom_symbol.at(iat);
   return symbol;
 }
 std::string GetAtomSymbol(const uint& atnum) {
-  if(atnum>=atom_symbol_vec.size() || atnum<=0) {
-    cerr << "GetAtomSymbol out of boundary  atnum=" << atnum << "  atom_symbol_vec.size()=" << atom_symbol_vec.size() << endl;
+  if(atnum>=vatom_symbol.size() || atnum<=0) {
+    cerr << "GetAtomSymbol out of boundary  atnum=" << atnum << "  vatom_symbol.size()=" << vatom_symbol.size() << endl;
     return "not found";
   }
-  return atom_symbol_vec.at(atnum);
+  return vatom_symbol.at(atnum);
 }
 
 // **************************************************************************
@@ -563,16 +563,17 @@ double GetAtomMass(const string& _symbol,bool clean) { //CO181128
   string symbol=_symbol; //CO181128
   if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO181128
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_mass_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_mass.at(iat);
   return (double) NNN;
 }
+
 double GetAtomMass(const uint& atnum) {
-  if(atnum>=atom_mass_vec.size() || atnum<=0) {
-    cerr << "GetAtomMass out of boundary  atnum=" << atnum << "  atom_mass_vec.size()=" << atom_mass_vec.size() << endl;
+  if(atnum>=vatom_mass.size() || atnum<=0) {
+    cerr << "GetAtomMass out of boundary  atnum=" << atnum << "  vatom_mass.size()=" << vatom_mass.size() << endl;
     return (double) NNN;
   }
-  return atom_mass_vec.at(atnum);
+  return vatom_mass.at(atnum);
 }
 
 // **************************************************************************
@@ -622,16 +623,16 @@ double GetAtomVolume(const string& _symbol,bool clean) { //CO181128
   string symbol=_symbol; //CO181128
   if(clean){symbol=KBIN::VASP_PseudoPotential_CleanName(symbol);} //CO181128
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_volume_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_volume.at(iat);
   return (double) NNN;
 }
 double GetAtomVolume(const uint& atnum) {
-  if(atnum>=atom_volume_vec.size() || atnum<=0) {
-    cerr << "GetAtomVolume out of boundary  atnum=" << atnum << "  atom_volume_vec.size()=" << atom_volume_vec.size() << endl;
+  if(atnum>=vatom_volume.size() || atnum<=0) {
+    cerr << "GetAtomVolume out of boundary  atnum=" << atnum << "  vatom_volume.size()=" << vatom_volume.size() << endl;
     return (double) NNN;
   }
-  return atom_volume_vec.at(atnum);
+  return vatom_volume.at(atnum);
 }
 
 // **************************************************************************
@@ -639,17 +640,17 @@ double GetAtomVolume(const uint& atnum) {
 // **************************************************************************
 int GetAtomValenceIupac(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_valence_iupac_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_valence_iupac.at(iat);
   return (int) NNN;
 }
 
 int GetAtomValenceIupac(const uint& atnum) {
-  if(atnum>=atom_valence_iupac_vec.size() || atnum<=0) {
-    cerr << "GetAtomValenceIupac out of boundary  atnum=" << atnum << "  atom_valence_iupac_vec.size()=" << atom_valence_iupac_vec.size() << endl;
+  if(atnum>=vatom_valence_iupac.size() || atnum<=0) {
+    cerr << "GetAtomValenceIupac out of boundary  atnum=" << atnum << "  vatom_valence_iupac.size()=" << vatom_valence_iupac.size() << endl;
     return (int) NNN;
   }
-  return atom_valence_iupac_vec.at(atnum);
+  return vatom_valence_iupac.at(atnum);
 }
 
 // **************************************************************************
@@ -657,17 +658,17 @@ int GetAtomValenceIupac(const uint& atnum) {
 // **************************************************************************
 int GetAtomValenceStd(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_valence_std_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_valence_std.at(iat);
   return (int) NNN;
 }
 
 int GetAtomValenceStd(const uint& atnum) {
-  if(atnum>=atom_valence_std_vec.size() || atnum<=0) {
-    cerr << "GetAtomValenceStd out of boundary  atnum=" << atnum << "  atom_valence_std_vec.size()=" << atom_valence_std_vec.size() << endl;
+  if(atnum>=vatom_valence_std.size() || atnum<=0) {
+    cerr << "GetAtomValenceStd out of boundary  atnum=" << atnum << "  vatom_valence_std.size()=" << vatom_valence_std.size() << endl;
     return (int) NNN;
   }
-  return atom_valence_std_vec.at(atnum);
+  return vatom_valence_std.at(atnum);
 }
 
 // **************************************************************************
@@ -675,16 +676,16 @@ int GetAtomValenceStd(const uint& atnum) {
 // **************************************************************************
 double GetAtomRadius(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_radius_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_radius.at(iat);
   return (double) NNN;
 }
 double GetAtomRadius(const uint& atnum) {
-  if(atnum>=atom_radius_vec.size() || atnum<=0) {
-    cerr << "GetAtomRadius out of boundary  atnum=" << atnum << "  atom_radius_vec.size()=" << atom_radius_vec.size() << endl;
+  if(atnum>=vatom_radius.size() || atnum<=0) {
+    cerr << "GetAtomRadius out of boundary  atnum=" << atnum << "  vatom_radius.size()=" << vatom_radius.size() << endl;
     return (double) NNN;
   }
-  return atom_radius_vec.at(atnum);
+  return vatom_radius.at(atnum);
 }
 
 // DX and CO - 9/4/17 - START 
@@ -693,16 +694,16 @@ double GetAtomRadius(const uint& atnum) {
 // **************************************************************************
 double GetAtomRadiusCovalent(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_radius_covalent_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_radius_covalent.at(iat);
   return (double) NNN;
 }
 double GetAtomRadiusCovalent(const uint& atnum) {
-  if(atnum>=atom_radius_covalent_vec.size() || atnum<=0) {
-    cerr << "GetAtomRadiusCovalent out of boundary  atnum=" << atnum << "  atom_radius_covalent_vec.size()=" << atom_radius_covalent_vec.size() << endl;
+  if(atnum>=vatom_radius_covalent.size() || atnum<=0) {
+    cerr << "GetAtomRadiusCovalent out of boundary  atnum=" << atnum << "  vatom_radius_covalent.size()=" << vatom_radius_covalent.size() << endl;
     return (double) NNN;
   }
-  return atom_radius_covalent_vec.at(atnum);
+  return vatom_radius_covalent.at(atnum);
 }
 // DX and CO - 9/4/17 - END 
 
@@ -711,16 +712,16 @@ double GetAtomRadiusCovalent(const uint& atnum) {
 // **************************************************************************
 double GetAtomElectronegativity(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_electronegativity_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_electronegativity.at(iat);
   return (double) NNN;
 }
 double GetAtomElectronegativity(const uint& atnum) {
-  if(atnum>=atom_electronegativity_vec.size() || atnum<=0) {
-    cerr << "GetAtomElectronegativity out of boundary  atnum=" << atnum << "  atom_electronegativity_vec.size()=" << atom_electronegativity_vec.size() << endl;
+  if(atnum>=vatom_electronegativity.size() || atnum<=0) {
+    cerr << "GetAtomElectronegativity out of boundary  atnum=" << atnum << "  vatom_electronegativity.size()=" << vatom_electronegativity.size() << endl;
     return (double) NNN;
   }
-  return atom_electronegativity_vec.at(atnum);
+  return vatom_electronegativity.at(atnum);
 }
 
 // **************************************************************************
@@ -728,16 +729,16 @@ double GetAtomElectronegativity(const uint& atnum) {
 // **************************************************************************
 string GetAtomCrystal(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return atom_crystal_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_crystal.at(iat);
   return (string) "nnn";
 }
 string GetAtomCrystal(const uint& atnum) {
-  if(atnum>=atom_crystal_vec.size() || atnum<=0) {
-    cerr << "GetAtomCrystal out of boundary  atnum=" << atnum << "  atom_crystal_vec.size()=" << atom_crystal_vec.size() << endl;
+  if(atnum>=vatom_crystal.size() || atnum<=0) {
+    cerr << "GetAtomCrystal out of boundary  atnum=" << atnum << "  vatom_crystal.size()=" << vatom_crystal.size() << endl;
     return (string) "nnn";
   }
-  return atom_crystal_vec.at(atnum);
+  return vatom_crystal.at(atnum);
 }
 
 // **************************************************************************
@@ -745,17 +746,17 @@ string GetAtomCrystal(const uint& atnum) {
 // **************************************************************************
 double GetAtomPettiforScale(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return pettifor_scale.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_pettifor_scale.at(iat);
   return 0.0;
 }
 
 double GetAtomPettiforScale(const uint& atnum) {
-  if(atnum>=atom_crystal_vec.size() || atnum<=0) {
-    cerr << "GetAtomPettiforScale out of boundary  atnum=" << atnum << "  atom_crystal_vec.size()=" << atom_crystal_vec.size() << endl;
+  if(atnum>=vatom_crystal.size() || atnum<=0) {
+    cerr << "GetAtomPettiforScale out of boundary  atnum=" << atnum << "  vatom_crystal.size()=" << vatom_crystal.size() << endl;
     return 0.0;
   }
-  return pettifor_scale.at(atnum);
+  return vatom_pettifor_scale.at(atnum);
 }
 
 bool GetAtomPettiforScale(const vector<string>& vsymbol,vector<double>& vvalue) {
@@ -852,16 +853,16 @@ bool SortAtomsPettiforScale(vector<string> &vsymbol) {
 // **************************************************************************
 double GetAtomXrayScatt(const string& symbol) {
   for(int iat=0;iat<NUM_ELEMENTS;iat++)
-    if(symbol==atom_symbol_vec.at(iat) || symbol==atom_name_vec.at(iat))
-      return xray_scatt_vec.at(iat);
+    if(symbol==vatom_symbol.at(iat) || symbol==vatom_name.at(iat))
+      return vatom_xray_scatt.at(iat);
   return (double) NNN;
 }
 double GetAtomXrayScatt(const uint& atnum) {
-  if(atnum>=xray_scatt_vec.size() || atnum<=0) {
-    cerr << "GetAtomXrayScatt out of boundary  atnum=" << atnum << "  xray_scatt_vec.size()=" << xray_scatt_vec.size() << endl;
+  if(atnum>=vatom_xray_scatt.size() || atnum<=0) {
+    cerr << "GetAtomXrayScatt out of boundary  atnum=" << atnum << "  vatom_xray_scatt.size()=" << vatom_xray_scatt.size() << endl;
     return (double) NNN;
   }
-  return xray_scatt_vec.at(atnum);
+  return vatom_xray_scatt.at(atnum);
 }
 
 //DX 20181220 - get group of atoms - START 
@@ -933,7 +934,7 @@ vector<string> GetGroupOfAtoms(string& group_name){
 // **************************************************************************
 double GetPearsonCoefficient(const string& symbol) {
   for (int iat = 0; iat < NUM_ELEMENTS; iat++) {
-    if (symbol == atom_symbol_vec[iat] || symbol == atom_name_vec[iat]) {
+    if (symbol == vatom_symbol[iat] || symbol == vatom_name[iat]) {
       return GetPearsonCoefficient(iat);
     }
   }
@@ -944,16 +945,20 @@ double GetPearsonCoefficient(const string& symbol) {
 }
 
 double GetPearsonCoefficient(const int& iat) {
-  return pearson_coefficient.at(iat);
+  return vatom_pearson_coefficient.at(iat);
 }
 
 // **************************************************************************
-// Function GetCompoundAttenuationLenght
+// Function GetCompoundAttenuationLength
 // **************************************************************************
-double GetCompoundAttenuationLenght(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density) { // density in g/cm^3, return in cm
   if(species.size()!=composition.size()) {
-    cerr << "ERROR - GetCompoundAttenuationLenght: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
-    exit(0);}
+    //[CO190629 - no exit()]cerr << "ERROR - GetCompoundAttenuationLength: species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]" << endl;
+    //[CO190629 - no exit()]exit(0);
+    stringstream message; //CO190629
+    message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO190629
+    throw aurostd::xerror("GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
+  }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
   for(uint i=0;i<species.size();i++) {
@@ -965,14 +970,14 @@ double GetCompoundAttenuationLenght(const vector<string>& species,const vector<d
   return (double) numerator/denominator; // in cm
 }
 
-double GetCompoundAttenuationLenght(const deque<string>& _species,const deque<int>& _composition,const double& density) { // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density) { // density in g/cm^3, return in cm
   vector<double> composition;
   for(uint i=0;i<_composition.size();i++) 
     composition.push_back(double(_composition.at(i)));
   vector<string> species;
   for(uint i=0;i<_species.size();i++) 
     species.push_back(string(_species.at(i)));
-  return GetCompoundAttenuationLenght(species,composition,density);
+  return GetCompoundAttenuationLength(species,composition,density);
 }
 
 // **************************************************************************
@@ -1075,7 +1080,7 @@ uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vect
     for(uint j=0;j<letters.length();j++)
       if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
   
-  cerr << alloy << endl; exit(0);
+  cerr << alloy << endl; exit(0); //CO190629 - need to clean this exit(), but this function looks unused...
 
   speciesX.clear();
   for(uint i=0;i<alloy.length();i++) {
@@ -2189,6 +2194,7 @@ void xstructure::ClearSpecies() { // CO 180420 - helps with pocc, match with Add
 ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="XSTRUCTURE::operator<<():";
+  stringstream message;
   int a_iomode=a.iomode;
   //  DEBUG=TRUE;
   // ----------------------------------------------------------------------
@@ -2539,7 +2545,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(a.atoms.at(iat).name_is_given==TRUE) {
 	oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
-	cerr << "QE needs atoms species names" << endl; exit(0);
+	      //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
+	      message << "QE needs atoms species names";  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
       }
       for(uint j=1;j<=3;j++) {
 	//  oss << " ";
@@ -3019,6 +3027,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // this is also a constructor so everything should look well defined
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="XSTRUCTURE>>:";
+  stringstream message;
 
   if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
   if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
@@ -3039,29 +3048,35 @@ istream& operator>>(istream& cinput, xstructure& a) {
   //CO 180702 - detect NO input
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
-  if(input_no_spaces.empty()){cerr << soliloquy << " No input..." << endl; exit(0);}  // CO 180702
+  if(input_no_spaces.empty()){
+    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+  }  // CO 180702
 
   if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
   // now clean for comments, tabs, double spaces ... etc
   // CO 180409 - fixing for issues with # at the beginning of the line
   string::size_type loc;  // CO 180409
   for(uint i=1;i<vinput.size();i++) { // not 1st line
-    //aurostd::string2tokens(vinput.at(i),tokens,"//");  // stefano   // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput.at(i)=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //aurostd::string2tokens(vinput.at(i),tokens,"#");  // stefano    // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput.at(i)=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //aurostd::string2tokens(vinput.at(i),tokens,"!");  // for QE     // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
-    //if(i>0 && tokens.size()>0) vinput.at(i)=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"//");  // stefano   // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"#");  // stefano    // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //aurostd::string2tokens(vinput[i],tokens,"!");  // for QE     // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
+    //if(i>0 && tokens.size()>0) vinput[i]=tokens.at(0);           // CO 180409 - not the best way, as it will screw up for lines that START with comment delimiter
     if(i>0){  // CO 180409
-      loc=vinput.at(i).find("//");vinput.at(i)=vinput.at(i).substr(0,loc);
-      loc=vinput.at(i).find('#');vinput.at(i)=vinput.at(i).substr(0,loc);
-      loc=vinput.at(i).find("!");vinput.at(i)=vinput.at(i).substr(0,loc);
+      loc=vinput[i].find("//");vinput[i]=vinput[i].substr(0,loc);
+      loc=vinput[i].find('#');vinput[i]=vinput[i].substr(0,loc);
+      loc=vinput[i].find("!");vinput[i]=vinput[i].substr(0,loc);
     }
-    DeStupidizer(vinput.at(i));
+    DeStupidizer(vinput[i]);
   }
-  if(vinput.size()==0) {cerr << soliloquy << " No input..." << endl; exit(0);}  // CO 180420
+  if(vinput.size()==0) {
+    //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
+    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+  }  // CO 180420
   
-  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput.at(i) << " " << "[X]" << endl;   exit(0);
+  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
   string sstring,stmp;
   bool IOMODE_found=FALSE;
   vector<double> poccaus; // partial occupation local host
@@ -3094,30 +3109,33 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR" << endl;
     uint QE=0;
     bool QE_ERROR=FALSE;
-    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput.at(i) << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"&system",true)+aurostd::substring2bool(vinput.at(i),"&SYSTEM",true); // DX 1/23/18 - added true to clean the spaces in string
+    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"&system",true)+aurostd::substring2bool(vinput[i],"&SYSTEM",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(&system)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"ibrav=",true)+aurostd::substring2bool(vinput.at(i),"IBRAV=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ibrav=",true)+aurostd::substring2bool(vinput[i],"IBRAV=",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ibrav)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"nat=",true)+aurostd::substring2bool(vinput.at(i),"NAT=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"nat=",true)+aurostd::substring2bool(vinput[i],"NAT=",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(nat)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"ntyp=",true)+aurostd::substring2bool(vinput.at(i),"NTYP=",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ntyp=",true)+aurostd::substring2bool(vinput[i],"NTYP=",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ntyp)=" << QE << endl;
-    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput.at(i),"atomic_positions",true)+aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS",true); // DX 1/23/18 - added true to clean the spaces in string
+    for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"atomic_positions",true)+aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ATOMIC_POSITIONS)=" << QE << endl;
     
     for(uint i=0;i<vinput.size()&&QE==5;i++) {
-      if(aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS") && 
-	 !aurostd::substring2bool(vinput.at(i),"crystal","CRYSTAL") && 
-	 !aurostd::substring2bool(vinput.at(i),"bohr","BOHR") && // DX added
-	 !aurostd::substring2bool(vinput.at(i),"angstrom","ANGSTROM")) {
-	cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput.at(i) << "\"" << endl;QE_ERROR=TRUE;
+      if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && 
+	 !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
+	 !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
+	 !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
+	cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
-      if( aurostd::substring2bool(vinput.at(i),"&system")) {
-	//	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput.at(i) << "\"" << endl;QE_ERROR=TRUE;
+      if( aurostd::substring2bool(vinput[i],"&system")) {
+	//	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
     }
-    if(QE==5 && QE_ERROR) {cerr << soliloquy << " QE input errors..." << endl; exit(0);}
+    if(QE==5 && QE_ERROR) {
+      //[CO190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
+      throw aurostd::xerror(soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
+    }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
       if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR = TRUE" << endl;
@@ -3129,15 +3147,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " CIF DETECTOR" << endl;
     uint CIF=0;
-    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput.at(i) << endl;
+    if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput.at(i),"loop_",true)){ CIF+=1; break;}
+      if(aurostd::substring2bool(vinput[i],"loop_",true)){ CIF+=1; break;}
     }
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput.at(i),"_atom_site_",true)){ CIF+=1; break;}
+      if(aurostd::substring2bool(vinput[i],"_atom_site_",true)){ CIF+=1; break;}
     }
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(vinput.at(i),"_cell_length_",true)){ CIF+=1; break;}
+      if(aurostd::substring2bool(vinput[i],"_cell_length_",true)){ CIF+=1; break;}
     }
     if(CIF==3){
       a.iomode=IOCIF; 
@@ -3191,26 +3209,39 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(lat_found || atom_found){
           if(lat_found && tokens_line.size()<4){  //could be more, but not less
-            cerr << soliloquy << " AIMS input error, ";
-            cerr << "lattice_vector ";
-            cerr << "at line[" << i+1 << "] is ill-defined" << endl;
-            cerr << "line: " << vinput[i] << endl;
-            exit(1);
+            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO190629 - no exit()]cerr << "lattice_vector ";
+            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] is ill-defined" << endl;
+            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO190629 - no exit()]exit(1);
+            message << " AIMS input error, ";  //CO196029
+            message << "lattice_vector "; //CO190629
+            message << "at line[" << i+1 << "] is ill-defined" << endl; //CO190629
+            message << "line: " << vinput[i] << endl; //CO190629
+            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
-            cerr << soliloquy << " AIMS input error, ";
-            cerr << "atom position ";
-            cerr << "at line[" << i+1 << "] "; //CO 180627
-            if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO 180627
-            else {cerr << "is ill-defined" << endl;} //CO 180627
-            cerr << "line: " << vinput[i] << endl;
-            exit(1);
+            //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
+            //[CO190629 - no exit()]cerr << "atom position ";
+            //[CO190629 - no exit()]cerr << "at line[" << i+1 << "] "; //CO 180627
+            //[CO190629 - no exit()]if(tokens_line.size()==4){cerr << "is missing the atom name" << endl;} //CO 180627
+            //[CO190629 - no exit()]else {cerr << "is ill-defined" << endl;} //CO 180627
+            //[CO190629 - no exit()]cerr << "line: " << vinput[i] << endl;
+            //[CO190629 - no exit()]exit(1);
+            message << " AIMS input error, "; //CO190629
+            message << "atom position "; //CO190629
+            message << "at line[" << i+1 << "] "; //CO190629
+            if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO190629
+            else {message << "is ill-defined" << endl;} //CO190629
+            message << "line: " << vinput[i] << endl;  //CO190629
+            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
           }
         }
       }
       if(!atom_found_anywhere){
-        cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
-        exit(1);
+        //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
+        //[CO190629 - no exit()]exit(1);
+        throw aurostd::xerror(soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -3226,14 +3257,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
-              exit(1);
+              //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
+              //[CO190629 - no exit()]exit(1);
+              throw aurostd::xerror(soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
-          exit(1);
+          //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
+          //[CO190629 - no exit()]exit(1);
+          throw aurostd::xerror(soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
         }
       }
     }
@@ -3276,25 +3309,34 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- TITLE
     // input.getline(stmp,MAX_TITLE_SIZE);title=stmp;
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     a.title=vinput.at(iline++);
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing second line in poscar" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing second line in poscar" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
     a.scale=0.0;
@@ -3307,9 +3349,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // oss << sstring << endl;
     // -------------- UNIT CELL
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -3327,16 +3372,22 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.lattice(1,3)=aurostd::string2utype<double>(tokens[2]);
       stringstream input_tmp;
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -3393,29 +3444,61 @@ istream& operator>>(istream& cinput, xstructure& a) {
     clear(a.origin);
     // ---------------------------------------------------------------
     // -------------- CHECK VASP4 VASP5 and CHECK DIRECT/CARTESIANS STUFF
-    if(a.iomode==IOVASP_POSCAR) stmp=vinput.at(6);
-    if(a.iomode==IOVASP_ABCCAR) stmp=vinput.at(4);
-    if(a.iomode==IOVASP_WYCKCAR) stmp=vinput.at(4);
+    //CO190629 - shift to line with Direct/Cartesian to find POCC specification
+    //don't worry about setting Selective Dynamics yet (but be aware of it)
+    if(a.iomode==IOVASP_POSCAR) stmp=vinput[6]; //true for VASP4, change if VASP5 later
+    if(a.iomode==IOVASP_ABCCAR) stmp=vinput[4];
+    if(a.iomode==IOVASP_WYCKCAR) stmp=vinput[4];
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
     aurostd::string2tokens(stmp,tokens);
     if(tokens.size()==0) {
-      oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing D/C/S line" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      //[CO190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO190629
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
     }
-  
-    if(tokens.at(0)[0]=='S' || tokens.at(0)[0]=='s' || tokens.at(0)[0]=='D' || tokens.at(0)[0]=='d' || tokens.at(0)[0]=='C' || tokens.at(0)[0]=='c') {
-      // VASP 4
-      a.is_vasp4_poscar_format=TRUE;
-      a.is_vasp5_poscar_format=FALSE;
-    } else {
+
+    // VASP 4
+    a.is_vasp4_poscar_format=TRUE;
+    a.is_vasp5_poscar_format=FALSE;
+    
+    if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       // VASP 5
       a.is_vasp4_poscar_format=FALSE;
       a.is_vasp5_poscar_format=TRUE;
+      //Kesong Yang identified this bug, we need to shift the line if vasp5, also if selective dynamics
+      uint ijline=0;
+      if(a.iomode==IOVASP_POSCAR) ijline=7;
+      if(a.iomode==IOVASP_ABCCAR) ijline=5;
+      if(a.iomode==IOVASP_WYCKCAR) ijline=5;
+      if(tokens[0][0]=='S' || tokens[0][0]=='s'){ijline++;} //selective dynamics
+      stmp=vinput.at(ijline);
+      aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
+      aurostd::string2tokens(stmp,tokens);  //now we should have D/C line
     }
+    
+    if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
+      message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+    }
+  
+    //[CO190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
+    //[CO190629 - OBSOLETE]  // VASP 4
+    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
+    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=FALSE;
+    //[CO190629 - OBSOLETE]} else {
+    //[CO190629 - OBSOLETE]  // VASP 5
+    //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
+    //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
+    //[CO190629 - OBSOLETE]}
+    
     a.partial_occupation_flag=FALSE;
 
-    for(uint j=1;j<tokens.size();j++) if(tokens.at(j)[0]=='P' || tokens.at(j)[0]=='P') a.partial_occupation_flag=TRUE;
+    for(uint j=1;j<tokens.size();j++) if(tokens[j][0]=='P' || tokens[j][0]=='p') a.partial_occupation_flag=TRUE;
     //if(a.scale_second==0.0) { // CO 180409
     a.partial_occupation_HNF=0; // nothing defined // CO 180409
     a.partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  // CO 170803 - site tol
@@ -3442,11 +3525,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     //if(a.partial_occupation_flag && a.scale_third.isentry){a.partial_occupation_site_tol=a.scale_third.content_double;} // CO 170803 - site tol
 
+    //last line was last lattice vector/geometry line
     if(a.is_vasp5_poscar_format) {
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -3454,8 +3541,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // -------------- ATOMS
     // Number of atoms of each type and total number of atoms.
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -3466,9 +3556,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     tmpns=aurostd::RemoveWhiteSpaces(stmp);
     if(string(tmpns).size()==0) {
       if(vinput.size()-1<iline) {
-	oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "missing line[" << iline << "]" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -3480,53 +3573,59 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //    a.partial_occupation_flag=FALSE;
     for(uint i=0;i<tokens_i.size()&&!a.partial_occupation_flag;i++)
       if(aurostd::substring2bool(tokens_i.at(i),"*") || aurostd::substring2bool(tokens_i.at(i),"+"))
-	a.partial_occupation_flag=TRUE;
+        a.partial_occupation_flag=TRUE;
     // -------------- no partial occupation
     if(a.partial_occupation_flag==FALSE) {
       if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION = FALSE" << endl;
       for(uint i=0;i<tokens_i.size();i++) {
-	number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
-	a.num_each_type.push_back(number); num_atoms+=number;
-	for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
-	for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+        number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
+        a.num_each_type.push_back(number); num_atoms+=number;
+        for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
+        for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
       }
     }
     // -------------- yes partial occupation
     if(a.partial_occupation_flag==TRUE) {
       if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION = TRUE" << endl;
       for(uint i=0;i<tokens_i.size();i++) {
-	if(!aurostd::substring2bool(tokens_i.at(i),"*") && !aurostd::substring2bool(tokens_i.at(i),"+")) { // NO POCC KEYWORD
-	  number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
-	  a.num_each_type.push_back(number); num_atoms+=number;
-	  for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
-	  for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
-	} else {
-	  aurostd::string2tokens(tokens_i.at(i),tokens_j,"+");if(LDEBUG) cerr << "tokens_j.size()=" << tokens_j.size() << endl;
-	  number=0;int nnumber;
-	  for(uint j=0;j<tokens_j.size();j++) {
-	    aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
-	    if(tokens_k.size()==0) {
-	      oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
-	      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	      exit(0);
-	    }
-	    nnumber=aurostd::string2utype<int>(tokens_k.at(0));
-	    if(tokens_k.size()==1) dpocc=1.0;
-	    if(tokens_k.size()==2) {dpocc=aurostd::string2utype<double>(tokens_k.at(1));} // SOMETHING FOR ROUNDING DPOCC UP TO FRACTIONS....
-	    number+=nnumber; num_atoms+=nnumber;
-	    for(uint l=0;l<(uint) nnumber;l++) poccaus.push_back(dpocc);
-	    for(uint l=0;l<(uint) nnumber;l++) {
-	      if(tokens_k.size()==1) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_); // no specie number
-	      if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
-	    }
-	    if(tokens_k.size()>=3) {
-	      oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
-	      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	      exit(0);
-	    }
-	  } // loop on +
-	  a.num_each_type.push_back(number);
-	}
+        if(!aurostd::substring2bool(tokens_i.at(i),"*") && !aurostd::substring2bool(tokens_i.at(i),"+")) { // NO POCC KEYWORD
+          number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
+          a.num_each_type.push_back(number); num_atoms+=number;
+          for(uint l=0;l<(uint) number;l++) poccaus.push_back(dpocc);
+          for(uint l=0;l<(uint) number;l++) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+        } else {
+          aurostd::string2tokens(tokens_i.at(i),tokens_j,"+");if(LDEBUG) cerr << "tokens_j.size()=" << tokens_j.size() << endl;
+          number=0;int nnumber;
+          for(uint j=0;j<tokens_j.size();j++) {
+            aurostd::string2tokens(tokens_j.at(j),tokens_k,"*");
+            if(tokens_k.size()==0) {
+              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl;
+              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            }
+            nnumber=aurostd::string2utype<int>(tokens_k.at(0));
+            if(tokens_k.size()==1) dpocc=1.0;
+            if(tokens_k.size()==2) {dpocc=aurostd::string2utype<double>(tokens_k.at(1));} // SOMETHING FOR ROUNDING DPOCC UP TO FRACTIONS....
+            number+=nnumber; num_atoms+=nnumber;
+            for(uint l=0;l<(uint) nnumber;l++) poccaus.push_back(dpocc);
+            for(uint l=0;l<(uint) nnumber;l++) {
+              if(tokens_k.size()==1) a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_); // no specie number
+              if(tokens_k.size()==2) a.partial_occupation_sublattice.push_back(i); // put specie number
+            }
+            if(tokens_k.size()>=3) {
+              //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl;
+              //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+              //[CO190629 - no exit()]exit(0);
+              message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO190629
+              for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            }
+          } // loop on +
+          a.num_each_type.push_back(number);
+        }
       }
       if(LDEBUG) {cerr << "P(" << poccaus.size()<< ") = ";for(uint j=0;j<poccaus.size();j++) cerr << poccaus.at(j) << " ";cerr << endl;}
     }
@@ -3538,9 +3637,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
     string stmp;
     if(LDEBUG) cerr << soliloquy << " DEBUG [1]" << endl;
     if(vinput.size()-1<iline) {
-      oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "missing line[" << iline << "]" << endl; //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -3548,50 +3650,62 @@ istream& operator>>(istream& cinput, xstructure& a) {
     aurostd::string2tokens(stmp,stmp_tokens);
     // Note that if there are spaces at the beginning of the line we have to remove them.
     if(stmp_tokens.size()==0) {
-      oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>:  Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     } else {
       if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
       a.order_parameter_structure=FALSE;
       if(sstmp[0]=='S' || sstmp[0]=='s') {
-	a.isd=TRUE;
-	if(vinput.size()-1<iline){
-	  oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}  // CO 180420 - check for missing lines
-	stmp=vinput.at(iline++);
-	sstmp=aurostd::RemoveSpaces(stmp);
+        a.isd=TRUE;
+        if(vinput.size()-1<iline){
+          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> missing line[" << iline << "]" << endl;
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "missing line[" << iline << "]" << endl; //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }  // CO 180420 - check for missing lines
+        stmp=vinput.at(iline++);
+        sstmp=aurostd::RemoveSpaces(stmp);
       }
       if(LDEBUG) cerr << soliloquy << " DEBUG [3]" << endl;
       if(sstmp[0]=='D' || sstmp[0]=='d') {
-	//	cerr << "FRAC" << endl;
-	a.coord_type[0]=sstmp[0];
-	a.coord_flag=_COORDS_FRACTIONAL_;
+        //	cerr << "FRAC" << endl;
+        a.coord_type[0]=sstmp[0];
+        a.coord_flag=_COORDS_FRACTIONAL_;
       } else {
-	if(sstmp[0]=='C' || sstmp[0]=='c') {
-	  //	  cerr << "CART" << endl;
-	  a.coord_type[0]=sstmp[0];
-	  a.coord_flag=_COORDS_CARTESIAN_;
-	  if(a.iomode==IOVASP_WYCKCAR) {
-	    oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
-	    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	    exit(0);
-	  }
-	} else {
-	  oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}
+        if(sstmp[0]=='C' || sstmp[0]=='c') {
+          //	  cerr << "CART" << endl;
+          a.coord_type[0]=sstmp[0];
+          a.coord_flag=_COORDS_CARTESIAN_;
+          if(a.iomode==IOVASP_WYCKCAR) {
+            //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;
+            //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+            //[CO190629 - no exit()]exit(0);
+            message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO190629
+            for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          }
+        } else {
+          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Did not find coordinate type D/d or C/c." << endl;  //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }
       }
       a.coord_type[1]='\0';
       if(stmp_tokens.size()>1) {
-	for(uint ipos=1;ipos<stmp_tokens.size();ipos++) {
-	  if(stmp_tokens.at(ipos)[0]=='O' || stmp_tokens.at(ipos)[0]=='o') a.order_parameter_structure=TRUE;
-	  //	  if(stmp_tokens.at(ipos)[0]=='P' || stmp_tokens.at(ipos)[0]=='p') a.partial_occupation_flag=TRUE;
-	}
+        for(uint ipos=1;ipos<stmp_tokens.size();ipos++) {
+          if(stmp_tokens.at(ipos)[0]=='O' || stmp_tokens.at(ipos)[0]=='o') a.order_parameter_structure=TRUE;
+          //	  if(stmp_tokens.at(ipos)[0]=='P' || stmp_tokens.at(ipos)[0]=='p') a.partial_occupation_flag=TRUE;
+        }
       }
       if(LDEBUG) cerr << soliloquy << " DEBUG a.order_parameter_structure=" << a.order_parameter_structure << endl;
     }
@@ -3625,32 +3739,38 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(itype=0;itype<a.num_each_type.size();itype++) {
       //  cerr << a.num_each_type.at(itype) << endl;
       for(j=0;j<(uint) a.num_each_type.at(itype);j++) {
-	if(LDEBUG) cerr << soliloquy << " DEBUG [5] itype,j=" << itype << "," << j << endl;
-	//	bool plug_atom=TRUE;
+        if(LDEBUG) cerr << soliloquy << " DEBUG [5] itype,j=" << itype << "," << j << endl;
+        //	bool plug_atom=TRUE;
         iat++; // it startf from -1 so the first is ZERO
         //  cerr << iat << " type=" << itype << endl;
         //  for(int iat=1;iat<=(num_atoms);iat++) {
         // cerr << iat << " " << (num_atoms) << endl;
         _atom atom;                                        // create new atom
         string stmp;
-  	stmp=vinput.at(iline++);
-	if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
-	if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
-	  oss << "ERROR:  Unsufficient number of atom lines." << endl;
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}  
-	if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
+        stmp=vinput.at(iline++);
+        if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
+        if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
+          //[CO190629 - no exit()]oss << "ERROR:  Unsufficient number of atom lines." << endl;
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Insufficient number of atom lines." << endl;  //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }  
+        if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
-	aurostd::StringSubst(stmp,"\t"," ");
-	std::vector<string> stmp_tokens;
-	aurostd::string2tokens(stmp,stmp_tokens);
-	if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
-	if(stmp_tokens.size()<3) {
-	  oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO 180409
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
-	}  
+        aurostd::StringSubst(stmp,"\t"," ");
+        std::vector<string> stmp_tokens;
+        aurostd::string2tokens(stmp,stmp_tokens);
+        if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
+        if(stmp_tokens.size()<3) {
+          //[CO190629 - no exit()]oss << "ERROR:  Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; // CO 180409
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        }  
 
         int id=0;
         string name;
@@ -3671,83 +3791,89 @@ istream& operator>>(istream& cinput, xstructure& a) {
         atom.basis=iat;     // position in the basis
         atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
         atom.corigin(1)=0.0;atom.corigin(2)=0.0;atom.corigin(3)=0.0; // inside the zero cell
-	atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
+        atom.coord(1)=0.0;atom.coord(2)=0.0;atom.coord(3)=0.0; // inside the zero cell
         atom.spin=0.0;
         atom.noncoll_spin.clear(); // DX 12/5/17 - non-collinear spin
         atom.type=itype;                // CONVASP_MODE if I want type 0,1,2,3,...
-	atom.order_parameter_value=0;
-	atom.order_parameter_atom=FALSE;
-	atom.partial_occupation_value=1.0;
-	atom.partial_occupation_flag=FALSE;
-	//	plug_atom=TRUE;   // not used
-	// NO ORDER PARAMETER
-	if(LDEBUG) cerr << soliloquy << " DEBUG [7]" << endl;
-	if(a.order_parameter_structure==FALSE) {
-	  // stmp_tokens.size() = 4 (plus possible comments).
-	  // Read in the names.
-	  if(stmp_tokens.size()==4 || (stmp_tokens.size()>=4 && a.isd==0)) {
-	    atom.name=stmp_tokens.at(id++);
-	    atom.CleanName();
-	    atom.CleanSpin();
-	    atom.name_is_given=TRUE;
-	  }
-	  // stmp_tokens.size()=6
-	  if(a.isd!=0 && stmp_tokens.size()==6) {
-	    string sdt;
-	    for(int ic=1;ic<=3;ic++)
-	      sdt=sdt+stmp_tokens.at(id++);
-	    atom.sd=sdt;
-	  }
-	  // stmp_tokens.size()=7
-	  if(a.isd==TRUE && stmp_tokens.size()>=7) {
-	    string sdt;
-	    for(int ic=1;ic<=3;ic++)
-	      sdt=sdt+stmp_tokens.at(id++);
-	    atom.sd=sdt;
-	    atom.name=stmp_tokens.at(id++);
-	    atom.CleanName();
-	    atom.CleanSpin();
-	    atom.name_is_given=TRUE;
-	  }
-	}
-	// ORDER PARAMETER
-	if(a.order_parameter_structure==TRUE) {
-	  if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
-	    if(a.order_parameter_structure==TRUE) {
-	      cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
-	      cerr << "  x y z Name OrderParameter "                     << endl;
-	      cerr << " where x,y,z are the coordinates " << endl;
-	      cerr << " Name is the symbol of the atom  " << endl;
-	      cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
-	      cerr << " good luck" << endl;
-	      exit(0);
-	    }
-	  }
-	  if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
-	    atom.name=stmp_tokens.at(id);
-	    atom.CleanName();atom.CleanSpin();
-	    atom.name_is_given=TRUE;
-	    id++;
-	    if(a.order_parameter_structure==TRUE) {
-	      if(stmp_tokens.at(id)=="-") {
-		atom.order_parameter_value=0;
-		atom.order_parameter_atom=FALSE;
-	      } else {
-		if(stmp_tokens.at(id)=="*") {
-		  atom.order_parameter_value=0;
-		  atom.order_parameter_atom=TRUE;
-		} else {
-		  atom.order_parameter_value=atoi(stmp_tokens.at(id).c_str());
-		  atom.order_parameter_atom=TRUE;
-		  a.order_parameter_sum+=atom.order_parameter_value;
-		}
-	      }
-	      id++;
-	    }
-	  }
-	}
-	if(LDEBUG) cerr << soliloquy << " DEBUG [8]" << endl;
-	// now plug atom into the atomlist
+        atom.order_parameter_value=0;
+        atom.order_parameter_atom=FALSE;
+        atom.partial_occupation_value=1.0;
+        atom.partial_occupation_flag=FALSE;
+        //	plug_atom=TRUE;   // not used
+        // NO ORDER PARAMETER
+        if(LDEBUG) cerr << soliloquy << " DEBUG [7]" << endl;
+        if(a.order_parameter_structure==FALSE) {
+          // stmp_tokens.size() = 4 (plus possible comments).
+          // Read in the names.
+          if(stmp_tokens.size()==4 || (stmp_tokens.size()>=4 && a.isd==0)) {
+            atom.name=stmp_tokens.at(id++);
+            atom.CleanName();
+            atom.CleanSpin();
+            atom.name_is_given=TRUE;
+          }
+          // stmp_tokens.size()=6
+          if(a.isd!=0 && stmp_tokens.size()==6) {
+            string sdt;
+            for(int ic=1;ic<=3;ic++)
+              sdt=sdt+stmp_tokens.at(id++);
+            atom.sd=sdt;
+          }
+          // stmp_tokens.size()=7
+          if(a.isd==TRUE && stmp_tokens.size()>=7) {
+            string sdt;
+            for(int ic=1;ic<=3;ic++)
+              sdt=sdt+stmp_tokens.at(id++);
+            atom.sd=sdt;
+            atom.name=stmp_tokens.at(id++);
+            atom.CleanName();
+            atom.CleanSpin();
+            atom.name_is_given=TRUE;
+          }
+        }
+        // ORDER PARAMETER
+        if(a.order_parameter_structure==TRUE) {
+          if(stmp_tokens.size()!=5 && stmp_tokens.size()!=6) {
+            if(a.order_parameter_structure==TRUE) {
+              //[CO190629 - no exit()]cerr << "ERROR - xstructure::operator>>: with the order parameter you must specify " << endl;
+              //[CO190629 - no exit()]cerr << "  x y z Name OrderParameter "                     << endl;
+              //[CO190629 - no exit()]cerr << " where x,y,z are the coordinates " << endl;
+              //[CO190629 - no exit()]cerr << " Name is the symbol of the atom  " << endl;
+              //[CO190629 - no exit()]cerr << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl;
+              //[CO190629 - no exit()]cerr << " good luck" << endl;
+              //[CO190629 - no exit()]exit(0);
+              message << "With the order parameter you must specify " << endl;  //CO190629
+              message << "  x y z Name OrderParameter "                     << endl;  //CO190629
+              message << " where x,y,z are the coordinates " << endl; //CO190629
+              message << " Name is the symbol of the atom  " << endl; //CO190629
+              message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO190629
+              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            }
+          }
+          if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
+            atom.name=stmp_tokens.at(id);
+            atom.CleanName();atom.CleanSpin();
+            atom.name_is_given=TRUE;
+            id++;
+            if(a.order_parameter_structure==TRUE) {
+              if(stmp_tokens.at(id)=="-") {
+                atom.order_parameter_value=0;
+                atom.order_parameter_atom=FALSE;
+              } else {
+                if(stmp_tokens.at(id)=="*") {
+                  atom.order_parameter_value=0;
+                  atom.order_parameter_atom=TRUE;
+                } else {
+                  atom.order_parameter_value=atoi(stmp_tokens.at(id).c_str());
+                  atom.order_parameter_atom=TRUE;
+                  a.order_parameter_sum+=atom.order_parameter_value;
+                }
+              }
+              id++;
+            }
+          }
+        }
+        if(LDEBUG) cerr << soliloquy << " DEBUG [8]" << endl;
+        // now plug atom into the atomlist
         //      cerr <<  atom.name << endl;
         //      cerr <<  atom.cleanname << endl;
         //      cerr <<  atom.name_is_given << endl;
@@ -3774,7 +3900,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     iline=vinput.size();
     // DX 1/23/18 - added nat - START
     for(uint i=0;i<vinput.size();i++){ 
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"NAT=",true)){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NAT=",true)){
         vector<string> comma_tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
@@ -3788,25 +3914,25 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     // DX 1/23/18 - added nat - END
     for(uint i=0;i<vinput.size();i++){
-      // DX 1/23/18 [OBSOLETE]  if(aurostd::substring2bool(vinput.at(i),"CELL_PARAMETERS") && 
-      // DX 1/23/18 [OBSOLETE]    aurostd::substring2bool(vinput.at(i),"angstrom","ANGSTROM")) {iline=i+1;jline=i;}
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"CELL_PARAMETERS")){ // DX 1/24/17 - added aurostd::toupper
-        if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ANGSTROM")){
+      // DX 1/23/18 [OBSOLETE]  if(aurostd::substring2bool(vinput[i],"CELL_PARAMETERS") && 
+      // DX 1/23/18 [OBSOLETE]    aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {iline=i+1;jline=i;}
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELL_PARAMETERS")){ // DX 1/24/17 - added aurostd::toupper
+        if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")){
           iline=i+1;jline=i;
         }
-        else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ALAT")){ // DX 2/15/18 - added alat bool
+        else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ALAT")){ // DX 2/15/18 - added alat bool
           iline=i+1;jline=i;                                                     // DX 2/15/18 - added alat bool
           alat = true;                                                           // DX 2/15/18 - added alat bool
         }
         // DX 1/23/18 - added bohr - START
-        else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"BOHR")){
+        else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")){
           iline=i+1;jline=i;
           bohr_lat = true;
         }
         // DX 1/23/18 - added bohr - END
       }
       // DX 1/23/18 - added ibrav - START
-      else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"IBRAV=",true)){
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"IBRAV=",true)){
         vector<string> comma_tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
         for(uint j=0;j<comma_tokens.size();j++){
@@ -3825,7 +3951,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
       // celldm variant
       for(uint i=0;i<vinput.size();i++){
-        if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"CELLDM")){
+        if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
           vector<string> comma_tokens; 
           aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
@@ -3846,7 +3972,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(celldm_count == 0){
         isabc = true;
 	for(uint i=0;i<vinput.size();i++){
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"A=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3859,7 +3985,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"B=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3872,7 +3998,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"C=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3885,7 +4011,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"COSAB=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3898,7 +4024,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"COSAC=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3911,7 +4037,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 	      }
 	    }
 	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput.at(i))),"COSBC=")){
+	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
 	    vector<string> comma_tokens; 
 	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
 	    for(uint j=0;j<comma_tokens.size();j++){
@@ -3973,18 +4099,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // cerr << "vinput.size()=" << vinput.size() << endl;
     // NOW ADD ATOMS
     for(uint i=0;i<vinput.size();i++) {
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput.at(i),"crystal","CRYSTAL")) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"CRYSTAL")) { // DX 1/24/18 - added aurostd::toupper
+      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL")) {
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) { // DX 1/24/18 - added aurostd::toupper
 	iline=i+1;a.coord_flag=_COORDS_FRACTIONAL_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
       }
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput.at(i),"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput.at(i),"angstrom","ANGSTROM")) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ANGSTROM")) { // DX 1/24/18 - added aurostd::toupper
+      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) { // DX 1/24/18 - added aurostd::toupper
 	iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
       }
       // DX 1/24/18 -- added Bohr case - START
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"BOHR")) { // DX 1/24/18 - added aurostd::toupper
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")) { // DX 1/24/18 - added aurostd::toupper
 	iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
         bohr_pos = true;
@@ -3996,14 +4122,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
       _atom atom;                                        // create new atom
       string stmp;
       xvector<double> v(3);clear(v);
-      stmp=vinput.at(i);       stmp=aurostd::RemoveCharacter(vinput.at(i),'\t');aurostd::StringSubst(stmp,"\t"," ");
+      stmp=vinput[i];       stmp=aurostd::RemoveCharacter(vinput[i],'\t');aurostd::StringSubst(stmp,"\t"," ");
       std::vector<string> stmp_tokens;
       aurostd::string2tokens(stmp,stmp_tokens);
       if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
       if(stmp_tokens.size()<4) {
-	oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO 180409
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Insufficient number of atom entries in atom=" << i << "" << endl; // CO 180409
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }  
       int id=0;
       string name;
@@ -4078,30 +4207,47 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.spacegroupnumberoption=0;
     // get space group
     for(uint i=0;i<vinput.size();i++) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SYMMETRY_INT_TABLES_NUMBER")){ // converted to upper to be case insensitive
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SYMMETRY_INT_TABLES_NUMBER")){ // converted to upper to be case insensitive
         vector<string> tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput.at(i))),tokens,"_SYMMETRY_INT_TABLES_NUMBER"); // converted to upper to be case insensitive
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SYMMETRY_INT_TABLES_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
 	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
-      else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SPACE_GROUP_IT_NUMBER")){ // converted to upper to be case insensitive
+      else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_IT_NUMBER")){ // converted to upper to be case insensitive
         vector<string> tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput.at(i))),tokens,"_SPACE_GROUP_IT_NUMBER"); // converted to upper to be case insensitive
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SPACE_GROUP_IT_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
 	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
+      //DX 20190708 - added another space group variant - START
+      else if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SYMMETRY_SPACE_GROUP_NAME_H-M")){ // converted to upper to be case insensitive
+        vector<string> tokens; 
+        aurostd::string2tokens(vinput.at(i),tokens);
+        if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_H-M"){
+          tokens.erase(tokens.begin());
+          string spacegroupsymbol = aurostd::joinWDelimiter(tokens,"");
+          spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\''); //clean
+          spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\"'); //clean
+          a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol);
+        }
+      }
+      //DX 20190708 - added another space group variant - END
     }
     // get space group setting
     string spacegroup_Hall="";
     for(uint i=0;i<vinput.size();i++) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput.at(i)),"_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_NAME_HALL")){ // converted to upper to be case insensitive
         vector<string> tokens; 
-        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput.at(i))),tokens,"_SPACE_GROUP_NAME_HALL"); // converted to upper to be case insensitive
-        if(tokens.size()==1){
-	  spacegroup_Hall = aurostd::string2utype<uint>(tokens.at(0));
+        //DX 20190708 - fix Hall reader - START
+        if(aurostd::toupper(tokens.at(0))=="_SYMMETRY_SPACE_GROUP_NAME_H-M"){
+          tokens.erase(tokens.begin());
+          spacegroup_Hall = aurostd::joinWDelimiter(tokens," "); //need a space here for Hall designation
+          spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\''); //clean
+          spacegroup_Hall = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroup_Hall,'\"'); //clean
         }
+        //DX 20190708 - fix Hall reader - END
       }
     }
     bool found_setting = false;
@@ -4126,13 +4272,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
 //      bool found_symops=FALSE;
 //      cerr << "wyckoff_multiplicities[1]: " << wyckoff_multiplicities[1] << endl;
 //      for(uint i=0;i<vinput.size();i++) {
-//	if(aurostd::substring2bool(vinput.at(i),"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput.at(i),"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
+//	if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
 //	  found_symops=TRUE;
 //	}
 //	else if(found_symops && multiplicity_count<wyckoff_multiplicities[1]){
 //	  multiplicity_count+=1;
 //	  vector<string> tokens; 
-//	  aurostd::string2tokens(vinput.at(i),tokens," ");
+//	  aurostd::string2tokens(vinput[i],tokens," ");
 //	  if(tokens.size()==2){
 //	    spacegroup_symop_xyz.push_back(tokens[1]);
 //	  }
@@ -4153,93 +4299,103 @@ istream& operator>>(istream& cinput, xstructure& a) {
       vector<string> spacegroup_symop_xyz;  
       int multiplicity_count=0;
       bool found_symops=FALSE;
+      bool found_symop_id=FALSE; //DX 20190708
       for(uint i=0;i<vinput.size();i++) {
-	if(aurostd::substring2bool(vinput.at(i),"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput.at(i),"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
-	  found_symops=TRUE;
-	}
-	else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
-	  multiplicity_count+=1;
-	  vector<string> tokens; 
-	  aurostd::string2tokens(vinput.at(i),tokens," ");
-    // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
-    tokens.erase(tokens.begin()+0); //erase symop index, not needed
-    string symop = aurostd::joinWDelimiter(tokens,"");
-    symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
-    symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
-    symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
-	  spacegroup_symop_xyz.push_back(symop);
-    //if(tokens.size()==2){
-	  //  spacegroup_symop_xyz.push_back(tokens[1]);
-	  //}
-    // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
-	
-	}
+        if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
+          found_symops=TRUE;
+        }
+        else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX 20190708
+          found_symop_id=TRUE;
+        }
+        else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
+          multiplicity_count+=1;
+          vector<string> tokens; 
+          aurostd::string2tokens(vinput[i],tokens," ");
+          // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
+          if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX 20190708 - enclose in if-statement
+          string symop = aurostd::joinWDelimiter(tokens,"");
+          symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
+          symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
+          symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
+          symop = SYM::reorderWyckoffPosition(symop); //DX 20190708 - standardize order of equation (variable first, then number)
+          spacegroup_symop_xyz.push_back(symop);
+          //if(tokens.size()==2){
+          //  spacegroup_symop_xyz.push_back(tokens[1]);
+          //}
+          // DX 20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
+        }
       }
       // compare cif and aflow's general position
       uint match_count=0;
       if(general_wyckoff_position.size()==spacegroup_symop_xyz.size()){
-	for(uint i=0;i<general_wyckoff_position.size();i++){
+        for(uint i=0;i<general_wyckoff_position.size();i++){
           bool match_found = false;
-	  for(uint j=0;j<spacegroup_symop_xyz.size();j++){
-	    if(general_wyckoff_position[i]==spacegroup_symop_xyz[j]){
+          for(uint j=0;j<spacegroup_symop_xyz.size();j++){
+            if(general_wyckoff_position[i]==spacegroup_symop_xyz[j]){
               match_found = true;
-	      match_count+=1;
+              match_count+=1;
               break;
-	    }
-	  }
+            }
+          }
           if(!match_found){
             if(LDEBUG) {
               cerr << "WARNING: Could not match " << i << ": " << general_wyckoff_position[i] << " to any symop in CIF. Trying other setting (if exists)." << endl;
             }
             break;
           }
-	}
-	if(match_count!=general_wyckoff_position.size()){
-	  //oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
-	  //print(general_wyckoff_position);
-	  //print(spacegroup_symop_xyz);
-	  //exit(0);
+        }
+        if(match_count!=general_wyckoff_position.size()){
+          //oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
+          //print(general_wyckoff_position);
+          //print(spacegroup_symop_xyz);
+          //exit(0);
           continue; //try a different setting
-	}
-	else {
-	  a.spacegroupnumberoption = setting_number;
+        }
+        else {
+          a.spacegroupnumberoption = setting_number;
           found_setting = true;
           break; //found setting
-	}
+        }
       }
       else {
-	oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
-            << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
-	for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	exit(0);
+        //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Number of symmetry operations do not match between input operations and space group number (aflow=" 
+        //[CO190629 - no exit()]  << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl; 
+        //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+        //[CO190629 - no exit()]exit(0);
+        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO190629
+          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO190629
+        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
       }
     }
     if(!found_setting){
-      oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
-
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
       vector<string> tokens;
       aurostd::string2tokens(vinput[i],tokens," ");
-      if(aurostd::substring2bool(vinput.at(i),"_cell_length_a") && tokens.size()==2){
+      if(aurostd::substring2bool(vinput[i],"_cell_length_a") && tokens.size()==2){
         a.a = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_length_b") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_length_b") && tokens.size()==2){
         a.b = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_length_c") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_length_c") && tokens.size()==2){
         a.c = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_angle_alpha") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_angle_alpha") && tokens.size()==2){
         a.alpha = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_angle_beta") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_angle_beta") && tokens.size()==2){
         a.beta = aurostd::string2utype<double>(tokens[1]); 
       }
-      else if(aurostd::substring2bool(vinput.at(i),"_cell_angle_gamma") && tokens.size()==2){
+      else if(aurostd::substring2bool(vinput[i],"_cell_angle_gamma") && tokens.size()==2){
         a.gamma = aurostd::string2utype<double>(tokens[1]); 
       }
     }
@@ -4248,24 +4404,43 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.partial_occupation_flag = FALSE;
     // get atoms
     vector<string> atom_site_fields;
-    bool found_atom_site_labels=FALSE;    
+    bool found_atom_site_labels=FALSE;
+    bool already_storing_atoms=FALSE;
     for(uint i=0;i<vinput.size();i++) {
       //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso loop - START
-      if(aurostd::substring2bool(vinput.at(i),"loop")){
+      if(aurostd::substring2bool(vinput[i],"loop")){
         found_atom_site_labels = FALSE;
       }
-      if(aurostd::substring2bool(vinput.at(i),"_atom_site") && !aurostd::substring2bool(vinput.at(i),"aniso")){
+      if(aurostd::substring2bool(vinput[i],"_atom_site") && !aurostd::substring2bool(vinput[i],"aniso")){
+        if(already_storing_atoms){ break; } //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         found_atom_site_labels=TRUE;
-        atom_site_fields.push_back(vinput.at(i));
+        atom_site_fields.push_back(vinput[i]);
+      }
+      else if(found_atom_site_labels && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0 && 
+          vinput[i][0]=='_' && !aurostd::substring2bool(vinput[i],"aniso")){ //DX 20190718 - to account for non-standard fields, e.g., _sm_ (Springer Materials) fields; not standard, but abundant
+        if(already_storing_atoms){ break; } //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
+        atom_site_fields.push_back(vinput[i]);
       }
       //DX 20181210 - CIF can have multiple loops, reset after each loop and neglect aniso_U loop - END
       else if(found_atom_site_labels == TRUE && aurostd::RemoveWhiteSpaces(vinput[i]).size()!=0){
         vector<string> tokens;
         aurostd::string2tokens(vinput[i],tokens," ");
+        //DX 20190718 - check tokens first; Springer Materials has extra spaces - START
+        for(uint t=0;t<tokens.size();t++){
+          if(aurostd::RemoveWhiteSpaces(tokens[t])[0]=='\'' && aurostd::RemoveWhiteSpaces(tokens[t])[tokens[t].size()-1]!='\''){
+            if(t+1<tokens.size()){
+              if(aurostd::RemoveWhiteSpaces(tokens[t+1])[0]!='\'' && aurostd::RemoveWhiteSpaces(tokens[t+1])[tokens[t+1].size()-1]=='\''){
+                tokens[t]+="_"+tokens[t+1];
+                tokens.erase(tokens.begin()+t+1);
+              }
+            }
+          }
+        }
+        //DX 20190718 - check tokens first; Springer Materials has extra spaces - END
         if(tokens.size()==atom_site_fields.size()){
           _atom tmp;
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = tokens[t]; tmp.name_is_given=TRUE; }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
@@ -4277,10 +4452,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
           }
           tmp.cpos=a.f2c*tmp.fpos;
           a.AddAtom(tmp);
+          already_storing_atoms=TRUE; //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
-          oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
-	  for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-	  exit(0);
+          //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
+          //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+          //[CO190629 - no exit()]exit(0);
+          message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO190629
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
         }
       }
     }
@@ -4474,9 +4653,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } else {
     // have partial
     if(poccaus.size()!=a.atoms.size()) {
-      oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
-      for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;
+      //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO190629
+      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -4547,14 +4729,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   if(a.is_vasp5_poscar_format==TRUE) {
     a.species.clear();a.species_pp.clear();a.species_pp_type.clear();a.species_pp_version.clear();a.species_pp_ZVAL.clear();a.species_pp_vLDAU.clear();a.species_volume.clear();a.species_mass.clear();
-    if(a.iomode==IOVASP_POSCAR) aurostd::string2tokens((vinput.at(5)),tokens);
-    if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput.at(3)),tokens);
-    if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput.at(3)),tokens);
+    if(a.iomode==IOVASP_POSCAR) aurostd::string2tokens((vinput[5]),tokens);
+    if(a.iomode==IOVASP_ABCCAR) aurostd::string2tokens((vinput[3]),tokens);
+    if(a.iomode==IOVASP_WYCKCAR) aurostd::string2tokens((vinput[3]),tokens);
     if(a.num_each_type.size()!=tokens.size()) {
-      oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
-      oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
-      oss << "      tokens.size()=" << tokens.size() << endl;
-      exit(0);
+      //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> in aflow_xatom.cpp you need to specify the same number of species and atoms types" << endl;
+      //[CO190629 - no exit()]oss << "      a.num_each_type.size()=" << a.num_each_type.size() << endl;
+      //[CO190629 - no exit()]oss << "      tokens.size()=" << tokens.size() << endl;
+      //[CO190629 - no exit()]exit(0);
+      message << "You need to specify the same number of species and atoms types" << endl;  //CO190629
+      message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO190629
+      message << "      tokens.size()=" << tokens.size() << endl; //CO190629
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -4678,19 +4864,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
 #endif
   // CHECKS
   if(a.atoms.size()!=a.qm_atoms.size())     {
-    oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
-    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-    exit(0);
+    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_atoms.size() " << endl;
+    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
-    oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
-    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-    exit(0);
+    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
+    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
-    oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
-    for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput.at(i) << endl;
-    exit(0);
+    //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
+    //[CO190629 - no exit()]for(uint i=0;i<vinput.size();i++) oss << "ERROR - xstructure::operator>>: " << vinput[i] << endl;
+    //[CO190629 - no exit()]exit(0);
+    message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO190629
+    for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
+    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   
   // ---------------------------------------------------------------
@@ -5211,6 +5406,18 @@ void xstructure::RemoveAtom(vector<uint>& v_atoms_to_remove) { //CO181226
   }
 }
 
+void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms){ //CO190520
+  //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
+  //it takes care of num_each_type, species, etc.
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="xstructure::ReplaceAtoms():";
+  for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
+    if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+    RemoveAtom(i);
+  }
+  for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
+}
+
 // **************************************************************************
 // xstructure::RemoveCopies xstructure::RemoveFractionalCopies xstructure::RemoveCartesianCopies
 // **************************************************************************
@@ -5246,7 +5453,8 @@ void xstructure::RemoveFractionalCopies(double tol) {
       flag_remove=false;
       for(iat2=iat1+1;iat2<atoms.size()&&flag_remove==FALSE;iat2++){
         xvector<double> fdiff = atoms.at(iat1).fpos-atoms.at(iat2).fpos; //DX 5/3/18 - account for PBC
-        SYM::PBC(fdiff); //DX 5/3/18 - account for PBC
+        fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+        //DX 20190613 [OBSOLETE] SYM::PBC(fdiff); //DX 5/3/18 - account for PBC
         if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) { //DX 5/3/18 - account for PBC and perform in Cartesian space
 	//DX 5/3/18 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE) {
 	  flag_remove=TRUE;
@@ -5417,8 +5625,8 @@ vector<double> GetSpins(const xstructure& a) {
 string GetElementName(string stringin) {
   // need to clean up the _pv stuff of VASP
   for(uint i=0;i<NUM_ELEMENTS;i++)
-    if(stringin==atom_symbol_vec.at(i))
-      return atom_name_vec.at(i);
+    if(stringin==vatom_symbol.at(i))
+      return vatom_name.at(i);
   return "NotFound";
 }
 
@@ -5426,947 +5634,1438 @@ string GetElementName(string stringin) {
 // GetSpaceGroupName
 // ***************************************************************************
 string GetSpaceGroupName(int spacegroupnumber, string directory) {
-  string spacegroup;
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) {
-    cerr << "aflow_xatom.cpp GetSpaceGroupName() routine: space group specified invalid (1-230): ";
-    cerr << spacegroupnumber << " [dir=" << directory << "]." << endl;
-    exit(0);
+  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupName()"; //DX 20190708 - for xerror
+  stringstream message; //DX 20190708 - for xerror
+  string spacegroup=""; //DX 20190708 - for xerror
+  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
+    message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
+    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  P1 #1
     spacegroup="P1";}
-  if(spacegroupnumber==2) { // ------------------- 2  P-1 #2
+  else if(spacegroupnumber==2) { // ------------------- 2  P-1 #2
     spacegroup="P-1";}
-  if(spacegroupnumber==3) { // ------------------- 3  P2 #3
+  else if(spacegroupnumber==3) { // ------------------- 3  P2 #3
     spacegroup="P2";}
-  if(spacegroupnumber==4) { // ------------------- 4  P2_{1} #4
+  else if(spacegroupnumber==4) { // ------------------- 4  P2_{1} #4
     spacegroup="P2_{1}";}
-  if(spacegroupnumber==5) { // ------------------- 5  C2 #5
+  else if(spacegroupnumber==5) { // ------------------- 5  C2 #5
     spacegroup="C2";}
-  if(spacegroupnumber==6) { // ------------------- 6  Pm #6
+  else if(spacegroupnumber==6) { // ------------------- 6  Pm #6
     spacegroup="Pm";}
-  if(spacegroupnumber==7) { // ------------------- 7  Pc #7
+  else if(spacegroupnumber==7) { // ------------------- 7  Pc #7
     spacegroup="Pc";}
-  if(spacegroupnumber==8) { // ------------------- 8  Cm #8
+  else if(spacegroupnumber==8) { // ------------------- 8  Cm #8
     spacegroup="Cm";}
-  if(spacegroupnumber==9) { // ------------------- 9  Cc #9
+  else if(spacegroupnumber==9) { // ------------------- 9  Cc #9
     spacegroup="Cc";}
-  if(spacegroupnumber==10) { // ------------------- 10  P2/m #10
+  else if(spacegroupnumber==10) { // ------------------- 10  P2/m #10
     spacegroup="P2/m";}
-  if(spacegroupnumber==11) { // ------------------- 11  P2_{1}/m #11
+  else if(spacegroupnumber==11) { // ------------------- 11  P2_{1}/m #11
     spacegroup="P2_{1}/m";}
-  if(spacegroupnumber==12) { // ------------------- 12  C2/m #12
+  else if(spacegroupnumber==12) { // ------------------- 12  C2/m #12
     spacegroup="C2/m";}
-  if(spacegroupnumber==13) { // ------------------- 13  P2/c #13
+  else if(spacegroupnumber==13) { // ------------------- 13  P2/c #13
     spacegroup="P2/c";}
-  if(spacegroupnumber==14) { // ------------------- 14  P2_{1}/c #14
+  else if(spacegroupnumber==14) { // ------------------- 14  P2_{1}/c #14
     spacegroup="P2_{1}/c";}
-  if(spacegroupnumber==15) { // ------------------- 15  C2/c #15
+  else if(spacegroupnumber==15) { // ------------------- 15  C2/c #15
     spacegroup="C2/c";}
-  if(spacegroupnumber==16) { // ------------------- 16  P222 #16
+  else if(spacegroupnumber==16) { // ------------------- 16  P222 #16
     spacegroup="P222";}
-  if(spacegroupnumber==17) { // ------------------- 17  P222_{1} #17
+  else if(spacegroupnumber==17) { // ------------------- 17  P222_{1} #17
     spacegroup="P222_{1}";}
-  if(spacegroupnumber==18) { // ------------------- 18  P2_{1}2_{1}2 #18
+  else if(spacegroupnumber==18) { // ------------------- 18  P2_{1}2_{1}2 #18
     spacegroup="P2_{1}2_{1}2";}
-  if(spacegroupnumber==19) { // ------------------- 19  P2_{1}2_{1}2_{1} #19
+  else if(spacegroupnumber==19) { // ------------------- 19  P2_{1}2_{1}2_{1} #19
     spacegroup="P2_{1}2_{1}2_{1}";}
-  if(spacegroupnumber==20) { // ------------------- 20  C222_{1} #20
+  else if(spacegroupnumber==20) { // ------------------- 20  C222_{1} #20
     spacegroup="C222_{1}";}
-  if(spacegroupnumber==21) { // ------------------- 21  C222 #21
+  else if(spacegroupnumber==21) { // ------------------- 21  C222 #21
     spacegroup="C222";}
-  if(spacegroupnumber==22) { // ------------------- 22  F222 #22
+  else if(spacegroupnumber==22) { // ------------------- 22  F222 #22
     spacegroup="F222";}
-  if(spacegroupnumber==23) { // ------------------- 23  I222 #23
+  else if(spacegroupnumber==23) { // ------------------- 23  I222 #23
     spacegroup="I222";}
-  if(spacegroupnumber==24) { // ------------------- 24  I2_{1}2_{1}2_{1} #24
+  else if(spacegroupnumber==24) { // ------------------- 24  I2_{1}2_{1}2_{1} #24
     spacegroup="I2_{1}2_{1}2_{1}";}
-  if(spacegroupnumber==25) { // ------------------- 25  Pmm2 #25
+  else if(spacegroupnumber==25) { // ------------------- 25  Pmm2 #25
     spacegroup="Pmm2";}
-  if(spacegroupnumber==26) { // ------------------- 26  Pmc2_{1} #26
+  else if(spacegroupnumber==26) { // ------------------- 26  Pmc2_{1} #26
     spacegroup="Pmc2_{1}";}
-  if(spacegroupnumber==27) { // ------------------- 27  Pcc2 #27
+  else if(spacegroupnumber==27) { // ------------------- 27  Pcc2 #27
     spacegroup="Pcc2";}
-  if(spacegroupnumber==28) { // ------------------- 28  Pma2 #28
+  else if(spacegroupnumber==28) { // ------------------- 28  Pma2 #28
     spacegroup="Pma2";}
-  if(spacegroupnumber==29) { // ------------------- 29  Pca2_{1} #29
+  else if(spacegroupnumber==29) { // ------------------- 29  Pca2_{1} #29
     spacegroup="Pca2_{1}";}
-  if(spacegroupnumber==30) { // ------------------- 30  Pnc2 #30
+  else if(spacegroupnumber==30) { // ------------------- 30  Pnc2 #30
     spacegroup="Pnc2";}
-  if(spacegroupnumber==31) { // ------------------- 31  Pmn2_{1} #31
+  else if(spacegroupnumber==31) { // ------------------- 31  Pmn2_{1} #31
     spacegroup="Pmn2_{1}";}
-  if(spacegroupnumber==32) { // ------------------- 32  Pba2 #32
+  else if(spacegroupnumber==32) { // ------------------- 32  Pba2 #32
     spacegroup="Pba2";}
-  if(spacegroupnumber==33) { // ------------------- 33  Pna2_{1} #33
+  else if(spacegroupnumber==33) { // ------------------- 33  Pna2_{1} #33
     spacegroup="Pna2_{1}";}
-  if(spacegroupnumber==34) { // ------------------- 34  Pnn2 #34
+  else if(spacegroupnumber==34) { // ------------------- 34  Pnn2 #34
     spacegroup="Pnn2";}
-  if(spacegroupnumber==35) { // ------------------- 35  Cmm2 #35
+  else if(spacegroupnumber==35) { // ------------------- 35  Cmm2 #35
     spacegroup="Cmm2";}
-  if(spacegroupnumber==36) { // ------------------- 36  Cmc2_{1} #36
+  else if(spacegroupnumber==36) { // ------------------- 36  Cmc2_{1} #36
     spacegroup="Cmc2_{1}";}
-  if(spacegroupnumber==37) { // ------------------- 37  Ccc2 #37
+  else if(spacegroupnumber==37) { // ------------------- 37  Ccc2 #37
     spacegroup="Ccc2";}
-  if(spacegroupnumber==38) { // ------------------- 38  Amm2 #38
+  else if(spacegroupnumber==38) { // ------------------- 38  Amm2 #38
     spacegroup="Amm2";}
-  if(spacegroupnumber==39) { // ------------------- 39  Aem2 #39
+  else if(spacegroupnumber==39) { // ------------------- 39  Aem2 #39
     spacegroup="Aem2";}
-  if(spacegroupnumber==40) { // ------------------- 40  Ama2 #40
+  else if(spacegroupnumber==40) { // ------------------- 40  Ama2 #40
     spacegroup="Ama2";}
-  if(spacegroupnumber==41) { // ------------------- 41  Aea2 #41
+  else if(spacegroupnumber==41) { // ------------------- 41  Aea2 #41
     spacegroup="Aea2";}
-  if(spacegroupnumber==42) { // ------------------- 42  Fmm2 #42
+  else if(spacegroupnumber==42) { // ------------------- 42  Fmm2 #42
     spacegroup="Fmm2";}
-  if(spacegroupnumber==43) { // ------------------- 43  Fdd2 #43
+  else if(spacegroupnumber==43) { // ------------------- 43  Fdd2 #43
     spacegroup="Fdd2";}
-  if(spacegroupnumber==44) { // ------------------- 44  Imm2 #44
+  else if(spacegroupnumber==44) { // ------------------- 44  Imm2 #44
     spacegroup="Imm2";}
-  if(spacegroupnumber==45) { // ------------------- 45  Iba2 #45
+  else if(spacegroupnumber==45) { // ------------------- 45  Iba2 #45
     spacegroup="Iba2";}
-  if(spacegroupnumber==46) { // ------------------- 46  Ima2 #46
+  else if(spacegroupnumber==46) { // ------------------- 46  Ima2 #46
     spacegroup="Ima2";}
-  if(spacegroupnumber==47) { // ------------------- 47  Pmmm #47
+  else if(spacegroupnumber==47) { // ------------------- 47  Pmmm #47
     spacegroup="Pmmm";}
-  if(spacegroupnumber==48) { // ------------------- 48  Pnnn #48
+  else if(spacegroupnumber==48) { // ------------------- 48  Pnnn #48
     spacegroup="Pnnn";}
-  if(spacegroupnumber==49) { // ------------------- 49  Pccm #49
+  else if(spacegroupnumber==49) { // ------------------- 49  Pccm #49
     spacegroup="Pccm";}
-  if(spacegroupnumber==50) { // ------------------- 50  Pban #50
+  else if(spacegroupnumber==50) { // ------------------- 50  Pban #50
     spacegroup="Pban";}
-  if(spacegroupnumber==51) { // ------------------- 51  Pmma #51
+  else if(spacegroupnumber==51) { // ------------------- 51  Pmma #51
     spacegroup="Pmma";}
-  if(spacegroupnumber==52) { // ------------------- 52  Pnna #52
+  else if(spacegroupnumber==52) { // ------------------- 52  Pnna #52
     spacegroup="Pnna";}
-  if(spacegroupnumber==53) { // ------------------- 53  Pmna #53
+  else if(spacegroupnumber==53) { // ------------------- 53  Pmna #53
     spacegroup="Pmna";}
-  if(spacegroupnumber==54) { // ------------------- 54  Pcca #54
+  else if(spacegroupnumber==54) { // ------------------- 54  Pcca #54
     spacegroup="Pcca";}
-  if(spacegroupnumber==55) { // ------------------- 55  Pbam #55
+  else if(spacegroupnumber==55) { // ------------------- 55  Pbam #55
     spacegroup="Pbam";}
-  if(spacegroupnumber==56) { // ------------------- 56  Pccn #56
+  else if(spacegroupnumber==56) { // ------------------- 56  Pccn #56
     spacegroup="Pccn";}
-  if(spacegroupnumber==57) { // ------------------- 57  Pbcm #57
+  else if(spacegroupnumber==57) { // ------------------- 57  Pbcm #57
     spacegroup="Pbcm";}
-  if(spacegroupnumber==58) { // ------------------- 58  Pnnm #58
+  else if(spacegroupnumber==58) { // ------------------- 58  Pnnm #58
     spacegroup="Pnnm";}
-  if(spacegroupnumber==59) { // ------------------- 59  Pmmn #59
+  else if(spacegroupnumber==59) { // ------------------- 59  Pmmn #59
     spacegroup="Pmmn";}
-  if(spacegroupnumber==60) { // ------------------- 60  Pbcn #60
+  else if(spacegroupnumber==60) { // ------------------- 60  Pbcn #60
     spacegroup="Pbcn";}
-  if(spacegroupnumber==61) { // ------------------- 61  Pbca #61
+  else if(spacegroupnumber==61) { // ------------------- 61  Pbca #61
     spacegroup="Pbca";}
-  if(spacegroupnumber==62) { // ------------------- 62  Pnma #62
+  else if(spacegroupnumber==62) { // ------------------- 62  Pnma #62
     spacegroup="Pnma";}
-  if(spacegroupnumber==63) { // ------------------- 63  Cmcm #63
+  else if(spacegroupnumber==63) { // ------------------- 63  Cmcm #63
     spacegroup="Cmcm";}
-  if(spacegroupnumber==64) { // ------------------- 64  Cmce #64
+  else if(spacegroupnumber==64) { // ------------------- 64  Cmce #64
     spacegroup="Cmce";}
-  if(spacegroupnumber==65) { // ------------------- 65  Cmmm #65
+  else if(spacegroupnumber==65) { // ------------------- 65  Cmmm #65
     spacegroup="Cmmm";}
-  if(spacegroupnumber==66) { // ------------------- 66  Cccm #66
+  else if(spacegroupnumber==66) { // ------------------- 66  Cccm #66
     spacegroup="Cccm";}
-  if(spacegroupnumber==67) { // ------------------- 67  Cmme #67
+  else if(spacegroupnumber==67) { // ------------------- 67  Cmme #67
     spacegroup="Cmme";}
-  if(spacegroupnumber==68) { // ------------------- 68  Ccce #68
+  else if(spacegroupnumber==68) { // ------------------- 68  Ccce #68
     spacegroup="Ccce";}
-  if(spacegroupnumber==69) { // ------------------- 69  Fmmm #69
+  else if(spacegroupnumber==69) { // ------------------- 69  Fmmm #69
     spacegroup="Fmmm";}
-  if(spacegroupnumber==70) { // ------------------- 70  Fddd #70
+  else if(spacegroupnumber==70) { // ------------------- 70  Fddd #70
     spacegroup="Fddd";}
-  if(spacegroupnumber==71) { // ------------------- 71  Immm #71
+  else if(spacegroupnumber==71) { // ------------------- 71  Immm #71
     spacegroup="Immm";}
-  if(spacegroupnumber==72) { // ------------------- 72  Ibam #72
+  else if(spacegroupnumber==72) { // ------------------- 72  Ibam #72
     spacegroup="Ibam";}
-  if(spacegroupnumber==73) { // ------------------- 73  Ibca #73
+  else if(spacegroupnumber==73) { // ------------------- 73  Ibca #73
     spacegroup="Ibca";}
-  if(spacegroupnumber==74) { // ------------------- 74  Imma #74
+  else if(spacegroupnumber==74) { // ------------------- 74  Imma #74
     spacegroup="Imma";}
-  if(spacegroupnumber==75) { // ------------------- 75  P4 #75
+  else if(spacegroupnumber==75) { // ------------------- 75  P4 #75
     spacegroup="P4";}
-  if(spacegroupnumber==76) { // ------------------- 76  P4_{1} #76
+  else if(spacegroupnumber==76) { // ------------------- 76  P4_{1} #76
     spacegroup="P4_{1}";}
-  if(spacegroupnumber==77) { // ------------------- 77  P4_{2} #77
+  else if(spacegroupnumber==77) { // ------------------- 77  P4_{2} #77
     spacegroup="P4_{2}";}
-  if(spacegroupnumber==78) { // ------------------- 78  P4_{3} #78
+  else if(spacegroupnumber==78) { // ------------------- 78  P4_{3} #78
     spacegroup="P4_{3}";}
-  if(spacegroupnumber==79) { // ------------------- 79  I4 #79
+  else if(spacegroupnumber==79) { // ------------------- 79  I4 #79
     spacegroup="I4";}
-  if(spacegroupnumber==80) { // ------------------- 80  I4_{1} #80
+  else if(spacegroupnumber==80) { // ------------------- 80  I4_{1} #80
     spacegroup="I4_{1}";}
-  if(spacegroupnumber==81) { // ------------------- 81  P-4 #81
+  else if(spacegroupnumber==81) { // ------------------- 81  P-4 #81
     spacegroup="P-4";}
-  if(spacegroupnumber==82) { // ------------------- 82  I-4 #82
+  else if(spacegroupnumber==82) { // ------------------- 82  I-4 #82
     spacegroup="I-4";}
-  if(spacegroupnumber==83) { // ------------------- 83  P4/m #83
+  else if(spacegroupnumber==83) { // ------------------- 83  P4/m #83
     spacegroup="P4/m";}
-  if(spacegroupnumber==84) { // ------------------- 84  P4_{2}/m #84
+  else if(spacegroupnumber==84) { // ------------------- 84  P4_{2}/m #84
     spacegroup="P4_{2}/m";}
-  if(spacegroupnumber==85) { // ------------------- 85  P4/n #85
+  else if(spacegroupnumber==85) { // ------------------- 85  P4/n #85
     spacegroup="P4/n";}
-  if(spacegroupnumber==86) { // ------------------- 86  P4_{2}/n #86
+  else if(spacegroupnumber==86) { // ------------------- 86  P4_{2}/n #86
     spacegroup="P4_{2}/n";}
-  if(spacegroupnumber==87) { // ------------------- 87  I4/m #87
+  else if(spacegroupnumber==87) { // ------------------- 87  I4/m #87
     spacegroup="I4/m";}
-  if(spacegroupnumber==88) { // ------------------- 88  I4_{1}/a #88
+  else if(spacegroupnumber==88) { // ------------------- 88  I4_{1}/a #88
     spacegroup="I4_{1}/a";}
-  if(spacegroupnumber==89) { // ------------------- 89  P422 #89
+  else if(spacegroupnumber==89) { // ------------------- 89  P422 #89
     spacegroup="P422";}
-  if(spacegroupnumber==90) { // ------------------- 90  P42_{1}2 #90
+  else if(spacegroupnumber==90) { // ------------------- 90  P42_{1}2 #90
     spacegroup="P42_{1}2";}
-  if(spacegroupnumber==91) { // ------------------- 91  P4_{1}22 #91
+  else if(spacegroupnumber==91) { // ------------------- 91  P4_{1}22 #91
     spacegroup="P4_{1}22";}
-  if(spacegroupnumber==92) { // ------------------- 92  P4_{1}2_{1}2 #92
+  else if(spacegroupnumber==92) { // ------------------- 92  P4_{1}2_{1}2 #92
     spacegroup="P4_{1}2_{1}2";}
-  if(spacegroupnumber==93) { // ------------------- 93  P4_{2}22 #93
+  else if(spacegroupnumber==93) { // ------------------- 93  P4_{2}22 #93
     spacegroup="P4_{2}22";}
-  if(spacegroupnumber==94) { // ------------------- 94  P4_{2}2_{1}2 #94
+  else if(spacegroupnumber==94) { // ------------------- 94  P4_{2}2_{1}2 #94
     spacegroup="P4_{2}2_{1}2";}
-  if(spacegroupnumber==95) { // ------------------- 95  P4_{3}22 #95
+  else if(spacegroupnumber==95) { // ------------------- 95  P4_{3}22 #95
     spacegroup="P4_{3}22";}
-  if(spacegroupnumber==96) { // ------------------- 96  P4_{3}2_{1}2 #96
+  else if(spacegroupnumber==96) { // ------------------- 96  P4_{3}2_{1}2 #96
     spacegroup="P4_{3}2_{1}2";}
-  if(spacegroupnumber==97) { // ------------------- 97  I422 #97
+  else if(spacegroupnumber==97) { // ------------------- 97  I422 #97
     spacegroup="I422";}
-  if(spacegroupnumber==98) { // ------------------- 98  I4_{1}22 #98
+  else if(spacegroupnumber==98) { // ------------------- 98  I4_{1}22 #98
     spacegroup="I4_{1}22";}
-  if(spacegroupnumber==99) { // ------------------- 99  P4mm #99
+  else if(spacegroupnumber==99) { // ------------------- 99  P4mm #99
     spacegroup="P4mm";}
-  if(spacegroupnumber==100) { // ------------------- 100  P4bm #100
+  else if(spacegroupnumber==100) { // ------------------- 100  P4bm #100
     spacegroup="P4bm";}
-  if(spacegroupnumber==101) { // ------------------- 101  P4_{2}cm #101
+  else if(spacegroupnumber==101) { // ------------------- 101  P4_{2}cm #101
     spacegroup="P4_{2}cm";}
-  if(spacegroupnumber==102) { // ------------------- 102  P4_{2}nm #102
+  else if(spacegroupnumber==102) { // ------------------- 102  P4_{2}nm #102
     spacegroup="P4_{2}nm";}
-  if(spacegroupnumber==103) { // ------------------- 103  P4cc #103
+  else if(spacegroupnumber==103) { // ------------------- 103  P4cc #103
     spacegroup="P4cc";}
-  if(spacegroupnumber==104) { // ------------------- 104  P4nc #104
+  else if(spacegroupnumber==104) { // ------------------- 104  P4nc #104
     spacegroup="P4nc";}
-  if(spacegroupnumber==105) { // ------------------- 105  P4_{2}mc #105
+  else if(spacegroupnumber==105) { // ------------------- 105  P4_{2}mc #105
     spacegroup="P4_{2}mc";}
-  if(spacegroupnumber==106) { // ------------------- 106  P4_{2}bc #106
+  else if(spacegroupnumber==106) { // ------------------- 106  P4_{2}bc #106
     spacegroup="P4_{2}bc";}
-  if(spacegroupnumber==107) { // ------------------- 107  I4mm #107
+  else if(spacegroupnumber==107) { // ------------------- 107  I4mm #107
     spacegroup="I4mm";}
-  if(spacegroupnumber==108) { // ------------------- 108  I4cm #108
+  else if(spacegroupnumber==108) { // ------------------- 108  I4cm #108
     spacegroup="I4cm";}
-  if(spacegroupnumber==109) { // ------------------- 109  I4_{1}md #109
+  else if(spacegroupnumber==109) { // ------------------- 109  I4_{1}md #109
     spacegroup="I4_{1}md";}
-  if(spacegroupnumber==110) { // ------------------- 110  I4_{1}cd #110
+  else if(spacegroupnumber==110) { // ------------------- 110  I4_{1}cd #110
     spacegroup="I4_{1}cd";}
-  if(spacegroupnumber==111) { // ------------------- 111  P-42m #111
+  else if(spacegroupnumber==111) { // ------------------- 111  P-42m #111
     spacegroup="P-42m";}
-  if(spacegroupnumber==112) { // ------------------- 112  P-42c #112
+  else if(spacegroupnumber==112) { // ------------------- 112  P-42c #112
     spacegroup="P-42c";}
-  if(spacegroupnumber==113) { // ------------------- 113  P-42_{1}m #113
+  else if(spacegroupnumber==113) { // ------------------- 113  P-42_{1}m #113
     spacegroup="P-42_{1}m";}
-  if(spacegroupnumber==114) { // ------------------- 114  P-42_{1}c #114
+  else if(spacegroupnumber==114) { // ------------------- 114  P-42_{1}c #114
     spacegroup="P-42_{1}c";}
-  if(spacegroupnumber==115) { // ------------------- 115  P-4m2 #115
+  else if(spacegroupnumber==115) { // ------------------- 115  P-4m2 #115
     spacegroup="P-4m2";}
-  if(spacegroupnumber==116) { // ------------------- 116  P-4c2 #116
+  else if(spacegroupnumber==116) { // ------------------- 116  P-4c2 #116
     spacegroup="P-4c2";}
-  if(spacegroupnumber==117) { // ------------------- 117  P-4b2 #117
+  else if(spacegroupnumber==117) { // ------------------- 117  P-4b2 #117
     spacegroup="P-4b2";}
-  if(spacegroupnumber==118) { // ------------------- 118  P-4n2 #118
+  else if(spacegroupnumber==118) { // ------------------- 118  P-4n2 #118
     spacegroup="P-4n2";}
-  if(spacegroupnumber==119) { // ------------------- 119  I-4m2 #119
+  else if(spacegroupnumber==119) { // ------------------- 119  I-4m2 #119
     spacegroup="I-4m2";}
-  if(spacegroupnumber==120) { // ------------------- 120  I-4c2 #120
+  else if(spacegroupnumber==120) { // ------------------- 120  I-4c2 #120
     spacegroup="I-4c2";}
-  if(spacegroupnumber==121) { // ------------------- 121  I-42m #121
+  else if(spacegroupnumber==121) { // ------------------- 121  I-42m #121
     spacegroup="I-42m";}
-  if(spacegroupnumber==122) { // ------------------- 122  I-42d #122
+  else if(spacegroupnumber==122) { // ------------------- 122  I-42d #122
     spacegroup="I-42d";}
-  if(spacegroupnumber==123) { // ------------------- 123  P4/mmm #123
+  else if(spacegroupnumber==123) { // ------------------- 123  P4/mmm #123
     spacegroup="P4/mmm";}
-  if(spacegroupnumber==124) { // ------------------- 124  P4/mcc #124
+  else if(spacegroupnumber==124) { // ------------------- 124  P4/mcc #124
     spacegroup="P4/mcc";}
-  if(spacegroupnumber==125) { // ------------------- 125  P4/nbm #125
+  else if(spacegroupnumber==125) { // ------------------- 125  P4/nbm #125
     spacegroup="P4/nbm";}
-  if(spacegroupnumber==126) { // ------------------- 126  P4/nnc #126
+  else if(spacegroupnumber==126) { // ------------------- 126  P4/nnc #126
     spacegroup="P4/nnc";}
-  if(spacegroupnumber==127) { // ------------------- 127  P4/mbm #127
+  else if(spacegroupnumber==127) { // ------------------- 127  P4/mbm #127
     spacegroup="P4/mbm";}
-  if(spacegroupnumber==128) { // ------------------- 128  P4/mnc #128
+  else if(spacegroupnumber==128) { // ------------------- 128  P4/mnc #128
     spacegroup="P4/mnc";}
-  if(spacegroupnumber==129) { // ------------------- 129  P4/nmm #129
+  else if(spacegroupnumber==129) { // ------------------- 129  P4/nmm #129
     spacegroup="P4/nmm";}
-  if(spacegroupnumber==130) { // ------------------- 130  P4/ncc #130
+  else if(spacegroupnumber==130) { // ------------------- 130  P4/ncc #130
     spacegroup="P4/ncc";}
-  if(spacegroupnumber==131) { // ------------------- 131  P4_{2}/mmc #131
+  else if(spacegroupnumber==131) { // ------------------- 131  P4_{2}/mmc #131
     spacegroup="P4_{2}/mmc";}
-  if(spacegroupnumber==132) { // ------------------- 132  P4_{2}/mcm #132
+  else if(spacegroupnumber==132) { // ------------------- 132  P4_{2}/mcm #132
     spacegroup="P4_{2}/mcm";}
-  if(spacegroupnumber==133) { // ------------------- 133  P4_{2}/nbc #133
+  else if(spacegroupnumber==133) { // ------------------- 133  P4_{2}/nbc #133
     spacegroup="P4_{2}/nbc";}
-  if(spacegroupnumber==134) { // ------------------- 134  P4_{2}/nnm #134
+  else if(spacegroupnumber==134) { // ------------------- 134  P4_{2}/nnm #134
     spacegroup="P4_{2}/nnm";}
-  if(spacegroupnumber==135) { // ------------------- 135  P4_{2}/mbc #135
+  else if(spacegroupnumber==135) { // ------------------- 135  P4_{2}/mbc #135
     spacegroup="P4_{2}/mbc";}
-  if(spacegroupnumber==136) { // ------------------- 136  P4_{2}/mnm #136
+  else if(spacegroupnumber==136) { // ------------------- 136  P4_{2}/mnm #136
     spacegroup="P4_{2}/mnm";}
-  if(spacegroupnumber==137) { // ------------------- 137  P4_{2}/nmc #137
+  else if(spacegroupnumber==137) { // ------------------- 137  P4_{2}/nmc #137
     spacegroup="P4_{2}/nmc";}
-  if(spacegroupnumber==138) { // ------------------- 138  P4_{2}/ncm #138
+  else if(spacegroupnumber==138) { // ------------------- 138  P4_{2}/ncm #138
     spacegroup="P4_{2}/ncm";}
-  if(spacegroupnumber==139) { // ------------------- 139  I4/mmm #139
+  else if(spacegroupnumber==139) { // ------------------- 139  I4/mmm #139
     spacegroup="I4/mmm";}
-  if(spacegroupnumber==140) { // ------------------- 140  I4/mcm #140
+  else if(spacegroupnumber==140) { // ------------------- 140  I4/mcm #140
     spacegroup="I4/mcm";}
-  if(spacegroupnumber==141) { // ------------------- 141  I4_{1}/amd #141
+  else if(spacegroupnumber==141) { // ------------------- 141  I4_{1}/amd #141
     spacegroup="I4_{1}/amd";}
-  if(spacegroupnumber==142) { // ------------------- 142  I4_{1}/acd #142
+  else if(spacegroupnumber==142) { // ------------------- 142  I4_{1}/acd #142
     spacegroup="I4_{1}/acd";}
-  if(spacegroupnumber==143) { // ------------------- 143  P3 #143
+  else if(spacegroupnumber==143) { // ------------------- 143  P3 #143
     spacegroup="P3";}
-  if(spacegroupnumber==144) { // ------------------- 144  P3_{1} #144
+  else if(spacegroupnumber==144) { // ------------------- 144  P3_{1} #144
     spacegroup="P3_{1}";}
-  if(spacegroupnumber==145) { // ------------------- 145  P3_{2} #145
+  else if(spacegroupnumber==145) { // ------------------- 145  P3_{2} #145
     spacegroup="P3_{2}";}
-  if(spacegroupnumber==146) { // ------------------- 146  R3 #146
+  else if(spacegroupnumber==146) { // ------------------- 146  R3 #146
     spacegroup="R3";}
-  if(spacegroupnumber==147) { // ------------------- 147  P-3 #147
+  else if(spacegroupnumber==147) { // ------------------- 147  P-3 #147
     spacegroup="P-3";}
-  if(spacegroupnumber==148) { // ------------------- 148  R-3 #148
+  else if(spacegroupnumber==148) { // ------------------- 148  R-3 #148
     spacegroup="R-3";}
-  if(spacegroupnumber==149) { // ------------------- 149  P312 #149
+  else if(spacegroupnumber==149) { // ------------------- 149  P312 #149
     spacegroup="P312";}
-  if(spacegroupnumber==150) { // ------------------- 150  P321 #150
+  else if(spacegroupnumber==150) { // ------------------- 150  P321 #150
     spacegroup="P321";}
-  if(spacegroupnumber==151) { // ------------------- 151  P3_{1}12 #151
+  else if(spacegroupnumber==151) { // ------------------- 151  P3_{1}12 #151
     spacegroup="P3_{1}12";}
-  if(spacegroupnumber==152) { // ------------------- 152  P3_{1}21 #152
+  else if(spacegroupnumber==152) { // ------------------- 152  P3_{1}21 #152
     spacegroup="P3_{1}21";}
-  if(spacegroupnumber==153) { // ------------------- 153  P3_{2}12 #153
+  else if(spacegroupnumber==153) { // ------------------- 153  P3_{2}12 #153
     spacegroup="P3_{2}12";}
-  if(spacegroupnumber==154) { // ------------------- 154  P3_{2}21 #154
+  else if(spacegroupnumber==154) { // ------------------- 154  P3_{2}21 #154
     spacegroup="P3_{2}21";}
-  if(spacegroupnumber==155) { // ------------------- 155  R32 #155
+  else if(spacegroupnumber==155) { // ------------------- 155  R32 #155
     spacegroup="R32";}
-  if(spacegroupnumber==156) { // ------------------- 156  P3m1 #156
+  else if(spacegroupnumber==156) { // ------------------- 156  P3m1 #156
     spacegroup="P3m1";}
-  if(spacegroupnumber==157) { // ------------------- 157  P31m #157
+  else if(spacegroupnumber==157) { // ------------------- 157  P31m #157
     spacegroup="P31m";}
-  if(spacegroupnumber==158) { // ------------------- 158  P3c1 #158
+  else if(spacegroupnumber==158) { // ------------------- 158  P3c1 #158
     spacegroup="P3c1";}
-  if(spacegroupnumber==159) { // ------------------- 159  P31c #159
+  else if(spacegroupnumber==159) { // ------------------- 159  P31c #159
     spacegroup="P31c";}
-  if(spacegroupnumber==160) { // ------------------- 160  R3m #160
+  else if(spacegroupnumber==160) { // ------------------- 160  R3m #160
     spacegroup="R3m";}
-  if(spacegroupnumber==161) { // ------------------- 161  R3c #161
+  else if(spacegroupnumber==161) { // ------------------- 161  R3c #161
     spacegroup="R3c";}
-  if(spacegroupnumber==162) { // ------------------- 162  P-31m #162
+  else if(spacegroupnumber==162) { // ------------------- 162  P-31m #162
     spacegroup="P-31m";}
-  if(spacegroupnumber==163) { // ------------------- 163  P-31c #163
+  else if(spacegroupnumber==163) { // ------------------- 163  P-31c #163
     spacegroup="P-31c";}
-  if(spacegroupnumber==164) { // ------------------- 164  P-3m1 #164
+  else if(spacegroupnumber==164) { // ------------------- 164  P-3m1 #164
     spacegroup="P-3m1";}
-  if(spacegroupnumber==165) { // ------------------- 165  P-3c1 #165
+  else if(spacegroupnumber==165) { // ------------------- 165  P-3c1 #165
     spacegroup="P-3c1";}
-  if(spacegroupnumber==166) { // ------------------- 166  R-3m #166
+  else if(spacegroupnumber==166) { // ------------------- 166  R-3m #166
     spacegroup="R-3m";}
-  if(spacegroupnumber==167) { // ------------------- 167  R-3c #167
+  else if(spacegroupnumber==167) { // ------------------- 167  R-3c #167
     spacegroup="R-3c";}
-  if(spacegroupnumber==168) { // ------------------- 168  P6 #168
+  else if(spacegroupnumber==168) { // ------------------- 168  P6 #168
     spacegroup="P6";}
-  if(spacegroupnumber==169) { // ------------------- 169  P6_{1} #169
+  else if(spacegroupnumber==169) { // ------------------- 169  P6_{1} #169
     spacegroup="P6_{1}";}
-  if(spacegroupnumber==170) { // ------------------- 170  P6_{5} #170
+  else if(spacegroupnumber==170) { // ------------------- 170  P6_{5} #170
     spacegroup="P6_{5}";}
-  if(spacegroupnumber==171) { // ------------------- 171  P6_{2} #171
+  else if(spacegroupnumber==171) { // ------------------- 171  P6_{2} #171
     spacegroup="P6_{2}";}
-  if(spacegroupnumber==172) { // ------------------- 172  P6_{4} #172
+  else if(spacegroupnumber==172) { // ------------------- 172  P6_{4} #172
     spacegroup="P6_{4}";}
-  if(spacegroupnumber==173) { // ------------------- 173  P6_{3} #173
+  else if(spacegroupnumber==173) { // ------------------- 173  P6_{3} #173
     spacegroup="P6_{3}";}
-  if(spacegroupnumber==174) { // ------------------- 174  P-6 #174
+  else if(spacegroupnumber==174) { // ------------------- 174  P-6 #174
     spacegroup="P-6";}
-  if(spacegroupnumber==175) { // ------------------- 175  P6/m #175
+  else if(spacegroupnumber==175) { // ------------------- 175  P6/m #175
     spacegroup="P6/m";}
-  if(spacegroupnumber==176) { // ------------------- 176  P6_{3}/m #176
+  else if(spacegroupnumber==176) { // ------------------- 176  P6_{3}/m #176
     spacegroup="P6_{3}/m";}
-  if(spacegroupnumber==177) { // ------------------- 177  P622 #177
+  else if(spacegroupnumber==177) { // ------------------- 177  P622 #177
     spacegroup="P622";}
-  if(spacegroupnumber==178) { // ------------------- 178  P6_{1}22 #178
+  else if(spacegroupnumber==178) { // ------------------- 178  P6_{1}22 #178
     spacegroup="P6_{1}22";}
-  if(spacegroupnumber==179) { // ------------------- 179  P6_{5}22 #179
+  else if(spacegroupnumber==179) { // ------------------- 179  P6_{5}22 #179
     spacegroup="P6_{5}22";}
-  if(spacegroupnumber==180) { // ------------------- 180  P6_{2}22 #180
+  else if(spacegroupnumber==180) { // ------------------- 180  P6_{2}22 #180
     spacegroup="P6_{2}22";}
-  if(spacegroupnumber==181) { // ------------------- 181  P6_{4}22 #181
+  else if(spacegroupnumber==181) { // ------------------- 181  P6_{4}22 #181
     spacegroup="P6_{4}22";}
-  if(spacegroupnumber==182) { // ------------------- 182  P6_{3}22 #182
+  else if(spacegroupnumber==182) { // ------------------- 182  P6_{3}22 #182
     spacegroup="P6_{3}22";}
-  if(spacegroupnumber==183) { // ------------------- 183  P6mm #183
+  else if(spacegroupnumber==183) { // ------------------- 183  P6mm #183
     spacegroup="P6mm";}
-  if(spacegroupnumber==184) { // ------------------- 184  P6cc #184
+  else if(spacegroupnumber==184) { // ------------------- 184  P6cc #184
     spacegroup="P6cc";}
-  if(spacegroupnumber==185) { // ------------------- 185  P6_{3}cm #185
+  else if(spacegroupnumber==185) { // ------------------- 185  P6_{3}cm #185
     spacegroup="P6_{3}cm";}
-  if(spacegroupnumber==186) { // ------------------- 186  P6_{3}mc #186
+  else if(spacegroupnumber==186) { // ------------------- 186  P6_{3}mc #186
     spacegroup="P6_{3}mc";}
-  if(spacegroupnumber==187) { // ------------------- 187  P-6m2 #187
+  else if(spacegroupnumber==187) { // ------------------- 187  P-6m2 #187
     spacegroup="P-6m2";}
-  if(spacegroupnumber==188) { // ------------------- 188  P-6c2 #188
+  else if(spacegroupnumber==188) { // ------------------- 188  P-6c2 #188
     spacegroup="P-6c2";}
-  if(spacegroupnumber==189) { // ------------------- 189  P-62m #189
+  else if(spacegroupnumber==189) { // ------------------- 189  P-62m #189
     spacegroup="P-62m";}
-  if(spacegroupnumber==190) { // ------------------- 190  P-62c #190
+  else if(spacegroupnumber==190) { // ------------------- 190  P-62c #190
     spacegroup="P-62c";}
-  if(spacegroupnumber==191) { // ------------------- 191  P6/mmm #191
+  else if(spacegroupnumber==191) { // ------------------- 191  P6/mmm #191
     spacegroup="P6/mmm";}
-  if(spacegroupnumber==192) { // ------------------- 192  P6/mcc #192
+  else if(spacegroupnumber==192) { // ------------------- 192  P6/mcc #192
     spacegroup="P6/mcc";}
-  if(spacegroupnumber==193) { // ------------------- 193  P6_{3}/mcm #193
+  else if(spacegroupnumber==193) { // ------------------- 193  P6_{3}/mcm #193
     spacegroup="P6_{3}/mcm";}
-  if(spacegroupnumber==194) { // ------------------- 194  P6_{3}/mmc #194
+  else if(spacegroupnumber==194) { // ------------------- 194  P6_{3}/mmc #194
     spacegroup="P6_{3}/mmc";}
-  if(spacegroupnumber==195) { // ------------------- 195  P23 #195
+  else if(spacegroupnumber==195) { // ------------------- 195  P23 #195
     spacegroup="P23";}
-  if(spacegroupnumber==196) { // ------------------- 196  F23 #196
+  else if(spacegroupnumber==196) { // ------------------- 196  F23 #196
     spacegroup="F23";}
-  if(spacegroupnumber==197) { // ------------------- 197  I23 #197
+  else if(spacegroupnumber==197) { // ------------------- 197  I23 #197
     spacegroup="I23";}
-  if(spacegroupnumber==198) { // ------------------- 198  P2_{1}3 #198
+  else if(spacegroupnumber==198) { // ------------------- 198  P2_{1}3 #198
     spacegroup="P2_{1}3";}
-  if(spacegroupnumber==199) { // ------------------- 199  I2_{1}3 #199
+  else if(spacegroupnumber==199) { // ------------------- 199  I2_{1}3 #199
     spacegroup="I2_{1}3";}
-  if(spacegroupnumber==200) { // ------------------- 200  Pm-3 #200
+  else if(spacegroupnumber==200) { // ------------------- 200  Pm-3 #200
     spacegroup="Pm-3";}
-  if(spacegroupnumber==201) { // ------------------- 201  Pn-3 #201
+  else if(spacegroupnumber==201) { // ------------------- 201  Pn-3 #201
     spacegroup="Pn-3";}
-  if(spacegroupnumber==202) { // ------------------- 202  Fm-3 #202
+  else if(spacegroupnumber==202) { // ------------------- 202  Fm-3 #202
     spacegroup="Fm-3";}
-  if(spacegroupnumber==203) { // ------------------- 203  Fd-3 #203
+  else if(spacegroupnumber==203) { // ------------------- 203  Fd-3 #203
     spacegroup="Fd-3";}
-  if(spacegroupnumber==204) { // ------------------- 204  Im-3 #204
+  else if(spacegroupnumber==204) { // ------------------- 204  Im-3 #204
     spacegroup="Im-3";}
-  if(spacegroupnumber==205) { // ------------------- 205  Pa-3 #205
+  else if(spacegroupnumber==205) { // ------------------- 205  Pa-3 #205
     spacegroup="Pa-3";}
-  if(spacegroupnumber==206) { // ------------------- 206  Ia-3 #206
+  else if(spacegroupnumber==206) { // ------------------- 206  Ia-3 #206
     spacegroup="Ia-3";}
-  if(spacegroupnumber==207) { // ------------------- 207  P432 #207
+  else if(spacegroupnumber==207) { // ------------------- 207  P432 #207
     spacegroup="P432";}
-  if(spacegroupnumber==208) { // ------------------- 208  P4_{2}32 #208
+  else if(spacegroupnumber==208) { // ------------------- 208  P4_{2}32 #208
     spacegroup="P4_{2}32";}
-  if(spacegroupnumber==209) { // ------------------- 209  F432 #209
+  else if(spacegroupnumber==209) { // ------------------- 209  F432 #209
     spacegroup="F432";}
-  if(spacegroupnumber==210) { // ------------------- 210  F4_{1}32 #210
+  else if(spacegroupnumber==210) { // ------------------- 210  F4_{1}32 #210
     spacegroup="F4_{1}32";}
-  if(spacegroupnumber==211) { // ------------------- 211  I432 #211
+  else if(spacegroupnumber==211) { // ------------------- 211  I432 #211
     spacegroup="I432";}
-  if(spacegroupnumber==212) { // ------------------- 212  P4_{3}32 #212
+  else if(spacegroupnumber==212) { // ------------------- 212  P4_{3}32 #212
     spacegroup="P4_{3}32";}
-  if(spacegroupnumber==213) { // ------------------- 213  P4_{1}32 #213
+  else if(spacegroupnumber==213) { // ------------------- 213  P4_{1}32 #213
     spacegroup="P4_{1}32";}
-  if(spacegroupnumber==214) { // ------------------- 214  I4_{1}32 #214
+  else if(spacegroupnumber==214) { // ------------------- 214  I4_{1}32 #214
     spacegroup="I4_{1}32";}
-  if(spacegroupnumber==215) { // ------------------- 215  P-43m #215
+  else if(spacegroupnumber==215) { // ------------------- 215  P-43m #215
     spacegroup="P-43m";}
-  if(spacegroupnumber==216) { // ------------------- 216  F-43m #216
+  else if(spacegroupnumber==216) { // ------------------- 216  F-43m #216
     spacegroup="F-43m";}
-  if(spacegroupnumber==217) { // ------------------- 217  I-43m #217
+  else if(spacegroupnumber==217) { // ------------------- 217  I-43m #217
     spacegroup="I-43m";}
-  if(spacegroupnumber==218) { // ------------------- 218  P-43n #218
+  else if(spacegroupnumber==218) { // ------------------- 218  P-43n #218
     spacegroup="P-43n";}
-  if(spacegroupnumber==219) { // ------------------- 219  F-43c #219
+  else if(spacegroupnumber==219) { // ------------------- 219  F-43c #219
     spacegroup="F-43c";}
-  if(spacegroupnumber==220) { // ------------------- 220  I-43d #220
+  else if(spacegroupnumber==220) { // ------------------- 220  I-43d #220
     spacegroup="I-43d";}
-  if(spacegroupnumber==221) { // ------------------- 221  Pm-3m #221
+  else if(spacegroupnumber==221) { // ------------------- 221  Pm-3m #221
     spacegroup="Pm-3m";}
-  if(spacegroupnumber==222) { // ------------------- 222  Pn-3n #222
+  else if(spacegroupnumber==222) { // ------------------- 222  Pn-3n #222
     spacegroup="Pn-3n";}
-  if(spacegroupnumber==223) { // ------------------- 223  Pm-3n #223
+  else if(spacegroupnumber==223) { // ------------------- 223  Pm-3n #223
     spacegroup="Pm-3n";}
-  if(spacegroupnumber==224) { // ------------------- 224  Pn-3m #224
+  else if(spacegroupnumber==224) { // ------------------- 224  Pn-3m #224
     spacegroup="Pn-3m";}
-  if(spacegroupnumber==225) { // ------------------- 225  Fm-3m #225
+  else if(spacegroupnumber==225) { // ------------------- 225  Fm-3m #225
     spacegroup="Fm-3m";}
-  if(spacegroupnumber==226) { // ------------------- 226  Fm-3c #226
+  else if(spacegroupnumber==226) { // ------------------- 226  Fm-3c #226
     spacegroup="Fm-3c";}
-  if(spacegroupnumber==227) { // ------------------- 227  Fd-3m #227
+  else if(spacegroupnumber==227) { // ------------------- 227  Fd-3m #227
     spacegroup="Fd-3m";}
-  if(spacegroupnumber==228) { // ------------------- 228  Fd-3c #228
+  else if(spacegroupnumber==228) { // ------------------- 228  Fd-3c #228
     spacegroup="Fd-3c";}
-  if(spacegroupnumber==229) { // ------------------- 229  Im-3m #229
+  else if(spacegroupnumber==229) { // ------------------- 229  Im-3m #229
     spacegroup="Im-3m";}
-  if(spacegroupnumber==230) { // ------------------- 230  Ia-3d #230
+  else if(spacegroupnumber==230) { // ------------------- 230  Ia-3d #230
     spacegroup="Ia-3d";}
   // done
   return spacegroup;
 }
 
 // ***************************************************************************
+// GetSpaceGroupNumber
+// ***************************************************************************
+int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
+  // DX 20190708
+  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupNumber()";
+  stringstream message;
+  int spacegroupnumber=0;
+  if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
+     spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
+    message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
+    message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+  }
+  // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
+  if(spacegroupsymbol=="P1") {  // ------------------- 1  P1 #1                                                                                 
+    spacegroupnumber=1;}
+  else if(spacegroupsymbol=="P-1") {  // ------------------- 2  P-1 #2
+    spacegroupnumber=2;}
+  else if(spacegroupsymbol=="P2") {  // ------------------- 3  P2 #3
+    spacegroupnumber=3;}
+  else if(spacegroupsymbol=="P2_{1}" || spacegroupsymbol=="P2_1" || spacegroupsymbol=="P21") {  // ------------------- 4  P2_{1}#4
+    spacegroupnumber=4;}
+  else if(spacegroupsymbol=="C2") {  // ------------------- 5  C2 #5
+    spacegroupnumber=5;}
+  else if(spacegroupsymbol=="Pm") {  // ------------------- 6  Pm #6
+    spacegroupnumber=6;}
+  else if(spacegroupsymbol=="Pc") {  // ------------------- 7  Pc #7
+    spacegroupnumber=7;}
+  else if(spacegroupsymbol=="Cm") {  // ------------------- 8  Cm #8
+    spacegroupnumber=8;}
+  else if(spacegroupsymbol=="Cc") {  // ------------------- 9  Cc #9
+    spacegroupnumber=9;}
+  else if(spacegroupsymbol=="P2/m") {  // ------------------- 10  P2/m #10
+    spacegroupnumber=10;}
+  else if(spacegroupsymbol=="P2_{1}/m" || spacegroupsymbol=="P2_1/m" || spacegroupsymbol=="P21/m") {  // ------------------- 11  P2_{1}/m #11
+    spacegroupnumber=11;}
+  else if(spacegroupsymbol=="C2/m") {  // ------------------- 12  C2/m #12
+    spacegroupnumber=12;}
+  else if(spacegroupsymbol=="P2/c") {  // ------------------- 13  P2/c #13
+    spacegroupnumber=13;}
+  else if(spacegroupsymbol=="P2_{1}/c" || spacegroupsymbol=="P2_1/c" || spacegroupsymbol=="P21/c") {  // ------------------- 14  P2_{1}/c #14
+    spacegroupnumber=14;}
+  else if(spacegroupsymbol=="C2/c") {  // ------------------- 15  C2/c #15
+    spacegroupnumber=15;}
+  else if(spacegroupsymbol=="P222") {  // ------------------- 16  P222 #16
+    spacegroupnumber=16;}
+  else if(spacegroupsymbol=="P222_{1}" || spacegroupsymbol=="P222_1" || spacegroupsymbol=="P2221") {  // ------------------- 17  P222_{1}#17
+    spacegroupnumber=17;}
+  else if(spacegroupsymbol=="P2_{1}2_{1}2" || spacegroupsymbol=="P2_12_12" || spacegroupsymbol=="P21212") {  // ------------------- 18  P2_{1}2_{1}2 #18
+    spacegroupnumber=18;}
+  else if(spacegroupsymbol=="P2_{1}2_{1}2_{1}" || spacegroupsymbol=="P2_12_12_1" || spacegroupsymbol=="P212121") {  // ------------------- 19  P2_{1}2_{1}2_{1}#19
+    spacegroupnumber=19;}
+  else if(spacegroupsymbol=="C222_{1}" || spacegroupsymbol=="C222_1" || spacegroupsymbol=="C2221") {  // ------------------- 20  C222_{1}#20
+    spacegroupnumber=20;}
+  else if(spacegroupsymbol=="C222") {  // ------------------- 21  C222 #21
+    spacegroupnumber=21;}
+  else if(spacegroupsymbol=="F222") {  // ------------------- 22  F222 #22
+    spacegroupnumber=22;}
+  else if(spacegroupsymbol=="I222") {  // ------------------- 23  I222 #23
+    spacegroupnumber=23;}
+  else if(spacegroupsymbol=="I2_{1}2_{1}2_{1}" || spacegroupsymbol=="I2_12_12_1" || spacegroupsymbol=="I212121") {  // ------------------- 24  I2_{1}2_{1}2_{1}#24
+    spacegroupnumber=24;}
+  else if(spacegroupsymbol=="Pmm2") {  // ------------------- 25  Pmm2 #25
+    spacegroupnumber=25;}
+  else if(spacegroupsymbol=="Pmc2_{1}" || spacegroupsymbol=="Pmc2_1" || spacegroupsymbol=="Pmc21") {  // ------------------- 26  Pmc2_{1}#26
+    spacegroupnumber=26;}
+  else if(spacegroupsymbol=="Pcc2") {  // ------------------- 27  Pcc2 #27
+    spacegroupnumber=27;}
+  else if(spacegroupsymbol=="Pma2") {  // ------------------- 28  Pma2 #28
+    spacegroupnumber=28;}
+  else if(spacegroupsymbol=="Pca2_{1}" || spacegroupsymbol=="Pca2_1" || spacegroupsymbol=="Pca21") {  // ------------------- 29  Pca2_{1}#29
+    spacegroupnumber=29;}
+  else if(spacegroupsymbol=="Pnc2") {  // ------------------- 30  Pnc2 #30
+    spacegroupnumber=30;}
+  else if(spacegroupsymbol=="Pmn2_{1}" || spacegroupsymbol=="Pmn2_1" || spacegroupsymbol=="Pmn21") {  // ------------------- 31  Pmn2_{1}#31
+    spacegroupnumber=31;}
+  else if(spacegroupsymbol=="Pba2") {  // ------------------- 32  Pba2 #32
+    spacegroupnumber=32;}
+  else if(spacegroupsymbol=="Pna2_{1}" || spacegroupsymbol=="Pna2_1" || spacegroupsymbol=="Pna21") {  // ------------------- 33  Pna2_{1}#33
+    spacegroupnumber=33;}
+  else if(spacegroupsymbol=="Pnn2") {  // ------------------- 34  Pnn2 #34
+    spacegroupnumber=34;}
+  else if(spacegroupsymbol=="Cmm2") {  // ------------------- 35  Cmm2 #35
+    spacegroupnumber=35;}
+  else if(spacegroupsymbol=="Cmc2_{1}" || spacegroupsymbol=="Cmc2_1" || spacegroupsymbol=="Cmc21") {  // ------------------- 36  Cmc2_{1}#36
+    spacegroupnumber=36;}
+  else if(spacegroupsymbol=="Ccc2") {  // ------------------- 37  Ccc2 #37
+    spacegroupnumber=37;}
+  else if(spacegroupsymbol=="Amm2") {  // ------------------- 38  Amm2 #38
+    spacegroupnumber=38;}
+  else if(spacegroupsymbol=="Aem2") {  // ------------------- 39  Aem2 #39
+    spacegroupnumber=39;}
+  else if(spacegroupsymbol=="Ama2") {  // ------------------- 40  Ama2 #40
+    spacegroupnumber=40;}
+  else if(spacegroupsymbol=="Aea2") {  // ------------------- 41  Aea2 #41
+    spacegroupnumber=41;}
+  else if(spacegroupsymbol=="Fmm2") {  // ------------------- 42  Fmm2 #42
+    spacegroupnumber=42;}
+  else if(spacegroupsymbol=="Fdd2") {  // ------------------- 43  Fdd2 #43
+    spacegroupnumber=43;}
+  else if(spacegroupsymbol=="Imm2") {  // ------------------- 44  Imm2 #44
+    spacegroupnumber=44;}
+  else if(spacegroupsymbol=="Iba2") {  // ------------------- 45  Iba2 #45
+    spacegroupnumber=45;}
+  else if(spacegroupsymbol=="Ima2") {  // ------------------- 46  Ima2 #46
+    spacegroupnumber=46;}
+  else if(spacegroupsymbol=="Pmmm") {  // ------------------- 47  Pmmm #47
+    spacegroupnumber=47;}
+  else if(spacegroupsymbol=="Pnnn") {  // ------------------- 48  Pnnn #48
+    spacegroupnumber=48;}
+  else if(spacegroupsymbol=="Pccm") {  // ------------------- 49  Pccm #49
+    spacegroupnumber=49;}
+  else if(spacegroupsymbol=="Pban") {  // ------------------- 50  Pban #50
+    spacegroupnumber=50;}
+  else if(spacegroupsymbol=="Pmma") {  // ------------------- 51  Pmma #51
+    spacegroupnumber=51;}
+  else if(spacegroupsymbol=="Pnna") {  // ------------------- 52  Pnna #52
+    spacegroupnumber=52;}
+  else if(spacegroupsymbol=="Pmna") {  // ------------------- 53  Pmna #53
+    spacegroupnumber=53;}
+  else if(spacegroupsymbol=="Pcca") {  // ------------------- 54  Pcca #54
+    spacegroupnumber=54;}
+  else if(spacegroupsymbol=="Pbam") {  // ------------------- 55  Pbam #55
+    spacegroupnumber=55;}
+  else if(spacegroupsymbol=="Pccn") {  // ------------------- 56  Pccn #56
+    spacegroupnumber=56;}
+  else if(spacegroupsymbol=="Pbcm") {  // ------------------- 57  Pbcm #57
+    spacegroupnumber=57;}
+  else if(spacegroupsymbol=="Pnnm") {  // ------------------- 58  Pnnm #58
+    spacegroupnumber=58;}
+  else if(spacegroupsymbol=="Pmmn") {  // ------------------- 59  Pmmn #59
+    spacegroupnumber=59;}
+  else if(spacegroupsymbol=="Pbcn") {  // ------------------- 60  Pbcn #60
+    spacegroupnumber=60;}
+  else if(spacegroupsymbol=="Pbca") {  // ------------------- 61  Pbca #61
+    spacegroupnumber=61;}
+  else if(spacegroupsymbol=="Pnma") {  // ------------------- 62  Pnma #62
+    spacegroupnumber=62;}
+  else if(spacegroupsymbol=="Cmcm") {  // ------------------- 63  Cmcm #63
+    spacegroupnumber=63;}
+  else if(spacegroupsymbol=="Cmce") {  // ------------------- 64  Cmce #64
+    spacegroupnumber=64;}
+  else if(spacegroupsymbol=="Cmmm") {  // ------------------- 65  Cmmm #65
+    spacegroupnumber=65;}
+  else if(spacegroupsymbol=="Cccm") {  // ------------------- 66  Cccm #66
+    spacegroupnumber=66;}
+  else if(spacegroupsymbol=="Cmme") {  // ------------------- 67  Cmme #67
+    spacegroupnumber=67;}
+  else if(spacegroupsymbol=="Ccce") {  // ------------------- 68  Ccce #68
+    spacegroupnumber=68;}
+  else if(spacegroupsymbol=="Fmmm") {  // ------------------- 69  Fmmm #69
+    spacegroupnumber=69;}
+  else if(spacegroupsymbol=="Fddd") {  // ------------------- 70  Fddd #70
+    spacegroupnumber=70;}
+  else if(spacegroupsymbol=="Immm") {  // ------------------- 71  Immm #71
+    spacegroupnumber=71;}
+  else if(spacegroupsymbol=="Ibam") {  // ------------------- 72  Ibam #72
+    spacegroupnumber=72;}
+  else if(spacegroupsymbol=="Ibca") {  // ------------------- 73  Ibca #73
+    spacegroupnumber=73;}
+  else if(spacegroupsymbol=="Imma") {  // ------------------- 74  Imma #74
+    spacegroupnumber=74;}
+  else if(spacegroupsymbol=="P4") {  // ------------------- 75  P4 #75
+    spacegroupnumber=75;}
+  else if(spacegroupsymbol=="P4_{1}" || spacegroupsymbol=="P4_1" || spacegroupsymbol=="P41") {  // ------------------- 76  P4_{1}#76
+    spacegroupnumber=76;}
+  else if(spacegroupsymbol=="P4_{2}" || spacegroupsymbol=="P4_2" || spacegroupsymbol=="P42") {  // ------------------- 77  P4_{2}#77
+    spacegroupnumber=77;}
+  else if(spacegroupsymbol=="P4_{3}" || spacegroupsymbol=="P4_3" || spacegroupsymbol=="P43") {  // ------------------- 78  P4_{3}#78
+    spacegroupnumber=78;}
+  else if(spacegroupsymbol=="I4") {  // ------------------- 79  I4 #79
+    spacegroupnumber=79;}
+  else if(spacegroupsymbol=="I4_{1}" || spacegroupsymbol=="I4_1" || spacegroupsymbol=="I41") {  // ------------------- 80  I4_{1}#80
+    spacegroupnumber=80;}
+  else if(spacegroupsymbol=="P-4") {  // ------------------- 81  P-4 #81
+    spacegroupnumber=81;}
+  else if(spacegroupsymbol=="I-4") {  // ------------------- 82  I-4 #82
+    spacegroupnumber=82;}
+  else if(spacegroupsymbol=="P4/m") {  // ------------------- 83  P4/m #83
+    spacegroupnumber=83;}
+  else if(spacegroupsymbol=="P4_{2}/m" || spacegroupsymbol=="P4_2/m" || spacegroupsymbol=="P42/m") {  // ------------------- 84  P4_{2}/m #84
+    spacegroupnumber=84;}
+  else if(spacegroupsymbol=="P4/n") {  // ------------------- 85  P4/n #85
+    spacegroupnumber=85;}
+  else if(spacegroupsymbol=="P4_{2}/n" || spacegroupsymbol=="P4_2/n" || spacegroupsymbol=="P42/n") {  // ------------------- 86  P4_{2}/n #86
+    spacegroupnumber=86;}
+  else if(spacegroupsymbol=="I4/m") {  // ------------------- 87  I4/m #87
+    spacegroupnumber=87;}
+  else if(spacegroupsymbol=="I4_{1}/a" || spacegroupsymbol=="I4_1/a" || spacegroupsymbol=="I41/a") {  // ------------------- 88  I4_{1}/a #88
+    spacegroupnumber=88;}
+  else if(spacegroupsymbol=="P422") {  // ------------------- 89  P422 #89
+    spacegroupnumber=89;}
+  else if(spacegroupsymbol=="P42_{1}2" || spacegroupsymbol=="P42_12" || spacegroupsymbol=="P4212") {  // ------------------- 90  P42_{1}2 #90
+    spacegroupnumber=90;}
+  else if(spacegroupsymbol=="P4_{1}22" || spacegroupsymbol=="P4_122" || spacegroupsymbol=="P4122") {  // ------------------- 91  P4_{1}22 #91
+    spacegroupnumber=91;}
+  else if(spacegroupsymbol=="P4_{1}2_{1}2" || spacegroupsymbol=="P4_12_12" || spacegroupsymbol=="P41212") {  // ------------------- 92  P4_{1}2_{1}2 #92
+    spacegroupnumber=92;}
+  else if(spacegroupsymbol=="P4_{2}22" || spacegroupsymbol=="P4_222" || spacegroupsymbol=="P4222") {  // ------------------- 93  P4_{2}22 #93
+    spacegroupnumber=93;}
+  else if(spacegroupsymbol=="P4_{2}2_{1}2" || spacegroupsymbol=="P4_22_12" || spacegroupsymbol=="P42212") {  // ------------------- 94  P4_{2}2_{1}2 #94
+    spacegroupnumber=94;}
+  else if(spacegroupsymbol=="P4_{3}22" || spacegroupsymbol=="P4_322" || spacegroupsymbol=="P4322") {  // ------------------- 95  P4_{3}22 #95
+    spacegroupnumber=95;}
+  else if(spacegroupsymbol=="P4_{3}2_{1}2" || spacegroupsymbol=="P4_32_12" || spacegroupsymbol=="P43212") {  // ------------------- 96  P4_{3}2_{1}2 #96
+    spacegroupnumber=96;}
+  else if(spacegroupsymbol=="I422") {  // ------------------- 97  I422 #97
+    spacegroupnumber=97;}
+  else if(spacegroupsymbol=="I4_{1}22" || spacegroupsymbol=="I4_122" || spacegroupsymbol=="I4122") {  // ------------------- 98  I4_{1}22 #98
+    spacegroupnumber=98;}
+  else if(spacegroupsymbol=="P4mm") {  // ------------------- 99  P4mm #99
+    spacegroupnumber=99;}
+  else if(spacegroupsymbol=="P4bm") {  // ------------------- 100  P4bm #100
+    spacegroupnumber=100;}
+  else if(spacegroupsymbol=="P4_{2}cm" || spacegroupsymbol=="P4_2cm" || spacegroupsymbol=="P42cm") {  // ------------------- 101  P4_{2}cm #101
+    spacegroupnumber=101;}
+  else if(spacegroupsymbol=="P4_{2}nm" || spacegroupsymbol=="P4_2nm" || spacegroupsymbol=="P42nm") {  // ------------------- 102  P4_{2}nm #102
+    spacegroupnumber=102;}
+  else if(spacegroupsymbol=="P4cc") {  // ------------------- 103  P4cc #103
+    spacegroupnumber=103;}
+  else if(spacegroupsymbol=="P4nc") {  // ------------------- 104  P4nc #104
+    spacegroupnumber=104;}
+  else if(spacegroupsymbol=="P4_{2}mc" || spacegroupsymbol=="P4_2mc" || spacegroupsymbol=="P42mc") {  // ------------------- 105  P4_{2}mc #105
+    spacegroupnumber=105;}
+  else if(spacegroupsymbol=="P4_{2}bc" || spacegroupsymbol=="P4_2bc" || spacegroupsymbol=="P42bc") {  // ------------------- 106  P4_{2}bc #106
+    spacegroupnumber=106;}
+  else if(spacegroupsymbol=="I4mm") {  // ------------------- 107  I4mm #107
+    spacegroupnumber=107;}
+  else if(spacegroupsymbol=="I4cm") {  // ------------------- 108  I4cm #108
+    spacegroupnumber=108;}
+  else if(spacegroupsymbol=="I4_{1}md" || spacegroupsymbol=="I4_1md" || spacegroupsymbol=="I41md") {  // ------------------- 109  I4_{1}md #109
+    spacegroupnumber=109;}
+  else if(spacegroupsymbol=="I4_{1}cd" || spacegroupsymbol=="I4_1cd" || spacegroupsymbol=="I41cd") {  // ------------------- 110  I4_{1}cd #110
+    spacegroupnumber=110;}
+  else if(spacegroupsymbol=="P-42m") {  // ------------------- 111  P-42m #111
+    spacegroupnumber=111;}
+  else if(spacegroupsymbol=="P-42c") {  // ------------------- 112  P-42c #112
+    spacegroupnumber=112;}
+  else if(spacegroupsymbol=="P-42_{1}m" || spacegroupsymbol=="P-42_1m" || spacegroupsymbol=="P-421m") {  // ------------------- 113  P-42_{1}m #113
+    spacegroupnumber=113;}
+  else if(spacegroupsymbol=="P-42_{1}c" || spacegroupsymbol=="P-42_1c" || spacegroupsymbol=="P-421c") {  // ------------------- 114  P-42_{1}c #114
+    spacegroupnumber=114;}
+  else if(spacegroupsymbol=="P-4m2") {  // ------------------- 115  P-4m2 #115
+    spacegroupnumber=115;}
+  else if(spacegroupsymbol=="P-4c2") {  // ------------------- 116  P-4c2 #116
+    spacegroupnumber=116;}
+  else if(spacegroupsymbol=="P-4b2") {  // ------------------- 117  P-4b2 #117
+    spacegroupnumber=117;}
+  else if(spacegroupsymbol=="P-4n2") {  // ------------------- 118  P-4n2 #118
+    spacegroupnumber=118;}
+  else if(spacegroupsymbol=="I-4m2") {  // ------------------- 119  I-4m2 #119
+    spacegroupnumber=119;}
+  else if(spacegroupsymbol=="I-4c2") {  // ------------------- 120  I-4c2 #120
+    spacegroupnumber=120;}
+  else if(spacegroupsymbol=="I-42m") {  // ------------------- 121  I-42m #121
+    spacegroupnumber=121;}
+  else if(spacegroupsymbol=="I-42d") {  // ------------------- 122  I-42d #122
+    spacegroupnumber=122;}
+  else if(spacegroupsymbol=="P4/mmm") {  // ------------------- 123  P4/mmm #123
+    spacegroupnumber=123;}
+  else if(spacegroupsymbol=="P4/mcc") {  // ------------------- 124  P4/mcc #124
+    spacegroupnumber=124;}
+  else if(spacegroupsymbol=="P4/nbm") {  // ------------------- 125  P4/nbm #125
+    spacegroupnumber=125;}
+  else if(spacegroupsymbol=="P4/nnc") {  // ------------------- 126  P4/nnc #126
+    spacegroupnumber=126;}
+  else if(spacegroupsymbol=="P4/mbm") {  // ------------------- 127  P4/mbm #127
+    spacegroupnumber=127;}
+  else if(spacegroupsymbol=="P4/mnc") {  // ------------------- 128  P4/mnc #128
+    spacegroupnumber=128;}
+  else if(spacegroupsymbol=="P4/nmm") {  // ------------------- 129  P4/nmm #129
+    spacegroupnumber=129;}
+  else if(spacegroupsymbol=="P4/ncc") {  // ------------------- 130  P4/ncc #130
+    spacegroupnumber=130;}
+  else if(spacegroupsymbol=="P4_{2}/mmc" || spacegroupsymbol=="P4_2/mmc" || spacegroupsymbol=="P42/mmc") {  // ------------------- 131  P4_{2}/mmc #131
+    spacegroupnumber=131;}
+  else if(spacegroupsymbol=="P4_{2}/mcm" || spacegroupsymbol=="P4_2/mcm" || spacegroupsymbol=="P42/mcm") {  // ------------------- 132  P4_{2}/mcm #132
+    spacegroupnumber=132;}
+  else if(spacegroupsymbol=="P4_{2}/nbc" || spacegroupsymbol=="P4_2/nbc" || spacegroupsymbol=="P42/nbc") {  // ------------------- 133  P4_{2}/nbc #133
+    spacegroupnumber=133;}
+  else if(spacegroupsymbol=="P4_{2}/nnm" || spacegroupsymbol=="P4_2/nnm" || spacegroupsymbol=="P42/nnm") {  // ------------------- 134  P4_{2}/nnm #134
+    spacegroupnumber=134;}
+  else if(spacegroupsymbol=="P4_{2}/mbc" || spacegroupsymbol=="P4_2/mbc" || spacegroupsymbol=="P42/mbc") {  // ------------------- 135  P4_{2}/mbc #135
+    spacegroupnumber=135;}
+  else if(spacegroupsymbol=="P4_{2}/mnm" || spacegroupsymbol=="P4_2/mnm" || spacegroupsymbol=="P42/mnm") {  // ------------------- 136  P4_{2}/mnm #136
+    spacegroupnumber=136;}
+  else if(spacegroupsymbol=="P4_{2}/nmc" || spacegroupsymbol=="P4_2/nmc" || spacegroupsymbol=="P42/nmc") {  // ------------------- 137  P4_{2}/nmc #137
+    spacegroupnumber=137;}
+  else if(spacegroupsymbol=="P4_{2}/ncm" || spacegroupsymbol=="P4_2/ncm" || spacegroupsymbol=="P42/ncm") {  // ------------------- 138  P4_{2}/ncm #138
+    spacegroupnumber=138;}
+  else if(spacegroupsymbol=="I4/mmm") {  // ------------------- 139  I4/mmm #139
+    spacegroupnumber=139;}
+  else if(spacegroupsymbol=="I4/mcm") {  // ------------------- 140  I4/mcm #140
+    spacegroupnumber=140;}
+  else if(spacegroupsymbol=="I4_{1}/amd" || spacegroupsymbol=="I4_1/amd" || spacegroupsymbol=="I41/amd") {  // ------------------- 141  I4_{1}/amd #141
+    spacegroupnumber=141;}
+  else if(spacegroupsymbol=="I4_{1}/acd" || spacegroupsymbol=="I4_1/acd" || spacegroupsymbol=="I41/acd") {  // ------------------- 142  I4_{1}/acd #142
+    spacegroupnumber=142;}
+  else if(spacegroupsymbol=="P3") {  // ------------------- 143  P3 #143
+    spacegroupnumber=143;}
+  else if(spacegroupsymbol=="P3_{1}" || spacegroupsymbol=="P3_1" || spacegroupsymbol=="P31") {  // ------------------- 144  P3_{1}#144
+    spacegroupnumber=144;}
+  else if(spacegroupsymbol=="P3_{2}" || spacegroupsymbol=="P3_2" || spacegroupsymbol=="P32") {  // ------------------- 145  P3_{2}#145
+    spacegroupnumber=145;}
+  else if(spacegroupsymbol=="R3") {  // ------------------- 146  R3 #146
+    spacegroupnumber=146;}
+  else if(spacegroupsymbol=="P-3") {  // ------------------- 147  P-3 #147
+    spacegroupnumber=147;}
+  else if(spacegroupsymbol=="R-3") {  // ------------------- 148  R-3 #148
+    spacegroupnumber=148;}
+  else if(spacegroupsymbol=="P312") {  // ------------------- 149  P312 #149
+    spacegroupnumber=149;}
+  else if(spacegroupsymbol=="P321") {  // ------------------- 150  P321 #150
+    spacegroupnumber=150;}
+  else if(spacegroupsymbol=="P3_{1}12" || spacegroupsymbol=="P3_112" || spacegroupsymbol=="P3112") {  // ------------------- 151  P3_{1}12 #151
+    spacegroupnumber=151;}
+  else if(spacegroupsymbol=="P3_{1}21" || spacegroupsymbol=="P3_121" || spacegroupsymbol=="P3121") {  // ------------------- 152  P3_{1}21 #152
+    spacegroupnumber=152;}
+  else if(spacegroupsymbol=="P3_{2}12" || spacegroupsymbol=="P3_212" || spacegroupsymbol=="P3212") {  // ------------------- 153  P3_{2}12 #153
+    spacegroupnumber=153;}
+  else if(spacegroupsymbol=="P3_{2}21" || spacegroupsymbol=="P3_221" || spacegroupsymbol=="P3221") {  // ------------------- 154  P3_{2}21 #154
+    spacegroupnumber=154;}
+  else if(spacegroupsymbol=="R32") {  // ------------------- 155  R32 #155
+    spacegroupnumber=155;}
+  else if(spacegroupsymbol=="P3m1") {  // ------------------- 156  P3m1 #156
+    spacegroupnumber=156;}
+  else if(spacegroupsymbol=="P31m") {  // ------------------- 157  P31m #157
+    spacegroupnumber=157;}
+  else if(spacegroupsymbol=="P3c1") {  // ------------------- 158  P3c1 #158
+    spacegroupnumber=158;}
+  else if(spacegroupsymbol=="P31c") {  // ------------------- 159  P31c #159
+    spacegroupnumber=159;}
+  else if(spacegroupsymbol=="R3m") {  // ------------------- 160  R3m #160
+    spacegroupnumber=160;}
+  else if(spacegroupsymbol=="R3c") {  // ------------------- 161  R3c #161
+    spacegroupnumber=161;}
+  else if(spacegroupsymbol=="P-31m") {  // ------------------- 162  P-31m #162
+    spacegroupnumber=162;}
+  else if(spacegroupsymbol=="P-31c") {  // ------------------- 163  P-31c #163
+    spacegroupnumber=163;}
+  else if(spacegroupsymbol=="P-3m1") {  // ------------------- 164  P-3m1 #164
+    spacegroupnumber=164;}
+  else if(spacegroupsymbol=="P-3c1") {  // ------------------- 165  P-3c1 #165
+    spacegroupnumber=165;}
+  else if(spacegroupsymbol=="R-3m") {  // ------------------- 166  R-3m #166
+    spacegroupnumber=166;}
+  else if(spacegroupsymbol=="R-3c") {  // ------------------- 167  R-3c #167
+    spacegroupnumber=167;}
+  else if(spacegroupsymbol=="P6") {  // ------------------- 168  P6 #168
+    spacegroupnumber=168;}
+  else if(spacegroupsymbol=="P6_{1}" || spacegroupsymbol=="P6_1" || spacegroupsymbol=="P61") {  // ------------------- 169  P6_{1}#169
+    spacegroupnumber=169;}
+  else if(spacegroupsymbol=="P6_{5}" || spacegroupsymbol=="P6_5" || spacegroupsymbol=="P65") {  // ------------------- 170  P6_{5}#170
+    spacegroupnumber=170;}
+  else if(spacegroupsymbol=="P6_{2}" || spacegroupsymbol=="P6_2" || spacegroupsymbol=="P62") {  // ------------------- 171  P6_{2}#171
+    spacegroupnumber=171;}
+  else if(spacegroupsymbol=="P6_{4}" || spacegroupsymbol=="P6_4" || spacegroupsymbol=="P64") {  // ------------------- 172  P6_{4}#172
+    spacegroupnumber=172;}
+  else if(spacegroupsymbol=="P6_{3}" || spacegroupsymbol=="P6_3" || spacegroupsymbol=="P63") {  // ------------------- 173  P6_{3}#173
+    spacegroupnumber=173;}
+  else if(spacegroupsymbol=="P-6") {  // ------------------- 174  P-6 #174
+    spacegroupnumber=174;}
+  else if(spacegroupsymbol=="P6/m") {  // ------------------- 175  P6/m #175
+    spacegroupnumber=175;}
+  else if(spacegroupsymbol=="P6_{3}/m" || spacegroupsymbol=="P6_3/m" || spacegroupsymbol=="P63/m") {  // ------------------- 176  P6_{3}/m #176
+    spacegroupnumber=176;}
+  else if(spacegroupsymbol=="P622") {  // ------------------- 177  P622 #177
+    spacegroupnumber=177;}
+  else if(spacegroupsymbol=="P6_{1}22" || spacegroupsymbol=="P6_122" || spacegroupsymbol=="P6122") {  // ------------------- 178  P6_{1}22 #178
+    spacegroupnumber=178;}
+  else if(spacegroupsymbol=="P6_{5}22" || spacegroupsymbol=="P6_522" || spacegroupsymbol=="P6522") {  // ------------------- 179  P6_{5}22 #179
+    spacegroupnumber=179;}
+  else if(spacegroupsymbol=="P6_{2}22" || spacegroupsymbol=="P6_222" || spacegroupsymbol=="P6222") {  // ------------------- 180  P6_{2}22 #180
+    spacegroupnumber=180;}
+  else if(spacegroupsymbol=="P6_{4}22" || spacegroupsymbol=="P6_422" || spacegroupsymbol=="P6422") {  // ------------------- 181  P6_{4}22 #181
+    spacegroupnumber=181;}
+  else if(spacegroupsymbol=="P6_{3}22" || spacegroupsymbol=="P6_322" || spacegroupsymbol=="P6322") {  // ------------------- 182  P6_{3}22 #182
+    spacegroupnumber=182;}
+  else if(spacegroupsymbol=="P6mm") {  // ------------------- 183  P6mm #183
+    spacegroupnumber=183;}
+  else if(spacegroupsymbol=="P6cc") {  // ------------------- 184  P6cc #184
+    spacegroupnumber=184;}
+  else if(spacegroupsymbol=="P6_{3}cm" || spacegroupsymbol=="P6_3cm" || spacegroupsymbol=="P63cm") {  // ------------------- 185  P6_{3}cm #185
+    spacegroupnumber=185;}
+  else if(spacegroupsymbol=="P6_{3}mc" || spacegroupsymbol=="P6_3mc" || spacegroupsymbol=="P63mc") {  // ------------------- 186  P6_{3}mc #186
+    spacegroupnumber=186;}
+  else if(spacegroupsymbol=="P-6m2") {  // ------------------- 187  P-6m2 #187
+    spacegroupnumber=187;}
+  else if(spacegroupsymbol=="P-6c2") {  // ------------------- 188  P-6c2 #188
+    spacegroupnumber=188;}
+  else if(spacegroupsymbol=="P-62m") {  // ------------------- 189  P-62m #189
+    spacegroupnumber=189;}
+  else if(spacegroupsymbol=="P-62c") {  // ------------------- 190  P-62c #190
+    spacegroupnumber=190;}
+  else if(spacegroupsymbol=="P6/mmm") {  // ------------------- 191  P6/mmm #191
+    spacegroupnumber=191;}
+  else if(spacegroupsymbol=="P6/mcc") {  // ------------------- 192  P6/mcc #192
+    spacegroupnumber=192;}
+  else if(spacegroupsymbol=="P6_{3}/mcm" || spacegroupsymbol=="P6_3/mcm" || spacegroupsymbol=="P63/mcm") {  // ------------------- 193  P6_{3}/mcm #193
+    spacegroupnumber=193;}
+  else if(spacegroupsymbol=="P6_{3}/mmc" || spacegroupsymbol=="P6_3/mmc" || spacegroupsymbol=="P63/mmc") {  // ------------------- 194  P6_{3}/mmc #194
+    spacegroupnumber=194;}
+  else if(spacegroupsymbol=="P23") {  // ------------------- 195  P23 #195
+    spacegroupnumber=195;}
+  else if(spacegroupsymbol=="F23") {  // ------------------- 196  F23 #196
+    spacegroupnumber=196;}
+  else if(spacegroupsymbol=="I23") {  // ------------------- 197  I23 #197
+    spacegroupnumber=197;}
+  else if(spacegroupsymbol=="P2_{1}3" || spacegroupsymbol=="P2_13" || spacegroupsymbol=="P213") {  // ------------------- 198  P2_{1}3 #198
+    spacegroupnumber=198;}
+  else if(spacegroupsymbol=="I2_{1}3" || spacegroupsymbol=="I2_13" || spacegroupsymbol=="I213") {  // ------------------- 199  I2_{1}3 #199
+    spacegroupnumber=199;}
+  else if(spacegroupsymbol=="Pm-3") {  // ------------------- 200  Pm-3 #200
+    spacegroupnumber=200;}
+  else if(spacegroupsymbol=="Pn-3") {  // ------------------- 201  Pn-3 #201
+    spacegroupnumber=201;}
+  else if(spacegroupsymbol=="Fm-3") {  // ------------------- 202  Fm-3 #202
+    spacegroupnumber=202;}
+  else if(spacegroupsymbol=="Fd-3") {  // ------------------- 203  Fd-3 #203
+    spacegroupnumber=203;}
+  else if(spacegroupsymbol=="Im-3") {  // ------------------- 204  Im-3 #204
+    spacegroupnumber=204;}
+  else if(spacegroupsymbol=="Pa-3") {  // ------------------- 205  Pa-3 #205
+    spacegroupnumber=205;}
+  else if(spacegroupsymbol=="Ia-3") {  // ------------------- 206  Ia-3 #206
+    spacegroupnumber=206;}
+  else if(spacegroupsymbol=="P432") {  // ------------------- 207  P432 #207
+    spacegroupnumber=207;}
+  else if(spacegroupsymbol=="P4_{2}32" || spacegroupsymbol=="P4_232" || spacegroupsymbol=="P4232") {  // ------------------- 208  P4_{2}32 #208
+    spacegroupnumber=208;}
+  else if(spacegroupsymbol=="F432") {  // ------------------- 209  F432 #209
+    spacegroupnumber=209;}
+  else if(spacegroupsymbol=="F4_{1}32" || spacegroupsymbol=="F4_132" || spacegroupsymbol=="F4132") {  // ------------------- 210  F4_{1}32 #210
+    spacegroupnumber=210;}
+  else if(spacegroupsymbol=="I432") {  // ------------------- 211  I432 #211
+    spacegroupnumber=211;}
+  else if(spacegroupsymbol=="P4_{3}32" || spacegroupsymbol=="P4_332" || spacegroupsymbol=="P4332") {  // ------------------- 212  P4_{3}32 #212
+    spacegroupnumber=212;}
+  else if(spacegroupsymbol=="P4_{1}32" || spacegroupsymbol=="P4_132" || spacegroupsymbol=="P4132") {  // ------------------- 213  P4_{1}32 #213
+    spacegroupnumber=213;}
+  else if(spacegroupsymbol=="I4_{1}32" || spacegroupsymbol=="I4_132" || spacegroupsymbol=="I4132") {  // ------------------- 214  I4_{1}32 #214
+    spacegroupnumber=214;}
+  else if(spacegroupsymbol=="P-43m") {  // ------------------- 215  P-43m #215
+    spacegroupnumber=215;}
+  else if(spacegroupsymbol=="F-43m") {  // ------------------- 216  F-43m #216
+    spacegroupnumber=216;}
+  else if(spacegroupsymbol=="I-43m") {  // ------------------- 217  I-43m #217
+    spacegroupnumber=217;}
+  else if(spacegroupsymbol=="P-43n") {  // ------------------- 218  P-43n #218
+    spacegroupnumber=218;}
+  else if(spacegroupsymbol=="F-43c") {  // ------------------- 219  F-43c #219
+    spacegroupnumber=219;}
+  else if(spacegroupsymbol=="I-43d") {  // ------------------- 220  I-43d #220
+    spacegroupnumber=220;}
+  else if(spacegroupsymbol=="Pm-3m") {  // ------------------- 221  Pm-3m #221
+    spacegroupnumber=221;}
+  else if(spacegroupsymbol=="Pn-3n") {  // ------------------- 222  Pn-3n #222
+    spacegroupnumber=222;}
+  else if(spacegroupsymbol=="Pm-3n") {  // ------------------- 223  Pm-3n #223
+    spacegroupnumber=223;}
+  else if(spacegroupsymbol=="Pn-3m") {  // ------------------- 224  Pn-3m #224
+    spacegroupnumber=224;}
+  else if(spacegroupsymbol=="Fm-3m") {  // ------------------- 225  Fm-3m #225
+    spacegroupnumber=225;}
+  else if(spacegroupsymbol=="Fm-3c") {  // ------------------- 226  Fm-3c #226
+    spacegroupnumber=226;}
+  else if(spacegroupsymbol=="Fd-3m") {  // ------------------- 227  Fd-3m #227
+    spacegroupnumber=227;}
+  else if(spacegroupsymbol=="Fd-3c") {  // ------------------- 228  Fd-3c #228
+    spacegroupnumber=228;}
+  else if(spacegroupsymbol=="Im-3m") {  // ------------------- 229  Im-3m #229
+    spacegroupnumber=229;}
+  else if(spacegroupsymbol=="Ia-3d") {  // ------------------- 230  Ia-3d #230                                                                           
+    spacegroupnumber=230;}
+  // done
+  else{
+    message << "routine: space group specified invalid; perhaps non-ITC setting: ";
+    message << "space group symbol=" << spacegroupsymbol << " [dir=" << directory << "].";
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+  }
+  return spacegroupnumber;
+}
+
+// ***************************************************************************
 // GetSpaceGroupSchoenflies
 // ***************************************************************************
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
-  string spacegroup;
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) {
-    cerr << "aflow_xatom.cpp GetSpaceGroupSchoenflies() routine: space group specified invalid (1-230): ";
-    cerr << spacegroupnumber << " [dir=" << directory << "]." << endl;
-    exit(0);
+  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX 20190708 - for xerror
+  stringstream message; //DX 20190708 - for xerror
+  string spacegroup=""; //DX 20190708 - for xerror
+  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
+    message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
+    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  C_{1}^{1} #1
     spacegroup="C_{1}^{1}";}
-  if(spacegroupnumber==2) { // ------------------- 2  C_{i}^{1} #2
+  else if(spacegroupnumber==2) { // ------------------- 2  C_{i}^{1} #2
     spacegroup="C_{i}^{1}";}
-  if(spacegroupnumber==3) { // ------------------- 3  C_{2}^{1} #3
+  else if(spacegroupnumber==3) { // ------------------- 3  C_{2}^{1} #3
     spacegroup="C_{2}^{1}";}
-  if(spacegroupnumber==4) { // ------------------- 4  C_{2}^{2} #4
+  else if(spacegroupnumber==4) { // ------------------- 4  C_{2}^{2} #4
     spacegroup="C_{2}^{2}";}
-  if(spacegroupnumber==5) { // ------------------- 5  C_{2}^{3} #5
+  else if(spacegroupnumber==5) { // ------------------- 5  C_{2}^{3} #5
     spacegroup="C_{2}^{3}";}
-  if(spacegroupnumber==6) { // ------------------- 6  C_{s}^{1} #6
+  else if(spacegroupnumber==6) { // ------------------- 6  C_{s}^{1} #6
     spacegroup="C_{s}^{1}";}
-  if(spacegroupnumber==7) { // ------------------- 7  C_{s}^{2} #7
+  else if(spacegroupnumber==7) { // ------------------- 7  C_{s}^{2} #7
     spacegroup="C_{s}^{2}";}
-  if(spacegroupnumber==8) { // ------------------- 8  C_{s}^{3} #8
+  else if(spacegroupnumber==8) { // ------------------- 8  C_{s}^{3} #8
     spacegroup="C_{s}^{3}";}
-  if(spacegroupnumber==9) { // ------------------- 9  C_{s}^{4} #9
+  else if(spacegroupnumber==9) { // ------------------- 9  C_{s}^{4} #9
     spacegroup="C_{s}^{4}";}
-  if(spacegroupnumber==10) { // ------------------- 10  C_{2h}^{1} #10
+  else if(spacegroupnumber==10) { // ------------------- 10  C_{2h}^{1} #10
     spacegroup="C_{2h}^{1}";}
-  if(spacegroupnumber==11) { // ------------------- 11  C_{2h}^{2} #11
+  else if(spacegroupnumber==11) { // ------------------- 11  C_{2h}^{2} #11
     spacegroup="C_{2h}^{2}";}
-  if(spacegroupnumber==12) { // ------------------- 12  C_{2h}^{3} #12
+  else if(spacegroupnumber==12) { // ------------------- 12  C_{2h}^{3} #12
     spacegroup="C_{2h}^{3}";}
-  if(spacegroupnumber==13) { // ------------------- 13  C_{2h}^{4} #13
+  else if(spacegroupnumber==13) { // ------------------- 13  C_{2h}^{4} #13
     spacegroup="C_{2h}^{4}";}
-  if(spacegroupnumber==14) { // ------------------- 14  C_{2h}^{5} #14
+  else if(spacegroupnumber==14) { // ------------------- 14  C_{2h}^{5} #14
     spacegroup="C_{2h}^{5}";}
-  if(spacegroupnumber==15) { // ------------------- 15  C_{2h}^{6} #15
+  else if(spacegroupnumber==15) { // ------------------- 15  C_{2h}^{6} #15
     spacegroup="C_{2h}^{6}";}
-  if(spacegroupnumber==16) { // ------------------- 16  D_{2}^{1} #16
+  else if(spacegroupnumber==16) { // ------------------- 16  D_{2}^{1} #16
     spacegroup="D_{2}^{1}";}
-  if(spacegroupnumber==17) { // ------------------- 17  D_{2}^{2} #17
+  else if(spacegroupnumber==17) { // ------------------- 17  D_{2}^{2} #17
     spacegroup="D_{2}^{2}";}
-  if(spacegroupnumber==18) { // ------------------- 18  D_{2}^{3} #18
+  else if(spacegroupnumber==18) { // ------------------- 18  D_{2}^{3} #18
     spacegroup="D_{2}^{3}";}
-  if(spacegroupnumber==19) { // ------------------- 19  D_{2}^{4} #19
+  else if(spacegroupnumber==19) { // ------------------- 19  D_{2}^{4} #19
     spacegroup="D_{2}^{4}";}
-  if(spacegroupnumber==20) { // ------------------- 20  D_{2}^{5} #20
+  else if(spacegroupnumber==20) { // ------------------- 20  D_{2}^{5} #20
     spacegroup="D_{2}^{5}";}
-  if(spacegroupnumber==21) { // ------------------- 21  D_{2}^{6} #21
+  else if(spacegroupnumber==21) { // ------------------- 21  D_{2}^{6} #21
     spacegroup="D_{2}^{6}";}
-  if(spacegroupnumber==22) { // ------------------- 22  D_{2}^{7} #22
+  else if(spacegroupnumber==22) { // ------------------- 22  D_{2}^{7} #22
     spacegroup="D_{2}^{7}";}
-  if(spacegroupnumber==23) { // ------------------- 23  D_{2}^{8} #23
+  else if(spacegroupnumber==23) { // ------------------- 23  D_{2}^{8} #23
     spacegroup="D_{2}^{8}";}
-  if(spacegroupnumber==24) { // ------------------- 24  D_{2}^{9} #24
+  else if(spacegroupnumber==24) { // ------------------- 24  D_{2}^{9} #24
     spacegroup="D_{2}^{9}";}
-  if(spacegroupnumber==25) { // ------------------- 25  C_{2v}^{1} #25
+  else if(spacegroupnumber==25) { // ------------------- 25  C_{2v}^{1} #25
     spacegroup="C_{2v}^{1}";}
-  if(spacegroupnumber==26) { // ------------------- 26  C_{2v}^{2} #26
+  else if(spacegroupnumber==26) { // ------------------- 26  C_{2v}^{2} #26
     spacegroup="C_{2v}^{2}";}
-  if(spacegroupnumber==27) { // ------------------- 27  C_{2v}^{3} #27
+  else if(spacegroupnumber==27) { // ------------------- 27  C_{2v}^{3} #27
     spacegroup="C_{2v}^{3}";}
-  if(spacegroupnumber==28) { // ------------------- 28  C_{2v}^{4} #28
+  else if(spacegroupnumber==28) { // ------------------- 28  C_{2v}^{4} #28
     spacegroup="C_{2v}^{4}";}
-  if(spacegroupnumber==29) { // ------------------- 29  C_{2v}^{5} #29
+  else if(spacegroupnumber==29) { // ------------------- 29  C_{2v}^{5} #29
     spacegroup="C_{2v}^{5}";}
-  if(spacegroupnumber==30) { // ------------------- 30  C_{2v}^{6} #30
+  else if(spacegroupnumber==30) { // ------------------- 30  C_{2v}^{6} #30
     spacegroup="C_{2v}^{6}";}
-  if(spacegroupnumber==31) { // ------------------- 31  C_{2v}^{7} #31
+  else if(spacegroupnumber==31) { // ------------------- 31  C_{2v}^{7} #31
     spacegroup="C_{2v}^{7}";}
-  if(spacegroupnumber==32) { // ------------------- 32  C_{2v}^{8} #32
+  else if(spacegroupnumber==32) { // ------------------- 32  C_{2v}^{8} #32
     spacegroup="C_{2v}^{8}";}
-  if(spacegroupnumber==33) { // ------------------- 33  C_{2v}^{9} #33
+  else if(spacegroupnumber==33) { // ------------------- 33  C_{2v}^{9} #33
     spacegroup="C_{2v}^{9}";}
-  if(spacegroupnumber==34) { // ------------------- 34  C_{2v}^{10} #34
+  else if(spacegroupnumber==34) { // ------------------- 34  C_{2v}^{10} #34
     spacegroup="C_{2v}^{10}";}
-  if(spacegroupnumber==35) { // ------------------- 35  C_{2v}^{11} #35
+  else if(spacegroupnumber==35) { // ------------------- 35  C_{2v}^{11} #35
     spacegroup="C_{2v}^{11}";}
-  if(spacegroupnumber==36) { // ------------------- 36  C_{2v}^{12} #36
+  else if(spacegroupnumber==36) { // ------------------- 36  C_{2v}^{12} #36
     spacegroup="C_{2v}^{12}";}
-  if(spacegroupnumber==37) { // ------------------- 37  C_{2v}^{13} #37
+  else if(spacegroupnumber==37) { // ------------------- 37  C_{2v}^{13} #37
     spacegroup="C_{2v}^{13}";}
-  if(spacegroupnumber==38) { // ------------------- 38  C_{2v}^{14} #38
+  else if(spacegroupnumber==38) { // ------------------- 38  C_{2v}^{14} #38
     spacegroup="C_{2v}^{14}";}
-  if(spacegroupnumber==39) { // ------------------- 39  C_{2v}^{15} #39
+  else if(spacegroupnumber==39) { // ------------------- 39  C_{2v}^{15} #39
     spacegroup="C_{2v}^{15}";}
-  if(spacegroupnumber==40) { // ------------------- 40  C_{2v}^{16} #40
+  else if(spacegroupnumber==40) { // ------------------- 40  C_{2v}^{16} #40
     spacegroup="C_{2v}^{16}";}
-  if(spacegroupnumber==41) { // ------------------- 41  C_{2v}^{17} #41
+  else if(spacegroupnumber==41) { // ------------------- 41  C_{2v}^{17} #41
     spacegroup="C_{2v}^{17}";}
-  if(spacegroupnumber==42) { // ------------------- 42  C_{2v}^{18} #42
+  else if(spacegroupnumber==42) { // ------------------- 42  C_{2v}^{18} #42
     spacegroup="C_{2v}^{18}";}
-  if(spacegroupnumber==43) { // ------------------- 43  C_{2v}^{19} #43
+  else if(spacegroupnumber==43) { // ------------------- 43  C_{2v}^{19} #43
     spacegroup="C_{2v}^{19}";}
-  if(spacegroupnumber==44) { // ------------------- 44  C_{2v}^{20} #44
+  else if(spacegroupnumber==44) { // ------------------- 44  C_{2v}^{20} #44
     spacegroup="C_{2v}^{20}";}
-  if(spacegroupnumber==45) { // ------------------- 45  C_{2v}^{21} #45
+  else if(spacegroupnumber==45) { // ------------------- 45  C_{2v}^{21} #45
     spacegroup="C_{2v}^{21}";}
-  if(spacegroupnumber==46) { // ------------------- 46  C_{2v}^{22} #46
+  else if(spacegroupnumber==46) { // ------------------- 46  C_{2v}^{22} #46
     spacegroup="C_{2v}^{22}";}
-  if(spacegroupnumber==47) { // ------------------- 47  D_{2h}^{1} #47
+  else if(spacegroupnumber==47) { // ------------------- 47  D_{2h}^{1} #47
     spacegroup="D_{2h}^{1}";}
-  if(spacegroupnumber==48) { // ------------------- 48  D_{2h}^{2} #48
+  else if(spacegroupnumber==48) { // ------------------- 48  D_{2h}^{2} #48
     spacegroup="D_{2h}^{2}";}
-  if(spacegroupnumber==49) { // ------------------- 49  D_{2h}^{3} #49
+  else if(spacegroupnumber==49) { // ------------------- 49  D_{2h}^{3} #49
     spacegroup="D_{2h}^{3}";}
-  if(spacegroupnumber==50) { // ------------------- 50  D_{2h}^{4} #50
+  else if(spacegroupnumber==50) { // ------------------- 50  D_{2h}^{4} #50
     spacegroup="D_{2h}^{4}";}
-  if(spacegroupnumber==51) { // ------------------- 51  D_{2h}^{5} #51
+  else if(spacegroupnumber==51) { // ------------------- 51  D_{2h}^{5} #51
     spacegroup="D_{2h}^{5}";}
-  if(spacegroupnumber==52) { // ------------------- 52  D_{2h}^{6} #52
+  else if(spacegroupnumber==52) { // ------------------- 52  D_{2h}^{6} #52
     spacegroup="D_{2h}^{6}";}
-  if(spacegroupnumber==53) { // ------------------- 53  D_{2h}^{7} #53
+  else if(spacegroupnumber==53) { // ------------------- 53  D_{2h}^{7} #53
     spacegroup="D_{2h}^{7}";}
-  if(spacegroupnumber==54) { // ------------------- 54  D_{2h}^{8} #54
+  else if(spacegroupnumber==54) { // ------------------- 54  D_{2h}^{8} #54
     spacegroup="D_{2h}^{8}";}
-  if(spacegroupnumber==55) { // ------------------- 55  D_{2h}^{9} #55
+  else if(spacegroupnumber==55) { // ------------------- 55  D_{2h}^{9} #55
     spacegroup="D_{2h}^{9}";}
-  if(spacegroupnumber==56) { // ------------------- 56  D_{2h}^{10} #56
+  else if(spacegroupnumber==56) { // ------------------- 56  D_{2h}^{10} #56
     spacegroup="D_{2h}^{10}";}
-  if(spacegroupnumber==57) { // ------------------- 57  D_{2h}^{11} #57
+  else if(spacegroupnumber==57) { // ------------------- 57  D_{2h}^{11} #57
     spacegroup="D_{2h}^{11}";}
-  if(spacegroupnumber==58) { // ------------------- 58  D_{2h}^{12} #58
+  else if(spacegroupnumber==58) { // ------------------- 58  D_{2h}^{12} #58
     spacegroup="D_{2h}^{12}";}
-  if(spacegroupnumber==59) { // ------------------- 59  D_{2h}^{13} #59
+  else if(spacegroupnumber==59) { // ------------------- 59  D_{2h}^{13} #59
     spacegroup="D_{2h}^{13}";}
-  if(spacegroupnumber==60) { // ------------------- 60  D_{2h}^{14} #60
+  else if(spacegroupnumber==60) { // ------------------- 60  D_{2h}^{14} #60
     spacegroup="D_{2h}^{14}";}
-  if(spacegroupnumber==61) { // ------------------- 61  D_{2h}^{15} #61
+  else if(spacegroupnumber==61) { // ------------------- 61  D_{2h}^{15} #61
     spacegroup="D_{2h}^{15}";}
-  if(spacegroupnumber==62) { // ------------------- 62  D_{2h}^{16} #62
+  else if(spacegroupnumber==62) { // ------------------- 62  D_{2h}^{16} #62
     spacegroup="D_{2h}^{16}";}
-  if(spacegroupnumber==63) { // ------------------- 63  D_{2h}^{17} #63
+  else if(spacegroupnumber==63) { // ------------------- 63  D_{2h}^{17} #63
     spacegroup="D_{2h}^{17}";}
-  if(spacegroupnumber==64) { // ------------------- 64  D_{2h}^{18} #64
+  else if(spacegroupnumber==64) { // ------------------- 64  D_{2h}^{18} #64
     spacegroup="D_{2h}^{18}";}
-  if(spacegroupnumber==65) { // ------------------- 65  D_{2h}^{19} #65
+  else if(spacegroupnumber==65) { // ------------------- 65  D_{2h}^{19} #65
     spacegroup="D_{2h}^{19}";}
-  if(spacegroupnumber==66) { // ------------------- 66  D_{2h}^{20} #66
+  else if(spacegroupnumber==66) { // ------------------- 66  D_{2h}^{20} #66
     spacegroup="D_{2h}^{20}";}
-  if(spacegroupnumber==67) { // ------------------- 67  D_{2h}^{21} #67
+  else if(spacegroupnumber==67) { // ------------------- 67  D_{2h}^{21} #67
     spacegroup="D_{2h}^{21}";}
-  if(spacegroupnumber==68) { // ------------------- 68  D_{2h}^{22} #68
+  else if(spacegroupnumber==68) { // ------------------- 68  D_{2h}^{22} #68
     spacegroup="D_{2h}^{22}";}
-  if(spacegroupnumber==69) { // ------------------- 69  D_{2h}^{23} #69
+  else if(spacegroupnumber==69) { // ------------------- 69  D_{2h}^{23} #69
     spacegroup="D_{2h}^{23}";}
-  if(spacegroupnumber==70) { // ------------------- 70  D_{2h}^{24} #70
+  else if(spacegroupnumber==70) { // ------------------- 70  D_{2h}^{24} #70
     spacegroup="D_{2h}^{24}";}
-  if(spacegroupnumber==71) { // ------------------- 71  D_{2h}^{25} #71
+  else if(spacegroupnumber==71) { // ------------------- 71  D_{2h}^{25} #71
     spacegroup="D_{2h}^{25}";}
-  if(spacegroupnumber==72) { // ------------------- 72  D_{2h}^{26} #72
+  else if(spacegroupnumber==72) { // ------------------- 72  D_{2h}^{26} #72
     spacegroup="D_{2h}^{26}";}
-  if(spacegroupnumber==73) { // ------------------- 73  D_{2h}^{27} #73
+  else if(spacegroupnumber==73) { // ------------------- 73  D_{2h}^{27} #73
     spacegroup="D_{2h}^{27}";}
-  if(spacegroupnumber==74) { // ------------------- 74  D_{2h}^{28} #74
+  else if(spacegroupnumber==74) { // ------------------- 74  D_{2h}^{28} #74
     spacegroup="D_{2h}^{28}";}
-  if(spacegroupnumber==75) { // ------------------- 75  C_{4}^{1} #75
+  else if(spacegroupnumber==75) { // ------------------- 75  C_{4}^{1} #75
     spacegroup="C_{4}^{1}";}
-  if(spacegroupnumber==76) { // ------------------- 76  C_{4}^{2} #76
+  else if(spacegroupnumber==76) { // ------------------- 76  C_{4}^{2} #76
     spacegroup="C_{4}^{2}";}
-  if(spacegroupnumber==77) { // ------------------- 77  C_{4}^{3} #77
+  else if(spacegroupnumber==77) { // ------------------- 77  C_{4}^{3} #77
     spacegroup="C_{4}^{3}";}
-  if(spacegroupnumber==78) { // ------------------- 78  C_{4}^{4} #78
+  else if(spacegroupnumber==78) { // ------------------- 78  C_{4}^{4} #78
     spacegroup="C_{4}^{4}";}
-  if(spacegroupnumber==79) { // ------------------- 79  C_{4}^{5} #79
+  else if(spacegroupnumber==79) { // ------------------- 79  C_{4}^{5} #79
     spacegroup="C_{4}^{5}";}
-  if(spacegroupnumber==80) { // ------------------- 80  C_{4}^{6} #80
+  else if(spacegroupnumber==80) { // ------------------- 80  C_{4}^{6} #80
     spacegroup="C_{4}^{6}";}
-  if(spacegroupnumber==81) { // ------------------- 81  S_{4}^{1} #81
+  else if(spacegroupnumber==81) { // ------------------- 81  S_{4}^{1} #81
     spacegroup="S_{4}^{1}";}
-  if(spacegroupnumber==82) { // ------------------- 82  S_{4}^{2} #82
+  else if(spacegroupnumber==82) { // ------------------- 82  S_{4}^{2} #82
     spacegroup="S_{4}^{2}";}
-  if(spacegroupnumber==83) { // ------------------- 83  C_{4h}^{1} #83
+  else if(spacegroupnumber==83) { // ------------------- 83  C_{4h}^{1} #83
     spacegroup="C_{4h}^{1}";}
-  if(spacegroupnumber==84) { // ------------------- 84  C_{4h}^{2} #84
+  else if(spacegroupnumber==84) { // ------------------- 84  C_{4h}^{2} #84
     spacegroup="C_{4h}^{2}";}
-  if(spacegroupnumber==85) { // ------------------- 85  C_{4h}^{3} #85
+  else if(spacegroupnumber==85) { // ------------------- 85  C_{4h}^{3} #85
     spacegroup="C_{4h}^{3}";}
-  if(spacegroupnumber==86) { // ------------------- 86  C_{4h}^{4} #86
+  else if(spacegroupnumber==86) { // ------------------- 86  C_{4h}^{4} #86
     spacegroup="C_{4h}^{4}";}
-  if(spacegroupnumber==87) { // ------------------- 87  C_{4h}^{5} #87
+  else if(spacegroupnumber==87) { // ------------------- 87  C_{4h}^{5} #87
     spacegroup="C_{4h}^{5}";}
-  if(spacegroupnumber==88) { // ------------------- 88  C_{4h}^{6} #88
+  else if(spacegroupnumber==88) { // ------------------- 88  C_{4h}^{6} #88
     spacegroup="C_{4h}^{6}";}
-  if(spacegroupnumber==89) { // ------------------- 89  D_{4}^{1} #89
+  else if(spacegroupnumber==89) { // ------------------- 89  D_{4}^{1} #89
     spacegroup="D_{4}^{1}";}
-  if(spacegroupnumber==90) { // ------------------- 90  D_{4}^{2} #90
+  else if(spacegroupnumber==90) { // ------------------- 90  D_{4}^{2} #90
     spacegroup="D_{4}^{2}";}
-  if(spacegroupnumber==91) { // ------------------- 91  D_{4}^{3} #91
+  else if(spacegroupnumber==91) { // ------------------- 91  D_{4}^{3} #91
     spacegroup="D_{4}^{3}";}
-  if(spacegroupnumber==92) { // ------------------- 92  D_{4}^{4} #92
+  else if(spacegroupnumber==92) { // ------------------- 92  D_{4}^{4} #92
     spacegroup="D_{4}^{4}";}
-  if(spacegroupnumber==93) { // ------------------- 93  D_{4}^{5} #93
+  else if(spacegroupnumber==93) { // ------------------- 93  D_{4}^{5} #93
     spacegroup="D_{4}^{5}";}
-  if(spacegroupnumber==94) { // ------------------- 94  D_{4}^{6} #94
+  else if(spacegroupnumber==94) { // ------------------- 94  D_{4}^{6} #94
     spacegroup="D_{4}^{6}";}
-  if(spacegroupnumber==95) { // ------------------- 95  D_{4}^{7} #95
+  else if(spacegroupnumber==95) { // ------------------- 95  D_{4}^{7} #95
     spacegroup="D_{4}^{7}";}
-  if(spacegroupnumber==96) { // ------------------- 96  D_{4}^{8} #96
+  else if(spacegroupnumber==96) { // ------------------- 96  D_{4}^{8} #96
     spacegroup="D_{4}^{8}";}
-  if(spacegroupnumber==97) { // ------------------- 97  D_{4}^{9} #97
+  else if(spacegroupnumber==97) { // ------------------- 97  D_{4}^{9} #97
     spacegroup="D_{4}^{9}";}
-  if(spacegroupnumber==98) { // ------------------- 98  D_{4}^{10} #98
+  else if(spacegroupnumber==98) { // ------------------- 98  D_{4}^{10} #98
     spacegroup="D_{4}^{10}";}
-  if(spacegroupnumber==99) { // ------------------- 99  C_{4v}^{1} #99
+  else if(spacegroupnumber==99) { // ------------------- 99  C_{4v}^{1} #99
     spacegroup="C_{4v}^{1}";}
-  if(spacegroupnumber==100) { // ------------------- 100  C_{4v}^{2} #100
+  else if(spacegroupnumber==100) { // ------------------- 100  C_{4v}^{2} #100
     spacegroup="C_{4v}^{2}";}
-  if(spacegroupnumber==101) { // ------------------- 101  C_{4v}^{3} #101
+  else if(spacegroupnumber==101) { // ------------------- 101  C_{4v}^{3} #101
     spacegroup="C_{4v}^{3}";}
-  if(spacegroupnumber==102) { // ------------------- 102  C_{4v}^{4} #102
+  else if(spacegroupnumber==102) { // ------------------- 102  C_{4v}^{4} #102
     spacegroup="C_{4v}^{4}";}
-  if(spacegroupnumber==103) { // ------------------- 103  C_{4v}^{5} #103
+  else if(spacegroupnumber==103) { // ------------------- 103  C_{4v}^{5} #103
     spacegroup="C_{4v}^{5}";}
-  if(spacegroupnumber==104) { // ------------------- 104  C_{4v}^{6} #104
+  else if(spacegroupnumber==104) { // ------------------- 104  C_{4v}^{6} #104
     spacegroup="C_{4v}^{6}";}
-  if(spacegroupnumber==105) { // ------------------- 105  C_{4v}^{7} #105
+  else if(spacegroupnumber==105) { // ------------------- 105  C_{4v}^{7} #105
     spacegroup="C_{4v}^{7}";}
-  if(spacegroupnumber==106) { // ------------------- 106  C_{4v}^{8} #106
+  else if(spacegroupnumber==106) { // ------------------- 106  C_{4v}^{8} #106
     spacegroup="C_{4v}^{8}";}
-  if(spacegroupnumber==107) { // ------------------- 107  C_{4v}^{9} #107
+  else if(spacegroupnumber==107) { // ------------------- 107  C_{4v}^{9} #107
     spacegroup="C_{4v}^{9}";}
-  if(spacegroupnumber==108) { // ------------------- 108  C_{4v}^{10} #108
+  else if(spacegroupnumber==108) { // ------------------- 108  C_{4v}^{10} #108
     spacegroup="C_{4v}^{10}";}
-  if(spacegroupnumber==109) { // ------------------- 109  C_{4v}^{11} #109
+  else if(spacegroupnumber==109) { // ------------------- 109  C_{4v}^{11} #109
     spacegroup="C_{4v}^{11}";}
-  if(spacegroupnumber==110) { // ------------------- 110  C_{4v}^{12} #110
+  else if(spacegroupnumber==110) { // ------------------- 110  C_{4v}^{12} #110
     spacegroup="C_{4v}^{12}";}
-  if(spacegroupnumber==111) { // ------------------- 111  D_{2d}^{1} #111
+  else if(spacegroupnumber==111) { // ------------------- 111  D_{2d}^{1} #111
     spacegroup="D_{2d}^{1}";}
-  if(spacegroupnumber==112) { // ------------------- 112  D_{2d}^{2} #112
+  else if(spacegroupnumber==112) { // ------------------- 112  D_{2d}^{2} #112
     spacegroup="D_{2d}^{2}";}
-  if(spacegroupnumber==113) { // ------------------- 113  D_{2d}^{3} #113
+  else if(spacegroupnumber==113) { // ------------------- 113  D_{2d}^{3} #113
     spacegroup="D_{2d}^{3}";}
-  if(spacegroupnumber==114) { // ------------------- 114  D_{2d}^{4} #114
+  else if(spacegroupnumber==114) { // ------------------- 114  D_{2d}^{4} #114
     spacegroup="D_{2d}^{4}";}
-  if(spacegroupnumber==115) { // ------------------- 115  D_{2d}^{5} #115
+  else if(spacegroupnumber==115) { // ------------------- 115  D_{2d}^{5} #115
     spacegroup="D_{2d}^{5}";}
-  if(spacegroupnumber==116) { // ------------------- 116  D_{2d}^{6} #116
+  else if(spacegroupnumber==116) { // ------------------- 116  D_{2d}^{6} #116
     spacegroup="D_{2d}^{6}";}
-  if(spacegroupnumber==117) { // ------------------- 117  D_{2d}^{7} #117
+  else if(spacegroupnumber==117) { // ------------------- 117  D_{2d}^{7} #117
     spacegroup="D_{2d}^{7}";}
-  if(spacegroupnumber==118) { // ------------------- 118  D_{2d}^{8} #118
+  else if(spacegroupnumber==118) { // ------------------- 118  D_{2d}^{8} #118
     spacegroup="D_{2d}^{8}";}
-  if(spacegroupnumber==119) { // ------------------- 119  D_{2d}^{9} #119
+  else if(spacegroupnumber==119) { // ------------------- 119  D_{2d}^{9} #119
     spacegroup="D_{2d}^{9}";}
-  if(spacegroupnumber==120) { // ------------------- 120  D_{2d}^{10} #120
+  else if(spacegroupnumber==120) { // ------------------- 120  D_{2d}^{10} #120
     spacegroup="D_{2d}^{10}";}
-  if(spacegroupnumber==121) { // ------------------- 121  D_{2d}^{11} #121
+  else if(spacegroupnumber==121) { // ------------------- 121  D_{2d}^{11} #121
     spacegroup="D_{2d}^{11}";}
-  if(spacegroupnumber==122) { // ------------------- 122  D_{2d}^{12} #122
+  else if(spacegroupnumber==122) { // ------------------- 122  D_{2d}^{12} #122
     spacegroup="D_{2d}^{12}";}
-  if(spacegroupnumber==123) { // ------------------- 123  D_{4h}^{1} #123
+  else if(spacegroupnumber==123) { // ------------------- 123  D_{4h}^{1} #123
     spacegroup="D_{4h}^{1}";}
-  if(spacegroupnumber==124) { // ------------------- 124  D_{4h}^{2} #124
+  else if(spacegroupnumber==124) { // ------------------- 124  D_{4h}^{2} #124
     spacegroup="D_{4h}^{2}";}
-  if(spacegroupnumber==125) { // ------------------- 125  D_{4h}^{3} #125
+  else if(spacegroupnumber==125) { // ------------------- 125  D_{4h}^{3} #125
     spacegroup="D_{4h}^{3}";}
-  if(spacegroupnumber==126) { // ------------------- 126  D_{4h}^{4} #126
+  else if(spacegroupnumber==126) { // ------------------- 126  D_{4h}^{4} #126
     spacegroup="D_{4h}^{4}";}
-  if(spacegroupnumber==127) { // ------------------- 127  D_{4h}^{5} #127
+  else if(spacegroupnumber==127) { // ------------------- 127  D_{4h}^{5} #127
     spacegroup="D_{4h}^{5}";}
-  if(spacegroupnumber==128) { // ------------------- 128  D_{4h}^{6} #128
+  else if(spacegroupnumber==128) { // ------------------- 128  D_{4h}^{6} #128
     spacegroup="D_{4h}^{6}";}
-  if(spacegroupnumber==129) { // ------------------- 129  D_{4h}^{7} #129
+  else if(spacegroupnumber==129) { // ------------------- 129  D_{4h}^{7} #129
     spacegroup="D_{4h}^{7}";}
-  if(spacegroupnumber==130) { // ------------------- 130  D_{4h}^{8} #130
+  else if(spacegroupnumber==130) { // ------------------- 130  D_{4h}^{8} #130
     spacegroup="D_{4h}^{8}";}
-  if(spacegroupnumber==131) { // ------------------- 131  D_{4h}^{9} #131
+  else if(spacegroupnumber==131) { // ------------------- 131  D_{4h}^{9} #131
     spacegroup="D_{4h}^{9}";}
-  if(spacegroupnumber==132) { // ------------------- 132  D_{4h}^{10} #132
+  else if(spacegroupnumber==132) { // ------------------- 132  D_{4h}^{10} #132
     spacegroup="D_{4h}^{10}";}
-  if(spacegroupnumber==133) { // ------------------- 133  D_{4h}^{11} #133
+  else if(spacegroupnumber==133) { // ------------------- 133  D_{4h}^{11} #133
     spacegroup="D_{4h}^{11}";}
-  if(spacegroupnumber==134) { // ------------------- 134  D_{4h}^{12} #134
+  else if(spacegroupnumber==134) { // ------------------- 134  D_{4h}^{12} #134
     spacegroup="D_{4h}^{12}";}
-  if(spacegroupnumber==135) { // ------------------- 135  D_{4h}^{13} #135
+  else if(spacegroupnumber==135) { // ------------------- 135  D_{4h}^{13} #135
     spacegroup="D_{4h}^{13}";}
-  if(spacegroupnumber==136) { // ------------------- 136  D_{4h}^{14} #136
+  else if(spacegroupnumber==136) { // ------------------- 136  D_{4h}^{14} #136
     spacegroup="D_{4h}^{14}";}
-  if(spacegroupnumber==137) { // ------------------- 137  D_{4h}^{15} #137
+  else if(spacegroupnumber==137) { // ------------------- 137  D_{4h}^{15} #137
     spacegroup="D_{4h}^{15}";}
-  if(spacegroupnumber==138) { // ------------------- 138  D_{4h}^{16} #138
+  else if(spacegroupnumber==138) { // ------------------- 138  D_{4h}^{16} #138
     spacegroup="D_{4h}^{16}";}
-  if(spacegroupnumber==139) { // ------------------- 139  D_{4h}^{17} #139
+  else if(spacegroupnumber==139) { // ------------------- 139  D_{4h}^{17} #139
     spacegroup="D_{4h}^{17}";}
-  if(spacegroupnumber==140) { // ------------------- 140  D_{4h}^{18} #140
+  else if(spacegroupnumber==140) { // ------------------- 140  D_{4h}^{18} #140
     spacegroup="D_{4h}^{18}";}
-  if(spacegroupnumber==141) { // ------------------- 141  D_{4h}^{19} #141
+  else if(spacegroupnumber==141) { // ------------------- 141  D_{4h}^{19} #141
     spacegroup="D_{4h}^{19}";}
-  if(spacegroupnumber==142) { // ------------------- 142  D_{4h}^{20} #142
+  else if(spacegroupnumber==142) { // ------------------- 142  D_{4h}^{20} #142
     spacegroup="D_{4h}^{20}";}
-  if(spacegroupnumber==143) { // ------------------- 143  C_{3}^{1} #143
+  else if(spacegroupnumber==143) { // ------------------- 143  C_{3}^{1} #143
     spacegroup="C_{3}^{1}";}
-  if(spacegroupnumber==144) { // ------------------- 144  C_{3}^{2} #144
+  else if(spacegroupnumber==144) { // ------------------- 144  C_{3}^{2} #144
     spacegroup="C_{3}^{2}";}
-  if(spacegroupnumber==145) { // ------------------- 145  C_{3}^{3} #145
+  else if(spacegroupnumber==145) { // ------------------- 145  C_{3}^{3} #145
     spacegroup="C_{3}^{3}";}
-  if(spacegroupnumber==146) { // ------------------- 146  C_{3}^{4} #146
+  else if(spacegroupnumber==146) { // ------------------- 146  C_{3}^{4} #146
     spacegroup="C_{3}^{4}";}
-  if(spacegroupnumber==147) { // ------------------- 147  C_{3i}^{1} #147
+  else if(spacegroupnumber==147) { // ------------------- 147  C_{3i}^{1} #147
     spacegroup="C_{3i}^{1}";}
-  if(spacegroupnumber==148) { // ------------------- 148  C_{3i}^{2} #148
+  else if(spacegroupnumber==148) { // ------------------- 148  C_{3i}^{2} #148
     spacegroup="C_{3i}^{2}";}
-  if(spacegroupnumber==149) { // ------------------- 149  D_{3}^{1} #149
+  else if(spacegroupnumber==149) { // ------------------- 149  D_{3}^{1} #149
     spacegroup="D_{3}^{1}";}
-  if(spacegroupnumber==150) { // ------------------- 150  D_{3}^{2} #150
+  else if(spacegroupnumber==150) { // ------------------- 150  D_{3}^{2} #150
     spacegroup="D_{3}^{2}";}
-  if(spacegroupnumber==151) { // ------------------- 151  D_{3}^{3} #151
+  else if(spacegroupnumber==151) { // ------------------- 151  D_{3}^{3} #151
     spacegroup="D_{3}^{3}";}
-  if(spacegroupnumber==152) { // ------------------- 152  D_{3}^{4} #152
+  else if(spacegroupnumber==152) { // ------------------- 152  D_{3}^{4} #152
     spacegroup="D_{3}^{4}";}
-  if(spacegroupnumber==153) { // ------------------- 153  D_{3}^{5} #153
+  else if(spacegroupnumber==153) { // ------------------- 153  D_{3}^{5} #153
     spacegroup="D_{3}^{5}";}
-  if(spacegroupnumber==154) { // ------------------- 154  D_{3}^{6} #154
+  else if(spacegroupnumber==154) { // ------------------- 154  D_{3}^{6} #154
     spacegroup="D_{3}^{6}";}
-  if(spacegroupnumber==155) { // ------------------- 155  D_{3}^{7} #155
+  else if(spacegroupnumber==155) { // ------------------- 155  D_{3}^{7} #155
     spacegroup="D_{3}^{7}";}
-  if(spacegroupnumber==156) { // ------------------- 156  C_{3v}^{1} #156
+  else if(spacegroupnumber==156) { // ------------------- 156  C_{3v}^{1} #156
     spacegroup="C_{3v}^{1}";}
-  if(spacegroupnumber==157) { // ------------------- 157  C_{3v}^{2} #157
+  else if(spacegroupnumber==157) { // ------------------- 157  C_{3v}^{2} #157
     spacegroup="C_{3v}^{2}";}
-  if(spacegroupnumber==158) { // ------------------- 158  C_{3v}^{3} #158
+  else if(spacegroupnumber==158) { // ------------------- 158  C_{3v}^{3} #158
     spacegroup="C_{3v}^{3}";}
-  if(spacegroupnumber==159) { // ------------------- 159  C_{3v}^{4} #159
+  else if(spacegroupnumber==159) { // ------------------- 159  C_{3v}^{4} #159
     spacegroup="C_{3v}^{4}";}
-  if(spacegroupnumber==160) { // ------------------- 160  C_{3v}^{5} #160
+  else if(spacegroupnumber==160) { // ------------------- 160  C_{3v}^{5} #160
     spacegroup="C_{3v}^{5}";}
-  if(spacegroupnumber==161) { // ------------------- 161  C_{3v}^{6} #161
+  else if(spacegroupnumber==161) { // ------------------- 161  C_{3v}^{6} #161
     spacegroup="C_{3v}^{6}";}
-  if(spacegroupnumber==162) { // ------------------- 162  D_{3d}^{1} #162
+  else if(spacegroupnumber==162) { // ------------------- 162  D_{3d}^{1} #162
     spacegroup="D_{3d}^{1}";}
-  if(spacegroupnumber==163) { // ------------------- 163  D_{3d}^{2} #163
+  else if(spacegroupnumber==163) { // ------------------- 163  D_{3d}^{2} #163
     spacegroup="D_{3d}^{2}";}
-  if(spacegroupnumber==164) { // ------------------- 164  D_{3d}^{3} #164
+  else if(spacegroupnumber==164) { // ------------------- 164  D_{3d}^{3} #164
     spacegroup="D_{3d}^{3}";}
-  if(spacegroupnumber==165) { // ------------------- 165  D_{3d}^{4} #165
+  else if(spacegroupnumber==165) { // ------------------- 165  D_{3d}^{4} #165
     spacegroup="D_{3d}^{4}";}
-  if(spacegroupnumber==166) { // ------------------- 166  D_{3d}^{5} #166
+  else if(spacegroupnumber==166) { // ------------------- 166  D_{3d}^{5} #166
     spacegroup="D_{3d}^{5}";}
-  if(spacegroupnumber==167) { // ------------------- 167  D_{3d}^{6} #167
+  else if(spacegroupnumber==167) { // ------------------- 167  D_{3d}^{6} #167
     spacegroup="D_{3d}^{6}";}
-  if(spacegroupnumber==168) { // ------------------- 168  C_{6}^{1} #168
+  else if(spacegroupnumber==168) { // ------------------- 168  C_{6}^{1} #168
     spacegroup="C_{6}^{1}";}
-  if(spacegroupnumber==169) { // ------------------- 169  C_{6}^{2} #169
+  else if(spacegroupnumber==169) { // ------------------- 169  C_{6}^{2} #169
     spacegroup="C_{6}^{2}";}
-  if(spacegroupnumber==170) { // ------------------- 170  C_{6}^{3} #170
+  else if(spacegroupnumber==170) { // ------------------- 170  C_{6}^{3} #170
     spacegroup="C_{6}^{3}";}
-  if(spacegroupnumber==171) { // ------------------- 171  C_{6}^{4} #171
+  else if(spacegroupnumber==171) { // ------------------- 171  C_{6}^{4} #171
     spacegroup="C_{6}^{4}";}
-  if(spacegroupnumber==172) { // ------------------- 172  C_{6}^{5} #172
+  else if(spacegroupnumber==172) { // ------------------- 172  C_{6}^{5} #172
     spacegroup="C_{6}^{5}";}
-  if(spacegroupnumber==173) { // ------------------- 173  C_{6}^{6} #173
+  else if(spacegroupnumber==173) { // ------------------- 173  C_{6}^{6} #173
     spacegroup="C_{6}^{6}";}
-  if(spacegroupnumber==174) { // ------------------- 174  C_{3h}^{1} #174
+  else if(spacegroupnumber==174) { // ------------------- 174  C_{3h}^{1} #174
     spacegroup="C_{3h}^{1}";}
-  if(spacegroupnumber==175) { // ------------------- 175  C_{6h}^{1} #175
+  else if(spacegroupnumber==175) { // ------------------- 175  C_{6h}^{1} #175
     spacegroup="C_{6h}^{1}";}
-  if(spacegroupnumber==176) { // ------------------- 176  C_{6h}^{2} #176
+  else if(spacegroupnumber==176) { // ------------------- 176  C_{6h}^{2} #176
     spacegroup="C_{6h}^{2}";}
-  if(spacegroupnumber==177) { // ------------------- 177  D_{6}^{1} #177
+  else if(spacegroupnumber==177) { // ------------------- 177  D_{6}^{1} #177
     spacegroup="D_{6}^{1}";}
-  if(spacegroupnumber==178) { // ------------------- 178  D_{6}^{2} #178
+  else if(spacegroupnumber==178) { // ------------------- 178  D_{6}^{2} #178
     spacegroup="D_{6}^{2}";}
-  if(spacegroupnumber==179) { // ------------------- 179  D_{6}^{3} #179
+  else if(spacegroupnumber==179) { // ------------------- 179  D_{6}^{3} #179
     spacegroup="D_{6}^{3}";}
-  if(spacegroupnumber==180) { // ------------------- 180  D_{6}^{4} #180
+  else if(spacegroupnumber==180) { // ------------------- 180  D_{6}^{4} #180
     spacegroup="D_{6}^{4}";}
-  if(spacegroupnumber==181) { // ------------------- 181  D_{6}^{5} #181
+  else if(spacegroupnumber==181) { // ------------------- 181  D_{6}^{5} #181
     spacegroup="D_{6}^{5}";}
-  if(spacegroupnumber==182) { // ------------------- 182  D_{6}^{6} #182
+  else if(spacegroupnumber==182) { // ------------------- 182  D_{6}^{6} #182
     spacegroup="D_{6}^{6}";}
-  if(spacegroupnumber==183) { // ------------------- 183  C_{6v}^{1} #183
+  else if(spacegroupnumber==183) { // ------------------- 183  C_{6v}^{1} #183
     spacegroup="C_{6v}^{1}";}
-  if(spacegroupnumber==184) { // ------------------- 184  C_{6v}^{2} #184
+  else if(spacegroupnumber==184) { // ------------------- 184  C_{6v}^{2} #184
     spacegroup="C_{6v}^{2}";}
-  if(spacegroupnumber==185) { // ------------------- 185  C_{6v}^{3} #185
+  else if(spacegroupnumber==185) { // ------------------- 185  C_{6v}^{3} #185
     spacegroup="C_{6v}^{3}";}
-  if(spacegroupnumber==186) { // ------------------- 186  C_{6v}^{4} #186
+  else if(spacegroupnumber==186) { // ------------------- 186  C_{6v}^{4} #186
     spacegroup="C_{6v}^{4}";}
-  if(spacegroupnumber==187) { // ------------------- 187  D_{3h}^{1} #187
+  else if(spacegroupnumber==187) { // ------------------- 187  D_{3h}^{1} #187
     spacegroup="D_{3h}^{1}";}
-  if(spacegroupnumber==188) { // ------------------- 188  D_{3h}^{2} #188
+  else if(spacegroupnumber==188) { // ------------------- 188  D_{3h}^{2} #188
     spacegroup="D_{3h}^{2}";}
-  if(spacegroupnumber==189) { // ------------------- 189  D_{3h}^{3} #189
+  else if(spacegroupnumber==189) { // ------------------- 189  D_{3h}^{3} #189
     spacegroup="D_{3h}^{3}";}
-  if(spacegroupnumber==190) { // ------------------- 190  D_{3h}^{4} #190
+  else if(spacegroupnumber==190) { // ------------------- 190  D_{3h}^{4} #190
     spacegroup="D_{3h}^{4}";}
-  if(spacegroupnumber==191) { // ------------------- 191  D_{6h}^{1} #191
+  else if(spacegroupnumber==191) { // ------------------- 191  D_{6h}^{1} #191
     spacegroup="D_{6h}^{1}";}
-  if(spacegroupnumber==192) { // ------------------- 192  D_{6h}^{2} #192
+  else if(spacegroupnumber==192) { // ------------------- 192  D_{6h}^{2} #192
     spacegroup="D_{6h}^{2}";}
-  if(spacegroupnumber==193) { // ------------------- 193  D_{6h}^{3} #193
+  else if(spacegroupnumber==193) { // ------------------- 193  D_{6h}^{3} #193
     spacegroup="D_{6h}^{3}";}
-  if(spacegroupnumber==194) { // ------------------- 194  D_{6h}^{4} #194
+  else if(spacegroupnumber==194) { // ------------------- 194  D_{6h}^{4} #194
     spacegroup="D_{6h}^{4}";}
-  if(spacegroupnumber==195) { // ------------------- 195  T^{1} #195
+  else if(spacegroupnumber==195) { // ------------------- 195  T^{1} #195
     spacegroup="T^{1}";}
-  if(spacegroupnumber==196) { // ------------------- 196  T^{2} #196
+  else if(spacegroupnumber==196) { // ------------------- 196  T^{2} #196
     spacegroup="T^{2}";}
-  if(spacegroupnumber==197) { // ------------------- 197  T^{3} #197
+  else if(spacegroupnumber==197) { // ------------------- 197  T^{3} #197
     spacegroup="T^{3}";}
-  if(spacegroupnumber==198) { // ------------------- 198  T^{4} #198
+  else if(spacegroupnumber==198) { // ------------------- 198  T^{4} #198
     spacegroup="T^{4}";}
-  if(spacegroupnumber==199) { // ------------------- 199  T^{5} #199
+  else if(spacegroupnumber==199) { // ------------------- 199  T^{5} #199
     spacegroup="T^{5}";}
-  if(spacegroupnumber==200) { // ------------------- 200  T_{h}^{1} #200
+  else if(spacegroupnumber==200) { // ------------------- 200  T_{h}^{1} #200
     spacegroup="T_{h}^{1}";}
-  if(spacegroupnumber==201) { // ------------------- 201  T_{h}^{2} #201
+  else if(spacegroupnumber==201) { // ------------------- 201  T_{h}^{2} #201
     spacegroup="T_{h}^{2}";}
-  if(spacegroupnumber==202) { // ------------------- 202  T_{h}^{3} #202
+  else if(spacegroupnumber==202) { // ------------------- 202  T_{h}^{3} #202
     spacegroup="T_{h}^{3}";}
-  if(spacegroupnumber==203) { // ------------------- 203  T_{h}^{4} #203
+  else if(spacegroupnumber==203) { // ------------------- 203  T_{h}^{4} #203
     spacegroup="T_{h}^{4}";}
-  if(spacegroupnumber==204) { // ------------------- 204  T_{h}^{5} #204
+  else if(spacegroupnumber==204) { // ------------------- 204  T_{h}^{5} #204
     spacegroup="T_{h}^{5}";}
-  if(spacegroupnumber==205) { // ------------------- 205  T_{h}^{6} #205
+  else if(spacegroupnumber==205) { // ------------------- 205  T_{h}^{6} #205
     spacegroup="T_{h}^{6}";}
-  if(spacegroupnumber==206) { // ------------------- 206  T_{h}^{7} #206
+  else if(spacegroupnumber==206) { // ------------------- 206  T_{h}^{7} #206
     spacegroup="T_{h}^{7}";}
-  if(spacegroupnumber==207) { // ------------------- 207  O^{1} #207
+  else if(spacegroupnumber==207) { // ------------------- 207  O^{1} #207
     spacegroup="O^{1}";}
-  if(spacegroupnumber==208) { // ------------------- 208  O^{2} #208
+  else if(spacegroupnumber==208) { // ------------------- 208  O^{2} #208
     spacegroup="O^{2}";}
-  if(spacegroupnumber==209) { // ------------------- 209  O^{3} #209
+  else if(spacegroupnumber==209) { // ------------------- 209  O^{3} #209
     spacegroup="O^{3}";}
-  if(spacegroupnumber==210) { // ------------------- 210  O^{4} #210
+  else if(spacegroupnumber==210) { // ------------------- 210  O^{4} #210
     spacegroup="O^{4}";}
-  if(spacegroupnumber==211) { // ------------------- 211  O^{5} #211
+  else if(spacegroupnumber==211) { // ------------------- 211  O^{5} #211
     spacegroup="O^{5}";}
-  if(spacegroupnumber==212) { // ------------------- 212  O^{6} #212
+  else if(spacegroupnumber==212) { // ------------------- 212  O^{6} #212
     spacegroup="O^{6}";}
-  if(spacegroupnumber==213) { // ------------------- 213  O^{7} #213
+  else if(spacegroupnumber==213) { // ------------------- 213  O^{7} #213
     spacegroup="O^{7}";}
-  if(spacegroupnumber==214) { // ------------------- 214  O^{8} #214
+  else if(spacegroupnumber==214) { // ------------------- 214  O^{8} #214
     spacegroup="O^{8}";}
-  if(spacegroupnumber==215) { // ------------------- 215  T_{d}^{1} #215
+  else if(spacegroupnumber==215) { // ------------------- 215  T_{d}^{1} #215
     spacegroup="T_{d}^{1}";}
-  if(spacegroupnumber==216) { // ------------------- 216  T_{d}^{2} #216
+  else if(spacegroupnumber==216) { // ------------------- 216  T_{d}^{2} #216
     spacegroup="T_{d}^{2}";}
-  if(spacegroupnumber==217) { // ------------------- 217  T_{d}^{3} #217
+  else if(spacegroupnumber==217) { // ------------------- 217  T_{d}^{3} #217
     spacegroup="T_{d}^{3}";}
-  if(spacegroupnumber==218) { // ------------------- 218  T_{d}^{4} #218
+  else if(spacegroupnumber==218) { // ------------------- 218  T_{d}^{4} #218
     spacegroup="T_{d}^{4}";}
-  if(spacegroupnumber==219) { // ------------------- 219  T_{d}^{5} #219
+  else if(spacegroupnumber==219) { // ------------------- 219  T_{d}^{5} #219
     spacegroup="T_{d}^{5}";}
-  if(spacegroupnumber==220) { // ------------------- 220  T_{d}^{6} #220
+  else if(spacegroupnumber==220) { // ------------------- 220  T_{d}^{6} #220
     spacegroup="T_{d}^{6}";}
-  if(spacegroupnumber==221) { // ------------------- 221  O_{h}^{1} #221
+  else if(spacegroupnumber==221) { // ------------------- 221  O_{h}^{1} #221
     spacegroup="O_{h}^{1}";}
-  if(spacegroupnumber==222) { // ------------------- 222  O_{h}^{2} #222
+  else if(spacegroupnumber==222) { // ------------------- 222  O_{h}^{2} #222
     spacegroup="O_{h}^{2}";}
-  if(spacegroupnumber==223) { // ------------------- 223  O_{h}^{3} #223
+  else if(spacegroupnumber==223) { // ------------------- 223  O_{h}^{3} #223
     spacegroup="O_{h}^{3}";}
-  if(spacegroupnumber==224) { // ------------------- 224  O_{h}^{4} #224
+  else if(spacegroupnumber==224) { // ------------------- 224  O_{h}^{4} #224
     spacegroup="O_{h}^{4}";}
-  if(spacegroupnumber==225) { // ------------------- 225  O_{h}^{5} #225
+  else if(spacegroupnumber==225) { // ------------------- 225  O_{h}^{5} #225
     spacegroup="O_{h}^{5}";}
-  if(spacegroupnumber==226) { // ------------------- 226  O_{h}^{6} #226
+  else if(spacegroupnumber==226) { // ------------------- 226  O_{h}^{6} #226
     spacegroup="O_{h}^{6}";}
-  if(spacegroupnumber==227) { // ------------------- 227  O_{h}^{7} #227
+  else if(spacegroupnumber==227) { // ------------------- 227  O_{h}^{7} #227
     spacegroup="O_{h}^{7}";}
-  if(spacegroupnumber==228) { // ------------------- 228  O_{h}^{8} #228
+  else if(spacegroupnumber==228) { // ------------------- 228  O_{h}^{8} #228
     spacegroup="O_{h}^{8}";}
-  if(spacegroupnumber==229) { // ------------------- 229  O_{h}^{9} #229
+  else if(spacegroupnumber==229) { // ------------------- 229  O_{h}^{9} #229
     spacegroup="O_{h}^{9}";}
-  if(spacegroupnumber==230) { // ------------------- 230  O_{h}^{10} #230
+  else if(spacegroupnumber==230) { // ------------------- 230  O_{h}^{10} #230
     spacegroup="O_{h}^{10}";}
   // done
   return spacegroup;
@@ -6379,12 +7078,15 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   // DX - Hall distinguishes space group setting.  This table assumes the first 
   //      setting that appears in the ITC.
   //      For more settings, they need to be hard-coded here.
-  string spacegroup;
-  if(spacegroupnumber < 1 || spacegroupnumber > 230) {
-    cerr << "aflow_xatom.cpp GetSpaceGroupHall() routine: space group specified invalid (1-230): " << spacegroupnumber << endl;
-    cerr << spacegroupnumber << " [dir=" << directory << "]." << endl;
-    exit(0);
+  string soliloquy = "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX 20190708 - for xerror
+  stringstream message; //DX 20190708 - for xerror
+  string spacegroup=""; //DX 20190708 - for xerror
+  if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
+    message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
+    message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
+  // OK
   if(setting==0){ //signals default //DX 20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
@@ -6397,531 +7099,532 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
     }
   }
   if(setting < 1 || setting > 2) {
-    cerr << "aflow_xatom.cpp GetSpaceGroupHall() routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]." << endl;
-    exit(0);
+    message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX 20190708 - for xerror
+    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   if(spacegroupnumber==1) { // ------------------- 1  P 1 #1
     spacegroup="P 1";}
-  if(spacegroupnumber==2) { // ------------------- 2  -P 1 #2
+  else if(spacegroupnumber==2) { // ------------------- 2  -P 1 #2
     spacegroup="-P 1";}
-  if(spacegroupnumber==3) { // ------------------- 3  P 2y #3
+  else if(spacegroupnumber==3) { // ------------------- 3  P 2y #3
     spacegroup="P 2y";}
-  if(spacegroupnumber==4) { // ------------------- 4  P 2yb #4
+  else if(spacegroupnumber==4) { // ------------------- 4  P 2yb #4
     spacegroup="P 2yb";}
-  if(spacegroupnumber==5) { // ------------------- 5  C 2y #5
+  else if(spacegroupnumber==5) { // ------------------- 5  C 2y #5
     spacegroup="C 2y";}
-  if(spacegroupnumber==6) { // ------------------- 6  P -2y #6
+  else if(spacegroupnumber==6) { // ------------------- 6  P -2y #6
     spacegroup="P -2y";}
-  if(spacegroupnumber==7) { // ------------------- 7  P -2yc #7
+  else if(spacegroupnumber==7) { // ------------------- 7  P -2yc #7
     spacegroup="P -2yc";}
-  if(spacegroupnumber==8) { // ------------------- 8  C -2y #8
+  else if(spacegroupnumber==8) { // ------------------- 8  C -2y #8
     spacegroup="C -2y";}
-  if(spacegroupnumber==9) { // ------------------- 9  C -2yc #9
+  else if(spacegroupnumber==9) { // ------------------- 9  C -2yc #9
     spacegroup="C -2yc";}
-  if(spacegroupnumber==10) { // ------------------- 10  -P 2y #10
+  else if(spacegroupnumber==10) { // ------------------- 10  -P 2y #10
     spacegroup="-P 2y";}
-  if(spacegroupnumber==11) { // ------------------- 11  -P 2yb #11
+  else if(spacegroupnumber==11) { // ------------------- 11  -P 2yb #11
     spacegroup="-P 2yb";}
-  if(spacegroupnumber==12) { // ------------------- 12  -C 2y #12
+  else if(spacegroupnumber==12) { // ------------------- 12  -C 2y #12
     spacegroup="-C 2y";}
-  if(spacegroupnumber==13) { // ------------------- 13  -P 2yc #13
+  else if(spacegroupnumber==13) { // ------------------- 13  -P 2yc #13
     spacegroup="-P 2yc";}
-  if(spacegroupnumber==14) { // ------------------- 14  -P 2ybc #14
+  else if(spacegroupnumber==14) { // ------------------- 14  -P 2ybc #14
     spacegroup="-P 2ybc";}
-  if(spacegroupnumber==15) { // ------------------- 15  -C 2yc #15
+  else if(spacegroupnumber==15) { // ------------------- 15  -C 2yc #15
     spacegroup="-C 2yc";}
-  if(spacegroupnumber==16) { // ------------------- 16  P 2 2 #16
+  else if(spacegroupnumber==16) { // ------------------- 16  P 2 2 #16
     spacegroup="P 2 2";}
-  if(spacegroupnumber==17) { // ------------------- 17  P 2c 2 #17
+  else if(spacegroupnumber==17) { // ------------------- 17  P 2c 2 #17
     spacegroup="P 2c 2";}
-  if(spacegroupnumber==18) { // ------------------- 18  P 2 2ab #18
+  else if(spacegroupnumber==18) { // ------------------- 18  P 2 2ab #18
     spacegroup="P 2 2ab";}
-  if(spacegroupnumber==19) { // ------------------- 19  P 2ac 2ab #19
+  else if(spacegroupnumber==19) { // ------------------- 19  P 2ac 2ab #19
     spacegroup="P 2ac 2ab";}
-  if(spacegroupnumber==20) { // ------------------- 20  C 2c 2 #20
+  else if(spacegroupnumber==20) { // ------------------- 20  C 2c 2 #20
     spacegroup="C 2c 2";}
-  if(spacegroupnumber==21) { // ------------------- 21  C 2 2 #21
+  else if(spacegroupnumber==21) { // ------------------- 21  C 2 2 #21
     spacegroup="C 2 2";}
-  if(spacegroupnumber==22) { // ------------------- 22  F 2 2 #22
+  else if(spacegroupnumber==22) { // ------------------- 22  F 2 2 #22
     spacegroup="F 2 2";}
-  if(spacegroupnumber==23) { // ------------------- 23  I 2 2 #23
+  else if(spacegroupnumber==23) { // ------------------- 23  I 2 2 #23
     spacegroup="I 2 2";}
-  if(spacegroupnumber==24) { // ------------------- 24  I 2b 2c #24
+  else if(spacegroupnumber==24) { // ------------------- 24  I 2b 2c #24
     spacegroup="I 2b 2c";}
-  if(spacegroupnumber==25) { // ------------------- 25  P 2 -2 #25
+  else if(spacegroupnumber==25) { // ------------------- 25  P 2 -2 #25
     spacegroup="P 2 -2";}
-  if(spacegroupnumber==26) { // ------------------- 26  P 2c -2 #26
+  else if(spacegroupnumber==26) { // ------------------- 26  P 2c -2 #26
     spacegroup="P 2c -2";}
-  if(spacegroupnumber==27) { // ------------------- 27  P 2 -2c #27
+  else if(spacegroupnumber==27) { // ------------------- 27  P 2 -2c #27
     spacegroup="P 2 -2c";}
-  if(spacegroupnumber==28) { // ------------------- 28  P 2 -2a #28
+  else if(spacegroupnumber==28) { // ------------------- 28  P 2 -2a #28
     spacegroup="P 2 -2a";}
-  if(spacegroupnumber==29) { // ------------------- 29  P 2c -2ac #29
+  else if(spacegroupnumber==29) { // ------------------- 29  P 2c -2ac #29
     spacegroup="P 2c -2ac";}
-  if(spacegroupnumber==30) { // ------------------- 30  P 2 -2bc #30
+  else if(spacegroupnumber==30) { // ------------------- 30  P 2 -2bc #30
     spacegroup="P 2 -2bc";}
-  if(spacegroupnumber==31) { // ------------------- 31  P 2ac -2 #31
+  else if(spacegroupnumber==31) { // ------------------- 31  P 2ac -2 #31
     spacegroup="P 2ac -2";}
-  if(spacegroupnumber==32) { // ------------------- 32  P 2 -2ab #32
+  else if(spacegroupnumber==32) { // ------------------- 32  P 2 -2ab #32
     spacegroup="P 2 -2ab";}
-  if(spacegroupnumber==33) { // ------------------- 33  P 2c -2n #33
+  else if(spacegroupnumber==33) { // ------------------- 33  P 2c -2n #33
     spacegroup="P 2c -2n";}
-  if(spacegroupnumber==34) { // ------------------- 34  P 2 -2n #34
+  else if(spacegroupnumber==34) { // ------------------- 34  P 2 -2n #34
     spacegroup="P 2 -2n";}
-  if(spacegroupnumber==35) { // ------------------- 35  C 2 -2 #35
+  else if(spacegroupnumber==35) { // ------------------- 35  C 2 -2 #35
     spacegroup="C 2 -2";}
-  if(spacegroupnumber==36) { // ------------------- 36  C 2c -2 #36
+  else if(spacegroupnumber==36) { // ------------------- 36  C 2c -2 #36
     spacegroup="C 2c -2";}
-  if(spacegroupnumber==37) { // ------------------- 37  C 2 -2c #37
+  else if(spacegroupnumber==37) { // ------------------- 37  C 2 -2c #37
     spacegroup="C 2 -2c";}
-  if(spacegroupnumber==38) { // ------------------- 38  A 2 -2 #38
+  else if(spacegroupnumber==38) { // ------------------- 38  A 2 -2 #38
     spacegroup="A 2 -2";}
-  if(spacegroupnumber==39) { // ------------------- 39  A 2 -2c #39
+  else if(spacegroupnumber==39) { // ------------------- 39  A 2 -2c #39
     spacegroup="A 2 -2c";}
-  if(spacegroupnumber==40) { // ------------------- 40  A 2 -2a #40
+  else if(spacegroupnumber==40) { // ------------------- 40  A 2 -2a #40
     spacegroup="A 2 -2a";}
-  if(spacegroupnumber==41) { // ------------------- 41  A 2 -2ac #41
+  else if(spacegroupnumber==41) { // ------------------- 41  A 2 -2ac #41
     spacegroup="A 2 -2ac";}
-  if(spacegroupnumber==42) { // ------------------- 42  F 2 -2 #42
+  else if(spacegroupnumber==42) { // ------------------- 42  F 2 -2 #42
     spacegroup="F 2 -2";}
-  if(spacegroupnumber==43) { // ------------------- 43  F 2 -2d #43
+  else if(spacegroupnumber==43) { // ------------------- 43  F 2 -2d #43
     spacegroup="F 2 -2d";}
-  if(spacegroupnumber==44) { // ------------------- 44  I 2 -2 #44
+  else if(spacegroupnumber==44) { // ------------------- 44  I 2 -2 #44
     spacegroup="I 2 -2";}
-  if(spacegroupnumber==45) { // ------------------- 45  I 2 -2c #45
+  else if(spacegroupnumber==45) { // ------------------- 45  I 2 -2c #45
     spacegroup="I 2 -2c";}
-  if(spacegroupnumber==46) { // ------------------- 46  I 2 -2a #46
+  else if(spacegroupnumber==46) { // ------------------- 46  I 2 -2a #46
     spacegroup="I 2 -2a";}
-  if(spacegroupnumber==47) { // ------------------- 47  -P 2 2 #47
+  else if(spacegroupnumber==47) { // ------------------- 47  -P 2 2 #47
     spacegroup="-P 2 2";}
-  if(spacegroupnumber==48 && setting==1) { // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
+  else if(spacegroupnumber==48 && setting==1) { // ------------------- 48  -P P 2 2 -1n #48 (setting 1)
     spacegroup="P 2 2 -1n";}
-  if(spacegroupnumber==48 && setting==2) { // ------------------- 48  -P 2ab 2bc #48 (setting 2)
+  else if(spacegroupnumber==48 && setting==2) { // ------------------- 48  -P 2ab 2bc #48 (setting 2)
     spacegroup="-P 2ab 2bc";}
-  if(spacegroupnumber==49) { // ------------------- 49  -P 2 2c #49
+  else if(spacegroupnumber==49) { // ------------------- 49  -P 2 2c #49
     spacegroup="-P 2 2c";}
-  if(spacegroupnumber==50 && setting==1) { // ------------------- 50  -P P 2 2 -1ab #50 (setting 1)
+  else if(spacegroupnumber==50 && setting==1) { // ------------------- 50  -P P 2 2 -1ab #50 (setting 1)
     spacegroup="P 2 2 -1ab";}
-  if(spacegroupnumber==50 && setting==2) { // ------------------- 50  -P 2ab 2b #50 (setting 2)
+  else if(spacegroupnumber==50 && setting==2) { // ------------------- 50  -P 2ab 2b #50 (setting 2)
     spacegroup="-P 2ab 2b";}
-  if(spacegroupnumber==51) { // ------------------- 51  -P 2a 2a #51
+  else if(spacegroupnumber==51) { // ------------------- 51  -P 2a 2a #51
     spacegroup="-P 2a 2a";}
-  if(spacegroupnumber==52) { // ------------------- 52  -P 2a 2bc #52
+  else if(spacegroupnumber==52) { // ------------------- 52  -P 2a 2bc #52
     spacegroup="-P 2a 2bc";}
-  if(spacegroupnumber==53) { // ------------------- 53  -P 2ac 2 #53
+  else if(spacegroupnumber==53) { // ------------------- 53  -P 2ac 2 #53
     spacegroup="-P 2ac 2";}
-  if(spacegroupnumber==54) { // ------------------- 54  -P 2a 2ac #54
+  else if(spacegroupnumber==54) { // ------------------- 54  -P 2a 2ac #54
     spacegroup="-P 2a 2ac";}
-  if(spacegroupnumber==55) { // ------------------- 55  -P 2 2ab #55
+  else if(spacegroupnumber==55) { // ------------------- 55  -P 2 2ab #55
     spacegroup="-P 2 2ab";}
-  if(spacegroupnumber==56) { // ------------------- 56  -P 2ab 2ac #56
+  else if(spacegroupnumber==56) { // ------------------- 56  -P 2ab 2ac #56
     spacegroup="-P 2ab 2ac";}
-  if(spacegroupnumber==57) { // ------------------- 57  -P 2c 2b #57
+  else if(spacegroupnumber==57) { // ------------------- 57  -P 2c 2b #57
     spacegroup="-P 2c 2b";}
-  if(spacegroupnumber==58) { // ------------------- 58  -P 2 2n #58
+  else if(spacegroupnumber==58) { // ------------------- 58  -P 2 2n #58
     spacegroup="-P 2 2n";}
-  if(spacegroupnumber==59 && setting==1) { // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
+  else if(spacegroupnumber==59 && setting==1) { // ------------------- 59  P 2 2ab -1ab #59 (setting 1)
     spacegroup="P 2 2ab -1ab";}
-  if(spacegroupnumber==59 && setting==2) { // ------------------- 59  -P 2ab 2a #59 (setting 2)
+  else if(spacegroupnumber==59 && setting==2) { // ------------------- 59  -P 2ab 2a #59 (setting 2)
     spacegroup="-P 2ab 2a";}
-  if(spacegroupnumber==60) { // ------------------- 60  -P 2n 2ab #60
+  else if(spacegroupnumber==60) { // ------------------- 60  -P 2n 2ab #60
     spacegroup="-P 2n 2ab";}
-  if(spacegroupnumber==61) { // ------------------- 61  -P 2ac 2ab #61
+  else if(spacegroupnumber==61) { // ------------------- 61  -P 2ac 2ab #61
     spacegroup="-P 2ac 2ab";}
-  if(spacegroupnumber==62) { // ------------------- 62  -P 2ac 2n #62
+  else if(spacegroupnumber==62) { // ------------------- 62  -P 2ac 2n #62
     spacegroup="-P 2ac 2n";}
-  if(spacegroupnumber==63) { // ------------------- 63  -C 2c 2 #63
+  else if(spacegroupnumber==63) { // ------------------- 63  -C 2c 2 #63
     spacegroup="-C 2c 2";}
-  if(spacegroupnumber==64) { // ------------------- 64  -C 2bc 2 #64
+  else if(spacegroupnumber==64) { // ------------------- 64  -C 2bc 2 #64
     spacegroup="-C 2bc 2";}
-  if(spacegroupnumber==65) { // ------------------- 65  -C 2 2 #65
+  else if(spacegroupnumber==65) { // ------------------- 65  -C 2 2 #65
     spacegroup="-C 2 2";}
-  if(spacegroupnumber==66) { // ------------------- 66  -C 2 2c #66
+  else if(spacegroupnumber==66) { // ------------------- 66  -C 2 2c #66
     spacegroup="-C 2 2c";}
-  if(spacegroupnumber==67) { // ------------------- 67  -C 2b 2 #67
+  else if(spacegroupnumber==67) { // ------------------- 67  -C 2b 2 #67
     spacegroup="-C 2b 2";}
-  if(spacegroupnumber==68 && setting==1) { // ------------------- 68  C 2 2 -1bc #68 (setting 1)
+  else if(spacegroupnumber==68 && setting==1) { // ------------------- 68  C 2 2 -1bc #68 (setting 1)
     spacegroup="C 2 2 -1bc";}
-  if(spacegroupnumber==68 && setting==2) { // ------------------- 68  -C 2b 2bc #68 (setting 2)
+  else if(spacegroupnumber==68 && setting==2) { // ------------------- 68  -C 2b 2bc #68 (setting 2)
     spacegroup="-C 2b 2bc";}
-  if(spacegroupnumber==69) { // ------------------- 69  -F 2 2 #69
+  else if(spacegroupnumber==69) { // ------------------- 69  -F 2 2 #69
     spacegroup="-F 2 2";}
-  if(spacegroupnumber==70 && setting==1) { // ------------------- 70  F 2 2 -1d #70 (setting 1)
+  else if(spacegroupnumber==70 && setting==1) { // ------------------- 70  F 2 2 -1d #70 (setting 1)
     spacegroup="F 2 2 -1d";}
-  if(spacegroupnumber==70 && setting==2) { // ------------------- 70  -F 2uv 2vw #70 (setting 2)
+  else if(spacegroupnumber==70 && setting==2) { // ------------------- 70  -F 2uv 2vw #70 (setting 2)
     spacegroup="-F 2uv 2vw";}
-  if(spacegroupnumber==71) { // ------------------- 71  -I 2 2 #71
+  else if(spacegroupnumber==71) { // ------------------- 71  -I 2 2 #71
     spacegroup="-I 2 2";}
-  if(spacegroupnumber==72) { // ------------------- 72  -I 2 2c #72
+  else if(spacegroupnumber==72) { // ------------------- 72  -I 2 2c #72
     spacegroup="-I 2 2c";}
-  if(spacegroupnumber==73) { // ------------------- 73  -I 2b 2c #73
+  else if(spacegroupnumber==73) { // ------------------- 73  -I 2b 2c #73
     spacegroup="-I 2b 2c";}
-  if(spacegroupnumber==74) { // ------------------- 74  -I 2b 2 #74
+  else if(spacegroupnumber==74) { // ------------------- 74  -I 2b 2 #74
     spacegroup="-I 2b 2";}
-  if(spacegroupnumber==75) { // ------------------- 75  P 4 #75
+  else if(spacegroupnumber==75) { // ------------------- 75  P 4 #75
     spacegroup="P 4";}
-  if(spacegroupnumber==76) { // ------------------- 76  P 4w #76
+  else if(spacegroupnumber==76) { // ------------------- 76  P 4w #76
     spacegroup="P 4w";}
-  if(spacegroupnumber==77) { // ------------------- 77  P 4c #77
+  else if(spacegroupnumber==77) { // ------------------- 77  P 4c #77
     spacegroup="P 4c";}
-  if(spacegroupnumber==78) { // ------------------- 78  P 4cw #78
+  else if(spacegroupnumber==78) { // ------------------- 78  P 4cw #78
     spacegroup="P 4cw";}
-  if(spacegroupnumber==79) { // ------------------- 79  I 4 #79
+  else if(spacegroupnumber==79) { // ------------------- 79  I 4 #79
     spacegroup="I 4";}
-  if(spacegroupnumber==80) { // ------------------- 80  I 4bw #80
+  else if(spacegroupnumber==80) { // ------------------- 80  I 4bw #80
     spacegroup="I 4bw";}
-  if(spacegroupnumber==81) { // ------------------- 81  P -4 #81
+  else if(spacegroupnumber==81) { // ------------------- 81  P -4 #81
     spacegroup="P -4";}
-  if(spacegroupnumber==82) { // ------------------- 82  I -4 #82
+  else if(spacegroupnumber==82) { // ------------------- 82  I -4 #82
     spacegroup="I -4";}
-  if(spacegroupnumber==83) { // ------------------- 83  -P 4 #83
+  else if(spacegroupnumber==83) { // ------------------- 83  -P 4 #83
     spacegroup="-P 4";}
-  if(spacegroupnumber==84) { // ------------------- 84  -P 4c #84
+  else if(spacegroupnumber==84) { // ------------------- 84  -P 4c #84
     spacegroup="-P 4c";}
-  if(spacegroupnumber==85 && setting==1) { // ------------------- 85  P 4ab -1ab #85 (setting 1)
+  else if(spacegroupnumber==85 && setting==1) { // ------------------- 85  P 4ab -1ab #85 (setting 1)
     spacegroup="P 4ab -1ab";}
-  if(spacegroupnumber==85 && setting==2) { // ------------------- 85  -P 4a #85 (setting 2)
+  else if(spacegroupnumber==85 && setting==2) { // ------------------- 85  -P 4a #85 (setting 2)
     spacegroup="-P 4a";}
-  if(spacegroupnumber==86 && setting==1) { // ------------------- 86  P 4n -1n #86 (setting 1)
+  else if(spacegroupnumber==86 && setting==1) { // ------------------- 86  P 4n -1n #86 (setting 1)
     spacegroup="P 4n -1n";}
-  if(spacegroupnumber==86 && setting==2) { // ------------------- 86  -P 4bc #86 (setting 2)
+  else if(spacegroupnumber==86 && setting==2) { // ------------------- 86  -P 4bc #86 (setting 2)
      spacegroup="-P 4bc";}
-  if(spacegroupnumber==87) { // ------------------- 87  -I 4 #87
+  else if(spacegroupnumber==87) { // ------------------- 87  -I 4 #87
     spacegroup="-I 4";}
-  if(spacegroupnumber==88 && setting==1) { // ------------------- 88  I 4bw -1bw #88 (setting 1)
+  else if(spacegroupnumber==88 && setting==1) { // ------------------- 88  I 4bw -1bw #88 (setting 1)
     spacegroup="I 4bw -1bw";}
-  if(spacegroupnumber==88 && setting==2) { // ------------------- 88  -I 4ad #88 (setting 2)
+  else if(spacegroupnumber==88 && setting==2) { // ------------------- 88  -I 4ad #88 (setting 2)
     spacegroup="-I 4ad";}
-  if(spacegroupnumber==89) { // ------------------- 89  P 4 2 #89
+  else if(spacegroupnumber==89) { // ------------------- 89  P 4 2 #89
     spacegroup="P 4 2";}
-  if(spacegroupnumber==90) { // ------------------- 90  P 4ab 2ab #90
+  else if(spacegroupnumber==90) { // ------------------- 90  P 4ab 2ab #90
     spacegroup="P 4ab 2ab";}
-  if(spacegroupnumber==91) { // ------------------- 91  P 4w 2c #91
+  else if(spacegroupnumber==91) { // ------------------- 91  P 4w 2c #91
     spacegroup="P 4w 2c";}
-  if(spacegroupnumber==92) { // ------------------- 92  P 4abw 2nw #92
+  else if(spacegroupnumber==92) { // ------------------- 92  P 4abw 2nw #92
     spacegroup="P 4abw 2nw";}
-  if(spacegroupnumber==93) { // ------------------- 93  P 4c 2 #93
+  else if(spacegroupnumber==93) { // ------------------- 93  P 4c 2 #93
     spacegroup="P 4c 2";}
-  if(spacegroupnumber==94) { // ------------------- 94  P 4n 2n #94
+  else if(spacegroupnumber==94) { // ------------------- 94  P 4n 2n #94
     spacegroup="P 4n 2n";}
-  if(spacegroupnumber==95) { // ------------------- 95  P 4cw 2c #95
+  else if(spacegroupnumber==95) { // ------------------- 95  P 4cw 2c #95
     spacegroup="P 4cw 2c";}
-  if(spacegroupnumber==96) { // ------------------- 96  P 4nw 2abw #96
+  else if(spacegroupnumber==96) { // ------------------- 96  P 4nw 2abw #96
     spacegroup="P 4nw 2abw";}
-  if(spacegroupnumber==97) { // ------------------- 97  I 4 2 #97
+  else if(spacegroupnumber==97) { // ------------------- 97  I 4 2 #97
     spacegroup="I 4 2";}
-  if(spacegroupnumber==98) { // ------------------- 98  I 4bw 2bw #98
+  else if(spacegroupnumber==98) { // ------------------- 98  I 4bw 2bw #98
     spacegroup="I 4bw 2bw";}
-  if(spacegroupnumber==99) { // ------------------- 99  P 4 -2 #99
+  else if(spacegroupnumber==99) { // ------------------- 99  P 4 -2 #99
     spacegroup="P 4 -2";}
-  if(spacegroupnumber==100) { // ------------------- 100  P 4 -2ab #100
+  else if(spacegroupnumber==100) { // ------------------- 100  P 4 -2ab #100
     spacegroup="P 4 -2ab";}
-  if(spacegroupnumber==101) { // ------------------- 101  P 4c -2c #101
+  else if(spacegroupnumber==101) { // ------------------- 101  P 4c -2c #101
     spacegroup="P 4c -2c";}
-  if(spacegroupnumber==102) { // ------------------- 102  P 4n -2n #102
+  else if(spacegroupnumber==102) { // ------------------- 102  P 4n -2n #102
     spacegroup="P 4n -2n";}
-  if(spacegroupnumber==103) { // ------------------- 103  P 4 -2c #103
+  else if(spacegroupnumber==103) { // ------------------- 103  P 4 -2c #103
     spacegroup="P 4 -2c";}
-  if(spacegroupnumber==104) { // ------------------- 104  P 4 -2n #104
+  else if(spacegroupnumber==104) { // ------------------- 104  P 4 -2n #104
     spacegroup="P 4 -2n";}
-  if(spacegroupnumber==105) { // ------------------- 105  P 4c -2 #105
+  else if(spacegroupnumber==105) { // ------------------- 105  P 4c -2 #105
     spacegroup="P 4c -2";}
-  if(spacegroupnumber==106) { // ------------------- 106  P 4c -2ab #106
+  else if(spacegroupnumber==106) { // ------------------- 106  P 4c -2ab #106
     spacegroup="P 4c -2ab";}
-  if(spacegroupnumber==107) { // ------------------- 107  I 4 -2 #107
+  else if(spacegroupnumber==107) { // ------------------- 107  I 4 -2 #107
     spacegroup="I 4 -2";}
-  if(spacegroupnumber==108) { // ------------------- 108  I 4 -2c #108
+  else if(spacegroupnumber==108) { // ------------------- 108  I 4 -2c #108
     spacegroup="I 4 -2c";}
-  if(spacegroupnumber==109) { // ------------------- 109  I 4bw -2 #109
+  else if(spacegroupnumber==109) { // ------------------- 109  I 4bw -2 #109
     spacegroup="I 4bw -2";}
-  if(spacegroupnumber==110) { // ------------------- 110  I 4bw -2c #110
+  else if(spacegroupnumber==110) { // ------------------- 110  I 4bw -2c #110
     spacegroup="I 4bw -2c";}
-  if(spacegroupnumber==111) { // ------------------- 111  P -4 2 #111
+  else if(spacegroupnumber==111) { // ------------------- 111  P -4 2 #111
     spacegroup="P -4 2";}
-  if(spacegroupnumber==112) { // ------------------- 112  P -4 2c #112
+  else if(spacegroupnumber==112) { // ------------------- 112  P -4 2c #112
     spacegroup="P -4 2c";}
-  if(spacegroupnumber==113) { // ------------------- 113  P -4 2ab #113
+  else if(spacegroupnumber==113) { // ------------------- 113  P -4 2ab #113
     spacegroup="P -4 2ab";}
-  if(spacegroupnumber==114) { // ------------------- 114  P -4 2n #114
+  else if(spacegroupnumber==114) { // ------------------- 114  P -4 2n #114
     spacegroup="P -4 2n";}
-  if(spacegroupnumber==115) { // ------------------- 115  P -4 -2 #115
+  else if(spacegroupnumber==115) { // ------------------- 115  P -4 -2 #115
     spacegroup="P -4 -2";}
-  if(spacegroupnumber==116) { // ------------------- 116  P -4 -2c #116
+  else if(spacegroupnumber==116) { // ------------------- 116  P -4 -2c #116
     spacegroup="P -4 -2c";}
-  if(spacegroupnumber==117) { // ------------------- 117  P -4 -2ab #117
+  else if(spacegroupnumber==117) { // ------------------- 117  P -4 -2ab #117
     spacegroup="P -4 -2ab";}
-  if(spacegroupnumber==118) { // ------------------- 118  P -4 -2n #118
+  else if(spacegroupnumber==118) { // ------------------- 118  P -4 -2n #118
     spacegroup="P -4 -2n";}
-  if(spacegroupnumber==119) { // ------------------- 119  I -4 -2 #119
+  else if(spacegroupnumber==119) { // ------------------- 119  I -4 -2 #119
     spacegroup="I -4 -2";}
-  if(spacegroupnumber==120) { // ------------------- 120  I -4 -2c #120
+  else if(spacegroupnumber==120) { // ------------------- 120  I -4 -2c #120
     spacegroup="I -4 -2c";}
-  if(spacegroupnumber==121) { // ------------------- 121  I -4 2 #121
+  else if(spacegroupnumber==121) { // ------------------- 121  I -4 2 #121
     spacegroup="I -4 2";}
-  if(spacegroupnumber==122) { // ------------------- 122  I -4 2bw #122
+  else if(spacegroupnumber==122) { // ------------------- 122  I -4 2bw #122
     spacegroup="I -4 2bw";}
-  if(spacegroupnumber==123) { // ------------------- 123  -P 4 2 #123
+  else if(spacegroupnumber==123) { // ------------------- 123  -P 4 2 #123
     spacegroup="-P 4 2";}
-  if(spacegroupnumber==124) { // ------------------- 124  -P 4 2c #124
+  else if(spacegroupnumber==124) { // ------------------- 124  -P 4 2c #124
     spacegroup="-P 4 2c";}
-  if(spacegroupnumber==125 && setting==1) { // ------------------- 125  P 4 2 -1ab #125 (setting 1)
+  else if(spacegroupnumber==125 && setting==1) { // ------------------- 125  P 4 2 -1ab #125 (setting 1)
     spacegroup="P 4 2 -1ab";}
-  if(spacegroupnumber==125 && setting==2) { // ------------------- 125  -P 4a 2b #125 (setting 2)
+  else if(spacegroupnumber==125 && setting==2) { // ------------------- 125  -P 4a 2b #125 (setting 2)
     spacegroup="-P 4a 2b";}
-  if(spacegroupnumber==126 && setting==1) { // ------------------- 126  P 4 2 -1n #126 (setting 1)
+  else if(spacegroupnumber==126 && setting==1) { // ------------------- 126  P 4 2 -1n #126 (setting 1)
     spacegroup="P 4 2 -1n";}
-  if(spacegroupnumber==126 && setting==2) { // ------------------- 126  -P 4a 2bc #126 (setting 2)
+  else if(spacegroupnumber==126 && setting==2) { // ------------------- 126  -P 4a 2bc #126 (setting 2)
     spacegroup="-P 4a 2bc";}
-  if(spacegroupnumber==127) { // ------------------- 127  -P 4 2ab #127
+  else if(spacegroupnumber==127) { // ------------------- 127  -P 4 2ab #127
     spacegroup="-P 4 2ab";}
-  if(spacegroupnumber==128) { // ------------------- 128  -P 4 2n #128
+  else if(spacegroupnumber==128) { // ------------------- 128  -P 4 2n #128
     spacegroup="-P 4 2n";}
-  if(spacegroupnumber==129 && setting==1) { // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
+  else if(spacegroupnumber==129 && setting==1) { // ------------------- 129  P 4ab 2ab -1ab #129 (setting 1)
     spacegroup="P 4ab 2ab -1ab";}
-  if(spacegroupnumber==129 && setting==2) { // ------------------- 129  -P 4a 2a #129 (setting 2)
+  else if(spacegroupnumber==129 && setting==2) { // ------------------- 129  -P 4a 2a #129 (setting 2)
     spacegroup="-P 4a 2a";}
-  if(spacegroupnumber==130 && setting==1) { // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
+  else if(spacegroupnumber==130 && setting==1) { // ------------------- 130  P 4ab 2n -1ab #130 (setting 1)
     spacegroup="P 4ab 2n -1ab";}
-  if(spacegroupnumber==130 && setting==2) { // ------------------- 130  -P 4a 2ac #130 (setting 2)
+  else if(spacegroupnumber==130 && setting==2) { // ------------------- 130  -P 4a 2ac #130 (setting 2)
     spacegroup="-P 4a 2ac";}
-  if(spacegroupnumber==131) { // ------------------- 131  -P 4c 2 #131
+  else if(spacegroupnumber==131) { // ------------------- 131  -P 4c 2 #131
     spacegroup="-P 4c 2";}
-  if(spacegroupnumber==132) { // ------------------- 132  -P 4c 2c #132
+  else if(spacegroupnumber==132) { // ------------------- 132  -P 4c 2c #132
     spacegroup="-P 4c 2c";}
-  if(spacegroupnumber==133 && setting==1) { // ------------------- 133  P 4n 2c -1n #133 (setting 1)
+  else if(spacegroupnumber==133 && setting==1) { // ------------------- 133  P 4n 2c -1n #133 (setting 1)
     spacegroup="P 4n 2c -1n";}
-  if(spacegroupnumber==133 && setting==2) { // ------------------- 133  -P 4ac 2b #133 (setting 2)
+  else if(spacegroupnumber==133 && setting==2) { // ------------------- 133  -P 4ac 2b #133 (setting 2)
    spacegroup="-P 4ac 2b";}
-  if(spacegroupnumber==134 && setting==1) { // ------------------- 134  -P 4ac 2bc #134 (setting 1)
+  else if(spacegroupnumber==134 && setting==1) { // ------------------- 134  -P 4ac 2bc #134 (setting 1)
     spacegroup="P 4n 2 -1n";}
-  if(spacegroupnumber==134 && setting==2) { // ------------------- 134  -P 4ac 2bc #134 (setting 2)
+  else if(spacegroupnumber==134 && setting==2) { // ------------------- 134  -P 4ac 2bc #134 (setting 2)
     spacegroup="-P 4ac 2bc";}
-  if(spacegroupnumber==135) { // ------------------- 135  -P 4c 2ab #135
+  else if(spacegroupnumber==135) { // ------------------- 135  -P 4c 2ab #135
     spacegroup="-P 4c 2ab";}
-  if(spacegroupnumber==136) { // ------------------- 136  -P 4n 2n #136
+  else if(spacegroupnumber==136) { // ------------------- 136  -P 4n 2n #136
     spacegroup="-P 4n 2n";}
-  if(spacegroupnumber==137 && setting==1) { // ------------------- 137  P 4n 2n -1n #137 (setting 1)
+  else if(spacegroupnumber==137 && setting==1) { // ------------------- 137  P 4n 2n -1n #137 (setting 1)
     spacegroup="P 4n 2n -1n";}
-  if(spacegroupnumber==137 && setting==2) { // ------------------- 137  -P 4ac 2a #137 (setting 2)
+  else if(spacegroupnumber==137 && setting==2) { // ------------------- 137  -P 4ac 2a #137 (setting 2)
     spacegroup="-P 4ac 2a";}
-  if(spacegroupnumber==138 && setting==1) { // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
+  else if(spacegroupnumber==138 && setting==1) { // ------------------- 138  P 4n 2ab -1n #138 (setting 1)
     spacegroup="P 4n 2ab -1n";}
-  if(spacegroupnumber==138 && setting==2) { // ------------------- 138  -P 4ac 2ac #138 (setting 2)
+  else if(spacegroupnumber==138 && setting==2) { // ------------------- 138  -P 4ac 2ac #138 (setting 2)
     spacegroup="-P 4ac 2ac";}
-  if(spacegroupnumber==139) { // ------------------- 139  -I 4 2 #139
+  else if(spacegroupnumber==139) { // ------------------- 139  -I 4 2 #139
     spacegroup="-I 4 2";}
-  if(spacegroupnumber==140) { // ------------------- 140  -I 4 2c #140
+  else if(spacegroupnumber==140) { // ------------------- 140  -I 4 2c #140
     spacegroup="-I 4 2c";}
-  if(spacegroupnumber==141 && setting==1) { // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
+  else if(spacegroupnumber==141 && setting==1) { // ------------------- 141  I 4bw 2bw -1bw #141 (setting 1)
     spacegroup="I 4bw 2bw -1bw";}
-  if(spacegroupnumber==141 && setting==2) { // ------------------- 141  -I 4bd 2 #141 (setting 2)
+  else if(spacegroupnumber==141 && setting==2) { // ------------------- 141  -I 4bd 2 #141 (setting 2)
     spacegroup="-I 4bd 2";}
-  if(spacegroupnumber==142 && setting==1) { // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
+  else if(spacegroupnumber==142 && setting==1) { // ------------------- 142  I 4bw 2aw -1bw #142 (setting 1)
     spacegroup="I 4bw 2aw -1bw";}
-  if(spacegroupnumber==142 && setting==2) { // ------------------- 142  -I 4bd 2c #142 (setting 2)
+  else if(spacegroupnumber==142 && setting==2) { // ------------------- 142  -I 4bd 2c #142 (setting 2)
     spacegroup="-I 4bd 2c";}
-  if(spacegroupnumber==143) { // ------------------- 143  P 3 #143
+  else if(spacegroupnumber==143) { // ------------------- 143  P 3 #143
     spacegroup="P 3";}
-  if(spacegroupnumber==144) { // ------------------- 144  P 31 #144
+  else if(spacegroupnumber==144) { // ------------------- 144  P 31 #144
     spacegroup="P 31";}
-  if(spacegroupnumber==145) { // ------------------- 145  P 32 #145
+  else if(spacegroupnumber==145) { // ------------------- 145  P 32 #145
     spacegroup="P 32";}
-  if(spacegroupnumber==146 && setting==1) { // ------------------- 146  P 3* #146 (setting 1, rhl)
+  else if(spacegroupnumber==146 && setting==1) { // ------------------- 146  P 3* #146 (setting 1, rhl)
     spacegroup="P 3*";}
-  if(spacegroupnumber==146 && setting==2) { // ------------------- 146  R 3 #146 (setting 2, hex)
+  else if(spacegroupnumber==146 && setting==2) { // ------------------- 146  R 3 #146 (setting 2, hex)
     spacegroup="R 3";}
-  if(spacegroupnumber==147) { // ------------------- 147  -P 3 #147
+  else if(spacegroupnumber==147) { // ------------------- 147  -P 3 #147
     spacegroup="-P 3";}
-  if(spacegroupnumber==148 && setting==1) { // ------------------- 148  -P 3* #148 (setting 1, rhl)
+  else if(spacegroupnumber==148 && setting==1) { // ------------------- 148  -P 3* #148 (setting 1, rhl)
     spacegroup="-P 3*";}
-  if(spacegroupnumber==148 && setting==2) { // ------------------- 148  -R 3 #148 (setting 2, hex)
+  else if(spacegroupnumber==148 && setting==2) { // ------------------- 148  -R 3 #148 (setting 2, hex)
     spacegroup="-R 3";}
-  if(spacegroupnumber==149) { // ------------------- 149  P 3 2 #149
+  else if(spacegroupnumber==149) { // ------------------- 149  P 3 2 #149
     spacegroup="P 3 2";}
-  if(spacegroupnumber==150) { // ------------------- 150  P 3 2'' #150
+  else if(spacegroupnumber==150) { // ------------------- 150  P 3 2'' #150
     spacegroup="P 3 2''";}
-  if(spacegroupnumber==151) { // ------------------- 151  P 31 2c (0 0 1) #151
+  else if(spacegroupnumber==151) { // ------------------- 151  P 31 2c (0 0 1) #151
     spacegroup="P 31 2c (0 0 1)";}
-  if(spacegroupnumber==152) { // ------------------- 152  P 31 2'' #152
+  else if(spacegroupnumber==152) { // ------------------- 152  P 31 2'' #152
     spacegroup="P 31 2''";}
-  if(spacegroupnumber==153) { // ------------------- 153  P 32 2c (0 0 -1) #153
+  else if(spacegroupnumber==153) { // ------------------- 153  P 32 2c (0 0 -1) #153
     spacegroup="P 32 2c (0 0 -1)";}
-  if(spacegroupnumber==154) { // ------------------- 154  P 32 2'' #154
+  else if(spacegroupnumber==154) { // ------------------- 154  P 32 2'' #154
     spacegroup="P 32 2''";}
-  if(spacegroupnumber==155 && setting==1) { // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
+  else if(spacegroupnumber==155 && setting==1) { // ------------------- 155  P 3* 2 #155 (setting 1, rhl)
     spacegroup="P 3* 2";}
-  if(spacegroupnumber==155 && setting==2) { // ------------------- 155  R 3 2'' #155 (setting 2, hex)
+  else if(spacegroupnumber==155 && setting==2) { // ------------------- 155  R 3 2'' #155 (setting 2, hex)
     spacegroup="R 3 2''";}
-  if(spacegroupnumber==156) { // ------------------- 156  P 3 -2'' #156
+  else if(spacegroupnumber==156) { // ------------------- 156  P 3 -2'' #156
     spacegroup="P 3 -2''";}
-  if(spacegroupnumber==157) { // ------------------- 157  P 3 -2 #157
+  else if(spacegroupnumber==157) { // ------------------- 157  P 3 -2 #157
     spacegroup="P 3 -2";}
-  if(spacegroupnumber==158) { // ------------------- 158  P 3 -2''c #158
+  else if(spacegroupnumber==158) { // ------------------- 158  P 3 -2''c #158
     spacegroup="P 3 -2''c";}
-  if(spacegroupnumber==159) { // ------------------- 159  P 3 -2c #159
+  else if(spacegroupnumber==159) { // ------------------- 159  P 3 -2c #159
     spacegroup="P 3 -2c";}
-  if(spacegroupnumber==160 && setting==1) { // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
+  else if(spacegroupnumber==160 && setting==1) { // ------------------- 160  P 3* -2 #160 (setting 1, rhl)
     spacegroup="P 3* -2";}
-  if(spacegroupnumber==160 && setting==2) { // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
+  else if(spacegroupnumber==160 && setting==2) { // ------------------- 160  R 3 -2'' #160 (setting 2, hex)
     spacegroup="R 3 -2''";}
-  if(spacegroupnumber==161 && setting==1) { // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
+  else if(spacegroupnumber==161 && setting==1) { // ------------------- 161  P 3* -2n #161 (setting 1, rhl)
     spacegroup="P 3* -2n";}
-  if(spacegroupnumber==161 && setting==2) { // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
+  else if(spacegroupnumber==161 && setting==2) { // ------------------- 161  R 3 -2''c #161 (setting 2, hex)
     spacegroup="R 3 -2''c";}
-  if(spacegroupnumber==162) { // ------------------- 162  -P 3 2 #162
+  else if(spacegroupnumber==162) { // ------------------- 162  -P 3 2 #162
     spacegroup="-P 3 2";}
-  if(spacegroupnumber==163) { // ------------------- 163  -P 3 2c #163
+  else if(spacegroupnumber==163) { // ------------------- 163  -P 3 2c #163
     spacegroup="-P 3 2c";}
-  if(spacegroupnumber==164) { // ------------------- 164  -P 3 2'' #164
+  else if(spacegroupnumber==164) { // ------------------- 164  -P 3 2'' #164
     spacegroup="-P 3 2''";}
-  if(spacegroupnumber==165) { // ------------------- 165  -P 3 2''c #165
+  else if(spacegroupnumber==165) { // ------------------- 165  -P 3 2''c #165
     spacegroup="-P 3 2''c";}
-  if(spacegroupnumber==166 && setting==1) { // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
+  else if(spacegroupnumber==166 && setting==1) { // ------------------- 166  -P 3* 2 #166 (setting 1, rhl)
     spacegroup="-P 3* 2";}
-  if(spacegroupnumber==166 && setting==2) { // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
+  else if(spacegroupnumber==166 && setting==2) { // ------------------- 166  -R 3 2'' #166 (setting 2, hex)
     spacegroup="-R 3 2''";}
-  if(spacegroupnumber==167 && setting==1) { // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
+  else if(spacegroupnumber==167 && setting==1) { // ------------------- 167  -P 3* 2n #167 (setting 1, rhl)
     spacegroup="-P 3* 2n";}
-  if(spacegroupnumber==167 && setting==2) { // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
+  else if(spacegroupnumber==167 && setting==2) { // ------------------- 167  -R 3 2''c #167 (setting 2, hex)
     spacegroup="-R 3 2''c";}
-  if(spacegroupnumber==168) { // ------------------- 168  P 6 #168
+  else if(spacegroupnumber==168) { // ------------------- 168  P 6 #168
     spacegroup="P 6";}
-  if(spacegroupnumber==169) { // ------------------- 169  P 61 #169
+  else if(spacegroupnumber==169) { // ------------------- 169  P 61 #169
     spacegroup="P 61";}
-  if(spacegroupnumber==170) { // ------------------- 170  P 65 #170
+  else if(spacegroupnumber==170) { // ------------------- 170  P 65 #170
     spacegroup="P 65";}
-  if(spacegroupnumber==171) { // ------------------- 171  P 62 #171
+  else if(spacegroupnumber==171) { // ------------------- 171  P 62 #171
     spacegroup="P 62";}
-  if(spacegroupnumber==172) { // ------------------- 172  P 64 #172
+  else if(spacegroupnumber==172) { // ------------------- 172  P 64 #172
     spacegroup="P 64";}
-  if(spacegroupnumber==173) { // ------------------- 173  P 6c #173
+  else if(spacegroupnumber==173) { // ------------------- 173  P 6c #173
     spacegroup="P 6c";}
-  if(spacegroupnumber==174) { // ------------------- 174  P -6 #174
+  else if(spacegroupnumber==174) { // ------------------- 174  P -6 #174
     spacegroup="P -6";}
-  if(spacegroupnumber==175) { // ------------------- 175  -P 6 #175
+  else if(spacegroupnumber==175) { // ------------------- 175  -P 6 #175
     spacegroup="-P 6";}
-  if(spacegroupnumber==176) { // ------------------- 176  -P 6c #176
+  else if(spacegroupnumber==176) { // ------------------- 176  -P 6c #176
     spacegroup="-P 6c";}
-  if(spacegroupnumber==177) { // ------------------- 177  P 6 2 #177
+  else if(spacegroupnumber==177) { // ------------------- 177  P 6 2 #177
     spacegroup="P 6 2";}
-  if(spacegroupnumber==178) { // ------------------- 178  P 61 2 (0 0 -1) #178
+  else if(spacegroupnumber==178) { // ------------------- 178  P 61 2 (0 0 -1) #178
     spacegroup="P 61 2 (0 0 -1)";}
-  if(spacegroupnumber==179) { // ------------------- 179  P 65 2 (0 0 1) #179
+  else if(spacegroupnumber==179) { // ------------------- 179  P 65 2 (0 0 1) #179
     spacegroup="P 65 2 (0 0 1)";}
-  if(spacegroupnumber==180) { // ------------------- 180  P 62 2c (0 0 1) #180
+  else if(spacegroupnumber==180) { // ------------------- 180  P 62 2c (0 0 1) #180
     spacegroup="P 62 2c (0 0 1)";}
-  if(spacegroupnumber==181) { // ------------------- 181  P 64 2c (0 0 -1) #181
+  else if(spacegroupnumber==181) { // ------------------- 181  P 64 2c (0 0 -1) #181
     spacegroup="P 64 2c (0 0 -1)";}
-  if(spacegroupnumber==182) { // ------------------- 182  P 6c 2c #182
+  else if(spacegroupnumber==182) { // ------------------- 182  P 6c 2c #182
     spacegroup="P 6c 2c";}
-  if(spacegroupnumber==183) { // ------------------- 183  P 6 -2 #183
+  else if(spacegroupnumber==183) { // ------------------- 183  P 6 -2 #183
     spacegroup="P 6 -2";}
-  if(spacegroupnumber==184) { // ------------------- 184  P 6 -2c #184
+  else if(spacegroupnumber==184) { // ------------------- 184  P 6 -2c #184
     spacegroup="P 6 -2c";}
-  if(spacegroupnumber==185) { // ------------------- 185  P 6c -2 #185
+  else if(spacegroupnumber==185) { // ------------------- 185  P 6c -2 #185
     spacegroup="P 6c -2";}
-  if(spacegroupnumber==186) { // ------------------- 186  P 6c -2c #186
+  else if(spacegroupnumber==186) { // ------------------- 186  P 6c -2c #186
     spacegroup="P 6c -2c";}
-  if(spacegroupnumber==187) { // ------------------- 187  P -6 2 #187
+  else if(spacegroupnumber==187) { // ------------------- 187  P -6 2 #187
     spacegroup="P -6 2";}
-  if(spacegroupnumber==188) { // ------------------- 188  P -6c 2 #188
+  else if(spacegroupnumber==188) { // ------------------- 188  P -6c 2 #188
     spacegroup="P -6c 2";}
-  if(spacegroupnumber==189) { // ------------------- 189  P -6 -2 #189
+  else if(spacegroupnumber==189) { // ------------------- 189  P -6 -2 #189
     spacegroup="P -6 -2";}
-  if(spacegroupnumber==190) { // ------------------- 190  P -6c -2c #190
+  else if(spacegroupnumber==190) { // ------------------- 190  P -6c -2c #190
     spacegroup="P -6c -2c";}
-  if(spacegroupnumber==191) { // ------------------- 191  -P 6 2 #191
+  else if(spacegroupnumber==191) { // ------------------- 191  -P 6 2 #191
     spacegroup="-P 6 2";}
-  if(spacegroupnumber==192) { // ------------------- 192  -P 6 2c #192
+  else if(spacegroupnumber==192) { // ------------------- 192  -P 6 2c #192
     spacegroup="-P 6 2c";}
-  if(spacegroupnumber==193) { // ------------------- 193  -P 6c 2 #193
+  else if(spacegroupnumber==193) { // ------------------- 193  -P 6c 2 #193
     spacegroup="-P 6c 2";}
-  if(spacegroupnumber==194) { // ------------------- 194  -P 6c 2c #194
+  else if(spacegroupnumber==194) { // ------------------- 194  -P 6c 2c #194
     spacegroup="-P 6c 2c";}
-  if(spacegroupnumber==195) { // ------------------- 195  P 2 2 3 #195
+  else if(spacegroupnumber==195) { // ------------------- 195  P 2 2 3 #195
     spacegroup="P 2 2 3";}
-  if(spacegroupnumber==196) { // ------------------- 196  F 2 2 3 #196
+  else if(spacegroupnumber==196) { // ------------------- 196  F 2 2 3 #196
     spacegroup="F 2 2 3";}
-  if(spacegroupnumber==197) { // ------------------- 197  I 2 2 3 #197
+  else if(spacegroupnumber==197) { // ------------------- 197  I 2 2 3 #197
     spacegroup="I 2 2 3";}
-  if(spacegroupnumber==198) { // ------------------- 198  P 2ac 2ab 3 #198
+  else if(spacegroupnumber==198) { // ------------------- 198  P 2ac 2ab 3 #198
     spacegroup="P 2ac 2ab 3";}
-  if(spacegroupnumber==199) { // ------------------- 199  I 2b 2c 3 #199
+  else if(spacegroupnumber==199) { // ------------------- 199  I 2b 2c 3 #199
     spacegroup="I 2b 2c 3";}
-  if(spacegroupnumber==200) { // ------------------- 200  -P 2 2 3 #200
+  else if(spacegroupnumber==200) { // ------------------- 200  -P 2 2 3 #200
     spacegroup="-P 2 2 3";}
-  if(spacegroupnumber==201 && setting==1) { // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
+  else if(spacegroupnumber==201 && setting==1) { // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
     spacegroup="P 2 2 3 -1n";}
-  if(spacegroupnumber==201 && setting==2) { // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
+  else if(spacegroupnumber==201 && setting==2) { // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
    spacegroup="-P 2ab 2bc 3";}
-  if(spacegroupnumber==202) { // ------------------- 202  -F 2 2 3 #202
+  else if(spacegroupnumber==202) { // ------------------- 202  -F 2 2 3 #202
     spacegroup="-F 2 2 3";}
-  if(spacegroupnumber==203 && setting==1) { // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
+  else if(spacegroupnumber==203 && setting==1) { // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
     spacegroup="F 2 2 3 -1d";}
-  if(spacegroupnumber==203 && setting==2) { // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
+  else if(spacegroupnumber==203 && setting==2) { // ------------------- 203  -F 2uv 2vw 3 #203 (setting 2)
     spacegroup="-F 2uv 2vw 3";}
-  if(spacegroupnumber==204) { // ------------------- 204  -I 2 2 3 #204
+  else if(spacegroupnumber==204) { // ------------------- 204  -I 2 2 3 #204
     spacegroup="-I 2 2 3";}
-  if(spacegroupnumber==205) { // ------------------- 205  -P 2ac 2ab 3 #205
+  else if(spacegroupnumber==205) { // ------------------- 205  -P 2ac 2ab 3 #205
     spacegroup="-P 2ac 2ab 3";}
-  if(spacegroupnumber==206) { // ------------------- 206  -I 2b 2c 3 #206
+  else if(spacegroupnumber==206) { // ------------------- 206  -I 2b 2c 3 #206
     spacegroup="-I 2b 2c 3";}
-  if(spacegroupnumber==207) { // ------------------- 207  P 4 2 3 #207
+  else if(spacegroupnumber==207) { // ------------------- 207  P 4 2 3 #207
     spacegroup="P 4 2 3";}
-  if(spacegroupnumber==208) { // ------------------- 208  P 4n 2 3 #208
+  else if(spacegroupnumber==208) { // ------------------- 208  P 4n 2 3 #208
     spacegroup="P 4n 2 3";}
-  if(spacegroupnumber==209) { // ------------------- 209  F 4 2 3 #209
+  else if(spacegroupnumber==209) { // ------------------- 209  F 4 2 3 #209
     spacegroup="F 4 2 3";}
-  if(spacegroupnumber==210) { // ------------------- 210  F 4d 2 3 #210
+  else if(spacegroupnumber==210) { // ------------------- 210  F 4d 2 3 #210
     spacegroup="F 4d 2 3";}
-  if(spacegroupnumber==211) { // ------------------- 211  I 4 2 3 #211
+  else if(spacegroupnumber==211) { // ------------------- 211  I 4 2 3 #211
     spacegroup="I 4 2 3";}
-  if(spacegroupnumber==212) { // ------------------- 212  P 4acd 2ab 3 #212
+  else if(spacegroupnumber==212) { // ------------------- 212  P 4acd 2ab 3 #212
     spacegroup="P 4acd 2ab 3";}
-  if(spacegroupnumber==213) { // ------------------- 213  P 4bd 2ab 3 #213
+  else if(spacegroupnumber==213) { // ------------------- 213  P 4bd 2ab 3 #213
     spacegroup="P 4bd 2ab 3";}
-  if(spacegroupnumber==214) { // ------------------- 214  I 4bd 2c 3 #214
+  else if(spacegroupnumber==214) { // ------------------- 214  I 4bd 2c 3 #214
     spacegroup="I 4bd 2c 3";}
-  if(spacegroupnumber==215) { // ------------------- 215  P -4 2 3 #215
+  else if(spacegroupnumber==215) { // ------------------- 215  P -4 2 3 #215
     spacegroup="P -4 2 3";}
-  if(spacegroupnumber==216) { // ------------------- 216  F -4 2 3 #216
+  else if(spacegroupnumber==216) { // ------------------- 216  F -4 2 3 #216
     spacegroup="F -4 2 3";}
-  if(spacegroupnumber==217) { // ------------------- 217  I -4 2 3 #217
+  else if(spacegroupnumber==217) { // ------------------- 217  I -4 2 3 #217
     spacegroup="I -4 2 3";}
-  if(spacegroupnumber==218) { // ------------------- 218  P -4n 2 3 #218
+  else if(spacegroupnumber==218) { // ------------------- 218  P -4n 2 3 #218
     spacegroup="P -4n 2 3";}
-  if(spacegroupnumber==219) { // ------------------- 219  F -4c 2 3 #219
+  else if(spacegroupnumber==219) { // ------------------- 219  F -4c 2 3 #219
     spacegroup="F -4c 2 3";}
-  if(spacegroupnumber==220) { // ------------------- 220  I -4bd 2c 3 #220
+  else if(spacegroupnumber==220) { // ------------------- 220  I -4bd 2c 3 #220
     spacegroup="I -4bd 2c 3";}
-  if(spacegroupnumber==221) { // ------------------- 221  -P 4 2 3 #221
+  else if(spacegroupnumber==221) { // ------------------- 221  -P 4 2 3 #221
     spacegroup="-P 4 2 3";}
-  if(spacegroupnumber==222 && setting==1) { // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
+  else if(spacegroupnumber==222 && setting==1) { // ------------------- 222  P 4 2 3 -1n #222 (setting 1)
     spacegroup="P 4 2 3 -1n";}
-  if(spacegroupnumber==222 && setting==2) { // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
+  else if(spacegroupnumber==222 && setting==2) { // ------------------- 222  -P 4a 2bc 3 #222 (setting 2)
     spacegroup="-P 4a 2bc 3";}
-  if(spacegroupnumber==223) { // ------------------- 223  -P 4n 2 3 #223
+  else if(spacegroupnumber==223) { // ------------------- 223  -P 4n 2 3 #223
     spacegroup="-P 4n 2 3";}
-  if(spacegroupnumber==224 && setting==1) { // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
+  else if(spacegroupnumber==224 && setting==1) { // ------------------- 224  P 4n 2 3 -1n #224 (setting 1)
     spacegroup="P 4n 2 3 -1n";}
-  if(spacegroupnumber==224 && setting==2) { // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
+  else if(spacegroupnumber==224 && setting==2) { // ------------------- 224  -P 4bc 2bc 3 #224 (setting 2)
     spacegroup="-P 4bc 2bc 3";}
-  if(spacegroupnumber==225) { // ------------------- 225  -F 4 2 3 #225
+  else if(spacegroupnumber==225) { // ------------------- 225  -F 4 2 3 #225
     spacegroup="-F 4 2 3";}
-  if(spacegroupnumber==226) { // ------------------- 226  -F 4c 2 3 #226
+  else if(spacegroupnumber==226) { // ------------------- 226  -F 4c 2 3 #226
     spacegroup="-F 4c 2 3";}
-  if(spacegroupnumber==227 && setting==1) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
+  else if(spacegroupnumber==227 && setting==1) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 1)
     spacegroup="F 4d 2 3 -1d";}
-  if(spacegroupnumber==227 && setting==2) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
+  else if(spacegroupnumber==227 && setting==2) { // ------------------- 227  -F 4vw 2vw 3 #227 (setting 2)
     spacegroup="-F 4vw 2vw 3";}
-  if(spacegroupnumber==228 && setting==1) { // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
+  else if(spacegroupnumber==228 && setting==1) { // ------------------- 228  F 4d 2 3 -1cd #228 (setting 1)
     spacegroup="F 4d 2 3 -1cd";}
-  if(spacegroupnumber==228 && setting==2) { // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
+  else if(spacegroupnumber==228 && setting==2) { // ------------------- 228  -F 4cvw 2vw 3 #228 (setting 2)
     spacegroup="-F 4cvw 2vw 3";}
-  if(spacegroupnumber==229) { // ------------------- 229  -I 4 2 3 #229
+  else if(spacegroupnumber==229) { // ------------------- 229  -I 4 2 3 #229
     spacegroup="-I 4 2 3";}
-  if(spacegroupnumber==230) { // ------------------- 230  -I 4bd 2c 3 #230
+  else if(spacegroupnumber==230) { // ------------------- 230  -I 4bd 2c 3 #230
     spacegroup="-I 4bd 2c 3";}
   // done
   return spacegroup;
@@ -6932,48 +7635,49 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
 // ***************************************************************************
 string GetLaueLabel(string& point_group) {
   string laue = "";
+  // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
   // -1 
   if (point_group=="1" || point_group=="-1"){
     laue = "-1";
   }
   // 2/m
-  if (point_group=="2" || point_group=="m" || point_group=="2/m"){
+  else if(point_group=="2" || point_group=="m" || point_group=="2/m"){
     laue = "2/m";
   }
   // mmm
-  if (point_group=="222" || point_group=="mm2" || point_group=="mmm"){
+  else if(point_group=="222" || point_group=="mm2" || point_group=="mmm"){
     laue = "mmm";
   }
   // 4/m
-  if (point_group=="4" || point_group=="-4" || point_group=="4/m"){
+  else if(point_group=="4" || point_group=="-4" || point_group=="4/m"){
     laue = "4/m";
   }
   // 4/mmmm
-  if (point_group=="422" || point_group=="4mm" || point_group=="-42m" || point_group=="-4m2" || point_group=="4/mmm"){
+  else if(point_group=="422" || point_group=="4mm" || point_group=="-42m" || point_group=="-4m2" || point_group=="4/mmm"){
     laue = "4/mmm";
   }
   // -3
-  if (point_group=="3" || point_group=="-3"){
+  else if(point_group=="3" || point_group=="-3"){
     laue = "-3";
   }
   // -3m
-  if (point_group=="312" || point_group=="321" || point_group=="32" || point_group=="31m" || point_group=="3m1" || point_group=="-31m" || point_group=="-3m1" || point_group=="-3m" || point_group=="3m"){
+  else if(point_group=="312" || point_group=="321" || point_group=="32" || point_group=="31m" || point_group=="3m1" || point_group=="-31m" || point_group=="-3m1" || point_group=="-3m" || point_group=="3m"){
     laue = "-3m";
   }
   // 6/m
-  if (point_group=="6" || point_group=="-6" || point_group=="6/m"){
+  else if(point_group=="6" || point_group=="-6" || point_group=="6/m"){
     laue = "6/m";
   }
   // 6/mmm
-  if (point_group=="622" || point_group=="6mm" || point_group=="-6m2" || point_group=="-62m" || point_group=="6/mmm"){
+  else if(point_group=="622" || point_group=="6mm" || point_group=="-6m2" || point_group=="-62m" || point_group=="6/mmm"){
     laue = "6/mmm";
   }
   // m-3
-  if (point_group=="23" || point_group=="m-3"){
+  else if(point_group=="23" || point_group=="m-3"){
     laue = "m-3";
   }
   // m-3m
-  if (point_group=="432" || point_group=="-43m" || point_group=="m-3m"){
+  else if(point_group=="432" || point_group=="-43m" || point_group=="m-3m"){
     laue = "m-3m";
   }
   return laue;
@@ -9167,55 +9871,100 @@ xmatrix<double> LatticeReduction(const xmatrix<double>& lattice) {
 //DX 20190214 [OBSOLETE]   return foldAtomsInCell(atoms, c2f_new, f2c_new, skew, tol);
 //DX 20190214 [OBSOLETE]}
 
-deque<_atom> foldAtomsInCell(xstructure& a, xmatrix<double>& lattice_new, bool skew, double tol, bool fold_in_only) { //CO190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  xmatrix<double> f2c_new=trasp(lattice_new);
-  xmatrix<double> c2f_new=inverse(f2c_new);
-  if(fold_in_only){return foldAtomsInCell(a.atoms,c2f_new,f2c_new,skew,tol);}
-  double radius=RadiusSphereLattice(lattice_new);
-  xvector<int> dims=LatticeDimensionSphere(a.lattice,radius); 
-  xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
-  vector<int> sc2pcMap, pc2scMap; //dummy
-  if(LDEBUG) {cerr << "BUILDING SUPERCELL " << dims << endl;}
-  xstructure b=GetSuperCell(a,supercell,sc2pcMap,pc2scMap,false,false);
-  if(LDEBUG) {cerr << "BUILT SUPERCELL " << endl;}
-  return foldAtomsInCell(b.atoms,c2f_new,f2c_new,skew,tol);
+  string soliloquy="foldAtomsInCell():";
+
+  double volume_original=abs(aurostd::det(a.lattice));
+  double volume_new=abs(aurostd::det(lattice_new));
+  bool fold_in_only=( (volume_new < volume_original) || (aurostd::isequal(volume_original,volume_new)) );
+
+  deque<_atom> atoms_orig=a.atoms;  //need to make a copy for the pointer
+  deque<_atom>* ptr_atoms=&atoms_orig;
+  xstructure atomic_grid; //stays empty if not needed
+  if(!fold_in_only){
+    double radius=RadiusSphereLattice(lattice_new);
+    xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO190520
+    if(LDEBUG){
+      cerr << soliloquy << " a.lattice=" << endl;cerr << a.lattice << endl;
+      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << soliloquy << " vol(a.lattice)=" << abs(aurostd::det(a.lattice)) << endl;
+      cerr << soliloquy << " vol(lattice_new)=" << abs(aurostd::det(lattice_new)) << endl;
+      cerr << soliloquy << " radius(a.lattice)=" << RadiusSphereLattice(a.lattice) << endl;
+      cerr << soliloquy << " radius(lattice_new)=" << radius << endl;
+      cerr << soliloquy << " dims=" << dims << endl;
+    }
+    //[CO190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
+    //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
+    //vector<int> sc2pcMap, pc2scMap; //dummy
+    if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
+    atomic_grid=a;atomic_grid.Clean();
+    atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
+    if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
+    ptr_atoms=&atomic_grid.atoms;
+  }
+  const deque<_atom> atoms=*ptr_atoms;
+
+  return foldAtomsInCell(atoms,a.lattice,lattice_new,skew,tol,check_min_dists); //DX 20190619 = added check_min_dists bool
 }
 
-deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool skew, double tol) { //CO190520 - removed pointers for bools and doubles, added const where possible
+deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX 20190619 - added check_min_dists bool
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="foldAtomsInCell():";
+  
   deque<_atom> atoms_in_cell;
+  
+  xmatrix<double> f2c_new=trasp(lattice_new);
+  xmatrix<double> c2f_new=inverse(f2c_new);
+
+  if(LDEBUG){
+    cerr << soliloquy << " f2c_new=" << endl;cerr << f2c_new << endl;
+    cerr << soliloquy << " c2f_new=" << endl;cerr << c2f_new << endl;
+  }
+  
   _atom tmp;
   for (uint j = 0; j < atoms.size(); j++) {
-    if(atoms_in_cell.size() == 0) {
-//[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
-//[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
-//[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
-atoms_in_cell.push_back(atoms[j]);
-atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
-atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
-atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-    } else {
-//bool duplicate_atom = false;
-tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
-tmp.cpos = f2c_new * tmp.fpos;
-//[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
-//[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
-//[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
-//[OBSOLETE]    duplicate_atom = true;
-//[OBSOLETE]    break;
-//[OBSOLETE]  }
-//[OBSOLETE]}
-//[OBSOLETE]if(duplicate_atom == false) {
-if(!SYM::MapAtom(atoms_in_cell,tmp,false,c2f_new,f2c_new,skew,tol)){
-  //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
-  //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
-  atoms_in_cell.push_back(atoms[j]);
-  atoms_in_cell.back().fpos = tmp.fpos;
-  atoms_in_cell.back().cpos = tmp.cpos;
-  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-}
+    //[CO190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
+    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = c2f_new * atoms[j].cpos;
+    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].fpos = BringInCell(atoms[j].fpos);
+    //[CO190520 - this case is not needed]  //[OBSOLETE]atoms[j].cpos = f2c_new * atoms[j].fpos;
+    //[CO190520 - this case is not needed]  atoms_in_cell.push_back(atoms[j]);
+    //[CO190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
+    //[CO190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
+    //[CO190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
+    //[CO190520 - this case is not needed]} else {
+    //bool duplicate_atom = false;
+    tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
+    tmp.cpos = f2c_new * tmp.fpos;
+    //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
+    //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
+    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
+    //[OBSOLETE]    duplicate_atom = true;
+    //[OBSOLETE]    break;
+    //[OBSOLETE]  }
+    //[OBSOLETE]}
+    //[OBSOLETE]if(duplicate_atom == false) {
+      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX 20190619 - lattice_new and f2c_new as input
+      //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
+      //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
+      atoms_in_cell.push_back(atoms[j]);
+      atoms_in_cell.back().fpos = tmp.fpos;
+      atoms_in_cell.back().cpos = tmp.cpos;
+      atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
     }
+    //[CO190520 - this case is not needed]}
   }
+
+  if(check_min_dists){ //DX 20190613
+    double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
+    double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
+    if(LDEBUG){
+      cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
+      cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
+    }
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
+  }
+
   return atoms_in_cell;
 }
 
@@ -9225,13 +9974,13 @@ if(!SYM::MapAtom(atoms_in_cell,tmp,false,c2f_new,f2c_new,skew,tol)){
 // get reduced lattice in reciprocal space, converts to real and folds atoms into this lattice
 // this should be the fastest lattice for VASP
 // CO 180409 - refer to standard primitive instead, this function is simply a test, probably not optimal to standard primitive
-xstructure GetPrimitiveVASP(xstructure& a) {
+xstructure GetPrimitiveVASP(const xstructure& a) {
   double tol=a.sym_eps;
   if(tol==AUROSTD_NAN){tol=SYM::defaultTolerance(a);}
   return GetPrimitiveVASP(a,tol);
 }
 
-xstructure GetPrimitiveVASP(xstructure& a,double tol) {
+xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   xstructure b(a);
   b.ReScale(1.0);
@@ -9244,7 +9993,9 @@ xstructure GetPrimitiveVASP(xstructure& a,double tol) {
   //get skew - STOP
   b.lattice=lattice_new; //b.f2c=trasp(b.lattice); b.c2f=inverse(b.f2c);  //set new lattice, f2c, c2f
   //b.atoms=foldAtomsInCell(b.atoms,b.c2f,b.f2c,skew,tol);                //fold atoms into new lattice
-  b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
+  //[CO190520 - ReplaceAtoms()]b.atoms=foldAtomsInCell(a,b.lattice,skew,tol,true);                   //fold atoms into new lattice, don't bother folding out (slow)
+  deque<_atom> atoms=foldAtomsInCell(a,b.lattice,skew,tol);  //CO190520 - ReplaceAtoms()
+  b.ReplaceAtoms(atoms);  //CO190520 - ReplaceAtoms()
   if((0||LDEBUG)&&!isequal(a.lattice,b.lattice,1e-3)){
     cerr << "-----------------------------------------------------------------------" << endl;
     cerr << "ORIG STRUCTURE " << endl;
@@ -9764,7 +10515,8 @@ bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double
     for(uint jat=0;jat<a.atoms.size();jat++) {
       if(types[iat]==types[jat]) {
         diff=ftpos-a.atoms.at(jat).fpos;
-        SYM::PBC(diff); //DX 20190317 - need to use PBC for comparing difference vectors
+        diff = SYM::minimizeDistanceFractionalMethod(diff); //DX 20190613
+        //DX 20190613 [OBSOLETE] SYM::PBC(diff); //DX 20190317 - need to use PBC for comparing difference vectors
         // If the translated atom maps onto another and its type is the same as the atom mapped onto then increment.
         if(aurostd::modulus(diff)< tolerance ) CntGoodTrans++;
       }
@@ -10951,7 +11703,8 @@ bool inCell(xvector<double>& pos_vec){
 bool alreadyInCell(_atom& atom, deque<_atom> atoms){
   for(uint i=0;i<atoms.size();i++){ 
     xvector<double> fdiff = atom.fpos-atoms[i].fpos;
-    SYM::PBC(fdiff);
+    fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+    //DX 20190613 [OBSOLETE] SYM::PBC(fdiff);
     if(aurostd::abs(fdiff(1))<_ZERO_TOL_ && 
        aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
        aurostd::abs(fdiff(3))<_ZERO_TOL_){
@@ -10991,7 +11744,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   string soliloquy="GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001) {cerr << "ERROR: singular supercell matrix" << endl;exit(0);}
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);} //exit(0)
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -10999,7 +11752,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //pflow::CalculateFullSymmetry(a);
   _atom atom,atom2;
   _sym_op pSymOp,fSymOp,aSymOp;  //corey
-  int i,j,k,dim;
+  int i,j,k; //,dim;
   uint iat;//,at_indx; //corey
   xvector<int> dims(3);
   xvector<double> cshift(3);  //corey
@@ -11044,11 +11797,13 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 
   // DX 20190319 - added option to expand strictly by uniform supercell matrix - START
   // CO190409 - note, force_supercell_matrix is PURELY for speed up purposes, the other approach should yield the same results (just slower)
-  if(force_supercell_matrix && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
-  else {
-  radius=RadiusSphereLattice(b.lattice);
-  dims=LatticeDimensionSphere(a.lattice,radius);dim=max(dims)+1;
+  if(force_supercell_matrix && aurostd::isdiagonal(supercell)){dims[1]=nx;dims[2]=ny;dims[3]=nz;} //[CO190520 - fixing for dims] && !derivative_structure){dim=nx;} // if here, then nx=ny=nz
+  else{
+    radius=RadiusSphereLattice(b.lattice);
+    dims=LatticeDimensionSphere(a.lattice,radius);//[CO190520 - EXCESSIVE]dim=max(dims)+1;
   } 
+
+  if(LDEBUG){cerr << soliloquy << " dims=" << dims << endl;}
   // DX 20190319 - added option to expand strictly by uniform supercell matrix - END
   // if(LDEBUG) cerr << "DEBUG  dims=" << dims << " " << " radius=" << radius << endl;  // DEBUG
 
@@ -11084,9 +11839,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     for(uint ia=0;ia<a.iatoms.size();ia++){
       for(uint iia=0;iia<a.iatoms[ia].size();iia++){
         pcmap=false;
-        for(i=-dim;i<=dim;i++) {
-          for(j=-dim;j<=dim;j++) {
-            for(k=-dim;k<=dim;k++) {
+        //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {
+        //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {
+        //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {
+        for(i=-dims[1];i<=dims[1];i++) {
+          for(j=-dims[2];j<=dims[2];j++) {
+            for(k=-dims[3];k<=dims[3];k++) {
               atom=a.atoms[a.iatoms[ia][iia]];
               //cerr << "atom " << a.iatoms[ia][iia] << " fpos_UNrot " << atom.fpos << endl;
               cshift=((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3);
@@ -11163,7 +11921,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
         if(ignore_pcmap==false && pcmap==false){
           if(force_strict_pc2scMap){
             message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-            throw aurostd::xerror(soliloquy, message, _INDEX_MISMATCH_);
+            throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
           }
           ignore_pcmap=true;
           pc2scMap.clear();
@@ -11186,9 +11944,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   } else {
     for(uint ia=0;ia<a.atoms.size();ia++) {
       pcmap=false;
-      for(i=-dim;i<=dim;i++){
-        for(j=-dim;j<=dim;j++){
-          for(k=-dim;k<=dim;k++){
+      //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){
+      //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){
+      //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){
+      for(i=-dims[1];i<=dims[1];i++){
+        for(j=-dims[2];j<=dims[2];j++){
+          for(k=-dims[3];k<=dims[3];k++){
             atom=a.atoms[ia];
             //atom.cpos=atom.cpos+(((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3));
             cshift=((double)i)*a.lattice(1)+((double)j)*a.lattice(2)+((double)k)*a.lattice(3);
@@ -11271,21 +12032,37 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   double density_a=a.scale*a.scale*a.scale*abs(det(a.lattice))/a.atoms.size();
   double density_b=b.scale*b.scale*b.scale*abs(det(b.lattice))/b.atoms.size();
   if(abs(b.atoms.size()-a.atoms.size()*fraction)>0.1 || abs(density_a-density_b)>0.001) {
-    cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
-    cerr << "         supercell has the wrong number of atoms" << endl;
-    cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
-    cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
-    cerr << "         b.scale            = " << b.scale << endl;
-    cerr << "         a.scale            = " << a.scale << endl;
-    cerr << "         fraction           = " << fraction << endl;
-    cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
-    cerr << "         b.density          = " << density_b << endl;
-    cerr << "         a.density          = " << density_a << endl;
-    cerr << "         b.lattice          = " << endl;
-    cerr << b.lattice << endl;
-    cerr << "         a.lattice          = " << endl;
-    cerr << a.lattice << endl;
-    exit(0);
+    //[CO190520 - OBSOLETE]cerr << "ERROR   xstructure xstructure::GetSuperCell     " << endl;
+    //[CO190520 - OBSOLETE]cerr << "         supercell has the wrong number of atoms" << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.atoms.size()     = " << b.atoms.size() << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.atoms.size()     = " << a.atoms.size() << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.scale            = " << b.scale << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.scale            = " << a.scale << endl;
+    //[CO190520 - OBSOLETE]cerr << "         fraction           = " << fraction << endl;
+    //[CO190520 - OBSOLETE]cerr << "         supercell atoms    = " << fraction*a.atoms.size() << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.density          = " << density_b << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.density          = " << density_a << endl;
+    //[CO190520 - OBSOLETE]cerr << "         b.lattice          = " << endl;
+    //[CO190520 - OBSOLETE]cerr << b.lattice << endl;
+    //[CO190520 - OBSOLETE]cerr << "         a.lattice          = " << endl;
+    //[CO190520 - OBSOLETE]cerr << a.lattice << endl;
+
+    message << "Supercell has the wrong number of atoms" << endl;
+    message << "b.atoms.size()     = " << b.atoms.size() << endl;
+    message << "a.atoms.size()     = " << a.atoms.size() << endl;
+    message << "b.scale            = " << b.scale << endl;
+    message << "a.scale            = " << a.scale << endl;
+    message << "fraction           = " << fraction << endl;
+    message << "supercell atoms    = " << fraction*a.atoms.size() << endl;
+    message << "b.density          = " << density_b << endl;
+    message << "a.density          = " << density_a << endl;
+    message << "b.lattice          = " << endl;
+    message << b.lattice << endl;
+    message << "a.lattice          = " << endl;
+    message << a.lattice << endl;
+
+    throw aurostd::xerror(soliloquy,message,_RUNTIME_ERROR_);
+    //exit(0);
   }
 
   bool pretend_uniform=false;//true;  // COREY TEST, REMOVE ME
@@ -11613,8 +12390,12 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
   }
-  cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  exit(0);
+  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO190520 -OBSOLETE]exit(0);
+  string soliloquy="GetSuperCell():";
+  stringstream message;
+  message << "Matrix must have 9 or 3 elements";
+  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -11631,8 +12412,12 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
   }
-  cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
-  exit(0);
+  //[CO190520 -OBSOLETE]cerr << "GetSuperCell - vector must have 9 or 3 elements" << endl;
+  //[CO190520 -OBSOLETE]exit(0);
+  string soliloquy="GetSuperCell():";
+  stringstream message;
+  message << "Matrix must have 9 or 3 elements";
+  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -12237,7 +13022,7 @@ void xstructure::FakeNames(void) {
     for(int j=0;j<num_each_type.at(itype);j++) {
       //    if(atoms.at(iatom).name_is_given==FALSE)
       {
-	atoms.at(iatom).name=atom_symbol_vec[2+atoms.at(iatom).type];
+	atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
 	if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
 	//	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
 	atoms.at(iatom).CleanName();
@@ -12706,8 +13491,11 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
   _atom atom;
   str.BringInCell();  // are INCELL.
-  xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
-  a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
+  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
   for(uint iat=0;iat<str.atoms.size();iat++){
     str.grid_atoms.push_back(str.atoms.at(iat));  // put first the unit cell !
     str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
@@ -12716,7 +13504,7 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
-	if(i!=0 || j!=0 || k!=0) {
+	if(i!=0 || j!=0 || k!=0) {  //these are ALREADY included
 	  for(uint iat=0;iat<str.atoms.size();iat++) {
 	    atom=str.atoms.at(iat);
 	    atom.isincell=FALSE; // these are OUT OF CELL
@@ -12897,30 +13685,30 @@ int ijk2l(const xstructure& str,const xvector<int>& ijk) {
 }
 
 // **************************************************************************
-// AQEgeom2aims AQEgeom2abinit AQEgeom2qe AQEgeom2vasp
+// input2AIMSxstr input2ABINITxstr input2QExstr input2VASPxstr
 // ***************************************************************************
-xstructure AQEgeom2aims(istream& input) {
+xstructure input2AIMSxstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) 
   a.xstructure2aims();
   return a;
 }
 
-xstructure AQEgeom2abinit(istream& input) {
+xstructure input2ABINITxstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) 
   a.xstructure2abinit();
   return a;
 }
 
-xstructure AQEgeom2qe(istream& input) {
+xstructure input2QExstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) 
   a.xstructure2qe();
   return a;
 }
 
-xstructure AQEgeom2vasp(istream& input) {
+xstructure input2VASPxstr(istream& input) {
   xstructure a(input,IOAFLOW_AUTO);
   //  if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM)
   a.xstructure2vasp();
@@ -13360,7 +14148,7 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
   for(uint i=0;i<elements.size();i++) {
     //  cout << "scanning " << elements.at(i) << endl;
     for(uint j=1;j<vinput.size();j++) {
-      aurostd::string2tokens(vinput.at(j),tokens);
+      aurostd::string2tokens(vinput[j],tokens);
       if(tokens.size()==7) {
 	if(tokens.at(1)==elements.at(i)) {
 	  cout << "   ";
@@ -13415,7 +14203,9 @@ string xstructure2json(xstructure& xstr) {
  
   // SPECIES 
   if(xstr.species.size()){
-    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapDeqEntries(xstr.species,"\""),",") << "]" << eendl;
+    deque<string> cleaned_species; //DX 20190612 - cleaned species names
+    for(uint i=0;i<xstr.species.size(); i++) { cleaned_species.push_back(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])); } //DX 20190612 - cleaned species names
+    sscontent_json << "\"species\":[" << aurostd::joinWDelimiter(aurostd::wrapDeqEntries(cleaned_species,"\""),",") << "]" << eendl; //DX 20190612 - cleaned species names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"species\":null" << eendl;}
   }
@@ -13469,7 +14259,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
 
   // NAME 
   if(atom.name.size()){
-    sscontent_json << "\"name\":\"" << atom.name << "\"" << eendl;
+    sscontent_json << "\"name\":\"" << KBIN::VASP_PseudoPotential_CleanName(atom.name) << "\"" << eendl; //DX 20190612 - added function to clean names
   } else {
     if(PRINT_NULL){ sscontent_json << "\"name\":null" << eendl;}
   }

@@ -16,20 +16,20 @@ const char _std_ = 'S';  // standard aflow/vasp units
 const char _m_ = 'm';    // convert to milli-
 
 // FORMATS
-const char _apool_ = 'a';  // apool
-const char _json_ = 'j';   // standard json
-const char _pdf_ = 'p';    // pdf
-const char _txt_ = 't';    // plain text
-const char _web_ = 'w';    // web json
-const char _latex_ = 'l';    // latex
-const char _gnuplot_ = 'g';  // gnuplot
-const char _jupyterthree_ = 'y';  // jupyter python 3
-const char _jupytertwo_ = 'z'; // jupyter python 2
+//[ME190628 - moved to aflow.h] const char _apool_ = 'a';  // apool
+//[ME190628 - moved to aflow.h] const char _json_ = 'j';   // standard json
+//[ME190628 - moved to aflow.h] const char _pdf_ = 'p';    // pdf
+//[ME190628 - moved to aflow.h] const char _txt_ = 't';    // plain text
+//[ME190628 - moved to aflow.h] const char _web_ = 'w';    // web json
+//[ME190628 - moved to aflow.h] const char _latex_ = 'l';    // latex
+//[ME190628 - moved to aflow.h] const char _gnuplot_ = 'g';  // gnuplot
+//[ME190628 - moved to aflow.h] const char _jupyterthree_ = 'y';  // jupyter python 3
+//[ME190628 - moved to aflow.h] const char _jupytertwo_ = 'z'; // jupyter python 2
 
 // REDUCTION MODES
-const char _frac_ = 'f';  //fractional
-const char _gcd_ = 'g';   //gcd
-const char _none_ = 'n';  //none
+//[ME190628 - moved to aflow.h] const char _frac_ = 'f';  //fractional
+//[ME190628 - moved to aflow.h] const char _gcd_ = 'g';   //gcd
+//[ME190628 - moved to aflow.h] const char _none_ = 'n';  //none
 
 // DEFAULTS
 const int CHULL_PRECISION = 8;                          //must be less than _precision_ in aflow_xatom.cpp, which is currently set to 14
@@ -197,7 +197,7 @@ namespace chull {
       bool m_is_equivalent_g_state; //can be many, includes original g_state
       bool m_is_sym_equivalent_g_state; //can be many, includes original g_state
       double m_dist_2_hull; //warning, this is not TRUE dist to hull (facet), this is vertical distance
-      //[OBSOLETE - reduce by _frac_ always! so use coord_group values]xvector<double> m_decomp_coefs; //un-reduced coefficients here, reduced exist at the m_coord_groups level
+      //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]xvector<double> m_decomp_coefs; //un-reduced coefficients here, reduced exist at the m_coord_groups level
       double m_stability_criterion;
       double m_n_plus_1_energy_gain;
       
@@ -217,7 +217,7 @@ namespace chull {
       bool isWithinHalfHull(bool lower_hull=true) const;
       bool isGState() const;
       xvector<double> getStoichiometricCoords() const; //get stoichiometric coordinates (sans energetic coordinate)
-      xvector<double> getTruncatedReducedCoords(const xvector<int>& elements_present,char reduce_mode=_frac_) const;
+      xvector<double> getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred=frac_vrt) const;
       xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present) const; //truncated arbitrary coords
       xvector<double> getTruncatedSCoords(const xvector<int>& elements_present) const; //truncate stoichiometry
       xvector<double> getTruncatedCCoords(const xvector<int>& elements_present,bool reduce=true) const; //similar to truncated stoichiometry, but in integer form (if not POCC)
@@ -703,10 +703,10 @@ namespace chull {
       vector<uint> extractDecompositionPhases(const ChullFacet& facet) const;
       vector<uint> getDecompositionPhases(uint i_point) const;
       vector<uint> getDecompositionPhases(const ChullPoint& point) const;
-      xvector<double> getDecompositionCoefficients(uint i_point,char reduce_mode=_frac_) const;
-      xvector<double> getDecompositionCoefficients(const ChullPoint& point,char reduce_mode=_frac_) const;
-      xvector<double> getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,char reduce_mode=_frac_) const;
-      xvector<double> getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,char reduce_mode=_frac_) const;
+      xvector<double> getDecompositionCoefficients(uint i_point,vector_reduction_type vred=frac_vrt) const;
+      xvector<double> getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred=frac_vrt) const;
+      xvector<double> getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred=frac_vrt) const;
+      xvector<double> getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred=frac_vrt) const;
       vector<uint> getAdjacentFacets(uint hull_member,bool ignore_hypercollinear=true,bool ignore_vertical=true,bool ignore_artificial=true) const;
       vector<vector<uint> > getEquilibriumPhases(uint hull_member) const;
       vector<uint> getEquivalentGStates(uint g_state) const;
@@ -720,7 +720,7 @@ namespace chull {
       double getNPlus1EnergyGain(uint cpoint) const;
 
       //writer
-      bool write(char mode=_pdf_) const;
+      bool write(filetype ftype=latex_ft) const;
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
@@ -847,10 +847,10 @@ namespace chull {
       void cleanHull(); //clean state of hull
       
       //writer functions
-      string prettyPrintCompound(const ChullPoint& point,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
-      string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode=_gcd_,bool exclude1=true,char mode=_latex_) const;
+      string prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
+      string prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
+      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
+      //[ME190628 - moved to pflow.h] string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred=gcd_vrt,bool exclude1=true,filetype ftype=latex_ft) const;
       string getICSDNumber(uint i_point,bool remove_suffix=true) const;
       string getICSDNumber(const ChullPoint& point,bool remove_suffix=true) const;
       string getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix=true) const;
@@ -865,7 +865,7 @@ namespace chull {
       string nodeCreator(const string& option, const string& position, const string& content) const;
       bool unwantedFacetLine(uint vi,uint vj,bool check_border=true) const;
       bool unwantedFacetLine(uint vi,uint vj,vector<vector<uint> >& facet_lines,bool check_border=true) const;
-      string getPointsPropertyHeaderList(char mode) const;
+      string getPointsPropertyHeaderList(filetype ftype) const;
       string getDelta(bool helvetica_font) const;
       string getSnapshotTableHeader(string headers,bool designate_HEADER=false) const;
       bool addInternalHyperlinks(bool internal_links_graph2report=true,bool internal_links_withinreport=true) const;
@@ -876,19 +876,19 @@ namespace chull {
       vector<string> grabAcceptableLatexColors(const string& banned_colors_str,bool replace_pranab_standard=true,bool allow_dvips_colors=true,uint count=10) const;
       vector<string> grabAcceptableLatexColors(const vector<string>& banned_colors,bool replace_pranab_standard=true,bool allow_dvips_colors=true,uint count=10) const;
       aurostd::xoption resolvePlotLabelSettings() const;
-      void writePDF() const;
+      void writeLatex() const;
       string getPlainTextHeader() const;
       string getJSONHeader() const;
-      string grabCHPointProperty(const ChullPoint& point,const string& property,char mode=_txt_) const;
-      string grabCHFacetProperty(const ChullFacet& facet,const string& property,char mode=_txt_) const;
-      vector<vector<string> > getPointsData(const string& properties_str,vector<string>& headers,char mode=_txt_) const;
-      vector<vector<vector<vector<string> > > > getFacetsData(const string& properties_str,vector<string>& headers,char mode=_txt_) const;
+      string grabCHPointProperty(const ChullPoint& point,const string& property,filetype ftype=txt_ft) const;
+      string grabCHFacetProperty(const ChullFacet& facet,const string& property,filetype ftype=txt_ft) const;
+      vector<vector<string> > getPointsData(const string& properties_str,vector<string>& headers,filetype ftype=txt_ft) const;
+      vector<vector<vector<vector<string> > > > getFacetsData(const string& properties_str,vector<string>& headers,filetype ftype=txt_ft) const;
       void getPlainTextColumnSizes(const vector<string>& headers,const vector<vector<string> >& ventry,vector<uint>& sizes) const;
       void getPlainTextColumnSizesPoints(const vector<string>& headers,const vector<vector<string> >& ventries,vector<uint>& sizes) const;
       void getPlainTextColumnSizesFacets(const vector<string>& headers,const vector<vector<vector<vector<string> > > >& ventries,vector<uint>& sizes) const;
       string getPlainTextTable(const vector<string>& headers,const vector<vector<string> >& ventries,const vector<uint>& sizes) const;
       string getJSONTable(const vector<string>& headers,const vector<vector<string> >& ventries) const;
-      void writeText(char mode=_txt_) const;
+      void writeText(filetype ftype=txt_ft) const;
       void writeWebApp() const;
       void writeAPool() const;
 

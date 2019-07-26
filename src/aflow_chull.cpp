@@ -256,7 +256,8 @@ namespace chull {
       aurostd::xcombos xc(vsizes,'E');
       while(xc.increment()){
         velements=xc.applyCombo(vcomponents);
-        if(verbose_elimination){velements=pflow::makeAlphabeticVector(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
+        if(verbose_elimination){velements=pflow::stringElements2VectorElements(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss,true,true,pp_string,false);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO190712
+        //[CO190712 - OBSOLETE]if(verbose_elimination){velements=pflow::getAlphabeticVectorString(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
         std::sort(velements.begin(),velements.end());
         original_input=aurostd::joinWDelimiter(velements,"");
         std::sort(velements.begin(),velements.end());velements.erase( std::unique( velements.begin(), velements.end() ), velements.end() );  //MnMnPd is same as MnPd
@@ -271,7 +272,8 @@ namespace chull {
     } else {  //simple list mode
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
-        velements=pflow::makeAlphabeticVector(tokens_comma[i], FileMESSAGE,oss);
+        velements=pflow::stringElements2VectorElements(tokens_comma[i],FileMESSAGE,oss,true,true,pp_string,false);  //clean and sort, do not keep_pp  //CO190712
+        //[CLO190712 - OBSOLETE]velements=pflow::getAlphabeticVectorString(tokens_comma[i], FileMESSAGE,oss);
         nary=velements.size();
         original_input=aurostd::joinWDelimiter(velements,"");
         std::sort(velements.begin(),velements.end());velements.erase( std::unique( velements.begin(), velements.end() ), velements.end() );  //MnMnPd is same as MnPd
@@ -315,7 +317,8 @@ namespace chull {
     for(uint i=0,fl_size_i=vinputs.size();i<fl_size_i;i++) {
       // go through each request
       // create log specific to that request
-      velements = pflow::makeAlphabeticVector(vinputs[i], FileMESSAGE,oss);
+      velements = pflow::stringElements2VectorElements(vinputs[i],FileMESSAGE,oss,true,true,pp_string,false); //clean and sort, do not keep_pp  //CO190712
+      //[CO190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
       if(!velements.size()){
         message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
         pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -666,10 +669,10 @@ namespace chull {
       // START outputs
       ////////////////////////////////////////////////////////////////////////////
 
-      if(vpflow.flag("CHULL::TEXT_DOC")) {if(!hull.write(_txt_)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // text doc
-      if(vpflow.flag("CHULL::JSON_DOC")) {if(!hull.write(_json_)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // json doc
-      if(vpflow.flag("CHULL::WEB_DOC")) {if(!hull.write(_web_)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // web-specific json doc
-      if(vpflow.flag("CHULL::LATEX_DOC")||vpflow.flag("CHULL::PNG_IMAGE")) {if(!hull.write(_pdf_)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // latex doc, keep last as it will trip on useless plots
+      if(vpflow.flag("CHULL::TEXT_DOC")) {if(!hull.write(txt_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // text doc
+      if(vpflow.flag("CHULL::JSON_DOC")) {if(!hull.write(json_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // json doc
+      if(vpflow.flag("CHULL::WEB_DOC")) {if(!hull.write(chull_web_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // web-specific json doc
+      if(vpflow.flag("CHULL::LATEX_DOC")||vpflow.flag("CHULL::PNG_IMAGE")) {if(!hull.write(latex_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // latex doc, keep last as it will trip on useless plots
 
       ////////////////////////////////////////////////////////////////////////////
       // END outputs
@@ -1235,7 +1238,7 @@ void ChullPoint::HullCopy(const ChullPoint& b){ //copies ALL chull stuff, no ent
   m_is_equivalent_g_state=b.m_is_equivalent_g_state;
   m_is_sym_equivalent_g_state=b.m_is_sym_equivalent_g_state;
   m_dist_2_hull=b.m_dist_2_hull;
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]m_decomp_coefs=b.m_decomp_coefs;
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]m_decomp_coefs=b.m_decomp_coefs;
   m_stability_criterion=b.m_stability_criterion;
   m_n_plus_1_energy_gain=b.m_n_plus_1_energy_gain;
   h_coords=b.h_coords;
@@ -1362,10 +1365,10 @@ xvector<double> ChullPoint::getStoichiometricCoords() const{
   return r_coords;
 }
 
-xvector<double> ChullPoint::getTruncatedReducedCoords(const xvector<int>& elements_present,char reduce_mode) const{
+xvector<double> ChullPoint::getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred) const{
   string soliloquy="ChullPoint::getTruncatedCoords():";
-  if(reduce_mode==_frac_ || reduce_mode==_none_){return getTruncatedSCoords(elements_present);}
-  else if(reduce_mode==_gcd_){return getTruncatedCCoords(elements_present,true);}
+  if(vred==frac_vrt || vred==no_vrt){return getTruncatedSCoords(elements_present);}
+  else if(vred==gcd_vrt){return getTruncatedCCoords(elements_present,true);}
   else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
   xvector<double> out;return out;
 }
@@ -1587,7 +1590,7 @@ void ChullPoint::cleanPointForHullTransfer() {
   m_is_equivalent_g_state=false;
   m_is_sym_equivalent_g_state=false;
   m_dist_2_hull=AUROSTD_MAX_DOUBLE;
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]m_decomp_coefs.clear();
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]m_decomp_coefs.clear();
   m_stability_criterion=AUROSTD_MAX_DOUBLE;
   m_n_plus_1_energy_gain=AUROSTD_MAX_DOUBLE;
   cleanPointForHullCalc();
@@ -3174,13 +3177,13 @@ uint ConvexHull::artificialMap(uint i_point) const{
   throw aurostd::xerror(soliloquy,"Cannot determine artificial point mapping");
 }
 
-bool ConvexHull::write(char mode) const {
+bool ConvexHull::write(filetype ftype) const {
   bool written=false;
   try{
-    if(mode==_apool_){writeAPool();written=true;}
-    else if(mode==_json_||mode==_txt_){writeText(mode);written=true;}
-    else if(mode==_pdf_){writePDF();written=true;}
-    else if(mode==_web_){writeWebApp();written=true;}
+    if(ftype==chull_apool_ft){writeAPool();written=true;}
+    else if(ftype==json_ft||ftype==txt_ft){writeText(ftype);written=true;}
+    else if(ftype==latex_ft){writeLatex();written=true;}
+    else if(ftype==chull_web_ft){writeWebApp();written=true;}
   }
   catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return written;
@@ -3397,7 +3400,8 @@ void ConvexHull::loadPoints(string alloy) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::loadPoints():";
   if(LDEBUG) {cerr << soliloquy << " initializing alloy, compound=" << alloy << endl;}
-  vector<string> velements = pflow::makeAlphabeticVector(alloy, *p_FileMESSAGE, *p_oss);
+  vector<string> velements = pflow::stringElements2VectorElements(alloy, *p_FileMESSAGE, *p_oss, true, true, pp_string, false); //clean and sort, do not keep_pp  //CO190712
+  //[CO190712 - OBSOLETE]vector<string> velements = pflow::getAlphabeticVectorString(alloy, *p_FileMESSAGE, *p_oss);
   return loadPoints(velements);
 }
 
@@ -5336,13 +5340,13 @@ void ConvexHull::setDecompositionPhases(uint i_nary,uint i_alloy,uint i_coord_gr
   m_coord_groups[i_coord_group].m_decomp_phases=extractDecompositionPhases(facet);
 }
 
-xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,char reduce_mode) const{
+xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,vector_reduction_type vred) const{
   string soliloquy="ConvexHull::getDecompositionCoefficients():";
   if(i_point>m_points.size()-1){throw aurostd::xerror(soliloquy,"Invalid index within points");}
-  return getDecompositionCoefficients(m_points[i_point],reduce_mode);
+  return getDecompositionCoefficients(m_points[i_point],vred);
 }
 
-xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,char reduce_mode) const{
+xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
   string soliloquy="ConvexHull::getDecompositionCoefficients():";
   if(!point.m_initialized){throw aurostd::xerror(soliloquy,"Uninitialized point");}
   if(point.m_is_on_hull){throw aurostd::xerror(soliloquy,"No decomposition coefficients for hull members");}
@@ -5355,19 +5359,19 @@ xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point
       return dcomp_coefs;
     }
     if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
-      return getDecompositionCoefficients(point,m_coord_groups[i_coord_group].m_decomp_phases,reduce_mode);
+      return getDecompositionCoefficients(point,m_coord_groups[i_coord_group].m_decomp_phases,vred);
     }
   }
-  return getDecompositionCoefficients(point,getDecompositionPhases(point),reduce_mode);
+  return getDecompositionCoefficients(point,getDecompositionPhases(point),vred);
 }
 
-xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,char reduce_mode) const{
+xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
   string soliloquy="ConvexHull::getDecompositionCoefficients():";
   if(i_point>m_points.size()-1){throw aurostd::xerror(soliloquy,"Invalid index within points");}
-  return getDecompositionCoefficients(m_points[i_point],decomp_phases,reduce_mode);
+  return getDecompositionCoefficients(m_points[i_point],decomp_phases,vred);
 }
 
-xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,char reduce_mode) const{
+xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
   string soliloquy="ConvexHull::getDecompositionCoefficients():";
   //do m_coords_group first (REDUCED)
   if(!point.m_initialized){throw aurostd::xerror(soliloquy,"Uninitialized point");}
@@ -5388,12 +5392,12 @@ xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point
   }
   vector<xvector<double> > lhs,rhs;
   //lhs
-  lhs.push_back(point.getTruncatedReducedCoords(m_elements_present,reduce_mode));
+  lhs.push_back(point.getTruncatedReducedCoords(m_elements_present,vred));
   //rhs
   for(uint i=0,fl_size_i=decomp_phases.size();i<fl_size_i;i++){
     if(decomp_phases[i]>m_points.size()-1){throw aurostd::xerror(soliloquy,"Invalid index within points");}
     if(!m_points[decomp_phases[i]].m_initialized){throw aurostd::xerror(soliloquy,"Uninitialized point");}
-    rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,reduce_mode));
+    rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,vred));
   }
   xvector<double> coef=balanceChemicalEquation(lhs,rhs,true,ZERO_TOL);  //normalize
   //aurostd::shiftlrows(coef,0);
@@ -5414,14 +5418,14 @@ void ConvexHull::setDecompositionCoefficients(uint i_nary,uint i_alloy,uint i_co
   uint i_point=m_coord_groups[i_coord_group].m_points[0];
   if(!m_points[i_point].m_initialized){throw aurostd::xerror(soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
   vector<uint>& decomp_phases=m_coord_groups[i_coord_group].m_decomp_phases;
-  m_coord_groups[i_coord_group].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,_frac_);
+  m_coord_groups[i_coord_group].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
 
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]//now do individual coefficients //[OBSOLETE - reduce by frac always], NO REDUCE
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]  i_point=m_coord_groups[i_coord_group].m_points[i];
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]  if(!m_points[i_point].m_initialized){throw aurostd::xerror(soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]  m_points[i_point].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,_frac_);
-  //[OBSOLETE - reduce by _frac_ always! so use coord_group values]}
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]//now do individual coefficients //[OBSOLETE - reduce by frac always], NO REDUCE
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  i_point=m_coord_groups[i_coord_group].m_points[i];
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(!m_points[i_point].m_initialized){throw aurostd::xerror(soliloquy,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  m_points[i_point].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
+  //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
 }
 
 void ConvexHull::setOffHullProperties(uint i_nary,uint i_alloy){
@@ -6405,15 +6409,15 @@ void ConvexHull::cleanHull() {
   h_horizon_ridges.clear();
 }
 
-string ConvexHull::prettyPrintCompound(const ChullPoint& point,char reduce_mode,bool exclude1,char mode) const {  // overload
+string ConvexHull::prettyPrintCompound(const ChullPoint& point,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
   if(!point.m_has_entry){
     string soliloquy="ConvexHull::prettyPrintCompound():";
     throw aurostd::xerror(soliloquy,"No entry found");
   }
-  return prettyPrintCompound(point.m_entry,reduce_mode,exclude1,mode);
+  return prettyPrintCompound(point.m_entry,vred,exclude1,ftype);
 }
 
-string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,char reduce_mode,bool exclude1,char mode) const {  // overload
+string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
   if(entry.vspecies.size()!=entry.vcomposition.size()) {
     string soliloquy="ConvexHull::prettyPrintCompound():";
     stringstream message;
@@ -6422,44 +6426,44 @@ string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,ch
     pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return entry.compound;
   }
-  return prettyPrintCompound(entry.vspecies,entry.vcomposition,reduce_mode,exclude1,mode);
+  return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  // ME190628
 }
 
-string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) const {  // overload
-  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),reduce_mode,exclude1,mode);
-}
+//[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // overload
+//[ME190628 - moved to pflow_funcs.cpp]   return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype);
+//[ME190628 - moved to pflow_funcs.cpp] }
 
-string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,char reduce_mode,bool exclude1,char mode) const {  // main function
-  // creates compound_label for LaTeX and text docs, like adding $_{}$
-  // 2-D, we usually want reduce_mode=_gcd_ true for convex points, and _none_ elsewhere
-  string soliloquy="ConvexHull::prettyPrintCompound():";
-  uint precision=COEF_PRECISION;
-  stringstream output;output.precision(precision);
-  if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(soliloquy,"vspecies.size() != vcomposition.rows");}
-  // special case, unary
-  if(vspecies.size() == 1) {
-    output << vspecies[0];
-    if(!exclude1) {output << (reduce_mode==_gcd_?1:vcomposition[vcomposition.lrows]);}
-    return output.str();
-  }
-  xvector<double> comp=vcomposition;
-  if(reduce_mode==_gcd_){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  else if(reduce_mode==_frac_){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
-  else if(reduce_mode==_none_){;}
-  else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(soliloquy,"Empty composition");}
-  for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
-    output << vspecies[i];
-    if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
-      if(mode==_latex_) {output << "$_{";
-      } else if(mode==_gnuplot_){output<< "_{";}
-      output << comp[i+comp.lrows];
-      if(mode==_latex_) {output << "}$";}
-      else if(mode==_gnuplot_){output<< "}";}
-    }
-  }
-  return output.str();
-}
+//[ME190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // main function
+//[ME190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
+//[ME190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
+//[ME190628 - moved to pflow_funcs.cpp]   string soliloquy="ConvexHull::prettyPrintCompound():";
+//[ME190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
+//[ME190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
+//[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(soliloquy,"vspecies.size() != vcomposition.rows");}
+//[ME190628 - moved to pflow_funcs.cpp]   // special case, unary
+//[ME190628 - moved to pflow_funcs.cpp]   if(vspecies.size() == 1) {
+//[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[0];
+//[ME190628 - moved to pflow_funcs.cpp]     if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
+//[ME190628 - moved to pflow_funcs.cpp]     return output.str();
+//[ME190628 - moved to pflow_funcs.cpp]   }
+//[ME190628 - moved to pflow_funcs.cpp]   xvector<double> comp=vcomposition;
+//[ME190628 - moved to pflow_funcs.cpp]   if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+//[ME190628 - moved to pflow_funcs.cpp]   else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+//[ME190628 - moved to pflow_funcs.cpp]   else if(vred==no_vrt){;}
+//[ME190628 - moved to pflow_funcs.cpp]   else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+//[ME190628 - moved to pflow_funcs.cpp]   if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(soliloquy,"Empty composition");}
+//[ME190628 - moved to pflow_funcs.cpp]   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
+//[ME190628 - moved to pflow_funcs.cpp]     output << vspecies[i];
+//[ME190628 - moved to pflow_funcs.cpp]     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
+//[ME190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "$_{";
+//[ME190628 - moved to pflow_funcs.cpp]       } else if(ftype==gnuplot_ft){output<< "_{";}
+//[ME190628 - moved to pflow_funcs.cpp]       output << comp[i+comp.lrows];
+//[ME190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "}$";}
+//[ME190628 - moved to pflow_funcs.cpp]       else if(ftype==gnuplot_ft){output<< "}";}
+//[ME190628 - moved to pflow_funcs.cpp]     }
+//[ME190628 - moved to pflow_funcs.cpp]   }
+//[ME190628 - moved to pflow_funcs.cpp]   return output.str();
+//[ME190628 - moved to pflow_funcs.cpp] }
 
 string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const{
   string soliloquy="ConvexHull::getICSDNumber():";
@@ -6963,46 +6967,46 @@ bool ConvexHull::unwantedFacetLine(uint vi,uint vj,vector<vector<uint> >& facet_
   return false;
 }
 
-string ConvexHull::getPointsPropertyHeaderList(char mode) const {
+string ConvexHull::getPointsPropertyHeaderList(filetype ftype) const {
   bool m_formation_energy_hull=!m_cflags.flag("CHULL::ENTROPIC_TEMPERATURE");    //energy vs. entropic_temperature hull
   bool compounds_column_report=false;
-  if(mode==_latex_){
+  if(ftype==latex_ft){
     compounds_column_report=DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN; //only grab if necessary, not an inexpensive string search
   }
   
   string headers="";
-  if(!(mode==_latex_ && !compounds_column_report)){headers+=(!headers.empty()?string(","):string(""))+"compound";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"reduced_compound";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"reduced_compound_latex";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"fractional_compound";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"fractional_compound_latex";}
+  if(!(ftype==latex_ft && !compounds_column_report)){headers+=(!headers.empty()?string(","):string(""))+"compound";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"reduced_compound";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"reduced_compound_latex";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"fractional_compound";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"fractional_compound_latex";}
   headers+=(!headers.empty()?string(","):string(""))+"prototype";
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"prototype_latex";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"prototype_latex";}
   headers+=(!headers.empty()?string(","):string(""))+"auid";
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"aurl";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"url_entry_page";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"nspecies";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"aurl";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"url_entry_page";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"nspecies";}
   headers+=(!headers.empty()?string(","):string(""))+"space_group_orig";
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"space_group_orig_latex";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"space_group_orig_latex";}
   headers+=(!headers.empty()?string(","):string(""))+"space_group_relax";
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"space_group_relax_latex";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"space_group_relax_latex";}
   headers+=(!headers.empty()?string(","):string(""))+"spin_atom";
   headers+=(!headers.empty()?string(","):string(""))+"enthalpy_formation_atom";
   headers+=(!headers.empty()?string(","):string(""))+"entropic_temperature";
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"ground_state";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"equivalent_structures_auid";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"icsd_ground_state";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"icsd_canonical_auid";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"phases_equilibrium_compound";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"phases_equilibrium_auid";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_compound";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_auid";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_coefficient";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"ground_state";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"equivalent_structures_auid";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"icsd_ground_state";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"icsd_canonical_auid";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_equilibrium_compound";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_equilibrium_auid";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_compound";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_auid";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_coefficient";}
   if(m_formation_energy_hull){headers+=(!headers.empty()?string(","):string(""))+"enthalpy_formation_atom_difference";}
   else {headers+=(!headers.empty()?string(","):string(""))+"entropic_temperature_difference";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"relative_stability_criterion";}
-  if(mode==_txt_ || mode==_json_){headers+=(!headers.empty()?string(","):string(""))+"N+1_energy_gain";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"relative_stability_criterion";}
+  if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"N+1_energy_gain";}
 
   return headers;
 }
@@ -7203,13 +7207,13 @@ aurostd::xoption ConvexHull::resolvePlotLabelSettings() const {
   }
   if(no_labels){
     if(labels_off_hull){
-      //[verbose once in writePDF()]message << "LABEL_NAME set to NONE but LABELS_OFF_HULL requested (fix .aflow.rc), toggling LABELS_OFF_HULL off"
-      //[verbose once in writePDF()]pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      //[verbose once in writeLatex()]message << "LABEL_NAME set to NONE but LABELS_OFF_HULL requested (fix .aflow.rc), toggling LABELS_OFF_HULL off"
+      //[verbose once in writeLatex()]pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       labels_off_hull=false;
     }
     if(meta_labels){
-      //[verbose once in writePDF()]message << "LABEL_NAME set to NONE but META_LABELS requested (fix .aflow.rc), toggling META_LABELS off"
-      //[verbose once in writePDF()]pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      //[verbose once in writeLatex()]message << "LABEL_NAME set to NONE but META_LABELS requested (fix .aflow.rc), toggling META_LABELS off"
+      //[verbose once in writeLatex()]pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       meta_labels=false;
     }
   }
@@ -7224,9 +7228,9 @@ aurostd::xoption ConvexHull::resolvePlotLabelSettings() const {
   return lflags;
 }
 
-void ConvexHull::writePDF() const {
+void ConvexHull::writeLatex() const {
   bool LDEBUG = (FALSE || XHOST.DEBUG);
-  string soliloquy="ConvexHull::writePDF():";
+  string soliloquy="ConvexHull::writeLatex():";
   stringstream message;
   if(!aurostd::IsCommandAvailable("pdflatex")) {throw aurostd::xerror(soliloquy,"\"pdflatex\" needs to be in your path");}
   if(m_cflags.flag("CHULL::PNG_IMAGE")){
@@ -7495,7 +7499,7 @@ void ConvexHull::writePDF() const {
   string MARGIN_REPORT="includeheadfoot,headheight="+(print_aflow_logo_full?string("70"):string("50"))+
     "pt,headsep=0.1in,top=0.5in,bottom=0.75in,left="+aurostd::utype2string(LATEX_LEFT_MARGIN_LETTER_STD)+"in,right="+aurostd::utype2string(LATEX_RIGHT_MARGIN_LETTER_STD)+"in,footskip=0.5in";
   
-  string headers=getPointsPropertyHeaderList(_latex_);
+  string headers=getPointsPropertyHeaderList(latex_ft);
   vector<string> vheaders;
   aurostd::string2tokens(headers,vheaders,",");
 
@@ -7870,7 +7874,14 @@ void ConvexHull::writePDF() const {
     doc_header_TEX_ss << "\\usepackage{hyperref} \\hypersetup{colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=blue}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepackage{bookmark} \%hyperref without .out" << " \%HEADER" << endl;
   }
+  
+  doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
+  doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
 
+  _doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+  _doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+  _doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+  _doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
   _doc_header_TEX_ss << "\\newcommand{\\newAlloy}[2]{%" << " \%HEADER" << endl;
   _doc_header_TEX_ss << "\\setAlloy{#1}" << " \%HEADER" << endl;
   _doc_header_TEX_ss << "\\setCountTotalEntries{#2}" << " \%HEADER" << endl;
@@ -8042,8 +8053,8 @@ void ConvexHull::writePDF() const {
 
     doc_header_TEX_ss << "\\usepackage{pgfplots}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepackage{pdflscape}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\usepackage{array} \%m{}" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\usepackage{setspace} \%setstretch linespacing" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\pgfplotsset{compat=1.10}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usepgfplotslibrary{ternary,units}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\usetikzlibrary{decorations.pathmorphing,pgfplots.units,backgrounds}" << " \%HEADER" << endl;
@@ -8060,10 +8071,10 @@ void ConvexHull::writePDF() const {
     doc_header_TEX_ss << "\\pgfdeclarelayer{foreground}" << " \%HEADER" << endl;
     doc_header_TEX_ss << "\\pgfsetlayers{background,main,foreground}" << " \%HEADER" << endl;
     
-    doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
-    doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{R}[1]{>{\\raggedleft \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
+    //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{X}[1]{>{\\setstretch{0.5} \\centering  \\arraybackslash}m{#1} } \%setstretch changes line spacing" << " \%HEADER" << endl;
 
     doc_header_TEX_ss << _doc_header_TEX_ss.str();
     _doc_header_TEX_ss.str("");  // don't repeat
@@ -9073,7 +9084,7 @@ void ConvexHull::writePDF() const {
 
             node_content_ss << "\\tiny{";   //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
             node_content_ss << "\\shortstack{";
-            compound_label = prettyPrintCompound(point,(plot_reduced_composition?_gcd_:_none_),true,_latex_);  // don't print prototype if not
+            compound_label = prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);  // don't print prototype if not
             node_content_ss << compound_label;
             // equal to compound
             output_name=prettyPrintPrototype(point,false,false);  // only one backslash needed
@@ -9135,7 +9146,7 @@ void ConvexHull::writePDF() const {
                 node_content_ss << "\\" << font_size << "{";  //leave g-states as default font
                 if(bold_labels/* && !helvetica_font*/) {node_content_ss << "\\textbf{";}
                 if(!m_formation_energy_hull){node_content_ss << "~~";}   //pre - 1
-                node_content_ss << prettyPrintCompound(point,(plot_reduced_composition?_gcd_:_none_),true,_latex_);
+                node_content_ss << prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);
                 if(m_formation_energy_hull){node_content_ss << "~~";}  //post - 2: only works if we put two?
                 if(bold_labels/* && !helvetica_font*/) {node_content_ss << "}";}
                 node_content_ss << "}";
@@ -9254,7 +9265,7 @@ void ConvexHull::writePDF() const {
               }
               if(!(icsd_labels&&found_icsd_label)){
                 if(compound_labels) {
-                  compound_label = prettyPrintCompound(point,(plot_reduced_composition?_gcd_:_none_),true,_latex_);  // don't print prototype if
+                  compound_label = prettyPrintCompound(point,(plot_reduced_composition?gcd_vrt:no_vrt),true,latex_ft);  // don't print prototype if
                   node_content_ss << compound_label;
                   // equal to compound
                 }
@@ -9675,7 +9686,7 @@ void ConvexHull::writePDF() const {
     tikzpic_TEX_ss << "\\restoregeometry" << endl;
   } else {
     // make sure to add this in
-    doc_header_TEX_ss << "\\usepackage{graphicx}" << endl;
+    doc_header_TEX_ss << "\\usepackage{graphicx}  \%HEADER" << endl;
     // contains begin{document}, which needs to go in sooner
     doc_header_TEX_ss << _doc_header_TEX_ss.str();
     _doc_header_TEX_ss.str("");
@@ -9799,7 +9810,7 @@ void ConvexHull::writePDF() const {
                 _report_data_ss << m_velements[j] << "$_{" << aurostd::utype2string(point.s_coords[j],COEF_PRECISION) << "}$";
               }
             }
-          } else {_report_data_ss << prettyPrintCompound(entry,_gcd_,true,_latex_);}
+          } else {_report_data_ss << prettyPrintCompound(entry,gcd_vrt,true,latex_ft);}
 
           //////////////////////////////////////////////////////////////////////
           // START Concentration label
@@ -9829,7 +9840,7 @@ void ConvexHull::writePDF() const {
                   } else {
                     const aflowlib::_aflowlib_entry& equation_entry = eq_phase.m_entry;
 
-                    output_name=prettyPrintCompound(equation_entry,_gcd_,true,_latex_);
+                    output_name=prettyPrintCompound(equation_entry,gcd_vrt,true,latex_ft);
                     // do not hyperlink current point (pointless)
                     if(!aurostd::identical(point.getStoichiometricCoords(), eq_phase.getStoichiometricCoords(), ZERO_TOL)) {
                       if(internal_links_withinreport) {
@@ -9851,7 +9862,7 @@ void ConvexHull::writePDF() const {
               equilibrium_phases_vs.clear();
               equilibrium_phases_CP.clear();
               //get header
-              //misc = prettyPrintCompound(entry,_gcd_,true,_latex_);
+              //misc = prettyPrintCompound(entry,gcd_vrt,true,latex_ft);
               equilibrium_phases_header_TEX_ss << m_coord_groups[i_coord_group].getDim() << "-phase equilibria";
               //equilibrium_phases_header_TEX_ss << " with " << misc;
               equilibrium_phases_header_TEX_ss << ":";
@@ -9865,7 +9876,7 @@ void ConvexHull::writePDF() const {
                 throw aurostd::xerror(soliloquy,"Size of decomposition phases != size of decomposition coefficients for coordgroup["+aurostd::utype2string(i)+"]");
               }
               // write out decomposition equation
-              reaction_chem_eq_TEX_ss << prettyPrintCompound(entry,_frac_,true,_latex_);
+              reaction_chem_eq_TEX_ss << prettyPrintCompound(entry,frac_vrt,true,latex_ft);
               reaction_chem_eq_TEX_ss << " $\\to$ ";
               for(uint k=0,fl_size_k=decomposition_phases.size();k<fl_size_k;k++) {
                 if(abs(decomposition_coefficients[decomposition_coefficients.lrows+k+1]) < ZERO_TOL) {continue;}
@@ -9877,7 +9888,7 @@ void ConvexHull::writePDF() const {
                   output_name=aurostd::joinWDelimiter(alloyToElements(dc_phase),"");  //unary, so "" delimiter doesn't play a role
                 } else {
                   const aflowlib::_aflowlib_entry& equation_entry = dc_phase.m_entry;
-                  output_name=prettyPrintCompound(equation_entry,_frac_,true,_latex_);
+                  output_name=prettyPrintCompound(equation_entry,frac_vrt,true,latex_ft);
                   if(internal_links_withinreport) {
                     misc_ss << "\\hyperref[" << input << "_" << equation_entry.auid << "]{";
                     misc_ss << output_name;
@@ -9918,7 +9929,7 @@ void ConvexHull::writePDF() const {
         else if(counter % 2) {report_data_ss << aurostd::PaddedPOST("\\rowcolor{white} ", 30);}  // odd should be white
         else {report_data_ss << aurostd::PaddedPOST("\\rowcolor{gray!25} ", 30);}
         chpoint_properties.clear();
-        for(uint i=0,fl_size_i=vheaders.size();i<fl_size_i;i++){chpoint_properties.push_back(grabCHPointProperty(point,vheaders[i],_latex_));}
+        for(uint i=0,fl_size_i=vheaders.size();i<fl_size_i;i++){chpoint_properties.push_back(grabCHPointProperty(point,vheaders[i],latex_ft));}
         report_data_ss << aurostd::joinWDelimiter(chpoint_properties," & ");
         report_data_ss << " \\\\" << endl;
         counter++;
@@ -10296,7 +10307,7 @@ string ConvexHull::getJSONHeader() const {
   return aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");
 }
 
-string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& property,char mode) const {
+string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& property,filetype ftype) const {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::grabCHPointProperty():";
   if(LDEBUG) {cerr << soliloquy << " start" << endl;}
@@ -10310,7 +10321,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
   string list_suffix="";
   string null_value="-";
   uint padding=30;  //latex only
-  if(mode==_json_){
+  if(ftype==json_ft){
     equilibrium_phases_delimiter=",";
     string_wrapper="\"";
     list_prefix="[";
@@ -10320,7 +10331,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
   string string_wrapper_math_mode="$";  //latex only
   bool compounds_column_report=false;
   bool external_links=false;
-  if(mode==_latex_){
+  if(ftype==latex_ft){
     null_value="N/A";
     compounds_column_report=DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN; //only grab if necessary, not an inexpensive string search
     external_links=addExternalHyperlinks(); //only grab if necessary, not an inexpensive string search
@@ -10332,23 +10343,23 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
   if(property=="compound"||property=="compound_latex"||property=="reduced_compound"||property=="reduced_compound_latex"||property=="fractional_compound"||property=="fractional_compound_latex"){
     math_mode=false;  //do not wrap these, they are automatically wrapped inside prettyPrint
     latex_property=(property=="compound_latex"||property=="reduced_compound_latex"||property=="fractional_compound_latex");
-    char reduced_mode=_none_;
-    if(property=="reduced_compound"||property=="reduced_compound_latex"){reduced_mode=_gcd_;}
-    if(property=="fractional_compound"||property=="fractional_compound_latex"){reduced_mode=_frac_;}
+    vector_reduction_type vred=no_vrt;
+    if(property=="reduced_compound"||property=="reduced_compound_latex"){vred=gcd_vrt;}
+    if(property=="fractional_compound"||property=="fractional_compound_latex"){vred=frac_vrt;}
     //[OBSOLETE]reduced=(property=="reduced_compound"||property=="reduced_compound_latex");
-    value=prettyPrintCompound(point,reduced_mode,(mode==_latex_||latex_property||reduced_mode==_gcd_||reduced_mode==_frac_),(latex_property?_latex_:mode));
-    if((mode==_latex_||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
+    value=prettyPrintCompound(point,vred,(ftype==latex_ft||latex_property||vred==gcd_vrt||vred==frac_vrt),(latex_property?latex_ft:ftype));
+    if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
     value=aurostd::wrapString(value,string_wrapper);
   }
   else if(property=="prototype"||property=="prototype_latex"){
     latex_property=(property=="prototype_latex");
-    if(mode==_latex_||latex_property){value=prettyPrintPrototype(point,mode==_json_,false);}  //JSON needs double backslash
+    if(ftype==latex_ft||latex_property){value=prettyPrintPrototype(point,ftype==json_ft,false);}  //JSON needs double backslash
     else {value=point.m_entry.prototype;}
     value=aurostd::wrapString(value,string_wrapper);
     padding=100;  //latex only
   }
   else if(property=="auid"){
-    if(mode==_latex_){value="\\texttt{"+aurostd::wrapString(point.m_entry.auid,string_wrapper)+"}";}
+    if(ftype==latex_ft){value="\\texttt{"+aurostd::wrapString(point.m_entry.auid,string_wrapper)+"}";}
     else {value=aurostd::wrapString(point.m_entry.auid,string_wrapper);}
   }
   else if(property=="aurl"){value=aurostd::wrapString(point.m_entry.aurl,string_wrapper);}
@@ -10357,38 +10368,38 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     math_mode=true;
     latex_property=(property=="space_group_orig_latex");
     string sg=point.getVSG().front();
-    if(mode==_latex_||latex_property){sg=aurostd::fixStringLatex(sg,mode==_json_,true);}
+    if(ftype==latex_ft||latex_property){sg=aurostd::fixStringLatex(sg,ftype==json_ft,true);}
     value=sg;
-    if((mode==_latex_||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
+    if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
     value=aurostd::wrapString(value,string_wrapper);
   }
   else if(property=="space_group_relax"||property=="space_group_relax_latex"){
     math_mode=true;
     latex_property=(property=="space_group_relax_latex");
     string sg=point.getVSG().back();
-    if(mode==_latex_||latex_property){sg=aurostd::fixStringLatex(sg,mode==_json_,true);}
+    if(ftype==latex_ft||latex_property){sg=aurostd::fixStringLatex(sg,ftype==json_ft,true);}
     value=sg;
-    if((mode==_latex_||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
+    if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
     value=aurostd::wrapString(value,string_wrapper);
   }
   else if(property=="spin_atom"){
     tmp_precision=precision;
-    if(mode==_latex_){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+    if(ftype==latex_ft){tmp_precision=2;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
     value=aurostd::utype2string(point.m_entry.spin_atom,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
   }
   else if(property=="enthalpy_formation_atom"){
     tmp_precision=precision;
-    if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+    if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
     value=aurostd::utype2string(H_f_atom(point,_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
   }
   else if(property=="entropic_temperature"){
     tmp_precision=precision;
-    if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+    if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
     value=aurostd::utype2string(point.m_entry.entropic_temperature,tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
   }
   else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
   else if(property=="equivalent_structures_auid"){
-    if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
     if(point.isGState()){
       //need to grab from coord_group
       uint i_coord_group=AUROSTD_MAX_UINT;
@@ -10436,7 +10447,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     }
   }
   else if(property=="phases_equilibrium_compound"){
-    if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
     if(point.isGState()&&!point.isUnary()){ //unaries are always gstates, but do NOT have any mixture context
       //need to grab from coord_group
       uint i_coord_group=AUROSTD_MAX_UINT;
@@ -10462,7 +10473,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     }
   }
   else if(property=="phases_equilibrium_auid"){
-    if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
     if(point.isGState()&&!point.isUnary()){
       //need to grab from coord_group
       uint i_coord_group=AUROSTD_MAX_UINT;
@@ -10488,7 +10499,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     }
   }
   else if(property=="phases_decomposition_compound"){
-    if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
     if(!point.isGState()){
       //need to grab from coord_group
       uint i_coord_group=AUROSTD_MAX_UINT;
@@ -10500,7 +10511,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
           for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_decomp_phases.size();i<fl_size_i;i++){
             i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
             const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
-            //[OBSOLETE - reduce by _frac_ always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
+            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
             if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
               if(m_points[i_point].m_has_entry){
                 compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
@@ -10513,7 +10524,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     }
   }
   else if(property=="phases_decomposition_auid"){
-    if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
     if(!point.isGState()){
       //need to grab from coord_group
       uint i_coord_group=AUROSTD_MAX_UINT;
@@ -10525,7 +10536,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
           for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_decomp_phases.size();i<fl_size_i;i++){
             i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
             const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
-            //[OBSOLETE - reduce by _frac_ always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
+            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
             if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
               if(m_points[i_point].m_has_entry){
                 auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
@@ -10538,7 +10549,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     }
   }
   else if(property=="phases_decomposition_coefficient"){
-    if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
+    if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"No latex rule defined for "+property);}
     if(!point.isGState()){
       //need to grab from coord_group
       uint i_coord_group=AUROSTD_MAX_UINT;
@@ -10546,9 +10557,9 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
       if(!m_coord_groups[i_coord_group].m_is_on_hull){
         if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
           vector<double> nonzero_coefs;
-          //[OBSOLETE - reduce by _frac_ always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
-          //[OBSOLETE - reduce by _frac_ always! so use coord_group values]  if(nonZeroWithinTol(point.m_decomp_coefs[i])){nonzero_coefs.push_back(point.m_decomp_coefs[i]);}
-          //[OBSOLETE - reduce by _frac_ always! so use coord_group values]}
+          //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
+          //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(nonZeroWithinTol(point.m_decomp_coefs[i])){nonzero_coefs.push_back(point.m_decomp_coefs[i]);}
+          //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
           for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
             if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
           }
@@ -10570,12 +10581,12 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
   }
   else if(property=="enthalpy_formation_atom_difference"){
     tmp_precision=precision;
-    if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+    if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
     value=aurostd::utype2string(point.getDist2Hull(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
   }
   else if(property=="entropic_temperature_difference"){
     tmp_precision=precision;
-    if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+    if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
     value=aurostd::utype2string(point.getDist2Hull(_std_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //will never be _m_ units
   }
   else if(property=="stability_criterion"){
@@ -10583,7 +10594,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     else {
     if(point.isGState()){
       tmp_precision=precision;
-      if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
       value=aurostd::utype2string(point.getStabilityCriterion(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //can be _m_ units, but smart enough to switch if T_S
     }
   }
@@ -10593,7 +10604,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     else {
     if(point.isGState()){
       tmp_precision=precision;
-      if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
       value=aurostd::utype2string(point.getRelativeStabilityCriterion(),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO 180409 - not showing as fraction anymore, not necessarily out of 100%
     }
   }
@@ -10603,14 +10614,14 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
     else {
     if(point.isGState()){
       tmp_precision=precision;
-      if(mode==_latex_){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
+      if(ftype==latex_ft){tmp_precision=0;tmp_roundoff_tol=5.0*pow(10,-((int)tmp_precision)-1);}
       value=aurostd::utype2string(point.getNPlus1EnergyGain(_m_),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM); //delivers as decimal, show as percentage  // CO 180409 - not showing as fraction anymore, not necessarily out of 100%
     }
   }
   }
   else {throw aurostd::xerror(soliloquy,"Unknown property");}
   if(value.empty()){value=null_value;}
-  if(mode==_latex_){
+  if(ftype==latex_ft){
     if(external_links && (property=="compound"||(!compounds_column_report&&property=="prototype"))){
       value="\\href{"+ENTRY_PAGE_URL_PREFIX+point.m_entry.auid+"}{"+value+"}";
     }
@@ -10620,7 +10631,7 @@ string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& pro
   return value;
 }
 
-string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& property,char mode) const {
+string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& property,filetype ftype) const {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::grabCHFacetProperty():";
   uint precision=COEF_PRECISION;
@@ -10631,7 +10642,7 @@ string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& pro
   string list_prefix="";
   string list_suffix="";
   string null_value="-";
-  if(mode==_json_){
+  if(ftype==json_ft){
     vector_delimiter=",";
     string_wrapper="\"";
     list_prefix="[";
@@ -10692,7 +10703,7 @@ string ConvexHull::grabCHFacetProperty(const ChullFacet& facet,const string& pro
   return value;
 }
 
-vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,vector<string>& headers,char mode) const {
+vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,vector<string>& headers,filetype ftype) const {
   string soliloquy="ConvexHull::getPointsData():";
   stringstream message;
 
@@ -10713,7 +10724,7 @@ vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,v
       if(!point.m_has_entry){continue;}
       ventries.push_back(vector<string>(0));
       for(uint j=0,fl_size_j=vproperties.size();j<fl_size_j;j++){
-        value=grabCHPointProperty(point,vproperties[j],mode);
+        value=grabCHPointProperty(point,vproperties[j],ftype);
         ventries.back().push_back(value);
       }
     }
@@ -10721,7 +10732,7 @@ vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,v
   
   string header;
   headers.clear();
-  if(mode==_json_){
+  if(ftype==json_ft){
   //for json response, we want TRUE keywords as they would appear in aflowlib.out
     for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
       header=vproperties[i];
@@ -10759,7 +10770,7 @@ vector<vector<string> > ConvexHull::getPointsData(const string& properties_str,v
   return ventries;
 }
 
-vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string& facet_properties_str,vector<string>& headers,char mode) const {
+vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string& facet_properties_str,vector<string>& headers,filetype ftype) const {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::getFacetsData():";
   stringstream message;
@@ -10789,7 +10800,7 @@ vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string
         if(LDEBUG) {cerr << soliloquy << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_facet=" << i_facet << endl;}
         ventries.back().back().push_back(vector<string>(0));
         for(uint j=0,fl_size_j=vproperties.size();j<fl_size_j;j++){
-          value=grabCHFacetProperty(facet,vproperties[j],mode);
+          value=grabCHFacetProperty(facet,vproperties[j],ftype);
           ventries.back().back().back().push_back(value);
         }
       }
@@ -10799,7 +10810,7 @@ vector<vector<vector<vector<string> > > > ConvexHull::getFacetsData(const string
 
   string header;
   headers.clear();
-  if(mode==_json_){
+  if(ftype==json_ft){
   //for json response, we want TRUE keywords as they would appear in aflowlib.out
     for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
       header=vproperties[i];
@@ -10890,20 +10901,20 @@ string ConvexHull::getJSONTable(const vector<string>& headers,const vector<vecto
   return aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"[","]");
 }
 
-void ConvexHull::writeText(char mode) const {
+void ConvexHull::writeText(filetype ftype) const {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::writeText():";
   stringstream message;
   
-  if(!(mode==_txt_ || mode==_json_)){throw aurostd::xerror(soliloquy,"Unknown mode");}
+  if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(soliloquy,"Unknown mode");}
 
   if(!m_initialized){throw aurostd::xerror(soliloquy,"Hull not initialized");}
 
-  if(mode==_txt_){message << "Starting plain text generator";}
+  if(ftype==txt_ft){message << "Starting plain text generator";}
   else {message << "Starting JSON generator";}
   pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-  string properties_str_points=getPointsPropertyHeaderList(mode);
+  string properties_str_points=getPointsPropertyHeaderList(ftype);
   
   bool terse_output=false;
   string facet_properties_str="vertices_position";
@@ -10923,22 +10934,22 @@ void ConvexHull::writeText(char mode) const {
   
   //POINTS DATA
   vector<string> headers_points;
-  vector<vector<string> > ventries_points=getPointsData(properties_str_points,headers_points,mode);
+  vector<vector<string> > ventries_points=getPointsData(properties_str_points,headers_points,ftype);
   if(LDEBUG) {cerr << soliloquy << " got points data" << endl;}
   
   //FACETS DATA
   vector<string> headers_facets;
   //first layer=nary, second=alloy, third=facet, fourth=properties
-  vector<vector<vector<vector<string> > > > ventries_facets=getFacetsData(facet_properties_str,headers_facets,mode);
+  vector<vector<vector<vector<string> > > > ventries_facets=getFacetsData(facet_properties_str,headers_facets,ftype);
   if(LDEBUG) {cerr << soliloquy << " got facets data" << endl;}
   
   //HEADER
-  if(mode==_json_){vout.push_back("\"hull_data\":"+getJSONHeader());}
+  if(ftype==json_ft){vout.push_back("\"hull_data\":"+getJSONHeader());}
   else {main_text_ss << getPlainTextHeader();}
   if(LDEBUG) {cerr << soliloquy << " created doc header" << endl;}
   
   //points data
-  if(mode==_json_){vout.push_back("\"points_data\":"+getJSONTable(headers_points,ventries_points));}
+  if(ftype==json_ft){vout.push_back("\"points_data\":"+getJSONTable(headers_points,ventries_points));}
   else {
     getPlainTextColumnSizesPoints(headers_points,ventries_points,column_sizes);
     main_text_ss << endl;
@@ -10949,7 +10960,7 @@ void ConvexHull::writeText(char mode) const {
   if(LDEBUG) {cerr << soliloquy << " added points data" << endl;}
   
   //facets data
-  if(mode==_json_){
+  if(ftype==json_ft){
     stringstream misc_ss;misc_ss.str("");
     vector<string> _vout;
     for(uint i=0,fl_size_i=ventries_facets.size();i<fl_size_i;i++){
@@ -10979,10 +10990,10 @@ void ConvexHull::writeText(char mode) const {
   }
   if(LDEBUG) {cerr << soliloquy << " added facets data" << endl;}
   
-  if(mode==_json_){main_text_ss << aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");}
+  if(ftype==json_ft){main_text_ss << aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");}
 
   string file_name="aflow_"+aurostd::joinWDelimiter(m_velements,"")+"_hull";
-  if(mode==_json_){file_name+=".json";}
+  if(ftype==json_ft){file_name+=".json";}
   else {file_name+=".txt";}
   
   if(m_cflags.flag("CHULL::SCREEN_ONLY")){
@@ -11034,7 +11045,7 @@ void ConvexHull::writeWebApp() const {
   // creating name of output file
   input=aurostd::joinWDelimiter(m_velements,"");
   //input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
-  main_JSON_file="aflow_"+input+"_hull.json";
+  main_JSON_file="aflow_"+input+"_hull_web.json"; //WS190620
   species_data_JSON_ss << aurostd::joinWDelimiter(aurostd::wrapVecEntries(m_velements,"\""),",");
   //for (uint i = 0; i < m_velements.size(); i++) {
   //  main_JSON_file.append(m_velements[i]);
@@ -11204,6 +11215,12 @@ void ConvexHull::writeWebApp() const {
           distances_data_JSON_ss << ",";
           // entropic temperature, row 5
           distances_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          distances_data_JSON_ss << ",";
+          distances_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
         } else {
           // enthalpy of formation, row 4
           // no need for precision for next few columns, leave it same way as
@@ -11216,6 +11233,19 @@ void ConvexHull::writeWebApp() const {
           num_ss << chull::T_S(entry);
           distances_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
           num_ss.str("");
+          
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+          distances_data_JSON_ss << ",";
+          
+          num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+          distances_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+          distances_data_JSON_ss << ",";
+          num_ss.str("");
+          
+          num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
+          distances_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+          num_ss.str("");
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
         }
         distances_data_JSON_ss << "}";
         distances_data_JSON_vs.push_back(distances_data_JSON_ss.str());
@@ -11247,6 +11277,12 @@ void ConvexHull::writeWebApp() const {
           hull_points_data_JSON_ss << ",";
           // entropic temperature, row 5
           hull_points_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+          hull_points_data_JSON_ss << ",";
+          hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          hull_points_data_JSON_ss << ",";
+          hull_points_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
         } else {
           // enthalpy of formation, row 4
           // no need for precision for next few columns, leave it same way as
@@ -11259,6 +11295,19 @@ void ConvexHull::writeWebApp() const {
           num_ss << chull::T_S(entry);
           hull_points_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
           num_ss.str("");
+
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+          hull_points_data_JSON_ss << ",";
+
+          num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+          hull_points_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+          hull_points_data_JSON_ss << ",";
+          num_ss.str("");
+
+          num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
+          hull_points_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+          num_ss.str("");
+          //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
         }
         hull_points_data_JSON_ss << "}";
         hull_points_data_JSON_vs.push_back(hull_points_data_JSON_ss.str());
@@ -11360,6 +11409,12 @@ void ConvexHull::writeWebApp() const {
       vertices_data_JSON_ss << ",";
       // entropic temperature, row 5
       vertices_data_JSON_ss << "\"entropicTemperature\":" << aurostd::utype2string(0.0,CHULL_PRECISION);
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - START
+      vertices_data_JSON_ss << ",";
+      vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+      vertices_data_JSON_ss << ",";
+      vertices_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp - STOP
     } else {
       // enthalpy of formation, row 4
       // no need for precision for next few columns, leave it same way as
@@ -11372,6 +11427,19 @@ void ConvexHull::writeWebApp() const {
       num_ss << chull::T_S(entry);
       vertices_data_JSON_ss << "\"entropicTemperature\":" << num_ss.str();
       num_ss.str("");
+
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - START
+      vertices_data_JSON_ss << ",";
+      
+      num_ss << ConvexHull::grabCHPointProperty(point,"N+1_energy_gain",json_ft);
+      vertices_data_JSON_ss << "\"nPlus1EnthalpyGain\":" << num_ss.str();
+      vertices_data_JSON_ss << ",";
+      num_ss.str("");
+      
+      num_ss << ConvexHull::grabCHPointProperty(point,"stability_criterion",json_ft);
+      vertices_data_JSON_ss << "\"stabilityCriterion\":" << num_ss.str();
+      num_ss.str("");
+      //wws16 06.20.2019 - adding in np1 and stab criterion to webApp, "N/A" for non ground-states - STOP
     }
     vertices_data_JSON_ss << "}";
     vertices_data_JSON_vs.push_back(vertices_data_JSON_ss.str());

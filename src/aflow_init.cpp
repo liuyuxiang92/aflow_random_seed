@@ -688,7 +688,8 @@ namespace init {
     XHOST.vflag_control.flag("README_COMPARE",aurostd::args2flag(argv,cmds,"--readme=compare|--readme_compare"));
     XHOST.vflag_control.flag("README_GFA",aurostd::args2flag(argv,cmds,"--readme=gfa|--readme_gfa")); //CO190401
     XHOST.vflag_control.flag("README_SYMMETRY",aurostd::args2flag(argv,cmds,"--readme=symmetry|--readme_symmetry"));
-    XHOST.vflag_control.flag("README_CHULL",aurostd::args2flag(argv,cmds,"--readme=chull|--readme_chull"));
+    XHOST.vflag_control.flag("README_CCE",aurostd::args2flag(argv,cmds,"--readme=cce|--readme_cce")); //CO190620
+    XHOST.vflag_control.flag("README_CHULL",aurostd::args2flag(argv,cmds,"--readme=chull|--readme_chull")); //CO190620
     XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION",aurostd::args2flag(argv,cmds,"--readme=partial_occupation|--readme=pocc|--readme_pocc"));
     XHOST.vflag_control.flag("README_APENNSY",aurostd::args2flag(argv,cmds,"--readme=apennsy|--readme_apennsy"));
     XHOST.vflag_control.flag("README_SCRIPTING",aurostd::args2flag(argv,cmds,"--readme=scripting|--readme_scripting|--readme=script|--readme_script"));
@@ -710,7 +711,8 @@ namespace init {
           XHOST.vflag_control.flag("README_COMPARE") ||
           XHOST.vflag_control.flag("README_GFA") || //CO190401
           XHOST.vflag_control.flag("README_SYMMETRY") ||
-          XHOST.vflag_control.flag("README_CHULL") ||
+          XHOST.vflag_control.flag("README_CCE") || //CO190620
+          XHOST.vflag_control.flag("README_CHULL") || //CO19620
           XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
           XHOST.vflag_control.flag("README_APENNSY") ||
           XHOST.vflag_control.flag("README_SCRIPTING") ||
@@ -733,7 +735,8 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_COMPARE\")=" << XHOST.vflag_control.flag("README_COMPARE") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_GFA\")=" << XHOST.vflag_control.flag("README_GFA") << endl;  //CO190401
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_SYMMETRY\")=" << XHOST.vflag_control.flag("README_SYMMETRY") << endl;
-    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CHULL\")=" << XHOST.vflag_control.flag("README_CHULL") << endl;
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CCE\")=" << XHOST.vflag_control.flag("README_CCE") << endl;  //CO190620
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_CHULL\")=" << XHOST.vflag_control.flag("README_CHULL") << endl;  //CO190620
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_PARTIAL_OCCUPATION\")=" << XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_APENNSY\")=" << XHOST.vflag_control.flag("README_APENNSY") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_SCRIPTING\")=" << XHOST.vflag_control.flag("README_SCRIPTING") << endl;
@@ -1118,7 +1121,8 @@ namespace init {
     if(str=="README_AFLOW_COMPARE_TXT") { if(XHOST_README_AFLOW_COMPARE_TXT.empty()) { return XHOST_README_AFLOW_COMPARE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_COMPARE_TXT;}} // LOADED TXTS
     if(str=="README_AFLOW_GFA_TXT") { if(XHOST_README_AFLOW_GFA_TXT.empty()) { return XHOST_README_AFLOW_GFA_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_GFA_TXT;}} // LOADED TXTS  //CO190401
     if(str=="README_AFLOW_SYM_TXT") { if(XHOST_README_AFLOW_SYM_TXT.empty()) { return XHOST_README_AFLOW_SYM_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_SYM_TXT;}} // LOADED TXTS
-    if(str=="README_AFLOW_CHULL_TXT") { if(XHOST_README_AFLOW_CHULL_TXT.empty()) { return XHOST_README_AFLOW_CHULL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CHULL_TXT;}} // LOADED TXTS
+    if(str=="README_AFLOW_CCE_TXT") { if(XHOST_README_AFLOW_CCE_TXT.empty()) { return XHOST_README_AFLOW_CCE_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CCE_TXT;}} // LOADED TXTS  //CO190620
+    if(str=="README_AFLOW_CHULL_TXT") { if(XHOST_README_AFLOW_CHULL_TXT.empty()) { return XHOST_README_AFLOW_CHULL_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_CHULL_TXT;}} // LOADED TXTS  //CO190620
     if(str=="README_AFLOW_EXCEPTIONS_TXT") {if(XHOST_README_AFLOW_EXCEPTIONS_TXT.empty()){ return XHOST_README_AFLOW_EXCEPTIONS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_EXCEPTIONS_TXT;}}  // ME180531
     if(str=="README_AFLOW_HTRESOURCES_TXT") { if(XHOST_README_AFLOW_HTRESOURCES_TXT.empty()) { return XHOST_README_AFLOW_HTRESOURCES_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_AFLOW_HTRESOURCES_TXT;}} // LOADED TXTS
     if(str=="README_PROTO_TXT") { if(XHOST_README_PROTO_TXT.empty()) { return XHOST_README_PROTO_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_README_PROTO_TXT;}} // LOADED TXTS

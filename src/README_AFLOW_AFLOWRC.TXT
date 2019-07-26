@@ -955,6 +955,25 @@ DEFAULT_CHULL_LATEX_BOLD_LABELS
   default: -1
   choices -1 (default), 0 (false), or 1 (true)
 
+DEFAULT_CHULL_PNG_RESOLUTION
+  description: Default resolution for conversion pdf to png (convert via ImageMagick).
+  type: integer
+  default: 300
+
+####################################################################################################
+DEFAULTS GFA
+
+DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF
+  description: Default cutoff formation enthalpy (in eV) for systems included in the GFA analysis.
+  type: double
+  default: 0.05
+
+####################################################################################################
+ARUN_DIRECTORY_PREFIX
+  description: Default prefix for ARUN directories.
+  type: string
+  default: "ARUN."
+
 ####################################################################################################
 DEFAULTS POCC
 
@@ -1168,6 +1187,26 @@ DEFAULT_APL_HSKPTS_FILE
   description: Output file for the high-symmetry k-points in APL.
   type: string
   default: "hskpoints.out"
+
+DEFAULT_APL_PHDOSCAR_FILE
+  description: Output file for the phonon DOS in VASP DOSCAR format.
+  type: string
+  default: "PHDOSCAR"
+
+DEFAULT_APL_PHPOSCAR_FILE
+  description: Output file for the unit cell of the phonon calcultions in VASP5 POSCAR format.
+  type: string
+  default: "PHPOSCAR"
+
+DEFAULT_APL_PHKPOINTS_FILE
+  description: Output file for the phonon dispersion path in VASP KPOINTS format.
+  type: string
+  default: "PHKPOINTS"
+
+DEFAULT_APL_PHEIGENVAL_FILE
+  description: Output file for the phonon dispersion in VASP EIGENVAL format.
+  type: string
+  default: "PHEIGENVAL"
 
 ####################################################################################################
 DEFAULTS AAPL

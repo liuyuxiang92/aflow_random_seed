@@ -5667,7 +5667,7 @@ namespace aflowlib {
     // ***************************************************************************
     // SCINTILLATION
     if(vflags.flag("FLAG::FOUND") && vflags.flag("FLAG::SCINTILLATION") && !directory.empty()) {
-      double scintillation_attenuation_length=GetCompoundAttenuationLenght(aentry.vspecies,aentry.vcomposition,aentry.density);
+      double scintillation_attenuation_length=GetCompoundAttenuationLength(aentry.vspecies,aentry.vcomposition,aentry.density);
      // oss << line_rule << endl; //JPO 180731
       oss << "<!-- Scintillation properties: BEGIN -->" << endl;
      // oss << "<div class=\"scintillation\">" << endl; //JPO 180731
@@ -5787,12 +5787,12 @@ namespace aflowlib {
 
       if(aentry.vfiles_WEB.size()>0) 
 	for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-	  if(aentry.vfiles_WEB.at(i)==label+".png")
+	  if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png"))  // ME190621 - include new file naming convention 
 	    oss << "<div class = \"picture_band\" id=\"band_dos_pic\"><a id=\"imgPopup\"><img class=\"pic\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\" style='display:block;background:white; margin: 0 auto;' /></a></div>" << endl;
       oss << "<div id=\"small_figure\" style=\'display:flex;justify-content:center;\'>" << endl;
       if(aentry.vfiles_WEB.size()>0) 
 	for(uint i=0;i<aentry.vfiles_WEB.size();i++)
-	  if(aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png")) 
+	  if((aurostd::substring2bool(aentry.vfiles_WEB.at(i),"_PEDOS_") || aurostd::substring2bool(aentry.vfiles_WEB.at(i), "_dos_")) && aurostd::substring2bool(aentry.vfiles_WEB.at(i),".png"))  // ME190621 - include new file name convention
 	    oss << "<img class=\"pic_small\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of pdos_" << label << "\" style='background:white; margin: 0 auto;height:0%;' >" << endl;
       oss << "</div>" << endl;
       oss << "</li></ul>" << endl;
@@ -5811,11 +5811,28 @@ namespace aflowlib {
       oss << "<a id=\"backwardArrow\">" << endl;
       oss << "<img src=\"img/backwardArrow.png\" alt=\"backward arrow\" ></a>" << endl;
       oss << "<ul class=\"pic_popup_list\">" << endl;
-      oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << label << ".png\" alt=\"Band Structure of " << label << "\"  ></li>" << endl;
-      oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << label << "_DOS.png\" alt=\"DOS of " << label << "\"  ></li>" << endl;
+      // ME190621 - BEGIN
+      // Include new file naming convention
+      if(aentry.vfiles_WEB.size()>0) {
+	for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
+	  if((aentry.vfiles_WEB.at(i)==label+".png") || (aentry.vfiles_WEB.at(i) == label + "_banddos.png")) {
+            oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"Band Structure of " << label << "\"  ></li>" << endl;
+            break;
+          }
+        }
+      }
+      if(aentry.vfiles_WEB.size()>0) {
+	for(uint i=0;i<aentry.vfiles_WEB.size();i++) {
+	  if((aentry.vfiles_WEB.at(i)==label+"_DOS.png") || (aentry.vfiles_WEB.at(i) == label + "_dos.png")) {
+            oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(i) << "\" alt=\"DOS of " << label << "\"  ></li>" << endl;
+            break;
+          }
+        }
+      }
+      // ME190621 - END
       if(aentry.vfiles_WEB.size()>0) 
 	for(uint iline=0;iline<aentry.vfiles_WEB.size();iline++)
-	  if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS"))
+	  if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"PEDOS") || aurostd::substring2bool(aentry.vfiles_WEB.at(iline), "_dos_"))  // ME190621 - include new file name convention
 	    if(aurostd::substring2bool(aentry.vfiles_WEB.at(iline),"png"))
 	      oss << "<li class=\"pic_popup\"><img class=\"pic_large\" src=\"" << url_WEB << "/" << aentry.vfiles_WEB.at(iline) << "\" alt=\"Band Structure of pdos_" << label << "\"  ></li>" << endl;
       oss << "</ul>" << endl;

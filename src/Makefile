@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.1.224
+VERSNUMBER=3.1.225
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -108,7 +108,7 @@ SQLITE_C = ./SQLITE/sqlite3.c
 #AUROSTD_HPP = aurostd.h
 
 #DX and CO - START
-AFLOW_HPP = aflow.h aflow_pflow.h aflow_agl_debye.h aflow_apennsy.h aflow_chull.h aflow_pocc.h aflow_pocc_old.h aflow_xgndstate.h aflow_xphases.h aflow_xvaspin.h APL/aflow_apl.h APL/aflow_qha_operations.h
+AFLOW_HPP = aflow.h aflow_pflow.h aflow_agl_debye.h aflow_apennsy.h aflow_chull.h aflow_pocc.h aflow_pocc_old.h aflow_cce.h aflow_xgndstate.h aflow_xphases.h aflow_xvaspin.h APL/aflow_apl.h APL/aflow_qha_operations.h
 #DX and CO - END
 AFLOWLIB_HPP = aflowlib.h
 
@@ -117,7 +117,7 @@ AFLOW_CLASS_SRC = aflow_xclasses.cpp
 AFLOW_FUNCS_SRC = aflow_aflowrc.cpp aflow_init.cpp aflow_xatom.cpp aflow_xelement.cpp aflow_kbin.cpp aflow_ialien.cpp aflow_kalien.cpp aflow_kvasp.cpp aflow_ivasp.cpp aflow_avasp.cpp aflow_ovasp.cpp aflow_kaims.cpp aflow_iaims.cpp aflow_oaims.cpp aflow_lattice.cpp aflow_spacegroup.cpp aflow_mix.cpp aflow_nomix.cpp aflow_qsub.cpp aflow_pthreads.cpp aflow_symmetry.cpp aflow_neighbours.cpp aflow_surface.cpp aflow_defects.cpp aflow_wyckoff.cpp aflow_xproto.cpp aflow_xproto_gus.cpp aflow_matlab.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_ifrozsl.cpp aflow_modules.cpp
 # aflow_ifrozsl.cpp
 PFLOW_FUNCS_SRC = aflow_aconvasp_main.cpp aflow_pflow_funcs.cpp aflow_pflow_print.cpp aflow_aconvasp.cpp 
-ESTRUCTURE_FUNCS_SRC = aflow_estructure.cpp 
+ESTRUCTURE_FUNCS_SRC = aflow_estructure.cpp aflow_plotter.cpp
 #[OBSOLETE] [KESONG] POCCUPATION_FUNCS_SRC = aflow_poccupation_params.cpp aflow_poccupation_edos.cpp aflow_poccupation_forcefield.cpp 
 POCCUPATION_FUNCS_SRC = aflow_pocc_old.cpp
 APENNSY_FUNCS_SRC = aflow_apennsy_gndstate.cpp aflow_apennsy_structures.cpp aflow_apennsy.cpp aflow_apennsy_phases.cpp aflow_apennsy_main.cpp aflow_apennsy_vaspin.cpp
@@ -151,6 +151,8 @@ CONTRIB_FUNCS_KR_SRC = aflow_bader.cpp
 CONTRIB_FUNCS_CT_SRC = aflow_contrib_cormac.cpp
 
 CHULL_FUNCS_SRC = aflow_chull.cpp
+
+CCE_SRC = aflow_cce.cpp  #RF 190603
 #README_SRC= aflow_readme.cpp
 
 DATA_SRC=aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
@@ -182,11 +184,12 @@ COMPARE_FUNCS_DH_OBJ   = $(COMPARE_FUNCS_DH_SRC:.cpp=.o)
 CHULL_OBJ              = $(CHULL_FUNCS_SRC:.cpp=.o)
 GFA_OBJ                = $(GFA_FUNCS_SRC:.cpp=.o)
 POCC_OBJ               = $(POCC_FUNCS_SRC:.cpp=.o) #CO 180409
+CCE_OBJ                = $(CCE_SRC:.cpp=.o) #RF 190603
 SQLITE_OBJ             = $(SQLITE_C:.c=.o)	#CO 170614
 
 #MB 190301 - added jupyter notebook files for chull
 CHULL_JUPYTER_OBJS_ALL=aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp
-OBJS_ALL= aflow.o $(AUROSTD_OBJ) $(AFLOW_CLASS_OBJ) $(AFLOW_FUNCS_OBJ) $(PFLOW_FUNCS_OBJ) $(ESTRUCTURE_FUNCS_OBJ) $(POCCUPATION_FUNCS_OBJ) $(APENNSY_FUNCS_OBJ) $(AUROSTD) $(LIBRARIES_FUNCS_OBJ) aflow_mix_experiments.o $(CONTRIB_FUNCS_OBJ) aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp $(CHULL_JUPYTER_OBJS_ALL) $(AFLOWLIB_OBJ) $(AGL_OBJ) $(AEL_OBJ) $(APL_OBJ) $(ANRL_OBJ) $(COMPARE_FUNCS_DH_OBJ) $(CHULL_OBJ) $(GFA_OBJ) $(POCC_OBJ) $(SQLITE_OBJ)
+OBJS_ALL= aflow.o $(AUROSTD_OBJ) $(AFLOW_CLASS_OBJ) $(AFLOW_FUNCS_OBJ) $(PFLOW_FUNCS_OBJ) $(ESTRUCTURE_FUNCS_OBJ) $(POCCUPATION_FUNCS_OBJ) $(APENNSY_FUNCS_OBJ) $(AUROSTD) $(LIBRARIES_FUNCS_OBJ) aflow_mix_experiments.o $(CONTRIB_FUNCS_OBJ) aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp $(CHULL_JUPYTER_OBJS_ALL) $(AFLOWLIB_OBJ) $(AGL_OBJ) $(AEL_OBJ) $(APL_OBJ) $(ANRL_OBJ) $(COMPARE_FUNCS_DH_OBJ) $(CHULL_OBJ) $(GFA_OBJ) $(POCC_OBJ) $(CCE_OBJ) $(SQLITE_OBJ)
 
 .PHONY: check send_version_updates_email
 all: aflow aflow_data 
@@ -624,7 +627,7 @@ aflow_data_latex.cpp: Makefile
 	echo "std::string decf00ca3ad2fe494eea8e543e929068=\"\\" >> aflow_data_latex.cpp
 	if [ -f ../AFLOW3_NONFREE/EXTRA/LATEX/decf00ca3ad2fe494eea8e543e929068 ]; then cat ../AFLOW3_NONFREE/EXTRA/LATEX/decf00ca3ad2fe494eea8e543e929068 | perl -p -e 's/\\/\\\\/g' | perl -p -e 's/\"/\\\"/g'  | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_latex.cpp ; fi
 	echo "\";" >> aflow_data_latex.cpp
-aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT README_AFLOW_APL.TXT README_AFLOW_QHA_SCQHA_QHA3P.TXT README_AFLOW_AGL.TXT README_AFLOW_AEL.TXT README_AFLOW_POCC.TXT README_AFLOW_ANRL.TXT README_AFLOW_COMPARE.TXT README_AFLOW_GFA.TXT README_AFLOW.TXT README_AFLOW_HTRESOURCES.TXT README_PROTO.TXT README_AFLOW_APENNSY.TXT README_AFLOW_FROZSL.TXT README_AFLOW_SCRIPTING.TXT README_AFLOW_SYM.TXT README_AFLOW_CHULL.TXT README_AFLOW_XAFLOW.TXT README_AFLOW_AFLOWRC.TXT README_AFLOW_EXCEPTIONS.TXT README_CONTRIBS.TXT README_AFLOW_VERSIONS_HISTORY.TXT Makefile
+aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT README_AFLOW_APL.TXT README_AFLOW_QHA_SCQHA_QHA3P.TXT README_AFLOW_AGL.TXT README_AFLOW_AEL.TXT README_AFLOW_POCC.TXT README_AFLOW_ANRL.TXT README_AFLOW_COMPARE.TXT README_AFLOW_GFA.TXT README_AFLOW.TXT README_AFLOW_HTRESOURCES.TXT README_PROTO.TXT README_AFLOW_APENNSY.TXT README_AFLOW_FROZSL.TXT README_AFLOW_SCRIPTING.TXT README_AFLOW_SYM.TXT README_AFLOW_CCE.TXT README_AFLOW_CHULL.TXT README_AFLOW_XAFLOW.TXT README_AFLOW_AFLOWRC.TXT README_AFLOW_EXCEPTIONS.TXT README_CONTRIBS.TXT README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 	rm -rf aflow_data_readme.cpp
 	echo "// aflow_data_readme.cpp automatic generated" >> aflow_data_readme.cpp
 	echo "#include <string>" >> aflow_data_readme.cpp
@@ -675,6 +678,9 @@ aflow_data_readme.cpp: README_AFLOW_LICENSE_GPL3.TXT README_AFLOW_ACONVASP.TXT R
 	echo "\";" >> aflow_data_readme.cpp
 	echo "std::string README_AFLOW_SYM_TXT=\"\\" >> aflow_data_readme.cpp
 	cat README_AFLOW_SYM.TXT | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> aflow_data_readme.cpp
+	echo "\";" >> aflow_data_readme.cpp
+	echo "std::string README_AFLOW_CCE_TXT=\"\\" >> aflow_data_readme.cpp
+	cat README_AFLOW_CCE.TXT | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> aflow_data_readme.cpp
 	echo "\";" >> aflow_data_readme.cpp
 	echo "std::string README_AFLOW_CHULL_TXT=\"\\" >> aflow_data_readme.cpp
 	cat README_AFLOW_CHULL.TXT | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' | perl -p -e 's/\"/\\"/g' >> aflow_data_readme.cpp
@@ -945,6 +951,7 @@ web:	realclean
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_POCC.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_SCRIPTING.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_SYM.TXT /www/AFLOW ; fi
+	if [ -d /www/AFLOW ]; then cp README_AFLOW_CCE.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_CHULL.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_EXCEPTIONS.TXT /www/AFLOW ; fi
 	if [ -d /www/AFLOW ]; then cp README_AFLOW_VERSIONS_HISTORY.TXT /www/AFLOW ; fi
@@ -1006,24 +1013,41 @@ patch_makefile1: Makefile
 patch_makefile2: Makefile
 	cat Makefile | sed "s/\-O1//g" | sed "s/\-O2//g" | sed "s/\-O3//g" > M	
 	mv M Makefile
-#ME190313 - only execute check if md5sum is present
 check:
-	-if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else ./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum; echo "#ffb9c5681045fb80f391e9a931f21d1"; fi
+	$(MAKE) proto_check
+check_full:
+	$(MAKE) proto_check
+	$(MAKE) slab_check
+proto_check:
+	@echo "Performing 'aflow --proto' test"
+	@if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else \
+		PROTO4SUM=$$(./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum | cut -d ' ' -f1) && \
+		[ "$${PROTO4SUM#*ffb9c5681045fb80f391e9a931f21d1}" != "$$PROTO4SUM" ] && \
+		echo "'aflow --proto' check pass!" && exit 0 || \
+		echo "'aflow --proto' test failed. Check compilation of aflow and aflow_data." && exit 1; \
+	fi
+#ME190313 - only execute check if md5sum is present
+#	-if [ -z `which md5sum` ]; then echo "Cannot find binary md5sum - check skipped."; else ./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum; echo "#ffb9c5681045fb80f391e9a931f21d1"; fi
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
+slab_check:
+	./aflow --slab_test
 www:	web
 clean:
 	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`
 	rm -rfv `find . -name "LOCK*" | grep -v TESTS | grep -v SOURCES` *.out aflow.rasmol.xyz* aflow_potcar.cpp aflow_xpotcar.cpp aflow3.tar.xz ./AFLOWDATA ./LIBRARY* *html *toc *m *.jpg *.gif *.png
 	rm -rfv ./APL/*~ ./ANRL/*~ ./ANRL*/*~ ./SQLITE/*~ ../AFLOW3_NONFREE/BIN/* ./EXTRA/GUS/*~ ./EXTRA/GUS/*.o 
 realclean: clean
-	rm -rf aurostd.cpp aurostd.h aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat *conflic* 
+	$(MAKE) clean_autogen
+	rm -rf aurostd.cpp aurostd.h *conflic* 
 	if [ -f $(EXTRA_FREE)/GUS/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/GUS realclean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FINDSYM/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FINDSYM realclean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then $(MAKE) -C ../AFLOW3_NONFREE/EXTRA/FROZSL clean; fi
 	if [ -f ../AFLOW3_NONFREE/EXTRA/FROZSL/Makefile ]; then rm -fv ../AFLOW3_NONFREE/EXTRA/FROZSL/*conflic*; fi
 	if [ -f $(EXTRA_FREE)/APL2AGR/Makefile ]; then $(MAKE) -C $(EXTRA_FREE)/APL2AGR realclean; fi
+clean_autogen:
+	rm -rf aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_chull_jupyter_requirements.cpp aflow_data_readme.cpp aflow_readme_aflow.cpp aflow_readme_aconvasp.cpp aflow_readme_apennsy.cpp aflow_readme_proto.cpp aflow_xproto_icsd_lib.cpp aflow_matlab_funcs.cpp aflow_gnuplot_funcs.cpp aflow_data_*cpp *.dat
 # ****************************************************************************
 # icsd
 icsdclean: clean realclean

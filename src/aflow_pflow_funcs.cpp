@@ -24,9 +24,9 @@
 // factors f, not f^2.  DW^2 would be the appropriate term to modulate
 // the intensity, but DW is appropriate to modulate the scattering factors
 // (see Warren,eq.3.24).
-double DebyeWallerFactor(const double& theta, const double& lambda,
-			 const double& temp, const double& debye_temp,
-			 const double& mass) {
+double DebyeWallerFactor(double theta,
+			 double temp, double debye_temp,
+			 double mass,double lambda) {
   double st=sin(theta);
   double h=PLANCKSCONSTANT_h; //ME181020
   double twoB=h*h*temp*12.0/(mass*KBOLTZ*debye_temp*debye_temp);
@@ -176,238 +176,50 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& _composition_matr
 
 namespace pflow {
 //CO190321
-xvector<double> HKLPlane2Direct(const xstructure& a,int h,int k,int l){return HKLPlane2Direct(a.scale*a.lattice,h,k,l);}  //CO190320
-xvector<double> HKLPlane2Direct(const xmatrix<double>& lattice,int h,int k,int l){xvector<int> hkl;hkl[1]=h;hkl[2]=k;hkl[3]=l;return HKLPlane2Direct(lattice,hkl);}  //CO190320
-xvector<double> HKLPlane2Direct(const xstructure& a,const xvector<int>& hkl){return HKLPlane2Direct(a.scale*a.lattice,hkl);}  //CO190320
-xvector<double> HKLPlane2Direct(const xmatrix<double>& lattice,const xvector<int>& hkl){ //CO190320
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::HKLPlane2Direct():";
-
-  //http://www.mse.mtu.edu/~drjohn/my3200/stereo/sg5.html
-  //use metric tensor of reciprocal lattice to write 
-  //also here: http://ssd.phys.strath.ac.uk/resources/crystallography/crystallographic-direction-calculator/
-  //hkl is nothing more than fractional coordinates in reciprocal space
-  //useful relationship: kM=(2*PI)^2*inverse(M)
-  //https://it.iucr.org/Ba/ch1o1v0001/ - metric tensors of the covariant (direct) and contravariant (reciprocal) bases
-  //http://physastro-msci.tripod.com/webonmediacontents/notes1.pdf
-  xvector<double> dhkl=aurostd::xvectorint2double(hkl); //need double for operations
-  xmatrix<double> klattice=ReciprocalLattice(lattice);
-  xmatrix<double> kf2c=trasp(klattice);       //convert fractional to cartesian
-  xvector<double> kn=kf2c*dhkl;               //h*b1+k*b2+l*b3
-  xmatrix<double> M=MetricTensor(lattice);    //metric tensor of direct space
-  xvector<double> n=M*kn;                     //convert from reciprocal (contravariant) to direct (covariant): direct = metric(direct) * reciprocal
-  n/=aurostd::modulus(n);                     //normalize
-
-  if(LDEBUG) {
-    cerr << soliloquy << " hkl=" << hkl << endl;
-    cerr << soliloquy << " lattice=" << endl;cerr << lattice << endl;
-    cerr << soliloquy << " klattice=" << endl;cerr << klattice << endl;
-    cerr << soliloquy << " M=" << endl;cerr << M << endl;
-    cerr << soliloquy << " kn=" << kn << endl;
-    cerr << soliloquy << " n=" << n << endl;
-  }
-  
-  //[CO190322 OBSOLETE]xmatrix<double> klattice=ReciprocalLattice(lattice);
-  //[CO190322 OBSOLETE]xvector<double> n_star=h*klattice(1)+k*klattice(2)+l*klattice(3);
-  //[CO190322 OBSOLETE]xmatrix<double> G_metric_tensor=MetricTensor(klattice);
-
-  //[CO190322 OBSOLETE]if(0){  //only works if hkl!=0
-  //[CO190322 OBSOLETE]  //http://lampx.tugraz.at/~hadley/ss1/crystaldiffraction/G_is_orthogonal_to_hkl_plane.html
-  //[CO190322 OBSOLETE]  //take intercepts of plane, define two vectors in plane, take cross product, normalize
-  //[CO190322 OBSOLETE]  const xvector<double>& a1=lattice(1);
-  //[CO190322 OBSOLETE]  const xvector<double>& a2=lattice(2);
-  //[CO190322 OBSOLETE]  const xvector<double>& a3=lattice(3);
-  //[CO190322 OBSOLETE]  xvector<double> v1=a1/(double)h-a3/(double)l;
-  //[CO190322 OBSOLETE]  xvector<double> v2=a2/(double)k-a3/(double)l;
-  //[CO190322 OBSOLETE]  xvector<double> n=aurostd::vector_product(v1,v2);
-  //[CO190322 OBSOLETE]}
-  //[CO190322 OBSOLETE]n/=aurostd::modulus(n);
-  
-  return n;
+//follows procedure outlined in: De Leon et al., PRL 114, 165502 (2015) (supp info)
+#define DEFAULT_SURFACE_LAYERS 3  //See W. Sun and G. Ceder, Surface Science 617 (2013) 53-59, fix/relax these layers of the slab
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,oss);
 }
-xvector<int> Direct2HKLPlane(const xstructure& a,const xvector<double>& n){return Direct2HKLPlane(a.scale*a.lattice,n);}  //CO190320
-xvector<int> Direct2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n){ //CO190320
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::Direct2HKLPlane():";
-  stringstream message;
-  
-  //http://www.mse.mtu.edu/~drjohn/my3200/stereo/sg5.html
-  //use metric tensor of reciprocal lattice to write 
-  //also here: http://ssd.phys.strath.ac.uk/resources/crystallography/crystallographic-direction-calculator/
-  //useful relationship: kM=(2*PI)^2*inverse(M)
-  //https://it.iucr.org/Ba/ch1o1v0001/ - metric tensors of the covariant (direct) and contravariant (reciprocal) bases
-  //http://physastro-msci.tripod.com/webonmediacontents/notes1.pdf
-  //https://physcourses.lums.edu.pk/wp-content/uploads/2012/09/Reciprocal-lattices.pdf
-  xmatrix<double> klattice=ReciprocalLattice(lattice);
-  xmatrix<double> kc2f=inverse(trasp(klattice));    //convert cartesian to fractional
-  xmatrix<double> kM=MetricTensor(klattice);        //metric tensor of reciprocal space
-  xvector<double> kn=kM*n;                          //convert from direct (covariant) to reciprocal (contravariant): reciprocal = metric(reciprocal) * direct
-  xvector<double> dhkl_frac=kc2f*kn;                //hkl (double) in fractional form (need to convert to integers)
-  if(LDEBUG) {cerr << soliloquy << " dhkl_frac=" << dhkl_frac << endl;}
-
-  //define tolerance based on how far we explore (up to max_multiple in hkl)
-  uint max_multiple=1e3;
-  double zero_tol=pow(10,(int)ceil(log10(1.0/max_multiple))); 
-  if(LDEBUG) {
-    cerr << soliloquy << " max_multiple=" << max_multiple << endl;
-    cerr << soliloquy << " zero_tol=" << zero_tol << endl;
-  }
-  //find minimum of hkl, be careful of 0s
-  //dhkl_frac/=aurostd::min(dhkl_frac); //what if it's 0, we need to be more careful
-  double min=AUROSTD_MAX_DOUBLE;
-  for(int i=dhkl_frac.lrows;i<=dhkl_frac.urows;i++){
-    if(abs(dhkl_frac[i])>zero_tol && abs(dhkl_frac[i])<abs(min)){min=dhkl_frac[i];}
-  }
-  if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
-  dhkl_frac/=min;
-  if(LDEBUG) {cerr << soliloquy << " dhkl_frac=" << dhkl_frac << endl;}
-
-  //explore multiples of hkl up to tolerance allows
-  xvector<double> dhkl=dhkl_frac;
-  bool found=false;
-  for(uint i=1;i<=max_multiple&&!found;i++){  //BRUTE (stupid) force, there's probably an algorithm out there for it... //start with 1, we may already have the solution
-    dhkl=dhkl_frac*(double)i;
-    if(LDEBUG) {cerr << soliloquy << " dhkl_frac*" << i << "=" << dhkl << endl;}
-    if(aurostd::isinteger(dhkl,zero_tol)){found=true;break;}
-  }
-  if(!found){throw aurostd::xerror(soliloquy,"Could not find valid hkl",_VALUE_ERROR_);}
-
-  //convert dhkl to hkl (integer)
-  xvector<int> hkl(dhkl.lrows,dhkl.urows);
-  for(int i=dhkl.lrows;i<=dhkl.urows;i++){hkl[i]=(int)nint(dhkl[i]);}
-
-  if(LDEBUG) {
-    cerr << soliloquy << " n=" << n << endl;
-    cerr << soliloquy << " kM=" << endl;cerr << kM << endl;
-    cerr << soliloquy << " hkl=" << hkl << endl;
-  }
-
-  return hkl;
-}
-
-//https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
-double getSpacingHKLPlane(const xstructure& a,int h,int k,int l){return getSpacingHKLPlane(a.scale*a.lattice,h,k,l);} //CO190320
-double getSpacingHKLPlane(const xmatrix<double>& lattice,int h,int k,int l){xvector<int> hkl;hkl[1]=h;hkl[2]=k;hkl[3]=l;return getSpacingHKLPlane(lattice,hkl);} //CO190320
-double getSpacingHKLPlane(const xstructure& a,const xvector<int>& hkl){return getSpacingHKLPlane(a.scale*a.lattice,hkl);} //CO190320
-double getSpacingHKLPlane(const xmatrix<double>& lattice,const xvector<int>& hkl){ //CO190320
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::getSpacingHKLPlane():";
-
-  //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
-  //useful relationship: kM=(2*PI)^2*inverse(M)
-  xvector<double> dhkl=aurostd::xvectorint2double(hkl); //need double for operations
-  xmatrix<double> klattice=ReciprocalLattice(lattice);
-  xmatrix<double> kM=MetricTensor(klattice);
-  double d_spacing=2.0*PI/sqrt(aurostd::scalar_product(dhkl,kM*dhkl));  //2*pi factor here is very important (counters the one in ReciprocalLattice())
-
-  if(LDEBUG) {
-    cerr << soliloquy << " hkl=" << hkl << endl;
-    cerr << soliloquy << " kM=" << endl;cerr << kM << endl;
-    cerr << soliloquy << " d_spacing=" << d_spacing << endl;
-  }
-
-  return d_spacing;
-}
-
-//returns back how many times you need to go in hkl direction before you return back to equivalent site
-//differs from getSpacingHKLPlane(), there can be multiple planes within one unit cell
-double getDistanceBetweenImages(const xstructure& aa,const xvector<double>& n){ //CO190320
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::getDistanceBetweenImages():";
-
-  xstructure a(aa); a.ReScale(1.0); //safety
-  const xmatrix<double>& lattice=a.lattice;
-  const xmatrix<double>& f2c=a.f2c;
-  const xmatrix<double>& c2f=a.c2f;
-  
-  double min_dist=a.dist_nn_min;
-  if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(a);}
-  double sym_eps=a.sym_eps;
-  if(sym_eps==AUROSTD_NAN){sym_eps=SYM::defaultTolerance(a);}
-  bool skew=SYM::isLatticeSkewed(lattice,min_dist,sym_eps);
-
-  xvector<int> hkl=Direct2HKLPlane(lattice,n);
-  double d_spacing=getSpacingHKLPlane(lattice,hkl);
-
-  if(LDEBUG) {
-    cerr << soliloquy << " n=" << n << endl;
-    cerr << soliloquy << " hkl=" << hkl << endl;
-    cerr << soliloquy << " d_spacing=" << d_spacing << endl;
-  }
-
-  xvector<double> fpos,fpos_orig,cpos;
-  fpos[1]=fpos_orig[1]=0.25;  //could be anything
-  fpos[2]=fpos_orig[2]=0.25;  //could be anything
-  fpos[3]=fpos_orig[3]=0.25;  //could be anything
-  cpos=f2c*fpos;  //F2C(lattice,fpos);
-
-  bool start=false;
-  int count=0;
-  while(!start || SYM::AtomFPOSMatch(fpos_orig,fpos,c2f,f2c,skew,sym_eps)){ //!aurostd::isequal(fpos,fpos_orig)){
-    start=true;
-    cpos+=d_spacing * n;
-    fpos=c2f*cpos;  //C2F(lattice,cpos);
-    //fpos=BringInCell(fpos); //handled by AtomFPOSMatch()
-    if(LDEBUG) {
-      cerr << soliloquy << " cpos=" << cpos << endl;
-      cerr << soliloquy << " fpos=" << fpos << endl;
-    }
-    count++;
-  }
-  return d_spacing * (double)count;
-}
-
-struct atom_plane_dist{ //for stacking fault calculations ONLY
-  int index;
-  double distance;
-  bool operator<(const atom_plane_dist& other) const {return distance<other.distance;}
-};
-
-//CO190321
-//see SI of 10.1103/PhysRevLett.114.165502
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,istream& input,ostream& oss){
-  xstructure a(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,oss);
-}
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const xstructure& a,ostream& oss){
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ostream& oss){
   _aflags aflags; aflags.Directory=".";
   _kflags kflags;
   _vflags vflags;
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,aflags,kflags,vflags,oss);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
 }
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
-  xstructure a(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,aflags,kflags,vflags,oss);
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
 }
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const xstructure& a,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
   ofstream FileMESSAGE;
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,aflags,kflags,vflags,FileMESSAGE,oss);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
 }
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
-  xstructure a(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,FileMESSAGE,oss);
-
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,FileMESSAGE,oss);
 }
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const xstructure& a,ofstream& FileMESSAGE,ostream& oss){
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss){
   _aflags aflags; aflags.Directory=".";
   _kflags kflags;
   _vflags vflags;
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,aflags,kflags,vflags,FileMESSAGE,oss);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
 }
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
-  xstructure a(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyDirSetup(vpflow,a,aflags,kflags,vflags,FileMESSAGE,oss);
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
 }
-void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const xstructure& aa,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::GeneralizedStackingFaultEnergyDirSetup():";
+  string soliloquy="pflow::GeneralizedStackingFaultEnergyCalculation():";
   stringstream message;
   std::streamsize prec = 8;
   bool check_min_dist=true; //turn off if it gets too slow
   int count_check_min_dist=0;
   
   message << aflow::Banner("BANNER_NORMAL");
-  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_);  //first to screen (not logged, file not opened)
+  pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
   if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
  
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,31 +228,40 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
 
   if(LDEBUG) {cerr << soliloquy << " get conventional cell" << endl;}
   
-  xstructure a(aa);
-  double min_dist_orig=0.0,min_dist=0.0;
+  xstructure xstr_bulk(xstr_in);
+  double min_dist=xstr_bulk.dist_nn_min;
+  if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr_bulk);}
+  double min_dist_orig=min_dist;
   if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist_orig=min_dist=a.MinDist();
+    min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
     if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
-  a=Standard_Conventional_UnitCellForm(a);a.Clean();  //best to work with standard conventional unitcell
+  
+  bool convert_sconv=true;
+  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.Clean();}  //best to work with standard conventional unitcell
   if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=a.MinDist();
+    min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){
+      //throw a warning here instead, minimum distance MIGHT change with sconv
+      //throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);
+      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+      min_dist_orig=min_dist;
+    }
   }
-  a.ReScale(1.0);
-  a.ShifOriginToAtom(0);
-  a.BringInCell();
-  a.Clean();  //clear origin!
-  if(LDEBUG) {a.write_DEBUG_flag=TRUE;}
-  //a.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
+  xstr_bulk.ReScale(1.0);
+  xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
+  xstr_bulk.BringInCell();
+  xstr_bulk.Clean();  //clear origin!
+  if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
+  //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
   
-  message << "structure(standard conventional)=";pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << a << endl;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_RAW_);
+  message << "structure(standard conventional)=";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << xstr_bulk << endl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
   
   if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=a.MinDist();
+    min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
     if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
@@ -453,10 +274,16 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   // START - get sym info for structure (mostly for FPOSMatch)
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  xstructure a_sym(a);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
-  pflow::PerformFullSymmetry(a);
-  a.dist_nn_min=a_sym.dist_nn_min;
-  a.sym_eps=a_sym.sym_eps;
+  xstructure xstr_sym(xstr_bulk);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
+  pflow::PerformFullSymmetry(xstr_sym);
+  xstr_bulk.dist_nn_min=xstr_sym.dist_nn_min;
+  xstr_bulk.sym_eps=xstr_sym.sym_eps;
+  bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,xstr_bulk.dist_nn_min,xstr_bulk.sym_eps);
+  if(LDEBUG){
+    cerr << soliloquy << " xstr_bulk.dist_nn_min=" << xstr_bulk.dist_nn_min << endl;
+    cerr << soliloquy << " xstr_bulk.sym_eps=" << xstr_bulk.sym_eps << endl;
+    cerr << soliloquy << " skew=" << skew << endl;
+  }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - get sym info for structure (mostly for FPOSMatch)
@@ -468,81 +295,118 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   
   if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
   
-  int h_i=1,k_i=1,l_i=1;  //hkl of interest
   int h_s=1,k_s=1,l_s=0;  //hkl of shear
-  xvector<int> hkl_i,hkl_s;
+  xvector<int> hkl_s;
   double step_size=0.2;   //step size
-  int total_layers=10;  //size of supercell (~ 2x layers)
-  int xy_dims=1;        //dimensions of supercell in x-y dimensions
-  int fixed_layers=2;   //number of fixed layers
-  double vacuum=15;     //vacuum in Angstroms
+  int fixed_layers=DEFAULT_SURFACE_LAYERS;     //number of fixed layers
   bool spin_off=false;
+  bool partial_dissociation=false;
 
   vector<string> tokens;
-  aurostd::string2tokens(vpflow.getattachedscheme("STACKING_FAULT_ENERGY:PLANE_INTEREST"),tokens,",");
-  if(tokens.size()==3){
-    h_i=aurostd::string2utype<int>(tokens[0]);
-    k_i=aurostd::string2utype<int>(tokens[1]);
-    l_i=aurostd::string2utype<int>(tokens[2]);
-    hkl_i[1]=h_i;hkl_i[2]=k_i;hkl_i[3]=l_i;
-  }
-  aurostd::string2tokens(vpflow.getattachedscheme("STACKING_FAULT_ENERGY:PLANE_SHEAR"),tokens,",");
+  aurostd::string2tokens(vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::SHEAR_DIRECTION"),tokens,",");
   if(tokens.size()==3){
     h_s=aurostd::string2utype<int>(tokens[0]);
     k_s=aurostd::string2utype<int>(tokens[1]);
     l_s=aurostd::string2utype<int>(tokens[2]);
-    hkl_s[1]=h_s;hkl_s[2]=k_s;hkl_s[3]=l_s;
   }
-  string step_size_string=vpflow.getattachedscheme("STACKING_FAULT_ENERGY:STEP_SIZE"); //step size
+  hkl_s[1]=h_s;hkl_s[2]=k_s;hkl_s[3]=l_s;
+  if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(soliloquy,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
+  string step_size_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE"); //step size
   if(aurostd::isfloat(step_size_string)){
     double _step_size=aurostd::string2utype<double>(step_size_string);
     if(_step_size>0.0 && _step_size<1.0){step_size=_step_size;}
   }
-  string steps_string=vpflow.getattachedscheme("STACKING_FAULT_ENERGY:STEPS"); //step size
+  string steps_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEPS"); //step size
   if(aurostd::isfloat(steps_string)){
     int _steps=aurostd::string2utype<int>(steps_string);
     if(_steps>0){step_size=1.0/_steps;}
   }
-  string total_layers_string=vpflow.getattachedscheme("STACKING_FAULT_ENERGY:TOTAL_LAYERS"); //step size
-  if(aurostd::isfloat(total_layers_string)){
-    int _total_layers=aurostd::string2utype<int>(total_layers_string);
-    if(_total_layers>0){total_layers=_total_layers;}
-  }
-  string fixed_layers_string=vpflow.getattachedscheme("STACKING_FAULT_ENERGY:FIXED_LAYERS"); //step size
+  string fixed_layers_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::FIXED_LAYERS");
   if(aurostd::isfloat(fixed_layers_string)){
     int _fixed_layers=aurostd::string2utype<int>(fixed_layers_string);
     if(_fixed_layers>0){fixed_layers=_fixed_layers;}
   }
-  string vacuum_string=vpflow.getattachedscheme("STACKING_FAULT_ENERGY:VACUUM"); //step size
-  if(aurostd::isfloat(vacuum_string)){
-    double _vacuum=aurostd::string2utype<double>(vacuum_string);
-    if(_vacuum>0){vacuum=_vacuum;}
-  }
-  spin_off=vpflow.flag("STACKING_FAULT_ENERGY:SPIN_OFF");
+  spin_off=vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::SPIN_OFF");
+  partial_dissociation=vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::PARTIAL_DISSOCIATION");
 
   std::streamsize prec_original = message.precision(); //original
   std::ios_base::fmtflags ff_original = message.flags();  //original
   message.precision(prec);
   message.unsetf(std::ios_base::floatfield);
   
-  message << "plane_interest=" << hkl_i;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "plane_shear=" << hkl_s;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "step_size=" << step_size;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "total_layers=" << total_layers;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "fixed_layers=" << fixed_layers;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "vacuum=" << vacuum;pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  
-  if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_WARNING_);}
+  message << "shear_direction" << hkl_s;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "step_size=" << step_size;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "fixed_layers=" << fixed_layers;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   
   message.precision(prec_original); //set back
   message.flags(ff_original); //set back
-  //exit(0);
+
+  aurostd::xoption slab_flags=vpflow; //may modify based on how many layers in unit cell
   
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - read flags
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - resolve layers count
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
+  //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_layers=getDistanceBetweenImages(xstr_bulk.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
+  xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
+  //d_spacing is based on lattice ONLY, no crystal information
+  //d_layers,d_cells are based on CRYSTAL (lattice + basis)
+  //d_layers finds distance in direction of n_s to next structure image
+  //d_cells makes sure you loop outside cell at least once
+  //d_spacing <= d_layers <= d_cells
+  double d_spacing=slab::getSpacingHKLPlane(xstr_bulk,hkl_s); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
+  double d_layers=slab::getDistanceBetweenImages(xstr_bulk,n_s,false); //this depends on UN-ROTATED lattice
+  double d_cells=slab::getDistanceBetweenImages(xstr_bulk,n_s,true); //go outside cell
+  int layers_per_cell=(int)(d_cells/d_layers);  //floor
+  if(LDEBUG) {
+    cerr << soliloquy << " n_s[h=" << hkl_s << "]=" << n_s << endl;
+    cerr << soliloquy << " d_spacing=" << d_spacing << endl;
+    cerr << soliloquy << " d_layers=" << d_layers << endl;
+    cerr << soliloquy << " d_cells=" << d_cells << endl;
+    cerr << soliloquy << " layers_per_cell=" << layers_per_cell << endl;
+  }
+  //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell<1){throw aurostd::xerror(soliloquy,"layers_per_cell<1 (="+aurostd::utype2string(layers_per_cell)+")",_INPUT_ERROR_);}
+  //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell>1){  //let's adjust total_layers input to CreateSlab_RigidRotation() which builds supercell assuming layers_per_cell==1
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  int total_layers=DEFAULT_TOTAL_LAYERS;
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  if(aurostd::isfloat(total_layers_string)){
+  //[CO190520 - do NOT reduce total_layers based on shear direction]    int _total_layers=aurostd::string2utype<int>(total_layers_string);
+  //[CO190520 - do NOT reduce total_layers based on shear direction]    if(_total_layers>0){total_layers=_total_layers;}
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  }
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  if(LDEBUG){cerr << soliloquy << " total_layers(pre)=" << total_layers << endl;}
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  total_layers=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  if(LDEBUG){cerr << soliloquy << " total_layers(post)=" << total_layers << endl;}
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  slab_flags.pop_attached("CREATE_SLAB::TOTAL_LAYERS");
+  //[CO190520 - do NOT reduce total_layers based on shear direction]  slab_flags.push_attached("CREATE_SLAB::TOTAL_LAYERS",aurostd::utype2string(total_layers));
+  //[CO190520 - do NOT reduce total_layers based on shear direction]}
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - resolve layers count
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - create slab
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  message << "Creating slab";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  xvector<int> hkl_i;
+  int total_layers;
+	xmatrix<double> rotation;
+  xstructure xstr_rotated;
+  vector<int> sc2pcMap_slab,pc2scMap_slab;
+
+  xstructure xstr_slab=slab::CreateSlab_RigidRotation(slab_flags,xstr_bulk,hkl_i,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  
+	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+  
   //rotate n_s too
   //[CO190408 - do rotation last!]bool rotate_shear=false;
   //[CO190408 - do rotation last!]if(rotate_shear){
@@ -550,34 +414,38 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " rotated n_s=" << n_s << endl;}  //CO190322 - don't think this needs to be rotated
   //[CO190408 - do rotation last!]}
   //[CO190408 - do rotation last!]//create rotated primitive cell: faster to rotate smaller cell than bigger one
-  //[CO190408 - do rotation last!]xstructure a_rotated(a);
+  //[CO190408 - do rotation last!]xstructure xstr_rotated(a);
   //[CO190408 - do rotation last!]if(0){  //try rotating atoms, DOES NOT WORK
-  //[CO190408 - do rotation last!]  _sym_op rot; rot.setUc(R,a.lattice); rot.is_pgroup=true;  //just rotation
+  //[CO190408 - do rotation last!]  _sym_op rot; rot.setUc(R,xstr_bulk.lattice); rot.is_pgroup=true;  //just rotation
   //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " sym_op=" << endl;cerr << rot << endl;}
   //[CO190408 - do rotation last!]  if(1){  //try ApplyXstructure(), same as ApplyAtomValidate on all atoms individually
-  //[CO190408 - do rotation last!]    a_rotated=SYM::ApplyXstructure(rot,a,false);  //no incell, we'll figure this out later
+  //[CO190408 - do rotation last!]    xstr_rotated=SYM::ApplyXstructure(rot,xstr_bulk,false);  //no incell, we'll figure this out later
   //[CO190408 - do rotation last!]  } else {  //try ApplyAtomValidate
-  //[CO190408 - do rotation last!]    for(uint i=0;i<a.atoms.size();i++){
-  //[CO190408 - do rotation last!]      if(!SYM::ApplyAtomValidate(a.atoms[i],a_rotated.atoms[i],rot,a,true,false)){
+  //[CO190408 - do rotation last!]    for(uint i=0;i<xstr_bulk.atoms.size();i++){
+  //[CO190408 - do rotation last!]      if(!SYM::ApplyAtomValidate(xstr_bulk.atoms[i],xstr_rotated.atoms[i],rot,xstr_bulk,true,false)){
   //[CO190408 - do rotation last!]        throw aurostd::xerror(soliloquy,"ApplyAtomValidate() failed",_VALUE_ERROR_);
   //[CO190408 - do rotation last!]      }
   //[CO190408 - do rotation last!]    }
   //[CO190408 - do rotation last!]  }
   //[CO190408 - do rotation last!]} else {  //try rotating lattice, seems to work
-  //[CO190408 - do rotation last!]  //a_rotated.lattice=R * a_rotated.lattice * inverse(R);
-  //[CO190408 - do rotation last!]  a_rotated.lattice=R * a_rotated.lattice;
-  //[CO190408 - do rotation last!]  a_rotated.FixLattices();
-  //[CO190408 - do rotation last!]  const xmatrix<double>& f2c=a_rotated.f2c;
-  //[CO190408 - do rotation last!]  for(uint i=0;i<a_rotated.atoms.size();i++){a_rotated.atoms[i].cpos=f2c*a_rotated.atoms[i].fpos;}
-  //[CO190408 - do rotation last!]  //a_rotated=Standard_Conventional_UnitCellForm(a);a_rotated.Clean();
+  //[CO190408 - do rotation last!]  //xstr_rotated.lattice=R * xstr_rotated.lattice * inverse(R);
+  //[CO190408 - do rotation last!]  xstr_rotated.lattice=R * xstr_rotated.lattice;
+  //[CO190408 - do rotation last!]  xstr_rotated.FixLattices();
+  //[CO190408 - do rotation last!]  const xmatrix<double>& f2c=xstr_rotated.f2c;
+  //[CO190408 - do rotation last!]  for(uint i=0;i<xstr_rotated.atoms.size();i++){xstr_rotated.atoms[i].cpos=f2c*xstr_rotated.atoms[i].fpos;}
+  //[CO190408 - do rotation last!]  //xstr_rotated=Standard_Conventional_UnitCellForm(a);xstr_rotated.Clean();
   //[CO190408 - do rotation last!]}
-  //[CO190408 - do rotation last!]if(LDEBUG) {cerr << soliloquy << " a_rotated=" << endl;cerr << a_rotated << endl;}
+  //[CO190408 - do rotation last!]if(LDEBUG) {cerr << soliloquy << " xstr_rotated=" << endl;cerr << xstr_rotated << endl;}
   //[CO190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
-  //[CO190408 - do rotation last!]  min_dist=a_rotated.MinDist();
+  //[CO190408 - do rotation last!]  min_dist=xstr_rotated.MinDist();
   //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
   //[CO190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO190408 - do rotation last!]}
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - create slab
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // START - defining hkl normals
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -585,17 +453,8 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
   
   //we need UN-ROTATED lattice here so we can get the right distance
-  xvector<double> n_i=HKLPlane2Direct(a.lattice,hkl_i);
-  
-  //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Direct(a.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
-  //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_lattice_plane_spacing=getDistanceBetweenImages(a.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
-  xvector<double> n_s=trasp(a.lattice)*aurostd::xvectorint2double(hkl_s);n_s/=aurostd::modulus(n_s);
-  double d_lattice_plane_spacing=getDistanceBetweenImages(a,n_s); //this depends on UN-ROTATED lattice
-  if(LDEBUG) {
-    cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;
-    cerr << soliloquy << " n_s[h=" << hkl_s << "]=" << n_s << endl;
-    cerr << soliloquy << " d_lattice_plane_spacing=" << d_lattice_plane_spacing << endl;
-  }
+  xvector<double> n_i=slab::HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
+  if(LDEBUG) {cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;}
 
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]//n_i and n_s must be perpendicular
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]if(!aurostd::isequal(aurostd::scalar_product(n_i,n_s),0.0,0.1)){
@@ -604,153 +463,27 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]}
 
-  //quick test to make sure everything works
-  xvector<int> hkl;
-  hkl=Direct2HKLPlane(a.lattice,n_i);
-  if(LDEBUG) {
-    cerr << soliloquy << " hkl_i=" << hkl_i << endl;
-    cerr << soliloquy << " n(hkl_i)=" << n_i << endl;
-    cerr << soliloquy << " hkl_i(test)=" << hkl << endl;
+  //rotate n_s
+  if(LDEBUG) {cerr << soliloquy << " n_s[h=" << h_s << ",k=" << k_s << ",l=" << l_s << "](unrotated)=" << n_s << endl;}
+  n_s=rotation*n_s;  //rotate to match structure rotation
+  if(LDEBUG) {cerr << soliloquy << " n_s[h=" << h_s << ",k=" << k_s << ",l=" << l_s << "](rotated)  =" << n_s << endl;}
+
+  if(!partial_dissociation){
+    //check that there is NO z component to n_s after rotation
+    xvector<double> n_s_frac=xstr_rotated.c2f*n_s;
+    if(LDEBUG){cerr << soliloquy << " n_s_frac=" << n_s_frac << endl;}
+    if(!aurostd::isequal(n_s_frac[3],0.0)){
+      message << "The shear plane and plane of interest are incommensurate" << endl;
+      message << "rotation=" << endl; message << rotation << endl;
+      message << "hkl_i=" << hkl_i << ", n_i=" << n_i << endl;
+      message << "hkl_s=" << hkl_s << ", n_s=" << n_s << endl;
+      message << "n_s_frac=" << n_s_frac << endl;
+      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+    }
   }
-  if(!aurostd::isequal(hkl_i,hkl)){
-    message << "Direct2HKLPlane() function failed on hkl_i=" << hkl_i << " (Direct2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  }
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]hkl=Direct2HKLPlane(a.lattice,n_s);
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]if(LDEBUG) {
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]  cerr << soliloquy << " hkl_s=" << hkl_s << endl;
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]  cerr << soliloquy << " n(hkl_s)=" << n_s << endl;
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]  cerr << soliloquy << " hkl_s(test)=" << hkl << endl;
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]}
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]if(!aurostd::isequal(hkl_s,hkl)){
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]  message << "Direct2HKLPlane() function failed on hkl_s=" << hkl_s << " (Direct2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  //[CO190515 - OBSOLETE, hkl_s is in real space basis]}
-  xvector<int> hkl_test;
-  xvector<double> n_test;
-  hkl_test[1]=7;hkl_test[2]=3;hkl_test[3]=2;
-  n_test=HKLPlane2Direct(a.lattice,hkl_test);
-  hkl=Direct2HKLPlane(a.lattice,n_test);
-  if(LDEBUG) {
-    cerr << soliloquy << " hkl_test=" << hkl_test << endl;
-    cerr << soliloquy << " n(hkl_test)=" << n_test << endl;
-    cerr << soliloquy << " hkl_test(test)=" << hkl << endl;
-  }
-  if(!aurostd::isequal(hkl_test,hkl)){
-    message << "Direct2HKLPlane() function failed on hkl=" << hkl_test << " (Direct2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  }
-  
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create rotation matrix
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " creating rotation matrix" << endl;}
-  
-  xvector<double> z(3);z(1)=0;z(2)=0;z(3)=-1; //this vector points in -z direction
-  
-  //find rotation from n_i to z
-  xmatrix<double> R=aurostd::getRotationMatrix3D(n_i,z);
-  if(LDEBUG) {cerr << soliloquy << " R=" << endl;cerr << R << endl;}
-  
-  //test of stupidity
-  xvector<double> pseudo_z=R*n_i;
-  if(LDEBUG) {cerr << soliloquy << " testing if " << pseudo_z << " == " << z << endl;}
-  if(!aurostd::isequal(pseudo_z,z)){
-    message << "pseudo_z != z";
-    cerr << soliloquy << " pseudo_z=" << pseudo_z << endl;
-    cerr << soliloquy << " z=" << z << endl;
-    cerr << soliloquy << " aurostd::modulus(pseudo_z-z)=" << aurostd::modulus(pseudo_z - z) << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
-  }
-
-  //rotate n_s
-  n_s=R*n_s;  //rotate to match structure rotation
-  if(LDEBUG) {cerr << soliloquy << " n_s[h=" << h_s << ",k=" << k_s << ",l=" << l_s << "](rotated)=" << n_s << endl;}
-
-  //check that there is NO z component to n_s after rotation
-  if(0&&!aurostd::isequal(n_s[3],0.0)){
-    message << "The shear plane and plane of interest are incommensurate" << endl;
-    message << "hkl_i=" << hkl_i << ", n_i=" << n_i << endl;
-    message << "hkl_s=" << hkl_s << ", n_s=" << n_s << endl;
-    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
-  }
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create rotation matrix
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - rotate structure
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(aurostd::modulus(a.origin)>_ZERO_TOL_){throw aurostd::xerror(soliloquy,"a.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
-
-  if(LDEBUG) {cerr << soliloquy << " rotating structure" << endl;}
-  xstructure a_rotated=Rotate(a,R); //WARNING! check if structure has origin, this will screw things up
-    
-  //tests of stupidity
-  xvector<double> alat_pre=a.lattice(1);xvector<double> blat_pre=a.lattice(2);xvector<double> clat_pre=a.lattice(3);
-  xvector<double> alat_post=a_rotated.lattice(1);xvector<double> blat_post=a_rotated.lattice(2);xvector<double> clat_post=a_rotated.lattice(3);
-  double vol_pre=aurostd::det(a.lattice);
-  double vol_post=aurostd::det(a_rotated.lattice);
-
-  if(LDEBUG) {
-    cerr << soliloquy << " alat_pre=" << alat_pre << endl;cerr << soliloquy << " alat_post=" << alat_post << endl;
-    cerr << soliloquy << " blat_pre=" << blat_pre << endl;cerr << soliloquy << " blat_post=" << blat_post << endl;
-    cerr << soliloquy << " clat_pre=" << clat_pre << endl;cerr << soliloquy << " clat_post=" << clat_post << endl;
-    cerr << soliloquy << " vol_pre=" << vol_pre << endl;cerr << soliloquy << " vol_post=" << vol_post << endl;
-  }
-
-  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(soliloquy,"lattice vector a length changed",_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(soliloquy,"lattice vector b length changed",_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(soliloquy,"lattice vector c length changed",_VALUE_ERROR_);}
-  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(soliloquy,"volume changed",_VALUE_ERROR_);}
-
-  //[CO190423 - already done in Rotate()]a_rotated.FixLattices();
-  //[CO190423 - already done in Rotate()]const xmatrix<double>& f2c=a_rotated.f2c;
-  //[CO190423 - already done in Rotate()]for(uint i=0;i<a_rotated.atoms.size();i++){a_rotated.atoms[i].cpos=f2c*a_rotated.atoms[i].fpos;}
-  //a_rotated=Standard_Conventional_UnitCellForm(a);a_rotated.Clean();
-
-  if(LDEBUG) {cerr << soliloquy << " a_rotated=" << endl;cerr << a_rotated << endl;}
-
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=a_rotated.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-    //[it may have to change]if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create supercell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " creating supercell" << endl;}
-  
-  //now create a supercell
-  //xmatrix<double> supercell_mat;supercell_mat(1,1)=supercell_mat(2,2)=supercell_mat(3,3)=(double)total_layers;
-  xmatrix<double> supercell_mat;supercell_mat(1,1)=(double)xy_dims;supercell_mat(2,2)=(double)xy_dims;supercell_mat(3,3)=(double)total_layers;
-  vector<int> sc2pcMap,pc2scMap;
-  xstructure a_supercell=GetSuperCell(a_rotated,supercell_mat,sc2pcMap,pc2scMap,false,false,false);
-  if(LDEBUG) {cerr << soliloquy << " a_supercell=" << endl;cerr << a_supercell << endl;}
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=a_supercell.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-  
-  //clean up structure
-  a_supercell.ReScale(1.0);
-  a_supercell.ShifOriginToAtom(0);
-  a_supercell.BringInCell();
-  //a_supercell.Clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate()
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create supercell
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -761,10 +494,10 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " defining half plane" << endl;}
   //[CO190423 - too much work, rely on atom.ijk instead!]
   //[CO190423 - too much work, rely on atom.ijk instead!]int count_total,count_above,count_below;
-  //[CO190423 - too much work, rely on atom.ijk instead!]count_total=a_supercell.atoms.size();
+  //[CO190423 - too much work, rely on atom.ijk instead!]count_total=xstr_slab.atoms.size();
   //[CO190423 - too much work, rely on atom.ijk instead!]count_above=count_total/2;count_below=count_total-count_above;
   //[CO190423 - too much work, rely on atom.ijk instead!]//count_above=count_below=count_total/2;
-  //[CO190423 - too much work, rely on atom.ijk instead!]//int count_above=0,count_below=0,count_total=a_supercell.atoms.size();
+  //[CO190423 - too much work, rely on atom.ijk instead!]//int count_above=0,count_below=0,count_total=xstr_slab.atoms.size();
   //[CO190423 - too much work, rely on atom.ijk instead!]
   //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {
   //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_above=" << count_above << endl;
@@ -773,7 +506,7 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above!=count_below){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above!=count_below";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+  //[CO190423 - too much work, rely on atom.ijk instead!]  pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above+count_below!=count_total){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above+count_below!=count_total";
@@ -783,8 +516,8 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //[CO190423 - too much work, rely on atom.ijk instead!]//half-plane is bad idea, too much room for error
   //[CO190423 - too much work, rely on atom.ijk instead!]////define half plane along c-axis
   //[CO190423 - too much work, rely on atom.ijk instead!]////normal vector is simply c-axis
-  //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> n_hp=a_rotated_supercell.lattice(3);n_hp/=aurostd::modulus(n_hp); //unit vector
-  //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> p_hp=aurostd::modulus(a_rotated_supercell.lattice(3))/2.0*n_hp; //half plane value
+  //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> n_hp=xstr_rotated_supercell.lattice(3);n_hp/=aurostd::modulus(n_hp); //unit vector
+  //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> p_hp=aurostd::modulus(xstr_rotated_supercell.lattice(3))/2.0*n_hp; //half plane value
   //[CO190423 - too much work, rely on atom.ijk instead!]//double D_hp=-aurostd::scalar_product(n_hp,p_hp);
   //[CO190423 - too much work, rely on atom.ijk instead!]//if(LDEBUG) {
   //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " n_hp=" << n_hp << endl;
@@ -794,7 +527,7 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   
   //[CO190423 - too much work, rely on atom.ijk instead!]//define zero plane along c-axis
   //[CO190423 - too much work, rely on atom.ijk instead!]//normal vector is simply c-axis
-  //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> n_zp=a_supercell.lattice(3);n_zp/=aurostd::modulus(n_zp); //unit vector
+  //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> n_zp=xstr_slab.lattice(3);n_zp/=aurostd::modulus(n_zp); //unit vector
   //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> p_zp; //0,0,0
   //[CO190423 - too much work, rely on atom.ijk instead!]double D_zp=-aurostd::scalar_product(n_zp,p_zp);
   //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {
@@ -818,9 +551,9 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   
   //sometimes k_min==0, sometimes k_min==1 (look at GetSuperCell())
   //get k_min and k_max first
-  int k=0,k_min=a_supercell.atoms.size(),k_max=-a_supercell.atoms.size();
-  for(uint i=0;i<a_supercell.atoms.size();i++){
-    const _atom& atom=a_supercell.atoms[i];
+  int k=0,k_min=xstr_slab.atoms.size(),k_max=-xstr_slab.atoms.size();
+  for(uint i=0;i<xstr_slab.atoms.size();i++){
+    const _atom& atom=xstr_slab.atoms[i];
     if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
     k=atom.ijk[3];
     if(k<k_min){k_min=k;}
@@ -835,13 +568,14 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   uint count_total_fixed=0,count_bottom_fixed=0,count_top_fixed=0; //tests of stupidity
   bool fixed_bottom=false,fixed_top=false;
   
-  a_supercell.isd=true; //set selective dynamics
-  for(uint i=0;i<a_supercell.atoms.size();i++){
-    _atom& atom=a_supercell.atoms[i];
+  xstr_slab.isd=true; //set selective dynamics
+  for(uint i=0;i<xstr_slab.atoms.size();i++){
+    _atom& atom=xstr_slab.atoms[i];
     if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
     k=atom.ijk[3];
     fixed_bottom=(k<(k_min+fixed_layers));
     fixed_top=(k>(k_min+(total_layers-fixed_layers-1)));
+    //keeping top/bottom fixed provides shielding to the effect of vacuum
     if(fixed_bottom || fixed_top){  //keep fixed
       atom.sd="FFF";  //keep fixed
       count_total_fixed++;
@@ -849,7 +583,9 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
       else if(fixed_top){count_top_fixed++;}
       if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " is FIXED" << endl;}
     } else {
-      atom.sd="TTT";  //default, allow relaxation
+      //we only allow relaxation in z-direction because we want to allow planes of atoms to come together/go apart
+      //atom.sd="TTT";  //default, allow relaxation
+      atom.sd="FFT";  //default, allow relaxation //CORRECTION: only relax in z direction: Vitek Phil Mag 18, 773-786 (1968), also http://theory.cm.utexas.edu/forum/viewtopic.php?t=3301
       if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " will RELAX" << endl;}
     }
   }
@@ -866,14 +602,14 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   
   //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
   //[CO190423 - too much work, rely on atom.ijk instead!]//http://mathworld.wolfram.com/Plane.html
-  //[CO190423 - too much work, rely on atom.ijk instead!]a_supercell.isd=true; //set selective dynamics
+  //[CO190423 - too much work, rely on atom.ijk instead!]xstr_slab.isd=true; //set selective dynamics
   //[CO190423 - too much work, rely on atom.ijk instead!]double signed_point_plane_distance=0.0;
   //[CO190423 - too much work, rely on atom.ijk instead!]vector<atom_plane_dist> v_apd;
-  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<a_supercell.atoms.size();i++){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  a_supercell.atoms[i].sd="TTT";  //default, change to FFF later
-  //[CO190423 - too much work, rely on atom.ijk instead!]  signed_point_plane_distance=aurostd::scalar_product(n_zp,a_supercell.atoms[i].cpos)+D_zp; //n_zp is already normalized to 1.0
+  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<xstr_slab.atoms.size();i++){
+  //[CO190423 - too much work, rely on atom.ijk instead!]  xstr_slab.atoms[i].sd="TTT";  //default, change to FFF later
+  //[CO190423 - too much work, rely on atom.ijk instead!]  signed_point_plane_distance=aurostd::scalar_product(n_zp,xstr_slab.atoms[i].cpos)+D_zp; //n_zp is already normalized to 1.0
   //[CO190423 - too much work, rely on atom.ijk instead!]  if(LDEBUG) {
-  //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " atom.ijk=" << a_supercell.atoms[i].ijk << endl;
+  //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " atom.ijk=" << xstr_slab.atoms[i].ijk << endl;
   //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " signed_point_plane_distance[atom=" << i << "]=" << signed_point_plane_distance << endl;
   //[CO190423 - too much work, rely on atom.ijk instead!]  }
   //[CO190423 - too much work, rely on atom.ijk instead!]  //(std::signbit(signed_point_plane_distance + _ZERO_TOL_ ) ? count_below++ : count_above++);  //not great about atoms right on plane
@@ -885,23 +621,23 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //[CO190423 - too much work, rely on atom.ijk instead!]std::sort(v_apd.begin(),v_apd.end()); //sort by distance, we will take from bottom/top halves
   //[CO190423 - too much work, rely on atom.ijk instead!]
   //[CO190423 - too much work, rely on atom.ijk instead!]//get number to keep fixed, assume a layer is one unit cell
-  //[CO190423 - too much work, rely on atom.ijk instead!]//uint count_keep_fixed=a.atoms.size() * total_layers * total_layers * fixed_layers;
-  //[CO190423 - too much work, rely on atom.ijk instead!]uint count_keep_fixed=a.atoms.size() * xy_dims * xy_dims * fixed_layers;
+  //[CO190423 - too much work, rely on atom.ijk instead!]//uint count_keep_fixed=xstr_bulk.atoms.size() * total_layers * total_layers * fixed_layers;
+  //[CO190423 - too much work, rely on atom.ijk instead!]uint count_keep_fixed=xstr_bulk.atoms.size() * xy_dims * xy_dims * fixed_layers;
   //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " count_keep_fixed=" << count_keep_fixed << endl;}
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(2*count_keep_fixed>a_supercell.atoms.size()){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "2*count_keep_fixed>a_supercell.atoms.size()";
+  //[CO190423 - too much work, rely on atom.ijk instead!]if(2*count_keep_fixed>xstr_slab.atoms.size()){
+  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "2*count_keep_fixed>xstr_slab.atoms.size()";
   //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]
   //[CO190423 - too much work, rely on atom.ijk instead!]//fixed selective dynamics stuff at once
   //[CO190423 - too much work, rely on atom.ijk instead!]uint count_check=0;
-  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<count_keep_fixed;i++){a_supercell.atoms[v_apd[i].index].sd="FFF";count_check++;} //bottom
+  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<count_keep_fixed;i++){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //bottom
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [1]";
   //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]count_check=0;
-  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_keep_fixed;i--){a_supercell.atoms[v_apd[i].index].sd="FFF";count_check++;} //top
+  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_keep_fixed;i--){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //top
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [2]";
   //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
@@ -910,34 +646,6 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - identify selective dynamics
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - add vacuum
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " adding vacuum" << endl;}
-  if(LDEBUG) {cerr << soliloquy << " old_c_lattice=" << endl;cerr << a_supercell.lattice << endl;}
-  xvector<double> new_c_lattice=a_supercell.lattice(3);
-  new_c_lattice+= vacuum * new_c_lattice/aurostd::modulus(new_c_lattice);
-  a_supercell.lattice[3][1]=new_c_lattice(1);
-  a_supercell.lattice[3][2]=new_c_lattice(2);
-  a_supercell.lattice[3][3]=new_c_lattice(3);
-  if(LDEBUG) {cerr << soliloquy << " new_c_lattice=" << endl;cerr << a_supercell.lattice << endl;}
- 
-  //fix fpos
-  a_supercell.FixLattices();
-  const xmatrix<double>& c2f=a_supercell.c2f;
-  for(uint i=0;i<a_supercell.atoms.size();i++){a_supercell.atoms[i].fpos=c2f*a_supercell.atoms[i].cpos;}
-
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=a_supercell.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - add vacuum
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -952,7 +660,23 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   int dir_count=0,dir_count_total=0;
   bool create_final_duplicate_directory=(true || LDEBUG); //debug really, we don't need the 1.0 shear fraction directory
   double shear_fraction=0.0;
-  double shear_fraction_final=(1.0+(create_final_duplicate_directory?_ZERO_TOL_:-_ZERO_TOL_));
+  double shear_fraction_final=(1.0+(create_final_duplicate_directory?_ZERO_TOL_:-_ZERO_TOL_));  //it's just a LITTLE bigger than 1.0 for the while loop
+
+  //for partial dissociation
+  double z_shift_fpos=0.0;  //for partial dissociation
+  xvector<double> n_z=xstr_rotated.lattice(3);
+  if(partial_dissociation){
+    xvector<double> total_shift_cpos=(d_layers) * n_s;
+    xvector<double> total_shift_fpos=xstr_rotated.c2f*total_shift_cpos;
+    z_shift_fpos=total_shift_fpos[3];
+    if(LDEBUG){
+      cerr << soliloquy << " total_shift_cpos=" << total_shift_cpos << endl;
+      cerr << soliloquy << " total_shift_fpos=" << total_shift_fpos << endl;
+      cerr << soliloquy << " z_shift_fpos=" << z_shift_fpos << endl;
+    }
+  }
+  if(LDEBUG){cerr << soliloquy << " z_shift_fpos=" << z_shift_fpos << endl;}
+
   //stringstream POSCAR;
   stringstream new_AflowIn_ss;
   stringstream arun_dirname;
@@ -960,103 +684,556 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
   //_aflags aflags; aflags.Directory=".";
   //_kflags kflags; 
   //_vflags vflags;
-  //[CO190405 - does not work]double d_lattice_plane_spacing=getSpacingHKLPlane(a_supercell.lattice,h_s,k_s,l_s); //aurostd::modulus(a_supercell.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
+  //[CO190405 - does not work, could be multiple layers within this spacing]double d_layers=getSpacingHKLPlane(xstr_slab.lattice,h_s,k_s,l_s); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
   //get dir_count_total
-  shear_fraction=0.0;
+  dir_count=0;shear_fraction=0.0;
   while(shear_fraction<shear_fraction_final){shear_fraction+=step_size;dir_count_total++;}
-  shear_fraction=0.0;
+  dir_count=0;shear_fraction=0.0;
   
-  int half_k=total_layers/2;  //floor
-  //half_k=(total_layers+2-1)/2;  //ceil
-  uint count_total=0,count_bottom=0,count_top=0; //tests of stupidity
-
+  //check if vasp is already done
+  bool all_vasp_done=true;
+  string FileName;
   while(shear_fraction<shear_fraction_final){
     xvasp.clear();
-    if(LDEBUG) {cerr << soliloquy << " shear_fraction=" << shear_fraction << endl;}
-
-    //apply shear
-    if(LDEBUG) {cerr << soliloquy << " applying shear" << endl;}
-    xstructure xstr_shear(a_supercell);
-    xstr_shear.write_DEBUG_flag=FALSE;  //FORCE
-    const xmatrix<double>& c2f=a_supercell.c2f;
-
-    count_total=0;count_bottom=0;count_top=0;
-    for(uint i=0;i<xstr_shear.atoms.size();i++){
-      _atom& atom=xstr_shear.atoms[i];
-      if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << endl;}
-      k=atom.ijk[3];
-      if(k<(k_min+half_k)){ //not shearing
-        if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " NOT shearing" << endl;}
-        count_bottom++;
-      } else {  //shearing
-        if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " shearing" << endl;}
-        atom.cpos += (shear_fraction * d_lattice_plane_spacing) * n_s;
-        atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
-        count_top++;
-      }
-      count_total++;
-    }
-    if(LDEBUG) {
-      cerr << soliloquy << " count_bottom=" << count_bottom << endl;
-      cerr << soliloquy << " count_top=" << count_top << endl;
-      cerr << soliloquy << " count_bottom+count_top=" << count_bottom+count_top << endl;
-      cerr << soliloquy << " count_total=" << count_total << endl;
-      cerr << soliloquy << " xstr_shear.atoms.size()=" << xstr_shear.atoms.size() << endl;
-    }
-    if(count_total!=xstr_shear.atoms.size()){
-      message << "count_total!=xstr_shear.atoms.size()";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-    }
-    if(count_total!=count_bottom+count_top){
-      message << "count_total!=count_bottom+count_top";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-    }
-
-    //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
-    //[CO190423 - too much work, rely on atom.ijk instead!]  for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_above;i--){  //top (furthest away)
-    //[CO190423 - too much work, rely on atom.ijk instead!]    _atom& atom=xstr_shear.atoms[v_apd[i].index];
-    //[CO190423 - too much work, rely on atom.ijk instead!]    atom.cpos += (shear_fraction * d_lattice_plane_spacing) * n_s;
-    //[CO190423 - too much work, rely on atom.ijk instead!]    atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
-    //[CO190423 - too much work, rely on atom.ijk instead!]  }
-    //[CO190423 - too much work, rely on atom.ijk instead!]}
-    //for(uint i=0;i<v_apd.size();i++){
-    //  //if(!std::signbit(v_apd[i].distance)){ //not great about atoms right on plane
-    //  if(signed_point_plane_distance>=-_ZERO_TOL_){ //above plane, opposite of what is defined above for count_below/count_above
-    //    xstr_shear.atoms[v_apd[i].index].cpos += shear_fraction * d_lattice_plane_spacing;
-    //    xstr_shear.atoms[v_apd[i].index].fpos = C2F(xstr_shear.lattice,xstr_shear.atoms[v_apd[i].index].cpos);
-    //  }
-    //}
-    xstr_shear.BringInCell(); //wrap around
-    if(LDEBUG) {cerr << soliloquy << " xstr_shear=" << endl;cerr << xstr_shear << endl;}
-    
-    if(check_min_dist){ //sanity check as we rotate structure/atoms
-      min_dist=xstr_shear.MinDist();
-      if(LDEBUG) {cerr << soliloquy << " mindist[" << (count_check_min_dist++)+dir_count << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-    }
-
-    //if(0){
-    //  string destination=aurostd::utype2string(h_i)+aurostd::utype2string(k_i)+aurostd::utype2string(l_i) + "/" + aurostd::utype2string(dir_count);
-    //  if(LDEBUG) {cerr << soliloquy << " creating " << destination << endl;}
-    //  aurostd::DirectoryMake(destination);
-    //  destination+="/POSCAR";
-    //  stringstream POSCAR; POSCAR.str("");
-    //  POSCAR << xstr;
-    //  aurostd::stringstream2file(POSCAR,destination);
-    //}
-
-    xvasp.str.Clear();
-    xvasp.str=xstr_shear;
+    //create directory name
     xvasp.Directory=aflags.Directory;
     xvasp.AVASP_arun=true;
     xvasp.AVASP_arun_mode="GSFE"; //generalized stacking fault energy
     arun_dirname.str("");
     arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
-    //arun_dirname << "H" << aurostd::utype2string(h_i) << "K"+aurostd::utype2string(k_i) << "L"+aurostd::utype2string(l_i);
-
-    arun_dirname << "iHKL" << aurostd::utype2string(h_i) << aurostd::utype2string(k_i) << aurostd::utype2string(l_i) << "-";
-    arun_dirname << "sHKL" << aurostd::utype2string(h_s) << aurostd::utype2string(k_s) << aurostd::utype2string(l_s) << "-";
+    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+    arun_dirname << "sHKL" << aurostd::utype2string(hkl_s[1]) << aurostd::utype2string(hkl_s[2]) << aurostd::utype2string(hkl_s[3]) << "-";
     arun_dirname << "sf" << aurostd::utype2string(shear_fraction,8);
+    xvasp.AVASP_arun_runname=arun_dirname.str();
+    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
+    if(!aurostd::EFileExist(FileName)){all_vasp_done=false;break;}
+    shear_fraction+=step_size;
+    dir_count++;
+  }
+  dir_count=0;shear_fraction=0.0;
+
+  if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+
+  //create directories if vasp is not done
+  int half_k=total_layers/2;  //floor
+  //half_k=(total_layers+2-1)/2;  //ceil
+  uint count_total=0,count_bottom=0,count_top=0; //tests of stupidity
+  while(shear_fraction<shear_fraction_final){
+    if(all_vasp_done==false){
+      xvasp.clear();
+      if(LDEBUG) {cerr << soliloquy << " shear_fraction=" << shear_fraction << endl;}
+
+      //apply shear
+      if(LDEBUG) {cerr << soliloquy << " applying shear" << endl;}
+      xstructure xstr_shear(xstr_slab);
+      xstr_shear.write_DEBUG_flag=FALSE;  //FORCE
+      const xmatrix<double>& c2f=xstr_slab.c2f;
+
+      count_total=0;count_bottom=0;count_top=0;
+      for(uint i=0;i<xstr_shear.atoms.size();i++){
+        _atom& atom=xstr_shear.atoms[i];
+        if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << endl;}
+        k=atom.ijk[3];
+        if(k<(k_min+half_k)){ //not shearing
+          if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " NOT shearing" << endl;}
+          count_bottom++;
+        } else {  //shearing
+          if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " shearing" << endl;}
+          atom.cpos += (shear_fraction * d_layers) * n_s;
+          if(partial_dissociation){atom.cpos -= (shear_fraction * z_shift_fpos) * n_z;}
+          atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
+          count_top++;
+        }
+        count_total++;
+      }
+      if(LDEBUG) {
+        cerr << soliloquy << " count_bottom=" << count_bottom << endl;
+        cerr << soliloquy << " count_top=" << count_top << endl;
+        cerr << soliloquy << " count_bottom+count_top=" << count_bottom+count_top << endl;
+        cerr << soliloquy << " count_total=" << count_total << endl;
+        cerr << soliloquy << " xstr_shear.atoms.size()=" << xstr_shear.atoms.size() << endl;
+      }
+      if(count_total!=xstr_shear.atoms.size()){
+        message << "count_total!=xstr_shear.atoms.size()";
+        throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+      }
+      if(count_total!=count_bottom+count_top){
+        message << "count_total!=count_bottom+count_top";
+        throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+      }
+
+      //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
+      //[CO190423 - too much work, rely on atom.ijk instead!]  for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_above;i--){  //top (furthest away)
+      //[CO190423 - too much work, rely on atom.ijk instead!]    _atom& atom=xstr_shear.atoms[v_apd[i].index];
+      //[CO190423 - too much work, rely on atom.ijk instead!]    atom.cpos += (shear_fraction * d_layers) * n_s;
+      //[CO190423 - too much work, rely on atom.ijk instead!]    atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
+      //[CO190423 - too much work, rely on atom.ijk instead!]  }
+      //[CO190423 - too much work, rely on atom.ijk instead!]}
+      //for(uint i=0;i<v_apd.size();i++){
+      //  //if(!std::signbit(v_apd[i].distance)){ //not great about atoms right on plane
+      //  if(signed_point_plane_distance>=-_ZERO_TOL_){ //above plane, opposite of what is defined above for count_below/count_above
+      //    xstr_shear.atoms[v_apd[i].index].cpos += shear_fraction * d_layers;
+      //    xstr_shear.atoms[v_apd[i].index].fpos = C2F(xstr_shear.lattice,xstr_shear.atoms[v_apd[i].index].cpos);
+      //  }
+      //}
+      xstr_shear.BringInCell(); //wrap around
+      if(LDEBUG) {cerr << soliloquy << " xstr_shear=" << endl;cerr << xstr_shear << endl;}
+      
+      if(check_min_dist){ //sanity check as we rotate structure/atoms
+        min_dist=xstr_shear.MinDist();
+        if(LDEBUG) {cerr << soliloquy << " mindist[" << (count_check_min_dist++)+dir_count << "]=" << min_dist << endl;}
+        if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+      }
+
+      //if(0){
+      //  string destination=aurostd::utype2string(h_i)+aurostd::utype2string(k_i)+aurostd::utype2string(l_i) + "/" + aurostd::utype2string(dir_count);
+      //  if(LDEBUG) {cerr << soliloquy << " creating " << destination << endl;}
+      //  aurostd::DirectoryMake(destination);
+      //  destination+="/POSCAR";
+      //  stringstream POSCAR; POSCAR.str("");
+      //  POSCAR << xstr;
+      //  aurostd::stringstream2file(POSCAR,destination);
+      //}
+
+      //load in xstructure
+      xvasp.str.Clear();
+      xvasp.str=xstr_shear;
+
+      //create directory name
+      xvasp.Directory=aflags.Directory;
+      xvasp.AVASP_arun=true;
+      xvasp.AVASP_arun_mode="GSFE"; //generalized stacking fault energy
+      arun_dirname.str("");
+      arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+      arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+      arun_dirname << "sHKL" << aurostd::utype2string(hkl_s[1]) << aurostd::utype2string(hkl_s[2]) << aurostd::utype2string(hkl_s[3]) << "-";
+      arun_dirname << "sf" << aurostd::utype2string(shear_fraction,8);
+      xvasp.AVASP_arun_runname=arun_dirname.str();
+      AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+      
+      setPreserveUnitCell(xvasp);
+      //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
+      if(1){
+        xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT",FALSE);
+        //xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT",TRUE);
+        xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP",TRUE);
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); //clear
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "KPOINTS" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "Gamma" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "11 11 1" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << endl;
+      }
+
+      //relax ions ONLY
+      xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS");
+      if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
+
+      //make aflow.in
+      AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
+    }
+    shear_fraction+=step_size;
+    dir_count++;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - create shear sub-directories
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  if(!all_vasp_done){
+	  message << "Now waiting for sheared VASP runs";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+    return;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - postprocessing
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - postprocessing
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+//CO190321
+//follows procedure outlined in: W. Sun and G. Ceder, Surface Science 617 (2013) 53-59
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return CleavageEnergyCalculation(vpflow,xstr_in,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ostream& oss){
+  _aflags aflags; aflags.Directory=".";
+  _kflags kflags;
+  _vflags vflags;
+  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+  ofstream FileMESSAGE;
+  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return CleavageEnergyCalculation(vpflow,xstr_in,FileMESSAGE,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss){
+  _aflags aflags; aflags.Directory=".";
+  _kflags kflags;
+  _vflags vflags;
+  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+  xstructure xstr_in(input,IOAFLOW_AUTO);
+  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+}
+void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="pflow::CleavageEnergyCalculation():";
+  stringstream message;
+  std::streamsize prec = 8;
+  bool check_min_dist=true; //turn off if it gets too slow
+  int count_check_min_dist=0;
+  
+  message << aflow::Banner("BANNER_NORMAL");
+  pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+  if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+ 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - get conventional cell
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  if(LDEBUG) {cerr << soliloquy << " get conventional cell" << endl;}
+  
+  xstructure xstr_bulk(xstr_in);
+  double min_dist=xstr_bulk.dist_nn_min;
+  if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr_bulk);}
+  double min_dist_orig=min_dist;
+  if(check_min_dist){ //sanity check as we rotate structure/atoms
+    min_dist=xstr_bulk.MinDist();
+    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+  }
+  
+  bool convert_sconv=true;
+  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.Clean();}  //best to work with standard conventional unitcell
+  if(check_min_dist){ //sanity check as we rotate structure/atoms
+    min_dist=xstr_bulk.MinDist();
+    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){
+      //throw a warning here instead, minimum distance MIGHT change with sconv
+      //throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);
+      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+      min_dist_orig=min_dist;
+    }
+  }
+  xstr_bulk.ReScale(1.0);
+  xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
+  xstr_bulk.BringInCell();
+  xstr_bulk.Clean();  //clear origin!
+  if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
+  //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
+  
+  message << "structure(standard conventional)=";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << xstr_bulk << endl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+  
+  if(check_min_dist){ //sanity check as we rotate structure/atoms
+    min_dist=xstr_bulk.MinDist();
+    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - get conventional cell
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - get sym info for structure (mostly for FPOSMatch)
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  xstructure xstr_sym(xstr_bulk);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
+  pflow::PerformFullSymmetry(xstr_sym);
+  xstr_bulk.dist_nn_min=xstr_sym.dist_nn_min;
+  xstr_bulk.sym_eps=xstr_sym.sym_eps;
+  bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,xstr_bulk.dist_nn_min,xstr_bulk.sym_eps);
+  if(LDEBUG){
+    cerr << soliloquy << " xstr_bulk.dist_nn_min=" << xstr_bulk.dist_nn_min << endl;
+    cerr << soliloquy << " xstr_bulk.sym_eps=" << xstr_bulk.sym_eps << endl;
+    cerr << soliloquy << " skew=" << skew << endl;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - get sym info for structure (mostly for FPOSMatch)
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - read flags
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
+  
+  int h_i=1,k_i=1,l_i=1;  //hkl of interest //needed for dirname
+  xvector<int> hkl_i;     //needed for dirname
+  int relaxation_layers=DEFAULT_SURFACE_LAYERS;      //number of relaxation layers
+  bool spin_off=false;
+
+  vector<string> tokens;
+  aurostd::string2tokens(vpflow.getattachedscheme("CREATE_SLAB::PLANE_INTEREST"),tokens,",");
+  if(tokens.size()==3){
+    h_i=aurostd::string2utype<int>(tokens[0]);
+    k_i=aurostd::string2utype<int>(tokens[1]);
+    l_i=aurostd::string2utype<int>(tokens[2]);
+  }
+  hkl_i[1]=h_i;hkl_i[2]=k_i;hkl_i[3]=l_i;
+  if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(soliloquy,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
+  string relaxation_layers_string=vpflow.getattachedscheme("CLEAVAGE_ENERGY::RELAXATION_LAYERS"); //step size
+  if(aurostd::isfloat(relaxation_layers_string)){
+    int _relaxation_layers=aurostd::string2utype<int>(relaxation_layers_string);
+    if(_relaxation_layers>0){relaxation_layers=_relaxation_layers;}
+  }
+  spin_off=vpflow.flag("CLEAVAGE_ENERGY::SPIN_OFF");
+
+  std::streamsize prec_original = message.precision(); //original
+  std::ios_base::fmtflags ff_original = message.flags();  //original
+  message.precision(prec);
+  message.unsetf(std::ios_base::floatfield);
+  
+  message << "relaxation_layers=" << relaxation_layers;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  
+  message.precision(prec_original); //set back
+  message.flags(ff_original); //set back
+  //exit(0);
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - read flags
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - run bulk (with our parameters)
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  int dir_count=0,dir_count_total=2;  //two total dirs, bulk and slab
+  bool all_vasp_done=true;
+  string FileName;
+  
+  stringstream new_AflowIn_ss;
+  stringstream arun_dirname;
+  _xvasp xvasp;
+
+  xvasp.clear();
+  //create directory name
+  xvasp.Directory=aflags.Directory;
+  xvasp.AVASP_arun=true;
+  xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+  arun_dirname.str("");
+  arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+  arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+  arun_dirname << "bulk";
+  xvasp.AVASP_arun_runname=arun_dirname.str();
+  AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+  all_vasp_done=true;
+  FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+  if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
+  if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
+
+  bool convert_sprim=true;
+  if(!all_vasp_done){
+    message << "Creating bulk VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    
+    xvasp.clear();
+
+    //load in xstructure
+    xvasp.str.Clear();
+    xvasp.str=xstr_bulk;
+    if(convert_sprim){
+      xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
+      xvasp.str.ReScale(1.0);
+      xvasp.str.ShifOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
+      xvasp.str.BringInCell();
+      xvasp.str.Clean();  //clear origin!
+    }
+    xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
+
+    //create directory name
+    xvasp.Directory=aflags.Directory;
+    xvasp.AVASP_arun=true;
+    xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+    arun_dirname.str("");
+    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+    arun_dirname << "bulk";
+    xvasp.AVASP_arun_runname=arun_dirname.str();
+    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+    setPreserveUnitCell(xvasp);
+    //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
+    if(1){
+      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT",FALSE);
+      //xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT",TRUE);
+      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP",TRUE);
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); //clear
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "KPOINTS" << endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "Gamma" << endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "11 11 11" << endl;
+      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << endl;
+    }
+
+    //relax ions ONLY
+    xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","ALL");
+    if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
+
+    //make aflow.in
+    AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
+  }
+  dir_count++;
+
+  if(!all_vasp_done){
+	  message << "Now waiting for the bulk VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+    return;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - run bulk (with our parameters)
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - grab relaxed bulk
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  xstructure xstr_relaxed=KBIN::GetMostRelaxedStructure(xvasp.Directory);
+  message << "structure(bulk_relaxed)=";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << xstr_relaxed << endl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - grab relaxed bulk
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - create slab
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  message << "Creating slab";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  //xvector<int> hkl_i;
+  int total_layers;
+	xmatrix<double> rotation;
+  xstructure xstr_slablattice;
+  vector<int> sc2pcMap_slab,pc2scMap_slab;
+
+  xstructure xstr_slab=slab::CreateSlab_SurfaceLattice(vpflow,xstr_relaxed,hkl_i,total_layers,xstr_slablattice,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  
+	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - create slab
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - identify selective dynamics
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  if(LDEBUG) {cerr << soliloquy << " identifying selective dynamics" << endl;}
+
+  //k in atom.ijk will go from 0 to total_layers-1
+  
+  //sometimes k_min==0, sometimes k_min==1 (look at GetSuperCell())
+  //get k_min and k_max first
+  int k=0,k_min=xstr_slab.atoms.size(),k_max=-xstr_slab.atoms.size();
+  for(uint i=0;i<xstr_slab.atoms.size();i++){
+    const _atom& atom=xstr_slab.atoms[i];
+    if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
+    k=atom.ijk[3];
+    if(k<k_min){k_min=k;}
+    if(k>k_max){k_max=k;}
+  }
+  if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
+  if(k_max-k_min+1!=total_layers){  //test of stupidity
+    message << "k_max-k_min!=total_layers";
+    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+  }
+
+  uint count_total_relaxing=0,count_bottom_relaxing=0,count_top_relaxing=0; //tests of stupidity
+  bool relax_bottom=false,relax_top=false;
+  
+  xstr_slab.isd=true; //set selective dynamics
+  for(uint i=0;i<xstr_slab.atoms.size();i++){
+    _atom& atom=xstr_slab.atoms[i];
+    if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
+    k=atom.ijk[3];
+    relax_bottom=(k<(k_min+relaxation_layers));
+    relax_top=(k>(k_min+(total_layers-relaxation_layers-1)));
+    if(relax_bottom || relax_top){  //relax
+      //atom.sd="TTT";  //default, allow relaxation
+      atom.sd="FFT";  //default, allow relaxation //CORRECTION: only relax in z direction: Vitek Phil Mag 18, 773-786 (1968), also http://theory.cm.utexas.edu/forum/viewtopic.php?t=3301
+      count_total_relaxing++;
+      if(relax_bottom){count_bottom_relaxing++;}
+      else if(relax_top){count_top_relaxing++;}
+      if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " will RELAX" << endl;}
+    } else {
+      atom.sd="FFF";  //keep fixed
+      if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " is FIXED" << endl;}
+    }
+  }
+  if(LDEBUG) {
+    cerr << soliloquy << " count_bottom_relaxing=" << count_bottom_relaxing << endl;
+    cerr << soliloquy << " count_top_relaxing=" << count_top_relaxing << endl;
+    cerr << soliloquy << " count_bottom_relaxing+count_top_relaxing=" << count_bottom_relaxing+count_top_relaxing << endl;
+    cerr << soliloquy << " count_total_relaxing=" << count_total_relaxing << endl;
+  }
+  if(count_total_relaxing!=count_bottom_relaxing+count_top_relaxing){
+    message << "count_total_relaxing!=count_bottom_relaxing+count_top_relaxing (" << count_total_relaxing << "!=" << count_bottom_relaxing+count_top_relaxing << ")";
+    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+  }
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - identify selective dynamics
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // START - run slab
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  xvasp.clear();
+  //create directory name
+  xvasp.Directory=aflags.Directory;
+  xvasp.AVASP_arun=true;
+  xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+  arun_dirname.str("");
+  arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+  arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+  arun_dirname << "slab";
+  xvasp.AVASP_arun_runname=arun_dirname.str();
+  AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+  all_vasp_done=true;
+  FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+  if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
+  if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
+
+  if(!all_vasp_done){
+    message << "Creating slab VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    
+    xvasp.clear();
+    //load in xstructure
+    xvasp.str.Clear();
+    xvasp.str=xstr_slab;
+    xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
+
+    //create directory name
+    xvasp.Directory=aflags.Directory;
+    xvasp.AVASP_arun=true;
+    xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+    arun_dirname.str("");
+    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+    arun_dirname << "slab";
     xvasp.AVASP_arun_runname=arun_dirname.str();
     AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
@@ -1081,18 +1258,25 @@ void GeneralizedStackingFaultEnergyDirSetup(const aurostd::xoption& vpflow,const
     //make aflow.in
     AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
 
-    shear_fraction+=step_size;
-    dir_count++;
+  }
+  dir_count++;
+  
+  if(!all_vasp_done){
+	  message << "Now waiting for the slab VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+    return;
   }
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - run slab
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create shear sub-directories
+  // START - postprocessing
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //http://aflow.org/material.php?id=aflow:2b14cf71a7951ed1
-  //http://aflow.org/material.php?id=aflow:0904a407dfa958a3
-
+  
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // STOP - postprocessing
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 } // namespace pflow
 
@@ -1222,6 +1406,427 @@ void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSym
 }
 
 // ***************************************************************************
+// GetXRAY HELPER FUNCTIONS
+// ***************************************************************************
+// Corey Oses 190620
+namespace pflow {
+void GetXray2ThetaIntensity(const xstructure& str,
+    vector<double>& v_twotheta,
+    vector<double>& v_intensity,
+    double lambda) { //CO190520 //CO190620 - v_amplitude can be calculated later
+  int num_atoms=str.atoms.size();
+  //  vector<string> names=str.GetNames();
+  vector<double> dist,sf;
+  vector<double> scatt_fact(num_atoms,0.0);
+  vector<double> mass(num_atoms,0.0);
+  vector<double> twoB_vec(num_atoms,0.0);
+  //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
+  vector<vector<double> > ids;
+  pflow::matrix<double> data;
+  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
+
+  v_twotheta.clear();
+
+  double tol=XRAY_THETA_TOL;
+
+  for(uint i=0;i<data.size();i++) {
+    double theta=0;
+    if(data[i][3]>0) {
+      double term=lambda/(2.0*data[i][3]);
+      if(term<=1) {
+        theta=asin(term);
+        theta=theta*360.0/TWOPI; // rad->degrees
+        if(theta>tol){
+          v_twotheta.push_back(2.0*theta);
+          v_intensity.push_back(data[i][4]);
+        } // if theta<tol
+      } // if term<=1
+    } // if dist>0
+  } // for
+}
+
+vector<uint> GetXrayPeaks(const xstructure& str,
+    vector<double>& v_twotheta,
+    vector<double>& v_intensity,
+    vector<double>& v_intensity_smooth,
+    double lambda) { //CO190520 //CO190620 - v_peaks_amplitude not needed
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="GetXrayPeaks():";
+  if(LDEBUG){cerr << soliloquy << " input str=" << endl;cerr << str << endl;}
+  GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
+  return GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
+}
+vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO190520 //CO190620 - v_peaks_amplitude not needed
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="GetXrayPeaks():";
+
+  if(v_twotheta.size()<2){throw aurostd::xerror(soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
+  if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+
+  xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
+  uint smoothing_iterations=4,avg_window=4;int width_maximum=1;double significance_multiplier=1.0;  //defaults
+
+  //fix avg_window to derive from degree separation, not points
+  double twotheta_smoothing=5.0;  //avg over 5 degrees
+  double twotheta_diff=(v_twotheta[1]-v_twotheta[0]);
+  double davg_window=twotheta_smoothing/twotheta_diff;
+  avg_window=max(avg_window,(uint)davg_window);
+  if(LDEBUG){
+    cerr << soliloquy << " twotheta_smoothing=" << twotheta_smoothing << endl;
+    cerr << soliloquy << " twotheta_diff=" << twotheta_diff << endl;
+    cerr << soliloquy << " davg_window=" << davg_window << endl;
+    cerr << soliloquy << " avg_window=" << avg_window << endl;
+  }
+
+  //COREY COME BACK, plug in 20-120 range
+  vector<int> _peak_indices=aurostd::getPeaks(xv_intensity,xv_intensity_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);  //indices wrt xvector (starts at 1), need to convert
+  v_intensity_smooth=aurostd::xvector2vector<double>(xv_intensity_smooth);
+  vector<uint> peak_indices;for(uint i=0;i<_peak_indices.size();i++){peak_indices.push_back(_peak_indices[i]-xv_intensity.lrows);} //shift indices for xvector -> vector conversion
+
+  if(LDEBUG){
+    cerr << soliloquy << " _peak_indices=" << aurostd::joinWDelimiter(_peak_indices,",") << endl;
+    cerr << soliloquy << "  peak_indices=" << aurostd::joinWDelimiter(peak_indices,",") << endl;
+  }
+
+  return peak_indices;
+
+  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_twotheta.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_intensity.clear();
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]//using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
+  //[CO190620 - moved to aurostd::getPeaks()]//raw data is X
+  //[CO190620 - moved to aurostd::getPeaks()]//smooth data via moving average to get Y
+  //[CO190620 - moved to aurostd::getPeaks()]//stddev(X-Y) is sigma
+  //[CO190620 - moved to aurostd::getPeaks()]//detect peaks when (X-Y)>multiplier*sigma
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]//smooth data
+  //[CO190620 - moved to aurostd::getPeaks()]uint smoothing_iterations=4;int avg_window=4;
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity);
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity_smooth=xv_intensity;
+  //[CO190620 - moved to aurostd::getPeaks()]for(uint i=0;i<smoothing_iterations;i++){xv_intensity_smooth=aurostd::moving_average(xv_intensity_smooth,avg_window);}
+  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> diff=xv_intensity-xv_intensity_smooth;
+  //[CO190620 - moved to aurostd::getPeaks()]double sigma=aurostd::stddev(diff);
+  //[CO190620 - moved to aurostd::getPeaks()]double multiplier=1;
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]bool local_maximum=false;
+  //[CO190620 - moved to aurostd::getPeaks()]bool significant=false;
+  //[CO190620 - moved to aurostd::getPeaks()]for(int i=xv_intensity.lrows;i<=xv_intensity.urows;i++){
+  //[CO190620 - moved to aurostd::getPeaks()]  local_maximum=(i>xv_intensity.lrows && i<xv_intensity.urows && xv_intensity[i]>xv_intensity[i-1] && xv_intensity[i]>xv_intensity[i+1]);
+  //[CO190620 - moved to aurostd::getPeaks()]  significant=(diff[i]>multiplier*sigma);
+  //[CO190620 - moved to aurostd::getPeaks()]  if(local_maximum && significant){
+  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_twotheta.push_back(v_twotheta[i-xv_intensity.lrows]);
+  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_intensity.push_back(v_intensity[i-xv_intensity.lrows]);
+  //[CO190620 - moved to aurostd::getPeaks()]    if(LDEBUG) {cerr << soliloquy << " PEAK[two-theta=" << v_twotheta[i-xv_intensity.lrows] << "]=" << xv_intensity[i] << endl;}
+  //[CO190620 - moved to aurostd::getPeaks()]  }
+  //[CO190620 - moved to aurostd::getPeaks()]}
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth=aurostd::xvector2vector(xv_intensity_smooth);
+  //[CO190620 - moved to aurostd::getPeaks()]
+  //[CO190620 - moved to aurostd::getPeaks()]if(0){  //don't bother sorting
+  //[CO190620 - moved to aurostd::getPeaks()]  for(uint i=0;i<v_peaks_twotheta.size();i++){
+  //[CO190620 - moved to aurostd::getPeaks()]    for(uint j=i+1;j<v_peaks_twotheta.size();j++){
+  //[CO190620 - moved to aurostd::getPeaks()]      if(v_peaks_intensity[j]>v_peaks_intensity[i]){  //CO190620 - use intensity vs. amplitude
+  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_twotheta=v_peaks_twotheta[i];
+  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_intensity=v_peaks_intensity[i];
+  //[CO190620 - moved to aurostd::getPeaks()]        
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[i]=v_peaks_twotheta[j];
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[i]=v_peaks_intensity[j];
+  //[CO190620 - moved to aurostd::getPeaks()]        
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[j]=tmp_twotheta;
+  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[j]=tmp_intensity;
+  //[CO190620 - moved to aurostd::getPeaks()]      }
+  //[CO190620 - moved to aurostd::getPeaks()]    }
+  //[CO190620 - moved to aurostd::getPeaks()]  }
+  //[CO190620 - moved to aurostd::getPeaks()]}
+}
+} // namespace pflow
+
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// PrintXRAY ids_cmp
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<double>]// This function sorts by theta (reverse sort by distance)
+//[CO190629 - replaced with aurostd::compareVecElements<double>]class ids_cmp{
+//[CO190629 - replaced with aurostd::compareVecElements<double>]public:
+//[CO190629 - replaced with aurostd::compareVecElements<double>]  int operator()(const vector<double>& a, const vector<double>& b)
+//[CO190629 - replaced with aurostd::compareVecElements<double>]  {return a[0]>b[0];} // Sorts in increasing order.
+//[CO190629 - replaced with aurostd::compareVecElements<double>]};
+
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// PrintXRAY hkl_cmp
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// ***************************************************************************
+//[CO190629 - replaced with aurostd::compareVecElements<int>]// This function sorts hkl
+//[CO190629 - replaced with aurostd::compareVecElements<int>]class hkl_cmp{
+//[CO190629 - replaced with aurostd::compareVecElements<int>]public:
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  int operator()(const vector<int>& a, const vector<int>& b)
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    if(a[0]!=b[0]){return a[0]>b[0];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    if(a[1]!=b[1]){return a[1]>b[1];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //if(a[2]!=b[2]){return a[2]>b[2];}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    return a[2]>b[2];   //return something...
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]int na=a[0]*100+a[1]*10+a[2];
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]int nb=b[0]*100+b[1]*10+b[2];
+//[CO190629 - replaced with aurostd::compareVecElements<int>]    //[CO190620 - what if h, k,or l is bigger than 10?]return na>nb;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]};
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      int t=1,f=1;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      if(a[0]<b[0]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	if(a[1]<b[1]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  if(a[2]<b[2]) {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	    return false;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  else {
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	    return true;
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	  }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//	}
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//      }
+//[CO190629 - replaced with aurostd::compareVecElements<int>]//    }
+
+namespace pflow {
+void GetXrayData(const xstructure& str,
+         vector<double>& dist,
+         vector<double>& sf,
+         vector<double>& scatt_fact,
+	       vector<double>& mass,vector<double>& twoB_vec,
+         vector<vector<double> >& ids,
+         pflow::matrix<double>& data,
+	       double lambda) { //CO190520  //CO190620 - intmax can be grabbed later
+  //int num_atoms=str.atoms.size();
+  //  vector<string> names=str.GetNames();
+  //vector<double> dist,sf;
+  //vector<double> scatt_fact(num_atoms,0.0);
+  //vector<double> mass(num_atoms,0.0);
+  //vector<double> twoB_vec(num_atoms,0.0);
+  pflow::GetXray(str,dist,sf,scatt_fact,mass,twoB_vec,lambda);
+
+  double tol=1.0E-5;
+  //int w1=4; // int
+  //int w2=12; // some doubles
+  //int w3=20; // Integrated intensities
+  int tlen=sf.size();
+  int len=Nint(std::pow((double) tlen,(double) 1.0/3.0));
+  int kmx=(len-1)/2; // len should be odd.
+
+  // Sort by theta (reverse sort by distance).
+  // Define an id pointer to sort.
+  vector<double> v(5);
+  // pflow::matrix<double> ids(tlen,v);
+  //vector<vector<double> > ids(tlen,v);  //CO190409
+  ids.resize(tlen,v);
+  for(int i0=-kmx;i0<=kmx;i0++) {
+    for(int i1=-kmx;i1<=kmx;i1++) {
+      for(int i2=-kmx;i2<=kmx;i2++) {
+        int ii0=i0+kmx;
+        int ii1=i1+kmx;
+        int ii2=i2+kmx;
+        int id=ii2+ii1*len+ii0*len*len;
+        ids[id][0]=dist[id];
+        ids[id][1]=id;
+        ids[id][2]=i0;
+        ids[id][3]=i1;
+        ids[id][4]=i2;
+      } // i2
+    } // i1
+  } // i0
+
+  //[CO190629 - waste of a class]sort(ids.begin(),ids.end(),ids_cmp());
+  //[CO190629 - does NOT work, sort ONLY by 0th index]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElements<double>);  //CO190629 - note that it is in descending order by distance (greater go first)
+  //[CO190629 - rbegin()/rend() != descending sort, this WILL change results]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElement<double>(0));  //CO190629 - note that it is in descending order by distance (greater go first)
+  sort(ids.begin(),ids.end(),aurostd::compareVecElement<double>(0,false));  //CO190629 - note that it is in descending order by distance (greater go first)
+
+  // Add corrections to all the amplitudes.
+  // Get max amplitude for normalizing and percentages.
+  double ampmax=1E-8;
+  for(int i0=-kmx;i0<=kmx;i0++) {
+    for(int i1=-kmx;i1<=kmx;i1++) {
+      for(int i2=-kmx;i2<=kmx;i2++) {
+        int ii0=i0+kmx;
+        int ii1=i1+kmx;
+        int ii2=i2+kmx;
+        int id1=ii2+ii1*len+ii0*len*len;
+        int id=(int) ids[id1][1];
+        ii0=(int) ids[id1][2];
+        ii1=(int) ids[id1][3];
+        ii2=(int) ids[id1][4];
+        double theta=0;
+        if(dist[id]>0) {
+          double term=lambda/(2.0*dist[id]);
+          if(term<=1) {
+            theta=asin(term);
+            if(theta>tol) {
+              sf[id]=sf[id]*CorrectionFactor(theta);
+              if(sf[id]>ampmax) {ampmax=sf[id];}
+            } // if theta>tol
+          } // if term<=1
+        } // if dist>0
+      } // i2
+    } // i1
+  } // i0
+
+  //[CO190520 - printing moved to PrintXray()]// Print out all data.
+  //[CO190520 - printing moved to PrintXray()]oss << "Wavelength (Ang) = " << lambda << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO190329
+  //[CO190520 - printing moved to PrintXray()]for(uint iat=0;iat<(uint) num_atoms;iat++) {
+  //[CO190520 - printing moved to PrintXray()]  oss <<setw(4)<<iat+1<<" "<<setw(4)<<str.atoms.at(iat).cleanname << " ";
+  //[CO190520 - printing moved to PrintXray()]  if(str.atoms.at(iat).cleanname.length()>1) oss << " ";
+  //[CO190520 - printing moved to PrintXray()]  oss <<setw(w2)<<scatt_fact[iat]<<setw(w2)<<KILOGRAM2AMU*mass[iat]<<setw(w2)<<1E+20*twoB_vec[iat]/2.0<<endl;
+  //[CO190520 - printing moved to PrintXray()]}
+  //[CO190520 - printing moved to PrintXray()]oss << "******************** All data ********************" << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Intensity            h    k    l    dist         keyword " << endl;
+  //[CO190520 - printing moved to PrintXray()]for(int i0=-kmx;i0<=kmx;i0++) {
+  //[CO190520 - printing moved to PrintXray()]  for(int i1=-kmx;i1<=kmx;i1++) {
+  //[CO190520 - printing moved to PrintXray()]    for(int i2=-kmx;i2<=kmx;i2++) {
+  //[CO190520 - printing moved to PrintXray()]      int ii0=i0+kmx;
+  //[CO190520 - printing moved to PrintXray()]      int ii1=i1+kmx;
+  //[CO190520 - printing moved to PrintXray()]      int ii2=i2+kmx;
+  //[CO190520 - printing moved to PrintXray()]      int id1=ii2+ii1*len+ii0*len*len;
+  //[CO190520 - printing moved to PrintXray()]      int id=(int) ids[id1][1];
+  //[CO190520 - printing moved to PrintXray()]      ii0=(int) ids[id1][2];
+  //[CO190520 - printing moved to PrintXray()]      ii1=(int) ids[id1][3];
+  //[CO190520 - printing moved to PrintXray()]      ii2=(int) ids[id1][4];
+  //[CO190520 - printing moved to PrintXray()]      double theta=0;
+  //[CO190520 - printing moved to PrintXray()]      if(dist[id]>0) {
+  //[CO190520 - printing moved to PrintXray()]        double term=lambda/(2.0*dist[id]);
+  //[CO190520 - printing moved to PrintXray()]        if(term<=1) {
+  //[CO190520 - printing moved to PrintXray()]          theta=asin(term);
+  //[CO190520 - printing moved to PrintXray()]          theta=theta*360.0/TWOPI; // rad->degrees
+  //[CO190520 - printing moved to PrintXray()]          if(theta>tol) oss
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w3)<<sf[id]<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii0<<" " // h
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii1<<" " // k
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii2<<" " // l
+  //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<dist[id]<<" " // dist
+  //[CO190520 - printing moved to PrintXray()]                          << "SINGLE"
+  //[CO190520 - printing moved to PrintXray()]                          << endl;
+  //[CO190520 - printing moved to PrintXray()]        } // if term<=1
+  //[CO190520 - printing moved to PrintXray()]      } // if dist>0
+  //[CO190520 - printing moved to PrintXray()]    } // i2
+  //[CO190520 - printing moved to PrintXray()]  } // i1
+  //[CO190520 - printing moved to PrintXray()]} // i0
+
+  // Now group everything at the same distance together and only store one entry for each distance.
+  // Choose hkl such that h is the largest, k the second, and l the third.
+  // Multiply the sf by the number of degenerate points at that distance.
+  // Get max integrated intensity for normalizations and percentages.
+  //[CO190620 - not needed here]double intmax=1E-8;
+  double odist=dist[(int)ids[0][1]]; // Initialize odsit to first distance.
+  double osf=sf[(int)ids[0][1]]; // Initialize osf to first distance.
+  vector<vector<int> > hkl_list;
+  vector<int> hkl(3);
+  //pflow::matrix<double> data;
+  for(int i0=-kmx;i0<=kmx;i0++) {
+    for(int i1=-kmx;i1<=kmx;i1++) {
+      for(int i2=-kmx;i2<=kmx;i2++) {
+        int ii0=i0+kmx;
+        int ii1=i1+kmx;
+        int ii2=i2+kmx;
+        int id1=ii2+ii1*len+ii0*len*len;
+        int id=(int) ids[id1][1];
+        ii0=(int) ids[id1][2];
+        ii1=(int) ids[id1][3];
+        ii2=(int) ids[id1][4];
+        double pdist=dist[id]; // Get present distance.
+        // Create vector of all the hkl values with the same distance
+        if(fabs(pdist-odist)<tol) { // Add present h,k,l to hkl_list.
+          hkl[0]=ii0;		    
+          hkl[1]=ii1;		    
+          hkl[2]=ii2;		    
+          hkl_list.push_back(hkl);
+        }
+        else { // Store one hkl, dist, total sf, multiplicity of point in data vector and then reset hkl_list vector to new hkl.
+          vector<double> datav(6);
+          // Sort hkl
+          //[CO190629 - waste of a class]sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
+          sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order by hkl (greater go first)
+          datav[0]=(double) hkl_list[0][0];  
+          datav[1]=(double) hkl_list[0][1];  
+          datav[2]=(double) hkl_list[0][2];  
+          datav[3]=odist;
+          datav[4]=osf*hkl_list.size();
+          datav[5]=hkl_list.size();
+          data.push_back(datav);
+          //[CO190620 - not needed here]if(datav[4]>intmax) {intmax=datav[4];}
+          vector<int> v(0);
+          hkl_list= vector<vector<int> > (0,v);
+          hkl[0]=ii0;		    
+          hkl[1]=ii1;		    
+          hkl[2]=ii2;		    
+          hkl_list.push_back(hkl);
+        }
+        odist=pdist;
+        osf=sf[id];
+      } // i2
+    } // i1
+  } // i0
+
+  //[CO190520 - printing moved to PrintXray()]// Output grouped data
+  //[CO190520 - printing moved to PrintXray()]oss << "******************** Grouped data ********************" << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      IntIntensity         %ofMaxInt    h    k    l    dist         mult. correction    keyword " << endl;
+  //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
+  //[CO190520 - printing moved to PrintXray()]  double theta=0;
+  //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
+  //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
+  //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
+  //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
+  //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
+  //[CO190520 - printing moved to PrintXray()]      if(theta>tol) oss
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w3)<<setprecision(2)<<data[i][4]<<setprecision(PREC_DEFAULT)<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // % max sf
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][0]<<" " // h
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][1]<<" " // k
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][2]<<" " // l
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<data[i][3]<<" " // dist
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(5)<<(int)data[i][5]<<" " // mult.
+  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<CorrectionFactor(theta*TWOPI/360.0)<<" " // correction.
+  //[CO190520 - printing moved to PrintXray()]                      << " GROUP"
+  //[CO190520 - printing moved to PrintXray()]                      << endl;
+  //[CO190520 - printing moved to PrintXray()]    } // if term<=1
+  //[CO190520 - printing moved to PrintXray()]  } // if dist>0
+  //[CO190520 - printing moved to PrintXray()]} // for
+
+  //[CO190520 - printing moved to PrintXray()]// Output data to plot
+  //[CO190520 - printing moved to PrintXray()]oss << "******************** To Plot data ********************" << endl;
+  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Amplitude    keyword " << endl;
+  //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
+  //[CO190520 - printing moved to PrintXray()]  double theta=0;
+  //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
+  //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
+  //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
+  //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
+  //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
+  //[CO190520 - printing moved to PrintXray()]      if(theta>tol) {
+  //[CO190520 - printing moved to PrintXray()]        // initial 0.
+  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+  //[CO190520 - printing moved to PrintXray()]            << endl;
+  //[CO190520 - printing moved to PrintXray()]        // true value of sf/intmax.
+  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+  //[CO190520 - printing moved to PrintXray()]            << endl;
+  //[CO190520 - printing moved to PrintXray()]        // final 0.
+  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
+  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+  //[CO190520 - printing moved to PrintXray()]            << endl;
+  //[CO190520 - printing moved to PrintXray()]        // tpx
+  //[CO190520 - printing moved to PrintXray()]      } // if theta<tol
+  //[CO190520 - printing moved to PrintXray()]    } // if term<=1
+  //[CO190520 - printing moved to PrintXray()]  } // if dist>0
+  //[CO190520 - printing moved to PrintXray()]} // for
+} // end routine
+} // namespace pflow
+
+// ***************************************************************************
 // GetXRAY
 // ***************************************************************************
 // This function gets XRAY following the convasp framework.
@@ -1229,8 +1834,8 @@ void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSym
 // updated by Corey Oses 190520
 namespace pflow {
   void GetXray(const xstructure& str, vector<double>& dist,vector<double>& sf,
-	       double lambda, vector<double>& scatt_fact, //CO190520
-	       vector<double>& mass, vector<double>& twoB_vec) {
+	       vector<double>& scatt_fact, //CO190520
+	       vector<double>& mass, vector<double>& twoB_vec,double lambda) {
     string soliloquy="pflow::GetXray():"; //CO190322
     stringstream message; //CO190322
     // Get data from str.
@@ -1285,36 +1890,36 @@ namespace pflow {
   
     for(int i0=-kmx;i0<=kmx;i0++) {
       for(int i1=-kmx;i1<=kmx;i1++) {
-	for(int i2=-kmx;i2<=kmx;i2++) {
+        for(int i2=-kmx;i2<=kmx;i2++) {
           ii0=i0+kmx;
           ii1=i1+kmx;
           ii2=i2+kmx;
           id=ii2+ii1*len+ii0*len*len; //this is index that converts 3D HKL search to 1D
-	  sfr=0.0;
-	  sfi=0.0;
+          sfr=0.0;
+          sfi=0.0;
           for(int ic=1;ic<=3;ic++){rv(ic)=i0*rlat(1,ic)+i1*rlat(2,ic)+i2*rlat(3,ic);}
           rvnorm=modulus(rv);
-	  if(rvnorm>0.0) dist[id]=TWOPI/rvnorm;
-	  for(int iat=0;iat<num_atoms;iat++) {
-	    // Get Debye Waller factor.
-	    dw=1;
-	    if(dist[id]>0) {
+          if(rvnorm>0.0) dist[id]=TWOPI/rvnorm;
+          for(int iat=0;iat<num_atoms;iat++) {
+            // Get Debye Waller factor.
+            dw=1;
+            if(dist[id]>0) {
               term=lambda/(2.0*dist[id]);
               if(term<=1) { //angle, must be less than equal to 1 or domain error occurs
                 theta=std::asin(term);  //radians
                 theta*=360.0/TWOPI; // rad->degrees
-		dw=DebyeWallerFactor(theta,lambda*1.0E-10,temp,debye_temp,mass[iat]);
-	      }
-	    }
+                dw=DebyeWallerFactor(theta,temp,debye_temp,mass[iat],lambda*1.0E-10);
+              }
+            }
             const _atom& atom=sstr.atoms[iat];
-	    //  double gdotr=i0*fpos[iat][0]+i1*fpos[iat][1]+i2*fpos[iat][2];
+            //  double gdotr=i0*fpos[iat][0]+i1*fpos[iat][1]+i2*fpos[iat][2];
             gdotr=i0*atom.fpos(1)+i1*atom.fpos(2)+i2*atom.fpos(3);
             gdotr*=TWOPI;
             sfr+=dw*scatt_fact[iat]*std::cos(gdotr);
             sfi-=dw*scatt_fact[iat]*std::sin(gdotr);
-	  }
+          }
           sf[id]=(sfr*sfr)+(sfi*sfi); //sum the squares, vector addition
-	} // i2
+        } // i2
       } // i1
     } // i0
   }
@@ -5456,16 +6061,35 @@ namespace pflow {
     line_tokens.clear();
     if(LDEBUG) oss << soliloquy << "FORMAT FOR LATTICE VECTORS LOOKS OK" << endl;
 
+    //DX 20190618 - check for VASP5 - START
+    //mirrors check in aflow_xatom.cpp
+    bool is_vasp_4_poscar = true; //VASP4 (default)
+    uint poscar_header_count = 7 ; // VASP4 (default)
+    uint species_line_number = 5 ; // VASP4 (default)
+    string stmp = vcontent.at(6);
+    aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
+    aurostd::string2tokens(stmp,line_tokens);
+    if(line_tokens.at(0)[0]!='S' && line_tokens.at(0)[0]!='s' && line_tokens.at(0)[0]!='D' && line_tokens.at(0)[0]!='d' && line_tokens.at(0)[0]!='C' && line_tokens.at(0)[0]!='c') {
+      is_vasp_4_poscar = false; // then VASP5
+      poscar_header_count = 8; // then VASP5
+      species_line_number = 6; // then VASP5
+    }
+    line_tokens.clear();
+    if(LDEBUG) oss << soliloquy << "IS VASP4 FORMAT = " << is_vasp_4_poscar << endl;
+    //DX 20190618 - check for VASP5 - END
+
     //if we get here, assume CHGCAR is formatted correctly for now
     //read in header, scaling factor, lattice vectors, number of atoms, coordinate type
     if(LDEBUG) oss << soliloquy << "READING POSCAR" << endl;
-    for(uint i=0;i<7;i++) {
+    //DX 20190618 [OBSOLETE] for(uint i=0;i<7;i++) {
+    for(uint i=0;i<poscar_header_count;i++) { //DX 20190618
       poscar << vcontent.at(i) << endl;
       chgcar_header << vcontent.at(i) << endl;
       linecount=i;
     }
     //read in number of atoms
-    aurostd::string2tokens(vcontent.at(5),sum_tokens," ");
+    //DX 20190618 aurostd::string2tokens(vcontent.at(5),sum_tokens," ");
+    aurostd::string2tokens(vcontent.at(species_line_number),sum_tokens," "); //DX 20190618
     for(uint i=0;i<sum_tokens.size();i++) {
       natoms+=aurostd::string2utype<uint>(sum_tokens.at(i));
     }
@@ -6422,6 +7046,56 @@ namespace pflow {
       }
     }
   }
+}
+
+
+// ME190628 - BEGIN
+// prettyPrintCompound
+namespace pflow {
+
+static const double ZERO_TOL = 1E-8;  // from CHULL
+
+string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO190629
+  vector<double> vcomposition;
+  vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
+  return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO190629
+}
+
+// Moved here from the ConvexHull class
+string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO190629
+  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO190629
+}
+
+string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO19062
+  // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
+  string soliloquy="pflow::prettyPrintCompound():";
+  uint precision=COEF_PRECISION;
+  stringstream output;output.precision(precision);
+  if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}
+  // special case, unary
+  if(vspecies.size() == 1) {
+    output << vspecies[0];
+    if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
+    return output.str();
+  }
+  xvector<double> comp=vcomposition;
+  if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+  else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+  else if(vred==no_vrt){;}
+  else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+  if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
+  for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
+    output << vspecies[i];
+    if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
+      if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
+      } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
+      output << comp[i+comp.lrows];
+      if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
+      else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
+    }
+  }
+  return output.str();
+}
 }
 
 // ***************************************************************************

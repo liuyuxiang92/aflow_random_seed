@@ -245,6 +245,7 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
+  string soliloquy="_XHOST::command():";  //CO190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
@@ -280,12 +281,15 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO 180705 - STOP
-  cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
+  //[CO190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
+  throw aurostd::xerror(soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
 bool _XHOST::is_command(const string& command) {
-  return !_XHOST::command(command).empty(); //CO 180705
+  try{string path=_XHOST::command(command);return !path.empty();}    //CO190629 - using xerror now
+  catch(aurostd::xerror& excpt){return false;}  //CO190629 - using xerror now
+  //[CO190629 - using xerror now]return !_XHOST::command(command).empty(); //CO 180705
   //[CO 180705 OBSOLETE]string _command=command;
   //[CO 180705 OBSOLETE]#ifdef _MACOSX_
   //[CO 180705 OBSOLETE]if(command=="beep") return TRUE;
@@ -1223,7 +1227,7 @@ _xvasp::_xvasp() {
   aopts.flag("AVASP_flag_CONVERT_UNIT_CELL_MINKOWSKI",TRUE);
   aopts.flag("FLAG::VOLUME_PRESERVED",FALSE);            // DEFAULT VALUES
   aopts.flag("FLAG::EXTRA_INCAR",FALSE);                 // DEFAULT VALUES
-  AVASP_EXTRA_INCAR.clear();                             // DEFAULT VALUES
+  AVASP_EXTRA_INCAR.str("");                             // DEFAULT VALUES  // ME 190614  clear ss with .str("")
   AVASP_INCAR_KEYWORD.clear();                           // DEFAULT VALUES  // ME 180601
   AVASP_INCAR_EXPLICIT_START_STOP.str("");               // DEFAULT VALUES  // ME 180601  //CO190401 - clear ss with .str("")
   AVASP_KPOINTS_KEYWORD.clear();                         // DEFAULT VALUES  // ME 180601

@@ -749,11 +749,11 @@ namespace SYM {
     }
     //double min_mod = find_min_lattice_vector(xvec2xmat(expanded[0],expanded[1],expanded[2]));
     xmatrix<double> f2c = trasp(lattice);
-    xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = SYM::isLatticeSkewed(lattice, min_dist, sym_tol); //DX 20190215
 
     for (uint i = 0; i < expanded.size(); i++) {
-      if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, c2f, f2c, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX 20190215
+      if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, lattice, f2c, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX 20190215 //DX 20190619 - lattice and f2c as input
 	tmpvec.push_back(expanded[i]);
       }
     }
@@ -2201,14 +2201,14 @@ namespace SYM {
       if(aurostd::abs(a.shift(i)) < tol) {
 	shift_string.push_back("");
       } else {
-	shift_string.push_back(dbl2frac(a.shift(i)));
+	shift_string.push_back(aurostd::dbl2frac(a.shift(i))); //DX 20190724 - now namespace aurostd
       }
     }
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(a.screwglide(i)) < tol) {
 	screwglide_string.push_back("0");
       } else {
-	screwglide_string.push_back(dbl2frac(a.screwglide(i)));
+	screwglide_string.push_back(aurostd::dbl2frac(a.screwglide(i))); //DX 20190724 - now namespace aurostd
       }
     }
     if(!havechar(a.symbol, 'm') && !havechar(a.symbol, 'n') && !havechar(a.symbol, 'd') && !havechar(a.symbol, 'a') && !havechar(a.symbol, 'c') && !havechar(a.symbol, 'b')) {
@@ -2291,7 +2291,7 @@ namespace SYM {
       if(a.symbol == "-1") {
 	output << a.symbol << " " << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       } else if(a.symbol == "1") {
-	output << a.symbol << " " << dbl2frac(a.shift(1)) << "," << dbl2frac(a.shift(2)) << "," << dbl2frac(a.shift(3));
+	output << a.symbol << " " << aurostd::dbl2frac(a.shift(1)) << "," << aurostd::dbl2frac(a.shift(2)) << "," << aurostd::dbl2frac(a.shift(3)); //DX 20190724 - now namespace aurostd
       } else {
 	output << a.symbol << " " << diross.str() << ";" << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       }

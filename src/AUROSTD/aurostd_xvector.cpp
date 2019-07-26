@@ -1385,9 +1385,9 @@ namespace aurostd {  // namespace aurostd
 //[OBSOLETE CO 180409]}
 
 // ----------------------------------------------------------------------------
-// gcd //CO 180409
+// GCD //CO 180409
 namespace aurostd {
-  int gcd(const xvector<int>& in_V){
+  int GCD(const xvector<int>& in_V){
     // find first nonzero entry
     int counter;
     bool set=false;
@@ -1395,12 +1395,27 @@ namespace aurostd {
       if(in_V[i]) {
         counter=i;
         set=true;
-  }
+      }
     }
     if(!set) {return 1;}  // always works
-    int denom=in_V[counter];
-    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){denom=gcd(denom,in_V[i]);}}// if we use chullpoint, there will be 0's!
-    return denom;
+    int gcd=in_V[counter];
+    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return gcd;
+  }
+  int LCM(const xvector<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 0;}  //special, trivial case: lcm must really be positive
+    int lcm=in_V[counter];
+    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){lcm=LCM(lcm,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return lcm;
   }
 }
 
@@ -1412,7 +1427,7 @@ namespace aurostd {
 
     xvector<int> v1(in_V.lrows,in_V.urows); //cast to xvector of ints
     for(int i=in_V.lrows;i<=in_V.urows;i++){v1[i]=nint(in_V[i]);}
-    int denom=gcd(v1);
+    int denom=GCD(v1);
     if(denom!=0){v1/=denom;}  //safety
     for(int i=v1.lrows;i<=v1.urows;i++){out_V[i]=(utype)v1[i];}  //cast back
     
@@ -1420,7 +1435,7 @@ namespace aurostd {
   }
   //xvector<int> reduceByGCD(const xvector<int>& in_V){
   //  xvector<int> out_V=in_V;
-  //  int denom=gcd(in_V);
+  //  int denom=GCD(in_V);
   //  if(denom!=1){out_V/=denom;}
   //  return out_V;
   //}
@@ -1962,6 +1977,48 @@ namespace aurostd {
     }
 }
 
+namespace aurostd {
+  template<class utype> xvector<utype>
+    pointLineIntersection(const xvector<utype>& a,const xvector<utype>& n,const xvector<utype>& p){ //CO 180520
+      //https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line (vector formulation)
+      //equation of line: x=a+t*n
+      //a is point on line
+      //n is direction of line
+      //p is arbitrary point
+      return p + ((a-p) - (aurostd::scalar_product((a-p),n)*n));
+    }
+  template<class utype> bool
+    linePlaneIntersect(const xvector<utype>& p0,const xvector<utype>& n,const xvector<utype>& l0, const xvector<utype>& l,double& d,xvector<utype>& intersection){ //CO 180520
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      string soliloquy="aurostd::linePlaneIntersect():";
+      //https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection (algebraic form)
+      //plane is defined as (p-p0)*n=0 for set of points p on plane
+      //equation of line: p=d*l+l0
+      double numerator=aurostd::scalar_product((p0-l0),n);
+      double denominator=aurostd::scalar_product(l,n);
+      d=0.0;
+      if(LDEBUG){
+        cerr << soliloquy << " p0=" << p0 << endl;
+        cerr << soliloquy << " n=" << n << endl;
+        cerr << soliloquy << " l0=" << l0 << endl;
+        cerr << soliloquy << " l=" << l << endl;
+        cerr << soliloquy << " numerator=" << numerator << endl;
+        cerr << soliloquy << " denominator=" << denominator << endl;
+      }
+      if(aurostd::isequal(denominator,0.0,_ZERO_TOL_)){ //line and plane are parallel
+        if(aurostd::isequal(numerator,0.0,_ZERO_TOL_)){intersection=l0;return true;} //line is contained in plane, so return back initial point
+        else{return false;} //line and plane have no intersection
+      }
+      d=numerator/denominator;
+      intersection=d*l+l0;
+      if(LDEBUG){
+        cerr << soliloquy << " d=" << d << endl;
+        cerr << soliloquy << " intersection=" << intersection << endl;
+      }
+      return true;
+    }
+}
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------- simple sort routines
 
@@ -2388,6 +2445,46 @@ namespace aurostd {  // namespace aurostd
 #undef _XSORT_NSTACK
 #undef _XSORT_SWAPT
 
+//CO190629 - START
+namespace aurostd {  // namespace aurostd
+  //sort by a particular index ONLY
+  //using bool ascending MAY become slow for long containers, as it needs to check the bool with every comparison
+  //split out into separate classes (compareVecElementAscending() vs. compareVecElementDescending()) for those cases
+  //I don't believe this is a practical problem though
+  template<class utype> 
+    compareVecElement<utype>::compareVecElement(uint ind,bool ascending) : m_uindex_sort((uint)ind),m_iindex_sort((int)ind),m_ascending_sort(ascending) {} //CO190629
+  template<class utype> 
+    bool compareVecElement<utype>::operator() (const vector<utype>& a,const vector<utype>& b) { //CO190629
+      if(a.size()!=b.size()){throw aurostd::xerror("compareVecElement::operator()():","a.size()!=b.size()",_INDEX_MISMATCH_);}
+      if(m_uindex_sort>=a.size()){throw aurostd::xerror("compareVecElement::operator()():","index_sort>=a.size()",_INDEX_BOUNDS_);}
+      if(m_ascending_sort){return a[m_uindex_sort]<b[m_uindex_sort];}
+      return a[m_uindex_sort]>b[m_uindex_sort]; //descending sort
+  }
+  template<class utype> 
+    bool compareVecElement<utype>::operator() (const xvector<utype>& a,const xvector<utype>& b) { //CO190629
+      if(a.lrows!=b.lrows){throw aurostd::xerror("compareVecElement::operator()():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
+      if(a.rows!=b.rows){throw aurostd::xerror("compareVecElement::operator()():","a.rows!=b.rows",_INDEX_MISMATCH_);}
+      if(m_iindex_sort<a.lrows||m_iindex_sort>a.urows){throw aurostd::xerror("compareVecElement::operator()():","index_sort<a.lrows||index_sort>a.urows",_INDEX_BOUNDS_);}
+      if(m_ascending_sort){return a[m_iindex_sort]<b[m_iindex_sort];}
+      return a[m_iindex_sort]>b[m_iindex_sort]; //descending sort
+  }
+  //sort by all indices in increasing order
+  template<class utype>
+    bool compareVecElements(const vector<utype>& a,const vector<utype>& b) { //CO190629
+      if(a.size()!=b.size()){throw aurostd::xerror("compareVecElements():","a.size()!=b.size()",_INDEX_MISMATCH_);}
+      for(uint i=0;i<a.size();i++){if(a[i]!=b[i]){return a[i]<b[i];}}
+      return false;
+    }
+  template<class utype>
+    bool compareXVecElements(const aurostd::xvector<utype>& a,const aurostd::xvector<utype>& b) { //CO190629
+      if(a.lrows!=b.lrows){throw aurostd::xerror("compareXVecElements():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
+      if(a.rows!=b.rows){throw aurostd::xerror("compareXVecElements():","a.rows!=b.rows",_INDEX_MISMATCH_);}
+      for(int i=a.lrows;i<=a.urows;i++){if(a[i]!=b[i]){return a[i]<b[i];}}
+      return false;
+    }
+} // namespace aurostd
+//CO190629 - STOP
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------- STATS stuff
 
@@ -2469,40 +2566,68 @@ namespace aurostd {
 }
 // ----------------------------------------------------------------------------
 // ----------------------------------------- implementation for extra data type
-
+#define DEBUG_CONVOLUTION 0
 namespace aurostd {
   //CO190419 - convolution and moving average
   //see 'doc conv' in matlab
   //also see numerical recipes in C 2nd edition, page 538
-  template<class utype> xvector<utype> convolution(const xvector<utype>& signal,const xvector<utype>& response,int SHAPE) {
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,int SHAPE) {
+    vector<uint> sum_counts;
+    return convolution(signal_input,response_input,sum_counts,SHAPE);
+  }
+  template<class utype> xvector<utype> convolution(const xvector<utype>& signal_input,const xvector<utype>& response_input,vector<uint>& sum_counts,int SHAPE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::convolution():";
-    if(signal.lrows!=response.lrows){throw aurostd::xerror(soliloquy,"signal.lrows!=response.lrows",_INDEX_MISMATCH_);}
-    int lrows=signal.lrows; //fixed
-    int size=signal.rows+response.rows-1;
+    if(LDEBUG){
+      cerr << soliloquy << " signal_input=" << signal_input << endl;
+      cerr << soliloquy << " response_input=" << response_input << endl;
+    }
+    if(signal_input.lrows!=response_input.lrows){throw aurostd::xerror(soliloquy,"signal_input.lrows!=response_input.lrows",_INDEX_MISMATCH_);}
+    int lrows=signal_input.lrows; //fixed
+    int size=signal_input.rows+response_input.rows-1;
+    vector<uint> sum_counts_full((uint)size,0);
     xvector<utype> conv(size+(lrows-1),lrows);conv.clear();  //set it all to 0
     vector<int> ind_zero_padding; //keep indices that require zero-padding for 'valid'
     int ind=0;
-    for(int j=conv.lrows;j<=conv.urows;j++){
-      for(int k=response.lrows;k<=response.urows;k++){
-        ind=j-k+1;
-        if(ind>=signal.lrows && ind<=signal.urows){ //instead of zero-padding, we can check if the signal index is valid
-          conv[j]+=signal[ind]*response[k];
-        }else{ind_zero_padding.push_back(j);} //keep j that require zero-padding (invalid indices), contains duplicates, but don't do work unless needed
+    bool k_added=false;
+    for(int k=conv.lrows;k<=conv.urows;k++){
+      k_added=false;
+      for(int j=signal_input.lrows;j<=signal_input.urows;j++){
+        ind=k-j+1;
+        if(j>=signal_input.lrows && j<=signal_input.urows &&
+           ind>=response_input.lrows && ind<=response_input.urows){ //instead of zero-padding, we can check if the response_input index is valid
+#if DEBUG_CONVOLUTION
+          cerr << soliloquy << " k=" << k << " j=" << j << " ind=" << ind << endl;
+#endif
+          conv[k]+=signal_input[j]*response_input[ind];
+          sum_counts_full[k]++;
+        }else{ //keep k that require zero-padding (invalid indices), contains duplicates, but don't do work unless needed
+          if(k_added==false){
+            ind_zero_padding.push_back(k);
+            k_added=true;
+          }
+        }
       }
     }
     if(LDEBUG){cerr << soliloquy << " full conv=" << conv << endl;}
-    if(SHAPE==CONV_SHAPE_FULL){return conv;}
-    if(SHAPE==CONV_SHAPE_SAME){ //same - same size as signal, pick middle of full conv
-      xvector<utype> conv_shape(signal.urows,signal.lrows);
-      int ind1=((conv.rows-signal.rows)+1)/2+lrows;  //https://stackoverflow.com/questions/2745074/fast-ceiling-of-an-integer-division-in-c-c
+    if(SHAPE==CONV_SHAPE_FULL){
+      sum_counts.clear();for(uint i=0;i<sum_counts_full.size();i++){sum_counts.push_back(sum_counts_full[i]);}  //full copy
+      return conv;
+    }
+    if(SHAPE==CONV_SHAPE_SAME){ //same - same size as signal_input, pick middle of full conv
+      xvector<utype> conv_shape(signal_input.urows,signal_input.lrows);
+      int ind1=((conv.rows-signal_input.rows)+1)/2+lrows;  //https://stackoverflow.com/questions/2745074/fast-ceiling-of-an-integer-division-in-c-c
       int ind2=lrows;
       if(LDEBUG){
-        cerr << soliloquy << " ind1=" << ind1 << endl;
+        cerr << soliloquy << " ind1=" << ind1 << " conv[ind1]=" << conv[ind1] << endl;
         cerr << soliloquy << " ind2=" << ind2 << endl;
       }
-      for(int i=ind1;i<=ind1+signal.rows-1;i++){conv_shape[ind2++]=conv[i];}
-      if(LDEBUG){cerr << soliloquy << " same conv=" << conv << endl;}
+      sum_counts.clear();
+      for(int i=ind1;i<=ind1+signal_input.rows-1;i++){
+        conv_shape[ind2++]=conv[i];
+        sum_counts.push_back(sum_counts_full[i]);
+      }
+      if(LDEBUG){cerr << soliloquy << " same conv=" << conv_shape << endl;}
       return conv_shape;
     }
     else if(SHAPE==CONV_SHAPE_VALID){ //valid - only that section of conv that does NOT require zero-padding
@@ -2511,28 +2636,89 @@ namespace aurostd {
       size=conv.rows-ind_zero_padding.size();
       xvector<utype> conv_shape(size+(lrows-1),lrows);
       int ind2=lrows;
+      sum_counts.clear();
       for(int i=conv.lrows;i<=conv.urows;i++){
-        if(!aurostd::withinList(ind_zero_padding,i)){conv_shape[ind2++]=conv[i];}
+        if(!aurostd::withinList(ind_zero_padding,i)){
+          conv_shape[ind2++]=conv[i];
+          sum_counts.push_back(sum_counts_full[i]);
+        }
       }
-      if(LDEBUG){cerr << soliloquy << " valid conv=" << conv << endl;}
+      if(LDEBUG){cerr << soliloquy << " valid conv=" << conv_shape << endl;}
       return conv_shape;
     }
     else{throw aurostd::xerror(soliloquy,"SHAPE specification unknown",_INPUT_UNKNOWN_);}
     return conv;
   }
-  template<class utype> xvector<utype> moving_average(const xvector<utype>& signal,int window) {
+  template<class utype> xvector<utype> moving_average(const xvector<utype>& signal_input,int window) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::moving_average():";
     if(LDEBUG){
-      cerr << soliloquy << " _signal=" << signal << endl;
+      cerr << soliloquy << " _signal_input=" << signal_input << endl;
       cerr << soliloquy << " window=" << window << endl;
     }
-    xvector<utype> response=box_filter_xv<utype>(window,signal.lrows);
-    xvector<utype> avg=convolution(signal,response,CONV_SHAPE_SAME);
+    //CO190622 - box_filter screws up edges
+    //the averaging needs to be truncated for the edges
+    //do NOT average beforehand
+    //[CO190622 - box_filter screws up edges]xvector<utype> response_input=box_filter_xv<utype>(window,signal_input.lrows);  //note, padding response_input with 0s to make len same as signal_input will yield NO difference
+    vector<uint> sum_counts;
+    xvector<utype> response_input=ones_xv<utype>(window+(signal_input.lrows-1),signal_input.lrows);  //note, padding response_input with 0s to make len same as signal_input will yield NO difference
+    xvector<utype> avg=convolution(signal_input,response_input,sum_counts,CONV_SHAPE_SAME);
+    if(LDEBUG){
+      cerr << soliloquy << " response_input=" << response_input << endl;
+      cerr << soliloquy << " sum_counts=" << aurostd::joinWDelimiter(sum_counts,",") << endl;
+    }
+    for(int i=avg.lrows;i<=avg.urows;i++){avg[i]/=(utype)sum_counts[i-avg.lrows];}
     if(LDEBUG){cerr << soliloquy << " avg=" << avg << endl;}
     return avg;
   }
 }
+
+namespace aurostd {
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,uint smoothing_iterations,uint avg_window,int width_maximum,double significance_multiplier){  //CO190620
+    xvector<utype> signal_smooth;
+    return getPeaks(signal_input,signal_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);
+  }
+  template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations,uint avg_window,int width_maximum,double significance_multiplier){  //CO190620
+    //using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
+    //raw data is X
+    //smooth data via moving average to get Y
+    //stddev(X-Y) is sigma
+    //detect peaks when (X-Y)>multiplier*sigma
+
+    //smooth data
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::getPeaks():";
+
+    if(LDEBUG){
+      cerr << soliloquy << " smoothing_iterations=" << smoothing_iterations << endl;
+      cerr << soliloquy << " avg_window=" << avg_window << endl;
+      cerr << soliloquy << " width_maximum=" << width_maximum << endl;
+      cerr << soliloquy << " significance_multiplier=" << significance_multiplier << endl;
+    }
+
+    signal_smooth=signal_input;
+    for(uint i=0;i<smoothing_iterations;i++){signal_smooth=aurostd::moving_average(signal_smooth,avg_window);}
+   xvector<utype> diff=signal_input-signal_smooth;
+    utype sigma=aurostd::stddev(diff);
+
+    vector<int> peak_indices;
+    bool local_maximum=false;
+    bool significant=false;
+    for(int i=signal_input.lrows;i<=signal_input.urows;i++){
+      local_maximum=true;
+      for(int j=1;j<=width_maximum&&local_maximum;j++){
+        if(!((i-j)>=signal_input.lrows && (i+j)<=signal_input.urows && signal_input[i]>signal_input[i-j] && signal_input[i]>signal_input[i+j])){local_maximum=false;}
+      }
+      //[CO190620 - now width_maximum is a parameter]local_maximum=((i-1)>=signal_input.lrows && (i+1)<=signal_input.urows && signal_input[i]>signal_input[i-1] && signal_input[i]>signal_input[i+1]);
+      significant=(diff[i]>significance_multiplier*sigma);
+      if(local_maximum && significant){
+        peak_indices.push_back(i);
+        if(LDEBUG) {cerr << soliloquy << " PEAK[i=" << i << "]=" << signal_input[i] << endl;}
+      }
+    }
+    return peak_indices;
+  }
+} // namespace aurostd
 
 #endif  // _AUROSTD_XVECTOR_IMPLEMENTATIONS_
 

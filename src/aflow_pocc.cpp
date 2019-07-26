@@ -1678,6 +1678,7 @@ void POccCalculator::add2DerivativeStructuresList(const POccSuperCell& psc){
 }
 
 void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
+  if(XHOST.WEB_MODE){return;} //CO190520 - no progress bar for web stuff
   double progress = (double)current/(double)end;
   int pos = BAR_WIDTH * progress;
 
@@ -4496,14 +4497,14 @@ void POccUFFEnergyAnalyzer::calculateNNDistances(xstructure& xstr,vector<uint>& 
   xmatrix<double> _distance_matrix(xstr.atoms.size()-1,xstr.atoms.size()-1,0,0); distance_matrix=_distance_matrix;
 
   //get distance matrix first, then find nearest-neighbor distances
-  xvector<double> min_vec; xvector<int> ijk;  //dummy
+  //DX 20190619 [OBSOLETE] xvector<double> min_vec; xvector<int> ijk;  //dummy
   
   //get distance matrix first
   for(uint atom1=0;atom1<xstr.atoms.size();atom1++){
     if(isVacancy(v_vacancies,atom1)){continue;}
     for(uint atom2=atom1+1;atom2<xstr.atoms.size();atom2++){
       if(isVacancy(v_vacancies,atom2)){continue;}
-      distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=SYM::minimumCartesianDistance(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice,min_vec,ijk);
+      distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice)); //DX 20190619 - updated function name and take the modulus of minimum cpos distance
     }
   }
 

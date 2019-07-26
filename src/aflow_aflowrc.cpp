@@ -399,6 +399,10 @@
 #define AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION                              300
 #define         DEFAULT_CHULL_PNG_RESOLUTION                              XHOST.adefault.getattachedutype<int>("DEFAULT_CHULL_PNG_RESOLUTION")
 
+// DEFAULT GFA
+#define AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     0.05  //CO190628
+#define         DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF                     XHOST.adefault.getattachedutype<double>("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF")  //CO190628
+
 // DEFAULT ARUN
 #define AFLOWRC_ARUN_DIRECTORY_PREFIX                         string("ARUN.")
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
@@ -499,6 +503,16 @@
 #define         DEFAULT_APL_HARMIFC_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_APL_HARMIFC_FILE")
 #define AFLOWRC_DEFAULT_APL_HSKPTS_FILE                       string("hskpoints.out")
 #define         DEFAULT_APL_HSKPTS_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_HSKPTS_FILE")
+// ME190614 - START
+#define AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE                     string("PHDOSCAR")
+#define         DEFAULT_APL_PHDOSCAR_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_PHDOSCAR_FILE")
+#define AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE                     string("PHPOSCAR")
+#define         DEFAULT_APL_PHPOSCAR_FILE                     XHOST.adefault.getattachedscheme("DEFAULT_APL_PHPOSCAR_FILE")
+#define AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE                    string("PHKPOINTS")
+#define         DEFAULT_APL_PHKPOINTS_FILE                    XHOST.adefault.getattachedscheme("DEFAULT_APL_PHKPOINTS_FILE")
+#define AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE                   string("PHEIGENVAL")
+#define         DEFAULT_APL_PHEIGENVAL_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_APL_PHEIGENVAL_FILE")
+// ME190614 - END
 
 // DEFAULT AAPL
 //// DEFAULT AAPL VALUES
@@ -1060,6 +1074,9 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_CHULL_LATEX_BOLD_LABELS",AFLOWRC_DEFAULT_CHULL_LATEX_BOLD_LABELS); 
     aflowrc::load_default("DEFAULT_CHULL_PNG_RESOLUTION",AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION); 
 
+    // DEFAULT GFA  //CO190628
+    aflowrc::load_default("DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF",AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF); //CO190628
+
     // DEFAULT ARUN
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
 
@@ -1115,6 +1132,12 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
+// ME190614 - START
+    aflowrc::load_default("DEFAULT_APL_PHDOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE);
+    aflowrc::load_default("DEFAULT_APL_PHPOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE);
+    aflowrc::load_default("DEFAULT_APL_PHKPOINTS_FILE",AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE);
+    aflowrc::load_default("DEFAULT_APL_PHEIGENVAL_FILE",AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE);
+// ME190614 - END
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
     aflowrc::load_default("DEFAULT_AAPL_BTE",AFLOWRC_DEFAULT_AAPL_BTE);
@@ -1495,6 +1518,10 @@ namespace aflowrc {
     aflowrc << "DEFAULT_CHULL_LATEX_BOLD_LABELS=" << AFLOWRC_DEFAULT_CHULL_LATEX_BOLD_LABELS << " // -1 - default: no bold unless the compound is a ternary, 0 - FALSE, 1 - TRUE" << endl;
     aflowrc << "DEFAULT_CHULL_PNG_RESOLUTION=" << AFLOWRC_DEFAULT_CHULL_PNG_RESOLUTION << " // INT" << endl;
 
+    aflowrc << " " << endl; //CO190628
+    aflowrc << "// DEFAULTS GFA" << endl; //CO190628
+    aflowrc << "DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF=" << AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << " // DOUBLE in eV" << endl; //CO190628
+    
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS ARUN" << endl;
     aflowrc << "ARUN_DIRECTORY_PREFIX=\"" << AFLOWRC_ARUN_DIRECTORY_PREFIX << "\"" << endl;
@@ -1548,6 +1575,12 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
+// ME190614 - START
+    aflowrc << "DEFAULT_APL_PHDOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_PHPOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_PHKPOINTS_FILE=\"" << AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_PHEIGENVAL_FILE=\"" << AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
+// ME190614 - END
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
@@ -1907,6 +1940,9 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_LATEX_BOLD_LABELS\")=" << DEFAULT_CHULL_LATEX_BOLD_LABELS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_PNG_RESOLUTION\")=" << DEFAULT_CHULL_PNG_RESOLUTION << endl;
     
+    if(LDEBUG) oss << "// DEFAULTS GFA" << endl;  //CO190628
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF\")=" << DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << endl;  //CO190628
+    
     if(LDEBUG) oss << "// DEFAULTS ARUN" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
     
@@ -1957,6 +1993,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
+// ME190614 - START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHDOSCAR_FILE\")=\"" << DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHPOSCAR_FILE\")=\"" << DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHKPOINTS_FILE\")=\"" << DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHEIGENVAL_FILE\")=\"" << DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
+// ME190614 - END
 
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
