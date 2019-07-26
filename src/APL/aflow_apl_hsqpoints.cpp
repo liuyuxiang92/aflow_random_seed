@@ -45,7 +45,7 @@ namespace apl
       else {
         // ME190726 - exit clean-up
         //_logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
-        throw APLRuntimeError("File " + file " doesn't exist");
+        throw APLRuntimeError("File " + file + " doesn't exist");
       }
     }
 

@@ -272,7 +272,7 @@ apl_block<T> *MVops::apl_block_alloc(const size_t n) {
     // ME190726 - exit clean-up
     //cerr << "block length n must be positive integer" << std::endl;
     //exit(0);
-    throw APLRuntimeError("block length n must be positive integer";
+    throw APLRuntimeError("block length n must be positive integer");
   }
 
   b = (apl_block<T> *)malloc(sizeof(apl_block<T>));
@@ -421,7 +421,7 @@ void md_lsquares::birch_murnaghan_fit() {
     // ME190726 - exit clean-up
     //cerr << " not able to allocate the memories \n";
     //exit(0);
-    throw APLRuntimeError("Unable to allocate memory".);
+    throw APLRuntimeError("Unable to allocate memory.");
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -545,7 +545,7 @@ void md_lsquares::birch_murnaghan_4th_order_fit(const xvector<double> &user_gues
     // ME190726 - exit clean-up
     //cerr << " not able to allocate the memories \n";
     //exit(0);
-    throw APLRuntimeError("Unable to allocate memory".);
+    throw APLRuntimeError("Unable to allocate memory.");
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -672,7 +672,7 @@ void md_lsquares::birch_murnaghan_3rd_order_fit(const xvector<double> &user_gues
     // ME190726 - exit clean-up
     //cerr << " not able to allocate the memories \n";
     //exit(0);
-    throw APLRuntimeError("Unable to allocate memory".);
+    throw APLRuntimeError("Unable to allocate memory.");
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -882,7 +882,7 @@ apl_vector_view<T> MVops::apl_vector_subvector(apl_vector<T> *v, size_t offset, 
     // ME190726 - exit clean-up
     //cerr << "vector length n must be positive integer" << std::endl;
     //exit(0);
-    throw APLRuntimeError("vector length n must be positive integer" << std::endl;
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   if (offset + (n - 1) >= v->size) {
@@ -916,7 +916,7 @@ const apl_vector_view<T> MVops::apl_vector_const_subvector(const apl_vector<T> *
     // ME190726 - exit clean-up
     //cerr << "vector length n must be positive integer" << std::endl;
     //exit(0);
-    throw APLRuntimeError("vector length n must be positive integer" << std::endl;
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   if (offset + (n - 1) >= v->size) {
