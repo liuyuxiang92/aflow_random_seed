@@ -1022,34 +1022,11 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
   bool swap = (banddos || plotoptions.flag("SWAP_AXES"));
   uint ndos = dos.size();
 
-  string yscale, maxdos, mindos;
-  yscale = plotoptions.getattachedscheme("YSCALE");
-  if (!yscale.empty()) {
-    double dosscale = aurostd::string2utype<double>(yscale);
-    if (dosscale < _ZERO_TOL_) dosscale = DEFAULT_DOS_SCALE;
-    double dosmax = 0.0;
-    // Determine the maximum displayed DOS for the xrange
-    // Find energy range that is displayed first
-    int e1 = -1, e2 = -1;
-    for (uint e = 0; e < xdos.number_energies; e++) {
-      if ((e1 < 0) && (energies[e] >= Emin)) e1 = (int) e;
-      if ((e2 < 0) && (energies[e] > Emax)) e2 = (int) e;
-      if ((e1 > 0) && (e2 > 0)) break;
-    }
-    if (e1 < 0) e1 = 0;  // Emin not found
-    if (e2 < 0) e2 = (int) xdos.number_energies; // Emax not found
-
-    for (uint d = 0; d < ndos; d++) {
-      for (uint s = 0; s < xdos.spin + 1; s++) {
-        for (int e = e1; e < e2; e++) {
-          if (dos[d][s][e] > dosmax) dosmax = dos[d][s][e];
-        }
-      }
-    }
-    dosmax *= dosscale;
-    maxdos = aurostd::utype2string<double>(dosmax);
-    mindos = aurostd::utype2string<double>(-(xdos.spin * dosmax));
-  }
+  double dosmax = getDosLimits(plotoptions, xdos, dos, energies);
+  string maxdos = aurostd::utype2string<double>(dosmax);
+  string mindos;
+  if (xdos.spin == 0) mindos = "0";
+  else mindos = "-" + maxdos;
 
   string unit = plotoptions.getattachedscheme("UNIT");
   if (unit.empty()) unit = "EV";
@@ -1100,8 +1077,10 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
   out << std::endl << "# Axes" << std::endl;
   if (banddos) {
     out << " unset xtics" << std::endl;
+    out << " unset xrange" << std::endl;
   }
-  out << " set xtics" << std::endl;
+
+  out << " set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
   out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
   out << " set tic scale 0" << std::endl;
   out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
@@ -1118,11 +1097,11 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
   if (Efermi > Emin) {
     out << std::endl << "# Fermi level" << std::endl;
     if (swap) {
-      out << "plot " << Efermi << " lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3 notitle" << std::endl;
+      out << " set arrow from " << mindos << "," << Efermi << " to " << maxdos << "," << Efermi;
     } else {
-      out << " set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1"
-          << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
+      out << " set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1";
     }
+    out << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
   }
 
   // Plot data
@@ -1152,6 +1131,51 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
           << ((i < ndos - 1)?",\\":"") << std::endl;
     }
   }
+}
+
+//getDosLimits////////////////////////////////////////////////////////////////
+// Determines the maximum DOS in the plot and sets the limit so that the tics
+// give "nice" numbers. Each plot has four tics, i.e. spin-polarized DOS have
+// two tics per side. This prevents negative numbers from overlapping. This
+// function is fairly primitive but should work for most plots.
+double getDosLimits(const xoption& plotoptions, const xDOSCAR& xdos,
+                    const deque<deque<deque<double> > >& dos, const deque<double>& energies) {
+  double Emin = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMIN"));
+  double Emax = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMAX"));
+  string dosscale = plotoptions.getattachedscheme("YSCALE");
+  uint ndos = dos.size();
+
+  double dosmax = 0.0;
+  // First, determine the maximum displayed DOS
+  // in the displayed energy range
+  int e1 = -1, e2 = -1;
+  for (uint e = 0; e < xdos.number_energies; e++) {
+    if ((e1 < 0) && (energies[e] >= Emin)) e1 = (int) e;
+    if ((e2 < 0) && (energies[e] > Emax)) e2 = (int) e;
+    if ((e1 > 0) && (e2 > 0)) break;
+  }
+  if (e1 < 0) e1 = 0;  // Emin not found
+  if (e2 < 0) e2 = (int) xdos.number_energies; // Emax not found
+
+  for (uint d = 0; d < ndos; d++) {
+    for (uint s = 0; s < xdos.spin + 1; s++) {
+      for (int e = e1; e < e2; e++) {
+        if (dos[d][s][e] > dosmax) dosmax = dos[d][s][e];
+      }
+    }
+  }
+  if (!dosscale.empty()) dosmax *= aurostd::string2utype<double>(dosscale);
+
+  // Now round up the numbers to give good tic values.
+  int l = (int) log10(dosmax);
+  int x = (int) ceil(dosmax/std::pow(10.0, l));
+  if ((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0)) {
+    dosmax = x * std::pow(10.0, l); 
+  } else {
+    dosmax = (x + 1) * std::pow(10.0, l);
+  }
+
+  return dosmax;
 }
 
 //generateBandPlotGNUPLOT/////////////////////////////////////////////////////
