@@ -1,3 +1,6 @@
+3.1.226 - 2019/08/26
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
+        -- set explicit double->int conversion for roundDouble() in chull (CO)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)

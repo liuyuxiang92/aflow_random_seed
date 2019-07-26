@@ -7123,9 +7123,9 @@ double ConvexHull::getYTickDistance(double y_range,int approx_num_ticks,double r
   while(delta_pow<round_to_value){exponent+=1;delta_pow=delta*pow(10,exponent);}
   delta=delta_pow;
   int y_tick_distance_int;
-  y_tick_distance_int=roundDouble(delta,round_to_value,false);  //divisor is ~ # of ticks
+  y_tick_distance_int=roundDouble(delta,(int)round_to_value,false);  //divisor is ~ # of ticks  //CO190724 - explicit double->int conversion (floor is fine)
   if(y_tick_distance_int==0){ //aflow_BSm_hull.pdf, we need some NONZERO y_tick_distance_int
-    y_tick_distance_int=roundDouble(delta,round_to_value,true);  //divisor is ~ # of ticks
+    y_tick_distance_int=roundDouble(delta,(int)round_to_value,true);  //divisor is ~ # of ticks //CO190724 - explicit double->int conversion (floor is fine)
   }
   double y_tick_distance=y_tick_distance_int*pow(10,-exponent);
   if(LDEBUG) {
@@ -8127,8 +8127,8 @@ void ConvexHull::writeLatex() const {
     double y_range=abs(ymax-ymin);
     double round_to_value=getRoundToValue(point_range);
     double extra_padding=(point_range)*extra_padding_multiplier; //to avoid label clashing with axis, 20% should be enough
-    //int extra_padding=roundDouble((point_range)*0.2, round_to_value, false);  //round down to keep tight, unless you get 0, need more padding
-    //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, round_to_value, true);}
+    //int extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, false);  //round down to keep tight, unless you get 0, need more padding  //CO190724 - explicit double->int conversion (floor is fine)
+    //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, true);}  //CO190724 - explicit double->int conversion (floor is fine)
     
     //adding conversion between meV/atom to kJ/mol
     bool showkJmolaxis = m_formation_energy_hull;  //default
@@ -8226,7 +8226,7 @@ void ConvexHull::writeLatex() const {
         ymin=min_point;
         if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
           if(m_formation_energy_hull){ymin-=extra_padding;}  // CO 180227 - we need to avoid labels here
-          ymin=roundDouble(ymin,round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN
+          ymin=roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO190724 - explicit double->int conversion (floor is fine)
         }
       }
       // between highest label and top line, increase if need more
@@ -8236,7 +8236,7 @@ void ConvexHull::writeLatex() const {
         ymax=max_point;
         if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
           if(!m_formation_energy_hull){ymax+=extra_padding;}  // CO 180227 - we need to avoid labels here
-          ymax=roundDouble(ymax,round_to_value,true);  //we want max to be MORE POSITIVE, so round UP
+          ymax=roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO190724 - explicit double->int conversion (floor is fine)
         }
       }
       y_range=abs(ymax-ymin);
@@ -8254,8 +8254,8 @@ void ConvexHull::writeLatex() const {
         cerr << soliloquy << " min_point                                          = " << min_point << endl;
         cerr << soliloquy << " max_point                                          = " << max_point << endl;
         cerr << soliloquy << " round_to_value                                     = " << round_to_value << endl;
-        //cerr << soliloquy << " roundDouble(min_point,round_to_value,false)        = " << roundDouble(min_point, round_to_value, false) << endl;
-        //cerr << soliloquy << " roundDouble(max_point,round_to_value,true)         = " << roundDouble(max_point, round_to_value, true) << endl;
+        //cerr << soliloquy << " roundDouble(min_point,(int)round_to_value,false)        = " << roundDouble(min_point, (int)round_to_value, false) << endl; //CO190724 - explicit double->int conversion (floor is fine)
+        //cerr << soliloquy << " roundDouble(max_point,(int)round_to_value,true)         = " << roundDouble(max_point, (int)round_to_value, true) << endl;  //CO190724 - explicit double->int conversion (floor is fine)
         cerr << soliloquy << " extra_padding                                      = " << extra_padding << endl;
         cerr << soliloquy << " ymin                                               = " << ymin << endl;
         cerr << soliloquy << " ymax                                               = " << ymax << endl;
