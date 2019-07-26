@@ -269,15 +269,19 @@ apl_block<T> *MVops::apl_block_alloc(const size_t n) {
   apl_block<T> *b;
 
   if (n == 0) {
-    cerr << "block length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "block length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("block length n must be positive integer";
   }
 
   b = (apl_block<T> *)malloc(sizeof(apl_block<T>));
 
   if (b == 0) {
-    cerr << "failed to allocate space for block struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for block struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for block struct");
   }
 
   b->data = (T *)calloc(1, MULTIPLICITY * n * sizeof(T));
@@ -414,8 +418,10 @@ void md_lsquares::birch_murnaghan_fit() {
   sigma = (double *)malloc(sizeof(double) * datapoints);
   xdata = (double *)malloc(sizeof(double) * datapoints);
   if ((y == NULL) || (sigma == NULL) || (xdata == NULL)) {
-    cerr << " not able to allocate the memories \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << " not able to allocate the memories \n";
+    //exit(0);
+    throw APLRuntimeError("Unable to allocate memory".);
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -536,8 +542,10 @@ void md_lsquares::birch_murnaghan_4th_order_fit(const xvector<double> &user_gues
   sigma = (double *)malloc(sizeof(double) * datapoints);
   xdata = (double *)malloc(sizeof(double) * datapoints);
   if ((y == NULL) || (sigma == NULL) || (xdata == NULL)) {
-    cerr << " not able to allocate the memories \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << " not able to allocate the memories \n";
+    //exit(0);
+    throw APLRuntimeError("Unable to allocate memory".);
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -661,8 +669,10 @@ void md_lsquares::birch_murnaghan_3rd_order_fit(const xvector<double> &user_gues
   sigma = (double *)malloc(sizeof(double) * datapoints);
   xdata = (double *)malloc(sizeof(double) * datapoints);
   if ((y == NULL) || (sigma == NULL) || (xdata == NULL)) {
-    cerr << " not able to allocate the memories \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << " not able to allocate the memories \n";
+    //exit(0);
+    throw APLRuntimeError("Unable to allocate memory".);
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -765,15 +775,19 @@ apl_vector<T> *MVops::apl_vector_alloc(const size_t n) {
   apl_vector<T> *v;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   v = (apl_vector<T> *)malloc(sizeof(apl_vector<T>));
 
   if (v == 0) {
-    cerr << "failed to allocate space for vector struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for vector struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for vector struct");
   }
 
   block = apl_block_alloc<T>(n);
@@ -781,8 +795,10 @@ apl_vector<T> *MVops::apl_vector_alloc(const size_t n) {
   if (block == 0) {
     free(v);
 
-    cerr << "failed to allocate space for block" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for block" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for block");
   }
 
   v->data = block->data;
@@ -835,8 +851,10 @@ template <class T>
 inline void MVops::apl_vector_set(apl_vector<T> *v, const size_t i, T x) {
 #if APL_RANGE_CHECK
   if (i >= v->size) {
-    cerr << "index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("index out of range");
   }
 #endif
   v->data[i * v->stride] = x;
@@ -846,8 +864,10 @@ template <class T>
 inline T MVops::apl_vector_get(const apl_vector<T> *v, const size_t i) {
 #if APL_RANGE_CHECK
   if (i >= v->size) {
-    cerr << "index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("index out of range");
   }
 #endif
   return v->data[i * v->stride];
@@ -859,13 +879,17 @@ apl_vector_view<T> MVops::apl_vector_subvector(apl_vector<T> *v, size_t offset, 
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer" << std::endl;
   }
 
   if (offset + (n - 1) >= v->size) {
-    cerr << "view would extend past end of vector" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "view would extend past end of vector" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("view would extend past end of vector");
   }
 
   {
@@ -889,13 +913,17 @@ const apl_vector_view<T> MVops::apl_vector_const_subvector(const apl_vector<T> *
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer" << std::endl;
   }
 
   if (offset + (n - 1) >= v->size) {
-    cerr << "view would extend past end of vector" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "view would extend past end of vector" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("view would extend past end of vector");
   }
 
   {
@@ -932,8 +960,10 @@ int MVops::apl_vector_div(apl_vector<T> *a, const apl_vector<T> *b) {
   const size_t N = a->size;
 
   if (b->size != N) {
-    cerr << "vectors must have same length" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vectors must have same length" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vectors must have same length");
   } else {
     const size_t stride_a = a->stride;
     const size_t stride_b = b->stride;
@@ -971,8 +1001,10 @@ int MVops::apl_vector_memcpy(apl_vector<T> *dest,
   const size_t dest_size = dest->size;
 
   if (src_size != dest_size) {
-    cerr << "vector lengths are not equal" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector lengths are not equal" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector lengths are not equal");
   }
 
   {
@@ -1001,13 +1033,17 @@ int MVops::apl_vector_swap_elements(apl_vector<T> *v, const size_t i, const size
   const size_t stride = v->stride;
 
   if (i >= size) {
-    cerr << "first index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index is out of range");
   }
 
   if (j >= size) {
-    cerr << "second index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second index is out of range");
   }
 
   if (i != j) {
@@ -1031,8 +1067,10 @@ MVops::apl_vector_view_array(T *base, size_t n) {
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   {
@@ -1072,18 +1110,24 @@ MVops::apl_matrix_alloc(const size_t n1, const size_t n2) {
   apl_matrix<T> *m;
 
   if (n1 == 0) {
-    cerr << "matrix dimension n1 must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix dimension n1 must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix dimension n1 must be positive integer");
   } else if (n2 == 0) {
-    cerr << "matrix dimension n2 must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix dimension n2 must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix dimension n2 must be positive integer");
   }
 
   m = (apl_matrix<T> *)malloc(sizeof(apl_matrix<T>));
 
   if (m == 0) {
-    cerr << "failed to allocate space for matrix struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for matrix struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for matrix struct");
   }
 
   // FIXME: n1*n2 could overflow for large dimensions //
@@ -1091,8 +1135,10 @@ MVops::apl_matrix_alloc(const size_t n1, const size_t n2) {
   block = apl_block_alloc<T>(n1 * n2);
 
   if (block == 0) {
-    cerr << "failed to allocate space for block" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for block" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for block");
   }
 
   m->data = block->data;
@@ -1120,11 +1166,15 @@ template <class T>
 inline T
 MVops::apl_matrix_get(const apl_matrix<T> *m, const size_t i, const size_t j) {
   if (i >= m->size1) {
-    cerr << "first index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index out of range");
   } else if (j >= m->size2) {
-    cerr << "second index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second index out of range");
   }
   return m->data[i * m->tda + j];
 }
@@ -1133,11 +1183,15 @@ template <class T>
 inline void
 MVops::apl_matrix_set(apl_matrix<T> *m, const size_t i, const size_t j, const T x) {
   if (i >= m->size1) {
-    cerr << "first index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index out of range");
   } else if (j >= m->size2) {
-    cerr << "second index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index out of range");
   }
   m->data[i * m->tda + j] = x;
 }
@@ -1152,8 +1206,10 @@ int MVops::apl_matrix_memcpy(apl_matrix<T> *dest,
   const size_t dest_size2 = dest->size2;
 
   if (src_size1 != dest_size1 || src_size2 != dest_size2) {
-    cerr << "matrix sizes are different" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix sizes are different" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix sizes are different");
   }
 
   {
@@ -1179,8 +1235,10 @@ MVops::apl_matrix_const_row(const apl_matrix<T> *m, const size_t i) {
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (i >= m->size1) {
-    cerr << "row index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "row index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("row index is out of range");
   }
 
   {
@@ -1205,8 +1263,10 @@ MVops::apl_matrix_row(apl_matrix<T> *m, const size_t i) {
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (i >= m->size1) {
-    cerr << "row index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "row index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("row index is out of range");
   }
 
   {
@@ -1231,8 +1291,10 @@ MVops::apl_matrix_column(apl_matrix<T> *m, const size_t j) {
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (j >= m->size2) {
-    cerr << "column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("column index is out of range");
   }
 
   {
@@ -1257,8 +1319,10 @@ MVops::apl_matrix_const_column(const apl_matrix<T> *m, const size_t j) {
   apl_vector_view<T> view = NULL_VECTOR_VIEW;
 
   if (j >= m->size2) {
-    cerr << "column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("column index is out of range");
   }
 
   {
@@ -1285,23 +1349,35 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
   apl_matrix_view<T> view = NULL_MATRIX_VIEW;
 
   if (i >= m->size1) {
-    cerr << "row index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "row index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("row index is out of range");
   } else if (j >= m->size2) {
-    cerr << "column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("column index is out of range");
   } else if (n1 == 0) {
-    cerr << "first dimension must be non-zero" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first dimension must be non-zero" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first dimension must be non-zero");
   } else if (n2 == 0) {
-    cerr << "second dimension must be non-zero" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second dimension must be non-zero" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second dimension must be non-zero");
   } else if (i + n1 > m->size1) {
-    cerr << "first dimension overflows matrix" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first dimension overflows matrix" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first dimension overflows matrix");
   } else if (j + n2 > m->size2) {
-    cerr << "second dimension overflows matrix" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second dimension overflows matrix" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second dimension overflows matrix");
   }
 
   {
@@ -1345,13 +1421,17 @@ int MVops::apl_matrix_swap_columns(apl_matrix<T> *m,
   const size_t size2 = m->size2;
 
   if (i >= size2) {
-    cerr << "first column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first column index is out of range");
   }
 
   if (j >= size2) {
-    cerr << "second column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second column index is out of range");
   }
 
   if (i != j) {
@@ -1454,15 +1534,19 @@ apl_block_complex<T> *MVops::apl_block_complex_alloc(const size_t n) {
   apl_block_complex<T> *b;
 
   if (n == 0) {
-    cerr << "block length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "block length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("block length n must be positive integer");
   }
 
   b = (apl_block_complex<T> *)malloc(sizeof(apl_block_complex<T>));
 
   if (b == 0) {
-    cerr << "failed to allocate space for block struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for block struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for block struct");
   }
 
   b->data = (T *)calloc(1, MULTIPLICITY * n * sizeof(T));
@@ -1485,15 +1569,19 @@ apl_vector_complex<T> *MVops::apl_vector_complex_alloc(const size_t n) {
   apl_vector_complex<T> *v;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   v = (apl_vector_complex<T> *)malloc(sizeof(apl_vector_complex<T>));
 
   if (v == 0) {
-    cerr << "failed to allocate space for vector struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for vector struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for vector struct");
   }
 
   block = apl_block_complex_alloc<T>(n);
@@ -1501,8 +1589,10 @@ apl_vector_complex<T> *MVops::apl_vector_complex_alloc(const size_t n) {
   if (block == 0) {
     free(v);
 
-    cerr << "failed to allocate space for block" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for block" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for block");
   }
 
   v->data = block->data;
@@ -1556,8 +1646,10 @@ template <class T>
 inline void MVops::apl_vector_complex_set(apl_vector_complex<T> *v, const size_t i, apl_complex<T> z) {
 #if APL_RANGE_CHECK
   if (i >= v->size) {
-    cerr << "index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("index out of range");
   }
 #endif
   *APL_MV_COMPLEX_AT(v, i) = z;
@@ -1567,8 +1659,10 @@ template <class T>
 inline apl_complex<T> MVops::apl_vector_complex_get(const apl_vector_complex<T> *v, const size_t i) {
 #if APL_RANGE_CHECK
   if (i >= v->size) {
-    cerr << "index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("index out of range");
   }
 #endif
   return *APL_MV_COMPLEX_AT(v, i);
@@ -1580,13 +1674,17 @@ apl_vector_complex_view<T> MVops::apl_vector_complex_subvector(apl_vector_comple
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   if (offset + (n - 1) >= v->size) {
-    cerr << "view would extend past end of vector" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "view would extend past end of vector" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("view would extend past end of vector");
   }
 
   {
@@ -1610,13 +1708,17 @@ const apl_vector_complex_view<T> MVops::apl_vector_complex_const_subvector(const
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   if (offset + (n - 1) >= v->size) {
-    cerr << "view would extend past end of vector" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "view would extend past end of vector" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("view would extend past end of vector");
   }
 
   {
@@ -1660,8 +1762,10 @@ int MVops::apl_vector_complex_div(apl_vector_complex<T> *a, const apl_vector_com
   const size_t N = a->size;
 
   if (b->size != N) {
-    cerr << "\n vectors must have same length \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n vectors must have same length \n";
+    //exit(0);
+    throw APLRuntimeError("vectors must have same length");
   } else {
     const size_t stride_a = a->stride;
     const size_t stride_b = b->stride;
@@ -1711,8 +1815,10 @@ int MVops::apl_vector_complex_memcpy(apl_vector_complex<T> *dest,
   const size_t dest_size = dest->size;
 
   if (src_size != dest_size) {
-    cerr << "vector lengths are not equal" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector lengths are not equal" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector lengths are not equal");
   }
 
   {
@@ -1741,13 +1847,17 @@ int MVops::apl_vector_complex_swap_elements(apl_vector_complex<T> *v, const size
   const size_t stride = v->stride;
 
   if (i >= size) {
-    cerr << "first index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index is out of range");
   }
 
   if (j >= size) {
-    cerr << "second index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("Second index is out of range");
   }
 
   if (i != j) {
@@ -1771,8 +1881,10 @@ MVops::apl_vector_complex_view_array(T *base, size_t n) {
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (n == 0) {
-    cerr << "vector length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length n must be positive integer");
   }
 
   {
@@ -1812,18 +1924,24 @@ MVops::apl_matrix_complex_alloc(const size_t n1, const size_t n2) {
   apl_matrix_complex<T> *m;
 
   if (n1 == 0) {
-    cerr << "matrix dimension n1 must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix dimension n1 must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix dimension n1 must be positive integer");
   } else if (n2 == 0) {
-    cerr << "matrix dimension n2 must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix dimension n2 must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix dimension n2 must be positive integer");
   }
 
   m = (apl_matrix_complex<T> *)malloc(sizeof(apl_matrix_complex<T>));
 
   if (m == 0) {
-    cerr << "failed to allocate space for matrix struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for matrix struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for matrix struct");
   }
 
   // FIXME: n1*n2 could overflow for large dimensions //
@@ -1831,8 +1949,10 @@ MVops::apl_matrix_complex_alloc(const size_t n1, const size_t n2) {
   block = apl_block_complex_alloc<T>(n1 * n2);
 
   if (block == 0) {
-    cerr << "failed to allocate space for block" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for block" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for block");
   }
 
   m->data = block->data;
@@ -1860,11 +1980,15 @@ template <class T>
 apl_complex<T>
 MVops::apl_matrix_complex_get(const apl_matrix_complex<T> *m, const size_t i, const size_t j) {
   if (i >= m->size1) {
-    cerr << "first index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index out of range");
   } else if (j >= m->size2) {
-    cerr << "second index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second index out of range");
   }
   return *(apl_complex<T> *)(m->data + 2 * (i * m->tda + j));
 }
@@ -1873,11 +1997,15 @@ template <class T>
 inline void
 MVops::apl_matrix_complex_set(apl_matrix_complex<T> *m, const size_t i, const size_t j, const apl_complex<T> x) {
   if (i >= m->size1) {
-    cerr << "first index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index out of range");
   } else if (j >= m->size2) {
-    cerr << "second index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second index out of range");
   }
   *(apl_complex<T> *)(m->data + 2 * (i * m->tda + j)) = x;
 }
@@ -1892,8 +2020,10 @@ int MVops::apl_matrix_complex_memcpy(apl_matrix_complex<T> *dest,
   const size_t dest_size2 = dest->size2;
 
   if (src_size1 != dest_size1 || src_size2 != dest_size2) {
-    cerr << "matrix sizes are different" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix sizes are different" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix sizes are different");
   }
 
   {
@@ -1919,8 +2049,10 @@ MVops::apl_matrix_complex_const_row(const apl_matrix_complex<T> *m, const size_t
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (i >= m->size1) {
-    cerr << "row index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "row index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("row index out of range");
   }
 
   {
@@ -1945,8 +2077,10 @@ MVops::apl_matrix_complex_row(apl_matrix_complex<T> *m, const size_t i) {
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (i >= m->size1) {
-    cerr << "row index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "row index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index out of range");
   }
 
   {
@@ -1971,8 +2105,10 @@ MVops::apl_matrix_complex_column(apl_matrix_complex<T> *m, const size_t j) {
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (j >= m->size2) {
-    cerr << "column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("column index out of range");
   }
 
   {
@@ -1997,8 +2133,10 @@ MVops::apl_matrix_complex_const_column(const apl_matrix_complex<T> *m, const siz
   apl_vector_complex_view<T> view = NULL_VECTOR_VIEW;
 
   if (j >= m->size2) {
-    cerr << "column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("column index out of range");
   }
 
   {
@@ -2025,23 +2163,35 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
   apl_matrix_complex_view<T> view = NULL_MATRIX_VIEW;
 
   if (i >= m->size1) {
-    cerr << "row index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "row index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("row index out of range");
   } else if (j >= m->size2) {
-    cerr << "column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("column index out of range");
   } else if (n1 == 0) {
-    cerr << "first dimension must be non-zero" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first dimension must be non-zero" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first dimension must be non-zero");
   } else if (n2 == 0) {
-    cerr << "second dimension must be non-zero" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second dimension must be non-zero" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second dimension must be non-zero");
   } else if (i + n1 > m->size1) {
-    cerr << "first dimension overflows matrix" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first dimension overflows matrix" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first dimension must be overflows matrix");
   } else if (j + n2 > m->size2) {
-    cerr << "second dimension overflows matrix" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second dimension overflows matrix" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second dimension must be overflows matrix");
   }
 
   {
@@ -2085,13 +2235,17 @@ int MVops::apl_matrix_complex_swap_columns(apl_matrix_complex<T> *m,
   const size_t size2 = m->size2;
 
   if (i >= size2) {
-    cerr << "first column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first column index is out of range");
   }
 
   if (j >= size2) {
-    cerr << "second column index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second column index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second column index is out of range");
   }
 
   if (i != j) {
@@ -2225,8 +2379,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
       malloc(sizeof(apl_multifit_linear_workspace<T>));
 
   if (w == 0) {
-    cerr << "failed to allocate space for multifit_linear struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for multifit_linear struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for multifit_linear struct");
   }
 
   w->n = n;  // number of observations //
@@ -2236,8 +2392,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
 
   if (w->A == 0) {
     free(w);
-    cerr << "failed to allocate space for A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for A");
   }
 
   w->Q = apl_matrix_alloc<T>(p, p);
@@ -2245,8 +2403,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
   if (w->Q == 0) {
     apl_matrix_free<T>(w->A);
     free(w);
-    cerr << "failed to allocate space for Q" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for Q" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for Q");
   }
 
   w->QSI = apl_matrix_alloc<T>(p, p);
@@ -2255,8 +2415,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     apl_matrix_free<T>(w->Q);
     apl_matrix_free<T>(w->A);
     free(w);
-    cerr << "failed to allocate space for QSI" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for QSI" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for QSI");
   }
 
   w->S = apl_vector_alloc<T>(p);
@@ -2266,8 +2428,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     apl_matrix_free<T>(w->Q);
     apl_matrix_free<T>(w->A);
     free(w);
-    cerr << "failed to allocate space for S" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for S" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for S");
   }
 
   w->t = apl_vector_alloc<T>(n);
@@ -2278,8 +2442,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     apl_matrix_free<T>(w->Q);
     apl_matrix_free<T>(w->A);
     free(w);
-    cerr << "failed to allocate space for t" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for t" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for t");
   }
 
   w->xt = apl_vector_calloc<T>(p);
@@ -2291,8 +2457,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     apl_matrix_free<T>(w->Q);
     apl_matrix_free<T>(w->A);
     free(w);
-    cerr << "failed to allocate space for xt" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for xt" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for xt");
   }
 
   w->D = apl_vector_calloc<T>(p);
@@ -2305,8 +2473,10 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     apl_matrix_free<T>(w->Q);
     apl_matrix_free<T>(w->A);
     free(w);
-    cerr << "failed to allocate space for xt" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for xt" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for xt");
   }
   return w;
 }
@@ -2446,8 +2616,10 @@ int MVops::apl_linalg_balance_columns(apl_matrix<T> *A, apl_vector<T> *D) {
   size_t j;
 
   if (D->size != A->size2) {
-    cerr << "length of D must match second dimension of A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "length of D must match second dimension of A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("length of D must match second dimension of A");
   }
 
   apl_vector_set_all<T>(D, 1.0);
@@ -2668,14 +2840,20 @@ int MVops::apl_linalg_householder_mh(double tau, const apl_vector<T> *v, apl_mat
 template <class T>
 int MVops::apl_linalg_bidiag_decomp(apl_matrix<T> *A, apl_vector<T> *tau_U, apl_vector<T> *tau_V) {
   if (A->size1 < A->size2) {
-    cerr << "bidiagonal decomposition requires M>=N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "bidiagonal decomposition requires M>=N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("bidiagonal decomposition requires M>=N");
   } else if (tau_U->size != A->size2) {
-    cerr << "size of tau_U must be N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of tau_U must be N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of tau_U must be N");
   } else if (tau_V->size + 1 != A->size2) {
-    cerr << "size of tau_V must be (N - 1)" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of tau_V must be (N - 1)" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of tau_V must be (N - 1)");
   } else {
     const size_t M = A->size1;
     const size_t N = A->size2;
@@ -2734,17 +2912,25 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
   const size_t K = std::min(M, N);
 
   if (M < N) {
-    cerr << "matrix A must have M >= N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix A must have M >= N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix A must have M >= N");
   } else if (tau_U->size != K) {
-    cerr << "size of tau must be MIN(M,N)" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of tau must be MIN(M,N)" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of tau must be MIN(M,N)");
   } else if (tau_V->size + 1 != K) {
-    cerr << "size of tau must be MIN(M,N) - 1" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of tau must be MIN(M,N) - 1" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of tau must be MIN(M,N) - 1");
   } else if (V->size1 != N || V->size2 != N) {
-    cerr << "size of V must be N x N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of V must be N x N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of V must be N x N");
   } else {
     size_t i, j;
 
@@ -3291,20 +3477,30 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
   const size_t K = std::min(M, N);
 
   if (M < N) {
-    cerr << "svd of MxN matrix, M<N, is not implemented" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "svd of MxN matrix, M<N, is not implemented" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("svd of MxN matrix, M<N, is not implemented");
   } else if (V->size1 != N) {
-    cerr << "square matrix V must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "square matrix V must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("square matrix V must match second dimension of matrix A");
   } else if (V->size1 != V->size2) {
-    cerr << "matrix V must be square" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix V must be square" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix V must be square");
   } else if (S->size != N) {
-    cerr << "length of vector S must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "length of vector S must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("length of vector S must match second dimension of matrix A");
   } else if (work->size != N) {
-    cerr << "length of workspace must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "length of workspace must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("length of workspace must match second dimension of matrix A");
   }
 
   // Handle the case of N = 1 (SVD of a column vector) //
@@ -3506,8 +3702,10 @@ int MVops::apl_blas_daxpy(double alpha, const apl_vector<T> *u, apl_vector<T> *v
     }
     return 0;
   } else {
-    cerr << "invalid length in apl_blas_daxpy()" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "invalid length in apl_blas_daxpy()" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("invalid length in apl_blas_daxpy()");
   }
 }
 // ******************************************************
@@ -3581,8 +3779,10 @@ void MVops::cblas_dgemv(const enum APL_ORDER order, const enum APL_TRANSPOSE Tra
         ix += incX;
       }
     } else {
-      cerr << "unrecognized operation" << std::endl;
-      exit(0);
+    // ME190726 - exit clean-up
+      //cerr << "unrecognized operation" << std::endl;
+      //exit(0);
+      throw APLRuntimeError("unrecognized operation");
     }
   }
 }
@@ -3603,8 +3803,10 @@ int MVops::apl_blas_dgemv(APL_TRANSPOSE_t TransA,
                 int(Y->stride));
     return 0;
   } else {
-    cerr << "invalid length" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "invalid length" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 }
 // ******************************************************
@@ -3616,8 +3818,10 @@ int MVops::apl_blas_ddot(const apl_vector<T> *X, const apl_vector<T> *Y, T *resu
                    int(Y->stride));
     return 0;
   } else {
-    cerr << "invalid length" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "invalid length" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 }
 // ******************************************************
@@ -3648,26 +3852,40 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
   const size_t N = A->size2;
 
   if (M < N) {
-    cerr << "svd of MxN matrix, M<N, is not implemented" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "svd of MxN matrix, M<N, is not implemented" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("svd of MxN matrix, M<N, is not implemented");
   } else if (V->size1 != N) {
-    cerr << "square matrix V must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "square matrix V must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("square matrix V must match second dimension of matrix A");
   } else if (V->size1 != V->size2) {
-    cerr << "matrix V must be square" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix V must be square" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix V must be square");
   } else if (X->size1 != N) {
-    cerr << "square matrix X must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "square matrix X must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("square matrix X must match second dimension of matrix A");
   } else if (X->size1 != X->size2) {
-    cerr << "matrix X must be square" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix X must be square" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("matrix X must be square");
   } else if (S->size != N) {
-    cerr << "length of vector S must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "length of vector S must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("length of vector S must match second dimension of matrix A");
   } else if (work->size != N) {
-    cerr << "length of workspace must match second dimension of matrix A" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "length of workspace must match second dimension of matrix A" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("length of workspace must match second dimension of matrix A");
   }
   if (N == 1) {
     apl_vector_view<T> column = apl_matrix_column<T>(A, 0);
@@ -3761,23 +3979,35 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
                                 apl_matrix<T> *cov,
                                 double *chisq, apl_multifit_linear_workspace<T> *work) {
   if (X->size1 != y->size) {
-    cerr << "number of observations in y does not match rows of matrix X" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "number of observations in y does not match rows of matrix X" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("number of observations in y does not match rows of matrix X");
   } else if (X->size2 != c->size) {
-    cerr << "number of parameters c does not match columns of matrix X" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "number of parameters c does not match columns of matrix X" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("number of parameters c does not match columns of matrix X");
   } else if (w->size != y->size) {
-    cerr << "number of weights does not match number of observations" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "number of weights does not match number of observations" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("number of weights does not match number of observations");
   } else if (cov->size1 != cov->size2) {
-    cerr << "covariance matrix is not square" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "covariance matrix is not square" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("covariance matrix is not square");
   } else if (c->size != cov->size1) {
-    cerr << "number of parameters does not match size of covariance matrix" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "number of parameters does not match size of covariance matrix" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("number of parameters does not match size of covariance matrix");
   } else if (X->size1 != work->n || X->size2 != work->p) {
-    cerr << "size of workspace does not match size of observation matrix" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of workspace does not match size of observation matrix" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of workspace does not match size of observation matrix");
   } else {
     MVops fit;
     const size_t n = X->size1;
@@ -3912,22 +4142,28 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
   apl_multifit_fdfsolver<utype> *s;
 
   if (n < p) {
-    cerr << "insufficient data points, n < p" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "insufficient data points, n < p" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("insufficient data points, n < p");
   }
 
   s = (apl_multifit_fdfsolver<utype> *)malloc(sizeof(apl_multifit_fdfsolver<utype>));
   if (s == 0) {
-    cerr << "failed to allocate space for multifit solver struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for multifit solver struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for multifit solver struct");
   }
 
   s->x = apl_vector_calloc<utype>(p);
 
   if (s->x == 0) {
     free(s);
-    cerr << "failed to allocate space for x" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for x" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for x");
   }
 
   s->f = apl_vector_calloc<utype>(n);
@@ -3935,8 +4171,10 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
   if (s->f == 0) {
     apl_vector_free<utype>(s->x);
     free(s);
-    cerr << "failed to allocate space for f" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for f" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for f");
   }
 
   s->J = apl_matrix_calloc<utype>(n, p);
@@ -3945,8 +4183,10 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     apl_vector_free<utype>(s->x);
     apl_vector_free<utype>(s->f);
     free(s);
-    cerr << "failed to allocate space for g" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for g" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for g");
   }
 
   s->dx = apl_vector_calloc<utype>(p);
@@ -3956,8 +4196,10 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     apl_vector_free<utype>(s->x);
     apl_vector_free<utype>(s->f);
     free(s);
-    cerr << "failed to allocate space for dx" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for dx" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for dx");
   }
 
   s->state = malloc(T->size);
@@ -3969,8 +4211,10 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     apl_matrix_free<utype>(s->J);
     free(s);  // exception in constructor, avoid memory leak //
 
-    cerr << "failed to allocate space for multifit solver state" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for multifit solver state" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for multifit solver state");
   }
   s->type = T;
 
@@ -3984,8 +4228,10 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     apl_matrix_free<utype>(s->J);
     free(s);  // exception in constructor, avoid memory leak //
 
-    cerr << "failed to set solver" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to set solver" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to set solver");
   }
 
   s->fdf = NULL;
@@ -3997,13 +4243,17 @@ int MVops::apl_multifit_fdfsolver_set(apl_multifit_fdfsolver<utype> *s,
                                       apl_multifit_function_fdf *f,
                                       const apl_vector<utype> *x) {
   if (s->f->size != f->n) {
-    cerr << "function size does not match solver" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "function size does not match solver" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("function size does not match solver");
   }
 
   if (s->x->size != x->size) {
-    cerr << "vector length does not match solver" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector length does not match solver" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector length does not match solver");
   }
 
   s->fdf = f;
@@ -4025,8 +4275,10 @@ int MVops::apl_multifit_test_delta(const apl_vector<utype> *dx, const apl_vector
   const size_t n = x->size;
 
   if (epsrel < 0.0) {
-    cerr << "relative tolerance is negative" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "relative tolerance is negative" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("relative tolerance is negative");
   }
 
   for (i = 0; i < n; i++) {
@@ -4053,15 +4305,19 @@ MVops::apl_permutation_alloc(const size_t n) {
   apl_permutation *p;
 
   if (n == 0) {
-    cerr << "permutation length n must be positive integer" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "permutation length n must be positive integer" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("permutation length n must be positive integer");
   }
 
   p = (apl_permutation *)malloc(sizeof(apl_permutation));
 
   if (p == 0) {
-    cerr << "failed to allocate space for permutation struct" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for permutation struct" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for permutation struct");
   }
 
   p->data = (size_t *)malloc(n * sizeof(size_t));
@@ -4069,8 +4325,10 @@ MVops::apl_permutation_alloc(const size_t n) {
   if (p->data == 0) {
     free(p);  // exception in constructor, avoid memory leak //
 
-    cerr << "failed to allocate space for permutation data" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for permutation data" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for permutation data");
   }
 
   p->size = n;
@@ -4100,8 +4358,10 @@ inline size_t
 MVops::apl_permutation_get(const apl_permutation *p, const size_t i) {
 #if APL_RANGE_CHECK
   if (i >= p->size) {
-    cerr << "index out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "index out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("index out of range");
   }
 #endif
   return p->data[i];
@@ -4128,13 +4388,17 @@ int MVops::apl_permutation_swap(apl_permutation *p, const size_t i, const size_t
   const size_t size = p->size;
 
   if (i >= size) {
-    cerr << "first index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "first index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("first index is out of range");
   }
 
   if (j >= size) {
-    cerr << "second index is out of range" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "second index is out of range" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("second index is out of range");
   }
 
   if (i != j) {
@@ -4152,14 +4416,20 @@ int MVops::apl_linalg_QRPT_decomp(apl_matrix<utype> *A, apl_vector<utype> *tau, 
   const size_t N = A->size2;
 
   if (tau->size != std::min(M, N)) {
-    cerr << "size of tau must be MIN(M,N)" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of tau must be MIN(M,N)" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of tau must be MIN(M,N)");
   } else if (p->size != N) {
-    cerr << "permutation size must be N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "permutation size must be N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("permutation size must be N");
   } else if (norm->size != N) {
-    cerr << "norm size must be N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "norm size must be N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("norm size must be N");
   } else {
     size_t i;
 
@@ -4268,13 +4538,17 @@ int MVops::apl_multifit_covar(const apl_matrix<utype> *J, double epsrel, apl_mat
   size_t m = J->size1, n = J->size2;
 
   if (m < n) {
-    cerr << "Jacobian be rectangular M x N with M >= N" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "Jacobian be rectangular M x N with M >= N" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("Jacobian must be rectangular M x N with M >= N");
   }
 
   if (covar->size1 != covar->size2 || covar->size1 != n) {
-    cerr << "covariance matrix must be square and match second dimension of jacobian" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "covariance matrix must be square and match second dimension of jacobian" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("covariance matrix must be square and match second dimension of jacobian");
   }
 
   r = apl_matrix_alloc<utype>(m, n);
@@ -4430,11 +4704,15 @@ int MVops::apl_linalg_QR_QTvec(const apl_matrix<utype> *QR, const apl_vector<uty
   const size_t N = QR->size2;
 
   if (tau->size != std::min(M, N)) {
-    cerr << "size of tau must be MIN(M,N)" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "size of tau must be MIN(M,N)" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("size of tau must be MIN(M,N)");
   } else if (v->size != M) {
-    cerr << "vector size must be M" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector size must be M" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector size must be M");
   } else {
     size_t i;
 
@@ -4479,8 +4757,10 @@ void MVops::compute_gradient_direction(const apl_matrix<utype> *r, const apl_per
 template <class utype>
 int MVops::apl_permute_vector_inverse(const apl_permutation *p, apl_vector<utype> *v) {
   if (v->size != p->size) {
-    cerr << "vector and permutation must be the same length" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "vector and permutation must be the same length" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("vector and permutation must have the same length");
   }
 
   apl_permute_inverse(p->data, v->data, v->stride, v->size);
@@ -5227,8 +5507,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
   r = fit.apl_matrix_calloc<utype>(n, p);
 
   if (r == 0) {
-    cerr << "failed to allocate space for r" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for r" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for r");
   }
 
   state->r = r;
@@ -5238,8 +5520,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
   if (tau == 0) {
     fit.apl_matrix_free<utype>(r);
 
-    cerr << "failed to allocate space for tau" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for tau" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for tau");
   }
 
   state->tau = tau;
@@ -5250,8 +5534,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_matrix_free<utype>(r);
     fit.apl_vector_free<utype>(tau);
 
-    cerr << "failed to allocate space for diag" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for diag" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for diag");
   }
 
   state->diag = diag;
@@ -5263,8 +5549,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(tau);
     fit.apl_vector_free<utype>(diag);
 
-    cerr << "failed to allocate space for qtf" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for qtf" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for qtf");
   }
 
   state->qtf = qtf;
@@ -5277,8 +5565,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(diag);
     fit.apl_vector_free<utype>(qtf);
 
-    cerr << "failed to allocate space for newton" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for newton" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for newton");
   }
 
   state->newton = newton;
@@ -5292,8 +5582,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(qtf);
     fit.apl_vector_free<utype>(newton);
 
-    cerr << "failed to allocate space for gradient" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for gradient" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for gradient");
   }
 
   state->gradient = gradient;
@@ -5308,8 +5600,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(newton);
     fit.apl_vector_free<utype>(gradient);
 
-    cerr << "failed to allocate space for x_trial" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for x_trial" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for x_trial");
   }
 
   state->x_trial = x_trial;
@@ -5325,8 +5619,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(gradient);
     fit.apl_vector_free<utype>(x_trial);
 
-    cerr << "failed to allocate space for f_trial" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for f_trial" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for f_trial");
   }
 
   state->f_trial = f_trial;
@@ -5343,8 +5639,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(x_trial);
     fit.apl_vector_free<utype>(f_trial);
 
-    cerr << "failed to allocate space for df" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for df" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for df");
   }
 
   state->df = df;
@@ -5362,8 +5660,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(f_trial);
     fit.apl_vector_free<utype>(df);
 
-    cerr << "failed to allocate space for sdiag" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for sdiag" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for sdiag");
   }
 
   state->sdiag = sdiag;
@@ -5382,8 +5682,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(df);
     fit.apl_vector_free<utype>(sdiag);
 
-    cerr << "failed to allocate space for rptdx" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for rptdx" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for rptdx");
   }
 
   state->rptdx = rptdx;
@@ -5403,8 +5705,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(sdiag);
     fit.apl_vector_free<utype>(rptdx);
 
-    cerr << "failed to allocate space for w" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for w" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for w");
   }
 
   state->w = w;
@@ -5425,8 +5729,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(rptdx);
     fit.apl_vector_free<utype>(w);
 
-    cerr << "failed to allocate space for work1" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for work1" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for work1");
   }
 
   state->work1 = work1;
@@ -5448,8 +5754,10 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     fit.apl_vector_free<utype>(w);
     fit.apl_vector_free<utype>(work1);
 
-    cerr << "failed to allocate space for perm" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for perm" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for perm");
   }
 
   state->perm = perm;
@@ -5657,23 +5965,29 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
   apl_eigen_hermv_workspace *w;
 
   if (n == 0) {
-    cerr << "matrix dimension must be positive integer";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix dimension must be positive integer";
+    //exit(0);
+    throw APLRuntimeError("matrix dimension must be positive integer");
   }
 
   w = (apl_eigen_hermv_workspace *)malloc(sizeof(apl_eigen_hermv_workspace));
 
   if (w == 0) {
-    cerr << "failed to allocate space for workspace";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for workspace";
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for workspace");
   }
 
   w->d = (double *)malloc(n * sizeof(double));
 
   if (w->d == 0) {
     free(w);
-    cerr << "failed to allocate space for diagonal";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for diagonal";
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for diagonal");
   }
 
   w->sd = (double *)malloc(n * sizeof(double));
@@ -5681,8 +5995,10 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
   if (w->sd == 0) {
     free(w->d);
     free(w);
-    cerr << "failed to allocate space for subdiagonal";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for subdiagonal";
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for subdiagonal");
   }
 
   w->tau = (double *)malloc(2 * n * sizeof(double));
@@ -5691,8 +6007,10 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     free(w->sd);
     free(w->d);
     free(w);
-    cerr << "failed to allocate space for tau";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for tau";
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for tau");
   }
 
   w->gc = (double *)malloc(n * sizeof(double));
@@ -5702,8 +6020,10 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     free(w->sd);
     free(w->d);
     free(w);
-    cerr << "failed to allocate space for cosines";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for cosines";
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for cosines");
   }
 
   w->gs = (double *)malloc(n * sizeof(double));
@@ -5714,8 +6034,10 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     free(w->sd);
     free(w->d);
     free(w);
-    cerr << "failed to allocate space for sines";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "failed to allocate space for sines";
+    //exit(0);
+    throw APLRuntimeError("failed to allocate space for sines");
   }
 
   w->size = n;
@@ -5876,11 +6198,15 @@ int MVops::apl_blas_zhemv(APL_UPLO Uplo, const apl_complex<T> alpha,
   const size_t N = A->size2;
 
   if (M != N) {
-    cerr << "\nmatrix must be square\n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\nmatrix must be square\n";
+    //exit(0);
+    throw APLRuntimeError("matrix must be square");
   } else if (N != X->size || N != Y->size) {
-    cerr << "\ninvalid length\n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\ninvalid length\n";
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 
   cblas_zhemv(aplRowMajor, Uplo, int(N), APL_MV_COMPLEX_P(&alpha), A->data,
@@ -6005,8 +6331,10 @@ void MVops::cblas_zhemv(const enum APL_ORDER order, const enum APL_UPLO Uplo,
         iy -= incY;
       }
     } else {
-      cerr << "unrecognized operation";
-      exit(0);
+    // ME190726 - exit clean-up
+      //cerr << "unrecognized operation";
+      //exit(0);
+      throw APLRuntimeError("unrecognized operation");
     }
   }
 }
@@ -6019,8 +6347,10 @@ int MVops::apl_blas_zdotc(const apl_vector_complex<T> *X, const apl_vector_compl
                     int(Y->stride), APL_MV_COMPLEX_P(dotc));
     return 0;
   } else {
-    cerr << "\n invalid length \n ";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n invalid length \n ";
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 }
 // ******************************************************
@@ -6055,8 +6385,10 @@ int MVops::apl_blas_zaxpy(const apl_complex<T> alpha, const apl_vector_complex<T
                 int(X->stride), Y->data, int(Y->stride));
     return 0;
   } else {
-    cerr << "\n invalid length \n ";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n invalid length \n ";
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 }
 // ******************************************************
@@ -6091,11 +6423,15 @@ int MVops::apl_blas_zher2(APL_UPLO_t Uplo, const apl_complex<T> alpha,
   const size_t N = A->size2;
 
   if (M != N) {
-    cerr << "\n matrix must be square \n ";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n matrix must be square \n ";
+    //exit(0);
+    throw APLRuntimeError("matrix must be square");
   } else if (X->size != N || Y->size != N) {
-    cerr << "\n invalid length \n ";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n invalid length \n ";
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 
   cblas_zher2(aplRowMajor, Uplo, int(N), APL_MV_COMPLEX_P(&alpha), X->data,
@@ -6197,8 +6533,10 @@ void MVops::cblas_zher2(const enum APL_ORDER order, const enum APL_UPLO Uplo,
         iy += incY;
       }
     } else {
-      cerr << "\n unrecognized operation \n";
-      exit(0);
+    // ME190726 - exit clean-up
+      //cerr << "\n unrecognized operation \n";
+      //exit(0);
+      throw APLRuntimeError("unrecognized operation");
     }
   }
 }
@@ -6206,11 +6544,15 @@ void MVops::cblas_zher2(const enum APL_ORDER order, const enum APL_UPLO Uplo,
 template <class T>
 int MVops::apl_linalg_hermtd_decomp(apl_matrix_complex<T> *A, apl_vector_complex<T> *tau) {
   if (A->size1 != A->size2) {
-    cerr << "\n hermitian tridiagonal decomposition requires square matrix \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n hermitian tridiagonal decomposition requires square matrix \n";
+    //exit(0);
+    throw APLRuntimeError("hermitian tridiagonal decomposition requires square matrix");
   } else if (tau->size + 1 != A->size1) {
-    cerr << "\n size of tau must be (matrix size - 1) \n ";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n size of tau must be (matrix size - 1) \n ";
+    //exit(0);
+    throw APLRuntimeError("size of tau must be (matrix size - 1)");
   } else {
     const size_t N = A->size1;
     size_t i;
@@ -6311,20 +6653,30 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
                                     apl_vector<T> *diag,
                                     apl_vector<T> *sdiag) {
   if (A->size1 != A->size2) {
-    cerr << "\n  matrix A must be sqaure \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n  matrix A must be sqaure \n";
+    //exit(0);
+    throw APLRuntimeError("matrix A must be sqaure");
   } else if (tau->size + 1 != A->size1) {
-    cerr << "\n size of tau must be (matrix size - 1) \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n size of tau must be (matrix size - 1) \n";
+    //exit(0);
+    throw APLRuntimeError("size of tau must be (matrix size - 1)");
   } else if (U->size1 != A->size1 || U->size2 != A->size1) {
-    cerr << "\n size of U must match size of A \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n size of U must match size of A \n";
+    //exit(0);
+    throw APLRuntimeError("size of U must match size of A");
   } else if (diag->size != A->size1) {
-    cerr << "\n size of diagonal must match size of A \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n size of diagonal must match size of A \n";
+    //exit(0);
+    throw APLRuntimeError("size of diagonal must match size of A");
   } else if (sdiag->size + 1 != A->size1) {
-    cerr << "\n  size of subdiagonal must be (matrix size - 1) \n ";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "\n  size of subdiagonal must be (matrix size - 1) \n ";
+    //exit(0);
+    throw APLRuntimeError("size of subdiagonal must be (matrix size - 1)");
   } else {
     const size_t N = A->size1;
 
@@ -6516,14 +6868,20 @@ int MVops::apl_eigen_hermv(apl_matrix_complex<T> *A, apl_vector<T> *eval,
                            apl_matrix_complex<T> *evec,
                            apl_eigen_hermv_workspace *w) {
   if (A->size1 != A->size2) {
-    cerr << "matrix must be square to compute eigenvalues";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "matrix must be square to compute eigenvalues";
+    //exit(0);
+    throw APLRuntimeError("matrix must be square to compute eigenvalues");
   } else if (eval->size != A->size1) {
-    cerr << "eigenvalue vector must match matrix size";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "eigenvalue vector must match matrix size";
+    //exit(0);
+    throw APLRuntimeError("eigenvalue vector must match matrix size");
   } else if (evec->size1 != A->size1 || evec->size2 != A->size1) {
-    cerr << "eigenvector matrix must match matrix size";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "eigenvector matrix must match matrix size";
+    //exit(0);
+    throw APLRuntimeError("eigenvector vector must match matrix size");
   } else {
     const size_t N = A->size1;
     double *const d = w->d;
@@ -6652,11 +7010,15 @@ bool MVops::isorthogonal(apl_matrix_complex<double> *m) {
 int MVops::apl_eigen_hermv_sort(apl_vector<double> *eval, apl_matrix_complex<double> *evec,
                                 apl_eigen_sort_t sort_type) {
   if (evec->size1 != evec->size2) {
-    cerr << "eigenvector matrix must be square \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "eigenvector matrix must be square \n";
+    //exit(0);
+    throw APLRuntimeError("eigenvector matrix must be square");
   } else if (eval->size != evec->size1) {
-    cerr << "eigenvalues must match eigenvector matrix \n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "eigenvalues must match eigenvector matrix \n";
+    //exit(0);
+    throw APLRuntimeError("eigenvalues must match eigenvector matrix");
   } else {
     const size_t N = eval->size;
     size_t i;
@@ -6686,8 +7048,10 @@ int MVops::apl_eigen_hermv_sort(apl_vector<double> *eval, apl_matrix_complex<dou
             test = (std::fabs(ej) > std::fabs(ek));
             break;
           default:
-            cerr << "unrecognized sort type \n ";
-            exit(0);
+            // ME190726 - exit clean-up
+            //cerr << "unrecognized sort type \n ";
+            //exit(0);
+            throw APLRuntimeError("unrecognized sort type");
         }
 
         if (test) {
@@ -6726,8 +7090,10 @@ void aplEigensystems::eigen_calculation(const aurostd::xmatrix<xcomplex<double> 
   }
   apl_eigen_hermv_workspace *w = apl_eigen_hermv_alloc(nBranches);
   if (apl_eigen_hermv<double>(m, eval, evec, w) != 0) {
-    cout << "\n apl eigenvale is not working" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cout << "\n apl eigenvale is not working" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("apl eigenvale is not working");
   };
   //apl_eigen_hermv_sort (eval, evec, APL_MV_EIGEN_SORT_ABS_ASC);
   apl_eigen_hermv_free(w);
@@ -6767,8 +7133,10 @@ void aplEigensystems::eigen_calculation(const aurostd::xmatrix<xcomplex<double> 
   }
   apl_eigen_hermv_workspace *w = apl_eigen_hermv_alloc(nBranches);
   if (apl_eigen_hermv<double>(m, eval, evec, w) != 0) {
-    cout << "\n apl eigenvale is not working" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cout << "\n apl eigenvale is not working" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("apl eigenvale is not working");
   };
 
   apl_eigen_hermv_sort(eval, evec, t);
@@ -6804,9 +7172,11 @@ int MVops::apl_blas_zgemv(APL_TRANSPOSE_t TransA, const apl_complex<double> alph
                 int(Y->stride));
     return 0;
   } else {
-    cerr << "invalid length"
-         << "\n";
-    exit(0);
+    // ME190726 - exit clean-up
+    //cerr << "invalid length"
+    //     << "\n";
+    //exit(0);
+    throw APLRuntimeError("invalid length");
   }
 }
 // ******************************************************
@@ -6947,9 +7317,11 @@ void MVops::cblas_zgemv(const enum APL_ORDER order, const enum APL_TRANSPOSE Tra
         iy += incY;
       }
     } else {
-      cerr << "unrecognized operation"
-           << "\n";
-      exit(0);
+      // ME190726 - exit clean-up
+      //cerr << "unrecognized operation"
+      //     << "\n";
+      //exit(0);
+      throw APLRuntimeError("unrecognized operation");
     }
   }
 }
@@ -6985,8 +7357,10 @@ MVops::calculate_gruneisen(xmatrix<xcomplex<double> > &m0, xmatrix<xcomplex<doub
 
   apl_eigen_hermv_workspace *w = apl_eigen_hermv_alloc(nBranches);
   if (apl_eigen_hermv<double>(aplDM0, apleval0, aplevec0, w) != 0) {
-    cout << "\n apl eigenvale is not working" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //cout << "\n apl eigenvale is not working" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("apl eigenvale is not working");
   };
   apl_eigen_hermv_sort(apleval0, aplevec0, APL_MV_EIGEN_SORT_ABS_ASC);
   apl_eigen_hermv_free(w);

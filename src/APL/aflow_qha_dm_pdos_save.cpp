@@ -166,7 +166,11 @@ namespace apl {
   //create phonon-dispersion path
   void QHAsubdirectoryData::create_pdispath(std::vector< xvector<double> > &qpoints)
   {
-    if(qpoints.size()==0){_logger<<apl::error<<"qpoints.size()==0 in create_pdispath() "<<apl::endl; exit(0);}
+    // ME190726 - exit clean-up
+    if(qpoints.size()==0){
+      //_logger<<apl::error<<"qpoints.size()==0 in create_pdispath() "<<apl::endl; exit(0);
+      throw APLRuntimeError("qpoints.size()==0 in create_pdispath()");
+    }
 
     _logger<<"Preparing to create dynamical matrices for high-symmetry qpoint"<<apl::endl;
 
@@ -305,7 +309,11 @@ return lines;
     vector<string> s;
     FILE *in;
     char buff[512];
-    if(!(in = popen(path.c_str(), "r"))){_logger<<apl::error<<"bash command can't not able to exacute"<<apl::endl; exit(0);}
+    if(!(in = popen(path.c_str(), "r"))){
+      // ME190726 - exit clean-up
+      //_logger<<apl::error<<"bash command can't not able to exacute"<<apl::endl; exit(0);
+      throw APLRuntimeError("Cannot execute bash command.");
+    }
     while(fgets(buff, sizeof(buff), in)!=NULL)
       {stringstream AFLOW;
 	string dirlist;
@@ -378,7 +386,11 @@ template<typename T>
   {
     //weight factor
     ofstream kout1(file.c_str());
-    if (kout1.is_open()){_logger<<apl::error <<" QHAsubdirectoryData:: unable to create [kweights-file]  "<<apl::endl;exit(0);}
+    // ME190726 - exit clean-up
+    if (kout1.is_open()){
+      //_logger<<apl::error <<" QHAsubdirectoryData:: unable to create [kweights-file]  "<<apl::endl;exit(0);
+      throw APLRuntimeError("QHAsubdirectoryData:: unable to create [kweights-file]");
+    }
 
     kout1 << std::setiosflags(std::ios::fixed|std::ios::showpoint|std::ios::right);
     kout1<< setprecision(Set_QHA_Precision);

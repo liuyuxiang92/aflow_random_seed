@@ -148,8 +148,10 @@ void DM_PDOS_save::createMPmesh(int na, int nb, int nc, const xstructure& xs) {
 //create phonon-dispersion path
 void DM_PDOS_save::create_pdispath(std::vector<xvector<double> >& qpoints) {
   if (qpoints.size() == 0) {
-    _logger << apl::error << "qpoints.size()==0 in create_pdispath() " << apl::endl;
-    exit(0);
+    // ME190728 - exit clean-up
+    //_logger << apl::error << "qpoints.size()==0 in create_pdispath() " << apl::endl;
+    //exit(0);
+    throw APLRuntimeError("qpoints.size()==0 in create_pdispath()");
   }
 
   _logger << "Preparing to create dynamical matrices for high-symmetry qpoint" << apl::endl;
@@ -255,8 +257,10 @@ DM_PDOS_save::directory_list(const string path) {
   FILE* in;
   char buff[512];
   if (!(in = popen(path.c_str(), "r"))) {
-    _logger << apl::error << "bash command can't not able to exacute" << apl::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //_logger << apl::error << "bash command can't not able to exacute" << apl::endl;
+    //exit(0);
+    throw APLRuntimeError("Cannot execute bash command.");
   }
   while (fgets(buff, sizeof(buff), in) != NULL) {
     stringstream AFLOW;
@@ -351,8 +355,10 @@ void DM_PDOS_save::write_weight(string file) {
   //CO - START
   aurostd::stringstream2file(kout1, file);
   if (!aurostd::FileExist(file)) {
-    _logger << apl::error << " DM_PDOS_save; unable to create [kweights-file]  " << apl::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //_logger << apl::error << " DM_PDOS_save; unable to create [kweights-file]  " << apl::endl;
+    //exit(0);
+    throw APLRuntimeError("DM_PDOS_save; unable to create [kweights-file]");
   }
   //kout1.clear();
   //kout1.close();
@@ -377,8 +383,10 @@ void check_consistency_aflow_apl::check_consistency_in_aflow(string& current_run
   //ifstream read_path (file_aflowin.c_str());
   //if (!read_path.is_open()){_logger<<apl::error<<file_aflowin<<" not able to open "<<apl::endl; exit(0);}
   if (!vlines.size()) {
-    _logger << apl::error << file_aflowin << " not able to open " << apl::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //_logger << apl::error << file_aflowin << " not able to open " << apl::endl;
+    //exit(0);
+    throw APLRuntimeError("Unable to open " + file_aflowin);
   }
 
   //while ( getline (read_path,line) )
@@ -407,8 +415,10 @@ void check_consistency_aflow_apl::check_consistency_in_aflow(string& current_run
   aurostd::efile2vectorstring(file_aflowin, vlines);
   //if (!read_path.is_open()){ _logger<<apl::error<<file_aflowin <<" not able to open "<<apl::endl; exit(0);}
   if (!vlines.size()) {
-    _logger << apl::error << file_aflowin << " not able to open " << apl::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //_logger << apl::error << file_aflowin << " not able to open " << apl::endl;
+    //exit(0);
+    throw APLRuntimeError("Unable to open " + file_aflowin);
   }
   //while ( getline (read_path,line) )
   while (line_count < vlines.size()) {
@@ -433,8 +443,10 @@ void check_consistency_aflow_apl::check_consistency_in_aflow(string& current_run
 
   //if (!read_path.is_open()){ _logger<<apl::error << file_aflowin <<" not able to open "<<apl::endl; exit(0);}
   if (!vlines.size()) {
-    _logger << apl::error << file_aflowin << " not able to open " << apl::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //_logger << apl::error << file_aflowin << " not able to open " << apl::endl;
+    //exit(0);
+    throw APLRuntimeError("unable to open " + file_aflowin);
   }
 
   //while ( getline (read_path,line) )
@@ -450,8 +462,10 @@ void check_consistency_aflow_apl::check_consistency_in_aflow(string& current_run
   string tmpaflow = _RUNNING_DIR + "/tmp_aflow.in";
   aurostd::stringstream2file(myaflow, tmpaflow);
   if (aurostd::FileExist(tmpaflow)) {
-    _logger << apl::error << tmpaflow << " unable to open" << std::endl;
-    exit(0);
+    // ME190726 - exit clean-up
+    //_logger << apl::error << tmpaflow << " unable to open" << std::endl;
+    //exit(0);
+    throw APLRuntimeError("Unabel to open " + tmpaflow);
   }
 
   if (oldDCUSERPATH == DCUSERPATH) {

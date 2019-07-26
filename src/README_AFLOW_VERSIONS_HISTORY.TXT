@@ -4,6 +4,7 @@
         -- Linear tetrahedron method does not reduce upon construction anymore (necessary for projected DOS). (ME)
         -- Cleaned up code and added more comments to QMesh and LTMethod files. (ME)
         -- Made moveToBZ inside QMesh more robust. (ME)
+        -- Replaced all instances of exit in APL with throw APLRuntimeError. (ME)
 
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
