@@ -43,13 +43,13 @@ int MiscibilityMiedemaCheck(int speciesA,int speciesB) {// aflow_mix.cpp
   // cerr << "DEBUG " << GetAtomName(speciesA) << " " << GetAtomName(speciesB) << endl;
   //  cerr << speciesA << " " << speciesB << endl;
   if(speciesA==speciesB) return MISCIBILITY_SYSTEM_MISCIBLE; // A is obviously miscibile with itself
-  if(atom_miedema_phi_star.at(speciesA)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): atom_miedema_phi_star.at(speciesA) undefined" << endl;exit(0);}
-  if(atom_miedema_phi_star.at(speciesB)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): atom_miedema_phi_star.at(speciesB) undefined" << endl;exit(0);}
-  if(atom_miedema_nws.at(speciesA)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): atom_miedema_nws.at(speciesA) undefined" << endl;exit(0);}
-  if(atom_miedema_nws.at(speciesB)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): atom_miedema_nws.at(speciesB) undefined" << endl;exit(0);}
-  ratio=(atom_miedema_phi_star.at(speciesA)-atom_miedema_phi_star.at(speciesB))/(atom_miedema_nws.at(speciesA)-atom_miedema_nws.at(speciesB));
-  // cerr << "DEBUG " << atom_miedema_phi_star.at(speciesA) << " " << atom_miedema_phi_star.at(speciesB) << endl;
-  // cerr << "DEBUG " << atom_miedema_nws.at(speciesA) << " " << atom_miedema_nws.at(speciesB) << endl;
+  if(vatom_miedema_phi_star.at(speciesA)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_phi_star.at(speciesA) undefined" << endl;exit(0);}
+  if(vatom_miedema_phi_star.at(speciesB)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_phi_star.at(speciesB) undefined" << endl;exit(0);}
+  if(vatom_miedema_nws.at(speciesA)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_nws.at(speciesA) undefined" << endl;exit(0);}
+  if(vatom_miedema_nws.at(speciesB)==NNN) {cerr << "APENNSY ERROR (aflow_mix.cpp): vatom_miedema_nws.at(speciesB) undefined" << endl;exit(0);}
+  ratio=(vatom_miedema_phi_star.at(speciesA)-vatom_miedema_phi_star.at(speciesB))/(vatom_miedema_nws.at(speciesA)-vatom_miedema_nws.at(speciesB));
+  // cerr << "DEBUG " << vatom_miedema_phi_star.at(speciesA) << " " << vatom_miedema_phi_star.at(speciesB) << endl;
+  // cerr << "DEBUG " << vatom_miedema_nws.at(speciesA) << " " << vatom_miedema_nws.at(speciesB) << endl;
   // cerr << ratio << endl;
   if(ratio>=MIEDEMA_MIX_SLOPE) return MISCIBILITY_SYSTEM_MISCIBLE; else return MISCIBILITY_SYSTEM_NOMIX;
   return MISCIBILITY_SYSTEM_UNKNOWN; // impossible because it is one of the other before
