@@ -1931,9 +1931,10 @@ namespace aflowlib {
       // ME190614 - BEGIN
       // This has to come first because FIXBANDS messes up the EIGENVAL files
       aurostd::xoption opts, plotoptions;
-      opts.push_attached("PLOT_DOS", directory_RAW + ",,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
-      opts.push_attached("PLOT_BANDDOS", directory_RAW + ",,,1.75"); // 1.75 is typically enough to prevent plot legend from overlapping with DOS
-      opts.push_attached("PLOT_PDOS", directory_RAW + ",-1,,,1.5");  // 1.5 is typically enough to prevent plot legend from overlapping with DOS
+      string dosscale = aurostd::utype2string<double>(DEFAULT_DOS_SCALE);
+      opts.push_attached("PLOT_DOS", directory_RAW + ",,," + dosscale);
+      opts.push_attached("PLOT_BANDDOS", directory_RAW + ",,," + dosscale);
+      opts.push_attached("PLOT_PDOS", directory_RAW + ",-1,,," + dosscale);
       opts.push_attached("PLOTTER::PRINT", "png");
       plotoptions = plotter::getPlotOptionsEStructure(opts, "PLOT_DOS");
       plotter::PLOT_DOS(plotoptions);

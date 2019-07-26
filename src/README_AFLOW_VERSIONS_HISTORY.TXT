@@ -14,6 +14,7 @@
         -- AAPL_KPPRA added to aflow_modules. (ME)
         -- Minor APL code clean-ups. (ME)
         -- Added new plotter functions for band structures, phonons, and thermal properties. (ME)
+        -- Updated numbering scheme for partial DOS from being zero-based to being one-based. (ME)
         -- Changed xDOSCAR, xEIGENVAL, and xKPOINTS to be compatible with new plotter. (ME)
         -- Added functionality to APL that outputs phonon DOS and dispersion in
         -- VASP format for new plotter functions. (ME)

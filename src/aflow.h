@@ -3310,6 +3310,7 @@ namespace plotter {
   // Gnuplot
   void generateDosPlotGNUPLOT(stringstream&, const xDOSCAR&, const deque<double>&,
                               const deque<deque<deque<double> > >&, const vector<string>&, const aurostd::xoption&);
+  double getDosLimits(const aurostd::xoption&, const xDOSCAR&, const deque<deque<deque<double> > >&, const deque<double>&);
   void generateBandPlotGNUPLOT(stringstream&, const xEIGENVAL&, const vector<double>&,
                                const vector<double>&, const vector<string>&, const aurostd::xoption&);
   string getFormattedUnit(const string&);
