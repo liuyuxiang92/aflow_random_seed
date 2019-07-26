@@ -1,4 +1,4 @@
-3.1.225 - 2019/07/25
+3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)
         -- changed output name for --output=web to aflow_ALLOY_hull_web.json (WS)
