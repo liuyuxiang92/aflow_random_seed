@@ -67,3 +67,4 @@ src/aflow_data_extra.cpp
 src/FILES_CHANGED.txt
 src/zip_modified_aflow_files.sh
 src/MODIFIED_FILES_*.zip
+src/compile_output*.txt
