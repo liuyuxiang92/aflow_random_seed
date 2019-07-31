@@ -11179,6 +11179,7 @@ void ConvexHull::writeWebApp() const {
       if(!point.m_has_entry) {
         data_helper_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\"";  //unary, so "" delimiter doesn't play a role
         if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
+        data_helper_ss.str(""); //WS190731 - patching quaternary hull writer issues
       } else {
         data_helper_ss << "\"" << entry.auid << "\"";
         points_data_JSON_vs.push_back(data_helper_ss.str());

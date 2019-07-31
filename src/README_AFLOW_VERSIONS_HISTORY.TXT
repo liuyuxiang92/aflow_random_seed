@@ -1,5 +1,6 @@
 3.1.226 - 2019/08/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
+        -- patched web json for quaternary chull (WS)
         -- set explicit double->int conversion for roundDouble() in chull (CO)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
