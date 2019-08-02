@@ -420,7 +420,7 @@ namespace chull {
         stringstream output2; 
         string aflow_chull_jupyter_plotter_py=AFLOW_CHULL_JUPYTER_PLOTTER_PY;
         output2 << aflow_chull_jupyter_plotter_py;
-        aurostd::stringstream2file(output2,jupyter_directory+'/'+"plotter.py");
+        aurostd::stringstream2file(output2,jupyter_directory+'/'+"aflow_chull_plotter.py");
 
         stringstream output3;
         string aflow_chull_python_py=AFLOW_CHULL_PYTHON_PY;
@@ -621,7 +621,7 @@ namespace chull {
         vector<double> _coords;
         xvector<double> coords(dimension);
         aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
-        for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j]=_coords[j];}
+        for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
         if(LDEBUG) {cerr << soliloquy << " coords=" << coords << endl;}
         double dist2hull;
         //NB: to anyone who is using the convex hull object
@@ -649,12 +649,16 @@ namespace chull {
           hull_energy_ss << chull::convertUnits(dist2hull, (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
           oss << aurostd::wrapString(hull_energy_ss.str(),"{","}");
         } else {
-          message << "hull_energy[coords=";
-          for(int j=coords.lrows;j<=coords.urows;j++){
-            message << coords[j];
-            if(j!=((int)dimension)-1){message << ",";}
-          }
-          message << "] = ";
+          //[CO190801 - OBSOLETE]message << "hull_energy[coords=" << aurostd::joinWDelimiter(coords,",");
+          //[CO190801 - OBSOLETE]for(int j=coords.lrows;j<=coords.urows;j++){
+          //[CO190801 - OBSOLETE]  message << coords[j];
+          //[CO190801 - OBSOLETE]  if(j!=((int)dimension)-1){message << ",";}
+          //[CO190801 - OBSOLETE]}
+          //[CO190801 - OBSOLETE]message << "] = ";
+          uint precision=COEF_PRECISION;
+          double roundoff_tol=5.0*pow(10,-((int)precision)-1);
+          message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
+          message << " = ";
           if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << -chull::convertUnits(dist2hull, _m_) << " (meV/atom)";} //dist2hull here needs negative sign
           else {message << dist2hull << " (K)";}
           pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
