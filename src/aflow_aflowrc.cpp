@@ -22,6 +22,26 @@
 #define AFLOWRC_DEFAULT_KZIP_EXT                        string(".xz") 
 #define         DEFAULT_KZIP_EXT                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_EXT")
 
+// ME 190810 - START
+// DEFAULTS AFLOW DATABASE
+//#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/home/esters/WORK/db_tests/aflowlib.db")
+#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/ramd/database_new/aflowlib.db")
+#define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
+//#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/home/esters/WORK/db_tests/aflowlib.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/ramd/database_new/aflowlib.json")
+#define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
+//#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/home/esters/WORK/db_tests/")
+#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/www/search/database_new/")
+#define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DATA_PATH")
+//#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/home/esters/WORK/db_tests/aapi_schema.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/www/search/database_new/aapi_schema.json")
+#define         DEFAULT_AFLOW_DB_SCHEMA_FILE            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_SCHEMA_FILE")
+#define AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP                true
+#define         DEFAULT_AFLOW_DB_USE_TMP                XHOST.adefault.getattachedutype<bool>("DEFAULT_AFLOW_DB_USE_TMP")
+#define AFLOWRC_DEFAULT_AFLOW_DB_MODE                   0  // DAT files
+#define         DEFAULT_AFLOW_DB_MODE                   XHOST.adefault.getattachedutype<int>("DEFAULT_AFLOW_DB_MODE")
+// ME180810 - STOP
+
 // FILENAMES FOR AFLOW.ORG ANALYSIS
 #define AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT         string("aflowlib.out")
 #define         DEFAULT_FILE_AFLOWLIB_ENTRY_OUT         XHOST.adefault.getattachedscheme("DEFAULT_FILE_AFLOWLIB_ENTRY_OUT")
@@ -873,6 +893,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
 
+    // ME190810 - START
+    // AFLOW database files
+    aflowrc::load_default("DEFAULT_AFLOW_DB_FILE", AFLOWRC_DEFAULT_AFLOW_DB_FILE);
+    aflowrc::load_default("DEFAULT_AFLOW_DB_STATS_FILE", AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE);
+    aflowrc::load_default("DEFAULT_AFLOW_DB_DATA_PATH", AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH);
+    aflowrc::load_default("DEFAULT_AFLOW_DB_SCHEMA_FILE", AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE);
+    aflowrc::load_default("DEFAULT_AFLOW_DB_USE_TMP", AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP);
+    aflowrc::load_default("DEFAULT_AFLOW_DB_MODE", AFLOWRC_DEFAULT_AFLOW_DB_MODE);
+    // ME190810 - END
     // FILENAMES FOR AFLOW.ORG ANALYSIS
     aflowrc::load_default("DEFAULT_FILE_AFLOWLIB_ENTRY_OUT",AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
     aflowrc::load_default("DEFAULT_FILE_AFLOWLIB_ENTRY_JSON",AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_JSON);
@@ -1306,6 +1335,15 @@ namespace aflowrc {
     aflowrc << "DEFAULT_KZIP_EXT=\"" << AFLOWRC_DEFAULT_KZIP_EXT << "\"" << endl;
 
     aflowrc << " " << endl;
+    // ME190810 - START
+    aflowrc << "// DEFAULT AFLOW DATABASE" << endl;
+    aflowrc << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_DB_STATS_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_DB_SCHEMA_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_DB_USE_TMP=" << AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP << endl;
+    aflowrc << "DEFAULT_AFLOW_DB_MODE=" << AFLOWRC_DEFAULT_AFLOW_DB_MODE << endl;
+    // ME190810 - STOP
     aflowrc << "// FILENAMES FOR AFLOW.ORG ANALYSIS" << endl;
     aflowrc << "DEFAULT_FILE_AFLOWLIB_ENTRY_OUT=\"" << AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << endl;
     aflowrc << "DEFAULT_FILE_AFLOWLIB_ENTRY_JSON=\"" << AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "\"" << endl;
@@ -1736,6 +1774,15 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.Home=" << XHOST.Home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
+    // ME190810 - START
+    if(LDEBUG) oss << "// DEFAULT AFLOW DATABASE" << endl;
+    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_STATS_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_SCHEMA_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_USE_TMP=" << AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP << endl;
+    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_MODE=" << AFLOWRC_DEFAULT_AFLOW_DB_MODE << endl;
+    // ME190810 - STOP
     if(LDEBUG) oss << "// DEFAULT DEFINITIONS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_BIN\")=\"" << DEFAULT_KZIP_BIN << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_EXT\")=\"" << DEFAULT_KZIP_EXT << "\"" << endl;

@@ -76,6 +76,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"ANGLES","--angle=|--angles=","0.0");
 
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB","--aflowlib=","");
+  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB2","--aflowlib2=","");  // ME190810
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AUID2AURL","--aflowlib_auid2aurl=|--auid2aurl=","");
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AURL2AUID","--aflowlib_aurl2auid=|--aurl2auid=","");
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AUID2LOOP","--aflowlib_auid2loop=|--auid2loop=","");
@@ -1056,6 +1057,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
+  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database") && argv.at(1)=="--rebuild_database");  // ME190810
 
   vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
@@ -1223,6 +1225,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("TERDATA_EXIST",aurostd::args2flag(argv,cmds,"--terdata_exist"));
   
   vpflow.flag("UFFENERGY",aurostd::args2flag(argv,cmds,"--uffenergy|--ue"));
+  vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database") && argv.at(1)=="--update_database");  // ME190810
   
   //DX 20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX 20180710 - check if used in proto
@@ -1479,6 +1482,16 @@ namespace pflow {
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
       if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",16.0),vpflow.flag("WWW")); _PROGRAMRUN=true;}
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
+      // ME 190810 - START
+      if(vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_SCHEMA_FILE,
+                             DEFAULT_AFLOW_DB_USE_TMP, DEFAULT_AFLOW_DB_MODE);
+        if (db.rebuildDatabase(vpflow.flag("REBUILDDB"))) {
+          db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
+        }
+        _PROGRAMRUN = true;
+      }
+      // ME190810 - END
       // [OBSOLETE CO 180703]if(vpflow.flag("QMVASP")) {pflow::QMVASP(argv); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}
@@ -1501,6 +1514,7 @@ namespace pflow {
       if(vpflow.flag("ALPHA_COMPOUND")) {cout << pflow::ALPHACompound(vpflow.getattachedscheme("ALPHA_COMPOUND")); _PROGRAMRUN=true;}
       if(vpflow.flag("ALPHA_SPECIES")) {cout << pflow::ALPHASpecies(vpflow.getattachedscheme("ALPHA_SPECIES")); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB")) {aflowlib::WEB_Aflowlib_Entry_PHP(vpflow.getattachedscheme("AFLOWLIB"),cout); _PROGRAMRUN=true;}
+      if(vpflow.flag("AFLOWLIB2")) {aflowlib::getAflowlibEntryWeb(DEFAULT_AFLOW_DB_FILE,vpflow.getattachedscheme("AFLOWLIB2"),cout); _PROGRAMRUN=true;}  // ME190810
       if(vpflow.flag("AFLOWLIB_AUID2AURL")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2AURL"),"AFLOWLIB_AUID2AURL"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AURL2AUID")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2AUID"),"AFLOWLIB_AURL2AUID"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AUID2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2LOOP"),"AFLOWLIB_AUID2LOOP"); _PROGRAMRUN=true;}

@@ -11,6 +11,7 @@
 #define _AFLOWLIB_H_
 
 #include "aflow.h"
+#include "SQLITE/sqlite3.h"
 //[OBSOLETE] [KESONG] #include "aflow_contrib_kesong.h" //CO 180515
 
 using std::vector;
@@ -476,6 +477,137 @@ bool AlloyAlphabeticLIBRARY(const string& system);
 // void Aflowlib_AUROHOUSE(int deltat);
 // void Aflowlib_AUROHOUSE(int deltat,bool CURATOR);
 // ***************************************************************************
+
+// ***************************************************************************
+// AflowDB class
+
+namespace aflowlib {
+
+struct DBstats {
+  vector<string> columns;
+  vector<int> count;
+  vector<std::pair<string, int> > loop_counts;
+  vector<string> max;
+  vector<string> min;
+  int nentries;
+  int nsystems;
+  vector<vector<string> > set;
+  vector<string> species;
+  string table;
+};
+
+#define _DB_MODE_READ_ -1
+#define _DB_MODE_DAT_   0
+#define _DB_MODE_AUID_  1
+#define _DB_SCHEMA_TABLE_ string("schema")
+
+class AflowDB {
+  public:
+    AflowDB(string);
+    AflowDB(string, string, string, bool=true, int=_DB_MODE_DAT_);
+    ~AflowDB();
+
+    string data_path;
+    int database_mode;
+    string database_file;
+    string schema_file;
+    bool use_tmp;
+
+    bool isTMP();
+
+    bool rebuildDatabase(bool=false);
+    void analyzeDatabase(string);
+
+    string getValue(const string&, const string&, string="");
+    vector<string> getValueMultiCol(const string&, const vector<string>&, string="");
+    string getProperty(const string&, const string&, const string&, string="");
+    vector<string> getColumn(const string&, const string&, string="");
+    vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
+    vector<vector<string> > getSetMultiCol(const string&, const vector<string>&, bool=false, string="", int=0, string="");
+    vector<string> getTableSubset(const string&);
+    vector<string> getTableSubset(const vector<string>&);
+    vector<string> getTables(string="");
+
+    void createTempTable(const string&, const vector<string>&, const string&);
+    void createTempTable(const string&, const vector<string>&, const vector<string>&);
+    void createTempTableAs(const string&, const string&);
+    void dropTempTable(const string&);
+    void transaction(bool);
+
+  private:
+    void free();
+    void open();
+    void close();
+
+    sqlite3* db;
+    bool is_tmp;
+
+    void openTmpFile();
+    bool closeTmpFile(bool=true);
+
+    vector<string> getDATfiles();
+    vector<string> getAUIDfiles();
+    bool newerFileExists(const vector<string>&);
+
+    void createSchemaTable(string);
+    void createDataEntries(const vector<string>&);
+
+    vector<string> getSchemaRows(const string&);
+    vector<string> getSchemaValues(string, const vector<string>&, const string&);
+
+    vector<string> getDataTypes(const vector<string>&);
+    vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+
+    DBstats getColStats(const string&);
+    vector<std::pair<string, int> > getDBLoopCounts(const string&);
+    vector<string> getUniqueFromJSONArrays(const vector<string>&);
+    void writeStatsToJSON(std::stringstream&, const DBstats&);
+
+    void createIndex(const string&, const string&, const string&);
+    void dropIndex(const string&);
+    string extractJSONvalue(const string&, const string&);
+    string extractJSONvalueAFLOW(const string&, string);
+    void dropTable(const string&);
+    void createTable(const string&, const vector<string>&, const string&);
+    void createTable(const string&, const vector<string>&, const vector<string>&, bool=false);
+    void createTableAs(const string&, const string&, bool=false);
+    void insertValues(const string&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&, const vector<string>&);
+    string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
+    string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
+
+    void SQLexecuteCommand(const string&);
+    string SQLexecuteCommandSCALAR(const string&);
+    vector<string> SQLexecuteCommandVECTOR(const string&);
+    vector<vector<string> > SQLexecuteCommand2DVECTOR(const string&);
+    static int SQLcallback(void*, int, char**, char**);
+    static int SQLcallbackSCALAR(void*, int, char**, char**);
+    static int SQLcallbackVECTOR(void*, int, char**, char**);
+    static int SQLcallback2DVECTOR(void*, int, char**, char**);
+};
+
+}  // namespace aflowlib
+
+// ***************************************************************************
+// AflowDB - WEB interface
+namespace aflowlib {
+  void getAflowlibEntryWeb(const string&, const string&, std::ostream&);
+  string getEntryJSON(AflowDB&, string="", bool=true);
+
+  string formatHREFToJSON(const string&, const string&, AflowDB& db);
+  string formatValueToHTML(const string&, const string&, AflowDB&);
+  string formatCompound(const string&);
+  string formatCrystallography(const string&);
+  string formatICSD(AflowDB&);
+  string formatLattice(const string&, bool);
+  string formatLDAU(const string&);
+  string formatSpaceGroup(string);
+  string formatSpeciesResolvedProperties(const string&, AflowDB&);
+  string formatAtomResolvedProperties(string, AflowDB&);
+  string formatAtomResolvedProperties(const vector<string>&, const vector<int>&, const string&, bool);
+
+  vector<string> getVectorFromArrayString(string);
+}
 
 #endif //  _AFLOWLIB_H_
 

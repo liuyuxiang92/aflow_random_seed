@@ -123,7 +123,7 @@ POCCUPATION_FUNCS_SRC = aflow_pocc_old.cpp
 APENNSY_FUNCS_SRC = aflow_apennsy_gndstate.cpp aflow_apennsy_structures.cpp aflow_apennsy.cpp aflow_apennsy_phases.cpp aflow_apennsy_main.cpp aflow_apennsy_vaspin.cpp
 LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp 
 CALCULATED_SRC = aflow_data_calculated.cpp
-AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp 
+AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp aflowlib_database.cpp aflowlib_db_web_interface.cpp
 #DX and CO - START
 APL_SRC = APL/aflow_apl_kphonons.cpp APL/aflow_qha_operations.cpp APL/aflow_apl_function_fitting.cpp APL/aflow_apl_dirphoncalc.cpp APL/aflow_apl_qmesh.cpp APL/aflow_apl_ltet.cpp APL/aflow_apl_doscalc.cpp APL/aflow_apl_gsa.cpp APL/aflow_apl_logger.cpp APL/aflow_apl_lrphoncalc.cpp APL/aflow_apl_pathbuilder.cpp APL/aflow_apl_pdisc.cpp APL/aflow_apl_phoncalc.cpp APL/aflow_apl_shellhandle.cpp APL/aflow_apl_supercell.cpp APL/aflow_apl_thermalpc.cpp APL/aflow_aapl_cluster.cpp APL/aflow_aapl_ifcs.cpp APL/aflow_aapl_setup.cpp APL/aflow_aapl_tcond.cpp APL/aflow_qha_aflowin_creator.cpp APL/aflow_qha_dm_pdos_save.cpp APL/aflow_apl_hsqpoints.cpp APL/aflow_qha_gruneisen.cpp APL/aflow_apl_group_velocity.cpp APL/aflow_apl_atomic_disp.cpp APL/aflow_scqha_gruneisen.cpp APL/aflow_scqha_eos.cpp APL/aflow_qha_energies.cpp APL/aflow_qha3phonons_eos.cpp APL/aflow_qha_eos.cpp APL/aflow_scqha_T_freqs.cpp
 #DX and CO - END
