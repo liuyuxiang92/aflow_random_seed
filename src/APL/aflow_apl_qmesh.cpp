@@ -127,7 +127,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
   // Calculate the point group of the reciprocal cell. This requires some dummy
   // ofstream objects to parse into the function. These objects will be removed
   // when CalculatePointGroupKCrystal is redesigned to work without ofstreams.
-  if (!xs.pgroupk_calculated) {  // ME190625 - need pgrouk, not pgrouk_xtal
+  if (!xs.pgroupk_calculated) {  // ME190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
     ofstream FileDevNull("/dev/null");
     if (!FileDevNull.is_open()) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
