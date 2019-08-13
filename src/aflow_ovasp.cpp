@@ -3825,7 +3825,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if (iline == (d + 1) * number_energies + 6 + d) {
       d++;
       // ME190810 - Safeguard against DOSCARs with additional lines
-      if (d == ndos) {
+      if (d == (int) ndos) {
         std::cerr << "xDOSCAR::GetProperties(): WARNING: DOSCAR contains more"
                   << " lines than the header suggests. xDOSCAR object may not"
                   << " be properly populated." << std::endl;
