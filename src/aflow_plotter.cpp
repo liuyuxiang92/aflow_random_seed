@@ -265,7 +265,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
       if (lattice.empty()) title += ")";
       else title += ", " + lattice + ")";
     } else { // Title not in ICSD format
-      return default_title;
+      return aurostd::fixStringLatex(default_title, false, false);
     }
   } else if (aurostd::substring2bool(default_title, "POCC")) {  // Check if in POCC format
     title = formatDefaultTitlePOCC(plotoptions);
@@ -279,17 +279,22 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
       if (aurostd::withinList(protos, proto)) {
         if (tokens.size() == 3) proto += "." + tokens[2];
         vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
-        vector<double> composition = getCompositionFromANRLProtoype(proto);
+        vector<double> composition = getCompositionFromANRLPrototype(proto);
         proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
         title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO190629
       } else {
-        aflowlib::GetAllPrototypeLabels(protos, "all");
-        if (aurostd::withinList(protos, proto)) {
-          if (tokens.size() == 3) proto += "." + tokens[2];
+        if (tokens.size() == 3) proto += "." + tokens[2];
+        vector<string> comp;
+        protos.clear();
+        aflowlib::GetAllPrototypeLabels(protos, comp, "htqc");
+        int index = aurostd::findInList(protos, proto);
+        if (index > -1) {
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-          title = pflow::prettyPrintCompound(tokens[0], no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO190629
+          vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
+          vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
+          title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO190629
         } else {  // Title not in prototype format
-          return default_title;
+          return aurostd::fixStringLatex(default_title, false, false);
         }
       }
     }
@@ -297,7 +302,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     if (lattice.empty()) title += ")";
     else title += ", " + lattice + ")";
   } else {  // Not an AFLOW-formatted default
-    return default_title;
+    return aurostd::fixStringLatex(default_title, false, false);
   }
   // Code only gets here if the title is AFLOW-formatted
   string set = plotoptions.getattachedscheme("DATASET");
@@ -309,13 +314,27 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
   return title;
 }
 
+//getCompositionFromHTQCPrototype/////////////////////////////////////////////
+// Gets the composition from an HTQC prototype string. The composition string
+// must be retrieved beforehand.
+vector<double> getCompositionFromHTQCPrototype(const string& htqc_prototype,
+                                               const string& composition) {
+  string anrl_prototype = composition + "_";
+  // Composition already has the correct sequence, so keeping the explicit
+  // sequence designator will confuse getCompositonFromANRLPrototype
+  string::size_type t = htqc_prototype.find(".");
+  anrl_prototype += htqc_prototype.substr(0, t);
+  return getCompositionFromANRLPrototype(anrl_prototype);
+}
+
 //getCompositionFromANRLPrototype/////////////////////////////////////////////
 // Gets the composition from an ANRL prototype string.
-vector<double> getCompositionFromANRLProtoype(const string& prototype) {
+vector<double> getCompositionFromANRLPrototype(const string& prototype) {
   // Determine element sequence
   // If there is a . in the prototype string, the element sequence is given explicitly
+  string seq;
   string::size_type t = prototype.find(".");
-  string seq = prototype.substr(t + 1, string::npos);
+  if (t != string::npos) seq = prototype.substr(t + 1, string::npos);
   t = prototype.find("_");
   string compound = prototype.substr(0, t);
   // If not explicitly given, determine element sequence from the prototype name

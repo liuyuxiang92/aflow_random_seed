@@ -4390,6 +4390,22 @@ namespace aurostd {
     return false;
   }
 
+  // ME190813
+  int findInList(const vector<string>& list, const string& input) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {if(list[i]==input) return i;}
+    return -1;
+  }
+
+  int findInList(const vector<int>& list, int input) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {if(list[i]==input) return i;}
+    return -1;
+  }
+
+  int findInList(const vector<uint>& list, uint input) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {if(list[i]==input) return i;}
+    return -1;
+  }
+
   // ***************************************************************************
   bool substring_present_file(const string& FileName, const string& strsub1, bool CLEAN) {
     string StringFile;

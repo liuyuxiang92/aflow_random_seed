@@ -3277,7 +3277,8 @@ namespace plotter {
   void setFileName(aurostd::xoption&, string="");
   void setTitle(aurostd::xoption&);
   string formatDefaultPlotTitle(const aurostd::xoption&);
-  vector<double> getCompositionFromANRLProtoype(const string& prototype);
+  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME190813
+  vector<double> getCompositionFromANRLPrototype(const string&);
   string formatDefaultTitlePOCC(const aurostd::xoption&);
   vector<double> getCompositionFromPoccString(const string&, bool&);
 

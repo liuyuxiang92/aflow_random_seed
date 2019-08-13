@@ -650,6 +650,9 @@ namespace aurostd {
   bool withinList(const vector<string>& list,const string& input);  //CO181010
   bool withinList(const vector<int>& list,int input); //CO181010
   bool withinList(const vector<uint>& list,uint input); //CO181010
+  int findInList(const vector<string>&, const string&);  // ME190813
+  int findInList(const vector<int>&, int);  // ME190813
+  int findInList(const vector<uint>&, uint);  // ME190813
   bool substring_present_file(const string& FileName, const string& strsub1) ;
   bool substring_present_file_FAST(const string& FileName, const string& strsub1) ;
   // about present substrings and taking off the value

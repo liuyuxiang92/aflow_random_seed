@@ -1,10 +1,14 @@
-3.1.226 - 2019/07/26
+3.1.226 - 2019/08/13
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Added projected phonon DOS calculations. (ME)
         -- Linear tetrahedron method does not reduce upon construction anymore (necessary for projected DOS). (ME)
         -- Cleaned up code and added more comments to QMesh and LTMethod files. (ME)
         -- Made moveToBZ inside QMesh more robust. (ME)
         -- Replaced all instances of exit in APL with throw APLRuntimeError. (ME)
+        -- Sped up reduction of q-mesh grid. (ME)
+        -- Added safeguards for DOSCAR readers for broken DOSCAR files. (ME)
+        -- Fixed plotter bugs for HTQC prototype names. (ME)
+        -- Added findInList function to AUROSTD. (ME)
 
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
