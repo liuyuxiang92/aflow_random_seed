@@ -371,10 +371,10 @@ namespace aurostd {
     conj(const xmatrix<utype>&) __xprototype; // ME 180904
   
   template<class utype> xmatrix<utype>  // transpose
-    trasp(const xmatrix<utype>&, bool=false) __xprototype; // 25 january 2000, ME190813 - modified
+    trasp(const xmatrix<utype>&, bool=true) __xprototype; // 25 january 2000, ME190813 - modified
   
   template<class utype> xmatrix<utype>  // transpose
-    trasp(const xvector<utype>&, bool=false) __xprototype; // 5 febrary 2000, ME190813 - modified
+    trasp(const xvector<utype>&, bool=true) __xprototype; // 5 febrary 2000, ME190813 - modified
 
   // Mathematical operations
   
