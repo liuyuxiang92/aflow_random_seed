@@ -24,22 +24,20 @@
 
 // ME 190810 - START
 // DEFAULTS AFLOW DATABASE
-//#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/home/esters/WORK/db_tests/aflowlib.db")
-#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/ramd/database_new/aflowlib.db")
+#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/marcosplayground/aflowlib.db")
+//#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/ramd/database_new/aflowlib.db")
 #define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
-//#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/home/esters/WORK/db_tests/aflowlib.json")
-#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/ramd/database_new/aflowlib.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/marcosplayground/aflowlib.json")
+//#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/ramd/database_new/aflowlib.json")
 #define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
 //#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/home/esters/WORK/db_tests/")
-#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/www/search/database_new/")
-#define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DATA_PATH")
+#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AUID/RAW/")
+#define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_DATA_PATH")
 //#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/home/esters/WORK/db_tests/aapi_schema.json")
 #define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/www/search/database_new/aapi_schema.json")
-#define         DEFAULT_AFLOW_DB_SCHEMA_FILE            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_SCHEMA_FILE")
+#define         DEFAULT_AFLOW_DB_SCHEMA_FILE            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_SCHEMA_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP                true
 #define         DEFAULT_AFLOW_DB_USE_TMP                XHOST.adefault.getattachedutype<bool>("DEFAULT_AFLOW_DB_USE_TMP")
-#define AFLOWRC_DEFAULT_AFLOW_DB_MODE                   0  // DAT files
-#define         DEFAULT_AFLOW_DB_MODE                   XHOST.adefault.getattachedutype<int>("DEFAULT_AFLOW_DB_MODE")
 // ME180810 - STOP
 
 // FILENAMES FOR AFLOW.ORG ANALYSIS
@@ -900,7 +898,6 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AFLOW_DB_DATA_PATH", AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH);
     aflowrc::load_default("DEFAULT_AFLOW_DB_SCHEMA_FILE", AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_USE_TMP", AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP);
-    aflowrc::load_default("DEFAULT_AFLOW_DB_MODE", AFLOWRC_DEFAULT_AFLOW_DB_MODE);
     // ME190810 - END
     // FILENAMES FOR AFLOW.ORG ANALYSIS
     aflowrc::load_default("DEFAULT_FILE_AFLOWLIB_ENTRY_OUT",AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
@@ -1342,7 +1339,6 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_SCHEMA_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_USE_TMP=" << AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP << endl;
-    aflowrc << "DEFAULT_AFLOW_DB_MODE=" << AFLOWRC_DEFAULT_AFLOW_DB_MODE << endl;
     // ME190810 - STOP
     aflowrc << "// FILENAMES FOR AFLOW.ORG ANALYSIS" << endl;
     aflowrc << "DEFAULT_FILE_AFLOWLIB_ENTRY_OUT=\"" << AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << endl;
@@ -1781,7 +1777,6 @@ namespace aflowrc {
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_SCHEMA_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_USE_TMP=" << AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP << endl;
-    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_MODE=" << AFLOWRC_DEFAULT_AFLOW_DB_MODE << endl;
     // ME190810 - STOP
     if(LDEBUG) oss << "// DEFAULT DEFINITIONS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_BIN\")=\"" << DEFAULT_KZIP_BIN << "\"" << endl;

@@ -18,7 +18,18 @@
 
 #include "aflowlib.h"
 #include "SQLITE/sqlite3.h"
-#include <time.h>
+
+// Some parts are written within the C++0x support in GCC, especially std::thread,
+// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
+// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
+#if GCC_VERSION >= 40400
+#define AFLOW_DB_MULTITHREADS_ENABLE
+#include <thread>
+#include <mutex>
+static std::mutex m;
+#else
+#warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#endif
 
 #define _AFLOW_DB_DEBUG_     false
 #define _SQL_COMMAND_DEBUG_  false  // debug SQL commands that are sent - verbose output
@@ -28,8 +39,8 @@ using std::string;
 using std::vector;
 
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
-
 static const int _DEFAULT_SET_LIMIT_ = 16;
+static const int _MAX_CPU_ = 16;
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
 
@@ -40,27 +51,20 @@ AflowDB::AflowDB(string db_file) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   free();
   database_file = db_file;
-  database_mode = _DB_MODE_READ_;
-  if (LDEBUG) std::cerr << "AflowDB: data base mode READ" << std::endl;
+  if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
   open();
 }
 
 // Open the database for write access
-AflowDB::AflowDB(string db_file, string dt_path, string schm_file, bool use_tmp_file, int mode) {
+AflowDB::AflowDB(string db_file, string dt_path, string schm_file, bool use_tmp_file) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   free();
   data_path = dt_path;
-  database_mode = mode;
   database_file = db_file;
   schema_file = schm_file;
   use_tmp = use_tmp_file;
   if (LDEBUG) {
-    string db_mode;
-    if (database_mode == _DB_MODE_DAT_) db_mode = "DAT";
-    else if (database_mode == _DB_MODE_AUID_) db_mode = "AUID";
-    else db_mode = "UNKNOWN";
     std::cerr << "AflowDB: Database file: " << database_file << std::endl;
-    std::cerr << "AflowDB: Database mode: " << db_mode << std::endl;
     std::cerr << "AflowDB: Data path: " << data_path << std::endl;
     std::cerr << "AflowDB: Schema file: " << schema_file << std::endl;
     std::cerr << "AflowDB: Use tmp file: " << use_tmp << std::endl;
@@ -74,7 +78,6 @@ AflowDB::~AflowDB() {
 }
 
 void AflowDB::free() {
-  database_mode = -1;
   data_path = "";
   database_file = "";
   schema_file = "";
@@ -182,7 +185,7 @@ namespace aflowlib {
 // the rebuilding functions. Returns true if the database has been
 // successfully rebuilt.
 bool AflowDB::rebuildDatabase(bool force_rebuild) {
-  bool LDEBUG = (TRUE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+  bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
 
   // Check whether to rebuild the database
   bool rebuild_db, file_empty;
@@ -195,21 +198,10 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     file_empty = aurostd::FileEmpty(database_file); // file_empty needed for LDEBUG
     rebuild_db = file_empty;
   }
-  // Get the files with the data entries. This file is needed for the database
-  // rebuild and/or to check for updated files.
-  vector<string> entry_sets;
-  if (database_mode == _DB_MODE_DAT_) {
-    entry_sets = getDATfiles();
-  } else if (database_mode == _DB_MODE_AUID_) {
-    entry_sets = getAUIDfiles();
-  } else {
-    return false;
-  }
+
   // Check if any relevant files are newer than the database. No need to check
   // if the database has to be rebuilt for other reasons already.
-  if (!rebuild_db) {
-    rebuild_db = newerFileExists(entry_sets);
-  }
+  vector<vector<string> > entries = getJsonFiles(rebuild_db);
 
   // Rebuild the database if needed.
   if (rebuild_db) {
@@ -217,15 +209,6 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       string function = _AFLOW_DB_DEBUG_ + "rebuildDatabase(): ";
       if (force_rebuild) std::cerr << function << "Rebuilding database (force_rebuild)." << std::endl;
       if (file_empty) std::cerr << function << "Rebuilding database (file not found or empty)." << std::endl;
-      if (database_mode == _DB_MODE_DAT_) {
-        std::cerr << function << "Rebuilding database using DAT file" << ((entry_sets.size() == 1)?"":"s");
-        for (uint i = 0; i < entry_sets.size(); i++) {
-          std::cerr << " " << entry_sets[i];
-        }
-        std::cerr << "." << std::endl;
-      } else if (database_mode == _DB_MODE_AUID_) {
-        std::cerr << function << "Rebuilding database using a list of AUIDs." << std::endl;
-      }
     }
 
     if (use_tmp) openTmpFile();
@@ -235,7 +218,7 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       dropTable(tables[t]);
     }
     createSchemaTable(schema_file);
-    createDataEntries(entry_sets);
+    createDataEntries(entries);
     if (use_tmp) return closeTmpFile();
     return true;
   } else {
@@ -243,61 +226,95 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
   }
 }
 
-//getDATfiles/////////////////////////////////////////////////////////////////
-// Retrieves a list of .dat files that contain the data.
-vector<string> AflowDB::getDATfiles() {
-  vector<string> files, dirls;
-  aurostd::DirectoryLS(data_path, dirls);
-  for (uint i = 0; i < dirls.size(); i++) {
-    if (aurostd::substring2bool(dirls[i], ".dat") && 
-        !aurostd::substring2bool(dirls[i], ".swp") &&  // Ignore .swp files
-        !aurostd::IsCompressed(dirls[i])) {  // Compressed files are backup, so ignore
-      files.push_back(dirls[i]);
+//getJsonFiles////////////////////////////////////////////////////////////////
+// Crawls through the AUID directory space and fetches all AUIDs that contain
+// a JSON file.
+vector<vector<string> > AflowDB::getJsonFiles(bool& rebuild_db) {
+  bool LDEBUG = (TRUE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+  vector<string> paths;
+  aurostd::DirectoryLS(data_path, paths);
+  if (paths.size() != 256) {
+    string function = _AFLOW_DB_ERR_PREFIX_ + "getJsonFiles()";
+    string message = "Not a valid AUID directory.";
+    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  }
+
+  vector<vector<string> > entries(256);
+
+#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+  int ncpus = init::GetCPUCores();
+  if (ncpus < 1) ncpus = 1;
+  if (ncpus > _MAX_CPU_) ncpus = _MAX_CPU_;
+  vector<vector<int> > thread_dist = getThreadDistribution(32, ncpus);
+  vector<std::thread*> threads;
+  for (int t = 0; t < ncpus; t++) {
+    threads.push_back(new std::thread(&AflowDB::getJsonFilesThread, this, thread_dist[t][0], thread_dist[t][1],
+                                      std::ref(entries), std::ref(rebuild_db), std::ref(paths)));
+  }
+  for (int t = 0; t < ncpus; t++) {
+    threads[t]->join();
+    delete threads[t];
+  }
+#else
+  getJsonFilesThread(0, 256, entries, rebuild_db, paths);
+#endif
+  if (LDEBUG) {
+    std::cerr << _AFLOW_DB_ERR_PREFIX_ << "getJsonFile(): Number of entries:" << std::endl;
+    for (int i = 0; i < 32; i++) {
+      std::cerr << "    " << std::hex << std::setfill('0') << std::setw(2) << i
+                << ": " << std::dec << entries[i].size() << std::endl;
     }
   }
-  return files;
+  return entries;
 }
 
-//getAUIDfiles////////////////////////////////////////////////////////////////
-// Retrieves a list of json files based on the AUID directory scheme. 
-vector<string> AflowDB::getAUIDfiles() {
-  // AUIDs may not have been initialized yet
-  if (XHOST_AUID.size() == 0) XHOST_AUID=init::InitGlobalObject("vAUID", "", false);
-  uint nauid = vAUID.size();
-  vector<string> files(nauid);
-  string path;
-  for (uint i = 0; i < nauid; i++) {
-    // Create the path to the json file based on the AUID
-    path = vAUID[i].substr(0, 8);  // aflow:XX
-    for (string::size_type j = 8; j != string::npos; j+= 2) {
-      path += "/" + vAUID[i].substr(j, 2);
-    }
-    files[i] = path + "/aflowlib.json";
-  }
-  return files;
-}
-
-//newerFileExists/////////////////////////////////////////////////////////////
-// Checks if a data file exists that is newer than the database.
-bool AflowDB::newerFileExists(const vector<string>& files) {
-  bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-  if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "newerFileExists(): Looking for newer files." << std::endl;
+void AflowDB::getJsonFilesThread(int startIndex, int endIndex, vector<vector<string> >& entries,
+                                 bool& rebuild_db, const vector<string>& paths) {
+  bool LDEBUG = (TRUE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   long int tm_db = aurostd::FileModificationTime(database_file);
+  for (int i = startIndex; i < endIndex; i++) {
+    // Fetch AUIDs
+    crawl(entries[i], data_path + paths[i], 1, 8);
 
-  // Check schema file
-  if (aurostd::FileModificationTime(schema_file) > tm_db) {
-    if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "newerFileExists(): Found newer file " << schema_file << "." << std::endl;
-    return true;
-  }
-
-  // Check data files
-  for (uint f = 0; f < files.size(); f++) {
-    if (aurostd::FileModificationTime(files[f]) > tm_db) {
-      if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "newerFileExists(): Found newer file " << files[f] << "." << std::endl;
-      return true;
+    // Check if there is a newer aflowlib.json (if necessary)
+    if (!rebuild_db) {
+      uint e = 0;
+      uint nentries = entries[i].size();
+      string filename;
+      for (e = 0; !(rebuild_db) && (e < nentries); e++) {
+        filename = data_path + "aflow:" + entries[i][e] + "/aflowlib.json";
+        if (aurostd::FileModificationTime(filename) > tm_db) break;
+      }
+      if ((e < nentries) && (!rebuild_db)) {
+      #ifdef AFLOW_DB_MULTITHREADS_ENABLE
+        std::unique_lock<std::mutex> lk(m);
+      #endif
+        rebuild_db = true;
+        if (LDEBUG) {
+          string entry = aurostd::RemoveSubString(entries[i][e], "/");
+          std::cerr << _AFLOW_DB_ERR_PREFIX_ << "getJsonFiles(): Found newer entry."
+                    << " AUID = aflow:" << aurostd::toupper(entry) << std::endl;
+        }
+      }
     }
   }
-  return false;
+}
+
+//crawl///////////////////////////////////////////////////////////////////////
+// Recursive function to crawl through the AUID directory space.
+void AflowDB::crawl(vector<string>& entries, const string& parent_path, int depth, int maxdepth) {
+  if (depth == maxdepth) { // Found the end of the directory tree
+    string filename = parent_path + "/aflowlib.json";
+    if (aurostd::FileExist(filename)) {
+      entries.push_back(parent_path.substr(string(data_path + "aflow:").size(), string::npos));
+    }
+  } else {
+    vector<string> child_paths;
+    aurostd::DirectoryLS(parent_path, child_paths);
+    for (uint p = 0, npaths = child_paths.size(); p < npaths; p++) {
+      crawl(entries, parent_path + "/" + child_paths[p], depth + 1, maxdepth);
+    }
+  }
 }
 
 // Schema --------------------------------------------------------------------
@@ -365,8 +382,7 @@ vector<string> AflowDB::getSchemaValues(string row, const vector<string>& cols, 
 
 //createDataEntries///////////////////////////////////////////////////////////
 // This function inserts the data into the database.
-void AflowDB::createDataEntries(const vector<string>& entry_sets) {
-  bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+void AflowDB::createDataEntries(const vector<vector<string> >& entries) {
   // Do not constantly synchronize the database with file on disk.
   // Increases performance significantly.
   SQLexecuteCommand("PRAGMA synchronous = OFF");
@@ -374,55 +390,35 @@ void AflowDB::createDataEntries(const vector<string>& entry_sets) {
   // Get all relevant properties from the schema
   vector<string> cols, types;
   transaction(true);
-  // Links and images are static, so storing them in the database would wasteful
+  // Links and images are static, so storing them in the database would be wasteful
   string where = "function IS NOT 'link' AND type IS NOT 'image'";
   where += " AND name IS NOT 'icsd_number'";  // ICSD numbers are not stored in the database
   cols = getSet(_DB_SCHEMA_TABLE_, "name", false, where);
   types = getDataTypes(cols);
 
   // Insert data
-  string table;
-  vector<string> vals;
-  int counter = 0, chunk_size = 1000;  // To insert entries in smaller chunks
-  uint nentry = entry_sets.size();
-  if (database_mode == _DB_MODE_DAT_) {
-    vector<string> jsons;
-    for (uint e = 0; e < nentry; e++) {
-      if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "createDataEntries(): Populating " << entry_sets[e] << std::endl;
-      aurostd::file2vectorstring(data_path + entry_sets[e], jsons);
-      uint njsons = jsons.size();
-      for (uint j = 0; j < njsons; j++) {
-        table = extractJSONvalueAFLOW(jsons[j], "catalog");
-        createTable(table, cols, types);
-        vals = getDataValues(jsons[j], cols, types);
-        insertValues(table, vals);
-        if (++counter % chunk_size == 0) {
-          transaction(false);
-          if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "createDataEntries(): Committed " << counter << " entries to the database." << std::endl;
-          transaction(true);
-        }
-      }
-    }
-  } else if (database_mode == _DB_MODE_AUID_) {
-    string json;
-    for (uint e = 0; e < nentry; e++) {
-      json = aurostd::file2string(data_path + entry_sets[e]);
-      table = extractJSONvalue(json, "catalog");
-      createTable(table, cols, types);
-      vals = getDataValues(json, cols, types);
-      insertValues(table, cols, vals);
-      if (++counter % chunk_size == 0) {
-        if (LDEBUG) std::cerr << _AFLOW_DB_DEBUG_ << "createDataEntries(): Committed " << counter << " entries to the database." << std::endl;
-        transaction(false);
-        transaction(true);
-      }
-    }
+#ifdef AFLOW_DB_ENABLE_MULTITHREADS
+  int ncpus = init::GetCPUCores();
+  if (ncpus < 1) ncpus = 1;
+  if (ncpus > _MAX_CPU_) ncpus = _MAX_CPU_;
+  vector<vector<int> > thread_dist = getThreadDistribution(256, ncpus);
+  vector<std::thread*> threads;
+  for (int t = 0; t < ncpus; t++) {
+    threads.push_back(new std::thread(&AflowDB::populateTables, this, thread_dist[t][0], thread_dist[t][1],
+                                      std::ref(entries), std::ref(cols), std::ref(types)));
   }
+  for (int t = 0; t < ncpus; t++) {
+    threads[t]->join();
+    delete threads[t];
+  }
+#else
+  populateTables(0, 256, entries, cols, types);
+#endif
 
   // Create indices on the properties that will be used to retrieve database entries
   vector<string> tables, index_cols;
   tables = getTableSubset(_DB_SCHEMA_TABLE_);
-  aurostd::string2tokens("auid,aurl,prototype,title", index_cols, ",");
+  aurostd::string2tokens("auid,aurl,prototype,title,catalog", index_cols, ",");
 
   string index;
   for (uint t = 0; t < tables.size(); t++) {
@@ -432,6 +428,32 @@ void AflowDB::createDataEntries(const vector<string>& entry_sets) {
     }
   }
   transaction(false);
+}
+
+void AflowDB::populateTables(int startIndex, int endIndex, const vector<vector<string> >& entries,
+                             const vector<string>& cols, const vector<string>& types) {
+  string table, json, filename;
+  vector<string> vals;
+  int chunk_size = 1000;  // To insert entries in smaller chunks
+  for (int i = startIndex; i < endIndex; i++) {
+    uint nentries = entries[i].size();
+    transaction(true);
+    int counter = 0;
+    stringstream t;
+    t << std::setfill('0') << std::setw(2) << std::hex << i;
+    table = t.str();
+    createTable(table, cols, types);
+    for (uint e = 0; e < nentries; e++) {
+      json = aurostd::file2string(data_path + "aflow:" + entries[i][e] + "/aflowlib.json");
+      vals = getDataValues(json, cols, types);
+      insertValues(table, cols, vals);
+      if (++counter % chunk_size == 0) {
+        transaction(false);
+        transaction(true);
+      }
+    }
+    transaction(false);
+  }
 }
 
 //getDataTypes////////////////////////////////////////////////////////////////
@@ -524,7 +546,7 @@ DBstats AflowDB::getColStats(const string& table) {
       if (stats.count[c] > 0) {  // No need to determine properties if count is zero
         stats.max[c] = getProperty("MAX", table, stats.columns[c]);
         stats.min[c] = getProperty("MIN", table, stats.columns[c]);
-        // Do not sort yet - sorting is expensive
+        // Do not sort set yet - sorting is expensive
         string where = stats.columns[c] + " NOT NULL";
         stats.set[c] = getSet(table, stats.columns[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
       }
@@ -557,7 +579,7 @@ vector<std::pair<string, int> > AflowDB::getDBLoopCounts(const string& table) {
 }
 
 //getUniqueFromJSONArrays/////////////////////////////////////////////////////
-// Determines the unique array elements in set of 1D-array strings.
+// Determines the unique array elements in a set of 1D-array strings.
 vector<string> AflowDB::getUniqueFromJSONArrays(const vector<string>& arrays) {
   vector<string> unique, tokens;
   string arr;
@@ -604,6 +626,8 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBstats& db_stats)
     json << (db_stats.min[c].empty()?"null":string("\"" + db_stats.min[c] + "\"")) << "," << std::endl;
     json << indent << tab << tab << tab << "\"max\": ";
     json << (db_stats.max[c].empty()?"null":string("\"" + db_stats.max[c] + "\"")) << "," << std::endl;
+
+    // Write set
     uint nset = db_stats.set[c].size();
     json << indent << tab << tab << tab << "\"set\": ";
     if (nset > _DEFAULT_SET_LIMIT_) {
@@ -611,7 +635,7 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBstats& db_stats)
     } else if (nset == 0) {
       json << "[]" << std::endl;
     } else {
-      // Retrieve the set again, but ordered. Ordering via SQLite may not be
+      // Retrieve the set again, but sorted. Sorting via SQLite may not be
       // as efficient as std::sort, but std::sort does not sort the numbers
       // correctly without type hinting.
       string where = db_stats.columns[c] + " NOT NULL";
@@ -624,6 +648,7 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBstats& db_stats)
       }
       json << indent << tab << tab << tab << "]" << std::endl;
     }
+
     json << indent << tab << tab << "}";
     if (c < ncols - 1) json << ",";
     json << std::endl;

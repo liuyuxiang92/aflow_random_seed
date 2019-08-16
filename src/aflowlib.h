@@ -496,19 +496,15 @@ struct DBstats {
   string table;
 };
 
-#define _DB_MODE_READ_ -1
-#define _DB_MODE_DAT_   0
-#define _DB_MODE_AUID_  1
 #define _DB_SCHEMA_TABLE_ string("schema")
 
 class AflowDB {
   public:
     AflowDB(string);
-    AflowDB(string, string, string, bool=true, int=_DB_MODE_DAT_);
+    AflowDB(string, string, string, bool=true);
     ~AflowDB();
 
     string data_path;
-    int database_mode;
     string database_file;
     string schema_file;
     bool use_tmp;
@@ -545,18 +541,19 @@ class AflowDB {
     void openTmpFile();
     bool closeTmpFile(bool=true);
 
-    vector<string> getDATfiles();
-    vector<string> getAUIDfiles();
-    bool newerFileExists(const vector<string>&);
+    vector<vector<string> > getJsonFiles(bool&);
+    void getJsonFilesThread(int, int, vector<vector<string> >&, bool&, const vector<string>&);
+    void crawl(vector<string>&, const string&, int, int);
 
     void createSchemaTable(string);
-    void createDataEntries(const vector<string>&);
+    void createDataEntries(const vector<vector<string> >&);
 
     vector<string> getSchemaRows(const string&);
     vector<string> getSchemaValues(string, const vector<string>&, const string&);
 
     vector<string> getDataTypes(const vector<string>&);
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+    void populateTables(int, int, const vector<vector<string> >&, const vector<string>&, const vector<string>&);
 
     DBstats getColStats(const string&);
     vector<std::pair<string, int> > getDBLoopCounts(const string&);

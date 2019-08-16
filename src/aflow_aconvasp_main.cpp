@@ -1484,8 +1484,7 @@ namespace pflow {
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
       // ME 190810 - START
       if(vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_SCHEMA_FILE,
-                             DEFAULT_AFLOW_DB_USE_TMP, DEFAULT_AFLOW_DB_MODE);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_SCHEMA_FILE, DEFAULT_AFLOW_DB_USE_TMP);
         if (db.rebuildDatabase(vpflow.flag("REBUILDDB"))) {
           db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         }
