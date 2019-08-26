@@ -483,17 +483,17 @@ bool AlloyAlphabeticLIBRARY(const string& system);
 
 namespace aflowlib {
 
-struct DBstats {
+struct DBStats {
   vector<string> columns;
   vector<int> count;
   vector<std::pair<string, int> > loop_counts;
   vector<string> max;
   vector<string> min;
-  int nentries;
-  int nsystems;
+  int nentries = 0;
+  int nsystems = 0;
   vector<vector<string> > set;
   vector<string> species;
-  string table;
+  string catalog = "";
 };
 
 #define _DB_SCHEMA_TABLE_ string("schema")
@@ -514,15 +514,29 @@ class AflowDB {
     bool rebuildDatabase(bool=false);
     void analyzeDatabase(string);
 
-    string getValue(const string&, const string&, string="");
-    vector<string> getValueMultiCol(const string&, const vector<string>&, string="");
-    string getProperty(const string&, const string&, const string&, string="");
-    vector<string> getColumn(const string&, const string&, string="");
-    vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
-    vector<vector<string> > getSetMultiCol(const string&, const vector<string>&, bool=false, string="", int=0, string="");
     vector<string> getTableSubset(const string&);
+    vector<string> getTableSubset(sqlite3*, const string&);
     vector<string> getTableSubset(const vector<string>&);
+    vector<string> getTableSubset(sqlite3*, const vector<string>&);
     vector<string> getTables(string="");
+    vector<string> getTables(sqlite3*, string="");
+
+    string getValue(const string&, const string&, string="");
+    string getValue(sqlite3*, const string&, const string&, string="");
+    vector<string> getValueMultiCol(const string&, const vector<string>&, string="");
+    vector<string> getValueMultiCol(sqlite3*, const string&, const vector<string>&, string="");
+    string getProperty(const string&, const string&, const string&, string="");
+    string getProperty(sqlite3*, const string&, const string&, const string&, string="");
+    vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
+    vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
+    vector<string> getColumn(const string&, const string&, string="");
+    vector<string> getColumn(sqlite3*, const string&, const string&, string="");
+    vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
+    vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
+    vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
+    vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
+    vector<vector<string> > getSetMultiCol(const string&, const vector<string>&, bool=false, string="", int=0, string="");
+    vector<vector<string> > getSetMultiCol(sqlite3*, const string&, const vector<string>&, bool=false, string="", int=0, string="");
 
     void createTempTable(const string&, const vector<string>&, const string&);
     void createTempTable(const string&, const vector<string>&, const vector<string>&);
@@ -532,14 +546,14 @@ class AflowDB {
 
   private:
     void free();
-    void open();
+    void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
     void close();
 
     sqlite3* db;
     bool is_tmp;
 
-    void openTmpFile();
-    bool closeTmpFile(bool=true);
+    void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+    bool closeTmpFile(bool=false, bool=false);
 
     vector<vector<string> > getJsonFiles(bool&);
     void getJsonFilesThread(int, int, vector<vector<string> >&, bool&, const vector<string>&);
@@ -555,10 +569,12 @@ class AflowDB {
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
     void populateTables(int, int, const vector<vector<string> >&, const vector<string>&, const vector<string>&);
 
-    DBstats getColStats(const string&);
-    vector<std::pair<string, int> > getDBLoopCounts(const string&);
+    //DBStats getColStats(const string&);
+    DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
+    void getColStats(int, int, DBStats&, const vector<string>&);
+    vector<std::pair<string, int> > getDBLoopCounts(const string&, const vector<string>&);
     vector<string> getUniqueFromJSONArrays(const vector<string>&);
-    void writeStatsToJSON(std::stringstream&, const DBstats&);
+    void writeStatsToJSON(std::stringstream&, const DBStats&);
 
     void createIndex(const string&, const string&, const string&);
     void dropIndex(const string&);
@@ -573,10 +589,10 @@ class AflowDB {
     string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
     string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
 
-    void SQLexecuteCommand(const string&);
-    string SQLexecuteCommandSCALAR(const string&);
-    vector<string> SQLexecuteCommandVECTOR(const string&);
-    vector<vector<string> > SQLexecuteCommand2DVECTOR(const string&);
+    void SQLexecuteCommand(sqlite3*, const string&);
+    string SQLexecuteCommandSCALAR(sqlite3*, const string&);
+    vector<string> SQLexecuteCommandVECTOR(sqlite3*, const string&);
+    vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3*, const string&);
     static int SQLcallback(void*, int, char**, char**);
     static int SQLcallbackSCALAR(void*, int, char**, char**);
     static int SQLcallbackVECTOR(void*, int, char**, char**);

@@ -30,10 +30,11 @@ void getAflowlibEntryWeb(const string& db_file, const string& id, std::ostream& 
 string getEntryJSON(AflowDB& db, string id, bool html) {
   // Determine the format of the input ID.
   string search_by;
-  if (aurostd::substring2bool(id, "aflowlib")) {
-    search_by = "aurl";
-  } else if (aurostd::substring2bool(id, "aflow:")) {
+  if (aurostd::substring2bool(id, "aflow:")) {
     search_by = "auid";
+    id = aurostd::tolower(id);
+  } else if (aurostd::substring2bool(id, "aflowlib")) {
+    search_by = "aurl";
   } else if (aurostd::substring2bool(id, "icsd:")) {
     search_by = "icsd";
     id = aurostd::RemoveSubStringFirst(id, "icsd:");
@@ -47,16 +48,20 @@ string getEntryJSON(AflowDB& db, string id, bool html) {
   // This makes retrieving values much quicker.
   vector<string> tables = db.getTableSubset("schema");
   uint ntables = tables.size();
-  string as;
-  if (search_by == "icsd") {
-    as = "SELECT * FROM ICSD WHERE prototype LIKE '%_" + id + "'";
+
+  string as, as_where;
+  if (search_by == "icsd") as_where = "prototype LIKE '%_" + id + "'";
+  else as_where = search_by + "='" + id + "'";
+
+  if (search_by == "auid") {
+    as = "SELECT * FROM auid_" + id.substr(6, 2) + " WHERE " + as_where;
   } else {
     for (uint t = 0; t < ntables; t++) {
-      as += "SELECT * FROM " + tables[t] + " WHERE ";
-      as += search_by + "='" + id + "'";
+      as += "SELECT * FROM " + tables[t] + " WHERE " + as_where;
       if (t < ntables - 1) as += " UNION ALL ";
     }
   }
+  as += "LIMIT 1";
   db.createTempTableAs(_WEBENTRY_TABLE_, as);
 
   // Return empty string if no entry found

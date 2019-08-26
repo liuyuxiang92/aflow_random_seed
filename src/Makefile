@@ -91,6 +91,9 @@ LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(LIBS_STATIC)
 DEBUG=
 BACKUP=/common/AFLOW/SRC/
 
+#ME190823 - SQLite options
+SQLITE_OPTS=-DSQLITE_ENABLE_JSON1 -DSQLITE-THREADSAFE=1
+
 # Library MKL dynamic link
 #LIB_MKL= -L /opt/intel/mkl100/lib/32 -lmkl_lapack -lmkl_core -lmkl_intel -lmkl_sequential
 # Library MKL static link
@@ -206,7 +209,7 @@ aflow: $(OBJS_ALL) Makefile
 static_no_pdf: aflow aflow_data
 	rm -rf $(SQLITE_OBJ)
 	#$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS_STATIC)
+	$(CC) $(SQLITE_OPTS) -c $(SQLITE_C) $(LIBS_STATIC)
 	cp sqlite3.o ./SQLITE/
 	rm -f aflow
 #	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW_STATIC)
@@ -220,7 +223,7 @@ $(SQLITE_OBJ): $(SQLITE_C)	#CO 1706147
 	#$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 	#$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $^ $(LIBS)
 	#$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-	$(CC) -DSQLITE_ENABLE_JSON1 -c $^
+	$(CC) $(SQLITE_OPTS) -c $^
 	cp sqlite3.o ./SQLITE/
 extra:	findsym frozsl apl2agr platon subst
 apl2agr:

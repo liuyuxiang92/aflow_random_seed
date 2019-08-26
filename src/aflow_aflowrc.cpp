@@ -25,15 +25,11 @@
 // ME 190810 - START
 // DEFAULTS AFLOW DATABASE
 #define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/marcosplayground/aflowlib.db")
-//#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/ramd/database_new/aflowlib.db")
 #define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/marcosplayground/aflowlib.json")
-//#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/ramd/database_new/aflowlib.json")
 #define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
-//#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/home/esters/WORK/db_tests/")
 #define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AUID/RAW/")
 #define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_DATA_PATH")
-//#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/home/esters/WORK/db_tests/aapi_schema.json")
 #define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/www/search/database_new/aapi_schema.json")
 #define         DEFAULT_AFLOW_DB_SCHEMA_FILE            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_SCHEMA_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_USE_TMP                true
