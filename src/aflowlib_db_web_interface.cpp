@@ -50,7 +50,7 @@ string getEntryJSON(AflowDB& db, string id, bool html) {
   uint ntables = tables.size();
 
   string as, as_where;
-  if (search_by == "icsd") as_where = "prototype LIKE '%_" + id + "'";
+  if (search_by == "icsd") as_where = "catalog='ICSD' AND prototype LIKE '%_" + id + "'";
   else as_where = search_by + "='" + id + "'";
 
   if (search_by == "auid") {
