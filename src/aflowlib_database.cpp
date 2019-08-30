@@ -60,18 +60,16 @@ AflowDB::AflowDB(string db_file) {
 }
 
 // Open the database for write access
-AflowDB::AflowDB(string db_file, string dt_path, string schm_file, bool use_tmp_file) {
+AflowDB::AflowDB(string db_file, string dt_path, string schm_file) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   free();
   data_path = dt_path;
   database_file = db_file;
   schema_file = schm_file;
-  use_tmp = use_tmp_file;
   if (LDEBUG) {
     std::cerr << "AflowDB: Database file: " << database_file << std::endl;
     std::cerr << "AflowDB: Data path: " << data_path << std::endl;
     std::cerr << "AflowDB: Schema file: " << schema_file << std::endl;
-    std::cerr << "AflowDB: Use tmp file: " << use_tmp << std::endl;
   }
   open();
 }
@@ -201,8 +199,33 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     file_empty = aurostd::FileEmpty(database_file); // file_empty needed for LDEBUG
     rebuild_db = file_empty;
   }
-  // Rebuild when the schema file has been updated
-  if(!rebuild_db) rebuild_db = (aurostd::FileModificationTime(schema_file) > aurostd::FileModificationTime(database_file));
+
+  // Rebuild when the schema file has new entries
+  if (!rebuild_db) {
+    vector<string> columns, keys;
+    string table = getTables()[0];  // All tables have the same columns, so any table is good
+    columns = getColumnNames(table);
+
+    string schema = aurostd::file2string(schema_file);
+    // To prevent SQL syntax errors, single quotes/apostrophes must be escaped
+    // with an additional single quote.
+    aurostd::StringSubst(schema, "'", "''");
+    keys = getSchemaKeys(schema);
+
+    uint nkeys = keys.size();
+    rebuild_db = (nkeys != columns.size());
+    if (!rebuild_db) {
+      vector<string> types_db = getColumnTypes(table);
+      vector<string> types_schema(nkeys);
+      uint k;
+      for (k = 0; k < nkeys; k++) types_schema[k] = getSchemaValues(keys[k], "type", schema)[0];
+      for (k = 0; k < nkeys; k++) {
+        if (!aurostd::withinList(columns, keys[k])) break;
+        if (!aurostd::withinList(types_db, types_schema[k])) break;
+      }
+      rebuild_db = (k != nkeys);
+    }
+  }
 
   // Check if any relevant files are newer than the database. No need to check
   // if the database has to be rebuilt for other reasons already.
@@ -218,17 +241,15 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       if (file_empty) std::cerr << function << "Rebuilding database (file not found or empty)." << std::endl;
     }
 
-    if (use_tmp) openTmpFile();
+    openTmpFile();
     // Drop all old tables before rebuilding
     vector<string> tables = getTables();
     for (uint t = 0; t < tables.size(); t++) {
       dropTable(tables[t]);
     }
-    createSchemaTable(schema_file);
     createDataEntries(entries);
     std::cout << aurostd::get_time() << std::endl;
-    if (use_tmp) return closeTmpFile();
-    return true;
+    return closeTmpFile();
   } else {
     return false;
   }
@@ -331,42 +352,9 @@ void AflowDB::crawl(vector<string>& entries, const string& parent_path, int dept
 
 // Schema --------------------------------------------------------------------
 
-//createSchemaTable///////////////////////////////////////////////////////////
-// This function creates the table containing the necessary metadata from the
-// schema. This table should only contain the metadata necessary to create
-// the database entries and the data for the entry page.
-void AflowDB::createSchemaTable(string schema_file) {
-  if (aurostd::FileExist(schema_file)) {
-    // Pull schema
-    string schema = aurostd::file2string(schema_file);
-    // To prevent SQL syntax errors, single quotes/apostrophes must be escaped
-    // with an additional single quote.
-    aurostd::StringSubst(schema, "'", "''");
-    vector<string> cols;
-    aurostd::string2tokens("name,function,status,href,linktext,type", cols, ",");
-    vector<string> rows = getSchemaRows(schema);
-
-    // Create table
-    transaction(true);
-    createTable(_DB_SCHEMA_TABLE_, cols, "TEXT");
-
-    // Insert values
-    for (uint r = 0; r < rows.size(); r++) {
-      vector<string> values = getSchemaValues(rows[r], cols, schema);
-      insertValues(_DB_SCHEMA_TABLE_, values);
-    }
-    createIndex("index_schema_name", _DB_SCHEMA_TABLE_, "name");
-    transaction(false);
-  } else {
-    string function = _AFLOW_DB_ERR_PREFIX_ + "createSchemaTable()";
-    string message = "Could not find schema file " + schema_file + ".";
-    throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
-  }
-}
-
-//getSchemaRows///////////////////////////////////////////////////////////////
-// Gets the rows of the schema table, i.e. the keys of the schema file.
-vector<string> AflowDB::getSchemaRows(const string& schema) {
+//getSchemaKeys///////////////////////////////////////////////////////////////
+// Gets the keys of the schema file.
+vector<string> AflowDB::getSchemaKeys(const string& schema) {
   string command = "SELECT key FROM json_each('" + schema + "', '$.AAPI_schema')";
   command += " WHERE key IS NOT '__schema^2__'";
   return SQLexecuteCommandVECTOR(db, command);
@@ -374,7 +362,12 @@ vector<string> AflowDB::getSchemaRows(const string& schema) {
 
 //getSchemaValues/////////////////////////////////////////////////////////////
 // Retrieves the desired metadata from the schema JSON file.
-vector<string> AflowDB::getSchemaValues(string row, const vector<string>& cols, const string& schema) {
+vector<string> AflowDB::getSchemaValues(const string& row, const string& col, const string& schema) {
+  vector<string> cols(1, col);
+  return getSchemaValues(row, cols, schema);
+}
+
+vector<string> AflowDB::getSchemaValues(const string& row, const vector<string>& cols, const string& schema) {
   string key, value;
   uint ncols = cols.size();
   vector<string> values(ncols, "NULL");
@@ -402,11 +395,9 @@ void AflowDB::createDataEntries(const vector<vector<string> >& entries) {
 
   // Get all relevant properties from the schema
   vector<string> cols, types;
-  // Links and images are static, so storing them in the database would be wasteful
-  string where = "function IS NOT 'link' AND type IS NOT 'image'";
-  where += " AND name IS NOT 'icsd_number'";  // ICSD numbers are not stored in the database
-  cols = getSet(_DB_SCHEMA_TABLE_, "name", false, where);
-  types = getDataTypes(cols);
+  string schema = aurostd::file2string(schema);
+  cols = getSchemaKeys(schema);
+  types = getDataTypes(cols, schema);
 
   // Insert data
 #ifdef AFLOW_DB_ENABLE_MULTITHREADS
@@ -429,7 +420,7 @@ void AflowDB::createDataEntries(const vector<vector<string> >& entries) {
 
   // Create indices on the properties that will be used to retrieve database entries
   vector<string> tables, index_cols;
-  tables = getTableSubset(_DB_SCHEMA_TABLE_);
+  tables = getTables();
   aurostd::string2tokens("auid,aurl,prototype,title,catalog", index_cols, ",");
   string index;
   for (uint t = 0; t < tables.size(); t++) {
@@ -480,12 +471,11 @@ void AflowDB::populateTables(int startIndex, int endIndex, const vector<vector<s
 //getDataTypes////////////////////////////////////////////////////////////////
 // Gets the data types of the schema keys and converts them into SQLite types.
 // Note that SQLite does not recognize arrays, so they will be stored as text.
-vector<string> AflowDB::getDataTypes(const vector<string>& cols) {
-  string where;
-  vector<string> types(cols.size());
-  for (uint i = 0; i < cols.size(); i++) {
-    where = "name='" + cols[i] + "'";
-    types[i] = getValue(_DB_SCHEMA_TABLE_, "type", where);
+vector<string> AflowDB::getDataTypes(const vector<string>& cols, const string& schema) {
+  uint ncols = cols.size();
+  vector<string> types(ncols);
+  for (uint i = 0; i < ncols; i++) {
+    types[i] = getSchemaValues(cols[i], "type", schema)[0];
     // AUID, AURL, and title have to be unique
     // Leave title not unique until the POCC title bug is fixed
     //if (_CHECK_UNIQUE_ && ((cols[i] == "auid") || (cols[i] == "aurl") || (cols[i] == "title"))) {
@@ -526,19 +516,18 @@ namespace aflowlib {
 // Provides analytics for each database data table in JSON format.
 void AflowDB::analyzeDatabase(string outfile) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-  // Get properties for which statistics need to be collected
-  string where = "function IS NOT 'link' AND type IS NOT 'image'";
-  where += " AND name IS NOT 'icsd_number'";  // ICSD numbers are not stored in the database
-  vector<string> columns = getSet(_DB_SCHEMA_TABLE_, "name", false, where);
 
-  vector<string> tables = getTableSubset(_DB_SCHEMA_TABLE_);
-  vector<string> catalogs = getSetMultiTables(tables, "catalog", true);
-  uint ncatalogs = catalogs.size();
+  // Get properties and tables for which statistics need to be collected
+  // Since all tables have the same columns, only one table needs to be searched
+  vector<string> tables = getTables();
+  vector<string> columns = getColumnNames(tables[0]);
 
   string tab = "    ";
   std::stringstream json;
   json << "{" << std::endl << tab << "\"Aflow_DBs\": {" << std::endl;
 
+  vector<string> catalogs = getSetMultiTables(tables, "catalog", true);
+  uint ncatalogs = catalogs.size();
   for (uint c = 0; c < ncatalogs; c++) {
     std::cout << aurostd::get_time() << std::endl;
     if (LDEBUG) std::cerr << "Starting analysis for catalog " << catalogs[c] << std::endl;
@@ -599,7 +588,6 @@ DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& ta
 
 void AflowDB::getColStats(int startIndex, int endIndex,
                           DBStats& stats, const vector<string>& tables) {
-  string type, where, where_type, where_set;
   vector<int> counts(_N_AUID_TABLES_);
 
   sqlite3* cursor;
@@ -610,6 +598,9 @@ void AflowDB::getColStats(int startIndex, int endIndex,
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
 
+  vector<string> types = getColumnTypes(cursor, tables[0]);
+
+  string where;
   for (int i = startIndex; i < endIndex; i++) {
     where = "catalog='" + stats.catalog + "'";
     where += " AND " + stats.columns[i]  + " NOT NULL";
@@ -628,10 +619,8 @@ void AflowDB::getColStats(int startIndex, int endIndex,
     vector<string> results(ntbls);
     vector<double> results_dbl(ntbls);
     if (stats.count[i] > 0) {  // No need to determine properties if count is zero
-      where_type = "name='" + stats.columns[i] + "'";
-      type = getValue(_DB_SCHEMA_TABLE_, "type", where_type);
       results = getPropertyMultiTables(cursor, "MAX", tbls, stats.columns[i], where);
-      if (type == "number")  {
+      if (types[i] == "number")  {
         for (uint t = 0; t < ntbls; t++) results_dbl[t] = aurostd::string2utype<double>(results[t]);
         // Converting the max of results_dbl into string leads to ugly numbers
         // in the final json, so sort and take the string in results. This does
@@ -642,7 +631,7 @@ void AflowDB::getColStats(int startIndex, int endIndex,
         stats.max[i] = aurostd::max(results);
       }
       results = getPropertyMultiTables(cursor, "MIN", tbls, stats.columns[i], where);
-      if (type == "number") {
+      if (types[i] == "number") {
         for (uint t = 0; t < ntbls; t++) results_dbl[t] = aurostd::string2utype<double>(results[t]);
         aurostd::sort(results_dbl, results);
         stats.min[i] = results[0];
@@ -664,7 +653,6 @@ void AflowDB::getColStats(int startIndex, int endIndex,
 /*
 void AflowDB::getColStats(int startIndex, int endIndex,
                           DBStats& stats, const vector<string>& tables) {
-  string type, where, where_type, where_set;
   vector<int> counts(_N_AUID_TABLES_);
 
   sqlite3* cursor;
@@ -675,7 +663,10 @@ void AflowDB::getColStats(int startIndex, int endIndex,
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
 
+  vector<string> types = getColumnTypes(cursor, tables[0]);
+
   uint t;
+  string where;
   for (int i = startIndex; i < endIndex; i++) {
     where = "catalog='" + stats.catalog + "'";
     where += " AND " + stats.columns[i]  + " NOT NULL";
@@ -696,12 +687,10 @@ void AflowDB::getColStats(int startIndex, int endIndex,
       vector<vector<string> > v2_results_set(ntbls);
       vector<string> results(ntbls), results_set;
 
-      where_type = "name='" + stats.columns[i] + "'";
-      type = getValue(_DB_SCHEMA_TABLE_, "type", where_type);
       for (t = 0; t < ntbls; t++) {
         results[t] = getProperty("MAX", tbls[t], stats.columns[i], where);
       }
-      if (type == "number")  {
+      if (types[i] == "number")  {
         for (t = 0; t < ntbls; t++) results_dbl[t] = aurostd::string2utype<double>(results[t]);
         // Converting the max of results_dbl into string leads to ugly numbers
         // in the final json, so sort and take the string in results. This does
@@ -714,7 +703,7 @@ void AflowDB::getColStats(int startIndex, int endIndex,
       for (t = 0; t < ntbls; t++) {
         results[t] = getProperty("MIN", tbls[t], stats.columns[i], where);
       }
-      if (type == "number") {
+      if (types[i] == "number") {
         for (t = 0; t < ntbls; t++) results_dbl[t] = aurostd::string2utype<double>(results[t]);
         aurostd::sort(results_dbl, results);
         stats.min[i] = results[0];
@@ -959,32 +948,6 @@ void AflowDB::dropTable(const string& table) {
   SQLexecuteCommand(db, command);
 }
 
-//getTableSubset//////////////////////////////////////////////////////////////
-// Gets all tables except for the table provided in exclude.
-vector<string> AflowDB::getTableSubset(const string& exclude) {
-  return getTableSubset(db, exclude);
-}
-
-vector<string> AflowDB::getTableSubset(sqlite3* cursor, const string& exclude) {
-  string where = "name IS NOT '" + exclude + "'";
-  return getTables(cursor, where);
-}
-
-// Gets all tables except for the tables provided in exclude.
-vector<string> AflowDB::getTableSubset(const vector<string>& exclude) {
-  return getTableSubset(db, exclude);
-}
-
-vector<string> AflowDB::getTableSubset(sqlite3* cursor, const vector<string>& exclude) {
-  uint nexclude = exclude.size();
-  string where;
-  for (uint i = 0; i < nexclude; i++) {
-    where += "name IS NOT '" + exclude[i] + "'";
-    if (i < nexclude - 1) where += " AND ";
-  }
-  return getTables(cursor, where);
-}
-
 //getTables///////////////////////////////////////////////////////////////////
 // Retrieves a set of tables. If where is empty, all tables in the database
 // will be returned.
@@ -1025,46 +988,6 @@ void AflowDB::createTable(const string& table, const vector<string>& cols, const
   }
 }
 
-//createTableAs///////////////////////////////////////////////////////////////
-// Creates a table using the AS option.
-void AflowDB::createTableAs(const string& table, const string& as, bool temp) {
-  string command = "CREATE " + string(temp?"TEMP ":"") + "TABLE IF NOT EXISTS " + table + " AS " + as + ";";
-  SQLexecuteCommand(db, command);
-}
-
-//createTempTable/////////////////////////////////////////////////////////////
-// Creates a temporary table that will be destroyed when the database cursor
-// is closed.
-void AflowDB::createTempTable(const string& table, const vector<string>& cols, const string& type) {
-  vector<string> types(cols.size(), type);
-  createTable(table, cols, types, true);
-}
-
-void AflowDB::createTempTable(const string& table, const vector<string>& cols, const vector<string>& types) {
-  createTable(table, cols, types, true);
-}
-
-//createTableAs///////////////////////////////////////////////////////////////
-// Creates a temporary table using the AS option.
-void AflowDB::createTempTableAs(const string& table, const string& as) {
-  createTableAs(table, as, true);
-}
-
-//dropTempTable///////////////////////////////////////////////////////////////
-// Removes a temporary table.
-void AflowDB::dropTempTable(const string& table) {
-  // Make sure that the table that is dropped is a temporary table
-  string command = "SELECT name FROM sqlite_temp_master WHERE type='table'";
-  vector<string> temp_tables = SQLexecuteCommandVECTOR(db, command);
-  if (aurostd::withinList(temp_tables, table)) {
-    dropTable(table);
-  } else {
-    string function = "AflowDB::dropTempTable()";
-    string message = "Could not find temporary table " + table + ".";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
-  }
-}
-
 // INSERT --------------------------------------------------------------------
 
 //insertValues////////////////////////////////////////////////////////////////
@@ -1093,6 +1016,40 @@ void AflowDB::insertValues(const string& table, const vector<string>& cols, cons
 }
 
 // GET -----------------------------------------------------------------------
+
+//getColumnNames//////////////////////////////////////////////////////////////
+// Returns the names of all columns in a specific table.
+vector<string> AflowDB::getColumnNames(const string& table) {
+  return getColumnNames(db, table);
+}
+
+vector<string> AflowDB::getColumnNames(sqlite3* cursor, const string& table) {
+  string command = "PRAGMA table_info(" + table + ")";
+  vector<vector<string> > pragma_results = SQLexecuteCommand2DVECTOR(cursor, command);
+  uint nresults = pragma_results.size();
+  vector<string> columns(nresults);
+  for (uint r = 0; r < nresults; r++) {
+    columns[r] = pragma_results[r][1];
+  }
+  return columns;
+}
+
+//getColumnTypes//////////////////////////////////////////////////////////////
+// Returns the data types of all columns in a specific table.
+vector<string> AflowDB::getColumnTypes(const string& table) {
+  return getColumnTypes(db, table);
+}
+
+vector<string> AflowDB::getColumnTypes(sqlite3* cursor, const string& table) {
+  string command = "PRAGMA table_info(" + table + ")";
+  vector<vector<string> > pragma_results = SQLexecuteCommand2DVECTOR(cursor, command);
+  uint nresults = pragma_results.size();
+  vector<string> columns(nresults);
+  for (uint r = 0; r < nresults; r++) {
+    columns[r] = pragma_results[r][2];
+  }
+  return columns;
+}
 
 //getValue////////////////////////////////////////////////////////////////////
 // Gets a value from a specific column. The row must be specified in the where

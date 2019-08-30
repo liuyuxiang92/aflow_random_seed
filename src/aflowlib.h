@@ -496,30 +496,28 @@ struct DBStats {
   string catalog = "";
 };
 
-#define _DB_SCHEMA_TABLE_ string("schema")
-
 class AflowDB {
   public:
     AflowDB(string);
-    AflowDB(string, string, string, bool=true);
+    AflowDB(string, string, string);
     ~AflowDB();
 
     string data_path;
     string database_file;
     string schema_file;
-    bool use_tmp;
 
     bool isTMP();
 
     bool rebuildDatabase(bool=false);
     void analyzeDatabase(string);
 
-    vector<string> getTableSubset(const string&);
-    vector<string> getTableSubset(sqlite3*, const string&);
-    vector<string> getTableSubset(const vector<string>&);
-    vector<string> getTableSubset(sqlite3*, const vector<string>&);
     vector<string> getTables(string="");
     vector<string> getTables(sqlite3*, string="");
+
+    vector<string> getColumnNames(const string&);
+    vector<string> getColumnNames(sqlite3*, const string&);
+    vector<string> getColumnTypes(const string&);
+    vector<string> getColumnTypes(sqlite3*, const string&);
 
     string getValue(const string&, const string&, string="");
     string getValue(sqlite3*, const string&, const string&, string="");
@@ -538,10 +536,6 @@ class AflowDB {
     vector<vector<string> > getSetMultiCol(const string&, const vector<string>&, bool=false, string="", int=0, string="");
     vector<vector<string> > getSetMultiCol(sqlite3*, const string&, const vector<string>&, bool=false, string="", int=0, string="");
 
-    void createTempTable(const string&, const vector<string>&, const string&);
-    void createTempTable(const string&, const vector<string>&, const vector<string>&);
-    void createTempTableAs(const string&, const string&);
-    void dropTempTable(const string&);
     void transaction(bool);
 
   private:
@@ -555,17 +549,17 @@ class AflowDB {
     void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
     bool closeTmpFile(bool=false, bool=false);
 
+    vector<string> getSchemaKeys(const string&);
+    vector<string> getSchemaValues(const string&, const string&, const string&);
+    vector<string> getSchemaValues(const string&, const vector<string>&, const string&);
+
     vector<vector<string> > getJsonFiles(bool&);
     void getJsonFilesThread(int, int, vector<vector<string> >&, bool&, const vector<string>&);
     void crawl(vector<string>&, const string&, int, int);
 
-    void createSchemaTable(string);
     void createDataEntries(const vector<vector<string> >&);
 
-    vector<string> getSchemaRows(const string&);
-    vector<string> getSchemaValues(string, const vector<string>&, const string&);
-
-    vector<string> getDataTypes(const vector<string>&);
+    vector<string> getDataTypes(const vector<string>&, const string&);
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
     void populateTables(int, int, const vector<vector<string> >&, const vector<string>&, const vector<string>&);
 
@@ -583,7 +577,6 @@ class AflowDB {
     void dropTable(const string&);
     void createTable(const string&, const vector<string>&, const string&);
     void createTable(const string&, const vector<string>&, const vector<string>&, bool=false);
-    void createTableAs(const string&, const string&, bool=false);
     void insertValues(const string&, const vector<string>&);
     void insertValues(const string&, const vector<string>&, const vector<string>&);
     string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
@@ -600,27 +593,6 @@ class AflowDB {
 };
 
 }  // namespace aflowlib
-
-// ***************************************************************************
-// AflowDB - WEB interface
-namespace aflowlib {
-  void getAflowlibEntryWeb(const string&, const string&, std::ostream&);
-  string getEntryJSON(AflowDB&, string="", bool=true);
-
-  string formatHREFToJSON(const string&, const string&, AflowDB& db);
-  string formatValueToHTML(const string&, const string&, AflowDB&);
-  string formatCompound(const string&);
-  string formatCrystallography(const string&);
-  string formatICSD(AflowDB&);
-  string formatLattice(const string&, bool);
-  string formatLDAU(const string&);
-  string formatSpaceGroup(string);
-  string formatSpeciesResolvedProperties(const string&, AflowDB&);
-  string formatAtomResolvedProperties(string, AflowDB&);
-  string formatAtomResolvedProperties(const vector<string>&, const vector<int>&, const string&, bool);
-
-  vector<string> getVectorFromArrayString(string);
-}
 
 #endif //  _AFLOWLIB_H_
 

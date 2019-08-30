@@ -870,7 +870,7 @@ int Supercell::getMaxShellID() {
 
 xvector<double> Supercell::getFPositionItsNearestImage(const xvector<double>& fposAtom,
                                                        const xvector<double>& fposCenter,
-                                                       const xmatrix<double>& lattice) const {
+                                                       const xmatrix<double>& lattice) {
   double r2min = numeric_limits<double>::max();
   double r2;
   xvector<double> rfmin(3), rf(3);
@@ -894,7 +894,7 @@ xvector<double> Supercell::getFPositionItsNearestImage(const xvector<double>& fp
 
 // ///////////////////////////////////////////////////////////////////////////
 
-xvector<double> Supercell::getFPositionItsNearestImage(int atomID, int centerID) const {
+xvector<double> Supercell::getFPositionItsNearestImage(int atomID, int centerID) {
   return (getFPositionItsNearestImage(_scStructure.atoms[atomID].fpos,
                                       _scStructure.atoms[centerID].fpos,
                                       _scStructure.lattice));
@@ -902,7 +902,7 @@ xvector<double> Supercell::getFPositionItsNearestImage(int atomID, int centerID)
 
 // ///////////////////////////////////////////////////////////////////////////
 
-xvector<double> Supercell::getCPositionItsNearestImage(int atomID, int centerID) const {
+xvector<double> Supercell::getCPositionItsNearestImage(int atomID, int centerID) {
   return (F2C(_scStructure.lattice,
               getFPositionItsNearestImage(atomID, centerID)));
 }
@@ -1681,7 +1681,7 @@ int Supercell::getAtomNumber(int i) {
 // ///////////////////////////////////////////////////////////////////////////
 // ME 180827 -- overloaded to calculate derivatives
 bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-                                     xcomplex<double>& phase) const {
+                                     xcomplex<double>& phase) {
   xvector<xcomplex<double> > placeholder;
   int i;
   return calcShellPhaseFactor(atomID, centerID, qpoint, phase, i, placeholder, false);
@@ -1689,28 +1689,7 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
 
 bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
                                      xcomplex<double>& phase, int& ifound,
-                                     xvector<xcomplex<double> >& derivative, bool calc_derivative) const {
-  ifound = 1;
-  xcomplex<double> iONE(0.0, 1.0);
-  int at1pc = sc2pcMap(atomID);
-  int at2pc = sc2pcMap(centerID);
-  int at1sc = pc2scMap(at1pc);
-  int at2sc = pc2scMap(at2pc);
-  const xstructure& scell = getSupercellStructure();
-  xvector<double> min_vec = SYM::minimizeDistanceCartesianMethod(scell.atoms[atomID].cpos, scell.atoms[at2sc].cpos, scell.lattice);
-  min_vec += scell.atoms[at2sc].cpos - scell.atoms[at1sc].cpos;
-
-  phase = exp(iONE * scalar_product(qpoint, min_vec));
-  if (calc_derivative) {
-    for (int i = 1; i < 4; i++) derivative[i] = iONE * phase * min_vec[i];
-  }
-  return true;
-}
-
-/*
-bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-                                     xcomplex<double>& phase, int& ifound,
-                                     xvector<xcomplex<double> >& derivative, bool calc_derivative) const {
+                                     xvector<xcomplex<double> >& derivative, bool calc_derivative) {
   // Get the nearest image of this atom, it determine also the shell radius
   xvector<double> rf = getFPositionItsNearestImage(atomID, centerID);
   xvector<double> rc = F2C(_scStructure.lattice, rf);
@@ -1754,7 +1733,7 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
             pc -= delta;
             phase = phase + exp(iONE * scalar_product(qpoint, pc));
             if (calc_derivative) {
-              for (uint i = 1; i < 4; i++) {
+            for (uint i = 1; i < 4; i++) {
                 derivative[i] += exp(iONE * (scalar_product(qpoint, pc))) * iONE * (pc(i));
               }
             }
@@ -1771,6 +1750,5 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
   //
   return isCountable;
 }
-*/
 
 }  // namespace apl
