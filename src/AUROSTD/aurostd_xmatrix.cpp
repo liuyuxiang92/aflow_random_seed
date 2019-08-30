@@ -526,8 +526,13 @@ namespace aurostd {  // namespace aurostd
     printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
     printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif    
-    if(a.cols!=b.rows)
-      {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*: (a.cols!=b.rows)=FALSE" << endl;exit(0);}    
+    if(a.cols!=b.rows) {
+      // ME190814 - eliminate exit
+      //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*: (a.cols!=b.rows)=FALSE" << endl;exit(0);}    
+      string function = "aurostd::xmatrix<utype>::operator*";
+      string message = "a.cols != b.rows";
+      throw xerror(function, message, _INDEX_MISMATCH_);
+    }
     xmatrix<utype> c(a.rows,b.cols);
     int i,j,k,ii,jj,kk;
     // register
@@ -554,6 +559,38 @@ namespace aurostd {  // namespace aurostd
 	c(i,j)+=a(ii,k)*b(kk,jj);
     */
     return  c;
+  }
+
+  // ME190814 - multiplication of a real matrix with a complex matrix
+  template<class utype>
+  xmatrix<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xmatrix<xcomplex<utype> >& b) {
+#ifdef _XMATH_DEBUG_OPERATORS
+    printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+    printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+#endif    
+    if (a.cols!=b.rows) {
+      string function = "aurostd::xmatrix<utype>::operator*";
+      string message = "a.cols != b.rows";
+      throw xerror(function, message, _INDEX_MISMATCH_);
+    }
+
+    xmatrix<xcomplex<utype> > c(a.rows, b.cols);
+    int i, j, k, ii, jj, kk;
+    utype *ai, aik;
+    xcomplex<utype> *bk, *ci;
+    for (i = c.lrows, ii = a.lrows; i <= c.urows; i++, ii++) {
+      ci = c[i];
+      ai = a[ii];
+      for (k = a.lcols, kk = b.lrows; k <= a.ucols; k++, kk++) {
+        bk = b[kk];
+        aik = ai[k];
+        for (j = c.lcols, jj = b.lcols; j <= c.ucols; j++, jj++) {
+          ci[j].re += aik * bk[jj].re;
+          ci[j].im += aik * bk[jj].im;
+        }
+      }
+    }
+    return c;
   }
 }
 
@@ -661,9 +698,13 @@ namespace aurostd {  // namespace aurostd
   
   template<class utype> bool                             // is xmatrix == xmatrix ?
   identical(const xmatrix<utype>& a,const xmatrix<utype>& b,const utype& _tol_,const char& _mode_) {
-    if(a.rows!=b.rows) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[1]" << endl;exit(0);}
-    if(a.cols!=b.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[2]" << endl;exit(0);}
-    if(a.isfloat || a.iscomplex) {
+    // ME190814 - BEGIN
+    // [OBSOLETE - return false instead] if(a.rows!=b.rows) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[1]" << endl;exit(0);}
+    // [OBSOLETE - return false instead] if(a.cols!=b.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in function identical (xmatrix == xmatrix)[2]" << endl;exit(0);}
+    if ((a.rows != b.rows) || (a.cols != b.cols)) return false;
+    //if(a.isfloat || a.iscomplex) { ME190814 - this doesn't work for xcomplex because abs() and _tol_ have different types
+    // ME190814 - END
+    if(a.isfloat) {
       if(_mode_==1) { // relative tolerance
 	for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
 	  for(int j=a.lcols,jj=b.lcols;j<=a.ucols;j++,jj++)
@@ -739,6 +780,93 @@ namespace aurostd {  // namespace aurostd
   // namespace aurostd
   template<class utype> bool                             // is xmatrix != xmatrix ?
   operator!=(const xmatrix<utype>& a,const xmatrix<utype>& b) {
+    return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
+  }
+  
+  // ME190814 - xcomplex version
+  // namespace aurostd
+  template<class utype> bool
+  identical(const xmatrix<xcomplex<utype> >& a, const xmatrix<xcomplex<utype> >& b, const utype& _tol_, const char& _mode_) {
+    if ((a.rows != b.rows) || (a.cols != b.cols)) return false;
+    if (_mode_ == 1) {  // relative tolerance
+      for (int i = a.lrows, ii = b.lrows; i <= a.urows; i++, ii++) {
+        for (int j = a.lcols, jj = b.lcols; i <= a.ucols; j++, jj++) {
+          if ((abs(a[i][j].re - b[ii][jj].re)/abs(a[i][j].re/2.0 + abs(b[ii][jj].re)/2.0 + _tol_)) >= _tol_) return false;
+          if ((abs(a[i][j].im - b[ii][jj].im)/abs(a[i][j].im/2.0 + abs(b[ii][jj].im)/2.0 + _tol_)) >= _tol_) return false;
+        }
+      }
+    } else if (_mode_ == 0) {  // absolute tolerance (faster) DEFAULT
+      for (int i = a.lrows, ii = b.lrows; i <= a.urows; i++, ii++) {
+        for (int j = a.lcols, jj = b.lcols; j <= a.ucols; j++, jj++) {
+          if (abs(a[i][j].re - b[ii][jj].re) >= _tol_) return false;
+          if (abs(a[i][j].im - b[ii][jj].im) >= _tol_) return false;
+        }
+      }
+    } else {  // unknown mode
+      string function = "aurostd::xmatrix::identical";
+      string message = "Unknown mode " + utype2string<char>(_mode_) + ".";
+      throw xerror(function, message, _VALUE_ILLEGAL_);
+    }
+    return true;
+  }
+
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
+    return (bool) identical(a,b,_tol_,(char) 0);  // relative
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  rel_identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
+    return (bool) identical(a,b,_tol_,(char) 1);  // relative
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  abs_identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
+    return (bool) identical(a,b,_tol_,(char) 0);  // absolute
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
+    return (bool) identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  operator==(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
+    return (bool) identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix != xmatrix ?
+  isdifferent(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
+    return (bool) !identical(a,b,_tol_,(char) 0);
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix != xmatrix ?
+  isdifferent(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
+    return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  isequal(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
+    return (bool) identical(a,b,_tol_,(char) 0);
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix == xmatrix ?
+  isequal(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
+    return (bool) identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
+  }
+  
+  // namespace aurostd
+  template<class utype> bool                             // is xmatrix != xmatrix ?
+  operator!=(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
     return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
   
@@ -2991,6 +3119,174 @@ namespace aurostd {
     exit(0);
   }
 #undef ROTATE  
+
+// ME190815
+// Jacobi algorithm for Hermitian matrices (used to be in APL/apl_aplmath.cpp)
+// Based on http://arxiv.org/abs/physics/0607103
+  template<class utype>
+  xvector<utype> jacobiHermitian(xmatrix<xcomplex<utype> >& A, char _sort_) {
+    xmatrix<xcomplex<utype> > U(A.rows, A.cols);
+    return jacobiHermitian(A, U, _sort_);
+  }
+
+  template<class utype>
+  xvector<utype> jacobiHermitian(xmatrix<xcomplex<utype> >& A, xmatrix<xcomplex<utype> >& U, char _sort_) {
+    // Matrices have to be square
+    if (!A.issquare) {
+      string function = "aurostd::xmatrix::jacobiHermitian";
+      string message = "Input matrix is not square.";
+      throw xerror(function, message, _RUNTIME_ERROR_);
+    }
+
+    // Reshape eigenvector matrix if needed
+    if ((U.rows != A.rows) || (U.cols != A.cols)) {
+      xmatrix<xcomplex<utype> > U_new(A.urows, A.ucols, A.lrows, A.lcols);
+      U = U_new;
+    }
+
+    // Initialize
+    utype eps = std::numeric_limits<utype>::epsilon();
+    uint max_sweeps = 50;
+    uint threshold_sweep = 4;
+    uint n = A.rows;
+    double reduction = 0.04/std::pow(n, 4);
+
+    xvector<utype> d(n);
+    xmatrix<utype> ev(2, n);
+    U.clear();
+    // Initialize U as unit matrix and d as diagonal elements of A
+    for (uint p = 1; p <= n; p++) {
+      ev[1][p] = 0.0;
+      ev[2][p] = A[p][p].re;
+      d[p] = ev[2][p];
+      U[p][p] = 1.0;
+    }
+
+    utype sum, threshold, t, delta, invc, s;
+    xcomplex<utype> x, y, Apq, cApq;
+    uint p, q, j, nSweep;
+
+    // Perform sweeps
+    for (nSweep = 1; nSweep <= max_sweeps; nSweep++) {
+      // Convergence criterion: sum of the squares of the off-diagonal elements
+      sum = 0.0;
+      for (q = 2; q <= n; q++) {
+        for (p = 1; p <= q - 1; p++) {
+          sum += magsqr(A[p][q]);
+        }
+      }
+      if (sum < 0.5 * eps) break;
+      if (nSweep < threshold_sweep) threshold = reduction * sum;
+      else threshold = 0;
+
+      // Perform Jacobi rotations
+      for (q = 2; q <= n; q++) {
+        for (p = 1; p <= q - 1; p++) {
+          sum = magsqr(A[p][q]);
+          if ((nSweep > threshold_sweep) && 
+              (sum < 0.5 * eps * std::max<utype>(ev[2][p] * ev[2][p], ev[2][q] * ev[2][q]))) {
+            A[p][q] = 0;
+          } else if (sum > threshold) {
+            t = 0.5 * (ev[2][p] - ev[2][q]);
+            t = 1.0/(t + copysign(sqrt(t * t + sum), t));
+            delta = t * sum;
+            ev[1][p] = ev[1][p] + delta;
+            ev[2][p] = d[p] + ev[1][p];
+            ev[1][q] = ev[1][q] - delta;
+            ev[2][q] = d[q] + ev[1][q];
+
+            invc = sqrt(delta * t + 1);
+            s = t/invc;
+            t = delta/(invc + 1);
+
+            Apq = A[p][q];
+            cApq = conj(Apq);
+
+            for (j = 1; j <= p - 1; j++) {
+              x = A[j][p];
+              y = A[j][q];
+              A[j][p] = x + s * (cApq * y - t * x);
+              A[j][q] = y - s * (Apq * x + t * y);
+            }
+
+            for (j = p + 1; j <= q - 1; j++) {
+              x = A[p][j];
+              y = A[j][q];
+              A[p][j] = x + s * (Apq * conj(y) - t * x);
+              A[j][q] = y - s * (Apq * conj(x) + t * y);
+            }
+
+            for (j = q + 1; j <= n; j++) {
+              x = A[p][j];
+              y = A[q][j];
+              A[p][j] = x + s * (Apq * y - t * x);
+              A[q][j] = y - s * (cApq * x + t * y);
+            }
+
+            A[p][q] = 0;
+
+            for (j = 1; j <= n; j++) {
+              x = U[p][j];
+              y = U[q][j];
+              U[p][j] = x + s * (Apq * y - t * x);
+              U[q][j] = y - s * (cApq * x + t * y);
+            }
+          }
+        }
+      }
+      for (p = 1; p <= n; p++) {
+        ev[1][p] = 0.0;
+        d[p] = ev[2][p];
+      }
+    }
+
+    if (nSweep > max_sweeps) {
+      string function = "aurostd::xmatrix::jacobiHermitian";
+      string message = "Number of sweeps exceeded maximum number of sweeps.";
+      throw xerror(function, message, _RUNTIME_ERROR_);
+    }
+
+    // Sort - leave as is if sort mode not found
+    if (_sort_ == 0) {  // ascending order
+      utype temp;
+      xcomplex<utype> xtemp;
+      for (uint i = 1; i <= n - 1; i++) {
+        for (uint j = i + 1; j <= n; j++) {
+          if (d[j] < d[i]) {
+            temp = d[j];
+            d[j] = d[i];
+            d[i] = temp;
+            for (uint k = 1; k <= n; k++) {
+              xtemp = U[j][k];
+              U[j][k] = U[i][k];
+              U[i][k] = xtemp;
+            }
+          }
+        }
+      }
+    } else if (_sort_ == 1) {  // descending order
+      utype temp;
+      xcomplex<utype> xtemp;
+      for (uint i = 1; i <= n - 1; i++) {
+        for (uint j = i + 1; j <= n; j++) {
+          if (d[j] > d[i]) {
+            temp = d[j];
+            d[j] = d[i];
+            d[i] = temp;
+            for (uint k = 1; k <= n; k++) {
+              xtemp = U[j][k];
+              U[j][k] = U[i][k];
+              U[i][k] = xtemp;
+            }
+          }
+        }
+      }
+    }
+
+    // Transpose to have eigenvectors in columns
+    U = trasp(U);
+    return d;
+  }
 }
 
 // ****************************************************
@@ -4118,6 +4414,8 @@ namespace aurostd { // namespace aurostd
 }
 
 // **************************************************************************
+
+
 
 #endif
 // **************************************************************************
