@@ -12,7 +12,8 @@
 #include "aflow_ael_elasticity.h"
 #include "aflow_agl_debye.h"
 
-#define LIB2RAW_FIX_THIS_LATER FALSE
+
+// [OBSOLETE] #define LIB2RAW_FIX_THIS_LATER FALSE // Not needed anymore due to "--quiet" option in lib2lib
 
 // ###############################################################################
 //                  AFLOW Automatic Elasticity Library (AEL) (2014-2019)
@@ -37,7 +38,7 @@ _AEL_data::_AEL_data() {
   calcstrainorigin = false;
   fitrelaxedstruct = false;
   vasprunxmlstress = false;
-  precaccalgonorm = true;
+  precaccalgonorm = false;
   relax_static = false;
   static_only = false;
   relax_only = false;
@@ -434,7 +435,7 @@ namespace AEL_functions {
     aurostd::xoption USER_ORIGIN_STRAIN_CALC;             USER_ORIGIN_STRAIN_CALC.option = false;
     aurostd::xoption USER_RELAXED_STRUCT_FIT;             USER_RELAXED_STRUCT_FIT.option = false;
     aurostd::xoption USER_VASPRUNXML_STRESS;              USER_VASPRUNXML_STRESS.option = false;
-    aurostd::xoption USER_PRECACC_ALGONORM;               USER_PRECACC_ALGONORM.option = true;
+    aurostd::xoption USER_PRECACC_ALGONORM;               USER_PRECACC_ALGONORM.option = false;
     aurostd::xoption USER_RELAX_STATIC;                   USER_RELAX_STATIC.option = false;
     aurostd::xoption USER_STATIC;                         USER_STATIC.option = false;
     aurostd::xoption USER_RELAX;                          USER_RELAX.option = false;
@@ -454,9 +455,9 @@ namespace AEL_functions {
     int    USER_NSHEAR_STRAINS              = 4;
     double USER_NORMAL_STRAIN_STEP           = 0.005;
     double USER_SHEAR_STRAIN_STEP            = 0.005;   
-    // OBSOLETE double USER_SHEAR_STRAIN_STEP             = 0.04; 
-    // OBSOLETE double USER_NORMAL_STRAIN_STEP            = 0.02;
-    // OBSOLETE double USER_SHEAR_STRAIN_STEP             = 0.02;
+    // [OBSOLETE] double USER_SHEAR_STRAIN_STEP             = 0.04; 
+    // [OBSOLETE] double USER_NORMAL_STRAIN_STEP            = 0.02;
+    // [OBSOLETE] double USER_SHEAR_STRAIN_STEP             = 0.02;
     double USER_NIND_STRAIN_DIRS           = 3;
     int    USER_NORMAL_POLYFIT_ORDER       = USER_NNORMAL_STRAINS;
     int    USER_SHEAR_POLYFIT_ORDER        = USER_NSHEAR_STRAINS;
@@ -575,8 +576,7 @@ namespace AEL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
     // Get the user's selection of which values to use for PREC and ALGO.
-    // The default is to use PREC=ACCURATE and ALGO=NORMAL, independently of what is used in these lines in the aflow.in file. 
-    // By setting this variable to OFF, the values for PREC and ALGO will be read from the aflow.in file.
+    // By setting this variable to ON, the values for PREC=ACCURATE and ALGO=NORMAL will be used for AEL, overriding other settings in the aflow.in file.
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"PRECACCALGONORM=",TRUE) ) {
       USER_PRECACC_ALGONORM.options2entry(AflowIn,_AELSTROPT_+"PRECACCALGONORM=",USER_PRECACC_ALGONORM.option);
       aurostd::StringstreamClean(aus);
@@ -759,8 +759,8 @@ namespace AEL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } 
     // Get the user's normal strain step size to be used in the calculation
-    if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NORMAL_STRAINSTEP=",TRUE) ) {
-      USER_NORMAL_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"NORMAL_STRAINSTEP=",TRUE);
+    if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NORMAL_STRAIN_STEP=",TRUE) ) {
+      USER_NORMAL_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"NORMAL_STRAIN_STEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Normal strain step size = " << USER_NORMAL_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -971,10 +971,10 @@ namespace AEL_functions {
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	for (uint k = 0; k < Pressure.size(); k++) {
 	  aurostd::StringstreamClean(aus);
-	  if(LIB2RAW_FIX_THIS_LATER) {  // to avoid too much garbage in lib2raw
-	    aus << _AELSTR_MESSAGE_ + "Pressure = " << Pressure.at(k) << "GPa, Volume = " << PressureVolumes.at(k) << "Ang^3" << endl;        
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  }
+	  // [OBSOLETE] if(LIB2RAW_FIX_THIS_LATER) {  // to avoid too much garbage in lib2raw
+	  aus << _AELSTR_MESSAGE_ + "Pressure = " << Pressure.at(k) << "GPa, Volume = " << PressureVolumes.at(k) << "Ang^3" << endl;        
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE] }
 	}
       } else if(aelerror == 8) {
 	aurostd::StringstreamClean(aus);
@@ -1013,7 +1013,7 @@ namespace AEL_functions {
 	aus << _AELSTR_MESSAGE_ << "Failed ARUN directory = " << AEL_data.failed_arun_list.at(i) << endl; 
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
-      // OBSOLETE return 1;
+      // [OBSOLETE] return 1;
     }
       
     // Calculate total mass of unit cell of system in units of kg
@@ -1244,21 +1244,34 @@ namespace AEL_functions {
       xstructure strainedstructure;
       xstructure compressedstructure;
       vector<xstructure> pressurestructures;
-      _xvasp _vaspRun;
+      _xvasp vaspRun;
       vector<_xvasp> vaspRuns;
       vector<vector <_xvasp> > vaspRunsPressures;
       vector<_xvasp> vaspRunsPressure;
       vector<_AEL_data> AEL_data_pressures;
       _AEL_data AEL_data_orig;
-      _vflags _vaspFlags;
-      _vaspFlags = vflags;
-      _kflags _kbinFlags;
-      _kbinFlags = kflags;
-      _aflags _aflowFlags;
-      _aflowFlags = aflags;
+      _vflags vaspFlags;
+      vaspFlags = vflags;
+      _kflags kbinFlags;
+      kbinFlags = kflags;
+      _aflags aflowFlags;
+      aflowFlags = aflags;
       vector<string> runname;
       vector<string> runnamepressure;
       vector<vector<string> > runnamepressures;
+      vector<string> dirrunname;
+      vector<string> dirrunnamepressure;
+      vector<vector<string> > dirrunnamepressures;
+      vector<string> arunname;
+      vector<string> arunnamepressure;
+      vector<vector<string> > arunnamepressures;
+      bool avasp_pop_xvasp_success = true;
+      bool aflowin_success = true;
+      stringstream arunaflowin;
+      bool write = true;
+
+      // Initialize vaspRun to get values of directory path, etc.
+      vaspRun = xvasp;
 
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Initial structure lattice:" << endl; 
@@ -1278,11 +1291,11 @@ namespace AEL_functions {
 	}
 	for (uint i = 0; i < VolumeScaleFactors.size(); i++) {
 	  aurostd::StringstreamClean(aus);
-	  if(LIB2RAW_FIX_THIS_LATER) {  // to avoid too much garbage in lib2raw
-	    aus << _AELSTR_MESSAGE_ + "Pressure = " << Pressure.at(i) << ", Volume = " << PressureVolumes.at(i) << endl; 
-	    aus << _AELSTR_MESSAGE_ + "VolumeScaleFactor = " << VolumeScaleFactors.at(i) << ", Rescaled Volume = " << pressurestructures.at(i).Volume() << endl; 
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  }
+	  // [OBSOLETE] if(LIB2RAW_FIX_THIS_LATER) {  // to avoid too much garbage in lib2raw
+	  aus << _AELSTR_MESSAGE_ + "Pressure = " << Pressure.at(i) << ", Volume = " << PressureVolumes.at(i) << endl; 
+	  aus << _AELSTR_MESSAGE_ + "VolumeScaleFactor = " << VolumeScaleFactors.at(i) << ", Rescaled Volume = " << pressurestructures.at(i).Volume() << endl; 
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE] }
 	}
       }
 
@@ -1295,7 +1308,7 @@ namespace AEL_functions {
 	  aus << AEL_data.normal_strain.at(i-1).at(j) << endl; 
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  strainedstructure.lattice = strainedstructure.lattice * AEL_data.normal_strain.at(i-1).at(j);
-	  vaspRuns.push_back(_vaspRun);
+	  vaspRuns.push_back(vaspRun);
 	  uint idVaspRun = vaspRuns.size()-1;
 	  vaspRuns.at(idVaspRun).str = strainedstructure;
 	  aurostd::StringstreamClean(aus);
@@ -1322,9 +1335,14 @@ namespace AEL_functions {
 	  } else {
 	    runname.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 	  }
-	  vaspRuns.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runname.at(idVaspRun);
+	  arunname.push_back(stridVaspRun + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
+	  dirrunname.push_back(AEL_data.dirpathname + "/" + runname.at(idVaspRun));	  	  
+	  // [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runname.at(idVaspRun);
 	  vaspRuns.at(idVaspRun).str = strainedstructure;
 	  AEL_data.strain_matrix_list.push_back(AEL_data.normal_strain.at(i-1).at(j));
+	  vaspRuns.at(idVaspRun).AVASP_arun_runname = arunname.at(idVaspRun);
+	  vaspRuns.at(idVaspRun).AVASP_arun = true;
+	  vaspRuns.at(idVaspRun).AVASP_arun_mode = "AEL";	  
 	}
       }
 
@@ -1346,7 +1364,7 @@ namespace AEL_functions {
 	  aus << _AELSTR_MESSAGE_ + "strainedstructure.lattice = " << endl; 
 	  aus << strainedstructure.lattice << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  vaspRuns.push_back(_vaspRun);
+	  vaspRuns.push_back(vaspRun);
 	  uint idVaspRun = vaspRuns.size()-1;
 	  vaspRuns.at(idVaspRun).str = strainedstructure;
 	  aurostd::StringstreamClean(aus);
@@ -1373,9 +1391,14 @@ namespace AEL_functions {
 	  } else {
 	    runname.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 	  }
-	  vaspRuns.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runname.at(idVaspRun);
+	  arunname.push_back(stridVaspRun + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
+	  dirrunname.push_back(AEL_data.dirpathname + "/" + runname.at(idVaspRun));
+	  // [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runname.at(idVaspRun);
 	  vaspRuns.at(idVaspRun).str = strainedstructure;
 	  AEL_data.strain_matrix_list.push_back(AEL_data.shear_strain.at(i-1).at(j));
+	  vaspRuns.at(idVaspRun).AVASP_arun_runname = arunname.at(idVaspRun);
+	  vaspRuns.at(idVaspRun).AVASP_arun = true;
+	  vaspRuns.at(idVaspRun).AVASP_arun_mode = "AEL";
 	}
       }
 
@@ -1386,7 +1409,7 @@ namespace AEL_functions {
 	aus << _AELSTR_MESSAGE_ + "strainedstructure.lattice = " << endl; 
 	aus << strainedstructure.lattice << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	vaspRuns.push_back(_vaspRun);
+	vaspRuns.push_back(vaspRun);
 	uint idVaspRun = vaspRuns.size()-1;
 	vaspRuns.at(idVaspRun).str = strainedstructure;
 	aurostd::StringstreamClean(aus);
@@ -1413,9 +1436,14 @@ namespace AEL_functions {
 	} else {
 	  runname.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	}
-	vaspRuns.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runname.at(idVaspRun);
+	arunname.push_back(stridVaspRun + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
+	dirrunname.push_back(AEL_data.dirpathname + "/" + runname.at(idVaspRun));
+	// [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runname.at(idVaspRun);
 	vaspRuns.at(idVaspRun).str = strainedstructure;
 	AEL_data.strain_matrix_list.push_back(aurostd::identity(strain_matrix));
+	vaspRuns.at(idVaspRun).AVASP_arun_runname = arunname.at(idVaspRun);
+	vaspRuns.at(idVaspRun).AVASP_arun = true;
+	vaspRuns.at(idVaspRun).AVASP_arun_mode = "AEL";
       }
 
       // Set-up normal and shear strained structures for finite pressures
@@ -1428,10 +1456,12 @@ namespace AEL_functions {
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  return aelerror = 1;
 	}
-	// OBSOLETE for (uint k = 1; k < Pressure.size(); k++) {
+	// [OBSOLETE] for (uint k = 1; k < Pressure.size(); k++) {
 	for (uint k = 0; k < Pressure.size(); k++) {
 	  vaspRunsPressure.clear();
 	  runnamepressure.clear();
+	  arunnamepressure.clear();
+	  dirrunnamepressure.clear();
 	  compressedstructure = pressurestructures.at(k);
 	  string strpressure;
 	  ostringstream cnvstrpressure;
@@ -1449,7 +1479,7 @@ namespace AEL_functions {
 	      aus << AEL_data.normal_strain.at(i-1).at(j) << endl; 
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      strainedstructure.lattice = strainedstructure.lattice * AEL_data.normal_strain.at(i-1).at(j);
-	      vaspRunsPressure.push_back(_vaspRun);
+	      vaspRunsPressure.push_back(vaspRun);
 	      uint idVaspRun = vaspRunsPressure.size()-1;
 	      vaspRunsPressure.at(idVaspRun).str = strainedstructure;
 	      aurostd::StringstreamClean(aus);
@@ -1484,8 +1514,17 @@ namespace AEL_functions {
 		  runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 		}
 	      }
-	      vaspRunsPressure.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun);
+	      if(fabs(Pressure.at(k)) < tolzero) {
+		arunnamepressure.push_back(stridVaspRun + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
+	      } else {
+		arunnamepressure.push_back(stridVaspRun + "_P_" + strpressure + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
+	      }
+	      dirrunnamepressure.push_back(AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun));
+	      // [OBSOLETE] vaspRunsPressure.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun);
 	      vaspRunsPressure.at(idVaspRun).str = strainedstructure;
+	      vaspRunsPressure.at(idVaspRun).AVASP_arun_runname = arunnamepressure.at(idVaspRun);
+	      vaspRunsPressure.at(idVaspRun).AVASP_arun = true;
+	      vaspRunsPressure.at(idVaspRun).AVASP_arun_mode = "AEL";
 	    }
 	  }
 
@@ -1507,7 +1546,7 @@ namespace AEL_functions {
 	      aus << _AELSTR_MESSAGE_ + "strainedstructure.lattice = " << endl; 
 	      aus << strainedstructure.lattice << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      vaspRunsPressure.push_back(_vaspRun);
+	      vaspRunsPressure.push_back(vaspRun);
 	      uint idVaspRun = vaspRunsPressure.size()-1;
 	      vaspRunsPressure.at(idVaspRun).str = strainedstructure;
 	      aurostd::StringstreamClean(aus);
@@ -1542,8 +1581,17 @@ namespace AEL_functions {
 		  runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 		}
 	      }
-	      vaspRunsPressure.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun);
+	      if(fabs(Pressure.at(k)) < tolzero) {
+		arunnamepressure.push_back(stridVaspRun + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
+	      } else {
+		arunnamepressure.push_back(stridVaspRun + "_P_" + strpressure + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
+	      }
+	      dirrunnamepressure.push_back(AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun));
+	      // [OBSOLETE] vaspRunsPressure.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun);
 	      vaspRunsPressure.at(idVaspRun).str = strainedstructure;
+	      vaspRunsPressure.at(idVaspRun).AVASP_arun_runname = arunnamepressure.at(idVaspRun);
+	      vaspRunsPressure.at(idVaspRun).AVASP_arun = true;
+	      vaspRunsPressure.at(idVaspRun).AVASP_arun_mode = "AEL";
 	    }
 	  }
 
@@ -1554,7 +1602,7 @@ namespace AEL_functions {
 	    aus << _AELSTR_MESSAGE_ + "strainedstructure.lattice = " << endl; 
 	    aus << strainedstructure.lattice << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    vaspRunsPressure.push_back(_vaspRun);
+	    vaspRunsPressure.push_back(vaspRun);
 	    uint idVaspRun = vaspRunsPressure.size()-1;
 	    vaspRunsPressure.at(idVaspRun).str = strainedstructure;
 	    aurostd::StringstreamClean(aus);
@@ -1589,11 +1637,22 @@ namespace AEL_functions {
 		runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	      }
 	    }
-	    vaspRunsPressure.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun);
+	    if(fabs(Pressure.at(k)) < tolzero) {
+	      arunnamepressure.push_back(stridVaspRun + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
+	    } else {
+	      arunnamepressure.push_back(stridVaspRun + "_P_" + strpressure + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
+	    }
+	    dirrunnamepressure.push_back(AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun));
+	    // [OBSOLETE] vaspRunsPressure.at(idVaspRun).Directory = AEL_data.dirpathname + "/" + runnamepressure.at(idVaspRun);
 	    vaspRunsPressure.at(idVaspRun).str = strainedstructure;
+	    vaspRunsPressure.at(idVaspRun).AVASP_arun_runname = arunnamepressure.at(idVaspRun);
+	    vaspRunsPressure.at(idVaspRun).AVASP_arun = true;
+	    vaspRunsPressure.at(idVaspRun).AVASP_arun_mode = "AEL";	    
 	  }
 	  vaspRunsPressures.push_back(vaspRunsPressure);
 	  runnamepressures.push_back(runnamepressure);
+	  arunnamepressures.push_back(arunnamepressure);
+	  dirrunnamepressures.push_back(dirrunnamepressure);
 	  AEL_data_pressures.push_back(AEL_data);
 	  if (AEL_data_pressures.size() < (k + 1)) {
 	    aurostd::StringstreamClean(aus);
@@ -1616,17 +1675,47 @@ namespace AEL_functions {
       string dfilename;
       // Set up AFLOW runs for strained structures
       for(uint idVaspRun = 0; idVaspRun < vaspRuns.size(); idVaspRun++) {
+	// Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
+	aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), vaspFlags, kbinFlags, dirrunname.at(idVaspRun), AEL_data, FileMESSAGE);
+	if(aelerror != 0) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AELSTR_ERROR_ + "Failed to assign values of flags from aflow.in file" << endl;  
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  return aelerror;
+	}
+	// [OBSOLETE] aurostd::StringstreamClean(aus);
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry = " << vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry << endl;
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme = " << vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl;  
+	// [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	avasp_pop_xvasp_success = AVASP_populateXVASP(aflowFlags, kbinFlags, vaspFlags, vaspRuns.at(idVaspRun));
+	if (!avasp_pop_xvasp_success) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AELSTR_ERROR_ + "Failed to set AFLOW flags for ARUN " << arunname.at(idVaspRun) << endl;  
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  return 1;
+	}
+	// [OBSOLETE] aurostd::StringstreamClean(aus);
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry = " << vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry << endl;
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme = " << vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl;  
+	// [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		
+
      	// If there are already LOCK or OUTCAR.static files in this directory, it means this directory was already generated and computed.
 	// Therefore do not touch, but store this structure in the list, so that it can be used in the next part of code.
-	// OBSOLETE if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ||
+	// [OBSOLETE] if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ||
 	if(AEL_data.relax_static || AEL_data.static_only) {
 	  if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ||
 	      aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
-	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ) continue; 	 
+	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
+	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ) continue; 	 
 	} else {
 	  if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ||
 	      aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ||
-	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ) continue; 	 
+	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.relax2") )||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ||
+	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.relax2") ) ) continue; 	 
 	}
 
 	// Check if structure is on list of failed runs to be skipped
@@ -1647,13 +1736,13 @@ namespace AEL_functions {
 	// If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
 	if (!XHOST.POSTPROCESS) {
 	// Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
-	aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), AEL_data, FileMESSAGE);
-	if(aelerror != 0) {
-	  aurostd::StringstreamClean(aus);
-	  aus << _AELSTR_ERROR_ + "Failed to assign values of flags from aflow.in file" << endl;  
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  return aelerror;
-	}
+	// [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), AEL_data, FileMESSAGE);
+	// [OBSOLETE] if(aelerror != 0) {
+	// [OBSOLETE]   aurostd::StringstreamClean(aus);
+	// [OBSOLETE]   aus << _AELSTR_ERROR_ + "Failed to assign values of flags from aflow.in file" << endl;  
+	// [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	// [OBSOLETE]   return aelerror;
+	// [OBSOLETE] }
 	  
 	// Create aflow.in
 	aurostd::StringstreamClean(aus);
@@ -1661,12 +1750,13 @@ namespace AEL_functions {
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
 	// Writes aflow.in file to appropriate directory for each VASP run
-	aelerror = AEL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AEL_data, FileMESSAGE);
-	if(aelerror != 0) {
+	// [OBSOLETE] aelerror = AEL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AEL_data, FileMESSAGE);
+	aflowin_success = AVASP_MakeSingleAFLOWIN(vaspRuns.at(idVaspRun), arunaflowin, write);
+	if(!aflowin_success) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AELSTR_ERROR_ + "Failed to create aflow.in files" << endl;  
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  return aelerror;
+	  return 1;
 	  }
 	}
       }
@@ -1676,17 +1766,31 @@ namespace AEL_functions {
 	for (uint k = 0; k < vaspRunsPressures.size(); k++) {
 	  // Set up AFLOW runs for strained structures
 	  for(uint idVaspRun = 0; idVaspRun < vaspRunsPressures.at(k).size(); idVaspRun++) {
+	  // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
+	    aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), vaspFlags, kbinFlags, dirrunnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
+	    if(aelerror != 0) {
+	      aurostd::StringstreamClean(aus);
+	      aus << _AELSTR_ERROR_ + "Failed to assign values of flags from aflow.in file" << endl;  
+	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      return aelerror;
+	    }
 	    // If there are already LOCK or OUTCAR.static files in this directory, it means this directory was already generated and computed.
 	    // Therefore do not touch, but store this structure in the list, so that it can be used in the next part of code.
-	    // OBSOLETE if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ||
+	    // [OBSOLETE] if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ||
 	    if(AEL_data.relax_static || AEL_data.static_only) {
 	      if( aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ||
 		  aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
-		  aurostd::EFileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.static") ) ) continue; 	 
+		  aurostd::EFileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
+		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/" + _AFLOWLOCK_ ) ||
+		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) ||
+		  aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.static") ) )continue; 	 
 	    } else {
 	      if( aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ||
 		  aurostd::FileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ||
-		  aurostd::EFileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ) continue; 	 
+		  aurostd::EFileExist( vaspRunsPressures.at(k).at(idVaspRun).Directory + string("/OUTCAR.relax2") ) ||
+		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + "/" + _AFLOWLOCK_ ) ||
+		  aurostd::FileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ||
+		  aurostd::EFileExist( dirrunnamepressures.at(k).at(idVaspRun) + string("/OUTCAR.relax2") ) ) continue; 	 
 	    }
 
 	    // Check if structure is on list of failed runs to be skipped
@@ -1707,13 +1811,13 @@ namespace AEL_functions {
 	    // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
 	    if (!XHOST.POSTPROCESS) {
 	    // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
-	    aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), _vaspFlags, _kbinFlags, runnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
-	    if(aelerror != 0) {
-	      aurostd::StringstreamClean(aus);
-	      aus << _AELSTR_ERROR_ + "Failed to assign values of flags from aflow.in file" << endl;  
-	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      return aelerror;
-	    }
+	    // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), _vaspFlags, _kbinFlags, runnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
+	    // [OBSOLETE] if(aelerror != 0) {
+	    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+	    // [OBSOLETE]   aus << _AELSTR_ERROR_ + "Failed to assign values of flags from aflow.in file" << endl;  
+	    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE]   return aelerror;
+	    // [OBSOLETE] }
 	  
 	    // Create aflow.in
 	    aurostd::StringstreamClean(aus);
@@ -1721,12 +1825,13 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
 	    // Writes aflow.in file to appropriate directory for each VASP run
-	    aelerror = AEL_functions::createAFLOWIN(vaspRunsPressures.at(k).at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AEL_data, FileMESSAGE);
-	    if(aelerror != 0) {
+	    // [OBSOLETE] aelerror = AEL_functions::createAFLOWIN(vaspRunsPressures.at(k).at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AEL_data, FileMESSAGE);
+	    aflowin_success = AVASP_MakeSingleAFLOWIN(vaspRuns.at(idVaspRun), arunaflowin, write);
+	    if(!aflowin_success) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_ERROR_ + "Failed to create aflow.in files" << endl;  
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      return aelerror;
+	      return 1;
 	      }
 	    }
 	  }
@@ -1738,7 +1843,7 @@ namespace AEL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
       // Extract stress tensors from results of VASP calculations for strained structures
-      aelerror = AEL_functions::extractstress(vaspRuns, AEL_data, FileMESSAGE);
+      aelerror = AEL_functions::extractstress(vaspRuns, AEL_data, dirrunname, FileMESSAGE);
       if(aelerror != 0) {
 	aurostd::StringstreamClean(aus);
 	aus << _AELSTR_ERROR_ + "Failed to extract stress tensors" << endl;  
@@ -1786,7 +1891,7 @@ namespace AEL_functions {
 	string ofilestrjson = AEL_data.dirpathname + "/AEL_structures.json";
 	if(!aurostd::stringstream2file(oss, ofilestrjson, "WRITE")) {
 	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_ERROR_ + "Unable to open file AEL_structure.json" <<  endl;
+	  aus << _AELSTR_ERROR_ + "Unable to open file AEL_structure.json" <<  endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  return 1;
 	}	
@@ -1796,7 +1901,7 @@ namespace AEL_functions {
 
       if (AEL_data.fitrelaxedstruct) {
 	AEL_data.strain_matrix_list.push_back(aurostd::identity(strain_matrix));
-	vaspRuns.push_back(_vaspRun);
+	vaspRuns.push_back(vaspRun);
 	uint idVaspRun = vaspRuns.size()-1;
 	vaspRuns.at(idVaspRun).str = initialstructure;
 	string stridVaspRun;
@@ -1835,18 +1940,18 @@ namespace AEL_functions {
 	strain_matrix = AEL_data.strain_matrix_list.at(idSuccessRun);
 	oss << "\"strain_matrix\":[";
 	for (uint j = 1; j < 4; j++) {
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "j = " << j << endl;
-	  // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "j = " << j << endl;
+	  // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  if (j == 1) {
 	    oss << "[";
 	  } else {
 	    oss << ",[";
 	  }
 	  for (uint k = 1; k < 4; k++) {
-	    // OBSOLETE aurostd::StringstreamClean(aus);
-	    // OBSOLETE aus << _AELSTR_MESSAGE_ << "k = " << k << endl;
-	    // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE] aurostd::StringstreamClean(aus);
+	    // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "k = " << k << endl;
+	    // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    // Write stress tensor components, converting from kB to GPa
 	    if (k == 1) {
 	      oss << 0.1 * strain_matrix[j][k];
@@ -1863,18 +1968,18 @@ namespace AEL_functions {
 	stress_tensor = AEL_data.stresscalculated.at(0);
 	oss << "\"stress_tensor\":[";
 	for (uint j = 1; j < 4; j++) {
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "j = " << j << endl;
-	  // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "j = " << j << endl;
+	  // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  if (j == 1) {
 	    oss << "[";
 	  } else {
 	    oss << ",[";
 	  }
 	  for (uint k = 1; k < 4; k++) {
-	    // OBSOLETE aurostd::StringstreamClean(aus);
-	    // OBSOLETE aus << _AELSTR_MESSAGE_ << "k = " << k << endl;
-	    // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE] aurostd::StringstreamClean(aus);
+	    // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "k = " << k << endl;
+	    // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    if (k == 1) {
 	      oss << 0.1 * stress_tensor[j][k];
 	    } else {
@@ -1892,18 +1997,18 @@ namespace AEL_functions {
 	  strain_matrix = AEL_data.strain_matrix_list.at(idSuccessRun);
 	  oss << "\"strain_matrix\":[";
 	  for (uint j = 1; j < 4; j++) {
-	    // OBSOLETE aurostd::StringstreamClean(aus);
-	    // OBSOLETE aus << _AELSTR_MESSAGE_ << "j = " << j << endl;
-	    // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE] aurostd::StringstreamClean(aus);
+	    // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "j = " << j << endl;
+	    // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    if (j == 1) {
 	      oss << "[";
 	    } else {
 	      oss << ",[";
 	    }
 	    for (uint k = 1; k < 4; k++) {
-	      // OBSOLETE aurostd::StringstreamClean(aus);
-	      // OBSOLETE aus << _AELSTR_MESSAGE_ << "k = " << k << endl;
-	      // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] aurostd::StringstreamClean(aus);
+	      // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "k = " << k << endl;
+	      // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      if (k == 1) {
 		oss << strain_matrix[j][k];
 	      } else {
@@ -1917,9 +2022,9 @@ namespace AEL_functions {
 	  // Convert pressure from kB to GPa before writing
 	  oss << "\"pressure\":" << 0.1 * AEL_data.pressurecalculated.at(i) << ",";
 	  stress_tensor = AEL_data.stresscalculated.at(i);
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "stress_tensor = " << stress_tensor << endl;
-	  // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "stress_tensor = " << stress_tensor << endl;
+	  // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  oss << "\"stress_tensor\":[";
 	  for (uint j = 1; j < 4; j++) {
 	    if (j == 1) {
@@ -2080,13 +2185,13 @@ namespace AEL_functions {
       if(USER_PRESSURE_CALC.option) {
 	for (uint k = 0; k < vaspRunsPressures.size(); k++) {
 	  aurostd::StringstreamClean(aus);
-	  if(LIB2RAW_FIX_THIS_LATER) {  // to avoid too much garbage in lib2raw
-	    // OBSOLETE aus << _AELSTR_MESSAGE_ + "extract stress tensors for Pressure = " << Pressure.at(k+1) << "GPa" << endl;  
-	    aus << _AELSTR_MESSAGE_ + "extract stress tensors for Pressure = " << Pressure.at(k) << "GPa" << endl;  
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  }
+	  // [OBSOLETE] if(LIB2RAW_FIX_THIS_LATER) {  // to avoid too much garbage in lib2raw
+	    // [OBSOLETE] aus << _AELSTR_MESSAGE_ + "extract stress tensors for Pressure = " << Pressure.at(k+1) << "GPa" << endl;  
+	  aus << _AELSTR_MESSAGE_ + "extract stress tensors for Pressure = " << Pressure.at(k) << "GPa" << endl;  
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE] }
 	  // Extract stress tensors from results of VASP calculations for strained structures
-	  aelerror = AEL_functions::extractstress(vaspRunsPressures.at(k), AEL_data_pressures.at(k), FileMESSAGE);
+	  aelerror = AEL_functions::extractstress(vaspRunsPressures.at(k), AEL_data_pressures.at(k), dirrunnamepressures.at(k), FileMESSAGE);
 	  if(aelerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_ERROR_ + "Failed to extract stress tensors" << endl;  
@@ -2323,7 +2428,7 @@ namespace AEL_functions {
       string ofileafaelname = AEL_data.dirpathname + "/aflow.ael.out";
       if(!aurostd::stringstream2file(oss, ofileafaelname, "WRITE")) {
 	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "Unable to open file aflow.ael.out" <<  endl;
+	aus << _AELSTR_ERROR_ + "Unable to open file aflow.ael.out" <<  endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	return 1;
       }	
@@ -2334,7 +2439,7 @@ namespace AEL_functions {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Opening file AEL_Elastic_constants.out" <<  endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      // OBSOLETE aurostd::StringstreamClean(oss);
+      // [OBSOLETE] aurostd::StringstreamClean(oss);
       oss << "# Elastic constants: stiffness tensor" << endl;
       for (uint i = 0; i < AEL_data.elastic_tensor.size(); i++) {
 	for (uint j = 0; j < AEL_data.elastic_tensor.size(); j++) {
@@ -2349,7 +2454,7 @@ namespace AEL_functions {
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	return 1;
       }	
-      // OBSOLETE aurostd::StringstreamClean(oss);
+      // [OBSOLETE] aurostd::StringstreamClean(oss);
       oss.clear();
       oss.str(std::string());
 
@@ -2357,7 +2462,7 @@ namespace AEL_functions {
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Opening file AEL_Compliance_tensor.out" <<  endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      // OBSOLETE aurostd::StringstreamClean(oss);
+      // [OBSOLETE] aurostd::StringstreamClean(oss);
       oss << "# Compliance tensor" << endl;
       for (uint i = 0; i < AEL_data.compliance_tensor.size(); i++) {
 	for (uint j = 0; j < AEL_data.compliance_tensor.size(); j++) {
@@ -2372,7 +2477,7 @@ namespace AEL_functions {
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	return 1;
       }	
-      // OBSOLETE aurostd::StringstreamClean(oss);
+      // [OBSOLETE] aurostd::StringstreamClean(oss);
       oss.clear();
       oss.str(std::string());
 
@@ -2386,47 +2491,47 @@ namespace AEL_functions {
       string strelasticindexi, strelasticindexj;
       string elastic_constant_label;
       ostringstream cnvstrelasticindexi, cnvstrelasticindexj;
-      // OBSOLETE oss << "{\"elastic_stiffness_tensor\": [";
+      // [OBSOLETE] oss << "{\"elastic_stiffness_tensor\": [";
       oss << "{\"elastic_stiffness_tensor\": {";
       for (uint i = 0; i < AEL_data.elastic_tensor.size(); i++) {
 	for (uint j = 0; j < AEL_data.elastic_tensor.size(); j++) {
 	  elasticindexi = i + 1;
 	  elasticindexj = j + 1;
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index i = " << elasticindexi <<  endl;
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index j = " << elasticindexj <<  endl;	  
-	  // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	  
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index i = " << elasticindexi <<  endl;
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index j = " << elasticindexj <<  endl;	  
+	  // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	  
 	  cnvstrelasticindexi.clear();
 	  cnvstrelasticindexi.str(std::string());
 	  cnvstrelasticindexj.clear();
 	  cnvstrelasticindexj.str(std::string());
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index i ss = " << cnvstrelasticindexi.str() <<  endl;
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index j ss = " << cnvstrelasticindexj.str() <<  endl;	  
-	  // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	  
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index i ss = " << cnvstrelasticindexi.str() <<  endl;
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index j ss = " << cnvstrelasticindexj.str() <<  endl;	  
+	  // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	  
 	  cnvstrelasticindexi << elasticindexi;
 	  cnvstrelasticindexj << elasticindexj;
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index i ss = " << cnvstrelasticindexi.str() <<  endl;
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index j ss = " << cnvstrelasticindexj.str() <<  endl;	  
-	  // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index i ss = " << cnvstrelasticindexi.str() <<  endl;
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index j ss = " << cnvstrelasticindexj.str() <<  endl;	  
+	  // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
 	  strelasticindexi = cnvstrelasticindexi.str();
 	  strelasticindexj = cnvstrelasticindexj.str();
-	  // OBSOLETE aurostd::StringstreamClean(aus);
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index i str = " << strelasticindexi <<  endl;
-	  // OBSOLETE aus << _AELSTR_MESSAGE_ << "Elastic index j str = " << strelasticindexj <<  endl;	  
+	  // [OBSOLETE] aurostd::StringstreamClean(aus);
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index i str = " << strelasticindexi <<  endl;
+	  // [OBSOLETE] aus << _AELSTR_MESSAGE_ << "Elastic index j str = " << strelasticindexj <<  endl;	  
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
 	  elastic_constant_label = "c_" + strelasticindexi + strelasticindexj;
 	  if ((i==0) && (j==0)) {
-	    // OBSOLETE oss << "{\"" + elastic_constant_label + "\":" << AEL_data.elastic_tensor.at(i).at(j) << "}";
+	    // [OBSOLETE] oss << "{\"" + elastic_constant_label + "\":" << AEL_data.elastic_tensor.at(i).at(j) << "}";
 	    oss << "\"" + elastic_constant_label + "\":" << AEL_data.elastic_tensor.at(i).at(j);
 	  } else {
-	    // OBSOLETE oss << ",{\"" + elastic_constant_label + "\":" << AEL_data.elastic_tensor.at(i).at(j) << "}";
+	    // [OBSOLETE] oss << ",{\"" + elastic_constant_label + "\":" << AEL_data.elastic_tensor.at(i).at(j) << "}";
 	    oss << ",\"" + elastic_constant_label + "\":" << AEL_data.elastic_tensor.at(i).at(j);
 	  }
 	}
       }
-      // OBSOLETE oss << "],\"elastic_compliance_tensor\": [";
+      // [OBSOLETE] oss << "],\"elastic_compliance_tensor\": [";
       oss << "},\"elastic_compliance_tensor\": {";
       for (uint i = 0; i < AEL_data.compliance_tensor.size(); i++) {
 	for (uint j = 0; j < AEL_data.compliance_tensor.size(); j++) {
@@ -2442,20 +2547,20 @@ namespace AEL_functions {
 	  strelasticindexj = cnvstrelasticindexj.str();
 	  elastic_constant_label = "s_" + strelasticindexi + strelasticindexj;
 	  if ((i==0) && (j==0)) {
-	    // OBSOLETE oss << "{\"" + elastic_constant_label + "\":" << AEL_data.compliance_tensor.at(i).at(j) << "}";
+	    // [OBSOLETE] oss << "{\"" + elastic_constant_label + "\":" << AEL_data.compliance_tensor.at(i).at(j) << "}";
 	    oss << "\"" + elastic_constant_label + "\":" << AEL_data.compliance_tensor.at(i).at(j);
 	  } else {
-	    // OBSOLETE oss << ",{\"" + elastic_constant_label + "\":" << AEL_data.compliance_tensor.at(i).at(j) << "}";
+	    // [OBSOLETE] oss << ",{\"" + elastic_constant_label + "\":" << AEL_data.compliance_tensor.at(i).at(j) << "}";
 	    oss << ",\"" + elastic_constant_label + "\":" << AEL_data.compliance_tensor.at(i).at(j);
 	  }
 	}
       }
-      // OBSOLETE oss << "],\"units\":\"GPa\"}" << endl;
+      // [OBSOLETE] oss << "],\"units\":\"GPa\"}" << endl;
       oss << "},\"units\":\"GPa\"}" << endl;
       string ofileelastictensorjson = AEL_data.dirpathname + "/AEL_elastic_tensor.json";
       if(!aurostd::stringstream2file(oss, ofileelastictensorjson, "WRITE")) {
 	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_ERROR_ + "Unable to open file AEL_elastic_tensor.json" <<  endl;
+	aus << _AELSTR_ERROR_ + "Unable to open file AEL_elastic_tensor.json" <<  endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	return 1;
       }	
@@ -2472,7 +2577,7 @@ namespace AEL_functions {
 	oss << "ael_shear_modulus_reuss=" << AEL_data.shearmodulus_reuss << " | ";
 	oss << "ael_bulk_modulus_vrh=" << AEL_data.bulkmodulus_vrh << " | ";
 	oss << "ael_shear_modulus_vrh=" << AEL_data.shearmodulus_vrh << " | ";
-	// OBSOLETE oss << "ael_elastic_anisotropy=" << AEL_data.elastic_anisotropy << " | ";
+	// [OBSOLETE] oss << "ael_elastic_anisotropy=" << AEL_data.elastic_anisotropy << " | ";
 	oss << "ael_elastic_anisotropy=" << AEL_data.elastic_anisotropy;
 	string ofileaellibname = AEL_data.dirpathname + "/aellib.out";
 	if(!aurostd::stringstream2file(oss, ofileaellibname, "WRITE")) {
@@ -2481,7 +2586,7 @@ namespace AEL_functions {
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  return 1;
 	}	
-	// OBSOLETE aurostd::StringstreamClean(oss);
+	// [OBSOLETE] aurostd::StringstreamClean(oss);
 	oss.clear();
 	oss.str(std::string());
 
@@ -2489,7 +2594,7 @@ namespace AEL_functions {
 	aurostd::StringstreamClean(aus);
 	aus << _AELSTR_MESSAGE_ + "Opening file AEL_elastic_moduli_directional.out" <<  endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	// OBSOLETE aurostd::StringstreamClean(oss);
+	// [OBSOLETE] aurostd::StringstreamClean(oss);
 	oss << "# Elastic moduli and Poisson ratio for different stress/strain directions" << endl;
 	oss << "# Valid for orthotropic materials" << endl;
 	oss << "#########################" << endl;
@@ -2517,7 +2622,7 @@ namespace AEL_functions {
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  return 1;
 	}	
-	// OBSOLETE aurostd::StringstreamClean(oss);
+	// [OBSOLETE] aurostd::StringstreamClean(oss);
 	oss.clear();
 	oss.str(std::string());
       }
@@ -2555,7 +2660,7 @@ namespace AEL_functions {
 	  oss << "ael_speed_sound_transverse=" << AEL_data_pressures.at(k).speed_sound_transverse << " (m/s)" << endl;
 	  oss << "ael_speed_sound_longitudinal=" << AEL_data_pressures.at(k).speed_sound_longitudinal << " (m/s)" << endl;
 	  oss << "ael_speed_sound_average=" << AEL_data_pressures.at(k).speed_sound_average << " (m/s)" << endl;
-	  // OBSOLETE oss << "ael_pughs_modulus_ratio=" << AEL_data_pressures.at(k).pughs_modulus_ratio << "  " << endl;
+	  // [OBSOLETE] oss << "ael_pughs_modulus_ratio=" << AEL_data_pressures.at(k).pughs_modulus_ratio << "  " << endl;
 	  oss << "ael_debye_temperature=" << AEL_data_pressures.at(k).debye_temperature << "  " << endl;
 	  oss << "ael_applied_pressure=" << AEL_data_pressures.at(k).applied_pressure << "  (GPa)" << endl;
 	  oss << "ael_average_external_pressure=" << AEL_data_pressures.at(k).average_external_pressure << "  (GPa)" << endl;  

@@ -1,3 +1,8 @@
+3.1.226 - 2019/08/30
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
+        -- Modified aflow.in generation in AEL and AGL to use common routines in aflow_avasp.cpp and aflow_modules.cpp (CT)  
+        -- Write AGL enthalpy as a function of pressure AFLOW readable format for future phase diagram application (CT)
+        -- Added --quiet option to LIB2LIB routine (CT)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)
