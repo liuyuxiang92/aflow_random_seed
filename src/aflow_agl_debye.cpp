@@ -2482,7 +2482,7 @@ namespace AGL_functions {
 	  if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) ||
 	      aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
 	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
-	    aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
 	    aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
 	    aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ) {
 	    AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
