@@ -7093,7 +7093,7 @@ void aplEigensystems::eigen_calculation(const aurostd::xmatrix<xcomplex<double> 
     // ME190726 - exit clean-up
     //cout << "\n apl eigenvale is not working" << std::endl;
     //exit(0);
-    throw APLRuntimeError("apl eigenvale is not working");
+    throw APLRuntimeError("apl eigenvalue calculation is not working");
   };
   //apl_eigen_hermv_sort (eval, evec, APL_MV_EIGEN_SORT_ABS_ASC);
   apl_eigen_hermv_free(w);
@@ -7136,7 +7136,7 @@ void aplEigensystems::eigen_calculation(const aurostd::xmatrix<xcomplex<double> 
     // ME190726 - exit clean-up
     //cout << "\n apl eigenvale is not working" << std::endl;
     //exit(0);
-    throw APLRuntimeError("apl eigenvale is not working");
+    throw APLRuntimeError("apl eigenvalue calculation is not working");
   };
 
   apl_eigen_hermv_sort(eval, evec, t);
@@ -7360,7 +7360,7 @@ MVops::calculate_gruneisen(xmatrix<xcomplex<double> > &m0, xmatrix<xcomplex<doub
     // ME190726 - exit clean-up
     //cout << "\n apl eigenvale is not working" << std::endl;
     //exit(0);
-    throw APLRuntimeError("apl eigenvale is not working");
+    throw APLRuntimeError("apl eigenvalue calculation is not working");
   };
   apl_eigen_hermv_sort(apleval0, aplevec0, APL_MV_EIGEN_SORT_ABS_ASC);
   apl_eigen_hermv_free(w);
