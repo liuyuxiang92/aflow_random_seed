@@ -1448,7 +1448,7 @@ namespace AEL_functions {
 
       // Set-up normal and shear strained structures for finite pressures
       if(USER_PRESSURE_CALC.option) {
-	if(fabs(Pressure.at(0)) > tolzero) {
+	if(aurostd::abs(Pressure.at(0)) > tolzero) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AELSTR_ERROR_ + "Calculation of elastic constants at finite pressure" << endl; 
 	  aus << _AELSTR_ERROR_ + "First pressure value = " << Pressure.at(0) << " > 0.0" << endl; 
@@ -1502,19 +1502,19 @@ namespace AEL_functions {
 	      cnvnormindstrain << i;
 	      strnormindstrain = cnvnormindstrain.str();
 	      if(USER_DIRNAME_ARUN.option) {
-		if(fabs(Pressure.at(k)) < tolzero) {
+		if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		  runnamepressure.push_back(_ARAELSTR_DIRNAME_ + stridVaspRun + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 		} else {
 		  runnamepressure.push_back(_ARAELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 		}
 	      } else {
-		if(fabs(Pressure.at(k)) < tolzero) {
+		if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		  runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 		} else {
 		  runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 		}
 	      }
-	      if(fabs(Pressure.at(k)) < tolzero) {
+	      if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		arunnamepressure.push_back(stridVaspRun + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
 	      } else {
 		arunnamepressure.push_back(stridVaspRun + "_P_" + strpressure + "_SF_N_" + strnormindstrain + "_" + strstrainfactor);
@@ -1569,19 +1569,19 @@ namespace AEL_functions {
 	      cnvshearindstrain << i;
 	      strshearindstrain = cnvshearindstrain.str();
 	      if(USER_DIRNAME_ARUN.option) {
-		if(fabs(Pressure.at(k)) < tolzero) {
+		if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		  runnamepressure.push_back(_ARAELSTR_DIRNAME_ + stridVaspRun + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 		} else {
 		  runnamepressure.push_back(_ARAELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 		}
 	      } else {
-		if(fabs(Pressure.at(k)) < tolzero) {
+		if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		  runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 		} else {
 		  runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 		}
 	      }
-	      if(fabs(Pressure.at(k)) < tolzero) {
+	      if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		arunnamepressure.push_back(stridVaspRun + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
 	      } else {
 		arunnamepressure.push_back(stridVaspRun + "_P_" + strpressure + "_SF_S_" + strshearindstrain + "_" + strstrainfactor);
@@ -1625,19 +1625,19 @@ namespace AEL_functions {
 	    cnvorgindstrain << 0;
 	    strorgindstrain = cnvorgindstrain.str();
 	    if(USER_DIRNAME_ARUN.option) {
-	      if(fabs(Pressure.at(k)) < tolzero) {
+	      if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		runnamepressure.push_back(_ARAELSTR_DIRNAME_ + stridVaspRun + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	      } else {
 		runnamepressure.push_back(_ARAELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	      }
 	    } else {
-	      if(fabs(Pressure.at(k)) < tolzero) {
+	      if(aurostd::abs(Pressure.at(k)) < tolzero) {
 		runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	      } else {
 		runnamepressure.push_back(_AELSTR_DIRNAME_ + stridVaspRun + "_P_" + strpressure + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	      }
 	    }
-	    if(fabs(Pressure.at(k)) < tolzero) {
+	    if(aurostd::abs(Pressure.at(k)) < tolzero) {
 	      arunnamepressure.push_back(stridVaspRun + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);
 	    } else {
 	      arunnamepressure.push_back(stridVaspRun + "_P_" + strpressure + "_SF_O_" + strorgindstrain + "_" + strstrainfactor);

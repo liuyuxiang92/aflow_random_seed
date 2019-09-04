@@ -185,7 +185,7 @@ namespace pflow {
     }
     nkb = nkb * natoms;
     // Skip initial temperature point if it is equal to zero
-    if(fabs(Temp[0]) < tol2) {
+    if(aurostd::abs(Temp[0]) < tol2) {
       jstart = 1;
     }
     else {
@@ -207,7 +207,7 @@ namespace pflow {
       debint(y, Deb);
       fy = 9.0 * Deb - cvt;
 
-      if(fabs(fy) < tol) {
+      if(aurostd::abs(fy) < tol) {
 	//	  Initial trial theta is correct - do nothing
       }
       else if(fy > 0.0) {
@@ -257,7 +257,7 @@ namespace pflow {
 	}
       }
       
-      while (fabs(fy) > tol) {
+      while (aurostd::abs(fy) > tol) {
 	y = (ya + yb) / 2.0;
 	debint(y, Deb);
 	fy = 9.0 * Deb - cvt;
@@ -272,7 +272,7 @@ namespace pflow {
 
     }
 
-    if(fabs(Temp[0]) < tol2) {
+    if(aurostd::abs(Temp[0]) < tol2) {
       tdmin = ThetaD[1];
       tdmax = ThetaD[1];
     }
@@ -338,7 +338,7 @@ namespace pflow {
     ofstream fdebin;
     fdebin.open(debyedatafile.c_str());  
     if(fdebin.is_open()) {
-      if(fabs(Temp[0]) < tol2) {
+      if(aurostd::abs(Temp[0]) < tol2) {
 	for (int i = 1; i < npoints; i++) {
 	  fdebin << Temp[i] << "\t" << ThetaD[i] << endl;
 	}
@@ -443,7 +443,7 @@ void gauleg(double& x1,double& x2,double x[],double w[], int& n) {
       z1=z;
       //.........Newton's method.
       z=z1-p1/pp;
-      if(fabs(z-z1) > eps) {
+      if(aurostd::abs(z-z1) > eps) {
 	converged = false;
       }
       else {
@@ -486,7 +486,7 @@ void debint (double& y, double& Deb) {
 	sum=sum+w[i]*fdebye(x[i]);
       }
       debye=sum/y/y/y;
-      xabs=fabs(debye-debye0);
+      xabs=aurostd::abs(debye-debye0);
       if(xabs < eps) {
 	break;
       }

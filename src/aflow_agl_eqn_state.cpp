@@ -454,7 +454,7 @@ namespace AGL_functions {
     // OBSOLETE	AGL_data.brerr = 1;
     // OBSOLETE	return;
     // OBSOLETE	}
-    if(fabs(AGL_data.pressure_external.at(0)) > tol) { 
+    if(aurostd::abs(AGL_data.pressure_external.at(0)) > tol) { 
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_ERROR_ + "birch : P(0) must be 0.0" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -829,7 +829,7 @@ namespace AGL_functions {
 	    xmlxp = exp(AGL_data.x_m_opt_statcalc * (1.0 - xpoints.at(ii))) *  (exp(inv1mbst * log(xpoints.at(ii))) - 1.0);
 	    sum_xm = sum_xm + weights.at(ii) * signfactor * xmlxp * AGL_data.x_m_opt_statcalc * AGL_data.volumestatcalc_0pressure * AGL_data.x_Press_sp_statcalc;
 	  }
-	  xabs = fabs(sum_xm - sum_prev_iter);
+	  xabs = aurostd::abs(sum_xm - sum_prev_iter);
 	  sum_prev_iter = sum_xm;
 	  nl = nl + 5;
 	}
@@ -936,7 +936,7 @@ namespace AGL_functions {
       endpart = true;
       xba_fbc = (x_b - x_a) * (f_b - f_c);
       xbc_fba = (x_b - x_c) * (f_b - f_a);
-      x_u = x_b - ((x_b - x_c) * xbc_fba - (x_b - x_a) * xba_fbc) / (2.0 * copysign(max(fabs(xbc_fba - xba_fbc), tiny), xbc_fba - xba_fbc));
+      x_u = x_b - ((x_b - x_c) * xbc_fba - (x_b - x_a) * xba_fbc) / (2.0 * copysign(max(aurostd::abs(xbc_fba - xba_fbc), tiny), xbc_fba - xba_fbc));
       ulim = x_b + glimit * (x_c - x_b);
       if((x_b - x_u) * (x_u - x_c) > 0.0) {
 	aglerror = AGL_functions::bcnt_optimize_beta(x_u, AGL_data, f_u, FileMESSAGE);
@@ -1049,15 +1049,15 @@ namespace AGL_functions {
     f_xwim1 = f_xwork;
     for (iter = 1; iter <= itmax; iter++) {
       xmid = 0.5 * (xlower + xupper);
-      tolx = tol * fabs(xwork) + zeps;
+      tolx = tol * aurostd::abs(xwork) + zeps;
       tolx2 = 2.0 * tolx;
       // Check if xwork is within tolerance range
-      if(fabs(xwork - xmid) <= (tolx2 - 0.5 * (xupper - xlower))) {
+      if(aurostd::abs(xwork - xmid) <= (tolx2 - 0.5 * (xupper - xlower))) {
 	xmin = xwork;
 	brent_x = f_xwork;
 	return aglerror;
       } else {
-	if(fabs(xbound_diff) > tolx) {
+	if(aurostd::abs(xbound_diff) > tolx) {
 	  xw1_fxw2 = (xwork - xwim1) * (f_xwork - f_xwim2);
 	  xw2_fxw1 = (xwork - xwim2) * (f_xwork - f_xwim1);
 	  xw12_fxw21 = (xwork - xwim2) * xw2_fxw1 - (xwork - xwim1) * xw1_fxw2;
@@ -1065,17 +1065,17 @@ namespace AGL_functions {
 	  if(xw2_fxw1 > 0.0) {
 	   xw12_fxw21 = -xw12_fxw21;
 	  }
-	  xw2_fxw1 = fabs(xw2_fxw1);
+	  xw2_fxw1 = aurostd::abs(xw2_fxw1);
 	  xbd_tmp = xbound_diff;
 	  xbound_diff = xbdg;
-	  if(fabs(xw12_fxw21) >= fabs(0.5 * xw2_fxw1 * xbd_tmp) || xw12_fxw21 <= xw2_fxw1 * (xlower - xwork) || xw12_fxw21 >= xw2_fxw1 * (xupper - xwork)) {
+	  if(aurostd::abs(xw12_fxw21) >= aurostd::abs(0.5 * xw2_fxw1 * xbd_tmp) || xw12_fxw21 <= xw2_fxw1 * (xlower - xwork) || xw12_fxw21 >= xw2_fxw1 * (xupper - xwork)) {
 	    xbdg_reset = true;
 	  } else {
 	    xbdg = xw12_fxw21 / xw2_fxw1;
 	    xwdg = xwork + xbdg;
 	    if(xwdg - xlower < tolx2 || xupper - xwdg < tolx2) {
 	      xbdg = copysign(tolx, xmid - xwork);
-	      if(fabs(xbdg) >= tolx) {
+	      if(aurostd::abs(xbdg) >= tolx) {
 		xwdg = xwork + xbdg;
 	      } else {
 		xwdg = xwork + copysign(tolx, xbdg);
@@ -1092,7 +1092,7 @@ namespace AGL_functions {
 	  }
 	  xbdg = goldenratio_diff2 * xbound_diff;
 	}
-	if(fabs(xbdg) >= tolx) {
+	if(aurostd::abs(xbdg) >= tolx) {
 	  xwdg = xwork + xbdg;
 	} else {
 	  xwdg = xwork + copysign(tolx, xbdg);
@@ -1119,13 +1119,13 @@ namespace AGL_functions {
 	  } else {
 	    xupper = xwdg;
 	  }
-	  if(f_xwdg <= f_xwim1 || fabs(xwim1 - xwork) < tole12 ) {
+	  if(f_xwdg <= f_xwim1 || aurostd::abs(xwim1 - xwork) < tole12 ) {
 	    xwim2 = xwim1;
 	    f_xwim2 = f_xwim1;
 	    xwim1 = xwdg;
 	    f_xwim1 = f_xwdg;
 	  } 
-	  else if(f_xwdg <= f_xwim2 || fabs(xwim2 - xwork) < tole12 || fabs(xwim2 - xwork) < tole12 ) {
+	  else if(f_xwdg <= f_xwim2 || aurostd::abs(xwim2 - xwork) < tole12 || aurostd::abs(xwim2 - xwork) < tole12 ) {
 	    xwim2 = xwdg;
 	    f_xwim2 = f_xwdg;
 	  }

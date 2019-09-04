@@ -3392,9 +3392,9 @@ namespace AGL_functions {
 
       // Finds temperature value which produces Debye temperature which is closest to the value which produces the best fit to the heat capacity data
       double difftd, difftdmin;
-      difftdmin = fabs(tdbest - AGL_data.DebyeTemperature0pressure.at(0));
+      difftdmin = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(0));
       for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
-	difftd = fabs(tdbest - AGL_data.DebyeTemperature0pressure.at(j));
+	difftd = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(j));
 	if(difftd < difftdmin) {
 	  jtdbest = j;
 	  difftdmin = difftd;
@@ -3425,9 +3425,9 @@ namespace AGL_functions {
       // Determine temperature value which is closest to the acoustic Debye temperature
       double diffatd, diffatdmin;
       uint jtdatd = 0;
-      diffatdmin = fabs(acousticthetaD - AGL_data.temperature_external.at(0));
+      diffatdmin = aurostd::abs(acousticthetaD - AGL_data.temperature_external.at(0));
       for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
-	diffatd = fabs(acousticthetaD - AGL_data.temperature_external.at(j));
+	diffatd = aurostd::abs(acousticthetaD - AGL_data.temperature_external.at(j));
 	if(diffatd < diffatdmin) {
 	  jtdatd = j;
 	  diffatdmin = diffatd;
@@ -3541,9 +3541,9 @@ namespace AGL_functions {
 	// Finds temperature value which is closest to the user's value of the Debye temperature to get the equilibrium volume
 	double difftdU, difftdminU;
 	int jtdbestU;
-	difftdminU = fabs(thetaU - AGL_data.temperature_external.at(0));
+	difftdminU = aurostd::abs(thetaU - AGL_data.temperature_external.at(0));
 	for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
-	  difftdU = fabs(thetaU - AGL_data.temperature_external.at(j));
+	  difftdU = aurostd::abs(thetaU - AGL_data.temperature_external.at(j));
 	  if(difftdU < difftdminU) {
 	    jtdbestU = j;
 	    difftdminU = difftdU;

@@ -134,7 +134,7 @@ void ShellHandle::init(const xstructure& xstr, int centralAtomID, int safeShellI
 
     // Stop if the radius does not change
     if ((((int)_shells.size() - 1) > safeShellID) &&
-        (fabs(radiusSafeShell - _shells[safeShellID].radius) < _AFLOW_APL_EPS_)) {
+        (aurostd::abs(radiusSafeShell - _shells[safeShellID].radius) < _AFLOW_APL_EPS_)) {
       break;
     }
     radiusSafeShell = _shells[safeShellID].radius;
@@ -172,7 +172,7 @@ void ShellHandle::calcShells(const xstructure& xstr, int centralAtomID, int n) {
 
           uint j = 0;
           for (; j < _shells.size(); j++)
-            if (fabs(_shells[j].radius - r) < _AFLOW_APL_EPS_SHELL_EQUIVALENCE_) break;
+            if (aurostd::abs(_shells[j].radius - r) < _AFLOW_APL_EPS_SHELL_EQUIVALENCE_) break;
           if (j == _shells.size()) {
             ShellData sd;
             sd.radius = r;
@@ -259,8 +259,8 @@ void ShellHandle::splitBySymmetry() {
 
               // Get lowest index
               for (_AFLOW_APL_REGISTER_ int l = 1; l <= 3; l++) {
-                if (fabs(atom.cpos(l) > _AFLOW_APL_EPS_CPOS_EQUIVALENCE_) &&
-                    fabs(atom.cpos(l)) < _indexReductionConstant) {
+                if (aurostd::abs(atom.cpos(l)) > _AFLOW_APL_EPS_CPOS_EQUIVALENCE_ &&  //CO190904 - enclose abs() before > TOL
+                    aurostd::abs(atom.cpos(l)) < _indexReductionConstant) {
                   _indexReductionConstant = atom.cpos(l);
                   //cout << _indexReductionConstant << std::endl;
                 }
@@ -357,9 +357,9 @@ void ShellHandle::splitBySymmetry() {
           xvector<double> rotfpos = C2F(sclattice, rotcpos);
           xvector<double> xmin = getFPositionItsNearestImage(rotfpos, zero, sclattice);
           rotcpos = F2C(sclattice, xmin);
-          if ((fabs(fabs(rotcpos(1)) - fabs(atomsAtSameShell[i].cpos(1))) < _AFLOW_APL_EPS_CPOS_EQUIVALENCE_) &&
-              (fabs(fabs(rotcpos(2)) - fabs(atomsAtSameShell[i].cpos(2))) < _AFLOW_APL_EPS_CPOS_EQUIVALENCE_) &&
-              (fabs(fabs(rotcpos(3)) - fabs(atomsAtSameShell[i].cpos(3))) < _AFLOW_APL_EPS_CPOS_EQUIVALENCE_))
+          if ((aurostd::abs(aurostd::abs(rotcpos(1)) - aurostd::abs(atomsAtSameShell[i].cpos(1))) < _AFLOW_APL_EPS_CPOS_EQUIVALENCE_) &&
+              (aurostd::abs(aurostd::abs(rotcpos(2)) - aurostd::abs(atomsAtSameShell[i].cpos(2))) < _AFLOW_APL_EPS_CPOS_EQUIVALENCE_) &&
+              (aurostd::abs(aurostd::abs(rotcpos(3)) - aurostd::abs(atomsAtSameShell[i].cpos(3))) < _AFLOW_APL_EPS_CPOS_EQUIVALENCE_))
             break;
         }
         if (symOpID != agroup[_centralAtomID].size())
@@ -417,9 +417,9 @@ void ShellHandle::splitBySymmetry() {
       xvector<int> pint(3);
       if (!_shells[ishell].ratoms[i].empty()) {
         xvector<double> p = _shells[ishell].ratoms[i][0].cpos;
-        p(1) = fabs(p(1));
-        p(2) = fabs(p(2));
-        p(3) = fabs(p(3));
+        p(1) = aurostd::abs(p(1));
+        p(2) = aurostd::abs(p(2));
+        p(3) = aurostd::abs(p(3));
         for (int j = 1; j < 3; j++)
           for (int k = j + 1; k <= 3; k++) {
             if (p(k) > p(j)) {
@@ -496,11 +496,11 @@ int ShellHandle::getShell(double r) {
 
     while (sigmaMul > _AFLOW_APL_EPS_) {
       double eps = (_shells[j].stdevRadius > _AFLOW_APL_EPS_) ? sigmaMul * _shells[j].stdevRadius : _AFLOW_APL_EPS_SHELL_EQUIVALENCE_;
-      //cout << j << " " <<  fabs( _shells[j].radius - r ) << " +/- " << _shells[j].stdevRadius << " " << eps << std::endl;
-      //cout <<  ( fabs( _shells[j].radius - r ) < eps ) << std::endl;
-      //cout <<  ( j < _shells.size()-1 ? fabs( _shells[j+1].radius - r ) > eps : true ) << std::endl;
-      if ((fabs(_shells[j].radius - r) < eps) &&
-          (j < _shells.size() - 1 ? fabs(_shells[j + 1].radius - r) > eps : true)) {
+      //cout << j << " " <<  aurostd::abs( _shells[j].radius - r ) << " +/- " << _shells[j].stdevRadius << " " << eps << std::endl;
+      //cout <<  ( aurostd::abs( _shells[j].radius - r ) < eps ) << std::endl;
+      //cout <<  ( j < _shells.size()-1 ? aurostd::abs( _shells[j+1].radius - r ) > eps : true ) << std::endl;
+      if ((aurostd::abs(_shells[j].radius - r) < eps) &&
+          (j < _shells.size() - 1 ? aurostd::abs(_shells[j + 1].radius - r) > eps : true)) {
         found = true;
         break;
       }

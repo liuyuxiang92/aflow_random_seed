@@ -675,7 +675,7 @@ namespace pflow {
 	  if((int)ChemConcRef.size()==Nspec) {
 	    iwrite=true;
 	    for(i=0;i<Nspec;i++) {
-	      if( (fabs(Zconc[i]-ChemConcRef[i])>TINY6) || (Znumber[i]!=ChemZRef[i])) iwrite=false;
+	      if( (aurostd::abs(Zconc[i]-ChemConcRef[i])>TINY6) || (Znumber[i]!=ChemZRef[i])) iwrite=false;
 	    }
 	  }//if same number of species
 	}//CHEM	
@@ -751,7 +751,7 @@ namespace pflow {
 	  if(Zconc.size()==ChemConcRef.size()) {
 	    iwrite=true;
 	    for(i=0;i<(int)ChemConcRef.size();i++) {
-	      if( fabs(Zconc[i]-ChemConcRef[i]) > TINY6 ) iwrite=false;
+	      if( aurostd::abs(Zconc[i]-ChemConcRef[i]) > TINY6 ) iwrite=false;
 	    }
 	  }
 	}//PROTO
@@ -1865,7 +1865,7 @@ float GetBandGap_WAHYU(stringstream& ein,float Efermi,char& gaptype) {
     }
   }
   int kvbm=0,kcbm=0;
-  if(fabs(cbm-vbm) < metal_gap_tol) {
+  if(aurostd::abs(cbm-vbm) < metal_gap_tol) {
     //   cout << "ERROR [GetBandGap] VBM and CBM can not be found. Setting VBM and CBM to Efermi." << endl;
     cout << "WARNING [GetBandGap] VBM and CBM can not be found. Setting VBM and CBM to Efermi." << endl;
     gaptype='I';
@@ -1917,7 +1917,7 @@ float GetBandgapFromDOS(ifstream& dos) {
     dos >> E[i] >> D[i]; getline(dos,sbuf);
   }
   for(i=0;i<Ngrids;i++) {
-    if(fabs(EF-E[i])<Egrid) {
+    if(aurostd::abs(EF-E[i])<Egrid) {
       if(D[i]>tol && D[i+1]>tol) {isMetal=true;break;}//metal
     }
   }
@@ -1925,7 +1925,7 @@ float GetBandgapFromDOS(ifstream& dos) {
   else {
     for(i=0;i<Ngrids;i++) {
       Dtmp=D[i];Etmp=E[i];
-      if(Dtmp<tol) delEE=fabs(EF-Etmp);
+      if(Dtmp<tol) delEE=aurostd::abs(EF-Etmp);
       if(delEE<delE) {
 	iclosest=i; delE=delEE;
       }
@@ -1941,7 +1941,7 @@ float GetBandgapFromDOS(ifstream& dos) {
     Ec=E[i];
     EF=(Ev+Ec)/2;//fix the EF
     bandgap=Ec-Ev;
-    if(fabs(Ev-Emin)<tol || fabs(Emax-Ec)<tol) bandgap=-1.0;
+    if(aurostd::abs(Ev-Emin)<tol || aurostd::abs(Emax-Ec)<tol) bandgap=-1.0;
   }
   E.clear(); D.clear();
   return bandgap;
@@ -1970,7 +1970,7 @@ float GetBandgapFromDOS(istream& dos) {
     dos >> E[i] >> D[i]; getline(dos,sbuf);
   }
   for(i=0;i<Ngrids;i++) {
-    if(fabs(EF-E[i])<Egrid) {
+    if(aurostd::abs(EF-E[i])<Egrid) {
       if(D[i]>tol && D[i+1]>tol) {isMetal=true;break;}//metal
     }
   }
@@ -1978,7 +1978,7 @@ float GetBandgapFromDOS(istream& dos) {
   else {
     for(i=0;i<Ngrids;i++) {
       Dtmp=D[i];Etmp=E[i];
-      if(Dtmp<tol) delEE=fabs(EF-Etmp);
+      if(Dtmp<tol) delEE=aurostd::abs(EF-Etmp);
       if(delEE<delE) {
         iclosest=i; delE=delEE;
       }
@@ -1994,7 +1994,7 @@ float GetBandgapFromDOS(istream& dos) {
     Ec=E[i];
     EF=(Ev+Ec)/2;//fix the EF
     bandgap=Ec-Ev;
-    if(fabs(Ev-Emin)<tol || fabs(Emax-Ec)<tol) bandgap=-1.0;
+    if(aurostd::abs(Ev-Emin)<tol || aurostd::abs(Emax-Ec)<tol) bandgap=-1.0;
   }
   E.clear(); D.clear();
   return bandgap;

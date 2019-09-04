@@ -59,7 +59,7 @@ bool aflowFITTING::birch_murnaghan_fitting(xvector<double> energy,
       if (!mrqmin(volume, energy, sig_bm, a_bm, ia_bm, covar_bm, alpha, chisq_bm, myf, &alamda)) return false;
       if (chisq_bm > ochisq)
         itst = 0;
-      else if (fabs(ochisq - chisq_bm) < 0.1)
+      else if (aurostd::abs(ochisq - chisq_bm) < 0.1)
         itst++;
       if (itst < 4) continue;
       alamda = 0.0;
@@ -140,8 +140,8 @@ bool aflowFITTING::gaussj(xmatrix<utype> &a,
       if (ipiv[j] != 1)
         for (k = 1; k <= n; k++) {
           if (ipiv[k] == 0) {
-            if (fabs(a[j][k]) >= big) {
-              big = fabs(a[j][k]);
+            if (aurostd::abs(a[j][k]) >= big) {
+              big = aurostd::abs(a[j][k]);
               irow = j;
               icol = k;
             }
