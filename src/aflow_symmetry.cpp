@@ -1310,6 +1310,30 @@ namespace SYM {
   }
 } // namespace SYM
 
+
+// ******************************************************************************
+// ME/DX 190904 - BringInCell
+// ******************************************************************************
+namespace SYM {
+
+double BringInCellComponent(double component, double tolerance, double upper_bound, double lower_bound) {
+  if (component == INFINITY || component != component || component == -INFINITY) {
+    std::cerr << "SYM::BringInCellComponent: WARNING: (+-) INF or NAN value." << std::endl;
+    return component;
+  }
+  while (component - upper_bound > tolerance) component -= 1.0;
+  while (component - lower_bound < tolerance) component += 1.0;
+  return component;
+}
+
+void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bound, double lower_bound) {
+  for (int i = fpos.lrows; i <= fpos.urows; i++) {
+    fpos[i] = BringInCellComponent(fpos[i], tolerance, upper_bound, lower_bound);
+  }
+}
+
+}
+
 // ******************************************************************************
 // mod_one (Modify double by 1; to keep in unit cell)
 // ******************************************************************************

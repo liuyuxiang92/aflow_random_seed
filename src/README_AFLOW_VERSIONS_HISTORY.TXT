@@ -9,6 +9,7 @@
         -- Added safeguards for DOSCAR readers for broken DOSCAR files. (ME)
         -- Fixed plotter bugs for HTQC prototype names. (ME)
         -- Added findInList function to AUROSTD. (ME)
+        -- Generalized BringInCell method. (ME/DX)
 
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz

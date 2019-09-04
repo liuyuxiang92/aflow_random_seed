@@ -205,8 +205,10 @@ void QMesh::generateGridPoints(bool force_gamma) {
   _shifted = !aurostd::iszero(shift);  // ME190813
 
   // Obtain Cartesian coordinates
-  for (int q = 0; q < _nQPs; q++) {
-    _qpoints[q].cpos = _recCell.f2c * _qpoints[q].fpos;
+  if (!_shifted) {
+    for (int q = 0; q < _nQPs; q++) {
+      _qpoints[q].cpos = _recCell.f2c * _qpoints[q].fpos;
+    }
   }
 }
 
@@ -217,6 +219,7 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
   for (int q = 0; q < _nQPs; q++) {
     _qpoints[q].fpos -= shift;
     moveToBZ(_qpoints[q].fpos);
+    _qpoints[q].cpos = _recCell.f2c * _qpoints[q].fpos;
   }
 }
 
@@ -224,10 +227,7 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
 // Moves a q-point into the first Brillouin zone.
 // ME190702 - made more robust
 void QMesh::moveToBZ(xvector<double>& qpt) const {
-  for (int i = 1; i < 4; i++) {
-    while (qpt[i] - 0.5 > _ZERO_TOL_) qpt[i] -= 1.0;
-    while (qpt[i] + 0.5 < _ZERO_TOL_) qpt[i] += 1.0;
-  }
+  SYM::BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5);
 }
 
 //makeIrreducible/////////////////////////////////////////////////////////////
@@ -270,9 +270,7 @@ void QMesh::makeIrreducible() {
       }
       irred_trans.push_back(trans);
     }
-    _logger.updateProgressBar(q, _nQPs);
   }
-  _logger.finishProgressBar();
   _reduced = true;
   _logger << "Found " << _nIQPs << " irreducible qpoints." << apl::endl;
 }

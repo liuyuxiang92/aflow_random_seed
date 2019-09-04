@@ -3675,6 +3675,8 @@ namespace SYM {
   bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190524 - need pointer for tolerance, otherwise it will not update
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
+  double BringInCellComponent(double, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+  void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
   double mod_one(double d); // DX 
   _atom mod_one_atom(const _atom& atom_in); // CO
   xvector<double> mod_one_xvec(xvector<double> a); // DX
