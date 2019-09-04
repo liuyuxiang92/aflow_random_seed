@@ -637,10 +637,10 @@ double GetXrayScattFactor(const string& _name,double lambda,bool clean) {
 // This function returns the volume of the cell from the lattice parameters
 namespace pflow {
   double GetVol(const xmatrix<double>& lat) {
-    return (double) fabs(pflow::GetSignedVol(lat));
+    return (double) aurostd::abs(pflow::GetSignedVol(lat));
   }
   double GetVol(const matrix<double>& lat) {
-    return (double) fabs(pflow::GetSignedVol(lat));
+    return (double) aurostd::abs(pflow::GetSignedVol(lat));
   }
 }
 
@@ -1077,26 +1077,26 @@ namespace pflow {
   bool VVequal(const vector<double>& a, const vector<double>& b) {
     double tol=1e-15;
     int size=std::min((int) a.size(),(int) b.size());
-    for(int i=0;i<size;i++) if(fabs(a.at(i)-b.at(i))>tol) return FALSE;
+    for(int i=0;i<size;i++) if(aurostd::abs(a.at(i)-b.at(i))>tol) return FALSE;
     return TRUE;
   }
   bool VVequal(const vector<int>& a, const vector<int>& b) {
     double tol=1e-15;
     int size=std::min((int) a.size(),(int) b.size());
-    for(int i=0;i<size;i++) if(fabs((double)(a.at(i)-b.at(i)))>tol) return FALSE;
+    for(int i=0;i<size;i++) if(aurostd::abs((double)(a.at(i)-b.at(i)))>tol) return FALSE;
     return TRUE;
   }
   // deque
   bool VVequal(const deque<double>& a, const deque<double>& b) {
     double tol=1e-15;
     int size=std::min((int) a.size(),(int) b.size());
-    for(int i=0;i<size;i++) if(fabs(a.at(i)-b.at(i))>tol) return FALSE;
+    for(int i=0;i<size;i++) if(aurostd::abs(a.at(i)-b.at(i))>tol) return FALSE;
     return TRUE;
   }
   bool VVequal(const deque<int>& a, const deque<int>& b) {
     double tol=1e-15;
     int size=std::min((int) a.size(),(int) b.size());
-    for(int i=0;i<size;i++) if(fabs((double)(a.at(i)-b.at(i)))>tol) return FALSE;
+    for(int i=0;i<size;i++) if(aurostd::abs((double)(a.at(i)-b.at(i)))>tol) return FALSE;
     return TRUE;
   }
   
@@ -1195,7 +1195,7 @@ namespace pflow {
     for(uint i=0;i<v.size();i++) {
       sum=sum+v[i]*v[i];
     }
-    //    sum=sqrt(fabs(sum));
+    //    sum=sqrt(aurostd::abs(sum));
     sum=sqrt(aurostd::abs(sum));
     return sum;
   }

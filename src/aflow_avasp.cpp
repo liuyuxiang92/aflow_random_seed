@@ -2117,17 +2117,19 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_GIBBS_INPUT=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_FULL_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PLOT_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    if(0){  //cormac will fix later
+    // [OBSOLETE] if(0){  //cormac will fix later
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IEOS=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IDEBYE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECKEVCONCAVITY=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECKMIN=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]FITTYPE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AUTOSKIPFAILEDARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIPFAILEDARUNS=",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIPARUNSMAX=7",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]RUNALLPRESSURETEMPERATURE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    }
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_CONCAVITY=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_MIN=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]FIT_TYPE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AUTOSKIP_FAILED_ARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_FAILED_ARUNS=",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_ARUNS_MAX=7",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]RUN_ALL_PRESSURE_TEMPERATURE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]HUGONIOT_EXTRAPOLATE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PRECACC_ALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    // [OBSOLETE] }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   
@@ -2144,18 +2146,18 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_CALC=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]RELAXED_STRUCT_FIT=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_FIT=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    if(0){  //cormac will fix later
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NEGSTRAINS=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NINDSTRAINS=3",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYMTOLFRAC=0.05",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPRUNXMLSTRESS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]PRECACCALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    // [OBSOLETE] if(0){  //cormac will fix later
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NEG_STRAINS=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NIND_STRAINS=3",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYM_TOL_FRAC=0.05",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPRUNXML_STRESS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]PRECACC_ALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYMMETRIZE=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPSYM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]AUTOSKIPFAILEDARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIPFAILEDARUNS=",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIPARUNSMAX=1",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    }
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]AUTOSKIP_FAILED_ARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_FAILED_ARUNS=",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_ARUNS_MAX=1",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    // [OBSOLETE] }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 

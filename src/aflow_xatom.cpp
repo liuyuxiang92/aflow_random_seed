@@ -11210,7 +11210,7 @@ xstructure GetPrimitive2(const xstructure& a) {
         if(iu!=iw && iu!=iv && iv!=iw) {
 	  for(i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
           new_vol=GetVol(plattice);
-          if(fabs(new_vol-min_vol)<tolerance && new_vol>1.0e-5)
+          if(aurostd::abs(new_vol-min_vol)<tolerance && new_vol>1.0e-5)
 	    plattice_list.push_back(plattice); // Add to plattice_list
 	  //if new_vol=min_vol
         } //if iu!=iv!=iw
@@ -11229,7 +11229,7 @@ xstructure GetPrimitive2(const xstructure& a) {
   // For now just pick the first one.
   // if(plattice_list.size()>0) plattice=plattice_list.at(1);
   // If volume did not reduce then just keep original lattice
-  if(fabs(GetVol(sstr.lattice)-GetVol(plattice))<tolerance) {plattice=sstr.lattice;}
+  if(aurostd::abs(GetVol(sstr.lattice)-GetVol(plattice))<tolerance) {plattice=sstr.lattice;}
 
   // Now we have the plvs for the new structure.  Now we must
   // construct a new structure object with the plvs and return it.

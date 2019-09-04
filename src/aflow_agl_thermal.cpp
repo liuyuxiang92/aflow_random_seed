@@ -136,7 +136,7 @@ namespace AGL_functions {
 	  delta_theta = 0.0;
 	} else {
 	  // OBSOLETE theta = pow((6.0 * pi * pi * AGL_data.natoms / AGL_data.volumeinput.at(i)), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(bulkmodstV / AGL_data.cellmass);
-	  // OBSOLETE theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms * sqrt(AGL_data.volumeinput.at(i))), third) * AGL_data.poissonratiofunction * sqrt((fabs(bulkmodstV / AGL_data.volumeinput.at(i)) / AGL_data.cellmass)  * eV_Ang3_to_amu_Ang_s);
+	  // OBSOLETE theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms * sqrt(AGL_data.volumeinput.at(i))), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(bulkmodstV / AGL_data.volumeinput.at(i)) / AGL_data.cellmass)  * eV_Ang3_to_amu_Ang_s);
 	  theta = (hbar_eV / KBOLTZEV) * pow((6.0 * pi * pi * AGL_data.natoms / AGL_data.volumeinput.at(i)), third) * AGL_data.poissonratiofunction * sqrt((bulkmodstV / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
 	  delta_theta = theta - AGL_data.tdebye.at(i);
 	  if(i > 0) {
@@ -152,7 +152,7 @@ namespace AGL_functions {
 	theta0 = AGL_data.tdebye.at(i);
 	AGL_data.tdebye.at(i) = theta;
 	if((AGL_data.volumeinput.at(i) - AGL_data.volumeinput.at(imin) < AGL_data.volumeinput.at(imin) * 0.1) && (i >= 3 && i >= (AGL_data.volumeinput.size()/10))) {
-	  converged = converged && (fabs(delta_theta) < eps);
+	  converged = converged && (aurostd::abs(delta_theta) < eps);
 	}
       }	
     }
@@ -431,7 +431,7 @@ namespace AGL_functions {
       // Iterate with increasing number of Legendre points to evaluate the Debye integral.
       debye_int_prev = 1e30;
       nl = 5;
-      DebyeIntegralerror = fabs(DebyeIntegral - debye_int_prev);
+      DebyeIntegralerror = aurostd::abs(DebyeIntegral - debye_int_prev);
       while ((nl <= maxnl) && (DebyeIntegralerror >= eps)) {
 	AGL_functions::gauss_legendre (cero, yval, xpoints, weight, nl, AGL_data, FileMESSAGE);
 	sumdebyeint = 0.0;
@@ -439,7 +439,7 @@ namespace AGL_functions {
 	  sumdebyeint = sumdebyeint + weight.at(i) * debye_function (xpoints.at(i));
 	}
 	DebyeIntegral = sumdebyeint * (3.0 / pow(yval, 3.0));
-	DebyeIntegralerror = fabs(DebyeIntegral - debye_int_prev);
+	DebyeIntegralerror = aurostd::abs(DebyeIntegral - debye_int_prev);
 	debye_int_prev = DebyeIntegral;
 	nl = nl + 5;
       }
@@ -487,7 +487,7 @@ namespace AGL_functions {
     kappaD = ((0.849 * 3 * pow(4, third)) / (20 * pow(PI, 3) * (1.0 - (0.514 / gammaD) + (0.228 / (gammaD * gammaD)) ))) * kths * KBOLTZ * vDcr * avmass / (hbar * gammaD * gammaD);
     kappaT.resize(temperature.size());
     for(uint i = 0; i < temperature.size(); i++) {
-      if(fabs(temperature.at(i)) < tol) {
+      if(aurostd::abs(temperature.at(i)) < tol) {
 	kappaT.at(i) = 0.0;
       } else {
 	kappaT.at(i) =  kappaD * acousticthetaD / temperature.at(i);
@@ -518,7 +518,7 @@ namespace AGL_functions {
     double gammafunc = ((0.849 * 3 * pow(4, third)) / (20 * pow(PI, 3) * (1.0 - (0.514 / gammaD) + (0.228 / (gammaD * gammaD)) )));
     kappaTV.resize(temperature.size());
     for(uint i = 0; i < temperature.size(); i++) {
-      if(fabs(temperature.at(i)) < tol) {
+      if(aurostd::abs(temperature.at(i)) < tol) {
 	kappaTV.at(i) = 0.0;
       } else {
 	// OBSOLETE vDcr = (pow(volumeq.at(i).at(0), third) / angstrom2bohr) * 1e-10;

@@ -1734,7 +1734,7 @@ void GetXrayData(const xstructure& str,
         ii2=(int) ids[id1][4];
         double pdist=dist[id]; // Get present distance.
         // Create vector of all the hkl values with the same distance
-        if(fabs(pdist-odist)<tol) { // Add present h,k,l to hkl_list.
+        if(aurostd::abs(pdist-odist)<tol) { // Add present h,k,l to hkl_list.
           hkl[0]=ii0;		    
           hkl[1]=ii1;		    
           hkl[2]=ii2;		    
@@ -6748,8 +6748,8 @@ namespace pflow {
 		  sfr=sfr+atchg[ia]*cos(exparg);
 		  sfi=sfi+atchg[ia]*sin(exparg);
 		}
-		if(fabs(sfr)<1e-16) {sfr=0.0;}
-		if(fabs(sfi)<1e-16) {sfi=0.0;}
+		if(aurostd::abs(sfr)<1e-16) {sfr=0.0;}
+		if(aurostd::abs(sfi)<1e-16) {sfi=0.0;}
 		double sf=sfr*sfr+sfi*sfi;
 		// Get expval.  In order not to get floating point
 		// errors due to manipulating small numbers we must
@@ -6776,7 +6776,7 @@ namespace pflow {
 		// The expval term is needed since in some shells
 		// term may be very small due to coincidently small sf,
 		// even before convergence.
-		if(fabs(term)>maxterm) {maxterm=fabs(term);}
+		if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
 		if(expval>maxterm) {maxterm=expval;}
 		// ADD FORCES ???
 	      } // If gsq>TOL
@@ -6853,7 +6853,7 @@ namespace pflow {
 		    // cout << "term1 erfcval " << term1 << " " << erfcval << endl;
 		    double term=term1*erfcval;
 		    ereal=ereal+term;
-		    if(fabs(term)>maxterm) {maxterm=fabs(term);}
+		    if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
 		    // FORCES ???
 		  } // rdist>TOL
 		} // ja
@@ -6915,7 +6915,7 @@ namespace pflow {
 		  if(dist>TOL) { // Avoid atom dist to itself.
 		    double term=exp(-Ks*dist)*atchg[ia]*atchg[ja]/dist;
 		    ereal=ereal+term;
-		    if(fabs(term)>maxterm) {maxterm=fabs(term);}
+		    if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
 		    // FORCES ???
 		  } // rdist>TOL
 		} // ja

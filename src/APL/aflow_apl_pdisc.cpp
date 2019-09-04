@@ -279,7 +279,7 @@ void PhononDispersionCalculator::writePDIS() {
         string name = "-";
         std::map<double, string>::iterator iter = labelMap.begin();
         for (; iter != labelMap.end(); iter++)
-          if (fabs(iter->first - x) < _AFLOW_APL_EPS_) break;
+          if (aurostd::abs(iter->first - x) < _AFLOW_APL_EPS_) break;
         if (iter != labelMap.end())
           name = iter->second;
         outfile << "# <exact>     " << x << " "
@@ -381,8 +381,8 @@ bool PhononDispersionCalculator::isExactQPoint(const xvector<double>& qpoint,
                              ((double)j) * lattice(2) +
                              ((double)k) * lattice(3));
         xcomplex<double> p = exp(iONE * scalar_product(qpoint, L));
-        if ((fabs(p.imag()) < _AFLOW_APL_EPS_) &&
-            (fabs(p.real() - 1.0) < _AFLOW_APL_EPS_)) {
+        if ((aurostd::abs(p.imag()) < _AFLOW_APL_EPS_) &&
+            (aurostd::abs(p.real() - 1.0) < _AFLOW_APL_EPS_)) {
           isExact = true;
           break;
         }
