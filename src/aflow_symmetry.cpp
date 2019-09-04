@@ -708,8 +708,23 @@ namespace SYM {
 
 namespace SYM {
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff){
-    xvector<int> ijk;
-    return minimizeDistanceFractionalMethod(fdiff, ijk);
+    //DX 20190904 [OBSOLETE] xvector<int> ijk;
+    //DX 20190904 [OBSOLETE] return minimizeDistanceFractionalMethod(fdiff, ijk);
+    
+    // ---------------------------------------------------------------------------
+    // loop over each component and bring close to origin 
+    // (i.e., between -0.5 and 0.5 in fractional coordinates)
+    
+    //DX 20190904 - START
+    double tolerance=0.0;
+    double upper_bound=0.5;
+    double lower_bound=-0.5;
+
+    xvector<double> min_diff = fdiff;
+    BringInCellInPlace(min_diff, tolerance, upper_bound, lower_bound);
+
+    return min_diff;
+    //DX 20190904 - END
   }
 } /// namespace SYM
 
@@ -721,19 +736,24 @@ namespace SYM {
     // loop over each component and bring close to origin 
     // (i.e., between -0.5 and 0.5 in fractional coordinates)
 
-    xvector<double> min_diff = fdiff;
-    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
-    for(uint i=1; i<4; i++){
-      while(min_diff(i)>0.5){
-        min_diff(i) = min_diff(i)-1;
-        ijk(i)-=1;
-      }
-      while(min_diff(i)<=-0.5){
-        min_diff(i) = min_diff(i)+1;
-        ijk(i)+=1;
-      }
+    xvector<double> min_diff = minimizeDistanceFractionalMethod(fdiff); //DX 20190904
+
+    for(int i=min_diff.lrows; i<=min_diff.urows; i++){ //DX 20190904
+      ijk(i) = (int)(min_diff[i]-fdiff[i]);
     }
-  return min_diff;
+
+    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
+    //DX 20190904 [OBSOLETE] for(uint i=1; i<4; i++){
+    //DX 20190904 [OBSOLETE]   while(min_diff(i)>0.5){
+    //DX 20190904 [OBSOLETE]     min_diff(i) = min_diff(i)-1;
+    //DX 20190904 [OBSOLETE]     ijk(i)-=1;
+    //DX 20190904 [OBSOLETE]   }
+    //DX 20190904 [OBSOLETE]   while(min_diff(i)<=-0.5){
+    //DX 20190904 [OBSOLETE]     min_diff(i) = min_diff(i)+1;
+    //DX 20190904 [OBSOLETE]     ijk(i)+=1;
+    //DX 20190904 [OBSOLETE]   }
+    //DX 20190904 [OBSOLETE] }
+    return min_diff;
   }
 }
 
