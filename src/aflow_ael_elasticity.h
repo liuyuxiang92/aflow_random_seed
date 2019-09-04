@@ -1,12 +1,12 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *              AFlow CORMAC TOHER - Duke University 2013-2018             *
+// *              AFlow CORMAC TOHER - Duke University 2013-2019             *
 // *                                                                         *
 // ***************************************************************************
 // aflow_ael_elasticity.h
 // functions written by
-// 2013-2018: cormac.toher@duke.edu
+// 2013-2019: cormac.toher@duke.edu
 
 #ifndef _AFLOW_AEL_ELASTICITY_H_
 #define _AFLOW_AEL_ELASTICITY_H_
@@ -57,7 +57,7 @@ class _AEL_data {
   // Variable to control where stress tensor is read from vasprun.xml file
   bool vasprunxmlstress;
 
-  // Variable to control whether PREC and ALGO values are read from the aflow.in file
+  // Variable to control whether PREC and ALGO values are set to ACCURATE and NORMAL, or are left as defaults/read from aflow.in file
   bool precaccalgonorm;
 
   // Variable to control what aflow run type is used (relax, static or relax_static)
@@ -129,12 +129,12 @@ class _AEL_data {
   vector<double> youngsmodulus_directional;
   vector<double> shearmodulus_directional;
   vector<double> poissonratio_directional;
-  // OBSOLETE aurostd::xmatrix<double> elastic_tensor;
-  // OBSOLETE aurostd::xmatrix<double> compliance_tensor;
-  // OBSOLETE aurostd::xmatrix<double> elastic_tensor(6, 6);
-  // OBSOLETE aurostd::xmatrix<double> compliance_tensor(6, 6);
-  // OBSOLETE xmatrix<double> elastic_tensor(6, 6);
-  // OBSOLETE xmatrix<double> compliance_tensor(6, 6);
+  // [OBSOLETE] aurostd::xmatrix<double> elastic_tensor;
+  // [OBSOLETE] aurostd::xmatrix<double> compliance_tensor;
+  // [OBSOLETE] aurostd::xmatrix<double> elastic_tensor(6, 6);
+  // [OBSOLETE] aurostd::xmatrix<double> compliance_tensor(6, 6);
+  // [OBSOLETE] xmatrix<double> elastic_tensor(6, 6);
+  // [OBSOLETE] xmatrix<double> compliance_tensor(6, 6);
 
   // Normal strain deformations
   vector<double> normal_deformations;
@@ -188,9 +188,9 @@ namespace AEL_functions {
   uint Get_BulkModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& BulkModulus, ofstream& FileMESSAGE);
   uint Get_ShearModulus(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, double& ShearModulus, ofstream& FileMESSAGE);
   // Functions for generating aflow.in input files for strained structures and extracting stress tensor data calculated with VASP
-  uint aelvaspflags(_xvasp& vaspRun, _vflags& _vaspFlags, _kflags& _kbinFlags, string& runname, _AEL_data& AEL_data, ofstream& FileMESSAGE);
-  uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& _kbinFlags, _vflags& _vaspFlags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
-  uint extractstress(vector<_xvasp>& vaspRuns, _AEL_data& AEL_data, ofstream& FileMESSAGE);
+  uint aelvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AEL_data& AEL_data, ofstream& FileMESSAGE);
+  // [OBSOLETE] uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& kbinFlags, _vflags& vaspFlags, _AEL_data& AEL_data, ofstream& FileMESSAGE);
+  uint extractstress(vector<_xvasp>& vaspRuns, _AEL_data& AEL_data, vector<string>& dirrunname, ofstream& FileMESSAGE);
   // Functions for implementing the elastic constants method 
   uint elasticityfit(_AEL_data& AEL_data, ofstream& FileMESSAGE);
   uint elasticitycheck(_AEL_data& AEL_data, _xvasp& xvasp, ofstream& FileMESSAGE);

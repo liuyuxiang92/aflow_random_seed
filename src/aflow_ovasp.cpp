@@ -3942,7 +3942,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if((Fup+Fdown)<zeroTol) {
       spinF=0.0;
     } else {
-      spinF=fabs((Fup-Fdown)/(Fup+Fdown)); // otherwise AFLOW_NAN
+      spinF=aurostd::abs((Fup-Fdown)/(Fup+Fdown)); // otherwise AFLOW_NAN
     }
   }
 

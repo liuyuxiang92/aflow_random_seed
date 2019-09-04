@@ -644,6 +644,12 @@ struct _moduleOptions {
 
   // QHA
   vector<aurostd::xoption> qhaflags;
+  
+  // AEL
+  vector<aurostd::xoption> aelflags;
+
+  // AGL
+  vector<aurostd::xoption> aglflags;
 };
 
 // --------------------------------------------------------------------------
@@ -2560,6 +2566,11 @@ namespace KBIN {
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO181226  // ME190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
+  vector<aurostd::xoption> loadDefaultsAEL();
+  bool writeFlagAEL(const string& key,const xoption& xopt); 
+  vector<aurostd::xoption> loadDefaultsAGL();
+  bool writeFlagAGL(const string& key,const xoption& xopt); 
+
 }
 
 // ----------------------------------------------------------------------------

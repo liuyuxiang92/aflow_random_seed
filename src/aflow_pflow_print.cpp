@@ -132,8 +132,8 @@ namespace pflow {
           }
           if(modulus(a1toa2)>tol && modulus(a2toa3)>tol && modulus(a1toa3)>tol) {
             double angle = 180.0-rad2deg*acos(getcos(a1toa2,a2toa3));
-            if(fabs(getcos(a1toa2,a2toa3)-1)<tol) angle=180;
-            if(fabs(getcos(a1toa2,a2toa3)+1)<tol) angle=0;
+            if(aurostd::abs(getcos(a1toa2,a2toa3)-1)<tol) angle=180;
+            if(aurostd::abs(getcos(a1toa2,a2toa3)+1)<tol) angle=0;
             if(pflag(1)) {
               oss << setw(4) << a1.number+1
                   << " " << setw(4) << a1.name.c_str()

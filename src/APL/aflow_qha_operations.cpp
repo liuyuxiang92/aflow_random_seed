@@ -2520,7 +2520,7 @@ T MVops::apl_blas_dasum(const apl_vector<T> *v) {
   }
 
   for (i = 0; i < N; i++) {
-    r += fabs(X[ix]);
+    r += aurostd::abs(X[ix]);
     ix += incX;
   }
   return r;
@@ -2559,14 +2559,14 @@ T MVops::apl_blas_dnrm2(const apl_vector<T> *v) {
   if (N <= 0 || incX <= 0) {
     return 0;
   } else if (N == 1) {
-    return fabs(X[0]);
+    return aurostd::abs(X[0]);
   }
 
   for (i = 0; i < N; i++) {
     const T x = X[ix];
 
     if (x != 0.0) {
-      const T ax = fabs(x);
+      const T ax = aurostd::abs(x);
 
       if (scale < ax) {
         ssq = 1.0 + ssq * (scale / ax) * (scale / ax);
@@ -2600,8 +2600,8 @@ MVops::cblas_idamax(const int N, const double *X, const int incX) {
   }
 
   for (i = 0; i < N; i++) {
-    if (fabs(X[ix]) > max) {
-      max = fabs(X[ix]);
+    if (aurostd::abs(X[ix]) > max) {
+      max = aurostd::abs(X[ix]);
       result = i;
     }
     ix += incX;
@@ -2686,7 +2686,7 @@ T MVops::apl_linalg_householder_transform(apl_vector<T> *v) {
     {
       double s = (alpha - beta);
 
-      if (fabs(s) > APL_DBL_MIN) {
+      if (aurostd::abs(s) > APL_DBL_MIN) {
         apl_blas_dscal<T>(1.0 / s, &x.vector);
         apl_vector_set<T>(v, 0, beta);
       } else {
@@ -2988,7 +2988,7 @@ void MVops::chop_small_elements(apl_vector<T> *d, apl_vector<T> *f) {
     double f_i = fit.apl_vector_get<T>(f, i);
     double d_ip1 = fit.apl_vector_get<T>(d, i + 1);
 
-    if (fabs(f_i) < APL_DBL_EPSILON * (fabs(d_i) + fabs(d_ip1))) {
+    if (aurostd::abs(f_i) < APL_DBL_EPSILON * (aurostd::abs(d_i) + aurostd::abs(d_ip1))) {
       fit.apl_vector_set<T>(f, i, 0.0);
     }
 
@@ -3001,7 +3001,7 @@ MVops::create_givens(const double a, const double b, double *c, double *s) {
   if (_iszero(b)) {
     *c = 1;
     *s = 0;
-  } else if (fabs(b) > fabs(a)) {
+  } else if (aurostd::abs(b) > aurostd::abs(a)) {
     double t = -a / b;
     double s1 = 1.0 / sqrt(1 + t * t);
     *s = s1;
@@ -3069,7 +3069,7 @@ void MVops::create_schur(double d0, double f0, double d1, double *c, double *s) 
   }
 
   // Check if we need to rescale to avoid underflow/overflow //
-  if (fabs(d0) < APL_SQRT_DBL_MIN || fabs(d0) > APL_SQRT_DBL_MAX || fabs(f0) < APL_SQRT_DBL_MIN || fabs(f0) > APL_SQRT_DBL_MAX || fabs(d1) < APL_SQRT_DBL_MIN || fabs(d1) > APL_SQRT_DBL_MAX) {
+  if (aurostd::abs(d0) < APL_SQRT_DBL_MIN || aurostd::abs(d0) > APL_SQRT_DBL_MAX || aurostd::abs(f0) < APL_SQRT_DBL_MIN || aurostd::abs(f0) > APL_SQRT_DBL_MAX || aurostd::abs(d1) < APL_SQRT_DBL_MIN || aurostd::abs(d1) > APL_SQRT_DBL_MAX) {
     double scale;
     int d0_exp, f0_exp;
     frexp(d0, &d0_exp);
@@ -3580,13 +3580,13 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
 
         for (i = 0; i < n_block; i++) {
           double s_i = apl_vector_get<T>(&S_block.vector, i);
-          double a = fabs(s_i);
+          double a = aurostd::abs(s_i);
           if (a > norm) norm = a;
         }
 
         for (i = 0; i < n_block - 1; i++) {
           double f_i = apl_vector_get<T>(&f_block.vector, i);
-          double a = fabs(f_i);
+          double a = aurostd::abs(f_i);
           if (a > norm) norm = a;
         }
 
@@ -4284,9 +4284,9 @@ int MVops::apl_multifit_test_delta(const apl_vector<utype> *dx, const apl_vector
   for (i = 0; i < n; i++) {
     double xi = apl_vector_get<utype>(x, i);
     double dxi = apl_vector_get<utype>(dx, i);
-    double tolerance = epsabs + epsrel * fabs(xi);
+    double tolerance = epsabs + epsrel * aurostd::abs(xi);
 
-    if (fabs(dxi) < tolerance) {
+    if (aurostd::abs(dxi) < tolerance) {
       ok = 1;
     } else {
       ok = 0;
@@ -4498,14 +4498,14 @@ int MVops::apl_linalg_QRPT_decomp(apl_matrix<utype> *A, apl_vector<utype> *tau, 
             double y = 0;
             double temp = apl_matrix_get<utype>(A, i, j) / x;
 
-            if (fabs(temp) >= 1)
+            if (aurostd::abs(temp) >= 1)
               y = 0.0;
             else
               y = x * sqrt(1 - temp * temp);
 
             // recompute norm to prevent loss of accuracy //
 
-            if (fabs(y / x) < sqrt(20.0) * APL_SQRT_DBL_EPSILON) {
+            if (aurostd::abs(y / x) < sqrt(20.0) * APL_SQRT_DBL_EPSILON) {
               apl_vector_view<utype> c_full = apl_matrix_column<utype>(A, j);
               apl_vector_view<utype> c =
                   apl_vector_subvector<utype>(&c_full.vector,
@@ -4564,12 +4564,12 @@ int MVops::apl_multifit_covar(const apl_matrix<utype> *J, double epsrel, apl_mat
 
   // Form the inverse of R in the full upper triangle of R //
 
-  tolr = epsrel * fabs(apl_matrix_get<utype>(r, 0, 0));
+  tolr = epsrel * aurostd::abs(apl_matrix_get<utype>(r, 0, 0));
 
   for (k = 0; k < n; k++) {
     double rkk = apl_matrix_get<utype>(r, k, k);
 
-    if (fabs(rkk) <= tolr) {
+    if (aurostd::abs(rkk) <= tolr) {
       break;
     }
 
@@ -4963,7 +4963,7 @@ int MVops::qrsolv(apl_matrix<utype> *r, const apl_permutation *p, const double l
         continue;
       }
 
-      if (fabs(rkk) < fabs(sdiagk)) {
+      if (aurostd::abs(rkk) < aurostd::abs(sdiagk)) {
         double cotangent = rkk / sdiagk;
         sine = 0.5 / sqrt(0.25 + 0.25 * cotangent * cotangent);
         cosine = sine * cotangent;
@@ -5185,7 +5185,7 @@ iteration:
 
   // If the function is small enough, accept the current value of par //
 
-  if (fabs(fp) <= 0.1 * delta)
+  if (aurostd::abs(fp) <= 0.1 * delta)
     goto line220;
 
   if (par_lower == 0 && fp <= fp_old && fp_old < 0)
@@ -5347,7 +5347,7 @@ int MVops::iterate(void *vstate, apl_multifit_function_fdf *fdf, apl_vector<utyp
   {
     size_t iamax = fit.apl_blas_idamax<utype>(gradient);
 
-    gnorm = fabs(fit.apl_vector_get<utype>(gradient, iamax) / state->fnorm);
+    gnorm = aurostd::abs(fit.apl_vector_get<utype>(gradient, iamax) / state->fnorm);
   }
 
 // Determine the Levenberg-Marquardt parameter //
@@ -5468,7 +5468,7 @@ lm_iteration:
       fit.apl_linalg_QRPT_decomp<utype>(r, tau, perm, &signum, work1);
     }
     return 0;
-  } else if (fabs(actred) <= APL_DBL_EPSILON && prered <= APL_DBL_EPSILON && p5 * ratio <= 1.0) {
+  } else if (aurostd::abs(actred) <= APL_DBL_EPSILON && prered <= APL_DBL_EPSILON && p5 * ratio <= 1.0) {
     return 29;  // cannot reach the specified tolerance in F //
   } else if (state->delta <= APL_DBL_EPSILON * state->xnorm) {
     return 30;  // cannot reach the specified tolerance in X //
@@ -5781,7 +5781,7 @@ int MVops::fdjac(const apl_vector<utype> *x, apl_multifit_function_fdf *fdf,
     // use column j of J as temporary storage for f(x + dx) //
     apl_vector_view<utype> v = fit.apl_matrix_column<utype>(J, j);
 
-    h = eps * fabs(xj);
+    h = eps * aurostd::abs(xj);
     if (_iszero(h))
       h = eps;
 
@@ -6076,7 +6076,7 @@ MVops::cblas_dznrm2(const int N, const void *X, const int incX) {
     const double y = CONST_IMAG(X, ix);
 
     if (x != 0.0) {
-      const double ax = std::fabs(x);
+      const double ax = aurostd::abs(x);
 
       if (scale < ax) {
         ssq = 1.0 + ssq * (scale / ax) * (scale / ax);
@@ -6087,7 +6087,7 @@ MVops::cblas_dznrm2(const int N, const void *X, const int incX) {
     }
 
     if (y != 0.0) {
-      const double ay = std::fabs(y);
+      const double ay = aurostd::abs(y);
 
       if (scale < ay) {
         ssq = 1.0 + ssq * (scale / ay) * (scale / ay);
@@ -6401,7 +6401,7 @@ void MVops::cblas_zaxpy(const int N, const void *alpha, const void *X, const int
   const double alpha_real = CONST_REAL0(alpha);
   const double alpha_imag = CONST_IMAG0(alpha);
 
-  if ((_iszero(std::fabs(alpha_real))) && (_iszero(std::fabs(alpha_imag)))) {
+  if ((_iszero(aurostd::abs(alpha_real))) && (_iszero(aurostd::abs(alpha_imag)))) {
     return;
   }
 
@@ -6725,7 +6725,7 @@ void MVops::chop_small_elements1(const size_t N, const double d[], double sd[]) 
     double sd_i = sd[i];
     double d_ip1 = d[i + 1];
 
-    if (std::fabs(sd_i) < APL_DBL_EPSILON * (std::fabs(d_i) + std::fabs(d_ip1))) {
+    if (aurostd::abs(sd_i) < APL_DBL_EPSILON * (aurostd::abs(d_i) + aurostd::abs(d_ip1))) {
       sd[i] = 0.0;
     }
     d_i = d_ip1;
@@ -6745,7 +6745,7 @@ MVops::trailing_eigenvalue1(const size_t n, const double d[], const double sd[])
   if (dt > 0) {
     mu = tb - tab * (tab / (dt + hypot(dt, tab)));
   } else if (_iszero(dt)) {
-    mu = tb - fabs(tab);
+    mu = tb - aurostd::abs(tab);
   } else {
     mu = tb + tab * (tab / ((-dt) + hypot(dt, tab)));
   }
@@ -6766,7 +6766,7 @@ void MVops::qrstep1(const size_t n, double d[], double sd[], double gc[], double
   //   We set mu to zero in this case, which at least diagonalises the
   //   submatrix [d_0, sd_0 ; sd_0, d_0] and allows further progress.
 
-  if (APL_DBL_EPSILON * std::fabs(mu) > (std::fabs(d[0]) + std::fabs(sd[0]))) {
+  if (APL_DBL_EPSILON * aurostd::abs(mu) > (aurostd::abs(d[0]) + aurostd::abs(sd[0]))) {
     mu = 0;
   }
 
@@ -7042,10 +7042,10 @@ int MVops::apl_eigen_hermv_sort(apl_vector<double> *eval, apl_matrix_complex<dou
             test = (ej > ek);
             break;
           case APL_MV_EIGEN_SORT_ABS_ASC:
-            test = (fabs(ej) < fabs(ek));
+            test = (aurostd::abs(ej) < aurostd::abs(ek));
             break;
           case APL_MV_EIGEN_SORT_ABS_DESC:
-            test = (std::fabs(ej) > std::fabs(ek));
+            test = (aurostd::abs(ej) > aurostd::abs(ek));
             break;
           default:
             // ME190726 - exit clean-up

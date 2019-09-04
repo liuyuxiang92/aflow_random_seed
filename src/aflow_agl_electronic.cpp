@@ -35,7 +35,7 @@ namespace AGL_functions {
   // extractedos: Extract electronic density of states from the completed VASP calculations
   // Adapted from section of AFLOW APL function DirectMethodPC::runVASPCalculations()
   //
-  uint extractedos(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
+  uint extractedos(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, vector<string>& dirrunname, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     vector<string> vfile, dfile, vofile, dofile;
@@ -45,9 +45,9 @@ namespace AGL_functions {
     xOUTCAR outcar;
     string vfilename, dfilename, ffilename;
     bool skipdir = false;
-    // OBSOLETE aurostd::xmatrix<double> stress_tensor(3, 3);
+    // [OBSOLETE] aurostd::xmatrix<double> stress_tensor(3, 3);
     AGL_dos_pressures AGL_dos_pressure;
-    // OBSOLETE vector<AGL_dos_pressures> AGL_dos_pressure_list;
+    // [OBSOLETE] vector<AGL_dos_pressures> AGL_dos_pressure_list;
     double sumdos, sumidos;
     for(uint idVaspRun = 0; idVaspRun < vaspRuns.size(); idVaspRun++) {
       skipdir = false;
@@ -91,13 +91,25 @@ namespace AGL_functions {
       // [OBSOLETE]   	// Extract all...
       // [OBSOLETE]   	aurostd::execute( string("tar -xf ") + tarfilename );
       // [OBSOLETE]     }
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" ); } // Extract all...
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" ); } // Extract all...
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" ); } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" );
+      } else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) {
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+      } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" );
+      } else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.gz") ) {
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.gz" );
+      } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" );
+      } else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.xz") ) {
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.xz" );
+      } // Extract all...
       
       // If the LOCK file is missing, then it is probably a corrupted run
       // Do not accept it and wait for the new run
-      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) ) {
+      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ )  && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ )) {
 	aurostd::StringstreamClean(aus);
 	aus <<  _AGLSTR_WARNING_ + "The " << _AFLOWLOCK_ << " file in " << vaspRuns.at(idVaspRun).Directory << " directory is missing." << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -115,6 +127,8 @@ namespace AGL_functions {
       for(uint i=0;i<vfile.size()&&(doscar.content=="");i++) {
 	if(aurostd::FileExist(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(i))) {
 	  doscar.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(i));
+	} else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(i))) {
+	  doscar.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(i));
 	}
       }
       //if(outcar.outcar=="") {
@@ -136,6 +150,8 @@ namespace AGL_functions {
       for(uint i=0;i<vofile.size()&&(outcar.content=="");i++) {
 	if(aurostd::FileExist(vaspRuns.at(idVaspRun).Directory+"/"+vofile.at(i))) {
 	  outcar.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vofile.at(i));
+	} else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vofile.at(i))) {
+	  outcar.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vofile.at(i));
 	}
       }
       //if(outcar.outcar=="") {
@@ -189,17 +205,17 @@ namespace AGL_functions {
 	AGL_dos_pressure.idosval.push_back(sumidos);
       }
       AGL_data.AGL_edos_properties.push_back(AGL_dos_pressure);
-      // OBSOLETE stress_tensor = -outcar.stress;
-      // OBSOLETE AGL_data.stresscalculated.push_back(stress_tensor);
-      // OBSOLETE AGL_data.structurecalculated.push_back(idVaspRun);
+      // [OBSOLETE] stress_tensor = -outcar.stress;
+      // [OBSOLETE] AGL_data.stresscalculated.push_back(stress_tensor);
+      // [OBSOLETE] AGL_data.structurecalculated.push_back(idVaspRun);
 
-      // OBSOLETE aurostd::StringstreamClean(aus);
+      // [OBSOLETE] aurostd::StringstreamClean(aus);
       // Print out total energy, volume and calculated residual pressure
-      // OBSOLETE aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(idVaspRun) << endl;
-      // OBSOLETE aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(AGL_data.energyinput.size()-1) << endl;
-      // OBSOLETE aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Volume (Ang^3) = " << AGL_data.volumeinput.at(AGL_data.volumeinput.size()-1) << endl;
-      // OBSOLETE aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Pressure (kB) = " << AGL_data.pressurecalculated.at(AGL_data.pressurecalculated.size()-1) << endl;      
-      // OBSOLETE aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      // [OBSOLETE] aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(idVaspRun) << endl;
+      // [OBSOLETE] aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(AGL_data.energyinput.size()-1) << endl;
+      // [OBSOLETE] aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Volume (Ang^3) = " << AGL_data.volumeinput.at(AGL_data.volumeinput.size()-1) << endl;
+      // [OBSOLETE] aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Pressure (kB) = " << AGL_data.pressurecalculated.at(AGL_data.pressurecalculated.size()-1) << endl;      
+      // [OBSOLETE] aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       outcar.clear();
       doscar.clear();
     }
@@ -218,13 +234,13 @@ namespace AGL_functions {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     double egap_tol = 1.0e-6;
-    // OBSOLETE double energ_prev;
-    // OBSOLETE double egapval;
+    // [OBSOLETE] double energ_prev;
+    // [OBSOLETE] double egapval;
     uint below_EF, above_EF, bottom_EF, top_EF, min_EF;
     uint valbandedge, condbandedge, valregionedge, condregionedge;
     int j_min_EF, j_below_EF, j_above_EF;
-    // OBSOLETE bool energy_ordered = true;
-    // OBSOLETE bool metallic_dos = false;
+    // [OBSOLETE] bool energy_ordered = true;
+    // [OBSOLETE] bool metallic_dos = false;
     bool ingap = false;
     bool polyfitfail = false;
     uint vallower = 0;
@@ -257,9 +273,9 @@ namespace AGL_functions {
       AGL_data.AGL_edos_properties.at(i).dosval_EF_poly_set = false;
       polyfitfail = false;
       // Check that energy value is monotonically increasing
-      // OBSOLETE energ_prev = AGL_data.AGL_edos_properties.at(i).energy.at(0);
-      // OBSOLETE energy_ordered = true;
-      // OBSOLETE metallic_dos = false;
+      // [OBSOLETE] energ_prev = AGL_data.AGL_edos_properties.at(i).energy.at(0);
+      // [OBSOLETE] energy_ordered = true;
+      // [OBSOLETE] metallic_dos = false;
       energtofit.clear();
       dostofit.clear();
       // Calls qcksortev to sort in order of increasing energy
@@ -270,18 +286,18 @@ namespace AGL_functions {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Sort successful " << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 	
-      // OBSOLETE for (uint j = 0; j < AGL_data.AGL_edos_properties.at(i).energy.size()) {
-      // OBSOLETE   if (AGL_data.AGL_edos_properties.at(i).energy.at(j) < energ_prev) {
-      // OBSOLETE     aurostd::StringstreamClean(aus);
-      // OBSOLETE     aus << _AGLSTR_WARNING_ + "The DOS for j =  " << j << " is not in monotonically ascending values of the energy." << endl;
-      // OBSOLETE     aus << _AGLSTR_WARNING_ + "Skipping band gap calculation for this system." << endl;	  
-      // OBSOLETE     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      // OBSOLETE     energy_ordered = false;
-      // OBSOLETE   } else {
-      // OBSOLETE     energ_prev = AGL_data.AGL_edos_properties.at(i).energy.at(j);
-      // OBSOLETE   }
-      // OBSOLETE }
-      // OBSOLETE if (energy_ordered) {
+      // [OBSOLETE] for (uint j = 0; j < AGL_data.AGL_edos_properties.at(i).energy.size()) {
+      // [OBSOLETE]   if (AGL_data.AGL_edos_properties.at(i).energy.at(j) < energ_prev) {
+      // [OBSOLETE]     aurostd::StringstreamClean(aus);
+      // [OBSOLETE]     aus << _AGLSTR_WARNING_ + "The DOS for j =  " << j << " is not in monotonically ascending values of the energy." << endl;
+      // [OBSOLETE]     aus << _AGLSTR_WARNING_ + "Skipping band gap calculation for this system." << endl;	  
+      // [OBSOLETE]     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      // [OBSOLETE]     energy_ordered = false;
+      // [OBSOLETE]   } else {
+      // [OBSOLETE]     energ_prev = AGL_data.AGL_edos_properties.at(i).energy.at(j);
+      // [OBSOLETE]   }
+      // [OBSOLETE] }
+      // [OBSOLETE] if (energy_ordered) {
       // Find energy points immediately above and below Fermi energy
       below_EF = 0;
       above_EF = 1;
@@ -383,7 +399,7 @@ namespace AGL_functions {
 	    // This prioritizes fitting the bottom of the DOS
 	    j_below_EF = below_EF - j;
 	    j_above_EF = above_EF - j;
-	    if ((fabs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(below_EF)) < 10.0) || (fabs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(above_EF)) < 10.0) || (std::abs(j_below_EF) <= 2) || (std::abs(j_above_EF) <= 2)) {
+	    if ((aurostd::abs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(below_EF)) < 10.0) || (aurostd::abs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(above_EF)) < 10.0) || (std::abs(j_below_EF) <= 2) || (std::abs(j_above_EF) <= 2)) {
 	      energtofit.push_back(AGL_data.AGL_edos_properties.at(i).energy.at(j));
 	      dostofit.push_back(AGL_data.AGL_edos_properties.at(i).dosval.at(j));
 	    }
@@ -411,11 +427,11 @@ namespace AGL_functions {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
 	    // Evaluate DOS at Fermi energy
-	    energdiffmin = fabs(energtofit.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	    energdiffmin = aurostd::abs(energtofit.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 	    ienergdiffmin = 0;
 	    for (uint j = 0; j < energtofit.size(); j++) {
-	      if (fabs(energtofit.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
-		energdiffmin = fabs(energtofit.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	      if (aurostd::abs(energtofit.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
+		energdiffmin = aurostd::abs(energtofit.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 		ienergdiffmin = j;
 	      }
 	    }
@@ -436,11 +452,11 @@ namespace AGL_functions {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
 	    // Evaluate DOS at Fermi energy
-	    energdiffmin = fabs(energtoeval.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	    energdiffmin = aurostd::abs(energtoeval.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 	    ienergdiffmin = 0;
 	    for (uint j = 0; j < energtoeval.size(); j++) {
-	      if (fabs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
-		energdiffmin = fabs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	      if (aurostd::abs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
+		energdiffmin = aurostd::abs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 		ienergdiffmin = j;
 	      }
 	    }
@@ -490,8 +506,8 @@ namespace AGL_functions {
 	    dcondupper = AGL_data.AGL_edos_properties.at(i).dosval.at(j);
 	    j++;
 	  }
-	  // OBSOLETE valbandedge = vallower;
-	  // OBSOLETE condbandedge = condupper;
+	  // [OBSOLETE] valbandedge = vallower;
+	  // [OBSOLETE] condbandedge = condupper;
 	  valbandedge = min_EF;
 	  condbandedge = min_EF;
 	  valregionedge = vallower;
@@ -555,7 +571,7 @@ namespace AGL_functions {
 	  aus << _AGLSTR_MESSAGE_ + "Electronic DOS gap: condinit energy = " << AGL_data.AGL_edos_properties.at(i).energy.at(condinit) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 	
 	  // Check which is closer to Fermi level
-	  if ((fabs(AGL_data.AGL_edos_properties.at(i).energy.at(below_EF) - AGL_data.AGL_edos_properties.at(i).energy.at(condinit))) < (fabs(AGL_data.AGL_edos_properties.at(i).energy.at(valinit) - AGL_data.AGL_edos_properties.at(i).energy.at(above_EF)))) {
+	  if ((aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(below_EF) - AGL_data.AGL_edos_properties.at(i).energy.at(condinit))) < (aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(valinit) - AGL_data.AGL_edos_properties.at(i).energy.at(above_EF)))) {
 	    // Band gap is below Fermi level
 	    // condinit is just before the conduction band edge
 	    condbandedge = condinit;
@@ -567,7 +583,7 @@ namespace AGL_functions {
 		break;
 	      }
 	    }
-	  } else if ((fabs(AGL_data.AGL_edos_properties.at(i).energy.at(below_EF) - AGL_data.AGL_edos_properties.at(i).energy.at(condinit))) > (fabs(AGL_data.AGL_edos_properties.at(i).energy.at(valinit) - AGL_data.AGL_edos_properties.at(i).energy.at(above_EF)))) {
+	  } else if ((aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(below_EF) - AGL_data.AGL_edos_properties.at(i).energy.at(condinit))) > (aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(valinit) - AGL_data.AGL_edos_properties.at(i).energy.at(above_EF)))) {
 	    // Band gap is above Fermi level
 	    // valinit is just after valence band edge
 	    valbandedge = valinit;
@@ -676,10 +692,10 @@ namespace AGL_functions {
 	aus << _AGLSTR_MESSAGE_ + "Electronic DOS gap: conduction band region edge energy = " << AGL_data.AGL_edos_properties.at(i).energy.at(condupper) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 	
 	// Linear fits to points on either side of transition to zero
-	// OBSOLETE vallower = valbandedge - 1;
-	// OBSOLETE valupper = valbandedge;
-	// OBSOLETE condlower = condbandedge;
-	// OBSOLETE condupper = condbandedge + 1;
+	// [OBSOLETE] vallower = valbandedge - 1;
+	// [OBSOLETE] valupper = valbandedge;
+	// [OBSOLETE] condlower = condbandedge;
+	// [OBSOLETE] condupper = condbandedge + 1;
 	valregionedge = vallower;
 	condregionedge = condupper;
       }
@@ -708,7 +724,7 @@ namespace AGL_functions {
 	    // Only fit values within two DOS points or within factor 10 of minimum
 	    // This prioritizes fitting the bottom of the DOS
 	    j_min_EF = min_EF - j;
-	    if ((fabs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(min_EF)) < 10.0) || (std::abs(j_min_EF) <= 2)) {
+	    if ((aurostd::abs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(min_EF)) < 10.0) || (std::abs(j_min_EF) <= 2)) {
 	      energtofit.push_back(AGL_data.AGL_edos_properties.at(i).energy.at(j));
 	      dostofit.push_back(AGL_data.AGL_edos_properties.at(i).dosval.at(j));
 	    }
@@ -762,11 +778,11 @@ namespace AGL_functions {
 	  for (uint j = vallower; j <= condupper; j++) {
 	    // Only fit values within one DOS point or within factor 10 of minimum
 	    // This prioritizes fitting the bottom of the DOS
-	    // OBSOLETE j_min_EF = min_EF - j;
-	    // OBSOLETE if ((fabs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(min_EF)) < 10.0) || (fabs(j_min_EF) <= 2)) {
+	    // [OBSOLETE] j_min_EF = min_EF - j;
+	    // [OBSOLETE] if ((aurostd::abs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(min_EF)) < 10.0) || (aurostd::abs(j_min_EF) <= 2)) {
 	      energtofit.push_back(AGL_data.AGL_edos_properties.at(i).energy.at(j));
 	      dostofit.push_back(AGL_data.AGL_edos_properties.at(i).dosval.at(j));
-	      // OBSOLETE }
+	      // [OBSOLETE] }
 	  }
 	  nminlimit = 1;
 	  nmaxlimit = 0;
@@ -807,28 +823,28 @@ namespace AGL_functions {
 	  itermax = condupper - vallower + 5;
 	  iter = 0;
 	  while ((valpolymin > egap_tol) && ((condupper - vallower) > 1) && (!polyfitfail)) {
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
 	    if (vallower < (AGL_data.AGL_edos_properties.at(i).dosval.size()-1)) {
 	      if ((AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) && (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower+1) > egap_tol)) {
 		vallower = vallower + 1;
 	      }
 	    }
-	    // OBSOLETE } else {
-	    // OBSOLETE   if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
-	    // OBSOLETE vallower = vallower + 1;
-	    // OBSOLETE   }	      
-	    // OBSOLETE }
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
+	    // [OBSOLETE] } else {
+	    // [OBSOLETE]   if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
+	    // [OBSOLETE] vallower = vallower + 1;
+	    // [OBSOLETE]   }	      
+	    // [OBSOLETE] }
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
 	    if (condupper > 0) {
 	      if ((AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) && (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper-1) > egap_tol)) {
 		condupper = condupper - 1;
 	      }
 	    }
-	    // OBSOLETE } else {
-	    // OBSOLETE   if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
-	    // OBSOLETE condupper = condupper - 1;
-	    // OBSOLETE   }	    
-	    // OBSOLETE }
+	    // [OBSOLETE] } else {
+	    // [OBSOLETE]   if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
+	    // [OBSOLETE] condupper = condupper - 1;
+	    // [OBSOLETE]   }	    
+	    // [OBSOLETE] }
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_MESSAGE_ + "Electronic DOS gap: vallower = " << vallower << endl;
 	    aus << _AGLSTR_MESSAGE_ + "Electronic DOS gap: condupper = " << condupper << endl;
@@ -908,7 +924,7 @@ namespace AGL_functions {
 	}
 	if (ingap && (!polyfitfail)) {
 	  // Bandgap found, is equal to difference between conduction band minimum and valence band maximum
-	  AGL_data.AGL_edos_properties.at(i).edos_band_gap = fabs(condbandmin - valbandmax);
+	  AGL_data.AGL_edos_properties.at(i).edos_band_gap = aurostd::abs(condbandmin - valbandmax);
 	  if (AGL_data.AGL_edos_properties.at(i).edos_band_gap < 0.0) {
 	    AGL_data.AGL_edos_properties.at(i).edos_band_gap = 0.0;
 	  }
@@ -948,7 +964,7 @@ namespace AGL_functions {
 	  }
 	  if (ingap) {
 	    // Bandgap found, is equal to difference between conduction band minimum and valence band maximum
-	    AGL_data.AGL_edos_properties.at(i).edos_band_gap = fabs(condbandmin - valbandmax);
+	    AGL_data.AGL_edos_properties.at(i).edos_band_gap = aurostd::abs(condbandmin - valbandmax);
 	    if (AGL_data.AGL_edos_properties.at(i).edos_band_gap < 0.0) {
 	      AGL_data.AGL_edos_properties.at(i).edos_band_gap = 0.0;
 	    }
@@ -1061,28 +1077,28 @@ namespace AGL_functions {
 	  itermax = valupper - vallower + 5;
 	  iter = 0;
 	  while ((valpolymin > egap_tol) && ((valupper - vallower) > 1) && (!polyfitfail)) {
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
 	    if (vallower < (AGL_data.AGL_edos_properties.at(i).dosval.size()-1)) {
 	      if ((AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) && (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower+1) > egap_tol)) {
 		vallower = vallower + 1;
 	      }
 	    }
-	    // OBSOLETE  } else {
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
-	    // OBSOLETE vallower = vallower + 1;				
-	    // OBSOLETE   }
-	    // OBSOLETE }
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(valupper) > egap_tol) {
+	    // [OBSOLETE]  } else {
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(vallower) > egap_tol) {
+	    // [OBSOLETE] vallower = vallower + 1;				
+	    // [OBSOLETE]   }
+	    // [OBSOLETE] }
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(valupper) > egap_tol) {
 	    if (valupper > 0) {
 	      if ((AGL_data.AGL_edos_properties.at(i).dosval.at(valupper) > egap_tol) && (AGL_data.AGL_edos_properties.at(i).dosval.at(valupper-1) > egap_tol)) {
 		valupper = valupper - 1;
 	      }
 	    }
-	    // OBSOLETE } else {
-	    // OBSOLETE   if (AGL_data.AGL_edos_properties.at(i).dosval.at(valupper) > egap_tol) {
-	    // OBSOLETE valupper = valupper - 1;
-	    // OBSOLETE   }
-	    // OBSOLETE }
+	    // [OBSOLETE] } else {
+	    // [OBSOLETE]   if (AGL_data.AGL_edos_properties.at(i).dosval.at(valupper) > egap_tol) {
+	    // [OBSOLETE] valupper = valupper - 1;
+	    // [OBSOLETE]   }
+	    // [OBSOLETE] }
 	    energtofit.clear();
 	    dostofit.clear();
 	    // Range of values to fit
@@ -1256,28 +1272,28 @@ namespace AGL_functions {
 	  itermax = condupper - condlower + 5;
 	  iter = 0;
 	  while ((condpolymin > egap_tol) && ((condupper - condlower) > 1) && (!polyfitfail)) {
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(condlower) > egap_tol) { 
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(condlower) > egap_tol) { 
 	    if (condlower < (AGL_data.AGL_edos_properties.at(i).dosval.size()-1)) {
 	      if ((AGL_data.AGL_edos_properties.at(i).dosval.at(condlower) > egap_tol) && (AGL_data.AGL_edos_properties.at(i).dosval.at(condlower+1) > egap_tol)) {
 		condlower = condlower + 1;
 	      }
 	    }
-	    // OBSOLETE } else {
-	    // OBSOLETE   if (AGL_data.AGL_edos_properties.at(i).dosval.at(condlower) > egap_tol) {
-	    // OBSOLETE condlower = condlower + 1;
-	    // OBSOLETE  }
-	    // OBSOLETE }
-	    // OBSOLETE if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
+	    // [OBSOLETE] } else {
+	    // [OBSOLETE]   if (AGL_data.AGL_edos_properties.at(i).dosval.at(condlower) > egap_tol) {
+	    // [OBSOLETE] condlower = condlower + 1;
+	    // [OBSOLETE]  }
+	    // [OBSOLETE] }
+	    // [OBSOLETE] if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
 	    if (condupper > 0) {
 	      if ((AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) && (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper-1) > egap_tol)) {
 		condupper = condupper - 1;
 	      }
 	    }
-	    // OBSOLETE } else {
-	    // OBSOLETE   if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
-	    // OBSOLETE   condupper = condupper - 1;
-	    // OBSOLETE   }
-	    // OBSOLETE }	    
+	    // [OBSOLETE] } else {
+	    // [OBSOLETE]   if (AGL_data.AGL_edos_properties.at(i).dosval.at(condupper) > egap_tol) {
+	    // [OBSOLETE]   condupper = condupper - 1;
+	    // [OBSOLETE]   }
+	    // [OBSOLETE] }	    
 	    energtofit.clear();
 	    dostofit.clear();
 	    // Range of values to fit
@@ -1386,7 +1402,7 @@ namespace AGL_functions {
 	aus << _AGLSTR_MESSAGE_ + "Electronic DOS gap: condupper = " << condupper << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	
 	// Calculate band gap
-	AGL_data.AGL_edos_properties.at(i).edos_band_gap = fabs(condbandmin - valbandmax);
+	AGL_data.AGL_edos_properties.at(i).edos_band_gap = aurostd::abs(condbandmin - valbandmax);
 	if (AGL_data.AGL_edos_properties.at(i).edos_band_gap < 0.0) {
 	  AGL_data.AGL_edos_properties.at(i).edos_band_gap = 0.0;
 	}
@@ -1443,7 +1459,7 @@ namespace AGL_functions {
 	  // This prioritizes fitting the bottom of the DOS
 	  j_below_EF = below_EF - j;
 	  j_above_EF = above_EF - j;
-	  if ((fabs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(below_EF)) < 10.0) || (fabs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(above_EF)) < 10.0) || (std::abs(j_below_EF) < 2) || (std::abs(j_above_EF) < 2)) {
+	  if ((aurostd::abs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(below_EF)) < 10.0) || (aurostd::abs(AGL_data.AGL_edos_properties.at(i).dosval.at(j) / AGL_data.AGL_edos_properties.at(i).dosval.at(above_EF)) < 10.0) || (std::abs(j_below_EF) < 2) || (std::abs(j_above_EF) < 2)) {
 	    energtofit.push_back(AGL_data.AGL_edos_properties.at(i).energy.at(j));
 	    dostofit.push_back(AGL_data.AGL_edos_properties.at(i).dosval.at(j));
 	  }
@@ -1477,11 +1493,11 @@ namespace AGL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	  // Evaluate DOS at Fermi energy
-	  energdiffmin = fabs(energtoeval.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	  energdiffmin = aurostd::abs(energtoeval.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 	  ienergdiffmin = 0;
 	  for (uint j = 0; j < energtoeval.size(); j++) {
-	    if (fabs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
-	      energdiffmin = fabs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	    if (aurostd::abs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
+	      energdiffmin = aurostd::abs(energtoeval.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 	      ienergdiffmin = j;
 	    }
 	  }
@@ -1494,11 +1510,11 @@ namespace AGL_functions {
       }
       if (polyfitfail) {
 	// Polynomial fit failed: find DOS value at Fermi energy in calculated DOS
-	energdiffmin = fabs(AGL_data.AGL_edos_properties.at(i).energy.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	energdiffmin = aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(0) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 	ienergdiffmin = 0;
 	for (uint j = 0; j < AGL_data.AGL_edos_properties.at(i).energy.size(); j++) {
-	  if (fabs(AGL_data.AGL_edos_properties.at(i).energy.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
-	    energdiffmin = fabs(AGL_data.AGL_edos_properties.at(i).energy.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
+	  if (aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy) < energdiffmin) {
+	    energdiffmin = aurostd::abs(AGL_data.AGL_edos_properties.at(i).energy.at(j) - AGL_data.AGL_edos_properties.at(i).Fermi_energy);
 	    ienergdiffmin = j;
 	  }
 	}
@@ -1515,7 +1531,7 @@ namespace AGL_functions {
     // Get derivatives of band gap and DOS(EF) as a function of pressure at zero pressure
     // Find also minimum and maximum values of band gap and corresponding pressures
     // First, find electronic band gap at pressure extrema and at value closest to zero
-    double presabsmin = fabs(pressure_list.at(0));
+    double presabsmin = aurostd::abs(pressure_list.at(0));
     double presmax = pressure_list.at(0);
     double presmin = pressure_list.at(0);
     uint ipresabsmin = 0;
@@ -1538,8 +1554,8 @@ namespace AGL_functions {
 	presmin = pressure_list.at(i);
 	ipresmin = i;
       }
-      if (fabs(pressure_list.at(i)) < presabsmin) {
-	presabsmin = fabs(pressure_list.at(i));
+      if (aurostd::abs(pressure_list.at(i)) < presabsmin) {
+	presabsmin = aurostd::abs(pressure_list.at(i));
 	ipresabsmin = i;
       }
       if (edosgap_list.at(i) < egapmin) {
@@ -1600,25 +1616,25 @@ namespace AGL_functions {
     // Check if there is a band gap point above or below both endpoints that is nearer to zero pressure than the endpoint pressures
     for (uint i = 0; i < pressure_list.size(); i++) {
       egapmaxdiffpoint = false;
-      if (fabs(edosgap_list.at(i) - edosgap_list.at(ipresmin)) > egapmaxdiff) {
-	egapmaxdiff = fabs(edosgap_list.at(i) - edosgap_list.at(ipresmin));
+      if (aurostd::abs(edosgap_list.at(i) - edosgap_list.at(ipresmin)) > egapmaxdiff) {
+	egapmaxdiff = aurostd::abs(edosgap_list.at(i) - edosgap_list.at(ipresmin));
 	egapmaxdiffpoint = true;
       } 
-      if (fabs(edosgap_list.at(i) - edosgap_list.at(ipresmax)) > egapmaxdiff) {
-	egapmaxdiff = fabs(edosgap_list.at(i) - edosgap_list.at(ipresmax));
+      if (aurostd::abs(edosgap_list.at(i) - edosgap_list.at(ipresmax)) > egapmaxdiff) {
+	egapmaxdiff = aurostd::abs(edosgap_list.at(i) - edosgap_list.at(ipresmax));
 	egapmaxdiffpoint = true;
       }
       if (LVERBOSE) {
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_MESSAGE_ + "Pressure = " << pressure_list.at(i) << endl;
 	aus << _AGLSTR_MESSAGE_ + "Electronic band gap = " << edosgap_list.at(i) << endl;
-	aus << _AGLSTR_MESSAGE_ + "Pressure min distance = " << fabs(pressure_list.at(i) - pressure_list.at(ipresmin)) << endl;
-	aus << _AGLSTR_MESSAGE_ + "Pressure max distance = " << fabs(pressure_list.at(i) - pressure_list.at(ipresmax)) << endl;
-	aus << _AGLSTR_MESSAGE_ + "Pressure absolute min distance = " << fabs(pressure_list.at(i) - pressure_list.at(ipresmin)) << endl;
+	aus << _AGLSTR_MESSAGE_ + "Pressure min distance = " << aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmin)) << endl;
+	aus << _AGLSTR_MESSAGE_ + "Pressure max distance = " << aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmax)) << endl;
+	aus << _AGLSTR_MESSAGE_ + "Pressure absolute min distance = " << aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmin)) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }	
       if (pressure_list.at(i) < pressure_list.at(ipresabsmin)) {
-	if (fabs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < fabs(pressure_list.at(i) - pressure_list.at(ipresmin))) {
+	if (aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmin))) {
 	  if ((edosgap_list.at(i) > edosgap_list.at(ipresmin)) && (edosgap_list.at(i) > edosgap_list.at(ipresmax)) && egapmaxdiffpoint) {
 	    nminlimit = 0;
 	    nmaxlimit = 1;
@@ -1628,7 +1644,7 @@ namespace AGL_functions {
 	  }
 	}
       } else if (pressure_list.at(i) > pressure_list.at(ipresabsmin)) {
-	if (fabs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < fabs(pressure_list.at(i) - pressure_list.at(ipresmax))) {
+	if (aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmax))) {
 	  if ((edosgap_list.at(i) > edosgap_list.at(ipresmin)) && (edosgap_list.at(i) > edosgap_list.at(ipresmax)) && egapmaxdiffpoint) {
 	    nminlimit = 0;
 	    nmaxlimit = 1;
@@ -1656,11 +1672,11 @@ namespace AGL_functions {
     uint ipresval;
     for (uint j = 0; j < AGL_data.AGL_edos_properties.size(); j++) {
       // First find matching pressure
-      presmindiff = fabs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(0));
+      presmindiff = aurostd::abs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(0));
       ipresval = 0;
       for (uint k = 0; k < pressure_list.size(); k++) {
-	if (presmindiff > fabs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k))) {
-	  presmindiff = fabs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k));
+	if (presmindiff > aurostd::abs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k))) {
+	  presmindiff = aurostd::abs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k));
 	  ipresval = k;
 	}
       }
@@ -1708,16 +1724,16 @@ namespace AGL_functions {
     // Check if there is a DOS value point above or below both endpoints that is nearer to zero pressure than the endpoint pressures
     for (uint i = 0; i < pressure_list.size(); i++) {
       edosmaxdiffpoint = false;
-      if (fabs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmin)) > edosmaxdiff) {
-	edosmaxdiff = fabs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmin));
+      if (aurostd::abs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmin)) > edosmaxdiff) {
+	edosmaxdiff = aurostd::abs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmin));
 	edosmaxdiffpoint = true;
       } 
-      if (fabs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmax)) > edosmaxdiff) {
-	edosmaxdiff = fabs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmax));
+      if (aurostd::abs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmax)) > edosmaxdiff) {
+	edosmaxdiff = aurostd::abs(dosvalEF_list.at(i) - dosvalEF_list.at(ipresmax));
 	edosmaxdiffpoint = true;
       }
       if (pressure_list.at(i) < pressure_list.at(ipresabsmin)) {
-	if (fabs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < fabs(pressure_list.at(i) - pressure_list.at(ipresmin))) {
+	if (aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmin))) {
 	  if ((dosvalEF_list.at(i) > dosvalEF_list.at(ipresmin)) && (dosvalEF_list.at(i) > dosvalEF_list.at(ipresmax)) && edosmaxdiffpoint) {
 	    nminlimit = 0;
 	    nmaxlimit = 1;
@@ -1727,7 +1743,7 @@ namespace AGL_functions {
 	  }
 	}
       } else if (pressure_list.at(i) > pressure_list.at(ipresabsmin)) {
-	if (fabs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < fabs(pressure_list.at(i) - pressure_list.at(ipresmax))) {
+	if (aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresabsmin)) < aurostd::abs(pressure_list.at(i) - pressure_list.at(ipresmax))) {
 	  if ((dosvalEF_list.at(i) > dosvalEF_list.at(ipresmin)) && (dosvalEF_list.at(i) > dosvalEF_list.at(ipresmax)) && edosmaxdiffpoint) {
 	    nminlimit = 0;
 	    nmaxlimit = 1;
@@ -1745,7 +1761,7 @@ namespace AGL_functions {
     }
     for (uint j = 0; j < AGL_data.AGL_edos_properties.size(); j++) {
       // First find matching pressure
-      presmindiff = fabs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(0));
+      presmindiff = aurostd::abs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(0));
       ipresval = 0;
       if (LVERBOSE) {
 	aurostd::StringstreamClean(aus);
@@ -1756,8 +1772,8 @@ namespace AGL_functions {
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       for (uint k = 0; k < pressure_list.size(); k++) {
-	if (presmindiff > fabs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k))) {
-	  presmindiff = fabs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k));
+	if (presmindiff > aurostd::abs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k))) {
+	  presmindiff = aurostd::abs(AGL_data.AGL_edos_properties.at(j).pressure_external - pressure_list.at(k));
 	  ipresval = k;
 	  if (LVERBOSE) {
 	    aurostd::StringstreamClean(aus);
@@ -1814,7 +1830,7 @@ namespace AGL_functions {
   uint edosfit(vector<double>& energtofit, vector<double>& dostofit, vector<double>& energtoeval, vector<double>& dospolyeval, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     uint pferr = 0;
-    // OBSOLETE uint nmaxlimit = 0;
+    // [OBSOLETE] uint nmaxlimit = 0;
     uint nmin, nmax;
     ostringstream aus;
     uint first_entry_tofit = 0;
@@ -1823,7 +1839,7 @@ namespace AGL_functions {
     double energval, dosval, energrange, denergpoints;
     int npolycoeffmax;
     uint nenergpoints;
-    // OBSOLETE bool ingap = false;
+    // [OBSOLETE] bool ingap = false;
     vector<double> polycoeffwork, weight;
     if (dostofit.size() > 1) {
       npolycoeffmax = dostofit.size() - 1;
@@ -1928,7 +1944,7 @@ namespace AGL_functions {
   uint edosgap_pressure_fit(vector<double>& pressure, vector<double>& edosgap, double& edosgap_pressure, vector<double>& edosgapfit, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     uint pferr = 0;
-    // OBSOLETE uint nmaxlimit = 0;
+    // [OBSOLETE] uint nmaxlimit = 0;
     uint nmin, nmax;
     ostringstream aus;
     uint first_entry_tofit = 0;
@@ -1988,7 +2004,7 @@ namespace AGL_functions {
 	nminpolyorder = 2;
       }
       // Loop over decreasing polynomial orders until polynomial with appropriate number of extrema in relevant interval is obtained
-      // OBSOLETE for (int i = npolycoeffmax; i > 0; i--) {
+      // [OBSOLETE] for (int i = npolycoeffmax; i > 0; i--) {
       for (int i = npolycoeffmax; i > nminpolyorder; i--) {
 	// Reinitialize polynomial coeffecients to zero
 	for (uint j = 0; j < polycoeffwork.size(); j++) {
@@ -2099,8 +2115,8 @@ namespace AGL_functions {
     uint ipresabsmin = 0;
     double presabsmin = pressure.at(0);
     for (uint i = 0; i < pressure.size(); i++) {
-      if (fabs(pressure.at(i)) < presabsmin) {
-	presabsmin = fabs(pressure.at(i));
+      if (aurostd::abs(pressure.at(i)) < presabsmin) {
+	presabsmin = aurostd::abs(pressure.at(i));
 	ipresabsmin = i;
       }
     }
