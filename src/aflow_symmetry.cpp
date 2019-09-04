@@ -1341,8 +1341,8 @@ double BringInCellComponent(double component, double tolerance, double upper_bou
     std::cerr << "SYM::BringInCellComponent: WARNING: (+-) INF or NAN value." << std::endl;
     return component;
   }
-  while (component - upper_bound > tolerance) component -= 1.0;
-  while (component - lower_bound < tolerance) component += 1.0;
+  while (component - upper_bound >= -tolerance) component -= 1.0;
+  while (component - lower_bound < -tolerance) component += 1.0;
   return component;
 }
 
