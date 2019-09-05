@@ -697,7 +697,7 @@ namespace SYM {
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD);
-  deque<_atom> updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice);
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX 20190805 - return to void
 
   //RHOMBOHEDRAL OBVERSE/REVERSE FUNCTIONS
   bool isObverseSetting(xstructure& xstr, double& tolerance);

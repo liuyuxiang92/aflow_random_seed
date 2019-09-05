@@ -361,14 +361,14 @@ namespace SYM {
 // ******************************************************************************
 // Update atom positions after screw operation
 namespace SYM {
-  deque<_atom> updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) {
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) { // DX 20190905 - return to void 
     for (uint a = 0; a < atoms.size(); a++) {
       atoms[a].cpos = S * atoms[a].cpos;
       //DX 20190905 [OBSOLETE-no more mod_one_xvec] atoms[a].fpos = SYM::mod_one_xvec(C2F(lattice, atoms[a].cpos));
       atoms[a].fpos = C2F(lattice, atoms[a].cpos); //DX 20190905
       BringInCellInPlace(atoms[a].fpos); //DX 20190905
     }
-    return atoms;
+    //DX 20190905 [OBSOLETE] return atoms;
   }
 } //namespace SYM
 
@@ -1882,7 +1882,7 @@ namespace SYM {
       cerr << "SYM::get_possible_origin_shifts: All Wyckoff positions with multiplicty " << multiplicity << " and same site symmetry " << site_symmetry << "." << endl;
       for(uint s=0;s<same_site_symmetry_positions.size();s++){
         print(same_site_symmetry_positions[s]);   
-        ::xb();  
+        xb();  
       }
     }
     for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  // DX 9/11/17 - Check all shifts not just minimum (minimum may not work) 
@@ -2629,8 +2629,8 @@ namespace SYM {
     if(LDEBUG) {
       cerr << "SYM::shiftWyckoffPositions: Shifted atoms: " << endl;
       for(uint i=0;i<equivalent_atoms_shifted.size();i++){
-        ::xb();
-        ::print(equivalent_atoms_shifted[i]);
+        xb();
+        print(equivalent_atoms_shifted[i]);
       }
       cerr << endl;
     } 
@@ -4342,8 +4342,8 @@ namespace SYM {
     if(LDEBUG) {
       cerr << "SYM::shiftSymmetryEquivalentAtoms: Equivalent atoms: " << endl;
       for(uint i=0;i<equivalent_atoms.size();i++){
-        ::xb();
-        ::print(equivalent_atoms[i]);
+        xb();
+        print(equivalent_atoms[i]);
       }
       cerr << endl;
     }
@@ -4401,8 +4401,8 @@ namespace SYM {
     if(LDEBUG) {
       cerr << "SYM::shiftSymmetryEquivalentAtoms: Equivalent atoms after origin shift (" << translation << "): " << endl;
       for(uint i=0;i<equivalent_atoms_shifted.size();i++){
-        ::xb();
-        ::print(equivalent_atoms_shifted[i]);
+        xb();
+        print(equivalent_atoms_shifted[i]);
       }
       cerr << endl;
     }

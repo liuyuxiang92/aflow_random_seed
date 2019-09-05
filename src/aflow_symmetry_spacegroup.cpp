@@ -81,447 +81,447 @@ namespace SYM {
       // ==================== MONOCLINIC ==================== //
       // ===== UNIQUE AXIS: b ===== //
       if(lattice_label == 'b') {
-	//GET ANGLE BETWEEN lattice_basis[1] AND (0 0 1)
-	double angle = aurostd::angle(lattice_basis[1], b);
-	if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-	  xvector<double> rotaxis = CrossPro(lattice_basis[1], b);
-	  normalize(rotaxis);
-	  Screw S;  //use screw class for rotation
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        //GET ANGLE BETWEEN lattice_basis[1] AND (0 0 1)
+        double angle = aurostd::angle(lattice_basis[1], b);
+        if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
+          xvector<double> rotaxis = CrossPro(lattice_basis[1], b);
+          normalize(rotaxis);
+          Screw S;  //use screw class for rotation
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	// DX: ORIG but it breaks for LIB2/LIB/AgAl/f342
-	//for (int i = 0; i < 3; i++) {
-	//  if(lattice_basis[1](i + 1) < -tol) {
-	//    lattice_basis[1] = -1 * lattice_basis[1];
-	//    minus_one(atomic_basis_, i + 1);
-	//  }
-	//}
-	// DX: Orig above, new below
-	if(lattice_basis[1](2) < -tol) {
-	    lattice_basis[1] = -1 * lattice_basis[1];
-	  minus_one(atomic_basis_, 2);
-	}
-	if(det(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
-	  xvector<double> lattice_tmp = lattice_basis[0];
-	  lattice_basis[0] = lattice_basis[2];
-	  lattice_basis[2] = lattice_tmp;
-	  swap_columns(atomic_basis_, 1, 3);
-	}
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        // DX: ORIG but it breaks for LIB2/LIB/AgAl/f342
+        //for (int i = 0; i < 3; i++) {
+        //  if(lattice_basis[1](i + 1) < -tol) {
+        //    lattice_basis[1] = -1 * lattice_basis[1];
+        //    minus_one(atomic_basis_, i + 1);
+        //  }
+        //}
+        // DX: Orig above, new below
+        if(lattice_basis[1](2) < -tol) {
+          lattice_basis[1] = -1 * lattice_basis[1];
+          minus_one(atomic_basis_, 2);
+        }
+        if(det(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
+          xvector<double> lattice_tmp = lattice_basis[0];
+          lattice_basis[0] = lattice_basis[2];
+          lattice_basis[2] = lattice_tmp;
+          swap_columns(atomic_basis_, 1, 3);
+        }
       }
 
       // [BELOW IS OBSOLETE]
-      
+
       // ====== UNIQUE AXIS: c ===== //
       if(lattice_label == 'm'){
-	//GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1) 
-	double angle = aurostd::angle(lattice_basis[2],c);
-	if(aurostd::abs( angle - Pi_r ) > tol && aurostd::abs ( angle ) > tol){
-	  xvector<double> rotaxis = CrossPro(lattice_basis[2],c);
-	  normalize(rotaxis);
-	  Screw S; //use screw class for rotation
-	  S.get_screw_direct(rotaxis,zero,2*Pi_r/angle);
-	  lattice_basis[0] =  S*lattice_basis[0];
-	  lattice_basis[1] =  S*lattice_basis[1];
-	  lattice_basis[2] =  S*lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0],lattice_basis[1],lattice_basis[2]);
-	  atomic_basis_ = updateAtomPositions(atomic_basis_,S,new_lattice);
-	}
-	//TESTif(lattice_basis[2](1) < -tol || lattice_basis[2](2) < -tol || lattice_basis[2](3) < -tol){
-	//TEST  lattice_basis[2] = -1*lattice_basis[2];
-	//TEST  minus_one(atomic_basis_,3);
-	//TEST}
-	if(lattice_basis[2](3) < -tol) {
-	  lattice_basis[2] = -1*lattice_basis[2];
-	  minus_one(atomic_basis_,3);
-	}
-	if(det(xvec2xmat(lattice_basis[0],lattice_basis[1],lattice_basis[2])) <0.0){
-	  xvector<double> lattice_tmp=lattice_basis[0];
-	  lattice_basis[0]=lattice_basis[1];
-	  lattice_basis[1]=lattice_tmp;
-	  swap_columns(atomic_basis_, 1, 2);
-	}
+        //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1) 
+        double angle = aurostd::angle(lattice_basis[2],c);
+        if(aurostd::abs( angle - Pi_r ) > tol && aurostd::abs ( angle ) > tol){
+          xvector<double> rotaxis = CrossPro(lattice_basis[2],c);
+          normalize(rotaxis);
+          Screw S; //use screw class for rotation
+          S.get_screw_direct(rotaxis,zero,2*Pi_r/angle);
+          lattice_basis[0] =  S*lattice_basis[0];
+          lattice_basis[1] =  S*lattice_basis[1];
+          lattice_basis[2] =  S*lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0],lattice_basis[1],lattice_basis[2]);
+          updateAtomPositions(atomic_basis_,S,new_lattice); //DX 20190905 - return changed to void
+        }
+        //TESTif(lattice_basis[2](1) < -tol || lattice_basis[2](2) < -tol || lattice_basis[2](3) < -tol){
+        //TEST  lattice_basis[2] = -1*lattice_basis[2];
+        //TEST  minus_one(atomic_basis_,3);
+        //TEST}
+        if(lattice_basis[2](3) < -tol) {
+          lattice_basis[2] = -1*lattice_basis[2];
+          minus_one(atomic_basis_,3);
+        }
+        if(det(xvec2xmat(lattice_basis[0],lattice_basis[1],lattice_basis[2])) <0.0){
+          xvector<double> lattice_tmp=lattice_basis[0];
+          lattice_basis[0]=lattice_basis[1];
+          lattice_basis[1]=lattice_tmp;
+          swap_columns(atomic_basis_, 1, 2);
+        }
       } 
       
 
       // ==================== ORTHORHOMBIC ==================== //
       if(lattice_label == 'o') {
-	//GET ANGLE BETWEEN lattice_basis[0] AND (1 0 0)
-	double angle = aurostd::angle(lattice_basis[0], a);
-	if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-	  xvector<double> rotaxis = CrossPro(lattice_basis[0], a);
-	  normalize(rotaxis);
-	  Screw S;  //use screw class for rotation
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        //GET ANGLE BETWEEN lattice_basis[0] AND (1 0 0)
+        double angle = aurostd::angle(lattice_basis[0], a);
+        if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
+          xvector<double> rotaxis = CrossPro(lattice_basis[0], a);
+          normalize(rotaxis);
+          Screw S;  //use screw class for rotation
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
-	double angle1 = aurostd::angle(lattice_basis[2], c);
-	if(aurostd::abs(angle1 - Pi_r) > tol && aurostd::abs(angle1) > tol) {
-	  xvector<double> rotaxis1 = CrossPro(lattice_basis[2], c);
-	  normalize(rotaxis1);
-	  Screw S;  //use screw class for rotation
-	  S.get_screw_direct(rotaxis1, zero, 2 * Pi_r / angle1);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
+        double angle1 = aurostd::angle(lattice_basis[2], c);
+        if(aurostd::abs(angle1 - Pi_r) > tol && aurostd::abs(angle1) > tol) {
+          xvector<double> rotaxis1 = CrossPro(lattice_basis[2], c);
+          normalize(rotaxis1);
+          Screw S;  //use screw class for rotation
+          S.get_screw_direct(rotaxis1, zero, 2 * Pi_r / angle1);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
-	double angle2 = aurostd::angle(lattice_basis[1], b);
-	if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
-	  xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
-	  normalize(rotaxis2);
-	  Screw S2;  //use screw class for rotation
-	  S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
-	  lattice_basis[0] = S2 * lattice_basis[0];
-	  lattice_basis[1] = S2 * lattice_basis[1];
-	  lattice_basis[2] = S2 * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
+        double angle2 = aurostd::angle(lattice_basis[1], b);
+        if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
+          xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
+          normalize(rotaxis2);
+          Screw S2;  //use screw class for rotation
+          S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
+          lattice_basis[0] = S2 * lattice_basis[0];
+          lattice_basis[1] = S2 * lattice_basis[1];
+          lattice_basis[2] = S2 * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S2, new_lattice);
-	}
-	}
-	for (int i = 0; i < 3; i++) {
-	  if(lattice_basis[i](i + 1) < -tol) {
-	    lattice_basis[i] = -1 * lattice_basis[i];
-	    minus_one(atomic_basis_, i + 1);
-	  }
-	}
+            updateAtomPositions(atomic_basis_, S2, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        for (int i = 0; i < 3; i++) {
+          if(lattice_basis[i](i + 1) < -tol) {
+            lattice_basis[i] = -1 * lattice_basis[i];
+            minus_one(atomic_basis_, i + 1);
+          }
+        }
       }
 
       // ==================== TETRAGONAL ==================== //
       if(lattice_label == 't') {
-	//GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
-	double angle = aurostd::angle(lattice_basis[2], c);
-	if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-	  xvector<double> rotaxis = CrossPro(lattice_basis[2], c);
-	  normalize(rotaxis);
-	  Screw S;  //use screw class for rotation
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
+        double angle = aurostd::angle(lattice_basis[2], c);
+        if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
+          xvector<double> rotaxis = CrossPro(lattice_basis[2], c);
+          normalize(rotaxis);
+          Screw S;  //use screw class for rotation
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
-	double angle2 = aurostd::angle(lattice_basis[1], b);
-	if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
-	  xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
-	  normalize(rotaxis2);
-	  Screw S2;  //use screw class for rotation
-	  S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
-	  lattice_basis[0] = S2 * lattice_basis[0];
-	  lattice_basis[1] = S2 * lattice_basis[1];
-	  lattice_basis[2] = S2 * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
+        double angle2 = aurostd::angle(lattice_basis[1], b);
+        if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
+          xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
+          normalize(rotaxis2);
+          Screw S2;  //use screw class for rotation
+          S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
+          lattice_basis[0] = S2 * lattice_basis[0];
+          lattice_basis[1] = S2 * lattice_basis[1];
+          lattice_basis[2] = S2 * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S2, new_lattice);
-	}
-	}
-	for (int i = 0; i < 3; i++) {
-	  if(lattice_basis[i](i + 1) < -tol) {
-	    lattice_basis[i] = -1 * lattice_basis[i];
-	    minus_one(atomic_basis_, i + 1);
-	  }
-	}
+            updateAtomPositions(atomic_basis_, S2, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        for (int i = 0; i < 3; i++) {
+          if(lattice_basis[i](i + 1) < -tol) {
+            lattice_basis[i] = -1 * lattice_basis[i];
+            minus_one(atomic_basis_, i + 1);
+          }
+        }
       }
 
       // ==================== CUBIC ==================== //
       if(lattice_label == 'c') {
-	//GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
-	double angle = aurostd::angle(lattice_basis[2], c);
-	if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-	  xvector<double> rotaxis = CrossPro(lattice_basis[2], c);
-	  normalize(rotaxis);
-	  Screw S;  //use screw class for rotation
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
+        double angle = aurostd::angle(lattice_basis[2], c);
+        if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
+          xvector<double> rotaxis = CrossPro(lattice_basis[2], c);
+          normalize(rotaxis);
+          Screw S;  //use screw class for rotation
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
-	double angle2 = aurostd::angle(lattice_basis[1], b);
-	if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
-	  xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
-	  normalize(rotaxis2);
-	  Screw S2;  //use screw class for rotation
-	  S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
-	  lattice_basis[0] = S2 * lattice_basis[0];
-	  lattice_basis[1] = S2 * lattice_basis[1];
-	  lattice_basis[2] = S2 * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
+        double angle2 = aurostd::angle(lattice_basis[1], b);
+        if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
+          xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
+          normalize(rotaxis2);
+          Screw S2;  //use screw class for rotation
+          S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
+          lattice_basis[0] = S2 * lattice_basis[0];
+          lattice_basis[1] = S2 * lattice_basis[1];
+          lattice_basis[2] = S2 * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S2, new_lattice);
-	}
-	}
-	for (int i = 0; i < 3; i++) {
-	  if(lattice_basis[i](i + 1) < -tol) {
-	    lattice_basis[i] = -1 * lattice_basis[i];
-	    minus_one(atomic_basis_, i + 1);
-	  }
-	}
+            updateAtomPositions(atomic_basis_, S2, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        for (int i = 0; i < 3; i++) {
+          if(lattice_basis[i](i + 1) < -tol) {
+            lattice_basis[i] = -1 * lattice_basis[i];
+            minus_one(atomic_basis_, i + 1);
+          }
+        }
       }
 
       // ==================== HEXAGONAL ==================== //
       if(lattice_label == 'h') {
-	double angle;
-	xvector<double> rotaxis;
-	Screw S;
-	if(lattice_basis[2](3) < -tol) {
-	  lattice_basis[2] = -1 * lattice_basis[2];
-	  minus_one(atomic_basis_, 3);
-	}
-	xvector<double> tmpc = c * aurostd::modulus(lattice_basis[2]);
-	//If lattice_basis[2] is already parallel to 001, this is not necessary
-	if(!vec_compare(tmpc, lattice_basis[2])) {
-	  angle = aurostd::angle(lattice_basis[2], c);
-	  rotaxis = CrossPro(lattice_basis[2], c);
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        double angle;
+        xvector<double> rotaxis;
+        Screw S;
+        if(lattice_basis[2](3) < -tol) {
+          lattice_basis[2] = -1 * lattice_basis[2];
+          minus_one(atomic_basis_, 3);
+        }
+        xvector<double> tmpc = c * aurostd::modulus(lattice_basis[2]);
+        //If lattice_basis[2] is already parallel to 001, this is not necessary
+        if(!vec_compare(tmpc, lattice_basis[2])) {
+          angle = aurostd::angle(lattice_basis[2], c);
+          rotaxis = CrossPro(lattice_basis[2], c);
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//GET ANGLE BETWEEN lattice_basis[0] AND (Sqrt(3)/2 1/2 0)
-	xvector<double> fromx;  // 30 degrees above x axis
-	fromx(1) = sqrt(3.0) / 2.0;
-	fromx(2) = 1.0 / 2.0;
-	angle = aurostd::angle(lattice_basis[0], fromx);
-	if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-	  rotaxis = CrossPro(lattice_basis[0], fromx);
-	  normalize(rotaxis);
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //GET ANGLE BETWEEN lattice_basis[0] AND (Sqrt(3)/2 1/2 0)
+        xvector<double> fromx;  // 30 degrees above x axis
+        fromx(1) = sqrt(3.0) / 2.0;
+        fromx(2) = 1.0 / 2.0;
+        angle = aurostd::angle(lattice_basis[0], fromx);
+        if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
+          rotaxis = CrossPro(lattice_basis[0], fromx);
+          normalize(rotaxis);
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
-	if(vec_compare(tmpb, lattice_basis[1])) {
-	  rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
-	  angle = -120.0 * Pi_r / 180.0;
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
+        if(vec_compare(tmpb, lattice_basis[1])) {
+          rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
+          angle = -120.0 * Pi_r / 180.0;
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
 
-	if(aurostd::determinant(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
-	  tmpvec = lattice_basis[0];
-	  lattice_basis[0] = lattice_basis[1];
-	  lattice_basis[1] = tmpvec;
-	  swap_columns(atomic_basis_, 1, 2);
-	}
+        if(aurostd::determinant(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
+          tmpvec = lattice_basis[0];
+          lattice_basis[0] = lattice_basis[1];
+          lattice_basis[1] = tmpvec;
+          swap_columns(atomic_basis_, 1, 2);
+        }
       }
 
       // ==================== RHOMBOHEDRAL ==================== //
       if(lattice_label == 'R') {
-	double angle;
-	xvector<double> rotaxis;
-	Screw S;
-	if(lattice_basis[2](3) < -tol) {
-	  lattice_basis[2] = -1 * lattice_basis[2];
-	  minus_one(atomic_basis_, 3);
-	}
-	xvector<double> tmpc = c * aurostd::modulus(lattice_basis[2]);
-	//If lattice_basis[2] is already parallel to 001, this is not necessary
-	if(!vec_compare(tmpc, lattice_basis[2])) {
-	  angle = aurostd::angle(lattice_basis[2], c);
-	  rotaxis = CrossPro(lattice_basis[2], c);
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        double angle;
+        xvector<double> rotaxis;
+        Screw S;
+        if(lattice_basis[2](3) < -tol) {
+          lattice_basis[2] = -1 * lattice_basis[2];
+          minus_one(atomic_basis_, 3);
+        }
+        xvector<double> tmpc = c * aurostd::modulus(lattice_basis[2]);
+        //If lattice_basis[2] is already parallel to 001, this is not necessary
+        if(!vec_compare(tmpc, lattice_basis[2])) {
+          angle = aurostd::angle(lattice_basis[2], c);
+          rotaxis = CrossPro(lattice_basis[2], c);
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//GET ANGLE BETWEEN lattice_basis[0] AND (Sqrt(3)/2 1/2 0)
-	xvector<double> fromx;  // 30 degrees above x axis
-	fromx(1) = sqrt(3.0) / 2.0;
-	fromx(2) = 1.0 / 2.0;
-	angle = aurostd::angle(lattice_basis[0], fromx);
-	if(aurostd::abs(angle) > tol && aurostd::abs(angle - Pi_r) > tol) {
-	  rotaxis = CrossPro(lattice_basis[0], fromx);
-	  normalize(rotaxis);
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //GET ANGLE BETWEEN lattice_basis[0] AND (Sqrt(3)/2 1/2 0)
+        xvector<double> fromx;  // 30 degrees above x axis
+        fromx(1) = sqrt(3.0) / 2.0;
+        fromx(2) = 1.0 / 2.0;
+        angle = aurostd::angle(lattice_basis[0], fromx);
+        if(aurostd::abs(angle) > tol && aurostd::abs(angle - Pi_r) > tol) {
+          rotaxis = CrossPro(lattice_basis[0], fromx);
+          normalize(rotaxis);
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
-	if(vec_compare(tmpb, lattice_basis[1])) {
-	  rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
-	  angle = -120.0 * Pi_r / 180.0;
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
+        if(vec_compare(tmpb, lattice_basis[1])) {
+          rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
+          angle = -120.0 * Pi_r / 180.0;
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
 
-	if(aurostd::determinant(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
-	  tmpvec = lattice_basis[0];
-	  lattice_basis[0] = lattice_basis[1];
-	  lattice_basis[1] = tmpvec;
-	  swap_columns(atomic_basis_, 1, 2);
-	}
-	lattice_basis_xmat = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
-	// Check for reverse/obverse setting
-	// [OBSOLETE] DX- This is done later in the code: isObverseSetting(lattice_basis_xmat,atomic_basis_,xstr.dist_nn_min,_SYM_TOL_);
-	lattice_basis[0] = extract_row(lattice_basis_xmat, 1);
-	lattice_basis[1] = extract_row(lattice_basis_xmat, 2);
-	lattice_basis[2] = extract_row(lattice_basis_xmat, 3);
+        if(aurostd::determinant(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
+          tmpvec = lattice_basis[0];
+          lattice_basis[0] = lattice_basis[1];
+          lattice_basis[1] = tmpvec;
+          swap_columns(atomic_basis_, 1, 2);
+        }
+        lattice_basis_xmat = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        // Check for reverse/obverse setting
+        // [OBSOLETE] DX- This is done later in the code: isObverseSetting(lattice_basis_xmat,atomic_basis_,xstr.dist_nn_min,_SYM_TOL_);
+        lattice_basis[0] = extract_row(lattice_basis_xmat, 1);
+        lattice_basis[1] = extract_row(lattice_basis_xmat, 2);
+        lattice_basis[2] = extract_row(lattice_basis_xmat, 3);
       }
       if(lattice_label == 'r') {
-	//cerr << "do not NEED to orient rhombohedral cell, rhombohedral axes" << endl;
+        //cerr << "do not NEED to orient rhombohedral cell, rhombohedral axes" << endl;
       }
 
       // ==================== RHOMBOHEDRAL IN HEXAGONAL SETTING ==================== //
       if(lattice_label == 'X') {  //
-	if(LDEBUG) { cerr << "SYM::orient: RHOMBOHEDRAL IN HEXAGONAL SETTING" << endl; }
-	double angle;
-	xvector<double> rotaxis;
-	Screw S;
-	if(lattice_basis[2](3) < -tol) {
-	  lattice_basis[2] = -1 * lattice_basis[2];
-	  minus_one(atomic_basis_, 3);
-	}
-	//GET ANGLE BETWEEN lattice_basis[0] AND (Sqrt(3)/2 1/2 0)
-	xvector<double> fromx;  // 30 degrees above x axis
-	fromx(1) = sqrt(3.0) / 2.0;
-	fromx(2) = 1.0 / 2.0;
-	angle = aurostd::angle(lattice_basis[0], fromx);
-	if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-	  rotaxis = CrossPro(lattice_basis[0], fromx);
-	  normalize(rotaxis);
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        if(LDEBUG) { cerr << "SYM::orient: RHOMBOHEDRAL IN HEXAGONAL SETTING" << endl; }
+        double angle;
+        xvector<double> rotaxis;
+        Screw S;
+        if(lattice_basis[2](3) < -tol) {
+          lattice_basis[2] = -1 * lattice_basis[2];
+          minus_one(atomic_basis_, 3);
+        }
+        //GET ANGLE BETWEEN lattice_basis[0] AND (Sqrt(3)/2 1/2 0)
+        xvector<double> fromx;  // 30 degrees above x axis
+        fromx(1) = sqrt(3.0) / 2.0;
+        fromx(2) = 1.0 / 2.0;
+        angle = aurostd::angle(lattice_basis[0], fromx);
+        if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
+          rotaxis = CrossPro(lattice_basis[0], fromx);
+          normalize(rotaxis);
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
-	if(vec_compare(tmpb, lattice_basis[1])) {
-	  rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
-	  angle = -120.0 * Pi_r / 180.0;
-	  S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
-	  lattice_basis[0] = S * lattice_basis[0];
-	  lattice_basis[1] = S * lattice_basis[1];
-	  lattice_basis[2] = S * lattice_basis[2];
-	  xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
+        if(vec_compare(tmpb, lattice_basis[1])) {
+          rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
+          angle = -120.0 * Pi_r / 180.0;
+          S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
+          lattice_basis[0] = S * lattice_basis[0];
+          lattice_basis[1] = S * lattice_basis[1];
+          lattice_basis[2] = S * lattice_basis[2];
+          xmatrix<double> new_lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
           if(update_atom_positions){
-	  atomic_basis_ = updateAtomPositions(atomic_basis_, S, new_lattice);
-	}
-	}
-	//print(lattice_basis);
-	lattice_basis_xmat = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
-	xmatrix<double> f2c = trasp(lattice_basis_xmat);
-	xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
-	bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, xstr.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+            updateAtomPositions(atomic_basis_, S, new_lattice); //DX 20190905 - return changed to void
+          }
+        }
+        //print(lattice_basis);
+        lattice_basis_xmat = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
+        xmatrix<double> f2c = trasp(lattice_basis_xmat);
+        xmatrix<double> c2f = inverse(trasp(lattice_basis_xmat));
+        bool skew = SYM::isLatticeSkewed(lattice_basis_xmat, xstr.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
 
-	//xb();
-	//print(atomic_basis_);
-	_atom obverse1;
-	_atom obverse2;
-	_atom obverse3;
-	obverse1.fpos(1) = 2.0 / 3.0;
-	obverse1.fpos(2) = 1.0 / 3.0;
-	obverse1.fpos(3) = 1.0 / 3.0;
-	obverse1.name = "0";
-	obverse2.fpos(1) = 1.0 / 3.0;
-	obverse2.fpos(2) = 2.0 / 3.0;
-	obverse2.fpos(3) = 2.0 / 3.0;
-	obverse2.name = "0";
-	obverse3.name = "0";
-	uint match_type1 = 0;
-	uint match_type2 = 0;
-	uint match_type3 = 0;
+        //xb();
+        //print(atomic_basis_);
+        _atom obverse1;
+        _atom obverse2;
+        _atom obverse3;
+        obverse1.fpos(1) = 2.0 / 3.0;
+        obverse1.fpos(2) = 1.0 / 3.0;
+        obverse1.fpos(3) = 1.0 / 3.0;
+        obverse1.name = "0";
+        obverse2.fpos(1) = 1.0 / 3.0;
+        obverse2.fpos(2) = 2.0 / 3.0;
+        obverse2.fpos(3) = 2.0 / 3.0;
+        obverse2.name = "0";
+        obverse3.name = "0";
+        uint match_type1 = 0;
+        uint match_type2 = 0;
+        uint match_type3 = 0;
 
-	if(aurostd::determinant(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
-	  tmpvec = lattice_basis[0];
-	  lattice_basis[0] = lattice_basis[1];
-	  lattice_basis[1] = tmpvec;
-	  swap_columns(atomic_basis_, 1, 2);
-	}
-	if((!SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	     !SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
-	     !SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
-	  lattice_basis[0] = -1 * lattice_basis[0];
-	  minus_one(atomic_basis_, 1);
-	  lattice_basis[1] = -1 * lattice_basis[1];
-	  minus_one(atomic_basis_, 2);
-	}
-	if(!(SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	      SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	      SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
-	  lattice_basis[0] = -1 * lattice_basis[0];
-	  minus_one(atomic_basis_, 1);
-	  lattice_basis[2] = -1 * lattice_basis[2];
-	  minus_one(atomic_basis_, 3);
-	}
-	if(!(SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	      SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	      SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
-	  lattice_basis[1] = -1 * lattice_basis[1];
-	  minus_one(atomic_basis_, 2);
-	  lattice_basis[2] = -1 * lattice_basis[2];
-	  minus_one(atomic_basis_, 3);
-	}
-	if(!(SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	      SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	      SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	    (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
-	  cerr << "SYM::orient: PROBLEM TRANFORMING TO OBVERSE SETTING. QUITING PROGRAM [dir = " << xstr.directory << "]." << endl;
-	  exit(0);
-	}
+        if(aurostd::determinant(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2])) < -tol) {
+          tmpvec = lattice_basis[0];
+          lattice_basis[0] = lattice_basis[1];
+          lattice_basis[1] = tmpvec;
+          swap_columns(atomic_basis_, 1, 2);
+        }
+        if((!SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              !SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) || //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
+              !SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+            (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
+          lattice_basis[0] = -1 * lattice_basis[0];
+          minus_one(atomic_basis_, 1);
+          lattice_basis[1] = -1 * lattice_basis[1];
+          minus_one(atomic_basis_, 2);
+        }
+        if(!(SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+            (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
+          lattice_basis[0] = -1 * lattice_basis[0];
+          minus_one(atomic_basis_, 1);
+          lattice_basis[2] = -1 * lattice_basis[2];
+          minus_one(atomic_basis_, 3);
+        }
+        if(!(SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+            (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
+          lattice_basis[1] = -1 * lattice_basis[1];
+          minus_one(atomic_basis_, 2);
+          lattice_basis[2] = -1 * lattice_basis[2];
+          minus_one(atomic_basis_, 3);
+        }
+        if(!(SYM::FPOSMatch(atomic_basis_, obverse1, match_type1, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              SYM::FPOSMatch(atomic_basis_, obverse2, match_type2, lattice_basis_xmat, f2c, skew, sym_tol) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+              SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+            (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
+          cerr << "SYM::orient: PROBLEM TRANFORMING TO OBVERSE SETTING. QUITING PROGRAM [dir = " << xstr.directory << "]." << endl;
+          exit(0);
+        }
       }
       xstr.lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
 

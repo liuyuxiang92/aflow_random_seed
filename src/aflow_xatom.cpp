@@ -10036,9 +10036,9 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // -------------------------------------------------------------------
 // double (change in place)
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
-  string function_name = "BringInCellInPlace()";
   if (component == INFINITY || component != component || component == -INFINITY) {
-    stringstream message; //DX 20190905 - surprisingly if this is not in the if-statement, it adds a lot to the run tim (~1 sec) 
+    string function_name = "BringInCellInPlace()";
+    stringstream message; 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
@@ -10079,9 +10079,9 @@ void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, 
 // double (return new double)
 double BringInCell(double component_in, double tolerance, double upper_bound, double lower_bound) {
   double component_out = component_in;
-  string function_name = "BringInCell()";
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
-    stringstream message; //DX 20190905 - surprisingly if this is not in the if-statement, it adds a lot to the run tim (~1 sec) 
+    string function_name = "BringInCell()";
+    stringstream message; 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
@@ -10159,7 +10159,7 @@ void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, d
 // xstructure (xstructure method) 
 void xstructure::BringInCell(double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   for(uint i=0;i<atoms.size();i++){
-    ::BringInCellInPlace(atoms[i], lattice, tolerance, upper_bound, lower_bound); //DX "::" to access outside of xstructure class
+    BringInCellInPlace(atoms[i], lattice, tolerance, upper_bound, lower_bound); //DX "::" to access outside of xstructure class
   }
 }
 
