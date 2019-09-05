@@ -10038,7 +10038,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
   if (component == INFINITY || component != component || component == -INFINITY) {
     string function_name = "BringInCellInPlace()";
-    stringstream message; 
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
@@ -10057,10 +10057,10 @@ void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bo
 // -------------------------------------------------------------------
 // _atom (change in place, updates both fpos and pos) 
 void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
-  BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound);
+  BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound); // update fpos first
 
   // update cpos
-  atom.cpos=F2C(lattice,atom.fpos);
+  atom.cpos=F2C(lattice,atom.fpos); // update cpos next
   atom.isincell=TRUE;
 }
 
@@ -10081,7 +10081,7 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
   double component_out = component_in;
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
     string function_name = "BringInCell()";
-    stringstream message; 
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
