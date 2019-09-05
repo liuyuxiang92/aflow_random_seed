@@ -4378,32 +4378,56 @@ namespace aurostd {
   }
 
   bool withinList(const vector<string>& list,const string& input) { //CO181010
-    for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}
-    return false;
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
+    int index;
+    return withinList(list, input, index);
   }
   bool withinList(const vector<int>& list,int input) {  //CO181010
-    for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}
-    return false;
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
+    int index;
+    return withinList(list, input, index);
   }
   bool withinList(const vector<uint>& list,uint input) {  //CO181010
-    for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
+    int index;
+    return withinList(list, input, index);
+  }
+
+  // ME190813 - added versions that also determine the index of the item in the list
+  bool withinList(const vector<string>& list, const string& input, int& index) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
     return false;
   }
 
-  // ME190813
-  int findInList(const vector<string>& list, const string& input) {
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {if(list[i]==input) return i;}
-    return -1;
+  bool withinList(const vector<int>& list, int input, int& index) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
+    return false;
   }
 
-  int findInList(const vector<int>& list, int input) {
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {if(list[i]==input) return i;}
-    return -1;
-  }
-
-  int findInList(const vector<uint>& list, uint input) {
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {if(list[i]==input) return i;}
-    return -1;
+  bool withinList(const vector<uint>& list, uint input, int& index) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
+    return false;
   }
 
   // ***************************************************************************

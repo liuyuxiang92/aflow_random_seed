@@ -287,8 +287,8 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
         vector<string> comp;
         protos.clear();
         aflowlib::GetAllPrototypeLabels(protos, comp, "htqc");
-        int index = aurostd::findInList(protos, proto);
-        if (index > -1) {
+        int index;
+        if (aurostd::withinList(protos, proto, index)) {
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
           vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
           vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
