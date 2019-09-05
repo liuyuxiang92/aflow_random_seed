@@ -13,6 +13,10 @@
         -- Fixed plotter bugs for HTQC prototype names. (ME)
         -- Added findInList function to AUROSTD. (ME)
         -- Generalized BringInCell method. (ME/DX)
+        -- created overloads for BringInCell method (double/xvector/_atom/xstructure), along with "InPlace" variants, i.e., const input (DX)
+        -- replaced all mod_one/mod_one_xvec/mod_one_atom for new BringInCell method (DX)
+        -- replaced old BringInCell functions with new version (DX)
+        -- fixed indenting in symmetry functions (DX)
         -- fabs() -> aurostd::abs() (CO)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz

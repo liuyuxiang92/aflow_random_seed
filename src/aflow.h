@@ -1420,8 +1420,9 @@ class xstructure {
   void NiggliUnitCellForm(void);                                // Reduce the Unit Cell to Niggli Form
   void MinkowskiBasisReduction(void);                           // Reduce the Basis to the max orthogonality (Minkowski)
   void LatticeReduction(void);                                  // Lattice Reduction to Max Orthogonality (MINK) and then Niggly Form
-  void BringInCell(void);                                       // Bring all the atoms in the origin
-  void BringInCell(double);                                     // Bring all the atoms in the origin
+  //DX 20190905 [OBSOLETE] void BringInCell(void);                                       // Bring all the atoms in the origin
+  //DX 20190905 [OBSOLETE] void BringInCell(double);                                     // Bring all the atoms in the origin
+  void BringInCell(double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
   void BringInCompact(void);                                    // Bring all the atoms near the origin
   void BringInWignerSeitz(void);                                // Bring all the atoms in the Wigner Seitz Cell
   void GetPrimitive(void);                                      // Make it primitive, if possible
@@ -2148,19 +2149,34 @@ xmatrix<double> FF2CC(const double& scale,const xmatrix<double>& lattice,const x
 xmatrix<double> FF2CC(const xmatrix<double>& lattice,const xmatrix<double>& fmat);                      // fmat is an operation in F coordinates
 xmatrix<double> CC2FF(const double& scale,const xmatrix<double>& lattice,const xmatrix<double>& cmat);  // cmat is an operation in C coordinates
 xmatrix<double> CC2FF(const xmatrix<double>& lattice,const xmatrix<double>& cmat);                      // cmat is an operation in C coordinates
+// DX 20190905 - START
+// double
+void BringInCellInPlace(double&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+double BringInCell(double, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+// xvector
+void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+// _atom
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+void BringInCellInPlace(_atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+// xstructure
+void BringInCellInPlace(xstructure& xstr, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+xstructure BringInCell(const xstructure& xstr_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+// DX 20190905 - END
 // DX and CO - START
-double BringInCell(const double& x);
-double BringInCell_20161115(const double& x);
-double BringInCell_20160101(const double& x);
-double BringInCell(const double& x);
-double BringInCell_20160101(const double& x);
-xvector<double> BringInCell(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell(const xvector<double>& v_in);
-xvector<double> BringInCell2(const xvector<double>& v_in);
-xvector<double> BringInCell2_20161115(const xvector<double>& v_in);
-xvector<double> BringInCell2_20160101(const xvector<double>& v_in, double tolerance);
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20161115(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20161115(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20160101(const xvector<double>& v_in, double tolerance);
 // DX and CO - END
 xstructure IdenticalAtoms(const xstructure& a);                                // Make identical atoms
 //xstructure SwapSpecies(const xstructure& a,const uint& A,const uint& B);       // Permute Species A with B (safe for species C).
@@ -2200,20 +2216,20 @@ xstructure GetPrimitiveVASP(const xstructure& a);
 xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 // CO 170807 - STOP
 // bring cell in,compact, wigner seitz
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
-// DX and CO - START
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice); // DX
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice); // DX
-xstructure BringInCell(const xstructure& a,double epsilon);
-xstructure BringInCell_20161115(const xstructure& a,double epsilon); // DX
-xstructure BringInCell_20160101(const xstructure& a,double epsilon); // DX
-xstructure BringInCell(const xstructure& a);
-xstructure BringInCell_20161115(const xstructure& a); // DX
-xstructure BringInCell_20160101(const xstructure& a); // DX
-// DX and CO - END
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
+//DX 20190905 [OBSOLETE] // DX and CO - START
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon);
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a);
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a); // DX
+//DX 20190905 [OBSOLETE] // DX and CO - END
 xstructure BringInCompact(const xstructure& a);
 xstructure BringInWignerSeitz(const xstructure& a);
 // primitive stuff
@@ -3686,11 +3702,9 @@ namespace SYM {
   bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190524 - need pointer for tolerance, otherwise it will not update
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
-  double BringInCellComponent(double, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
-  void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
-  double mod_one(double d); // DX 
-  _atom mod_one_atom(const _atom& atom_in); // CO
-  xvector<double> mod_one_xvec(xvector<double> a); // DX
+  //DX 20190905 [OBSOLETE] double mod_one(double d); // DX 
+  //DX 20190905 [OBSOLETE] _atom mod_one_atom(const _atom& atom_in); // CO
+  //DX 20190905 [OBSOLETE] xvector<double> mod_one_xvec(xvector<double> a); // DX
   bool CheckForIdentity(const xstructure& xstr); // DX
   bool checkSuperCellLatticePoints(xstructure& xstr, int& num_lattice_points, char& centering, uint& expand_size); // DX
   bool ComparePointGroupAndSpaceGroupString(xstructure& xstr, int& multiplicity_of_primitive, bool& derivative_structure); // DX

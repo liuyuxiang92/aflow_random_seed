@@ -616,7 +616,7 @@ namespace SYM {
   int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
-  double mod_one(double d);
+  //DX 20190905 [OBSOLETE] double mod_one(double d);
   double smallest_gt_min(double min, vector<double> vec);
   int smallest_gt_min_index(double min, int not_index1, int not_index2, vector<double> vec);
 

@@ -227,7 +227,7 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
 // Moves a q-point into the first Brillouin zone.
 // ME190702 - made more robust
 void QMesh::moveToBZ(xvector<double>& qpt) const {
-  SYM::BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5);
+  BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5); //DX 20190905 - removed SYM namespace
 }
 
 //makeIrreducible/////////////////////////////////////////////////////////////

@@ -742,7 +742,9 @@ namespace SYM {
     xmatrix<double> lb_r60_inv = aurostd::inverse(xvec2xmat(lb1, lb2, lb3));
 
     for (uint i = 0; i < atoms.size(); i++) {
-      atoms[i].fpos = SYM::mod_one_xvec(atoms[i].fpos * lb * lb_r60_inv);
+      //DX 20190905 [OBSOLETE-no more mod_one_xvec] atoms[i].fpos = SYM::mod_one_xvec(atoms[i].fpos * lb * lb_r60_inv);
+      atoms[i].fpos = atoms[i].fpos * lb * lb_r60_inv; //DX 20190905 
+      BringInCellInPlace(atoms[i].fpos); //DX 20190905 
     }
     lattice_basis[0] = lb1;
     lattice_basis[1] = lb2;
@@ -882,7 +884,8 @@ uint xstructure::GetPrimitiveCell(void) {
   if(foundbasis == false) {
     for (uint i = 0; i < atomic_basis_.size(); i++) {
       _atom tmp;
-      tmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos);
+      //DX 20190905 [OBSOLETE-no more mod_one_xvec] tmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos);
+      tmp.fpos = ::BringInCell(atomic_basis_[i].fpos); //DX 20190905 - new BringInCell function and go outside xstructure scope
       tmp.name = atomic_basis_[i].name;
       tmp.type = atomic_basis_[i].type;
       tmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
@@ -894,7 +897,9 @@ uint xstructure::GetPrimitiveCell(void) {
     vector<xvector<double> > diff_vectors;
     vector<uint> atom_pos;
     for (uint i = 0; i < atoms_by_type[index_for_smallest_group].size(); i++) {
-      xvector<double> tmp = SYM::mod_one_xvec(atoms_by_type[index_for_smallest_group][i].fpos - atoms_by_type[index_for_smallest_group][0].fpos); //need to bring in cell, otherwise, checking larger cells not smaller
+      //DX 20190905 [OBSOLETE-no more mod_one_xvec] xvector<double> tmp = SYM::mod_one_xvec(atoms_by_type[index_for_smallest_group][i].fpos - atoms_by_type[index_for_smallest_group][0].fpos); //need to bring in cell, otherwise, checking larger cells not smaller
+      xvector<double> tmp = atoms_by_type[index_for_smallest_group][i].fpos - atoms_by_type[index_for_smallest_group][0].fpos; //need to bring in cell, otherwise, checking larger cells not smaller //DX 20190905
+      BringInCellInPlace(tmp); //DX 20190905
       diff_vectors.push_back(tmp);
       atom_pos.push_back(i);
     }
@@ -912,7 +917,9 @@ uint xstructure::GetPrimitiveCell(void) {
       uint count = 0;
       for (uint i = 0; i < atomic_basis_.size(); i++) {
         _atom atmp;
-        atmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos + diff_vectors[d]);
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] atmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos + diff_vectors[d]);
+        atmp.fpos = atomic_basis_[i].fpos + diff_vectors[d]; //DX 20190905 
+        BringInCellInPlace(atmp.fpos); //DX 20190905
         atmp.name = atomic_basis_[i].name;
         atmp.type = atomic_basis_[i].type;
         atmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
@@ -2993,8 +3000,8 @@ namespace SYM {
     uint index_for_smallest_group = 0;
     for (uint i = 1; i < atoms_by_type.size(); i++) {
       if(atoms_by_type[i].size() < smallest_group) {
-	smallest_group = atoms_by_type[i].size();
-	index_for_smallest_group = i;
+        smallest_group = atoms_by_type[i].size();
+        index_for_smallest_group = i;
       }
     }
     vector<xvector<double> > translations;
@@ -3029,83 +3036,85 @@ namespace SYM {
       ident_trans = 0;
       // ===== There must be an identity operator otherwise a tolerance problem ===== //
       while (ident_trans == 0) {
-	int symcount = 0;
+        int symcount = 0;
 
-	// ===== Loop over symmetry elements ===== //
-	for (uint i = 0; i < SYMINDEX.size(); i++) {
-	  symcount++;
-	  xmatrix<double> Rf = ITC_sym_info.sym_mats[SYMINDEX[i]];  //Uf  // CO
-	  string sym_symbol = ITC_sym_info.symbol[SYMINDEX[i]];
-	  //cerr << "testing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
-	  xvector<double> T;
-	  vector<int> atom_map;
-	  vector<int> type_map;
-	  // CO - START
-	  symOp.Uf = Rf;
-	  symOp.Uc = f2c * Rf * c2f;
-	  symOp.str_Hermann_Mauguin = sym_symbol;
-	  // CO - END
-	  // ===== Use the smallest group of an atom type to find the possible translations ===== //
-	  for (uint j = 0; j < atoms_by_type[index_for_smallest_group].size(); j++) {
-	    T = SYM::mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - Rf * atoms_by_type[index_for_smallest_group][j].fpos);  //ftau
-	    // CO - START
-	    symOp.ftau = T;
-	    symOp.ctau = f2c * T;  //atoms_by_type[index_for_smallest_group][0].cpos - Rf*atoms_by_type[index_for_smallest_group][j].cpos;//f2c*T;
-	    // CO - END
-	    //if(SYM::getFullSymBasis(atomicbasis,Rf,c2f,f2c,sym_symbol,T,skew,tol,atom_map,type_map)){ //DX 20190215 - _SYM_TOL_ to tol
-	    // DX if(SYM::getFullSymBasis(atomicbasis,L,c2f,f2c,symOp,skew,tol,false,atom_map,type_map)){ //DX 20190215 - _SYM_TOL_ to tol
-	    if(SYM::getFullSymBasis(atomicbasis, L, c2f, f2c, symOp, TRUE, skew, tol, atom_map, type_map)) { //DX 20190215 - _SYM_TOL_ to tol
-	      /*cerr << "---------" << endl;
-	      cerr << "Uf " << endl << symOp.Uf << endl;
-	      cerr << "FTAU: " << symOp.ftau << endl;
-	      cerr << "---------" << endl;*/
-	      // ===== If one-to-one, store the symmetry operator ===== //
-	      //cerr << " ===> storing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
-	      //print(atom_map);
-	      insym.push_back(SYMINDEX[i]);
-	      translations.push_back(T);
-	      all_atom_maps.push_back(atom_map);
-	      all_type_maps.push_back(type_map);
-	      atom_map.clear();
-	      type_map.clear();
+        // ===== Loop over symmetry elements ===== //
+        for (uint i = 0; i < SYMINDEX.size(); i++) {
+          symcount++;
+          xmatrix<double> Rf = ITC_sym_info.sym_mats[SYMINDEX[i]];  //Uf  // CO
+          string sym_symbol = ITC_sym_info.symbol[SYMINDEX[i]];
+          //cerr << "testing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
+          xvector<double> T;
+          vector<int> atom_map;
+          vector<int> type_map;
+          // CO - START
+          symOp.Uf = Rf;
+          symOp.Uc = f2c * Rf * c2f;
+          symOp.str_Hermann_Mauguin = sym_symbol;
+          // CO - END
+          // ===== Use the smallest group of an atom type to find the possible translations ===== //
+          for (uint j = 0; j < atoms_by_type[index_for_smallest_group].size(); j++) {
+            //DX 20190905 [OBSOLETE-no more mod_one_xvec] T = SYM::mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - Rf * atoms_by_type[index_for_smallest_group][j].fpos);  //ftau
+            T = atoms_by_type[index_for_smallest_group][0].fpos - Rf * atoms_by_type[index_for_smallest_group][j].fpos;  //ftau //DX 20190905
+            BringInCellInPlace(T); //DX 20190905
+            // CO - START
+            symOp.ftau = T;
+            symOp.ctau = f2c * T;  //atoms_by_type[index_for_smallest_group][0].cpos - Rf*atoms_by_type[index_for_smallest_group][j].cpos;//f2c*T;
+            // CO - END
+            //if(SYM::getFullSymBasis(atomicbasis,Rf,c2f,f2c,sym_symbol,T,skew,tol,atom_map,type_map)){ //DX 20190215 - _SYM_TOL_ to tol
+            // DX if(SYM::getFullSymBasis(atomicbasis,L,c2f,f2c,symOp,skew,tol,false,atom_map,type_map)){ //DX 20190215 - _SYM_TOL_ to tol
+            if(SYM::getFullSymBasis(atomicbasis, L, c2f, f2c, symOp, TRUE, skew, tol, atom_map, type_map)) { //DX 20190215 - _SYM_TOL_ to tol
+              /*cerr << "---------" << endl;
+                cerr << "Uf " << endl << symOp.Uf << endl;
+                cerr << "FTAU: " << symOp.ftau << endl;
+                cerr << "---------" << endl;*/
+              // ===== If one-to-one, store the symmetry operator ===== //
+              //cerr << " ===> storing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
+              //print(atom_map);
+              insym.push_back(SYMINDEX[i]);
+              translations.push_back(T);
+              all_atom_maps.push_back(atom_map);
+              all_type_maps.push_back(type_map);
+              atom_map.clear();
+              type_map.clear();
 
-	      // ===== Categorize by type of symmetry element ===== //
-	      if(ITC_sym_info.symbol[SYMINDEX[i]] == "1") {
-		ident_trans++;
-		centeringops.push_back(T);
-		pointgroupops.push_back("1");
-	      } else if(ITC_sym_info.symbol[SYMINDEX[i]] == "m") {
-		mcount++;
-		mcount_dirs.push_back(ITC_sym_info.sym_mats_direction[SYMINDEX[i] + 1]);
-		pointgroupops.push_back("m");
-	      } else if(ITC_sym_info.symbol[SYMINDEX[i]] == "2") {
-		twocount++;
-		pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
-	      } else if(havechar(ITC_sym_info.symbol[SYMINDEX[i]], '3')) {
-		threecount++;
-		pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
-	      } else if(havechar(ITC_sym_info.symbol[SYMINDEX[i]], '4')) {
-		fourcount++;
-		pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
-	      } else if(havechar(ITC_sym_info.symbol[SYMINDEX[i]], '6')) {
-		sixcount++;
-		pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
-	      } else {
-		pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
-	      }
-	    } else {
-	      atom_map.clear();
-	      type_map.clear();
-	    }
-	  }
-	}
+              // ===== Categorize by type of symmetry element ===== //
+              if(ITC_sym_info.symbol[SYMINDEX[i]] == "1") {
+                ident_trans++;
+                centeringops.push_back(T);
+                pointgroupops.push_back("1");
+              } else if(ITC_sym_info.symbol[SYMINDEX[i]] == "m") {
+                mcount++;
+                mcount_dirs.push_back(ITC_sym_info.sym_mats_direction[SYMINDEX[i] + 1]);
+                pointgroupops.push_back("m");
+              } else if(ITC_sym_info.symbol[SYMINDEX[i]] == "2") {
+                twocount++;
+                pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
+              } else if(havechar(ITC_sym_info.symbol[SYMINDEX[i]], '3')) {
+                threecount++;
+                pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
+              } else if(havechar(ITC_sym_info.symbol[SYMINDEX[i]], '4')) {
+                fourcount++;
+                pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
+              } else if(havechar(ITC_sym_info.symbol[SYMINDEX[i]], '6')) {
+                sixcount++;
+                pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
+              } else {
+                pointgroupops.push_back(ITC_sym_info.symbol[SYMINDEX[i]]);
+              }
+            } else {
+              atom_map.clear();
+              type_map.clear();
+            }
+          }
+        }
 
-	if(ident_trans == 0) {
-	  if(LDEBUG) { cerr << "SYM::check_ccell: ERROR: Could not find identity." << endl; }
-	  SOps.latticesystem = "REDO";
-	  SOps.commensurate = false;
-	  return SOps;
-	}
+        if(ident_trans == 0) {
+          if(LDEBUG) { cerr << "SYM::check_ccell: ERROR: Could not find identity." << endl; }
+          SOps.latticesystem = "REDO";
+          SOps.commensurate = false;
+          return SOps;
+        }
       }
 
       // ===== Scale number of operators based on number of identity operators ===== //
@@ -3117,9 +3126,9 @@ namespace SYM {
 
       vector<string> tmpsecondpgops;
       for (uint i = 0; i < insym.size(); i++) {
-	if(i % ident_trans == 0) {
-	  tmpsecondpgops.push_back(ITC_sym_info.symbol[insym[i]]);
-	}
+        if(i % ident_trans == 0) {
+          tmpsecondpgops.push_back(ITC_sym_info.symbol[insym[i]]);
+        }
       }
       //print(tmpsecondpgops);
 
@@ -3128,12 +3137,12 @@ namespace SYM {
 
       // === If not found, change tolerances and redo symmetry search (otherwise, segmentation fault) === //
       if(pointgroup_crystalsystem[0] == "REDO") {
-	if(LDEBUG) { cerr << "SYM::check_ccell: WARNING: Point group mapping failed (number of symmetry elements does not match with a given point group) [dir=" << xstr.directory << "]." << endl; }
-	SOps.latticesystem = "REDO";
-	SOps.commensurate = false;
-	return SOps;
+        if(LDEBUG) { cerr << "SYM::check_ccell: WARNING: Point group mapping failed (number of symmetry elements does not match with a given point group) [dir=" << xstr.directory << "]." << endl; }
+        SOps.latticesystem = "REDO";
+        SOps.commensurate = false;
+        return SOps;
       } else {
-	pointgroupmap_success = true;
+        pointgroupmap_success = true;
       }
     }  // End of the pointgroupmap_success loop
 
@@ -3184,35 +3193,35 @@ namespace SYM {
     if(xstr_CCell.crystal_system_ITC != crystalsystem.str()) {
       //cerr << "CCell not equal to crystalsystem.str(): " << CCell.CrystalSystem << " != " << crystalsystem.str() << endl;
       for (uint i = 0; i < insym.size(); i++) {
-	xvector<double> origin;
-	if(ITC_sym_info.symbol[insym[i]] == "m") {
-	  Glide mirror_tmp;
-	  mirror_tmp.get_glide_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin);
-	  mirror_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
-	  mirrors_.push_back(mirror_tmp);
-	} else {
-	  Screw screw_tmp;
-	  if(havechar(ITC_sym_info.symbol[insym[i]], '2')) {
-	    screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 2);
-	    twofold_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
-	    twofold_.push_back(screw_tmp);
-	  }
-	  if(havechar(ITC_sym_info.symbol[insym[i]], '3')) {
-	    screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 3);
-	    rot_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
-	    other_.push_back(screw_tmp);
-	  }
-	  if(havechar(ITC_sym_info.symbol[insym[i]], '4')) {
-	    screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 4);
-	    rot_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
-	    other_.push_back(screw_tmp);
-	  }
-	  if(havechar(ITC_sym_info.symbol[insym[i]], '6')) {
-	    screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 6);
-	    rot_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
-	    other_.push_back(screw_tmp);
-	  }
-	}
+        xvector<double> origin;
+        if(ITC_sym_info.symbol[insym[i]] == "m") {
+          Glide mirror_tmp;
+          mirror_tmp.get_glide_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin);
+          mirror_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
+          mirrors_.push_back(mirror_tmp);
+        } else {
+          Screw screw_tmp;
+          if(havechar(ITC_sym_info.symbol[insym[i]], '2')) {
+            screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 2);
+            twofold_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
+            twofold_.push_back(screw_tmp);
+          }
+          if(havechar(ITC_sym_info.symbol[insym[i]], '3')) {
+            screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 3);
+            rot_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
+            other_.push_back(screw_tmp);
+          }
+          if(havechar(ITC_sym_info.symbol[insym[i]], '4')) {
+            screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 4);
+            rot_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
+            other_.push_back(screw_tmp);
+          }
+          if(havechar(ITC_sym_info.symbol[insym[i]], '6')) {
+            screw_tmp.get_screw_direct(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L, origin, 6);
+            rot_lattice_vectors.push_back(ITC_sym_info.sym_mats_direction[insym[i] + 1] * L);
+            other_.push_back(screw_tmp);
+          }
+        }
       }
       SOps.latticesystem = latticesystem;
       SOps.crystalsystem = crystalsystem.str();
