@@ -555,7 +555,7 @@ namespace SYM {
   // ******************************************************************************
 //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
-  xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
+  //DX 20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
   double DotPro(xvector<double> a, xvector<double> b);
 //  double modulus(xvector<double> a);
   double modulus(vector<double> a);
@@ -566,8 +566,8 @@ namespace SYM {
   xmatrix<double> concatenate(vector<xvector<double> >& V);
   xmatrix<double> concatenate(vector<xmatrix<double> >& V);
 
-  void normalize(xvector<double>& v);
-  void normalize(vector<double>& v);
+  //DX 20190905 [OBSOLETE] void normalize(xvector<double>& v);
+  //DX 20190905 [OBSOLETE] void normalize(vector<double>& v);
   xmatrix<double> xvec2xmat(xvector<double> a, xvector<double> b, xvector<double> c);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V, vector<double> R);
