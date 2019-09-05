@@ -2150,16 +2150,21 @@ xmatrix<double> FF2CC(const xmatrix<double>& lattice,const xmatrix<double>& fmat
 xmatrix<double> CC2FF(const double& scale,const xmatrix<double>& lattice,const xmatrix<double>& cmat);  // cmat is an operation in C coordinates
 xmatrix<double> CC2FF(const xmatrix<double>& lattice,const xmatrix<double>& cmat);                      // cmat is an operation in C coordinates
 // DX 20190905 - START
+//BringInCellInPlace() overloads
 void BringInCellInPlace(double&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
 void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
 void BringInCellInPlace(_atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
-void BringInCellInPlaceFPOS(_atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
 void BringInCellInPlace(xstructure& xstr, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+
+//BringInCell() overloads
 double BringInCell(double, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
 xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
 _atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
-_atom BringInCellFPOS(const _atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
 xstructure BringInCell(const xstructure& xstr_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+
+//BringInCellFPOS overloads
+void BringInCellInPlaceFPOS(_atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
 // DX 20190905 - END
 // DX and CO - START
 //DX 20190905 [OBSOLETE] double BringInCell(const double& x);
