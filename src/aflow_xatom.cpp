@@ -10060,7 +10060,7 @@ void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tole
   BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound); // update fpos first
 
   // update cpos
-  atom.cpos=F2C(lattice,atom.fpos);
+  atom.cpos=F2C(lattice,atom.fpos); // update cpos next
   atom.isincell=TRUE;
 }
 
