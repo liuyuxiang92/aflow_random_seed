@@ -10033,8 +10033,11 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // -------------------------------------------------------------------
 // double (change in place)
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
+  string function_name = "BringInCellInPlace()";
   if (component == INFINITY || component != component || component == -INFINITY) {
-    std::cerr << "SYM::BringInCellComponent: WARNING: (+-) INF or NAN value." << std::endl;
+    stringstream message; //DX 20190905 - surprisingly if this is not in the if-statement, it adds a lot to the run tim (~1 sec) 
+    message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
+    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
@@ -10044,9 +10047,11 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
 // double (return new double)
 double BringInCell(double component_in, double tolerance, double upper_bound, double lower_bound) {
   double component_out = component_in;
+  string function_name = "BringInCell()";
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
-    std::cerr << "SYM::BringInCellComponent: WARNING: (+-) INF or NAN value." << std::endl;
-    return component_out;
+    stringstream message; //DX 20190905 - surprisingly if this is not in the if-statement, it adds a lot to the run tim (~1 sec) 
+    message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
+    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
