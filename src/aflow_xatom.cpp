@@ -10057,7 +10057,7 @@ void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bo
 // -------------------------------------------------------------------
 // _atom (change in place, updates both fpos and pos) 
 void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
-  BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound);
+  BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound); // update fpos first
 
   // update cpos
   atom.cpos=F2C(lattice,atom.fpos);
