@@ -10038,7 +10038,7 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
   string function_name = "BringInCellInPlace()";
   if (component == INFINITY || component != component || component == -INFINITY) {
-    stringstream message; //DX 20190905 - surprisingly if this is not in the if-statement, it adds a lot to the run tim (~1 sec) 
+    stringstream message; //DX 20190905 - surprisingly if this is not in the if-statement, it adds a lot to the run time (~1 sec) 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
