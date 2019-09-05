@@ -553,15 +553,15 @@ class AflowDB {
     vector<string> getSchemaValues(const string&, const string&, const string&);
     vector<string> getSchemaValues(const string&, const vector<string>&, const string&);
 
-    vector<vector<string> > getJsonFiles(bool&);
-    void getJsonFilesThread(int, int, vector<vector<string> >&, bool&, const vector<string>&);
-    void crawl(vector<string>&, const string&, int, int);
-
-    void createDataEntries(const vector<vector<string> >&);
+    void performUpdate(bool);
+    vector<vector<string> > getUpdatedJsonData(const string&, const vector<string>&,
+                                               const vector<string>&, bool, long int);
+    void getUpdatedJsonDataThread(int, int, const vector<string>&, const vector<string>&,
+                                  const vector<string>&, bool, long int, vector<vector<vector<string> > >&);
+    void crawl(vector<string>&, const string&, int, int, bool, long int);
 
     vector<string> getDataTypes(const vector<string>&, const string&);
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
-    void populateTables(int, int, const vector<vector<string> >&, const vector<string>&, const vector<string>&);
 
     //DBStats getColStats(const string&);
     DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
@@ -576,9 +576,9 @@ class AflowDB {
     string extractJSONvalueAFLOW(const string&, string);
     void dropTable(const string&);
     void createTable(const string&, const vector<string>&, const string&);
-    void createTable(const string&, const vector<string>&, const vector<string>&, bool=false);
-    void insertValues(const string&, const vector<string>&);
-    void insertValues(const string&, const vector<string>&, const vector<string>&);
+    void createTable(const string&, const vector<string>&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&, bool=false);
+    void insertValues(const string&, const vector<string>&, const vector<string>&, bool=false);
     string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
     string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
 
