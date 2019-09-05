@@ -1903,16 +1903,14 @@ namespace SYM {
           for(uint p=0;p<possible_shifts.size();p++){
             for(uint q=0;q<possible_shifts.size();q++){
                //DX 20190905 [OBSOLETE-no more mod_one_xvec] if(aurostd::abs(aurostd::modulus(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){
-               xvector<double> tmp_shift = candidate_shift-possible_shifts[p]-possible_shifts[q]; //DX 20190905
-               if(aurostd::abs(aurostd::modulus(BringInCell(tmp_shift)))<_ZERO_TOL_){ //DX 20190905 
+               if(aurostd::abs(aurostd::modulus(BringInCell(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){ //DX 20190905 
                  stored_other_shift=true;
                  break;
                }
             }
             if(!stored_other_shift){
               //DX 20190905 [OBSOLETE-no more mod_one_xvec] possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]));
-              xvector<double> tmp_shift_2 = candidate_shift-possible_shifts[p]; //DX 20190905 
-              possible_shifts.push_back(BringInCell(tmp_shift_2)); //DX 20190905
+              possible_shifts.push_back(BringInCell(candidate_shift-possible_shifts[p])); //DX 20190905
             }
           }
           // DX 2/28/18 - Consider difference of two shifts - END

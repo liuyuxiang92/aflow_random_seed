@@ -10030,6 +10030,9 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // inside the cell if they are between "lower_bound-tolerance" and "upper_bound-tolerance")
 // the AFLOW developers suggest a hard cutoff, e.g., _ZERO_TOL_ (DX/ME/CO)
 
+// **************************************************************************
+// BringInCellInPlace() (change value/object in place)
+
 // -------------------------------------------------------------------
 // double (change in place)
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
@@ -10042,6 +10045,47 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
 }
+
+// -------------------------------------------------------------------
+// xvector (change in place)
+void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bound, double lower_bound) {
+  for (int i = fpos.lrows; i <= fpos.urows; i++) {
+    BringInCellInPlace(fpos[i], tolerance, upper_bound, lower_bound);
+  }
+}
+
+// -------------------------------------------------------------------
+// _atom (change in place, updates both fpos and pos) 
+void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound);
+
+  // update cpos
+  atom.cpos=F2C(lattice,atom.fpos);
+  atom.isincell=TRUE;
+}
+
+// -------------------------------------------------------------------
+// _atom (change in place, update fpos only) 
+void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
+  BringInCellInPlace(atom.fpos, tolerance, upper_bound, lower_bound);
+  
+  // update ijk
+  for(int i=atom.fpos.lrows; i<=atom.fpos.urows; i++){
+    atom.ijk(i) = (int)(atom.fpos[i]-orig_fpos[i]);
+  }
+}
+
+// -------------------------------------------------------------------
+// xstructure (change in place) 
+void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  for(uint i=0;i<xstr.atoms.size();i++){
+    BringInCellInPlace(xstr.atoms[i], xstr.lattice, tolerance, upper_bound, lower_bound);
+  }
+}
+
+// **************************************************************************
+// BringInCell() (return new value/object)
 
 // -------------------------------------------------------------------
 // double (return new double)
@@ -10059,46 +10103,13 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
 }
 
 // -------------------------------------------------------------------
-// xvector (change in place)
-void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bound, double lower_bound) {
-  for (int i = fpos.lrows; i <= fpos.urows; i++) {
-    BringInCellInPlace(fpos[i], tolerance, upper_bound, lower_bound);
-  }
-}
-
-// -------------------------------------------------------------------
 // xvector (return new xvector)
 xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   xvector<double> fpos_out = fpos_in;
   for (int i = fpos_out.lrows; i <= fpos_out.urows; i++) {
-    fpos_out[i] = BringInCell(fpos_in[i], tolerance, upper_bound, lower_bound);
+    BringInCellInPlace(fpos_out[i], tolerance, upper_bound, lower_bound);
   }
   return fpos_out;
-}
-
-// -------------------------------------------------------------------
-// _atom (return new _atom, update fpos only) 
-_atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
-  _atom atom_out = atom_in;
-  atom_out.fpos = BringInCell(atom_in.fpos, tolerance, upper_bound, lower_bound);
-  
-  // update ijk
-  for(int i=atom_out.fpos.lrows; i<=atom_out.fpos.urows; i++){
-    atom_out.ijk(i) = (int)(atom_out.fpos[i]-atom_in.fpos[i]);
-  }
-
-  return atom_out;
-}
-
-// -------------------------------------------------------------------
-// _atom (change in place) 
-void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
-  atom = BringInCellFPOS(atom, tolerance, upper_bound, lower_bound);
-
-  // update cpos
-  atom.cpos=F2C(lattice,atom.fpos);
-  atom.isincell=TRUE;
-  
 }
 
 // -------------------------------------------------------------------
@@ -10114,33 +10125,39 @@ _atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double t
 }
 
 // -------------------------------------------------------------------
-// xstructure (change in place) 
-void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
-  for(uint i=0;i<xstr.atoms.size();i++){
-    xstr.atoms[i]=BringInCell(xstr.atoms[i], xstr.lattice, tolerance, upper_bound, lower_bound);
+// _atom (return new _atom, update fpos only) 
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  _atom atom_out = atom_in;
+  BringInCellInPlace(atom_out.fpos, tolerance, upper_bound, lower_bound);
+  
+  // update ijk
+  for(int i=atom_out.fpos.lrows; i<=atom_out.fpos.urows; i++){
+    atom_out.ijk(i) = (int)(atom_out.fpos[i]-atom_in.fpos[i]);
   }
+  return atom_out;
 }
+
 
 // -------------------------------------------------------------------
 // xstructure (return xstructure) 
 xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   xstructure xstr_out = xstr_in;
   for(uint i=0;i<xstr_out.atoms.size();i++){
-    xstr_out.atoms[i]=BringInCell(xstr_out.atoms[i], xstr_out.lattice, tolerance, upper_bound, lower_bound);
+    BringInCellInPlace(xstr_out.atoms[i], xstr_out.lattice, tolerance, upper_bound, lower_bound);
   }
   return xstr_out;
 }
 
+// **************************************************************************
+// BringInCell() (method for xstructure)
 
 // -------------------------------------------------------------------
 // xstructure (xstructure method) 
 void xstructure::BringInCell(double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   for(uint i=0;i<atoms.size();i++){
-    atoms[i]=::BringInCell(atoms[i], lattice, tolerance, upper_bound, lower_bound); //DX "::" to access outside of xstructure class
+    ::BringInCellInPlace(atoms[i], lattice, tolerance, upper_bound, lower_bound); //DX "::" to access outside of xstructure class
   }
 }
-
-//------------------------------------
 
 //DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
 //DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
@@ -10960,9 +10977,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   b.write_DEBUG_flag=FALSE;
   // plug them all
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
-    //DX 20190905 [OBSOLETE- pass by ref]b.atoms.at(iat).fpos=BringInCell(C2F(b.lattice,b.atoms.at(iat).cpos));
-    xvector<double> tmp_fpos = C2F(b.lattice,b.atoms.at(iat).cpos); //DX 20190905
-    b.atoms.at(iat).fpos=BringInCell(tmp_fpos); //DX 20190905
+    b.atoms.at(iat).fpos=BringInCell(C2F(b.lattice,b.atoms.at(iat).cpos));
     b.atoms.at(iat).cpos=F2C(b.lattice,b.atoms.at(iat).fpos);
   }
   // now remove them
@@ -11089,9 +11104,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
   b.write_DEBUG_flag=FALSE;
   // plug them all
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
-    //DX 20190905 [OBSOLETE- pass by ref]b.atoms.at(iat).fpos=BringInCell(C2F(b.lattice,b.atoms.at(iat).cpos));
-    xvector<double> tmp_fpos = C2F(b.lattice,b.atoms.at(iat).cpos); //DX 20190905
-    b.atoms.at(iat).fpos=BringInCell(tmp_fpos); //DX 20190905
+    b.atoms.at(iat).fpos=BringInCell(C2F(b.lattice,b.atoms.at(iat).cpos));
     b.atoms.at(iat).cpos=F2C(b.lattice,b.atoms.at(iat).fpos);
   }
   // now remove them
