@@ -13040,7 +13040,7 @@ string xstructure::platon2sg(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,
   xstructure str=*this;
   stringstream aus;
   // string directory="/tmp/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
-  string directory=XHOST.Tmpfs+"/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
+  string directory=XHOST.tmpfs+"/_aflow_platon_"+XHOST.ostrPID.str();  // dont change what works
   string file=directory+"/aflow_platon_";
   string file_spf=file+".spf";
   string file_out=file+".out";

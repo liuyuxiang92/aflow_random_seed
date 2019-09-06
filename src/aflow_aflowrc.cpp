@@ -10,7 +10,7 @@
 // ***************************************************************************
 #ifdef _AFLOW_AFLOWRC_H_
 
-#define AFLOWRC_FILENAME_LOCAL   XHOST.Home+"/.aflow.rc"
+#define AFLOWRC_FILENAME_LOCAL   XHOST.home+"/.aflow.rc"
 #define AFLOWRC_FILENAME_GLOBAL  "/etc/aflow.conf"
 
 // DEFAULT DEFINITIONS
@@ -779,8 +779,8 @@ namespace aflowrc {
 	}
       }
     }
-    // fix ~/ with XHOST.User
-    if(aurostd::substring2bool(string_to_add,"~/")) aurostd::StringSubst(string_to_add,"~/",XHOST.Home+"/");
+    // fix ~/ with XHOST.user
+    if(aurostd::substring2bool(string_to_add,"~/")) aurostd::StringSubst(string_to_add,"~/",XHOST.home+"/");
     XHOST.adefault.push_attached(schema,string_to_add); // add what is present or the default if not present
     return found;
   }
@@ -801,7 +801,7 @@ namespace aflowrc {
     bool aflowrc_local=FALSE;
     bool aflowrc_global=FALSE;
     if(LDEBUG) oss << "aflowrc::is_available: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::is_available: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::is_available: XHOST.home=" << XHOST.home << endl;
     // TESTING LOCAL OR USER BASED
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     aflowrc_local=aurostd::FileExist(AFLOWRC_FILENAME_LOCAL);
@@ -853,7 +853,7 @@ namespace aflowrc {
   bool read(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     if(LDEBUG) oss << "aflowrc::read: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::read: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::read: XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     if(LDEBUG) oss << "aflowrc::read: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
@@ -1282,7 +1282,7 @@ namespace aflowrc {
   bool write_default(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     if(LDEBUG) oss << "aflowrc::write_default: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::write_default: XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     if(LDEBUG) oss << "aflowrc::write_default: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
@@ -1733,7 +1733,7 @@ namespace aflowrc {
   bool print_aflowrc(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     if(LDEBUG) oss << "aflowrc::print_aflowrc: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.home=" << XHOST.home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     if(LDEBUG) oss << "// DEFAULT DEFINITIONS" << endl;

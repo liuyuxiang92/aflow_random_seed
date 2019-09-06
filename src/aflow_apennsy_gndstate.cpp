@@ -956,8 +956,8 @@ bool APENNSY_Parameters::LibLoadAlloysLIB2(_aflags &aflags) {
   vector<string> list;
   if(XHOST.APENNSY_USE_SERVER) { 
     bool TEST=FALSE;//TRUE;
-    if(!TEST) command="ls "+vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW/ "; // NORMAL
-    else command="ls "+vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW/ | grep -v Cs|  grep -E 'Os|Ru' | grep -v -E 'Al|As|B_h|Ba|Be|Bi|Br|Ca|Cl|Cs|Ga|Ge|In|K_|Li|Mg|Sb|Se|Si|Sn|Sr'"; // DEBUG
+    if(!TEST) command="ls "+init::AFLOW_Projects_Directories("LIB2")+"/RAW/ "; // NORMAL
+    else command="ls "+init::AFLOW_Projects_Directories("LIB2")+"/RAW/ | grep -v Cs|  grep -E 'Os|Ru' | grep -v -E 'Al|As|B_h|Ba|Be|Bi|Br|Ca|Cl|Cs|Ga|Ge|In|K_|Li|Mg|Sb|Se|Si|Sn|Sr'"; // DEBUG
     //  cerr << aurostd::execute2string(command) << endl;
     aurostd::string2tokens(aurostd::execute2string(command),list,"\n");
   }
@@ -986,7 +986,7 @@ bool APENNSY_Parameters::LibLoadAlloysLIB2(_aflags &aflags) {
   alloysmesg.clear();alloysmesg.str(std::string());alloysmesg << "Loading LIBRARY X: Nalloys=" << alloys.size() << endl;
   // DONE
   if(XHOST.APENNSY_USE_SERVER) {  
-    for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW/"+alloys.at(i));
+    for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+alloys.at(i));
   }
   if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) {
     for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(AFLOWLIB_PROJECT_GNDSTATE+"/"+alloys.at(i));
@@ -1013,7 +1013,7 @@ bool APENNSY_Parameters::LibLoadAlloysLIB2U(_aflags &aflags) {
   alloysmesg.clear();alloysmesg.str(std::string());alloysmesg << "Loading LIBRARY U: Nalloys=" << alloys.size() << endl;
   // DONE
   if(XHOST.APENNSY_USE_SERVER) {  
-    for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW/"+alloys.at(i));
+    for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+alloys.at(i));
   }
   if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) {
     for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(AFLOWLIB_PROJECT_GNDSTATE+"/"+alloys.at(i));
@@ -1040,7 +1040,7 @@ bool APENNSY_Parameters::LibLoadAlloysLIB2PGM(_aflags &aflags) {
   alloysmesg.clear();alloysmesg.str(std::string());alloysmesg << "Loading LIBRARY PGM: Nalloys=" << alloys.size() << endl;
   // DONE
   if(XHOST.APENNSY_USE_SERVER) {  
-    for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW/"+alloys.at(i));
+    for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(init::AFLOW_Projects_Directories("LIB2")+"/RAW/"+alloys.at(i));
   }
   if(XHOST.APENNSY_SERVER_AFLOWLIB_ORG) {
     for(uint i=0;i<alloys.size();i++) alloysRAW.push_back(AFLOWLIB_PROJECT_GNDSTATE+"/"+alloys.at(i));

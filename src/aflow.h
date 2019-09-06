@@ -298,7 +298,7 @@ class _XHOST {
   bool GENERATE_AFLOWIN_ONLY; //CT 180719
   bool POSTPROCESS; //CT 181212
   // HARDWARE/SOFTWARE
-  string hostname,MachineType,Tmpfs,User,Group,Home,Shell,Progname;
+  string hostname,machine_type,tmpfs,user,group,home,shell,progname;
   string Find_Parameters;
   bool sensors_allowed;
   // ARGUMENTS
@@ -451,10 +451,9 @@ class _XHOST {
 #define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO190620
 #define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO190620
 #define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME180705
-#define XHOST_README_AFLOW_HTRESOURCES_TXT             XHOST.vGlobal_string.at(58)
-#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(59)
-#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(60)
-#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(61)
+#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
+#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
+#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(60)
 
 #define XHOST_FINDSYM_data_space_txt                   XHOST.vGlobal_string.at(70)
 #define XHOST_FINDSYM_data_wyckoff_txt                 XHOST.vGlobal_string.at(71)
@@ -1001,6 +1000,7 @@ namespace init {
   string InitLoadString(string string2load,bool=FALSE);
   string InitGlobalObject(string string2load,string="",bool=FALSE);
   string InitLibraryObject(string string2load,bool=FALSE);
+  string AFLOW_Projects_Directories(string string2load);
   long GetRAM(void);
   uint GetTEMPs(void);
 } // namespace init

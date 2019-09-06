@@ -2602,7 +2602,7 @@ namespace aflowlib {
 	}
       }
     }
-    // out << "XHOST.Progname=" << XHOST.Progname << endl;
+    // out << "XHOST.progname=" << XHOST.progname << endl;
     // out << "XHOST.command(\"aflow_data\")=" << XHOST.command("aflow_data") << endl;
     // LIBRARY_ALL
     if(aurostd::substring2bool(library,"all")) {

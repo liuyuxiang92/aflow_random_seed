@@ -53,7 +53,7 @@ AFLOW.url = AFLOW.url_WEB + "/" + AFLOW.label;
 // top left message about the space group
 AFLOW.cif2oss = function(params) {
   return (
-    " font echo 14;color echo white; set echo 3% 97%; echo AFLOW.org consortium) (AFLOW v" +
+    " font echo 14;color echo white; set echo 3% 97%; echo AFLOW.org consortium (AFLOW v" +
     AFLOW.version +
     ") | entry=" +
     AFLOW.label +
