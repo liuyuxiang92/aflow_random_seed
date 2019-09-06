@@ -1,8 +1,8 @@
 3.1.226 - 2019/08/14
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
-	-- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
+        -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
         -- Bug fixes in producing html/json for icsd# entries (SC)
-	(AFLOW: aflowlib_web_interface*.cpp aflowlib.h)
+        (AFLOW: aflowlib_web_interface*.cpp aflowlib.h)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz
         -- fixing bug with stability criterion calculation in --output=web, need structure comparison for correct stability criterion calculation (WS)
