@@ -256,13 +256,13 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       else std::cerr << function << ": No new files found. Database will not be updated." << std::endl;
     }
   }
-  std::cout << aurostd::get_time() << std::endl;
+  std::cerr << aurostd::get_time() << std::endl;
 
   if (rebuild_db || update_db) {
     if (update_db) aurostd::CopyFile(database_file, database_file + ".tmp");
     openTmpFile();
     performUpdate(rebuild_db);
-    std::cout << aurostd::get_time() << std::endl;
+    std::cerr << aurostd::get_time() << std::endl;
     return closeTmpFile();
   } else {
     return false;
@@ -318,7 +318,7 @@ void AflowDB::performUpdate(bool rebuild_db) {
     uint nvals = values.size();
     transaction(true);
     for (uint v = 0; v < nvals; v++) {
-      insertValues(tables[i], columns, values[i], !rebuild_db);
+      insertValues(tables[i], columns, values[v], !rebuild_db);
       if (++count % chunk_size == 0) {
         transaction(false);
         transaction(true);
@@ -537,11 +537,11 @@ void AflowDB::analyzeDatabase(string outfile) {
   vector<string> catalogs = getSetMultiTables(tables, "catalog", true);
   uint ncatalogs = catalogs.size();
   for (uint c = 0; c < ncatalogs; c++) {
-    std::cout << aurostd::get_time() << std::endl;
+    std::cerr << aurostd::get_time() << std::endl;
     if (LDEBUG) std::cerr << "Starting analysis for catalog " << catalogs[c] << std::endl;
     DBStats db_stats = getCatalogStats(catalogs[c], tables, columns);
     writeStatsToJSON(json, db_stats);
-    std::cout << aurostd::get_time() << std::endl;
+    std::cerr << aurostd::get_time() << std::endl;
     if (c < ncatalogs - 1) json << ",";
     json << std::endl;
   }
