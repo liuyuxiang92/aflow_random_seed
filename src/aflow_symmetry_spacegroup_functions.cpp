@@ -994,18 +994,18 @@ namespace SYM {
   }
 } //namespace SYM
 
-// ******************************************************************************
-// CrossPro (Cross Product)
-// ******************************************************************************
-namespace SYM {
-  xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b) {
-    xvector<double> resu;
-    resu[1] = a[2] * b[3] - b[2] * a[3];
-    resu[2] = a[3] * b[1] - b[3] * a[1];
-    resu[3] = a[1] * b[2] - b[1] * a[2];
-    return resu;
-  }
-} //namespace SYM
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] // ******************************************************************************
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] // CrossPro (Cross Product)
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] // ******************************************************************************
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] namespace SYM {
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]   xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b) {
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     xvector<double> resu;
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     resu[1] = a[2] * b[3] - b[2] * a[3];
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     resu[2] = a[3] * b[1] - b[3] * a[1];
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     resu[3] = a[1] * b[2] - b[1] * a[2];
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     return resu;
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]   }
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] } //namespace SYM
 
 // ******************************************************************************
 // DotPro (Dot Product)
@@ -4670,7 +4670,7 @@ namespace SYM {
 	count++;
 	Screw candidate_rotation;
 	//Get axis direction
-	xvector<double> axis_direction = CrossPro(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]);
+	xvector<double> axis_direction = aurostd::vector_product(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]); //DX 20190905 - SYM::CrossPro() -> aurostd::vector_product()
 	xvector<double> full_direction = axis_direction;
 	bool found_point = false;
 	for (uint j = 0; j < big_expanded.size(); j++) {
@@ -5296,11 +5296,11 @@ namespace SYM {
     double tol = 1e-6;
     xvector<double> dir1 = S1.return_direction();
     xvector<double> dir2 = S2.return_direction();
-    normalize(dir1);
-    normalize(dir2);
+    dir1/=aurostd::modulus(dir1); //DX 20190905 - SYM::normalize() -> divide by aurostd::modulus()
+    dir2/=aurostd::modulus(dir2); //DX 20190905 - SYM::normalize() -> divide by aurostd::modulus()
     if(dir1 == dir2) {
-      if(aurostd::modulus(CrossPro(S1.return_point() - S2.return_point(), S1.return_direction())) < tol) {
-	same = true;
+      if(aurostd::modulus(aurostd::vector_product(S1.return_point() - S2.return_point(), S1.return_direction())) < tol) { //DX 20190905 - SYM::CrossPro() -> aurostd::vector_product()
+        same = true;
       }
     }
     return same;

@@ -25,17 +25,17 @@ using namespace std;
 //DX 20190215 [OBSOLETE] extern double _SYM_TOL_;
 //DX 20190215 [OBSOLETE] #endif
 
-// **********************************************************************************************************************
-// normalize (Overloaded)
-// **********************************************************************************************************************
-namespace SYM {
-  void normalize(xvector<double>& v) {
-    double mod = aurostd::modulus(v);
-    for (int i = 1; i <= v.urows; i++) {
-      v(i) = v(i) / mod;
-    }
-  }
-} //namespace SYM
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // normalize (Overloaded)
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] namespace SYM {
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   void normalize(xvector<double>& v) {
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     double mod = aurostd::modulus(v);
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     for (int i = 1; i <= v.urows; i++) {
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]       v(i) = v(i) / mod;
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     }
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   }
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] } //namespace SYM
 /*
 // **********************************************************************************************************************
 // normalize (Overloaded)

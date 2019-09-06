@@ -10128,18 +10128,6 @@ xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper
 // BringInCellFPOS() (updates atom.fpos only)
 
 // -------------------------------------------------------------------
-// _atom (return new _atom, update fpos and cpos) 
-_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
-  _atom atom_out = BringInCellFPOS(atom_in, tolerance, upper_bound, lower_bound);
-
-  // update cpos
-  atom_out.cpos=F2C(lattice,atom_out.fpos);
-  atom_out.isincell=TRUE;
-  
-  return atom_out;
-}
-
-// -------------------------------------------------------------------
 // _atom (change in place, update fpos only) 
 void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
@@ -10151,6 +10139,17 @@ void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, d
   }
 }
 
+// -------------------------------------------------------------------
+// _atom (return new _atom, update fpos and cpos) 
+_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  _atom atom_out = BringInCellFPOS(atom_in, tolerance, upper_bound, lower_bound);
+
+  // update cpos
+  atom_out.cpos=F2C(lattice,atom_out.fpos);
+  atom_out.isincell=TRUE;
+  
+  return atom_out;
+}
 
 // **************************************************************************
 // BringInCell() (method for xstructure)

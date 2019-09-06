@@ -17,6 +17,9 @@
         -- replaced all mod_one/mod_one_xvec/mod_one_atom for new BringInCell method (DX)
         -- replaced old BringInCell functions with new version (DX)
         -- fixed indenting in symmetry functions (DX)
+        -- replaced all SYM::CrossPro() with aurostd::vector_product() (DX)
+        -- replaced all SYM::normalize() with explicity division of aurostd::modulus() (DX)
+        -- replaced SYM::extract_row() with aurostd::operator() (DX)
         -- fabs() -> aurostd::abs() (CO)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz

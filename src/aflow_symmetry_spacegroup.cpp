@@ -66,9 +66,9 @@ namespace SYM {
     //print(lattice_basis)
     xmatrix<double> lattice_basis_xmat = xstr.lattice;
     vector<xvector<double> > lattice_basis;
-    lattice_basis.push_back(extract_row(xstr.lattice, 1));
-    lattice_basis.push_back(extract_row(xstr.lattice, 2));
-    lattice_basis.push_back(extract_row(xstr.lattice, 3));
+    lattice_basis.push_back(xstr.lattice(1)); //DX 20190905 - SYM::extract_row -> aurostd::xmatrix::operator(int)
+    lattice_basis.push_back(xstr.lattice(2)); //DX 20190905 - SYM::extract_row -> aurostd::xmatrix::operator(int)
+    lattice_basis.push_back(xstr.lattice(3)); //DX 20190905 - SYM::extract_row -> aurostd::xmatrix::operator(int)
 
     xmatrix<double> Linv = aurostd::inverse(xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]));
 
@@ -84,8 +84,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[1] AND (0 0 1)
         double angle = aurostd::angle(lattice_basis[1], b);
         if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-          xvector<double> rotaxis = CrossPro(lattice_basis[1], b);
-          normalize(rotaxis);
+          xvector<double> rotaxis = aurostd::vector_product(lattice_basis[1], b); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product 
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S;  //use screw class for rotation
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
@@ -123,8 +123,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1) 
         double angle = aurostd::angle(lattice_basis[2],c);
         if(aurostd::abs( angle - Pi_r ) > tol && aurostd::abs ( angle ) > tol){
-          xvector<double> rotaxis = CrossPro(lattice_basis[2],c);
-          normalize(rotaxis);
+          xvector<double> rotaxis = aurostd::vector_product(lattice_basis[2],c); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S; //use screw class for rotation
           S.get_screw_direct(rotaxis,zero,2*Pi_r/angle);
           lattice_basis[0] =  S*lattice_basis[0];
@@ -155,8 +155,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[0] AND (1 0 0)
         double angle = aurostd::angle(lattice_basis[0], a);
         if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-          xvector<double> rotaxis = CrossPro(lattice_basis[0], a);
-          normalize(rotaxis);
+          xvector<double> rotaxis = aurostd::vector_product(lattice_basis[0], a); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S;  //use screw class for rotation
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
@@ -170,8 +170,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
         double angle1 = aurostd::angle(lattice_basis[2], c);
         if(aurostd::abs(angle1 - Pi_r) > tol && aurostd::abs(angle1) > tol) {
-          xvector<double> rotaxis1 = CrossPro(lattice_basis[2], c);
-          normalize(rotaxis1);
+          xvector<double> rotaxis1 = aurostd::vector_product(lattice_basis[2], c); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis1/=aurostd::modulus(rotaxis1); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus;
           Screw S;  //use screw class for rotation
           S.get_screw_direct(rotaxis1, zero, 2 * Pi_r / angle1);
           lattice_basis[0] = S * lattice_basis[0];
@@ -185,8 +185,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
         double angle2 = aurostd::angle(lattice_basis[1], b);
         if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
-          xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
-          normalize(rotaxis2);
+          xvector<double> rotaxis2 = aurostd::vector_product(lattice_basis[1], b); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis2/=aurostd::modulus(rotaxis2); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S2;  //use screw class for rotation
           S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
           lattice_basis[0] = S2 * lattice_basis[0];
@@ -210,8 +210,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
         double angle = aurostd::angle(lattice_basis[2], c);
         if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-          xvector<double> rotaxis = CrossPro(lattice_basis[2], c);
-          normalize(rotaxis);
+          xvector<double> rotaxis = aurostd::vector_product(lattice_basis[2], c); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S;  //use screw class for rotation
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
@@ -225,8 +225,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
         double angle2 = aurostd::angle(lattice_basis[1], b);
         if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
-          xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
-          normalize(rotaxis2);
+          xvector<double> rotaxis2 = aurostd::vector_product(lattice_basis[1], b); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis2/=aurostd::modulus(rotaxis2); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S2;  //use screw class for rotation
           S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
           lattice_basis[0] = S2 * lattice_basis[0];
@@ -250,8 +250,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[2] AND (0 0 1)
         double angle = aurostd::angle(lattice_basis[2], c);
         if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-          xvector<double> rotaxis = CrossPro(lattice_basis[2], c);
-          normalize(rotaxis);
+          xvector<double> rotaxis = aurostd::vector_product(lattice_basis[2], c); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S;  //use screw class for rotation
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
@@ -265,8 +265,8 @@ namespace SYM {
         //GET ANGLE BETWEEN lattice_basis[1] AND (0 1 0)
         double angle2 = aurostd::angle(lattice_basis[1], b);
         if(aurostd::abs(angle2 - Pi_r) > tol && aurostd::abs(angle2) > tol) {
-          xvector<double> rotaxis2 = CrossPro(lattice_basis[1], b);
-          normalize(rotaxis2);
+          xvector<double> rotaxis2 = aurostd::vector_product(lattice_basis[1], b); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis2/=aurostd::modulus(rotaxis2); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           Screw S2;  //use screw class for rotation
           S2.get_screw_direct(rotaxis2, zero, 2 * Pi_r / angle2);
           lattice_basis[0] = S2 * lattice_basis[0];
@@ -296,9 +296,9 @@ namespace SYM {
         }
         xvector<double> tmpc = c * aurostd::modulus(lattice_basis[2]);
         //If lattice_basis[2] is already parallel to 001, this is not necessary
-        if(!vec_compare(tmpc, lattice_basis[2])) {
+        if(aurostd::isdifferent(tmpc, lattice_basis[2],_ZERO_TOL_)) { //DX 20190805 - !SYM::vec_compare -> aurostd::isdifferent
           angle = aurostd::angle(lattice_basis[2], c);
-          rotaxis = CrossPro(lattice_basis[2], c);
+          rotaxis = aurostd::vector_product(lattice_basis[2], c); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
           lattice_basis[1] = S * lattice_basis[1];
@@ -314,8 +314,8 @@ namespace SYM {
         fromx(2) = 1.0 / 2.0;
         angle = aurostd::angle(lattice_basis[0], fromx);
         if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-          rotaxis = CrossPro(lattice_basis[0], fromx);
-          normalize(rotaxis);
+          rotaxis = aurostd::vector_product(lattice_basis[0], fromx); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
           lattice_basis[1] = S * lattice_basis[1];
@@ -326,8 +326,8 @@ namespace SYM {
           }
         }
         xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
-        if(vec_compare(tmpb, lattice_basis[1])) {
-          rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
+        if(aurostd::identical(tmpb, lattice_basis[1], _ZERO_TOL_)) { //DX 20190805 - SYM::vec_compare -> aurostd::identical
+          rotaxis = aurostd::vector_product(lattice_basis[0], lattice_basis[1]); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
           angle = -120.0 * Pi_r / 180.0;
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
@@ -358,9 +358,9 @@ namespace SYM {
         }
         xvector<double> tmpc = c * aurostd::modulus(lattice_basis[2]);
         //If lattice_basis[2] is already parallel to 001, this is not necessary
-        if(!vec_compare(tmpc, lattice_basis[2])) {
+        if(aurostd::isdifferent(tmpc, lattice_basis[2], _ZERO_TOL_)) { //DX 20190805 - !SYM::vec_compare -> aurostd::isdifferent
           angle = aurostd::angle(lattice_basis[2], c);
-          rotaxis = CrossPro(lattice_basis[2], c);
+          rotaxis = aurostd::vector_product(lattice_basis[2], c); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
           lattice_basis[1] = S * lattice_basis[1];
@@ -376,8 +376,8 @@ namespace SYM {
         fromx(2) = 1.0 / 2.0;
         angle = aurostd::angle(lattice_basis[0], fromx);
         if(aurostd::abs(angle) > tol && aurostd::abs(angle - Pi_r) > tol) {
-          rotaxis = CrossPro(lattice_basis[0], fromx);
-          normalize(rotaxis);
+          rotaxis = aurostd::vector_product(lattice_basis[0], fromx); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
           lattice_basis[1] = S * lattice_basis[1];
@@ -388,8 +388,8 @@ namespace SYM {
           }
         }
         xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
-        if(vec_compare(tmpb, lattice_basis[1])) {
-          rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
+        if(aurostd::identical(tmpb, lattice_basis[1], _ZERO_TOL_)) { //DX 20190805 - SYM::vec_compare -> aurostd::identical
+          rotaxis = aurostd::vector_product(lattice_basis[0], lattice_basis[1]); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
           angle = -120.0 * Pi_r / 180.0;
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
@@ -410,9 +410,9 @@ namespace SYM {
         lattice_basis_xmat = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
         // Check for reverse/obverse setting
         // [OBSOLETE] DX- This is done later in the code: isObverseSetting(lattice_basis_xmat,atomic_basis_,xstr.dist_nn_min,_SYM_TOL_);
-        lattice_basis[0] = extract_row(lattice_basis_xmat, 1);
-        lattice_basis[1] = extract_row(lattice_basis_xmat, 2);
-        lattice_basis[2] = extract_row(lattice_basis_xmat, 3);
+        lattice_basis[0] = lattice_basis_xmat(1); //DX 20190905 - SYM::extract_row -> aurostd::xmatrix::operator(int)
+        lattice_basis[1] = lattice_basis_xmat(2); //DX 20190905 - SYM::extract_row -> aurostd::xmatrix::operator(int)
+        lattice_basis[2] = lattice_basis_xmat(3); //DX 20190905 - SYM::extract_row -> aurostd::xmatrix::operator(int)
       }
       if(lattice_label == 'r') {
         //cerr << "do not NEED to orient rhombohedral cell, rhombohedral axes" << endl;
@@ -434,8 +434,8 @@ namespace SYM {
         fromx(2) = 1.0 / 2.0;
         angle = aurostd::angle(lattice_basis[0], fromx);
         if(aurostd::abs(angle - Pi_r) > tol && aurostd::abs(angle) > tol) {
-          rotaxis = CrossPro(lattice_basis[0], fromx);
-          normalize(rotaxis);
+          rotaxis = aurostd::vector_product(lattice_basis[0], fromx); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
+          rotaxis/=aurostd::modulus(rotaxis); //DX 20190905 - SYM::normalize -> divide by aurostd::modulus
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
           lattice_basis[1] = S * lattice_basis[1];
@@ -446,8 +446,8 @@ namespace SYM {
           }
         }
         xvector<double> tmpb = -b * aurostd::modulus(lattice_basis[1]);
-        if(vec_compare(tmpb, lattice_basis[1])) {
-          rotaxis = CrossPro(lattice_basis[0], lattice_basis[1]);
+        if(aurostd::identical(tmpb, lattice_basis[1],_ZERO_TOL_)) { //DX 20190805 - SYM::vec_compare -> aurostd::identical
+          rotaxis = aurostd::vector_product(lattice_basis[0], lattice_basis[1]); //DX 20190905 - SYM::CrossPro -> aurostd::vector_product
           angle = -120.0 * Pi_r / 180.0;
           S.get_screw_direct(rotaxis, zero, 2 * Pi_r / angle);
           lattice_basis[0] = S * lattice_basis[0];
