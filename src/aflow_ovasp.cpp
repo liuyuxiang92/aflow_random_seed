@@ -3789,11 +3789,12 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           }
         // Nothing found, assume SOC (more likely case)
         } else {
-          std::cerr << "WARNING: Could not determine whether the DOSCAR is lm-resolved"
-                    << " or contains spin-orbit coupling. AFLOW will assume that the"
-                    << " DOSCAR is lm-resolved. If this is not the case, please put an"
-                    << " INCAR" << ext << ", a vasprun.xml " << ext << ", or an"
-                    << " OUTCAR" << ext << " file into the working directory and try again" << std::endl;
+          string message = "Could not determine whether the DOSCAR is lm-resolved"
+                           " or contains spin-orbit coupling. AFLOW will assume that the"
+                           " DOSCAR is lm-resolved. If this is not the case, please put an"
+                           " INCAR" + ext + ", a vasprun.xml " + ext + ", or an"
+                           " OUTCAR" +  ext + " file into the working directory and try again.";
+          pflow::logger("xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
           isLSCOUPLING = true;
         }
         lmResolved = !(isLSCOUPLING);  // With 16 columns, it cannot be both
@@ -3826,9 +3827,9 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       d++;
       // ME190810 - Safeguard against DOSCARs with additional lines
       if (d == (int) ndos) {
-        std::cerr << "xDOSCAR::GetProperties(): WARNING: DOSCAR contains more"
-                  << " lines than the header suggests. xDOSCAR object may not"
-                  << " be properly populated." << std::endl;
+        string message = "DOSCAR contains more lines than the header suggests."
+                         " xDOSCAR object may not be properly populated.";
+        pflow::logger("xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
         break;
       }
       e = 0;
