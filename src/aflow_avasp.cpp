@@ -1600,21 +1600,21 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.5]" << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.7] vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
-	  if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) label_AFLOWLIB_LIB0=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) label_AFLOWLIB_LIB1=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) label_AFLOWLIB_LIB2=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) label_AFLOWLIB_LIB4=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) label_AFLOWLIB_LIB5=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) label_AFLOWLIB_LIB6=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) label_AFLOWLIB_LIB7=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) label_AFLOWLIB_LIB8=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) label_AFLOWLIB_LIB9=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) label_AFLOWLIB_LIB0=init::AFLOW_Projects_Directories("LIB0")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) label_AFLOWLIB_LIB1=init::AFLOW_Projects_Directories("LIB1")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) label_AFLOWLIB_LIB2=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) label_AFLOWLIB_LIB4=init::AFLOW_Projects_Directories("LIB4")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) label_AFLOWLIB_LIB5=init::AFLOW_Projects_Directories("LIB5")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) label_AFLOWLIB_LIB6=init::AFLOW_Projects_Directories("LIB6")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) label_AFLOWLIB_LIB7=init::AFLOW_Projects_Directories("LIB7")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) label_AFLOWLIB_LIB8=init::AFLOW_Projects_Directories("LIB8")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) label_AFLOWLIB_LIB9=init::AFLOW_Projects_Directories("LIB9")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] label_AFLOWLIB_LIB2=" << label_AFLOWLIB_LIB2 << endl;
-	  if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
+	  if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
 	} else {
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] else CHECK THESE BY HAND" << endl;
-	  label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2));  // why this swap ?
-	  label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3));  // why this swap ?
+	  label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,init::AFLOW_Projects_Directories("LIB3"),init::AFLOW_Projects_Directories("LIB2"));  // why this swap ?
+	  label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,init::AFLOW_Projects_Directories("LIB2"),init::AFLOW_Projects_Directories("LIB3"));  // why this swap ?
 	  aurostd::StringSubst(label_AFLOWLIB_LIB3,"LIB2U","");
 	  aurostd::StringSubst(label_AFLOWLIB_LIB2,"//","/");
 	  aurostd::StringSubst(label_AFLOWLIB_LIB3,"//","/");
@@ -1630,10 +1630,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] label_AFLOWLIB_LIB9=" << label_AFLOWLIB_LIB9 << endl;
 	}
         if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.1]" << endl;
-	//     if(xvasp.AVASP_libbase.size()==0) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB"+label_MIX;
-	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;
+	//     if(xvasp.AVASP_libbase.size()==0) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/LIB"+label_MIX;
+	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;
 	//  cerr << "LIB2=" << label_AFLOWLIB_LIB2 << endl;
 	//  cerr << "LIB3=" << label_AFLOWLIB_LIB3 << endl;
       } else {
@@ -1761,7 +1761,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD) {
     if(LDEBUG) cerr << "DEBUG: xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD" << endl;
     // xvasp.AVASP_dirbase=_ICSD_DIRBASE_;
-    // xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    // xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("ICSD");
     // directory=xvasp.AVASP_dirbase+"/"+xvasp.AVASP_label;
     system=xvasp.AVASP_label;
     //    if(xvasp.str.spacegroupnumber!=0) {
@@ -1945,7 +1945,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << "[AFLOW] * M. Buongiorno Nardelli " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW] AFLOW automatically generated (aflow_avasp.cpp) " << endl;
-  aflowin << "[AFLOW] GENERATOR = " << XHOST.User << " " << endl;  //CO 180622
+  aflowin << "[AFLOW] GENERATOR = " << XHOST.user << " " << endl;  //CO 180622
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW]SYSTEM=" << system << endl;
@@ -3586,21 +3586,21 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.5]" << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.7] vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
-          label_AFLOWLIB_LIB0=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB1=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB2=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB4=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB5=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB6=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB7=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB8=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB9=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9)+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB0=init::AFLOW_Projects_Directories("LIB0")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB1=init::AFLOW_Projects_Directories("LIB1")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB2=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB4=init::AFLOW_Projects_Directories("LIB4")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB5=init::AFLOW_Projects_Directories("LIB5")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB6=init::AFLOW_Projects_Directories("LIB6")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB7=init::AFLOW_Projects_Directories("LIB7")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB8=init::AFLOW_Projects_Directories("LIB8")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB9=init::AFLOW_Projects_Directories("LIB9")+"/RAW"+label_MIX;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] label_AFLOWLIB_LIB2=" << label_AFLOWLIB_LIB2 << endl;
-          if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
+          if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
         } else {
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] else CHECK THESE BY HAND" << endl;
-          label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2));  // why this swap ?
-          label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3));  // why this swap ?
+          label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,init::AFLOW_Projects_Directories("LIB3"),init::AFLOW_Projects_Directories("LIB2"));  // why this swap ?
+          label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,init::AFLOW_Projects_Directories("LIB2"),init::AFLOW_Projects_Directories("LIB3"));  // why this swap ?
           aurostd::StringSubst(label_AFLOWLIB_LIB3,"LIB2U","");
           aurostd::StringSubst(label_AFLOWLIB_LIB2,"//","/");
           aurostd::StringSubst(label_AFLOWLIB_LIB3,"//","/");
@@ -3616,10 +3616,10 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] label_AFLOWLIB_LIB9=" << label_AFLOWLIB_LIB9 << endl;
         }
         if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.1]" << endl;
-        //     if(xvasp.AVASP_libbase.size()==0) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB"+label_MIX;
-        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;
+        //     if(xvasp.AVASP_libbase.size()==0) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/LIB"+label_MIX;
+        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;
         //  cerr << "LIB2=" << label_AFLOWLIB_LIB2 << endl;
         //  cerr << "LIB3=" << label_AFLOWLIB_LIB3 << endl;
       } else {
@@ -3731,7 +3731,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD) {
     if(LDEBUG) cerr << "DEBUG: xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD" << endl;
     // xvasp.AVASP_dirbase=_ICSD_DIRBASE_;
-    // xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    // xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("ICSD");
     // directory=xvasp.AVASP_dirbase+"/"+xvasp.AVASP_label;
     system=xvasp.AVASP_label;
     //    if(xvasp.str.spacegroupnumber!=0) {
@@ -3818,7 +3818,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << "[AFLOW] * M. Buongiorno Nardelli " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW] Aflow automatically generated (aflow_avasp.cpp) " << endl;
-  aflowin << "[AFLOW] GENERATOR = " << XHOST.User << " " << endl;  //CO 180622
+  aflowin << "[AFLOW] GENERATOR = " << XHOST.user << " " << endl;  //CO 180622
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW]SYSTEM=" << system << endl;
@@ -5276,7 +5276,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB4 Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-	flag_LIB4=TRUE;xvasp.AVASP_dirbase="./LIB4/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)+"/LIB";
+	flag_LIB4=TRUE;xvasp.AVASP_dirbase="./LIB4/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB4")+"/LIB";
       }
   // LIB3
   present_all=TRUE;present_here=FALSE;
@@ -5288,7 +5288,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(present_all) {
     cout << "LIB3 Compatibility mode" << endl;
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_LIB3;
-    flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB";
+    flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB3")+"/LIB";
   }
   // LIB2U
   present_all=TRUE;present_here=FALSE;
@@ -5300,7 +5300,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(present_all) {
     cout << "LIB2U Compatibility mode" << endl;
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-    flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+    flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
   }
   // LIB2
   present_all=TRUE;present_here=FALSE;
@@ -5312,7 +5312,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(present_all) {
     cout << "LIB2 Compatibility mode" << endl;
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-    flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+    flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
   }
   //[CO181226 OBSOLETE]}
 
@@ -6084,7 +6084,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB3 Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_LIB3;
-	flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB";
+	flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB3")+"/LIB";
       }
       // LIB2U
       present_all=TRUE;present_here=FALSE;
@@ -6096,7 +6096,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB2U Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-	flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+	flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
       }
       // LIB2
       present_all=TRUE;present_here=FALSE;
@@ -6108,7 +6108,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB2 Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-	flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+	flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
       }
     }
 
@@ -6674,7 +6674,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
 
   xvasp.AVASP_dirbase=_ICSD_DIRBASE_;
   xvasp.AVASP_libbase="./";
-  if(XHOST_LIBRARY_ICSD+1<vAFLOW_PROJECTS_DIRECTORIES.size()) xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+  if(XHOST_LIBRARY_ICSD+1<vAFLOW_PROJECTS_DIRECTORIES.size()) xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("ICSD");
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_ICSD;
 
   bool DEBUG_SKIP=TRUE;

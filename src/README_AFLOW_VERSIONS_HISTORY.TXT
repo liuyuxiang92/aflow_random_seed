@@ -1,5 +1,7 @@
 3.1.226 - 2019/09/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
+        -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
+        -- Bug fixes in producing html/json for icsd# entries (SC)
         -- Modified aflow.in generation in AEL and AGL to use common routines in aflow_avasp.cpp and aflow_modules.cpp (CT)  
         -- Write AGL enthalpy as a function of pressure in an AFLOW readable format for future phase diagram application (CT)
         -- Added --quiet option to LIB2LIB routine (CT)

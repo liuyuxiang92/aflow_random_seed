@@ -844,17 +844,17 @@ namespace pflow {
       use the list of RAW and LIB dirs that have been compiled in aflow
       i.e. XHOST.vGlobal.at(X) (ICSD_LIB);  // aflow_data_calculated.cpp
       XHOST.vGlobal.at(X) (ICSD_RAW);  // aflow_data_calculated.cpp
-      This routine checks the validity of the vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/RAW/ dirs and files
-      with respect to vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/LIB/
+      This routine checks the validity of the init::AFLOW_Projects_Directories("ICSD")/RAW/ dirs and files
+      with respect to init::AFLOW_Projects_Directories("ICSD")/LIB/
 	
       output.dat will contain:
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/RAW/../../  OK
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/RAW/../../  OK
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/RAW/../../  ERROR file1 file2 ...
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/RAW/../../  NotInLIB
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/RAW/../../  NotInLIB
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/LIB/../../  NotInRAW
-      vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)/LIB/../../  NotInRAW
+      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  OK
+      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  OK
+      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  ERROR file1 file2 ...
+      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  NotInLIB
+      init::AFLOW_Projects_Directories("ICSD")/RAW/../../  NotInLIB
+      init::AFLOW_Projects_Directories("ICSD")/LIB/../../  NotInRAW
+      init::AFLOW_Projects_Directories("ICSD")/LIB/../../  NotInRAW
       and so on
       the MISSING lines mean that the structures are in LIB but not in RAW	
     */
@@ -871,9 +871,9 @@ namespace pflow {
     if(argv.size()>2) if(argv.at(2)=="1") inew=false;
     if(inew) {
       //find LIB
-      aurostd::execute("find "+vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)+"/LIB/ -type d | grep ICSD | sort > wLIBlist.tmp");
+      aurostd::execute("find "+init::AFLOW_Projects_Directories("ICSD")+"/LIB/ -type d | grep ICSD | sort > wLIBlist.tmp");
       //find RAW
-      aurostd::execute("find "+vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)+"/RAW/ -type d | grep ICSD | sort > wRAWlist.tmp");
+      aurostd::execute("find "+init::AFLOW_Projects_Directories("ICSD")+"/RAW/ -type d | grep ICSD | sort > wRAWlist.tmp");
     } else {
       //write LIB
       oftmp.open("wLIBlist.tmp");
@@ -884,8 +884,8 @@ namespace pflow {
       oftmp << init::InitGlobalObject("Library_CALCULATED_ICSD_RAW");
       oftmp.close();		
     }
-    aurostd::execute("subst \""+vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)+"/LIB/\" \"\" wLIBlist.tmp");
-    aurostd::execute("subst \""+vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)+"/RAW/\" \"\" wRAWlist.tmp");
+    aurostd::execute("subst \""+init::AFLOW_Projects_Directories("ICSD")+"/LIB/\" \"\" wLIBlist.tmp");
+    aurostd::execute("subst \""+init::AFLOW_Projects_Directories("ICSD")+"/RAW/\" \"\" wRAWlist.tmp");
 
     //loading lib to a vector string
     LIBlist.clear();
@@ -937,16 +937,16 @@ namespace pflow {
     }
     Nrawnotlib = RAWnotLIB.size();
     //output LIBnotRAW
-    for(i=0;i<Nlibnotraw;i++) cout << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD) << "LIB/" << LIBnotRAW.at(i) << " NotInRaw" << endl;
+    for(i=0;i<Nlibnotraw;i++) cout << init::AFLOW_Projects_Directories("ICSD") << "LIB/" << LIBnotRAW.at(i) << " NotInRaw" << endl;
     //output RAWnotLIB
-    for(i=0;i<Nrawnotlib;i++) cout << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD) << "RAW/" << RAWnotLIB.at(i) << " NotInLib" << endl;	
+    for(i=0;i<Nrawnotlib;i++) cout << init::AFLOW_Projects_Directories("ICSD") << "RAW/" << RAWnotLIB.at(i) << " NotInLib" << endl;	
 	
     // processing LIBRAW
     int itmp=0;
     string directory_RAW,directory_LIB;
     for(i=0;i<Nlibraw;i++) {
-      directory_LIB = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)+"LIB/"+LIBRAW.at(i)+"/";
-      directory_RAW = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)+"RAW/"+LIBRAW.at(i)+"/";
+      directory_LIB = init::AFLOW_Projects_Directories("ICSD")+"LIB/"+LIBRAW.at(i)+"/";
+      directory_RAW = init::AFLOW_Projects_Directories("ICSD")+"RAW/"+LIBRAW.at(i)+"/";
       cerr << "Processing " << directory_RAW << endl;
       // 1. check if exist
       ifound=TRUE;

@@ -19,6 +19,10 @@
 #include "aflow_chull_jupyter_requirements.cpp"  //MB190305
 #include "aflow_chull_python.cpp"  //MB190305
 
+
+#define _AFLOW_CHULL_PRINT_LOGO_1 TRUE
+#define _AFLOW_CHULL_PRINT_LOGO_2 FALSE
+
 // DEFINITIONS
 const std::string AFLOW_WEB = string("http://" + AFLOWLIB_MATERIALS_SERVER);
 const std::string NOMAD_WEB = string("http://www.nomad-coe.eu/");
@@ -7263,10 +7267,10 @@ void ConvexHull::writeLatex() const {
   bool latex_interactive_mode=m_cflags.flag("CHULL::LATEX_INTERACTIVE");
   
   //FROM AFLOWRC
-  bool print_aflow_logo_full=true;  //otherwise print aflow_text
+  bool print_aflow_logo_full=_AFLOW_CHULL_PRINT_LOGO_1;  //otherwise print aflow_text
   bool print_aflow_text_logo=false;
   if(print_aflow_logo_full&&print_aflow_text_logo){print_aflow_text_logo=false;}
-  bool print_logo_2=true;
+  bool print_logo_2=_AFLOW_CHULL_PRINT_LOGO_2;
   bool print_aflow_webaddress_logo=true;
   if(print_logo_2&&print_aflow_webaddress_logo){print_aflow_webaddress_logo=false;}
   int banner_setting=DEFAULT_CHULL_LATEX_BANNER;
@@ -9867,7 +9871,7 @@ void ConvexHull::writeLatex() const {
               equilibrium_phases_CP.clear();
               //get header
               //misc = prettyPrintCompound(entry,gcd_vrt,true,latex_ft);
-              equilibrium_phases_header_TEX_ss << m_coord_groups[i_coord_group].getDim() << "-phase equilibria";
+              equilibrium_phases_header_TEX_ss << "vertex of facets (" << m_coord_groups[i_coord_group].getDim() << "-phase equilibria)";
               //equilibrium_phases_header_TEX_ss << " with " << misc;
               equilibrium_phases_header_TEX_ss << ":";
             }
@@ -9974,7 +9978,7 @@ void ConvexHull::writeLatex() const {
         print_scriterion=false;
         scriterion_data_ss.str("");
         if(m_coord_groups[i_coord_group].m_is_on_hull) {
-          _report_data_ss << " " << "(ground-state)";
+          _report_data_ss << " " << "(ground-state)"; // if ground-state
           if(m_coord_groups[i_coord_group].m_stability_criterion<AUROSTD_NAN){
             print_scriterion=true;
             tmp_precision=0;
@@ -9984,7 +9988,9 @@ void ConvexHull::writeLatex() const {
             scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
             scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
           }
-        }
+        } else {
+        _report_data_ss << " " << "(unstable)"; // if above hull	  
+	}
         // compound name
         main_TEX_ss << "\\multicolumn{" << vheaders.size()-(print_scriterion?num_cols_scriterion:0) << "}{l}{";
         main_TEX_ss << "\\cellcolor{white}\\normalsize{" + _report_data_ss.str();

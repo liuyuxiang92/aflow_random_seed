@@ -82,14 +82,14 @@ namespace aurostd {
 // FILES creation/destruction
 namespace aurostd {
   string TmpFileCreate(string identifier) {
-    string str=XHOST.Tmpfs+"/_aflow_"+identifier+"."+XHOST.User+".pid"+XHOST.ostrPID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp";
+    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp";
     // cerr << str << endl;
     return str;
   }
   string TmpFileCreate(void) {
     return TmpFileCreate("");}
   string TmpDirectoryCreate(string identifier) {
-    string dir=XHOST.Tmpfs+"/_aflow_"+identifier+"_"+XHOST.User+"_pid"+XHOST.ostrPID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";
+    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";
     DirectoryMake(dir);
     return dir;}
   string TmpDirectoryCreate(void) {
@@ -1612,7 +1612,7 @@ namespace aurostd {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
-    // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.User+"/");
+    // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.user+"/");
     aurostd::StringSubst(fileOUT,"//","/");
     aurostd::StringSubst(fileOUT,"/./","/");
     aurostd::StringSubst(fileOUT,"*","\"*\"");
