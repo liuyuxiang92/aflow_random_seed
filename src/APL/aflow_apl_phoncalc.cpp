@@ -1201,6 +1201,13 @@ namespace apl {
     return getFrequency(kpoint, flags, placeholder_eigen, placeholder_mat, false);
   }
 
+  // ME190624 - get eigenvectors and frequencies
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
+                                                 xmatrix<xcomplex<double> >& eigenvectors) {
+    vector<xmatrix<xcomplex<double> > > placeholder_mat;
+    return getFrequency(kpoint, flags, eigenvectors, placeholder_mat, false);
+  }
+
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
                                                  xmatrix<xcomplex<double> >& eigenvectors,
                                                  vector<xmatrix<xcomplex<double> > >& dDynMat,

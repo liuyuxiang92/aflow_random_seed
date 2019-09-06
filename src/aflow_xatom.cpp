@@ -10021,196 +10021,337 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 #define _incellcutoff_ (1.0-_EPS_roundoff_)
 // DX and CO, IF EPSILON IS PROVIDED, THEN WE ASSUME YOU WANT US TO MOVE THE ATOMS, OTHERWISE IT'S A HARD CUT OFF
 
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-xvector<double> BringInCell(const xvector<double>& v_in,double epsilon) {
-  // DX and CO - START
-  return BringInCell_20160101(v_in,epsilon);
-}
+// BringInCell() - ROBUST (DX/ME/CO: 20190905)
+// this function brings components/xvectors/_atoms into a unit cell
+// the upper bound and lower bound of the cell can be adjusted
+// (e.g., standard unit cell : 0.0 to 1.0 ; unit cell centered on origin: -0.5 to 0.5)
+// the tolerance can be tuned and "shifts" the bounds, favoring the lower bound
+// (e.g., for bounds 0.0 to 1.0, we favor the origin, bringing values 
+// inside the cell if they are between "lower_bound-tolerance" and "upper_bound-tolerance")
+// the AFLOW developers suggest a hard cutoff, e.g., _ZERO_TOL_ (DX/ME/CO)
 
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon) {
-  return BringInCell_20160101(v_in,epsilon); //SYM::mod_one_xvec(v_in);
-}
+// **************************************************************************
+// BringInCellInPlace() (change value/object in place)
 
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon) {
-  double incelleps=1.0-epsilon;
-  xvector<double> v_out(v_in.urows,v_in.lrows);
-  for(int i=v_out.lrows;i<=v_out.urows;i++) {
-    v_out(i)=v_in(i);
-    while(v_out(i)> incelleps) v_out(i)-=1.0;
-    while(v_out(i)< 0.0)       v_out(i)+=1.0;
-    if(abs(v_out(i))<epsilon)  v_out(i)=0.0;
-    if(v_out(i)> incelleps)    v_out(i)=0.0;
+// -------------------------------------------------------------------
+// double (change in place)
+void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
+  if (component == INFINITY || component != component || component == -INFINITY) {
+    string function_name = "BringInCellInPlace()";
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
+    message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
+    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
-  //v_out=roundoff(v_out,_EPS_sym_);
-  // DX and CO - END
-  return v_out;
+  while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
+  while (component - lower_bound < -tolerance){ component += 1.0; }
 }
 
-xvector<double> BringInCell(const xvector<double>& v_in) {
-  // DX and CO - START
-  return SYM::mod_one_xvec(v_in); //hard cutoff, _ZERO_TOL_ = 1e-10
-  //_EPS_sym_ is the universal tolerance here
-  //return BringInCell(v_in,_EPS_sym_);
-  // DX and CO - END
-}
-
-// DX anc CO - START
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
- 
-  return BringInCell_20160101(atom_in,lattice,epsilon);
-}
-
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
-  return BringInCell_20160101(atom_in,lattice,epsilon);//BringInCell(atom_in,lattice);
-}
-// DX and CO - END
-
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
-  double _incelleps=1.0;
-  if(epsilon>0.0) _incelleps=1.0-epsilon;else _incelleps=1.0;
-  _atom atom;
-  atom=atom_in;
-  atom.ijk=atom_in.ijk;
-  for(int i=1;i<=3;i++) {
-    while(atom.fpos(i)> _incelleps) {
-      atom.fpos(i)-=1.0;
-      atom.ijk(i)++;
-    }
-    while(atom.fpos(i)<0.0) {
-      atom.fpos(i)+=1.0;
-      atom.ijk(i)--;
-    }
-    if(epsilon>0.0) { // roundoff only if epsilon>0.0
-      if(abs(atom.fpos(i))<epsilon) atom.fpos(i)=0.0;
-      if(atom.fpos(i)>_incelleps) atom.fpos(i)=0.0;
-    }
+// -------------------------------------------------------------------
+// xvector (change in place)
+void BringInCellInPlace(xvector<double>& fpos, double tolerance, double upper_bound, double lower_bound) {
+  for (int i = fpos.lrows; i <= fpos.urows; i++) {
+    BringInCellInPlace(fpos[i], tolerance, upper_bound, lower_bound);
   }
-  atom.cpos=F2C(lattice,atom.fpos);
+}
+
+// -------------------------------------------------------------------
+// _atom (change in place, updates both fpos and pos) 
+void BringInCellInPlace(_atom& atom, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  BringInCellInPlaceFPOS(atom, tolerance, upper_bound, lower_bound); // update fpos first
+
+  // update cpos
+  atom.cpos=F2C(lattice,atom.fpos); // update cpos next
   atom.isincell=TRUE;
-  return atom;
 }
 
-// DX and CO - START
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
-  return BringInCell_20161115(atom_in,lattice);
-}
-
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice) {
-  //_atom atom;
-  //atom=atom_in;
-  //atom.ijk=atom_in.ijk; //just to be sure //it's part of the assignment operator now
-  _atom atom=SYM::mod_one_atom(atom_in);
-  atom.cpos=F2C(lattice,atom.fpos);
-  atom.isincell=TRUE;
-  return atom;
-}
-// DX and CO - END
-
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice) {
-  return BringInCell(atom_in,lattice,_EPS_roundoff_);
-}
-
-//_atom _BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
-//  return BringInCell(atom_in,lattice);
-//}
-
-// DX and CO - START
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-xstructure BringInCell(const xstructure& a,double epsilon) {
-  return BringInCell_20160101(a,epsilon);
-}
-
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-xstructure BringInCell_20161115(const xstructure& a,double epsilon) {
-  xstructure b(a); // copies everything
-  for(int i=0;i<(int)a.atoms.size();i++){
-    b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
-  }
-  return b;
-}
-
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-xstructure BringInCell_20160101(const xstructure& a,double epsilon) {
-  xstructure b(a); // copies everything
-  for(int i=0;i<(int)a.atoms.size();i++) {
-    b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
-  }
-  return b;
-}
-
-
-
-xstructure BringInCell(const xstructure& a) {
-  // DX and CO - START
-  return BringInCell_20161115(a);
-}
-
-//SUPER SLOW, AVOID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//USE THE ONE THAT ONLY COPIES ATOMS, COREY
-//a.sym_eps is STRONGLY PREFERRED
-//however, it requires knowledge (and calculating of the full symmetry, i.e. slow factor group)
-//therefore, if you call the default without having a.sym_eps calculated, the assumption
-//is that a constant tolerance is good enough (speed)
-//if you want to do this correctly, calculate the full symmetry of the structure first (CalculateFullSymmetry() in
-//aflow_aconvasp_main.cpp)
-xstructure BringInCell_20161115(const xstructure& a) {
-  xstructure b=a;
-  //  double _eps_;
-  //  if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
-  //    _eps_=a.sym_eps;
-  //  }
-  //  else {
-  //    _eps_=_EPS_sym_;
-  //    // Calculate point group/space group to find correct tolerance for system
-  //    //SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       
-  //    //_eps_=a.sym_eps;
-  //  }
-  //  return BringInCell(a,_eps_);
-  for(uint i=0; i<b.atoms.size(); i++){
-    b.atoms[i].fpos = SYM::mod_one_xvec(b.atoms[i].fpos);
-  } 
-  return b;
-}
-
-xstructure BringInCell_20160101(const xstructure& a) {
-  return BringInCell(a,_EPS_roundoff_);
-}
-// DX and CO - END
-
-//CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
-//DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
-void xstructure::BringInCell(double epsilon) {
-  _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
-  for(int i=0;i<(int)atoms.size();i++){
-    atoms[i]=BringInCell(atoms[i],lattice,epsilon);
+// -------------------------------------------------------------------
+// xstructure (change in place) 
+void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  for(uint i=0;i<xstr.atoms.size();i++){
+    BringInCellInPlace(xstr.atoms[i], xstr.lattice, tolerance, upper_bound, lower_bound);
   }
 }
-void xstructure::BringInCell(void) {
-  // DX and CO - START
-  _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
-  for(int i=0;i<(int)atoms.size();i++){
-    atoms[i]=BringInCell(atoms[i],lattice);
+
+// **************************************************************************
+// BringInCell() (return new value/object)
+
+// -------------------------------------------------------------------
+// double (return new double)
+double BringInCell(double component_in, double tolerance, double upper_bound, double lower_bound) {
+  double component_out = component_in;
+  if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
+    string function_name = "BringInCell()";
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
+    message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
+    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
-  //TOO SLOW
-  //xstructure BringInCell(const xstructure& a);
-  //*this=BringInCell(*this);
-  //BringInCell(_EPS_sym_);  // CO
-  // DX and CO - END
+  while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
+  while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
+  return component_out;
 }
+
+// -------------------------------------------------------------------
+// xvector (return new xvector)
+xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  xvector<double> fpos_out = fpos_in;
+  for (int i = fpos_out.lrows; i <= fpos_out.urows; i++) {
+    BringInCellInPlace(fpos_out[i], tolerance, upper_bound, lower_bound);
+  }
+  return fpos_out;
+}
+
+// -------------------------------------------------------------------
+// _atom (return new _atom, update fpos only) 
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  _atom atom_out = atom_in;
+  BringInCellInPlace(atom_out.fpos, tolerance, upper_bound, lower_bound);
+  
+  // update ijk
+  for(int i=atom_out.fpos.lrows; i<=atom_out.fpos.urows; i++){
+    atom_out.ijk(i) = (int)(atom_out.fpos[i]-atom_in.fpos[i]);
+  }
+  return atom_out;
+}
+
+
+// -------------------------------------------------------------------
+// xstructure (return xstructure) 
+xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  xstructure xstr_out = xstr_in;
+  for(uint i=0;i<xstr_out.atoms.size();i++){
+    BringInCellInPlace(xstr_out.atoms[i], xstr_out.lattice, tolerance, upper_bound, lower_bound);
+  }
+  return xstr_out;
+}
+
+// **************************************************************************
+// BringInCellFPOS() (updates atom.fpos only)
+
+// -------------------------------------------------------------------
+// _atom (change in place, update fpos only) 
+void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
+  BringInCellInPlace(atom.fpos, tolerance, upper_bound, lower_bound);
+  
+  // update ijk
+  for(int i=atom.fpos.lrows; i<=atom.fpos.urows; i++){
+    atom.ijk(i) = (int)(atom.fpos[i]-orig_fpos[i]);
+  }
+}
+
+// -------------------------------------------------------------------
+// _atom (return new _atom, update fpos and cpos) 
+_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  _atom atom_out = BringInCellFPOS(atom_in, tolerance, upper_bound, lower_bound);
+
+  // update cpos
+  atom_out.cpos=F2C(lattice,atom_out.fpos);
+  atom_out.isincell=TRUE;
+  
+  return atom_out;
+}
+
+// **************************************************************************
+// BringInCell() (method for xstructure)
+
+// -------------------------------------------------------------------
+// xstructure (xstructure method) 
+void xstructure::BringInCell(double tolerance, double upper_bound, double lower_bound) { //DX 20190904
+  for(uint i=0;i<atoms.size();i++){
+    BringInCellInPlace(atoms[i], lattice, tolerance, upper_bound, lower_bound); //DX "::" to access outside of xstructure class
+  }
+}
+
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon) {
+//DX 20190905 [OBSOLETE]   // DX and CO - START
+//DX 20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon) {
+//DX 20190905 [OBSOLETE]   return BringInCell_20160101(v_in,epsilon); //SYM::mod_one_xvec(v_in);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon) {
+//DX 20190905 [OBSOLETE]   double incelleps=1.0-epsilon;
+//DX 20190905 [OBSOLETE]   xvector<double> v_out(v_in.urows,v_in.lrows);
+//DX 20190905 [OBSOLETE]   for(int i=v_out.lrows;i<=v_out.urows;i++) {
+//DX 20190905 [OBSOLETE]     v_out(i)=v_in(i);
+//DX 20190905 [OBSOLETE]     while(v_out(i)> incelleps) v_out(i)-=1.0;
+//DX 20190905 [OBSOLETE]     while(v_out(i)< 0.0)       v_out(i)+=1.0;
+//DX 20190905 [OBSOLETE]     if(abs(v_out(i))<epsilon)  v_out(i)=0.0;
+//DX 20190905 [OBSOLETE]     if(v_out(i)> incelleps)    v_out(i)=0.0;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   //v_out=roundoff(v_out,_EPS_sym_);
+//DX 20190905 [OBSOLETE]   // DX and CO - END
+//DX 20190905 [OBSOLETE]   return v_out;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in) {
+//DX 20190905 [OBSOLETE]   // DX and CO - START
+//DX 20190905 [OBSOLETE]   return SYM::mod_one_xvec(v_in); //hard cutoff, _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE]   //_EPS_sym_ is the universal tolerance here
+//DX 20190905 [OBSOLETE]   //return BringInCell(v_in,_EPS_sym_);
+//DX 20190905 [OBSOLETE]   // DX and CO - END
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] // DX anc CO - START
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
+//DX 20190905 [OBSOLETE]  
+//DX 20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
+//DX 20190905 [OBSOLETE]   return BringInCell_20160101(atom_in,lattice,epsilon);//BringInCell(atom_in,lattice);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] // DX and CO - END
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon) {
+//DX 20190905 [OBSOLETE]   double _incelleps=1.0;
+//DX 20190905 [OBSOLETE]   if(epsilon>0.0) _incelleps=1.0-epsilon;else _incelleps=1.0;
+//DX 20190905 [OBSOLETE]   _atom atom;
+//DX 20190905 [OBSOLETE]   atom=atom_in;
+//DX 20190905 [OBSOLETE]   atom.ijk=atom_in.ijk;
+//DX 20190905 [OBSOLETE]   for(int i=1;i<=3;i++) {
+//DX 20190905 [OBSOLETE]     while(atom.fpos(i)> _incelleps) {
+//DX 20190905 [OBSOLETE]       atom.fpos(i)-=1.0;
+//DX 20190905 [OBSOLETE]       atom.ijk(i)++;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     while(atom.fpos(i)<0.0) {
+//DX 20190905 [OBSOLETE]       atom.fpos(i)+=1.0;
+//DX 20190905 [OBSOLETE]       atom.ijk(i)--;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     if(epsilon>0.0) { // roundoff only if epsilon>0.0
+//DX 20190905 [OBSOLETE]       if(abs(atom.fpos(i))<epsilon) atom.fpos(i)=0.0;
+//DX 20190905 [OBSOLETE]       if(atom.fpos(i)>_incelleps) atom.fpos(i)=0.0;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   atom.cpos=F2C(lattice,atom.fpos);
+//DX 20190905 [OBSOLETE]   atom.isincell=TRUE;
+//DX 20190905 [OBSOLETE]   return atom;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] // DX and CO - START
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX 20190905 [OBSOLETE]   return BringInCell_20161115(atom_in,lattice);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX 20190905 [OBSOLETE]   //_atom atom;
+//DX 20190905 [OBSOLETE]   //atom=atom_in;
+//DX 20190905 [OBSOLETE]   //atom.ijk=atom_in.ijk; //just to be sure //it's part of the assignment operator now
+//DX 20190905 [OBSOLETE]   _atom atom=SYM::mod_one_atom(atom_in);
+//DX 20190905 [OBSOLETE]   atom.cpos=F2C(lattice,atom.fpos);
+//DX 20190905 [OBSOLETE]   atom.isincell=TRUE;
+//DX 20190905 [OBSOLETE]   return atom;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] // DX and CO - END
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX 20190905 [OBSOLETE]   return BringInCell(atom_in,lattice,_EPS_roundoff_);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //_atom _BringInCell(const _atom& atom_in,const xmatrix<double>& lattice) {
+//DX 20190905 [OBSOLETE] //  return BringInCell(atom_in,lattice);
+//DX 20190905 [OBSOLETE] //}
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] // DX and CO - START
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon) {
+//DX 20190905 [OBSOLETE]   return BringInCell_20160101(a,epsilon);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon) {
+//DX 20190905 [OBSOLETE]   xstructure b(a); // copies everything
+//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)a.atoms.size();i++){
+//DX 20190905 [OBSOLETE]     b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   return b;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon) {
+//DX 20190905 [OBSOLETE]   xstructure b(a); // copies everything
+//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)a.atoms.size();i++) {
+//DX 20190905 [OBSOLETE]     b.atoms[i]=BringInCell(a.atoms[i],a.lattice,epsilon);//BringInCell(a.atoms[i],a.lattice);
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   return b;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a) {
+//DX 20190905 [OBSOLETE]   // DX and CO - START
+//DX 20190905 [OBSOLETE]   return BringInCell_20161115(a);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //SUPER SLOW, AVOID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//DX 20190905 [OBSOLETE] //USE THE ONE THAT ONLY COPIES ATOMS, COREY
+//DX 20190905 [OBSOLETE] //a.sym_eps is STRONGLY PREFERRED
+//DX 20190905 [OBSOLETE] //however, it requires knowledge (and calculating of the full symmetry, i.e. slow factor group)
+//DX 20190905 [OBSOLETE] //therefore, if you call the default without having a.sym_eps calculated, the assumption
+//DX 20190905 [OBSOLETE] //is that a constant tolerance is good enough (speed)
+//DX 20190905 [OBSOLETE] //if you want to do this correctly, calculate the full symmetry of the structure first (CalculateFullSymmetry() in
+//DX 20190905 [OBSOLETE] //aflow_aconvasp_main.cpp)
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a) {
+//DX 20190905 [OBSOLETE]   xstructure b=a;
+//DX 20190905 [OBSOLETE]   //  double _eps_;
+//DX 20190905 [OBSOLETE]   //  if(a.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
+//DX 20190905 [OBSOLETE]   //    _eps_=a.sym_eps;
+//DX 20190905 [OBSOLETE]   //  }
+//DX 20190905 [OBSOLETE]   //  else {
+//DX 20190905 [OBSOLETE]   //    _eps_=_EPS_sym_;
+//DX 20190905 [OBSOLETE]   //    // Calculate point group/space group to find correct tolerance for system
+//DX 20190905 [OBSOLETE]   //    //SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);       
+//DX 20190905 [OBSOLETE]   //    //_eps_=a.sym_eps;
+//DX 20190905 [OBSOLETE]   //  }
+//DX 20190905 [OBSOLETE]   //  return BringInCell(a,_eps_);
+//DX 20190905 [OBSOLETE]   for(uint i=0; i<b.atoms.size(); i++){
+//DX 20190905 [OBSOLETE]     b.atoms[i].fpos = SYM::mod_one_xvec(b.atoms[i].fpos);
+//DX 20190905 [OBSOLETE]   } 
+//DX 20190905 [OBSOLETE]   return b;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a) {
+//DX 20190905 [OBSOLETE]   return BringInCell(a,_EPS_roundoff_);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] // DX and CO - END
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] //CO190114 - DO NOT USE OVERLOADS OF BRINGINCELL() WITH EPSILON UNLESS YOU KNOW WHAT YOU ARE DOING
+//DX 20190905 [OBSOLETE] //DEFAULT TO OVERLOADS WITHOUT EPSILON WHICH USE HARD CUTOFF OF _ZERO_TOL_ = 1e-10
+//DX 20190905 [OBSOLETE] void xstructure::BringInCell(double epsilon) {
+//DX 20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
+//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)atoms.size();i++){
+//DX 20190905 [OBSOLETE]     atoms[i]=BringInCell(atoms[i],lattice,epsilon);
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] void xstructure::BringInCell(void) {
+//DX 20190905 [OBSOLETE]   // DX and CO - START
+//DX 20190905 [OBSOLETE]   _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
+//DX 20190905 [OBSOLETE]   for(int i=0;i<(int)atoms.size();i++){
+//DX 20190905 [OBSOLETE]     atoms[i]=BringInCell(atoms[i],lattice);
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   //TOO SLOW
+//DX 20190905 [OBSOLETE]   //xstructure BringInCell(const xstructure& a);
+//DX 20190905 [OBSOLETE]   //*this=BringInCell(*this);
+//DX 20190905 [OBSOLETE]   //BringInCell(_EPS_sym_);  // CO
+//DX 20190905 [OBSOLETE]   // DX and CO - END
+//DX 20190905 [OBSOLETE] }
 
 // ***************************************************************************
 // Function BringInCompact

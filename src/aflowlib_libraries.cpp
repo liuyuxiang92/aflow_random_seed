@@ -1267,7 +1267,17 @@ namespace aflowlib {
         if (aurostd::substring2bool(aflowlib_data.aurl, "ICSD")) {
           aflowlib_data.title = tokens.back();
         } else {
-          aflowlib_data.title = tokens[tokens.size() - 2] + "." + tokens[tokens.size() - 1];
+          // ME190821 - Made more general
+          // [OBSOLETE] aflowlib_data.title = tokens[tokens.size() - 2] + "." + tokens[tokens.size() - 1];
+          uint i = 0;
+          vector<string> vtitle;
+          for (i = 0; i < tokens.size(); i++) {
+            if (tokens[i] == "AFLOWDATA") break;
+          }
+          for (uint j = i + 2; j < tokens.size(); j++) {  // i + 2 to skip AFLOWDATA/LIBX_RAW/
+            vtitle.push_back(tokens[j]);
+          }
+          aflowlib_data.title = aurostd::joinWDelimiter(vtitle, ".");
         }
         // ME 190125 - END
 	for(uint i=1;i<aflowlib_data.vauid.size();i++) 

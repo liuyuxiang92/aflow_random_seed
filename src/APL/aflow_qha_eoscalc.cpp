@@ -697,14 +697,18 @@ namespace apl {
   vector<vector<T> > EOS::geteDOS(T &fermi, string file) {
     //CO - START
     if (!aurostd::EFileExist(file)) {
-      _logger << apl::error << file << " does not exist" << apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file << " does not exist" << apl::endl;
+      //exit(0);
+      throw APLRuntimeError("File " + file + " does not exist.");
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      _logger << apl::error << file << " does not exist" << apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file << " does not exist" << apl::endl;
+      //exit(0);
+      throw APLRuntimeError("File " + file " does not exist.");
     }
     //string command="";
     //string EXT=string(file)+string(".EXT");
@@ -750,14 +754,18 @@ namespace apl {
   EOS::readfile(string file, const vector<uint> &readCOL) {
     //CO - START
     if (!aurostd::EFileExist(file)) {
-      _logger << apl::error << file << " does not exist" << apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file << " does not exist" << apl::endl;
+      //exit(0);
+      throw APLRuntimeError("File " + file " does not exist.");
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      _logger << apl::error << file << " does not exist" << apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file << " does not exist" << apl::endl;
+      //exit(0);
+      throw APLRuntimeError("File " + file + " does not exist.");
     }
     //string command="";
     //string EXT=string(file)+string(".EXT");
@@ -805,14 +813,18 @@ namespace apl {
   double EOS::getE0K(string file, double &pv, double &MAGCELL) {
     //CO - START
     if (!aurostd::EFileExist(file)) {
-      _logger << apl::error << file << " does not exist" << apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file << " does not exist" << apl::endl;
+      //exit(0);
+      throw APLRuntimeError("File " + file + " does not exist");
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      _logger << apl::error << file << " does not exist" << apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file << " does not exist" << apl::endl;
+      //exit(0);
+      throw APLRuntimeError("File " + file + " does not exist.");
     }
     pv = 0.0;
     MAGCELL = 0.0;

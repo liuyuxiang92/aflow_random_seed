@@ -468,7 +468,9 @@ namespace apl
       vector<string> vstr=split<string>(line);
       if(vstr.size()!=4)
 	{
-	  _logger << apl::error << file<<" Wrong format." << apl::endl; exit(0);
+          // ME190726 - exit clean-up
+	  //_logger << apl::error << file<<" Wrong format." << apl::endl; exit(0);
+          throw APLRuntimeError("Wrong format in file " + file + ".");
 	}
       vector<double>  tmp(2, 0.0);
       tmp[0]=atof(vstr[0].c_str());

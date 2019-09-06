@@ -662,8 +662,11 @@ namespace apl
   double SCQHA_QHA3P::average_gruneisen_parameter(double temperature_in_kelvins)
   {
     if(temperature_in_kelvins<0.1) return 0.0;
-    if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
-    if(_freqs_mesh.size()==0){_logger<<apl::error<<"_freqs_mesh.size()==0"<<apl::endl;exit(0);}
+    // ME190726 - exit clean-up
+    //[OBSOLETE] if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
+    //[OBSOLETE] if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
+    if(_freqs_mesh.size()==0) throw APLRuntimeError("_freqs_mesh.size()==0");
+    if(_freqs_mesh.size()==0) throw APLRuntimeError("_freqs_mesh.size()==0");
     //if cutoff is not set then set it to 0.001 to avoid numerical error
     if(_iszero(_cutoff_freq)) _cutoff_freq=1.0e-3;
                 
@@ -794,8 +797,10 @@ namespace apl
   {
     if(_iszero(f0))return 0;
     if(f0<0.0){
-      _logger<< apl::error<<"Gruneisen calculation frequency negative "<<apl::endl;
-      exit(0);
+      // ME190728 - exit clean-up
+      //_logger<< apl::error<<"Gruneisen calculation frequency negative "<<apl::endl;
+      //exit(0);
+      throw APLRuntimeError("Grueneisen calculation frequency negative");
     }
     double gptest=-(fp-fm)/(2.0*_delta_V)*(_V0/f0);
     return gptest;

@@ -1,8 +1,25 @@
-3.1.226 - 2019/08/30
+3.1.226 - 2019/09/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modified aflow.in generation in AEL and AGL to use common routines in aflow_avasp.cpp and aflow_modules.cpp (CT)  
         -- Write AGL enthalpy as a function of pressure in an AFLOW readable format for future phase diagram application (CT)
         -- Added --quiet option to LIB2LIB routine (CT)
+        -- Added projected phonon DOS calculations. (ME)
+        -- Linear tetrahedron method does not reduce upon construction anymore (necessary for projected DOS). (ME)
+        -- Cleaned up code and added more comments to QMesh and LTMethod files. (ME)
+        -- Made moveToBZ inside QMesh more robust. (ME)
+        -- Replaced all instances of exit in APL with throw APLRuntimeError. (ME)
+        -- Sped up reduction of q-mesh grid. (ME)
+        -- Added safeguards for DOSCAR readers for broken DOSCAR files. (ME)
+        -- Fixed plotter bugs for HTQC prototype names. (ME)
+        -- Added findInList function to AUROSTD. (ME)
+        -- Generalized BringInCell method. (ME/DX)
+        -- created overloads for BringInCell method (double/xvector/_atom/xstructure), along with "InPlace" variants, i.e., const input (DX)
+        -- replaced all mod_one/mod_one_xvec/mod_one_atom for new BringInCell method (DX)
+        -- replaced old BringInCell functions with new version (DX)
+        -- fixed indenting in symmetry functions (DX)
+        -- replaced all SYM::CrossPro() with aurostd::vector_product() (DX)
+        -- replaced all SYM::normalize() with explicity division of aurostd::modulus() (DX)
+        -- replaced SYM::extract_row() with aurostd::operator() (DX)
         -- fabs() -> aurostd::abs() (CO)
 3.1.225 - 2019/07/26
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.225.tar.xz

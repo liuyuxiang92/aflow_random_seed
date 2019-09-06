@@ -3681,6 +3681,12 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   string line;
   uint ndos = 1;  // ME190614
   if(filename=="") filename="stringstream";
+  // ME190812 - Add checks for broken DOSCARs
+  if (vcontent.size() < 7) {
+    string function = "xDOSCAR::GetProperties()";
+    string message = "Broken DOSCAR: no content.";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
   for(uint iline = 0; iline < 7;iline++) { // ME190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
     // cerr << "iline=" << iline << "  " << vcontent.at(iline) << " tokens.size()=" << tokens.size() << endl;
@@ -3783,11 +3789,12 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           }
         // Nothing found, assume SOC (more likely case)
         } else {
-          std::cerr << "WARNING: Could not determine whether the DOSCAR is lm-resolved"
-                    << " or contains spin-orbit coupling. AFLOW will assume that the"
-                    << " DOSCAR is lm-resolved. If this is not the case, please put an"
-                    << " INCAR" << ext << ", a vasprun.xml " << ext << ", or an"
-                    << " OUTCAR" << ext << " file into the working directory and try again" << std::endl;
+          string message = "Could not determine whether the DOSCAR is lm-resolved"
+                           " or contains spin-orbit coupling. AFLOW will assume that the"
+                           " DOSCAR is lm-resolved. If this is not the case, please put an"
+                           " INCAR" + ext + ", a vasprun.xml " + ext + ", or an"
+                           " OUTCAR" +  ext + " file into the working directory and try again.";
+          pflow::logger("xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
           isLSCOUPLING = true;
         }
         lmResolved = !(isLSCOUPLING);  // With 16 columns, it cannot be both
@@ -3818,6 +3825,13 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   for (uint iline = 6; iline < vcontent.size(); iline++) {
     if (iline == (d + 1) * number_energies + 6 + d) {
       d++;
+      // ME190810 - Safeguard against DOSCARs with additional lines
+      if (d == (int) ndos) {
+        string message = "DOSCAR contains more lines than the header suggests."
+                         " xDOSCAR object may not be properly populated.";
+        pflow::logger("xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
+        break;
+      }
       e = 0;
     } else {
       aurostd::string2tokens(vcontent.at(iline),tokens);
@@ -3886,6 +3900,12 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       //[OBSOLETE]    }
     }
     // ME190614 - END
+  }
+  // ME190812 - Safeguard against broken DOSCARs
+  if ((d < (int) ndos) || (e < (int) number_energies)) {
+    string function = "xDOSCAR::GetProperties()";
+    string message = "Broken DOSCAR: not enough lines.";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
   // fix denergy
   denergy=venergy.at(1)-venergy.at(0);
