@@ -71,7 +71,7 @@ SymmetryInformationITC::SymmetryInformationITC(){
 }
 
 // free
-void SymmetryInformationITC::Free(){
+void SymmetryInformationITC::free(){
 }
 
 // destructor
@@ -106,16 +106,16 @@ SymmetryInformationITC::~SymmetryInformationITC(){
   generators.clear();
   sgindex.clear();
   gl_sgs.clear();
-  Free();
+  free();
 }
 
 // copy constructor
 SymmetryInformationITC::SymmetryInformationITC(const SymmetryInformationITC& b){
-  Copy(b);
+  copy(b);
 }
 
 // copy constructor
-void SymmetryInformationITC::Copy(const SymmetryInformationITC& b){
+void SymmetryInformationITC::copy(const SymmetryInformationITC& b){
   if(this != &b){
     glideplanes=b.glideplanes;
     glideplanes_hex=b.glideplanes_hex;
@@ -152,8 +152,8 @@ void SymmetryInformationITC::Copy(const SymmetryInformationITC& b){
 // ===== Assignment Operator (operator=) ===== //
 const SymmetryInformationITC& SymmetryInformationITC::operator=(const SymmetryInformationITC& b){
   if(this!=&b){
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }

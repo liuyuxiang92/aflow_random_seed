@@ -23,6 +23,7 @@
         -- replaced all SYM::normalize() with explicity division of aurostd::modulus() (DX)
         -- replaced SYM::extract_row() with aurostd::operator() (DX)
         -- fabs() -> aurostd::abs() (CO)
+        -- patched new gcc9 warnings for implicit const warnings (CO)
         (AFLOW: aconvasp.cpp, aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib.h, aflowlib_libraries.cpp, aflowlib_webapp_entry.js, aflowlib_web_interface.cpp, aflowrc.cpp, apennsy_gndstate.cpp, apennsy_main.cpp, apennsy_vaspin.cpp, avasp.cpp, chull.cpp, contrib_cormac.cpp, contrib_wahyu.cpp, data.cpp, init.cpp, Makefile, modules.cpp, oaims.cpp, ovasp.cpp, pflow_funcs.cpp, pflow_print.cpp, plotter.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_SYM.TXT, surface.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, xatom.cpp, xclasses.cpp, xproto.cpp)
         (AEL: ael_elastic_fit.cpp, ael_elasticity.cpp, ael_elasticity.h, ael_get_stress.cpp)
         (AGL: agl_debye.cpp, agl_debye.h, agl_electronic.cpp, agl_eqn_state.cpp, agl_get_ev.cpp, agl_hugoniot.cpp, agl_polynomial.cpp, agl_rungibbs.cpp, agl_thermal.cpp)

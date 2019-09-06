@@ -77,8 +77,8 @@ class SymmetryInformationITC {
     bool initgenerators(string axis_cell);
     bool initsgs(string axis_cell);
   private:
-    void Free();
-    void Copy(const SymmetryInformationITC& b);
+    void free();
+    void copy(const SymmetryInformationITC& b);
 };
 
 //DX 20190215 [OBSOLETE] // ******************************************************************************

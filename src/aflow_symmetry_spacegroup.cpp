@@ -3526,7 +3526,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       xstr = xstr_orig;
       xstr.sym_eps = sym_eps; // DX 20190314 - need to update sym_eps, since the structure was overwritten 
       xstr.sym_eps_change_count = sym_eps_change_count; // DX 4/23/18 - need to update change count, since the structure was overwritten 
-      CCell.Free();
+      CCell.free();
       xstr.MinkowskiBasisReduction();
       xstr.GetPrimitiveCell();
 

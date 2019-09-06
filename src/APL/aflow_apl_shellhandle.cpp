@@ -9,6 +9,8 @@ namespace apl {
 
 // ///////////////////////////////////////////////////////////////////////////
 
+ShellData::ShellData() {free();}
+ShellData::ShellData(const ShellData& b) {copy(b);}
 ShellData::~ShellData() {
   for (uint i = 0; i < atoms.size(); i++)
     atoms[i].clear();
@@ -23,39 +25,51 @@ ShellData::~ShellData() {
   index.clear();
 }
 
-// ///////////////////////////////////////////////////////////////////////////
+void ShellData::free(){
+  occupation=0;
+  occupationCapacity=0;
+  isFull=false;
+  radius=0.0;
+  stdevRadius=0.0;
+  for(uint i=0;i<index.size();i++){index[i].clear();} index.clear();
+  for(uint i=0;i<atoms.size();i++){atoms[i].clear();} atoms.clear();
+  for(uint i=0;i<ratoms.size();i++){ratoms[i].clear();} ratoms.clear();
+}
 
-ShellData& ShellData::operator=(const ShellData& that) {
-  if (this != &that) {
-    occupation = that.occupation;
-    occupationCapacity = that.occupationCapacity;
-    isFull = that.isFull;
-    radius = that.radius;
-    stdevRadius = that.stdevRadius;
+void ShellData::copy(const ShellData& b){
+  occupation = b.occupation;
+  occupationCapacity = b.occupationCapacity;
+  isFull = b.isFull;
+  radius = b.radius;
+  stdevRadius = b.stdevRadius;
 
-    atoms.clear();
-    for (uint i = 0; i < that.atoms.size(); i++) {
-      deque<_atom> row;
-      for (uint j = 0; j < that.atoms[i].size(); j++)
-        row.push_back(that.atoms[i][j]);
-      atoms.push_back(row);
-      row.clear();
-    }
-
-    ratoms.clear();
-    for (uint i = 0; i < that.ratoms.size(); i++) {
-      deque<_atom> row;
-      for (uint j = 0; j < that.ratoms[i].size(); j++)
-        row.push_back(that.ratoms[i][j]);
-      ratoms.push_back(row);
-      row.clear();
-    }
-
-    index.clear();
-    for (uint i = 0; i < that.index.size(); i++)
-      index.push_back(that.index[i]);
+  atoms.clear();
+  for (uint i = 0; i < b.atoms.size(); i++) {
+    deque<_atom> row;
+    for (uint j = 0; j < b.atoms[i].size(); j++)
+      row.push_back(b.atoms[i][j]);
+    atoms.push_back(row);
+    row.clear();
   }
 
+  ratoms.clear();
+  for (uint i = 0; i < b.ratoms.size(); i++) {
+    deque<_atom> row;
+    for (uint j = 0; j < b.ratoms[i].size(); j++)
+      row.push_back(b.ratoms[i][j]);
+    ratoms.push_back(row);
+    row.clear();
+  }
+
+  index.clear();
+  for (uint i = 0; i < b.index.size(); i++)
+    index.push_back(b.index[i]);
+}
+
+// ///////////////////////////////////////////////////////////////////////////
+
+ShellData& ShellData::operator=(const ShellData& b) {
+  if (this != &b) {copy(b);}
   return *this;
 }
 

@@ -51,38 +51,44 @@
 // look into aflow.h for the definitions
 
 // constructors
-_atom::_atom() {
+_atom::_atom() {free();}
+_atom::_atom(const _atom& b){copy(b);}
+
+// destructor
+_atom::~_atom() {free();}
+
+void _atom::free() {
   fpos.clear();
   cpos.clear();
   corigin.clear();
   coord.clear();
   fpos_equation.clear(); //DX 20180607 - symbolic math for atom positions
   cpos_equation.clear(); //DX 20180607 - symbolic math for atom positions
-  type=0;
   spin=0.0;
-  noncoll_spin.clear(); // DX 12/5/17 - magnetic sym (non-collinear)
   spin_is_given=FALSE; // DX 9/21/17 - magnetic sym
+  noncoll_spin.clear(); // DX 12/5/17 - magnetic sym (non-collinear)
   noncoll_spin_is_given=FALSE; // DX 12/5/17 - magnetic sym (non-collinear)
   mass=0.0;
+  type=0;
   name="";
   info=0;  // (RHT)
   cleanname="";
+  name_is_given=FALSE;
   atomic_number=0;
   number=0;
-  name_is_given=FALSE;
   sd="";
   print_RHT=false;  //CO190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
   print_cartesian=FALSE;
-  basis=0;
+  verbose=FALSE;
   ijk.clear();
   isincell=FALSE;
+  basis=0;
   reference=0.0;
   ireference=0;
   equivalent=-1;
   is_inequivalent=TRUE;
   num_equivalents=0;
   index_iatoms=0;
-  verbose=FALSE;
   order_parameter_value=0;
   order_parameter_atom=FALSE;
   partial_occupation_value=1.0;
@@ -90,54 +96,47 @@ _atom::_atom() {
   shell = 0;
 }
 
-// destructor
-_atom::~_atom() {
-  free();
-}
-
-void _atom::free() {
+void _atom::copy(const _atom& b) {
+  fpos=b.fpos;
+  cpos=b.cpos;
+  corigin=b.corigin;
+  coord=b.coord;
+  fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
+  cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
+  spin=b.spin;
+  spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
+  noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+  noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+  mass=b.mass;
+  type=b.type;
+  name=b.name;
+  info=b.info;  // (RHT)
+  cleanname=b.cleanname;
+  name_is_given=b.name_is_given;
+  atomic_number=b.atomic_number;
+  number=b.number;
+  sd=b.sd;
+  print_RHT=b.print_RHT;  // (RHT)
+  print_cartesian=b.print_cartesian;
+  verbose=b.verbose;
+  ijk=b.ijk;
+  isincell=b.isincell;
+  basis=b.basis;
+  reference=b.reference;
+  ireference=b.ireference;
+  equivalent=b.equivalent;
+  is_inequivalent=b.is_inequivalent;
+  num_equivalents=b.num_equivalents;
+  index_iatoms=b.index_iatoms;
+  order_parameter_value=b.order_parameter_value;
+  order_parameter_atom=b.order_parameter_atom;
+  partial_occupation_value=b.partial_occupation_value;
+  partial_occupation_flag=b.partial_occupation_flag;
+  shell = b.shell;
 }
 
 const _atom& _atom::operator=(const _atom& b) {       // operator=
-  if(this != &b) {
-    free();
-    fpos=b.fpos;
-    cpos=b.cpos;
-    corigin=b.corigin;
-    coord=b.coord;
-    fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
-    cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
-    type=b.type;
-    spin=b.spin;
-    spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
-    noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-    noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-    mass=b.mass;
-    name=b.name;
-    info=b.info;  // (RHT)
-    cleanname=b.cleanname;
-    atomic_number=b.atomic_number;
-    number=b.number;
-    name_is_given=b.name_is_given;
-    sd=b.sd;
-    print_RHT=b.print_RHT;  // (RHT)
-    print_cartesian=b.print_cartesian;
-    basis=b.basis;
-    ijk=b.ijk;
-    isincell=b.isincell;
-    reference=b.reference;
-    ireference=b.ireference;
-    equivalent=b.equivalent;
-    is_inequivalent=b.is_inequivalent;
-    num_equivalents=b.num_equivalents;
-    index_iatoms=b.index_iatoms;
-    verbose=b.verbose;
-    order_parameter_value=b.order_parameter_value;
-    order_parameter_atom=b.order_parameter_atom;
-    partial_occupation_value=b.partial_occupation_value;
-    partial_occupation_flag=b.partial_occupation_flag;
-    shell = b.shell;
-  }
+  if(this != &b) {copy(b);}
   return *this;
 }
 
@@ -1218,22 +1217,32 @@ vector<uint> composition2stoichiometry(string& composition){
 // look into aflow.h for the definitions
 
 // constructors
-_sym_op::_sym_op() {
+_sym_op::_sym_op() {free();}
+_sym_op::_sym_op(const _sym_op& b) {copy(b);}
+
+// destructor
+_sym_op::~_sym_op() {free();}
+
+void _sym_op::free() {
   Uc.clear();Uf.clear();           // clear stuff
-  ctau.clear();ftau.clear();       // clear stuff
-  ctrasl.clear();ftrasl.clear();   // clear stuff
   generator.clear();               // clear stuff
   generator_coefficients.clear();  // clear stuff       // DX 12/6/17 - generator coefficients
   su2_coefficients.clear();        // clear stuff       // DX 1/15/18 - su(2) coefficients on Pauli matrices
   SU2_matrix.clear();              // clear stuff	// DX 1/15/18 - 2x2 complex SU(2) matrix
-  str_type="";                     // clear stuff
-  str_Hermann_Mauguin="";          // clear stuff
-  str_Schoenflies="";              // clear stuff
   angle=0.0;                       // clear stuff
   axis.clear();                    // clear stuff
   quaternion_vector.clear();       // clear stuff	//GEENA
   quaternion_matrix.clear();       // clear stuff	//GEENA
+  str_type="";                     // clear stuff
+  str_Hermann_Mauguin="";          // clear stuff
+  str_Schoenflies="";              // clear stuff
   flag_inversion=FALSE;            // clear stuff
+  ctau.clear();ftau.clear();       // clear stuff
+  basis_atoms_map.clear();         // clear stuff
+  basis_types_map.clear();         // clear stuff
+  basis_map_calculated=FALSE;      // clear stuff
+  ctrasl.clear();ftrasl.clear();   // clear stuff
+  site=0;                          // clear stuff       // DX 8/3/17
   is_pgroup=FALSE;                 // clear stuff
   is_pgroup_xtal=FALSE;            // clear stuff
   is_pgroupk=FALSE;                // clear stuff
@@ -1241,61 +1250,42 @@ _sym_op::_sym_op() {
   is_fgroup=FALSE;                 // clear stuff
   is_sgroup=FALSE;                 // clear stuff
   is_agroup=FALSE;                 // clear stuff
-  site=0;                          // clear stuff       // DX 8/3/17
-  basis_atoms_map.clear();         // clear stuff
-  basis_types_map.clear();         // clear stuff
-  // DX and CO - START
-  basis_map_calculated=FALSE;      // clear stuff
-  // DX and CO - END
 }
 
-// destructor
-_sym_op::~_sym_op() {
-  free();
-}
-
-void _sym_op::free() {
+void _sym_op::copy(const _sym_op& b){
+  Uc=b.Uc;
+  Uf=b.Uf;
+  generator=b.generator;
+  generator_coefficients=b.generator_coefficients; // DX 12/6/17 - generator coefficients
+  su2_coefficients=b.su2_coefficients;             // DX 1/15/18 - su(2) coefficients on Pauli matrices
+  SU2_matrix=b.SU2_matrix;                         // DX 1/15/18 - 2x2 complex SU(2) matrix 
+  angle=b.angle;
+  axis=b.axis;
+  quaternion_vector=b.quaternion_vector;	//GEENA
+  quaternion_matrix=b.quaternion_matrix;	//GEENA
+  str_type=b.str_type;
+  str_Hermann_Mauguin=b.str_Hermann_Mauguin;
+  str_Schoenflies=b.str_Schoenflies;
+  flag_inversion=b.flag_inversion;
+  ctau=b.ctau;
+  ftau=b.ftau;
+  basis_atoms_map.clear(); for(uint i=0;i<b.basis_atoms_map.size();i++){basis_atoms_map.push_back(b.basis_atoms_map.at(i));}
+  basis_types_map.clear(); for(uint i=0;i<b.basis_types_map.size();i++){basis_types_map.push_back(b.basis_types_map.at(i));}
+  basis_map_calculated=b.basis_map_calculated;
+  ctrasl=b.ctrasl;
+  ftrasl=b.ftrasl;
+  site=b.site;                        // DX 8/3/17
+  is_pgroup=b.is_pgroup;
+  is_pgroup_xtal=b.is_pgroup_xtal;
+  is_pgroupk=b.is_pgroupk;
+  is_pgroupk_xtal=b.is_pgroupk_xtal;  // DX 12/5/17
+  is_fgroup=b.is_fgroup;
+  is_sgroup=b.is_sgroup;
+  is_agroup=b.is_agroup;
 }
 
 const _sym_op& _sym_op::operator=(const _sym_op& b) {       // operator=
-  if(this != &b) {
-    free();
-    Uc=b.Uc;
-    Uf=b.Uf;
-    ctau=b.ctau;
-    ftau=b.ftau;
-    ctrasl=b.ctrasl;
-    ftrasl=b.ftrasl;
-    str_type=b.str_type;
-    str_Hermann_Mauguin=b.str_Hermann_Mauguin;
-    str_Schoenflies=b.str_Schoenflies;
-    generator=b.generator;
-    generator_coefficients=b.generator_coefficients; // DX 12/6/17 - generator coefficients
-    su2_coefficients=b.su2_coefficients;             // DX 1/15/18 - su(2) coefficients on Pauli matrices
-    SU2_matrix=b.SU2_matrix;                         // DX 1/15/18 - 2x2 complex SU(2) matrix 
-    angle=b.angle;
-    axis=b.axis;
-    quaternion_vector=b.quaternion_vector;	//GEENA
-    quaternion_matrix=b.quaternion_matrix;	//GEENA
-    flag_inversion=b.flag_inversion;
-    is_pgroup=b.is_pgroup;
-    is_pgroup_xtal=b.is_pgroup_xtal;
-    is_pgroupk=b.is_pgroupk;
-    is_pgroupk_xtal=b.is_pgroupk_xtal;  // DX 12/5/17
-    is_fgroup=b.is_fgroup;
-    is_sgroup=b.is_sgroup;
-    is_agroup=b.is_agroup;
-    site=b.site;                        // DX 8/3/17
-    basis_atoms_map.clear();
-    for(uint i=0;i<b.basis_atoms_map.size();i++)
-      basis_atoms_map.push_back(b.basis_atoms_map.at(i));
-    basis_types_map.clear();
-    for(uint i=0;i<b.basis_types_map.size();i++)
-      basis_types_map.push_back(b.basis_types_map.at(i));
-    // DX and CO - START
-    basis_map_calculated=b.basis_map_calculated;
-    // DX and CP - START
-  }
+  if(this != &b) {copy(b);}
   return *this;
 }
 
@@ -1550,7 +1540,7 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
 // STRUCTURE
 // look into aflow.h for the definitions
 
-void xstructure::Free() {
+void xstructure::free() {
 }
 
 // Constructors
@@ -1806,7 +1796,7 @@ xstructure::xstructure(const string& url,const string& file,int _iomode) {
   strstream >> (*this);
 }
 
-void xstructure::Copy(const xstructure& bstr) {
+void xstructure::copy(const xstructure& bstr) {
   // All the other stuff not set in the constructor
   iomode=bstr.iomode;
   title=bstr.title;
@@ -2102,9 +2092,9 @@ void xstructure::Copy(const xstructure& bstr) {
 
 // copy
 xstructure::xstructure(const xstructure& b) {
-  //  Free();
+  //  free();
   // *this=b;
-  Copy(b);
+  copy(b);
 }
 
 // destructor
@@ -2151,14 +2141,14 @@ xstructure::~xstructure() {
   symbolic_math_lattice.clear();                         // symbolic math representation of lattice 20180618
   prototype_parameter_list.clear();                      // prototype parameter list ANRL 20180618
   prototype_parameter_values.clear();                    // prototype parameters values ANRL 20180618
-  Free();
+  free();
 }
 
 // copies xtructures: b=a
 const xstructure& xstructure::operator=(const xstructure& b) {  // operator=
   if(this!=&b) {
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }

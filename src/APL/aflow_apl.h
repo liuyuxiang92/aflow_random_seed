@@ -2568,6 +2568,9 @@ namespace apl
 namespace apl {
 
 struct ShellData {
+  ShellData();
+  ShellData(const ShellData& b);
+
   int occupation;
   int occupationCapacity;
   bool isFull;
@@ -2579,6 +2582,9 @@ struct ShellData {
 
   ~ShellData();
   ShellData& operator=(const ShellData&);
+
+  void free();
+  void copy(const ShellData& b);
 };
 
 class ShellHandle {

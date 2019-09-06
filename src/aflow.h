@@ -1069,6 +1069,7 @@ class _atom { // simple class.. nothing fancy
  public:
   // constructor destructor                              // constructor/destructor
   _atom();                                               // default, just allocate
+  _atom(const _atom& b);                                 // required by gcc9
   ~_atom();                                              // kill everything
   const _atom& operator=(const _atom &b);                // copy
   void clear();
@@ -1119,6 +1120,7 @@ class _atom { // simple class.. nothing fancy
   void ClearSymmetry(void);                              // clears symmetry //CO190219
  private:                                                //
   void free();                                           // free space
+  void copy(const _atom& b);                                           // copy
 };
 
 class _atom_reference_cmp {                              // sorting through reference
@@ -1224,7 +1226,11 @@ class _sym_op {
  public:
   // constructor destructor
   _sym_op();                                                    // default, just allocate
+  _sym_op(const _sym_op& b);                                    // needed for gcc9  //CO190906
   ~_sym_op();                                                   // kill everything
+  const _sym_op& operator=(const _sym_op& b);
+  friend ostream& operator<<(ostream &,const _sym_op&);
+  
   // content
   // for _PGROUP_
   xmatrix<double>  Uc;            // 3x3                        // uniques (not irreducible) operations on positions (Uc cartesian)
@@ -1241,32 +1247,26 @@ class _sym_op {
   string           str_Hermann_Mauguin;                         // Hermann_Mauguin notation
   string           str_Schoenflies;                             // Schoenflies notation
   bool             flag_inversion;                              // flag if inversion
-  vector<int>      basis_atoms_map;                             // this is the vector that tell where the basis atom gets mapped by the operation
-  vector<int>      basis_types_map;                           // this is the vector that tell where the basis species gets mapped by the operation
-  // DX and CO - START
-  bool             basis_map_calculated;                        //have we've calculated it?
-  // DX and CO - END
-  bool             is_pgroup;                                   // bool is_pgroup
-  // for _PGROUPXTAL_
-  bool             is_pgroup_xtal;                              // bool is_pgroup_xtal
-  // for _PGROUPK_
-  bool             is_pgroupk;                                  // bool is_pgroupk
-  // for _PGROUPK_XTAL_                  
-  bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal // DX 12/5/17 - Added pgroupk_xtal
   // for _FGROUP_
   xvector<double>  ctau;          // 3                          // translation in CARTESIAN       // FACTOR GROUP only, [0,1[
   xvector<double>  ftau;          // 3                          // translation in FRACTIONAL      // FACTOR GROUP only, [0,1[
-  bool             is_fgroup;                                   // bool is_fgroup
+  vector<int>      basis_atoms_map;                             // this is the vector that tell where the basis atom gets mapped by the operation
+  vector<int>      basis_types_map;                             // this is the vector that tell where the basis species gets mapped by the operation
+  bool             basis_map_calculated;                        //have we've calculated it?
   // for _SGROUP_
   xvector<double>  ctrasl;        // 3                          // translation in CARTESIAN       // SPACE GROUP only, [integers]
   xvector<double>  ftrasl;        // 3                          // translation in FRACTIONAL      // SPACE GROUP only, [ingegers]
-  bool             is_sgroup;                                   // bool is_sgroup
   // operators
   // for _AGROUP_
-  bool             is_agroup;                                   // bool is_agroup     // for site operation point group
   uint             site;                                        // uint site          // site index // DX 8/3/17
-  const _sym_op& operator=(const _sym_op& b);
-  friend ostream& operator<<(ostream &,const _sym_op&);
+  // IDENTITY
+  bool             is_pgroup;                                   // bool is_pgroup
+  bool             is_pgroup_xtal;                              // bool is_pgroup_xtal
+  bool             is_pgroupk;                                  // bool is_pgroupk
+  bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal // DX 12/5/17 - Added pgroupk_xtal
+  bool             is_fgroup;                                   // bool is_fgroup
+  bool             is_sgroup;                                   // bool is_sgroup
+  bool             is_agroup;                                   // bool is_agroup     // for site operation point group
 
   void setUc(const xmatrix<double>& Uc,const xmatrix<double>& lattice);  //CO190321
   void setUf(const xmatrix<double>& Uf,const xmatrix<double>& lattice);  //CO190321
@@ -1275,6 +1275,7 @@ class _sym_op {
 
  private:
   void free();
+  void copy(const _sym_op& b);
 };
 
 //DX 201801107 - add _kpoint class - START
@@ -1340,8 +1341,8 @@ class GroupedWyckoffPosition{
     vector<uint> multiplicities;
     vector<string> letters;
   private:
-    void Free();
-    void Copy(const GroupedWyckoffPosition& b);
+    void free();
+    void copy(const GroupedWyckoffPosition& b);
 };
 // --------------------------------------------------------------------------
 //DX 20181010 - grouped Wyckoff class - END
@@ -1748,8 +1749,8 @@ class xstructure {
   string error_string;                                          // contains type of error
   // END OF CONTENT                                             //
  private:                                                       // ---------------------------------------
-  void Free();                                                  // to free everything
-  void Copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
+  void free();                                                  // to free everything
+  void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
 // CO 180420
@@ -3451,7 +3452,7 @@ namespace pocc {
     double r1,theta0,x1,D1,zeta,Z1,Vi,Uj,Xi,hard,radius; 
     void GetUFFParameters(string);
   private:
-    void Free(); //free space
+    void free(); //free space
   };
   string ReturnAtomProperties(string atom);
   //Atomic Properties Database
@@ -3464,7 +3465,7 @@ namespace pocc {
     double mass,radius,Xi; //atomic, weight radius /pauling electronegativity
     void GetAtomicProperties(string);
   private:
-    void Free();
+    void free();
   };
 } // namespace pocc
 
@@ -3473,6 +3474,7 @@ namespace pocc {
   class Bond{
   public:
     Bond();
+    Bond(const Bond& b);
     ~Bond();
     _atom bgn,end;
     double length;
@@ -3482,7 +3484,8 @@ namespace pocc {
     bool operator!=(const Bond &other) const;
     friend ostream& operator<<(ostream&,const Bond&);
   private:
-    void Free();
+    void free();
+    void copy(const Bond& b);
   };
   void SetUFFPara(_atom atomi, _atom atomj, double& R0, double& Kij, double& Xij, double& Dij);
   double CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj);
@@ -3761,8 +3764,8 @@ namespace spacegroup{
     std::vector<_sym_op> fgroup;                                  // rotations/inversions + incell_translations operations
     std::vector<_sym_op> pgroup;                                  // rotations/inversions
   private:                                                       // ---------------------------------------
-    void Free();                                                  // to free everything
-    void Copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
+    void free();                                                  // to free everything
+    void copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
   };
 
   extern std::vector<_spacegroup> vspacegroups;
@@ -4048,6 +4051,7 @@ namespace pflow {
   public:
     // constructors
     matrix(void) {};
+    matrix(const matrix& b) {copy(b);};
     matrix(const int m);
     matrix(const int m,const int n);
     matrix(const int m,const int n,const utype& inutype);
@@ -4055,30 +4059,27 @@ namespace pflow {
     ~matrix(void) {};                         // destructor
     // accessors
     void print(void);
-    uint size(void) const {
-      return (uint) mat.size();}
+    uint size(void) const {return (uint) mat.size();}
     matrix<utype> transpose(void) const;
     //  matrix<utype>::iterator begin();
     //  matrix<utype>::iterator end();
     // operator
-    vector<utype>& operator[] (const int i) {
-      assert(i>=0 && i<=(int) mat.size()); return mat[i];}
-    const vector<utype>& operator[] (const int i) const {
-      assert(i>=0 && i<=(int) mat.size()); return mat[i];};
+    vector<utype>& operator[] (const int i) {assert(i>=0 && i<=(int) mat.size()); return mat[i];}
+    const vector<utype>& operator[] (const int i) const {assert(i>=0 && i<=(int) mat.size()); return mat[i];};
     const matrix<utype>& operator=(const matrix<utype>& b);
     // mutators
-    void push_back(const vector<utype>& inutypevec) {
-      mat.push_back(inutypevec);}
+    void push_back(const vector<utype>& inutypevec) {mat.push_back(inutypevec);}
     void pop_back(void) {mat.pop_back();}
     void vecvec2mat(const vector<vector<utype> >& inVV);
     void vec2mat(const vector<utype>& inV);
     void clear(void) {mat.clear();}
-    void insert(const int& id,const vector<utype>& inV) {
-      mat.insert(mat.begin()+id,inV);}
+    void insert(const int& id,const vector<utype>& inV) {mat.insert(mat.begin()+id,inV);}
     void erase(const int id);
     void erase_col(const int id);
   private:
     vector<vector<utype> > mat;
+    void free();
+    void copy(const matrix& b);
   };
   template <class utype> matrix<utype>  xmatrix2matrix(const xmatrix<utype>& );
   template <class utype> xmatrix<utype> matrix2xmatrix(const matrix<utype>& );
