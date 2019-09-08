@@ -2594,15 +2594,15 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a_iomode==IOABINIT_AUTO) oss << "# " << a.title <<endl;//<< " (AUTO)" << endl;
     if(a_iomode==IOABINIT_GEOM) oss << "# " << a.title <<endl;//<< " (GEOM)" << endl;
     oss << "acell   " << double(1) << "   " << double(1) << "   " << double(1) << "  ANGSTR" << endl; // scaling of the primitive vectors, in Bohr.
-    for(uint j=1;j<=3;j++) { // each COLUMN of this array is one primitive translation
+    for(uint j=1;j<=3;j++) { //CO190908 - manual is misleading, it's row-based// each COLUMN of this array is one primitive translation
       if(j==1) oss << "rprim";
       if(j==2) oss << "     ";
       if(j==3) oss << "     ";
       for(uint i=1;i<=3;i++) {
 	oss << " ";
-	if(abs(a.lattice(i,j))<10.0) oss << " ";
-	if(!std::signbit(a.lattice(i,j))) oss << " ";
-	oss << a.lattice(i,j) << "";
+	if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO190908 - manual is misleading, it's row-based
+	if(!std::signbit(a.lattice(j,i))) oss << " "; //CO190908 - manual is misleading, it's row-based
+	oss << a.lattice(j,i) << "";  //CO190908 - manual is misleading, it's row-based
       }
       oss << endl;
     }
