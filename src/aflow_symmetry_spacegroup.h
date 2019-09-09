@@ -77,8 +77,8 @@ class SymmetryInformationITC {
     bool initgenerators(string axis_cell);
     bool initsgs(string axis_cell);
   private:
-    void Free();
-    void Copy(const SymmetryInformationITC& b);
+    void free();
+    void copy(const SymmetryInformationITC& b);
 };
 
 //DX 20190215 [OBSOLETE] // ******************************************************************************
@@ -555,7 +555,7 @@ namespace SYM {
   // ******************************************************************************
 //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
-  xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
+  //DX 20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
   double DotPro(xvector<double> a, xvector<double> b);
 //  double modulus(xvector<double> a);
   double modulus(vector<double> a);
@@ -566,8 +566,8 @@ namespace SYM {
   xmatrix<double> concatenate(vector<xvector<double> >& V);
   xmatrix<double> concatenate(vector<xmatrix<double> >& V);
 
-  void normalize(xvector<double>& v);
-  void normalize(vector<double>& v);
+  //DX 20190905 [OBSOLETE] void normalize(xvector<double>& v);
+  //DX 20190905 [OBSOLETE] void normalize(vector<double>& v);
   xmatrix<double> xvec2xmat(xvector<double> a, xvector<double> b, xvector<double> c);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V, vector<double> R);
@@ -616,7 +616,7 @@ namespace SYM {
   int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
-  double mod_one(double d);
+  //DX 20190905 [OBSOLETE] double mod_one(double d);
   double smallest_gt_min(double min, vector<double> vec);
   int smallest_gt_min_index(double min, int not_index1, int not_index2, vector<double> vec);
 
@@ -697,7 +697,7 @@ namespace SYM {
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD);
-  deque<_atom> updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice);
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX 20190805 - return to void
 
   //RHOMBOHEDRAL OBVERSE/REVERSE FUNCTIONS
   bool isObverseSetting(xstructure& xstr, double& tolerance);

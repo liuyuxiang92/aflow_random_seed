@@ -75,7 +75,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("ANGLES",aurostd::args2flag(argv,cmds,"--angle|--angles"));
   vpflow.args2addattachedscheme(argv,cmds,"ANGLES","--angle=|--angles=","0.0");
 
-  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB","--aflowlib=","");
+  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB::ENTRY_PHP","--aflowlib=","");
+  vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB::ENTRY_JSON","--aflowlib2=","");  // TEST SC 20190812
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AUID2AURL","--aflowlib_auid2aurl=|--auid2aurl=","");
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AURL2AUID","--aflowlib_aurl2auid=|--aurl2auid=","");
   vpflow.args2addattachedscheme(argv,cmds,"AFLOWLIB_AUID2LOOP","--aflowlib_auid2loop=|--auid2loop=","");
@@ -1341,8 +1342,8 @@ namespace pflow {
   int main(vector<string> &argv,vector<string> &cmds) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::main: BEGIN" << endl;
-    // cerr << "C username=" << XHOST.User << endl;
-    // cerr << "C groupname=" << XHOST.Group << endl;
+    // cerr << "C username=" << XHOST.user << endl;
+    // cerr << "C groupname=" << XHOST.group << endl;
     // cerr << "C XHOST.ostrPID=" << XHOST.ostrPID.str() << endl;
     // cerr.flush();
     // cerr << argv.size() << endl;
@@ -1519,8 +1520,9 @@ namespace pflow {
       if(vpflow.flag("ANGLES")) {pflow::ANGLES(vpflow.getattachedscheme("ANGLES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ALPHA_COMPOUND")) {cout << pflow::ALPHACompound(vpflow.getattachedscheme("ALPHA_COMPOUND")); _PROGRAMRUN=true;}
       if(vpflow.flag("ALPHA_SPECIES")) {cout << pflow::ALPHASpecies(vpflow.getattachedscheme("ALPHA_SPECIES")); _PROGRAMRUN=true;}
-      if(vpflow.flag("AFLOWLIB")) {aflowlib::WEB_Aflowlib_Entry_PHP(vpflow.getattachedscheme("AFLOWLIB"),cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("AFLOWLIB_AUID2AURL")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2AURL"),"AFLOWLIB_AUID2AURL"); _PROGRAMRUN=true;}
+       if(vpflow.flag("AFLOWLIB::ENTRY_PHP")) {aflowlib::WEB_Aflowlib_Entry_PHP(vpflow.getattachedscheme("AFLOWLIB::ENTRY_PHP"),cout); _PROGRAMRUN=true;} // TEST SC 20190813
+      if(vpflow.flag("AFLOWLIB::ENTRY_JSON")) {aflowlib::WEB_Aflowlib_Entry(vpflow.getattachedscheme("AFLOWLIB::ENTRY_JSON"),cout); _PROGRAMRUN=true;} // TEST SC 20190812
+       if(vpflow.flag("AFLOWLIB_AUID2AURL")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2AURL"),"AFLOWLIB_AUID2AURL"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AURL2AUID")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2AUID"),"AFLOWLIB_AURL2AUID"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AUID2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2LOOP"),"AFLOWLIB_AUID2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
@@ -2047,16 +2049,16 @@ namespace pflow {
   "<< x<<" --use_aflow.in=XXX \n\
   "<< x<<" --aflowin < POSCAR \n\
   "<< x<<" --aflowSG[_label,_number][=tolerance| =tight| =loose] < POSCAR \n\
-  "<< x<<" --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
+  "<< x<<" --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   "<< x<<" --poscar2aflowin < POSCAR \n\
   "<< x<<" --angle=cutoff < POSCAR \n\
-  "<< x<<" --agroup | --sitepointgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
+  "<< x<<" --agroup | --sitepointgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   "<< x<<" --agroup2 < POSCAR \n\
   "<< x<<" --agroup2m < POSCAR \n\
   "<< x<<" --alphabetic < POSCAR \n\
   "<< x<<" --alpha_compound=string1,string2.... \n\
   "<< x<<" --alpha_species=string1,string2... \n\
-  "<< x<<" --aflowlib=entry \n\
+  "<< x<<" --aflowlib=entry [--print=txt | --print=json] \n\
   "<< x<<" --aflowlib_auid2aurl=auid1,auid2.... | --auid2aurl=... \n\
   "<< x<<" --aflowlib_aurl2auid=aurl1,aurl2.... [ --aurl2auid=... \n\
   "<< x<<" --aflowlib_auid2loop=auid1,auid2.... | --auid2loop=... \n\
@@ -2158,7 +2160,7 @@ namespace pflow {
                  --png_resolution=|--pngresolution=|--pngr=300 \n\
                  --plot_iso_max_latent_heat|--iso_max|--isomax \n\
   "<< x<<" --corners | --corner < POSCAR \n\
-  "<< x<<" --data[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] < POSCAR \n\
+  "<< x<<" --data[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] < POSCAR \n\
   "<< x<<" --data1=rcut < POSCAR \n\
   "<< x<<" --data2 < POSCAR \n\
   "<< x<<" --debye=THERMO[.bz2|.gz|.xz] \n\
@@ -2166,12 +2168,12 @@ namespace pflow {
   "<< x<<" --disp=cutoff < POSCAR \n\
   "<< x<<" --dist=cutoff < POSCAR \n\
   "<< x<<" --delta_kpoints=number [or --dkpoints=number | -dkpoints=number | -dk=number] < POSCAR \n\
-  "<< x<<" --edata[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] < POSCAR \n\
+  "<< x<<" --edata[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] < POSCAR \n\
   "<< x<<" --effective-mass | --em DIRECTORY \n\
   "<< x<<" --eigcurv=DIRECTORY(with bands) \n\
   "<< x<<" --enum | --multienum < POPSCAR \n\
   "<< x<<" --enumsort | --multienumsort < POPSCAR \n\
-  "<< x<<" --equivalent | --equiv | --inequivalent | --inequiv | --iatoms | --eatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
+  "<< x<<" --equivalent | --equiv | --inequivalent | --inequiv | --iatoms | --eatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   "<< x<<" --ewald[=eta] < POSCAR \n\
   "<< x<<" --findsym[=tolerance_relative: default " << DEFAULT_FINDSYM_TOL << "] < POSCAR \n\
   "<< x<<" --findsym_print[=tolerance_relative: default " << DEFAULT_FINDSYM_TOL << "] < POSCAR \n\
@@ -2273,7 +2275,7 @@ namespace pflow {
   "<< x<<" --setcm cm1 cm2 cm3 < POSCAR \n\
   "<< x<<" --setorigin r1 r2 r3 | atom# < POSCAR \n\
   "<< x<<" --sewald eta < POSCAR \n\
-  "<< x<<" --sgdata|--space_group_data[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
+  "<< x<<" --sgdata|--space_group_data[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   "<< x<<" --shell=ns,r1,r2,name,dens < POSCAR \n\
   "<< x<<" --shift=Sx,Sy,Sz[,cCdD] < POSCAR \n\
   "<< x<<" --sitepointgroup | --agroup < POSCAR \n\
@@ -2305,15 +2307,15 @@ namespace pflow {
   "<< x<<" --zval_atom[=directory] \n\
   "<< x<<" --zval_cell[=directory] \n\
   \n\
-  "<< x<<" --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] < POSCAR \n\
-  "<< x<<" --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal | --pgroupx | --pgroupX[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
+  "<< x<<" --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR \n\
+  "<< x<<" --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal | --pgroupx | --pgroupX[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   "<< x<<" --pgl < POSCAR \n\
   "<< x<<" --pgx < POSCAR \n\
   "<< x<<" --factorgroup | --fgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt|=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   "<< x<<" --sitepointgroup | --agroup < POSCAR \n\
   "<< x<<" --spacegroup | --sgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt|=json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
-  "<< x<<" --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] < POSCAR \n\
-  "<< x<<" --pointgroupkcrystal | --pgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
+  "<< x<<" --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR \n\
+  "<< x<<" --pointgroupkcrystal | --pgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR \n\
   \n\
  Prototypes HTQC \n\
   "<< x<<" --prototypes | --protos \n\
@@ -2813,7 +2815,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
         return init::ErrorOption(cout,options,"pflow::SYMMETRY",
-				 aurostd::liststring2string("aflow "+aliases+"[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] "+sym_specific_options+" < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
+				 aurostd::liststring2string("aflow "+aliases+"[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] "+sym_specific_options+" < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
       }
     }
     // DX 170804 - need to rescale, so we make a fast copy and calculate
@@ -5171,7 +5173,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
         return init::ErrorOption(cout,options,"pflow::DATA",
-				 aurostd::liststring2string("aflow "+aliases+"[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
+				 aurostd::liststring2string("aflow "+aliases+"[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
       }
     }
     xstructure _a(input,IOAFLOW_AUTO);
@@ -5588,7 +5590,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
         init::ErrorOption(cout,options,"pflow::EQUIVALENT",
-                          aurostd::liststring2string("aflow --equivalent|--equiv|--inequivalent|--inequiv|--iatoms|--eatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0"));
+                          aurostd::liststring2string("aflow --equivalent|--equiv|--inequivalent|--inequiv|--iatoms|--eatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0"));
         exit(0);
       }
     }
@@ -6279,7 +6281,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
         return init::ErrorOption(cout,options,"pflow::CalculateFullSymmetry",
-				 aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
+				 aurostd::liststring2string("aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt"));
       }
     }
     // DX 170804 - need to rescale, so we make a fast copy and calculate
@@ -13878,7 +13880,7 @@ namespace pflow {
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
         return init::ErrorOption(cout,options,"pflow::SGDATA",
-				 aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic"));
+				 aurostd::liststring2string("aflow --sgdata|--space_group_data[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, print=txt, non-magnetic"));
       }
     }
     xstructure _a(input,IOAFLOW_AUTO);

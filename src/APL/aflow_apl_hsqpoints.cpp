@@ -43,14 +43,18 @@ namespace apl
     if(!t1){
       if(t2){command=string("bzip2 -d ")+string(bz2);aurostd::execute2string(command);}
       else {
-        _logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
+        // ME190726 - exit clean-up
+        //_logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
+        throw APLRuntimeError("File " + file + " doesn't exist");
       }
     }
 
     string line;
     ifstream in (file.c_str());
     if (!in.is_open()){
-      _logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
+      // ME190726 - exit clean-up
+      //_logger << apl::error << file<<" doesn't exist" << apl::endl; exit(0);
+      throw APLRuntimeError("File " + file + " doesn't exist");
     }
     while ( getline (in,line) )
       {
@@ -68,7 +72,9 @@ namespace apl
         apl::tokenize(line, vsr, string(" "));
          if(vsr.size()!=5)
          {
-            _logger << apl::error << file<<" format error " << apl::endl; exit(0);
+            // ME190726 - exit clean-up
+            //_logger << apl::error << file<<" format error " << apl::endl; exit(0);
+            throw APLRuntimeError("Format error in file " + file + ".");
          }
          xvector<double> tmp(3,1);
          tmp[1]=atof(vsr[0].c_str());

@@ -67,7 +67,7 @@ StructurePrototype::StructurePrototype(){
 }
 
 // ===== Free  ===== //
-void StructurePrototype::Free(){
+void StructurePrototype::free(){
 }
 
 // ===== Destructor ===== //
@@ -100,16 +100,16 @@ StructurePrototype::~StructurePrototype(){
   representative_structure_properties.clear();
   duplicate_structures_properties.clear();
   family_structures_properties.clear(); //DX 20190425
-  Free();
+  free();
 }
 
 // ===== Copy Constructor ===== //
 StructurePrototype::StructurePrototype(const StructurePrototype& b){
-  Copy(b);
+  copy(b);
 }
 
 // ===== Copy Constructor Function ===== //
-void StructurePrototype::Copy(const StructurePrototype& b) {
+void StructurePrototype::copy(const StructurePrototype& b) {
   if(this != &b){
     iomode=b.iomode;
     representative_structure_name=b.representative_structure_name; 
@@ -158,8 +158,8 @@ void StructurePrototype::Copy(const StructurePrototype& b) {
 // ***************************************************************************
 const StructurePrototype& StructurePrototype::operator=(const StructurePrototype& b){
   if(this!=&b){
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }
@@ -562,7 +562,7 @@ GroupedWyckoffPosition::GroupedWyckoffPosition(){
 }
 
 // ===== Free  ===== //
-void GroupedWyckoffPosition::Free(){
+void GroupedWyckoffPosition::free(){
 }
 
 // ===== Destructor  ===== //
@@ -574,11 +574,11 @@ GroupedWyckoffPosition::~GroupedWyckoffPosition(){
 
 // ===== Copy Constructor ===== //
 GroupedWyckoffPosition::GroupedWyckoffPosition(const GroupedWyckoffPosition& b){
-  Copy(b);
+  copy(b);
 }
 
 // ===== Copy Constructor Function ===== //
-void GroupedWyckoffPosition::Copy(const GroupedWyckoffPosition& b) {
+void GroupedWyckoffPosition::copy(const GroupedWyckoffPosition& b) {
   if(this != &b){
     type=b.type;
     element=b.element;
@@ -591,8 +591,8 @@ void GroupedWyckoffPosition::Copy(const GroupedWyckoffPosition& b) {
 // ===== Assignment Operator (operator=) ===== //
 const GroupedWyckoffPosition& GroupedWyckoffPosition::operator=(const GroupedWyckoffPosition& b){
   if(this!=&b){
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }

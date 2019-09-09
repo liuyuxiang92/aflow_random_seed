@@ -137,8 +137,12 @@ namespace pocc {
 namespace pocc {
   struct POccSuperCell {
     //no need (YET) to make a class, simple ints and double, no real methods
+    POccSuperCell();
+    POccSuperCell(const POccSuperCell& b);
     const POccSuperCell& operator=(const POccSuperCell& b);
     bool operator<(const POccSuperCell& other) const;
+    void free();
+    void copy(const POccSuperCell& b);
     
     unsigned long long int hnf_index;
     unsigned long long int site_config_index;

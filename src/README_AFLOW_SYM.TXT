@@ -218,7 +218,7 @@ The output format can be specified by appending the optional flag [--print=<form
 ****************************************************************************************************
 AFLOW COMMANDS USAGE:
   
-  aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculates the full symmetry of a crystal: point group lattice, point group crystal, factor group,
         space group, site point group, inequivalent/equivalent atoms, and the point group of the klattice.
         This routine calculates the full symmetry suite at a certain tolerance. If symmetry rules are broken,
@@ -240,7 +240,7 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 
@@ -294,7 +294,7 @@ AFLOW COMMANDS USAGE:
         Options:
           [--no_symmetry] : Will not perform symmetry analysis and return the CIF with space group 1.
  
-  aflow --edata[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt| =json] < POSCAR
+  aflow --edata[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt | --print=json] < POSCAR
         Outputs to standard the information given by --data in addition
         to lattice-, superlattice- and reciprocal-lattice types.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -320,10 +320,10 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
   
-  aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculate point/factor/space group and use them to label equivalent
         and inequivalent atoms. On the output, each structure atom has
         number_label_of_atom[equivalent_to_label]* (* if inequivalent).
@@ -347,10 +347,10 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
   
-  aflow --factorgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --factorgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculates factor group symmetry of the cell {R|t} and writes
         in the aflow.fgroup.out file. See documentation of aflow.
         The point group is required for the factor group, therefore
@@ -374,7 +374,7 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
   
@@ -389,7 +389,7 @@ AFLOW COMMANDS USAGE:
   aflow --pearson_symbol | --pearson < POSCAR
         Returns the Pearson symbol of the structure.
 
-  aflow --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] < POSCAR
+  aflow --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
         Calculates the point group symmetry of the lattice {R} and writes
         it in the aflow.pgroup.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -403,10 +403,10 @@ AFLOW COMMANDS USAGE:
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
 
-  aflow --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculate the point group symmetry of the crystal {R+atoms} and
         writes it the aflow.pgroup_xtal.file.  
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -428,11 +428,11 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 
-  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
         Calculates the dual of the crystal point group symmetry operations and writes
         it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -454,11 +454,11 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 
-  aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] < POSCAR
+  aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
         Calculates the point group symmetry of the klattice {K} and writes
         it in the aflow.pgroupk.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -472,7 +472,7 @@ AFLOW COMMANDS USAGE:
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
  
   aflow --sc | --std_conv | --standard_conventional | --sconv < POSCAR
@@ -481,7 +481,7 @@ AFLOW COMMANDS USAGE:
 	  to output POSCAR in a standard primitive lattice) (WS & SC Nov09)
         REF: Setyawan Curtarolo, DOI: 10.1016/j.commatsci.2010.05.010
 
-  aflow --sgdata | --space_group_data[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --sgdata | --space_group_data[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Outputs the following space group information: space group number, space group labels
         (Hermann Mauguin, Hall, Schoenflies), Laue class, crystal class, ITC setting, ITC origin shift,
         general Wyckoff position, and the WYCCAR (similar to --edata).
@@ -508,9 +508,9 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
 
-  aflow --sitepointgroup | --agroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --sitepointgroup | --agroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculates the site point group symmetry for every atom in the
         unit cell and writes it in the aflow.agroup.out file.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -532,7 +532,7 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 	   See documentation of aflow.
@@ -543,7 +543,7 @@ AFLOW COMMANDS USAGE:
 	  to output POSCAR in a standard conventional lattice) (WS & SC Nov09)
         REF: Setyawan Curtarolo, DOI: 10.1016/j.commatsci.2010.05.010
   
-  aflow --spacegroup [=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]< POSCAR
+  aflow --spacegroup [=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]< POSCAR
         Calculates space group symmetry of the cell {R|t+T} with
         translations as big as |T| and writes it in the aflow.sgroup.out
         file. See documentation of aflow.
@@ -571,7 +571,7 @@ AFLOW COMMANDS USAGE:
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
 

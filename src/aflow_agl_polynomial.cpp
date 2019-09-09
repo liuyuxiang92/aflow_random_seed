@@ -596,7 +596,7 @@ namespace AGL_functions {
     if(ydata_to_fit.at(imin) < ydata_to_fit.at(imin+1) && ydata_to_fit.at(imin) < ydata_to_fit.at(imin-1)) {
       return 0;
     } 
-    else if(fabs(ydata_to_fit.at(imin) - ydata_to_fit.at(imin+1)) < tol && fabs(ydata_to_fit.at(imin) - ydata_to_fit.at(imin-1)) < tol) {
+    else if(aurostd::abs(ydata_to_fit.at(imin) - ydata_to_fit.at(imin+1)) < tol && aurostd::abs(ydata_to_fit.at(imin) - ydata_to_fit.at(imin-1)) < tol) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "bracket_minimum: Flat function, impossible to search" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -818,7 +818,7 @@ namespace AGL_functions {
       pxmin = x;
       return pmerr;
     }
-    while (fabs(x_b - x_a) > tol && fabs(dx) > tol) {
+    while (aurostd::abs(x_b - x_a) > tol && aurostd::abs(dx) > tol) {
       // Reset bracket range to previous root estimate on one side
       if(zero_bracketed_check(f_a, f_x)) {
 	x_b = x;
@@ -1066,7 +1066,7 @@ namespace AGL_functions {
 	// Newton's method.
 	z = z1 - polynom1 / polynomderiv;
 	// Convergence test
-	zdiff = fabs(z-z1);
+	zdiff = aurostd::abs(z-z1);
       }
       if((iloops >= AGL_data.maxloops) && (zdiff > eps)) {
 	aurostd::StringstreamClean(aus);
@@ -1340,7 +1340,7 @@ namespace AGL_functions {
 	}
 	debye_integral = sumdebyeint / (pow(yval, 3.0));
 	// Convergence check
-	diff_int_abs = fabs(debye_integral - debye_int_prev);
+	diff_int_abs = aurostd::abs(debye_integral - debye_int_prev);
 	if(diff_int_abs < eps) {
 	  break;
 	}

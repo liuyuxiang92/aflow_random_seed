@@ -88,8 +88,10 @@ namespace apl
 
     if (_kpoints.size()==0)
       {
-	_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
-	exit(0);
+        // ME190726 - exit clean-up
+	//_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
+	//exit(0);
+        throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
       }
 
   }

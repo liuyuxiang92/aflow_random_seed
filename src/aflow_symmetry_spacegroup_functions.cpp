@@ -71,7 +71,7 @@ SymmetryInformationITC::SymmetryInformationITC(){
 }
 
 // free
-void SymmetryInformationITC::Free(){
+void SymmetryInformationITC::free(){
 }
 
 // destructor
@@ -106,16 +106,16 @@ SymmetryInformationITC::~SymmetryInformationITC(){
   generators.clear();
   sgindex.clear();
   gl_sgs.clear();
-  Free();
+  free();
 }
 
 // copy constructor
 SymmetryInformationITC::SymmetryInformationITC(const SymmetryInformationITC& b){
-  Copy(b);
+  copy(b);
 }
 
 // copy constructor
-void SymmetryInformationITC::Copy(const SymmetryInformationITC& b){
+void SymmetryInformationITC::copy(const SymmetryInformationITC& b){
   if(this != &b){
     glideplanes=b.glideplanes;
     glideplanes_hex=b.glideplanes_hex;
@@ -152,8 +152,8 @@ void SymmetryInformationITC::Copy(const SymmetryInformationITC& b){
 // ===== Assignment Operator (operator=) ===== //
 const SymmetryInformationITC& SymmetryInformationITC::operator=(const SymmetryInformationITC& b){
   if(this!=&b){
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }
@@ -361,12 +361,14 @@ namespace SYM {
 // ******************************************************************************
 // Update atom positions after screw operation
 namespace SYM {
-  deque<_atom> updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) {
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice) { // DX 20190905 - return to void 
     for (uint a = 0; a < atoms.size(); a++) {
       atoms[a].cpos = S * atoms[a].cpos;
-      atoms[a].fpos = SYM::mod_one_xvec(C2F(lattice, atoms[a].cpos));
+      //DX 20190905 [OBSOLETE-no more mod_one_xvec] atoms[a].fpos = SYM::mod_one_xvec(C2F(lattice, atoms[a].cpos));
+      atoms[a].fpos = C2F(lattice, atoms[a].cpos); //DX 20190905
+      BringInCellInPlace(atoms[a].fpos); //DX 20190905
     }
-    return atoms;
+    //DX 20190905 [OBSOLETE] return atoms;
   }
 } //namespace SYM
 
@@ -992,18 +994,18 @@ namespace SYM {
   }
 } //namespace SYM
 
-// ******************************************************************************
-// CrossPro (Cross Product)
-// ******************************************************************************
-namespace SYM {
-  xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b) {
-    xvector<double> resu;
-    resu[1] = a[2] * b[3] - b[2] * a[3];
-    resu[2] = a[3] * b[1] - b[3] * a[1];
-    resu[3] = a[1] * b[2] - b[1] * a[2];
-    return resu;
-  }
-} //namespace SYM
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] // ******************************************************************************
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] // CrossPro (Cross Product)
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] // ******************************************************************************
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] namespace SYM {
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]   xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b) {
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     xvector<double> resu;
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     resu[1] = a[2] * b[3] - b[2] * a[3];
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     resu[2] = a[3] * b[1] - b[3] * a[1];
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     resu[3] = a[1] * b[2] - b[1] * a[2];
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]     return resu;
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()]   }
+//DX 20190905 [OBSOLETE - using aurostd::vector_product()] } //namespace SYM
 
 // ******************************************************************************
 // DotPro (Dot Product)
@@ -1880,7 +1882,7 @@ namespace SYM {
       cerr << "SYM::get_possible_origin_shifts: All Wyckoff positions with multiplicty " << multiplicity << " and same site symmetry " << site_symmetry << "." << endl;
       for(uint s=0;s<same_site_symmetry_positions.size();s++){
         print(same_site_symmetry_positions[s]);   
-        ::xb();  
+        xb();  
       }
     }
     for (uint s = 0; s < same_site_symmetry_positions.size(); s++) {  // DX 9/11/17 - Check all shifts not just minimum (minimum may not work) 
@@ -1894,18 +1896,21 @@ namespace SYM {
           }
         }
         if(!stored_shift){
-          possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift));
+          //DX 20190905 [OBSOLETE-no more mod_one_xvec] possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift));
+          possible_shifts.push_back(BringInCell(candidate_shift)); //DX 20190905
           // DX 2/28/18 - Consider difference of two shifts - START
           bool stored_other_shift =false;
           for(uint p=0;p<possible_shifts.size();p++){
             for(uint q=0;q<possible_shifts.size();q++){
-               if(aurostd::abs(aurostd::modulus(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){
+               //DX 20190905 [OBSOLETE-no more mod_one_xvec] if(aurostd::abs(aurostd::modulus(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){
+               if(aurostd::abs(aurostd::modulus(BringInCell(candidate_shift-possible_shifts[p]-possible_shifts[q])))<_ZERO_TOL_){ //DX 20190905 
                  stored_other_shift=true;
                  break;
                }
             }
             if(!stored_other_shift){
-              possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]));
+              //DX 20190905 [OBSOLETE-no more mod_one_xvec] possible_shifts.push_back(SYM::mod_one_xvec(candidate_shift-possible_shifts[p]));
+              possible_shifts.push_back(BringInCell(candidate_shift-possible_shifts[p])); //DX 20190905
             }
           }
           // DX 2/28/18 - Consider difference of two shifts - END
@@ -2608,20 +2613,24 @@ namespace SYM {
     // == Subtract shift from previous iterations == //
     for (uint i = 0; i < equivalent_atoms_shifted.size(); i++) {
       for (uint j = 0; j < equivalent_atoms_shifted[i].size(); j++) {
-        equivalent_atoms_shifted[i][j].fpos = SYM::mod_one_xvec(equivalent_atoms_shifted[i][j].fpos + previous_shift);
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] equivalent_atoms_shifted[i][j].fpos = SYM::mod_one_xvec(equivalent_atoms_shifted[i][j].fpos + previous_shift);
+        equivalent_atoms_shifted[i][j].fpos = equivalent_atoms_shifted[i][j].fpos + previous_shift; //DX 20190905
+        BringInCellInPlace(equivalent_atoms_shifted[i][j].fpos); //DX 20190905
       }
     }
     // == Apply new origin shift == //
     for (uint i = 0; i < equivalent_atoms_shifted.size(); i++) {
       for (uint j = 0; j < equivalent_atoms_shifted[i].size(); j++) {
-        equivalent_atoms_shifted[i][j].fpos = SYM::mod_one_xvec(equivalent_atoms_shifted[i][j].fpos - new_shift);
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] equivalent_atoms_shifted[i][j].fpos = SYM::mod_one_xvec(equivalent_atoms_shifted[i][j].fpos - new_shift);
+        equivalent_atoms_shifted[i][j].fpos = equivalent_atoms_shifted[i][j].fpos - new_shift; //DX 20190905
+        BringInCellInPlace(equivalent_atoms_shifted[i][j].fpos); //DX 20190905
       }
     }
     if(LDEBUG) {
       cerr << "SYM::shiftWyckoffPositions: Shifted atoms: " << endl;
       for(uint i=0;i<equivalent_atoms_shifted.size();i++){
-        ::xb();
-        ::print(equivalent_atoms_shifted[i]);
+        xb();
+        print(equivalent_atoms_shifted[i]);
       }
       cerr << endl;
     } 
@@ -2708,34 +2717,36 @@ namespace SYM {
 	    for (int k = 0; k < 3; k++) {  //TAKE FIRST SYMMETRY-RELATED SITE TO ASSIGN VARIABLES (HENCE: [j][0])
 	      W(k + 1, 4) = tmp_equivalent_atoms_shifted[ix].fpos(k + 1);
 	      for (uint l = 0; l < wyckoff_set[m][k].size(); l++) {
-		//cerr <<"is " << wyckoff_set[m][k][l].dbl << " " << wyckoff_set[m][k][l].chr << " equal to: " << tmp_equivalent_atoms_shifted[ix].fpos(k+1) << endl;//DEBUG MODE
-		// === Compare constent components in Wyckoff positions first === //
-		if(wyckoff_set[m][k][l].chr == '\0') {
-		  W(k + 1, 4) -= wyckoff_set[m][k][l].dbl;
-		} 
-		else {
-		  int neg_pos = 1;
-		  //If the coefficient is negative then multiply both sides by negative one and take RHS modulo 1
-		  //cerr << "wyckoff_set[m][k][l].chr: " << wyckoff_set[m][k][l].chr << endl;
-		  if(wyckoff_set[m][k][l].chr == 'x') {
-		    contains_variable = true;
-		    contains_x_variable = true;
-		    W(k + 1, 1) = neg_pos * wyckoff_set[m][k][l].dbl;
-		  }
-		  if(wyckoff_set[m][k][l].chr == 'y') {
-		    contains_variable = true;
-		    contains_y_variable = true;
-		    W(k + 1, 2) = neg_pos * wyckoff_set[m][k][l].dbl;
-		  }
-		  if(wyckoff_set[m][k][l].chr == 'z') {
-		    contains_variable = true;
-		    contains_z_variable = true;
-		    W(k + 1, 3) = neg_pos * wyckoff_set[m][k][l].dbl;
-		  }
-		  W(k + 1, 4) = SYM::mod_one(neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1));
-		}
-	      }
-	    }
+          //cerr <<"is " << wyckoff_set[m][k][l].dbl << " " << wyckoff_set[m][k][l].chr << " equal to: " << tmp_equivalent_atoms_shifted[ix].fpos(k+1) << endl;//DEBUG MODE
+          // === Compare constent components in Wyckoff positions first === //
+          if(wyckoff_set[m][k][l].chr == '\0') {
+            W(k + 1, 4) -= wyckoff_set[m][k][l].dbl;
+          } 
+          else {
+            int neg_pos = 1;
+            //If the coefficient is negative then multiply both sides by negative one and take RHS modulo 1
+            //cerr << "wyckoff_set[m][k][l].chr: " << wyckoff_set[m][k][l].chr << endl;
+            if(wyckoff_set[m][k][l].chr == 'x') {
+              contains_variable = true;
+              contains_x_variable = true;
+              W(k + 1, 1) = neg_pos * wyckoff_set[m][k][l].dbl;
+            }
+            if(wyckoff_set[m][k][l].chr == 'y') {
+              contains_variable = true;
+              contains_y_variable = true;
+              W(k + 1, 2) = neg_pos * wyckoff_set[m][k][l].dbl;
+            }
+            if(wyckoff_set[m][k][l].chr == 'z') {
+              contains_variable = true;
+              contains_z_variable = true;
+              W(k + 1, 3) = neg_pos * wyckoff_set[m][k][l].dbl;
+            }
+            //DX 20190905 [OBSOLETE-no more mod_one_xvec] W(k + 1, 4) = SYM::mod_one(neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1));
+            W(k + 1, 4) = neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1); //DX 20190905
+            BringInCellInPlace(W(k + 1, 4)); //DX 20190905
+          }
+        }
+      }
 	    // ===== Linear algebra problem: Solve for Wyckoff position (if positions are not constant) ===== //
 	    vector<xvector<double> > LHS;
 	    xvector<double> tmp1; tmp1(1) = W(1, 1); tmp1(2) = W(1, 2); tmp1(3) = W(1, 3);
@@ -4300,37 +4311,39 @@ namespace SYM {
     for (uint k = 0; k < atoms.size(); k++) {
       deque<_atom> tmpv;
       for (uint i = 0; i < sym_ops.size(); i++) {
-	_atom tmp;
-	tmp.fpos = (SYM::mod_one_xvec((sym_ops[i] * atoms[k].fpos + translations[i])));
-	tmp.cpos = f2c * tmp.fpos;
-	tmp.name = atoms[k].name;
-	tmp.type = atoms[k].type;
+        _atom tmp;
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] tmp.fpos = (SYM::mod_one_xvec((sym_ops[i] * atoms[k].fpos + translations[i])));
+        tmp.fpos = sym_ops[i] * atoms[k].fpos + translations[i]; //DX 20190905
+        BringInCellInPlace(tmp.fpos); //DX 20190905
+        tmp.cpos = f2c * tmp.fpos;
+        tmp.name = atoms[k].name;
+        tmp.type = atoms[k].type;
         tmp.spin = atoms[k].spin; // DX 9/21/17 - magnetic sym
         tmp.spin_is_given = atoms[k].spin_is_given; // DX 9/21/17 - magnetic sym
         tmp.noncoll_spin = atoms[k].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
         tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-	bool contained = false;
-	for (uint j = 0; j < equivalent_atoms.size(); j++) {
-	  if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
-	    contained = true;
-	    break;
-	  }
-	}
-	if(contained == false) {
-	  tmpv.push_back(tmp);
-	}
+        bool contained = false;
+        for (uint j = 0; j < equivalent_atoms.size(); j++) {
+          if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
+            contained = true;
+            break;
+          }
+        }
+        if(contained == false) {
+          tmpv.push_back(tmp);
+        }
       }
       if(tmpv.size() > 0) {
-	reduce_atom_deques(tmpv, lattice, min_dist,tol); //DX 20190215
-	equivalent_atoms.push_back(tmpv);
+        reduce_atom_deques(tmpv, lattice, min_dist,tol); //DX 20190215
+        equivalent_atoms.push_back(tmpv);
       }
     }
     // ===== DEBUG::PRINT EQUIVALENT ATOMS ===== //
     if(LDEBUG) {
       cerr << "SYM::shiftSymmetryEquivalentAtoms: Equivalent atoms: " << endl;
       for(uint i=0;i<equivalent_atoms.size();i++){
-         ::xb();
-         ::print(equivalent_atoms[i]);
+        xb();
+        print(equivalent_atoms[i]);
       }
       cerr << endl;
     }
@@ -4354,31 +4367,33 @@ namespace SYM {
     for (uint i = 0; i < equivalent_atoms.size(); i++) {
       one_shifted_group.clear();
       for (uint j = 0; j < equivalent_atoms[i].size(); j++) {
-	_atom tmp;
-	xvector<double> tmpxvec = SYM::mod_one_xvec(equivalent_atoms[i][j].fpos + translation);
-	// ===== Ensure that multiple equivalent atoms are not occupying the same space ===== //
-	tmp.fpos = tmpxvec;
-	tmp.cpos = f2c * tmp.fpos;
-	tmp.name = equivalent_atoms[i][j].name;
-	tmp.type = equivalent_atoms[i][j].type;
+        _atom tmp;
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] xvector<double> tmpxvec = SYM::mod_one_xvec(equivalent_atoms[i][j].fpos + translation);
+        xvector<double> tmpxvec = equivalent_atoms[i][j].fpos + translation; //DX 20190905
+        BringInCellInPlace(tmpxvec); //DX 20190905
+        // ===== Ensure that multiple equivalent atoms are not occupying the same space ===== //
+        tmp.fpos = tmpxvec;
+        tmp.cpos = f2c * tmp.fpos;
+        tmp.name = equivalent_atoms[i][j].name;
+        tmp.type = equivalent_atoms[i][j].type;
         tmp.spin = equivalent_atoms[i][j].spin; // DX 9/21/17 - magnetic sym
         tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX 9/21/17 - magnetic sym
         tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
         tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-	if(one_shifted_group.size() == 0) {
-	  one_shifted_group.push_back(tmp);
-	} else {
-	  bool duplicate_atom = false;
-	  for (uint b = 0; b < one_shifted_group.size(); b++) {
-	    if(SYM::MapAtom(one_shifted_group[b].fpos, tmp.fpos, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
-	      duplicate_atom = true;
-	      break;
-	    }
-	  }
-	  if(duplicate_atom == false) {
-	    one_shifted_group.push_back(tmp);
-	  }
-	}
+        if(one_shifted_group.size() == 0) {
+          one_shifted_group.push_back(tmp);
+        } else {
+          bool duplicate_atom = false;
+          for (uint b = 0; b < one_shifted_group.size(); b++) {
+            if(SYM::MapAtom(one_shifted_group[b].fpos, tmp.fpos, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
+              duplicate_atom = true;
+              break;
+            }
+          }
+          if(duplicate_atom == false) {
+            one_shifted_group.push_back(tmp);
+          }
+        }
       }
       equivalent_atoms_shifted.push_back(one_shifted_group);
     }
@@ -4386,8 +4401,8 @@ namespace SYM {
     if(LDEBUG) {
       cerr << "SYM::shiftSymmetryEquivalentAtoms: Equivalent atoms after origin shift (" << translation << "): " << endl;
       for(uint i=0;i<equivalent_atoms_shifted.size();i++){
-         ::xb();
-         ::print(equivalent_atoms_shifted[i]);
+        xb();
+        print(equivalent_atoms_shifted[i]);
       }
       cerr << endl;
     }
@@ -4655,7 +4670,7 @@ namespace SYM {
 	count++;
 	Screw candidate_rotation;
 	//Get axis direction
-	xvector<double> axis_direction = CrossPro(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]);
+	xvector<double> axis_direction = aurostd::vector_product(tmp_trip[1] - tmp_trip[0], tmp_trip[2] - tmp_trip[0]); //DX 20190905 - SYM::CrossPro() -> aurostd::vector_product()
 	xvector<double> full_direction = axis_direction;
 	bool found_point = false;
 	for (uint j = 0; j < big_expanded.size(); j++) {
@@ -5281,11 +5296,11 @@ namespace SYM {
     double tol = 1e-6;
     xvector<double> dir1 = S1.return_direction();
     xvector<double> dir2 = S2.return_direction();
-    normalize(dir1);
-    normalize(dir2);
+    dir1/=aurostd::modulus(dir1); //DX 20190905 - SYM::normalize() -> divide by aurostd::modulus()
+    dir2/=aurostd::modulus(dir2); //DX 20190905 - SYM::normalize() -> divide by aurostd::modulus()
     if(dir1 == dir2) {
-      if(aurostd::modulus(CrossPro(S1.return_point() - S2.return_point(), S1.return_direction())) < tol) {
-	same = true;
+      if(aurostd::modulus(aurostd::vector_product(S1.return_point() - S2.return_point(), S1.return_direction())) < tol) { //DX 20190905 - SYM::CrossPro() -> aurostd::vector_product()
+        same = true;
       }
     }
     return same;

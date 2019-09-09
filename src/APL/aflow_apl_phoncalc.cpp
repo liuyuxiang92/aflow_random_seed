@@ -879,7 +879,7 @@ namespace apl {
 
 	    geg = scalar_product(g, _dielectricTensor * g);
 
-	    if (fabs(geg) > _AFLOW_APL_EPS_ && geg / lambda2 / 4.0 < gmax) {
+	    if (aurostd::abs(geg) > _AFLOW_APL_EPS_ && geg / lambda2 / 4.0 < gmax) {
 	      double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
 	      for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
@@ -1199,6 +1199,13 @@ namespace apl {
     xmatrix<xcomplex<double> > placeholder_eigen(nBranches, nBranches, 1, 1);
     vector<xmatrix<xcomplex<double> > > placeholder_mat;
     return getFrequency(kpoint, flags, placeholder_eigen, placeholder_mat, false);
+  }
+
+  // ME190624 - get eigenvectors and frequencies
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
+                                                 xmatrix<xcomplex<double> >& eigenvectors) {
+    vector<xmatrix<xcomplex<double> > > placeholder_mat;
+    return getFrequency(kpoint, flags, eigenvectors, placeholder_mat, false);
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
@@ -1593,9 +1600,9 @@ namespace apl {
 	for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
 	  int l = 0;
 	  for (; l < _supercell.getNumberOfAtoms(); l++)
-	    if ((fabs(ix.atoms[k].cpos(1) - _supercell.getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
-		(fabs(ix.atoms[k].cpos(2) - _supercell.getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
-		(fabs(ix.atoms[k].cpos(3) - _supercell.getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
+	    if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell.getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
+		(aurostd::abs(ix.atoms[k].cpos(2) - _supercell.getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
+		(aurostd::abs(ix.atoms[k].cpos(3) - _supercell.getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
 	      break;
 	  //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
 	  if (l == _supercell.getNumberOfAtoms()) {

@@ -10,7 +10,7 @@
 // ***************************************************************************
 #ifdef _AFLOW_AFLOWRC_H_
 
-#define AFLOWRC_FILENAME_LOCAL   XHOST.Home+"/.aflow.rc"
+#define AFLOWRC_FILENAME_LOCAL   XHOST.home+"/.aflow.rc"
 #define AFLOWRC_FILENAME_GLOBAL  "/etc/aflow.conf"
 
 // DEFAULT DEFINITIONS
@@ -583,6 +583,107 @@
 #define AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE                  string("thermal_conductivity.plt")
 #define         DEFAULT_AAPL_TCOND_PLOT_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCOND_PLOT_FILE")
 
+
+// DEFAULT AEL
+//// DEFAULT AEL STRAIN CALCS
+#define AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY                   TRUE
+#define         DEFAULT_AEL_STRAIN_SYMMETRY                   XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_STRAIN_SYMMETRY")
+#define AFLOWRC_DEFAULT_AEL_NNORMAL_STRAINS                   4
+#define         DEFAULT_AEL_NNORMAL_STRAINS                   XHOST.adefault.getattachedutype<int>("DEFAULT_AEL_NNORMAL_STRAINS")
+#define AFLOWRC_DEFAULT_AEL_NSHEAR_STRAINS                    4
+#define         DEFAULT_AEL_NSHEAR_STRAINS                    XHOST.adefault.getattachedutype<int>("DEFAULT_AEL_NSHEAR_STRAINS")
+#define AFLOWRC_DEFAULT_AEL_NORMAL_STRAIN_STEP                0.005
+#define         DEFAULT_AEL_NORMAL_STRAIN_STEP                XHOST.adefault.getattachedutype<double>("DEFAULT_AEL_NORMAL_STRAIN_STEP")
+#define AFLOWRC_DEFAULT_AEL_SHEAR_STRAIN_STEP                 0.005
+#define         DEFAULT_AEL_SHEAR_STRAIN_STEP                 XHOST.adefault.getattachedutype<double>("DEFAULT_AEL_SHEAR_STRAIN_STEP")
+#define AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_CALC                FALSE
+#define         DEFAULT_AEL_ORIGIN_STRAIN_CALC                XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_ORIGIN_STRAIN_CALC")
+#define AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_FIT                 FALSE
+#define         DEFAULT_AEL_ORIGIN_STRAIN_FIT                 XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_ORIGIN_STRAIN_FIT")
+#define AFLOWRC_DEFAULT_AEL_RELAXED_STRUCT_FIT                FALSE
+#define         DEFAULT_AEL_RELAXED_STRUCT_FIT                XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_RELAXED_STRUCT_FIT")
+#define AFLOWRC_DEFAULT_AEL_NEG_STRAINS                       TRUE
+#define         DEFAULT_AEL_NEG_STRAINS                       XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_NEG_STRAINS")
+#define AFLOWRC_DEFAULT_AEL_NIND_STRAIN_DIRS                  3
+#define         DEFAULT_AEL_NIND_STRAIN_DIRS                  XHOST.adefault.getattachedutype<int>("DEFAULT_AEL_NIND_STRAIN_DIRS")
+#define AFLOWRC_DEFAULT_AEL_VASPSYM                           FALSE
+#define         DEFAULT_AEL_VASPSYM                           XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_VASPSYM")
+#define AFLOWRC_DEFAULT_AEL_PRECACC_ALGONORM                  FALSE
+#define         DEFAULT_AEL_PRECACC_ALGONORM                  XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_PRECACC_ALGONORM")
+#define AFLOWRC_DEFAULT_AEL_VASPRUNXML_STRESS                 FALSE
+#define         DEFAULT_AEL_VASPRUNXML_STRESS                 XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_VASPRUNXML_STRESS")
+#define AFLOWRC_DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS             FALSE
+#define         DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS             XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS")
+#define AFLOWRC_DEFAULT_AEL_SKIP_ARUNS_MAX                    1
+#define         DEFAULT_AEL_SKIP_ARUNS_MAX                    XHOST.adefault.getattachedutype<int>("DEFAULT_AEL_SKIP_ARUNS_MAX")
+
+//// DEFAULT AEL CHECKS AND PROCESSING
+#define AFLOWRC_DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY            TRUE
+#define         DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY            XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY")
+#define AFLOWRC_DEFAULT_AEL_SYMMETRIZE                        FALSE
+#define         DEFAULT_AEL_SYMMETRIZE                        XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_SYMMETRIZE")
+
+//// DEFAULT AEL OUTPUT FILES
+#define AFLOWRC_DEFAULT_AEL_FILE_PREFIX                       string("aflow.ael.")
+#define         DEFAULT_AEL_FILE_PREFIX                       XHOST.adefault.getattachedscheme("DEFAULT_AEL_FILE_PREFIX")
+#define AFLOWRC_DEFAULT_AEL_WRITE_FULL_RESULTS                FALSE
+#define         DEFAULT_AEL_WRITE_FULL_RESULTS                XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_WRITE_FULL_RESULTS")
+#define AFLOWRC_DEFAULT_AEL_DIRNAME_ARUN                      TRUE
+#define         DEFAULT_AEL_DIRNAME_ARUN                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AEL_DIRNAME_ARUN")
+
+// DEFAULT AGL
+//// DEFAULT AGL STRAIN CALCS
+#define AFLOWRC_DEFAULT_AGL_AEL_POISSON_RATIO                 TRUE
+#define         DEFAULT_AGL_AEL_POISSON_RATIO                 XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_AEL_POISSON_RATIO")
+#define AFLOWRC_DEFAULT_AGL_NSTRUCTURES                       28
+#define         DEFAULT_AGL_NSTRUCTURES                       XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_NSTRUCTURES")
+#define AFLOWRC_DEFAULT_AGL_STRAIN_STEP                       0.01
+#define         DEFAULT_AGL_STRAIN_STEP                       XHOST.adefault.getattachedutype<double>("DEFAULT_AGL_STRAIN_STEP")
+#define AFLOWRC_DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS             FALSE
+#define         DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS             XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS")
+#define AFLOWRC_DEFAULT_AGL_SKIP_ARUNS_MAX                    7
+#define         DEFAULT_AGL_SKIP_ARUNS_MAX                    XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_SKIP_ARUNS_MAX")
+
+//// DEFAULT AGL CHECKS AND PROCESSING
+#define AFLOWRC_DEFAULT_AGL_NTEMPERATURE                      201
+#define         DEFAULT_AGL_NTEMPERATURE                      XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_NTEMPERATURE")
+#define AFLOWRC_DEFAULT_AGL_STEMPERATURE                      10.0
+#define         DEFAULT_AGL_STEMPERATURE                      XHOST.adefault.getattachedutype<double>("DEFAULT_AGL_STEMPERATURE")
+#define AFLOWRC_DEFAULT_AGL_NPRESSURE                         101
+#define         DEFAULT_AGL_NPRESSURE                         XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_NPRESSURE")
+#define AFLOWRC_DEFAULT_AGL_SPRESSURE                         1.0
+#define         DEFAULT_AGL_SPRESSURE                         XHOST.adefault.getattachedutype<double>("DEFAULT_AGL_SPRESSURE")
+#define AFLOWRC_DEFAULT_AGL_POISSON_RATIO                     0.25
+#define         DEFAULT_AGL_POISSON_RATIO                     XHOST.adefault.getattachedutype<double>("DEFAULT_AGL_POISSON_RATIO")
+#define AFLOWRC_DEFAULT_AGL_IEOS                              0
+#define         DEFAULT_AGL_IEOS                              XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_IEOS")
+#define AFLOWRC_DEFAULT_AGL_IDEBYE                            0
+#define         DEFAULT_AGL_IDEBYE                            XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_IDEBYE")
+#define AFLOWRC_DEFAULT_AGL_FIT_TYPE                          0
+#define         DEFAULT_AGL_FIT_TYPE                          XHOST.adefault.getattachedutype<int>("DEFAULT_AGL_FIT_TYPE")
+#define AFLOWRC_DEFAULT_AGL_CHECK_EV_CONCAVITY                FALSE
+#define         DEFAULT_AGL_CHECK_EV_CONCAVITY                XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_CHECK_EV_CONCAVITY")
+#define AFLOWRC_DEFAULT_AGL_CHECK_EV_MIN                      FALSE
+#define         DEFAULT_AGL_CHECK_EV_MIN                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_CHECK_EV_MIN")
+#define AFLOWRC_DEFAULT_AGL_HUGONIOT_CALC                     TRUE
+#define         DEFAULT_AGL_HUGONIOT_CALC                     XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_HUGONIOT_CALC")
+#define AFLOWRC_DEFAULT_AGL_HUGONIOT_EXTRAPOLATE              FALSE
+#define         DEFAULT_AGL_HUGONIOT_EXTRAPOLATE              XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_HUGONIOT_EXTRAPOLATE")
+#define AFLOWRC_DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE      FALSE
+#define         DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE")
+
+//// DEFAULT AGL OUTPUT FILES
+#define AFLOWRC_DEFAULT_AGL_FILE_PREFIX                       string("aflow.agl.")
+#define         DEFAULT_AGL_FILE_PREFIX                       XHOST.adefault.getattachedscheme("DEFAULT_AGL_FILE_PREFIX")
+#define AFLOWRC_DEFAULT_AGL_WRITE_FULL_RESULTS                FALSE
+#define         DEFAULT_AGL_WRITE_FULL_RESULTS                XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_WRITE_FULL_RESULTS")
+#define AFLOWRC_DEFAULT_AGL_DIRNAME_ARUN                      TRUE
+#define         DEFAULT_AGL_DIRNAME_ARUN                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_DIRNAME_ARUN")
+#define AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT                 FALSE
+#define         DEFAULT_AGL_WRITE_GIBBS_INPUT                 XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_WRITE_GIBBS_INPUT")
+#define AFLOWRC_DEFAULT_AGL_PLOT_RESULTS                      FALSE
+#define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
+  
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
 #define         AFLOW_CORE_TEMPERATURE_BEEP                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_BEEP") 
@@ -791,8 +892,8 @@ namespace aflowrc {
 	}
       }
     }
-    // fix ~/ with XHOST.User
-    if(aurostd::substring2bool(string_to_add,"~/")) aurostd::StringSubst(string_to_add,"~/",XHOST.Home+"/");
+    // fix ~/ with XHOST.user
+    if(aurostd::substring2bool(string_to_add,"~/")) aurostd::StringSubst(string_to_add,"~/",XHOST.home+"/");
     XHOST.adefault.push_attached(schema,string_to_add); // add what is present or the default if not present
     return found;
   }
@@ -813,7 +914,7 @@ namespace aflowrc {
     bool aflowrc_local=FALSE;
     bool aflowrc_global=FALSE;
     if(LDEBUG) oss << "aflowrc::is_available: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::is_available: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::is_available: XHOST.home=" << XHOST.home << endl;
     // TESTING LOCAL OR USER BASED
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     aflowrc_local=aurostd::FileExist(AFLOWRC_FILENAME_LOCAL);
@@ -865,7 +966,7 @@ namespace aflowrc {
   bool read(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     if(LDEBUG) oss << "aflowrc::read: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::read: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::read: XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     if(LDEBUG) oss << "aflowrc::read: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
@@ -1187,6 +1288,63 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AAPL_TCOND_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_FILE);
     aflowrc::load_default("DEFAULT_AAPL_TCOND_PLOT_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE);
  
+    // DEFAULT AEL
+    //// DEFAULT AEL STRAIN CALCS
+    aflowrc::load_default("DEFAULT_AEL_STRAIN_SYMMETRY",AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY);
+    aflowrc::load_default("DEFAULT_AEL_NNORMAL_STRAINS",AFLOWRC_DEFAULT_AEL_NNORMAL_STRAINS);
+    aflowrc::load_default("DEFAULT_AEL_NSHEAR_STRAINS",AFLOWRC_DEFAULT_AEL_NSHEAR_STRAINS);
+    aflowrc::load_default("DEFAULT_AEL_NORMAL_STRAIN_STEP",AFLOWRC_DEFAULT_AEL_NORMAL_STRAIN_STEP);
+    aflowrc::load_default("DEFAULT_AEL_SHEAR_STRAIN_STEP",AFLOWRC_DEFAULT_AEL_SHEAR_STRAIN_STEP);
+    aflowrc::load_default("DEFAULT_AEL_ORIGIN_STRAIN_CALC",AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_CALC);
+    aflowrc::load_default("DEFAULT_AEL_ORIGIN_STRAIN_FIT",AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_FIT);
+    aflowrc::load_default("DEFAULT_AEL_RELAXED_STRUCT_FIT",AFLOWRC_DEFAULT_AEL_RELAXED_STRUCT_FIT);
+    aflowrc::load_default("DEFAULT_AEL_NEG_STRAINS",AFLOWRC_DEFAULT_AEL_NEG_STRAINS); 
+    aflowrc::load_default("DEFAULT_AEL_NIND_STRAIN_DIRS",AFLOWRC_DEFAULT_AEL_VASPSYM); 
+    aflowrc::load_default("DEFAULT_AEL_VASPSYM",AFLOWRC_DEFAULT_AEL_VASPSYM);
+    aflowrc::load_default("DEFAULT_AEL_PRECACC_ALGONORM",AFLOWRC_DEFAULT_AEL_PRECACC_ALGONORM);
+    aflowrc::load_default("DEFAULT_AEL_VASPRUNXML_STRESS",AFLOWRC_DEFAULT_AEL_VASPRUNXML_STRESS);
+    aflowrc::load_default("DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS",AFLOWRC_DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS);
+    aflowrc::load_default("DEFAULT_AEL_SKIP_ARUNS_MAX",AFLOWRC_DEFAULT_AEL_SKIP_ARUNS_MAX);
+
+    //// DEFAULT AEL CHECKS AND PROCESSING
+    aflowrc::load_default("DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY",AFLOWRC_DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY);
+    aflowrc::load_default("DEFAULT_AEL_SYMMETRIZE",AFLOWRC_DEFAULT_AEL_SYMMETRIZE);
+
+    //// DEFAULT AEL OUTPUT FILES
+    aflowrc::load_default("DEFAULT_AEL_FILE_PREFIX",AFLOWRC_DEFAULT_AEL_FILE_PREFIX);
+    aflowrc::load_default("DEFAULT_AEL_WRITE_FULL_RESULTS",AFLOWRC_DEFAULT_AEL_WRITE_FULL_RESULTS);
+    aflowrc::load_default("DEFAULT_AEL_DIRNAME_ARUN",AFLOWRC_DEFAULT_AEL_DIRNAME_ARUN);
+
+    // DEFAULT AGL
+    //// DEFAULT AGL STRAIN CALCS
+    aflowrc::load_default("DEFAULT_AGL_AEL_POISSON_RATIO",AFLOWRC_DEFAULT_AGL_AEL_POISSON_RATIO);
+    aflowrc::load_default("DEFAULT_AGL_NSTRUCTURES",AFLOWRC_DEFAULT_AGL_NSTRUCTURES);
+    aflowrc::load_default("DEFAULT_AGL_STRAIN_STEP",AFLOWRC_DEFAULT_AGL_STRAIN_STEP);
+    aflowrc::load_default("DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS",AFLOWRC_DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS);
+    aflowrc::load_default("DEFAULT_AGL_SKIP_ARUNS_MAX",AFLOWRC_DEFAULT_AGL_SKIP_ARUNS_MAX);
+
+    //// DEFAULT AGL CHECKS AND PROCESSING
+    aflowrc::load_default("DEFAULT_AGL_NTEMPERATURE",AFLOWRC_DEFAULT_AGL_NTEMPERATURE);
+    aflowrc::load_default("DEFAULT_AGL_STEMPERATURE",AFLOWRC_DEFAULT_AGL_STEMPERATURE);
+    aflowrc::load_default("DEFAULT_AGL_NPRESSURE",AFLOWRC_DEFAULT_AGL_NPRESSURE);
+    aflowrc::load_default("DEFAULT_AGL_SPRESSURE",AFLOWRC_DEFAULT_AGL_SPRESSURE);    
+    aflowrc::load_default("DEFAULT_AGL_POISSON_RATIO",AFLOWRC_DEFAULT_AGL_POISSON_RATIO);
+    aflowrc::load_default("DEFAULT_AGL_IEOS",AFLOWRC_DEFAULT_AGL_IEOS);
+    aflowrc::load_default("DEFAULT_AGL_IDEBYE",AFLOWRC_DEFAULT_AGL_IDEBYE);
+    aflowrc::load_default("DEFAULT_AGL_FIT_TYPE",AFLOWRC_DEFAULT_AGL_FIT_TYPE);
+    aflowrc::load_default("DEFAULT_AGL_CHECK_EV_CONCAVITY",AFLOWRC_DEFAULT_AGL_CHECK_EV_CONCAVITY);
+    aflowrc::load_default("DEFAULT_AGL_CHECK_EV_MIN",AFLOWRC_DEFAULT_AGL_CHECK_EV_MIN);    
+    aflowrc::load_default("DEFAULT_AGL_HUGONIOT_CALC",AFLOWRC_DEFAULT_AGL_HUGONIOT_CALC);
+    aflowrc::load_default("DEFAULT_AGL_HUGONIOT_EXTRAPOLATE",AFLOWRC_DEFAULT_AGL_HUGONIOT_EXTRAPOLATE);
+    aflowrc::load_default("DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE",AFLOWRC_DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE);
+    
+    //// DEFAULT AGL OUTPUT FILES
+    aflowrc::load_default("DEFAULT_AGL_FILE_PREFIX",AFLOWRC_DEFAULT_AGL_FILE_PREFIX);
+    aflowrc::load_default("DEFAULT_AGL_WRITE_FULL_RESULTS",AFLOWRC_DEFAULT_AGL_WRITE_FULL_RESULTS);
+    aflowrc::load_default("DEFAULT_AGL_DIRNAME_ARUN",AFLOWRC_DEFAULT_AGL_DIRNAME_ARUN);
+    aflowrc::load_default("DEFAULT_AGL_WRITE_GIBBS_INPUT",AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT);
+    aflowrc::load_default("DEFAULT_AGL_PLOT_RESULTS",AFLOWRC_DEFAULT_AGL_PLOT_RESULTS);    
+
     // DEFAULT CORE
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_BEEP",AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP);
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_HALT",AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT);
@@ -1301,7 +1459,7 @@ namespace aflowrc {
   bool write_default(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     if(LDEBUG) oss << "aflowrc::write_default: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::write_default: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::write_default: XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     if(LDEBUG) oss << "aflowrc::write_default: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
@@ -1638,6 +1796,55 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AAPL_TCOND_PLOT_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;
 
     aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS AEL" << endl;
+    aflowrc << "DEFAULT_AEL_STRAIN_SYMMETRY=" << AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY << endl;
+    aflowrc << "DEFAULT_AEL_NNORMAL_STRAINS=" << AFLOWRC_DEFAULT_AEL_NNORMAL_STRAINS << endl;
+    aflowrc << "DEFAULT_AEL_NSHEAR_STRAINS=" << AFLOWRC_DEFAULT_AEL_NSHEAR_STRAINS << endl;
+    aflowrc << "DEFAULT_AEL_NORMAL_STRAIN_STEP=" << AFLOWRC_DEFAULT_AEL_NORMAL_STRAIN_STEP << endl;
+    aflowrc << "DEFAULT_AEL_SHEAR_STRAIN_STEP=" << AFLOWRC_DEFAULT_AEL_SHEAR_STRAIN_STEP << endl;
+    aflowrc << "DEFAULT_AEL_ORIGIN_STRAIN_CALC=" << AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_CALC << endl;
+    aflowrc << "DEFAULT_AEL_ORIGIN_STRAIN_FIT=" << AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_FIT << endl;
+    aflowrc << "DEFAULT_AEL_RELAXED_STRUCT_FIT=" << AFLOWRC_DEFAULT_AEL_RELAXED_STRUCT_FIT << endl;
+    aflowrc << "DEFAULT_AEL_NEG_STRAINS=" << AFLOWRC_DEFAULT_AEL_NEG_STRAINS << endl;
+    aflowrc << "DEFAULT_AEL_NIND_STRAIN_DIRS=" << AFLOWRC_DEFAULT_AEL_NIND_STRAIN_DIRS << endl;
+    aflowrc << "DEFAULT_AEL_VASPSYM=" << AFLOWRC_DEFAULT_AEL_VASPSYM << endl;
+    aflowrc << "DEFAULT_AEL_PRECACC_ALGONORM=" << AFLOWRC_DEFAULT_AEL_PRECACC_ALGONORM << endl;
+    aflowrc << "DEFAULT_AEL_VASPRUNXML_STRESS=" << AFLOWRC_DEFAULT_AEL_VASPRUNXML_STRESS << endl;
+    aflowrc << "DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS=" << AFLOWRC_DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS << endl;
+    aflowrc << "DEFAULT_AEL_SKIP_ARUNS_MAX=" << AFLOWRC_DEFAULT_AEL_SKIP_ARUNS_MAX << endl;
+    aflowrc << "DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY=" << AFLOWRC_DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY << endl;
+    aflowrc << "DEFAULT_AEL_SYMMETRIZE=" << AFLOWRC_DEFAULT_AEL_SYMMETRIZE << endl;
+    aflowrc << "DEFAULT_AEL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_AEL_FILE_PREFIX << "\"" << endl;
+    aflowrc << "DEFAULT_AEL_WRITE_FULL_RESULTS=" << AFLOWRC_DEFAULT_AEL_WRITE_FULL_RESULTS << endl;
+    aflowrc << "DEFAULT_AEL_DIRNAME_ARUN=" << AFLOWRC_DEFAULT_AEL_DIRNAME_ARUN << endl;
+
+    aflowrc << " " << endl;
+    aflowrc << "// DEFAULTS AGL" << endl;
+    aflowrc << "DEFAULT_AGL_AEL_POISSON_RATIO=" << AFLOWRC_DEFAULT_AGL_AEL_POISSON_RATIO << endl;
+    aflowrc << "DEFAULT_AGL_NSTRUCTURES=" << AFLOWRC_DEFAULT_AGL_NSTRUCTURES << endl;
+    aflowrc << "DEFAULT_AGL_STRAIN_STEP=" << AFLOWRC_DEFAULT_AGL_STRAIN_STEP << endl;
+    aflowrc << "DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS=" << AFLOWRC_DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS << endl;
+    aflowrc << "DEFAULT_AGL_SKIP_ARUNS_MAX=" << AFLOWRC_DEFAULT_AEL_SKIP_ARUNS_MAX << endl;    
+    aflowrc << "DEFAULT_AGL_NTEMPERATURE=" << AFLOWRC_DEFAULT_AGL_NTEMPERATURE << endl;
+    aflowrc << "DEFAULT_AGL_STEMPERATURE=" << AFLOWRC_DEFAULT_AGL_STEMPERATURE << endl;
+    aflowrc << "DEFAULT_AGL_NPRESSURE=" << AFLOWRC_DEFAULT_AGL_NPRESSURE << endl;
+    aflowrc << "DEFAULT_AGL_SPRESSURE=" << AFLOWRC_DEFAULT_AGL_SPRESSURE << endl;
+    aflowrc << "DEFAULT_AGL_POISSON_RATIO=" << AFLOWRC_DEFAULT_AGL_POISSON_RATIO << endl;
+    aflowrc << "DEFAULT_AGL_IEOS=" << AFLOWRC_DEFAULT_AGL_IEOS << endl;
+    aflowrc << "DEFAULT_AGL_IDEBYE=" << AFLOWRC_DEFAULT_AGL_IDEBYE << endl;
+    aflowrc << "DEFAULT_AGL_FIT_TYPE=" << AFLOWRC_DEFAULT_AGL_FIT_TYPE << endl;
+    aflowrc << "DEFAULT_AGL_CHECK_EV_CONCAVITY=" << AFLOWRC_DEFAULT_AGL_CHECK_EV_CONCAVITY << endl;
+    aflowrc << "DEFAULT_AGL_CHECK_EV_MIN=" << AFLOWRC_DEFAULT_AGL_CHECK_EV_MIN << endl;
+    aflowrc << "DEFAULT_AGL_HUGONIOT_CALC=" << AFLOWRC_DEFAULT_AGL_HUGONIOT_CALC << endl;
+    aflowrc << "DEFAULT_AGL_HUGONIOT_EXTRAPOLATE=" << AFLOWRC_DEFAULT_AGL_HUGONIOT_EXTRAPOLATE << endl;
+    aflowrc << "DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE=" << AFLOWRC_DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE << endl;    
+    aflowrc << "DEFAULT_AGL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_AGL_FILE_PREFIX << "\"" << endl;
+    aflowrc << "DEFAULT_AGL_WRITE_FULL_RESULTS=" << AFLOWRC_DEFAULT_AGL_WRITE_FULL_RESULTS << endl;
+    aflowrc << "DEFAULT_AGL_DIRNAME_ARUN=" << AFLOWRC_DEFAULT_AGL_DIRNAME_ARUN << endl;
+    aflowrc << "DEFAULT_AGL_WRITE_GIBBS_INPUT=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
+    aflowrc << "DEFAULT_AGL_PLOT_RESULTS=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
+
+    aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CORE" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_HALT=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT << " // Celsius" << endl;
@@ -1759,7 +1966,7 @@ namespace aflowrc {
   bool print_aflowrc(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     if(LDEBUG) oss << "aflowrc::print_aflowrc: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.Home=" << XHOST.Home << endl;
+    if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.home=" << XHOST.home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     // ME190810 - START
@@ -2060,7 +2267,54 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BOUNDARY_FILE\")=\"" << DEFAULT_AAPL_BOUNDARY_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_FILE\")=\"" << DEFAULT_AAPL_TCOND_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_PLOT_FILE\")=\"" << DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;
+    
+    if(LDEBUG) oss << "// DEFAULTS AEL" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_STRAIN_SYMMETRY\")=" << AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_NNORMAL_STRAINS\")=" << AFLOWRC_DEFAULT_AEL_NNORMAL_STRAINS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_NSHEAR_STRAINS\")=" << AFLOWRC_DEFAULT_AEL_NSHEAR_STRAINS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_NORMAL_STRAIN_STEP\")=" << AFLOWRC_DEFAULT_AEL_NORMAL_STRAIN_STEP << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_SHEAR_STRAIN_STEP\")=" << AFLOWRC_DEFAULT_AEL_SHEAR_STRAIN_STEP << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_ORIGIN_STRAIN_CALC\")=" << AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_CALC << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_ORIGIN_STRAIN_FIT\")=" << AFLOWRC_DEFAULT_AEL_ORIGIN_STRAIN_FIT << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_RELAXED_STRUCT_FIT\")=" << AFLOWRC_DEFAULT_AEL_RELAXED_STRUCT_FIT << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_NEG_STRAINS\")=" << AFLOWRC_DEFAULT_AEL_NEG_STRAINS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_NIND_STRAIN_DIRS\")=" << AFLOWRC_DEFAULT_AEL_NIND_STRAIN_DIRS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_VASPSYM\")=" << AFLOWRC_DEFAULT_AEL_VASPSYM << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_PRECACC_ALGONORM\")=" << AFLOWRC_DEFAULT_AEL_PRECACC_ALGONORM << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_VASPRUNXML_STRESS\")=" << AFLOWRC_DEFAULT_AEL_VASPRUNXML_STRESS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS\")=" << AFLOWRC_DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_SKIP_ARUNS_MAX\")=" << AFLOWRC_DEFAULT_AEL_SKIP_ARUNS_MAX << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY\")=" << AFLOWRC_DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_SYMMETRIZE\")=" << AFLOWRC_DEFAULT_AEL_SYMMETRIZE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_FILE_PREFIX\")=\"" << AFLOWRC_DEFAULT_AEL_FILE_PREFIX << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_WRITE_FULL_RESULTS\")=" << AFLOWRC_DEFAULT_AEL_WRITE_FULL_RESULTS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_DIRNAME_ARUN\")=" << AFLOWRC_DEFAULT_AEL_DIRNAME_ARUN << endl;
 
+    if(LDEBUG) oss << "// DEFAULTS AGL" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_AEL_POISSON_RATIO\")=" << AFLOWRC_DEFAULT_AGL_AEL_POISSON_RATIO << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_NSTRUCTURES\")=" << AFLOWRC_DEFAULT_AGL_NSTRUCTURES << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_STRAIN_STEP\")=" << AFLOWRC_DEFAULT_AGL_STRAIN_STEP << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS\")=" << AFLOWRC_DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_SKIP_ARUNS_MAX\")=" << AFLOWRC_DEFAULT_AEL_SKIP_ARUNS_MAX << endl;    
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_NTEMPERATURE\")=" << AFLOWRC_DEFAULT_AGL_NTEMPERATURE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_STEMPERATURE\")=" << AFLOWRC_DEFAULT_AGL_STEMPERATURE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_NPRESSURE\")=" << AFLOWRC_DEFAULT_AGL_NPRESSURE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_SPRESSURE\")=" << AFLOWRC_DEFAULT_AGL_SPRESSURE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_POISSON_RATIO\")=" << AFLOWRC_DEFAULT_AGL_POISSON_RATIO << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_IEOS\")=" << AFLOWRC_DEFAULT_AGL_IEOS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_IDEBYE\")=" << AFLOWRC_DEFAULT_AGL_IDEBYE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_FIT_TYPE\")=" << AFLOWRC_DEFAULT_AGL_FIT_TYPE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_CHECK_EV_CONCAVITY\")=" << AFLOWRC_DEFAULT_AGL_CHECK_EV_CONCAVITY << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_CHECK_EV_MIN\")=" << AFLOWRC_DEFAULT_AGL_CHECK_EV_MIN << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_HUGONIOT_CALC\")=" << AFLOWRC_DEFAULT_AGL_HUGONIOT_CALC << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_HUGONIOT_EXTRAPOLATE\")=" << AFLOWRC_DEFAULT_AGL_HUGONIOT_EXTRAPOLATE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE\")=" << AFLOWRC_DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE << endl;    
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_FILE_PREFIX\")=\"" << AFLOWRC_DEFAULT_AGL_FILE_PREFIX << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_FULL_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_WRITE_FULL_RESULTS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_DIRNAME_ARUN\")=" << AFLOWRC_DEFAULT_AGL_DIRNAME_ARUN << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_GIBBS_INPUT\")=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_PLOT_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
+    
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;

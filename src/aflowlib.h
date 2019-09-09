@@ -41,9 +41,10 @@ namespace aflowlib {
   class _aflowlib_entry {
   public:
     // constructor destructor                                 // constructor/destructor
-    _aflowlib_entry();                                         // default, just allocate
-    ~_aflowlib_entry();                                        // kill everything
-    _aflowlib_entry(const _aflowlib_entry& b);                  // constructor copy
+    _aflowlib_entry();                                        // default, just allocate
+    ~_aflowlib_entry();                                       // kill everything
+    _aflowlib_entry(const _aflowlib_entry& b);                // constructor copy
+    _aflowlib_entry(const string& file);                      // constructor from file
     const _aflowlib_entry& operator=(const _aflowlib_entry &b); // copy
     // CONTROL
     string entry;vector<string> ventry;                       // ventry split by "|"
@@ -263,6 +264,11 @@ namespace aflowlib {
    };
 }
 
+namespace aflowlib {
+  uint auid2vauid(const string auid, deque<string>& vauid);                // splits the auid into vauid
+  string auid2directory(const string auid);                                // gives AUID directory from existence of vauid
+}
+
 // ***************************************************************************
 // AFLUX STUFF
 namespace aflowlib {
@@ -292,6 +298,8 @@ namespace aflowlib {
   string AFLUXCall(string& summons); //DX 20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(string& response); //DX 20190206 - get properties from AFLUX response
   uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss);
+  uint WEB_Aflowlib_Entry(string options,ostream& oss); 
+  // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  // TEST SC 20190813
 }
 
 // ***************************************************************************

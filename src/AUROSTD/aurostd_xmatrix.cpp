@@ -2070,7 +2070,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                             // trasp xmatrix
-  trasp(const xmatrix<utype>& a)
+  trasp(const xmatrix<utype>& a, bool conjugate)  // ME190813 - conjugate complex now an option
   {
 #ifdef _XMATH_DEBUG_FUNCTIONS
     printf("M -> function traspose xmatrix: ");
@@ -2080,10 +2080,10 @@ namespace aurostd {  // namespace aurostd
     xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
     for(int i=a.lrows;i<=a.urows;i++)
       for(int j=a.lcols;j<=a.ucols;j++)
-        if (a.iscomplex) {
+        if (a.iscomplex && conjugate) {
           out[j][i] = conj(a[i][j]);
         } else {
-	out[j][i]=a[i][j];
+          out[j][i]=a[i][j];
         }
     return out;
   }
@@ -2092,7 +2092,7 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                             // trasp xvector
-  trasp(const xvector<utype>& a)
+  trasp(const xvector<utype>& a, bool conjugate)  // ME190813 - conjugate complex now an option
   {
 #ifdef _XMATH_DEBUG_FUNCTIONS
     printf("M -> function traspose xvector: ");
@@ -2100,10 +2100,10 @@ namespace aurostd {  // namespace aurostd
 #endif
     xmatrix<utype> out(a.urows,1,a.lrows,1);
     for(int i=a.lrows;i<=a.urows;i++) {
-      if (a.iscomplex) {
+      if (a.iscomplex && conjugate) {
         out[i][1] = conj(a[i]);
       } else {
-      out[i][1]=a[i];
+        out[i][1]=a[i];
       }
     }
     return out;

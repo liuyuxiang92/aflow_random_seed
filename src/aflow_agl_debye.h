@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2018           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
 // *                                                                         *
 // ***************************************************************************
 // aflow_agl_debye.h
@@ -21,11 +21,11 @@
 #define third one/three
 
 // Physical constants for use in AGL
-// OBSOLETE #define hartree2kjmol 2625.5             // hartree -> kJ/mol
-// OBSOLETE #define au2GPa 29421.4                   // atomic units (pressure) -> GPa
-// OBSOLETE #define physconstkbau 3.166830e-6        // Boltzmann constant [Hartree/K]
-// OBSOLETE #define physconstme 9.1093897e-28        // electron mass [g]
-// OBSOLETE #define physconstamu 1.6605402e-24       // atomic mass unit [g]
+// [OBSOLETE] #define hartree2kjmol 2625.5             // hartree -> kJ/mol
+// [OBSOLETE] #define au2GPa 29421.4                   // atomic units (pressure) -> GPa
+// [OBSOLETE] #define physconstkbau 3.166830e-6        // Boltzmann constant [Hartree/K]
+// [OBSOLETE] #define physconstme 9.1093897e-28        // electron mass [g]
+// [OBSOLETE] #define physconstamu 1.6605402e-24       // atomic mass unit [g]
 #define kj2unit 0.1202707236;                 // kJ/mol -> kB/cell
 #define hart2ev 27.211383                     // Hartree -> eV
 #define eV_Ang3_to_GPa 160.21766              // eV/Ang^3 -> GPa
@@ -119,6 +119,8 @@ class _AGL_data {
   bool gaussxm_debug;
   // Variable to record origin of Poisson ratio used
   string poissonratiosource;
+  // Variable to control whether PREC and ALGO values are set to ACCURATE and NORMAL, or are left as defaults/read from aflow.in file
+  bool precaccalgonorm;
   // Variable to control what aflow run type is used (relax, static or relax_static)
   bool relax_static;
   bool static_only;
@@ -142,6 +144,8 @@ class _AGL_data {
   double cellmass;
   vector<double> energyinput;
   vector<double> volumeinput;
+  vector<double> energyinput_orig;
+  vector<double> volumeinput_orig;
   vector<double> pressurecalculated;
   vector<xmatrix<double> > stresscalculated;
   vector<int> structurecalculated;
@@ -229,7 +233,7 @@ class _AGL_data {
   // output data for all pressures
   vector<vector<double> > InternalEnergyPressurekjmol, EntropyPressurekjmol, CvkjmolPressure, DebyeTemperaturePressure, GruneisenParameterPressure, HelmholtzEnergyPressurekjmol;
   vector<vector<double> > InternalEnergyPressuremeV, EntropyPressuremeV, HelmholtzEnergyPressuremeV, CvunitkBpressure, EntropyunitkBpressure;
-  // OBSOLETE vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib, EnergyDFT_UIntVibeV;
+  // [OBSOLETE] vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib, EnergyDFT_UIntVibeV;
   vector<vector<double> > GibbsFreeEnergyPressureeV, EnergyDFT_UIntVib;
   vector<vector<double> > xminsav, VolumeEquilibrium, mass_density_gcm3;
 
@@ -257,9 +261,9 @@ namespace AGL_functions {
   uint Get_BulkModulusVolumeAngstromTemperature(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Temperature, vector<double>& BulkModulusIsothermal, vector<double>& EquilibriumVolume, ofstream& FileMESSAGE);
   uint Get_VolumeStaticPressure(_xvasp&  xvasp, string  AflowIn, _aflags& aflags, _kflags& kflags, _vflags& vflags, vector<double>& Pressure, vector<double>& PressureVolumes, vector<double>& VolumeScaleFactors, ofstream& FileMESSAGE);
   // Functions for generating _AFLOWIN_ input files for strained structures and checking (E,V) data calculated with VASP
-  uint aglvaspflags(_xvasp& vaspRun, _vflags& _vaspFlags, _kflags& _kbinFlags, string& runname, ofstream& FileMESSAGE);
-  uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& _kbinFlags, _vflags& _vaspFlags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
-  uint extractenerg(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, ofstream& FileMESSAGE);
+  uint aglvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AGL_data& AGL_data, ofstream& FileMESSAGE);
+  // [OBSOLETE] uint createAFLOWIN(_xvasp& vaspRun, _xvasp& xvasp, _kflags& kbinFlags, _vflags& vaspFlags, _AGL_data& AGL_data, ofstream& FileMESSAGE);
+  uint extractenerg(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, vector<string>& dirrunname, ofstream& FileMESSAGE);
   uint checkmin(_AGL_data& AGL_data, int& cmerr, ofstream& FileMESSAGE);
   uint checkconcav(_AGL_data& AGL_data, int& ccerr, ofstream& FileMESSAGE);
   uint gibbsinpwrite(_AGL_data& AGL_data, ofstream& FileMESSAGE);
@@ -303,15 +307,15 @@ namespace AGL_functions {
   // Written by Patrick Avery: psavery@buffalo.edu
   uint runHugoniot(const std::vector<double>& pressures_external, const std::vector<double>& temperatures_external, const std::vector<std::vector<double> >& mass_densities_gcm3, const std::vector<std::vector<double> >& energies_pT_kJg, std::vector<std::vector<double> >& hugoniot_output, bool hugoniotextrapolate, ofstream& FileMESSAGE, double desired_initial_pressure_external = 0.0, double desired_initial_temperature_external = 300.0);
   uint runHugoniotAllTemperaturesAndPressures(const std::vector<AGL_pressure_temperature_energies>& AGL_pressure_temperature_energy_list, double cellmass_grams, std::vector<std::vector<double> >& results, bool hugoniotextrapolate, ofstream& FileMESSAGE, double desired_initial_pressure_external = 0.0, double desired_initial_temperature_external = 300.0);
-  // OBSOLETE uint calculateHugoniot(const std::vector<std::vector<std::vector<double> > >& data, std::vector<std::vector<double> >& hugoniotData, ofstream& FileMESSAGE, double desired_initial_pressure_external = 0.0, double desired_initial_temperature_external = 300.0);
+  // [OBSOLETE] uint calculateHugoniot(const std::vector<std::vector<std::vector<double> > >& data, std::vector<std::vector<double> >& hugoniotData, ofstream& FileMESSAGE, double desired_initial_pressure_external = 0.0, double desired_initial_temperature_external = 300.0);
   // OSBOLETE uint calculateHugoniotDataPoint(double initial_mass_density_gcm3, double initial_energyDFT_UIntVib_kJg, double initial_pressure_external, const std::vector<double>& mass_densities_gcm3, const std::vector<double>& temperatures_external, const std::vector<double>& energiesDFT_UIntVib_kJg, double pressure_external, double& hugoniotDensity, double& hugoniotTemperature, double& hugoniotEnergy, ofstream& FileMESSAGE);
   uint calculateHugoniotDataPoint(double initial_mass_density_gcm3, double initial_energyDFT_UIntVib_kJg, double initial_pressure_external, const std::vector<double>& mass_densities_gcm3, const std::vector<double>& temperatures_external, const std::vector<double>& energiesDFT_UIntVib_kJg, double pressure_external, double& hugoniotDensity, double& hugoniotTemperature, double& hugoniotEnergy, bool hugoniotextrapolate, ofstream& FileMESSAGE);
-  // OBSOLETE uint findBestInitialConditions(const std::vector<std::vector<std::vector<double> > >& data, double desired_initial_pressure_external, double desired_initial_temperature_external, double& initial_mass_density_gcm3, double& initial_temperature_external, double& initial_energyDFT_UIntVib_kJg, double& initial_pressure_external, ofstream& FileMESSAGE);
+  // [OBSOLETE] uint findBestInitialConditions(const std::vector<std::vector<std::vector<double> > >& data, double desired_initial_pressure_external, double desired_initial_temperature_external, double& initial_mass_density_gcm3, double& initial_temperature_external, double& initial_energyDFT_UIntVib_kJg, double& initial_pressure_external, ofstream& FileMESSAGE);
   uint findBestInitialConditions(const std::vector<double>& pressures_external, const std::vector<double>& temperatures_external, const std::vector<std::vector<double> >& mass_densities_gcm3, const std::vector<std::vector<double> >& energies_pT_kJg, double desired_initial_pressure_external, double desired_initial_temperature_external, double& initial_mass_density_gcm3, double& initial_temperature_external, double& initial_energyDFT_UIntVib_kJg, double& initial_pressure_external, ofstream& FileMESSAGE);
   uint findBestInitialConditionsAllTemperaturesAndPressures(const std::vector<AGL_pressure_temperature_energies>& AGL_pressure_temperature_energy_list, const std::vector<double>& mass_densities_gcm3, const std::vector<double>& energies_pT_kJg, double desired_initial_pressure_external, double desired_initial_temperature_external, double& initial_mass_density_gcm3, double& initial_temperature_external, double& initial_energyDFT_UIntVib_kJg, double& initial_pressure_external, ofstream& FileMESSAGE);
   void interpolateToFindHugoniotEnergyAndDensity(double initial_mass_density_gcm3, double initial_energyDFT_UIntVib_kJg, double initial_pressure_external, double pressure_external, double energy1, double energy2, double density1, double density2, double& hugoniot_energy, double& hugoniot_density);
   // Functions for extracting electronic properties as a function of pressure
-  uint extractedos(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, ofstream& FileMESSAGE);
+  uint extractedos(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, vector<string>& dirrunname, ofstream& FileMESSAGE);
   uint edosbandgap(_AGL_data& AGL_data, ofstream& FileMESSAGE); 
   uint edosfit(vector<double>& energtofit, vector<double>& dostofit, vector<double>& energtoeval, vector<double>& dospolyeval, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE);
   uint edosgap_pressure_fit(vector<double>& pressure, vector<double>& edosgap, double& edosgap_pressure, vector<double>& edosgapfit, uint& nminlimit, uint& nmaxlimit, bool& gxmdebug, ofstream& FileMESSAGE);
