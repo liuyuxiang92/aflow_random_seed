@@ -233,26 +233,21 @@ void QMesh::moveToBZ(xvector<double>& qpt) const {
 
 //makeIrreducible/////////////////////////////////////////////////////////////
 // Makes the q-point mesh irreducible
+// ME190730 - Changed algorithm to be much faster
 void QMesh::makeIrreducible() {
   if (_reduced) return;  // ME190701 - don't reduce if it's already reduced
-  _logger << "Determining irreducible q-points." << apl::endl;
-  _logger.initProgressBar("Irreducible q-points");
 
   _ibzqpts.clear();
   _weights.clear();
   _nIQPs = 0;
-  xvector<double> qpt(3);
   int nsym = (int) _recCell.pgroup.size();
-  vector<vector<xvector<double> > > irred_trans;
-  vector<xvector<double> > trans(nsym, xvector<double>(3));
-  xvector<double> newkpoint;
-  double tol = _AFLOW_APL_EPS_;
+  vector<vector<int> > irred_trans;
+  vector<int> trans(nsym, -1);
   for (int q = 0; q < _nQPs; q++) {
     bool append = true;
     for (int sym = 0; sym < nsym; sym++) {
       for (int iq = 0; iq < _nIQPs; iq++) {
-        if (SYM::FPOSMatch(_qpoints[q].fpos, irred_trans[iq][sym],
-                           _recCell.lattice, _recCell.f2c, _recCell.skewed, tol)) { //DX 20190619 - lattice and f2c as input
+        if (irred_trans[iq][sym] == q) {
           append = false;
           _weights[iq]++;
           _qpoints[q].symop = sym;
@@ -271,13 +266,11 @@ void QMesh::makeIrreducible() {
       // Calculate the transformed irreducible q-point once to avoid repeated
       // matrix multiplications
       for (int sym = 0; sym < nsym; sym++) {
-        trans[sym] = _recCell.pgroup[sym].Uf * _qpoints[q].fpos;
+        trans[sym] = getQPointIndex(_recCell.pgroup[sym].Uf * _qpoints[q].fpos);
       }
       irred_trans.push_back(trans);
     }
-    _logger.updateProgressBar(q, _nQPs);
   }
-  _logger.finishProgressBar();
   _reduced = true;
   _logger << "Found " << _nIQPs << " irreducible qpoints." << apl::endl;
 }
@@ -349,6 +342,8 @@ const _qpoint& QMesh::getQPoint(const xvector<double>& fpos) const {
 }
 
 // ME190701
+// Returns the index of the qpoint based on the fractional
+// position. It assumes that the point is already on the grid.
 int QMesh::getQPointIndex(xvector<double> fpos) const {
   // Shift back to original Monkhorst-Pack positions
   if (_shifted) fpos += _shift;

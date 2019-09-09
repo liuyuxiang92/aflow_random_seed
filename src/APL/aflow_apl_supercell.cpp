@@ -1751,7 +1751,7 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
             pc -= delta;
             phase = phase + exp(iONE * scalar_product(qpoint, pc));
             if (calc_derivative) {
-            for (uint i = 1; i < 4; i++) {
+              for (uint i = 1; i < 4; i++) {
                 derivative[i] += exp(iONE * (scalar_product(qpoint, pc))) * iONE * (pc(i));
               }
             }

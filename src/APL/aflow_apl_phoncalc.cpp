@@ -1164,29 +1164,28 @@ namespace apl {
                                                    xmatrix<xcomplex<double> >& eigenvectors,
                                                    vector<xmatrix<xcomplex<double> > >& dDynMat,
                                                    bool calc_derivative) {
-    // Get dynamic matrix
+    // Get dynamical matrix
     xmatrix<xcomplex<double> > dynamicalMatrix = getDynamicalMatrix(kpoint, dDynMat, calc_derivative);
 
     // Diagonalize
     xvector<double> eigenvalues(dynamicalMatrix.rows, 1);
 //    xmatrix<xcomplex<double> > unitaryMatrix;  OBSOLETE ME 180827
 
+// OBSOLETE ME190815 - moved to aurostd::xmatrix
+//#ifdef USE_MKL
+//    zheevMKL(dynamicalMatrix, eigenvalues, eigenvectors);
+//#else
+//    //tred2(dynamicalMatrix);
+//    zheevByJacobiRotation(dynamicalMatrix2, eigenvalues2, eigenvectors2);
+//    eigenvectors2 = trasp(eigenvectors2);
+//#endif
 
-/*
-//OBSOLETE ME 180828 - zheevByJacobiRotation may not yield the correct eigenvectors.
-#ifdef USE_MKL
-    zheevMKL(dynamicalMatrix, eigenvalues, eigenvectors);
-#else
-    //tred2(dynamicalMatrix);
-    zheevByJacobiRotation(dynamicalMatrix, eigenvalues, eigenvectors);
-#endif
-*/
+// ME 180828; OBSOLETE ME190815 - use Jacobi algorithm in aurostd::xmatrix
+//    apl::aplEigensystems e;
+//    e.eigen_calculation(dynamicalMatrix, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
 
-// ME 180828 
-    apl::aplEigensystems e;
-    e.eigen_calculation(dynamicalMatrix, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
+    eigenvalues = jacobiHermitian(dynamicalMatrix, eigenvectors);  // ME190815
 
-    //
     return eigenvalues;
   }
 

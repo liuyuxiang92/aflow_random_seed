@@ -1620,22 +1620,26 @@ class TCONDCalculator {
     void writeThermalConductivity();
     // void writeThermalConductivityPlot(); OBSOLETE ME190614
 
-    void getLastQPoint(int, int, int);
-//    vector<vector<vector<xcomplex<double> > > > calculatePhases();
     vector<vector<vector<vector<xcomplex<double> > > > > calculatePhases();
-    vector<vector<int> > calculateInvariantSymOps();
+    vector<vector<int> > calculateSmallGroups();
+
+    void reduceByFGroup(vector<vector<int> >&, vector<vector<int> >&);
+    xmatrix<xcomplex<double> > calculateGamma(int, int);
+
+    //void getInequivalentQPointSet(int, int, int, const vector<vector<int> >&, const vector<vector<int> >&);
+    void getInequivalentQPointSet(int);
+    vector<vector<bool> > getSigns(int);
+
     double calculateIntegrationWeights(int, const LTMethod&);
     void calculateWeightsLT(const LTMethod&, int, int, int, vector<double>&);
     vector<double> getWeightsLT(const LTMethod&, double, const vector<double>&);
     double integrate(const LTMethod&, double, const vector<double>&, const vector<double>&);
-//    void calculateTransitionProbabilities(const vector<vector<vector<xcomplex<double> > > >&);
-//    void calculateTransitionProbabilitiesPhonon(int, int, int, const vector<vector<vector<xcomplex<double> > > >&);
-    void calculateTransitionProbabilities(const vector<vector<vector<vector<xcomplex<double> > > > >&);
+    void calculateTransitionProbabilities();
     void calculateTransitionProbabilitiesPhonon(int, int, int, const vector<vector<vector<vector<xcomplex<double> > > > >&);
     void calculateTransitionProbabilitiesIsotope(const LTMethod&, int, int, vector<vector<double> >&);
     void calculateTransitionProbabilitiesBoundary();
     void getProcess(ifstream&, vector<int>&, vector<int>&);
-    void getProcess(int, ifstream&, ifstream&, vector<bool>&, vector<int>&, vector<int>&);
+    void getProcess(int, ifstream&, vector<bool>&, vector<int>&, vector<int>&);
 
     xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&);
     double getOccupationTerm(int, const vector<vector<double> >&, const vector<bool>&,
@@ -2699,16 +2703,14 @@ xvector<utype> getVectorConvolution(const xvector<utype>& a, const xvector<utype
 }
 
 
-/*
-OBSOLETE - ME180828
+//OBSOLETE - ME190815 - moved to aurostd::xmatrix
 namespace apl {
-void tred2(xmatrix<xcomplex<double> >&);
+//void tred2(xmatrix<xcomplex<double> >&);
 void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
 #ifdef USE_MKL
 void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
 #endif
 }
-*/
 
 // ***************************************************************************
 // cursor.h
