@@ -6,6 +6,7 @@
 // Stefano Curtarolo 
 // Corey Oses
 // Frisco Rose (AFLUX)
+// Marco Esters (AFLOW DB)
 
 #ifndef _AFLOWLIB_H_
 #define _AFLOWLIB_H_
@@ -550,49 +551,52 @@ class AflowDB {
     bool closeTmpFile(bool=false, bool=false);
 
     vector<string> getSchemaKeys(const string&);
-    vector<string> getSchemaValues(const string&, const string&, const string&);
-    vector<string> getSchemaValues(const string&, const vector<string>&, const string&);
 
-    void performUpdate(bool);
-    vector<vector<string> > getUpdatedJsonData(const string&, const vector<string>&,
-                                               const vector<string>&, bool, long int);
-    void getUpdatedJsonDataThread(int, int, const vector<string>&, const vector<string>&,
-                                  const vector<string>&, bool, long int, vector<vector<vector<string> > >&);
-    void crawl(vector<string>&, const string&, int, int, bool, long int);
+    void rebuildDB();
+    void buildTables(int, int, const vector<string>&, const vector<string>&);
 
-    vector<string> getDataTypes(const vector<string>&, const string&);
+    vector<string> getDataTypes(const string&, const vector<string>&);
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
 
-    //DBStats getColStats(const string&);
     DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-    void getColStats(int, int, DBStats&, const vector<string>&);
+    void getColStats(int, int, const string&,
+                     const vector<string>&, const vector<string>&, vector<vector<int> >&,
+                     vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
     vector<std::pair<string, int> > getDBLoopCounts(const string&, const vector<string>&);
     vector<string> getUniqueFromJSONArrays(const vector<string>&);
     void writeStatsToJSON(std::stringstream&, const DBStats&);
 
     void createIndex(const string&, const string&, const string&);
     void dropIndex(const string&);
-    string extractJSONvalue(const string&, const string&);
-    string extractJSONvalueAFLOW(const string&, string);
     void dropTable(const string&);
     void createTable(const string&, const vector<string>&, const string&);
     void createTable(const string&, const vector<string>&, const vector<string>&);
-    void insertValues(const string&, const vector<string>&, bool=false);
-    void insertValues(const string&, const vector<string>&, const vector<string>&, bool=false);
+    void insertValues(const string&, const vector<string>&);
+    void insertValues(const string&, const vector<string>&, const vector<string>&);
     string prepareSELECT(const string&, const string&, const string&, string="", int=0, string="");
     string prepareSELECT(const string&, const string&, const vector<string>&, string="", int=0, string="");
-
-    void SQLexecuteCommand(sqlite3*, const string&);
-    string SQLexecuteCommandSCALAR(sqlite3*, const string&);
-    vector<string> SQLexecuteCommandVECTOR(sqlite3*, const string&);
-    vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3*, const string&);
-    static int SQLcallback(void*, int, char**, char**);
-    static int SQLcallbackSCALAR(void*, int, char**, char**);
-    static int SQLcallbackVECTOR(void*, int, char**, char**);
-    static int SQLcallback2DVECTOR(void*, int, char**, char**);
 };
 
 }  // namespace aflowlib
+
+namespace aflowlib {
+  void updateDatabaseJsonFiles(const string&);
+  void updateDatabaseJsonFilesThread(int, int, const vector<string>&, const vector<string>&, const vector<long int>&);
+  void fetchUpdatedJsonFiles(vector<string>&, const string&, int, int, long int);
+
+  vector<string> getJsonKeys(const string&, string="");
+  string extractJsonValue(const string&, const string&);
+  string extractJsonValueAflow(const string&, string);
+
+  void SQLexecuteCommand(sqlite3*, const string&);
+  string SQLexecuteCommandSCALAR(sqlite3*, const string&);
+  vector<string> SQLexecuteCommandVECTOR(sqlite3*, const string&);
+  vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3*, const string&);
+  int SQLcallback(void*, int, char**, char**);
+  int SQLcallbackSCALAR(void*, int, char**, char**);
+  int SQLcallbackVECTOR(void*, int, char**, char**);
+  int SQLcallback2DVECTOR(void*, int, char**, char**);
+}
 
 #endif //  _AFLOWLIB_H_
 
