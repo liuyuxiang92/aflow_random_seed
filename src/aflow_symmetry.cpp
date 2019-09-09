@@ -708,8 +708,23 @@ namespace SYM {
 
 namespace SYM {
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff){
-    xvector<int> ijk;
-    return minimizeDistanceFractionalMethod(fdiff, ijk);
+    //DX 20190904 [OBSOLETE] xvector<int> ijk;
+    //DX 20190904 [OBSOLETE] return minimizeDistanceFractionalMethod(fdiff, ijk);
+    
+    // ---------------------------------------------------------------------------
+    // loop over each component and bring close to origin 
+    // (i.e., between -0.5 and 0.5 in fractional coordinates)
+    
+    //DX 20190904 - START
+    double tolerance=0.0;
+    double upper_bound=0.5;
+    double lower_bound=-0.5;
+
+    xvector<double> min_diff = fdiff;
+    BringInCellInPlace(min_diff, tolerance, upper_bound, lower_bound);
+
+    return min_diff;
+    //DX 20190904 - END
   }
 } /// namespace SYM
 
@@ -721,19 +736,24 @@ namespace SYM {
     // loop over each component and bring close to origin 
     // (i.e., between -0.5 and 0.5 in fractional coordinates)
 
-    xvector<double> min_diff = fdiff;
-    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
-    for(uint i=1; i<4; i++){
-      while(min_diff(i)>0.5){
-        min_diff(i) = min_diff(i)-1;
-        ijk(i)-=1;
-      }
-      while(min_diff(i)<=-0.5){
-        min_diff(i) = min_diff(i)+1;
-        ijk(i)+=1;
-      }
+    xvector<double> min_diff = minimizeDistanceFractionalMethod(fdiff); //DX 20190904
+
+    for(int i=min_diff.lrows; i<=min_diff.urows; i++){ //DX 20190904
+      ijk(i) = (int)(min_diff[i]-fdiff[i]);
     }
-  return min_diff;
+
+    //DX 20190416 [OBSOLETE] xvector<double> tmp = v_in;
+    //DX 20190904 [OBSOLETE] for(uint i=1; i<4; i++){
+    //DX 20190904 [OBSOLETE]   while(min_diff(i)>0.5){
+    //DX 20190904 [OBSOLETE]     min_diff(i) = min_diff(i)-1;
+    //DX 20190904 [OBSOLETE]     ijk(i)-=1;
+    //DX 20190904 [OBSOLETE]   }
+    //DX 20190904 [OBSOLETE]   while(min_diff(i)<=-0.5){
+    //DX 20190904 [OBSOLETE]     min_diff(i) = min_diff(i)+1;
+    //DX 20190904 [OBSOLETE]     ijk(i)+=1;
+    //DX 20190904 [OBSOLETE]   }
+    //DX 20190904 [OBSOLETE] }
+    return min_diff;
   }
 }
 
@@ -1310,66 +1330,66 @@ namespace SYM {
   }
 } // namespace SYM
 
-// ******************************************************************************
-// mod_one (Modify double by 1; to keep in unit cell)
-// ******************************************************************************
-// Bring a component of coordinate in the cell, based on a tolerance
-namespace SYM {
-  double mod_one(double d){
-    if(d==INFINITY || d!=d || d==-INFINITY ){
-      cerr << "SYM::mod_one: ERROR: (+-)INF or NAN value" << endl;
-      return d;
-    }
-    while(d>=1.0-_ZERO_TOL_){ //1e-10
-      d=d-1.0;
-    }
-    while(d<-_ZERO_TOL_){ //1e-10
-      d=d+1.0;
-    }
-    return d;
-  }
-}
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // mod_one (Modify double by 1; to keep in unit cell)
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // Bring a component of coordinate in the cell, based on a tolerance
+//DX 20190905 [OBSOLETE] namespace SYM {
+//DX 20190905 [OBSOLETE]   double mod_one(double d){
+//DX 20190905 [OBSOLETE]     if(d==INFINITY || d!=d || d==-INFINITY ){
+//DX 20190905 [OBSOLETE]       cerr << "SYM::mod_one: ERROR: (+-)INF or NAN value" << endl;
+//DX 20190905 [OBSOLETE]       return d;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     while(d>=1.0-_ZERO_TOL_){ //1e-10
+//DX 20190905 [OBSOLETE]       d=d-1.0;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     while(d<-_ZERO_TOL_){ //1e-10
+//DX 20190905 [OBSOLETE]       d=d+1.0;
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     return d;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
 
-// ******************************************************************************
-// mod_one_atom (Modify fpos and ijk by 1; to keep in unit cell)
-// ******************************************************************************
-// Bring atom.fpos and atom.ijk in the cell, based on a tolerance
-namespace SYM {
-  _atom mod_one_atom(const _atom& atom_in){
-    _atom atom;
-    atom=atom_in;
-    atom.ijk=atom_in.ijk;
-    for(uint i=1;i<(uint)atom.fpos.rows+1;i++){
-      if(atom.fpos[i]==INFINITY || atom.fpos[i]!=atom.fpos[i] || atom.fpos[i]==-INFINITY ){
-        cerr << "SYM::mod_one_atom:ERROR: (+-)INF or NAN value" << endl;
-        return atom;
-      }
-      while(atom.fpos[i]>=1-_ZERO_TOL_){
-        atom.fpos[i]-=1.0;
-        atom.ijk[i]++;
-      }
-      while(atom.fpos[i]<-_ZERO_TOL_){
-        atom.fpos[i]+=1.0;
-        atom.ijk[i]--;
-      }
-    }
-    return atom;
-  }
-}
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // mod_one_atom (Modify fpos and ijk by 1; to keep in unit cell)
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // Bring atom.fpos and atom.ijk in the cell, based on a tolerance
+//DX 20190905 [OBSOLETE] namespace SYM {
+//DX 20190905 [OBSOLETE]   _atom mod_one_atom(const _atom& atom_in){
+//DX 20190905 [OBSOLETE]     _atom atom;
+//DX 20190905 [OBSOLETE]     atom=atom_in;
+//DX 20190905 [OBSOLETE]     atom.ijk=atom_in.ijk;
+//DX 20190905 [OBSOLETE]     for(uint i=1;i<(uint)atom.fpos.rows+1;i++){
+//DX 20190905 [OBSOLETE]       if(atom.fpos[i]==INFINITY || atom.fpos[i]!=atom.fpos[i] || atom.fpos[i]==-INFINITY ){
+//DX 20190905 [OBSOLETE]         cerr << "SYM::mod_one_atom:ERROR: (+-)INF or NAN value" << endl;
+//DX 20190905 [OBSOLETE]         return atom;
+//DX 20190905 [OBSOLETE]       }
+//DX 20190905 [OBSOLETE]       while(atom.fpos[i]>=1-_ZERO_TOL_){
+//DX 20190905 [OBSOLETE]         atom.fpos[i]-=1.0;
+//DX 20190905 [OBSOLETE]         atom.ijk[i]++;
+//DX 20190905 [OBSOLETE]       }
+//DX 20190905 [OBSOLETE]       while(atom.fpos[i]<-_ZERO_TOL_){
+//DX 20190905 [OBSOLETE]         atom.fpos[i]+=1.0;
+//DX 20190905 [OBSOLETE]         atom.ijk[i]--;
+//DX 20190905 [OBSOLETE]       }
+//DX 20190905 [OBSOLETE]     }
+//DX 20190905 [OBSOLETE]     return atom;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
 
-// ******************************************************************************
-// mod_one_xvec (Modify xvector compoenents by 1; to keep in unit cell)
-// ******************************************************************************
-// Bring a coordinate in the cell, based on vector tolerance
-namespace SYM {
-  xvector<double> mod_one_xvec(xvector<double> a){
-    xvector<double> b;
-    b(1) = mod_one(a(1));
-    b(2) = mod_one(a(2));
-    b(3) = mod_one(a(3));
-    return b;
-  }
-}
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // mod_one_xvec (Modify xvector compoenents by 1; to keep in unit cell)
+//DX 20190905 [OBSOLETE] // ******************************************************************************
+//DX 20190905 [OBSOLETE] // Bring a coordinate in the cell, based on vector tolerance
+//DX 20190905 [OBSOLETE] namespace SYM {
+//DX 20190905 [OBSOLETE]   xvector<double> mod_one_xvec(xvector<double> a){
+//DX 20190905 [OBSOLETE]     xvector<double> b;
+//DX 20190905 [OBSOLETE]     b(1) = mod_one(a(1));
+//DX 20190905 [OBSOLETE]     b(2) = mod_one(a(2));
+//DX 20190905 [OBSOLETE]     b(3) = mod_one(a(3));
+//DX 20190905 [OBSOLETE]     return b;
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE] }
 
 // ******************************************************************************
 // Check for identity
@@ -4925,58 +4945,58 @@ namespace SYM {
 
 // DX AND COREY - START
 
-double BringInCell(const double& x) {
-  return BringInCell_20161115(x);
-}
-
-double BringInCell_20161115(const double& x) {
-  return SYM::mod_one(x);
-}
-
-#ifndef COMPILE_SLIM
-double BringInCell_20160101(const double& x) {
-  //  if(x>0.0) { y=x-(double)floor(x); return y; }
-  // else { if(x<0.0) y=x+floor(-x)+1.0;}
-  if(x> _EPS_) return x-floor(x);
-  if(x<-_EPS_) return x+floor(-x)+1.0;
-  //  if(abs(x)<0.0001) y=0.0;
-  // if(abs(x-1.0)<0.0001) y=0.0;
-  return 0.0;
-}
-#endif
-
-#ifndef COMPILE_SLIM
-double BringInCell_20160101(const double& x,double tolerance) {
-  //  if(x>0.0) { y=x-(double)floor(x); return y; }
-  // else { if(x<0.0) y=x+floor(-x)+1.0;}
-  if(x>tolerance) {return x-floor(x);}
-  if(x<tolerance) {return x+floor(-x)+1.0;}
-  //  if(abs(x)<0.0001) y=0.0;
-  // if(abs(x-1.0)<0.0001) y=0.0;
-  return 0.0;
-}
-#endif
-
-xvector<double> BringInCell2_20161115(const xvector<double>& v_in) {
-  return BringInCell2(v_in);
-}
-
-#ifndef COMPILE_SLIM
-xvector<double> BringInCell2_20160101(const xvector<double>& v_in,double tolerance) {
-  xvector<double> v_out(v_in.urows,v_in.lrows);
-  for(int i=v_out.lrows;i<=v_out.urows;i++) {
-    //v_out(i)=BringInCell(v_in(i),tolerance);
-    v_out(i)=BringInCell_20160101(v_in(i),tolerance);
-    if(abs(v_out(i))<tolerance) {v_out(i)=0.0;}
-    if(abs(v_out(i)-1.0)<tolerance) {v_out(i)=0.0;}
-  }
-  return v_out;
-}
-#endif
-
-xvector<double> BringInCell2(const xvector<double>& v_in) {
-  return SYM::mod_one_xvec(v_in);
-}
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x) {
+//DX 20190905 [OBSOLETE]   return BringInCell_20161115(x);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] double BringInCell_20161115(const double& x) {
+//DX 20190905 [OBSOLETE]   return SYM::mod_one(x);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] #ifndef COMPILE_SLIM
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x) {
+//DX 20190905 [OBSOLETE]   //  if(x>0.0) { y=x-(double)floor(x); return y; }
+//DX 20190905 [OBSOLETE]   // else { if(x<0.0) y=x+floor(-x)+1.0;}
+//DX 20190905 [OBSOLETE]   if(x> _EPS_) return x-floor(x);
+//DX 20190905 [OBSOLETE]   if(x<-_EPS_) return x+floor(-x)+1.0;
+//DX 20190905 [OBSOLETE]   //  if(abs(x)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   // if(abs(x-1.0)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   return 0.0;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] #endif
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] #ifndef COMPILE_SLIM
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x,double tolerance) {
+//DX 20190905 [OBSOLETE]   //  if(x>0.0) { y=x-(double)floor(x); return y; }
+//DX 20190905 [OBSOLETE]   // else { if(x<0.0) y=x+floor(-x)+1.0;}
+//DX 20190905 [OBSOLETE]   if(x>tolerance) {return x-floor(x);}
+//DX 20190905 [OBSOLETE]   if(x<tolerance) {return x+floor(-x)+1.0;}
+//DX 20190905 [OBSOLETE]   //  if(abs(x)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   // if(abs(x-1.0)<0.0001) y=0.0;
+//DX 20190905 [OBSOLETE]   return 0.0;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] #endif
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20161115(const xvector<double>& v_in) {
+//DX 20190905 [OBSOLETE]   return BringInCell2(v_in);
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] #ifndef COMPILE_SLIM
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20160101(const xvector<double>& v_in,double tolerance) {
+//DX 20190905 [OBSOLETE]   xvector<double> v_out(v_in.urows,v_in.lrows);
+//DX 20190905 [OBSOLETE]   for(int i=v_out.lrows;i<=v_out.urows;i++) {
+//DX 20190905 [OBSOLETE]     //v_out(i)=BringInCell(v_in(i),tolerance);
+//DX 20190905 [OBSOLETE]     v_out(i)=BringInCell_20160101(v_in(i),tolerance);
+//DX 20190905 [OBSOLETE]     if(abs(v_out(i))<tolerance) {v_out(i)=0.0;}
+//DX 20190905 [OBSOLETE]     if(abs(v_out(i)-1.0)<tolerance) {v_out(i)=0.0;}
+//DX 20190905 [OBSOLETE]   }
+//DX 20190905 [OBSOLETE]   return v_out;
+//DX 20190905 [OBSOLETE] }
+//DX 20190905 [OBSOLETE] #endif
+//DX 20190905 [OBSOLETE] 
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2(const xvector<double>& v_in) {
+//DX 20190905 [OBSOLETE]   return SYM::mod_one_xvec(v_in);
+//DX 20190905 [OBSOLETE] }
 
 namespace SYM {
   //xstructure and _sym_op
@@ -5294,7 +5314,9 @@ namespace SYM {
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup index_for_smallest_group=" << index_for_smallest_group << endl;}
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup atoms_by_type.size()=" << atoms_by_type.size() << endl;}
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup atoms_by_type[index_for_smallest_group].size()=" << atoms_by_type[index_for_smallest_group].size() << endl;}
-        symOp.ftau = mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos);
+        //DX 20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau = mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos);
+        symOp.ftau = atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos; //DX 20190905 - uses new bring in cell function
+        BringInCellInPlace(symOp.ftau); //DX 20190905 - uses new bring in cell function
         // CO - START
         symOp.ctau=a.f2c*symOp.ftau;
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup about to test symop" << endl;}
@@ -5302,7 +5324,8 @@ namespace SYM {
         //if(getFullSymBasis(a.atoms,a.pgroup[pg].Uf,a.c2f,a.f2c,a.pgroup[pg].str_Hermann_Mauguin,symOp.ftau,skew,_eps_,basis_atoms_map,basis_types_map)){
         if(getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,TRUE,skew,_eps_,basis_atoms_map,basis_types_map)){
           //Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=symOp.ftau; // for safety try to check out inverse
-          symOp.ftau=mod_one_xvec(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[
+          //DX 20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau=mod_one_xvec(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[
+          BringInCellInPlace(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[ //DX 20190905 - uses new BringInCell function
           for(uint i=1;i<=3;i++) {
             if(symOp.ftau[i]>1.0-_ZERO_TOL_){ 
               symOp.ftau[i]=0.0; // DX roundoff
@@ -7136,7 +7159,8 @@ namespace SYM {
             if(!SYM::ApplyAtomValidate(a.atoms[iat],tatom,a.fgroup[fg],a.lattice,a.c2f,a.f2c,skew,FALSE,FALSE,_eps_)){
               return FALSE;
             }
-            tatom.fpos=mod_one_xvec(tatom.fpos);
+            //DX 20190905 [OBSOLETE-no more mod_one_xvec] tatom.fpos=mod_one_xvec(tatom.fpos);
+            BringInCellInPlace(tatom.fpos); //DX 20190905 - uses new BringInCell function
             fgroup_map=MapAtom(tatom, a.atoms[eat], FALSE, a.lattice, a.f2c, skew, _eps_); //DX 20190619 - lattice and f2c as input
           }
           if(fgroup_map){
@@ -7816,7 +7840,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     // DX 12/7/17 - added generator_coefficients - START
     // generator coefficients
     if(group[i].generator.lrows){
-      sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
+      sscontent_json << "\"generator_coefficients\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].generator_coefficients,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
     } else {
       if(PRINT_NULL){ sscontent_json << "\"generator_coefficients\":null" << eendl;}
     }
@@ -7854,7 +7878,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // axis
     if(group[i].axis.lrows){
-      sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
+      sscontent_json << "\"axis\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].axis,5,roff),",") << "]" << eendl; //DX 20180726 - added roff
     } else {
       if(PRINT_NULL){ sscontent_json << "\"axis\":null" << eendl;}
     }
@@ -7862,7 +7886,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // quaternion vector
     if(group[i].quaternion_vector.lrows){
-      sscontent_json << "\"quaternion_vector\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].quaternion_vector,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"quaternion_vector\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].quaternion_vector,5,roff),",") << "]" << eendl;
     } else {
       if(PRINT_NULL){ sscontent_json << "\"quaternion_vector\":null" << eendl;}
     }
@@ -7892,7 +7916,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // ctau
     if(group[i].ctau.rows && (group_str == "fgroup" || group_str == "sgroup")){
-      sscontent_json << "\"ctau\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ctau,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ctau\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctau,5,roff),",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ctau\":null" << eendl;}
     }
@@ -7900,7 +7924,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // ftau
     if(group[i].ftau.rows && (group_str == "fgroup" || group_str == "sgroup")){
-      sscontent_json << "\"ftau\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ftau,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ftau\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ftau,5,roff),",") << "]" << eendl;
     } else if (group_str == "fgroup" || group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ftau\":null" << eendl;}
     }
@@ -7924,7 +7948,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
     
     // ctrasl
     if(group[i].ctrasl.rows && group_str == "sgroup"){
-      sscontent_json << "\"ctrasl\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ctrasl,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ctrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctrasl,5,roff),",") << "]" << eendl;
     } else if (group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ctrasl\":null" << eendl;}
     }
@@ -7932,7 +7956,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
 
     // ftrasl
     if(group[i].ftrasl.rows && group_str == "sgroup"){
-      sscontent_json << "\"ftrasl\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(group[i].ftrasl,5,roff),",") << "]" << eendl;
+      sscontent_json << "\"ftrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ftrasl,5,roff),",") << "]" << eendl;
     } else if (group_str == "sgroup"){
       if(PRINT_NULL){ sscontent_json << "\"ftrasl\":null" << eendl;}
     }

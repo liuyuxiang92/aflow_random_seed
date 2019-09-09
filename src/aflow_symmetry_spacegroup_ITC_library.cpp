@@ -25,17 +25,17 @@ using namespace std;
 //DX 20190215 [OBSOLETE] extern double _SYM_TOL_;
 //DX 20190215 [OBSOLETE] #endif
 
-// **********************************************************************************************************************
-// normalize (Overloaded)
-// **********************************************************************************************************************
-namespace SYM {
-  void normalize(xvector<double>& v) {
-    double mod = aurostd::modulus(v);
-    for (int i = 1; i <= v.urows; i++) {
-      v(i) = v(i) / mod;
-    }
-  }
-} //namespace SYM
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // normalize (Overloaded)
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] // **********************************************************************************************************************
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] namespace SYM {
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   void normalize(xvector<double>& v) {
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     double mod = aurostd::modulus(v);
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     for (int i = 1; i <= v.urows; i++) {
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]       v(i) = v(i) / mod;
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]     }
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()]   }
+//DX 20190905 [OBSOLETE - use explicit division by aurostd::modulus()] } //namespace SYM
 /*
 // **********************************************************************************************************************
 // normalize (Overloaded)
@@ -744,7 +744,8 @@ namespace SYM {
     deque<_atom> tmpvec;
     for (uint i = 0; i < expanded.size(); i++) {
       for (int j = 1; j < 4; j++) {
-	expanded[i].fpos[j] = SYM::mod_one(expanded[i].fpos[j]);
+        //DX 20190905 [OBSOLETE - no more mod_one] expanded[i].fpos[j] = SYM::mod_one(expanded[i].fpos[j]);
+        BringInCellInPlace(expanded[i].fpos[j]); //DX 20190905
       }
     }
     //double min_mod = find_min_lattice_vector(xvec2xmat(expanded[0],expanded[1],expanded[2]));
@@ -754,7 +755,7 @@ namespace SYM {
 
     for (uint i = 0; i < expanded.size(); i++) {
       if(!SYM::MapAtom(tmpvec, expanded[i], TRUE, lattice, f2c, skew, sym_tol)) {  //CAN I USE JUST 1 HERE //DX 20190215 //DX 20190619 - lattice and f2c as input
-	tmpvec.push_back(expanded[i]);
+        tmpvec.push_back(expanded[i]);
       }
     }
     expanded.clear();
@@ -2201,14 +2202,14 @@ namespace SYM {
       if(aurostd::abs(a.shift(i)) < tol) {
 	shift_string.push_back("");
       } else {
-	shift_string.push_back(dbl2frac(a.shift(i)));
+	shift_string.push_back(aurostd::dbl2frac(a.shift(i))); //DX 20190724 - now namespace aurostd
       }
     }
     for (uint i = 1; i < 4; i++) {
       if(aurostd::abs(a.screwglide(i)) < tol) {
 	screwglide_string.push_back("0");
       } else {
-	screwglide_string.push_back(dbl2frac(a.screwglide(i)));
+	screwglide_string.push_back(aurostd::dbl2frac(a.screwglide(i))); //DX 20190724 - now namespace aurostd
       }
     }
     if(!havechar(a.symbol, 'm') && !havechar(a.symbol, 'n') && !havechar(a.symbol, 'd') && !havechar(a.symbol, 'a') && !havechar(a.symbol, 'c') && !havechar(a.symbol, 'b')) {
@@ -2291,7 +2292,7 @@ namespace SYM {
       if(a.symbol == "-1") {
 	output << a.symbol << " " << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       } else if(a.symbol == "1") {
-	output << a.symbol << " " << dbl2frac(a.shift(1)) << "," << dbl2frac(a.shift(2)) << "," << dbl2frac(a.shift(3));
+	output << a.symbol << " " << aurostd::dbl2frac(a.shift(1)) << "," << aurostd::dbl2frac(a.shift(2)) << "," << aurostd::dbl2frac(a.shift(3)); //DX 20190724 - now namespace aurostd
       } else {
 	output << a.symbol << " " << diross.str() << ";" << screwglide_string[0] << "," << screwglide_string[1] << "," << screwglide_string[2];
       }

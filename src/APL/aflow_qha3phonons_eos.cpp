@@ -507,8 +507,10 @@ namespace apl
   { 
 
     if(omeg< 0.001){
-      _logger<<apl::error <<"Frequency too small (<0.001 THz) for U_vib(T)"<<apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger<<apl::error <<"Frequency too small (<0.001 THz) for U_vib(T)"<<apl::endl;
+      //exit(0);
+      throw APLRuntimeError("Frequency too small (<0.001 THz) for U_vib(T)");
     }
 
     double betaa=47.9924*omeg/temp;
@@ -521,8 +523,10 @@ namespace apl
   {
     if(omeg<0.001)
       {
-	_logger<<apl::error<<"Frequency too small (<0.001 THz) for F_vib(T)"<<apl::endl;
-	exit(0);
+        // ME190726 - exit clean-up
+	//_logger<<apl::error<<"Frequency too small (<0.001 THz) for F_vib(T)"<<apl::endl;
+	//exit(0);
+        throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
       }
 
     double betaa=47.9924*omeg/temp;
@@ -534,8 +538,10 @@ namespace apl
   double QHA3POINTS::entropy(const double omeg, const double temp)
   {
     if(omeg<0.001){
-      _logger<<apl::error<< "Frequency too small (<0.001 THz) for S_vib(T)" <<apl::endl;
-      exit(0);
+      // ME190726 - exit clean-up
+      //_logger<<apl::error<< "Frequency too small (<0.001 THz) for S_vib(T)" <<apl::endl;
+      //exit(0);
+      throw APLRuntimeError("Frequency too small (<0.001 THz) for S_vib(T)");
     }
     double  betaa=47.9924*omeg/temp;
     double  S=4.14129*omeg/temp/(exp(betaa)-1.0)-0.0861733* log(1.0-exp(-1.0*betaa));
@@ -547,8 +553,10 @@ namespace apl
   {
     if(omeg<0.001)
       {
-	_logger<<apl::error<<"Frequency too small (<0.001 THz) for Cv(T)" <<apl::endl;
-	exit(0);
+        // ME190726 - exit clean-up
+	//_logger<<apl::error<<"Frequency too small (<0.001 THz) for Cv(T)" <<apl::endl;
+	//exit(0);
+        throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
       }
 
     double betaa=47.9924*omeg/temp;

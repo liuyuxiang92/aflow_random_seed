@@ -194,7 +194,7 @@ namespace AGL_functions {
   // Convenience function to check if a double is an element of a vector of doubles
   bool inVector(double item, const std::vector<double>& vec, double tol = 1.e-5) {
     for(size_t i = 0; i < vec.size(); ++i) {
-      if(fabs(item - vec.at(i)) < tol)
+      if(aurostd::abs(item - vec.at(i)) < tol)
 	return true;
     }
     return false;
@@ -287,7 +287,7 @@ namespace AGL_functions {
       tmp_mass_densities_gcm3.reserve(300);
       for(size_t j = 0; j < AGL_pressure_temperature_energy_list.size(); ++j) {
         double pressure = AGL_pressure_temperature_energy_list.at(j).pressure_external;
-        if(fabs(pressure - currentPressure) < pressureTol) {
+        if(aurostd::abs(pressure - currentPressure) < pressureTol) {
           temperatures_external.push_back(AGL_pressure_temperature_energy_list.at(j).temperature_external);
           energiesDFT_UIntVib_kJg.push_back(energies_pT_kJg.at(j));
           tmp_mass_densities_gcm3.push_back(mass_densities_gcm3.at(j));
@@ -436,7 +436,7 @@ namespace AGL_functions {
 // OBSOLETE    pressure_external = data.at(i).at(j).at(3);
 // All of the pressures in this vector should be the same. Double check
 // that and print an error if they are not.
-// OBSOLETE    if(j != 0 && fabs(pressure_external - data.at(i).at(j - 1).at(3)) > 1e-5) {
+// OBSOLETE    if(j != 0 && aurostd::abs(pressure_external - data.at(i).at(j - 1).at(3)) > 1e-5) {
 // OBSOLETE	aurostd::StringstreamClean(aus);
 // OBSOLETE	  aus << _AGLSTR_ERROR_ + "Error in " << __FUNCTION__ << ": pressures should all be "
 // OBSOLETE            << "the same in each middle vector! In middle vector number "
@@ -607,7 +607,7 @@ namespace AGL_functions {
       //std::cout << "E is " << energiesDFT_UIntVib_kJg.at(i) << "; D is " << mass_densities_gcm3.at(i) << "\n";
       // Figure out when we switch signs. The solution is between these
       // two points.
-      if((val == 0.0 || fabs(val + lastVal) < fabs(val) + fabs(lastVal)) &&
+      if((val == 0.0 || aurostd::abs(val + lastVal) < aurostd::abs(val) + aurostd::abs(lastVal)) &&
 	 i != 0) {
         ind1 = i - 1;
         ind2 = i;
@@ -625,9 +625,9 @@ namespace AGL_functions {
       size_t lastInd = mass_densities_gcm3.size() - 1;
       // If the first point is closer to the solution, use the first two
       // points. Otherwise, use the last two points.
-      if(fabs(energiesDFT_UIntVib_kJg.at(0) - initial_energyDFT_UIntVib_kJg -
+      if(aurostd::abs(energiesDFT_UIntVib_kJg.at(0) - initial_energyDFT_UIntVib_kJg -
 	      0.5 * (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(0))) <
-	 fabs(energiesDFT_UIntVib_kJg.at(lastInd) - initial_energyDFT_UIntVib_kJg - 0.5 *
+	 aurostd::abs(energiesDFT_UIntVib_kJg.at(lastInd) - initial_energyDFT_UIntVib_kJg - 0.5 *
 	      (pressure_external + initial_pressure_external) * (1.0/initial_mass_density_gcm3 - 1.0/mass_densities_gcm3.at(lastInd)))) {
         ind1 = 0;
         ind2 = 1;
@@ -671,11 +671,11 @@ namespace AGL_functions {
     // the solution is less than temperatures_external[0]. Then (and only then) should hugoniot_energy
     // be less than energiesDFT_UIntVib_kJg.at(ind1). In addition, fraction may be greater than 1.0
     // if and only if the solution is greater than temperatures_external.at(lastInd - 1).
-    double fraction = (hugoniot_energy - energiesDFT_UIntVib_kJg.at(ind1)) / fabs(energiesDFT_UIntVib_kJg.at(ind2) - energiesDFT_UIntVib_kJg.at(ind1));
+    double fraction = (hugoniot_energy - energiesDFT_UIntVib_kJg.at(ind1)) / aurostd::abs(energiesDFT_UIntVib_kJg.at(ind2) - energiesDFT_UIntVib_kJg.at(ind1));
 
     // The temperature should be the same fraction away from the ind1
     // temperature.
-    hugoniot_temperature = fabs(temperatures_external.at(ind1) - temperatures_external.at(ind2)) * fraction +
+    hugoniot_temperature = aurostd::abs(temperatures_external.at(ind1) - temperatures_external.at(ind2)) * fraction +
       temperatures_external.at(ind1);
 
     // CHANGES BY PAT 06-03-17
@@ -764,7 +764,7 @@ namespace AGL_functions {
       // closer to the desired initial, keep it.
       double currentPressure = pressures_external.at(i);
       // END CHANGES BY PAT 12-24-17
-      if(bestInitialPressureInd == -1 || fabs(currentPressure - desired_initial_pressure_external) < fabs(bestInitialPressure - desired_initial_pressure_external)) {
+      if(bestInitialPressureInd == -1 || aurostd::abs(currentPressure - desired_initial_pressure_external) < aurostd::abs(bestInitialPressure - desired_initial_pressure_external)) {
         bestInitialPressureInd = i;
         bestInitialPressure = currentPressure;
       }
@@ -782,7 +782,7 @@ namespace AGL_functions {
 
     // If the best initial pressure is greater than a difference of
     // 1.0 GPa, print a warning.
-    if(fabs(bestInitialPressure - desired_initial_pressure_external) > 1.0) {
+    if(aurostd::abs(bestInitialPressure - desired_initial_pressure_external) > 1.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest pressure to the desired initial pressure of "
 	  << desired_initial_pressure_external << " GPa was found to be " << bestInitialPressure << " GPa." << endl;
@@ -819,8 +819,8 @@ namespace AGL_functions {
       double currentTemperature = temperatures_external.at(i);
       // END CHANGES BY PAT 12-24-17   
       if(bestInitialTemperatureInd == -1 ||
-	 fabs(currentTemperature - desired_initial_temperature_external) <
-	 fabs(bestInitialTemperature - desired_initial_temperature_external)) {
+	 aurostd::abs(currentTemperature - desired_initial_temperature_external) <
+	 aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
         bestInitialTemperatureInd = i;
         bestInitialTemperature = currentTemperature;
       }
@@ -838,7 +838,7 @@ namespace AGL_functions {
 
     // If the best initial temperature is greater than a difference of
     // 10.0, print a warning.
-    if(fabs(bestInitialTemperature - desired_initial_temperature_external) > 10.0) {
+    if(aurostd::abs(bestInitialTemperature - desired_initial_temperature_external) > 10.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest temperature to the desired initial temperature of "
 	  << desired_initial_temperature_external << " K was found to be " << bestInitialTemperature << " K." << endl;
@@ -886,8 +886,8 @@ namespace AGL_functions {
     double bestInitialPressure = 1.e300;
     for(size_t i = 0; i < AGL_pressure_temperature_energy_list.size(); ++i) {
       const double& currentPressure = AGL_pressure_temperature_energy_list.at(i).pressure_external;
-      if(fabs(currentPressure - desired_initial_pressure_external) <
-	 fabs(bestInitialPressure - desired_initial_pressure_external)) {
+      if(aurostd::abs(currentPressure - desired_initial_pressure_external) <
+	 aurostd::abs(bestInitialPressure - desired_initial_pressure_external)) {
         bestInitialPressure = currentPressure;
       }
     }
@@ -906,10 +906,10 @@ namespace AGL_functions {
     int bestConditionsInd = -1;
     for(size_t i = 0; i < AGL_pressure_temperature_energy_list.size(); ++i) {
       const double& currentPressure = AGL_pressure_temperature_energy_list.at(i).pressure_external;
-      if(fabs(currentPressure - bestInitialPressure) < pressureTol) {
+      if(aurostd::abs(currentPressure - bestInitialPressure) < pressureTol) {
         const double& currentTemperature = AGL_pressure_temperature_energy_list.at(i).temperature_external;
-        if(fabs(currentTemperature - desired_initial_temperature_external) <
-	   fabs(bestInitialTemperature - desired_initial_temperature_external)) {
+        if(aurostd::abs(currentTemperature - desired_initial_temperature_external) <
+	   aurostd::abs(bestInitialTemperature - desired_initial_temperature_external)) {
           bestInitialTemperature = currentTemperature;
           bestConditionsInd = i;
         }
@@ -936,7 +936,7 @@ namespace AGL_functions {
 
     // If the best initial pressure is greater than a difference of
     // 1.0 GPa, print a warning.
-    if(fabs(bestInitialPressure - desired_initial_pressure_external) > 1.0) {
+    if(aurostd::abs(bestInitialPressure - desired_initial_pressure_external) > 1.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest pressure to the desired initial pressure of "
 	  << desired_initial_pressure_external << " GPa was found to be " << bestInitialPressure << " GPa" << endl;
@@ -949,7 +949,7 @@ namespace AGL_functions {
 
     // If the best initial temperature is greater than a difference of
     // 10.0, print a warning.
-    if(fabs(bestInitialTemperature - desired_initial_temperature_external) > 10.0) {
+    if(aurostd::abs(bestInitialTemperature - desired_initial_temperature_external) > 10.0) {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_WARNING_ + "Warning in " << __FUNCTION__ << ": the closest temperature at pressure " << bestInitialPressure << " GPa to the desired initial temperature of "
 	  << desired_initial_temperature_external << " K was found to be " << bestInitialTemperature << " K." << endl;

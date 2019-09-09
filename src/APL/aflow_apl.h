@@ -1282,8 +1282,8 @@ class QMesh {
     int getIrredQPointIndex(int, int, int) const;
     const _qpoint& getQPoint(int) const;
     const _qpoint& getQPoint(int, int, int) const;
-    const _qpoint& getQPoint(const xvector<double>&) const;  // ME190701
-    int getQPointIndex(xvector<double>) const;  // ME190701
+    const _qpoint& getQPoint(const xvector<double>&) const;  // ME190813
+    int getQPointIndex(xvector<double>) const;  // ME190813
     int getQPointIndex(int, int, int) const;
     vector<xvector<double> > getQPointsCPOS() const;
     vector<xvector<double> > getQPointsFPOS() const;
@@ -1292,7 +1292,7 @@ class QMesh {
     const vector<int>& getIbzqpts() const;
     const vector<_qpoint>& getPoints() const;
     const _kcell& getReciprocalCell() const;
-    bool isShifted() const;
+    bool isShifted() const;  // ME190813
     const xvector<double>& getShift() const;
     const vector<int>& getWeights() const;
     bool isReduced() const;
@@ -1312,7 +1312,7 @@ class QMesh {
     vector<_qpoint> _qpoints;  // The q-points of the mesh
     _kcell _recCell;  // The reciprocal cell
     bool _reduced;  // Indicates whether the q-point mesh has been reduced
-    bool _shifted;  // Indicated whether the q-point mesh has been shifted
+    bool _shifted;  // Indicates whether the q-point mesh has been shifted
     xvector<double> _shift;  // The shift vector of the mesh
     vector<int> _weights;  // The weights of each irreducible q-point
 
@@ -2603,6 +2603,9 @@ namespace apl
 namespace apl {
 
 struct ShellData {
+  ShellData();
+  ShellData(const ShellData& b);
+
   int occupation;
   int occupationCapacity;
   bool isFull;
@@ -2614,6 +2617,9 @@ struct ShellData {
 
   ~ShellData();
   ShellData& operator=(const ShellData&);
+
+  void free();
+  void copy(const ShellData& b);
 };
 
 class ShellHandle {

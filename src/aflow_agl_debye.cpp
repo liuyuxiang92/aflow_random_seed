@@ -41,6 +41,7 @@ _AGL_data::_AGL_data() {
   birchfitorder_iG = 0;
   fittype = 0;
   poissonratiosource="";
+  precaccalgonorm = false;
   relax_static = false;
   static_only = false;
   relax_only = false;
@@ -55,6 +56,8 @@ _AGL_data::_AGL_data() {
   temperature_external.clear();
   energyinput.clear();
   volumeinput.clear();
+  energyinput_orig.clear();
+  volumeinput_orig.clear();
   pressurecalculated.clear();
   stresscalculated.clear();
   structurecalculated.clear();
@@ -196,6 +199,7 @@ const _AGL_data& _AGL_data::operator=(const _AGL_data& b) {       // operator=
     birchfitorder_iG = b.birchfitorder_iG;
     fittype = b.fittype;
     poissonratiosource = b.poissonratiosource;
+    precaccalgonorm = b.precaccalgonorm;
     relax_static = b.relax_static;
     static_only = b.static_only;
     relax_only = b.relax_only;
@@ -210,6 +214,8 @@ const _AGL_data& _AGL_data::operator=(const _AGL_data& b) {       // operator=
     temperature_external = b.temperature_external;
     energyinput = b.energyinput;
     volumeinput = b.volumeinput;
+    energyinput_orig = b.energyinput_orig;
+    volumeinput_orig = b.volumeinput_orig;
     pressurecalculated = b.pressurecalculated;
     stresscalculated = b.stresscalculated;
     structurecalculated = b.structurecalculated;    
@@ -354,6 +360,11 @@ namespace KBIN {
     } else if(aglerror == 8) { 
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "AGL Debye run waiting for other calculations!" << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    } else if (aglerror == 9) {
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ << "AGL Debye failure to generate Hugoniot data" << endl;
+      aus << _AGLSTR_MESSAGE_ << "Main AGL Debye completed successfully" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else {
       aurostd::StringstreamClean(aus);
@@ -663,6 +674,7 @@ namespace AGL_functions {
     aurostd::xoption USER_SPECIES_MASS;                  USER_SPECIES_MASS.option = false;
     aurostd::xoption USER_DIRNAME_ARUN;                  USER_DIRNAME_ARUN.option = false;
     aurostd::xoption USER_GAUSSXM_DEBUG;                 USER_GAUSSXM_DEBUG.option = false;
+    aurostd::xoption USER_PRECACC_ALGONORM;              USER_PRECACC_ALGONORM.option = false;
     aurostd::xoption USER_RELAX_STATIC;                  USER_RELAX_STATIC.option = false;
     aurostd::xoption USER_STATIC;                        USER_STATIC.option = false;
     aurostd::xoption USER_AUTOSKIP_FAILED_ARUNS;         USER_AUTOSKIP_FAILED_ARUNS.option = false;
@@ -1557,7 +1569,20 @@ namespace AGL_functions {
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Write AGL_functions::gaussxm debugging information = " << USER_GAUSSXM_DEBUG.option << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    }       		
+    }
+    // Get the user's selection of which values to use for PREC and ALGO.
+    // By setting this variable to ON, the values for PREC=ACCURATE and ALGO=NORMAL will be used for AGL, overriding other settings in the aflow.in file.
+    if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"PRECACCALGONORM=",TRUE) ) {
+      USER_PRECACC_ALGONORM.options2entry(AflowIn,_AGLSTROPT_+"PRECACCALGONORM=",USER_PRECACC_ALGONORM.option);
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ + "Use PREC=ACCURATE and ALGO=NORMAL = " << USER_PRECACC_ALGONORM.option << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"PRECACC_ALGONORM=",TRUE) ) {
+      USER_PRECACC_ALGONORM.options2entry(AflowIn,_AGLSTROPT_+"PRECACC_ALGONORM=",USER_PRECACC_ALGONORM.option);
+      aurostd::StringstreamClean(aus);
+      aus << _AGLSTR_MESSAGE_ + "Use PREC=ACCURATE and ALGO=NORMAL = " << USER_PRECACC_ALGONORM.option << endl;  
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    }
     // Get the user's selection of which type of runs to do to obtain the thermal properties
     // The default is to use STATIC, independently of what is used in these lines in the aflow.in file. 
     // By setting RELAX_STATIC to ON, the run type RELAX_STATIC=2 will be used.
@@ -1712,6 +1737,7 @@ namespace AGL_functions {
     AGL_data.birchfitorder_iG = USER_BIRCH_FIT_ORDER_IG;
     AGL_data.fittype = USER_FIT_TYPE;
     AGL_data.gaussxm_debug = USER_GAUSSXM_DEBUG.option;
+    AGL_data.precaccalgonorm = USER_PRECACC_ALGONORM.option;
     AGL_data.relax_static = USER_RELAX_STATIC.option;
     AGL_data.static_only = USER_STATIC.option;
     AGL_data.autoskipfailedaruns = USER_AUTOSKIP_FAILED_ARUNS.option;
@@ -2039,16 +2065,22 @@ namespace AGL_functions {
       double initialvolume = xvasp.str.Volume();
 
       xstructure strainedstructure;
-      _xvasp _vaspRun;
+      _xvasp vaspRun;
       vector<_xvasp> vaspRuns;
-      _vflags _vaspFlags;
-      _vaspFlags = vflags;
-      _kflags _kbinFlags;
-      _kbinFlags = kflags;
-      _aflags _aflowFlags;
-      _aflowFlags = aflags;
+      _vflags vaspFlags;
+      vaspFlags = vflags;
+      _kflags kbinFlags;
+      kbinFlags = kflags;
+      _aflags aflowFlags;
+      aflowFlags = aflags;
       vector<string> runname;
+      vector<string> dirrunname;
+      vector<string> arunname;
       vector<double> strainfactorlist;
+      bool avasp_pop_xvasp_success = true;
+      bool aflowin_success = true;
+      stringstream arunaflowin;
+      bool write = true;      
 
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "creating strained structures" << endl;  
@@ -2067,7 +2099,8 @@ namespace AGL_functions {
 
 	// Create vector of classes of type _xvasp
 	// Each element will contain the input and output data for the VASP run for one strained structure
-	vaspRuns.push_back(_vaspRun);
+	vaspRun = xvasp;
+	vaspRuns.push_back(vaspRun);
 	int idVaspRun = vaspRuns.size()-1;
 
 	// Set up name of separate directory for AFLOW run for each strained structure
@@ -2089,16 +2122,40 @@ namespace AGL_functions {
 	  // [OBSOLETE] runname = _AGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor;
 	  runname.push_back(_AGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor);
 	}
+	arunname.push_back(stridVaspRun + "_SF_" + strstrainfactor);
+	dirrunname.push_back(AGL_data.dirpathname + "/" + runname.at(idVaspRun));
 
 	// [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname;
-	vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname.at(idVaspRun);
+	// [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname.at(idVaspRun);
 	vaspRuns.at(idVaspRun).str = strainedstructure;
-      
+	vaspRuns.at(idVaspRun).AVASP_arun_runname = arunname.at(idVaspRun);
+	vaspRuns.at(idVaspRun).AVASP_arun = true;
+	vaspRuns.at(idVaspRun).AVASP_arun_mode = "AGL";
+
+	// Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
+	aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), vaspFlags, kbinFlags, dirrunname.at(idVaspRun), AGL_data, FileMESSAGE);
+	if(aglerror != 0) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AGLSTR_ERROR_ + "Failed to assign values of flags from " << _AFLOWIN_ << " file" << endl;  
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  return aglerror;
+	}	
+	avasp_pop_xvasp_success = AVASP_populateXVASP(aflowFlags, kbinFlags, vaspFlags, vaspRuns.at(idVaspRun));
+	if (!avasp_pop_xvasp_success) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AGLSTR_ERROR_ + "Failed to set AFLOW flags for ARUN " << arunname.at(idVaspRun) << endl;  
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  return 1;
+	}
+	
 	// If there are already LOCK or OUTCAR.static files in this directory, it means this directory was already generated and computed.
 	// Therefore do not touch, but store this structure in the list, so that it can be used in the next part of code.
 	if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) ||
 	    aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
-	    aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ) continue; 	
+	    aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
+	    aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
+	    aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
+	    aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ) continue; 	
 
 	// Check if structure is on list of failed runs to be skipped
 	// If so, then skip generation and continue to next structure
@@ -2119,28 +2176,29 @@ namespace AGL_functions {
   
 	// If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
 	if (!XHOST.POSTPROCESS) {
-	// Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
-	// [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
-	aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
-	if(aglerror != 0) {
-	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_ERROR_ + "Failed to assign values of flags from " << _AFLOWIN_ << " file" << endl;  
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  return aglerror;
-	}
+	  // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
+	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
+	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
+	  // [OBSOLETE] if(aglerror != 0) {
+	  // [OBSOLETE]   aurostd::StringstreamClean(aus);
+	  // [OBSOLETE]   aus << _AGLSTR_ERROR_ + "Failed to assign values of flags from " << _AFLOWIN_ << " file" << endl;  
+	  // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE]   return aglerror;
+	  // [OBSOLETE] }
 	  
-	// Create _AFLOWIN_
-	aurostd::StringstreamClean(aus);
-	aus << _AGLSTR_MESSAGE_ << "writing " << _AFLOWIN_ << "" << endl;  
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-
-	// Writes _AFLOWIN_ file to appropriate directory for each VASP run
-	aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
-	if(aglerror != 0) {
+	  // Create _AFLOWIN_
 	  aurostd::StringstreamClean(aus);
-	  aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	  aus << _AGLSTR_MESSAGE_ << "writing " << _AFLOWIN_ << "" << endl;  
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  return aglerror;
+
+	  // Writes _AFLOWIN_ file to appropriate directory for each VASP run
+	  // [OBSOLETE] aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
+	  aflowin_success = AVASP_MakeSingleAFLOWIN(vaspRuns.at(idVaspRun), arunaflowin, write);
+	  if(!aflowin_success) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return 1;
 	  }
 	}
       }
@@ -2150,7 +2208,7 @@ namespace AGL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
       // Extract final energies from results of VASP calculations for strained structures
-      aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, FileMESSAGE);
+      aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
       if(aglerror != 0) {
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_ERROR_ + "Failed to extract total energies" << endl;  
@@ -2158,7 +2216,7 @@ namespace AGL_functions {
 	return aglerror;
       }
       // Extract electronic DOS from results of VASP calculations for strained structures
-      aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, FileMESSAGE);
+      aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
       if(aglerror != 0) {
 	aurostd::StringstreamClean(aus);
 	aus << _AGLSTR_ERROR_ + "Failed to extract electronic DOS" << endl;  
@@ -2215,7 +2273,7 @@ namespace AGL_functions {
 	  aus << _AGLSTR_WARNING_ + "New strain factor = " << strainfactor << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  strainedstructure.InflateLattice(strainfactor);
-	  vaspRuns.push_back(_vaspRun);
+	  vaspRuns.push_back(vaspRun);
 	  int idVaspRun = vaspRuns.size()-1;
 	  string stridVaspRun;
 	  ostringstream cnvidVaspRun;
@@ -2233,25 +2291,49 @@ namespace AGL_functions {
 	    // [OBSOLETE] runname = _AGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor;
 	    runname.push_back(_ARAGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor);
 	  }	  
+	  arunname.push_back(stridVaspRun + "_SF_" + strstrainfactor);
+	  dirrunname.push_back(AGL_data.dirpathname + "/" + runname.at(idVaspRun));
 
 	  // [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname;
-	  vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname.at(idVaspRun);
+	  // [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname.at(idVaspRun);
 	  vaspRuns.at(idVaspRun).str = strainedstructure;
+	  vaspRuns.at(idVaspRun).AVASP_arun_runname = arunname.at(idVaspRun);
+	  vaspRuns.at(idVaspRun).AVASP_arun = true;
+	  vaspRuns.at(idVaspRun).AVASP_arun_mode = "AGL";
+
+	  // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
+	  aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), vaspFlags, kbinFlags, dirrunname.at(idVaspRun), AGL_data, FileMESSAGE);
+	  if(aglerror != 0) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_ERROR_ + "Failed to assign values of flags from " << _AFLOWIN_ << " file" << endl;  
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return aglerror;
+	  }	  
+	  avasp_pop_xvasp_success = AVASP_populateXVASP(aflowFlags, kbinFlags, vaspFlags, vaspRuns.at(idVaspRun));
+	  if (!avasp_pop_xvasp_success) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_ERROR_ + "Failed to set AFLOW flags for ARUN " << arunname.at(idVaspRun) << endl;  
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return 1;
+	  }
 
 	  // If there are already LOCK or OUTCAR.static files, it means this directory was already generated and computed.
 	  // Therefore do not touch, but store this structure in the
 	  // list, so that it can be used in next part of the code.
 	  if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) ||
 	      aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
-	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ) {
-	    aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, FileMESSAGE);
+	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
+	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") )) {
+	    aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	    if(aglerror != 0) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AGLSTR_ERROR_ + "Failed to extract total energies" << endl;  
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      return aglerror;
 	    }
-	    aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, FileMESSAGE);
+	    aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	    if(aglerror != 0) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AGLSTR_ERROR_ + "Failed to extract electronic DOS" << endl;  
@@ -2277,37 +2359,45 @@ namespace AGL_functions {
 	  }	
 	  if(skipdir) {
 	    aurostd::StringstreamClean(aus);
-	    // [OBSOLETE] aus << _AELSTR_MESSAGE_ + "Skipping directory: " << runname << endl;
-	    aus << _AELSTR_MESSAGE_ + "Skipping directory: " << runname.at(idVaspRun) << endl;
+	    // [OBSOLETE] aus << _AGLSTR_MESSAGE_ + "Skipping directory: " << runname << endl;
+	    aus << _AGLSTR_MESSAGE_ + "Skipping directory: " << runname.at(idVaspRun) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    skipdir = false;
 	    continue;
 	  }
 	  // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
 	  if (!XHOST.POSTPROCESS) {
-	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
-	  aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
-	  if(aglerror != 0) {
-	    aurostd::StringstreamClean(aus);
-	    aus << _AGLSTR_ERROR_ + "Failed to assign flags" << endl;  
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
+	    // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
+	    // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
+	    // [OBSOLETE] if(aglerror != 0) {
+	    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+	    // [OBSOLETE]   aus << _AGLSTR_ERROR_ + "Failed to assign flags" << endl;  
+	    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE]   return aglerror;
+	    // [OBSOLETE] }
+	    // [OBSOLETE]  aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
+	    // [OBSOLETE] if(aglerror != 0) {
+	    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+	    // [OBSOLETE]   aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE]   return aglerror;
+	    // [OBSOLETE] }
+	    aflowin_success = AVASP_MakeSingleAFLOWIN(vaspRuns.at(idVaspRun), arunaflowin, write);
+	    if(!aflowin_success) {
+	      aurostd::StringstreamClean(aus);
+	      aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      return 1;
+	    }
 	  }
-	  aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
-	  if(aglerror != 0) {
-	    aurostd::StringstreamClean(aus);
-	    aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
-	  }
-	  aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, FileMESSAGE);
+	  aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	  if(aglerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to extract total energies" << endl;  
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    return aglerror;
 	  }
-	  aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, FileMESSAGE);
+	  aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	  if(aglerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to extract electronic DOS" << endl;  
@@ -2319,8 +2409,7 @@ namespace AGL_functions {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to find energy minimum" << endl;  
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
-	    }	  
+	    return aglerror;	  
 	  }	  
 	}
 	i = vaspRuns.size() - 1;
@@ -2343,7 +2432,7 @@ namespace AGL_functions {
 	  aus << _AGLSTR_WARNING_ + "New strain factor = " << strainfactor << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  strainedstructure.InflateLattice(strainfactor);
-	  vaspRuns.push_back(_vaspRun);
+	  vaspRuns.push_back(vaspRun);
 	  int idVaspRun = vaspRuns.size()-1;
 	  string stridVaspRun;
 	  ostringstream cnvidVaspRun;
@@ -2361,19 +2450,43 @@ namespace AGL_functions {
 	    //OBSOLETE runname = _AGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor;
 	    runname.push_back(_AGLSTR_DIRNAME_ + stridVaspRun + "_SF_" + strstrainfactor);
 	  }
+	  arunname.push_back(stridVaspRun + "_SF_" + strstrainfactor);
+	  dirrunname.push_back(AGL_data.dirpathname + "/" + runname.at(idVaspRun));
 
 	  // [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname;
-	  vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname.at(idVaspRun);
+	  // [OBSOLETE] vaspRuns.at(idVaspRun).Directory = AGL_data.dirpathname + "/" + runname.at(idVaspRun);
 	  vaspRuns.at(idVaspRun).str = strainedstructure;
+	  vaspRuns.at(idVaspRun).AVASP_arun_runname = arunname.at(idVaspRun);
+	  vaspRuns.at(idVaspRun).AVASP_arun = true;
+	  vaspRuns.at(idVaspRun).AVASP_arun_mode = "AGL";
 
+	  // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
+	  aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), vaspFlags, kbinFlags, dirrunname.at(idVaspRun), AGL_data, FileMESSAGE);
+	  if(aglerror != 0) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_ERROR_ + "Failed to assign values of flags from " << _AFLOWIN_ << " file" << endl;  
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return aglerror;
+	  }	  
+	  avasp_pop_xvasp_success = AVASP_populateXVASP(aflowFlags, kbinFlags, vaspFlags, vaspRuns.at(idVaspRun));
+	  if (!avasp_pop_xvasp_success) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_ERROR_ + "Failed to set AFLOW flags for ARUN " << arunname.at(idVaspRun) << endl;  
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return 1;
+	  }
+	  
 	  // If there are already LOCK or OUTCAR.static files, it means this directory was already generated and computed.
 	  // Therefore do not touch, but store this structure in the
 	  // list, so that it can be used in next part of the code.
 	  if( aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) ||
 	      aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
-	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ) {
-	    AGL_functions::extractenerg(vaspRuns, AGL_data, FileMESSAGE);
-	    AGL_functions::extractedos(vaspRuns, AGL_data, FileMESSAGE);
+	      aurostd::EFileExist( vaspRuns.at(idVaspRun).Directory + string("/OUTCAR.static") ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ ) ||
+	      aurostd::FileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ||
+	      aurostd::EFileExist( dirrunname.at(idVaspRun) + string("/OUTCAR.static") ) ) {
+	    AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
+	    AGL_functions::extractedos(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	    AGL_functions::checkmin(AGL_data, cm, FileMESSAGE);	 
 	    continue;
 	  }
@@ -2387,8 +2500,8 @@ namespace AGL_functions {
 	  }	
 	  if(skipdir) {
 	    aurostd::StringstreamClean(aus);
-	    // [OBSOLETE] aus << _AELSTR_MESSAGE_ + "Skipping directory: " << runname << endl;
-	    aus << _AELSTR_MESSAGE_ + "Skipping directory: " << runname.at(idVaspRun) << endl;
+	    // [OBSOLETE] aus << _AGLSTR_MESSAGE_ + "Skipping directory: " << runname << endl;
+	    aus << _AGLSTR_MESSAGE_ + "Skipping directory: " << runname.at(idVaspRun) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    skipdir = false;
 	    continue;
@@ -2396,28 +2509,37 @@ namespace AGL_functions {
 	  // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
 	  if (!XHOST.POSTPROCESS) {	  
 	  // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
-	  aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
-	  if(aglerror != 0) {
-	    aurostd::StringstreamClean(aus);
-	    aus << _AGLSTR_ERROR_ + "Failed to assign flags" << endl;  
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
+	    // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
+	    // [OBSOLETE] if(aglerror != 0) {
+	    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+	    // [OBSOLETE]   aus << _AGLSTR_ERROR_ + "Failed to assign flags" << endl;  
+	    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE]   return aglerror;
+	    // [OBSOLETE] }
+	    // [OBSOLETE] aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
+	    // [OBSOLETE] if(aglerror != 0) {
+	    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+	    // [OBSOLETE]   aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    // [OBSOLETE]   return aglerror;
+	    // [OBSOLETE] }
+	    // Writes _AFLOWIN_ file to appropriate directory for each VASP run
+	    aflowin_success = AVASP_MakeSingleAFLOWIN(vaspRuns.at(idVaspRun), arunaflowin, write);
+	    if(!aflowin_success) {
+	      aurostd::StringstreamClean(aus);
+	      aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      return 1;
+	    }
 	  }
-	  aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
-	  if(aglerror != 0) {
-	    aurostd::StringstreamClean(aus);
-	    aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
-	  }
-	  aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, FileMESSAGE);
+	  aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	  if(aglerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to extract total energies" << endl;  
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    return aglerror;
 	  }
-	  aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, FileMESSAGE);
+	  aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	  if(aglerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to extract electronic DOS" << endl;  
@@ -2430,7 +2552,6 @@ namespace AGL_functions {
 	    aus << _AGLSTR_ERROR_ + "Failed to find energy minimum" << endl;  
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    return aglerror;
-	    }
 	  }
 	}
       }
@@ -2460,7 +2581,7 @@ namespace AGL_functions {
 	  ncc++;
 	  for(uint idVaspRun = 0; idVaspRun < vaspRuns.size(); idVaspRun++) {
 	    string runnamedir = vaspRuns.at(idVaspRun).Directory;
-	    aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runnamedir, FileMESSAGE);
+	    aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), vaspFlags, kbinFlags, runnamedir, AGL_data, FileMESSAGE);
 	    if(aglerror != 0) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AGLSTR_ERROR_ + "Failed to assign flags" << endl;  
@@ -2477,25 +2598,25 @@ namespace AGL_functions {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AGLSTR_WARNING_ + "(E, V) data is not concave" << endl;
 	  aus << _AGLSTR_WARNING_ + "Increasing the number of k-points and rerunning VASP calculations" << endl;
-	  aus << _AGLSTR_WARNING_ + "Resetting value of KPPRA from " << _vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int << " to " << vaspRuns.at(0).AVASP_value_KPPRA << endl;
+	  aus << _AGLSTR_WARNING_ + "Resetting value of KPPRA from " << vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int << " to " << vaspRuns.at(0).AVASP_value_KPPRA << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	  for(uint idVaspRun = 0; idVaspRun < vaspRuns.size(); idVaspRun++) {
-	    aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
-	    if(aglerror != 0) {
-	      aurostd::StringstreamClean(aus);
-	      aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
-	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      return aglerror;
-	    }
-	  }
-	  aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, FileMESSAGE);
+	  // [OBSOLETE]for(uint idVaspRun = 0; idVaspRun < vaspRuns.size(); idVaspRun++) {
+	  // [OBSOLETE]  aglerror = AGL_functions::createAFLOWIN(vaspRuns.at(idVaspRun), xvasp, _kbinFlags, _vaspFlags, AGL_data, FileMESSAGE);
+	  // [OBSOLETE]  if(aglerror != 0) {
+	  // [OBSOLETE]    aurostd::StringstreamClean(aus);
+	  // [OBSOLETE]    aus << _AGLSTR_ERROR_ + "Failed to create " << _AFLOWIN_ << " files" << endl;  
+	  // [OBSOLETE]    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  // [OBSOLETE]    return aglerror;
+	  // [OBSOLETE]  }
+	  // [OBSOLETE]}
+	  aglerror = AGL_functions::extractenerg(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	  if(aglerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to extract total energies" << endl;  
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    return aglerror;
 	  }
-	  aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, FileMESSAGE);
+	  aglerror = AGL_functions::extractedos(vaspRuns, AGL_data, dirrunname, FileMESSAGE);
 	  if(aglerror != 0) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_ERROR_ + "Failed to extract electronic DOS" << endl;  
@@ -2555,14 +2676,19 @@ namespace AGL_functions {
       // Converts units of pressure from kB to GPa
       // [OBSOLETE] AGL_data.volumeinput.resize(vaspRuns.size());
       // [OBSOLETE] for(uint idVaspRun = 0; idVaspRun < vaspRuns.size(); idVaspRun++) {
+      // Vectors to store original E(V) data in case GIBBS needs to be re-run
+      AGL_data.energyinput_orig.resize(AGL_data.volumeinput.size());
+      AGL_data.volumeinput_orig.resize(AGL_data.volumeinput.size());
       for (uint i = 0; i < AGL_data.volumeinput.size(); i++) {
 	// [OBSOLETE] AGL_data.volumeinput.at(idVaspRun) = vaspRuns.at(idVaspRun).str.Volume() * pow(angstrom2bohr, 3.0);
 	// [OBSOLETE] AGL_data.energyinput.at(idVaspRun) *= ev2hart1;
 	// [OBSOLETE] AGL_data.energyinput.at(idVaspRun) = AGL_data.energyinput.at(idVaspRun) / hart2ev;
 	// [OBSOLETE] AGL_data.volumeinput.at(i) = AGL_data.volumeinput.at(i) * pow(angstrom2bohr, 3.0);
 	// [OBSOLETE] AGL_data.energyinput.at(i) = AGL_data.energyinput.at(i) / hart2ev;
-	AGL_data.volumeinput.at(i) = AGL_data.volumeinput.at(i);
-	AGL_data.energyinput.at(i) = AGL_data.energyinput.at(i);	
+	// Store original E(V) data in case GIBBS needs to be re-run
+	AGL_data.volumeinput_orig.at(i) = AGL_data.volumeinput.at(i);
+	AGL_data.energyinput_orig.at(i) = AGL_data.energyinput.at(i);
+	// Convert pressure units from kB to GPa
 	AGL_data.pressurecalculated.at(i) = AGL_data.pressurecalculated.at(i) / 10.0;
 	aurostd::StringstreamClean(aus);
 	// Print out total energy, volume and calculated residual pressure
@@ -3026,6 +3152,23 @@ namespace AGL_functions {
 	  return 1;
 	}
 	oss.clear();
+	oss.str(std::string());
+	oss << "# pressure_stepnumber=" << USER_NPRESSURE << endl;
+	oss << "# pressure_stepsize=" << USER_SPRESSURE << endl;
+	oss << "#  P (GPa) " << "        " << aurostd::PaddedPRE("H (eV/atom)",13," ") << endl;
+	for (uint k = 0; k < AGL_data.AGL_pressure_enthalpy_list.size(); k++) {
+	  if (!std::isnan(AGL_data.AGL_pressure_enthalpy_list.at(k).enthalpy)) {
+	    oss << setw(10) << setprecision(2) << fixed << setprecision(2) << AGL_data.AGL_pressure_enthalpy_list.at(k).pressure_external << "          " << setw(12) << setprecision(6) << AGL_data.AGL_pressure_enthalpy_list.at(k).enthalpy / AGL_data.natoms << endl;
+	  }
+	}	
+	string ofileenthalpies = AGL_data.dirpathname + "/AGL_enthalpy_pressure.out";
+	if(!aurostd::stringstream2file(oss, ofileenthalpies, "WRITE")) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AGLSTR_ERROR_ + "Unable to open file AGL_enthalpy_pressure.out" <<  endl;
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  return 1;
+	}
+	oss.clear();
 	oss.str(std::string());		
 	// Exits AGL without writing other output since this output might not be available for all pressures and temperatures in non-truncated ranges
 	return 0;
@@ -3249,9 +3392,9 @@ namespace AGL_functions {
 
       // Finds temperature value which produces Debye temperature which is closest to the value which produces the best fit to the heat capacity data
       double difftd, difftdmin;
-      difftdmin = fabs(tdbest - AGL_data.DebyeTemperature0pressure.at(0));
+      difftdmin = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(0));
       for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
-	difftd = fabs(tdbest - AGL_data.DebyeTemperature0pressure.at(j));
+	difftd = aurostd::abs(tdbest - AGL_data.DebyeTemperature0pressure.at(j));
 	if(difftd < difftdmin) {
 	  jtdbest = j;
 	  difftdmin = difftd;
@@ -3282,9 +3425,9 @@ namespace AGL_functions {
       // Determine temperature value which is closest to the acoustic Debye temperature
       double diffatd, diffatdmin;
       uint jtdatd = 0;
-      diffatdmin = fabs(acousticthetaD - AGL_data.temperature_external.at(0));
+      diffatdmin = aurostd::abs(acousticthetaD - AGL_data.temperature_external.at(0));
       for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
-	diffatd = fabs(acousticthetaD - AGL_data.temperature_external.at(j));
+	diffatd = aurostd::abs(acousticthetaD - AGL_data.temperature_external.at(j));
 	if(diffatd < diffatdmin) {
 	  jtdatd = j;
 	  diffatdmin = diffatd;
@@ -3398,9 +3541,9 @@ namespace AGL_functions {
 	// Finds temperature value which is closest to the user's value of the Debye temperature to get the equilibrium volume
 	double difftdU, difftdminU;
 	int jtdbestU;
-	difftdminU = fabs(thetaU - AGL_data.temperature_external.at(0));
+	difftdminU = aurostd::abs(thetaU - AGL_data.temperature_external.at(0));
 	for (uint j = 1; j < AGL_data.temperature_external.size(); j++) {
-	  difftdU = fabs(thetaU - AGL_data.temperature_external.at(j));
+	  difftdU = aurostd::abs(thetaU - AGL_data.temperature_external.at(j));
 	  if(difftdU < difftdminU) {
 	    jtdbestU = j;
 	    difftdminU = difftdU;
@@ -4211,20 +4354,39 @@ namespace AGL_functions {
 	    tempi = tempi + USER_STEMPERATURE;
 	  }
 
+	  // Reset E(V) data to initial values
+	  AGL_data.energyinput.resize(AGL_data.volumeinput_orig.size());
+	  AGL_data.volumeinput.resize(AGL_data.volumeinput_orig.size());
+	  for (uint i = 0; i < AGL_data.volumeinput_orig.size(); i++) {
+	    AGL_data.volumeinput.at(i) = AGL_data.volumeinput_orig.at(i);
+	    AGL_data.energyinput.at(i) = AGL_data.energyinput_orig.at(i);
+	    // Print out total energy and volume
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_MESSAGE_ << "Energy (eV) = " << AGL_data.energyinput.at(i) << endl;
+	    aus << _AGLSTR_MESSAGE_ << "Volume (Ang^3) = " << AGL_data.volumeinput.at(i) << endl;
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  }
+	  
 	  aurostd::StringstreamClean(aus);
 	  aus << _AGLSTR_MESSAGE_ + "Running GIBBS" <<  endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  
 	  // Runs GIBBS algorithm within AFLOW to calculate thermal properties
 	  aglerror = AGL_functions::gibbsrun(AGL_data, FileMESSAGE);
+	  if (aglerror != 0) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_WARNING_ + "Failure in re-run of GIBBS to get all pressure-temperature date to calculate Hugoniot" <<  endl;
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return 9;
+	  }
 	  
 	  // Run Hugoniot
 	  aglerror = AGL_functions::runHugoniotAllTemperaturesAndPressures(AGL_data.AGL_pressure_temperature_energy_list, cellmass_grams, hugoniot_output, AGL_data.hugoniotextrapolate, FileMESSAGE);
 	  if(aglerror != 0 && aglerror != 2) {
 	    aurostd::StringstreamClean(aus);
-	    aus << _AGLSTR_ERROR_ + "Failure in Hugoniot calculation" <<  endl;
+	    aus << _AGLSTR_WARNING_ + "Failure in Hugoniot calculation" <<  endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	    return aglerror;
+	    return 9;
 	  } else {
 	    oss << std::setw(15) << "#     rho(g/cc)" << std::setw(15) << "T(K)" << std::setw(15) << "E(kJ/g)" << std::setw(15) << "P(GPa)" << endl;
 	    for (uint i = 0; i < hugoniot_output.size(); i++) {
@@ -4345,7 +4507,24 @@ namespace AGL_functions {
 	    return 1;
 	  }	
 	  oss.clear();
-	  oss.str(std::string());		  		  
+	  oss.str(std::string());
+	  oss << "# pressure_stepnumber=" << USER_NPRESSURE << endl;
+	  oss << "# pressure_stepsize=" << USER_SPRESSURE << endl;
+	  oss << "#  P (GPa) " << "        " << aurostd::PaddedPRE("H (eV/atom)",13," ") << endl;
+	  for (uint k = 0; k < AGL_data.AGL_pressure_enthalpy_list.size(); k++) {
+	    if (!std::isnan(AGL_data.AGL_pressure_enthalpy_list.at(k).enthalpy)) {
+	      oss << setw(10) << setprecision(2) << fixed << setprecision(2) << AGL_data.AGL_pressure_enthalpy_list.at(k).pressure_external << "          " << setw(12) << setprecision(6) << AGL_data.AGL_pressure_enthalpy_list.at(k).enthalpy / AGL_data.natoms << endl;
+	    }
+	  }	
+	  string ofileenthalpies = AGL_data.dirpathname + "/AGL_enthalpy_pressure.out";
+	  if(!aurostd::stringstream2file(oss, ofileenthalpies, "WRITE")) {
+	    aurostd::StringstreamClean(aus);
+	    aus << _AGLSTR_ERROR_ + "Unable to open file AGL_enthalpy_pressure.out" <<  endl;
+	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    return 1;
+	  }
+	  oss.clear();
+	  oss.str(std::string());			  
 	  json_written = true;
 	} else {
 	  for (uint k = 0; k < AGL_data.pressure_external.size(); k++) {
@@ -4425,7 +4604,7 @@ namespace AGL_functions {
 	oss << "],\"gibbs_free_energy_atom\": [";
 	for (uint j = 0; j < AGL_data.temperature_external.size(); j++) {
 	  for (uint k = 0; k < AGL_data.pressure_external.size(); k++) {
-	    // OBSOLETE if ((j==0) && (k==0)) {
+	    // [OBSOLETE] if ((j==0) && (k==0)) {
 	    if (firstgibbs) {
 	      if (!std::isnan(AGL_data.GibbsFreeEnergyPressureeV.at(j).at(k))) {
 	      oss << "{\"temperature\":" << AGL_data.temperature_external.at(j) << ",\"pressure\":" << AGL_data.pressure_external.at(k) << ",\"gibbs_energy\":" << AGL_data.GibbsFreeEnergyPressureeV.at(j).at(k) / AGL_data.natoms << "}";
@@ -4499,6 +4678,23 @@ namespace AGL_functions {
 	}	
 	oss.clear();
 	oss.str(std::string());
+	oss << "# pressure_stepnumber=" << USER_NPRESSURE << endl;
+	oss << "# pressure_stepsize=" << USER_SPRESSURE << endl;
+	oss << "#  P (GPa) " << "        " << aurostd::PaddedPRE("H (eV/atom)",13," ") << endl;
+	for (uint k = 0; k < AGL_data.pressure_external.size(); k++) {
+	  if (!std::isnan(AGL_data.EnthalpyPressureeV.at(k))) {
+	    oss << setw(10) << setprecision(2) << fixed << setprecision(2) << AGL_data.pressure_external.at(k) << "          " << setw(12) << setprecision(6) << AGL_data.EnthalpyPressureeV.at(k) / AGL_data.natoms << endl;
+	  }
+	}	
+	string ofileenthalpies = AGL_data.dirpathname + "/AGL_enthalpy_pressure.out";
+	if(!aurostd::stringstream2file(oss, ofileenthalpies, "WRITE")) {
+	  aurostd::StringstreamClean(aus);
+	  aus << _AGLSTR_ERROR_ + "Unable to open file AGL_enthalpy_pressure.out" <<  endl;
+	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	  return 1;
+	}
+	oss.clear();
+	oss.str(std::string());		
       }
     }
     catch (AGLStageBreak& e) {

@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2018           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -13,7 +13,7 @@
 
  
 // ###############################################################################
-//                  AFLOW Automatic GIBBS Library (AGL) (2013-2018)
+//                  AFLOW Automatic GIBBS Library (AGL) (2013-2019)
 // ###############################################################################
 //
 // Uses quasi-harmonic Debye model to obtain thermodynamic properties of materials
@@ -35,55 +35,123 @@ namespace AGL_functions {
   // Function to assign values for VASP input flags from _AFLOWIN_ file to vaspRun _xvasp class
   // Adapted from section of AFLOW APL function DirectMethodPC::runVASPCalculations()
   //
-  uint aglvaspflags(_xvasp& vaspRun, _vflags& _vaspFlags, _kflags& _kbinFlags, string& runname, ofstream& FileMESSAGE) {
+  // [OBSOLETE] uint aglvaspflags(_xvasp& vaspRun, _vflags& _vaspFlags, _kflags& _kbinFlags, string& runname, ofstream& FileMESSAGE) {
+  uint aglvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
     ostringstream aus;
+    vector<string> vfile;
+    string vfilename;
+    bool vfileexist = false;
+    if(AGL_data.relax_static || AGL_data.static_only) {
+      aurostd::string2tokens(string("OUTCAR.static.bz2,OUTCAR.static.gz,OUTCAR.static.xz,OUTCAR.static"),vfile,",");
+      for(uint ij=0;ij<vfile.size();ij++) {
+	if(aurostd::FileExist(dirrunname+"/"+vfile.at(ij))) {
+	  vfilename = vfile.at(ij);
+	  vfileexist = true;
+	}    
+      }  
+    } else {
+      aurostd::string2tokens(string("OUTCAR.relax2.bz2,OUTCAR.relax2.gz,OUTCAR.relax2.xz,OUTCAR.relax2"),vfile,",");
+      for(uint ij=0;ij<vfile.size();ij++) {
+	if(aurostd::FileExist(dirrunname+"/"+vfile.at(ij))) {
+	  vfilename = vfile.at(ij);
+	  vfileexist = true;
+	}    
+      }  
+    }
     // SOME WARNINGS: check existence of LOCK and OUTCAR.static files
-    if( !aurostd::FileExist( vaspRun.Directory + "/"+_AFLOWLOCK_ ) &&
-	aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.static") ) ) {
+    // [OBSOLETE] if( !aurostd::FileExist( vaspRun.Directory + "/"+_AFLOWLOCK_ ) && aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.static") ) ) {
+    if( !aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) && ( vfileexist ) ) {
       aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_WARNING_ + "found OUTCAR.static but no LOCK in " <<  vaspRun.Directory << endl;
+      // [OBOLSETE] aus << _AGLSTR_WARNING_ + "found OUTCAR.static but no LOCK in " <<  vaspRun.Directory << endl;
+      aus << _AGLSTR_WARNING_ + "found " << vfilename << " but no " << _AFLOWLOCK_ << " in " <<  vaspRun.Directory << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 1;
     }
 
-    if( aurostd::FileExist( vaspRun.Directory + "/"+_AFLOWLOCK_ ) &&
-	!aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.static") ) ) {
+    // [OBSOLETE] if( aurostd::FileExist( vaspRun.Directory + "/"+_AFLOWLOCK_ ) && !aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.static") ) ) {
+    if( aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) &&	!(vfileexist) ) {
       aurostd::StringstreamClean(aus);
-      aus << _AGLSTR_WARNING_ + "found LOCK but no OUTCAR.static in " <<  vaspRun.Directory << endl;
+      // [OBSOLETE] aus << _AGLSTR_WARNING_ + "found LOCK but no OUTCAR.static in " <<  vaspRun.Directory << endl;
+      aus << _AGLSTR_WARNING_ + "found " << _AFLOWLOCK_ << " but no OUTCAR in " <<  vaspRun.Directory << endl;      
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 1;
     }
 	  	   	    
     // Switch off autotune
-    _kbinFlags.KBIN_MPI_AUTOTUNE = true;
+    kbinFlags.KBIN_MPI_AUTOTUNE = true;
 
+    if(AGL_data.relax_static) {
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC = true;
+      vaspRun.AVASP_flag_GENERATE = false;
+      vaspRun.AVASP_flag_RUN_RELAX = false;
+      vaspRun.AVASP_flag_RUN_STATIC = false;
+      vaspRun.AVASP_flag_RUN_STATIC_BANDS = false;
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC", true);
+      vaspFlags.KBIN_VASP_RUN.flag("GENERATE", false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX",false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",false);
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC",false);
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC_BANDS",false);
+      vaspRun.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE);
+    } else {
+      vaspRun.AVASP_flag_RUN_STATIC = true;
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC = false;
+      vaspRun.AVASP_flag_GENERATE = false;
+      vaspRun.AVASP_flag_RUN_RELAX = false;
+      vaspRun.AVASP_flag_RUN_STATIC_BANDS = false;
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC", true);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC", false);
+      vaspFlags.KBIN_VASP_RUN.flag("GENERATE", false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX", false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS", false);
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC_BANDS", false);
+      // Increase DOSCAR density for STATIC-only runs
+      vaspRun.aopts.flag("FLAG::EXTRA_INCAR", true);
+      vaspRun.AVASP_EXTRA_INCAR << "# Added by [AFLOW_AGL] begin" << std::endl;
+      vaspRun.AVASP_EXTRA_INCAR << "EMIN= -30.0    # For finer DOS grid" << std::endl;
+      vaspRun.AVASP_EXTRA_INCAR << "EMAX=  45.0    # For finer DOS grid" << std::endl;
+      vaspRun.AVASP_EXTRA_INCAR << "NEDOS= 5000    # For finer DOS grid" << std::endl;
+      vaspRun.AVASP_EXTRA_INCAR << "# Added by [AFLOW_AGL] end" << std::endl;    
+    }
+
+    if(AGL_data.precaccalgonorm) {
+      vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.clear();
+      vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.isentry = true;      
+      vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.content_string = "ACCURATE";
+      vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.clear();
+      vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.isentry = true;      
+      vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.content_string = "NORMAL";
+    }
+   
     // Common KPOINTS settings and OVERRIDES
-    vaspRun.AVASP_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_KSCHEME.content_string;
-    vaspRun.AVASP_value_KPPRA = _vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int;
-    vaspRun.AVASP_STATIC_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KSCHEME.content_string;
-    vaspRun.AVASP_value_KPPRA_STATIC = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KPPRA.content_int;
+    // [OBSOLETE] vaspRun.AVASP_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_KSCHEME.content_string;
+    // [OBSOLETE] vaspRun.AVASP_value_KPPRA = _vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int;
+    // [OBSOLETE] vaspRun.AVASP_STATIC_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KSCHEME.content_string;
+    // [OBSOLETE] vaspRun.AVASP_value_KPPRA_STATIC = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KPPRA.content_int;
 
     // Clear old INCAR and set it as we want...
-    vaspRun.INCAR.str(std::string());
-    string system;
-    for(uint j=0; j < vaspRun.str.species.size(); j++)
-      system = system + vaspRun.str.species_pp.at(j);
-    system = system + "@" + runname;
-    vaspRun.INCAR << "SYSTEM=" << system << std::endl;
-    vaspRun.INCAR << "# Added by [AFLOW_AGL] begin" << std::endl;
-    vaspRun.INCAR << "NELMIN=4         # The forces have to be well converged" << std::endl;
-    vaspRun.INCAR << "NELM = 120       # Many electronic steps (SC2013)" << std::endl;
-    vaspRun.INCAR << "ADDGRID=.TRUE.   # For finer forces" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR.str(std::string());
+    // [OBSOLETE] string system;
+    // [OBSOLETE] for(uint j=0; j < vaspRun.str.species.size(); j++)
+    // [OBSOLETE]   system = system + vaspRun.str.species_pp.at(j);
+    // [OBSOLETE] system = system + "@" + runname;
+    // [OBSOLETE] vaspRun.INCAR << "SYSTEM=" << system << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "# Added by [AFLOW_AGL] begin" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "NELMIN=4         # The forces have to be well converged" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "NELM = 120       # Many electronic steps (SC2013)" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "ADDGRID=.TRUE.   # For finer forces" << std::endl;
     // Added July 2018 to increase DOSCAR grid density
     // Temporary measure until aflow.in generation with AVASP is working with APL, AEL and AGL
-    vaspRun.INCAR << "EMIN= -30.0    # For finer DOS grid" << std::endl;
-    vaspRun.INCAR << "EMAX=  45.0    # For finer DOS grid" << std::endl;
-    vaspRun.INCAR << "NEDOS= 5000    # For finer DOS grid" << std::endl;
-    vaspRun.INCAR << "# Added by [AFLOW_AGL] end" << std::endl;    
+    // [OBSOLETE] vaspRun.INCAR << "EMIN= -30.0    # For finer DOS grid" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "EMAX=  45.0    # For finer DOS grid" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "NEDOS= 5000    # For finer DOS grid" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "# Added by [AFLOW_AGL] end" << std::endl;    
 
     // Change format of POSCAR
-    if( ( !_kbinFlags.KBIN_MPI && ( _kbinFlags.KBIN_BIN.find("46") != string::npos ) ) ||
-	(  _kbinFlags.KBIN_MPI && ( _kbinFlags.KBIN_MPI_BIN.find("46") != string::npos ) ) ) {
+    if( ( !kbinFlags.KBIN_MPI && ( kbinFlags.KBIN_BIN.find("46") != string::npos ) ) ||
+	(  kbinFlags.KBIN_MPI && ( kbinFlags.KBIN_MPI_BIN.find("46") != string::npos ) ) ) {
       vaspRun.str.is_vasp5_poscar_format = false; 
     }
     return 0;
@@ -93,7 +161,7 @@ namespace AGL_functions {
 // ***************************************************************************
 // AGL_functions::createAFLOWIN
 // ***************************************************************************
-namespace AGL_functions {
+/* namespace AGL_functions {
   //
   // Create _AFLOWIN_ file: makes new directory and writes _AFLOWIN_ for strained structure file inside it 
   // Adapted from that in AFLOW APL function PhononCalculator::createAFLOWIN()
@@ -186,10 +254,10 @@ namespace AGL_functions {
 
     // Write INCAR lines to _AFLOWIN_ file 
     //
-    // OBSOLETE outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-    // OBSOLETE if(SPACES) outfile << std::endl;
-    // OBSOLETE outfile << "[VASP_RUN]STATIC" << std::endl;
-    // OBSOLETE if(SPACES) outfile << std::endl;
+    // [OBSOLETE] outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    // [OBSOLETE] if(SPACES) outfile << std::endl;
+    // [OBSOLETE] outfile << "[VASP_RUN]STATIC" << std::endl;
+    // [OBSOLETE] if(SPACES) outfile << std::endl;
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     if(AGL_data.relax_static) {
       outfile << "[VASP_RUN]RELAX_STATIC=2" << std::endl;
@@ -219,7 +287,7 @@ namespace AGL_functions {
     } else {
       outfile << "[VASP_FORCE_OPTION]CHGCAR=OFF" << std::endl; 
     }
-    // OBSOLETE outfile << "[VASP_FORCE_OPTION]CHGCAR=OFF" << std::endl;
+    // [OBSOLETE] outfile << "[VASP_FORCE_OPTION]CHGCAR=OFF" << std::endl;
     outfile << "[VASP_FORCE_OPTION]PREC=ACCURATE" << std::endl;
     outfile << "[VASP_FORCE_OPTION]ALGO=NORMAL" << std::endl;
 
@@ -267,15 +335,15 @@ namespace AGL_functions {
       if(!_vaspFlags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.isentry) { outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species_pp.at(j) << std::endl; }
       if(_vaspFlags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.isentry)  { outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species.at(j) << std::endl; }
     }
-    // OBSOLETE   aurostd::StringstreamClean(aus);
-    // OBSOLETE   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
-    // OBSOLETE     aus << _AGLSTR_MESSAGE_ << "Species_pp " << j << " = " << xvasp.str.species_pp.at(j) << endl;
-    // OBSOLETE     aus << _AGLSTR_MESSAGE_ << "Species " << j << " = " << xvasp.str.species.at(j) << endl;
-    // OBSOLETE   }
-    // OBSOLETE   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    // OBSOLETE   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
-    // OBSOLETE  outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species_pp.at(j) << std::endl;
-    // OBSOLETE}
+    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+    // [OBSOLETE]   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
+    // [OBSOLETE]     aus << _AGLSTR_MESSAGE_ << "Species_pp " << j << " = " << xvasp.str.species_pp.at(j) << endl;
+    // [OBSOLETE]     aus << _AGLSTR_MESSAGE_ << "Species " << j << " = " << xvasp.str.species.at(j) << endl;
+    // [OBSOLETE]   }
+    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    // [OBSOLETE]   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
+    // [OBSOLETE]  outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species_pp.at(j) << std::endl;
+    // [OBSOLETE]}
 
     if(SPACES) { outfile << std::endl; }
 
@@ -292,7 +360,7 @@ namespace AGL_functions {
     if(AFLOWIN_QE_FLAG) {
       outfile << AFLOWIN_SEPARATION_LINE << std::endl; 
       outfile << "[QE_GEOM_MODE_EXPLICIT]START " << std::endl;
-      // OBSOLETE xstructure qestr(vaspRun.str);qestr.vasp2qe();
+      // [OBSOLETE] xstructure qestr(vaspRun.str);qestr.vasp2qe();
       xstructure qestr(vaspRun.str);qestr.xstructure2qe();
       outfile << qestr;
       outfile << "[QE_GEOM_MODE_EXPLICIT]STOP " << std::endl;
@@ -304,7 +372,7 @@ namespace AGL_functions {
 
     return 0;
   }
-} // namespace AGL_functions
+  } */ // namespace AGL_functions
 
 // ************************************************************************************************
 // This set of functions extract, sort and check (E, V) data from VASP runs
@@ -318,7 +386,7 @@ namespace AGL_functions {
   // extractenerg: Extract final energies from the completed VASP calculations
   // Adapted from section of AFLOW APL function DirectMethodPC::runVASPCalculations()
   //
-  uint extractenerg(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, ofstream& FileMESSAGE) {
+  uint extractenerg(vector<_xvasp>& vaspRuns, _AGL_data& AGL_data, vector<string>& dirrunname, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     vector<string> vfile, dfile;
@@ -373,13 +441,25 @@ namespace AGL_functions {
       // [OBSOLETE]   	// Extract all...
       // [OBSOLETE]   	aurostd::execute( string("tar -xf ") + tarfilename );
       // [OBSOLETE]     }
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" ); } // Extract all...
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" ); } // Extract all...
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" ); } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" );
+      } else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) { 
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+      } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" );
+      } else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.gz") ) {
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.gz" );
+      } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" );
+      } else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.xz") ) {
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.xz" );
+      } // Extract all...
       
       // If the LOCK file is missing, then it is probably a corrupted run
       // Do not accept it and wait for the new run
-      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) ) {
+      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/"+_AFLOWLOCK_ ) && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ )) {
 	aurostd::StringstreamClean(aus);
 	aus <<  _AGLSTR_WARNING_ + "The " << _AFLOWLOCK_ << " file in " << vaspRuns.at(idVaspRun).Directory << " directory is missing." << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -397,6 +477,8 @@ namespace AGL_functions {
       for(uint i=0;i<vfile.size()&&(outcar.content=="");i++) {
 	if(aurostd::FileExist(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(i))) {
 	  outcar.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(i));
+	} else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(i))) {
+	  outcar.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(i));
 	}
       }
       //if(outcar.outcar=="") {
@@ -423,7 +505,7 @@ namespace AGL_functions {
 
       aurostd::StringstreamClean(aus);
       // Print out total energy, volume and calculated residual pressure
-      // OBSOLETE aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(idVaspRun) << endl;
+      // [OBSOLETE] aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(idVaspRun) << endl;
       aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Energy (eV) = " << AGL_data.energyinput.at(AGL_data.energyinput.size()-1) << endl;
       aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Volume (Ang^3) = " << AGL_data.volumeinput.at(AGL_data.volumeinput.size()-1) << endl;
       aus << _AGLSTR_MESSAGE_ << "System number = " << idVaspRun << ", Pressure (kB) = " << AGL_data.pressurecalculated.at(AGL_data.pressurecalculated.size()-1) << endl;      

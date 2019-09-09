@@ -7,7 +7,7 @@
    "outputs": [],
    "source": [
     "# Install requirements with 'pip install -r requirements.txt' (python 2) or 'pip3 install -r requirements.txt' (python 3)\n",
-    "from plotter import Plotter"
+    "from aflow_chull_plotter import Plotter"
    ]
   },
   {
@@ -21,7 +21,7 @@
     "plotter = Plotter(aflow_path='~/bin/aflow')\n",
     "plotter.plot(alloy)\n",
     "# NOTE: For 2D plot double click to the right of point to go to compound link\n",
-    "# For tertiary plot double click on point and then click on the pop-up banner to go to compound link\n",
+    "# For ternary plot double click on point and then click on the pop-up banner to go to compound link\n",
     "# Be patient when you see the * to the left"
    ]
   }

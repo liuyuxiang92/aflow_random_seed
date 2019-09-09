@@ -394,7 +394,7 @@ void DOSCalculator::calcDosLT() {
         } else if ((f[1] < fbin) && (fbin <= f[2])) {
           double df = fbin - f[1];
           dos = cc23a + cc23b * df + cc23c * df * df;
-          _idos[k] += cc23a * f21/3.0 + 3.0* cc23 * f21 * df + 3.0 * cc23 * df * df + cc23c * (df * df * df)/3.0;
+          _idos[k] += cc23a * f21/3.0 + 3.0 * cc23 * f21 * df + 3.0 * cc23 * df * df + cc23c * (df * df * df)/3.0;
         } else if ((f[2] < fbin) && (fbin <= f[3])) {
           double df = f[3] - fbin;
           dos = cc34 * df * df;

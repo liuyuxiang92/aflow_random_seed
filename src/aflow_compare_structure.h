@@ -40,8 +40,8 @@
 //    vector<string> site_symmetries;
 //    vector<uint> multiplicities;
 //  private:
-//    void Free();
-//    void Copy(const GroupedWyckoffPosition& b);
+//    void free();
+//    void copy(const GroupedWyckoffPosition& b);
 //};
 
 // ===== StructurePrototype Class ===== //
@@ -102,8 +102,8 @@ class StructurePrototype{
     bool removeNonDuplicate(uint& index);                                                   // remove non-duplicate structures 
     bool removeDuplicates(bool remove_duplicate_count);                                     // remove duplicate structure information
   private:
-    void Free();                                                                            // free operator
-    void Copy(const StructurePrototype& b);                                                 // copy constructor
+    void free();                                                                            // free operator
+    void copy(const StructurePrototype& b);                                                 // copy constructor
 };
 
 

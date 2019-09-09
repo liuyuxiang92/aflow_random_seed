@@ -225,6 +225,11 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   trasp(v);
   //  sin(v);sinh(v);cos(v);cosh(v);exp(v);
 
+  vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO19062
+  vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO19062
+  std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO190629
+  std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO190629
+
   o=+(v==v);o=+(v!=v);o+=identical(v,v);o+=identical(v,v,x);o+=identical(v,v,(utype&) x);o+=identical(v,v,(const utype&) x);o+=isdifferent(v,v);
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);v+=reduceByGCD(v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v);
   o+=getcos(v,v);v.clear();v.set(x);v.reset();clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
@@ -242,7 +247,9 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=aurostd::mean(v);o+=aurostd::stddev(v); //CO190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO190520
   v=aurostd::gaussian_filter_xv<utype>(x);v=aurostd::gaussian_filter_xv<utype>(x,1);v=aurostd::gaussian_filter_xv<utype>(x,1,1); //CO190520
-  o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::moving_average(v,x); //CO190520
+  vector<uint> vii; //CO190622
+  o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO190520
+  vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
 
   // initialize matrices
   utype* mstar;mstar=NULL;

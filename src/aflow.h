@@ -25,27 +25,65 @@
 
 //ME190628 BEGIN - moved from CHULL for broader access
 // Output formats
-#define _apool_         'a'  // apool
-#define _json_          'j'  // standard json
-#define _pdf_           'p'  // pdf
-#define _txt_           't'  // plain text
-#define _web_           'w'  // web json
-#define _latex_         'l'  // latex
-#define _gnuplot_       'g'  // gnuplot
-#define _jupyterthree_  'y'  // jupyter python 3
-#define _jupytertwo_    'z'  // jupyter python 2
+enum filetype {   //CO190629
+//GENERAL FILE TYPES
+  txt_ft,         //general plain text
+  json_ft,
+  csv_ft,
+  latex_ft,
+  gnuplot_ft,
+  jupyter2_ft,    //python 2 jupyter
+  jupyter3_ft,    //python 3 jupyter
+//CHULL SPECIFIC
+  chull_apool_ft,
+  chull_web_ft,
+};
+//[CO190629 - obsolete with enum filetype]#define _apool_         'a'  // apool
+//[CO190629 - obsolete with enum filetype]#define _json_          'j'  // standard json
+//[CO190629 - obsolete with enum filetype]#define _pdf_           'p'  // pdf
+//[CO190629 - obsolete with enum filetype]#define _txt_           't'  // plain text
+//[CO190629 - obsolete with enum filetype]#define _web_           'w'  // web json
+//[CO190629 - obsolete with enum filetype]#define _latex_         'l'  // latex
+//[CO190629 - obsolete with enum filetype]#define _gnuplot_       'g'  // gnuplot
+//[CO190629 - obsolete with enum filetype]#define _jupyterthree_  'y'  // jupyter python 3
+//[CO190629 - obsolete with enum filetype]#define _jupytertwo_    'z'  // jupyter python 2
 
-// Reduction modes
-#define _frac_          'f'  //fractional
-#define _gcd_           'g'  //gcd
-#define _none_          'n'  //none
+// Vector reduction types
+enum vector_reduction_type {   //CO190629
+  frac_vrt,   //reduce to fractions (normalized to 1)
+  gcd_vrt,    //reduce by gcd
+  no_vrt,     //no reduction
+};
+//[CO190629 - obsolete with enum vector_reduction_type]#define _frac_          'f'  //fractional
+//[CO190629 - obsolete with enum vector_reduction_type]#define _gcd_           'g'  //gcd
+//[CO190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 // ME190628 END
 
+//compound specification is how a compound is specified
+//composition (Mn2Pt3) is ORTHOGONAL to pseudopotential string (Mn_pvPt)
+//for instance, H1.25 can be a pseudopotential and NOT a composition
+enum compound_designation {
+  composition_string,
+  pp_string,
+};
+
+//CO190712 - see VASP_PseudoPotential_CleanName_InPlace() in aflow_ivasp.cpp
+const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+                                     ",_GW"    //CO190712 - potpaw_PBE/potpaw_PBE.20100506/As_GW
+                                     ",_ZORA"  //CO190712 - potpaw_PBE/potpaw_PBE.20100506/Pt_ZORA
+                                     ",_LDApU" //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Zn_sv_LDApU
+                                     ",_AE"    //CO190712 - potpaw_LDA/potpaw_LDA.20100505/Li_AE_GW2
+                                     ",_NC2"   //CO190712 - potpaw_LDA/potpaw_LDA.20100505/As_NC2
+                                     ",_200eV"
+                                     "";
 
 //XSTRUCTURE definitions
 #define _AFLOW_XSTR_PRINT_PRECISION_ 14  //CO 180509
 #define _AFLOW_POCC_PRECISION_ 8 //must be less than _AFLOW_XSTR_PRINT_PRECISION_, which is currently set to 14
 #define _AFLOW_POCC_ZERO_TOL_ pow(10,-_AFLOW_POCC_PRECISION_) 
+
+//XRD
+#define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO190622
 
 //moved from avasp.cpp for broader access (chull.cpp)
 #define SPECIE_TRANSITION_METALS string("Ag,Au,Cd,Co,Cr_pv,Cu_pv,Fe_pv,Hf_pv,Hg,Ir,La,Mn_pv,Mo_pv,Nb_sv,Ni_pv,Os_pv,Pd_pv,Pt,Re_pv,Rh_pv,Ru_pv,Sc_sv,Ta_pv,Tc_pv,Ti_sv,V_sv,W_pv,Y_sv,Zn,Zr_sv")
@@ -260,7 +298,7 @@ class _XHOST {
   bool GENERATE_AFLOWIN_ONLY; //CT 180719
   bool POSTPROCESS; //CT 181212
   // HARDWARE/SOFTWARE
-  string hostname,MachineType,Tmpfs,User,Group,Home,Shell,Progname;
+  string hostname,machine_type,tmpfs,user,group,home,shell,progname;
   string Find_Parameters;
   bool sensors_allowed;
   // ARGUMENTS
@@ -413,10 +451,9 @@ class _XHOST {
 #define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO190620
 #define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO190620
 #define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME180705
-#define XHOST_README_AFLOW_HTRESOURCES_TXT             XHOST.vGlobal_string.at(58)
-#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(59)
-#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(60)
-#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(61)
+#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
+#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
+#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(60)
 
 #define XHOST_FINDSYM_data_space_txt                   XHOST.vGlobal_string.at(70)
 #define XHOST_FINDSYM_data_wyckoff_txt                 XHOST.vGlobal_string.at(71)
@@ -606,6 +643,12 @@ struct _moduleOptions {
 
   // QHA
   vector<aurostd::xoption> qhaflags;
+  
+  // AEL
+  vector<aurostd::xoption> aelflags;
+
+  // AGL
+  vector<aurostd::xoption> aglflags;
 };
 
 // --------------------------------------------------------------------------
@@ -963,6 +1006,7 @@ namespace init {
   string InitLoadString(string string2load,bool=FALSE);
   string InitGlobalObject(string string2load,string="",bool=FALSE);
   string InitLibraryObject(string string2load,bool=FALSE);
+  string AFLOW_Projects_Directories(string string2load);
   long GetRAM(void);
   uint GetTEMPs(void);
 } // namespace init
@@ -1025,6 +1069,7 @@ class _atom { // simple class.. nothing fancy
  public:
   // constructor destructor                              // constructor/destructor
   _atom();                                               // default, just allocate
+  _atom(const _atom& b);                                 // required by gcc9
   ~_atom();                                              // kill everything
   const _atom& operator=(const _atom &b);                // copy
   void clear();
@@ -1075,6 +1120,7 @@ class _atom { // simple class.. nothing fancy
   void ClearSymmetry(void);                              // clears symmetry //CO190219
  private:                                                //
   void free();                                           // free space
+  void copy(const _atom& b);                                           // copy
 };
 
 class _atom_reference_cmp {                              // sorting through reference
@@ -1089,24 +1135,24 @@ class _atom_type_cmp {                                   // sorting through type
 };
 
 #define NUM_ELEMENTS (103+1)  // up to Uranium
-extern std::vector<string> atom_symbol_vec;             // store starting from ONE
-extern std::vector<string> atom_name_vec;               // store starting from ONE
-extern std::vector<double> atom_mass_vec;               // store starting from ONE
-extern std::vector<double> atom_volume_vec;             // store starting from ONE
-extern std::vector<int> atom_valence_iupac_vec;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<int> atom_valence_std_vec;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
-extern std::vector<double> atom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
-extern std::vector<double> atom_radius_vec;             // store starting from ONE - Saxena
-extern std::vector<double> atom_radius_covalent_vec;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j // DX and CO - 9/4/17
-extern std::vector<double> atom_electronegativity_vec;  // store starting from ONE - Saxena
-extern std::vector<string> atom_crystal_vec;            // store starting from ONE - Ashcroft Mermin
-extern std::vector<double> xray_scatt_vec;              // store starting from ONE
-extern std::vector<double> pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
-extern std::vector<double> pearson_coefficient;         // ME 181020
+extern std::vector<string> vatom_symbol;             // store starting from ONE
+extern std::vector<string> vatom_name;               // store starting from ONE
+extern std::vector<double> vatom_mass;               // store starting from ONE
+extern std::vector<double> vatom_volume;             // store starting from ONE
+extern std::vector<int> vatom_valence_iupac;         // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+extern std::vector<int> vatom_valence_std;           // store starting from ONE http://en.wikipedia.org/wiki/Valence_(chemistry)
+extern std::vector<double> vatom_miedema_phi_star;       // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_nws;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_Vm;             // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_gamma_s;        // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_miedema_BVm;            // store starting from ONE Miedema Rule Table 1a Physica 100B (1980) 1-28
+extern std::vector<double> vatom_radius;             // store starting from ONE - Saxena
+extern std::vector<double> vatom_radius_covalent;    // store starting from ONE - Codero, Covalent radii revisited, DOI: 10.1039/b801115j // DX and CO - 9/4/17
+extern std::vector<double> vatom_electronegativity;  // store starting from ONE - Saxena
+extern std::vector<string> vatom_crystal;            // store starting from ONE - Ashcroft Mermin
+extern std::vector<double> vatom_xray_scatt;              // store starting from ONE
+extern std::vector<double> vatom_pettifor_scale;              // store starting from ONE - Chemical Scale Pettifor Solid State Communications 51 31-34 1984
+extern std::vector<double> vatom_pearson_coefficient;         // ME 181020
 
 void atoms_initialize(void);
 uint GetAtomNumber(const string& symbol);
@@ -1150,8 +1196,8 @@ double GetPearsonCoefficient(const int&);
 double GetAtomXrayScatt(const string& symbol);
 double GetAtomXrayScatt(const uint& atnum);
 vector<string> GetGroupOfAtoms(string& group_name); //DX 20181220 
-double GetCompoundAttenuationLenght(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
-double GetCompoundAttenuationLenght(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const vector<string>& species,const vector<double>& composition,const double& density);  // density in g/cm^3, return in cm
+double GetCompoundAttenuationLength(const deque<string>& _species,const deque<int>& _composition,const double& density);  // density in g/cm^3, return in cm
 // DX and CO - START
 //DX 20190214 [OBSOLETE]bool isequalRHT(const _atom& a, const _atom& b,double=_SYM_TOL_);       // bool equality only checks 'coord' and 'name' (RHT)  // RHT
 // DX and CO - END
@@ -1180,7 +1226,11 @@ class _sym_op {
  public:
   // constructor destructor
   _sym_op();                                                    // default, just allocate
+  _sym_op(const _sym_op& b);                                    // needed for gcc9  //CO190906
   ~_sym_op();                                                   // kill everything
+  const _sym_op& operator=(const _sym_op& b);
+  friend ostream& operator<<(ostream &,const _sym_op&);
+  
   // content
   // for _PGROUP_
   xmatrix<double>  Uc;            // 3x3                        // uniques (not irreducible) operations on positions (Uc cartesian)
@@ -1197,32 +1247,26 @@ class _sym_op {
   string           str_Hermann_Mauguin;                         // Hermann_Mauguin notation
   string           str_Schoenflies;                             // Schoenflies notation
   bool             flag_inversion;                              // flag if inversion
-  vector<int>      basis_atoms_map;                             // this is the vector that tell where the basis atom gets mapped by the operation
-  vector<int>      basis_types_map;                           // this is the vector that tell where the basis species gets mapped by the operation
-  // DX and CO - START
-  bool             basis_map_calculated;                        //have we've calculated it?
-  // DX and CO - END
-  bool             is_pgroup;                                   // bool is_pgroup
-  // for _PGROUPXTAL_
-  bool             is_pgroup_xtal;                              // bool is_pgroup_xtal
-  // for _PGROUPK_
-  bool             is_pgroupk;                                  // bool is_pgroupk
-  // for _PGROUPK_XTAL_                  
-  bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal // DX 12/5/17 - Added pgroupk_xtal
   // for _FGROUP_
   xvector<double>  ctau;          // 3                          // translation in CARTESIAN       // FACTOR GROUP only, [0,1[
   xvector<double>  ftau;          // 3                          // translation in FRACTIONAL      // FACTOR GROUP only, [0,1[
-  bool             is_fgroup;                                   // bool is_fgroup
+  vector<int>      basis_atoms_map;                             // this is the vector that tell where the basis atom gets mapped by the operation
+  vector<int>      basis_types_map;                             // this is the vector that tell where the basis species gets mapped by the operation
+  bool             basis_map_calculated;                        //have we've calculated it?
   // for _SGROUP_
   xvector<double>  ctrasl;        // 3                          // translation in CARTESIAN       // SPACE GROUP only, [integers]
   xvector<double>  ftrasl;        // 3                          // translation in FRACTIONAL      // SPACE GROUP only, [ingegers]
-  bool             is_sgroup;                                   // bool is_sgroup
   // operators
   // for _AGROUP_
-  bool             is_agroup;                                   // bool is_agroup     // for site operation point group
   uint             site;                                        // uint site          // site index // DX 8/3/17
-  const _sym_op& operator=(const _sym_op& b);
-  friend ostream& operator<<(ostream &,const _sym_op&);
+  // IDENTITY
+  bool             is_pgroup;                                   // bool is_pgroup
+  bool             is_pgroup_xtal;                              // bool is_pgroup_xtal
+  bool             is_pgroupk;                                  // bool is_pgroupk
+  bool             is_pgroupk_xtal;                             // bool is_pgroupk_xtal // DX 12/5/17 - Added pgroupk_xtal
+  bool             is_fgroup;                                   // bool is_fgroup
+  bool             is_sgroup;                                   // bool is_sgroup
+  bool             is_agroup;                                   // bool is_agroup     // for site operation point group
 
   void setUc(const xmatrix<double>& Uc,const xmatrix<double>& lattice);  //CO190321
   void setUf(const xmatrix<double>& Uf,const xmatrix<double>& lattice);  //CO190321
@@ -1231,6 +1275,7 @@ class _sym_op {
 
  private:
   void free();
+  void copy(const _sym_op& b);
 };
 
 //DX 201801107 - add _kpoint class - START
@@ -1296,8 +1341,8 @@ class GroupedWyckoffPosition{
     vector<uint> multiplicities;
     vector<string> letters;
   private:
-    void Free();
-    void Copy(const GroupedWyckoffPosition& b);
+    void free();
+    void copy(const GroupedWyckoffPosition& b);
 };
 // --------------------------------------------------------------------------
 //DX 20181010 - grouped Wyckoff class - END
@@ -1376,8 +1421,9 @@ class xstructure {
   void NiggliUnitCellForm(void);                                // Reduce the Unit Cell to Niggli Form
   void MinkowskiBasisReduction(void);                           // Reduce the Basis to the max orthogonality (Minkowski)
   void LatticeReduction(void);                                  // Lattice Reduction to Max Orthogonality (MINK) and then Niggly Form
-  void BringInCell(void);                                       // Bring all the atoms in the origin
-  void BringInCell(double);                                     // Bring all the atoms in the origin
+  //DX 20190905 [OBSOLETE] void BringInCell(void);                                       // Bring all the atoms in the origin
+  //DX 20190905 [OBSOLETE] void BringInCell(double);                                     // Bring all the atoms in the origin
+  void BringInCell(double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
   void BringInCompact(void);                                    // Bring all the atoms near the origin
   void BringInWignerSeitz(void);                                // Bring all the atoms in the Wigner Seitz Cell
   void GetPrimitive(void);                                      // Make it primitive, if possible
@@ -1703,8 +1749,8 @@ class xstructure {
   string error_string;                                          // contains type of error
   // END OF CONTENT                                             //
  private:                                                       // ---------------------------------------
-  void Free();                                                  // to free everything
-  void Copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
+  void free();                                                  // to free everything
+  void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
 // CO 180420
@@ -2036,6 +2082,7 @@ vector<string> GetCleanNames(const xstructure& a);
 vector<double> GetSpins(const xstructure& a);
 string GetElementName(string stringin);
 string GetSpaceGroupName(int spacegroupnumber, string directory=""); //DX 20180526 - add directory
+int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory=""); //DX 20190708
 string GetSpaceGroupLabel(int spacegroupnumber);
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory=""); // DX 9/1/17 //DX 20180526 - add directory
 string GetSpaceGroupHall(int spacegroupnumber, int setting=1, string directory=""); // DX 9/1/17 //DX 20180526 - add directory //DX 20180806 - added setting
@@ -2103,19 +2150,36 @@ xmatrix<double> FF2CC(const double& scale,const xmatrix<double>& lattice,const x
 xmatrix<double> FF2CC(const xmatrix<double>& lattice,const xmatrix<double>& fmat);                      // fmat is an operation in F coordinates
 xmatrix<double> CC2FF(const double& scale,const xmatrix<double>& lattice,const xmatrix<double>& cmat);  // cmat is an operation in C coordinates
 xmatrix<double> CC2FF(const xmatrix<double>& lattice,const xmatrix<double>& cmat);                      // cmat is an operation in C coordinates
+// DX 20190905 - START
+//BringInCellInPlace() overloads
+void BringInCellInPlace(double&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+void BringInCellInPlace(_atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+void BringInCellInPlace(xstructure& xstr, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+
+//BringInCell() overloads
+double BringInCell(double, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+xstructure BringInCell(const xstructure& xstr_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+
+//BringInCellFPOS overloads
+void BringInCellInPlaceFPOS(_atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+// DX 20190905 - END
 // DX and CO - START
-double BringInCell(const double& x);
-double BringInCell_20161115(const double& x);
-double BringInCell_20160101(const double& x);
-double BringInCell(const double& x);
-double BringInCell_20160101(const double& x);
-xvector<double> BringInCell(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell(const xvector<double>& v_in);
-xvector<double> BringInCell2(const xvector<double>& v_in);
-xvector<double> BringInCell2_20161115(const xvector<double>& v_in);
-xvector<double> BringInCell2_20160101(const xvector<double>& v_in, double tolerance);
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20161115(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20161115(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20160101(const xvector<double>& v_in, double tolerance);
 // DX and CO - END
 xstructure IdenticalAtoms(const xstructure& a);                                // Make identical atoms
 //xstructure SwapSpecies(const xstructure& a,const uint& A,const uint& B);       // Permute Species A with B (safe for species C).
@@ -2155,20 +2219,20 @@ xstructure GetPrimitiveVASP(const xstructure& a);
 xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 // CO 170807 - STOP
 // bring cell in,compact, wigner seitz
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
-// DX and CO - START
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice); // DX
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice); // DX
-xstructure BringInCell(const xstructure& a,double epsilon);
-xstructure BringInCell_20161115(const xstructure& a,double epsilon); // DX
-xstructure BringInCell_20160101(const xstructure& a,double epsilon); // DX
-xstructure BringInCell(const xstructure& a);
-xstructure BringInCell_20161115(const xstructure& a); // DX
-xstructure BringInCell_20160101(const xstructure& a); // DX
-// DX and CO - END
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
+//DX 20190905 [OBSOLETE] // DX and CO - START
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon);
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a);
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a); // DX
+//DX 20190905 [OBSOLETE] // DX and CO - END
 xstructure BringInCompact(const xstructure& a);
 xstructure BringInWignerSeitz(const xstructure& a);
 // primitive stuff
@@ -2261,10 +2325,10 @@ int ijk2l(const xstructure& str,const xvector<int>& ijk);
 xvector<double> r_lattice(const xstructure& str,const int &l);
 xvector<double> r_lattice(const xstructure& str,const int &i,const int &j,const int &k);
 xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk);
-xstructure AQEgeom2aims(istream& input);
-xstructure AQEgeom2abinit(istream& input);
-xstructure AQEgeom2qe(istream& input);
-xstructure AQEgeom2vasp(istream& input);
+xstructure input2AIMSxstr(istream& input);
+xstructure input2ABINITxstr(istream& input);
+xstructure input2QExstr(istream& input);
+xstructure input2VASPxstr(istream& input);
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
@@ -2521,6 +2585,11 @@ namespace KBIN {
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO181226  // ME190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
+  vector<aurostd::xoption> loadDefaultsAEL();
+  bool writeFlagAEL(const string& key,const xoption& xopt); 
+  vector<aurostd::xoption> loadDefaultsAGL();
+  bool writeFlagAGL(const string& key,const xoption& xopt); 
+
 }
 
 // ----------------------------------------------------------------------------
@@ -2645,6 +2714,10 @@ namespace KBIN {
   bool VASP_Modify_POTCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   bool VASP_Reread_POTCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   string VASP_PseudoPotential_CleanName(const string& specieIN);
+  string VASP_PseudoPotential_CleanName_190712(const string& specieIN); //CO190712
+  string VASP_PseudoPotential_CleanName_190101(const string& specieIN); //CO190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO190712
+  bool VASP_PseudoPotential_CleanName_TEST(void); //CO190712
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX);
   uint VASP_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vector<double> &natomsX);
   bool VASP_SplitAlloySpecies(string alloy_in, string &specieA, string &specieB);
@@ -3234,7 +3307,8 @@ namespace plotter {
   void setFileName(aurostd::xoption&, string="");
   void setTitle(aurostd::xoption&);
   string formatDefaultPlotTitle(const aurostd::xoption&);
-  vector<double> getCompositionFromANRLProtoype(const string& prototype);
+  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME190813
+  vector<double> getCompositionFromANRLPrototype(const string&);
   string formatDefaultTitlePOCC(const aurostd::xoption&);
   vector<double> getCompositionFromPoccString(const string&, bool&);
 
@@ -3267,6 +3341,7 @@ namespace plotter {
   // Gnuplot
   void generateDosPlotGNUPLOT(stringstream&, const xDOSCAR&, const deque<double>&,
                               const deque<deque<deque<double> > >&, const vector<string>&, const aurostd::xoption&);
+  double getDosLimits(const aurostd::xoption&, const xDOSCAR&, const deque<deque<deque<double> > >&, const deque<double>&);
   void generateBandPlotGNUPLOT(stringstream&, const xEIGENVAL&, const vector<double>&,
                                const vector<double>&, const vector<string>&, const aurostd::xoption&);
   string getFormattedUnit(const string&);
@@ -3377,7 +3452,7 @@ namespace pocc {
     double r1,theta0,x1,D1,zeta,Z1,Vi,Uj,Xi,hard,radius; 
     void GetUFFParameters(string);
   private:
-    void Free(); //free space
+    void free(); //free space
   };
   string ReturnAtomProperties(string atom);
   //Atomic Properties Database
@@ -3390,7 +3465,7 @@ namespace pocc {
     double mass,radius,Xi; //atomic, weight radius /pauling electronegativity
     void GetAtomicProperties(string);
   private:
-    void Free();
+    void free();
   };
 } // namespace pocc
 
@@ -3399,6 +3474,7 @@ namespace pocc {
   class Bond{
   public:
     Bond();
+    Bond(const Bond& b);
     ~Bond();
     _atom bgn,end;
     double length;
@@ -3408,7 +3484,8 @@ namespace pocc {
     bool operator!=(const Bond &other) const;
     friend ostream& operator<<(ostream&,const Bond&);
   private:
-    void Free();
+    void free();
+    void copy(const Bond& b);
   };
   void SetUFFPara(_atom atomi, _atom atomj, double& R0, double& Kij, double& Xij, double& Dij);
   double CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj);
@@ -3630,9 +3707,9 @@ namespace SYM {
   bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190524 - need pointer for tolerance, otherwise it will not update
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
-  double mod_one(double d); // DX 
-  _atom mod_one_atom(const _atom& atom_in); // CO
-  xvector<double> mod_one_xvec(xvector<double> a); // DX
+  //DX 20190905 [OBSOLETE] double mod_one(double d); // DX 
+  //DX 20190905 [OBSOLETE] _atom mod_one_atom(const _atom& atom_in); // CO
+  //DX 20190905 [OBSOLETE] xvector<double> mod_one_xvec(xvector<double> a); // DX
   bool CheckForIdentity(const xstructure& xstr); // DX
   bool checkSuperCellLatticePoints(xstructure& xstr, int& num_lattice_points, char& centering, uint& expand_size); // DX
   bool ComparePointGroupAndSpaceGroupString(xstructure& xstr, int& multiplicity_of_primitive, bool& derivative_structure); // DX
@@ -3687,8 +3764,8 @@ namespace spacegroup{
     std::vector<_sym_op> fgroup;                                  // rotations/inversions + incell_translations operations
     std::vector<_sym_op> pgroup;                                  // rotations/inversions
   private:                                                       // ---------------------------------------
-    void Free();                                                  // to free everything
-    void Copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
+    void free();                                                  // to free everything
+    void copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
   };
 
   extern std::vector<_spacegroup> vspacegroups;
@@ -3974,6 +4051,7 @@ namespace pflow {
   public:
     // constructors
     matrix(void) {};
+    matrix(const matrix& b) {copy(b);};
     matrix(const int m);
     matrix(const int m,const int n);
     matrix(const int m,const int n,const utype& inutype);
@@ -3981,30 +4059,27 @@ namespace pflow {
     ~matrix(void) {};                         // destructor
     // accessors
     void print(void);
-    uint size(void) const {
-      return (uint) mat.size();}
+    uint size(void) const {return (uint) mat.size();}
     matrix<utype> transpose(void) const;
     //  matrix<utype>::iterator begin();
     //  matrix<utype>::iterator end();
     // operator
-    vector<utype>& operator[] (const int i) {
-      assert(i>=0 && i<=(int) mat.size()); return mat[i];}
-    const vector<utype>& operator[] (const int i) const {
-      assert(i>=0 && i<=(int) mat.size()); return mat[i];};
+    vector<utype>& operator[] (const int i) {assert(i>=0 && i<=(int) mat.size()); return mat[i];}
+    const vector<utype>& operator[] (const int i) const {assert(i>=0 && i<=(int) mat.size()); return mat[i];};
     const matrix<utype>& operator=(const matrix<utype>& b);
     // mutators
-    void push_back(const vector<utype>& inutypevec) {
-      mat.push_back(inutypevec);}
+    void push_back(const vector<utype>& inutypevec) {mat.push_back(inutypevec);}
     void pop_back(void) {mat.pop_back();}
     void vecvec2mat(const vector<vector<utype> >& inVV);
     void vec2mat(const vector<utype>& inV);
     void clear(void) {mat.clear();}
-    void insert(const int& id,const vector<utype>& inV) {
-      mat.insert(mat.begin()+id,inV);}
+    void insert(const int& id,const vector<utype>& inV) {mat.insert(mat.begin()+id,inV);}
     void erase(const int id);
     void erase_col(const int id);
   private:
     vector<vector<utype> > mat;
+    void free();
+    void copy(const matrix& b);
   };
   template <class utype> matrix<utype>  xmatrix2matrix(const xmatrix<utype>& );
   template <class utype> xmatrix<utype> matrix2xmatrix(const matrix<utype>& );
@@ -4025,7 +4100,7 @@ xvector<double> GetCDispFromOrigin(const _atom& atom);
 double GetDistFromOrigin(const _atom& atom);
 //void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,xvector<int>& ijk,const xmatrix<double>& lattice,const bool coord_flag);
 _atom ConvertAtomToLat(const _atom& in_at,const xmatrix<double>& lattice);
-double GetXrayScattFactor(const string& name,const double& lambda,bool clean=true); //CO190322
+double GetXrayScattFactor(const string& name,double lambda=XRAY_RADIATION_COPPER_Kalpha,bool clean=true); //CO190322
 xmatrix<double> RecipLat(const xmatrix<double>& lat);
 double Normal(const double& x,const double& mu,const double& sigma);
 xstructure SetLat(const xstructure& a,const xmatrix<double>& in_lat);
@@ -4123,6 +4198,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup, uint option, xstructure strin);
 // ----------------------------------------------------------------------------
 // aflowlib.h stuff
 #include "aflow_pflow.h"
+
+// ----------------------------------------------------------------------------
+// aflow_xelement.h stuff
+#include "aflow_xelement.h"
 
 #endif
 // ***************************************************************************

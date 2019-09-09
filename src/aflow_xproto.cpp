@@ -620,6 +620,15 @@ namespace aflowlib {
     vector<string> vlabel_ANRL;
     if(aurostd::string2tokens(label,vlabel_ANRL,"_")>=4) {
       if(LDEBUG) { cerr << "aflowlib::PrototypeLibraries: ANRL=" << 1 << endl; }
+      // DX 20190708 - START 
+      // add default permutation to label if not included in input //DX 20190708
+      vector<string> perm_tokens;
+      if(aurostd::string2tokens(label,perm_tokens,".")==1) {
+        string default_permutation = aurostd::RemoveNumbers(vlabel_ANRL[0]);
+        label += "."+default_permutation;
+        if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << label << endl;
+      }
+      // DX 20190708 - END
       return anrl::PrototypeANRL(oss,label,parameters,vatomX,vvolumeX,volume_in,mode,flip_option);
     }
     // done
@@ -2593,7 +2602,7 @@ namespace aflowlib {
 	}
       }
     }
-    // out << "XHOST.Progname=" << XHOST.Progname << endl;
+    // out << "XHOST.progname=" << XHOST.progname << endl;
     // out << "XHOST.command(\"aflow_data\")=" << XHOST.command("aflow_data") << endl;
     // LIBRARY_ALL
     if(aurostd::substring2bool(library,"all")) {

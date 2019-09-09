@@ -194,7 +194,7 @@ void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
   // Execute gnuplot and pdflatex
   aurostd::stringstream2file(gpfile, filename + ".plt");
   aurostd::execute(XHOST.command("gnuplot") + " " + filename + ".plt");
-  aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex > /dev/null");
+  aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error " + filename_latex + ".tex 2>&1 > /dev/null");
   // Convert to the desired format if not pdf
   if (format != "pdf") {
     aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
@@ -260,12 +260,12 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     vector<string> tokens;
     aurostd::string2tokens(default_title, tokens, "_");
     if (tokens.size() == 3) {
-      title = pflow::prettyPrintCompound(tokens[0], _none_, true, _latex_) + " (ICSD \\#" + tokens[2];
+      title = pflow::prettyPrintCompound(tokens[0], no_vrt, true, latex_ft) + " (ICSD \\#" + tokens[2];  //_none_ //_latex_ //CO190629
       string lattice = plotoptions.getattachedscheme("LATTICE");
       if (lattice.empty()) title += ")";
       else title += ", " + lattice + ")";
     } else { // Title not in ICSD format
-      return default_title;
+      return aurostd::fixStringLatex(default_title, false, false);
     }
   } else if (aurostd::substring2bool(default_title, "POCC")) {  // Check if in POCC format
     title = formatDefaultTitlePOCC(plotoptions);
@@ -279,17 +279,22 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
       if (aurostd::withinList(protos, proto)) {
         if (tokens.size() == 3) proto += "." + tokens[2];
         vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
-        vector<double> composition = getCompositionFromANRLProtoype(proto);
+        vector<double> composition = getCompositionFromANRLPrototype(proto);
         proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-        title = pflow::prettyPrintCompound(elements, composition, _none_, true, _latex_) + " (" + proto;
+        title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_ //CO190629
       } else {
-        aflowlib::GetAllPrototypeLabels(protos, "all");
-        if (aurostd::withinList(protos, proto)) {
-          if (tokens.size() == 3) proto += "." + tokens[2];
+        if (tokens.size() == 3) proto += "." + tokens[2];
+        vector<string> comp;
+        protos.clear();
+        aflowlib::GetAllPrototypeLabels(protos, comp, "htqc");
+        int index;
+        if (aurostd::withinList(protos, proto, index)) {
           proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
-          title = pflow::prettyPrintCompound(tokens[0], _none_, true, _latex_) + " (" + proto;
+          vector<string> elements = pflow::stringElements2VectorElements(tokens[0]);
+          vector<double> composition = getCompositionFromHTQCPrototype(proto, comp[index]);
+          title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO190629
         } else {  // Title not in prototype format
-          return default_title;
+          return aurostd::fixStringLatex(default_title, false, false);
         }
       }
     }
@@ -297,7 +302,7 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
     if (lattice.empty()) title += ")";
     else title += ", " + lattice + ")";
   } else {  // Not an AFLOW-formatted default
-    return default_title;
+    return aurostd::fixStringLatex(default_title, false, false);
   }
   // Code only gets here if the title is AFLOW-formatted
   string set = plotoptions.getattachedscheme("DATASET");
@@ -309,13 +314,27 @@ string formatDefaultPlotTitle(const xoption& plotoptions) {
   return title;
 }
 
+//getCompositionFromHTQCPrototype/////////////////////////////////////////////
+// Gets the composition from an HTQC prototype string. The composition string
+// must be retrieved beforehand.
+vector<double> getCompositionFromHTQCPrototype(const string& htqc_prototype,
+                                               const string& composition) {
+  string anrl_prototype = composition + "_";
+  // Composition already has the correct sequence, so keeping the explicit
+  // sequence designator will confuse getCompositonFromANRLPrototype
+  string::size_type t = htqc_prototype.find(".");
+  anrl_prototype += htqc_prototype.substr(0, t);
+  return getCompositionFromANRLPrototype(anrl_prototype);
+}
+
 //getCompositionFromANRLPrototype/////////////////////////////////////////////
 // Gets the composition from an ANRL prototype string.
-vector<double> getCompositionFromANRLProtoype(const string& prototype) {
+vector<double> getCompositionFromANRLPrototype(const string& prototype) {
   // Determine element sequence
   // If there is a . in the prototype string, the element sequence is given explicitly
+  string seq;
   string::size_type t = prototype.find(".");
-  string seq = prototype.substr(t + 1, string::npos);
+  if (t != string::npos) seq = prototype.substr(t + 1, string::npos);
   t = prototype.find("_");
   string compound = prototype.substr(0, t);
   // If not explicitly given, determine element sequence from the prototype name
@@ -408,7 +427,7 @@ string formatDefaultTitlePOCC(const xoption& plotoptions) {
       generic = true;
       broken = true;
     } else {
-      compound = pflow::prettyPrintCompound(elements, composition, _none_, true, _latex_);
+      compound = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft);  //_none_ //_latex_ //CO190629
     }
   }
   if (generic) {  // Broken or unsupported string, so use a very generric title
@@ -1022,34 +1041,11 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
   bool swap = (banddos || plotoptions.flag("SWAP_AXES"));
   uint ndos = dos.size();
 
-  string yscale, maxdos, mindos;
-  yscale = plotoptions.getattachedscheme("YSCALE");
-  if (!yscale.empty()) {
-    double dosscale = aurostd::string2utype<double>(yscale);
-    if (dosscale < _ZERO_TOL_) dosscale = DEFAULT_DOS_SCALE;
-    double dosmax = 0.0;
-    // Determine the maximum displayed DOS for the xrange
-    // Find energy range that is displayed first
-    int e1 = -1, e2 = -1;
-    for (uint e = 0; e < xdos.number_energies; e++) {
-      if ((e1 < 0) && (energies[e] >= Emin)) e1 = (int) e;
-      if ((e2 < 0) && (energies[e] > Emax)) e2 = (int) e;
-      if ((e1 > 0) && (e2 > 0)) break;
-    }
-    if (e1 < 0) e1 = 0;  // Emin not found
-    if (e2 < 0) e2 = (int) xdos.number_energies; // Emax not found
-
-    for (uint d = 0; d < ndos; d++) {
-      for (uint s = 0; s < xdos.spin + 1; s++) {
-        for (int e = e1; e < e2; e++) {
-          if (dos[d][s][e] > dosmax) dosmax = dos[d][s][e];
-        }
-      }
-    }
-    dosmax *= dosscale;
-    maxdos = aurostd::utype2string<double>(dosmax);
-    mindos = aurostd::utype2string<double>(-(xdos.spin * dosmax));
-  }
+  double dosmax = getDosLimits(plotoptions, xdos, dos, energies);
+  string maxdos = aurostd::utype2string<double>(dosmax);
+  string mindos;
+  if (xdos.spin == 0) mindos = "0";
+  else mindos = "-" + maxdos;
 
   string unit = plotoptions.getattachedscheme("UNIT");
   if (unit.empty()) unit = "EV";
@@ -1100,8 +1096,10 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
   out << std::endl << "# Axes" << std::endl;
   if (banddos) {
     out << " unset xtics" << std::endl;
+    out << " unset xrange" << std::endl;
   }
-  out << " set xtics" << std::endl;
+
+  out << " set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
   out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
   out << " set tic scale 0" << std::endl;
   out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
@@ -1118,11 +1116,11 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
   if (Efermi > Emin) {
     out << std::endl << "# Fermi level" << std::endl;
     if (swap) {
-      out << "plot " << Efermi << " lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3 notitle" << std::endl;
+      out << " set arrow from " << mindos << "," << Efermi << " to " << maxdos << "," << Efermi;
     } else {
-      out << " set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1"
-          << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
+      out << " set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1";
     }
+    out << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
   }
 
   // Plot data
@@ -1152,6 +1150,51 @@ void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<
           << ((i < ndos - 1)?",\\":"") << std::endl;
     }
   }
+}
+
+//getDosLimits////////////////////////////////////////////////////////////////
+// Determines the maximum DOS in the plot and sets the limit so that the tics
+// give "nice" numbers. Each plot has four tics, i.e. spin-polarized DOS have
+// two tics per side. This prevents negative numbers from overlapping. This
+// function is fairly primitive but should work for most plots.
+double getDosLimits(const xoption& plotoptions, const xDOSCAR& xdos,
+                    const deque<deque<deque<double> > >& dos, const deque<double>& energies) {
+  double Emin = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMIN"));
+  double Emax = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMAX"));
+  string dosscale = plotoptions.getattachedscheme("YSCALE");
+  uint ndos = dos.size();
+
+  double dosmax = 0.0;
+  // First, determine the maximum displayed DOS
+  // in the displayed energy range
+  int e1 = -1, e2 = -1;
+  for (uint e = 0; e < xdos.number_energies; e++) {
+    if ((e1 < 0) && (energies[e] >= Emin)) e1 = (int) e;
+    if ((e2 < 0) && (energies[e] > Emax)) e2 = (int) e;
+    if ((e1 > 0) && (e2 > 0)) break;
+  }
+  if (e1 < 0) e1 = 0;  // Emin not found
+  if (e2 < 0) e2 = (int) xdos.number_energies; // Emax not found
+
+  for (uint d = 0; d < ndos; d++) {
+    for (uint s = 0; s < xdos.spin + 1; s++) {
+      for (int e = e1; e < e2; e++) {
+        if (dos[d][s][e] > dosmax) dosmax = dos[d][s][e];
+      }
+    }
+  }
+  if (!dosscale.empty()) dosmax *= aurostd::string2utype<double>(dosscale);
+
+  // Now round up the numbers to give good tic values.
+  int l = (int) log10(dosmax);
+  int x = (int) ceil(dosmax/std::pow(10.0, l));
+  if ((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0)) {
+    dosmax = x * std::pow(10.0, l); 
+  } else {
+    dosmax = (x + 1) * std::pow(10.0, l);
+  }
+
+  return dosmax;
 }
 
 //generateBandPlotGNUPLOT/////////////////////////////////////////////////////

@@ -1370,6 +1370,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
 
   // FIX THE SPECIES IF AUTO_PSEUDOPOTENTIALS
   if(xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS")) {
+    if(LDEBUG){cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::AVASP_AUTO_PSEUDOPOTENTIALS\")==1" << endl;}
     if(1 && xvasp.str.species.size()==2) // AlMg potpaw_GGA
       if((KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(0))=="Ga" && KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(1))=="Mg") ||
 	 (KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(0))=="Ge" && KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(1))=="Mg") ||
@@ -1599,21 +1600,21 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.5]" << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.7] vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
-	  if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) label_AFLOWLIB_LIB0=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) label_AFLOWLIB_LIB1=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) label_AFLOWLIB_LIB2=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) label_AFLOWLIB_LIB4=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) label_AFLOWLIB_LIB5=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) label_AFLOWLIB_LIB6=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) label_AFLOWLIB_LIB7=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) label_AFLOWLIB_LIB8=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
-	  if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) label_AFLOWLIB_LIB9=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9)+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) label_AFLOWLIB_LIB0=init::AFLOW_Projects_Directories("LIB0")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) label_AFLOWLIB_LIB1=init::AFLOW_Projects_Directories("LIB1")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) label_AFLOWLIB_LIB2=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) label_AFLOWLIB_LIB4=init::AFLOW_Projects_Directories("LIB4")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) label_AFLOWLIB_LIB5=init::AFLOW_Projects_Directories("LIB5")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) label_AFLOWLIB_LIB6=init::AFLOW_Projects_Directories("LIB6")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) label_AFLOWLIB_LIB7=init::AFLOW_Projects_Directories("LIB7")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) label_AFLOWLIB_LIB8=init::AFLOW_Projects_Directories("LIB8")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
+	  if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) label_AFLOWLIB_LIB9=init::AFLOW_Projects_Directories("LIB9")+"/RAW"+label_MIX;  //CO181216 - in case it doesn't find index
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] label_AFLOWLIB_LIB2=" << label_AFLOWLIB_LIB2 << endl;
-	  if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
+	  if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
 	} else {
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] else CHECK THESE BY HAND" << endl;
-	  label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2));  // why this swap ?
-	  label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3));  // why this swap ?
+	  label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,init::AFLOW_Projects_Directories("LIB3"),init::AFLOW_Projects_Directories("LIB2"));  // why this swap ?
+	  label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,init::AFLOW_Projects_Directories("LIB2"),init::AFLOW_Projects_Directories("LIB3"));  // why this swap ?
 	  aurostd::StringSubst(label_AFLOWLIB_LIB3,"LIB2U","");
 	  aurostd::StringSubst(label_AFLOWLIB_LIB2,"//","/");
 	  aurostd::StringSubst(label_AFLOWLIB_LIB3,"//","/");
@@ -1629,10 +1630,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] label_AFLOWLIB_LIB9=" << label_AFLOWLIB_LIB9 << endl;
 	}
         if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.1]" << endl;
-	//     if(xvasp.AVASP_libbase.size()==0) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB"+label_MIX;
-	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;
+	//     if(xvasp.AVASP_libbase.size()==0) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/LIB"+label_MIX;
+	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+	if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;
 	//  cerr << "LIB2=" << label_AFLOWLIB_LIB2 << endl;
 	//  cerr << "LIB3=" << label_AFLOWLIB_LIB3 << endl;
       } else {
@@ -1760,7 +1761,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD) {
     if(LDEBUG) cerr << "DEBUG: xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD" << endl;
     // xvasp.AVASP_dirbase=_ICSD_DIRBASE_;
-    // xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    // xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("ICSD");
     // directory=xvasp.AVASP_dirbase+"/"+xvasp.AVASP_label;
     system=xvasp.AVASP_label;
     //    if(xvasp.str.spacegroupnumber!=0) {
@@ -1944,7 +1945,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << "[AFLOW] * M. Buongiorno Nardelli " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW] AFLOW automatically generated (aflow_avasp.cpp) " << endl;
-  aflowin << "[AFLOW] GENERATOR = " << XHOST.User << " " << endl;  //CO 180622
+  aflowin << "[AFLOW] GENERATOR = " << XHOST.user << " " << endl;  //CO 180622
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW]SYSTEM=" << system << endl;
@@ -2116,17 +2117,19 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_GIBBS_INPUT=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_FULL_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PLOT_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    if(0){  //cormac will fix later
+    // [OBSOLETE] if(0){  //cormac will fix later
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IEOS=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IDEBYE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECKEVCONCAVITY=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECKMIN=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]FITTYPE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AUTOSKIPFAILEDARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIPFAILEDARUNS=",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIPARUNSMAX=7",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]RUNALLPRESSURETEMPERATURE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    }
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_CONCAVITY=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_MIN=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]FIT_TYPE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AUTOSKIP_FAILED_ARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_FAILED_ARUNS=",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_ARUNS_MAX=7",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]RUN_ALL_PRESSURE_TEMPERATURE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]HUGONIOT_EXTRAPOLATE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PRECACC_ALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    // [OBSOLETE] }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   
@@ -2143,18 +2146,18 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_CALC=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]RELAXED_STRUCT_FIT=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_FIT=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    if(0){  //cormac will fix later
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NEGSTRAINS=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NINDSTRAINS=3",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYMTOLFRAC=0.05",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPRUNXMLSTRESS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]PRECACCALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    // [OBSOLETE] if(0){  //cormac will fix later
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NEG_STRAINS=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NIND_STRAINS=3",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYM_TOL_FRAC=0.05",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPRUNXML_STRESS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]PRECACC_ALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYMMETRIZE=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
     aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPSYM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]AUTOSKIPFAILEDARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIPFAILEDARUNS=",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIPARUNSMAX=1",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    }
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]AUTOSKIP_FAILED_ARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_FAILED_ARUNS=",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_ARUNS_MAX=1",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    // [OBSOLETE] }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
@@ -3583,21 +3586,21 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.5]" << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] XHOST_LIBRARY_LIB2=" << XHOST_LIBRARY_LIB2 << endl;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.7] vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
-          label_AFLOWLIB_LIB0=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB1=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB2=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB4=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB5=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB6=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB7=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB8=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8)+"/RAW"+label_MIX;
-          label_AFLOWLIB_LIB9=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9)+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB0=init::AFLOW_Projects_Directories("LIB0")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB1=init::AFLOW_Projects_Directories("LIB1")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB2=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB4=init::AFLOW_Projects_Directories("LIB4")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB5=init::AFLOW_Projects_Directories("LIB5")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB6=init::AFLOW_Projects_Directories("LIB6")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB7=init::AFLOW_Projects_Directories("LIB7")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB8=init::AFLOW_Projects_Directories("LIB8")+"/RAW"+label_MIX;
+          label_AFLOWLIB_LIB9=init::AFLOW_Projects_Directories("LIB9")+"/RAW"+label_MIX;
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.6] label_AFLOWLIB_LIB2=" << label_AFLOWLIB_LIB2 << endl;
-          if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
+          if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING)  {label_AFLOWLIB_LIB3=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;} else {label_AFLOWLIB_LIB3="./LIB"+label_MIX;}
         } else {
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] else CHECK THESE BY HAND" << endl;
-          label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2));  // why this swap ?
-          label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2),vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3));  // why this swap ?
+          label_AFLOWLIB_LIB2=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB2,init::AFLOW_Projects_Directories("LIB3"),init::AFLOW_Projects_Directories("LIB2"));  // why this swap ?
+          label_AFLOWLIB_LIB3=label_MIX;aurostd::StringSubst(label_AFLOWLIB_LIB3,init::AFLOW_Projects_Directories("LIB2"),init::AFLOW_Projects_Directories("LIB3"));  // why this swap ?
           aurostd::StringSubst(label_AFLOWLIB_LIB3,"LIB2U","");
           aurostd::StringSubst(label_AFLOWLIB_LIB2,"//","/");
           aurostd::StringSubst(label_AFLOWLIB_LIB3,"//","/");
@@ -3613,10 +3616,10 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.02] label_AFLOWLIB_LIB9=" << label_AFLOWLIB_LIB9 << endl;
         }
         if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5d.1]" << endl;
-        //     if(xvasp.AVASP_libbase.size()==0) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB"+label_MIX;
-        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/RAW"+label_MIX;
-        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB"+label_MIX;
+        //     if(xvasp.AVASP_libbase.size()==0) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/LIB"+label_MIX;
+        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) label_MIX=init::AFLOW_Projects_Directories("LIB2")+"/RAW"+label_MIX;
+        if(xvasp.AVASP_libbase.size()==0 && xvasp.AVASP_prototype_mode==LIBRARY_MODE_LIB3) label_MIX=init::AFLOW_Projects_Directories("LIB3")+"/LIB"+label_MIX;
         //  cerr << "LIB2=" << label_AFLOWLIB_LIB2 << endl;
         //  cerr << "LIB3=" << label_AFLOWLIB_LIB3 << endl;
       } else {
@@ -3728,7 +3731,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD) {
     if(LDEBUG) cerr << "DEBUG: xvasp.AVASP_prototype_mode==LIBRARY_MODE_ICSD" << endl;
     // xvasp.AVASP_dirbase=_ICSD_DIRBASE_;
-    // xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+    // xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("ICSD");
     // directory=xvasp.AVASP_dirbase+"/"+xvasp.AVASP_label;
     system=xvasp.AVASP_label;
     //    if(xvasp.str.spacegroupnumber!=0) {
@@ -3815,7 +3818,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   aflowin << "[AFLOW] * M. Buongiorno Nardelli " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW] Aflow automatically generated (aflow_avasp.cpp) " << endl;
-  aflowin << "[AFLOW] GENERATOR = " << XHOST.User << " " << endl;  //CO 180622
+  aflowin << "[AFLOW] GENERATOR = " << XHOST.user << " " << endl;  //CO 180622
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[AFLOW]SYSTEM=" << system << endl;
@@ -5028,6 +5031,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(!pocc_tol_raw.empty()){aurostd::string2tokens(pocc_tol_raw,pocc_tol_sets,",");}
   else {pocc_tol_sets.push_back("");} //so that it enters the for loop later just once
 
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NOAUTOPP")) xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE); //CO190712
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
@@ -5111,6 +5115,24 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 
   //get label_raw, may contain ","
   string label_raw=(reverse?PARAMS->ucell.back():PARAMS->ucell.front());
+    
+  // DX 20190708 - START 
+  // add default permutation to label if not included in input //DX 20190708
+  vector<string> orig_labels, new_labels, anrl_tokens, perm_tokens;
+  aurostd::string2tokens(label_raw,orig_labels,",");
+  for(uint i=0;i<orig_labels.size();i++){
+    if(aurostd::string2tokens(orig_labels[i],anrl_tokens,"_")>=4) {
+      if(aurostd::string2tokens(orig_labels[i],perm_tokens,".")==1) {
+        string default_permutation = aurostd::RemoveNumbers(anrl_tokens[0]);
+        new_labels.push_back(orig_labels[i]+"."+default_permutation);
+        if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << new_labels[new_labels.size()-1] << endl;
+      }
+      else{ new_labels.push_back(orig_labels[i]); }
+    }
+    else{ new_labels.push_back(orig_labels[i]); }
+  }
+  label_raw = aurostd::joinWDelimiter(new_labels,",");
+  // DX 20190708 - END
 
   //get nspecies
   uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label_raw); //PARAMS->ucell.at(0)); //CO181226
@@ -5254,7 +5276,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB4 Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-	flag_LIB4=TRUE;xvasp.AVASP_dirbase="./LIB4/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)+"/LIB";
+	flag_LIB4=TRUE;xvasp.AVASP_dirbase="./LIB4/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB4")+"/LIB";
       }
   // LIB3
   present_all=TRUE;present_here=FALSE;
@@ -5266,7 +5288,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(present_all) {
     cout << "LIB3 Compatibility mode" << endl;
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_LIB3;
-    flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB";
+    flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB3")+"/LIB";
   }
   // LIB2U
   present_all=TRUE;present_here=FALSE;
@@ -5278,7 +5300,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(present_all) {
     cout << "LIB2U Compatibility mode" << endl;
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-    flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+    flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
   }
   // LIB2
   present_all=TRUE;present_here=FALSE;
@@ -5290,7 +5312,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(present_all) {
     cout << "LIB2 Compatibility mode" << endl;
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-    flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+    flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
   }
   //[CO181226 OBSOLETE]}
 
@@ -6062,7 +6084,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB3 Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_LIB3;
-	flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)+"/LIB";
+	flag_LIB3=TRUE;xvasp.AVASP_dirbase="./LIB3/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB3")+"/LIB";
       }
       // LIB2U
       present_all=TRUE;present_here=FALSE;
@@ -6074,7 +6096,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB2U Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-	flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+	flag_LIB2U=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
       }
       // LIB2
       present_all=TRUE;present_here=FALSE;
@@ -6086,7 +6108,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       if(present_all) {
 	cout << "LIB2 Compatibility mode" << endl;
 	xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC;
-	flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)+"/LIB";
+	flag_LIB2=TRUE;xvasp.AVASP_dirbase="./LIB2/LIB";xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("LIB2")+"/LIB";
       }
     }
 
@@ -6652,7 +6674,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
 
   xvasp.AVASP_dirbase=_ICSD_DIRBASE_;
   xvasp.AVASP_libbase="./";
-  if(XHOST_LIBRARY_ICSD+1<vAFLOW_PROJECTS_DIRECTORIES.size()) xvasp.AVASP_libbase=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD);
+  if(XHOST_LIBRARY_ICSD+1<vAFLOW_PROJECTS_DIRECTORIES.size()) xvasp.AVASP_libbase=init::AFLOW_Projects_Directories("ICSD");
   xvasp.AVASP_prototype_mode=LIBRARY_MODE_ICSD;
 
   bool DEBUG_SKIP=TRUE;

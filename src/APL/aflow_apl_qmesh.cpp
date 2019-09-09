@@ -56,7 +56,7 @@ QMesh& QMesh::operator=(const QMesh& that) {
     _qpoints = that._qpoints;
     _recCell = that._recCell;
     _reduced = that._reduced;
-    _shifted = that._shifted;  // ME190701
+    _shifted = that._shifted;  // ME190813
     _shift = that._shift;
     _weights = that._weights;
   }
@@ -129,7 +129,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
   // Calculate the point group of the reciprocal cell. This requires some dummy
   // ofstream objects to parse into the function. These objects will be removed
   // when CalculatePointGroupKCrystal is redesigned to work without ofstreams.
-  if (!xs.pgroupk_calculated) {  // ME190625 - need pgrouk, not pgrouk_xtal
+  if (!xs.pgroupk_calculated) {  // ME190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
     ofstream FileDevNull("/dev/null");
     if (!FileDevNull.is_open()) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
@@ -203,11 +203,13 @@ void QMesh::generateGridPoints(bool force_gamma) {
     gamma = true;
   }
   _isGammaCentered = gamma;
-  _shifted = !aurostd::iszero(shift);  // ME190701
+  _shifted = !aurostd::iszero(shift);  // ME190813
 
   // Obtain Cartesian coordinates
-  for (int q = 0; q < _nQPs; q++) {
-    _qpoints[q].cpos = _recCell.f2c * _qpoints[q].fpos;
+  if (!_shifted) {
+    for (int q = 0; q < _nQPs; q++) {
+      _qpoints[q].cpos = _recCell.f2c * _qpoints[q].fpos;
+    }
   }
 }
 
@@ -218,6 +220,7 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
   for (int q = 0; q < _nQPs; q++) {
     _qpoints[q].fpos -= shift;
     moveToBZ(_qpoints[q].fpos);
+    _qpoints[q].cpos = _recCell.f2c * _qpoints[q].fpos;
   }
 }
 
@@ -225,15 +228,12 @@ void QMesh::shiftMesh(const xvector<double>& shift) {
 // Moves a q-point into the first Brillouin zone.
 // ME190702 - made more robust
 void QMesh::moveToBZ(xvector<double>& qpt) const {
-  for (int i = 1; i < 4; i++) {
-    while (qpt[i] - 0.5 > _ZERO_TOL_) qpt[i] -= 1.0;
-    while (qpt[i] + 0.5 < _ZERO_TOL_) qpt[i] += 1.0;
-  }
+  BringInCellInPlace(qpt, _ZERO_TOL_, 0.5, -0.5); //DX 20190905 - removed SYM namespace
 }
 
 //makeIrreducible/////////////////////////////////////////////////////////////
 // Makes the q-point mesh irreducible
-// ME190730 - Changed algorithm to be much faster
+// ME190813 - Changed algorithm to be much faster
 void QMesh::makeIrreducible() {
   if (_reduced) return;  // ME190701 - don't reduce if it's already reduced
 
@@ -341,7 +341,7 @@ const _qpoint& QMesh::getQPoint(const xvector<double>& fpos) const {
   return _qpoints[getQPointIndex(fpos)];
 }
 
-// ME190701
+// ME190813
 // Returns the index of the qpoint based on the fractional
 // position. It assumes that the point is already on the grid.
 int QMesh::getQPointIndex(xvector<double> fpos) const {
@@ -395,7 +395,7 @@ const _kcell& QMesh::getReciprocalCell() const {
   return _recCell;
 }
 
-// ME190701
+// ME190813
 bool QMesh::isShifted() const {
   return _shifted;
 }
