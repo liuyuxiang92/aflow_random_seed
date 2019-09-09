@@ -77,24 +77,28 @@ void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<st
   for (int i = startIndex; i < endIndex; i++) {
     vector<string> entries;
     fetchUpdatedJsonFiles(entries, entry_paths[i], 1, 8, mod_times[i]);
-    vector<string> json;
-    aurostd::file2vectorstring(json_files[i], json);
-    uint njson = json.size();
-    uint nentry = entries.size();
-    vector<string> auids(njson);
-    uint j;
-    for (j = 0; j < njson; j++) auids[j] = extractJsonValueAflow(json[j], "auid");
+    if (mod_times[i] > 0) {
+      vector<string> json;
+      aurostd::file2vectorstring(json_files[i], json);
+      uint njson = json.size();
+      uint nentry = entries.size();
+      vector<string> auids(njson);
+      uint j;
+      for (j = 0; j < njson; j++) auids[j] = extractJsonValueAflow(json[j], "auid");
 
-    string auid;
-    for (uint e = 0; e < nentry; e++) {
-      for (j = 0; j < njson; j++) {
-        auid = extractJsonValueAflow(entries[e], "auid");
-        if (auid == auids[j]) break;
+      string auid;
+      for (uint e = 0; e < nentry; e++) {
+        for (j = 0; j < njson; j++) {
+          auid = extractJsonValueAflow(entries[e], "auid");
+          if (auid == auids[j]) break;
+        }
+        if (j == njson) json.push_back(entries[e]);
+        else json[j] = entries[e];
       }
-      if (j == njson) json.push_back(entries[e]);
-      else json[j] = entries[e];
+      aurostd::string2file(aurostd::joinWDelimiter(json, ","), json_files[i]);
+    } else {
+      aurostd::string2file(aurostd::joinWDelimiter(entries, ","), json_files[i]);
     }
-    aurostd::string2file(aurostd::joinWDelimiter(json, ",\n"), json_files[i]);
   }
 }
 
