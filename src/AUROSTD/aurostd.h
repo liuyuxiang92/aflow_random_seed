@@ -359,7 +359,7 @@ namespace aurostd {
   // [OBSOLETE]  bool UnzipFile(const string& FileName);  bool ZipFile(const string& FileName);
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
-  int  FileSize(const string& FileName);
+  long int  FileSize(const string& FileName);  // ME191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   long int FileModificationTime(const string&);  // ME181712

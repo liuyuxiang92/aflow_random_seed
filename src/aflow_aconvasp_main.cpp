@@ -88,7 +88,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("AFLUX::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
   //DX 20190206 - add AFLUX functionality to command line - END
-  vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database") && argv.at(1)=="--analyze_database");  // ME190810
+  vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database") && argv.at(1)=="--analyze_database");  // ME191001
 
   // Commands for serializing bands and DOS data to JSON
   vpflow.args2addattachedscheme(argv,cmds,"DOSDATA2JSON","--dosdata2json=","./"); // Eric G
@@ -1058,7 +1058,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
-  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database") && argv.at(1)=="--rebuild_database");  // ME190810
+  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database") && argv.at(1)=="--rebuild_database");  // ME191001
 
   vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
@@ -1226,8 +1226,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("TERDATA_EXIST",aurostd::args2flag(argv,cmds,"--terdata_exist"));
   
   vpflow.flag("UFFENERGY",aurostd::args2flag(argv,cmds,"--uffenergy|--ue"));
-  vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database") && argv.at(1)=="--update_database");  // ME190810
-  vpflow.flag("UPDATEDBJSONS", aurostd::args2flag(argv,cmds,"--update_database_jsons") && argv.at(1)=="--update_database_jsons");  // ME190810
+  vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database") && argv.at(1)=="--update_database");  // ME191001
+  vpflow.flag("UPDATEDBJSONS", aurostd::args2flag(argv,cmds,"--update_database_jsons") && argv.at(1)=="--update_database_jsons");  // ME191001
   
   //DX 20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX 20180710 - check if used in proto
@@ -1484,9 +1484,10 @@ namespace pflow {
       if(vpflow.flag("JMOLGIF")) {pflow::JMOLAnimation(cin,argv); _PROGRAMRUN=true;}
       if(vpflow.flag("KPATH")) {pflow::KPATH(cin,aurostd::args2attachedutype<double>(argv,"--grid=",16.0),vpflow.flag("WWW")); _PROGRAMRUN=true;}
       if(vpflow.flag("NANOPARTICLE")) {cout << pflow::NANOPARTICLE(cin,xvector<double>(0)); _PROGRAMRUN=true;}
-      // ME 190810 - START
+      // ME 191001 - START
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_SCHEMA_FILE);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH,
+                             DEFAULT_AFLOW_DB_SCHEMA_FILE, DEFAULT_AFLOW_DB_LOCK_FILE);
         if (db.rebuildDatabase(vpflow.flag("REBUILDDB"))) {
           db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         }
@@ -1498,7 +1499,7 @@ namespace pflow {
         _PROGRAMRUN = true;
       }
       if (vpflow.flag("UPDATEDBJSONS")) {aflowlib::updateDatabaseJsonFiles(DEFAULT_AFLOW_DB_DATA_PATH); _PROGRAMRUN = true;}
-      // ME190810 - END
+      // ME191001 - END
       // [OBSOLETE CO 180703]if(vpflow.flag("QMVASP")) {pflow::QMVASP(argv); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_EXEC")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_EXEC"),1,cin); _PROGRAMRUN=true;}

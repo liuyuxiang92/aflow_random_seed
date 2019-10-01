@@ -1980,10 +1980,11 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo - jan 08
   // returns in bytes the size of a file
-  int FileSize(const string& _FileName) {
+  // ME191001 - Changed to long int to accommodate large files
+  long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     ifstream FileStream;
-    int sizeout;
+    long int sizeout;
     FileStream.open(FileName.c_str(),std::ios::in);
     if(!FileStream.good()) {
       sizeout=0;

@@ -507,12 +507,13 @@ struct DBStats {
 
 class AflowDB {
   public:
-    AflowDB(string);
-    AflowDB(string, string, string);
+    AflowDB(const string&);
+    AflowDB(const string&, const string&, const string&, const string&);
     ~AflowDB();
 
     string data_path;
     string database_file;
+    string lock_file;
     string schema_file;
 
     bool isTMP();
@@ -530,20 +531,14 @@ class AflowDB {
 
     string getValue(const string&, const string&, string="");
     string getValue(sqlite3*, const string&, const string&, string="");
-    vector<string> getValueMultiCol(const string&, const vector<string>&, string="");
-    vector<string> getValueMultiCol(sqlite3*, const string&, const vector<string>&, string="");
     string getProperty(const string&, const string&, const string&, string="");
     string getProperty(sqlite3*, const string&, const string&, const string&, string="");
     vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, string="");
     vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, string="");
-    vector<string> getColumn(const string&, const string&, string="");
-    vector<string> getColumn(sqlite3*, const string&, const string&, string="");
     vector<string> getSet(const string&, const string&, bool=false, string="", int=0, string="");
     vector<string> getSet(sqlite3*, const string&, const string&, bool=false, string="", int=0, string="");
     vector<string> getSetMultiTables(const vector<string>&, const string&, bool=false, string="", int=0);
     vector<string> getSetMultiTables(sqlite3*, const vector<string>&, const string&, bool=false, string="", int=0);
-    vector<vector<string> > getSetMultiCol(const string&, const vector<string>&, bool=false, string="", int=0, string="");
-    vector<vector<string> > getSetMultiCol(sqlite3*, const string&, const vector<string>&, bool=false, string="", int=0, string="");
 
     void transaction(bool);
 
@@ -562,16 +557,16 @@ class AflowDB {
 
     void rebuildDB();
     void buildTables(int, int, const vector<string>&, const vector<string>&);
+    void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
     vector<string> getDataTypes(const string&, const vector<string>&);
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
 
-    DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-    void getColStats(int, int, const string&,
-                     const vector<string>&, const vector<string>&, vector<vector<int> >&,
+    DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
+    void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
+                     const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
                      vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
-    vector<std::pair<string, int> > getDBLoopCounts(const string&, const vector<string>&);
-    vector<string> getUniqueFromJSONArrays(const vector<string>&);
+    vector<string> getUniqueFromJsonArrays(const vector<string>&);
     void writeStatsToJSON(std::stringstream&, const DBStats&);
 
     void createIndex(const string&, const string&, const string&);
