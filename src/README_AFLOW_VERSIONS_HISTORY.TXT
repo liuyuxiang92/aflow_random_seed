@@ -1,4 +1,4 @@
-3.1.226 - 2019/09/05
+3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
         -- Bug fixes in producing html/json for icsd# entries (SC)
