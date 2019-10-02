@@ -30,7 +30,7 @@ std::mutex m;
 #warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-#define _AFLOW_DB_DEBUG_ false
+#define _AFLOW_DB_DEBUG_ true
 
 using std::string;
 using std::vector;
@@ -125,35 +125,46 @@ void AflowDB::openTmpFile(int open_flags) {
     long int tm_tmp = aurostd::FileModificationTime(tmp_file);
     time_t t = std::time(nullptr);
     long int tm_curr = (long int) t;
+    int pid = -1;
+    bool del_tmp = false;
     if (LDEBUG) {
       std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile(): "
                 << "Found temporary database file with time stamp " << tm_tmp
                 << " (current time: " << tm_curr << ")." << std::endl;
     }
+    if (aurostd::FileExist(lock_file) && !aurostd::FileEmpty(lock_file)) {
+      int pid = aurostd::string2utype<int>(aurostd::file2string(lock_file));
+      if (kill(pid, 0)) pid = -1;
+    }
     if (tm_curr - tm_tmp < DEFAULT_AFLOW_DB_STALE_THRESHOLD) {
-      string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-      string message = "Could not create temporary database file."
-                       " File already exists and rebuild process is active.";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      if (pid > -1) del_tmp = false;
+      else del_tmp = true;
     } else {
+      del_tmp = true;
+    }
+
+    if (del_tmp) {
       if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile(): "
                             << " Temporary database file already exists,"
                             << " but process has become stale. Removing temporary files"
                             << " and killing outstanding process." << std::endl;
-      if (aurostd::FileExist(lock_file) && !aurostd::FileEmpty(lock_file)) {
-        int pid = aurostd::string2utype<int>(aurostd::file2string(lock_file));
-        if (!kill(pid, 0)) {
-          int killreturn = kill(pid, 9);
-          if (killreturn) {
-            string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
-            stringstream message;
-            message << "Could not kill active process " << pid
-                    << "(errno =  " << errno << ")." << std::endl;
-          }
+      if (pid > -1) {
+        int killreturn = kill(pid, 9);
+        if (killreturn) {
+          string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
+          stringstream message;
+          message << "Could not kill active process " << pid
+                  << "(errno =  " << errno << ")." << std::endl;
+          throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
         }
       }
       aurostd::RemoveFile(tmp_file);
       aurostd::RemoveFile(tmp_file + "-journal");
+    } else {
+      string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
+      string message = "Could not create temporary database file."
+                       " File already exists and rebuild process is active.";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -195,8 +206,8 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
     if (LDEBUG) std::cerr << "Force copy selected. Database will be overwritten." << std::endl;
     copied = aurostd::CopyFile(tmp_file, database_file);
   } else {
-    int database_size = aurostd::FileSize(database_file);
-    int tmp_size = aurostd::FileSize(tmp_file);
+    long int database_size = aurostd::FileSize(database_file);
+    long int tmp_size = aurostd::FileSize(tmp_file);
     if (LDEBUG) {
       std::cerr << "Size of database file: " << database_size << std::endl;
       std::cerr << "Size of temporary database file: " << tmp_size << std::endl;
@@ -271,7 +282,12 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       vector<string> types_db = getColumnTypes(table);
       vector<string> types_schema(nkeys);
       uint k;
-      for (k = 0; k < nkeys; k++) types_schema[k] = extractJsonValue(schema, "AAPI_schema." + keys[k] + ".type");
+      string type;
+      for (k = 0; k < nkeys; k++) {
+        type = extractJsonValue(schema, "AAPI_schema." + keys[k] + ".type");
+        if (type == "number") types_schema[k] = "REAL";
+        else types_schema[k] = "TEXT";
+      }
       for (k = 0; k < nkeys; k++) {
         if (!aurostd::withinList(columns, keys[k])) break;
         if (!aurostd::withinList(types_db, types_schema[k])) break;
