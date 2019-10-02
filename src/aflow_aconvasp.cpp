@@ -115,27 +115,19 @@ namespace pflow {
   
   template<class utype>
   const matrix<utype>& matrix<utype>::operator=(const matrix<utype> &b) {
-    if(this != &b) {copy(b);}
-    return *this;
-  }
-
-  template<class utype>
-  void matrix<utype>::free(){
-    for(uint i=0;i<mat.size();i++){mat[i].clear();} mat.clear();
-  }
-  
-  template<class utype>
-  void matrix<utype>::copy(const matrix& b){
-    uint m=b.mat.size();
-    uint n=0;
-    mat=vector<vector<utype> > (m);
-    for(uint i=0;i<m;i++) {
-      n=b.mat[i].size();
-      mat[i]=vector<utype> (n);
-      for(uint j=0;j<n;j++) {
-        mat[i][j]=b.mat[i][j];
+    if(this != &b) {
+      uint m=b.mat.size();
+      uint n=0;
+      mat=vector<vector<utype> > (m);
+      for(uint i=0;i<m;i++) {
+	n=b.mat[i].size();
+	mat[i]=vector<utype> (n);
+	for(uint j=0;j<n;j++) {
+	  mat[i][j]=b.mat[i][j];
+	}
       }
     }
+    return *this;
   }
 
   // mutators

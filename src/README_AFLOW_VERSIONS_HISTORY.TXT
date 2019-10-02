@@ -1,10 +1,11 @@
-3.1.226 - 2019/09/05
+3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
         -- Bug fixes in producing html/json for icsd# entries (SC)
         -- Modified aflow.in generation in AEL and AGL to use common routines in aflow_avasp.cpp and aflow_modules.cpp (CT)  
         -- Write AGL enthalpy as a function of pressure in an AFLOW readable format for future phase diagram application (CT)
         -- Added --quiet option to LIB2LIB routine (CT)
+        -- Sets the VASP symmetry to off by default for AEL calculations (CT)
         -- Added projected phonon DOS calculations. (ME)
         -- Linear tetrahedron method does not reduce upon construction anymore (necessary for projected DOS). (ME)
         -- Cleaned up code and added more comments to QMesh and LTMethod files. (ME)
@@ -23,8 +24,8 @@
         -- replaced all SYM::normalize() with explicity division of aurostd::modulus() (DX)
         -- replaced SYM::extract_row() with aurostd::operator() (DX)
         -- fabs() -> aurostd::abs() (CO)
-        -- patched new gcc9 warnings for implicit const warnings (CO)
         -- changed abinit writer lattice from column-based to row-based (CO)
+        -- updated some class definitions (free()/copy()) (CO)
         (AFLOW: aconvasp.cpp, aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib.h, aflowlib_libraries.cpp, aflowlib_webapp_entry.js, aflowlib_web_interface.cpp, aflowrc.cpp, apennsy_gndstate.cpp, apennsy_main.cpp, apennsy_vaspin.cpp, avasp.cpp, chull.cpp, compare_structure_function.cpp, compare_structure.h, contrib_cormac.cpp, contrib_wahyu.cpp, data.cpp, init.cpp, Makefile, modules.cpp, oaims.cpp, ovasp.cpp, pflow_funcs.cpp, pflow_print.cpp, plotter.cpp, pocc.cpp, pocc.h, pocc_old.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_SYM.TXT, spacegroup.cpp, surface.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, xatom.cpp, xclasses.cpp, xproto.cpp)
         (AEL: ael_elastic_fit.cpp, ael_elasticity.cpp, ael_elasticity.h, ael_get_stress.cpp)
         (AGL: agl_debye.cpp, agl_debye.h, agl_electronic.cpp, agl_eqn_state.cpp, agl_get_ev.cpp, agl_hugoniot.cpp, agl_polynomial.cpp, agl_rungibbs.cpp, agl_thermal.cpp)
