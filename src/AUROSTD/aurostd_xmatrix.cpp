@@ -567,7 +567,7 @@ namespace aurostd {  // namespace aurostd
 #ifdef _XMATH_DEBUG_OPERATORS
     printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
     printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
-#endif
+#endif    
     if (a.cols!=b.rows) {
       string function = "aurostd::xmatrix<utype>::operator*";
       string message = "a.cols != b.rows";
@@ -782,7 +782,11 @@ namespace aurostd {  // namespace aurostd
   operator!=(const xmatrix<utype>& a,const xmatrix<utype>& b) {
     return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // ME190814 - xcomplex version
   // namespace aurostd
   template<class utype> bool
@@ -815,61 +819,101 @@ namespace aurostd {  // namespace aurostd
   identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
     return (bool) identical(a,b,_tol_,(char) 0);  // relative
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix == xmatrix ?
   rel_identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
     return (bool) identical(a,b,_tol_,(char) 1);  // relative
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix == xmatrix ?
   abs_identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
     return (bool) identical(a,b,_tol_,(char) 0);  // absolute
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix == xmatrix ?
   identical(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
     return (bool) identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix == xmatrix ?
   operator==(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
     return (bool) identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix != xmatrix ?
   isdifferent(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
     return (bool) !identical(a,b,_tol_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix != xmatrix ?
   isdifferent(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
     return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix == xmatrix ?
   isequal(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b,const utype& _tol_) {
     return (bool) identical(a,b,_tol_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix == xmatrix ?
   isequal(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
     return (bool) identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool                             // is xmatrix != xmatrix ?
   operator!=(const xmatrix<xcomplex<utype> >& a,const xmatrix<xcomplex<utype> >& b) {
     return (bool) !identical(a,b,(utype) _AUROSTD_XMATRIX_TOLERANCE_IDENTITY_,(char) 0);
   }
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   // namespace aurostd
   template<class utype> bool
   isinteger(const xmatrix<utype>& a,const utype& tol) {
@@ -4462,6 +4506,8 @@ namespace aurostd { // namespace aurostd
 }
 
 // **************************************************************************
+
+
 
 #endif
 // **************************************************************************
