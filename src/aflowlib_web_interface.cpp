@@ -5927,6 +5927,25 @@ namespace aflowlib {
 	// XHOST.FLAG::BADER
 	aflowlib_json << "," << "\"XHOST.FLAG::BADER\":" << (vflags.flag("FLAG::BADER")?"true":"false");
 	aflowlib_out << " | " << "XHOST.FLAG::BADER=" << (vflags.flag("FLAG::BADER")?"1":"0");
+
+        // ME191004 - START
+        // Grab compressed files
+        if(XHOST.vflag_control.flag("PRINT_MODE::JSON") || !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
+          string fgroup, bandsdata;
+          if (aurostd::EFileExist(directory_RAW + "/aflow.fgroup.bands.json")) {
+            fgroup = aurostd::efile2string(directory_RAW + "/aflow.fgroup.bands.json");
+          } else if (aurostd::EFileExist(directory_RAW + "/aflow.fgroup.relax.json")) {
+            fgroup = aurostd::efile2string(directory_RAW + "/aflow.fgroup.relax.json");
+          }
+          aflowlib_json << ", \"fgroup\":" << (fgroup.empty()?"null":fgroup);
+
+          if (vflags.flag("FLAG::ELECTRONIC")) {
+            string system_name = KBIN::ExtractSystemName(directory_LIB);
+            bandsdata = aurostd::efile2string(directory_RAW + "/" + system_name + "_bandsdata.json");
+          }
+          aflowlib_json << ", \"bandsdata\":" << (bandsdata.empty()?"null":bandsdata);
+        }
+        // ME1901004 - STOP
       }
 
       // XHOST.machine_type
