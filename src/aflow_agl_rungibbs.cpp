@@ -701,8 +701,8 @@ namespace AGL_functions {
 	AGL_data.bulkmodulus.at(k) = plnv * eV_Ang3_to_GPa * xmin * xmin / (9.0 * AGL_data.voleqmin.at(k));
 	aglerror = AGL_functions::polynom_eval (xmin, energypolynomialcoeffs, energyvalue, 0);
 	aglerror = AGL_functions::polynom_eval (xmin, energypolynomialerror, plnv, 0);
-	energyerror = sqrt (fabs( plnv - energyvalue*energyvalue ));
-	relative_error.at(k) = energyerror / max (fabs(energyvalue), fabs(energyvalue) + (energyerror/2.0));
+	energyerror = sqrt (aurostd::abs( plnv - energyvalue*energyvalue ));
+	relative_error.at(k) = energyerror / max (aurostd::abs(energyvalue), aurostd::abs(energyvalue) + (energyerror/2.0));
 	if(aglerror != 0) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AGLSTR_WARNING_ + "Error evaluating polynomials for pressure = " << AGL_data.pressure_external.at(k) << endl;
@@ -725,8 +725,8 @@ namespace AGL_functions {
 	AGL_data.bulkmodulus.push_back(plnv * eV_Ang3_to_GPa * xmin * xmin / (9.0 * AGL_data.voleqmin.at(k)));
 	aglerror = AGL_functions::polynom_eval (xmin, energypolynomialcoeffs, energyvalue, 0);
 	aglerror = AGL_functions::polynom_eval (xmin, energypolynomialerror, plnv, 0);
-	energyerror = sqrt (fabs( plnv - energyvalue*energyvalue ));
-	relative_error.push_back(energyerror / max (fabs(energyvalue), fabs(energyvalue)+energyerror/2.0));
+	energyerror = sqrt (aurostd::abs( plnv - energyvalue*energyvalue ));
+	relative_error.push_back(energyerror / max (aurostd::abs(energyvalue), aurostd::abs(energyvalue)+energyerror/2.0));
 	if(aglerror != 0) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AGLSTR_ERROR_ + "Error evaluating polynomials" << endl;
@@ -975,9 +975,9 @@ namespace AGL_functions {
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	return 3;
       } else {
-	// OBSOLETE tdebyemin = pow(6*pi*pi*AGL_data.natoms*AGL_data.volumeinput.at(imin)*AGL_data.volumeinput.at(imin), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(fabs(AGL_data.d2EnergydVolume2_static.at(imin))/AGL_data.cellmass);
-	// OBSOLETE tdebyemin = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * (sqrt(AGL_data.volumeinput.at(imin))), third) * AGL_data.poissonratiofunction * sqrt((fabs(AGL_data.d2EnergydVolume2_static.at(imin) * AGL_data.volumeinput.at(imin))/AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
-	tdebyemin = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * AGL_data.volumeinput.at(imin) * AGL_data.volumeinput.at(imin), third) * AGL_data.poissonratiofunction * sqrt((fabs(AGL_data.d2EnergydVolume2_static.at(imin)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
+	// OBSOLETE tdebyemin = pow(6*pi*pi*AGL_data.natoms*AGL_data.volumeinput.at(imin)*AGL_data.volumeinput.at(imin), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(aurostd::abs(AGL_data.d2EnergydVolume2_static.at(imin))/AGL_data.cellmass);
+	// OBSOLETE tdebyemin = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * (sqrt(AGL_data.volumeinput.at(imin))), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(AGL_data.d2EnergydVolume2_static.at(imin) * AGL_data.volumeinput.at(imin))/AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
+	tdebyemin = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * AGL_data.volumeinput.at(imin) * AGL_data.volumeinput.at(imin), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(AGL_data.d2EnergydVolume2_static.at(imin)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
       }
     }
     else {
@@ -1092,9 +1092,9 @@ namespace AGL_functions {
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  return 3;
 	} else {
-	  // OBSOLETE tdebyevol = pow(6*pi*pi*AGL_data.natoms*AGL_data.volumeinput.at(ij)*AGL_data.volumeinput.at(ij), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(fabs(AGL_data.d2EnergydVolume2_static.at(ij))/AGL_data.cellmass);
-	  // OBSOLETE tdebyevol = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * (sqrt(AGL_data.volumeinput.at(ij))), third) * AGL_data.poissonratiofunction * sqrt((fabs(AGL_data.d2EnergydVolume2_static.at(ij) * AGL_data.volumeinput.at(imin)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
-	  tdebyevol = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * AGL_data.volumeinput.at(ij) * AGL_data.volumeinput.at(ij), third) * AGL_data.poissonratiofunction * sqrt((fabs(AGL_data.d2EnergydVolume2_static.at(ij)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
+	  // OBSOLETE tdebyevol = pow(6*pi*pi*AGL_data.natoms*AGL_data.volumeinput.at(ij)*AGL_data.volumeinput.at(ij), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(aurostd::abs(AGL_data.d2EnergydVolume2_static.at(ij))/AGL_data.cellmass);
+	  // OBSOLETE tdebyevol = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * (sqrt(AGL_data.volumeinput.at(ij))), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(AGL_data.d2EnergydVolume2_static.at(ij) * AGL_data.volumeinput.at(imin)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
+	  tdebyevol = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * AGL_data.volumeinput.at(ij) * AGL_data.volumeinput.at(ij), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(AGL_data.d2EnergydVolume2_static.at(ij)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
 	  if(LDEBUG) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AGLSTR_MESSAGE_ + "tdebyevol = " << tdebyevol << endl;
@@ -1867,8 +1867,8 @@ namespace AGL_functions {
 	AGL_data.bulkmodulus.at(k) = plnv * eV_Ang3_to_GPa * xmin * xmin / (9.0 * AGL_data.voleqmin.at(k));
 	AGL_functions::polynom_eval (xmin, helmholtzenergypolynomialcoeffs, energyvalue, 0);
 	AGL_functions::polynom_eval (xmin, helmholtzpolynomialerror, plnv, 0);
-	energyerror = sqrt(fabs(plnv - energyvalue * energyvalue));
-	relative_error.at(k) = energyerror / max (fabs(energyvalue), fabs(energyvalue) + energyerror/2.0);     
+	energyerror = sqrt(aurostd::abs(plnv - energyvalue * energyvalue));
+	relative_error.at(k) = energyerror / max (aurostd::abs(energyvalue), aurostd::abs(energyvalue) + energyerror/2.0);     
 	// If AGL_data.run_all_pressure_temperature is selected, calculates remaining thermal properties for this temperature and pressure and saves them in structure
 	if (AGL_data.run_all_pressure_temperature) {
 	  AGL_pressure_temperature_energy.volume_equilibrium = AGL_data.voleqmin.at(k);
@@ -2189,7 +2189,7 @@ namespace AGL_functions {
 	      }
 	      // Isotropic Debye model properties
 	      // OBSOLETE theta.at(k) = pow(6 * pi * pi * AGL_data.natoms * AGL_data.voleqmin.at(k) * AGL_data.voleqmin.at(k), third) / physconstkbau * AGL_data.poissonratiofunction * sqrt(AGL_data.d2EnergydVolume2_dynamic.at(k)/AGL_data.cellmass);
-	      // OBSOLETE theta.at(k) = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * sqrt(AGL_data.voleqmin.at(k)), third) * AGL_data.poissonratiofunction * sqrt((fabs(AGL_data.d2EnergydVolume2_dynamic.at(k) * AGL_data.voleqmin.at(k)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
+	      // OBSOLETE theta.at(k) = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * sqrt(AGL_data.voleqmin.at(k)), third) * AGL_data.poissonratiofunction * sqrt((aurostd::abs(AGL_data.d2EnergydVolume2_dynamic.at(k) * AGL_data.voleqmin.at(k)) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
 	      theta.at(k) = (hbar_eV / KBOLTZEV) * pow(6 * pi * pi * AGL_data.natoms * AGL_data.voleqmin.at(k) * AGL_data.voleqmin.at(k), third) * AGL_data.poissonratiofunction * sqrt((AGL_data.d2EnergydVolume2_dynamic.at(k) / AGL_data.cellmass) * eV_Ang3_to_amu_Ang_s);
 	      AGL_functions::thermal_properties (theta.at(k), AGL_data.temperature_external.at(j), DebyeIntegral, DebyeIntegralerror, UIntEnergyVib, Cv.at(k), HelmholtzEnergy, Entropy, AGL_data, FileMESSAGE);
 	      // OBSOLETE IntEnergyVib = UIntEnergyVib * hartree2kjmol;

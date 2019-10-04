@@ -5,7 +5,7 @@
 // *                                                                         *
 // ***************************************************************************
 
-// This file provides serves as an AflowIn reader for AFLOW modules (e.g. APL).
+// This file provides serves as an AflowIn reader for AFLOW modules (e.g. APL, AEL, AGL).
 // It loads all parameters from the aflow.in file (or the defaults if no file
 // is present).
 
@@ -15,6 +15,8 @@
 #define _ASTROPT_APL_ string("[AFLOW_APL]")
 #define _ASTROPT_QHA_ string("[AFLOW_QHA]")
 #define _ASTROPT_AAPL_ string("[AFLOW_AAPL]")
+#define _ASTROPT_AEL_ string("[AFLOW_AEL]")
+#define _ASTROPT_AGL_ string("[AFLOW_AGL]")
 
 #define FLAG_PRECISION 7  //CO181226
 
@@ -38,6 +40,8 @@ void setModules(_xinput& xinput) {
   _moduleOptions module_opts;
   module_opts.aplflags = loadDefaultsAPL();
   module_opts.aaplflags = loadDefaultsAAPL();
+  module_opts.aelflags = loadDefaultsAEL();
+  module_opts.aglflags = loadDefaultsAGL();  
   // The readParameters functions are necessary to set xvasp
   string placeholder = "";  // acts as pseudo-aflow.in
   readParametersAPL(placeholder, module_opts, xinput);
@@ -59,6 +63,8 @@ void readModulesFromAflowIn(const string& AflowIn,
   _moduleOptions module_opts;
   module_opts.aplflags = loadDefaultsAPL();
   module_opts.aaplflags = loadDefaultsAAPL();
+  module_opts.aelflags = loadDefaultsAEL();
+  module_opts.aglflags = loadDefaultsAGL();  
   readParametersAPL(AflowIn, module_opts, xinput);
   readParametersAAPL(AflowIn, module_opts, xinput);
   kflags.KBIN_MODULE_OPTIONS = module_opts;
@@ -106,6 +112,8 @@ vector<aurostd::xoption> loadDefaultsAPL() {
   opt.keyword="DOSMESH"; opt.xscheme = DEFAULT_APL_DOSMESH; aplflags.push_back(opt); opt.clear();
   opt.keyword="DOSSMEAR"; opt.xscheme = utype2string<double>(DEFAULT_APL_DOSSMEAR, FLAG_PRECISION); aplflags.push_back(opt); opt.clear();
   opt.keyword="DOSPOINTS"; opt.xscheme = utype2string<int>(DEFAULT_APL_DOSPOINTS); aplflags.push_back(opt); opt.clear();
+  opt.keyword="DOSPROJECTIONS_CART"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
+  opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
   opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
   opt.keyword="TPT"; opt.xscheme = DEFAULT_APL_TPT; aplflags.push_back(opt); opt.clear();
   if (LDEBUG) {
@@ -368,6 +376,138 @@ void readParametersAAPL(const string& AflowIn,
       std::cerr << soliloquy << "  " << module_opts.aaplflags[i].keyword << " = " << module_opts.aaplflags[i].xscheme << std::endl;
     }
   }
+}
+
+
+// AEL-related functions -----------------------------------------------------
+
+//loadDefaultsAEL/////////////////////////////////////////////////////////////
+// Sets all AEL flags to their default values.
+vector<aurostd::xoption> loadDefaultsAEL() {
+  bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+  string soliloquy="loadDefaultsAEL():";
+  vector<aurostd::xoption> aelflags;
+  aurostd::xoption opt;
+  opt.keyword="STRAIN_SYMMETRY"; opt.option = DEFAULT_AEL_STRAIN_SYMMETRY; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="NNORMAL_STRAINS"; opt.xscheme = utype2string<int>(DEFAULT_AEL_NNORMAL_STRAINS); aelflags.push_back(opt); opt.clear();
+  opt.keyword="NSHEAR_STRAINS"; opt.xscheme = utype2string<int>(DEFAULT_AEL_NNORMAL_STRAINS); aelflags.push_back(opt); opt.clear();
+  opt.keyword="NORMAL_STRAIN_STEP"; opt.xscheme = utype2string<double>(DEFAULT_AEL_NORMAL_STRAIN_STEP, FLAG_PRECISION); aelflags.push_back(opt); opt.clear();
+  opt.keyword="SHEAR_STRAIN_STEP"; opt.xscheme = utype2string<double>(DEFAULT_AEL_SHEAR_STRAIN_STEP, FLAG_PRECISION); aelflags.push_back(opt); opt.clear();
+  opt.keyword="ORIGIN_STRAIN_CALC"; opt.option = DEFAULT_AEL_ORIGIN_STRAIN_CALC; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="ORIGIN_STRAIN_FIT"; opt.option = DEFAULT_AEL_ORIGIN_STRAIN_FIT; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="RELAXED_STRUCT_FIT"; opt.option = DEFAULT_AEL_RELAXED_STRUCT_FIT; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="NEG_STRAINS"; opt.option = DEFAULT_AEL_NEG_STRAINS; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="NIND_STRAIN_DIRS"; opt.xscheme = utype2string<int>(DEFAULT_AEL_NIND_STRAIN_DIRS); aelflags.push_back(opt); opt.clear();
+  opt.keyword="VASPSYM"; opt.option = DEFAULT_AEL_VASPSYM; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="PRECACC_ALGONORM"; opt.option = DEFAULT_AEL_PRECACC_ALGONORM; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="VASPRUNXML_STRESS"; opt.option = DEFAULT_AEL_VASPRUNXML_STRESS; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="AUTOSKIP_FAILED_ARUNS"; opt.option = DEFAULT_AEL_AUTOSKIP_FAILED_ARUNS; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="SKIP_ARUNS_MAX"; opt.xscheme = utype2string<int>(DEFAULT_AEL_SKIP_ARUNS_MAX); aelflags.push_back(opt); opt.clear();
+  opt.keyword="CHECK_ELASTIC_SYMMETRY"; opt.option = DEFAULT_AEL_CHECK_ELASTIC_SYMMETRY; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="SYMMETRIZE"; opt.option = DEFAULT_AEL_SYMMETRIZE; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="WRITE_FULL_RESULTS"; opt.option = DEFAULT_AEL_WRITE_FULL_RESULTS; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();
+  opt.keyword="DIRNAME_ARUN"; opt.option = DEFAULT_AEL_DIRNAME_ARUN; opt.xscheme = (opt.option?"ON":"OFF"); aelflags.push_back(opt); opt.clear();    
+  if (LDEBUG) {
+    for (uint i = 0; i < aelflags.size(); i++) {
+      std::cerr << soliloquy << " key: " << aelflags[i].keyword << ", xscheme: " << aelflags[i].xscheme << ", option: " << aelflags[i].option << std::endl;
+    }
+  }
+  return aelflags;
+}
+
+//writeFlagAEL///////////////////////////////////////////////////////////////
+// Determines whether flag should be written to aflow.in
+bool writeFlagAEL(const string& key,const xoption& xopt){ 
+  if (xopt.isentry) {return true;}  
+  if(key=="STRAIN_SYMMETRY"){return true;}
+  if(key=="NNORMAL_STRAINS"){return true;}  
+  if(key=="NSHEAR_STRAINS"){return true;}
+  if(key=="NORMAL_STRAIN_STEP"){return true;}
+  if(key=="SHEAR_STRAIN_STEP"){return true;}
+  if(key=="ORIGIN_STRAIN_CALC"){return true;}
+  if(key=="ORIGIN_STRAIN_FIT"){return true;}
+  if(key=="RELAXED_STRUCT_FIT"){return true;}
+  if(key=="NEG_STRAINS"){return true;}
+  if(key=="NIND_STRAIN_DIRS"){return true;}
+  if(key=="VASPSYM"){return true;}
+  if(key=="PRECACC_ALGONORM"){return true;}
+  if(key=="VASPRUNXML_STRESS"){return true;}
+  if(key=="AUTOSKIP_FAILED_ARUNS"){return true;}
+  if(key=="SKIP_ARUNS_MAX"){return true;}
+  if(key=="CHECK_ELASTIC_SYMMETRY"){return true;}
+  if(key=="SYMMETRIZE"){if((xopt.option == AFLOWRC_DEFAULT_AEL_SYMMETRIZE) && (xopt.option == DEFAULT_AEL_SYMMETRIZE)) {return false;}}
+  if(key=="WRITE_FULL_RESULTS"){return true;}
+  if(key=="DIRNAME_ARUN"){return true;}
+  return true;
+}
+
+// AGL-related functions -----------------------------------------------------
+
+//loadDefaultsAGL/////////////////////////////////////////////////////////////
+// Sets all AGL flags to their default values.
+vector<aurostd::xoption> loadDefaultsAGL() {
+  bool LDEBUG = (FALSE || XHOST.DEBUG || DEBUG_MODULES);
+  string soliloquy="loadDefaultsAGL():";
+  vector<aurostd::xoption> aglflags;
+  aurostd::xoption opt;
+  opt.keyword="AEL_POISSON_RATIO"; opt.option = DEFAULT_AGL_AEL_POISSON_RATIO; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="NSTRUCTURES"; opt.xscheme = utype2string<int>(DEFAULT_AGL_NSTRUCTURES); aglflags.push_back(opt); opt.clear();
+  opt.keyword="STRAIN_STEP"; opt.xscheme = utype2string<double>(DEFAULT_AGL_STRAIN_STEP, FLAG_PRECISION); aglflags.push_back(opt); opt.clear();
+  opt.keyword="AUTOSKIP_FAILED_ARUNS"; opt.option = DEFAULT_AGL_AUTOSKIP_FAILED_ARUNS; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="SKIP_ARUNS_MAX"; opt.xscheme = utype2string<int>(DEFAULT_AGL_SKIP_ARUNS_MAX); aglflags.push_back(opt); opt.clear();
+  opt.keyword="NTEMPERATURE"; opt.xscheme = utype2string<int>(DEFAULT_AGL_NTEMPERATURE); aglflags.push_back(opt); opt.clear();
+  opt.keyword="STEMPERATURE"; opt.xscheme = utype2string<double>(DEFAULT_AGL_STEMPERATURE, FLAG_PRECISION); aglflags.push_back(opt); opt.clear();
+  opt.keyword="NPRESSURE"; opt.xscheme = utype2string<int>(DEFAULT_AGL_NPRESSURE); aglflags.push_back(opt); opt.clear();
+  opt.keyword="SPRESSURE"; opt.xscheme = utype2string<double>(DEFAULT_AGL_SPRESSURE, FLAG_PRECISION); aglflags.push_back(opt); opt.clear();
+  opt.keyword="POISSON_RATIO"; opt.xscheme = utype2string<double>(DEFAULT_AGL_POISSON_RATIO, FLAG_PRECISION); aglflags.push_back(opt); opt.clear();
+  opt.keyword="IEOS"; opt.xscheme = utype2string<int>(DEFAULT_AGL_IEOS); aglflags.push_back(opt); opt.clear();
+  opt.keyword="IDEBYE"; opt.xscheme = utype2string<int>(DEFAULT_AGL_IDEBYE); aglflags.push_back(opt); opt.clear();
+  opt.keyword="FIT_TYPE"; opt.xscheme = utype2string<int>(DEFAULT_AGL_FIT_TYPE); aglflags.push_back(opt); opt.clear();
+  opt.keyword="CHECK_EV_CONCAVITY"; opt.option = DEFAULT_AGL_CHECK_EV_CONCAVITY; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="CHECK_EV_MIN"; opt.option = DEFAULT_AGL_CHECK_EV_MIN; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="HUGONIOT_CALC"; opt.option = DEFAULT_AGL_HUGONIOT_CALC; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="HUGONIOT_EXTRAPOLATE"; opt.option = DEFAULT_AGL_HUGONIOT_EXTRAPOLATE; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="RUN_ALL_PRESSURE_TEMPERATURE"; opt.option = DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="WRITE_FULL_RESULTS"; opt.option = DEFAULT_AGL_WRITE_FULL_RESULTS; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="DIRNAME_ARUN"; opt.option = DEFAULT_AGL_DIRNAME_ARUN; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="WRITE_GIBBS_INPUT"; opt.option = DEFAULT_AGL_WRITE_GIBBS_INPUT; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+  opt.keyword="PLOT_RESULTS"; opt.option = DEFAULT_AGL_PLOT_RESULTS; opt.xscheme = (opt.option?"ON":"OFF"); aglflags.push_back(opt); opt.clear();
+
+  if (LDEBUG) {
+    for (uint i = 0; i < aglflags.size(); i++) {
+      std::cerr << soliloquy << " key: " << aglflags[i].keyword << ", xscheme: " << aglflags[i].xscheme << ", option: " << aglflags[i].option << std::endl;
+    }
+  }
+  return aglflags;
+}
+
+//writeFlagAGL///////////////////////////////////////////////////////////////
+// Determines whether flag should be written to aflow.in
+bool writeFlagAGL(const string& key,const xoption& xopt){ 
+  if (xopt.isentry) {return true;}  
+  if(key=="AEL_POISSON_RATIO"){return true;}
+  if(key=="NSTRUCTURES"){return true;}  
+  if(key=="STRAIN_STEP"){return true;}
+  if(key=="AUTOSKIP_FAILED_ARUNS"){return true;}
+  if(key=="SKIP_ARUNS_MAX"){return true;}
+  if(key=="NTEMPERATURE"){return true;}
+  if(key=="STEMPERATURE"){return true;}
+  if(key=="NPRESSURE"){return true;}
+  if(key=="SPRESSURE"){return true;}
+  if(key=="IEOS"){if(utype2string<int>(AFLOWRC_DEFAULT_AGL_IEOS)==xopt.xscheme && utype2string<int>(DEFAULT_AGL_FIT_TYPE)==xopt.xscheme){return false;}}
+  if(key=="IDEBYE"){if(utype2string<int>(AFLOWRC_DEFAULT_AGL_IDEBYE)==xopt.xscheme && utype2string<int>(DEFAULT_AGL_IDEBYE)==xopt.xscheme){return false;}}
+  if(key=="FIT_TYPE"){if(utype2string<int>(AFLOWRC_DEFAULT_AGL_FIT_TYPE)==xopt.xscheme && utype2string<int>(DEFAULT_AGL_FIT_TYPE)==xopt.xscheme){return false;}}
+  if(key=="CHECK_EV_CONCAVITY"){if((xopt.option == AFLOWRC_DEFAULT_AGL_CHECK_EV_CONCAVITY) && (xopt.option == DEFAULT_AGL_CHECK_EV_CONCAVITY)) {return false;}}
+  if(key=="CHECK_EV_MIN"){if((xopt.option == AFLOWRC_DEFAULT_AGL_CHECK_EV_MIN) && (xopt.option == DEFAULT_AGL_CHECK_EV_MIN)) {return false;}}
+  if(key=="HUGONIOT_CALC"){return true;}
+  if(key=="HUGONIOT_EXTRAPOLATE"){if((xopt.option == AFLOWRC_DEFAULT_AGL_HUGONIOT_EXTRAPOLATE) && (xopt.option == DEFAULT_AGL_HUGONIOT_EXTRAPOLATE)) {return false;}}
+  if(key=="RUN_ALL_PRESSURE_TEMPERATURE"){return true;}
+  if(key=="WRITE_FULL_RESULTS"){return true;}
+  if(key=="DIRNAME_ARUN"){return true;}
+  if(key=="WRITE_GIBBS_INPUT"){if((xopt.option == AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT) && (xopt.option == DEFAULT_AGL_WRITE_GIBBS_INPUT)) {return false;}}
+  if(key=="PLOT_RESULTS"){return true;}
+  
+  return true;
 }
 
 }  // namespace KBIN

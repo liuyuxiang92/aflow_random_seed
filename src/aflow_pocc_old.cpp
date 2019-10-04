@@ -3869,8 +3869,14 @@ namespace pocc {
 
 namespace pocc {
   Bond::Bond() {}
+  Bond::Bond(const Bond& b) {copy(b);}
   Bond::~Bond() {}
-  void Bond::Free() {}
+  void Bond::free() {}
+  void Bond::copy(const Bond& b) {
+    bgn = b.bgn;
+    end = b.end;
+    length = b.length;
+  }
   
   void Bond::Set(xstructure xstr, _atom atomBGN, _atom atomEND) {
     xstr.ReScale(1.0); //safety
@@ -3879,12 +3885,8 @@ namespace pocc {
     length = AtomDist(bgn, end);
   }
   
-  const Bond& Bond::operator=(const Bond& other) {
-    if(this != &other) {
-      this->bgn = other.bgn;
-      this->end = other.end;
-      this->length = other.length;
-    }
+  const Bond& Bond::operator=(const Bond& b) {
+    if(this != &b) {copy(b);}
     return *this;
   }
   
@@ -4569,13 +4571,8 @@ namespace pocc {
 
 // destructor
 namespace pocc {
-  UFFPara::~UFFPara() {
-    Free();
-  }} // namespace pocc 
-
-
-namespace pocc {
-  void UFFPara::Free() {}
+  void UFFPara::free() {}
+  UFFPara::~UFFPara() {free();}
 } // namespace pocc 
 
 namespace pocc {
@@ -4716,11 +4713,8 @@ namespace pocc {
     Xi = 0;
   }
 
-  Atom::~Atom() {
-    Free(); 
-  }
-
-  void Atom::Free() {}
+  void Atom::free() {}
+  Atom::~Atom() {free(); }
 
   void Atom::GetAtomicProperties(string atom) {
     //string strData=pocc::ReturnAtomProperties(atom);

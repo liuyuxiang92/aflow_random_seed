@@ -298,7 +298,7 @@ class _XHOST {
   bool GENERATE_AFLOWIN_ONLY; //CT 180719
   bool POSTPROCESS; //CT 181212
   // HARDWARE/SOFTWARE
-  string hostname,MachineType,Tmpfs,User,Group,Home,Shell,Progname;
+  string hostname,machine_type,tmpfs,user,group,home,shell,progname;
   string Find_Parameters;
   bool sensors_allowed;
   // ARGUMENTS
@@ -451,10 +451,9 @@ class _XHOST {
 #define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO190620
 #define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO190620
 #define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57) //ME180705
-#define XHOST_README_AFLOW_HTRESOURCES_TXT             XHOST.vGlobal_string.at(58)
-#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(59)
-#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(60)
-#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(61)
+#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
+#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
+#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(60)
 
 #define XHOST_FINDSYM_data_space_txt                   XHOST.vGlobal_string.at(70)
 #define XHOST_FINDSYM_data_wyckoff_txt                 XHOST.vGlobal_string.at(71)
@@ -644,6 +643,12 @@ struct _moduleOptions {
 
   // QHA
   vector<aurostd::xoption> qhaflags;
+  
+  // AEL
+  vector<aurostd::xoption> aelflags;
+
+  // AGL
+  vector<aurostd::xoption> aglflags;
 };
 
 // --------------------------------------------------------------------------
@@ -1001,6 +1006,7 @@ namespace init {
   string InitLoadString(string string2load,bool=FALSE);
   string InitGlobalObject(string string2load,string="",bool=FALSE);
   string InitLibraryObject(string string2load,bool=FALSE);
+  string AFLOW_Projects_Directories(string string2load);
   long GetRAM(void);
   uint GetTEMPs(void);
 } // namespace init
@@ -1071,8 +1077,8 @@ class _atom { // simple class.. nothing fancy
   xvector<double> cpos;                                  // so if fpos/cpos is outside a cell, you can shift
   xvector<double> corigin;                               // origin for convasp purposes
   xvector<double> coord;                                 // general coordinate for symmetry routines (RHT)
-  vector<string> fpos_equation;                         // DX 20180607 - lattice equation for atomic position 
-  vector<string> cpos_equation;                         // DX 20180607 - Cartesian equation for atomic position 
+  vector<string> fpos_equation;                          // DX 20180607 - lattice equation for atomic position 
+  vector<string> cpos_equation;                          // DX 20180607 - Cartesian equation for atomic position 
   double spin;                                           // spin along z in VASP MODE
   bool spin_is_given;                                    // TRUE if spin has been set // DX 9/21/17
   xvector<double> noncoll_spin;                          // non-collinear spin                // DX 12/5/17
@@ -1080,15 +1086,12 @@ class _atom { // simple class.. nothing fancy
   double mass;                                           // mass 
   int    type;                                           // with bringincell, which adjust cpos/fpos and ijk as well
   string name;                                           // the name read from the INPUT
-  int info;                                              // container for misc. information  // RHT
-  string cleanname;                                      // a chemical clean version of the name
   bool   name_is_given;                                  // TRUE is atom name has been given
+  string cleanname;                                      // a chemical clean version of the name
+  int info;                                              // container for misc. information  // RHT
   int    atomic_number;                                  // 0 by defauls
   int    number;                                         // atom number reference for convasp, from zero to the sky
   string sd;                                             // ?
-  bool   print_RHT;                                      // a printer for coord and name (general position)   // RHT
-  bool   print_cartesian;                                // print frac or cartesian
-  bool   verbose;                                        // verbose in printing
   xvector<int> ijk;                                      // xvector identifier of the lattice (but you must give str)
   bool   isincell;                                       // is in cell ? (i==j==k==0 ?)
   int    basis;                                          // identifier of position in the basis, from zero to the sky
@@ -1106,6 +1109,10 @@ class _atom { // simple class.. nothing fancy
   double partial_occupation_value;                       // partial occupation
   bool   partial_occupation_flag;                        // partial occupation
   int shell;                                             // neighbour shell number
+  // printing
+  bool   verbose;                                        // verbose in printing
+  bool   print_RHT;                                      // a printer for coord and name (general position)   // RHT
+  bool   print_cartesian;                                // print frac or cartesian
   // operators/functions                                 // operator/functions
   friend ostream& operator<<(ostream &,const _atom&);    // print
   void CleanName(void);                                  // function to clean up the name
@@ -1218,6 +1225,7 @@ class _sym_op {
  public:
   // constructor destructor
   _sym_op();                                                    // default, just allocate
+  _sym_op(const _sym_op& b);                                    // constructor copy
   ~_sym_op();                                                   // kill everything
   // content
   // for _PGROUP_
@@ -1229,17 +1237,12 @@ class _sym_op {
   xvector<xcomplex<double> > su2_coefficients;                  // su(2) coefficients on sigma_1, sigma_2, sigma_3 basis (Pauli matrices) // DX 1/15/18
   double           angle;                                       // angle axis
   xvector<double>  axis;          // 3                          // (1,2,3)=axis
-  xvector<double> quaternion_vector;				//GEENA
-  xmatrix<double> quaternion_matrix;				//GEENA
+  xvector<double>  quaternion_vector;				//GEENA
+  xmatrix<double>  quaternion_matrix;				//GEENA
   string           str_type;                                    // generic type of the operation
   string           str_Hermann_Mauguin;                         // Hermann_Mauguin notation
   string           str_Schoenflies;                             // Schoenflies notation
   bool             flag_inversion;                              // flag if inversion
-  vector<int>      basis_atoms_map;                             // this is the vector that tell where the basis atom gets mapped by the operation
-  vector<int>      basis_types_map;                           // this is the vector that tell where the basis species gets mapped by the operation
-  // DX and CO - START
-  bool             basis_map_calculated;                        //have we've calculated it?
-  // DX and CO - END
   bool             is_pgroup;                                   // bool is_pgroup
   // for _PGROUPXTAL_
   bool             is_pgroup_xtal;                              // bool is_pgroup_xtal
@@ -1250,6 +1253,9 @@ class _sym_op {
   // for _FGROUP_
   xvector<double>  ctau;          // 3                          // translation in CARTESIAN       // FACTOR GROUP only, [0,1[
   xvector<double>  ftau;          // 3                          // translation in FRACTIONAL      // FACTOR GROUP only, [0,1[
+  vector<int>      basis_atoms_map;                             // this is the vector that tell where the basis atom gets mapped by the operation
+  vector<int>      basis_types_map;                             // this is the vector that tell where the basis species gets mapped by the operation
+  bool             basis_map_calculated;                        //have we've calculated it?
   bool             is_fgroup;                                   // bool is_fgroup
   // for _SGROUP_
   xvector<double>  ctrasl;        // 3                          // translation in CARTESIAN       // SPACE GROUP only, [integers]
@@ -1257,8 +1263,9 @@ class _sym_op {
   bool             is_sgroup;                                   // bool is_sgroup
   // operators
   // for _AGROUP_
-  bool             is_agroup;                                   // bool is_agroup     // for site operation point group
   uint             site;                                        // uint site          // site index // DX 8/3/17
+  bool             is_agroup;                                   // bool is_agroup     // for site operation point group
+  
   const _sym_op& operator=(const _sym_op& b);
   friend ostream& operator<<(ostream &,const _sym_op&);
 
@@ -1269,6 +1276,7 @@ class _sym_op {
 
  private:
   void free();
+  void copy(const _sym_op& b);
 };
 
 //DX 201801107 - add _kpoint class - START
@@ -1334,8 +1342,8 @@ class GroupedWyckoffPosition{
     vector<uint> multiplicities;
     vector<string> letters;
   private:
-    void Free();
-    void Copy(const GroupedWyckoffPosition& b);
+    void free();
+    void copy(const GroupedWyckoffPosition& b);
 };
 // --------------------------------------------------------------------------
 //DX 20181010 - grouped Wyckoff class - END
@@ -1414,8 +1422,9 @@ class xstructure {
   void NiggliUnitCellForm(void);                                // Reduce the Unit Cell to Niggli Form
   void MinkowskiBasisReduction(void);                           // Reduce the Basis to the max orthogonality (Minkowski)
   void LatticeReduction(void);                                  // Lattice Reduction to Max Orthogonality (MINK) and then Niggly Form
-  void BringInCell(void);                                       // Bring all the atoms in the origin
-  void BringInCell(double);                                     // Bring all the atoms in the origin
+  //DX 20190905 [OBSOLETE] void BringInCell(void);                                       // Bring all the atoms in the origin
+  //DX 20190905 [OBSOLETE] void BringInCell(double);                                     // Bring all the atoms in the origin
+  void BringInCell(double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
   void BringInCompact(void);                                    // Bring all the atoms near the origin
   void BringInWignerSeitz(void);                                // Bring all the atoms in the Wigner Seitz Cell
   void GetPrimitive(void);                                      // Make it primitive, if possible
@@ -1741,8 +1750,8 @@ class xstructure {
   string error_string;                                          // contains type of error
   // END OF CONTENT                                             //
  private:                                                       // ---------------------------------------
-  void Free();                                                  // to free everything
-  void Copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
+  void free();                                                  // to free everything
+  void copy(const xstructure& b);                               // the flag is necessary because sometimes you need to allocate the space.
 };
 
 // CO 180420
@@ -2142,19 +2151,36 @@ xmatrix<double> FF2CC(const double& scale,const xmatrix<double>& lattice,const x
 xmatrix<double> FF2CC(const xmatrix<double>& lattice,const xmatrix<double>& fmat);                      // fmat is an operation in F coordinates
 xmatrix<double> CC2FF(const double& scale,const xmatrix<double>& lattice,const xmatrix<double>& cmat);  // cmat is an operation in C coordinates
 xmatrix<double> CC2FF(const xmatrix<double>& lattice,const xmatrix<double>& cmat);                      // cmat is an operation in C coordinates
+// DX 20190905 - START
+//BringInCellInPlace() overloads
+void BringInCellInPlace(double&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+void BringInCellInPlace(xvector<double>&, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+void BringInCellInPlace(_atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+void BringInCellInPlace(xstructure& xstr, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+
+//BringInCell() overloads
+double BringInCell(double, double=_ZERO_TOL_, double=1.0, double=0.0);  // ME/DX 190409
+xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+_atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+xstructure BringInCell(const xstructure& xstr_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+
+//BringInCellFPOS overloads
+void BringInCellInPlaceFPOS(_atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+_atom BringInCellFPOS(const _atom& atom_in, double tolerance=_ZERO_TOL_, double upper_bound=1.0, double lower_bound=0.0); //DX 20190904
+// DX 20190905 - END
 // DX and CO - START
-double BringInCell(const double& x);
-double BringInCell_20161115(const double& x);
-double BringInCell_20160101(const double& x);
-double BringInCell(const double& x);
-double BringInCell_20160101(const double& x);
-xvector<double> BringInCell(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon);
-xvector<double> BringInCell(const xvector<double>& v_in);
-xvector<double> BringInCell2(const xvector<double>& v_in);
-xvector<double> BringInCell2_20161115(const xvector<double>& v_in);
-xvector<double> BringInCell2_20160101(const xvector<double>& v_in, double tolerance);
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20161115(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell(const double& x);
+//DX 20190905 [OBSOLETE] double BringInCell_20160101(const double& x);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20161115(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell_20160101(const xvector<double>& v_in,double epsilon);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20161115(const xvector<double>& v_in);
+//DX 20190905 [OBSOLETE] xvector<double> BringInCell2_20160101(const xvector<double>& v_in, double tolerance);
 // DX and CO - END
 xstructure IdenticalAtoms(const xstructure& a);                                // Make identical atoms
 //xstructure SwapSpecies(const xstructure& a,const uint& A,const uint& B);       // Permute Species A with B (safe for species C).
@@ -2194,20 +2220,20 @@ xstructure GetPrimitiveVASP(const xstructure& a);
 xstructure GetPrimitiveVASP(const xstructure& a,double tol);
 // CO 170807 - STOP
 // bring cell in,compact, wigner seitz
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
-// DX and CO - START
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
-_atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
-_atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice); // DX
-_atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice); // DX
-xstructure BringInCell(const xstructure& a,double epsilon);
-xstructure BringInCell_20161115(const xstructure& a,double epsilon); // DX
-xstructure BringInCell_20160101(const xstructure& a,double epsilon); // DX
-xstructure BringInCell(const xstructure& a);
-xstructure BringInCell_20161115(const xstructure& a); // DX
-xstructure BringInCell_20160101(const xstructure& a); // DX
-// DX and CO - END
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon);
+//DX 20190905 [OBSOLETE] // DX and CO - START
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice,double epsilon); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell(const _atom& atom_in,const xmatrix<double>& lattice);
+//DX 20190905 [OBSOLETE] _atom BringInCell_20161115(const _atom& atom_in,const xmatrix<double>& lattice); // DX
+//DX 20190905 [OBSOLETE] _atom BringInCell_20160101(const _atom& atom_in,const xmatrix<double>& lattice); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a,double epsilon);
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a,double epsilon); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a,double epsilon); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell(const xstructure& a);
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20161115(const xstructure& a); // DX
+//DX 20190905 [OBSOLETE] xstructure BringInCell_20160101(const xstructure& a); // DX
+//DX 20190905 [OBSOLETE] // DX and CO - END
 xstructure BringInCompact(const xstructure& a);
 xstructure BringInWignerSeitz(const xstructure& a);
 // primitive stuff
@@ -2560,6 +2586,11 @@ namespace KBIN {
   vector<aurostd::xoption> loadDefaultsAAPL();
   bool writeFlagAAPL(const string& key,const xoption& xopt);  //CO181226  // ME190113
   void readParametersAAPL(const string&, _moduleOptions&, _xinput&);
+  vector<aurostd::xoption> loadDefaultsAEL();
+  bool writeFlagAEL(const string& key,const xoption& xopt); 
+  vector<aurostd::xoption> loadDefaultsAGL();
+  bool writeFlagAGL(const string& key,const xoption& xopt); 
+
 }
 
 // ----------------------------------------------------------------------------
@@ -3277,7 +3308,8 @@ namespace plotter {
   void setFileName(aurostd::xoption&, string="");
   void setTitle(aurostd::xoption&);
   string formatDefaultPlotTitle(const aurostd::xoption&);
-  vector<double> getCompositionFromANRLProtoype(const string& prototype);
+  vector<double> getCompositionFromHTQCPrototype(const string&, const string&);  // ME190813
+  vector<double> getCompositionFromANRLPrototype(const string&);
   string formatDefaultTitlePOCC(const aurostd::xoption&);
   vector<double> getCompositionFromPoccString(const string&, bool&);
 
@@ -3421,7 +3453,7 @@ namespace pocc {
     double r1,theta0,x1,D1,zeta,Z1,Vi,Uj,Xi,hard,radius; 
     void GetUFFParameters(string);
   private:
-    void Free(); //free space
+    void free(); //free space
   };
   string ReturnAtomProperties(string atom);
   //Atomic Properties Database
@@ -3434,7 +3466,7 @@ namespace pocc {
     double mass,radius,Xi; //atomic, weight radius /pauling electronegativity
     void GetAtomicProperties(string);
   private:
-    void Free();
+    void free();
   };
 } // namespace pocc
 
@@ -3443,6 +3475,7 @@ namespace pocc {
   class Bond{
   public:
     Bond();
+    Bond(const Bond& b);
     ~Bond();
     _atom bgn,end;
     double length;
@@ -3452,7 +3485,8 @@ namespace pocc {
     bool operator!=(const Bond &other) const;
     friend ostream& operator<<(ostream&,const Bond&);
   private:
-    void Free();
+    void free();
+    void copy(const Bond& b);
   };
   void SetUFFPara(_atom atomi, _atom atomj, double& R0, double& Kij, double& Xij, double& Dij);
   double CalculateBondEnergy(xstructure xstr, _atom atomi, _atom atomj);
@@ -3674,9 +3708,9 @@ namespace SYM {
   bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan); //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190524 - need pointer for tolerance, otherwise it will not update
   deque<deque<_atom> > break_up_by_type(deque<_atom>& expanded_crystal);
   vector<vector<_atom> > break_up_by_type(vector<_atom> expanded_crystal);
-  double mod_one(double d); // DX 
-  _atom mod_one_atom(const _atom& atom_in); // CO
-  xvector<double> mod_one_xvec(xvector<double> a); // DX
+  //DX 20190905 [OBSOLETE] double mod_one(double d); // DX 
+  //DX 20190905 [OBSOLETE] _atom mod_one_atom(const _atom& atom_in); // CO
+  //DX 20190905 [OBSOLETE] xvector<double> mod_one_xvec(xvector<double> a); // DX
   bool CheckForIdentity(const xstructure& xstr); // DX
   bool checkSuperCellLatticePoints(xstructure& xstr, int& num_lattice_points, char& centering, uint& expand_size); // DX
   bool ComparePointGroupAndSpaceGroupString(xstructure& xstr, int& multiplicity_of_primitive, bool& derivative_structure); // DX
@@ -3731,8 +3765,8 @@ namespace spacegroup{
     std::vector<_sym_op> fgroup;                                  // rotations/inversions + incell_translations operations
     std::vector<_sym_op> pgroup;                                  // rotations/inversions
   private:                                                       // ---------------------------------------
-    void Free();                                                  // to free everything
-    void Copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
+    void free();                                                  // to free everything
+    void copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
   };
 
   extern std::vector<_spacegroup> vspacegroups;
@@ -4025,26 +4059,21 @@ namespace pflow {
     ~matrix(void) {};                         // destructor
     // accessors
     void print(void);
-    uint size(void) const {
-      return (uint) mat.size();}
+    uint size(void) const {return (uint) mat.size();}
     matrix<utype> transpose(void) const;
     //  matrix<utype>::iterator begin();
     //  matrix<utype>::iterator end();
     // operator
-    vector<utype>& operator[] (const int i) {
-      assert(i>=0 && i<=(int) mat.size()); return mat[i];}
-    const vector<utype>& operator[] (const int i) const {
-      assert(i>=0 && i<=(int) mat.size()); return mat[i];};
+    vector<utype>& operator[] (const int i) {assert(i>=0 && i<=(int) mat.size()); return mat[i];}
+    const vector<utype>& operator[] (const int i) const {assert(i>=0 && i<=(int) mat.size()); return mat[i];};
     const matrix<utype>& operator=(const matrix<utype>& b);
     // mutators
-    void push_back(const vector<utype>& inutypevec) {
-      mat.push_back(inutypevec);}
+    void push_back(const vector<utype>& inutypevec) {mat.push_back(inutypevec);}
     void pop_back(void) {mat.pop_back();}
     void vecvec2mat(const vector<vector<utype> >& inVV);
     void vec2mat(const vector<utype>& inV);
     void clear(void) {mat.clear();}
-    void insert(const int& id,const vector<utype>& inV) {
-      mat.insert(mat.begin()+id,inV);}
+    void insert(const int& id,const vector<utype>& inV) {mat.insert(mat.begin()+id,inV);}
     void erase(const int id);
     void erase_col(const int id);
   private:

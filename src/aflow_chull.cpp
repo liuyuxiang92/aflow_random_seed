@@ -19,6 +19,10 @@
 #include "aflow_chull_jupyter_requirements.cpp"  //MB190305
 #include "aflow_chull_python.cpp"  //MB190305
 
+
+#define _AFLOW_CHULL_PRINT_LOGO_1 TRUE
+#define _AFLOW_CHULL_PRINT_LOGO_2 FALSE
+
 // DEFINITIONS
 const std::string AFLOW_WEB = string("http://" + AFLOWLIB_MATERIALS_SERVER);
 const std::string NOMAD_WEB = string("http://www.nomad-coe.eu/");
@@ -420,7 +424,7 @@ namespace chull {
         stringstream output2; 
         string aflow_chull_jupyter_plotter_py=AFLOW_CHULL_JUPYTER_PLOTTER_PY;
         output2 << aflow_chull_jupyter_plotter_py;
-        aurostd::stringstream2file(output2,jupyter_directory+'/'+"plotter.py");
+        aurostd::stringstream2file(output2,jupyter_directory+'/'+"aflow_chull_plotter.py");
 
         stringstream output3;
         string aflow_chull_python_py=AFLOW_CHULL_PYTHON_PY;
@@ -621,7 +625,7 @@ namespace chull {
         vector<double> _coords;
         xvector<double> coords(dimension);
         aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
-        for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j]=_coords[j];}
+        for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
         if(LDEBUG) {cerr << soliloquy << " coords=" << coords << endl;}
         double dist2hull;
         //NB: to anyone who is using the convex hull object
@@ -649,12 +653,16 @@ namespace chull {
           hull_energy_ss << chull::convertUnits(dist2hull, (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
           oss << aurostd::wrapString(hull_energy_ss.str(),"{","}");
         } else {
-          message << "hull_energy[coords=";
-          for(int j=coords.lrows;j<=coords.urows;j++){
-            message << coords[j];
-            if(j!=((int)dimension)-1){message << ",";}
-          }
-          message << "] = ";
+          //[CO190801 - OBSOLETE]message << "hull_energy[coords=" << aurostd::joinWDelimiter(coords,",");
+          //[CO190801 - OBSOLETE]for(int j=coords.lrows;j<=coords.urows;j++){
+          //[CO190801 - OBSOLETE]  message << coords[j];
+          //[CO190801 - OBSOLETE]  if(j!=((int)dimension)-1){message << ",";}
+          //[CO190801 - OBSOLETE]}
+          //[CO190801 - OBSOLETE]message << "] = ";
+          uint precision=COEF_PRECISION;
+          double roundoff_tol=5.0*pow(10,-((int)precision)-1);
+          message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
+          message << " = ";
           if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << -chull::convertUnits(dist2hull, _m_) << " (meV/atom)";} //dist2hull here needs negative sign
           else {message << dist2hull << " (K)";}
           pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
@@ -7123,9 +7131,9 @@ double ConvexHull::getYTickDistance(double y_range,int approx_num_ticks,double r
   while(delta_pow<round_to_value){exponent+=1;delta_pow=delta*pow(10,exponent);}
   delta=delta_pow;
   int y_tick_distance_int;
-  y_tick_distance_int=roundDouble(delta,round_to_value,false);  //divisor is ~ # of ticks
+  y_tick_distance_int=roundDouble(delta,(int)round_to_value,false);  //divisor is ~ # of ticks  //CO190724 - explicit double->int conversion (floor is fine)
   if(y_tick_distance_int==0){ //aflow_BSm_hull.pdf, we need some NONZERO y_tick_distance_int
-    y_tick_distance_int=roundDouble(delta,round_to_value,true);  //divisor is ~ # of ticks
+    y_tick_distance_int=roundDouble(delta,(int)round_to_value,true);  //divisor is ~ # of ticks //CO190724 - explicit double->int conversion (floor is fine)
   }
   double y_tick_distance=y_tick_distance_int*pow(10,-exponent);
   if(LDEBUG) {
@@ -7259,10 +7267,10 @@ void ConvexHull::writeLatex() const {
   bool latex_interactive_mode=m_cflags.flag("CHULL::LATEX_INTERACTIVE");
   
   //FROM AFLOWRC
-  bool print_aflow_logo_full=true;  //otherwise print aflow_text
+  bool print_aflow_logo_full=_AFLOW_CHULL_PRINT_LOGO_1;  //otherwise print aflow_text
   bool print_aflow_text_logo=false;
   if(print_aflow_logo_full&&print_aflow_text_logo){print_aflow_text_logo=false;}
-  bool print_logo_2=true;
+  bool print_logo_2=_AFLOW_CHULL_PRINT_LOGO_2;
   bool print_aflow_webaddress_logo=true;
   if(print_logo_2&&print_aflow_webaddress_logo){print_aflow_webaddress_logo=false;}
   int banner_setting=DEFAULT_CHULL_LATEX_BANNER;
@@ -8127,8 +8135,8 @@ void ConvexHull::writeLatex() const {
     double y_range=abs(ymax-ymin);
     double round_to_value=getRoundToValue(point_range);
     double extra_padding=(point_range)*extra_padding_multiplier; //to avoid label clashing with axis, 20% should be enough
-    //int extra_padding=roundDouble((point_range)*0.2, round_to_value, false);  //round down to keep tight, unless you get 0, need more padding
-    //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, round_to_value, true);}
+    //int extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, false);  //round down to keep tight, unless you get 0, need more padding  //CO190724 - explicit double->int conversion (floor is fine)
+    //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, true);}  //CO190724 - explicit double->int conversion (floor is fine)
     
     //adding conversion between meV/atom to kJ/mol
     bool showkJmolaxis = m_formation_energy_hull;  //default
@@ -8226,7 +8234,7 @@ void ConvexHull::writeLatex() const {
         ymin=min_point;
         if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
           if(m_formation_energy_hull){ymin-=extra_padding;}  // CO 180227 - we need to avoid labels here
-          ymin=roundDouble(ymin,round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN
+          ymin=roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO190724 - explicit double->int conversion (floor is fine)
         }
       }
       // between highest label and top line, increase if need more
@@ -8236,7 +8244,7 @@ void ConvexHull::writeLatex() const {
         ymax=max_point;
         if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
           if(!m_formation_energy_hull){ymax+=extra_padding;}  // CO 180227 - we need to avoid labels here
-          ymax=roundDouble(ymax,round_to_value,true);  //we want max to be MORE POSITIVE, so round UP
+          ymax=roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO190724 - explicit double->int conversion (floor is fine)
         }
       }
       y_range=abs(ymax-ymin);
@@ -8254,8 +8262,8 @@ void ConvexHull::writeLatex() const {
         cerr << soliloquy << " min_point                                          = " << min_point << endl;
         cerr << soliloquy << " max_point                                          = " << max_point << endl;
         cerr << soliloquy << " round_to_value                                     = " << round_to_value << endl;
-        //cerr << soliloquy << " roundDouble(min_point,round_to_value,false)        = " << roundDouble(min_point, round_to_value, false) << endl;
-        //cerr << soliloquy << " roundDouble(max_point,round_to_value,true)         = " << roundDouble(max_point, round_to_value, true) << endl;
+        //cerr << soliloquy << " roundDouble(min_point,(int)round_to_value,false)        = " << roundDouble(min_point, (int)round_to_value, false) << endl; //CO190724 - explicit double->int conversion (floor is fine)
+        //cerr << soliloquy << " roundDouble(max_point,(int)round_to_value,true)         = " << roundDouble(max_point, (int)round_to_value, true) << endl;  //CO190724 - explicit double->int conversion (floor is fine)
         cerr << soliloquy << " extra_padding                                      = " << extra_padding << endl;
         cerr << soliloquy << " ymin                                               = " << ymin << endl;
         cerr << soliloquy << " ymax                                               = " << ymax << endl;
@@ -9863,7 +9871,7 @@ void ConvexHull::writeLatex() const {
               equilibrium_phases_CP.clear();
               //get header
               //misc = prettyPrintCompound(entry,gcd_vrt,true,latex_ft);
-              equilibrium_phases_header_TEX_ss << m_coord_groups[i_coord_group].getDim() << "-phase equilibria";
+              equilibrium_phases_header_TEX_ss << "vertex of facets (" << m_coord_groups[i_coord_group].getDim() << "-phase equilibria)";
               //equilibrium_phases_header_TEX_ss << " with " << misc;
               equilibrium_phases_header_TEX_ss << ":";
             }
@@ -9970,7 +9978,7 @@ void ConvexHull::writeLatex() const {
         print_scriterion=false;
         scriterion_data_ss.str("");
         if(m_coord_groups[i_coord_group].m_is_on_hull) {
-          _report_data_ss << " " << "(ground-state)";
+          _report_data_ss << " " << "(ground-state)"; // if ground-state
           if(m_coord_groups[i_coord_group].m_stability_criterion<AUROSTD_NAN){
             print_scriterion=true;
             tmp_precision=0;
@@ -9980,7 +9988,9 @@ void ConvexHull::writeLatex() const {
             scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),tmp_precision,true,tmp_roundoff_tol,FIXED_STREAM);
             scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
           }
-        }
+        } else {
+        _report_data_ss << " " << "(unstable)"; // if above hull	  
+	}
         // compound name
         main_TEX_ss << "\\multicolumn{" << vheaders.size()-(print_scriterion?num_cols_scriterion:0) << "}{l}{";
         main_TEX_ss << "\\cellcolor{white}\\normalsize{" + _report_data_ss.str();
@@ -11179,6 +11189,7 @@ void ConvexHull::writeWebApp() const {
       if(!point.m_has_entry) {
         data_helper_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\"";  //unary, so "" delimiter doesn't play a role
         if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
+        data_helper_ss.str(""); //WS190731 - patching quaternary hull writer issues
       } else {
         data_helper_ss << "\"" << entry.auid << "\"";
         points_data_JSON_vs.push_back(data_helper_ss.str());

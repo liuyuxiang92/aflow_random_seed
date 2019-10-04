@@ -373,7 +373,7 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       //JUNKAI aus << "export DISPLAY=:0.0" << endl << DEFAULT_KBIN_MATLAB_BIN << " -r " << string("apennsy") << endl;
       //JUNKAI aurostd::execute(aus);
       //JUNKAI aus.clear();aus.str(std::string());
-      //JUNKAI // aus << "mv *eps " << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2) << "/EPS/HULL/" << endl;
+      //JUNKAI // aus << "mv *eps " << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << endl;
       //JUNKAI aus << "rm -f apennsy.m" << endl;
       //JUNKAI aurostd::execute(aus);
 
@@ -391,7 +391,7 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       aus << "export DISPLAY=:0.0" << endl << DEFAULT_KBIN_MATLAB_BIN << " -r " << string("apennsy") << endl;
       aurostd::execute(aus);
       aus.clear();aus.str(std::string());
-      // aus << "mv *eps " << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2) << "/EPS/HULL/" << endl;
+      // aus << "mv *eps " << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << endl;
       if(!XHOST.vflag_control.flag("KEEP::MAT")) aus << "rm -f apennsy.m" << endl;
       aurostd::execute(aus);
     }
@@ -553,7 +553,7 @@ int Apennsymain(vector<string> &argv,vector<string> &cmds) {
       FileENERGY_LIB2X.close();
 
       aus.clear();aus.str(std::string());
-      // aus << "mv " << KBIN::VASP_PseudoPotential_CleanName(params.alloys.at(k)) << ".eps " << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2) << "/EPS/HULL/" << endl;
+      // aus << "mv " << KBIN::VASP_PseudoPotential_CleanName(params.alloys.at(k)) << ".eps " << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << endl;
       
       aus << XHOST.command("latex") << " " << namefile << ".tex  | grep -v Overfull | grep -v cmtt | grep -v type | grep -v BCC | grep -v share " << endl;
       // [OBSOLETE] aus << XHOST.command("dvips") << " " << namefile << ".dvi" << " -o " << namefile << ".eps" << endl;
@@ -1216,8 +1216,8 @@ string APENNSY_Parameters::APENNSY_EnergyList(bool _verbose,_aflags &aflags) {
 	string label=aurostd::PaddedPRE(aurostd::utype2string<uint>(ZLibrary.at(k).size()),3,"0");
 	oss << "\\newpage  %LATEX" << endl; 
 	oss << "\\cleardoublepage  %LATEX" << endl;
-	// oss << "\\psfig{file=" << "" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2) << "/EPS/HULL/" << alloysRAW.at(k) << "/" << speciesAB.at(k) << ".eps}  %LATEX" << endl;
-	// oss << "\\psfig{file=" << "" << vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2) << "/EPS/HULL/" << speciesAB.at(k) << ".eps}  %LATEX" << endl;
+	// oss << "\\psfig{file=" << "" << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << alloysRAW.at(k) << "/" << speciesAB.at(k) << ".eps}  %LATEX" << endl;
+	// oss << "\\psfig{file=" << "" << init::AFLOW_Projects_Directories("LIB2") << "/EPS/HULL/" << speciesAB.at(k) << ".eps}  %LATEX" << endl;
 	// oss << "\\psfig{file=" << speciesAB.at(k) << "."+label << ".eps}  %LATEX" << endl;
 	oss << "\\psfig{file=" << speciesAB.at(k) << ".eps}  %LATEX" << endl;
 	oss << "\\clearpage  %LATEX" << endl;

@@ -407,7 +407,7 @@ the point density, and the frequency unit.
 
       The default specifier is THZ|ALLOW_NEGATIVE.
 
-3.2  Phonon Density of States
+3.2.  Phonon Density of States
 
 The phonon density of states (pDOS) are saved into the file aflow.apl.phonon_dos.out. Besides the
 pDOS, this file also contains the frequencies in THz, the wavenumbers in inverse cm, and the
@@ -444,7 +444,23 @@ mesh, the number of energy points, and the smearing width.
         [AFLOW_APL]DOSSMEAR=0.05
 
       This is especially important for the RS method. The default is 0.05 for the RS method and
-      0.0 for the LT method (i.e. no smearing). 
+      0.0 for the LT method (i.e. no smearing).
+
+Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
+
+        [AFLOW_APL]DOSPROJECTIONS_CART=1,0,0;0,1,0;0,0,1
+                                 or
+        [AFLOW_APL]DOSPROJECTIONS_FRAC=-1,1,1;1,-1,1;1,1,-1
+
+Where DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC give the projection directions in Cartesian and
+fractional coordinates, respectively. It is not possible to choose both options. If neither options
+is populated, projected DOS will not be calculated.
+
+Each projection vector triplet needs to be separated by a semicolon, and the coordinates inside the
+triplets must be separated by commas. The projection vectors have to be given in Cartesian
+coordinates. Per default, both are turned off.
+
+Projected DOS are currently only available for the linear tetrahedron method.
 
 3.3. Thermodynamic Properties
 

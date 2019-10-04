@@ -82,14 +82,14 @@ namespace aurostd {
 // FILES creation/destruction
 namespace aurostd {
   string TmpFileCreate(string identifier) {
-    string str=XHOST.Tmpfs+"/_aflow_"+identifier+"."+XHOST.User+".pid"+XHOST.ostrPID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp";
+    string str=XHOST.tmpfs+"/_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp";
     // cerr << str << endl;
     return str;
   }
   string TmpFileCreate(void) {
     return TmpFileCreate("");}
   string TmpDirectoryCreate(string identifier) {
-    string dir=XHOST.Tmpfs+"/_aflow_"+identifier+"_"+XHOST.User+"_pid"+XHOST.ostrPID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";
+    string dir=XHOST.tmpfs+"/_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";
     DirectoryMake(dir);
     return dir;}
   string TmpDirectoryCreate(void) {
@@ -1612,7 +1612,7 @@ namespace aurostd {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
-    // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.User+"/");
+    // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.user+"/");
     aurostd::StringSubst(fileOUT,"//","/");
     aurostd::StringSubst(fileOUT,"/./","/");
     aurostd::StringSubst(fileOUT,"*","\"*\"");
@@ -4378,15 +4378,55 @@ namespace aurostd {
   }
 
   bool withinList(const vector<string>& list,const string& input) { //CO181010
-    for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}
-    return false;
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
+    int index;
+    return withinList(list, input, index);
   }
   bool withinList(const vector<int>& list,int input) {  //CO181010
-    for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}
-    return false;
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
+    int index;
+    return withinList(list, input, index);
   }
   bool withinList(const vector<uint>& list,uint input) {  //CO181010
-    for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}
+    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME190905
+    //return false;  OBSOLETE ME190905
+    int index;
+    return withinList(list, input, index);
+  }
+
+  // ME190813 - added versions that also determine the index of the item in the list
+  bool withinList(const vector<string>& list, const string& input, int& index) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
+  bool withinList(const vector<int>& list, int input, int& index) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
+  bool withinList(const vector<uint>& list, uint input, int& index) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(list[i]==input) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
     return false;
   }
 

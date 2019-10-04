@@ -37,8 +37,8 @@ namespace spacegroup {
     std::vector<_sym_op> fgroup;                                  // rotations/inversions + incell_translations operations
     std::vector<_sym_op> pgroup;                                  // rotations/inversions
    private:                                                       // ---------------------------------------
-    void Free();                                                  // to free everything
-    void Copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
+    void free();                                                  // to free everything
+    void copy(const _spacegroup& b);                               // the flag is necessary because sometimes you need to allocate the space.
     };
   */
   std::vector<_spacegroup> vspacegroups;
@@ -149,7 +149,7 @@ namespace spacegroup {
 
 // ****************************************************
 namespace spacegroup {
-  void _spacegroup::Free() {
+  void _spacegroup::free() {
   }
   
   // Constructors
@@ -163,7 +163,7 @@ namespace spacegroup {
     pgroup.clear();
   }
   
-  void _spacegroup::Copy(const _spacegroup& a) {
+  void _spacegroup::copy(const _spacegroup& a) {
     // All the other stuff not set in the constructor
     number=a.number;
     option=a.option;
@@ -201,9 +201,9 @@ namespace spacegroup {
   
   // copy
   _spacegroup::_spacegroup(const _spacegroup& b) {
-    //  Free();
+    //  free();
     // *this=b;
-    Copy(b);
+    copy(b);
   }
   
   // destructor
