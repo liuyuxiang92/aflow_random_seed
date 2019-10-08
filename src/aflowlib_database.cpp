@@ -403,7 +403,8 @@ void AflowDB::populateTable(const string& table, const vector<string>& columns, 
 
   // Create indexes on important database properties
   vector<string> index_cols;
-  aurostd::string2tokens("auid,catalog,nspecies", index_cols, ",");
+  string indexes = "auid,aurl,catalog,compound,nspecies,Pearson_symbol_relax,spacegroup_relax";
+  aurostd::string2tokens(indexes, index_cols, ",");
   string index, index_expression;
   for (uint i = 0; i < index_cols.size(); i++) {
     index = "index_" + table + "_" + index_cols[i];
