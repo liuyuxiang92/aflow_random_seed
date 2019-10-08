@@ -228,6 +228,7 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
   is_tmp = false;
 
   aurostd::string2file("", lock_file);
+  if (copied) aurostd::ChmodFile("444", database_file);
   return copied;
 }
 
