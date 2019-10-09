@@ -36,9 +36,7 @@ static const double hbar_J = E_ELECTRON * 1e12 * hbar;  // hbar in J/THz;
 static const double hbar_amu = hbar * au2THz * 1e13;  // hbar in amu A^2 THz
 static const double BEfactor = hbar*1e12/KBOLTZEV;  // hbar/kB in K/THz
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
-static const double scatt_multi[2][3] = {{1.0, 0.5, 0},
-                                          {0.5, 0.5, 1.0/6.0}};
-static const double ps_prefactors[2] = {2.0/3.0, 6.0/7.0};
+static const double scatt_multi[2] = {1.0, 0.5};
 
 using aurostd::xcomplex;
 using aurostd::xmatrix;
@@ -90,7 +88,6 @@ TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm,
   nBranches = _pc.getNumberOfBranches();
   nQPs = _qm.getnQPs();
   nIQPs = _qm.getnIQPs();
-  pcell = _pc.getInputCellStructure();
 }
 
 TCONDCalculator::~TCONDCalculator() {
@@ -107,14 +104,16 @@ void TCONDCalculator::free() {
   freq.clear();
   gvel.clear();
   intr_trans_probs.clear();
-  irred_qpts_symops.clear();
+  intr_trans_probs_iso.clear();
   nBranches = 0;
   nIQPs = 0;
   nQPs = 0;
   processes.clear();
+  processes_iso.clear();
+  rates_boundary.clear();
+  rates_isotope.clear();
   temperatures.clear();
   thermal_conductivity.clear();
-  tmpdir = "";
 }
 
 }  // namespace apl
@@ -124,12 +123,6 @@ void TCONDCalculator::free() {
 namespace apl {
 
 void TCONDCalculator::calculateThermalConductivity() {
-  // Setup temporary directory
-  //tmpdir = aurostd::TmpDirectoryCreate("TCOND") + "/";
-  tmpdir = "./test/";
-  if (aurostd::IsDirectory(tmpdir)) aurostd::RemoveDirectory(tmpdir);
-  aurostd::DirectoryMake(tmpdir);
-
   // Setup temperatures
   double tstart, tend, tstep;
   tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
@@ -143,10 +136,6 @@ void TCONDCalculator::calculateThermalConductivity() {
   writeTempIndepOutput(DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE, "Frequency", "THz", freq);
   writeGroupVelocities();
 
-  //int max_order = 3;
-  //if (calc_options.flag("FOURTH_ORDER")) max_order = 4;
-  //for (int order = 3; order <= max_order; order++) calculateScatteringProcesses(order, trans_map);
-
   calculateTransitionProbabilities();
 
   vector<vector<int> > small_groups = calculateSmallGroups();
@@ -154,40 +143,6 @@ void TCONDCalculator::calculateThermalConductivity() {
   for (uint t = 0; t < temperatures.size(); t++) {
     thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], small_groups);
   }
-  //aurostd::RemoveDirectory(tmpdir);
-}
-
-} // namespace apl
-
-namespace apl {
-
-vector<vector<vector<vector<xcomplex<double> > > > > TCONDCalculator::calculatePhases() {
-  const xstructure& scell = _pc.getSuperCellStructure();
-  const xstructure& pcell = _pc.getInputCellStructure();
-  const vector<int>& sc2pcMap = _pc.getSupercell()._sc2pcMap;
-  const vector<int>& pc2scMap = _pc.getSupercell()._pc2scMap;
-  uint niatoms = pcell.atoms.size();
-  uint natoms = scell.atoms.size();
-  vector<vector<vector<vector<xcomplex<double> > > > > phases(niatoms, vector<vector<vector<xcomplex<double> > > >(natoms, vector<vector<xcomplex<double> > >(nQPs, vector<xcomplex<double> >(2))));
-
-  int at_eq, at_eq_sc, iat_sc;
-  xvector<double> min_vec(3);
-  for (uint iat = 0; iat < niatoms; iat++) {
-    iat_sc = pc2scMap[iat];
-    const xvector<double>& iat_cpos = scell.atoms[iat_sc].cpos;
-    for (uint at = 0; at < natoms; at++) {
-      min_vec = SYM::minimizeDistanceCartesianMethod(scell.atoms[at].cpos, iat_cpos, scell.lattice);
-      at_eq = sc2pcMap[at];
-      at_eq_sc = pc2scMap[at_eq];
-      min_vec += iat_cpos;
-      min_vec -= scell.atoms[at_eq_sc].cpos;
-      for (int q = 0; q < nQPs; q++) {
-        phases[iat][at][q][0] = exp(iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
-        phases[iat][at][q][1] = conj(phases[iat][at][q][0]);
-      }
-    }
-  }
-  return phases;
 }
 
 vector<vector<int> > TCONDCalculator::calculateSmallGroups() {
@@ -245,124 +200,6 @@ void TCONDCalculator::calculateFrequenciesGroupVelocities() {
 #endif
 }
 
-/*
-//calculateFrequenciesGroupVelocities/////////////////////////////////////////
-// Calculates the frequencies and group velocities for each q-point.
-void TCONDCalculator::calculateFrequenciesGroupVelocities() {
-  _logger << "Calculating frequencies and group velocities." << apl::endl;
-  eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nBranches, nBranches));
-  freq.resize(nQPs, vector<double>(nBranches));
-  gvel.resize(nQPs, vector<xvector<double> >(nBranches, xvector<double>(3)));
-
-  vector<vector<int> > irred_qpts;
-  vector<vector<int> > symops;
-  reduceByFGroup(irred_qpts, symops);
-  uint nirred = irred_qpts.size();
-
-  const vector<_sym_op>& fgroup = _pc.getInputCellStructure().fgroup;
-  xvector<double> f;
-  vector<xmatrix<xcomplex<double> > > dDynMat(3, xmatrix<xcomplex<double> >(nBranches, nBranches));
-  for (uint i = 0; i < nirred; i++) {
-    int iq = irred_qpts[i][0];
-    // Frequencies
-    f = _pc.getFrequency(_qm.getQPoint(iq).cpos, apl::THZ | apl::OMEGA, eigenvectors[iq], dDynMat);
-    freq[iq] = aurostd::xvector2vector(f);  // Convert to vector to have same indexing as gvel
-    // Group velocities
-    vector<xvector<double> > gv(nBranches, xvector<double>(3));
-    xmatrix<xcomplex<double> > eigen_conj = trasp(eigenvectors[iq]);
-    for (int br = 0; br < nBranches; br++) {
-      if (freq[iq][br] > _AFLOW_APL_EPS_) {
-        for (int j = 1; j < 4; j++) {
-          gv[br][j] = real(eigen_conj(br + 1) * (dDynMat[j - 1] * eigenvectors[iq].getcol(br + 1)));
-        }
-      }
-      gvel[iq][br] = gv[br];
-    }
-
-    // Transform
-    uint nq = irred_qpts[i].size();
-    for (uint j = 1; j < nq; j++) {
-      int q = irred_qpts[i][j];
-      xmatrix<xcomplex<double> > Gamma = calculateGamma(q, symops[i][j]);
-      // Frequencies
-      freq[q] = freq[iq];
-      // Eigenvectors
-      eigenvectors[q] = Gamma * eigenvectors[iq];
-      // Group velocities
-      const xmatrix<double>& Uc = fgroup[symops[i][j]].Uc;
-      for (int br = 0; br < nBranches; br++) {
-        gvel[q][br] = Uc * gv[br];
-      }
-    }
-  }
-}
-*/
-
-//reduceByFGroup//////////////////////////////////////////////////////////////
-// Reduce the q-point grid by the factor group. This is necessary to get the
-// proper symmetry operations for the Gamma matrices (see calculateGamma).
-void TCONDCalculator::reduceByFGroup(vector<vector<int> >& irred_qpts,
-                                     vector<vector<int> >& symops) {
-  irred_qpts.clear();
-  symops.clear();
-  const vector<_sym_op>& fgroup = _pc.getInputCellStructure().fgroup;
-  uint nsym = fgroup.size();
-
-  vector<xmatrix<double> > Uf_rec(nsym);
-  for (uint isym = 0; isym < nsym; isym++) Uf_rec[isym] = trasp(inverse(fgroup[isym].Uf));
-
-  vector<int> trans(nsym, -1);
-  vector<vector<int> > irred_trans;
-  for (int q = 0; q < nQPs; q++) {
-    bool append = true;
-    for (uint isym = 0; isym < nsym; isym++) {
-      for (uint iq = 0; iq < irred_qpts.size(); iq++) {
-        if (irred_trans[iq][isym] == q) {
-          append = false;
-          irred_qpts[iq].push_back(q);
-          symops[iq].push_back(isym);
-          isym = nsym;
-          iq = irred_qpts.size();
-        }
-      }
-    }
-    if (append) {
-      vector<int> ir(1, q), so(1, 0);
-      irred_qpts.push_back(ir);
-      symops.push_back(so);
-      for (uint isym = 0; isym < nsym; isym++) {
-        trans[isym] = _qm.getQPointIndex(Uf_rec[isym] * _qm.getQPoint(q).fpos);
-      }
-      irred_trans.push_back(trans);
-    }
-  }
-}
-
-//calculateGamma//////////////////////////////////////////////////////////////
-// Calculates the Gamma matrix (see Eq. 2.37 in DOI: 10.1103/RevModPhys.40.1).
-xmatrix<xcomplex<double> > TCONDCalculator::calculateGamma(int q, int isym) {
-  const xstructure& pcell = _pc.getInputCellStructure();
-  uint natoms = pcell.atoms.size();
-  const _sym_op& fgroup = pcell.fgroup[isym];
-
-  const xvector<double>& qpt = _qm.getQPoint(q).cpos;
-
-  xmatrix<xcomplex<double> > Gamma(nBranches, nBranches);
-  xvector<double> dx(3);
-  xcomplex<double> phase;
-  for (uint at = 0; at < natoms; at++) {
-    int at_map = pcell.fgroup[isym].basis_atoms_map[at];
-    dx = inverse(fgroup.Uc) * pcell.atoms[at].cpos - pcell.atoms[at_map].cpos;
-    phase = exp(iONE * scalar_product(qpt, dx));
-    for (int i = 1; i < 4; i++) {
-      for (int j = 1; j < 4; j++) {
-        Gamma[3 * at_map + i][3 * at + j] = fgroup.Uc[i][j] * phase;
-      }
-    }
-  }
-  return Gamma;
-}
-
 //calculateFreqGvel///////////////////////////////////////////////////////////
 // Calculates the frequencies and group velocities using the eigenvalue
 // solver implemented in apl::PhononCalculator.
@@ -395,315 +232,53 @@ void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
 
 }  // namespace apl
 
-/*************************** SCATTERING PROCESSES ***************************/
-
-namespace apl {
-
-/*
-void TCONDCalculator::getInequivalentQPointSet(int order) {
-  const int o1 = order - 1;
-  const int o2 = order - 2;
-
-  const xstructure& pcell = _pc.getInputCellStructure();
-  uint natoms = pcell.atoms.size();
-  const vector<_sym_op>& fgroup = pcell.fgroup;
-
-  int o;
-  vector<vector<bool> > signs = getSigns(order);
-  uint nsigns = signs.size();
-
-  aurostd::xcombos qpts_combo(nQPs, o2, 'E', true);
-
-  vector<int> set(o1), set_sorted(o1), qpts(o2);
-  string path = "irred." + aurostd::utype2string<int>(order) + ".";
-  xvector<double> qsum(3);
-  int nprocs = nsigns * nIQPs;
-  for (int i = startIndex; i < endIndex; i++) {
-    int iq = _qm.getIbzqpts()[i];
-    string irredfile = path + aurostd::utype2string<int>(i);
-    ofstream irredfl;
-    openTmpFile(irredfl, irredfile);
-
-    vector<int> small_group;
-    uint nsym = small_group.size();
-
-    vector<vector<int> > trans_map(nsym, vector<int>(nQPs));
-    for (uint isym = 0; isym < nsym; isym++) {
-      for (int q = 0; q < nQPs; q++) {
-        trans_map[isym][q]= _qm.getQPointIndex(fgroup[small_group[isym]].Uf * _qm.getQPoint(q).fpos);
-      }
-    }
-
-    vector<xmatrix<double> > trans_eigen(nsym, xmatrix<double>(nBranches, nBranches));
-    for (uint isym = 0; isym < nsym; isym++) {
-      for (uint at = 0; at < natoms; at++) {
-        int at_map = fgroup[isym].basis_atoms_map[at];
-        for (int r = 1; r < 4; r++) {
-          for (int c = 1; c < 4; c++) {
-            trans_eigen[isym][3 * at_map + r][3 * at + c] = fgroup[small_group[isym]].Uc[r][c];
-          }
-        }
-      }
-    }
-
-    for (uint s = 0; s < nsigns; s++) {
-      vector<int> ineq_sets_index, weights;
-      vector<vector<int> > ineq_sets;
-      qpts_combo.reset();
-      int q = 0;
-      int nsets = 0;
-      int iset;
-      uint isym;
-      while (qpts_combo.increment()) {
-        qpts = qpts_combo.getCombo();
-        qsum = _qm.getQPoint(iq).fpos;
-        for (o = 0; o < o2; o++) {
-          if (signs[s][o]) qsum -= _qm.getQPoint(qpts[o]).fpos;
-          else qsum += _qm.getQPoint(qpts[o]).fpos;
-          set[o] = qpts[o];
-        }
-        set[o2] = _qm.getQPointIndex(qsum);
-        for (isym = 0; isym < nsym; isym++) {
-          for (o = 0; o < o2; o++) {
-            if (signs[s][o]) set_sorted[o] = -trans_map[small_groups[isym]][set[o]];
-            else set_sorted[o] = trans_map[small_groups[i][isym]][set[o]];
-          }
-          set_sorted[o2] = -trans_map[small_groups[isym]][set[o2]];
-          std::sort(set_sorted.begin(), set_sorted.end());
-          for (iset = 0; iset < nsets; iset++) {
-            for (o = 0; o < o1; o++) {
-              if (set_sorted[o] != ineq_sets[iset][o]) break;
-            }
-            if (o == o1) break;
-          }
-          if (iset != nsets) {
-            if (isym == 0) break;  // Identity means it is a permutation
-            else {
-              for (o = 0; o < o1; o++) {
-                if (eigenvectors[std::abs(set_sorted[o])] != trans_eigen[isym] * eigenvectors[std::abs(ineq_sets[iset][o])]) break;
-              }
-              if (o != o1) break;
-            }
-          }
-        }
-        if (isym == nsym) {
-          ineq_sets_index.push_back(q);
-          for (o = 0; o < o2; o++) {
-            if (signs[s][o]) set[o] = -set[o];
-          }
-          set[o2] = -set[o2];
-          std::sort(set.begin(), set.end());
-          ineq_sets.push_back(set);
-          nsets++;
-          weights.push_back(1);
-        } else {
-          weights[iset]++;
-        }
-        q++;
-      }
-      std::cout << "nsets = " << nsets << std::endl;
-      exit(0);
-      irredfl.write((char*)(&nsets), sizeof(int));
-      for (uint q = 0; q < ineq_sets_index.size(); q++) {
-        char w = (char) weights[q];
-        irredfl.write((char*)(&ineq_sets_index[q]), sizeof(int));
-        irredfl.write((char*)(&w), sizeof(char));
-      }
-      _logger.updateProgressBar(1.0/nprocs);
-    }
-    closeTmpFile(irredfl, irredfile);
-  }
-}
-*/
-
-vector<vector<bool> > TCONDCalculator::getSigns(int order) {
-  const int o2 = order - 2;
-  vector<vector<bool> > signs;
-  aurostd::xcombos sign_combos(2, o2, 'C', true);
-  while (sign_combos.increment()) {
-    vector<bool> sgn(o2);
-    for (int o = 0; o < o2; o++) {
-      if (sign_combos.getCombo()[o] == 0) sgn[o] = false;
-      else sgn[o] = true;
-    }
-    signs.push_back(sgn);
-  }
-  return signs;
-}
-
-}
-
 /********************************** WEIGHTS *********************************/
 
 namespace apl {
-
-double TCONDCalculator::calculateIntegrationWeights(int order, const LTMethod& _lt) {
-  _logger << "Calculating integration weights" << apl::endl;
-  string message = "Calculating weights";
-  double phase_space = 0.0;
-  vector<double> ps(nIQPs);
-  _logger.initProgressBar(message);
-  calculateWeightsLT(_lt, order, 0, nIQPs, ps);
-  _logger.finishProgressBar();
-/*
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-  vector<std::thread*> threads;
-  int ncpus;
-  _pc.get_NCPUS(ncpus);
-  vector<vector<int> > thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
-  for (int icpu = 0; icpu < ncpus; icpu++) {
-    threads.push_back(new std::thread(&TCONDCalculator::calculateWeightsLT, this,
-                      std::ref(_lt), order, thread_dist[icpu][0], thread_dist[icpu][1], std::ref(ps)));
-  }
-  finishMPI(threads, _logger);
-#else
-  _logger.initProgressBar(message);
-  calculateWeightsLT(_lt, order, 0, nIQPs, ps);
-  _logger.finishProgressBar();
-#endif
-*/
-  for (int i = 0; i < nIQPs; i++) phase_space += ps[i];
-  return phase_space;
-}
-
-void TCONDCalculator::calculateWeightsLT(const LTMethod& _lt, int order,
-                                         int startIndex, int endIndex, vector<double>& ps) {
-  vector<vector<int> > branches;
-  vector<double> frequencies(nQPs), weights(nQPs);
-  xvector<double> qsum;
-  vector<int> lastq(nQPs);
-  double freq_ref;
-  vector<bool> zerofreq(nQPs);
-  uint b, s;
-  int iq, qpt, q, o;
-  bool sign;
-
-  const int o2 = order - 2;
-  const int o3 = order - 3;
-  const double prefactor = ps_prefactors[o3]/(std::pow(nBranches, order) * std::pow(nQPs, o2));
-
-  string pathp, pathw, filenamep, filenamew;
-  pathp = "proc.unfiltered." + aurostd::utype2string<int>(order) + ".";
-  pathw = "wght." + aurostd::utype2string<int>(order) + ".";
-
-  aurostd::xcombos qpt_combos(nQPs, o3, 'E', true);
-  vector<vector<bool> > signs = getSigns(order);
-  uint nsigns = signs.size();
-
-  aurostd::xcombos branch_combos(nBranches, order, 'E', true);
-  while (branch_combos.increment()) branches.push_back(branch_combos.getCombo());
-  uint nbr = branches.size();
-
-  int nprocs = nsigns * nIQPs;
-
-  for (int i = startIndex; i < endIndex; i++) {
-    ofstream outp, outw;
-    iq = _qm.getIbzqpts()[i];
-    filenamew = pathw + aurostd::utype2string<int>(i);
-    filenamep = pathp + aurostd::utype2string<int>(i);
-    openTmpFile(outp, filenamep);
-    openTmpFile(outw, filenamew);
-    for (s = 0; s < nsigns; s++) {
-      int c = 0;
-      qpt_combos.reset();
-      bool increment = ((order == 3) || qpt_combos.increment());
-      while (increment) {
-        const vector<int>& qpoints = qpt_combos.getCombo();
-        qsum = _qm.getQPoint(iq).fpos;
-        for (o = 0; o < o3; o++) {
-          if (signs[s][o]) qsum -= _qm.getQPoint(qpoints[o]).fpos;
-          else qsum += _qm.getQPoint(qpoints[o]).fpos;
-        }
-        for (q = 0; q < nQPs; q++) {
-          if (signs[s][o3]) lastq[q] = _qm.getQPointIndex(qsum - _qm.getQPoint(q).fpos);
-          else lastq[q] = _qm.getQPointIndex(qsum + _qm.getQPoint(q).fpos);
-        }
-        for (b = 0; b < nbr; b++) {
-          freq_ref = freq[iq][branches[b][0]];
-          if (1 || freq_ref > _AFLOW_APL_EPS_) {
-            for (o = 0; o < o3; o++) {
-              if (freq[qpoints[o]][branches[b][o+1]] < _AFLOW_APL_EPS_) break;
-              if (signs[s][o]) freq_ref -= freq[qpoints[o]][branches[b][o + 1]];
-              else freq_ref += freq[qpoints[o]][branches[b][o + 1]];
-            }
-            if (o == o3) {
-              for (q = 0; q < nQPs; q++) {
-                zerofreq[q] = ((freq[q][branches[b][o2]] < _AFLOW_APL_EPS_) || (freq[lastq[q]][branches[b].back()] < _AFLOW_APL_EPS_));
-                if (signs[s][o3]) frequencies[q] = freq[q][branches[b][o2]];
-                else frequencies[q] = -freq[q][branches[b][o2]];
-                frequencies[q] += freq[lastq[q]][branches[b].back()];
-              }
-              weights = getWeightsLT(_lt, freq_ref, frequencies);
-              for (q = 0; q < nQPs; q++) {
-                if (!zerofreq[q] && (weights[q] > _ZERO_TOL_)) {
-                  outw.write((char*)(&weights[q]), sizeof(double));
-                  for (o = 0; o < o2; o++) {
-                    sign = signs[s][o];
-                    outp.write((char*)(&sign), sizeof(bool));
-                  }
-                  qpt = c + q;
-                  outp.write((char*)(&qpt), sizeof(int));
-                  outp.write((char*)(&b), sizeof(int));
-                  ps[i] += scatt_multi[o3][s] * weights[q];
-                }
-              }
-            }
-          }
-        }
-        increment = qpt_combos.increment();
-        c += nQPs;
-      }
-      _logger.updateProgressBar(1.0/nprocs);
-    }
-    ps[i] *= _qm.getWeights()[i] * prefactor;
-    closeTmpFile(outp, filenamep);
-    closeTmpFile(outw, filenamew);
-  }
-}
-
-#ifdef ALAMODE
 
 double fij(double ei, double ej, double e) {
   return (e - ej)/(ei - ej);
 }
 
-void insertion_sort(double *a, int *ind, int n) {
-  int i;
-  for (i = 0; i < n; ++i) ind[i] = i;
-  for (i = 1; i < n; ++i) {
-    double tmp = a[i];
-    int j = i;
-    while (j > 0 && tmp < a[j - 1]) {
-      a[j] = a[j - 1];
-      ind[j] = ind[j - 1];
-      --j;
-    }
-    a[j] = tmp;
-    ind[j] = i;
-  }
-}
-
-vector<double> TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
-                                             const vector<double>& energy) {
-  vector<double> weight(nQPs);
+void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
+                                   const vector<double>& energy, vector<double>& weights) {
+  for (int q = 0; q < nQPs; q++) weights[q] = 0;
   const vector<vector<int> >& corners = _lt.getTetrahedra();
   double vol = _lt.getVolumePerTetrahedron();
+  int ntet = _lt.getnTetrahedra();
 
-  double g;
+  double g, tmp;
+  int i, j, ii, jj;
 
   double e_tmp[4];
   int sort_arg[4], kindex[4];
 
-  for (int i = 0; i < _lt.getnTetrahedra(); ++i) {
-    for (int j = 0; j < 4; ++j) {
+  for (i = 0; i < ntet; i++) {
+    for (j = 0; j < 4; j++) {
       e_tmp[j] = energy[corners[i][j]];
       kindex[j] = corners[i][j];
     }
-    insertion_sort(e_tmp, sort_arg, 4);
+
+    for (ii = 0; ii < 4; ii++) sort_arg[ii] = ii;
+
+    for (ii = 0; ii < 4; ii++) {
+      tmp = e_tmp[ii];
+      jj = ii;
+      while (jj > 0 && tmp < e_tmp[jj - 1]) {
+        e_tmp[jj] = e_tmp[jj - 1];
+        sort_arg[jj] = sort_arg[jj - 1];
+        jj--;
+      }
+      e_tmp[jj] = tmp;
+      sort_arg[jj] = ii;
+    }
+
     double e1 = e_tmp[0];
     double e2 = e_tmp[1];
     double e3 = e_tmp[2];
     double e4 = e_tmp[3];
+
+    if (aurostd::isequal(e1, e4)) continue;
 
     int k1 = kindex[sort_arg[0]];
     int k2 = kindex[sort_arg[1]];
@@ -741,241 +316,12 @@ vector<double> TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
         I4 = g * fij(e4, e1, e_ref);
 
     }
-    weight[k1] += vol * I1;
-    weight[k2] += vol * I2;
-    weight[k3] += vol * I3;
-    weight[k4] += vol * I4;
+    weights[k1] += vol * I1;
+    weights[k2] += vol * I2;
+    weights[k3] += vol * I3;
+    weights[k4] += vol * I4;
   }
-  return weight;
 }
-
-double TCONDCalculator::integrate(const LTMethod& _lt, double e_ref,
-                                  const vector<double>& f, const vector<double>& energy) {
-  double ret = 0.0;
-  double I1, I2, I3, I4;
-
-  double frac3 = 1.0 / 3.0;
-  double g;
-
-  const vector<vector<int> >& corners = _lt.getTetrahedra();
-  double vol = _lt.getVolumePerTetrahedron();
-
-  vector<std::pair<double, double> > tetra_data(4);
-
-  for (int i = 0; i < _lt.getnTetrahedra(); ++i) {
-
-    for (uint j = 0; j < 4; j++) {
-      int knum = corners[i][j];
-      tetra_data[j].first = energy[knum];
-      tetra_data[j].second = f[knum];
-    }
-
-    std::sort(tetra_data.begin(), tetra_data.end());
-
-    double e1 = tetra_data[0].first;
-    double e2 = tetra_data[1].first;
-    double e3 = tetra_data[2].first;
-    double e4 = tetra_data[3].first;
-
-    double f1 = tetra_data[0].second;
-    double f2 = tetra_data[1].second;
-    double f3 = tetra_data[2].second;
-    double f4 = tetra_data[3].second;
-
-    if (e3 <= e_ref && e_ref < e4) {
-        g = 3.0 * std::pow(e4 - e_ref, 2) / ((e4 - e1) * (e4 - e2) * (e4 - e3));
-
-        I1 = frac3 * fij(e1, e4, e_ref);
-        I2 = frac3 * fij(e2, e4, e_ref);
-        I3 = frac3 * fij(e3, e4, e_ref);
-        I4 = frac3 * (fij(e4, e1, e_ref) + fij(e4, e2, e_ref) + fij(e4, e3, e_ref));
-
-        ret += vol * g * (I1 * f1 + I2 * f2 + I3 * f3 + I4 * f4);
-
-    } else if (e2 <= e_ref && e_ref < e3) {
-        g = 3.0 * (e2 - e1 + 2.0 * (e_ref - e2) - (e4 + e3 - e2 - e1)
-            * std::pow(e_ref - e2, 2) / ((e3 - e2) * (e4 - e2))) / ((e3 - e1) * (e4 - e1));
-
-        I1 = frac3 * fij(e1, e4, e_ref) * g + fij(e1, e3, e_ref) * fij(e3, e1, e_ref) * fij(e2, e3, e_ref) / (e4 -
-            e1);
-        I2 = frac3 * fij(e2, e3, e_ref) * g + std::pow(fij(e2, e4, e_ref), 2) * fij(e3, e2, e_ref) / (e4 - e1);
-        I3 = frac3 * fij(e3, e2, e_ref) * g + std::pow(fij(e3, e1, e_ref), 2) * fij(e2, e3, e_ref) / (e4 - e1);
-        I4 = frac3 * fij(e4, e1, e_ref) * g + fij(e4, e2, e_ref) * fij(e2, e4, e_ref) * fij(e3, e2, e_ref) / (e4 -
-            e1);
-
-        ret += vol * (I1 * f1 + I2 * f2 + I3 * f3 + I4 * f4);
-
-    } else if (e1 <= e_ref && e_ref < e2) {
-        g = 3.0 * std::pow(e_ref - e1, 2) / ((e2 - e1) * (e3 - e1) * (e4 - e1));
-
-        I1 = frac3 * (fij(e1, e2, e_ref) + fij(e1, e3, e_ref) + fij(e1, e4, e_ref));
-        I2 = frac3 * fij(e2, e1, e_ref);
-        I3 = frac3 * fij(e3, e1, e_ref);
-        I4 = frac3 * fij(e4, e1, e_ref);
-
-        ret += vol * g * (I1 * f1 + I2 * f2 + I3 * f3 + I4 * f4);
-
-    }
-    
-  }
-  return ret;
-}
-
-#else
-
-vector<double> TCONDCalculator::getWeightsLT(const LTMethod& _lt, double freq_ref,
-                                             const vector<double>& _freqs) {
-  vector<double> weights(nQPs);
-  double f[4], w[4];
-  int k[4];
-  const vector<vector<int> >& corners = _lt.getTetrahedra();
-  double vol = _lt.getVolumePerTetrahedron();
-
-  int i, j;
-  double t, t2;
-
-  // Shorthands for weight calculations. Will only populate necessary values.
-  // For notation and formulas, see DOI 10.1007/978-3-642-25864-0_9.
-  double E[4];
-  double eps[4][4];
-
-  for (int itet = 0; itet < _lt.getnTetrahedra(); itet++) {
-    for (int icorner = 0; icorner < 4; icorner++) {
-      f[icorner] = _freqs[corners[itet][icorner]];
-      k[icorner] = icorner;
-    }
-    // Perform an explicit insertion sort to keep track of swaps
-    for (i = 1; i < 4; i++) {
-      t = f[i];
-      j = i;
-      while ((j > 0) && (t < f[j - 1])) {
-        f[j] = f[j - 1];
-        k[j] = k[j - 1];
-        j--;
-      }
-      f[j] = t;
-      k[j] = i;
-    }
-    if ((f[2] <= freq_ref) && (freq_ref < f[3])) {
-      E[3] = freq_ref - f[3];
-      eps[3][0] = f[3] - f[0];
-      eps[3][1] = f[3] - f[1];
-      eps[3][2] = f[3] - f[2];
-      t = std::pow(E[3], 2)/(eps[3][0] * eps[3][1] * eps[3][2]);
-      for (j = 0; j < 3; j++) w[j] = -t * E[3]/eps[3][j];
-      w[3] = 3.0;
-      for (i = 0; i < 3; i++) w[3] += E[3]/eps[3][i];
-      w[3] *= t;
-    } else if ((f[1] <= freq_ref) && (freq_ref < f[2])) {
-      for (i = 0; i < 4; i++) E[i] = freq_ref - f[i];
-      for (i = 1; i < 4; i++) {
-        for (j = 0; j < i; j++) {
-          eps[i][j] = f[i] - f[j];
-        }
-      }
-      t = E[0] * E[2]/(eps[2][0] * eps[2][1] * eps[3][0]);
-      t2 = E[1] * E[3]/(eps[2][1] * eps[3][0] * eps[3][1]);
-      w[0] = t * (E[2]/eps[2][0] + E[3]/eps[3][0]) + t2 * E[3]/eps[3][0];
-      w[1] = t * E[2]/eps[2][1] + t2 * (E[2]/eps[2][1] + E[3]/eps[3][1]);
-      w[2] = -t * (E[0]/eps[2][0] + E[1]/eps[2][1]) - t2 * E[1]/eps[2][1];
-      w[3] = -t * E[0]/eps[3][0] - t2 * (E[0]/eps[3][0] + E[1]/eps[3][1]);
-    } else if ((f[0] <= freq_ref) && (freq_ref < f[1])) {
-      E[0] = freq_ref - f[0];
-      eps[1][0] = f[1] - f[0];
-      eps[2][0] = f[2] - f[0];
-      eps[3][0] = f[3] - f[0];
-      t = std::pow(E[0], 2)/(eps[1][0] * eps[2][0] * eps[3][0]);
-      w[0] = 3.0;
-      for (i = 1; i < 4; i++) w[0] -= E[0]/eps[i][0];
-      w[0] *= t;
-      for (j = 1; j < 4; j++) w[j] = t * E[0]/eps[j][0];
-    } else {
-      for (i = 0; i < 4; i++) w[i] = 0.0;
-    }
-
-    for (i = 0; i < 4; i++) weights[corners[itet][k[i]]] += vol * w[i];
-  }
-  return weights;
-}
-
-double TCONDCalculator::integrate(const LTMethod& _lt, double freq_ref,
-                                  const vector<double>& _func, const vector<double>& _freqs) {
-  double integ = 0.0;
-  double c[4], f[4], w[4];
-  int k[4];
-  const vector<vector<int> >& corners = _lt.getTetrahedra();
-  double vol = _lt.getVolumePerTetrahedron();
-
-  int i, j;
-  double t, t2;
-
-  // Shorthands for weight calculations. Will only populate necessary values.
-  // For notation and formulas, see DOI 10.1007/978-3-642-25864-0_9.
-  double E[4];
-  double eps[4][4];
-
-  for (int itet = 0; itet < _lt.getnTetrahedra(); itet++) {
-    for (int icorner = 0; icorner < 4; icorner++) {
-      f[icorner] = _freqs[corners[itet][icorner]];
-      c[icorner] = _func[corners[itet][icorner]];
-      k[icorner] = icorner;
-    }
-    // Perform an explicit insertion sort to keep track of swaps
-    for (i = 1; i < 4; i++) {
-      t = f[i];
-      j = i;
-      while ((j > 0) && (t < f[j - 1])) {
-        f[j] = f[j - 1];
-        c[j] = c[j - 1];
-        k[j] = k[j - 1];
-        j--;
-      }
-      f[j] = t;
-      c[j] = c[j - 1];
-      k[j] = i;
-    }
-    if ((f[0] <= freq_ref) && (freq_ref < f[1])) {
-      E[0] = freq_ref - f[0];
-      eps[1][0] = f[1] - f[0];
-      eps[2][0] = f[2] - f[0];
-      eps[3][0] = f[3] - f[0];
-      t = std::pow(E[0], 2)/(eps[1][0] * eps[2][0] * eps[3][0]);
-      w[0] = 3.0;
-      for (i = 1; i < 4; i++) w[0] -= E[0]/eps[i][0];
-      w[0] *= t;
-      for (j = 1; j < 4; j++) w[j] = t * E[0]/eps[j][0];
-    } else if ((f[1] <= freq_ref) && (freq_ref < f[2])) {
-      for (i = 0; i < 4; i++) E[i] = freq_ref - f[i];
-      for (i = 1; i < 4; i++) {
-        for (j = 0; j < i; j++) {
-          eps[i][j] = f[i] - f[j];
-        }
-      }
-      t = E[0] * E[2]/(eps[2][0] * eps[2][1] * eps[3][0]);
-      t2 = E[1] * E[3]/(eps[2][1] * eps[3][0] * eps[3][1]);
-      w[0] = t * (E[2]/eps[2][0] + E[3]/eps[3][0]) + t2 * E[3]/eps[3][0];
-      w[1] = t * E[2]/eps[2][1] + t2 * (E[2]/eps[2][1] + E[3]/eps[3][1]);
-      w[2] = -t * (E[0]/eps[2][0] + E[1]/eps[2][1]) - t2 * E[1]/eps[2][1];
-      w[3] = -t * E[0]/eps[3][0] - t2 * (E[0]/eps[3][0] + E[1]/eps[3][1]);
-    } else if ((f[2] <= freq_ref) && (freq_ref < f[3])) {
-      E[3] = freq_ref - f[3];
-      eps[3][0] = f[3] - f[0];
-      eps[3][1] = f[3] - f[1];
-      eps[3][2] = f[3] - f[2];
-      t = std::pow(E[3], 2)/(eps[3][0] * eps[3][1] * eps[3][2]);
-      for (j = 0; j < 3; j++) w[j] = -t * E[3]/eps[3][j];
-      w[3] = 3.0;
-      for (i = 0; i < 3; i++) w[3] += E[3]/eps[3][i];
-      w[3] *= t;
-    } else {
-      for (i = 0; i < 4; i++) w[i] = 0;
-    }
-    for (i = 0; i < 4; i++) integ += vol * c[i] * w[i];
-  }
-  return integ;
-}
-
-#endif
 
 }  // namespace apl
 
@@ -995,346 +341,220 @@ void TCONDCalculator::calculateTransitionProbabilities() {
   LTMethod _lt(_qm, _logger);
   vector<vector<vector<vector<xcomplex<double> > > > > phases = calculatePhases();
 
-  int max_order;
-  if (calc_options.flag("FOURTH_ORDER")) max_order = 4;
-  else max_order = 3;
-  //max_order = 4;
-  vector<double> phase_space(max_order - 2);
-  for (int order = 3; order <= max_order; order++) {
-    /*
-    message = "Scattering Proccesses";
-    _logger << "Calculating scattering processes" << apl::endl;
-    getInequivalentQPointSet(order, 0, nIQPs, small_groups, trans_map);
+  message = "Transition Probabilities";
+  _logger << "Calculating transition probabilities for 3-phonon scattering processes." << apl::endl;
+  processes.resize(nIQPs);
+  intr_trans_probs.resize(nIQPs);
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::getInequivalentQPointSet, this,
-                                        order, thread_dist[icpu][0], thread_dist[icpu][1],
-                                        std::ref(small_groups), std::ref(trans_map)));
-    }
-    finishMPI(threads, _logger);
-#else
-    _logger.initProgressBar(message);
-    getInequivalentQPointSet(order, 0, nIQPs, small_groups, trans_map);
-    _logger.finishProgressBar();
-#endif
-    for (int i = 0; i < nIQPs; i++) {
-      ifstream irredfl;
-      string irredfile = "irred.3." + aurostd::utype2string<int>(i);
-      openTmpFile(irredfl, irredfile);
-      irredfl.seekg(0, irredfl.end);
-      int n = irredfl.tellg()/sizeof(int);
-      std::cout << i << " " << n << std::endl;
-      closeTmpFile(irredfl, irredfile);
-    }
-    exit(0);
-    */
-    phase_space[order - 3] = calculateIntegrationWeights(order, _lt);
-    _logger << "phase space = " << phase_space[order - 3] << apl::endl;
+  thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
+  threads.clear();
+  for (int icpu = 0; icpu < ncpus; icpu++) {
+    threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
+                                      thread_dist[icpu][0], thread_dist[icpu][1], std::ref(_lt), std::ref(phases)));
   }
-  exit(0);
-
-  for (int order = 3; order <= max_order; order++) {
-    message = "Transition Probabilities";
-    _logger << "Calculating transition probabilities for " << order << "-phonon processes." << apl::endl;
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-                                        order, thread_dist[icpu][0], thread_dist[icpu][1], std::ref(phases)));
-    }
-    finishMPI(threads, _logger);
+  finishMPI(threads, _logger);
 #else
-    _logger.initProgressBar(message);
-    calculateTransitionProbabilitiesPhonon(order, 0, nIQPs, phases);
-    _logger.finishProgressBar();
+  _logger.initProgressBar(message);
+  calculateTransitionProbabilitiesPhonon(0, nIQPs, phases);
+  _logger.finishProgressBar();
 #endif
-    _logger << "Finished" << apl::endl;
-    ifstream transfl, procfl, weightfl;
-    string transfile = "trans.3.0";
-    string procfile = "proc.unfiltered.3.0";
-    string weightfile = "wght.3.0";
-    openTmpFile(transfl, transfile);
-    openTmpFile(procfl, procfile);
-    openTmpFile(weightfl, weightfile);
-    vector<double> trans, weights;
-    vector<vector<int> > qpts, branches;
-    vector<int> qp(3), brnch(3);
-    qp[0] = _qm.getIbzqpts()[0];
-    vector<bool> sg(1);
-    vector<vector<bool> > signs;
-    double t;
-    while (transfl.peek() != EOF) {
-      transfl.read((char*)(&t), sizeof(double));
-      trans.push_back(t);
-      weightfl.read((char*)(&t), sizeof(double));
-      weights.push_back(t);
-      getProcess(3, procfl, sg, qp, brnch);
-      signs.push_back(sg);
-      qpts.push_back(qp);
-      branches.push_back(brnch);
-    }
-    closeTmpFile(transfl, transfile);
-    closeTmpFile(procfl, procfile);
-    closeTmpFile(weightfl, weightfile);
-    for (uint i = 0; i < trans.size(); i++) {
-      std::cout << signs[i][0] << ", " << aurostd::joinWDelimiter(qpts[i], " ") << ", " << aurostd::joinWDelimiter(branches[i], " ") << ", " << weights[i] << " " << (trans[i]/weights[i]) << " " << trans[i] << std::endl;
-      for (int q = 1; q < 3; q++) {
-        std::cout << _qm.getQPoint(qpts[i][q]).fpos << std::endl;
-      }
-      if (trans[i] > _ZERO_TOL_ ) {
-      for (uint j = 0; j < trans.size(); j++) {
-//        if ((std::abs(trans[i] - trans[j]) < _ZERO_TOL_) && (std::abs((trans[i]/weights[i]) - (trans[j]/weights[j])) < _ZERO_TOL_)) {
-        if ((i != j) && (std::abs(trans[i] - trans[j]) < _ZERO_TOL_)) {
-//          for (int q = 1; q < 3; q++) {
-//            std::cout << _qm.getQPoint(qpts[i][q]).cpos << std::endl;
-//            std::cout << _qm.getQPoint(qpts[i][q]).fpos << std::endl;
-//            std::cout << eigenvectors[qpts[i][q]] << std::endl << std::endl;
-//          }
-          std::cout << signs[j][0] << ", " << aurostd::joinWDelimiter(qpts[j], " ") << ", " << aurostd::joinWDelimiter(branches[j], " ") << ", " << weights[j] << " " << (trans[j]/weights[j]) << " " << trans[j] << std::endl;
-          for (int q = 1; q < 3; q++) {
-//            std::cout << _qm.getQPoint(qpts[j][q]).cpos << std::endl;
-            std::cout << _qm.getQPoint(qpts[j][q]).fpos << std::endl;
-//            std::cout << eigenvectors[qpts[j][q]] << std::endl << std::endl;
-          }
-        }
-      }
-      }
-      std::cout << "--------------------------------------------------" << std::endl << std::endl;
-    }
-    exit(0);
-  }
 
   if (0 && calc_options.flag("ISOTOPE")) {
-    vector<vector<double> > isotope_rates(nIQPs, vector<double>(nBranches, 0.0));
     _logger << "Calculating isotope transition probabilities." << apl::endl;
     message = "Isotope Transition Probabilities";
+    processes_iso.resize(nIQPs);
+    intr_trans_probs_iso.resize(nIQPs);
+
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE    
     thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
     threads.clear();
     for (int icpu = 0; icpu < ncpus; icpu++) {
       threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
-                                        std::ref(_lt), thread_dist[icpu][0], thread_dist[icpu][1], std::ref(isotope_rates)));
+                                        thread_dist[icpu][0], thread_dist[icpu][1], std::ref(_lt)));
     }
     finishMPI(threads, _logger);
 #else
     _logger.initProgressBar(message);
-    calculateTransitionProbabilitiesIsotope(_lt, 0, nIQPs, isotope_rates);
+    calculateTransitionProbabilitiesIsotope(0, nIQPs, _lt);
     _logger.finishProgressBar();
 #endif
-    writeRatesToTmpFile("rates.iso", isotope_rates);
   }
 
   if (calc_options.flag("BOUNADRY")) {
-    calculateTransitionProbabilitiesBoundary();
+    rates_boundary = calculateTransitionProbabilitiesBoundary();
   }
 }
 
-void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int order, int startIndex, int endIndex,
-                                                             const vector<vector<vector<vector<xcomplex<double> > > > >& phases) {
-  const int o3 = order - 3;
-  const int o2 = order - 2;
-  const int o1 = order - 1;
-  bool sign;
+vector<vector<vector<vector<xcomplex<double> > > > > TCONDCalculator::calculatePhases() {
+  const xstructure& scell = _pc.getSuperCellStructure();
+  const xstructure& pcell = _pc.getInputCellStructure();
+  const vector<int>& sc2pcMap = _pc.getSupercell()._sc2pcMap;
+  const vector<int>& pc2scMap = _pc.getSupercell()._pc2scMap;
+  uint niatoms = pcell.atoms.size();
+  uint natoms = scell.atoms.size();
+  vector<vector<vector<vector<xcomplex<double> > > > > phases(niatoms, vector<vector<vector<xcomplex<double> > > >(natoms, vector<vector<xcomplex<double> > >(nQPs, vector<xcomplex<double> >(2))));
 
+  int at_eq, at_eq_sc, iat_sc;
+  xvector<double> min_vec(3);
+  for (uint iat = 0; iat < niatoms; iat++) {
+    iat_sc = pc2scMap[iat];
+    const xvector<double>& iat_cpos = scell.atoms[iat_sc].cpos;
+    for (uint at = 0; at < natoms; at++) {
+      min_vec = SYM::minimizeDistanceCartesianMethod(scell.atoms[at].cpos, iat_cpos, scell.lattice);
+      at_eq = sc2pcMap[at];
+      at_eq_sc = pc2scMap[at_eq];
+      min_vec += iat_cpos;
+      min_vec -= scell.atoms[at_eq_sc].cpos;
+      for (int q = 0; q < nQPs; q++) {
+        phases[iat][at][q][0] = exp(iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
+        phases[iat][at][q][1] = conj(phases[iat][at][q][0]);
+      }
+    }
+  }
+  return phases;
+}
+
+void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex, const LTMethod& _lt,
+                                                             const vector<vector<vector<vector<xcomplex<double> > > > >& phases) {
   const Supercell& scell = _pc.getSupercell();
-  const vector<_cluster>& clusters = _pc._clusters[o3].clusters;
+  const vector<_cluster>& clusters = _pc._clusters[0].clusters;
   uint nclusters = clusters.size();
   vector<double> invmasses(nclusters);
   for (uint c = 0; c < nclusters; c++) {
     double mass = 1.0;
-    for (int o = 0; o < order; o++) mass *= scell.getAtomMass(clusters[c].atoms[o]);
+    for (int o = 0; o < 3; o++) mass *= scell.getAtomMass(clusters[c].atoms[o]);
     invmasses[c] = 1/sqrt(mass);
   }
 
-  const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[o3].force_constants;
+  const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
   vector<vector<int> > cart_indices;
-  aurostd::xcombos cart(3, order, 'E', true);
+  aurostd::xcombos cart(3, 3, 'E', true);
   while (cart.increment()) cart_indices.push_back(cart.getCombo());
   uint ncart = cart_indices.size();
 
   // Units are chosen so that probabilities are in THz (1/ps)
-  double probability_prefactor = std::pow(hbar_amu, o2) * PI/(std::pow(nQPs, o3) * std::pow(2.0, o1));
-  probability_prefactor *= std::pow(au2THz * 10.0, 2);
+  const double probability_prefactor = std::pow(au2THz * 10.0, 2) * hbar_amu * PI/4.0;
+  const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
 
   int natoms = (int) _pc.getInputCellStructure().atoms.size();
-  vector<int> atpowers(order, 1);
+  vector<int> atpowers(3, 1);
   vector<vector<int> > at_eigen;
-  aurostd::xcombos at_combos(natoms, order, 'E' , true);
+  aurostd::xcombos at_combos(natoms, 3, 'E' , true);
   while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
   uint nateigen = at_eigen.size();
   vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
-  for (int o = o1; o > 0; o--) atpowers[o1 - o] = (int) std::pow(natoms, o);
+  for (int o = 0; o < 2; o++) atpowers[o] = (int) std::pow(natoms, 2 - o);
+
+  vector<vector<int> > branches;
+  aurostd::xcombos branch_combos(nBranches, 3, 'E', true);
+  while (branch_combos.increment()) branches.push_back(branch_combos.getCombo());
+  uint nbr = branches.size();
 
   xcomplex<double> matrix, prefactor, eigen;
-  vector<int> qpts(order), branches(order);
-  vector<bool> signs(o2);
-  int iat, o, e, q, br;
-  uint c, crt;
-  double transprob, weight;
-
-  string transfile, procfile, weightfile, procunffile;
-  string pathpunf = "proc.unfiltered." + aurostd::utype2string<int>(order) + ".";
-  string pathp = "proc." + aurostd::utype2string<int>(order) + ".";
-  string patht = "trans." + aurostd::utype2string<int>(order) + ".";
-  string pathw = "wght." + aurostd::utype2string<int>(order) + ".";
+  vector<double> weights(nQPs), frequencies(nQPs);
+  vector<int> qpts(3), proc(3), lastq(nQPs);
+  int iat, o, e, q, s;
+  uint c, crt, br;
+  double transprob, freq_ref;
+  bool calc;
 
   for (int i = startIndex; i < endIndex; i++) {
     qpts[0] = _qm.getIbzqpts()[i];
-    ifstream procunffl, weightfl;
-    ofstream transfl, procfl;
-    procunffile = pathpunf + aurostd::utype2string<int>(i);
-    procfile = pathp + aurostd::utype2string<int>(i);
-    transfile = patht + aurostd::utype2string<int>(i);
-    weightfile = pathw + aurostd::utype2string<int>(i);
-    openTmpFile(procunffl, procunffile);
-//    openTmpFile(procfl, procfile);
-    openTmpFile(transfl, transfile);
-    openTmpFile(weightfl, weightfile);
 
-    while (!weightfl.eof()) {
-      weightfl.read((char*)(&weight), sizeof(double));
-      if (weightfl.eof()) break;
-      getProcess(order, procunffl, signs, qpts, branches);
-  
-      // Precompute eigenvalue products
-      for (c = 0; c < nateigen; c++) {
-        for (crt = 0; crt < ncart; crt++) {
-          e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
-          eigen = eigenvectors[qpts[0]][e][branches[0] + 1];
-          for (o = 1; o < o1 ; o++) {
-            e = at_eigen[c][o] * 3 + cart_indices[crt][o] + 1;
-            if (signs[o - 1]) eigen *= conj(eigenvectors[qpts[o]][e][branches[o] + 1]);
-            else eigen *= eigenvectors[qpts[o]][e][branches[o] + 1];
+    for (s = 0; s < 2; s++) {
+      for (q = 0; q < nQPs; q++) {
+        if (s) lastq[q] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos - _qm.getQPoint(q).fpos);
+        else lastq[q] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos + _qm.getQPoint(q).fpos);
+      }
+      for (br = 0; br < nbr; br++) {
+        freq_ref = freq[qpts[0]][branches[br][0]];
+        for (q = 0; q < nQPs; q++) {
+          if (s) frequencies[q] = freq[q][branches[br][1]] + freq[lastq[q]][branches[br][2]];
+          else frequencies[q] = -freq[q][branches[br][1]] + freq[lastq[q]][branches[br][2]];
+        }
+        
+        getWeightsLT(_lt, freq_ref, frequencies, weights);
+
+        for (q = 0; q < nQPs; q++) {
+          calc = (weights[q] > _ZERO_TOL_);
+          if (calc) {
+            qpts[1] = q;
+            qpts[2] = lastq[q];
+            for (o = 0; o < 3; o++) {
+              if (freq[qpts[o]][branches[br][o]] < _ZERO_TOL_) break;
+            }
+            calc = (o == 3);
           }
-          e = at_eigen[c][o1] * 3 + cart_indices[crt][o1] + 1;
-          eigen *= conj(eigenvectors[qpts[o1]][e][branches[o1] + 1]);
-          eigenprods[c][crt] = eigen;
-        }
-      }
 
-      matrix.re = 0.0;
-      matrix.im = 0.0;
-      vector<xcomplex<double> > m(nclusters, xcomplex<double>(0.0, 0.0));
-      for (c = 0; c < nclusters; c++) {
-        const vector<int>& atoms = clusters[c].atoms;
-        iat = scell.sc2pcMap(atoms[0]);
-        prefactor = invmasses[c] * phases[iat][atoms[o1]][qpts[o1]][1];
-        for (o = 1; o < o1; o++) prefactor *= phases[iat][atoms[o]][qpts[o]][(int) signs[o - 1]];
-        e = 0;
-        for (o = 0; o < order; o++) e += scell.sc2pcMap(atoms[o]) * atpowers[o];
-        for (crt = 0; crt < ncart; crt++) {
-          // Perform multiplication expliclty in place instead of using xcomplex.
-          // This is three times as fast because constructors and destructors are not called.
-          matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
-          matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
+          if (calc) {
+            // Precompute eigenvalue products
+            for (c = 0; c < nateigen; c++) {
+              for (crt = 0; crt < ncart; crt++) {
+                e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
+                eigen = eigenvectors[qpts[0]][e][branches[br][0] + 1];
+                e = at_eigen[c][o] * 3 + cart_indices[crt][o] + 1;
+                if (s) eigen *= conj(eigenvectors[qpts[o]][e][branches[br][o] + 1]);
+                else eigen *= eigenvectors[qpts[o]][e][branches[br][o] + 1];
+                e = at_eigen[c][2] * 3 + cart_indices[crt][2] + 1;
+                eigen *= conj(eigenvectors[qpts[2]][e][branches[br][2] + 1]);
+                eigenprods[c][crt] = eigen;
+              }
+            }
+      
+            matrix.re = 0.0;
+            matrix.im = 0.0;
+            for (c = 0; c < nclusters; c++) {
+              const vector<int>& atoms = clusters[c].atoms;
+              iat = scell.sc2pcMap(atoms[0]);
+              prefactor = invmasses[c] * phases[iat][atoms[2]][qpts[2]][1];
+              for (o = 1; o < 2; o++) prefactor *= phases[iat][atoms[o]][qpts[o]][s];
+              e = 0;
+              for (o = 0; o < 3; o++) e += scell.sc2pcMap(atoms[o]) * atpowers[o];
+              for (crt = 0; crt < ncart; crt++) {
+                // Perform multiplication expliclty in place instead of using xcomplex.
+                // This is three times as fast because constructors and destructors are not called.
+                matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
+                matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
+              }
+            }
+            transprob = probability_prefactor * magsqr(matrix) * weights[q];
+            for (o = 0; o < 3; o++) transprob /= freq[qpts[o]][branches[br][o]];
+            if (transprob > _ZERO_TOL_) {
+              proc[0] = s;
+              proc[1] = q;
+              proc[2] = br;
+              processes[i].push_back(proc);
+              intr_trans_probs[i].push_back(transprob);
+            }
+          }
         }
       }
-//      transprob = probability_prefactor * magsqr(matrix) * weight;
-//      for (o = 0; o < order; o++) transprob /= freq[qpts[o]][branches[o]];
-      transprob = magsqr(matrix);
-      /*
-      if (1 || transprob > _ZERO_TOL_) {
-        q = 0;
-        for (o = 0; o < o2; o++) q += qpts[o2 - o] * (int) std::pow(nQPs, o);
-        br = 0;
-        for (o = 0; o < order; o++) br += branches[o1 - o] * (int) std::pow(nBranches, o);
-        for (o = 0; o < o2; o++) {
-          sign = signs[o];
-          procfl.write((char*)(&sign), sizeof(bool));
-        }
-        procfl.write((char*)(&q), sizeof(int));
-        procfl.write((char*)(&br), sizeof(int));
-        */
-        transfl.write((char*)(&transprob), sizeof(double));
-      //}
     }
-//    weightfl.close();
-//    aurostd::RemoveFile(tmpdir + weightfile);
-//    aurostd::RemoveFile(tmpdir + procunffile);
-    closeTmpFile(weightfl, weightfile);
-    closeTmpFile(procfl, procfile);
-    closeTmpFile(procunffl, procfile);
-    closeTmpFile(transfl, transfile);
     _logger.updateProgressBar(1.0/nIQPs);
   }
 }
 
-void TCONDCalculator::getProcess(ifstream& procfl, vector<int>& qpts, vector<int>& branches) {
-  int r;
-  procfl.read((char*)(&r), sizeof(int));
-  qpts[1] = r;
-  procfl.read((char*)(&r), sizeof(int));
-  branches[0] = r/nBranches;
-  branches[1] = r % nBranches;
-}
-
-void TCONDCalculator::getProcess(int order, ifstream& procfl, vector<bool>& signs,
-                                 vector<int>& qpts, vector<int>& branches) {
-  const int o1 = order - 1;
-  const int o2 = order - 2;
-  const int o3 = order - 3;
-  int o, r, pw;
-  bool sign;
-
-  for (o = 0; o < o2; o++) {
-    procfl.read((char*)(&sign), sizeof(bool));
-    signs[o] = sign;
-  }
-
-  procfl.read((char*)(&r), sizeof(int));
-  xvector<double> qsum = _qm.getQPoint(qpts[0]).fpos;
-  for (o = 0; o < o3; o++) {
-    pw = (int) std::pow(nQPs, o3 - o);
-    qpts[o + 1] = r/pw;
-    r = r % pw;
-    if (!signs[o]) qsum += _qm.getQPoint(qpts[o + 1]).fpos;
-    else qsum -= _qm.getQPoint(qpts[o + 1]).fpos;
-  }
-  qpts[o2] = r;
-  if (signs[o3]) qpts[o1] = _qm.getQPointIndex(qsum - _qm.getQPoint(qpts[o2]).fpos);
-  else qpts[o1] = _qm.getQPointIndex(qsum + _qm.getQPoint(qpts[o2]).fpos);
-  
-  procfl.read((char*)(&r), sizeof(int));
-  for (o = 0; o < o1; o++) {
-    pw = (int) std::pow(nBranches, o1 - o);
-    branches[o] = r/pw;
-    r = r % pw;
-  }
-  branches[o1] = r;
-}
-
-void TCONDCalculator::calculateTransitionProbabilitiesIsotope(const LTMethod& _lt, int startIndex,
-                                                              int endIndex, vector<vector<double> >& rates) {
+void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, int endIndex, const LTMethod& _lt) {
   const xstructure& pcell = _pc.getInputCellStructure();
   uint natoms = pcell.atoms.size();
   vector<double> pearson(natoms);
   uint at;
   for (at = 0; at < natoms; at++) pearson[at] = GetPearsonCoefficient(pcell.atoms[at].atomic_number);
 
-  vector<double> freqs(nQPs), func(nQPs), weights(nQPs);
+  vector<double> frequencies(nQPs), func(nQPs), weights(nQPs);
+  vector<int> proc(2);
   double prefactor, rate;
   int q1, q2, br1, br2, b, e;
   xcomplex<double> eig;
   xvector<xcomplex<double> > eigen1(3), eigen2(3);
 
-  string transfile, procfile;
-  ofstream transfl, procfl;
-  for (int iq = startIndex; iq < endIndex; iq++) {
-    transfile = "trans.iso." + aurostd::utype2string<int>(iq);
-    procfile = "proc.iso." + aurostd::utype2string<int>(iq);
-    openTmpFile(transfl, transfile);
-    openTmpFile(procfl, procfile);
-    q1 = _qm.getIbzqpts()[iq];
+  for (int i = startIndex; i < endIndex; i++) {
+    q1 = _qm.getIbzqpts()[i];
     for (br1 = 0; br1 < nBranches; br1++) {
-      //std::cout << "br1 = " << br1 << std::endl;
-      //std::cout << freq[q1][br1] << std::endl;
       prefactor = freq[q1][br1] * freq[q1][br1] * PI/2.0;
       for (br2 = 0; br2 < nBranches; br2++) {
         for (q2 = 0; q2 < nQPs; q2++) {
-          freqs[q2] = freq[q2][br2];
+          frequencies[q2] = freq[q2][br2];
           func[q2] = 0.0;
           for (at = 0; at < natoms; at++) {
             if (pearson[at] != 0) {
@@ -1351,47 +571,37 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(const LTMethod& _l
             }
           }
         }
-        weights = getWeightsLT(_lt, freq[q1][br1], freqs);
+        getWeightsLT(_lt, freq[q1][br1], frequencies, weights);
         for (q2 = 0; q2 < nQPs; q2++) {
           rate = prefactor * weights[q2] * func[q2];
           if (rate > _ZERO_TOL_) {
-            rates[iq][br1] += rate;
-            //if(br1 == 4) std::cout << q2 << " " << br1 << " " << br2 << " " << weights[q2] << " " << prefactor << " " << func[q2] << " " << rate << std::endl;
-            transfl.write((char*)(&rate), sizeof(double));
             b = nBranches * br1 + br2;
-            procfl.write((char*)(&q2), sizeof(int));
-            procfl.write((char*)(&b), sizeof(int));
+            proc[0] = q2;
+            proc[1] = b;
+            intr_trans_probs_iso[i].push_back(rate);
+            processes_iso[i].push_back(proc);
+            rates_isotope[i][br1] += rate;
           }
         }
       }
-//      for (int i = 0; i < nBranches; i++) std::cout << rates[iq][i] << " ";
-//      std::cout << std::endl;
     }
-    closeTmpFile(transfl, transfile);
-    closeTmpFile(procfl, procfile);
     _logger.updateProgressBar(1.0/nIQPs);
   }
 }
 
-void TCONDCalculator::calculateTransitionProbabilitiesBoundary() {
-  string transfile = "trans.boundary";
-  ofstream transfl;
-  openTmpFile(transfl, transfile);
-  int q;
-  double rate;
+vector<vector<double> > TCONDCalculator::calculateTransitionProbabilitiesBoundary() {
+  int br, iq, q;
   vector<vector<double> > rates(nIQPs, vector<double>(nBranches));
   double grain_size = aurostd::string2utype<double>(calc_options.getattachedscheme("GRAIN_SIZE"));
+
   _logger << "Calculating grain boundary transition probabilities with a grain size of " << grain_size << " nm." << apl::endl;
-  for (int iq = 0; iq < nIQPs; iq++) {
-    for (int br = 0; br < nBranches; br++) {
+  for (iq = 0; iq < nIQPs; iq++) {
+    for (br = 0; br < nBranches; br++) {
       q = _qm.getIbzqpts()[iq];
-      rate = aurostd::modulus(gvel[q][br])/grain_size;
-      rates[iq][br] = rate;
-      transfl.write((char*)(&rate), sizeof(double));
+      rates[iq][br] = aurostd::modulus(gvel[q][br])/grain_size;
     }
   }
-  closeTmpFile(transfl, transfile);
-  writeRatesToTmpFile("rates.boundary", rates);
+  return rates;
 }
 
 }  // namespace apl
@@ -1400,18 +610,31 @@ void TCONDCalculator::calculateTransitionProbabilitiesBoundary() {
 
 namespace apl {
 
+void TCONDCalculator::getProcess(const vector<int>& process,
+                                 vector<int>& qpts, vector<int>& branches) {
+  xvector<double> qsum = _qm.getQPoint(qpts[0]).fpos;
+  qpts[1] = process[1];
+  if (process[0]) qpts[2] = _qm.getQPointIndex(qsum - _qm.getQPoint(qpts[1]).fpos);
+  else qpts[2] = _qm.getQPointIndex(qsum + _qm.getQPoint(qpts[1]).fpos);
+
+  int pw, br;
+  br = process[2];
+  for (int i = 0; i < 2; i++) {
+    pw = (int) std::pow(nBranches, 2 - i);
+    branches[i] = br/pw;
+    br = br % pw;
+  }
+  branches[2] = br;
+}
+
 xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
                                                                     const vector<vector<int> >& small_groups) {
   _logger << "Calculating thermal conductivity for " << T << " K." << apl::endl;
   vector<vector<double> > occ = getOccupationNumbers(T);
   _logger << "Calculating scattering rates." << apl::endl;
-  int max_order;
-  if (calc_options.flag("FOURTH_ORDER")) max_order = 4;
-  else max_order = 3;
-  for (int o = 3; o <= max_order; o++) calculateAnharmonicRates(o, T, occ);
+  vector<vector<double> > rates = getRates(occ);
 
   _logger << "Calculating RTA" << apl::endl;
-  vector<vector<double> > rates = getRates(T);
   vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates);
   xmatrix<double> tcond = calcTCOND(T, occ, mfd); // RTA solution
   std::cout << "tcond: " << std::endl;
@@ -1457,8 +680,7 @@ vector<vector<double> > TCONDCalculator::getOccupationNumbers(double T) {
   return occ;
 }
 
-void TCONDCalculator::calculateAnharmonicRates(int order, double T,
-                                               const vector<vector<double> >& occ) {
+vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
   vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
   int ncpus;
@@ -1469,14 +691,14 @@ void TCONDCalculator::calculateAnharmonicRates(int order, double T,
   for (int icpu = 0; icpu < ncpus; icpu++) {
     threads.push_back(new std::thread(&TCONDCalculator::calcAnharmRates, this,
                                       thread_dist[icpu][0], thread_dist[icpu][1],
-                                      order, std::ref(occ), std::ref(rates)));
+                                      std::ref(occ), std::ref(rates)));
   }
   for (int icpu = 0; icpu < ncpus; icpu++) {
     threads[icpu]->join();
     delete threads[icpu];
   }
 #else
-  calcAnharmRates(0, nIQPs, order, occ, rates);
+  calcAnharmRates(0, nIQPs, occ, rates);
 #endif
   for (int i = 0; i < nIQPs; i++) {
     std::cout << i;
@@ -1485,94 +707,47 @@ void TCONDCalculator::calculateAnharmonicRates(int order, double T,
     }
     std::cout << std::endl;
   }
-  string ratefile = "rates." + aurostd::utype2string<int>(order) + "." + aurostd::utype2string<double>(T);;
-  writeRatesToTmpFile(ratefile, rates);
+  return rates;
 }
 
-void TCONDCalculator::calcAnharmRates(int startIndex, int endIndex, int order,
-                                      const vector<vector<double> >& occ, vector<vector<double> >& rates) {
-  vector<int> qpts(order), branches(order);
-  vector<bool> signs(order - 2);
-  string procfile, transfile, qptfile;
-  double trans;
-  string pathp = "proc." + aurostd::utype2string<int>(order) + ".";
-  string patht = "trans." + aurostd::utype2string<int>(order) + ".";
+void TCONDCalculator::calcAnharmRates(int startIndex, int endIndex,
+                                      const vector<vector<double> >& occ,
+                                      vector<vector<double> >& rates) {
+  vector<int> qpts(3), branches(3);
 
   for (int i = startIndex; i < endIndex; i++) {
-    ifstream procfl, transfl;
-    procfile = pathp + aurostd::utype2string<int>(i);
-    transfile = patht + aurostd::utype2string<int>(i);
-    openTmpFile(procfl, procfile);
-    openTmpFile(transfl, transfile);
     qpts[0] = _qm.getIbzqpts()[i];
-    while (transfl.peek() != EOF) {
-      transfl.read((char*)(&trans), sizeof(double));
-      getProcess(order, procfl, signs, qpts, branches);
-      rates[i][branches[0]] += trans * getOccupationTerm(order, occ, signs, qpts, branches);
+    for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
+      getProcess(processes[i][p], qpts, branches);
+      rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, processes[i][p][0], qpts, branches);
     }
-    closeTmpFile(procfl, procfile);
-    closeTmpFile(transfl, transfile);
   }
 }
 
-double TCONDCalculator::getOccupationTerm(int order,
-                                          const vector<vector<double> >& occ,
-                                          const vector<bool>& signs,
-                                          const vector<int>& qpts,
-                                          const vector<int>& branches) {
-  double term = 0;
-  if (order == 3) {
-    if (signs[0]) {
-      term = (1.0 + occ[qpts[1]][branches[1]] + occ[qpts[2]][branches[2]])/2.0;
-    } else {
-      term = occ[qpts[1]][branches[1]] - occ[qpts[2]][branches[2]];
-    }
-  } else if (order == 4) {
-    if (!signs[0] && !signs[1]) {  // ++
-      term = occ[qpts[1]][branches[1]] * occ[qpts[2]][branches[2]] * occ[qpts[3]][branches[3]]/6.0;
-    } else if (signs[0] && signs[1]) {  // --
-      term = (1 + occ[qpts[1]][branches[1]]) * (1 + occ[qpts[2]][branches[2]]) * occ[qpts[3]][branches[3]]/2.0;
-    } else {  // +-
-      term = (1 + occ[qpts[1]][branches[1]]) * occ[qpts[2]][branches[2]] * occ[qpts[3]][branches[3]]/2.0;
-    }
-    term /= occ[qpts[0]][branches[0]];
+double TCONDCalculator::getOccupationTerm(const vector<vector<double> >& occ, int sign,
+                                          const vector<int>& qpts, const vector<int>& branches) {
+  if (sign) {  // -
+      return (1.0 + occ[qpts[1]][branches[1]] + occ[qpts[2]][branches[2]])/2.0;
+  } else {  // +
+      return occ[qpts[1]][branches[1]] - occ[qpts[2]][branches[2]];
   }
-  return term;
 }
 
-vector<vector<double> > TCONDCalculator::getRates(double T) {
-  vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
-
-  vector<vector<double> > rtmp = readRatesFromTmpFile("rates.3." + aurostd::utype2string<double>(T));
-  for (int iq = 0; iq < nIQPs; iq++) {
-    for (int br = 0; br < nBranches; br++) {
-      rates[iq][br] += rtmp[iq][br];
-    }
-  }
-
-  if (calc_options.flag("FOURTH_ORDER")) {
-    rtmp = readRatesFromTmpFile("rates.4." + aurostd::utype2string<double>(T));
-    for (int iq = 0; iq < nIQPs; iq++) {
-      for (int br = 0; br < nBranches; br++) {
-        rates[iq][br] += rtmp[iq][br];
-      }
-    }
-  }
+vector<vector<double> > TCONDCalculator::getRates(const vector<vector<double> >& occ) {
+  vector<vector<double> > rates = calculateAnharmonicRates(occ);
 
   if (0 && calc_options.flag("ISOTOPE")) {
-    rtmp = readRatesFromTmpFile("rates.iso");
     for (int iq = 0; iq < nIQPs; iq++) {
       for (int br = 0; br < nBranches; br++) {
-        rates[iq][br] += rtmp[iq][br];
+        rates[iq][br] += rates_isotope[iq][br];
       }
     }
   }
 
   if (calc_options.flag("BOUNDARY")) {
-    rtmp = readRatesFromTmpFile("rates.boundary");
     for (int iq = 0; iq < nIQPs; iq++) {
       for (int br = 0; br < nBranches; br++) {
-        rates[iq][br] += rtmp[iq][br];
+        rates[iq][br] += rates_boundary[iq][br];
       }
     }
   }
@@ -1662,53 +837,28 @@ void TCONDCalculator::calculateDelta(int startIndex, int endIndex,
                                      const vector<vector<xvector<double> > >& mfd,
                                      vector<vector<xvector<double> > >& delta) {
   xvector<double> correction(3);
-  double trans;
-  string procfile, transfile, qptfile;
-  int max_order;
-  if (calc_options.flag("FOURTH_ORDER")) max_order = 4;
-  else max_order = 3;
+  vector<int> qpts(3), branches(3);
 
   for (int i = startIndex; i < endIndex; i++) {
-    for (int o = 3; o <= max_order; o++) {
-      const int o2 = o - 2;
-      vector<int> qpts(o), branches(o);
-      vector<bool> signs(o2);
-      qpts[0] = _qm.getIbzqpts()[i];
-      ifstream procfl, transfl;
-      procfile = "proc." + aurostd::utype2string<int>(o) + "." + aurostd::utype2string<int>(i);
-      transfile = "trans." + aurostd::utype2string<int>(o) + "." + aurostd::utype2string<int>(i);
-      openTmpFile(procfl, procfile);
-      openTmpFile(transfl, transfile);
-      while (transfl.peek() != EOF) {
-        transfl.read((char*)(&trans), sizeof(double));
-        getProcess(o, procfl, signs, qpts, branches);
-        correction = mfd[qpts.back()][branches.back()];
-        for (int j = 0; j < o2; j++) {
-          if (signs[j]) correction -= mfd[qpts[j + 1]][branches[j + 1]];
-          else correction += mfd[qpts[j + 1]][branches[j + 1]];
-        }
-        delta[qpts[0]][branches[0]] += trans * correction * getOccupationTerm(o, occ, signs, qpts, branches);
-      }
-      closeTmpFile(procfl, procfile);
-      closeTmpFile(transfl, transfile);
+    qpts[0] = _qm.getIbzqpts()[i];
+    for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
+      getProcess(processes[i][p], qpts, branches);
+      correction = mfd[qpts[2]][branches[2]];
+      if (processes[i][p][0]) correction -= mfd[qpts[1]][branches[1]];
+      else correction += mfd[qpts[1]][branches[1]];
+      correction *= getOccupationTerm(occ, processes[i][p][0], qpts, branches);
+      delta[qpts[0]][branches[0]] += intr_trans_probs[i][p] * correction;
     }
 
     if (calc_options.flag("ISOTOPE")) {
-      ifstream procfl_iso, transfl_iso;
-      procfile = "proc.iso." + aurostd::utype2string<int>(i);
-      transfile = "trans.iso." + aurostd::utype2string<int>(i);
-
-      vector<int> qpts_iso(2), branches_iso(2);
-      qpts_iso[i] = _qm.getIbzqpts()[i];
-      openTmpFile(procfl_iso, procfile);
-      openTmpFile(transfl_iso, transfile);
-      while (transfl_iso.peek() != EOF) {
-        transfl_iso.read((char*)(&trans), sizeof(double));
-        getProcess(procfl_iso, qpts_iso, branches_iso);
-        delta[qpts_iso[0]][branches_iso[0]] += trans * mfd[qpts_iso[1]][branches_iso[1]];
+      int q1, q2, br1, br2;
+      q1 = _qm.getIbzqpts()[i];
+      for (uint p = 0, nprocs = processes_iso[i].size(); p < nprocs; p++) {
+        q2 = processes_iso[i][p][0];
+        br1 = processes_iso[i][p][1]/nBranches;
+        br2 = processes_iso[i][p][1] % nBranches;
+        delta[q1][br1] += intr_trans_probs_iso[i][p] * mfd[q2][br2];
       }
-      closeTmpFile(procfl_iso, procfile);
-      closeTmpFile(transfl_iso, transfile);
     }
 
     // Symmetrize
@@ -1748,50 +898,6 @@ void TCONDCalculator::correctMFD(const vector<vector<double> >& rates,
 /********************************* FILE I/O *********************************/
 
 namespace apl {
-
-void TCONDCalculator::openTmpFile(ofstream& file, const string& filename) {
-  file.open((tmpdir + filename).c_str(), std::ios::out|std::ios::binary);
-}
-
-void TCONDCalculator::openTmpFile(ifstream& file, const string& filename) {
-  aurostd::UncompressFile(tmpdir + filename + "." + calc_options.getattachedscheme("KZIP_BIN"));
-  file.open((tmpdir + filename).c_str(), std::ios::in|std::ios::binary);
-}
-
-void TCONDCalculator::closeTmpFile(ofstream& file, const string& filename) {
-  file.close();
-  aurostd::CompressFile(tmpdir + filename, calc_options.getattachedscheme("KZIP_BIN"));
-}
-
-void TCONDCalculator::closeTmpFile(ifstream& file, const string& filename) {
-  file.close();
-  aurostd::CompressFile(tmpdir + filename, calc_options.getattachedscheme("KZIP_BIN"));
-}
-
-void TCONDCalculator::writeRatesToTmpFile(const string& ratefile, 
-                                          const vector<vector<double> >& rates) {
-  ofstream ratefl;
-  openTmpFile(ratefl, ratefile);
-  for (int q = 0; q < nIQPs; q++) {
-    for (int br = 0; br < nBranches; br++) {
-      ratefl.write((char*)(&rates[q][br]), sizeof(double));
-    }
-  }
-  closeTmpFile(ratefl, ratefile);
-}
-
-vector<vector<double> > TCONDCalculator::readRatesFromTmpFile(const string& ratefile) {
-  ifstream ratefl;
-  vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
-  openTmpFile(ratefl, ratefile);
-  for (int q = 0; q < nIQPs; q++) {
-    for (int br = 0; br < nBranches; br++) {
-      ratefl.read((char*)(&rates[q][br]), sizeof(double));
-    }
-  }
-  closeTmpFile(ratefl, ratefile);
-  return rates;
-}
 
 void TCONDCalculator::writeTempIndepOutput(const string& filename, string keyword,
                                            const string& unit, const vector<vector<double> >& data) {

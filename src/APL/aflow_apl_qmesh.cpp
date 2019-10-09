@@ -341,11 +341,7 @@ const _qpoint& QMesh::getQPoint(const xvector<double>& fpos) const {
   return _qpoints[getQPointIndex(fpos)];
 }
 
-<<<<<<< Updated upstream
 // ME190813
-=======
-// ME190701
->>>>>>> Stashed changes
 // Returns the index of the qpoint based on the fractional
 // position. It assumes that the point is already on the grid.
 int QMesh::getQPointIndex(xvector<double> fpos) const {

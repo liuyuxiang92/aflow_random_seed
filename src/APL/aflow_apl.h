@@ -1554,114 +1554,59 @@ class TCONDCalculator {
     vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
     vector<vector<double> > freq;  // The frequencies at each q-point
     vector<vector<xvector<double> > > gvel;  // The group velocities
-    vector<vector<int> > irred_qpts_symops;  // List of invariant operations for the irreducible q-points
     int nBranches;  // The number of branches in the phonon spectrum
     int nIQPs;  // The total number of irreducible q-points in the grid
     int nQPs;  // The total number of q-points in the grid
-    xstructure pcell;  // The real space primitive cell
-    vector<vector<vector<int> > > processes;  // The q-point and branch indices of the scattering processes
+    vector<vector<vector<int> > > processes;  // The sign, q-point and branch indices of the scattering processes
     vector<vector<double> > intr_trans_probs;  // The intrinsic transition probabilities
-    vector<double> temperatures;  // The temperatures for the thermal conductivity calculations
+    vector<vector<vector<int> > > processes_iso;  // The q-point and branch indices of the isotope scattering processes
+    vector<vector<double> > intr_trans_probs_iso;  // The intrinsic transition probabilities for isotope processes
+    vector<vector<double> > rates_boundary;
+    vector<vector<double> > rates_isotope;
+    vector<double> temperatures;  // The mperatures for the thermal conductivity calculations
     vector<xmatrix<double> > thermal_conductivity;  // The thermal conductivity values
 
-    void setCalculationOptions(string, bool, bool, bool, bool,
-                               double, double, double, double);
-    void calculateFrequenciesGroupVelocities();
-    void calculateTransitionProbabilities(int);
     void calculateThermalConductivity();
 
-    void calculateScatteringProcesses(int);
   private:
     PhononCalculator& _pc;  // Reference to the phonon calculator
     QMesh& _qm;  // Reference to the q-point mesh
     Logger& _logger;  // The APL logger
-    string tmpdir;
 
     void free();
 
+    vector<vector<int> > calculateSmallGroups();
+    void calculateFrequenciesGroupVelocities();
     void calculateFreqGvel(int, int);
-    void calculateScattering(int, int, int, vector<vector<vector<double> > >&,
-                             vector<vector<vector<vector<int> > > >&);
-    double getSigma(const vector<int>&, int);
-    vector<vector<xvector<double> > > getPhaseVectors(int);
-    void calculateScatteringMatrix(int, int, int,
-                                   vector<xcomplex<double> >&,
-                                   const vector<vector<xvector<double> > >&);
-    void calculateIntrTransProbs(int, int, int, const vector<double>&,
-                                 const vector<xcomplex<double> >&);
-    double getProbabilityPrefactor(int);
-    double gaussian(int, double, const vector<int>&);
-
-    vector<vector<double> > getIsotopeRates(vector<vector<int> >&, vector<double>&);
-//ME190107    vector<vector<double> > getIsotopeRates(vector<vector<int> >&, const vector<vector<double> >&, vector<double>&);
-    vector<vector<double> > getSigmaIsotope();
-    vector<vector<double> > getBoundaryRates();
-    vector<vector<double> > getAnharmonicRates(int, const vector<vector<double> >&);
+    void getWeightsLT(const LTMethod&, double, const vector<double>&, vector<double>&);
+    void calculateTransitionProbabilities();
+    vector<vector<vector<vector<xcomplex<double> > > > > calculatePhases();
+    void calculateTransitionProbabilitiesPhonon(int, int, const LTMethod&,
+                                                const vector<vector<vector<vector<xcomplex<double> > > > >&);
+    void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
+    vector<vector<double> > calculateTransitionProbabilitiesBoundary();
+    void getProcess(const vector<int>&, vector<int>&, vector<int>&);
+    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&);
     vector<vector<double> > getOccupationNumbers(double);
-    double getOccupationTerm(int, const vector<int>&, const vector<vector<double> >&);
+    vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
+    void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
+    double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
+    vector<vector<double> > getRates(const vector<vector<double> >&);
     vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
-    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<double> >&,
-                             const vector<vector<int> >&, const vector<double>&,
-                             vector<vector<xvector<double> > >&);
-    xvector<double> getMFDCorrection(int, const vector<int>&,
-                                     const vector<vector<xvector<double> > >&,
-                                     const vector<vector<double> >&);
     xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
                               const vector<vector<xvector<double> > >&);
-    void iterateMeanFreePath(vector<vector<xvector<double> > >&);
-
-    void writeQpoints();
-    void writeIrredQpoints();
-    void writeFrequencies();
-    void writeGroupVelocities();
-    void writeTempIndepRatesFile(string, string, const vector<vector<double> >&);
-    string tempDepRatesString(string, double, const vector<vector<double> >&);
-    void writeTempDepRatesFile(string, const string&);
-    void writeThermalConductivity();
-    // void writeThermalConductivityPlot(); OBSOLETE ME190614
-
-    vector<vector<vector<vector<xcomplex<double> > > > > calculatePhases();
-    vector<vector<int> > calculateSmallGroups();
-
-    void reduceByFGroup(vector<vector<int> >&, vector<vector<int> >&);
-    xmatrix<xcomplex<double> > calculateGamma(int, int);
-
-    //void getInequivalentQPointSet(int, int, int, const vector<vector<int> >&, const vector<vector<int> >&);
-    void getInequivalentQPointSet(int);
-    vector<vector<bool> > getSigns(int);
-
-    double calculateIntegrationWeights(int, const LTMethod&);
-    void calculateWeightsLT(const LTMethod&, int, int, int, vector<double>&);
-    vector<double> getWeightsLT(const LTMethod&, double, const vector<double>&);
-    double integrate(const LTMethod&, double, const vector<double>&, const vector<double>&);
-    void calculateTransitionProbabilities();
-    void calculateTransitionProbabilitiesPhonon(int, int, int, const vector<vector<vector<vector<xcomplex<double> > > > >&);
-    void calculateTransitionProbabilitiesIsotope(const LTMethod&, int, int, vector<vector<double> >&);
-    void calculateTransitionProbabilitiesBoundary();
-    void getProcess(ifstream&, vector<int>&, vector<int>&);
-    void getProcess(int, ifstream&, vector<bool>&, vector<int>&, vector<int>&);
-
-    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&);
-    double getOccupationTerm(int, const vector<vector<double> >&, const vector<bool>&,
-                             const vector<int>&, const vector<int>&);
-    vector<vector<double> > getRates(double);
     void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<double> >&,
                              const vector<vector<int> >&, vector<vector<xvector<double> > >&);
     void calculateDelta(int, int, const vector<vector<int> >&, const vector<vector<double> >&,
                         const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
     void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
-    void calculateAnharmonicRates(int, double, const vector<vector<double> >&);
-    void calcAnharmRates(int, int, int, const vector<vector<double> >&, vector<vector<double> >&);
     
-    void openTmpFile(ofstream&, const string&);
-    void openTmpFile(ifstream&, const string&);
-    void closeTmpFile(ofstream&, const string&);
-    void closeTmpFile(ifstream&, const string&);
-    void writeRatesToTmpFile(const string&, const vector<vector<double> >&);
-    vector<vector<double> > readRatesFromTmpFile(const string&);
     void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
     void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
     void writeDataBlock(stringstream&, const vector<vector<double> >&);
+    void writeFrequencies();
+    void writeGroupVelocities();
+    void writeThermalConductivity();
 };
 
 }  // namespace apl

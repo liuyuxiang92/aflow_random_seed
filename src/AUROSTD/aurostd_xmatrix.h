@@ -150,7 +150,6 @@ namespace aurostd {
   // ME190814 - xcomplex versions
   template<class utype> bool
     identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&,const char& _mode_) __xprototype;
-<<<<<<< Updated upstream
 
   template<class utype> bool
     identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
@@ -179,36 +178,6 @@ namespace aurostd {
   template<class utype> bool
     isequal(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
 
-=======
-  
-  template<class utype> bool
-    identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    rel_identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    abs_identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    operator==(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    isdifferent(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    isdifferent(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    isequal(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    isequal(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
->>>>>>> Stashed changes
   template<class utype> bool
     operator!=(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
 
