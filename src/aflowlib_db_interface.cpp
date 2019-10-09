@@ -13,6 +13,7 @@
 
 #define _SQL_COMMAND_DEBUG_  false  // debug SQL commands that are sent - verbose output
 #define _SQL_CALLBACK_DEBUG_ false  // debug SQL callbacks - extremely verbose output
+#define _DB_INTERFACE_DEBUG_ true
 
 // Some parts are written within the C++0x support in GCC, especially std::thread,
 // which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
@@ -25,7 +26,11 @@ static const int _MAX_CPU_ = 16;
 #warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
+using std::string;
+using std::vector;
+
 static const int _N_AUID_TABLES_ = 256;
+static const string _COMPRESSION_ = "xz";
 
 /*********************************** JSON ***********************************/
 
@@ -35,20 +40,22 @@ namespace aflowlib {
 // Walks the data path for new AFLOW JSON files and updates the JSON
 // collection files accordingly.
 void updateDatabaseJsonFiles(const string& data_path) {
-  string auid_path = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID) + "/RAW/";
+  bool LDEBUG = (FALSE || XHOST.DEBUG || _DB_INTERFACE_DEBUG_);
+  string auid_path = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
 
   // Fetch the files to update first
   long int tm;
-  string json, path;
+  string json, json_compressed, path;
   vector<long int> mod_times;
   vector<string> json_files, entry_paths;
   for (int i = 0; i < _N_AUID_TABLES_; i++) {
     stringstream t;
     t << std::setfill('0') << std::setw(2) << std::hex << i;
     json = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
-    if (aurostd::FileExist(json)) tm = aurostd::FileModificationTime(json);
+    json_compressed = json + "." + _COMPRESSION_;
+    if (aurostd::FileExist(json_compressed)) tm = aurostd::FileModificationTime(json_compressed);
     else tm = 0;
-    path = auid_path + "aflow:" + t.str();
+    path = auid_path + "/aflow:" + t.str();
     if (aurostd::FileModificationTime(path) > tm) {
       json_files.push_back(json);
       entry_paths.push_back(path);
@@ -57,6 +64,12 @@ void updateDatabaseJsonFiles(const string& data_path) {
   }
 
   int njson = (int) json_files.size();
+  if (LDEBUG) {
+    std::cerr << "aflowlib::updateDatabaseJsonFiles(): ";
+    if (njson > 0) std::cerr << "Files to update: "
+                             << aurostd::joinWDelimiter(json_files, ", ") << std::endl;
+    else std::cerr << "No files to update." << std::endl;
+  }
   if (njson > 0) {  // Necessary to prevent a floating point exception
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
     int ncpu = init::GetCPUCores();
@@ -87,7 +100,7 @@ void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<st
     fetchUpdatedJsonFiles(entries, entry_paths[i], 1, 8, mod_times[i]);
     if (mod_times[i] > 0) {
       vector<string> json;
-      aurostd::file2vectorstring(json_files[i], json);
+      aurostd::efile2vectorstring(json_files[i], json);
       uint njson = json.size();
       uint nentry = entries.size();
       vector<string> auids(njson);
@@ -102,8 +115,11 @@ void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<st
         else json.push_back(entries[e]);
       }
       aurostd::string2file(aurostd::joinWDelimiter(json, ""), json_files[i]);
+      aurostd::RemoveFile(json_files[i] + "." + _COMPRESSION_);
+      aurostd::CompressFile(json_files[i], _COMPRESSION_);
     } else {
       aurostd::string2file(aurostd::joinWDelimiter(entries, ""), json_files[i]);
+      aurostd::CompressFile(json_files[i], _COMPRESSION_);
     }
   }
 }
@@ -114,7 +130,7 @@ void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<st
 void fetchUpdatedJsonFiles(vector<string>& json_files, const string& parent_path,
                            int depth, int maxdepth, long int mod_time) {
   if (depth == maxdepth) {
-    string filename = parent_path + "/aflowlib.json";
+    string filename = parent_path + "/RAW/aflowlib.json";
     if (aurostd::FileExist(filename)) {
       json_files.push_back(aurostd::file2string(filename));
     }

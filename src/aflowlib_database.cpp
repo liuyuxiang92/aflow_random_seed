@@ -375,7 +375,7 @@ void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& co
 
     string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
     vector<string> data;
-    aurostd::file2vectorstring(jsonfile, data);
+    aurostd::efile2vectorstring(jsonfile, data);
     uint ndata = data.size();
     vector<vector<string> > values(ndata);
     for (uint d = 0; d < ndata; d++) {
