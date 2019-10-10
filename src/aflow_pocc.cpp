@@ -278,14 +278,23 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
+  POccSuperCell::POccSuperCell(){free();}
+  POccSuperCell::POccSuperCell(const POccSuperCell& b){copy(b);}
   const POccSuperCell& POccSuperCell::operator=(const POccSuperCell& b){
-    if(this!=&b){
-      hnf_index=b.hnf_index;
-      site_config_index=b.site_config_index;
-      degeneracy=b.degeneracy;
-      m_uff_energy=b.m_uff_energy;
-    }
+    if(this!=&b){copy(b);}
     return *this;
+  }
+  void POccSuperCell::free(){
+    hnf_index=AUROSTD_MAX_UINT;
+    site_config_index=AUROSTD_MAX_UINT;
+    degeneracy=AUROSTD_MAX_UINT;
+    m_uff_energy=AUROSTD_MAX_DOUBLE;
+  }
+  void POccSuperCell::copy(const POccSuperCell& b){
+    hnf_index=b.hnf_index;
+    site_config_index=b.site_config_index;
+    degeneracy=b.degeneracy;
+    m_uff_energy=b.m_uff_energy;
   }
   bool POccSuperCell::operator<(const POccSuperCell& other) const {
     if(hnf_index!=other.hnf_index){return hnf_index<other.hnf_index;}
@@ -4497,14 +4506,14 @@ void POccUFFEnergyAnalyzer::calculateNNDistances(xstructure& xstr,vector<uint>& 
   xmatrix<double> _distance_matrix(xstr.atoms.size()-1,xstr.atoms.size()-1,0,0); distance_matrix=_distance_matrix;
 
   //get distance matrix first, then find nearest-neighbor distances
-  xvector<double> min_vec; xvector<int> ijk;  //dummy
+  //DX 20190619 [OBSOLETE] xvector<double> min_vec; xvector<int> ijk;  //dummy
   
   //get distance matrix first
   for(uint atom1=0;atom1<xstr.atoms.size();atom1++){
     if(isVacancy(v_vacancies,atom1)){continue;}
     for(uint atom2=atom1+1;atom2<xstr.atoms.size();atom2++){
       if(isVacancy(v_vacancies,atom2)){continue;}
-      distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=SYM::minimumCartesianDistance(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice,min_vec,ijk);
+      distance_matrix(atom1,atom2)=distance_matrix(atom2,atom1)=aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr.atoms[atom1].cpos,xstr.atoms[atom2].cpos,xstr.lattice)); //DX 20190619 - updated function name and take the modulus of minimum cpos distance
     }
   }
 

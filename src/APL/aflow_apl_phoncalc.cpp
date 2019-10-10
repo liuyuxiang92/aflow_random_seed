@@ -20,6 +20,12 @@ namespace apl {
     _isGammaEwaldPrecomputed = false;
 //    DOtar = false;  OBSOLETE - ME 181024
     xInputsAAPL.clear();
+    // ME190614 - Add system for VASP-style output files
+    if ((_xFlags.AFLOW_MODE_VASP) && (!_xFlags.vflags.AFLOW_SYSTEM.content_string.empty())) {
+      _system = _xFlags.vflags.AFLOW_SYSTEM.content_string;
+    } else {
+      _system = _supercell.getInputStructure().title;
+    }
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -782,8 +788,8 @@ namespace apl {
               }
 	    }
           }
-	    }
 	}
+      }
     }
 
     //
@@ -873,7 +879,7 @@ namespace apl {
 
 	    geg = scalar_product(g, _dielectricTensor * g);
 
-	    if (fabs(geg) > _AFLOW_APL_EPS_ && geg / lambda2 / 4.0 < gmax) {
+	    if (aurostd::abs(geg) > _AFLOW_APL_EPS_ && geg / lambda2 / 4.0 < gmax) {
 	      double fac2 = fac * exp(-geg / lambda2 / 4.0) / geg;
 
 	      for (uint ipc1 = 0; ipc1 < pcAtomsSize; ipc1++) {
@@ -1077,11 +1083,11 @@ namespace apl {
                   if (_isPolarMaterial && (aurostd::modulus(kpoint) > _AFLOW_APL_EPS_)) {
                     xcomplex<double> nac = ((double) neq) * phase * dDynMat_NAC[d](3 * ipc1 + ix, 3 * ipc2 + iy);
                     dDynMat[d](3 * ipc1 + ix, 3 * ipc2 + iy) += nac;
-	    }
-	  }
-	}
-      }
-    }
+                  }
+                }
+              }
+            }
+          }
 	}
       }
     }
@@ -1193,6 +1199,13 @@ namespace apl {
     xmatrix<xcomplex<double> > placeholder_eigen(nBranches, nBranches, 1, 1);
     vector<xmatrix<xcomplex<double> > > placeholder_mat;
     return getFrequency(kpoint, flags, placeholder_eigen, placeholder_mat, false);
+  }
+
+  // ME190624 - get eigenvectors and frequencies
+  xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
+                                                 xmatrix<xcomplex<double> >& eigenvectors) {
+    vector<xmatrix<xcomplex<double> > > placeholder_mat;
+    return getFrequency(kpoint, flags, eigenvectors, placeholder_mat, false);
   }
 
   xvector<double> PhononCalculator::getFrequency(const xvector<double>& kpoint, IPCFreqFlags flags,
@@ -1587,9 +1600,9 @@ namespace apl {
 	for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
 	  int l = 0;
 	  for (; l < _supercell.getNumberOfAtoms(); l++)
-	    if ((fabs(ix.atoms[k].cpos(1) - _supercell.getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
-		(fabs(ix.atoms[k].cpos(2) - _supercell.getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
-		(fabs(ix.atoms[k].cpos(3) - _supercell.getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
+	    if ((aurostd::abs(ix.atoms[k].cpos(1) - _supercell.getSupercellStructure().atoms[l].cpos(1)) < _AFLOW_APL_EPS_) &&
+		(aurostd::abs(ix.atoms[k].cpos(2) - _supercell.getSupercellStructure().atoms[l].cpos(2)) < _AFLOW_APL_EPS_) &&
+		(aurostd::abs(ix.atoms[k].cpos(3) - _supercell.getSupercellStructure().atoms[l].cpos(3)) < _AFLOW_APL_EPS_))
 	      break;
 	  //CO, not really mapping error, just mismatch between structure read in (ix) and current supercell structure (should be exact)
 	  if (l == _supercell.getNumberOfAtoms()) {
@@ -2064,6 +2077,11 @@ namespace apl {
     return (3 * _supercell.getInputStructure().atoms.size());
   }
 
+  // ME190614
+  string PhononCalculator::getSystemName() {
+    return _system;
+  }
+
   // ///////////////////////////////////////////////////////////////////////////
   void PhononCalculator::store_masses()  //[PINKU]
   {
@@ -2234,7 +2252,8 @@ namespace apl {
       }
       if(_kbinFlags.AFLOW_MODE_VASP) {
 	if(aurostd::EFileExist(dir + string("/vasprun.xml.static")) || 
-	   aurostd::EFileExist(dir + string("/vasprun.xml"))) {
+	   aurostd::EFileExist(dir + string("/vasprun.xml")) || 
+           aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME190607
 	  return true;
 	}
       }
@@ -2249,25 +2268,32 @@ namespace apl {
 
   //outfileFoundEverywherePhonons///////////////////////////////////////////////
   void PhononCalculator::outfileFoundEverywherePhonons(vector<_xinput>& xinps) {
-	  _logger << "Reading vasprun.xml files." << apl::endl; //CO190116
+    _logger << "Reading force files." << apl::endl; //CO190116  // ME190607
     for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {
-      _logger << "Reading vasprun.xml " << idxRun+1 << "/" << (uint)xinps.size() << "." << apl::endl; //CO190116
-      string tarfilename = xinps[idxRun].getDirectory() + ".tar";
+      _logger << "Reading force file " << idxRun+1 << "/" << (uint)xinps.size() << "." << apl::endl; //CO190116  // ME190607
+      // string tarfilename = xinps[idxRun].getDirectory() + ".tar";  OBSOLETE ME 190607
       xinps[idxRun].getXStr().qm_forces.clear();
       // Load data....
       if(_kbinFlags.AFLOW_MODE_VASP){
-	string vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml.static");
-	if(!aurostd::EFileExist(vasprunxml_file)) {
-	  vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml");
-	  if(!aurostd::EFileExist(vasprunxml_file)) {
-	    _logger << apl::warning << "The vasprun.xml file in " << xinps[idxRun].getDirectory() << " directory is missing." << apl::endl;
-	    throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
-	  }
-	}
-	//xVASPRUNXML vasprunxml(vasprunxml_file); OBSOLETE ME 190204 - far too slow
-        xVASPRUNXML vasprunxml;
-        vasprunxml.GetForcesFile(vasprunxml_file);
-	for (uint i = 0; i < vasprunxml.vforces.size(); i++) xinps[idxRun].getXStr().qm_forces.push_back(vasprunxml.vforces.at(i));
+        // ME 190607 - BEGIN
+        // Read forces from aflow qmvasp file - much faster
+        xinps[idxRun].getXStr().qm_forces = readForcesFromQmvasp(xinps[idxRun].getDirectory());
+        if ((int) xinps[idxRun].getXStr().qm_forces.size() != _supercell.getNumberOfAtoms()) {
+          _logger << "Reading forces from " << DEFAULT_AFLOW_QMVASP_OUT << " failed. Will try vasprun.xml" << apl::endl;
+          xinps[idxRun].getXStr().qm_forces.clear();
+          string vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml.static");
+          if(!aurostd::EFileExist(vasprunxml_file)) {
+            vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml");
+            if(!aurostd::EFileExist(vasprunxml_file)) {
+              _logger << apl::warning << "The vasprun.xml file in " << xinps[idxRun].getDirectory() << " directory is missing." << apl::endl;
+              throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
+            }
+          }
+          //xVASPRUNXML vasprunxml(vasprunxml_file); OBSOLETE ME 190204 - far too slow
+          xVASPRUNXML vasprunxml;
+          vasprunxml.GetForcesFile(vasprunxml_file);
+          for (uint i = 0; i < vasprunxml.vforces.size(); i++) xinps[idxRun].getXStr().qm_forces.push_back(vasprunxml.vforces.at(i));
+        }
 	if (int(xinps[idxRun].getXStr().qm_forces.size()) == _supercell.getNumberOfAtoms()) { xinps[idxRun].getXStr().qm_calculated = TRUE; }
       }
       if(_kbinFlags.AFLOW_MODE_AIMS){
@@ -2302,7 +2328,7 @@ namespace apl {
 //	if (aurostd::FileExist(tarfilename)) aurostd::execute(string("rm -rf ") + xinps[idxRun].getDirectory() + "/");
 //      }
     }
-    _logger << "No errors caught, all vasprun.xml files read successfully." << apl::endl; //CO190116
+    _logger << "No errors caught, all force files read successfully." << apl::endl; //CO190116  // ME190607
   }
   
   void PhononCalculator::subtractZeroStateForces(vector<_xinput>& xinps) {
@@ -2316,4 +2342,37 @@ namespace apl {
   }
   // END ME 180518
 
+  // ME 190607
+  vector<xvector<double> > PhononCalculator::readForcesFromQmvasp(const string& directory) {
+    vector<xvector<double> > forces;
+    string file = directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
+    if (aurostd::EFileExist(file)) {
+      vector<string> vlines;
+      aurostd::efile2vectorstring(file, vlines);
+      uint vsize = vlines.size();
+      uint line_count = 0;
+      string line;
+      while (line_count != vsize) {
+        line = vlines[line_count++];
+        if (line.find("TOTAL-FORCE") != string::npos) {
+          vector<double> tokens;
+          xvector<double> f(3);
+          line = vlines[++line_count];  // Skip [AFLOW] line
+          while ((line_count < vsize) && (line.find("[AFLOW]") == string::npos)) {
+            aurostd::string2tokens(line, tokens, " ");
+            if (tokens.size() == 6) {
+              for (int i = 1; i < 4; i++) f[i] = tokens[i+2];
+              forces.push_back(f);
+            } else {  // size has to be six, or there is an error in the file
+              forces.clear();
+              return forces;
+            }
+            line = vlines[++line_count];
+          }
+          return forces;
+        }
+      }
+    }
+    return forces;
+  }
 }  // namespace apl

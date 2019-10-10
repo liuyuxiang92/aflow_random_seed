@@ -139,9 +139,9 @@ bool relaxStructureAPL_VASP(int start_relax,
   // Safeguard for when CONVERT is set in the aflow.in file
   if (!vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") &&
       !vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme.empty()) { // ME190109
-  xvasp.str.Standard_Lattice_primitive = false;
-  xvasp.str.Standard_Lattice_conventional = false;
-  VASP_Convert_Unit_Cell(xvasp, vflags, aflags, fileMessage, aus);
+    xvasp.str.Standard_Lattice_primitive = false;
+    xvasp.str.Standard_Lattice_conventional = false;
+    VASP_Convert_Unit_Cell(xvasp, vflags, aflags, fileMessage, aus);
   }
 
   // Restore original settings
@@ -307,12 +307,14 @@ void RunPhonons_APL_181216(_xinput& xinput,
   /***************************** READ PARAMETERS *****************************/
 
   string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO190114 - initialize everything
+  string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; // ME190625
   string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO190114 - initialize everything
   bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false; //CO190114 - initialize everything
   bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO190114 - initialize everything
   double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO190114 - initialize everything  
   int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO190114 - initialize everything
   vector<int> USER_DOS_MESH(3);
+  vector<xvector<double> > USER_DOS_PROJECTIONS;
   for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
     const string& key = kflags.KBIN_MODULE_OPTIONS.aplflags[i].keyword;
     logger << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme << apl::endl;
@@ -348,9 +350,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
     if (key == "DOSMETHOD") {USER_DOS_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
     if (key == "DOSSMEAR") {USER_DOS_SMEAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_double; continue;}
     if (key == "DOSPOINTS") {USER_DOS_NPOINTS = kflags.KBIN_MODULE_OPTIONS.aplflags[i].content_int; continue;}
+    if (key == "DOSPROJECTIONS_CART") {USER_DOS_PROJECTIONS_CART_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
+    if (key == "DOSPROJECTIONS_FRAC") {USER_DOS_PROJECTIONS_FRAC_SCHEME = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}  // ME190625
     if (key == "TP") {USER_TP = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
     if (key == "TPT") {USER_TPT = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
-      }
+  }
 
   /***************************** CHECK PARAMETERS *****************************/
 
@@ -383,18 +387,18 @@ void RunPhonons_APL_181216(_xinput& xinput,
         } else if (START_RELAX != 1) {
           logger << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
           logger << "Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << "." << apl::endl;
-      }
+        }
       } else {
         USER_RELAX = false;
         logger << apl::warning << "RELAX option only supported for VASP. Relaxations will be skipped." << apl::endl;
-        }
-          }
+      }
+    }
 
     // Correct user engine
     if (USER_ENGINE == "GSA") {
       logger << "The Generalized Supercell Approach (GSA) is deprecated - replaced with the Direct Method (DM)." << apl::endl;
       USER_ENGINE = "DM";
-            }
+    }
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
       message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
       message += "See README_AFLOW_APL.TXT for more information.";
@@ -421,12 +425,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
         USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_type;
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
-      tokens.clear();
+        tokens.clear();
         if (!USER_DC_INITCOORDS_FRAC.empty()) {
           apl::tokenize(USER_DC_INITCOORDS_FRAC, tokens, string(" ;"));
         } else {
           apl::tokenize(USER_DC_INITCOORDS_CART, tokens, string(" ;"));
-    }
+        }
         uint ncoords = tokens.size();
         tokens.clear();
         apl::tokenize(USER_DC_INITCOORDS_LABELS, tokens, string(" ,;"));  // ME190427 - also break along semicolon
@@ -435,12 +439,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
           message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
           message += "See README_AFLOW_APL.TXT for more information.";
           throw apl::APLRuntimeError(message);
-      }
+        }
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
         message += "See README_AFLOW_APL.TXT for more information.";
         throw apl::APLRuntimeError(message);
-    }
+      }
     }
 
     // DOS
@@ -465,6 +469,31 @@ void RunPhonons_APL_181216(_xinput& xinput,
         USER_DOS_MESH[0] = aurostd::string2utype<int>(tokens[0]);
         USER_DOS_MESH[1] = aurostd::string2utype<int>(tokens[1]);
         USER_DOS_MESH[2] = aurostd::string2utype<int>(tokens[2]);
+      }
+      // ME190625 - projected DOS
+      if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() || !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
+        if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
+          message = "Ambiguous input in APL DOS projections. ";
+          message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
+          throw apl::APLRuntimeError(message);
+        } else {
+          string projscheme;
+          if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
+          else projscheme = USER_DOS_PROJECTIONS_FRAC_SCHEME;
+          aurostd::string2tokens(projscheme, tokens, "; ");
+          for (uint i = 0; i < tokens.size(); i++) {
+            vector<double> proj;
+            aurostd::string2tokens(tokens[i], proj, ", ");
+            if (proj.size() == 3) {
+              USER_DOS_PROJECTIONS.push_back(aurostd::vector2xvector<double>(proj));
+            } else {
+              message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
+              message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
+              message += "See README_AFLOW_APL.TXT for the correct format.";
+              throw apl::APLRuntimeError(message);
+            }
+          }
+        }
       }
     }
 
@@ -554,6 +583,18 @@ void RunPhonons_APL_181216(_xinput& xinput,
     logger << " mesh with " << USER_DOS_NPOINTS << " bins.";
     if (USER_DOS_METHOD == "RS")
       logger << " A smearing value of " << USER_DOS_SMEAR << " eV will be used.";
+    // ME190626 - projected DOS
+    if ((USER_DOS_PROJECTIONS.size() == 0) || (USER_DOS_METHOD == "RS")) {
+      logger << " Projected phonon DOS will NOT be calculated.";
+    } else {
+      logger << " Projected phonon DOS will be calculated along the "
+             << (USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"fractional":"Cartesian") << " directions ";
+      for (uint i = 0; i < USER_DOS_PROJECTIONS.size(); i++) {
+        logger << "[";
+        for (int j = 1; j < 4; j++) logger << USER_DOS_PROJECTIONS[i][j] << ((j < 3)?", ":"");
+        logger << "]" << ((i < USER_DOS_PROJECTIONS.size() - 1)?", ":".");
+      }
+    }
     logger << apl::endl;
   } else {
     logger << "Phonon DOS will NOT be calculated." << apl::endl;
@@ -1204,6 +1245,13 @@ void RunPhonons_APL_181216(_xinput& xinput,
       }
     }
 
+    // ME190626 - Convert projection directions for DOS to Cartesian
+    if ((USER_DOS_PROJECTIONS.size() > 0) && (!USER_DOS_PROJECTIONS_FRAC_SCHEME.empty())) {
+      for (uint p = 0; p < USER_DOS_PROJECTIONS.size(); p++) {
+        USER_DOS_PROJECTIONS[p] = xinput.getXStr().f2c * USER_DOS_PROJECTIONS[p];
+      }
+    }
+
     // SUPERCELL ---------------------------------------------------------
 
     // Construct the working supercell ////////////////////////////////////
@@ -1502,7 +1550,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
           //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
           //  phcalc->getInputCellStructure(), logger);
          apl::QMesh qmesh(USER_DOS_MESH, phcalc->getInputCellStructure(), logger);
-         qmesh.makeIrreducible();
+         if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
 
         // OBSOLETE - DOSCalculator is not an auto_ptr anymore
         //auto_ptr<apl::DOSCalculator> dosc;
@@ -1516,7 +1564,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
         //  dosc.reset(new apl::DOSRootSamplingMethod(*phcalc, qmesh, logger));
         //}
         
-        apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD);
+        apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
 
         // ME190428 - END
         // Calculate DOS
@@ -1561,9 +1609,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
                   }
                 }
                 // ME190501 Allow user to override path
-                  if(!USER_DC_USERPATH.empty()) {  // Set path
-                    pdisc.setPath(USER_DC_USERPATH);
-                  }
+                if(!USER_DC_USERPATH.empty()) {  // Set path
+                  pdisc.setPath(USER_DC_USERPATH);
+                }
 
                 std::vector< xvector<double> > qpoints=pdisc.get_qpoints();
                 store.create_pdispath(qpoints);
@@ -1576,7 +1624,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
               //apl::MonkhorstPackMesh qmesh(USER_DOS_MESH[0], USER_DOS_MESH[1], USER_DOS_MESH[2],
               //                             phcalc->getInputCellStructure(),logger);
               apl::QMesh qmesh(USER_DOS_MESH, phcalc->getInputCellStructure(), logger);
-              qmesh.makeIrreducible();
+              if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
               
               // OBSOLETE - DOSCalculator is not an auto_ptr anymore
               //auto_ptr<apl::DOSCalculator> dosc;
@@ -1589,7 +1637,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
               //  dosc.reset( new apl::DOSRootSamplingMethod(*phcalc,qmesh,logger) );
               //}
               
-              apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD);
+              apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
               // ME190428 - END
               // Calculate DOS
               dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
@@ -1676,15 +1724,16 @@ void RunPhonons_APL_181216(_xinput& xinput,
         }
       }
       // ME190501 Allow user to override path
-        if(!USER_DC_USERPATH.empty()){  // Set path
-          pdisc.setPath(USER_DC_USERPATH);
-        }
+      if(!USER_DC_USERPATH.empty()){  // Set path
+        pdisc.setPath(USER_DC_USERPATH);
+      }
 
       // Calculate frequencies on path
       pdisc.calc(frequencyFormat);
 
       // Write results into PDIS file
       pdisc.writePDIS();
+      pdisc.writePHEIGENVAL();  // ME190614
 	//QHA/SCQHA/QHA3P  START //PN180705
 	//////////////////////////////////////////////////////////////////////
         ptr_hsq.reset(new apl::PhononHSQpoints(logger));
@@ -1726,7 +1775,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       //                             phcalc->getInputCellStructure(), logger);
 
       apl::QMesh qmesh(USER_DOS_MESH, phcalc->getInputCellStructure(), logger);
-      qmesh.makeIrreducible();
+      if (USER_DOS_PROJECTIONS.size() == 0) qmesh.makeIrreducible();  // ME190625
       // Setup the DOS engine which is used also for thermodynamic properties
       // OBSOLETE - DOSCalculator is not an auto_ptr anymore
       //auto_ptr<apl::DOSCalculator> dosc;
@@ -1740,11 +1789,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
       //}
 
       // Calculate DOS
-      apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD);
+      apl::DOSCalculator dosc(*phcalc, qmesh, logger, USER_DOS_METHOD, USER_DOS_PROJECTIONS);
       // ME190428 - END
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) {
         dosc.writePDOS();
+        dosc.writePHDOSCAR();  // ME190614
       }
 
       // Calculate thermal properties
@@ -3815,7 +3865,6 @@ void RunPhonons_APL_180101(_xinput& xinput,
       bool awakeAnharmIFCs;
       for (uint i = 0; i < phcalc->_clusters.size(); i++) {
         string ifcs_hib_file = DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
-        //[ME181226] std::cout << ifcs_hib_file << std::endl;
         if (USER_HIBERNATE_OPTION.option) {
           awakeAnharmIFCs = (aurostd::EFileExist(ifcs_hib_file) ||
                              aurostd::FileExist(ifcs_hib_file));

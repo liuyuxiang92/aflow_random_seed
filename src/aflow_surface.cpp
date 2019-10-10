@@ -1404,7 +1404,7 @@ namespace slab {
 	  j=i+1;
 	  while (j<=3 && Continue==true) {  
 	    DET=MATRIX[i][1]*MATRIX[j][2]-MATRIX[i][2]*MATRIX[j][1];  
-	    if(fabs(DET)>_slab_epsilon_) {
+	    if(aurostd::abs(DET)>_slab_epsilon_) {
 	      t1=i; 
 	      t2=j;
 	      Continue=false;
@@ -1420,7 +1420,7 @@ namespace slab {
 	  cerr << MATRIX[1][1] << " " << MATRIX[1][2] << endl << MATRIX[2][1] << " " << MATRIX[2][2] << endl;
 	  }*/
   
-	if(fabs(DET)>_slab_epsilon_) {
+	if(aurostd::abs(DET)>_slab_epsilon_) {
 	  INVERSE_MATRIX[1][1]= MATRIX[t2][2]/DET;  INVERSE_MATRIX[1][2]=-MATRIX[t1][2]/DET;
 	  INVERSE_MATRIX[2][1]=-MATRIX[t2][1]/DET;  INVERSE_MATRIX[2][2]= MATRIX[t1][1]/DET;
 	  VECTOR[1]=t1; VECTOR[2]=t2;
@@ -1437,11 +1437,11 @@ namespace slab {
 	      fractpart[i]=modf (s[i] , &intpart);
 	    }
   
-	    //if(fabs(fractpart[1]-1.0)<_slab_epsilon_ || fabs(fractpart[2]-1.0)<_slab_epsilon_) {for(i=1;i<=2;i++) { cerr << s[i] << " (" << fractpart[i] << ") " << endl; };}
+	    //if(aurostd::abs(fractpart[1]-1.0)<_slab_epsilon_ || aurostd::abs(fractpart[2]-1.0)<_slab_epsilon_) {for(i=1;i<=2;i++) { cerr << s[i] << " (" << fractpart[i] << ") " << endl; };}
 	    //cerr << s[1] << " (" << fractpart[1] << "); "  << s[2] << " (" << fractpart[2] << ") " << endl; cin >> Help_string;
-	    //cerr << fabs(fractpart[1]) << "absFrac-_slab_epsilon_" << _slab_epsilon_ << endl;
-	    //  if((fabs(fractpart[1])<_slab_epsilon_) &&  (fabs(fractpart[2])<_slab_epsilon_)) { cerr << LayerBasis[1] << " =LayerBasis= " << LayerBasis[2] << endl; cerr << s[1] << " " << s[2] << endl; /*cin >> Help_double;*/}
-	    if((fabs(fractpart[1])>_slab_epsilon_ && fabs(fabs(fractpart[1])-1.0)>_slab_epsilon_) ||  (fabs(fractpart[2])>_slab_epsilon_ && fabs(fabs(fractpart[2])-1.0)>_slab_epsilon_)) {
+	    //cerr << aurostd::abs(fractpart[1]) << "absFrac-_slab_epsilon_" << _slab_epsilon_ << endl;
+	    //  if((aurostd::abs(fractpart[1])<_slab_epsilon_) &&  (aurostd::abs(fractpart[2])<_slab_epsilon_)) { cerr << LayerBasis[1] << " =LayerBasis= " << LayerBasis[2] << endl; cerr << s[1] << " " << s[2] << endl; /*cin >> Help_double;*/}
+	    if((aurostd::abs(fractpart[1])>_slab_epsilon_ && aurostd::abs(aurostd::abs(fractpart[1])-1.0)>_slab_epsilon_) ||  (aurostd::abs(fractpart[2])>_slab_epsilon_ && aurostd::abs(aurostd::abs(fractpart[2])-1.0)>_slab_epsilon_)) {
 	      Continue=false;
 	      /*if(LayerBasis[1]==48 && LayerBasis[2]==49) {
 		cerr << LayerBasis[1] << " =LayerBasis= " << LayerBasis[2] << endl;
@@ -1459,7 +1459,7 @@ namespace slab {
 	  //cerr << "Basis:" << endl; for(i=1;i<=2;i++) {for(j=1;j<=3;j++) { cerr << LayerSitesDirCoords[0][LayerBasis[i]][j] << " ";} cerr << endl;}
 	  Layer0BasisCosAngleCurrent=CosAngle(0,LayerBasis[1],0,LayerBasis[2], UnitCellVector, LayerSitesDirCoords);
 	  //cerr << "CosAngle=" << Layer0BasisCosAngleCurrent << endl;
-	  if(Layer0BasisCosAngleCurrent>=0 && Layer0BasisCosAngleCurrent<Layer0BasisCosAngle && fabs(Layer0BasisCosAngleCurrent-Layer0BasisCosAngle)>_slab_epsilon_) {
+	  if(Layer0BasisCosAngleCurrent>=0 && Layer0BasisCosAngleCurrent<Layer0BasisCosAngle && aurostd::abs(Layer0BasisCosAngleCurrent-Layer0BasisCosAngle)>_slab_epsilon_) {
 	    for(i=1;i<=2;i++) {
 	      Layer0Basis[i]=LayerBasis[i]; 
 	    }
@@ -1562,7 +1562,7 @@ namespace slab {
 	  }
 	}
 	//cerr << SiteDirectCoord[1] << " " << SiteDirectCoord[2] << endl; // cin >> Help_double;
-	if(SiteDirectCoord[1]>=0 && SiteDirectCoord[1]<1 && fabs(SiteDirectCoord[1]-1)>_slab_epsilon_ && SiteDirectCoord[2]>=0 && SiteDirectCoord[2]<1 && fabs(SiteDirectCoord[2]-1)>_slab_epsilon_) {
+	if(SiteDirectCoord[1]>=0 && SiteDirectCoord[1]<1 && aurostd::abs(SiteDirectCoord[1]-1)>_slab_epsilon_ && SiteDirectCoord[2]>=0 && SiteDirectCoord[2]<1 && aurostd::abs(SiteDirectCoord[2]-1)>_slab_epsilon_) {
 	  //SiteDirectCoord[3]=Layer/hkl_Length/AbsValueSlab_Basis[3];
 	  SiteDirectCoord[3]=1.0*Layer/(NumFilledLayers + NumEmptyLayers);
 	  // cerr << SiteDirectCoord[1] << " " << SiteDirectCoord[2] << " " << SiteDirectCoord[3] << endl;
@@ -1617,12 +1617,12 @@ namespace slab {
 	      }
 	      SiteDirectCoordWRTslab[3]=RS[3]/(AbsValueSlab_Basis[3]*AbsValueSlab_Basis[3]);
 	      for(i=1;i<=3;i++) {
-		if(fabs(SiteDirectCoordWRTslab[i]-0.0)<_slab_epsilon_) {
+		if(aurostd::abs(SiteDirectCoordWRTslab[i]-0.0)<_slab_epsilon_) {
 		  SiteDirectCoordWRTslab[i]=0.0;
 		} 
 	      }
 	      for(i=1;i<=3;i++) {
-		if(fabs(SiteDirectCoordWRTslab[i]-1.0)<_slab_epsilon_) {
+		if(aurostd::abs(SiteDirectCoordWRTslab[i]-1.0)<_slab_epsilon_) {
 		  SiteDirectCoordWRTslab[i]=1.0;
 		} 
 	      }  
@@ -1660,7 +1660,7 @@ namespace slab {
       for(i=1;i<=NumSites[k];i++) {
 	Layer=1;Continue=true;
 	while (Layer<=NumLayers && Continue==true) {
-	  if(fabs(ListSiteDirectCoordWRTslab[k][i][3]-LayerDirectCoordWRTslab3[Layer])<_slab_epsilon_) {
+	  if(aurostd::abs(ListSiteDirectCoordWRTslab[k][i][3]-LayerDirectCoordWRTslab3[Layer])<_slab_epsilon_) {
 	    NumInLayer[Layer]++;
 	    AtomInLayer[Layer].resize(NumInLayer[Layer]+1);  
 	    AtomInLayer[Layer][NumInLayer[Layer]].resize(3);
@@ -2420,7 +2420,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
   uint starting_atom=AUROSTD_MAX_UINT;
   for(uint i=0;i<atoms.size();i++){
     if(LDEBUG){cerr << soliloquy << " checking atoms[i=" << i << "].fpos=" << atoms[i].fpos << endl;}
-    if(SYM::AtomFPOSMatch(fpos_starting,atoms[i].fpos,c2f,f2c,skew,sym_eps)){starting_atom=i;break;}
+    if(SYM::FPOSMatch(fpos_starting,atoms[i].fpos,lattice,f2c,skew,sym_eps)){starting_atom=i;break;} //DX 20190619 - lattice and f2c as input
   }
   if(starting_atom==AUROSTD_MAX_UINT){
     if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}
@@ -2494,7 +2494,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
       if(LDEBUG){cerr << soliloquy << " dist_rorigin=" << dist_rorigin << endl;}
       cpos_final+=cdiff;
       fpos_final=BringInCell(c2f*cpos_final);
-      dist_rorigin_new=aurostd::modulus(f2c*SYM::FPOSDistance(fpos_final,atoms[ind_min].fpos,lattice,c2f,f2c,skew));  //using fpos_final as a check
+      dist_rorigin_new=aurostd::modulus(f2c*SYM::FPOSDistFromFPOS(fpos_final,atoms[ind_min].fpos,lattice,c2f,f2c,skew));  //using fpos_final as a check //DX 20190620 - changed function name
       if(LDEBUG){
         cerr << soliloquy << " cpos_final(post)=" << cpos_final << endl;
         cerr << soliloquy << " fpos_final(post)=" << fpos_final << endl;

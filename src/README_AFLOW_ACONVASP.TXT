@@ -961,7 +961,7 @@ LATTICES = (the ones with "")
         This option is just for visualization and should not be used
         to transform POSCARS to run. You will get super-imposed atoms!
 
-  aflow --data[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] < POSCAR
+  aflow --data[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] < POSCAR
         Outputs to standard out basic data about the structure in the
         POSCAR input file. Output includes volume, a b c alpha beta gamma,
         reciprocal lattice, reciprocal lattice volume.
@@ -976,7 +976,7 @@ LATTICES = (the ones with "")
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
   aflow --data1=rcut < POSCAR
         This is basically like cmp_str except that it works on 1 str.  
         Slightly different data is given: No space groups, All bond lengths.
@@ -1017,7 +1017,7 @@ LATTICES = (the ones with "")
         The smallest mesh to satisfy this requirement is calculated.
         See also --kpoints.
 
-  aflow --edata[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt| =json] < POSCAR
+  aflow --edata[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt | --print=json] < POSCAR
         Outputs to standard the information given by --data in addition
         to lattice-, superlattice- and reciprocal-lattice types.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -1043,7 +1043,7 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
 
@@ -1058,7 +1058,7 @@ LATTICES = (the ones with "")
         See --edos. Outputs total DOS and DOS of orbital s and d. The sDOS or dDOS is per species
         as given in POSCAR. Output format:
         Energy DOSup DOSdown s_up_spec1 s_down_spec1...s_up_specN s_down_specN d_up_spec1 d_down_spec1...d_up_specN d_down_specN
-  aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculate point/factor/space group and use them to label equivalent
         and inequivalent atoms. On the output, each structure atom has
         number_label_of_atom[equivalent_to_label]* (* if inequivalent).
@@ -1082,7 +1082,7 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
 
@@ -1148,7 +1148,7 @@ LATTICES = (the ones with "")
         Useful for scripting (SC0209).
         Check aflow --readme=symmetry
 
-  aflow --factorgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --factorgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculates factor group symmetry of the cell {R|t} and writes
         in the aflow.fgroup.out file. See documentation of aflow.
         The point group is required for the factor group, therefore
@@ -1172,7 +1172,7 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
@@ -1193,7 +1193,7 @@ LATTICES = (the ones with "")
         Resample the PATH following the standard definition of the POSCAR and the standard path.
         If there are not nearby points, it will ask to redo the nbands step.
 
-  aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculates the full symmetry of a crystal: point group lattice, point group crystal, factor group,
         space group, site point group, inequivalent/equivalent atoms, and the point group of the klattice.
         This routine calculates the full symmetry suite at a certain tolerance. If symmetry rules are broken,
@@ -1215,7 +1215,7 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
@@ -1980,22 +1980,26 @@ LATTICES = (the ones with "")
   aflow --platonSG_number[=EQUAL | EXACT][,ang,d1,d2,d3] < POSCAR
         Same as above but prints ONLY the space group number.	  
 
-  aflow --plotband[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
-        Generate bandstructure plot using GNUPLOT
-        In this function, the spin-polarized DOS plot can be generated!
+  aflow --plotband | --plotbands[=directory[,Emin[,Emax]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--title=]
+        Generate bandstructure plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory:
          DOSCAR.static
          EIGENVAL.bands
          KPOINTS.bands
-         OUTCAR.static
+         POSCAR.static
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
-        Example:
-         aflow --plotband=/common/DATA/ZnO,-8,6  or
-         aflow --plotband=/common/DATA/ZnO,-8,6,1.2
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in EIGENVAL file)
+        Examples:
+         aflow --plotband=/common/DATA/ZnO,-8,6
+         aflow --plotband=./ --print=gpl --print=png --title=ZnO
+
   aflow --plotband2[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         In this function, the DOS is the sum of spin-up and spin-down!
         The following files must reside in the directory
@@ -2019,57 +2023,112 @@ LATTICES = (the ones with "")
          Emin: The minimum value of the DOS plot. Default value -10
          Emax: The maximum value of the DOS plot. Default value 10
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
-  aflow --plotbanddos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
-        Generate bandstructure plot and DOS plot using GNUPLOT
-        This function equals to "aflow --plotband" & ""aflow --plotdos"
+
+  aflow --plotbanddos [=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
+        Generate combined bandstructure and DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	 DOSCAR.static
 	 EIGENVAL.bands
 	 KPOINTS.bands
-	 OUTCAR.static
+	 POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
-  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
-        Generate DOS plot using GNUPLOT
-        The following files must reside in the directory:
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
+        Examples:
+          aflow --plotbanddos=/common/DATA/ZnO,-8,6,1.5
+          aflow --plotbanddos=./ --print=png --projection=atoms
+
+  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=]
+        Generate DOS plot using GNUPLOT and pdfLaTeX
+        The following file must reside in the directory:
          DOSCAR.static
-         OUTCAR.static
+         POSCAR.static (in VASP 5 format for atom-projected DOS)
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
         Examples:
          aflow --plotdos=/common/DATA/ZnO,-8,6
-         aflow --plotdos=/common/DATA/ZnO,-8,6,1.2
+         aflow --plotdos=./ --print=png --projection=atoms
+
   aflow --plotdosweb[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         Generate DOS plot using GNUPLOT
-        The following files must reside in the directory
+        The following file must reside in the directory
          DOSCAR.static
         Defaults.
          Directory: default = ./
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: 1.2
  
-  aflow --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
-        Generate PDOS plot using GNUPLOT
+  aflow --plotpdos | --plotpedos[=directory[,number_atom[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+        Generate atom-projected DOS plot using GNUPLOT and pdfLaTeX
         The following files must reside in the directory
 	  	DOSCAR.static
-	  	OUTCAR.static
+	  	POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
         Defaults.
          Directory: default = ./
-         Number atom: default = 1
-         Emin: The minimum value of the DOS plot. Default value -10
-         Emax: The maximum value of the DOS plot. Default value 10
-         DOSSCALE: The scale value of the DOS plot. Default value 1.2
-        Example:
-         aflow --plotpedos=/common/DATA/ZnO,1
-         aflow --plotpedos=/common/DATA/ZnO,1,-8,6
-         aflow --plotpedos=/common/DATA/ZnO,1,-8,6,1.2
+         Number atom: The atom index. Default value -1 (plot all inequivalent)
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
+        Examples:
+         aflow --plotpdos=/common/DATA/ZnO,-1,-8,6,1.2
+         aflow --plotpdos=./,2 --print=png
+
+  aflow --plotpdosall | --plotpedosall[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=lm|none|orbitals] [--title=]
+        Generate atom-projected DOS plots of all inequivalent atoms using GNUPLOT and pdfLaTeX
+        The following files must reside in the directory
+	  	DOSCAR.static
+	  	POSCAR.static
+        NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
+              with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
+              vasprun.xml.static, or OUTCAR.static are required as well.
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the DOS plot. Default value: -10
+         Emax: The maximum value of the DOS plot. Default value: 10
+         DOSSCALE: The scale value of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --noshift: do not shift the Fermi level to zero
+         --print: specify the format of the output image (default: pdf)
+         --projection: Determines whether the DOS is projected along the l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --title: the title of the plot in LaTeX format (default: AFLOW-formatted title based on title in DOSCAR file)
+        Examples:
+         aflow --plotpdosall=/common/DATA/ZnO,-1,-8,6,1.2
+         aflow --plotpdosall=./ --print=png
+
   aflow --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         Usage: aflow  --plotpedosall_nonquivalent[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]
         Generate PDOS plots of all the inquivalent atoms using GNUPLOT.
@@ -2084,39 +2143,106 @@ LATTICES = (the ones with "")
          DOSSCALE: The scale value of the DOS plot. Default value 1.2
         Use --keep=gnuplot (--keep=GPL) to keep the GNU plot code.
 
-  aflow --plotphonondispersion | --pphdis ( --rcm | --meV | --THz |  --hz ) [--print=eps | --print=pdf | --print=png | --print=jpg | --print=gif ] DIRECTORY
-        Usage:  aflow --pphdis --rcm /common/DATA/ZnO
- 	  Generate Phonon dispersion, phonon DoS, F_vib, S_vib, and C_v plots in .eps form using
- 	  GNUPLOT.  The flags [ --rcm | --meV | --THz |  --hz ] specifies the units used in the graphs; --rcm is default.
-	  	--rcm   reciprocal centimeters
-		--meV   mili-electron Volts
-		--THz   teraHertz
-		--hz    Hertz
-	  The optional flags [--print=pdf | --print=png | --print=jpg | --print=gif ] will trigger the conversion from .eps to the requested type.
- 	  The following files must reside in DIRECTORY as in the AFLOW written form or compressed files
- 	  	PDIS
- 		PDOS
- 		THERMO
-	  If the files are found compressed, the compressed files are preserved and temporary files are written and discarded.
- 	  The generation of these files is controlled by the commands
- 	      [AFLOW_APL]DC
- 	      [AFLOW_APL]DOS
- 	      [AFLOW_APL]TP
-        See README_APL, especially 3). for more details.
+  aflow --plotphdisp | --plotphonondispersion | --pphdis[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+        Plot the phonon dispersion using GNUPLOT and pdfLaTex
+        The following files must reside in the directory
+                PHDOSCAR
+                PHEIGENVAL
+                PHKPOINTS
+                PHPOSCAR
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the plot. Default value: minimum frequency
+         Emax: The maximum value of the plot. Default value: maximum frequency
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
+         --unit: the unit of the phonon frequencies/energies (default: THz)
+        Example:
+         aflow --plotphdisp=./  --print=png --unit=cm-1
+        
+  aflow --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+        Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
+        The following files must reside in the directory
+                PHDOSCAR
+                PHEIGENVAL
+                PHKPOINTS
+                PHPOSCAR
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the DOS plot. Default value: minimum frequency
+         Emax: The maximum value of the DOS plot. Default value: maximum frequency
+         DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in PHDOSCAR file)
+         --unit: the unit of the phonon frequencies/energies (default: THz)
+        Example:
+         aflow --plotphdispdos=./  --print=png --unit=cm-1
+ 	  
+  aflow --plotdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1]
+        Plot a combined phonon dispersion and phonon DOS plot using GNUPLOT and pdfLaTex
+        The following files must reside in the directory
+                PHDOSCAR
+        Defaults.
+         Directory: default = ./
+         Emin: The minimum value of the plot. Default value: minimum frequency
+         Emax: The maximum value of the plot. Default value: maximum frequency
+         DOSSCALE: The scaling factor of the DOS plot. Default value: no scaling
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: title in PHDOSCAR file)
+         --unit: the unit of the phonon frequencies/energies (default: THz)
+        Example:
+         aflow --plotphdos=./  --print=png --unit=cm-1
+
+  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+        Plots the APL thermal properties such as vibrational free energy, entropy, and heat capacity
+        using GNUPLOT and pdfLaTeX.
+        The following file must reside in the directory:
+                aflow.apl.thermal_properties.out
+        Defaults.
+         Directory: default = ./
+         Tmin: The minimum temperature of the plot. Default value: 0 K
+         Tmax: The maximum temperature of the plot. Default value: maximum temperature
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+        Example:
+         aflow --plotthermo=./,100,300
+
+  aflow --plotcond | --plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+        Plots the AAPL thermal conductivity using GNUPLOT and pdfLaTeX.
+        The following file must reside in the directory:
+                aflow.aapl.thermal_conductivity.out
+        Defaults.
+         Directory: default = ./
+         Tmin: The minimum temperature of the plot. Default value: 0 K
+         Tmax: The maximum temperature of the plot. Default value: maximum temperature
+        Optional arguments:
+         --keep=gpl: keep the gnuplot script
+         --print: specify the format of the output image (default: pdf)
+         --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+        Example:
+         aflow --plottcond=./,100,300
 
   aflow --pocc_dos[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
         Generate density of states (DOS) plot at different temperature for a partial occupation structure.
-        If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2 eV.
+        If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2.
         Example: aflow --pocc_dos=./,300
         More details about how to do this can be found in "README_AFLOW_POCC.TXT".
   aflow --pocc_mag[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
         Calculate magnetic moment at different temperature for a partial occupation structure.
- 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2 eV.
+ 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2.
         Example: aflow --pocc_mag=./,300
         More details about how to do this can be found in "README_AFLOW_POCC.TXT".
   aflow --pocc_bandgap[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]]
         Calculate band gap at different temperature for a partial occupation structure.
- 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2 eV.
+ 	If not specified, default directory is ./, temperature is 300K, DOS_Emin=-5 eV, DOS_Emax=5 eV, and DOSSCALE=1.2.
         Example: aflow --pocc_bandgap=./,300
         More details about how to do this can be found in "README_AFLOW_POCC.TXT".
 
@@ -2193,7 +2319,7 @@ LATTICES = (the ones with "")
         the output of aflow.  I am not sure that this will all  
         work the same way with PAW potentials.  
 
-  aflow --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] < POSCAR
+  aflow --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
         Calculates the point group symmetry of the lattice {R} and writes
         it in the aflow.pgroup.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2207,10 +2333,10 @@ LATTICES = (the ones with "")
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculate the point group symmetry of the crystal {R+atoms} and
         writes it the aflow.pgroup_xtal.file.  
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2232,11 +2358,11 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
-  aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] < POSCAR
+  aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
         Calculates the point group symmetry of the klattice {K} and writes
         it in the aflow.pgroupk.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2250,10 +2376,10 @@ LATTICES = (the ones with "")
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
         Calculates the dual of the crystal point group symmetry operations and writes
         it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2275,7 +2401,7 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
@@ -2702,7 +2828,7 @@ LATTICES = (the ones with "")
         Charges must be entered after each atom position.
         E.g.,   Co 0 0 0 +2.  
 
-  aflow --sgdata | --space_group_data[=tolerance| =tight| =loose] [--setting=1| =2][--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --sgdata | --space_group_data[=tolerance| =tight| =loose] [--setting=1| =2][--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Outputs the following space group information: space group number, space group labels 
         (Hermann Mauguin, Hall, Schoenflies), Laue class, crystal class, ITC setting, ITC origin shift, 
         general Wyckoff position, and the WYCCAR (similar to --edata).
@@ -2729,7 +2855,7 @@ LATTICES = (the ones with "")
           For monoclinic systems, setting 1=unique axis-b and 2=unique axis-c.
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
         Check aflow --readme=symmetry
 
   aflow --shell=ns,r1,r2,name,dens < POSCAR
@@ -2760,7 +2886,7 @@ LATTICES = (the ones with "")
         S=(Sx,Sy,Sz).  The shifted is added to the positions.  The shift
         is assumed to be given in Cartesian coordinates unless you specify
         c or C for Cartesian or d or D for direct at the end.
-  aflow --sitepointgroup | --agroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --sitepointgroup | --agroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
         Calculates the site point group symmetry for every atom in the
         unit cell and writes it in the aflow.agroup.out file.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2782,11 +2908,11 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
-  aflow --spacegroup [=tolerance| =tight| =loose] [--no_scan] [--print=txt| =json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]< POSCAR
+  aflow --spacegroup [=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]< POSCAR
         Calculates space group symmetry of the cell {R|t+T} with
         translations as big as |T| and writes it in the aflow.sgroup.out
         file. See documentation of aflow.
@@ -2814,7 +2940,7 @@ LATTICES = (the ones with "")
           collinear/non-collinear based on the input).
         Options:
           [--no_scan] : Will not perform tolerance scan.
-          [--print=txt| =json] : Specify output format.
+          [--print=txt | --print=json] : Specify output format.
           [--screen_only] : Prints symmetry elements to string and does not write to a file.
           [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
         Check aflow --readme=symmetry
@@ -3207,9 +3333,13 @@ FROZSL MODE
 
 ******************************************************************************************
 AFLOWLIB MODE
-  aflow --aflowlib=entry
+  aflow --aflowlib=entry [--print=txt | --print=json]
         Create the WEB/PHP page for the entry specified as auid or aurl. It works where the complete
         databases have been installed.
+	Entry can be auid, directories, icsd numbers.
+	OPTIONS
+	--print=txt (prints aflowlib.out)
+	--print=json (prints aflowlib.json)
 	
   aflow --aflowlib_auid2aurl=auid1,auid2.... | --auid2aurl=...
         Searches the available AUIDs and reports the AURLs if found.

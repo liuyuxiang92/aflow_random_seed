@@ -26,10 +26,13 @@ namespace apl {
 // ///////////////////////////////////////////////////////////////////////////
 
 //DOSCalculator::DOSCalculator(IPhononCalculator& pc, IReciprocalPointGrid& rg, Logger& l)  OBSOLETE ME190423
-DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string method)
+DOSCalculator::DOSCalculator(IPhononCalculator& pc, QMesh& rg, Logger& l, string method,
+                             const vector<xvector<double> >& projections)  // ME190624
     : _pc(pc), _rg(rg), _logger(l) {
   clear();
   _bzmethod = method;
+  _system = _pc.getSystemName();  // ME190614
+  _projections = projections;  // ME190626
   calculateFrequencies();
 }
 
@@ -47,7 +50,12 @@ void DOSCalculator::clear() {
   _freqs.clear();
   _bins.clear();
   _dos.clear();
+  _idos.clear();  // ME190614
+  _eigen.clear();  // ME190624
+  _projectedDOS.clear(); // ME190614
+  _projections.clear();  // ME190624
   _bzmethod = "";
+  _temperature = 0.0;  // ME190614
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -57,7 +65,7 @@ void DOSCalculator::calculateInOneThread(int startIndex, int endIndex) {
   //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
   for (int iqp = startIndex; iqp < endIndex; iqp++) {
     _logger.updateProgressBar(iqp, _qpoints.size());
-    _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE);
+    _freqs[iqp] = _pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  // ME190624
     //std::this_thread::yield();
   }
 }
@@ -99,6 +107,7 @@ void DOSCalculator::calculateFrequencies() {
   xvector<double> zero(_pc.getNumberOfBranches());
   for (uint i = 0; i < _qpoints.size(); i++)
     _freqs.push_back(zero);
+  _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc.getNumberOfBranches(), _pc.getNumberOfBranches()));  // ME190624
 
   // Distribute the calculation
   int startIndex, endIndex;
@@ -134,10 +143,13 @@ void DOSCalculator::calculateFrequencies() {
 #else
 
   // Calculate frequencies
+  // ME190624 - added eigenvectors for projected DOS
+  xmatrix<xcomplex<double> > xmtrx(_pc.getNumberOfBranches(), _pc.getNumberOfBranches());
   _logger.initProgressBar("Calculating frequencies for DOS");
   for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
     _logger.updateProgressBar(iqp, _qpoints.size());
-    _freqs.push_back(_pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE));
+    _freqs.push_back(_pc.getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
+    _eigen.push_back(xmtrx);
   }
   _logger.finishProgressBar();
 
@@ -167,16 +179,18 @@ void DOSCalculator::calculateFrequencies() {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-void DOSCalculator::smearWithGaussian(vector<double>& dos, double h, double sigma) {
+// ME190614 - added integrated DOS
+void DOSCalculator::smearWithGaussian(vector<double>& dos, vector<double>& idos, double h, double sigma) {
   // Construct table for gaussian function
   int ng = (int)(6.0 * sigma / h + 1.0);
   double fact = 1.0 / (sqrt(2.0 * M_PI) * sigma);
-  vector<double> gauss;
+  vector<double> gauss, igauss;
   double gnorm = 0.0;
   for (int ig = -ng; ig <= ng; ig++) {
     double eg = ig * h;
     double arg = eg * eg / (sigma * sigma) / 2.0;
     gauss.push_back(fact * exp(-arg));
+    igauss.push_back(fact * erf(-arg));
     gnorm += gauss.back();
   }
 
@@ -184,6 +198,7 @@ void DOSCalculator::smearWithGaussian(vector<double>& dos, double h, double sigm
   gnorm *= h;
   for (int ig = -ng; ig <= ng; ig++) {
     gauss[ig + ng] /= gnorm;
+    igauss[ig + ng] /= gnorm;
   }
 
   // Prepare new dos
@@ -191,15 +206,18 @@ void DOSCalculator::smearWithGaussian(vector<double>& dos, double h, double sigm
   for (uint i = 0; i < dos.size(); i++) {
     newdos.push_back(0.0);
   }
+  vector<double> newidos(newdos.size(), 0.0);
 
   // Convolute...
   for (int ie = 0; ie < (int)dos.size(); ie++) {
     double wt = dos[ie] * h;
+    double wti = idos[ie] * h;
     for (int jg = -ng; jg <= ng; jg++) {
       int je = ie + jg;
       if (je < 0) continue;
       if (je >= (int)dos.size()) continue;
       newdos[je] += gauss[jg + ng] * wt;
+      newidos[je] += igauss[jg + ng] * wti;
     }
   }
 
@@ -227,13 +245,19 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
 
   // Clear old stuff
   _dos.clear();
+  _idos.clear();  // ME190614
   _bins.clear();
 
   // Prepare storagearrays
   for (int k = 0; k < USER_DOS_NPOINTS; k++) {
     _dos.push_back(0);
+    _idos.push_back(0);  // ME190614
     _bins.push_back(_minFreq + k * _stepDOS + _halfStepDOS);
   }
+  // ME190624
+  if (_projections.size() > 0)
+    _projectedDOS.resize(_pc.getInputCellStructure().atoms.size(),
+                           vector<vector<double> >(_projections.size(), vector<double>(USER_DOS_NPOINTS)));
 
   // Perform the raw specific calculation by method
   // ME190423 - START
@@ -244,7 +268,7 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
 
   // Smooth DOS by gaussians
   if (USER_DOS_SMEAR > 1E-6)
-    smearWithGaussian(_dos, _stepDOS, USER_DOS_SMEAR);
+    smearWithGaussian(_dos, _idos, _stepDOS, USER_DOS_SMEAR);  // ME190614
 
   // Normalize to number of branches
   double sum = 0.0;
@@ -252,8 +276,10 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
     sum += _dos[k];
   sum /= _pc.getNumberOfBranches();
 
-  for (int k = 0; k < USER_DOS_NPOINTS; k++)
+  for (int k = 0; k < USER_DOS_NPOINTS; k++) {
     _dos[k] /= (sum * _stepDOS);
+    _idos[k] /= (sum * _stepDOS);  // ME190614
+  }
 }
 
 // ME190423 - START
@@ -261,6 +287,7 @@ void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
 // ///////////////////////////////////////////////////////////////////////////
 
 void DOSCalculator::calcDosRS() {
+  _logger << "Calculating phonon DOS using the root sampling method." << apl::endl;
   for (uint k = 0; k < _bins.size(); k++) {
     for (uint i = 0; i < _freqs.size(); i++) {
       for (int j = _freqs[i].lrows; j <= _freqs[i].urows; j++) {
@@ -271,24 +298,67 @@ void DOSCalculator::calcDosRS() {
       }
     }
   }
+  // ME190614 - calculate integrated DOS
+  _idos[0] = _dos[0];
+  for (uint k = 1; k < _dos.size(); k++) {
+    _idos[k] = _idos[k-1] + _dos[k];
+  }
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
+// ME190614 - added integrated DOS
+// ME190625 - rearranged and added projected DOS
 void DOSCalculator::calcDosLT() {
+  _logger << "Calculating phonon DOS using the linear tetrahedron method." << apl::endl;
+  // Procompute projections for each q-point and branch to save time
+  uint nproj = _projections.size();
+  vector<xvector<double> > proj_norm(nproj, xvector<double>(3));
+  for (uint p = 0; p < nproj; p++) {
+    proj_norm[p] = _projections[p]/aurostd::modulus(_projections[p]);
+  }
+  const xstructure& xstr = _pc.getInputCellStructure();
+  uint natoms = xstr.atoms.size();
+  vector<vector<vector<vector<double> > > > parts;
+  if (nproj > 0) {
+    xcomplex<double> eig;
+    parts.assign(_rg.getnQPs(), vector<vector<vector<double> > >(_pc.getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
+    for (int q = 0; q < _rg.getnQPs(); q++) {
+      for (uint br = 0; br < _pc.getNumberOfBranches(); br++) {
+        int ibranch = br + _freqs[0].lrows;
+        for (uint p = 0; p < nproj; p++) {
+          for (uint at = 0; at < natoms; at++) {
+            eig.re = 0.0;
+            eig.im = 0.0;
+            for (int i = 1; i < 4; i++) eig += proj_norm[p][i] * _eigen[q][3*at + i][ibranch];
+            parts[q][br][p][at] = aurostd::magsqr(eig);
+          }
+        }
+      }
+    }
+  }
+
   vector<double> f(4);
   double max_freq = _bins.back() + _halfStepDOS;
   double min_freq = _bins.front() - _halfStepDOS;
+  vector<vector<int> > tet_corners;
   LTMethod _lt(_rg, _logger);
-  for (int itet = 0; itet < _lt.getnTetrahedra(); itet++) {
+  if (nproj == 0) {
+    _lt.makeIrreducible();
+    tet_corners = _lt.getIrreducibleTetrahedraIbzqpt();
+  } else {
+    tet_corners = _lt.getTetrahedra();
+  }
+  for (int itet = 0; itet < _lt.getnIrredTetrahedra(); itet++) {
     double weightVolumeTetrahedron = _lt.getWeight(itet) * _lt.getVolumePerTetrahedron();
+    const vector<int>& corners = tet_corners[itet];
     for (int ibranch = _freqs[0].lrows; ibranch <= _freqs[0].urows; ibranch++) {
       for (int icorner = 0; icorner < 4; icorner++) {
-        f[icorner] = _freqs[_rg.getIbzqpt(_lt.getCornerIrred(itet, icorner))][ibranch];
+        f[icorner] = _freqs[corners[icorner]][ibranch];
       }
       std::sort(f.begin(), f.end());
-      double& fmin = f[0];
-      double& fmax = f[3];
+      double fmin = f[0];
+      double fmax = f[3];
       if (fmax > max_freq) continue;
       if (fmin < min_freq) continue;
       
@@ -312,18 +382,35 @@ void DOSCalculator::calcDosLT() {
       double cc23c = -3.0 * cc23 * (f31 + f42)/(f32 * f42);
       double cc34 = 3.0 * weightVolumeTetrahedron/(f41 * f42 * f43);
 
-      double fbin;
+      double fbin, dos, part;
+      int br = ibranch - _freqs[0].lrows;
       for (int k = kstart; k <= kstop; k++) {
         fbin = _minFreq + k * _stepDOS + _halfStepDOS;
+        dos = 0.0;
         if ((f[0] <= fbin) && (fbin <= f[1])) {
           double df = fbin - f[0];
-          _dos[k] += cc12 * df * df;
+          dos = cc12 * df * df;
+          _idos[k] += cc12 * (df * df * df)/3.0;
         } else if ((f[1] < fbin) && (fbin <= f[2])) {
           double df = fbin - f[1];
-          _dos[k] += cc23a + cc23b * df + cc23c * df * df;
+          dos = cc23a + cc23b * df + cc23c * df * df;
+          _idos[k] += cc23a * f21/3.0 + 3.0 * cc23 * f21 * df + 3.0 * cc23 * df * df + cc23c * (df * df * df)/3.0;
         } else if ((f[2] < fbin) && (fbin <= f[3])) {
           double df = f[3] - fbin;
-          _dos[k] += cc34 * df * df;
+          dos = cc34 * df * df;
+          _idos[k] += weightVolumeTetrahedron + cc34 * (df * df * df)/3.0;
+        } else if (f[3] < fbin) {
+          _idos[k] += weightVolumeTetrahedron;
+        }
+        _dos[k] += dos;
+        for (uint p = 0; p < nproj; p++) {
+          for (uint at = 0; at < natoms; at++) {
+            part = 0.0;
+            for (int icorner = 0; icorner < 4; icorner++) {
+              part += parts[corners[icorner]][br][p][at];
+            }
+            _projectedDOS[at][p][k] += 0.25 * dos * part;
+          }
         }
       }
     }
@@ -373,6 +460,86 @@ void DOSCalculator::writePDOS() {
   //outfile.clear();
   //outfile.close();
   //CO - END
+}
+
+// ME190614 - writes phonon DOS in DOSCAR format
+void DOSCalculator::writePHDOSCAR() {
+  string filename = DEFAULT_APL_PHDOSCAR_FILE;
+  _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
+  stringstream doscar;
+  xDOSCAR xdos = createDOSCAR();
+  doscar << xdos;
+  aurostd::stringstream2file(doscar, filename);
+  if (!aurostd::FileExist(filename)) {
+    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string message = "Cannot open output file " + filename + ".";
+    throw aurostd::xerror(function, message, _FILE_ERROR_);
+  }
+  if (xdos.partial) {  // Write PHDOSCAR if there are projected DOS
+    filename = DEFAULT_APL_PHPOSCAR_FILE;
+    xstructure xstr = _pc.getInputCellStructure();
+    xstr.is_vasp5_poscar_format = true;
+    stringstream poscar;
+    poscar << xstr;
+    aurostd::stringstream2file(poscar, filename);
+    if (!aurostd::FileExist(filename)) {
+      string function = "PhononDispersionCalculator::writePHPOSCAR()";
+      string message = "Cannot open output file " + filename + ".";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
+    }
+  }
+}
+  
+xDOSCAR DOSCalculator::createDOSCAR() {
+  xDOSCAR xdos;
+  xdos.spin = 0;
+  // Header values
+  xdos.number_atoms = _pc.getInputCellStructure().atoms.size();
+  xdos.partial = (_projectedDOS.size() > 0);
+  xdos.Vol = GetVolume(_pc.getInputCellStructure())/xdos.number_atoms;
+  xvector<double> lattice;
+  lattice[1] = _pc.getInputCellStructure().a * 1E-10;
+  lattice[2] = _pc.getInputCellStructure().b * 1E-10;
+  lattice[3] = _pc.getInputCellStructure().c * 1E-10;
+  xdos.lattice = lattice;
+  xdos.POTIM = 0.5E-15;
+  xdos.temperature = _temperature;
+  xdos.carstring = "PHON";
+  xdos.title = _system;
+
+  // Data
+  double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
+  double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
+  double conv = factorTHz2Raw * factorRaw2meV/1000;
+  xdos.energy_max = _maxFreq * conv;
+  xdos.energy_min = _minFreq * conv;
+  xdos.number_energies = _dos.size();
+  xdos.Efermi = 0.0;  // phonon DOS have no Fermi energy
+  xdos.venergy = aurostd::vector2deque(_bins);
+  for (uint i = 0; i < xdos.number_energies; i++) xdos.venergy[i] *= conv;
+  xdos.viDOS.resize(1);
+  xdos.viDOS[0] = aurostd::vector2deque(_idos);
+  deque<deque<deque<deque<double> > > > vDOS;
+  // ME190625
+  if (_projections.size() > 0) {
+    vDOS.resize(xdos.number_atoms + 1, deque<deque<deque<double> > >(_projections.size() + 1, deque<deque<double> >(1)));
+  } else {
+    vDOS.resize(1, deque<deque<deque<double> > >(1, deque<deque<double> >(1)));
+  }
+ 
+  vDOS[0][0][0] = aurostd::vector2deque<double>(_dos);
+
+  // ME190624 - projected DOS
+  if (_projections.size() > 0) {
+    for (uint at = 0; at < xdos.number_atoms; at++) {
+      for (uint p = 0; p < _projections.size(); p++) {
+        vDOS[at + 1][p + 1][0] = aurostd::vector2deque(_projectedDOS[at][p]);
+      }
+    }
+  }
+  xdos.vDOS = vDOS;
+
+  return xdos;
 }
 
 // ///////////////////////////////////////////////////////////////////////////

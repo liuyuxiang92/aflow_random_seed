@@ -453,7 +453,7 @@ namespace AEL_functions {
       // Convert units from kB to GPa
       // OBSOLETE Cij = 0.1 * Cij;
       // OBSOLETE // OBSOLETE Remove any values less than 1.0; these are likely due to noise
-      // OBSOLETE // OBSOLETE if(fabs(Cij) < 1.0) {
+      // OBSOLETE // OBSOLETE if(aurostd::abs(Cij) < 1.0) {
       // OBSOLETE   // OBSOLETE Cij = 0.0;
       // OBSOLETE // OBSOLETE }
       // OBSOLETE elastic_const[k+1][i] = Cij;
@@ -482,7 +482,7 @@ namespace AEL_functions {
 	// Convert units from kB to GPa
 	Cij = 0.1 * Cij;
 	// OBSOLETE Remove any values less than 1.0; these are likely due to noise
-	// OBSOLETE if(fabs(Cij) < 1.0) {
+	// OBSOLETE if(aurostd::abs(Cij) < 1.0) {
 	// OBSOLETE Cij = 0.0;
 	// OBSOLETE }
 	elastic_const[k+1][i] = Cij;
@@ -651,7 +651,7 @@ namespace AEL_functions {
       // Convert units from kB to GPa
       // OBSOLETE Cij = 0.1 * Cij;
       // OBSOLETE // OBSOLETE Remove any values less than 1.0; these are likely due to noise
-      // OBSOLETE // OBSOLETE if(fabs(Cij) < 1.0) {
+      // OBSOLETE // OBSOLETE if(aurostd::abs(Cij) < 1.0) {
       // OBSOLETE // OBSOLETE Cij = 0.0;
       // OBSOLETE // OBSOLETE }
       // OBSOLETE  elastic_const[k+1][i+3] = Cij;
@@ -678,7 +678,7 @@ namespace AEL_functions {
 	aelerror =  cij_fit(shear_deformations_tofit.at(i-1), stress_components.at(k), Cij, npolyfitorder, AEL_data.gaussxm_debug, FileMESSAGE);
 	// Convert units from kB to GPa
 	Cij = 0.1 * Cij;
-	// OBSOLETE if(fabs(Cij) < 1.0) {
+	// OBSOLETE if(aurostd::abs(Cij) < 1.0) {
 	// OBSOLETE Cij = 0.0;
 	// OBSOLETE }
 	elastic_const[k+1][i+3] = Cij;
@@ -725,23 +725,23 @@ namespace AEL_functions {
     // First find the matrix element with the largest value
     for (uint i = 1; i <= 6; i++) {
       for (uint j = 1; j <= 6; j++) {
-	if(Cijmax < fabs(elastic_const[i][j])) {
+	if(Cijmax < aurostd::abs(elastic_const[i][j])) {
 	  Cijmax = elastic_const[i][j];
 	}
       }
     }
     // Next set tolerance to 0.02 times Cijmax or 1.0; whichever is larger
-    Cijtol = fabs(0.02 * Cijmax);
+    Cijtol = aurostd::abs(0.02 * Cijmax);
     if(Cijtol < 1.0) {
       Cijtol = 1.0;
     }
     // Next set off-diagonal elements with an absolute value less than than the tolerance to zero
     for (uint i = 1; i <= 6; i++) {
       for (uint j = 1; j <= 6; j++) {
-	if((i != j) && (fabs(elastic_const[i][j]) < Cijtol)) {
+	if((i != j) && (aurostd::abs(elastic_const[i][j]) < Cijtol)) {
 	  elastic_const[i][j] = 0.0;
 	}
-	if((i != j) && (fabs(elastic_const_half[i][j]) < Cijtol)) {
+	if((i != j) && (aurostd::abs(elastic_const_half[i][j]) < Cijtol)) {
 	  elastic_const_half[i][j] = 0.0;
 	}
       }
@@ -933,8 +933,8 @@ namespace AEL_functions {
     // First check symmetry about diagonal - tensor should be symmetric for all lattice types
     for (uint i = 0; i < 6; i++) {
       for (uint j = 0; j < 6; j++) {
-	if(fabs(AEL_data.elastic_tensor.at(j).at(i)) < tol) {
-	  if(fabs(AEL_data.elastic_tensor.at(i).at(j)) > tol) {
+	if(aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) < tol) {
+	  if(aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > tol) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_" << i+1 << j+1 << endl;
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << endl;
@@ -990,7 +990,7 @@ namespace AEL_functions {
 	}
 	// Check off-diagonal elements in lower right quadrant are zero
 	for (uint j = 3; j < 6; j++) {
-	  if((i != j) && (fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
+	  if((i != j) && (aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1001,13 +1001,13 @@ namespace AEL_functions {
       // Check upper right and lower left quadrants are zero
       for (uint i = 3; i < 6; i++) {
 	for (uint j = 0; j < 3; j++) {
-	  if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1070,7 +1070,7 @@ namespace AEL_functions {
       // Next check off-diagonal elements in lower right quadrant are all zero
       for (uint i = 3; i < 6; i ++) {
 	for (uint j = 3; j < 6; j++) {
-	  if((i != j) && (fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
+	  if((i != j) && (aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1164,13 +1164,13 @@ namespace AEL_functions {
       if((xvasp.str.bravais_lattice_type == "HEX") || (tetI)) {
 	for (uint i = 3; i < 6; i++) {
 	  for (uint j = 0; j < 3; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1196,13 +1196,13 @@ namespace AEL_functions {
 	  }
 	  for (uint i = 3; i < 5; i++) {
 	    for (uint j = 0; j < 3; j++) {
-	      if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1238,13 +1238,13 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	  for (uint j = 0; j < 3; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_3" << j+1 << " = " << AEL_data.elastic_tensor.at(3).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << "3 = " << AEL_data.elastic_tensor.at(j).at(3) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1252,13 +1252,13 @@ namespace AEL_functions {
 	    }	  
 	  }
 	  for (uint j = 0; j < 3; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_5" << j+1 << " = " << AEL_data.elastic_tensor.at(5).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << "5 = " << AEL_data.elastic_tensor.at(j).at(5) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1294,13 +1294,13 @@ namespace AEL_functions {
 	  }
 	  for (uint i = 4; i < 6; i++) {
 	    for (uint j = 0; j < 3; j++) {
-	      if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1449,7 +1449,7 @@ namespace AEL_functions {
       // Next check off-diagonal elements 
       if(rhlI) {
 	if(inddir == 2) {
-	  if((fabs(AEL_data.elastic_tensor.at(0).at(3)) > 1.0) && (fabs(AEL_data.elastic_tensor.at(0).at(4)) < 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(3)) > 1.0) && (aurostd::abs(AEL_data.elastic_tensor.at(0).at(4)) < 1.0)) {
 	    if((AEL_data.elastic_tensor.at(0).at(3) / (-AEL_data.elastic_tensor.at(1).at(3)) > upperbound) || (AEL_data.elastic_tensor.at(0).at(3) / (-AEL_data.elastic_tensor.at(1).at(3)) < lowerbound)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_14" << endl;
@@ -1480,13 +1480,13 @@ namespace AEL_functions {
 	    }
 	    for (uint i = 4; i < 6; i++) {
 	      for (uint j = 0; j < 4; j++) {
-		if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		}
-		if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1506,7 +1506,7 @@ namespace AEL_functions {
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
-	  } else if((fabs(AEL_data.elastic_tensor.at(0).at(4)) > 1.0) && (fabs(AEL_data.elastic_tensor.at(0).at(3)) < 1.0)) {
+	  } else if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(4)) > 1.0) && (aurostd::abs(AEL_data.elastic_tensor.at(0).at(3)) < 1.0)) {
 	    if((AEL_data.elastic_tensor.at(0).at(4) / (-AEL_data.elastic_tensor.at(1).at(4)) > upperbound) || (AEL_data.elastic_tensor.at(0).at(4) / (-AEL_data.elastic_tensor.at(1).at(4)) < lowerbound)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_14" << endl;
@@ -1536,13 +1536,13 @@ namespace AEL_functions {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
 	    for (uint j = 0; j < 3; j++) {
-	      if((fabs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_4" << j+1 << " = " << AEL_data.elastic_tensor.at(3).at(j) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if((fabs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << j+1 << "4 = " << AEL_data.elastic_tensor.at(j).at(3) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1550,13 +1550,13 @@ namespace AEL_functions {
 	      }	  
 	    }
 	    for (uint j = 0; j < 3; j++) {
-	      if((fabs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_6" << j+1 << " = " << AEL_data.elastic_tensor.at(5).at(j) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if((fabs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << j+1 << "6 = " << AEL_data.elastic_tensor.at(j).at(5) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1595,7 +1595,7 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	} else if(inddir == 1) {
-	  if((fabs(AEL_data.elastic_tensor.at(0).at(3)) > 1.0) && (fabs(AEL_data.elastic_tensor.at(0).at(5)) < 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(3)) > 1.0) && (aurostd::abs(AEL_data.elastic_tensor.at(0).at(5)) < 1.0)) {
 	    if((AEL_data.elastic_tensor.at(0).at(3) / (-AEL_data.elastic_tensor.at(2).at(3)) > upperbound) || (AEL_data.elastic_tensor.at(0).at(3) / (-AEL_data.elastic_tensor.at(2).at(3)) < lowerbound)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_14" << endl;
@@ -1626,13 +1626,13 @@ namespace AEL_functions {
 	    }
 	    for (uint i = 4; i < 6; i++) {
 	      for (uint j = 0; j < 4; j++) {
-		if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		}
-		if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1652,7 +1652,7 @@ namespace AEL_functions {
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
-	  } else if((fabs(AEL_data.elastic_tensor.at(0).at(5)) > 1.0) && (fabs(AEL_data.elastic_tensor.at(0).at(3)) < 1.0)) {
+	  } else if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(5)) > 1.0) && (aurostd::abs(AEL_data.elastic_tensor.at(0).at(3)) < 1.0)) {
 	    if((AEL_data.elastic_tensor.at(0).at(5) / (-AEL_data.elastic_tensor.at(2).at(5)) > upperbound) || (AEL_data.elastic_tensor.at(0).at(5) / (-AEL_data.elastic_tensor.at(2).at(5)) < lowerbound)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_14" << endl;
@@ -1683,13 +1683,13 @@ namespace AEL_functions {
 	    }
 	    for (uint i = 3; i < 5; i++) {
 	      for (uint j = 0; j < 3; j++) {
-		if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		}
-		if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1727,7 +1727,7 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }  
 	} else if(inddir == 0) {
-	  if((fabs(AEL_data.elastic_tensor.at(1).at(4)) > 1.0) && (fabs(AEL_data.elastic_tensor.at(1).at(5)) < 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(1).at(4)) > 1.0) && (aurostd::abs(AEL_data.elastic_tensor.at(1).at(5)) < 1.0)) {
 	    if((AEL_data.elastic_tensor.at(1).at(4) / (-AEL_data.elastic_tensor.at(2).at(4)) > upperbound) || (AEL_data.elastic_tensor.at(1).at(4) / (-AEL_data.elastic_tensor.at(2).at(4)) < lowerbound)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_14" << endl;
@@ -1757,13 +1757,13 @@ namespace AEL_functions {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
 	    for (uint j = 0; j < 3; j++) {
-	      if((fabs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_3" << j+1 << " = " << AEL_data.elastic_tensor.at(3).at(j) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if((fabs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << j+1 << "3 = " << AEL_data.elastic_tensor.at(j).at(3) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1771,56 +1771,56 @@ namespace AEL_functions {
 	      }	  
 	    }
 	    for (uint j = 0; j < 3; j++) {
-	      if((fabs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_5" << j+1 << " = " << AEL_data.elastic_tensor.at(5).at(j) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if((fabs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
+	      if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
 		aurostd::StringstreamClean(aus);
 		aus << _AELSTR_WARNING_ + "C_" << j+1 << "5 = " << AEL_data.elastic_tensor.at(j).at(5) << " != 0.0" << endl;
 		aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }	  
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(4).at(0)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(0)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_51 = " << AEL_data.elastic_tensor.at(4).at(0) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(0).at(4)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(4)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_15 = " << AEL_data.elastic_tensor.at(0).at(4) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
-	    if((fabs(AEL_data.elastic_tensor.at(4).at(3)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(3)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_54 = " << AEL_data.elastic_tensor.at(4).at(3) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(3).at(4)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(4)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_45 = " << AEL_data.elastic_tensor.at(3).at(4) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
-	    if((fabs(AEL_data.elastic_tensor.at(5).at(4)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(4)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_65 = " << AEL_data.elastic_tensor.at(5).at(4) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(4).at(5)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(5)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_56 = " << AEL_data.elastic_tensor.at(4).at(5) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
-	  } else if((fabs(AEL_data.elastic_tensor.at(1).at(5)) > 1.0) && (fabs(AEL_data.elastic_tensor.at(1).at(4)) < 1.0)) {
+	  } else if((aurostd::abs(AEL_data.elastic_tensor.at(1).at(5)) > 1.0) && (aurostd::abs(AEL_data.elastic_tensor.at(1).at(4)) < 1.0)) {
 	    if((AEL_data.elastic_tensor.at(1).at(5) / (-AEL_data.elastic_tensor.at(2).at(5)) > upperbound) || (AEL_data.elastic_tensor.at(1).at(5) / (-AEL_data.elastic_tensor.at(2).at(5)) < lowerbound)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant C_14" << endl;
@@ -1851,13 +1851,13 @@ namespace AEL_functions {
 	    }
 	    for (uint i = 3; i < 5; i++) {
 	      for (uint j = 0; j < 3; j++) {
-		if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		}
-		if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+		if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 		  aurostd::StringstreamClean(aus);
 		  aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 		  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1956,13 +1956,13 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	  for (uint j = 2; j < 4; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(4).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_5" << j+1 << " = " << AEL_data.elastic_tensor.at(4).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(4)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(4)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << "5 = " << AEL_data.elastic_tensor.at(j).at(4) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -1970,13 +1970,13 @@ namespace AEL_functions {
 	    }	  
 	  }
 	  for (uint j = 0; j < 3; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_6" << j+1 << " = " << AEL_data.elastic_tensor.at(5).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << "6 = " << AEL_data.elastic_tensor.at(j).at(5) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2053,38 +2053,38 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	  for (uint j = 0; j < 3; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(4).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_5" << j+1 << " = " << AEL_data.elastic_tensor.at(4).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(4)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(4)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << "5 = " << AEL_data.elastic_tensor.at(j).at(4) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(5).at(1)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(1)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_62 = " << AEL_data.elastic_tensor.at(5).at(1) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(1).at(5)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(1).at(5)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_26 = " << AEL_data.elastic_tensor.at(1).at(5) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }	  
-	  if((fabs(AEL_data.elastic_tensor.at(5).at(3)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(3)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_64 = " << AEL_data.elastic_tensor.at(5).at(3) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(3).at(5)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(5)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_46 = " << AEL_data.elastic_tensor.at(3).at(5) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2160,51 +2160,51 @@ namespace AEL_functions {
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	  for (uint j = 0; j < 3; j++) {
-	    if((fabs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_4" << j+1 << " = " << AEL_data.elastic_tensor.at(3).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0) ) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << "4 = " << AEL_data.elastic_tensor.at(j).at(3) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }	  
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(4).at(0)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(0)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_51 = " << AEL_data.elastic_tensor.at(4).at(0) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(0).at(4)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(4)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_15 = " << AEL_data.elastic_tensor.at(0).at(4) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }	  
-	  if((fabs(AEL_data.elastic_tensor.at(5).at(0)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(0)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_61 = " << AEL_data.elastic_tensor.at(5).at(0) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(0).at(5)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(0).at(5)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_16 = " << AEL_data.elastic_tensor.at(0).at(5) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }	  
 
-	  if((fabs(AEL_data.elastic_tensor.at(5).at(4)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(4)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_65 = " << AEL_data.elastic_tensor.at(5).at(4) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(4).at(5)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(5)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_56 = " << AEL_data.elastic_tensor.at(4).at(5) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2221,7 +2221,7 @@ namespace AEL_functions {
       // Check off-diagonal elements in lower right quadrant are zero     
       for (uint i = 3; i < 6; i++) {
 	for (uint j = 3; j < 6; j++) {
-	  if((i != j) && (fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
+	  if((i != j) && (aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2232,13 +2232,13 @@ namespace AEL_functions {
       // Check upper right and lower left quadrants are zero
       for (uint i = 3; i < 6; i++) {
 	for (uint j = 0; j < 3; j++) {
-	  if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0) ) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2254,50 +2254,50 @@ namespace AEL_functions {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);       
       if(AEL_data.elastic_tensor.at(4).at(0) > 1.0) {
 	for (uint j = 0; j < 3; j++) {
-	  if((fabs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(j)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_4" << j+1 << " = " << AEL_data.elastic_tensor.at(3).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(j)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_6" << j+1 << " = " << AEL_data.elastic_tensor.at(5).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(3)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << j+1 << "4 = " << AEL_data.elastic_tensor.at(j).at(3) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  if((fabs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(5)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << j+1 << "6 = " << AEL_data.elastic_tensor.at(5).at(j) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	}
-	if((fabs(AEL_data.elastic_tensor.at(4).at(3)) > 1.0)) {
+	if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(3)) > 1.0)) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AELSTR_WARNING_ + "C_54 = " << AEL_data.elastic_tensor.at(4).at(3) << " != 0.0" << endl;
 	  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	}	  
-	if((fabs(AEL_data.elastic_tensor.at(4).at(5)) > 1.0)) {
+	if((aurostd::abs(AEL_data.elastic_tensor.at(4).at(5)) > 1.0)) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AELSTR_WARNING_ + "C_56 = " << AEL_data.elastic_tensor.at(4).at(5) << " != 0.0" << endl;
 	  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	}	  
-	if((fabs(AEL_data.elastic_tensor.at(3).at(4)) > 1.0)) {
+	if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(4)) > 1.0)) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AELSTR_WARNING_ + "C_45 = " << AEL_data.elastic_tensor.at(3).at(4) << " != 0.0" << endl;
 	  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	}	  
-	if((fabs(AEL_data.elastic_tensor.at(5).at(4)) > 1.0)) {
+	if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(4)) > 1.0)) {
 	  aurostd::StringstreamClean(aus);
 	  aus << _AELSTR_WARNING_ + "C_65 = " << AEL_data.elastic_tensor.at(5).at(4) << " != 0.0" << endl;
 	  aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2306,13 +2306,13 @@ namespace AEL_functions {
       } else if(AEL_data.elastic_tensor.at(3).at(0) > 1.0) {
 	for (uint j = 0; j < 3; j++) {
 	  for (uint i = 4; i < 6; i++) {
-	    if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0)) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2321,13 +2321,13 @@ namespace AEL_functions {
 	  }
 	}
         for (uint i = 4; i < 6; i++) {
-	  if((fabs(AEL_data.elastic_tensor.at(3).at(i)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(3).at(i)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_4" << i+1 << " = " << AEL_data.elastic_tensor.at(3).at(i) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }	  
-	  if((fabs(AEL_data.elastic_tensor.at(i).at(3)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(3)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << "4 = " << AEL_data.elastic_tensor.at(i).at(3) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2337,13 +2337,13 @@ namespace AEL_functions {
       } else if(AEL_data.elastic_tensor.at(5).at(0) > 1.0) {
 	for (uint j = 0; j < 3; j++) {
 	  for (uint i = 3; i < 5; i++) {
-	    if((fabs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(j)) > 1.0)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << i+1 << j+1 << " = " << AEL_data.elastic_tensor.at(i).at(j) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in normal stress: Increase normal strain" << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
-	    if((fabs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0)) {
+	    if((aurostd::abs(AEL_data.elastic_tensor.at(j).at(i)) > 1.0)) {
 	      aurostd::StringstreamClean(aus);
 	      aus << _AELSTR_WARNING_ + "C_" << j+1 << i+1 << " = " << AEL_data.elastic_tensor.at(j).at(i) << " != 0.0" << endl;
 	      aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
@@ -2352,13 +2352,13 @@ namespace AEL_functions {
 	  }
 	}
         for (uint i = 3; i < 5; i++) {
-	  if((fabs(AEL_data.elastic_tensor.at(5).at(i)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(5).at(i)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_6" << i+1 << " = " << AEL_data.elastic_tensor.at(5).at(i) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }	  
-	  if((fabs(AEL_data.elastic_tensor.at(i).at(5)) > 1.0)) {
+	  if((aurostd::abs(AEL_data.elastic_tensor.at(i).at(5)) > 1.0)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_WARNING_ + "C_" << i+1 << "6 = " << AEL_data.elastic_tensor.at(i).at(5) << " != 0.0" << endl;
 	    aus << _AELSTR_WARNING_ + "Inconsistency in elastic constant: Noise in shear stress: Increase shear strain" << endl;

@@ -632,14 +632,14 @@ void Supercell::trimStructure(int n, const xvector<double>& a,
   for (_AFLOW_APL_REGISTER_ int i = 0; i < (int)_scStructure.num_each_type.size(); i++) {
     int end = start + _scStructure.num_each_type[i];
     for (_AFLOW_APL_REGISTER_ int j = start; j < end - 1; j++) {
-      if (fabs(_scStructure.atoms[j].fpos(1)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(1) = 0.0;
-      if (fabs(_scStructure.atoms[j].fpos(2)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(2) = 0.0;
-      if (fabs(_scStructure.atoms[j].fpos(3)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(3) = 0.0;
+      if (aurostd::abs(_scStructure.atoms[j].fpos(1)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(1) = 0.0;
+      if (aurostd::abs(_scStructure.atoms[j].fpos(2)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(2) = 0.0;
+      if (aurostd::abs(_scStructure.atoms[j].fpos(3)) < _AFLOW_APL_EPS_) _scStructure.atoms[j].fpos(3) = 0.0;
 
       for (_AFLOW_APL_REGISTER_ int k = j + 1; k < end; k++) {
-        if (fabs(_scStructure.atoms[k].fpos(1)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(1) = 0.0;
-        if (fabs(_scStructure.atoms[k].fpos(2)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(2) = 0.0;
-        if (fabs(_scStructure.atoms[k].fpos(3)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(3) = 0.0;
+        if (aurostd::abs(_scStructure.atoms[k].fpos(1)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(1) = 0.0;
+        if (aurostd::abs(_scStructure.atoms[k].fpos(2)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(2) = 0.0;
+        if (aurostd::abs(_scStructure.atoms[k].fpos(3)) < _AFLOW_APL_EPS_) _scStructure.atoms[k].fpos(3) = 0.0;
 
         if (_scStructure.atoms[k].fpos(1) < _scStructure.atoms[j].fpos(1)) {
           _atom ta = _scStructure.atoms[j];
@@ -1047,7 +1047,7 @@ bool Supercell::compareFPositions(xvector<double>& v1, xvector<double>& v2) {
 bool Supercell::compareFPositions(xvector<double>& v1, xvector<double>& v2, double eps) {
   // Get the difference vector for SUPERCELL positions
   // if symmetry related, use eps=_sym_eps (default), otherwise eps=_AFLOW_APL_EPS_
-  return SYM::AtomFPOSMatch(v1, v2, _scStructure.c2f, _scStructure.f2c, _skew, eps);
+  return SYM::FPOSMatch(v1, v2, _scStructure.lattice, _scStructure.f2c, _skew, eps); //DX 20190619 - lattice and f2c as input
 }
 //[CO190218 - OBSOLETE]#else
 //[CO190218 - OBSOLETE]bool Supercell::compareFPositions(const xvector<double>& v1,
@@ -1060,14 +1060,14 @@ bool Supercell::compareFPositions(xvector<double>& v1, xvector<double>& v2, doub
 //[CO190218 - OBSOLETE]    // Correct it for rare cases, when structure is not well relaxed or
 //[CO190218 - OBSOLETE]    // there is a lot of roundoff problems, like positions like
 //[CO190218 - OBSOLETE]    // [0,0,0] and [0,0,0.9993567989], but they are the equal in principle
-//[CO190218 - OBSOLETE]    if (fabs(v1(i) - 1.0) < eps)
+//[CO190218 - OBSOLETE]    if (aurostd::abs(v1(i) - 1.0) < eps)
 //[CO190218 - OBSOLETE]      r(i) -= 1.0;
-//[CO190218 - OBSOLETE]    if (fabs(v2(i) - 1.0) < eps)
+//[CO190218 - OBSOLETE]    if (aurostd::abs(v2(i) - 1.0) < eps)
 //[CO190218 - OBSOLETE]      r(i) += 1.0;
 //[CO190218 - OBSOLETE]
 //[CO190218 - OBSOLETE]    // If this component is still nonzero -> this two possitions are not
 //[CO190218 - OBSOLETE]    // the same
-//[CO190218 - OBSOLETE]    if (fabs(r(i)) > eps)
+//[CO190218 - OBSOLETE]    if (aurostd::abs(r(i)) > eps)
 //[CO190218 - OBSOLETE]      return false;
 //[CO190218 - OBSOLETE]  }
 //[CO190218 - OBSOLETE]
@@ -1728,7 +1728,7 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
           pc = F2C(_scStructure.lattice, pf);
           
 
-          if (fabs(aurostd::modulus(pc) - rshell) < _AFLOW_APL_EPS_) {
+          if (aurostd::abs(aurostd::modulus(pc) - rshell) < _AFLOW_APL_EPS_) {
             //cout << centerID+1 << " " << atomID+1 << " " << aurostd::modulus(pc) << " "; printXVector(pc);
             pc -= delta;
             phase = phase + exp(iONE * scalar_product(qpoint, pc));

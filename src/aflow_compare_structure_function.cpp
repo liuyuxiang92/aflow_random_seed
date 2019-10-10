@@ -67,7 +67,7 @@ StructurePrototype::StructurePrototype(){
 }
 
 // ===== Free  ===== //
-void StructurePrototype::Free(){
+void StructurePrototype::free(){
 }
 
 // ===== Destructor ===== //
@@ -100,16 +100,16 @@ StructurePrototype::~StructurePrototype(){
   representative_structure_properties.clear();
   duplicate_structures_properties.clear();
   family_structures_properties.clear(); //DX 20190425
-  Free();
+  free();
 }
 
 // ===== Copy Constructor ===== //
 StructurePrototype::StructurePrototype(const StructurePrototype& b){
-  Copy(b);
+  copy(b);
 }
 
 // ===== Copy Constructor Function ===== //
-void StructurePrototype::Copy(const StructurePrototype& b) {
+void StructurePrototype::copy(const StructurePrototype& b) {
   if(this != &b){
     iomode=b.iomode;
     representative_structure_name=b.representative_structure_name; 
@@ -158,8 +158,8 @@ void StructurePrototype::Copy(const StructurePrototype& b) {
 // ***************************************************************************
 const StructurePrototype& StructurePrototype::operator=(const StructurePrototype& b){
   if(this!=&b){
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }
@@ -562,7 +562,7 @@ GroupedWyckoffPosition::GroupedWyckoffPosition(){
 }
 
 // ===== Free  ===== //
-void GroupedWyckoffPosition::Free(){
+void GroupedWyckoffPosition::free(){
 }
 
 // ===== Destructor  ===== //
@@ -574,11 +574,11 @@ GroupedWyckoffPosition::~GroupedWyckoffPosition(){
 
 // ===== Copy Constructor ===== //
 GroupedWyckoffPosition::GroupedWyckoffPosition(const GroupedWyckoffPosition& b){
-  Copy(b);
+  copy(b);
 }
 
 // ===== Copy Constructor Function ===== //
-void GroupedWyckoffPosition::Copy(const GroupedWyckoffPosition& b) {
+void GroupedWyckoffPosition::copy(const GroupedWyckoffPosition& b) {
   if(this != &b){
     type=b.type;
     element=b.element;
@@ -591,8 +591,8 @@ void GroupedWyckoffPosition::Copy(const GroupedWyckoffPosition& b) {
 // ===== Assignment Operator (operator=) ===== //
 const GroupedWyckoffPosition& GroupedWyckoffPosition::operator=(const GroupedWyckoffPosition& b){
   if(this!=&b){
-    Free();
-    Copy(b);
+    free();
+    copy(b);
   }
   return *this;
 }
@@ -5246,7 +5246,7 @@ namespace compare{
     deque<_atom> atoms = lfa_supercell.atoms;
     xmatrix<double> lattice = lfa_supercell.lattice;
     xmatrix<double> f2c = trasp(lattice);
-    xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = false;
 
     vector<int> ind(2); ind[0]=i, ind[1]=j;
@@ -5262,7 +5262,7 @@ namespace compare{
       tmp.type = atoms[d].type;
       tmp.cpos = atoms[d].cpos+vec;
       tmp.fpos = C2F(lattice,tmp.cpos);
-      if(SYM::MapAtom(atoms,tmp,true,c2f,f2c,skew,tolerance)){
+      if(SYM::MapAtom(atoms,tmp,true,lattice,f2c,skew,tolerance)){ //DX 20190619 - lattice and f2c as input
         transformed.push_back(tmp);
         index_to_check.push_back(d);
         count++;
@@ -5896,7 +5896,7 @@ namespace compare{
 	  bool duplicate_lattice_point=false;
 	  for(uint a=0; a<new_basis.size(); a++){
 	    xvector<double> tmp = BringInCell(proto.atoms[j].fpos,1e-10);
-	    if(SYM::MapAtom(new_basis[a].fpos,tmp,c2f,f2c,skew,tol)){
+	    if(SYM::MapAtom(new_basis[a].fpos,tmp,proto.lattice,proto.f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input
 	      duplicate_lattice_point=true;
 	      break;
 	    }

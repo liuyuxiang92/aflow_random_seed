@@ -1,7 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-// *                Aflow CORMAC TOHER - Duke University 2013-2018           *
+// *                Aflow CORMAC TOHER - Duke University 2013-2019           *
 // *                                                                         *
 // ***************************************************************************
 // Written by Cormac Toher
@@ -34,7 +34,7 @@ namespace AEL_functions {
   // Function to assign values for VASP input flags from aflow.in file to vaspRun _xvasp class
   // Adapted from section of AFLOW APL function DirectMethodPC::runVASPCalculations()
   //
-  uint aelvaspflags(_xvasp& vaspRun, _vflags& _vaspFlags, _kflags& _kbinFlags, string& runname, _AEL_data& AEL_data, ofstream& FileMESSAGE) {
+  uint aelvaspflags(_xvasp& vaspRun, _vflags& vaspFlags, _kflags& kbinFlags, string& dirrunname, _AEL_data& AEL_data, ofstream& FileMESSAGE) {
     ostringstream aus;
     vector<string> vfile;
     string vfilename;
@@ -42,7 +42,7 @@ namespace AEL_functions {
     if(AEL_data.relax_static || AEL_data.static_only) {
       aurostd::string2tokens(string("OUTCAR.static.bz2,OUTCAR.static.gz,OUTCAR.static.xz,OUTCAR.static"),vfile,",");
       for(uint ij=0;ij<vfile.size();ij++) {
-	if(aurostd::FileExist(vaspRun.Directory+"/"+vfile.at(ij))) {
+	if(aurostd::FileExist(dirrunname+"/"+vfile.at(ij))) {
 	  vfilename = vfile.at(ij);
 	  vfileexist = true;
 	}    
@@ -50,66 +50,118 @@ namespace AEL_functions {
     } else {
       aurostd::string2tokens(string("OUTCAR.relax2.bz2,OUTCAR.relax2.gz,OUTCAR.relax2.xz,OUTCAR.relax2"),vfile,",");
       for(uint ij=0;ij<vfile.size();ij++) {
-	if(aurostd::FileExist(vaspRun.Directory+"/"+vfile.at(ij))) {
+	if(aurostd::FileExist(dirrunname+"/"+vfile.at(ij))) {
 	  vfilename = vfile.at(ij);
 	  vfileexist = true;
 	}    
       }  
     }
     // SOME WARNINGS: check existence of LOCK and OUTCAR.relax2 files
-    // OBSOLETE if( !aurostd::FileExist( vaspRun.Directory + string("/LOCK") ) &&
-    if( !aurostd::FileExist( vaspRun.Directory + "/" + _AFLOWLOCK_ ) &&
+    // [OBSOLETE] if( !aurostd::FileExist( vaspRun.Directory + string("/LOCK") ) &&
+    if( !aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) &&
 	( vfileexist ) ) {
-      //OBSOLETE	aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.relax2") ) ) {
+      //[OBSOLETE]	aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.relax2") ) ) {
       aurostd::StringstreamClean(aus);
-      // OBSOLETE aus << _AELSTR_WARNING_ + "found OUTCAR.static but no LOCK in " <<  vaspRun.Directory << endl;
+      // [OBSOLETE] aus << _AELSTR_WARNING_ + "found OUTCAR.static but no LOCK in " <<  vaspRun.Directory << endl;
       aus << _AELSTR_WARNING_ + "found " << vfilename << " but no " << _AFLOWLOCK_ << " in " <<  vaspRun.Directory << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 1;
     }
 
-    // OBSOLETE if( aurostd::FileExist( vaspRun.Directory + string("/LOCK") ) &&
-    if( aurostd::FileExist( vaspRun.Directory + "/" + _AFLOWLOCK_ ) &&
+    // [OBSOLETE] if( aurostd::FileExist( vaspRun.Directory + string("/LOCK") ) &&
+    if( aurostd::FileExist( dirrunname + "/" + _AFLOWLOCK_ ) &&
 	!(vfileexist) ) {
-      //OBSOLETE	!aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.relax2") ) ) {
+      //[OBSOLETE]	!aurostd::FileExist( vaspRun.Directory + string("/OUTCAR.relax2") ) ) {
       aurostd::StringstreamClean(aus);
-      // OBSOLETE aus << _AELSTR_WARNING_ + "found LOCK but no OUTCAR.static in " <<  vaspRun.Directory << endl;
+      // [OBSOLETE] aus << _AELSTR_WARNING_ + "found LOCK but no OUTCAR.static in " <<  vaspRun.Directory << endl;
       aus << _AELSTR_WARNING_ + "found " << _AFLOWLOCK_ << " but no OUTCAR in " <<  vaspRun.Directory << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 1;
     }
 	  	   	    
     // Switch off autotune
-    _kbinFlags.KBIN_MPI_AUTOTUNE = true;
+    kbinFlags.KBIN_MPI_AUTOTUNE = true;
 
+    if(AEL_data.relax_static) {
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC = true;
+      vaspRun.AVASP_flag_GENERATE = false;
+      vaspRun.AVASP_flag_RUN_RELAX = false;
+      vaspRun.AVASP_flag_RUN_STATIC = false;
+      vaspRun.AVASP_flag_RUN_STATIC_BANDS = false;
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC", true);
+      vaspFlags.KBIN_VASP_RUN.flag("GENERATE", false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX",false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS",false);
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC",false);
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC_BANDS",false);
+      vaspFlags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.clear();
+      vaspFlags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.isentry = true;      
+      vaspFlags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.content_string = "IONS";
+      vaspRun.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE);
+    } else {
+      vaspRun.AVASP_flag_RUN_STATIC = true;
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC = false;
+      vaspRun.AVASP_flag_GENERATE = false;
+      vaspRun.AVASP_flag_RUN_RELAX = false;
+      vaspRun.AVASP_flag_RUN_STATIC_BANDS = false;
+      vaspRun.AVASP_flag_RUN_RELAX_STATIC_BANDS = false;
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC", true);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC", false);
+      vaspFlags.KBIN_VASP_RUN.flag("GENERATE", false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX", false);
+      vaspFlags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS", false);
+      vaspFlags.KBIN_VASP_RUN.flag("STATIC_BANDS", false);      
+    }
+
+    // Set unit cell conversion to "PRESERVE"
+    setPreserveUnitCell(vaspRun);
+    vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.isentry = true;
+    vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.pop("STANDARD_PRIMITIVE");    
+    vaspFlags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.push("PRESERVE");
+
+    if(AEL_data.precaccalgonorm) {
+      vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.clear();
+      vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.isentry = true;      
+      vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.content_string = "ACCURATE";
+      vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.clear();
+      vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.isentry = true;      
+      vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.content_string = "NORMAL";
+    }
+    
+    // Switch off VASP symmetry - this can help when applied strains break the symmetry of the primitive cell
+    if(!AEL_data.vasp_symmetry) {
+     vaspFlags.KBIN_VASP_FORCE_OPTION_SYM.option = false;
+    }
+    
     // Common KPOINTS settings and OVERRIDES
-    vaspRun.AVASP_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_KSCHEME.content_string;
-    vaspRun.AVASP_value_KPPRA = _vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int;
-    vaspRun.AVASP_STATIC_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KSCHEME.content_string;
-    vaspRun.AVASP_value_KPPRA_STATIC = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KPPRA.content_int;
+    // [OBSOLETE] vaspRun.AVASP_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_KSCHEME.content_string;
+    // [OBSOLETE] vaspRun.AVASP_value_KPPRA = _vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int;
+    // [OBSOLETE] vaspRun.AVASP_STATIC_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KSCHEME.content_string;
+    // [OBSOLETE] vaspRun.AVASP_value_KPPRA_STATIC = _vaspFlags.KBIN_VASP_KPOINTS_STATIC_KPPRA.content_int;
 
 
     // Clear old INCAR and set it as we want...
     // Want to relax ions only keeping cell size and shape fixed
     // Might want to create new relaxation type instead of creating INCAR by hand
-    vaspRun.INCAR.str(std::string());
-    string system;
-    for(uint j=0; j < vaspRun.str.species.size(); j++)
-      system = system + vaspRun.str.species_pp.at(j);
-    system = system + "@" + runname;
-    vaspRun.INCAR << "SYSTEM=" << system << std::endl;
-    vaspRun.INCAR << "# Added by [AFLOW_AEL] begin" << std::endl;
-    vaspRun.INCAR << "NELMIN=4         # The forces have to be well converged" << std::endl;
-    vaspRun.INCAR << "NELM = 120       # Many electronic steps (SC2013)" << std::endl;
-    vaspRun.INCAR << "ADDGRID=.TRUE.   # For finer forces" << std::endl;
-    // OBSOLETE vaspRun.INCAR << "ISIF=2           # To calculate stress tensor including ion relaxation only" << std::endl;
-    // OBSOLETE vaspRun.INCAR << "IBRION=2         # Ion relaxation using conjugate gradient" << std::endl;
-    // OBSOLETE vaspRun.INCAR << "NSW=51           # Relax ions for long" << std::endl;
-    vaspRun.INCAR << "# Added by [AFLOW_AEL] end" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR.str(std::string());
+    // [OBSOLETE] string system;
+    // [OBSOLETE] for(uint j=0; j < vaspRun.str.species.size(); j++)
+    // [OBSOLETE]   system = system + vaspRun.str.species_pp.at(j);
+    // [OBSOLETE] system = system + "@" + runname;
+    // [OBSOLETE] vaspRun.INCAR << "SYSTEM=" << system << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "# Added by [AFLOW_AEL] begin" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "NELMIN=4         # The forces have to be well converged" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "NELM = 120       # Many electronic steps (SC2013)" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "ADDGRID=.TRUE.   # For finer forces" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "ISIF=2           # To calculate stress tensor including ion relaxation only" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "IBRION=2         # Ion relaxation using conjugate gradient" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "NSW=51           # Relax ions for long" << std::endl;
+    // [OBSOLETE] vaspRun.INCAR << "# Added by [AFLOW_AEL] end" << std::endl;
 
     // Change format of POSCAR
-    if( ( !_kbinFlags.KBIN_MPI && ( _kbinFlags.KBIN_BIN.find("46") != string::npos ) ) ||
-	(  _kbinFlags.KBIN_MPI && ( _kbinFlags.KBIN_MPI_BIN.find("46") != string::npos ) ) ) {
+    if( ( !kbinFlags.KBIN_MPI && ( kbinFlags.KBIN_BIN.find("46") != string::npos ) ) ||
+	(  kbinFlags.KBIN_MPI && ( kbinFlags.KBIN_MPI_BIN.find("46") != string::npos ) ) ) {
       vaspRun.str.is_vasp5_poscar_format = false; 
     }
 
@@ -120,7 +172,7 @@ namespace AEL_functions {
 // ***************************************************************************
 // AEL_functions::createAFLOWIN
 // ***************************************************************************
-namespace AEL_functions {
+/*namespace AEL_functions {
   //
   // Create aflow.in file: makes new directory and writes aflow.in for strained structure file inside it 
   // Adapted from that in AFLOW APL function PhononCalculator::createAFLOWIN()
@@ -137,7 +189,7 @@ namespace AEL_functions {
     aurostd::DirectoryChmod("777", vaspRun.Directory);
 
     // Create file
-    // OBSOLETE string filename =  vaspRun.Directory + string("/aflow.in");
+    // [OBSOLETE] string filename =  vaspRun.Directory + string("/aflow.in");
     string filename =  vaspRun.Directory + "/" + _AFLOWIN_;
 
     // Check if aflow.in file exists in the directory     
@@ -153,7 +205,7 @@ namespace AEL_functions {
     // Check aflow.in file is open
     if( !outfile.is_open() ) {
       aurostd::StringstreamClean(aus);
-      // OBSOLETE aus << _AELSTR_WARNING_ + "Cannot create [aflow.in] file" << endl;
+      // [OBSOLETE] aus << _AELSTR_WARNING_ + "Cannot create [aflow.in] file" << endl;
       aus << _AELSTR_WARNING_ + "Cannot create [" << _AFLOWIN_ << "] file" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return 1;
@@ -251,9 +303,9 @@ namespace AEL_functions {
     outfile << "[VASP_FORCE_OPTION]CHGCAR=OFF" << std::endl;
     if(AEL_data.precaccalgonorm) {      
       outfile << "[VASP_FORCE_OPTION]PREC=ACCURATE" << std::endl;
-      // OBSOLETE outfile << "[VASP_FORCE_OPTION]PREC=HIGH" << std::endl;
+      // [OBSOLETE] outfile << "[VASP_FORCE_OPTION]PREC=HIGH" << std::endl;
       outfile << "[VASP_FORCE_OPTION]ALGO=NORMAL" << std::endl;
-      // OBSOLETE outfile << "[VASP_FORCE_OPTION]ALGO=FAST" << std::endl;
+      // [OBSOLETE] outfile << "[VASP_FORCE_OPTION]ALGO=FAST" << std::endl;
     } else {
       outfile << "[VASP_FORCE_OPTION]PREC=" << _vaspFlags.KBIN_VASP_FORCE_OPTION_PREC.content_string << std::endl;
       outfile << "[VASP_FORCE_OPTION]ALGO=" << _vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.content_string << std::endl;
@@ -265,7 +317,7 @@ namespace AEL_functions {
       outfile << "[VASP_FORCE_OPTION]SYM=OFF" << std::endl;
     }
 
-    // OBSOLETE if( _vaspFlags.KBIN_VASP_FORCE_OPTION_SYM.option ) outfile << "[VASP_FORCE_OPTION]SYM=ON" << std::endl;
+    // [OBSOLETE] if( _vaspFlags.KBIN_VASP_FORCE_OPTION_SYM.option ) outfile << "[VASP_FORCE_OPTION]SYM=ON" << std::endl;
 
     if( _vaspFlags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.isentry ) { outfile << "[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=" << _vaspFlags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme << std::endl; }
     if( _vaspFlags.KBIN_VASP_FORCE_OPTION_ABMIX.isentry ) { outfile << "[VASP_FORCE_OPTION]ABMIX=" << _vaspFlags.KBIN_VASP_FORCE_OPTION_ABMIX.xscheme << std::endl; }
@@ -311,15 +363,15 @@ namespace AEL_functions {
       if(!_vaspFlags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.isentry) { outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species_pp.at(j) << std::endl; }
       if(_vaspFlags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.isentry)  { outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species.at(j) << std::endl; }
     }
-    // OBSOLETE   aurostd::StringstreamClean(aus);
-    // OBSOLETE   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
-    // OBSOLETE     aus << _AGLSTR_MESSAGE_ + "Species_pp " << j << " = " << xvasp.str.species_pp.at(j) << endl;
-    // OBSOLETE     aus << _AGLSTR_MESSAGE_ + "Species " << j << " = " << xvasp.str.species.at(j) << endl;
-    // OBSOLETE   }
-    // OBSOLETE   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    // OBSOLETE   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
-    // OBSOLETE  outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species_pp.at(j) << std::endl;
-    // OBSOLETE}
+    // [OBSOLETE]   aurostd::StringstreamClean(aus);
+    // [OBSOLETE]   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
+    // [OBSOLETE]     aus << _AELSTR_MESSAGE_ + "Species_pp " << j << " = " << xvasp.str.species_pp.at(j) << endl;
+    // [OBSOLETE]     aus << _AELSTR_MESSAGE_ + "Species " << j << " = " << xvasp.str.species.at(j) << endl;
+    // [OBSOLETE]   }
+    // [OBSOLETE]   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+    // [OBSOLETE]   for(uint j=0; j < xvasp.str.species_pp.size(); j++) {
+    // [OBSOLETE]  outfile << "[VASP_POTCAR_FILE]" << xvasp.str.species_pp.at(j) << std::endl;
+    // [OBSOLETE]}
 
     if(SPACES) { outfile << std::endl; }
 
@@ -334,16 +386,16 @@ namespace AEL_functions {
     if(SPACES) { outfile << std::endl; }
 
     //
-    // OBSOLETE outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-    // OBSOLETE if(SPACES) outfile << std::endl;
-    // OBSOLETE outfile << "[VASP_RUN]STATIC" << std::endl;
-    // OBSOLETE if(SPACES) outfile << std::endl;
+    // [OBSOLETE] outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    // [OBSOLETE] if(SPACES) outfile << std::endl;
+    // [OBSOLETE] outfile << "[VASP_RUN]STATIC" << std::endl;
+    // [OBSOLETE] if(SPACES) outfile << std::endl;
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
 
     if(AFLOWIN_QE_FLAG) {
       outfile << AFLOWIN_SEPARATION_LINE << std::endl; 
       outfile << "[QE_GEOM_MODE_EXPLICIT]START " << std::endl;
-      // OBSOLETE xstructure qestr(vaspRun.str);qestr.vasp2qe();
+      // [OBSOLETE] xstructure qestr(vaspRun.str);qestr.vasp2qe();
       xstructure qestr(vaspRun.str);qestr.xstructure2qe();
       outfile << qestr;
       outfile << "[QE_GEOM_MODE_EXPLICIT]STOP " << std::endl;
@@ -355,7 +407,7 @@ namespace AEL_functions {
 
     return 0;
   }
-} // namespace AEL_functions
+  } */ // namespace AEL_functions
 
 // ************************************************************************************************
 // This set of functions extract stress tensor data from VASP runs
@@ -369,7 +421,7 @@ namespace AEL_functions {
   // extractstress: Extract stress tensors from the completed VASP calculations
   // Adapted from section of AFLOW APL function DirectMethodPC::runVASPCalculations()
   //
-  uint extractstress(vector<_xvasp>& vaspRuns, _AEL_data& AEL_data, ofstream& FileMESSAGE) {
+  uint extractstress(vector<_xvasp>& vaspRuns, _AEL_data& AEL_data, vector<string>& dirrunname, ofstream& FileMESSAGE) {
     bool LVERBOSE=(FALSE || XHOST.DEBUG);
     ostringstream aus;
     vector<string> vfile, dfile;
@@ -421,14 +473,14 @@ namespace AEL_functions {
 	}
 	double strainfactor = 1.0 + AEL_data.normal_deformations.at(j);
 	aurostd::StringstreamClean(aus);
-	// OBSOLETE aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
 	aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory << endl;
 	aus << _AELSTR_MESSAGE_ + "Normal stress: i = " << i << ", j = " << j << ", strain factor = " << strainfactor << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	aurostd::string2tokens(vaspRuns.at(idVaspRun).Directory, dfile, "/");
 	dfilename = dfile.at(dfile.size()-1);
 	aurostd::StringstreamClean(aus);
-	// OBSOLETE aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
 	aus << _AELSTR_MESSAGE_ + "Directory name = " << dfilename << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	// Check if structure is on list of failed runs to be skipped
@@ -441,8 +493,8 @@ namespace AEL_functions {
 	    aus << _AELSTR_MESSAGE_ + "ffilename = " << ffilename << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  // OBSOLETE if(dfilename == AEL_data.failed_arun_list.at(ij)) continue;
-	  // OBSOLETE if(strncmp(dfilename.c_str(), ffilename.c_str(), 12) == 0) continue;
+	  // [OBSOLETE] if(dfilename == AEL_data.failed_arun_list.at(ij)) continue;
+	  // [OBSOLETE] if(strncmp(dfilename.c_str(), ffilename.c_str(), 12) == 0) continue;
 	  if(aurostd::substring2bool(dfilename,ffilename,TRUE)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_MESSAGE_ + "Found directory in to-skip list: " << dfilename << endl;
@@ -462,13 +514,25 @@ namespace AEL_functions {
 	// continue;
 
 	// If tarred and compressed directory exists...
-	if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" ); } // Extract all...
-	if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" ); } // Extract all...
-	if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" ); } // Extract all...
+	if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) {
+	  aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" );
+	} else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) { 
+	  aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+	} // Extract all...
+	if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) {
+	  aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" );
+	} else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.gz") ) {
+	  aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.gz" );
+	} // Extract all...
+	if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) {
+	  aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" );
+	} else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.xz") ) {
+	  aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.xz" );
+	} // Extract all...
       
 	// If the LOCK file is missing, then it is probably a corrupted run
 	// Do not accept it and wait for the new run
-	// OBSOLETE if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ) {
+	// [OBSOLETE] if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ) {
 	if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ) {
 	  aurostd::StringstreamClean(aus);
 	  aus <<  _AELSTR_WARNING_ + "The " << _AFLOWLOCK_ << " file in " << vaspRuns.at(idVaspRun).Directory << " directory is missing." << endl;
@@ -494,7 +558,16 @@ namespace AEL_functions {
 	      }
 	      vasprunxml.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(ij));
 	      vfilename = vfile.at(ij);
-	    }
+	    } else if (aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(ij))) {
+	      if(LVERBOSE) {
+		aurostd::StringstreamClean(aus);
+		aus << _AELSTR_MESSAGE_ + "vfile = " << vfile.at(ij) << endl;
+		aus << _AELSTR_MESSAGE_ + "file = " << dirrunname.at(idVaspRun)+"/"+vfile.at(ij) << endl;	    
+		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      }
+	      vasprunxml.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(ij));
+	      vfilename = vfile.at(ij);
+	    }	  
 	  }
 	  if(vasprunxml.content=="") {
 	    aurostd::StringstreamClean(aus);
@@ -522,6 +595,15 @@ namespace AEL_functions {
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
 	      outcar.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(ij));
+	      vfilename = vfile.at(ij);
+	    } else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(ij))) {
+	      if(LVERBOSE) {
+		aurostd::StringstreamClean(aus);
+		aus << _AELSTR_MESSAGE_ + "vfile = " << vfile.at(ij) << endl;
+		aus << _AELSTR_MESSAGE_ + "file = " << dirrunname.at(idVaspRun)+"/"+vfile.at(ij) << endl;	    
+		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      }
+	      outcar.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(ij));
 	      vfilename = vfile.at(ij);
 	    }
 	  }
@@ -570,14 +652,14 @@ namespace AEL_functions {
 	}
 	double strainfactor = 1.0 + AEL_data.shear_deformations.at(j);
 	aurostd::StringstreamClean(aus);
-	// OBSOLETE aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
 	aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory << endl;
 	aus << _AELSTR_MESSAGE_ + "Shear stress: i = " << i << ", j = " << j << ", strain factor = " << strainfactor << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	aurostd::string2tokens(vaspRuns.at(idVaspRun).Directory, dfile, "/");
 	dfilename = dfile.at(dfile.size()-1);
 	aurostd::StringstreamClean(aus);
-	// OBSOLETE aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
+	// [OBSOLETE] aus << _AELSTR_MESSAGE_ + "System number = " << idVaspRun << ", Directory = " << vaspRuns.at(idVaspRun).Directory.at(idVaspRun) << endl;
 	aus << _AELSTR_MESSAGE_ + "Directory name = " << dfilename << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	// Check if structure is on list of failed runs to be skipped
@@ -590,8 +672,8 @@ namespace AEL_functions {
 	    aus << _AELSTR_MESSAGE_ + "ffilename = " << ffilename << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
-	  // OBSOLETE if(dfilename == AEL_data.failed_arun_list.at(ij)) continue;
-	  // OBSOLETE if(strncmp(dfilename.c_str(), ffilename.c_str(), 12) == 0) continue;
+	  // [OBSOLETE] if(dfilename == AEL_data.failed_arun_list.at(ij)) continue;
+	  // [OBSOLETE] if(strncmp(dfilename.c_str(), ffilename.c_str(), 12) == 0) continue;
 	  if(aurostd::substring2bool(dfilename,ffilename,TRUE)) {
 	    aurostd::StringstreamClean(aus);
 	    aus << _AELSTR_MESSAGE_ + "Found directory in to-skip list: " << dfilename << endl;
@@ -609,14 +691,26 @@ namespace AEL_functions {
 	}
 
 	// If tarred and compressed directory exists...
-        if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" ); } // Extract all...
-        if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" ); } // Extract all...
-        if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) { aurostd::execute( string("tar -xf") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" ); } // Extract all...
+        if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) {
+	  aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" );
+	} else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) {
+	  aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+	} // Extract all...
+        if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) {
+	  aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" );
+	} else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.gz") ) {
+	  aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.gz" );
+	} // Extract all...
+        if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) {
+	  aurostd::execute( string("tar -xf") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" );
+	} else if( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.xz") ) {
+	  aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.xz" );
+	} // Extract all...
 	
 	// If the LOCK file is missing, then it is probably a corrupted run
 	// Do not accept it and wait for the new run
-	// OBSOLETE if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ) {
-	if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ) {
+	// [OBSOLETE] if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + string("/LOCK") ) ) {
+	if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ )  && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ )) {
 	  aurostd::StringstreamClean(aus);
 	  aus <<  _AELSTR_WARNING_ + "The " << _AFLOWLOCK_ << " file in " << vaspRuns.at(idVaspRun).Directory << " directory is missing." << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -640,6 +734,15 @@ namespace AEL_functions {
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
 	      vasprunxml.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(ij));
+	      vfilename = vfile.at(ij);
+	    } else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(ij))) {
+	      if(LVERBOSE) {
+		aurostd::StringstreamClean(aus);
+		aus << _AELSTR_MESSAGE_ + "vfile = " << vfile.at(ij) << endl;
+		aus << _AELSTR_MESSAGE_ + "file = " << dirrunname.at(idVaspRun)+"/"+vfile.at(ij) << endl;	    
+		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      }
+	      vasprunxml.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(ij));
 	      vfilename = vfile.at(ij);
 	    }
 	  }
@@ -669,6 +772,15 @@ namespace AEL_functions {
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
 	      outcar.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(ij));
+	      vfilename = vfile.at(ij);
+	    } else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(ij))) {
+	      if(LVERBOSE) {
+		aurostd::StringstreamClean(aus);
+		aus << _AELSTR_MESSAGE_ + "vfile = " << vfile.at(ij) << endl;
+		aus << _AELSTR_MESSAGE_ + "file = " << dirrunname.at(idVaspRun)+"/"+vfile.at(ij) << endl;	    
+		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      }
+	      outcar.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(ij));
 	      vfilename = vfile.at(ij);
 	    }
 	  }
@@ -719,13 +831,25 @@ namespace AEL_functions {
 
       // If tarred and compressed directory exists...
       // [OBSOLETE]    string tarfilename = vaspRuns.at(idVaspRun).Directory + ".tar.bz2";
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" ); } // Extract all...
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" ); } // Extract all...
-      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) { aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" ); } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.bz2") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.bz2" );
+      } else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) { 
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+      } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.gz") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.gz" );
+      } else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) { 
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+      } // Extract all...
+      if( aurostd::FileExist(vaspRuns.at(idVaspRun).Directory + ".tar.xz") ) {
+	aurostd::execute( string("tar -xf ") + vaspRuns.at(idVaspRun).Directory + ".tar.xz" );
+      }  else if ( aurostd::FileExist(dirrunname.at(idVaspRun) + ".tar.bz2") ) { 
+	aurostd::execute( string("tar -xf ") + dirrunname.at(idVaspRun) + ".tar.bz2" );
+      } // Extract all...
 
       // If the LOCK file is missing, then it is probably a corrupted run
       // Do not accept it and wait for the new run
-      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) ) {
+      if( !aurostd::FileExist( vaspRuns.at(idVaspRun).Directory + "/" + _AFLOWLOCK_ ) && !aurostd::FileExist( dirrunname.at(idVaspRun) + "/"+_AFLOWLOCK_ )) {
 	aurostd::StringstreamClean(aus);
 	aus <<  _AELSTR_WARNING_ + "The " << _AFLOWLOCK_ << " file in " << vaspRuns.at(idVaspRun).Directory << " directory is missing." << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -741,6 +865,15 @@ namespace AEL_functions {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
 	    vasprunxml.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(ij));
+	    vfilename = vfile.at(ij);
+	  } else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(ij))) {
+	    if(LVERBOSE) {
+	      aurostd::StringstreamClean(aus);
+	      aus << _AELSTR_MESSAGE_ + "vfile = " << vfile.at(ij) << endl;
+	      aus << _AELSTR_MESSAGE_ + "file = " << dirrunname.at(idVaspRun)+"/"+vfile.at(ij) << endl;	    
+	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    }
+	    vasprunxml.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(ij));
 	    vfilename = vfile.at(ij);
 	  }
 	}
@@ -762,6 +895,15 @@ namespace AEL_functions {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    }
 	    outcar.GetPropertiesFile(vaspRuns.at(idVaspRun).Directory+"/"+vfile.at(ij));
+	    vfilename = vfile.at(ij);
+	  } else if(aurostd::FileExist(dirrunname.at(idVaspRun)+"/"+vfile.at(ij))) {
+	    if(LVERBOSE) {
+	      aurostd::StringstreamClean(aus);
+	      aus << _AELSTR_MESSAGE_ + "vfile = " << vfile.at(ij) << endl;
+	      aus << _AELSTR_MESSAGE_ + "file = " << dirrunname.at(idVaspRun)+"/"+vfile.at(ij) << endl;	    
+	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	    }
+	    outcar.GetPropertiesFile(dirrunname.at(idVaspRun)+"/"+vfile.at(ij));
 	    vfilename = vfile.at(ij);
 	  }
 	}

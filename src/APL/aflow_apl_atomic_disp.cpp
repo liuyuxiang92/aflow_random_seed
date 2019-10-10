@@ -484,8 +484,10 @@ namespace apl
     std::ofstream ofs_anime("aflow.apl.normal_mode_direction.axsf");
     if (!ofs_anime.is_open())
       {
-        _logger<<apl::error<<"aflow.apl.normal_mode_direction.axsf unable to open"<<apl::endl;
-        exit(0);
+        // ME190726 - exit clean-up
+        //_logger<<apl::error<<"aflow.apl.normal_mode_direction.axsf unable to open"<<apl::endl;
+        //exit(0);
+        throw APLRuntimeError("aflow.apl.normal_mode_direction.axsf unable to open");
       }
     ofs_anime.setf(std::ios::scientific);
 

@@ -665,6 +665,7 @@ class IPhononCalculator {
  public:
   virtual ~IPhononCalculator() {}
   virtual xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&) = 0;
+  virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &) = 0;  // ME190624
   virtual xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> > &,
                                        vector<xmatrix<xcomplex<double> > >&, bool=true) = 0;  // ME 180827
   virtual double getEPS() = 0;  //CO
@@ -673,6 +674,7 @@ class IPhononCalculator {
   virtual const xstructure& getInputCellStructure() = 0;
   virtual const xstructure& getSuperCellStructure() = 0;
   virtual uint getNumberOfBranches() = 0;
+  virtual string getSystemName() = 0;  // ME190614
   // **** BEGIN PINKU ******
   virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&) = 0;
   virtual xmatrix<xcomplex<double> > getDynamicalMatrix(const xvector<double>&,
@@ -707,6 +709,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   _kflags& _kbinFlags;
   _xflags& _xFlags; //_vflags& _vaspFlags;
   string& _AflowIn;
+  string _system;  // ME190614 - for VASP-style output files
 
   // Our standard and common output system
   Logger& _logger;
@@ -803,6 +806,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   //******* END ME ************
   // Interface
   xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
+  xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME190624
   xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&, 
                                vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME180827
   double getFrequencyConversionFactor(IPCFreqFlags, IPCFreqFlags);
@@ -811,6 +815,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   const xstructure& getSuperCellStructure();
   double getEPS();  //CO
   uint getNumberOfBranches();
+  string getSystemName();  // ME190614
   /* friend void runVASPCalculationsBE(apl::PhononCalculator*); */
   /* friend void readBornEffectiveChargesFromOUTCAR(apl::PhononCalculator *pcalculator); */
   /* friend void symmetrizeBornEffectiveChargeTensors(apl::PhononCalculator *pcalculator); */
@@ -833,6 +838,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   void outfileFoundEverywherePhonons(vector<_xinput>&);
   void subtractZeroStateForces(vector<_xinput>&);
   // END ME 180518
+  vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
 };
 }  // namespace apl
 
@@ -1086,6 +1092,7 @@ class PathBuilder {
   void takeAflowElectronicPath(const string&,const Supercell&);//, const xstructure&, const xstructure&);
   void setMode(ModeEnumType);
   void setStore(StoreEnumType);
+  const StoreEnumType& getStore() const;  // ME190614
   void setDensity(int);
   int getDensity();
   uint getPathSize();
@@ -1097,6 +1104,7 @@ class PathBuilder {
   std::vector<aurostd::xvector<double> > getPath(ModeEnumType, const string&);
   double getPathLength();
   double getPathLength(uint);
+  xKPOINTS createKPOINTS(const Supercell&);  // ME190614
 };
 }  // namespace apl
 
@@ -1111,6 +1119,7 @@ class PhononDispersionCalculator {
   std::vector<xvector<double> > _qpoints;
   std::vector<xvector<double> > _freqs;
   IPCFreqFlags _frequencyFormat;
+  double _temperature;  // ME190614
   //[OBSOLETE PN180705]vector<double> path;       //[PINKU]
   //[OBSOLETE PN180705]vector<int> path_segment;  //[PINKU]
  private:
@@ -1127,6 +1136,12 @@ class PhononDispersionCalculator {
   void writePDIS();
   bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
   std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PINKU]
+  // ME190614 - START
+  xEIGENVAL createEIGENVAL();
+  void writePHEIGENVAL();
+  void writePHKPOINTS();
+  string _system;
+  // ME19614 - STOP
   //[OBSOLETE PN180705]std::vector<double> get_path() { return path; }                   //[PINKU]
   //[OBSOLETE PN180705]std::vector<int> get_path_segment() { return path_segment; }      //[PINKU]
 };
@@ -1229,42 +1244,45 @@ struct _kcell {
 };
 
 class QMesh {
- public:
+  public:
     QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const vector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const QMesh&);
     QMesh& operator=(const QMesh&);
     ~QMesh();
-  void clear();
+    void clear();
 
     void makeIrreducible();
     void writeQpoints(string, bool=true);
     void writeIrredQpoints(string, bool=true);
 
-    const int& getnIQPs() const;
-    const int& getnQPs() const;
-    const int& getGrid(const int&) const;
+    int getnIQPs() const;
+    int getnQPs() const;
+    int getGrid(int) const;
     const xvector<int>& getGrid() const;
-    const _qpoint& getIrredQPoint(const int&) const;
-    const _qpoint& getIrredQPoint(const int&, const int&, const int&) const;
+    const _qpoint& getIrredQPoint(int) const;
+    const _qpoint& getIrredQPoint(int, int, int) const;
     vector<xvector<double> > getIrredQPointsCPOS() const;
     vector<xvector<double> > getIrredQPointsFPOS() const;
-    const int& getIrredQPointIndex(const int&) const;
-    const int& getIrredQPointIndex(const int&, const int&, const int&) const;
-    const _qpoint& getQPoint(const int&) const;
-    const _qpoint& getQPoint(const int&, const int&, const int&) const;
-    const int& getQPointIndex(const int&, const int&, const int&) const;
+    int getIrredQPointIndex(int) const;
+    int getIrredQPointIndex(int, int, int) const;
+    const _qpoint& getQPoint(int) const;
+    const _qpoint& getQPoint(int, int, int) const;
+    const _qpoint& getQPoint(const xvector<double>&) const;  // ME190813
+    int getQPointIndex(xvector<double>) const;  // ME190813
+    int getQPointIndex(int, int, int) const;
     vector<xvector<double> > getQPointsCPOS() const;
     vector<xvector<double> > getQPointsFPOS() const;
-    const int& getIbzqpt(const int&) const;
-    const int& getIbzqpt(const int&, const int&, const int&) const;
+    int getIbzqpt(int) const;
+    int getIbzqpt(int, int, int) const;
     const vector<int>& getIbzqpts() const;
     const vector<_qpoint>& getPoints() const;
     const _kcell& getReciprocalCell() const;
+    bool isShifted() const;  // ME190813
     const xvector<double>& getShift() const;
     const vector<int>& getWeights() const;
-    const bool& isReduced() const;
-    const bool& isGammaCentered() const;
+    bool isReduced() const;
+    bool isGammaCentered() const;
 
   private:
     void free();
@@ -1280,6 +1298,7 @@ class QMesh {
     vector<_qpoint> _qpoints;  // The q-points of the mesh
     _kcell _recCell;  // The reciprocal cell
     bool _reduced;  // Indicates whether the q-point mesh has been reduced
+    bool _shifted;  // Indicates whether the q-point mesh has been shifted
     xvector<double> _shift;  // The shift vector of the mesh
     vector<int> _weights;  // The weights of each irreducible q-point
 
@@ -1287,42 +1306,52 @@ class QMesh {
     void setupReciprocalCell(xstructure);
     void generateGridPoints(bool);
     void shiftMesh(const xvector<double>&);
-    void moveToBZ(xvector<double>&);
+    void moveToBZ(xvector<double>&) const;
 };
 }  // namespace apl
 
 namespace apl {
 class LTMethod {
- public:
+  public:
     LTMethod(QMesh&, Logger&);
     LTMethod(const LTMethod&);
     LTMethod& operator=(const LTMethod&);
     ~LTMethod();
 
+    void makeIrreducible();  // ME190625
+
     const vector<vector<int> >& getTetrahedra() const;
-    const vector<int>& getTetrahedron(const int&) const;
-    const int& getCorner(const int&, const int&) const;
-    const int& getCornerIrred(const int&, const int&) const;
-    const int& getnTetrahedra() const;
-    const double& getVolumePerTetrahedron() const;
+    const vector<int>& getTetrahedron(int) const;
+    const vector<int>& getIrredTetrahedron(int) const;
+    int getCorner(int, int) const;
+    // const int& getCornerIrred(const int&, const int&) const; OBSOLETE ME1906
+    vector<vector<int> > getIrreducibleTetrahedra() const;  // ME190625
+    vector<vector<int> > getIrreducibleTetrahedraIbzqpt() const;  // ME190625
+
+    int getnTetrahedra() const;
+    int getnIrredTetrahedra() const;
+    double getVolumePerTetrahedron() const;
     const vector<int>& getWeights() const;
-    const int& getWeight(const int&) const;
+    int getWeight(int) const;
+    bool isReduced() const;
   private:
     void free();
 
     QMesh& _qm;
     Logger& _logger;  // The APL logger
 
-    vector<vector<int> > _irredTetrahedra;  // The corners of the irreducible tetrahedra
+    vector<vector<int> > _tetrahedra;  // The corners of the tetrahedra - ME190625
+    vector<int> _irredTetrahedra;  // List of irreducible tetrahedra - ME190625
+    bool _reduced;  // ME190625
     int _nTetra;  // The number of tetrahedra
+    int _nIrredTetra;  // The number of irreducible tetrahedra - ME190625
     double _volumePerTetrahedron;  // The relative volume of each tetrahedron
     vector<int> _weights;  // The weights of each irreducible tetrahedron
 
     void generateTetrahedra();
     vector<vector<xvector<int> > > initializeTetrahedra();
     void findMostCompact(vector<vector<xvector<int> > >&);
-    void getIrreducibleTetrahedra(const vector<vector<xvector<int> > >&);
-    
+    void generateAllTetrahedra(const vector<vector<xvector<int> > >&);  // ME190625
 };
 }  // namespace apl
 
@@ -1370,17 +1399,22 @@ class DOSCalculator {  // ME190424
   double _halfStepDOS;
   std::vector<double> _bins;
   std::vector<double> _dos;
+  std::vector<double> _idos;  // ME190614
+  std::vector<xmatrix<xcomplex<double> > > _eigen;  // ME190624 - eigenvectors for projected DOS
+  std::vector<vector<vector<double> > > _projectedDOS; // ME190614 - projectedDOS.at(atom).at(direction).at(frequency)
+  std::vector<xvector<double> > _projections;  // ME190626 - the projection directions for the DOS in Cartesian coordinates
+  double _temperature;  // ME190614
   //CO - START
  //private:
   void calculateInOneThread(int, int);
   //CO - END
  protected:
   void calculateFrequencies();
-  void smearWithGaussian(vector<double>&, double, double);
+  void smearWithGaussian(vector<double>&, vector<double>&, double, double);  // ME190614
 
  public:
 //  DOSCalculator(IPhononCalculator&, IReciprocalPointGrid&, Logger&);  OBSOLETE ME190417
-  DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string);  // ME190423
+  DOSCalculator(IPhononCalculator&, QMesh&, Logger&, string, const vector<xvector<double> >&);  // ME190423 // ME190624 - added projections
   virtual ~DOSCalculator();
   // ME190423 - START
   //virtual void rawCalc(int) {} OBSOLETE ME190419
@@ -1392,10 +1426,13 @@ class DOSCalculator {  // ME190424
   void clear();
   void writePDOS();
   void writePDOS(string, string);  //[PINKU]
+  xDOSCAR createDOSCAR();  // ME190614
+  void writePHDOSCAR();  // ME190614
   // Interface IDOSCalculator
   std::vector<double> getBins();
   std::vector<double> getDOS();
   bool hasNegativeFrequencies();
+  string _system;  // ME190614
 };
 }  // namespace apl
 
@@ -1472,9 +1509,9 @@ class ThermalPropertiesCalculator {
 
 }  // namespace apl
 
-   // ***************************************************************************
+// ***************************************************************************
 // BEGIN ME: Lattice Thermal Conductivity (AAPL)
-   // ***************************************************************************
+// ***************************************************************************
 
 namespace apl {
 
@@ -1589,7 +1626,7 @@ class TCONDCalculator {
     string tempDepRatesString(string, double, const vector<vector<double> >&);
     void writeTempDepRatesFile(string, const string&);
     void writeThermalConductivity();
-    void writeThermalConductivityPlot();
+    // void writeThermalConductivityPlot(); OBSOLETE ME190614
 };
 
 }  // namespace apl
@@ -2531,6 +2568,9 @@ namespace apl
 namespace apl {
 
 struct ShellData {
+  ShellData();
+  ShellData(const ShellData& b);
+
   int occupation;
   int occupationCapacity;
   bool isFull;
@@ -2542,6 +2582,9 @@ struct ShellData {
 
   ~ShellData();
   ShellData& operator=(const ShellData&);
+
+  void free();
+  void copy(const ShellData& b);
 };
 
 class ShellHandle {

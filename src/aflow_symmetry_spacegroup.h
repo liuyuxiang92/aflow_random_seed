@@ -77,8 +77,8 @@ class SymmetryInformationITC {
     bool initgenerators(string axis_cell);
     bool initsgs(string axis_cell);
   private:
-    void Free();
-    void Copy(const SymmetryInformationITC& b);
+    void free();
+    void copy(const SymmetryInformationITC& b);
 };
 
 //DX 20190215 [OBSOLETE] // ******************************************************************************
@@ -464,6 +464,8 @@ namespace SYM {
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position);
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity);
   vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity); //DX 20190128 
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate); //DX 20190723
+  string reorderWyckoffPosition(const string& orig_position); //DX 20190708
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, xvector<double>& new_shift);
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring,
 			    deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted,
@@ -527,7 +529,7 @@ namespace SYM {
   char whichchar(string str_in);
   double whichnum(string str_in);
   double frac2dbl(string str);  //expand to cover case when input is e.g., ".5"
-  string dbl2frac(double a, bool sign_prefix=true);
+  //DX 20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
   void multiply(vector<string> A, vector<string> B);
   void xstring(ostream& output, xmatrix<double> a);
   void cleanupstring(string& str);  //eliminates blank spaces before and after string
@@ -542,8 +544,8 @@ namespace SYM {
   bool GCD_conventional_atomic_basis(deque<_atom>& conventional_basis_atoms, deque<deque<_atom> >& prim_split_atom_types, int& prim_GCD);
   //[CO 180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew);
   //[CO 180409 - moved to xatom]deque<_atom> foldAtomsInCell(deque<_atom>& atoms, xmatrix<double>& c2f_new, xmatrix<double>& f2c_new, bool& skew, double& tol);
-  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& c2f_orig, xmatrix<double>& f2c_new, bool& skew, double& tol);
-  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& c2f_orig, xmatrix<double>& f2c_new, bool& skew, double& tol);
+  bool MapAtomsInNewCell(_atom& a, _atom& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
+  bool MapAtomsInNewCell(xvector<double>& a, xvector<double>& b, xmatrix<double>& lattice_new, bool& skew, double& tol); //DX 20190619 - changed c2f_orig and f2c_new to lattice_new
   deque<deque<_atom> > groupSymmetryEquivalentAtoms(deque<_atom>& atoms, xmatrix<double>& lattice, vector<xmatrix<double> >& sym_ops,
 						    vector<xvector<double> >& translations, double& min_dist, double& tol); //DX 20190215
   deque<deque<_atom> > shiftSymmetryEquivalentAtoms(deque<deque<_atom> >& equivalent_atoms, xmatrix<double>& lattice, xvector<double>& translation, double& min_dist, double& tol);
@@ -553,7 +555,7 @@ namespace SYM {
   // ******************************************************************************
 //  namespace rstd {
   typedef std::map<int, xvector<double> > hash;
-  xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
+  //DX 20190905 [OBSOLETE] xvector<double> CrossPro(const xvector<double>& a, const xvector<double>& b);
   double DotPro(xvector<double> a, xvector<double> b);
 //  double modulus(xvector<double> a);
   double modulus(vector<double> a);
@@ -564,8 +566,8 @@ namespace SYM {
   xmatrix<double> concatenate(vector<xvector<double> >& V);
   xmatrix<double> concatenate(vector<xmatrix<double> >& V);
 
-  void normalize(xvector<double>& v);
-  void normalize(vector<double>& v);
+  //DX 20190905 [OBSOLETE] void normalize(xvector<double>& v);
+  //DX 20190905 [OBSOLETE] void normalize(vector<double>& v);
   xmatrix<double> xvec2xmat(xvector<double> a, xvector<double> b, xvector<double> c);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V);
   xmatrix<double> xvec2xmat(vector<xvector<double> > V, vector<double> R);
@@ -614,7 +616,7 @@ namespace SYM {
   int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
-  double mod_one(double d);
+  //DX 20190905 [OBSOLETE] double mod_one(double d);
   double smallest_gt_min(double min, vector<double> vec);
   int smallest_gt_min_index(double min, int not_index1, int not_index2, vector<double> vec);
 
@@ -695,7 +697,7 @@ namespace SYM {
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD);
-  deque<_atom> updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice);
+  void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX 20190805 - return to void
 
   //RHOMBOHEDRAL OBVERSE/REVERSE FUNCTIONS
   bool isObverseSetting(xstructure& xstr, double& tolerance);

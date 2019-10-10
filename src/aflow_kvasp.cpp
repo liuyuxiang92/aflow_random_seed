@@ -1416,6 +1416,7 @@ namespace KBIN {
 		    if(xvasp.NRELAXING==xvasp.NRELAX) {
 		      Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
 		      if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION=]");return Krun;}
+		      KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);  // ME190610 - or else SPIN_REMOVE_RELAX_2 won't work
 		    }
 		  }
 		  xvasp.NRELAXING=xvasp.NRELAX;
@@ -2675,9 +2676,16 @@ namespace KBIN {
 			     aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING: Sub-Space-Matrix is not hermitian in DAV")) );
 	xwarning.flag("EDDDAV",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Error EDDDAV: Call to ZHEGV failed. Returncode"));
 	xwarning.flag("ZPOTRF",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LAPACK: Routine ZPOTRF failed"));
-	xwarning.flag("NBANDS",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NBANDS") && // GET ALL TIMES
-				!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The number of bands has been changed from the values supplied") &&  // AVOID SELF HEALING
-				!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","now  NBANDS  =")) );  // AVOID SELF HEALING
+      //ME190620 - Avoid changing NBANDS in the aflow.in file just because VASP throws the warning that NBANDS is changed because of NPAR. However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
+        if (aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out", "NBANDS")) {
+          // The NBANDS warning due to NPAR is not an error we want to fix, so set to
+          // false if found
+          bool nbands_error = (!aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The number of bands has been changed from the values supplied")
+                         && !aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","now  NBANDS  ="));
+          // Need explicit check or else the NPAR warning prevents this NBANDS error from being corrected
+          nbands_error = nbands_error || aurostd::substring_present_file_FAST(xvasp.Directory + "/vasp.out", "The number of bands is not sufficient to hold all electrons");
+          xwarning.flag("NBANDS", nbands_error);
+        }
 	xwarning.flag("LRF_COMMUTATOR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","LRF_COMMUTATOR internal error: the vector")); // GET ALL TIMES
 	xwarning.flag("EXCCOR",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","ERROR FEXCF: supplied exchange-correlation table")); // look for problem at the correlation
 	xwarning.flag("NATOMS",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","The distance between some ions is very small")); // look for problem for distance
@@ -2698,13 +2706,19 @@ namespace KBIN {
 	xwarning.flag("NPARN",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NPAR = 4") &&
 			       aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NPAR=number of nodes")) ); // fix with NPAR=nodes in MPI
 	xwarning.flag("NPAR_REMOVE",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Please remove the tag NPAR from the INCAR file and restart the"));
-	xwarning.flag("GAMMA_SHIFT",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","shift your grid to Gamma"));
+	xwarning.flag("GAMMA_SHIFT",
+      aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","shift your grid to Gamma") || //CO190704
+      aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Shift your grid to Gamma") || //CO190704 - new VASP
+      FALSE); //CO190704
 	xwarning.flag("CSLOSHING",KBIN::VASP_CheckUnconvergedOSZICAR(xvasp.Directory)); // check from OSZICAR
 	xwarning.flag("NKXYZ_IKPTD",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKX>IKPTD") ||
 				     aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKY>IKPTD") ||
 				     aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","NKZ>IKPTD")) );
 	xwarning.flag("DENTET",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","WARNING: DENTET: can't reach specified precision")); // not only npar==1
-	xwarning.flag("EFIELD_PEAD",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","EFIELD_PEAD is too large")); // EFIELD_PEAD
+	xwarning.flag("EFIELD_PEAD",
+      aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","EFIELD_PEAD is too large") || //190704
+      aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","EFIELD_PEAD are too large for comfort") || //190704 - new VASP
+      FALSE); // EFIELD_PEAD  //CO190704
 	xwarning.flag("READ_KPOINTS_RD_SYM",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","ERROR in RE_READ_KPOINTS_RD") &&
 					     aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","switch off symmetry")) );
 	xwarning.flag("MPICH11",(aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES") &&

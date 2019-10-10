@@ -23,6 +23,8 @@ static const char _LOGGER_OPTION_ = 'O';
 static const char _LOGGER_RAW_ = 'R';
 static const char _LOGGER_MESSAGE_ = 'M';
 
+#define XRAY_THETA_TOL 1e-5;                                  //CO190409
+
 //[MOVED to aflow.h]// LOADENTRIES DEFAULTS
 //[MOVED to aflow.h]static const uint _AFLOW_LIB_MAX_ = 10;  //LIB11 does not exist yet, modify accordingly
 
@@ -275,8 +277,10 @@ namespace pflow {
   vector<vector<string> > elementalCombinations(const vector<string>& velements, uint nary);
   ////////////////////////////////////////////////////////////////////////////////
   //easy way to think about it:  do compounds belong to the hull?
-  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool sort_input=false, bool clean=true);
-  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool sort_input=false, bool clean=true);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
+  bool compoundsBelong(const vector<string>& velements, const string& input, vector<string>& input_velements, vector<double>& input_vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string,bool shortcut_pp_string_AFLOW_database=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ostream& oss=cout, bool sort_elements=false);
   bool compoundsBelong(const vector<string>& velements, const vector<string>& elements, ofstream& FileMESSAGE, ostream& oss=cout, bool sort_elements=false);
   ////////////////////////////////////////////////////////////////////////////////
@@ -284,16 +288,23 @@ namespace pflow {
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   bool loadXstructures(aflowlib::_aflowlib_entry& entry, ofstream& FileMESSAGE, ostream& oss=cout, bool relaxed_only=true, string path="", bool is_url_path=false);
   ////////////////////////////////////////////////////////////////////////////////
-  // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true);
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true);
+  vector<string> getElements(const string& _input); //CO190712
+  void elementsFromCompositionString(const string& input);  //CO190712
+  void elementsFromCompositionString(const string& input,vector<string>& velements,vector<double>& vcomposition); //CO190712
+  void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO190712
   ////////////////////////////////////////////////////////////////////////////////
-  // functions for making input alphabetic
-  // PdMn -> MnPd, does it by CAPITAL letters
-  string makeAlphabeticString(const string& input, ostream& oss=cout);
-  string makeAlphabeticString(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
-  vector<string> makeAlphabeticVector(const string& input, ostream& oss=cout);
-  vector<string> makeAlphabeticVector(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
+  // returns UNSORTED vector<string> from string
+  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  ////////////////////////////////////////////////////////////////////////////////
+  //[CO190712 - OBSOLETE]// functions for making input alphabetic
+  //[CO190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters
+  //[CO190712 - OBSOLETE]string getAlphabeticString(const string& input, ostream& oss=cout);
+  //[CO190712 - OBSOLETE]string getAlphabeticString(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
+  //[CO190712 - OBSOLETE]vector<string> getAlphabeticVectorString(const string& input, ostream& oss=cout);
+  //[CO190712 - OBSOLETE]vector<string> getAlphabeticVectorString(const string& input, ofstream& FileMESSAGE, ostream& oss=cout);
   ////////////////////////////////////////////////////////////////////////////////
   // sets default flags
   void defaultLoadEntriesFlags(aurostd::xoption& vpflow, ostream& oss=cout, string input="A", bool entry_output=true, bool silent=false);
@@ -423,14 +434,21 @@ namespace pflow {
   xstructure WYCKOFF(vector<string>,istream& input);
   void XRAY(string options,istream& input);
   void XRAY_PEAKS(const aurostd::xoption& vpflow,istream& input); //CO190409
+  void READ_XRAY_DATA(const string& filename,vector<double>& v_twotheta,vector<double>& intensity); //CO190620
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,istream& input); //CO190409
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const xstructure& str);  //CO190409
-  void PRINT_XRAY_DATA_PLOT(istream& input,double lambda,const string& directory="");  //CO190409
-  void PRINT_XRAY_DATA_PLOT(const xstructure& str,double lambda,const string& _directory="");  //CO190409
-  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input,bool force_generic_title=false); //CO190409
-  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str,bool force_generic_title=false); //CO190409
-  void PLOT_XRAY(istream& input,double lambda=1.5418,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
-  void PLOT_XRAY(const xstructure& str,double lambda=1.5418,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
+  void PRINT_XRAY_DATA_PLOT(istream& input,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="");  //CO190409
+  void PRINT_XRAY_DATA_PLOT(const xstructure& str,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="");  //CO190409
+  void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const string& directory="");  //CO190620
+  void PRINT_XRAY_DATA_PLOT(const string& filename,const string& directory="");  //CO190620
+  void PRINT_XRAY_DATA_PLOT(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& directory=""); //CO190620
+  void PLOT_XRAY(const aurostd::xoption& vpflow,istream& input); //CO190409
+  void PLOT_XRAY(const aurostd::xoption& vpflow,const xstructure& str); //CO190409
+  void PLOT_XRAY(istream& input,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
+  void PLOT_XRAY(const xstructure& str,double lambda=XRAY_RADIATION_COPPER_Kalpha,const string& directory="",bool keep_gp=false,bool force_generic_title=false); //CO190409
+  void PLOT_XRAY(const aurostd::xoption& vpflow,const string& title="",const string& directory="",bool keep_gp=false);  //CO190620
+  void PLOT_XRAY(const string& filename,const string& title="",const string& directory="",bool keep_gp=false); //CO190620
+  void PLOT_XRAY(const vector<double>& v_twotheta,const vector<double>& v_intensity,const string& title="",const string& directory="",bool keep_gp=false);  //CO190620
   void XYZ(string options,istream& input);
   void XYZINSPHERE(istream& input,double radius);
   void XYZWS(istream& input);
@@ -481,15 +499,14 @@ void PrintRDFCmp(const xstructure& str_A,const xstructure& str_B,const double& r
 		 const pflow::matrix<double>& rms_mat,ostream& oss=cout);
 void PrintRSM(const xstructure&,ostream& oss=cout);
 void PrintShell(const xstructure& str,const int& ns,const double& rmin,const double& rmax,const string& sname,const int lin_dens,ostream& oss=cout);
+double CorrectionFactor(const double& th);
 void PrintXray(const xstructure& str,double l,ostream& oss=cout); //CO190520
-void GetXray2ThetaIntensity(const xstructure& str, double lambda,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_amplitude); //CO190520
-void GetXrayPeaks(const xstructure& str,double lambda,vector<double>& v_intensity_smooth,vector<double>& v_peaks_twotheta,vector<double>& v_peaks_intensity,vector<double>& v_peaks_amplitude); //CO190520
 void PrintXYZ(const xstructure& a,const xvector<int>& n,ostream& oss=cout);
 void PrintXYZws(const xstructure& a,ostream& oss=cout);
 void PrintXYZInSphere(const xstructure& a,const double& radius,ostream& oss=cout);
 
 // aflow_pflow_funcs.cpp
-double DebyeWallerFactor(const double& theta,const double& lambda,const double& temp,const double& debye_temp,const double& mass);
+double DebyeWallerFactor(double theta,double temp,double debye_temp,double mass,double lambda=XRAY_RADIATION_COPPER_Kalpha);
 string getGenericTitleXStructure(const xstructure& xstr,bool latex=false); //CO190520
 xvector<double> balanceChemicalEquation(const vector<xvector<double> >& _lhs,const vector<xvector<double> >& _rhs,
     bool normalize,double tol); //CO 180817
@@ -517,11 +534,14 @@ namespace pflow { //CO190601
 } // namespace pflow
 
 namespace pflow {
-  void GetXray(const xstructure& str,vector<double>& dist,vector<double>& sf,double lambda,
-	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec); //CO190520
-  void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,double lambda,
+  void GetXray2ThetaIntensity(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
+  vector<uint> GetXrayPeaks(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_intensity_smooth,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520  //CO190620 - v_peaks_amplitude not needed
+  vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth); //CO190520  //CO190620 - v_peaks_amplitude not needed
+  void GetXray(const xstructure& str,vector<double>& dist,vector<double>& sf,
+	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
+  void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,
         vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
-        vector<vector<double> >& ids,pflow::matrix<double>& data,double& intmax);  //CO190409
+        vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO190409  //CO190620 - intmax can be grabbed later
   void GetRDF(xstructure str,const double& rmax,const int& nbins,matrix<double>& rdf_all);
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,
 		    const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
@@ -865,6 +885,17 @@ namespace pflow {
 namespace pflow {
   void BZMAX(istream& input);
 }
+
+//ME190628 - prettyPrintCompound from CHULL
+namespace pflow {
+  // Precision for pretty printing
+  const int COEF_PRECISION = 4;
+
+  string prettyPrintCompound(const string&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft); //char=_latex_  //CO190629
+  string prettyPrintCompound(const vector<string>&, const vector<double>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO190629
+  string prettyPrintCompound(const vector<string>&, const aurostd::xvector<double>&, vector_reduction_type vred=gcd_vrt, bool=true, filetype ftype=latex_ft);  //char=_latex_  //CO190629
+
+}  // namespace pflow
 
 #endif
 // ***************************************************************************
