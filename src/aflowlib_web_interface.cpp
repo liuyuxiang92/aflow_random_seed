@@ -5931,19 +5931,21 @@ namespace aflowlib {
         // ME191004 - START
         // Grab compressed files
         if(XHOST.vflag_control.flag("PRINT_MODE::JSON") || !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
-          string fgroup, bandsdata;
+          string content;
+          // fgroup for JMOL applet
           if (aurostd::EFileExist(directory_RAW + "/aflow.fgroup.bands.json")) {
-            fgroup = aurostd::efile2string(directory_RAW + "/aflow.fgroup.bands.json");
+            content = aurostd::efile2string(directory_RAW + "/aflow.fgroup.bands.json");
           } else if (aurostd::EFileExist(directory_RAW + "/aflow.fgroup.relax.json")) {
-            fgroup = aurostd::efile2string(directory_RAW + "/aflow.fgroup.relax.json");
+            content = aurostd::efile2string(directory_RAW + "/aflow.fgroup.relax.json");
           }
-          aflowlib_json << ", \"fgroup\":" << (fgroup.empty()?"null":fgroup);
+          aflowlib_json << ", \"fgroup\":" << (content.empty()?"null":content);
 
+          content = "";
           if (vflags.flag("FLAG::ELECTRONIC")) {
             string system_name = KBIN::ExtractSystemName(directory_LIB);
-            bandsdata = aurostd::efile2string(directory_RAW + "/" + system_name + "_bandsdata.json");
+            content = aurostd::efile2string(directory_RAW + "/" + system_name + "_bandsdata.json");
           }
-          aflowlib_json << ", \"bandsdata\":" << (bandsdata.empty()?"null":bandsdata);
+          aflowlib_json << ", \"bandsdata\":" << (content.empty()?"null":content);
         }
         // ME1901004 - STOP
       }
