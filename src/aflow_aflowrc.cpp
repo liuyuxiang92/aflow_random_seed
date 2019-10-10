@@ -22,22 +22,21 @@
 #define AFLOWRC_DEFAULT_KZIP_EXT                        string(".xz") 
 #define         DEFAULT_KZIP_EXT                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_EXT")
 
-// ME 190810 - START
+// ME 191001 - START
 // DEFAULTS AFLOW DATABASE
-#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/marcosplayground/aflowlib.db")
+#define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/mnt/ramd/aflowlib.db")
 #define         DEFAULT_AFLOW_DB_FILE                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_FILE")
-#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/marcosplayground/aflowlib.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE             string("/mnt/ramd/aflowlib.json")
 #define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
-//#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AFLOW/LIBS/")
-#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/home/esters/WORK/common/JSON/")
+#define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AFLOW/LIBS/")
 #define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_DATA_PATH")
-#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/www/search/database_new/aapi_schema.json")
+#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/www/search/aapi_schema.json")
 #define         DEFAULT_AFLOW_DB_SCHEMA_FILE            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_SCHEMA_FILE")
-#define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/mnt/marcosplayground/ADB_Idle.lock")
+#define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/mnt/ramd/ADB_Idle.lock")
 #define         DEFAULT_AFLOW_DB_LOCK_FILE              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_LOCK_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD        3*3600
 #define         DEFAULT_AFLOW_DB_STALE_THRESHOLD        XHOST.adefault.getattachedutype<long int>("DEFAULT_AFLOW_DB_STALE_THRESHOLD")
-// ME180810 - STOP
+// ME191001 - STOP
 
 // FILENAMES FOR AFLOW.ORG ANALYSIS
 #define AFLOWRC_DEFAULT_FILE_AFLOWLIB_ENTRY_OUT         string("aflowlib.out")
