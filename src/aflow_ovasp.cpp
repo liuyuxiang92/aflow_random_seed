@@ -3902,7 +3902,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     // ME190614 - END
   }
   // ME190812 - Safeguard against broken DOSCARs
-  if ((d < (int) ndos) || (e < (int) number_energies)) {
+  if ((d + 1 < (int) ndos) || (e < (int) number_energies)) {
     string function = "xDOSCAR::GetProperties()";
     string message = "Broken DOSCAR: not enough lines.";
     throw aurostd::xerror(function, message, _FILE_ERROR_);
