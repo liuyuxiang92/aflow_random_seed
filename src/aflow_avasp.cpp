@@ -832,6 +832,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
     xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC", vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry);
     xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF", vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry);
   }
+  xvasp.AVASP_LDAU_PARAMETERS_STRING = vflags.KBIN_VASP_LDAU_PARAMETERS;  // ME191010
 
   // INCAR
   xvasp.aopts.flag("FLAG::INCAR_MODE_IMPLICIT", vflags.KBIN_VASP_INCAR_MODE.flag("IMPLICIT"));
