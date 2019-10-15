@@ -188,11 +188,6 @@ string extractJsonValueAflow(const string& json, string key) {
       end = json.find("}", start);
       value = json.substr(start, end - start - 1);
     }
-    if (value[0] == '"') {
-      value = value.substr(1, end - 2);
-    } else {
-      value = value.substr(0, end);
-    }
   } else {
     value = "";
   }

@@ -741,11 +741,11 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBStats& db_stats)
     str_formatted = db_stats.min[c];
     str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
     json << indent << tab << tab << tab << "\"min\": "
-         << (db_stats.min[c].empty()?"null":string("\"" + str_formatted + "\"")) << "," << std::endl;
+         << (db_stats.min[c].empty()?"null":str_formatted) << "," << std::endl;
     str_formatted = db_stats.max[c];
     str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
     json << indent << tab << tab << tab << "\"max\": "
-         << (db_stats.max[c].empty()?"null":string("\"" + str_formatted + "\"")) << "," << std::endl;
+         << (db_stats.max[c].empty()?"null":str_formatted) << "," << std::endl;
 
     // Write set
     uint nset = db_stats.set[c].size();
@@ -759,7 +759,7 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBStats& db_stats)
       for (uint s = 0; s < nset; s++) {
         str_formatted = db_stats.set[c][s];
         str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
-        json << indent << tab << tab << tab << tab << "\"" << str_formatted << "\"";
+        json << indent << tab << tab << tab << tab << str_formatted;
         if (s < nset - 1) json << ",";
         json << std::endl;
       }
