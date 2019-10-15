@@ -335,8 +335,10 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
 // Rebuild -------------------------------------------------------------------
 
 void AflowDB::rebuildDB() {
+  bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   // Do not constantly synchronize the database with file on disk.
   // Increases performance significantly.
+  if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Starting rebuild." << std::endl;
   SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
   // Get columns from schema
@@ -364,6 +366,7 @@ void AflowDB::rebuildDB() {
 #else
   buildTables(0, _N_AUID_TABLES_, columns, types);
 #endif
+  if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Finished rebuild." << std::endl;
 }
 
 void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
