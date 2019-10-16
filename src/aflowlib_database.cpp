@@ -121,6 +121,22 @@ void AflowDB::openTmpFile(int open_flags) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   string tmp_file = database_file + ".tmp";
   if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile(): Opening " << tmp_file << std::endl;
+
+  // Create a symbolic link to lock the tmp file creation process. Since creating
+  // symbolic links is an atomic process, it can be used to prevent race conditions.
+  string lock_link = lock_file + ".lnk";
+  if (symlink(lock_file.c_str(), lock_link.c_str())) {
+    string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
+    stringstream message;
+    message << "Could not create symbolic link to lock file " + lock_file + ": ";
+    if (errno == EEXIST) {
+      message << "Another process is created it already.";
+    } else {
+      message << "Process exited with errno " << errno << ".";
+    }
+    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  }
+  
   if (aurostd::FileExist(tmp_file)) {
     long int tm_tmp = aurostd::FileModificationTime(tmp_file);
     time_t t = std::time(nullptr);
@@ -151,6 +167,7 @@ void AflowDB::openTmpFile(int open_flags) {
       if (pid > -1) {
         int killreturn = kill(pid, 9);
         if (killreturn) {
+          aurostd::RemoveFile(lock_link);
           string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
           stringstream message;
           message << "Could not kill active process " << pid
@@ -171,6 +188,7 @@ void AflowDB::openTmpFile(int open_flags) {
   aurostd::string2file(aurostd::utype2string<int>(getpid()), lock_file);
   int sql_code = sqlite3_close(db);
   if (sql_code != SQLITE_OK) {
+    aurostd::RemoveFile(lock_link);
     string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
     string message = "Could not close main database file " + database_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
@@ -185,6 +203,7 @@ void AflowDB::openTmpFile(int open_flags) {
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
   is_tmp = true;
+  aurostd::RemoveFile(lock_link);
 }
 
 //closeTmpFile////////////////////////////////////////////////////////////////
@@ -425,13 +444,15 @@ void AflowDB::populateTable(const string& table, const vector<string>& columns, 
 
 // Schema --------------------------------------------------------------------
 
+//getSchemaKeys///////////////////////////////////////////////////////////////
+// Retrieves all properties that need to be included in the database.
 vector<string> AflowDB::getSchemaKeys(const string& schema) {
   vector<string> keys_unfiltered = getJsonKeys(schema, "AAPI_schema");
 
   vector<string> keys;
   string function;
   for (uint k = 0; k < keys_unfiltered.size(); k++) {
-    if (keys_unfiltered[k] != "__schema^2__") {
+    if ((keys_unfiltered[k] != "__schema^2__") && (keys_unfiltered[k] != "icsd_number")) {
       function = extractJsonValue(schema, "AAPI_schema." + keys_unfiltered[k] + ".function");
       if ((function != "link") && (function != "image")) {
         keys.push_back(keys_unfiltered[k]);
@@ -507,7 +528,7 @@ void AflowDB::analyzeDatabase(string outfile) {
 
   for (uint c = 0; c < ncatalogs; c++) {
     DBStats db_stats = getCatalogStats(catalogs[c], tables, columns, loops);
-    writeStatsToJSON(json, db_stats);
+    writeStatsToJson(json, db_stats);
     if (c < ncatalogs - 1) json << ",";
     json << std::endl;
   }
@@ -722,9 +743,9 @@ vector<string> AflowDB::getUniqueFromJsonArrays(const vector<string>& arrays) {
   return unique;
 }
 
-//writeStatsToJSON////////////////////////////////////////////////////////////
+//writeStatsToJson////////////////////////////////////////////////////////////
 // Writes the database statistics into a JSON-formatted string(stream).
-void AflowDB::writeStatsToJSON(std::stringstream& json, const DBStats& db_stats) {
+void AflowDB::writeStatsToJson(std::stringstream& json, const DBStats& db_stats) {
   string tab = "    ";
   string indent = tab + tab;
   json << indent << "\"" << db_stats.catalog << "\": {" << std::endl;
@@ -742,11 +763,23 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBStats& db_stats)
     json << indent << tab << tab << tab << "\"count\": ";
     json << aurostd::utype2string<int>(db_stats.count[c]) << "," << std::endl;
     str_formatted = db_stats.min[c];
-    str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+    if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+      str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
+      str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+      str_formatted = "\"" + str_formatted + "\"";
+    } else {
+      str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+    }
     json << indent << tab << tab << tab << "\"min\": "
          << (db_stats.min[c].empty()?"null":str_formatted) << "," << std::endl;
     str_formatted = db_stats.max[c];
-    str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+    if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+      str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
+      str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+      str_formatted = "\"" + str_formatted + "\"";
+    } else {
+      str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+    }
     json << indent << tab << tab << tab << "\"max\": "
          << (db_stats.max[c].empty()?"null":str_formatted) << "," << std::endl;
 
@@ -761,7 +794,13 @@ void AflowDB::writeStatsToJSON(std::stringstream& json, const DBStats& db_stats)
       json << "[" << std::endl;
       for (uint s = 0; s < nset; s++) {
         str_formatted = db_stats.set[c][s];
-        str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+        if ((str_formatted[0] == '\"') && (str_formatted.back() == '\"')) {  // Don't escape enclosing strings
+          str_formatted = str_formatted.substr(1, str_formatted.size() - 2);
+          str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+          str_formatted = "\"" + str_formatted + "\"";
+        } else {
+          str_formatted = aurostd::StringSubst(str_formatted, "\"", "\\\"");
+        }
         json << indent << tab << tab << tab << tab << str_formatted;
         if (s < nset - 1) json << ",";
         json << std::endl;

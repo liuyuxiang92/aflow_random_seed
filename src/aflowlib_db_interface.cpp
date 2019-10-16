@@ -173,7 +173,6 @@ string extractJsonValue(const string& json, const string& key) {
 // the aflowlib.json. It cannot handle nested JSONs!
 string extractJsonValueAflow(const string& json, string key) {
   string value;
-  string keyback = key;
   key = "\"" + key + "\":";
   string::size_type start, end;
   start = json.find(key);
@@ -186,7 +185,7 @@ string extractJsonValueAflow(const string& json, string key) {
       value = value.substr(0, end);
     } else {
       end = json.find("}", start);
-      value = json.substr(start, end - start - 1);
+      value = json.substr(start, end - start);
     }
   } else {
     value = "";

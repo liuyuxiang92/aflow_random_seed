@@ -568,7 +568,7 @@ class AflowDB {
                      const vector<string>&, vector<vector<int> >&, vector<vector<int> >&,
                      vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
     vector<string> getUniqueFromJsonArrays(const vector<string>&);
-    void writeStatsToJSON(std::stringstream&, const DBStats&);
+    void writeStatsToJson(std::stringstream&, const DBStats&);
 
     void createIndex(const string&, const string&, const string&);
     void dropIndex(const string&);
