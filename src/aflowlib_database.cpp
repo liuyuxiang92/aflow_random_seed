@@ -748,7 +748,7 @@ vector<string> AflowDB::getUniqueFromJsonArrays(const vector<string>& arrays) {
 void AflowDB::writeStatsToJson(std::stringstream& json, const DBStats& db_stats) {
   string tab = "    ";
   string indent = tab + tab;
-  json << indent << "\"" << db_stats.catalog << "\": {" << std::endl;
+  json << indent << db_stats.catalog << ": {" << std::endl;
   json << indent << tab << "\"count\": " << db_stats.nentries << "," << std::endl;
   json << indent << tab << "\"systems\": " <<  db_stats.nsystems << "," << std::endl;
   for (uint l = 0; l < db_stats.loop_counts.size(); l++) {
