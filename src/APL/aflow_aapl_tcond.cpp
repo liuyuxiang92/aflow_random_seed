@@ -36,7 +36,6 @@ static const double hbar_J = E_ELECTRON * 1e12 * hbar;  // hbar in J/THz;
 static const double hbar_amu = hbar * au2THz * 1e13;  // hbar in amu A^2 THz
 static const double BEfactor = hbar*1e12/KBOLTZEV;  // hbar/kB in K/THz
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
-static const double scatt_multi[2] = {1.0, 0.5};
 
 using aurostd::xcomplex;
 using aurostd::xmatrix;
@@ -143,6 +142,7 @@ void TCONDCalculator::calculateThermalConductivity() {
   for (uint t = 0; t < temperatures.size(); t++) {
     thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], small_groups);
   }
+  writeThermalConductivity();
 }
 
 vector<vector<int> > TCONDCalculator::calculateSmallGroups() {
@@ -345,39 +345,58 @@ void TCONDCalculator::calculateTransitionProbabilities() {
   _logger << "Calculating transition probabilities for 3-phonon scattering processes." << apl::endl;
   processes.resize(nIQPs);
   intr_trans_probs.resize(nIQPs);
+  vector<vector<vector<vector<double> > > > phase_space(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
   thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
   threads.clear();
   for (int icpu = 0; icpu < ncpus; icpu++) {
     threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-                                      thread_dist[icpu][0], thread_dist[icpu][1], std::ref(_lt), std::ref(phases)));
+                                      thread_dist[icpu][0], thread_dist[icpu][1],
+                                      std::ref(_lt), std::ref(phase_space), std::ref(phases)));
   }
   finishMPI(threads, _logger);
 #else
   _logger.initProgressBar(message);
-  calculateTransitionProbabilitiesPhonon(0, nIQPs, phases);
+  calculateTransitionProbabilitiesPhonon(0, nIQPs, _lt, phase_space, phases);
   _logger.finishProgressBar();
 #endif
+  writePhaseSpace(phase_space);
 
-  if (0 && calc_options.flag("ISOTOPE")) {
+  if (calc_options.flag("ISOTOPE")) {
     _logger << "Calculating isotope transition probabilities." << apl::endl;
-    message = "Isotope Transition Probabilities";
-    processes_iso.resize(nIQPs);
-    intr_trans_probs_iso.resize(nIQPs);
 
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE    
-    thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
-                                        thread_dist[icpu][0], thread_dist[icpu][1], std::ref(_lt)));
+    // Test if isotope scattering is possible
+    const xstructure& pcell = _pc.getInputCellStructure();
+    uint at, natoms;
+    natoms = pcell.atoms.size();
+    for (at = 0; at < natoms; at++) {
+      if (GetPearsonCoefficient(pcell.atoms[at].atomic_number) > 0) break;
     }
-    finishMPI(threads, _logger);
+
+    if (at == natoms) {
+      calc_options.flag("ISOTOPE", false);
+      _logger << "There are no atoms with isotopes of different masses."
+              << " Isotope scattering will be turned off." << apl::endl;
+    } else {
+      message = "Isotope Transition Probabilities";
+      processes_iso.resize(nIQPs);
+      intr_trans_probs_iso.resize(nIQPs);
+      rates_isotope.resize(nIQPs, vector<double>(nBranches));
+
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+      thread_dist = setupMPI(message, _logger, nIQPs, ncpus);
+      threads.clear();
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this,
+                                          thread_dist[icpu][0], thread_dist[icpu][1], std::ref(_lt)));
+      }
+      finishMPI(threads, _logger);
 #else
-    _logger.initProgressBar(message);
-    calculateTransitionProbabilitiesIsotope(0, nIQPs, _lt);
-    _logger.finishProgressBar();
+      _logger.initProgressBar(message);
+      calculateTransitionProbabilitiesIsotope(0, nIQPs, _lt);
+      _logger.finishProgressBar();
 #endif
+    }
   }
 
   if (calc_options.flag("BOUNADRY")) {
@@ -415,6 +434,7 @@ vector<vector<vector<vector<xcomplex<double> > > > > TCONDCalculator::calculateP
 }
 
 void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex, const LTMethod& _lt,
+                                                             vector<vector<vector<vector<double> > > >& phase_space,
                                                              const vector<vector<vector<vector<xcomplex<double> > > > >& phases) {
   const Supercell& scell = _pc.getSupercell();
   const vector<_cluster>& clusters = _pc._clusters[0].clusters;
@@ -435,6 +455,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   // Units are chosen so that probabilities are in THz (1/ps)
   const double probability_prefactor = std::pow(au2THz * 10.0, 2) * hbar_amu * PI/4.0;
   const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
+  const double scatt_multi[2] = {1.0, 0.5};
 
   int natoms = (int) _pc.getInputCellStructure().atoms.size();
   vector<int> atpowers(3, 1);
@@ -453,7 +474,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   xcomplex<double> matrix, prefactor, eigen;
   vector<double> weights(nQPs), frequencies(nQPs);
   vector<int> qpts(3), proc(3), lastq(nQPs);
-  int iat, o, e, q, s;
+  int iat, o, e, q, s, p, w;
   uint c, crt, br;
   double transprob, freq_ref;
   bool calc;
@@ -480,6 +501,11 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
           if (calc) {
             qpts[1] = q;
             qpts[2] = lastq[q];
+            p = 0;
+            for (o = 0; o < 3; o++) {
+              if (branches[br][o] > 2) p++;
+            }
+            phase_space[i][branches[br][0]][p][s] += scatt_multi[s] * weights[q];
             for (o = 0; o < 3; o++) {
               if (freq[qpts[o]][branches[br][o]] < _ZERO_TOL_) break;
             }
@@ -492,9 +518,9 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
               for (crt = 0; crt < ncart; crt++) {
                 e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
                 eigen = eigenvectors[qpts[0]][e][branches[br][0] + 1];
-                e = at_eigen[c][o] * 3 + cart_indices[crt][o] + 1;
-                if (s) eigen *= conj(eigenvectors[qpts[o]][e][branches[br][o] + 1]);
-                else eigen *= eigenvectors[qpts[o]][e][branches[br][o] + 1];
+                e = at_eigen[c][1] * 3 + cart_indices[crt][1] + 1;
+                if (s) eigen *= conj(eigenvectors[qpts[1]][e][branches[br][1] + 1]);
+                else eigen *= eigenvectors[qpts[1]][e][branches[br][1] + 1];
                 e = at_eigen[c][2] * 3 + cart_indices[crt][2] + 1;
                 eigen *= conj(eigenvectors[qpts[2]][e][branches[br][2] + 1]);
                 eigenprods[c][crt] = eigen;
@@ -530,6 +556,14 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
         }
       }
     }
+    w = _qm.getWeights()[i];
+    for (int b = 0; b < nBranches; b++) {
+      for (p = 0; p < 4; p++) {
+        for (s = 0; s < 2; s++) {
+          phase_space[i][b][p][s] *= ps_prefactor * w;
+        }
+      }
+    }
     _logger.updateProgressBar(1.0/nIQPs);
   }
 }
@@ -541,40 +575,37 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
   uint at;
   for (at = 0; at < natoms; at++) pearson[at] = GetPearsonCoefficient(pcell.atoms[at].atomic_number);
 
-  vector<double> frequencies(nQPs), func(nQPs), weights(nQPs);
+  vector<double> frequencies(nQPs), weights(nQPs);
   vector<int> proc(2);
-  double prefactor, rate;
+  double prefactor, eigsqr, rate;
   int q1, q2, br1, br2, b, e;
   xcomplex<double> eig;
-  xvector<xcomplex<double> > eigen1(3), eigen2(3);
 
   for (int i = startIndex; i < endIndex; i++) {
     q1 = _qm.getIbzqpts()[i];
     for (br1 = 0; br1 < nBranches; br1++) {
-      prefactor = freq[q1][br1] * freq[q1][br1] * PI/2.0;
+      prefactor = freq[q1][br1] * freq[q1][br1] * PI/4.0;
       for (br2 = 0; br2 < nBranches; br2++) {
-        for (q2 = 0; q2 < nQPs; q2++) {
-          frequencies[q2] = freq[q2][br2];
-          func[q2] = 0.0;
-          for (at = 0; at < natoms; at++) {
-            if (pearson[at] != 0) {
-              eig.re = 0.0;
-              eig.im = 0.0;
-              e = 3 * at;
-              for (int i = 1; i < 4; i++) {
-                eig.re += eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].re;
-                eig.re += eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].im;
-                eig.im += eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].re;
-                eig.im -= eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].im;
-              }
-              func[q2] += pearson[at] * magsqr(eig);
-            }
-          }
-        }
+        for (q2 = 0; q2 < nQPs; q2++) frequencies[q2] = freq[q2][br2];
         getWeightsLT(_lt, freq[q1][br1], frequencies, weights);
         for (q2 = 0; q2 < nQPs; q2++) {
-          rate = prefactor * weights[q2] * func[q2];
-          if (rate > _ZERO_TOL_) {
+          if (weights[q2] > _ZERO_TOL_) {
+            eigsqr = 0.0;
+            for (at = 0; at < natoms; at++) {
+              if (pearson[at] != 0) {
+                eig.re = 0.0;
+                eig.im = 0.0;
+                e = 3 * at;
+                for (int i = 1; i < 4; i++) {
+                  eig.re += eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].re;
+                  eig.re += eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].im;
+                  eig.im += eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].im;
+                  eig.im -= eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].re;
+                }
+                eigsqr += pearson[at] * magsqr(eig);
+              }
+            }
+            rate = prefactor * weights[q2] * eigsqr;
             b = nBranches * br1 + br2;
             proc[0] = q2;
             proc[1] = b;
@@ -640,7 +671,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
   std::cout << "tcond: " << std::endl;
   std::cout << tcond << std::endl;
 
-  if (0 && !calc_options.flag("RTA")) {
+  if (!calc_options.flag("RTA")) {
     xmatrix<double> tcond_prev(3, 3), diff(3, 3);
     int num_iter = 1;
     double norm;
@@ -658,7 +689,8 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
       std::cout << std::setw(15) << num_iter;
       std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
       std::cout << std::setw(25) << std::dec << (norm) << std::endl;
-    } while((std::abs(norm) < 1e-5) && (num_iter <= max_iter));
+      num_iter++;
+    } while ((std::abs(norm) > 1e-5) && (num_iter <= max_iter));
     if (num_iter > max_iter) {
       string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor()";
       stringstream message;
@@ -700,13 +732,6 @@ vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<v
 #else
   calcAnharmRates(0, nIQPs, occ, rates);
 #endif
-  for (int i = 0; i < nIQPs; i++) {
-    std::cout << i;
-    for (int j = 0; j < nBranches; j++) {
-      std::cout << " " << rates[i][j];
-    }
-    std::cout << std::endl;
-  }
   return rates;
 }
 
@@ -736,7 +761,7 @@ double TCONDCalculator::getOccupationTerm(const vector<vector<double> >& occ, in
 vector<vector<double> > TCONDCalculator::getRates(const vector<vector<double> >& occ) {
   vector<vector<double> > rates = calculateAnharmonicRates(occ);
 
-  if (0 && calc_options.flag("ISOTOPE")) {
+  if (calc_options.flag("ISOTOPE")) {
     for (int iq = 0; iq < nIQPs; iq++) {
       for (int br = 0; br < nBranches; br++) {
         rates[iq][br] += rates_isotope[iq][br];
@@ -847,17 +872,16 @@ void TCONDCalculator::calculateDelta(int startIndex, int endIndex,
       if (processes[i][p][0]) correction -= mfd[qpts[1]][branches[1]];
       else correction += mfd[qpts[1]][branches[1]];
       correction *= getOccupationTerm(occ, processes[i][p][0], qpts, branches);
-      delta[qpts[0]][branches[0]] += intr_trans_probs[i][p] * correction;
+      delta[i][branches[0]] += intr_trans_probs[i][p] * correction;
     }
 
     if (calc_options.flag("ISOTOPE")) {
-      int q1, q2, br1, br2;
-      q1 = _qm.getIbzqpts()[i];
+      int q2, br1, br2;
       for (uint p = 0, nprocs = processes_iso[i].size(); p < nprocs; p++) {
         q2 = processes_iso[i][p][0];
         br1 = processes_iso[i][p][1]/nBranches;
         br2 = processes_iso[i][p][1] % nBranches;
-        delta[q1][br1] += intr_trans_probs_iso[i][p] * mfd[q2][br2];
+        delta[i][br1] += intr_trans_probs_iso[i][p] * mfd[q2][br2];
       }
     }
 
@@ -1048,6 +1072,49 @@ void TCONDCalculator::writeGroupVelocities() {
     string message = "Could not write group velocities to file.";
     throw xerror(function, message, _FILE_ERROR_);
   }
+}
+
+void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> > > >& phase_space) {
+  vector<double> ps_procs(4), ps_nu(2);
+  vector<vector<double> > ps_modes(nIQPs, vector<double>(nBranches));
+  double ps_total = 0, ps;
+  for (int i = 0; i < nIQPs; i++) {
+    for (int b = 0; b < nBranches; b++) {
+      for (int p = 0; p < 4; p++) {
+        for (int s = 0; s < 2; s++) {
+          ps = phase_space[i][b][p][s];
+          ps_total += ps;
+          ps_nu[s] += ps;
+          ps_procs[p] += ps;
+          ps_modes[i][b] += ps;
+        }
+      }
+    }
+  }
+
+  stringstream output;
+  output << AFLOWIN_SEPARATION_LINE << std::endl;
+  output << "# 3-phonon scattering phase space (in s)" << std::endl;
+  output << "[AAPL_TOTAL_SCATTERING_PHASE_SPACE]START" << std::endl;
+  output << std::setiosflags(std::ios::left | std::ios::fixed | std::ios::showpoint);
+  output << std::setw(15) << "total" << std::setw(10) << std::setprecision(8) << std::dec << ps_total << std::endl;
+  output << std::setw(15) << "total normal" << std::setw(10) << std::setprecision(8) << std::dec << ps_nu[0] << std::endl;
+  output << std::setw(15) << "total umklapp" << std::setw(10) << std::setprecision(8) << std::dec << ps_nu[1] << std::endl;
+  output << std::setw(15) << "total AAA" << std::setw(10) << std::setprecision(8) << std::dec << ps_procs[0] << std::endl;
+  output << std::setw(15) << "total AAO" << std::setw(10) << std::setprecision(8) << std::dec << ps_procs[1] << std::endl;
+  output << std::setw(15) << "total AOO" << std::setw(10) << std::setprecision(8) << std::dec << ps_procs[2] << std::endl;
+  output << std::setw(15) << "total OOO" << std::setw(10) << std::setprecision(8) << std::dec << ps_procs[3] << std::endl;
+  output << "[AAPL_TOTAL_SCATTERING_PHASE_SPACE]STOP" << std::endl;
+  output << "[AAPL_MODE_SCATTERING_PHASE_SPACE]START" << std::endl;
+  for (int i = 0; i < nIQPs; i++) {
+    for (int b = 0; b < nBranches; b++) {
+      output << std::setw(17) << std::setprecision(10) << std::dec << ps_modes[i][b];
+    }
+    output << std::endl;
+  }
+  output << "[AAPL_MODE_SCATTERING_PHASE_SPACE]STOP" << std::endl;
+  output << AFLOWIN_SEPARATION_LINE << std::endl;
+  aurostd::stringstream2file(output, "aflow.aapl.phase_space.out");
 }
 
 void TCONDCalculator::writeThermalConductivity() {

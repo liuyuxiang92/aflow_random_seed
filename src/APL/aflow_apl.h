@@ -1582,6 +1582,7 @@ class TCONDCalculator {
     void calculateTransitionProbabilities();
     vector<vector<vector<vector<xcomplex<double> > > > > calculatePhases();
     void calculateTransitionProbabilitiesPhonon(int, int, const LTMethod&,
+                                                vector<vector<vector<vector<double> > > >&,
                                                 const vector<vector<vector<vector<xcomplex<double> > > > >&);
     void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
     vector<vector<double> > calculateTransitionProbabilitiesBoundary();
@@ -1606,6 +1607,7 @@ class TCONDCalculator {
     void writeDataBlock(stringstream&, const vector<vector<double> >&);
     void writeFrequencies();
     void writeGroupVelocities();
+    void writePhaseSpace(const vector<vector<vector<vector<double> > > >&);
     void writeThermalConductivity();
 };
 
