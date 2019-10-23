@@ -129,6 +129,11 @@ namespace AEL_functions {
       vaspFlags.KBIN_VASP_FORCE_OPTION_ALGO.content_string = "NORMAL";
     }
     
+    // Switch off VASP symmetry - this can help when applied strains break the symmetry of the primitive cell
+    if(!AEL_data.vasp_symmetry) {
+     vaspFlags.KBIN_VASP_FORCE_OPTION_SYM.option = false;
+    }
+    
     // Common KPOINTS settings and OVERRIDES
     // [OBSOLETE] vaspRun.AVASP_KSCHEME = _vaspFlags.KBIN_VASP_KPOINTS_KSCHEME.content_string;
     // [OBSOLETE] vaspRun.AVASP_value_KPPRA = _vaspFlags.KBIN_VASP_KPOINTS_KPPRA.content_int;

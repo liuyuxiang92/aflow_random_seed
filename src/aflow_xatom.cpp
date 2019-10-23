@@ -51,13 +51,7 @@
 // look into aflow.h for the definitions
 
 // constructors
-_atom::_atom() {free();}
-_atom::_atom(const _atom& b){copy(b);}
-
-// destructor
-_atom::~_atom() {free();}
-
-void _atom::free() {
+_atom::_atom() {
   fpos.clear();
   cpos.clear();
   corigin.clear();
@@ -71,15 +65,12 @@ void _atom::free() {
   mass=0.0;
   type=0;
   name="";
-  info=0;  // (RHT)
-  cleanname="";
   name_is_given=FALSE;
+  cleanname="";
+  info=0;  // (RHT)
   atomic_number=0;
   number=0;
   sd="";
-  print_RHT=false;  //CO190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
-  print_cartesian=FALSE;
-  verbose=FALSE;
   ijk.clear();
   isincell=FALSE;
   basis=0;
@@ -93,56 +84,62 @@ void _atom::free() {
   order_parameter_atom=FALSE;
   partial_occupation_value=1.0;
   partial_occupation_flag=FALSE;
-  shell = 0;
+  shell=0;
+  verbose=FALSE;
+  print_RHT=false;  //CO190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
+  print_cartesian=FALSE;
 }
 
-void _atom::copy(const _atom& b) {
-  fpos=b.fpos;
-  cpos=b.cpos;
-  corigin=b.corigin;
-  coord=b.coord;
-  fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
-  cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
-  spin=b.spin;
-  spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
-  noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-  noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-  mass=b.mass;
-  type=b.type;
-  name=b.name;
-  info=b.info;  // (RHT)
-  cleanname=b.cleanname;
-  name_is_given=b.name_is_given;
-  atomic_number=b.atomic_number;
-  number=b.number;
-  sd=b.sd;
-  print_RHT=b.print_RHT;  // (RHT)
-  print_cartesian=b.print_cartesian;
-  verbose=b.verbose;
-  ijk=b.ijk;
-  isincell=b.isincell;
-  basis=b.basis;
-  reference=b.reference;
-  ireference=b.ireference;
-  equivalent=b.equivalent;
-  is_inequivalent=b.is_inequivalent;
-  num_equivalents=b.num_equivalents;
-  index_iatoms=b.index_iatoms;
-  order_parameter_value=b.order_parameter_value;
-  order_parameter_atom=b.order_parameter_atom;
-  partial_occupation_value=b.partial_occupation_value;
-  partial_occupation_flag=b.partial_occupation_flag;
-  shell = b.shell;
+// destructor
+_atom::~_atom() {free();}
+
+void _atom::free() {
 }
 
 const _atom& _atom::operator=(const _atom& b) {       // operator=
-  if(this != &b) {copy(b);}
+  if(this != &b) {
+    free();
+    fpos=b.fpos;
+    cpos=b.cpos;
+    corigin=b.corigin;
+    coord=b.coord;
+    fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
+    cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
+    spin=b.spin;
+    spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
+    noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+    noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+    mass=b.mass;
+    type=b.type;
+    name=b.name;
+    name_is_given=b.name_is_given;
+    cleanname=b.cleanname;
+    info=b.info;  // (RHT)
+    atomic_number=b.atomic_number;
+    number=b.number;
+    sd=b.sd;
+    ijk=b.ijk;
+    isincell=b.isincell;
+    basis=b.basis;
+    reference=b.reference;
+    ireference=b.ireference;
+    equivalent=b.equivalent;
+    is_inequivalent=b.is_inequivalent;
+    num_equivalents=b.num_equivalents;
+    index_iatoms=b.index_iatoms;
+    order_parameter_value=b.order_parameter_value;
+    order_parameter_atom=b.order_parameter_atom;
+    partial_occupation_value=b.partial_occupation_value;
+    partial_occupation_flag=b.partial_occupation_flag;
+    shell=b.shell;
+    verbose=b.verbose;
+    print_RHT=b.print_RHT;  // (RHT)
+    print_cartesian=b.print_cartesian;
+  }
   return *this;
 }
 
-void _atom::clear(){
-  _atom a; (*this)=a;
-}
+void _atom::clear(){_atom a; (*this)=a;}
 
 ostream& operator<<(ostream& oss,const _atom& atom) {
   oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1218,7 +1215,7 @@ vector<uint> composition2stoichiometry(string& composition){
 
 // constructors
 _sym_op::_sym_op() {free();}
-_sym_op::_sym_op(const _sym_op& b) {copy(b);}
+_sym_op::_sym_op(const _sym_op& b){copy(b);}
 
 // destructor
 _sym_op::~_sym_op() {free();}
@@ -1227,8 +1224,8 @@ void _sym_op::free() {
   Uc.clear();Uf.clear();           // clear stuff
   generator.clear();               // clear stuff
   generator_coefficients.clear();  // clear stuff       // DX 12/6/17 - generator coefficients
-  su2_coefficients.clear();        // clear stuff       // DX 1/15/18 - su(2) coefficients on Pauli matrices
   SU2_matrix.clear();              // clear stuff	// DX 1/15/18 - 2x2 complex SU(2) matrix
+  su2_coefficients.clear();        // clear stuff       // DX 1/15/18 - su(2) coefficients on Pauli matrices
   angle=0.0;                       // clear stuff
   axis.clear();                    // clear stuff
   quaternion_vector.clear();       // clear stuff	//GEENA
@@ -1237,18 +1234,18 @@ void _sym_op::free() {
   str_Hermann_Mauguin="";          // clear stuff
   str_Schoenflies="";              // clear stuff
   flag_inversion=FALSE;            // clear stuff
-  ctau.clear();ftau.clear();       // clear stuff
-  basis_atoms_map.clear();         // clear stuff
-  basis_types_map.clear();         // clear stuff
-  basis_map_calculated=FALSE;      // clear stuff
-  ctrasl.clear();ftrasl.clear();   // clear stuff
-  site=0;                          // clear stuff       // DX 8/3/17
   is_pgroup=FALSE;                 // clear stuff
   is_pgroup_xtal=FALSE;            // clear stuff
   is_pgroupk=FALSE;                // clear stuff
   is_pgroupk_xtal=FALSE;           // clear stuff       // DX 12/5/17
+  ctau.clear();ftau.clear();       // clear stuff
+  basis_atoms_map.clear();         // clear stuff
+  basis_types_map.clear();         // clear stuff
+  basis_map_calculated=FALSE;      // clear stuff
   is_fgroup=FALSE;                 // clear stuff
+  ctrasl.clear();ftrasl.clear();   // clear stuff
   is_sgroup=FALSE;                 // clear stuff
+  site=0;                          // clear stuff       // DX 8/3/17
   is_agroup=FALSE;                 // clear stuff
 }
 
@@ -1257,8 +1254,8 @@ void _sym_op::copy(const _sym_op& b){
   Uf=b.Uf;
   generator=b.generator;
   generator_coefficients=b.generator_coefficients; // DX 12/6/17 - generator coefficients
-  su2_coefficients=b.su2_coefficients;             // DX 1/15/18 - su(2) coefficients on Pauli matrices
   SU2_matrix=b.SU2_matrix;                         // DX 1/15/18 - 2x2 complex SU(2) matrix 
+  su2_coefficients=b.su2_coefficients;             // DX 1/15/18 - su(2) coefficients on Pauli matrices
   angle=b.angle;
   axis=b.axis;
   quaternion_vector=b.quaternion_vector;	//GEENA
@@ -1267,25 +1264,25 @@ void _sym_op::copy(const _sym_op& b){
   str_Hermann_Mauguin=b.str_Hermann_Mauguin;
   str_Schoenflies=b.str_Schoenflies;
   flag_inversion=b.flag_inversion;
-  ctau=b.ctau;
-  ftau=b.ftau;
-  basis_atoms_map.clear(); for(uint i=0;i<b.basis_atoms_map.size();i++){basis_atoms_map.push_back(b.basis_atoms_map.at(i));}
-  basis_types_map.clear(); for(uint i=0;i<b.basis_types_map.size();i++){basis_types_map.push_back(b.basis_types_map.at(i));}
-  basis_map_calculated=b.basis_map_calculated;
-  ctrasl=b.ctrasl;
-  ftrasl=b.ftrasl;
-  site=b.site;                        // DX 8/3/17
   is_pgroup=b.is_pgroup;
   is_pgroup_xtal=b.is_pgroup_xtal;
   is_pgroupk=b.is_pgroupk;
   is_pgroupk_xtal=b.is_pgroupk_xtal;  // DX 12/5/17
+  ctau=b.ctau;
+  ftau=b.ftau;
+  basis_atoms_map.clear();for(uint i=0;i<b.basis_atoms_map.size();i++){basis_atoms_map.push_back(b.basis_atoms_map.at(i));}
+  basis_types_map.clear();for(uint i=0;i<b.basis_types_map.size();i++){basis_types_map.push_back(b.basis_types_map.at(i));}
+  basis_map_calculated=b.basis_map_calculated;
   is_fgroup=b.is_fgroup;
+  ctrasl=b.ctrasl;
+  ftrasl=b.ftrasl;
   is_sgroup=b.is_sgroup;
+  site=b.site;                        // DX 8/3/17
   is_agroup=b.is_agroup;
 }
 
 const _sym_op& _sym_op::operator=(const _sym_op& b) {       // operator=
-  if(this != &b) {copy(b);}
+  if(this != &b) {free();copy(b);}
   return *this;
 }
 
