@@ -86,14 +86,6 @@ namespace aurostd {
   template<class utype> xmatrix<utype>                                   // matrix*matrix
     operator*(const xmatrix<utype>&,const xmatrix<utype>&) __xprototype; // matrix*matrix
   
-  // ME190814
-  template<class utype> xmatrix<xcomplex<utype> >                        // matrix*matrix
-    operator*(const xmatrix<utype>&,const xmatrix<xcomplex<utype> >&) __xprototype; // matrix*matrix
-  
-  // ME190814
-  template<class utype> xmatrix<xcomplex<utype> >                        // matrix*matrix
-    operator*(const xmatrix<utype>&,const xmatrix<xcomplex<utype> >&) __xprototype; // matrix*matrix
-  
   template<class utype> xvector<utype>                                   // matrix*vector
     operator*(const xmatrix<utype>&,const xvector<utype>&) __xprototype; // matrix*vector
   
@@ -150,40 +142,6 @@ namespace aurostd {
   
   template<class utype> bool
     operator!=(const xmatrix<utype>&,const xmatrix<utype>&) __xprototype;
-
-  // ME190814 - xcomplex versions
-  template<class utype> bool
-    identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&,const char& _mode_) __xprototype;
-  
-  template<class utype> bool
-    identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    rel_identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    abs_identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    identical(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    operator==(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    isdifferent(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    isdifferent(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    isequal(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&,const utype&) __xprototype;
-  
-  template<class utype> bool
-    isequal(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
-  
-  template<class utype> bool
-    operator!=(const xmatrix<xcomplex<utype> >&,const xmatrix<xcomplex<utype> >&) __xprototype;
 
   //CO - START
   template<class utype> bool
@@ -542,11 +500,6 @@ namespace aurostd {
   // On output, elements of a above the diagonal are destroyed. d[1..n] returns the eigenvalues of a.
   // v[1..n][1..n] is a matrix whose columns contain, on output, the normalized eigenvectors of
   // a. The function returns the number of Jacobi rotations that were required.
-  // ME190815
-  template<class utype>
-    xvector<utype> jacobiHermitian(xmatrix<xcomplex<utype> >&, char=0);
-  template<class utype>
-    xvector<utype> jacobiHermitian(xmatrix<xcomplex<utype> >&, xmatrix<xcomplex<utype> >&, char=0);
   template<class utype>
     void eigsrt(xvector<utype> &d,xmatrix<utype> &v) __xprototype;
   // Given the eigenvalues d[1..n] and eigenvectors v[1..n][1..n] as output from jacobi
