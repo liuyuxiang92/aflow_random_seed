@@ -1,6 +1,7 @@
 3.1.227 - 2019/11/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Added a handler for the AFLOW database. (ME)
+        -- Updated SQLite to version 3.26.0. (ME)
 3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
