@@ -13,7 +13,7 @@
 
 #define _SQL_COMMAND_DEBUG_  false  // debug SQL commands that are sent - verbose output
 #define _SQL_CALLBACK_DEBUG_ false  // debug SQL callbacks - extremely verbose output
-#define _DB_INTERFACE_DEBUG_ true
+#define _DB_INTERFACE_DEBUG_ true   // switched on for logging
 
 // Some parts are written within the C++0x support in GCC, especially std::thread,
 // which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:

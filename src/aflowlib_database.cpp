@@ -30,7 +30,7 @@ std::mutex m;
 #warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-#define _AFLOW_DB_DEBUG_ true
+#define _AFLOW_DB_DEBUG_ true  // switched on for logging
 
 using std::string;
 using std::vector;
