@@ -157,7 +157,6 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
-  m=mx*m;m==n;m!=n;jacobiHermitian(m);vx=m(1); // ME190814
 
   //  jacobi(m,vx,m);
  
