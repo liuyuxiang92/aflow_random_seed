@@ -17,6 +17,8 @@
 
 #include "aflowlib.h"
 #include "SQLITE/sqlite3.h"
+#include <signal.h>
+#include <unistd.h>
 
 // Some parts are written within the C++0x support in GCC, especially std::thread,
 // which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
