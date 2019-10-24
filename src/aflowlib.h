@@ -499,11 +499,11 @@ struct DBStats {
   vector<std::pair<string, int> > loop_counts;
   vector<string> max;
   vector<string> min;
-  int nentries = 0;
-  int nsystems = 0;
+  int nentries;
+  int nsystems;
   vector<vector<string> > set;
   vector<string> species;
-  string catalog = "";
+  string catalog;
 };
 
 class AflowDB {

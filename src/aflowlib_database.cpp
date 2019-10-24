@@ -551,6 +551,8 @@ DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& ta
   stats.count.assign(ncols, 0);
   stats.max.assign(ncols, "");
   stats.min.assign(ncols, "");
+  stats.nentries = 0;
+  stats.nsystems = 0;
   stats.set.resize(ncols);
   stats.loop_counts.resize(nloops);
   for (uint l = 0; l < nloops; l++) {
