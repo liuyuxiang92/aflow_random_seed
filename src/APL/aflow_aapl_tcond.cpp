@@ -31,10 +31,9 @@ static const int max_iter = 250;  // Maximum number of iterations for the iterat
 
 // Define constants and conversion factors. See AUROSTD/aurostd_xscalar.h for more.
 static const double au2THz = 9.648553873170e+02;  // eV/(A amu) -> nm * THz^2
-static const double hbar = PLANCKSCONSTANTEV_hbar;  // hbar in eVs
-static const double hbar_J = E_ELECTRON * 1e12 * hbar;  // hbar in J/THz;
-static const double hbar_amu = hbar * au2THz * 1e13;  // hbar in amu A^2 THz
-static const double BEfactor = hbar*1e12/KBOLTZEV;  // hbar/kB in K/THz
+static const double hbar_J = E_ELECTRON * 1e12 * PLANCKSCONSTANTEV_hbar;  // hbar in J/THz;
+static const double hbar_amu = PLANCKSCONSTANTEV_hbar * au2THz * 1e13;  // hbar in amu A^2 THz
+static const double BEfactor = PLANCKSCONSTANTEV_hbar * 1e12/KBOLTZEV;  // hbar/kB in K/THz
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
 
 using aurostd::xcomplex;
@@ -127,16 +126,23 @@ void TCONDCalculator::calculateThermalConductivity() {
   tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
   tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
   tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
-  tstart = 300.0;
-  tend = 300.0;
   for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
 
   calculateFrequenciesGroupVelocities();
   writeTempIndepOutput(DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE, "Frequency", "THz", freq);
   writeGroupVelocities();
 
-  calculateTransitionProbabilities();
+  _logger << "Calculating Grueneisen parameters." << apl::endl;
+  vector<vector<vector<xcomplex<double> > > > phases = calculatePhases();
+  vector<vector<double> > grueneisen_modes = calculateModeGrueneisen(phases);
+  phases.clear();
+  vector<double> grueneisen_avg(temperatures.size());
+  for (uint t = 0; t < temperatures.size(); t++) {
+    grueneisen_avg[t] = calculateAverageGrueneisen(temperatures[t], grueneisen_modes);
+  }
+  writeGrueneisen(grueneisen_avg, grueneisen_modes);
 
+  calculateTransitionProbabilities();
   vector<vector<int> > small_groups = calculateSmallGroups();
   thermal_conductivity.assign(temperatures.size(), xmatrix<double>(3, 3));
   for (uint t = 0; t < temperatures.size(); t++) {
@@ -339,7 +345,7 @@ void TCONDCalculator::calculateTransitionProbabilities() {
 #endif
   string message;
   LTMethod _lt(_qm, _logger);
-  vector<vector<vector<vector<xcomplex<double> > > > > phases = calculatePhases();
+  vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(true);
 
   message = "Transition Probabilities";
   _logger << "Calculating transition probabilities for 3-phonon scattering processes." << apl::endl;
@@ -404,14 +410,14 @@ void TCONDCalculator::calculateTransitionProbabilities() {
   }
 }
 
-vector<vector<vector<vector<xcomplex<double> > > > > TCONDCalculator::calculatePhases() {
+vector<vector<vector<xcomplex<double> > > > TCONDCalculator::calculatePhases(bool conjugate) {
   const xstructure& scell = _pc.getSuperCellStructure();
   const xstructure& pcell = _pc.getInputCellStructure();
   const vector<int>& sc2pcMap = _pc.getSupercell()._sc2pcMap;
   const vector<int>& pc2scMap = _pc.getSupercell()._pc2scMap;
   uint niatoms = pcell.atoms.size();
   uint natoms = scell.atoms.size();
-  vector<vector<vector<vector<xcomplex<double> > > > > phases(niatoms, vector<vector<vector<xcomplex<double> > > >(natoms, vector<vector<xcomplex<double> > >(nQPs, vector<xcomplex<double> >(2))));
+  vector<vector<vector<xcomplex<double> > > > phases(niatoms, vector<vector<xcomplex<double> > >(natoms, vector<xcomplex<double> >(nQPs)));
 
   int at_eq, at_eq_sc, iat_sc;
   xvector<double> min_vec(3);
@@ -425,8 +431,8 @@ vector<vector<vector<vector<xcomplex<double> > > > > TCONDCalculator::calculateP
       min_vec += iat_cpos;
       min_vec -= scell.atoms[at_eq_sc].cpos;
       for (int q = 0; q < nQPs; q++) {
-        phases[iat][at][q][0] = exp(iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
-        phases[iat][at][q][1] = conj(phases[iat][at][q][0]);
+        if (conjugate) phases[iat][at][q] = exp(-iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
+        else phases[iat][at][q] = exp(iONE * scalar_product(_qm.getQPoint(q).cpos, min_vec));
       }
     }
   }
@@ -435,7 +441,7 @@ vector<vector<vector<vector<xcomplex<double> > > > > TCONDCalculator::calculateP
 
 void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int endIndex, const LTMethod& _lt,
                                                              vector<vector<vector<vector<double> > > >& phase_space,
-                                                             const vector<vector<vector<vector<xcomplex<double> > > > >& phases) {
+                                                             const vector<vector<vector<xcomplex<double> > > >& phases) {
   const Supercell& scell = _pc.getSupercell();
   const vector<_cluster>& clusters = _pc._clusters[0].clusters;
   uint nclusters = clusters.size();
@@ -455,7 +461,6 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   // Units are chosen so that probabilities are in THz (1/ps)
   const double probability_prefactor = std::pow(au2THz * 10.0, 2) * hbar_amu * PI/4.0;
   const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
-  const double scatt_multi[2] = {1.0, 0.5};
 
   int natoms = (int) _pc.getInputCellStructure().atoms.size();
   vector<int> atpowers(3, 1);
@@ -464,7 +469,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
   uint nateigen = at_eigen.size();
   vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
-  for (int o = 0; o < 2; o++) atpowers[o] = (int) std::pow(natoms, 2 - o);
+  for (int j = 0; j < 2; j++) atpowers[j] = (int) std::pow(natoms, 2 - j);
 
   vector<vector<int> > branches;
   aurostd::xcombos branch_combos(nBranches, 3, 'E', true);
@@ -472,85 +477,114 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   uint nbr = branches.size();
 
   xcomplex<double> matrix, prefactor, eigen;
-  vector<double> weights(nQPs), frequencies(nQPs);
-  vector<int> qpts(3), proc(3), lastq(nQPs);
-  int iat, o, e, q, s, p, w;
+  vector<vector<double> > weights(3, vector<double>(nQPs)), frequencies(3, vector<double>(nQPs));
+  vector<int> qpts(3), proc(3), lastq(nQPs), q_minus(nQPs);
+  int iat, j, e, q, p, w, lq;
   uint c, crt, br;
-  double transprob, freq_ref;
+  double transprob, freq_ref, prod;
   bool calc;
 
+  for (q = 0; q < nQPs; q++) q_minus[q] = _qm.getQPointIndex(-_qm.getQPoint(q).fpos);
   for (int i = startIndex; i < endIndex; i++) {
     qpts[0] = _qm.getIbzqpts()[i];
+    for (q = 0; q < nQPs; q++) lastq[q] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos - _qm.getQPoint(q).fpos);
 
-    for (s = 0; s < 2; s++) {
+    for (br = 0; br < nbr; br++) {
+      freq_ref = freq[qpts[0]][branches[br][0]];
       for (q = 0; q < nQPs; q++) {
-        if (s) lastq[q] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos - _qm.getQPoint(q).fpos);
-        else lastq[q] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos + _qm.getQPoint(q).fpos);
+        lq = lastq[q];
+        frequencies[0][q] = -freq[q][branches[br][1]] + freq[lq][branches[br][2]];
+        frequencies[1][q] = freq[q][branches[br][1]] - freq[lq][branches[br][2]];
+        frequencies[2][q] = freq[q][branches[br][1]] + freq[lq][branches[br][2]];
       }
-      for (br = 0; br < nbr; br++) {
-        freq_ref = freq[qpts[0]][branches[br][0]];
-        for (q = 0; q < nQPs; q++) {
-          if (s) frequencies[q] = freq[q][branches[br][1]] + freq[lastq[q]][branches[br][2]];
-          else frequencies[q] = -freq[q][branches[br][1]] + freq[lastq[q]][branches[br][2]];
-        }
         
-        getWeightsLT(_lt, freq_ref, frequencies, weights);
+      for (j = 0; j < 3; j++) getWeightsLT(_lt, freq_ref, frequencies[j], weights[j]);
 
-        for (q = 0; q < nQPs; q++) {
-          calc = (weights[q] > _ZERO_TOL_);
-          if (calc) {
-            qpts[1] = q;
-            qpts[2] = lastq[q];
-            p = 0;
-            for (o = 0; o < 3; o++) {
-              if (branches[br][o] > 2) p++;
-            }
-            phase_space[i][branches[br][0]][p][s] += scatt_multi[s] * weights[q];
-            for (o = 0; o < 3; o++) {
-              if (freq[qpts[o]][branches[br][o]] < _ZERO_TOL_) break;
-            }
-            calc = (o == 3);
+      for (q = 0; q < nQPs; q++) {
+        lq = lastq[q];
+        calc = (q < lq);
+        if (calc) {
+          for (j = 0; j < 3; j++) {
+            if (weights[j][q] > _ZERO_TOL_) break;
           }
+          calc = (j < 3);
+        }
+        if (calc) {
+          qpts[1] = q;
+          qpts[2] = lq;
+          p = 0;
+          for (j = 0; j < 3; j++) {
+            if (branches[br][j] > 2) p++;
+          }
+          phase_space[i][branches[br][0]][p][0] += weights[0][q];
+          phase_space[i][branches[br][0]][p][0] += weights[1][q];
+          phase_space[i][branches[br][0]][p][1] += weights[2][q];
+          for (j = 0; j < 3; j++) {
+            if (freq[qpts[j]][branches[br][j]] < _AFLOW_APL_EPS_) break;
+          }
+          calc = (j == 3);
+        }
 
-          if (calc) {
-            // Precompute eigenvalue products
-            for (c = 0; c < nateigen; c++) {
-              for (crt = 0; crt < ncart; crt++) {
-                e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
-                eigen = eigenvectors[qpts[0]][e][branches[br][0] + 1];
-                e = at_eigen[c][1] * 3 + cart_indices[crt][1] + 1;
-                if (s) eigen *= conj(eigenvectors[qpts[1]][e][branches[br][1] + 1]);
-                else eigen *= eigenvectors[qpts[1]][e][branches[br][1] + 1];
-                e = at_eigen[c][2] * 3 + cart_indices[crt][2] + 1;
-                eigen *= conj(eigenvectors[qpts[2]][e][branches[br][2] + 1]);
-                eigenprods[c][crt] = eigen;
+        if (calc) {
+          // Precompute eigenvalue products
+          for (c = 0; c < nateigen; c++) {
+            for (crt = 0; crt < ncart; crt++) {
+              e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
+              eigen = eigenvectors[qpts[0]][e][branches[br][0] + 1];
+              for (j = 1; j < 3; j++) {
+                e = at_eigen[c][j] * 3 + cart_indices[crt][j] + 1;
+                eigen *= conj(eigenvectors[qpts[j]][e][branches[br][j] + 1]);
               }
+              eigenprods[c][crt] = eigen;
             }
+          }
       
-            matrix.re = 0.0;
-            matrix.im = 0.0;
-            for (c = 0; c < nclusters; c++) {
-              const vector<int>& atoms = clusters[c].atoms;
-              iat = scell.sc2pcMap(atoms[0]);
-              prefactor = invmasses[c] * phases[iat][atoms[2]][qpts[2]][1];
-              for (o = 1; o < 2; o++) prefactor *= phases[iat][atoms[o]][qpts[o]][s];
-              e = 0;
-              for (o = 0; o < 3; o++) e += scell.sc2pcMap(atoms[o]) * atpowers[o];
-              for (crt = 0; crt < ncart; crt++) {
-                // Perform multiplication expliclty in place instead of using xcomplex.
-                // This is three times as fast because constructors and destructors are not called.
-                matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
-                matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
-              }
+          matrix.re = 0.0;
+          matrix.im = 0.0;
+          for (c = 0; c < nclusters; c++) {
+            const vector<int>& atoms = clusters[c].atoms;
+            iat = scell.sc2pcMap(atoms[0]);
+            prefactor.re = invmasses[c];
+            prefactor.im = 0.0;
+            for (j = 1; j < 3; j++) prefactor *= phases[iat][atoms[j]][qpts[j]];
+            e = 0;
+            for (j = 0; j < 3; j++) e += scell.sc2pcMap(atoms[j]) * atpowers[j];
+            for (crt = 0; crt < ncart; crt++) {
+              // Perform multiplication expliclty in place instead of using xcomplex.
+              // This is three times faster because constructors and destructors are not called.
+              matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
+              matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
             }
-            transprob = probability_prefactor * magsqr(matrix) * weights[q];
-            for (o = 0; o < 3; o++) transprob /= freq[qpts[o]][branches[br][o]];
-            if (transprob > _ZERO_TOL_) {
-              proc[0] = s;
-              proc[1] = q;
-              proc[2] = br;
-              processes[i].push_back(proc);
-              intr_trans_probs[i].push_back(transprob);
+          }
+          prod = magsqr(matrix);
+          if (prod > _ZERO_TOL_) {
+            for (j = 0; j < 3; j++) prod /= freq[qpts[j]][branches[br][j]];
+            for (j = 0; j < 3; j++) {
+              transprob = prod * probability_prefactor * weights[j][q];
+              if (transprob > _ZERO_TOL_) {
+                if (j == 2) {
+                  proc[0] = 1;
+                  proc[1] = q;
+                  proc[2] = br;
+                  processes[i].push_back(proc);
+                  intr_trans_probs[i].push_back(transprob);
+                  proc[1] = lq;
+                  proc[2] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                  processes[i].push_back(proc);
+                  intr_trans_probs[i].push_back(transprob);
+                } else {
+                  proc[0] = 0;
+                  if (j == 0) {
+                    proc[1] = q_minus[q];
+                    proc[2] = br;
+                  } else{
+                    proc[1] = q_minus[lq];
+                    proc[2] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                  }
+                  processes[i].push_back(proc);
+                  intr_trans_probs[i].push_back(transprob);
+                }
+              }
             }
           }
         }
@@ -559,8 +593,8 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
     w = _qm.getWeights()[i];
     for (int b = 0; b < nBranches; b++) {
       for (p = 0; p < 4; p++) {
-        for (s = 0; s < 2; s++) {
-          phase_space[i][b][p][s] *= ps_prefactor * w;
+        for (j = 0; j < 2; j++) {
+          phase_space[i][b][p][j] *= ps_prefactor * w;
         }
       }
     }
@@ -635,6 +669,118 @@ vector<vector<double> > TCONDCalculator::calculateTransitionProbabilitiesBoundar
   return rates;
 }
 
+/******************************** GRUENEISEN ********************************/
+
+vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases) {
+  vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
+
+  const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
+  const Supercell& scell = _pc.getSupercell();
+
+  const vector<_cluster>& clusters = _pc._clusters[0].clusters;
+  uint nclusters = clusters.size();
+  vector<double> invmasses(nclusters);
+  for (uint c = 0; c < nclusters; c++) {
+    double mass = 1.0;
+    for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c].atoms[i]);
+    invmasses[c] = 1/sqrt(mass);
+  }
+
+  vector<vector<int> > cart_indices;
+  aurostd::xcombos cart(3, 3, 'E', true);
+  while (cart.increment()) cart_indices.push_back(cart.getCombo());
+  uint ncart = cart_indices.size();
+
+  int natoms = (int) _pc.getInputCellStructure().atoms.size();
+  vector<int> atpowers(2, 1);
+  vector<vector<int> > at_eigen;
+  aurostd::xcombos at_combos(natoms, 2, 'E' , true);
+  while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
+  uint nateigen = at_eigen.size();
+  vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
+
+  const xstructure& scell_xstr = scell.getSupercellStructure();
+  uint natoms_sc = scell_xstr.atoms.size();
+  vector<vector<xvector<double> > > min_dist(natoms, vector<xvector<double> >(natoms_sc));
+  for (int i = 0; i < natoms; i++) {
+    const xvector<double>& iat_cpos = scell_xstr.atoms[scell.pc2scMap(i)].cpos;
+    for (uint j = 0; j < natoms_sc; j++) {
+      min_dist[i][j] = SYM::minimizeDistanceCartesianMethod(scell_xstr.atoms[j].cpos, iat_cpos, scell_xstr.lattice);
+    }
+  }
+
+  int at1_pc, at2_sc, at2_pc, at3_sc, e, q;
+  double ifc_prod;
+  uint c, crt;
+  xcomplex<double> prefactor, eigen, g_mode;
+  for (int iq = 0; iq < nIQPs; iq++) {
+    q = _qm.getIbzqpts()[iq];
+    for (int br = 0; br < nBranches; br++) {
+      if (freq[q][br] > _AFLOW_APL_EPS_) {
+        g_mode.re = 0.0;
+        g_mode.im = 0.0;
+
+        // Precompute eigenvalue products
+        for (c = 0; c < nateigen; c++) {
+          for (crt = 0; crt < ncart; crt++) {
+            e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
+            eigen = conj(eigenvectors[q][e][br + 1]);
+            e = at_eigen[c][1] * 3 + cart_indices[crt][1] + 1;
+            eigen *= eigenvectors[q][e][br + 1];
+            eigenprods[c][crt] = eigen;
+          }
+        }
+
+        for (c = 0; c < nclusters; c++) {
+          at1_pc = scell.sc2pcMap(clusters[c].atoms[0]);
+          at2_sc = clusters[c].atoms[1];
+          at2_pc = scell.sc2pcMap(at2_sc);
+          at3_sc = clusters[c].atoms[2];
+          prefactor = invmasses[c] * phases[at1_pc][at2_sc][q];
+          e = at1_pc * natoms + at2_pc;
+          for (crt = 0; crt < ncart; crt++) {
+            ifc_prod = ifcs[c][crt] * min_dist[at1_pc][at3_sc][cart_indices[crt][2] + 1];
+            // Perform multiplication expliclty in place instead of using xcomplex.
+            // This is three times faster because constructors and destructors are not called.
+            g_mode.re += ifc_prod * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
+            g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
+          }
+        }
+        g_mode *= -10.0*au2THz/(6.0 * std::pow(freq[q][br], 2));
+        if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
+          _logger << apl::warning << " Grueneisen parameter at mode "
+                                  << iq << ", " << br << " is not real ("
+                                  << g_mode.re << ", " << g_mode.im << ")." << apl::endl;
+        }
+        grueneisen[iq][br] = g_mode.re;
+      } else {
+        grueneisen[iq][br] = 0.0;
+      }
+    }
+  }
+
+  return grueneisen;
+}
+
+double TCONDCalculator::calculateAverageGrueneisen(double T,
+                                                   const vector<vector<double> >& grueneisen_modes) {
+  vector<vector<double> > occ = getOccupationNumbers(T);
+  int iq;
+  double c, c_tot = 0, g_tot = 0;
+  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2));
+  for (int q = 0; q < nQPs; q++) {
+    iq = _qm.getIbzqpt(q);
+    for (int br = 0; br < nBranches; br++) {
+      if (freq[q][br] > _AFLOW_APL_EPS_) {
+        c = prefactor * occ[q][br] * (1.0 + occ[q][br]) * std::pow(freq[q][br], 2);
+        c_tot += c;
+        g_tot += grueneisen_modes[iq][br] * c;
+      }
+    }
+  }
+  return (g_tot/c_tot);
+}
+
 }  // namespace apl
 
 /************************************ BTE ***********************************/
@@ -668,8 +814,6 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
   _logger << "Calculating RTA" << apl::endl;
   vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates);
   xmatrix<double> tcond = calcTCOND(T, occ, mfd); // RTA solution
-  std::cout << "tcond: " << std::endl;
-  std::cout << tcond << std::endl;
 
   if (!calc_options.flag("RTA")) {
     xmatrix<double> tcond_prev(3, 3), diff(3, 3);
@@ -1075,6 +1219,8 @@ void TCONDCalculator::writeGroupVelocities() {
 }
 
 void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> > > >& phase_space) {
+  string filename = DEFAULT_AAPL_FILE_PREFIX + "phase_space.out";
+
   vector<double> ps_procs(4), ps_nu(2);
   vector<vector<double> > ps_modes(nIQPs, vector<double>(nBranches));
   double ps_total = 0, ps;
@@ -1114,7 +1260,34 @@ void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> 
   }
   output << "[AAPL_MODE_SCATTERING_PHASE_SPACE]STOP" << std::endl;
   output << AFLOWIN_SEPARATION_LINE << std::endl;
-  aurostd::stringstream2file(output, "aflow.aapl.phase_space.out");
+  aurostd::stringstream2file(output, filename);
+}
+
+void TCONDCalculator::writeGrueneisen(const vector<double>& grueneisen_avg,
+                                      const vector<vector<double> >& grueneisen_modes) {
+  stringstream output;
+  string filename = DEFAULT_AAPL_FILE_PREFIX + "grueneisen.out";
+
+  output << AFLOWIN_SEPARATION_LINE << std::endl;
+  output << "[AAPL_AVERAGE_GRUENEISEN]START" << std::endl;
+  output << std::setiosflags(std::ios::right | std::ios::fixed | std::ios::showpoint);
+  output << std::setw(8) << "# T (K)"
+         << std::setw(23) << "Grueneisen parameter" << std::endl;
+  for (uint t = 0; t < grueneisen_avg.size(); t++) {
+    output << std::setw(8) << std::fixed << std::setprecision(2) << temperatures[t];
+    output << std::setw(23) << std::setprecision(10) << std::dec << grueneisen_avg[t] << std::endl;
+  }
+  output << "[AAPL_AVERAGE_GRUENEISEN]STOP" << std::endl;
+  output << "[AAPL_MODE_GRUENEISEN]START" << std::endl;
+  for (int i = 0; i < nIQPs; i++) {
+    for (int b = 0; b < nBranches; b++) {
+      output << std::setw(17) << std::setprecision(10) << std::dec << grueneisen_modes[i][b];
+    }
+    output << std::endl;
+  }
+  output << "[AAPL_MODE_GRUENEISEN]STOP" << std::endl;
+  output << AFLOWIN_SEPARATION_LINE << std::endl;
+  aurostd::stringstream2file(output, filename);
 }
 
 void TCONDCalculator::writeThermalConductivity() {

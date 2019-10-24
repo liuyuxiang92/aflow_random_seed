@@ -1575,15 +1575,18 @@ class TCONDCalculator {
 
     void free();
 
+    vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
+    double calculateAverageGrueneisen(double T, const vector<vector<double> >&);
+
     vector<vector<int> > calculateSmallGroups();
     void calculateFrequenciesGroupVelocities();
     void calculateFreqGvel(int, int);
     void getWeightsLT(const LTMethod&, double, const vector<double>&, vector<double>&);
     void calculateTransitionProbabilities();
-    vector<vector<vector<vector<xcomplex<double> > > > > calculatePhases();
+    vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
     void calculateTransitionProbabilitiesPhonon(int, int, const LTMethod&,
                                                 vector<vector<vector<vector<double> > > >&,
-                                                const vector<vector<vector<vector<xcomplex<double> > > > >&);
+                                                const vector<vector<vector<xcomplex<double> > > >&);
     void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
     vector<vector<double> > calculateTransitionProbabilitiesBoundary();
     void getProcess(const vector<int>&, vector<int>&, vector<int>&);
@@ -1608,6 +1611,7 @@ class TCONDCalculator {
     void writeFrequencies();
     void writeGroupVelocities();
     void writePhaseSpace(const vector<vector<vector<vector<double> > > >&);
+    void writeGrueneisen(const vector<double>&, const vector<vector<double> >&);
     void writeThermalConductivity();
 };
 
