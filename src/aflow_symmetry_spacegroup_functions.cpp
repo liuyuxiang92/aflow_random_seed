@@ -2849,8 +2849,14 @@ namespace SYM {
 		  //cerr << endl;
 		  first_wyckoff = false;
 		  // ========== Store Wyckoff Position ========== //
-                  tmp.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX 12/12/17 - need to updated coord to include non-parametrized Wyckoff positions
-		  tmp.type = tmp_equivalent_atoms_shifted[ix].name;
+      tmp.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX 12/12/17 - need to updated coord to include non-parametrized Wyckoff positions
+      tmp.type = tmp_equivalent_atoms_shifted[ix].name;
+      //DX 20191010 - update partial occupation value - START
+      if(CCell.partial_occupation_flag){
+        tmp.site_occupation=tmp_equivalent_atoms_shifted[ix].partial_occupation_value;
+      }
+      else{ tmp.site_occupation=1.0; }
+      //DX 20191010 - update partial occupation value - END
 		  tmp.wyckoffSymbol = wyckoffsymbols[wyckoffsymbols_mult_index[j] - 1];
       tmp.equations.clear(); //DX 20190130 - clear for safety
       //DX 20190128 - add multiplicity, letter, and site symmetry - START 
@@ -4311,17 +4317,17 @@ namespace SYM {
     for (uint k = 0; k < atoms.size(); k++) {
       deque<_atom> tmpv;
       for (uint i = 0; i < sym_ops.size(); i++) {
-        _atom tmp;
+        _atom tmp = atoms[k]; //DX 20191011 - initialized instead of setting individually below
         //DX 20190905 [OBSOLETE-no more mod_one_xvec] tmp.fpos = (SYM::mod_one_xvec((sym_ops[i] * atoms[k].fpos + translations[i])));
         tmp.fpos = sym_ops[i] * atoms[k].fpos + translations[i]; //DX 20190905
         BringInCellInPlace(tmp.fpos); //DX 20190905
         tmp.cpos = f2c * tmp.fpos;
-        tmp.name = atoms[k].name;
-        tmp.type = atoms[k].type;
-        tmp.spin = atoms[k].spin; // DX 9/21/17 - magnetic sym
-        tmp.spin_is_given = atoms[k].spin_is_given; // DX 9/21/17 - magnetic sym
-        tmp.noncoll_spin = atoms[k].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-        tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] tmp.name = atoms[k].name;
+        //DX 20191011 [OBSOLETE] tmp.type = atoms[k].type;
+        //DX 20191011 [OBSOLETE] tmp.spin = atoms[k].spin; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] tmp.spin_is_given = atoms[k].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] tmp.noncoll_spin = atoms[k].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atoms[k].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
         bool contained = false;
         for (uint j = 0; j < equivalent_atoms.size(); j++) {
           if(SYM::MapAtom(equivalent_atoms[j], tmp, TRUE, lattice, f2c, skew, tol)) { //DX 20190215 //DX 20190619 - lattice and f2c as input
@@ -4367,19 +4373,19 @@ namespace SYM {
     for (uint i = 0; i < equivalent_atoms.size(); i++) {
       one_shifted_group.clear();
       for (uint j = 0; j < equivalent_atoms[i].size(); j++) {
-        _atom tmp;
+        _atom tmp = equivalent_atoms[i][j]; //DX 20191011 - initialized instead of setting individually below
         //DX 20190905 [OBSOLETE-no more mod_one_xvec] xvector<double> tmpxvec = SYM::mod_one_xvec(equivalent_atoms[i][j].fpos + translation);
         xvector<double> tmpxvec = equivalent_atoms[i][j].fpos + translation; //DX 20190905
         BringInCellInPlace(tmpxvec); //DX 20190905
         // ===== Ensure that multiple equivalent atoms are not occupying the same space ===== //
         tmp.fpos = tmpxvec;
         tmp.cpos = f2c * tmp.fpos;
-        tmp.name = equivalent_atoms[i][j].name;
-        tmp.type = equivalent_atoms[i][j].type;
-        tmp.spin = equivalent_atoms[i][j].spin; // DX 9/21/17 - magnetic sym
-        tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX 9/21/17 - magnetic sym
-        tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-        tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] tmp.name = equivalent_atoms[i][j].name;
+        //DX 20191011 [OBSOLETE] tmp.type = equivalent_atoms[i][j].type;
+        //DX 20191011 [OBSOLETE] tmp.spin = equivalent_atoms[i][j].spin; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] tmp.spin_is_given = equivalent_atoms[i][j].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] tmp.noncoll_spin = equivalent_atoms[i][j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = equivalent_atoms[i][j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
         if(one_shifted_group.size() == 0) {
           one_shifted_group.push_back(tmp);
         } else {
@@ -4420,7 +4426,7 @@ namespace SYM {
     deque<deque<_atom> > split_atom_types = SYM::break_up_by_type(conventional_basis_atoms);
     if(split_atom_types.size() != prim_split_atom_types.size()) {
       if(LDEBUG) {
-	cerr << "SYM::GCD_conventional_atomic_basis::WARNING: Number of atom types is not the same: " << split_atom_types.size() << " != " << prim_split_atom_types.size() << endl;
+        cerr << "SYM::GCD_conventional_atomic_basis::WARNING: Number of atom types is not the same: " << split_atom_types.size() << " != " << prim_split_atom_types.size() << endl;
       }
       return false;
     }
@@ -4428,20 +4434,20 @@ namespace SYM {
     int GCD = 0;
     if(split_atom_types.size() > 1) {
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
-	if(p == 0) {
-	  GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
-	} else {
-	  GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
-	}
+        if(p == 0) {
+          GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
+        } else {
+          GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
+        }
       }
       for (uint p = 0; p < prim_split_atom_types.size(); p++) {
-	for (uint s = 0; s < split_atom_types.size(); s++) {
-	  if(prim_split_atom_types[p][0].name == split_atom_types[s][0].name) {
-	    if((prim_split_atom_types[p].size() * GCD) / prim_GCD != split_atom_types[s].size()) {
-	      consistent_ratio = false;
-	    }
-	  }
-	}
+        for (uint s = 0; s < split_atom_types.size(); s++) {
+          if(prim_split_atom_types[p][0].name == split_atom_types[s][0].name) {
+            if((prim_split_atom_types[p].size() * GCD) / prim_GCD != split_atom_types[s].size()) {
+              consistent_ratio = false;
+            }
+          }
+        }
       }
     } else if(split_atom_types.size() == 0) {  //Conventional basis atoms == 0
       if(LDEBUG) { cerr << "SYM::GCD_conventional_atomic_basis::WARNING: Conventional Basis atoms = 0" << endl; }

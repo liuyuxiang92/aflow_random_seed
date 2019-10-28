@@ -1320,6 +1320,7 @@ class wyckoffsite_ITC { //Also for wyckoff sites
   string letter;                                                //DX 20190128 - add Wyckoff letter
   string site_symmetry;                                         //DX 20190128 - add Wyckoff site symmetry
   uint multiplicity;                                            //DX 20190128 - add Wyckoff multiplicity
+  double site_occupation;                                            //DX 20190128 - add Wyckoff site occupation
   vector<vector<string> > equations;                             //DX 20190128 - add Wyckoff equations
  private:                                                       // ---------------------------------------
   void free();                                                  // to free everything

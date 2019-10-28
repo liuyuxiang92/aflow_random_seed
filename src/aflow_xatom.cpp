@@ -1459,6 +1459,7 @@ wyckoffsite_ITC::wyckoffsite_ITC() {
   letter=""; //DX 20180128 - add Wyckoff letter
   site_symmetry=""; //DX 20180128 - add Wyckoff site symmetry
   multiplicity=0; //DX 20180128 - add Wyckoff multiplicity
+  site_occupation=1.0; //DX 20191010 - add site occupation (default: 1.0)
   equations.clear(); //DX 20180128 - add Wyckoff multiplicity
 }
 
@@ -1481,6 +1482,7 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
     letter=b.letter; //DX 20180128 - add Wyckoff letter
     site_symmetry=b.site_symmetry; //DX 20180128 - add Wyckoff site symmetry
     multiplicity=b.multiplicity; //DX 20180128 - add Wyckoff multiplicity
+    site_occupation=b.site_occupation; //DX 20191010 - add site occupation
     equations=b.equations; //DX 20180128 - add Wyckoff multiplicity
   }
   return *this;
@@ -1513,6 +1515,7 @@ wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   letter=b.letter; //DX 20180128 - add Wyckoff letter
   site_symmetry=b.site_symmetry; //DX 20180128 - add Wyckoff site symmetry
   multiplicity=b.multiplicity; //DX 20180128 - add Wyckoff multiplicity
+  site_occupation=b.site_occupation; //DX 20191010 - add site occupation
   equations=b.equations; //DX 20180128 - add Wyckoff multiplicity
 }
 
@@ -1525,6 +1528,7 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
   oss << " site_symmetry: "<< site.site_symmetry << endl;
   oss << " multiplicity: "<< site.multiplicity << endl;
   oss << " wyckoffSymbol: "<< site.wyckoffSymbol << endl;
+  oss << " site_occupation: " << site.site_occupation; //DX 20191010 - add site occupation
   for(uint i=0;i<site.equations.size();i++){
     oss << "  " << aurostd::joinWDelimiter(site.equations[i],",") << endl;
   }
@@ -4452,6 +4456,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
     a.isd=FALSE; // set Selective Dynamics to false
+    //DX 20191010 - moved loop that used to be here after re-alphabetizing
+    a.MakeBasis();
+    a.MakeTypes(); //DX 20190508 - otherwise types are not created
+    a.SpeciesPutAlphabetic(); //DX 20190508 - put alphabetic, needed for many AFLOW functions to work properly
+    //DX 20191010 - moved this loop - START
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){
         poccaus.push_back(a.atoms[i].partial_occupation_value);
@@ -4462,9 +4471,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
       }
     }
-    a.MakeBasis();
-    a.MakeTypes(); //DX 20190508 - otherwise types are not created
-    a.SpeciesPutAlphabetic(); //DX 20190508 - put alphabetic, needed for many AFLOW functions to work properly
+    //DX 20191010 - moved this loop - END
     a.is_vasp4_poscar_format=FALSE; //DX 20190308 - needed or SPECIES section breaks
     a.is_vasp5_poscar_format=FALSE; //DX 20190308 - needed or SPECIES section breaks
   } // CIF INPUT

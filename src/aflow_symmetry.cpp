@@ -566,15 +566,18 @@ namespace SYM {
   bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(a.spin_is_given){ // DX 9/21/17 - magnetic symmetry
       bool spins_match = (aurostd::abs(a.spin-b.spin)<=tol);
-      return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else if(a.noncoll_spin_is_given){ // DX 12/5/17 - magnetic sym (non-collinear)
       bool spins_match = (aurostd::abs(a.noncoll_spin(1)-b.noncoll_spin(1))<=tol && aurostd::abs(a.noncoll_spin(2)-b.noncoll_spin(2))<=tol &&
                           aurostd::abs(a.noncoll_spin(3)-b.noncoll_spin(3))<=tol);
-      return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else {
-      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+      //return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value)); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
     }
   }
 } // namespace SYM
