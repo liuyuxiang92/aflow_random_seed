@@ -621,15 +621,14 @@ class Supercell {
   const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
   xvector<double> getFPositionItsNearestImage(const xvector<double>&,
                                               const xvector<double>&,
-                                              const xmatrix<double>&) const;
-  xvector<double> getFPositionItsNearestImage(int, int) const;
-  xvector<double> getCPositionItsNearestImage(int, int) const;
+                                              const xmatrix<double>&);
+  xvector<double> getFPositionItsNearestImage(int, int);
+  xvector<double> getCPositionItsNearestImage(int, int);
   bool compareFPositions(xvector<double>&, xvector<double>&);          //CO
   bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
-  bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&) const;
+  bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
-                            int&, xvector<xcomplex<double> >&, bool) const;  // ME 180828
-  // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
+                            int&, xvector<xcomplex<double> >&, bool);  // ME 180828
   int pc2scMap(int) const;
   int sc2pcMap(int) const;
   void center(int);
