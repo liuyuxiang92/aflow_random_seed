@@ -390,7 +390,7 @@ namespace SYM {
 // ExtractLatticeParametersFromWyccar
 // ******************************************************************************
 namespace SYM {
-  vector<double> ExtractLatticeParametersFromWyccar(vector<string>& wyccar_ITC){
+  vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC){ //DX 20191030 - added const
     vector<double> lattice_parameters;
     if(wyccar_ITC.size()>3){
       vector<string> tokens;
@@ -412,7 +412,7 @@ namespace SYM {
 // ExtractWyckoffAttributeString 
 // ******************************************************************************
 namespace SYM {
-  string ExtractWyckoffAttributeString(vector<string>& wyccar_ITC, uint attribute_index){
+  string ExtractWyckoffAttributeString(const vector<string>& wyccar_ITC, uint attribute_index){ //DX 20191030 - added const
     vector<string> all_wyckoff_sets;
     vector<string> wyckoff_set;
     string atom_name = ""; string prev_atom_name = ""; string wyckoff_letter = "";
@@ -442,7 +442,7 @@ namespace SYM {
 // ExtractWyckoffLettersString 
 // ******************************************************************************
 namespace SYM {
-  string ExtractWyckoffLettersString(vector<string>& wyccar_ITC){
+  string ExtractWyckoffLettersString(const vector<string>& wyccar_ITC){ //DX 20191030 - added const
     return ExtractWyckoffAttributeString(wyccar_ITC, 5); //Wyckoff letter sits at 5th column of wyccar
   }
 }
@@ -451,7 +451,7 @@ namespace SYM {
 // ExtractWyckoffMultiplicitiesString 
 // ******************************************************************************
 namespace SYM {
-  string ExtractWyckoffMultiplicitiesString(vector<string>& wyccar_ITC){
+  string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC){ //DX 20191030 - added const
     return ExtractWyckoffAttributeString(wyccar_ITC, 4); //Wyckoff multiplicity sits at 4th column of wyccar
   }
 }
@@ -460,7 +460,7 @@ namespace SYM {
 // ExtractWyckoffSiteSymmetriesString 
 // ******************************************************************************
 namespace SYM {
-  string ExtractWyckoffSiteSymmetriesString(vector<string>& wyccar_ITC){
+  string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC){ //DX 20191030 - added const
     return ExtractWyckoffAttributeString(wyccar_ITC, 6); //Wyckoff site symmetry sits at 6th column of wyccar
   }
 }
@@ -1754,10 +1754,25 @@ namespace SYM {
   }
 } //namespace SYM
 
+// ******************************************************************************
+// get_Wyckoff_from_letter
+// ******************************************************************************
+//DX 20191029 - END
+namespace SYM {
+  void get_Wyckoff_from_letter(uint space_group_number, string& space_group_setting, 
+      string& Wyckoff_letter, uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions){
+    
+    SymmetryInformationITC ITC_sym_info;
+    ITC_sym_info.initsgs(space_group_setting);
+    string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1];
+
+    get_Wyckoff_from_letter(spacegroupstring, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
+  }
+}
+//DX 20191029 - END
+
+// ---------------------------------------------------------------------------
 //DX 20190128 - START
-// ******************************************************************************
-// get_certain_wyckoff_pos (Get certain Wyckoff position based on mult and site sym)
-// ******************************************************************************
 namespace SYM {
   void get_Wyckoff_from_letter(string& spaceg, string& Wyckoff_letter, 
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions) { //DX 20190128 - int to uint
@@ -2035,40 +2050,237 @@ namespace SYM {
       vector<vector<string> > none;
       return none;
     }
-    
-    stringstream temp;
-    int line = 0;
 
-    string multiplicity, letter, site_symmetry;
-    vector<string> positions;
+    //DX 20191030 - use tokens instead of stringstream assignment - START
+    vector<string> all_positions;
+    vector<string> all_Wyckoff_strings, Wyckoff_tokens; 
+    string multiplicity, letter, site_symmetry, position;
 
+    // split up Wyckoff positions
+    aurostd::string2tokens(spaceg, all_Wyckoff_strings, "\n");
 
-    for (uint i = 0; i < spaceg.length(); i++) {
-      if(spaceg[i] == 0x0a){
-	      line++;
-      }
-      if(line > 1) {
-	      temp << spaceg[i];
-        if(spaceg[i] == 0x0a) {
-          string multiplicity, letter, site_symm, pos;
-          temp >> multiplicity;
-          temp >> letter;
-          temp >> site_symmetry;
-          //DX 20190128 [OBSOLETE] - use aurostd - Wyckoff_multiplicity = atoi(multiplicity.c_str());
-          Wyckoff_multiplicity = aurostd::string2utype<uint>(multiplicity.c_str());
-          if(letter == Wyckoff_letter){
-            temp >> pos;
-            positions.push_back(pos);
+    for(uint i=0; i<all_Wyckoff_strings.size();i++){
+      aurostd::string2tokens(all_Wyckoff_strings[i], Wyckoff_tokens, " ");
+
+      // expected sequence: "24 h ..2 (x, y, z) (x, 0, z) ..."
+      if(Wyckoff_tokens.size()>3){
+        letter = Wyckoff_tokens[1];
+        if(letter == Wyckoff_letter){
+          multiplicity = Wyckoff_tokens[0]; site_symmetry = Wyckoff_tokens[2];
+          for(uint t=3;t<Wyckoff_tokens.size();t++){ //DX 20191030 - need loop to get all positions
+            string position = aurostd::RemoveWhiteSpaces(Wyckoff_tokens[t]); position = aurostd::RemoveCharacter(position,'\n');
+            if(position.size()!=0){
+              all_positions.push_back(position);
+            }
             break;
-          }
-          else {
-	          temp.str(std::string());
-	          temp.clear();
-            continue;
           }
         }
       }
+      else{
+        //bad position
+      }
     }
+    //DX 20191030 - remove stringstream assignment (used to be here)
+    //DX 20191030 - use tokens instead of stringstream assignment - END
+
+    if(LDEBUG) {cerr << "SYM::get_wyckoff_pos:: Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
+
+    vector<vector<string> > non_shifted_Wyckoff_positions;
+    vector<string> tokens;
+    //format positions
+    for(uint i=0;i<all_positions.size();i++){
+      aurostd::string2tokens(all_positions[i],tokens,",");
+      vector<string> vec_pos;
+      for(uint t=0;t<tokens.size();t++){
+        string pos = aurostd::StringSubst(tokens[t],"(",""); pos = aurostd::StringSubst(pos,")","");
+        vec_pos.push_back(pos);
+      }
+      non_shifted_Wyckoff_positions.push_back(vec_pos);
+    }
+
+    vector<vector<string> > all_Wyckoff_positions;
+
+    stringstream temp;
+    temp.str(std::string());
+    temp.clear();
+    for(uint i=0;i<get_centering(spaceg).size();i++) {
+      for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
+        vector<string> vec_pos;
+        for(uint k=0;k<non_shifted_Wyckoff_positions[j].size();k++){
+          temp << non_shifted_Wyckoff_positions[j][k];
+          temp << "+" << get_centering(spaceg)[i][k];
+          vec_pos.push_back(temp.str());
+          temp.str(std::string());
+          temp.clear();
+        }
+        all_Wyckoff_positions.push_back(vec_pos);
+      }
+    }
+
+    if(LDEBUG) {
+      vector<string> tmp; 
+      for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
+      cerr << "SYM::get_wyckoff_pos:: All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+    }
+
+    return all_Wyckoff_positions;
+  }
+}
+//DX 20190128 - END
+
+/////////////////////////////////////////////////////////////////////////////////
+// FUNCTIONS: get Wyckoff position information (DX 20191030)
+//
+// The following inputs are required to get the Wyckoff position information (minimum)
+//   1) space group number
+//   2) space group setting
+//   3) Wyckoff letter designation
+// Other information - Wyckoff multiplicity and site symmetry - are not unique 
+// to a given position
+//
+// Functions below get the equation, multiplicity, site symmetry, or all information
+
+// ******************************************************************************
+// getWyckoffEquations 
+// ******************************************************************************
+namespace SYM {
+  // ---------------------------------------------------------------------------
+  // input: space group number + setting
+  vector<vector<string> > getWyckoffEquations(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter){
+   
+    // get Wyckoff information based on space group and setting
+    SymmetryInformationITC ITC_sym_info;
+    ITC_sym_info.initsgs(space_group_setting);
+    string Wyckoff_string = ITC_sym_info.gl_sgs[space_group_number - 1];
+
+    return getWyckoffEquations(Wyckoff_string, Wyckoff_letter);
+  }
+
+  // ---------------------------------------------------------------------------
+  // input: Wyckoff string 
+  vector<vector<string> > getWyckoffEquations(const string& Wyckoff_string, const string& Wyckoff_letter){
+
+    uint Wyckoff_multiplicity = 0;
+    string site_symmetry = "";
+    vector<vector<string> > positions;
+  
+    getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
+
+    return positions;
+  }
+}
+
+// ******************************************************************************
+// getWyckoffMultiplicity 
+// ******************************************************************************
+namespace SYM {
+  // ---------------------------------------------------------------------------
+  // input: space group number + setting
+  uint getWyckoffMultiplicity(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter){
+   
+    // get Wyckoff information based on space group and setting
+    SymmetryInformationITC ITC_sym_info;
+    ITC_sym_info.initsgs(space_group_setting);
+    string Wyckoff_string = ITC_sym_info.gl_sgs[space_group_number - 1];
+
+    return getWyckoffMultiplicity(Wyckoff_string, Wyckoff_letter);
+  }
+
+  // ---------------------------------------------------------------------------
+  // input: Wyckoff string 
+  uint getWyckoffMultiplicity(const string& Wyckoff_string, const string& Wyckoff_letter){
+
+    uint Wyckoff_multiplicity = 0;
+    string site_symmetry = "";
+    vector<vector<string> > positions;
+  
+    getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
+
+    return Wyckoff_multiplicity;
+  }
+}
+
+// ******************************************************************************
+// getWyckoffSiteSymmetry
+// ******************************************************************************
+namespace SYM {
+  // ---------------------------------------------------------------------------
+  // input: space group number + setting
+  string getWyckoffSiteSymmetry(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter){
+   
+    // get Wyckoff information based on space group and setting
+    SymmetryInformationITC ITC_sym_info;
+    ITC_sym_info.initsgs(space_group_setting);
+    string Wyckoff_string = ITC_sym_info.gl_sgs[space_group_number - 1];
+
+    return getWyckoffSiteSymmetry(Wyckoff_string, Wyckoff_letter);
+  }
+
+  // ---------------------------------------------------------------------------
+  // input: Wyckoff string 
+  string getWyckoffSiteSymmetry(const string& Wyckoff_string, const string& Wyckoff_letter){
+
+    uint Wyckoff_multiplicity = 0;
+    string site_symmetry = "";
+    vector<vector<string> > positions;
+  
+    getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, positions);
+
+    return site_symmetry;
+  }
+}
+
+// ******************************************************************************
+// getWyckoffInformation 
+// ******************************************************************************
+namespace SYM {
+  // ---------------------------------------------------------------------------
+  // input: space group number + setting
+  void getWyckoffInformation(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter,
+      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
+
+    // get Wyckoff information based on space group and setting
+    SymmetryInformationITC ITC_sym_info;
+    ITC_sym_info.initsgs(space_group_setting);
+    string Wyckoff_string = ITC_sym_info.gl_sgs[space_group_number - 1];
+
+    return getWyckoffInformation(Wyckoff_string, Wyckoff_letter, Wyckoff_multiplicity, site_symmetry, all_positions);
+  }
+
+  // ---------------------------------------------------------------------------
+  // input: space group number + setting
+  void getWyckoffInformation(const string& Wyckoff_string, const string& Wyckoff_letter,
+      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
+
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    bool reduce = true; // simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
+    vector<string> split_Wyckoff_strings, Wyckoff_tokens, positions;
+
+    // split up Wyckoff positions
+    aurostd::string2tokens(Wyckoff_string, split_Wyckoff_strings, "\n");
+
+    for(uint i=0; i<split_Wyckoff_strings.size();i++){
+      aurostd::string2tokens(split_Wyckoff_strings[i], Wyckoff_tokens, " ");
+
+      // expected sequence: "24 h ..2 (x, y, z) (x, 0, z) ..."
+      if(Wyckoff_tokens.size()>3){
+        string letter = Wyckoff_tokens[1];
+        if(letter == Wyckoff_letter){
+          Wyckoff_multiplicity = aurostd::string2utype<uint>(Wyckoff_tokens[0]); site_symmetry = Wyckoff_tokens[2];
+          for(uint t=3;t<Wyckoff_tokens.size();t++){ //DX 20191030 - need loop to get all positions
+            string position = aurostd::RemoveWhiteSpaces(Wyckoff_tokens[t]); position = aurostd::RemoveCharacter(position,'\n');
+            if(position.size()!=0){
+              positions.push_back(position);
+            }
+            break;
+          }
+        }
+      }
+      else{
+        //bad position
+      }
+    }
+
 
     if(LDEBUG) {cerr << "SYM::get_wyckoff_pos:: Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
 
@@ -2080,36 +2292,50 @@ namespace SYM {
       vector<string> vec_pos;
       for(uint t=0;t<tokens.size();t++){
         string pos = aurostd::StringSubst(tokens[t],"(",""); pos = aurostd::StringSubst(pos,")","");
-        vec_pos.push_back(pos);
+        // ---------------------------------------------------------------------------
+        // split into equation entities (number, variable)
+        if(reduce){
+          vector<sdouble> sd_coordinate = simplify(pos);
+          vec_pos.push_back(SYM::formatWyckoffPosition(sd_coordinate));
+        }
+        else{
+          vec_pos.push_back(pos);
+        }
       }
       non_shifted_Wyckoff_positions.push_back(vec_pos);
     }
 
-    vector<vector<string> > all_Wyckoff_positions;
-
-	  temp.str(std::string());
-	  temp.clear();
-    for(uint i=0;i<get_centering(spaceg).size();i++) {
+    stringstream temp;
+    temp.str(std::string());
+    temp.clear();
+    for(uint i=0;i<get_centering(Wyckoff_string).size();i++) {
       for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
         vector<string> vec_pos;
         for(uint k=0;k<non_shifted_Wyckoff_positions[j].size();k++){
           temp << non_shifted_Wyckoff_positions[j][k];
-	        temp << "+" << get_centering(spaceg)[i][k];
-          vec_pos.push_back(temp.str());
-	        temp.str(std::string());
-	        temp.clear();
+          temp << "+" << get_centering(Wyckoff_string)[i][k];
+          // ---------------------------------------------------------------------------
+          // split into equation entities (number, variable) 
+          if(reduce){
+            vector<sdouble> sd_coordinate = simplify(temp.str());
+            vec_pos.push_back(SYM::formatWyckoffPosition(sd_coordinate));
+          }
+          else{
+            vec_pos.push_back(temp.str());
+          }
+          temp.str(std::string());
+          temp.clear();
         }
-        all_Wyckoff_positions.push_back(vec_pos);
+        all_positions.push_back(vec_pos);
       }
     }
-    
+
     if(LDEBUG) {
       vector<string> tmp; 
-      for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
+      for(uint i=0;i<all_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_positions[i],",")+")");}
       cerr << "SYM::get_wyckoff_pos:: All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
     }
 
-    return all_Wyckoff_positions;
   }
 }
 //DX 20190128 - END
@@ -2459,10 +2685,23 @@ namespace SYM {
   }
 } //namespace SYM
 
-//DX 20190128 - START
+//DX 20191029 - START
 // ******************************************************************************
 // findWyckoffEquations
 // ******************************************************************************
+namespace SYM {
+  vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting, 
+      string& Wyckoff_letter, uint Wyckoff_multiplicity){
+    
+    SymmetryInformationITC ITC_sym_info;
+    ITC_sym_info.initsgs(space_group_setting);
+    string spacegroupstring = ITC_sym_info.gl_sgs[space_group_number - 1];
+    return findWyckoffEquations(spacegroupstring, Wyckoff_letter, Wyckoff_multiplicity);
+  }
+}
+//DX 20191029 - END
+
+// ---------------------------------------------------------------------------
 namespace SYM {
   vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multiplicity){
     vector<string> positions;
@@ -2541,7 +2780,14 @@ namespace SYM {
     while(running_double>1.0 || aurostd::isequal(running_double,1.0,_ZERO_TOL_)){
       running_double-=1.0;
     }
+    //DX 20191030 - added case for double only AND not double only - START
     if(double_only){
+      string running_frac = aurostd::dbl2frac(running_double,false); //DX 20190724 - now namespace aurostd
+      ss_eqn << running_frac;
+      vec_coord.push_back(ss_eqn.str());
+      ss_eqn.str("");
+    }
+    else{
       if(!aurostd::isequal(running_double,0.0,_ZERO_TOL_)){ //DX 20190718 - don't add +0 to the end
         string running_frac = aurostd::dbl2frac(running_double,false); //DX 20190724 - now namespace aurostd
         ss_eqn << running_frac;
@@ -2549,6 +2795,8 @@ namespace SYM {
         ss_eqn.str("");
       }
     }
+    //DX 20191030 - added case for double only AND not double only - END
+
     coordinate = aurostd::joinWDelimiter(vec_coord,"+");
     // ---------------------------------------------------------------------------
     // clean up cases of -+ or +-

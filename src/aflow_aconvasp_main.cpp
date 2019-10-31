@@ -1193,9 +1193,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX 20190128 - add structure2ANRL - START
   vpflow.flag("STRUCTURE2ANRL",aurostd::args2attachedflag(argv,cmds,"--prototype") && !vpflow.flag("LIST_PROTOTYPE_LABELS")); //DX 20190416 - changed from --anrl to --prototype //DX 20190509 - added check for prototype labels
   if(vpflow.flag("STRUCTURE2ANRL")){
-    if(aurostd::args2attachedflag(argv,"--setting=")){
-      vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::SETTING","--setting=","1");
-    }
+    vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::SETTING","--setting=","");
+    vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE","--tolerance=",""); //DX 20191028
+    vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF",aurostd::args2flag(argv,cmds,"--force_Wyckoff|--force_wyckoff|--force_Wyckoff_order|--force_wyckoff_order")); //DX 20191028
   }
   //DX 20190128 - add structure2ANRL - END
 
@@ -4936,7 +4936,7 @@ namespace pflow {
 namespace pflow {
   void CIF(istream& input, aurostd::xoption& vpflow) {
     if(vpflow.flag("CIF::USAGE")) {
-      init::ErrorOption(cout,"--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance| =tight| =loose] [--setting=1|2] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
+      init::ErrorOption(cout,"--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance| =tight| =loose] [--setting=1|2] [--no_symmetry] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
       return;
     }
     xstructure a(input,IOAFLOW_AUTO);

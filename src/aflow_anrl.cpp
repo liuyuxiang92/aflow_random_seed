@@ -3831,12 +3831,42 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  vector<double> getANRLLatticeParameterValues(vector<string>& wyccar_ITC, char& lattice_type, char& lattice_centering, uint& setting ){
+  vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting){
     // get lattice parameter values from the WYCCAR based on the degrees of freedom given the lattice type
 
     // extract lattice parameters from wyccar
     vector<double> all_lattice_parameters = SYM::ExtractLatticeParametersFromWyccar(wyccar_ITC);
 
+    return getANRLLatticeParameterValues(all_lattice_parameters, lattice_type, lattice_centering, setting);
+  }
+  
+  vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting ){
+    // get lattice parameter values from the XSTRUCTURE
+
+    string function_name = "anrl::getANRLLatticeParameterValuesFromABCAngles()";
+
+    // extract lattice parameters from xstructure
+    vector<double> all_lattice_parameters;
+    all_lattice_parameters.push_back(xstr.a);
+    all_lattice_parameters.push_back(xstr.b);
+    all_lattice_parameters.push_back(xstr.c);
+    all_lattice_parameters.push_back(xstr.alpha);
+    all_lattice_parameters.push_back(xstr.beta);
+    all_lattice_parameters.push_back(xstr.gamma);
+
+    // ensure all lattice parameters have been set (i.e., not zero or negative)
+    for(uint i=0;i<all_lattice_parameters.size();i++){
+      if(all_lattice_parameters[i]<=_ZERO_TOL_){
+        stringstream message; message << "The " << i << "th lattice parameter is ill-defined. Please check input.";
+        throw aurostd::xerror(function_name, message, _INPUT_ILLEGAL_);
+      }
+    }
+
+    return getANRLLatticeParameterValues(all_lattice_parameters, lattice_type, lattice_centering, setting);
+  }
+
+  vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting ){
+      
     // store only relevant parameter values
     vector<double> lattice_parameter_values;
     // triclinic
@@ -3889,7 +3919,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  uint getANRLSettingChoice(int& spacegroup){
+  uint getANRLSettingChoice(int spacegroup){ //DX 20191031 - remove reference
     // ANRL setting choice
     // rhl: rhombohedral setting: setting=1
     // monoclinic: unique axis-b: setting=1
@@ -3917,34 +3947,50 @@ namespace anrl {
     string function_name = "anrl::structure2anrl()";
 
     string directory="";
+    bool recalculate_symmetry = true; //DX 20191030
+    uint setting=SG_SETTING_ANRL; //anrl setting choice is default
 
     string usage="aflow --anrl|--convert2anrl|--structure2anrl|--struct2anrl < POSCAR";
     string options="";
     
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
+   
+    //DX 20191030 - add force Wyckoff choice option - START
+    // check if forcing certain Wyckoff convention 
+    // Wyckoff positions must be provided (either in CIF, Wyccar, or in Wyckoff object)
+    if(vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF")){
+      // check if Wyckoff information is available
+      if(xstr.wyckoff_sites_ITC.size()==0){
+        throw aurostd::xerror(function_name,"Cannot use --force_Wyckoff option, Wyckoff positions must be given.",_INPUT_ILLEGAL_);
+      }
+      if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
+        throw aurostd::xerror(function_name,"Cannot indicate use --setting and --force_Wyckoff option together.",_INPUT_ILLEGAL_);
+      }
+      setting = xstr.spacegroupnumberoption;
+      recalculate_symmetry = false;
+    }
+    //DX 20191030 - add force Wyckoff choice option - END
       
     // symmetry tolerance
-    double default_tolerance=SYM::defaultTolerance(xstr); 
     double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("STRUCTURE2::TOLERANCE")){
+    if(vpflow.flag("STRUCTURE2ANRL::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE");
       if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
-        tolerance=default_tolerance;
+        tolerance=SYM::defaultTolerance(xstr); 
       }
       else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
+        tolerance=SYM::defaultTolerance(xstr)*10.0; 
       }
       else {
         tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE"));
       }
     }
     else {
-      tolerance = default_tolerance;
+      tolerance=SYM::defaultTolerance(xstr); 
     }
       
     // space group setting
-    uint setting=SG_SETTING_ANRL; //anrl setting choice is default
     if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
       if(aurostd::tolower(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING")) == "anrl"){
         setting=SG_SETTING_ANRL;
@@ -3954,22 +4000,23 @@ namespace anrl {
       if(user_setting==1){setting=SG_SETTING_1;}
       else if(user_setting==2){setting=SG_SETTING_2;}
         if(user_setting!=SG_SETTING_1 && user_setting!=SG_SETTING_2){  //DX 20190318
-          cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX 20190318
-        return "";
+          throw aurostd::xerror(function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX 20191030
+          //DX 20191030 [OBSOLETE] cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX 20190318
+          //DX 20191030 [OBSOLETE] return "";
         } //DX 20190318
       }
     }
-    return structure2anrl(xstr,tolerance,setting);
+    return structure2anrl(xstr,tolerance,setting,recalculate_symmetry);
   }
 }   
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr){ 
+  string structure2anrl(xstructure& xstr, bool recalculate_symmetry){ //DX 20190829 - added recalculate_symmetry
     // determine anrl label, parameters, and parameter values of the input structure
     double default_tolerance=SYM::defaultTolerance(xstr); 
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
-    return structure2anrl(xstr,default_tolerance,setting);
+    return structure2anrl(xstr,default_tolerance,setting, recalculate_symmetry); //DX 20190829 - added recalculate_symmetry
   }
 }
 
@@ -3984,7 +4031,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, uint& setting){ 
+  string structure2anrl(xstructure& xstr, uint setting){ //DX 20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     double default_tolerance=SYM::defaultTolerance(xstr); 
     return structure2anrl(xstr,default_tolerance,setting);
@@ -3993,7 +4040,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance, uint& setting){  //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry){  //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
     
@@ -4003,7 +4050,16 @@ namespace anrl {
     ofstream FileMESSAGE;
 
     // Calculate symmetry
-    uint space_group_number = xstr.SpaceGroup_ITC(tolerance,setting);
+    uint space_group_number=0;
+    if((xstr.space_group_ITC==0 && xstr.spacegroupnumber==0) || recalculate_symmetry){ //DX 20190829 - added if-statement; don't recalculate, it is faster
+      space_group_number = xstr.SpaceGroup_ITC(tolerance,setting);
+    }
+    else if(xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){
+      space_group_number = xstr.space_group_ITC;
+    }
+    else if(xstr.spacegroupnumber>=1 && xstr.spacegroupnumber<=230){
+      space_group_number = xstr.spacegroupnumber;
+    }
     
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
@@ -4011,6 +4067,7 @@ namespace anrl {
     // ===== Determine ANRL label ===== //
     // stoichiometry
     xstructure tmp_xstr=xstr; // make new one so we do not override atom names
+    ReScale(tmp_xstr,1.0); //DX 20191031
     bool remove_ones=true;
     compare::fakeAtomsName(tmp_xstr);
     string reduced_stoichiometry = compare::getCompoundName(tmp_xstr,remove_ones);
@@ -4020,8 +4077,11 @@ namespace anrl {
     for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
       conventional_cell_atoms_count += xstr.wyckoff_sites_ITC[i].multiplicity;
     }
-    char lattice_type = xstr.lattice_label_ITC;
-    char lattice_centering = xstr.bravais_label_ITC;
+    //DX 20191031 [OBSOLETE] char lattice_type = xstr.lattice_label_ITC;
+    //DX 20191031 [OBSOLETE] char lattice_centering = xstr.bravais_label_ITC;
+    string lattice_type_and_centering = LATTICE::SpaceGroup2LatticeTypeAndCentering(space_group_number); //DX 20191031
+    char lattice_type = lattice_type_and_centering[0];
+    char lattice_centering = lattice_type_and_centering[1];
 
     // rhl fixes
     if(lattice_centering == 'R' && setting==SG_SETTING_2){conventional_cell_atoms_count/=3;} // for rhl, number in Pearson symbol is given wrt to rhl cell
@@ -4050,8 +4110,13 @@ namespace anrl {
     
     // lattice parameters
     lattice_parameter_list = anrl::getANRLLatticeParameterString(lattice_type);
-    lattice_parameter_values = anrl::getANRLLatticeParameterValues(xstr.wyccar_ITC, lattice_type, lattice_centering, setting);
-    
+    if(xstr.wyccar_ITC.size()!=0){
+      lattice_parameter_values = anrl::getANRLLatticeParameterValuesFromWyccar(xstr.wyccar_ITC, lattice_type, lattice_centering, setting);
+    }
+    else{
+      lattice_parameter_values = anrl::getANRLLatticeParameterValuesFromABCAngles(xstr, lattice_type, lattice_centering, setting);
+    }
+
     // Wyckoff parameters
 		vector<wyckoffsite_ITC> ordered_Wyckoff_sites_ITC = xstr.wyckoff_sites_ITC;
     // reorder Wyckoff positions alphabetically by Wyckoff letter, then by species

@@ -2473,13 +2473,15 @@ namespace anrl {
                                  uint proto_spacegroup, string proto_params, uint print_mode); //DX 20180710 - added print_mode
   string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize);
   vector<string> getANRLLatticeParameterString(char& lattice_type);
-  vector<double> getANRLLatticeParameterValues(vector<string>& wyccar_ITC, char& lattice_type, char& lattice_centering, uint& setting);
-  uint getANRLSettingChoice(int& spacegroup);
+  vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting); //DX 20191031
+  vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting); //DX 20191031
+  vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting); //DX 20191031
+  uint getANRLSettingChoice(int spacegroup); //DX 20191031 - removed reference
   string structure2anrl(istream& input, aurostd::xoption& vpflow);           // xoption
-  string structure2anrl(xstructure& xstr);                                   // use default options
-  string structure2anrl(xstructure& xstr, double tolerance);                // specify symmetry tolerance //CO190520 - removed pointers for bools and doubles, added const where possible
-  string structure2anrl(xstructure& xstr, uint& setting);                    // specify setting
-  string structure2anrl(xstructure& xstr, double tolerance, uint& setting); // main function //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX 20191031 - added recalculate_symmetry
+  string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
   xstructure rhl2hex(xstructure& str, double& a, double& c); 
 }
 
@@ -3781,7 +3783,9 @@ namespace spacegroup{
 // lattice and brillouin zones
 namespace LATTICE {
   bool lattice_is_working(string lat);
+  string Lattice2TypeAndCentering(const string& lattice_type); //DX 20191031
   string SpaceGroup2Lattice(uint sg);
+  string SpaceGroup2LatticeTypeAndCentering(uint sg); //DX 20191031
   uint Lattice2SpaceGroup(string lattice,vector<uint>& vsg);
   string SpaceGroup2LatticeVariation(uint sg,const xstructure& str);
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);

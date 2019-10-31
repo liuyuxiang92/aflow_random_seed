@@ -1,3 +1,14 @@
+3.1.227 - 2019/11/01
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
+        -- fixed tolerance "WARNING" in symmetry screw axis determination (DX)
+        -- added missing partial occupation value when printing CIF (DX)
+        -- added site occupation to Wyckoff object (DX)
+        -- used _atom copy constructor in symmetry functions instead of by-hand updates (DX)
+        -- fixed indenting in symmetry functions (DX)
+        -- added rescaling of structure in prototyping functionality (DX)
+        -- added functions to extract information from certain Wyckoff positions (DX)
+        -- added functionality to force input Wyckoff choice for structure prototyping (DX)
+        -- added check for duplicate subdirectory in aflow zipping, removes subdirectory if found (DX+CO)
 3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)

@@ -5043,6 +5043,21 @@ namespace aflowlib {
     obb<<endl;
     if(print==TRUE) oss << obb.str();
     oss.flush();
+
+    // DX and CO 20191030 - check for identical subdirectories - START
+    // check if directory has an identical subdirectory
+    vector<string> dir_tokens;
+    aurostd::string2tokens(dir,dir_tokens,"/");
+    string run_directory = dir_tokens[dir_tokens.size()-1];
+    string sub_directory = dir+"/"+run_directory;
+    if(aurostd::FileExist(sub_directory)) {
+      obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
+      oss << obb.str();
+      oss.flush();
+      aurostd::RemoveDirectory(sub_directory);
+    }
+    // DX and CO 20191030 - check for identical subdirectories - END
+
     return ok;
   }
 }

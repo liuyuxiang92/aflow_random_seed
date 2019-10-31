@@ -1528,7 +1528,8 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
   oss << " site_symmetry: "<< site.site_symmetry << endl;
   oss << " multiplicity: "<< site.multiplicity << endl;
   oss << " wyckoffSymbol: "<< site.wyckoffSymbol << endl;
-  oss << " site_occupation: " << site.site_occupation; //DX 20191010 - add site occupation
+  oss << " site_occupation: " << site.site_occupation << endl; //DX 20191010 - add site occupation
+  oss << " equations: " << endl; //DX 20191010 - add site occupation
   for(uint i=0;i<site.equations.size();i++){
     oss << "  " << aurostd::joinWDelimiter(site.equations[i],",") << endl;
   }
@@ -4202,14 +4203,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
         vector<string> tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SYMMETRY_INT_TABLES_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
-	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
+          a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_IT_NUMBER")){ // converted to upper to be case insensitive
         vector<string> tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SPACE_GROUP_IT_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
-	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
+          a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
       //DX 20190708 - added another space group variant - START
@@ -4221,7 +4222,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
           string spacegroupsymbol = aurostd::joinWDelimiter(tokens,"");
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\''); //clean
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\"'); //clean
-          a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol);
+          try{ a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); } //DX 20191029 - added try/catch sequence
+          catch(aurostd::xerror& re){ if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(soliloquy, message, std::cerr, _LOGGER_WARNING_); } } //DX 20191029 - added try/catch sequence
         }
       }
       //DX 20190708 - added another space group variant - END
@@ -4241,6 +4243,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //DX 20190708 - fix Hall reader - END
       }
     }
+    //DX 20191029 - check if space group number is found - START
+    if(a.spacegroupnumber==0){
+      message << "Either space group number was not given or it was given in a non-standard setting.";
+      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+    }
+    //DX 20191029 - check if space group number is found - END
     bool found_setting = false;
     // loop over possible settings in aflow
     for(uint setting_number=1;setting_number<=2;setting_number++){
@@ -4344,6 +4352,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         else {
           a.spacegroupnumberoption = setting_number;
+          a.spacegroupoption = setting_string; //DX 20191029
           found_setting = true;
           break; //found setting
         }
@@ -4430,6 +4439,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //DX 20190718 - check tokens first; Springer Materials has extra spaces - END
         if(tokens.size()==atom_site_fields.size()){
           _atom tmp;
+          wyckoffsite_ITC wyckoff_tmp; //DX 20191029
           for(uint t=0;t<tokens.size();t++){
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
@@ -4437,10 +4447,19 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_occupancy")){ 
               tmp.partial_occupation_value = aurostd::string2utype<double>(tokens[t]); 
+              wyckoff_tmp.site_occupation = tmp.partial_occupation_value; //DX 20191029 
               if(aurostd::abs(tmp.partial_occupation_value-1.0)<1e-6){ tmp.partial_occupation_flag = FALSE; }
               else { tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
             }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_symmetry_multiplicity")){ wyckoff_tmp.multiplicity=aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label")){ wyckoff_tmp.letter=tokens[t]; }
           }
+          wyckoff_tmp.type = tmp.name; //DX 20191029
+          wyckoff_tmp.coord = tmp.fpos; //DX 20191029
+          if(wyckoff_tmp.multiplicity!=0 && wyckoff_tmp.letter!=""){
+            SYM::getWyckoffInformation(a.spacegroupnumber, a.spacegroupoption, wyckoff_tmp.letter, wyckoff_tmp.multiplicity, wyckoff_tmp.site_symmetry, wyckoff_tmp.equations);
+          }
+          a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
           tmp.cpos=a.f2c*tmp.fpos;
           a.AddAtom(tmp);
           already_storing_atoms=TRUE; //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)

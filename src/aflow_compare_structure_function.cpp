@@ -2240,11 +2240,14 @@ namespace compare{
     uint type_count = 0; //DX 20190425 - add type indicator
 
     for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
-      vector<string> tokens;
-      aurostd::string2tokens(xstr.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");  
-      uint multiplicity = aurostd::string2utype<uint>(tokens[0]);     
-      string letter = aurostd::string2utype<string>(tokens[1]);     
-      string site_symmetry = aurostd::string2utype<string>(tokens[2]);     
+      //DX 20191030 [OBOSLETE] vector<string> tokens;
+      //DX 20191030 [OBOSLETE] aurostd::string2tokens(xstr.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");  
+      //DX 20191030 [OBOSLETE] uint multiplicity = aurostd::string2utype<uint>(tokens[0]);     
+      //DX 20191030 [OBOSLETE] string letter = aurostd::string2utype<string>(tokens[1]);     
+      //DX 20191030 [OBOSLETE] string site_symmetry = aurostd::string2utype<string>(tokens[2]);     
+      uint multiplicity = xstr.wyckoff_sites_ITC[i].multiplicity; //DX 20191031 
+      string letter = xstr.wyckoff_sites_ITC[i].letter; //DX 20191031
+      string site_symmetry = xstr.wyckoff_sites_ITC[i].site_symmetry; //DX 20191031
 
       bool element_found = false;
       uint element_index = 0;
