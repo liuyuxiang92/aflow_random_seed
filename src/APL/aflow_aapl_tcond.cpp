@@ -704,12 +704,12 @@ vector<vector<double> > TCONDCalculator::calculateTransitionProbabilitiesBoundar
   return rates;
 }
 
-double fij(double ei, double ej, double e) {
-  return (e - ej)/(ei - ej);
+double fij(double fi, double fj, double f) {
+  return (f - fj)/(fi - fj);
 }
 
-void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
-                                   const vector<double>& energy, vector<double>& weights) {
+void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double freq_ref,
+                                   const vector<double>& frequencies, vector<double>& weights) {
   for (int q = 0; q < nQPs; q++) weights[q] = 0;
   const vector<vector<int> >& corners = _lt.getTetrahedra();
   double vol = _lt.getVolumePerTetrahedron();
@@ -718,76 +718,76 @@ void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
   double g, tmp;
   int i, j, ii, jj;
 
-  double e_tmp[4];
-  int sort_arg[4], kindex[4];
+  double f[4];
+  int index_sort[4], index[4];
 
   for (i = 0; i < ntet; i++) {
     for (j = 0; j < 4; j++) {
-      e_tmp[j] = energy[corners[i][j]];
-      kindex[j] = corners[i][j];
+      f[j] = frequencies[corners[i][j]];
+      index[j] = corners[i][j];
     }
 
-    for (ii = 0; ii < 4; ii++) sort_arg[ii] = ii;
+    for (ii = 0; ii < 4; ii++) index_sort[ii] = ii;
 
     for (ii = 0; ii < 4; ii++) {
-      tmp = e_tmp[ii];
+      tmp = f[ii];
       jj = ii;
-      while (jj > 0 && tmp < e_tmp[jj - 1]) {
-        e_tmp[jj] = e_tmp[jj - 1];
-        sort_arg[jj] = sort_arg[jj - 1];
+      while (jj > 0 && tmp < f[jj - 1]) {
+        f[jj] = f[jj - 1];
+        index_sort[jj] = index_sort[jj - 1];
         jj--;
       }
-      e_tmp[jj] = tmp;
-      sort_arg[jj] = ii;
+      f[jj] = tmp;
+      index_sort[jj] = ii;
     }
 
-    double e1 = e_tmp[0];
-    double e2 = e_tmp[1];
-    double e3 = e_tmp[2];
-    double e4 = e_tmp[3];
+    double f1 = f[0];
+    double f2 = f[1];
+    double f3 = f[2];
+    double f4 = f[3];
 
-    if (aurostd::isequal(e1, e4)) continue;
+    if (aurostd::isequal(f1, f4)) continue;
 
-    int k1 = kindex[sort_arg[0]];
-    int k2 = kindex[sort_arg[1]];
-    int k3 = kindex[sort_arg[2]];
-    int k4 = kindex[sort_arg[3]];
+    int q1 = index[index_sort[0]];
+    int q2 = index[index_sort[1]];
+    int q3 = index[index_sort[2]];
+    int q4 = index[index_sort[3]];
 
     double I1 = 0.0;
     double I2 = 0.0;
     double I3 = 0.0;
     double I4 = 0.0;
 
-    if (e3 <= e_ref && e_ref < e4) {
-        g = std::pow(e4 - e_ref, 2) / ((e4 - e1) * (e4 - e2) * (e4 - e3));
+    if (f3 <= freq_ref && freq_ref < f4) {
+        g = std::pow(f4 - freq_ref, 2) / ((f4 - f1) * (f4 - f2) * (f4 - f3));
 
-        I1 = g * fij(e1, e4, e_ref);
-        I2 = g * fij(e2, e4, e_ref);
-        I3 = g * fij(e3, e4, e_ref);
-        I4 = g * (fij(e4, e1, e_ref) + fij(e4, e2, e_ref) + fij(e4, e3, e_ref));
+        I1 = g * fij(f1, f4, freq_ref);
+        I2 = g * fij(f2, f4, freq_ref);
+        I3 = g * fij(f3, f4, freq_ref);
+        I4 = g * (fij(f4, f1, freq_ref) + fij(f4, f2, freq_ref) + fij(f4, f3, freq_ref));
 
-    } else if (e2 <= e_ref && e_ref < e3) {
-        g = (e2 - e1 + 2.0 * (e_ref - e2) - (e4 + e3 - e2 - e1)
-            * std::pow(e_ref - e2, 2) / ((e3 - e2) * (e4 - e2))) / ((e3 - e1) * (e4 - e1));
+    } else if (f2 <= freq_ref && freq_ref < f3) {
+        g = (f2 - f1 + 2.0 * (freq_ref - f2) - (f4 + f3 - f2 - f1)
+            * std::pow(freq_ref - f2, 2) / ((f3 - f2) * (f4 - f2))) / ((f3 - f1) * (f4 - f1));
 
-        I1 = g * fij(e1, e4, e_ref) + fij(e1, e3, e_ref) * fij(e3, e1, e_ref) * fij(e2, e3, e_ref) / (e4 - e1);
-        I2 = g * fij(e2, e3, e_ref) + std::pow(fij(e2, e4, e_ref), 2) * fij(e3, e2, e_ref) / (e4 - e1);
-        I3 = g * fij(e3, e2, e_ref) + std::pow(fij(e3, e1, e_ref), 2) * fij(e2, e3, e_ref) / (e4 - e1);
-        I4 = g * fij(e4, e1, e_ref) + fij(e4, e2, e_ref) * fij(e2, e4, e_ref) * fij(e3, e2, e_ref) / (e4 - e1);
+        I1 = g * fij(f1, f4, freq_ref) + fij(f1, f3, freq_ref) * fij(f3, f1, freq_ref) * fij(f2, f3, freq_ref) / (f4 - f1);
+        I2 = g * fij(f2, f3, freq_ref) + std::pow(fij(f2, f4, freq_ref), 2) * fij(f3, f2, freq_ref) / (f4 - f1);
+        I3 = g * fij(f3, f2, freq_ref) + std::pow(fij(f3, f1, freq_ref), 2) * fij(f2, f3, freq_ref) / (f4 - f1);
+        I4 = g * fij(f4, f1, freq_ref) + fij(f4, f2, freq_ref) * fij(f2, f4, freq_ref) * fij(f3, f2, freq_ref) / (f4 - f1);
 
-    } else if (e1 <= e_ref && e_ref < e2) {
-        g = std::pow(e_ref - e1, 2) / ((e2 - e1) * (e3 - e1) * (e4 - e1));
+    } else if (f1 <= freq_ref && freq_ref < f2) {
+        g = std::pow(freq_ref - f1, 2) / ((f2 - f1) * (f3 - f1) * (f4 - f1));
 
-        I1 = g * (fij(e1, e2, e_ref) + fij(e1, e3, e_ref) + fij(e1, e4, e_ref));
-        I2 = g * fij(e2, e1, e_ref);
-        I3 = g * fij(e3, e1, e_ref);
-        I4 = g * fij(e4, e1, e_ref);
+        I1 = g * (fij(f1, f2, freq_ref) + fij(f1, f3, freq_ref) + fij(f1, f4, freq_ref));
+        I2 = g * fij(f2, f1, freq_ref);
+        I3 = g * fij(f3, f1, freq_ref);
+        I4 = g * fij(f4, f1, freq_ref);
 
     }
-    weights[k1] += vol * I1;
-    weights[k2] += vol * I2;
-    weights[k3] += vol * I3;
-    weights[k4] += vol * I4;
+    weights[q1] += vol * I1;
+    weights[q2] += vol * I2;
+    weights[q3] += vol * I3;
+    weights[q4] += vol * I4;
   }
 }
 
