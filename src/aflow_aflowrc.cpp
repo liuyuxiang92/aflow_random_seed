@@ -558,6 +558,10 @@
 #define         DEFAULT_AAPL_FREQ_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_FREQ_FILE")
 #define AFLOWRC_DEFAULT_AAPL_GVEL_FILE                        string("group_velocities.out")
 #define         DEFAULT_AAPL_GVEL_FILE                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_GVEL_FILE")
+#define AFLOWRC_DEFAULT_AAPL_PS_FILE                          string("phase_space.out")  // ME191104
+#define         DEFAULT_AAPL_PS_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_PS_FILE")  // ME191104
+#define AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE                  string("grueneisen.out")  // ME191104
+#define         DEFAULT_AAPL_GRUENEISEN_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_GRUENEISEN_FILE")  // ME191104
 #define AFLOWRC_DEFAULT_AAPL_RATES_FILE                       string("scattering_rates_total.out")
 #define         DEFAULT_AAPL_RATES_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_AAPL_RATES_FILE")
 #define AFLOWRC_DEFAULT_AAPL_RATES_3RD_FILE                   string("scattering_rates_anharmonic_3rd.out")
@@ -570,8 +574,9 @@
 #define         DEFAULT_AAPL_BOUNDARY_FILE                    XHOST.adefault.getattachedscheme("DEFAULT_AAPL_BOUNDARY_FILE")
 #define AFLOWRC_DEFAULT_AAPL_TCOND_FILE                       string("thermal_conductivity.out")
 #define         DEFAULT_AAPL_TCOND_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCOND_FILE")
-#define AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE                  string("thermal_conductivity.plt")
-#define         DEFAULT_AAPL_TCOND_PLOT_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCOND_PLOT_FILE")
+//OBSOLETE ME191104
+//#define AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE                  string("thermal_conductivity.plt")
+//#define         DEFAULT_AAPL_TCOND_PLOT_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_AAPL_TCOND_PLOT_FILE")
 
 
 // DEFAULT AEL
@@ -1264,13 +1269,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AAPL_IRRQPTS_FILE",AFLOWRC_DEFAULT_AAPL_IRRQPTS_FILE);
     aflowrc::load_default("DEFAULT_AAPL_FREQ_FILE",AFLOWRC_DEFAULT_AAPL_FREQ_FILE);
     aflowrc::load_default("DEFAULT_AAPL_GVEL_FILE",AFLOWRC_DEFAULT_AAPL_GVEL_FILE);
+    aflowrc::load_default("DEFAULT_AAPL_PS_FILE",AFLOWRC_DEFAULT_AAPL_PS_FILE);  // ME191104
+    aflowrc::load_default("DEFAULT_AAPL_GRUENEISEN_FILE",AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE);  // ME191104
     aflowrc::load_default("DEFAULT_AAPL_RATES_FILE",AFLOWRC_DEFAULT_AAPL_RATES_FILE);
     aflowrc::load_default("DEFAULT_AAPL_RATES_3RD_FILE",AFLOWRC_DEFAULT_AAPL_RATES_3RD_FILE);
     aflowrc::load_default("DEFAULT_AAPL_RATES_4TH_FILE",AFLOWRC_DEFAULT_AAPL_RATES_4TH_FILE);
     aflowrc::load_default("DEFAULT_AAPL_ISOTOPE_FILE",AFLOWRC_DEFAULT_AAPL_ISOTOPE_FILE);
     aflowrc::load_default("DEFAULT_AAPL_BOUNDARY_FILE",AFLOWRC_DEFAULT_AAPL_BOUNDARY_FILE);
     aflowrc::load_default("DEFAULT_AAPL_TCOND_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_FILE);
-    aflowrc::load_default("DEFAULT_AAPL_TCOND_PLOT_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE);
+    //aflowrc::load_default("DEFAULT_AAPL_TCOND_PLOT_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE);  OBSOLETE ME191104
  
     // DEFAULT AEL
     //// DEFAULT AEL STRAIN CALCS
@@ -1765,13 +1772,15 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AAPL_IRRQPTS_FILE=\"" << AFLOWRC_DEFAULT_AAPL_IRRQPTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_FREQ_FILE=\"" << AFLOWRC_DEFAULT_AAPL_FREQ_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_GVEL_FILE=\"" << AFLOWRC_DEFAULT_AAPL_GVEL_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_AAPL_PS_FILE=\"" << AFLOWRC_DEFAULT_AAPL_PS_FILE << "\"" << endl;  // ME191104
+    aflowrc << "DEFAULT_AAPL_GRUENEISEN_FILE=\"" << AFLOWRC_DEFAULT_AAPL_GRUENEISEN_FILE << "\"" << endl;  // ME191104
     aflowrc << "DEFAULT_AAPL_RATES_FILE=\"" << AFLOWRC_DEFAULT_AAPL_RATES_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_RATES_3RD_FILE=\"" << AFLOWRC_DEFAULT_AAPL_RATES_3RD_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_RATES_4TH_FILE=\"" << AFLOWRC_DEFAULT_AAPL_RATES_4TH_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_ISOTOPE_FILE=\"" << AFLOWRC_DEFAULT_AAPL_ISOTOPE_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_BOUNDARY_FILE=\"" << AFLOWRC_DEFAULT_AAPL_BOUNDARY_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AAPL_TCOND_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_FILE << "\"" << endl;
-    aflowrc << "DEFAULT_AAPL_TCOND_PLOT_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;
+    //aflowrc << "DEFAULT_AAPL_TCOND_PLOT_FILE=\"" << AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME191104
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AEL" << endl;
@@ -2232,13 +2241,15 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_IRRQPTS_FILE\")=\"" << DEFAULT_AAPL_IRRQPTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_FREQ_FILE\")=\"" << DEFAULT_AAPL_FREQ_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_GVEL_FILE\")=\"" << DEFAULT_AAPL_GVEL_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_PS_FILE\")=\"" << DEFAULT_AAPL_PS_FILE << "\"" << endl;  // ME191104
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_GRUENEISEN_FILE\")=\"" << DEFAULT_AAPL_GRUENEISEN_FILE << "\"" << endl;  // ME191104
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_RATES_FILE\")=\"" << DEFAULT_AAPL_RATES_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_RATES_3RD_FILE\")=\"" << DEFAULT_AAPL_RATES_3RD_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_RATES_4TH_FILE\")=\"" << DEFAULT_AAPL_RATES_4TH_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_ISOTOPE_FILE\")=\"" << DEFAULT_AAPL_ISOTOPE_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BOUNDARY_FILE\")=\"" << DEFAULT_AAPL_BOUNDARY_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_FILE\")=\"" << DEFAULT_AAPL_TCOND_FILE << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_PLOT_FILE\")=\"" << DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;
+    //if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_PLOT_FILE\")=\"" << DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME190411
     
     if(LDEBUG) oss << "// DEFAULTS AEL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_STRAIN_SYMMETRY\")=" << AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY << endl;

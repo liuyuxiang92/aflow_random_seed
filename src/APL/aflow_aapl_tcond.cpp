@@ -1179,7 +1179,7 @@ void TCONDCalculator::writeGroupVelocities() {
 }
 
 void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> > > >& phase_space) {
-  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + "phase_space.out");
+  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_PS_FILE);
 
   vector<double> ps_procs(4), ps_nu(2);
   vector<vector<double> > ps_modes(nIQPs, vector<double>(nBranches));
@@ -1227,7 +1227,7 @@ void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> 
 void TCONDCalculator::writeGrueneisen(const vector<double>& grueneisen_avg,
                                       const vector<vector<double> >& grueneisen_modes) {
   stringstream output;
-  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + "grueneisen.out");
+  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GRUENEISEN_FILE);
 
   output << AFLOWIN_SEPARATION_LINE << std::endl;
   output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc.getSystemName() << std::endl;

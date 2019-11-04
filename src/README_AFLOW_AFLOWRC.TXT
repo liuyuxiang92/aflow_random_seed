@@ -1102,6 +1102,11 @@ DEFAULT_APL_ZEROSTATE
   type: bool
   default: 1
 
+DEFAULT_APL_ZEROSTATE_CHGCAR
+  description: Use the CHGCAR of the ZEROSTATE calculation to be read by other APL and AAPL calculations.
+  type: bool
+  default: 0
+
 DEFAULT_APL_USE_LEPSILON
   description: Use LEPSILON for the calculation of the Born effective charge tensor. Otherwise, use LCALCEPS.
   type: bool
@@ -1292,14 +1297,24 @@ DEFAULT_AAPL_IRRQPTS_FILE
   default: "irred_qpoints.out"
 
 DEFAULT_AAPL_FREQ_FILE
-  description: Output file for the harmonic frequencies at the q-points used for thermal conductivity calculations.
+  description: Output file for the harmonic frequencies of the phonon modes used for thermal conductivity calculations.
   type: string
   default: "frequencies.out"
 
 DEFAULT_AAPL_GVEL_FILE
-  description: Output file for the group velocities at the q-points used for thermal conductivity calculations.
+  description: Output file for the group velocities of the phonon modes used for thermal conductivity calculations.
   type: string
   default: "group_velocities.out"
+
+DEFAULT_AAPL_PS_FILE
+  description: Output file for the phase space of the phonon modes obtained from thermal conductivity calculations.
+  type: string
+  default: "phase_space.out"
+
+DEFAULT_AAPL_GRUENEISEN_FILE
+  description: Output file for the average and mode Grueneisen parameters obtained from thermal conductivity calculations.
+  type: string
+  default: "grueneisen.out"
 
 DEFAULT_AAPL_RATES_FILE
   description: Output file for the total phonon scattering rates.

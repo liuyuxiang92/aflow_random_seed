@@ -486,7 +486,11 @@ namespace apl
 	{
           // ME190726 - exit clean-up
 	  //_logger << apl::error << file<<" Wrong format." << apl::endl; exit(0);
-          throw APLRuntimeError("Wrong format in file " + file + ".");
+          // ME191031 - use xerror
+          //throw APLRuntimeError("Wrong format in file " + file + ".");
+          string function = "QH_ENERGIES::get_pdos()";
+          string message = "Wrong format in file " + file + ".";
+          throw aurostd::xerror(function, message, _FILE_CORRUPT_);
 	}
       vector<double>  tmp(2, 0.0);
       tmp[0]=atof(vstr[0].c_str());

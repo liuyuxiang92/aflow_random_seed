@@ -1384,7 +1384,7 @@ MVops::apl_matrix_row(apl_matrix<T> *m, const size_t i) {
     //cerr << "row index is out of range" << std::endl;
     //exit(0);
     // ME191031 - use xerror
-    throw APLRuntimeError("row index is out of range");
+    //throw APLRuntimeError("row index is out of range");
     string function = "MVops::apl_matrix_row()";
     string message = "row index is out of range";
     throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
@@ -1848,7 +1848,7 @@ inline apl_complex<T> MVops::apl_vector_complex_get(const apl_vector_complex<T> 
     //cerr << "index out of range" << std::endl;
     //exit(0);
     // ME191031 - use xerror
-    throw APLRuntimeError("index out of range");
+    //throw APLRuntimeError("index out of range");
     string function = "MVops::apl_vector_complex_get()";
     string message = "index out of range";
     throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
@@ -3273,7 +3273,7 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
     //cerr << "matrix A must have M >= N" << std::endl;
     //exit(0);
     // ME191031 - use xerror
-    throw APLRuntimeError("matrix A must have M >= N");
+    //throw APLRuntimeError("matrix A must have M >= N");
     string function = "MVops::apl_linalg_bidiag_unpack2()";
     string message = "matrix A must have M >= N";
     throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
@@ -3300,7 +3300,7 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
     //cerr << "size of V must be N x N" << std::endl;
     //exit(0);
     // ME191031 - use xerror
-    throw APLRuntimeError("size of V must be N x N");
+    //throw APLRuntimeError("size of V must be N x N");
     string function = "MVops::apl_linalg_bidiag_unpack2()";
     string message = "size of V must be N x N";
     throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
@@ -7914,7 +7914,7 @@ int MVops::apl_blas_zgemv(APL_TRANSPOSE_t TransA, const apl_complex<double> alph
     //     << "\n";
     //exit(0);
     // ME191031 - use xerror
-    throw APLRuntimeError("invalid length");
+    //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_zgemv()";
     string message = "invalid length";
     throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
