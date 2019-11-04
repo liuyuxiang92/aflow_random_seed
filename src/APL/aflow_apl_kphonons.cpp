@@ -2167,6 +2167,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
       logger << "Preparing a q-mesh of " << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << "." << apl::endl;
       apl::QMesh qmtcond(USER_THERMALGRID, phcalc->getInputCellStructure(), logger, true);
       qmtcond.makeIrreducible();
+      qmtcond.writeQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_QPOINTS_FILE);
+      qmtcond.writeIrredQpoints(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_IRRQPTS_FILE);
 
       // Do the thermal conductivity calculation
       logger << "Starting thermal conductivity calculations." << apl::endl;

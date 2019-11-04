@@ -35,6 +35,7 @@ static const double hbar_J = E_ELECTRON * 1e12 * PLANCKSCONSTANTEV_hbar;  // hba
 static const double hbar_amu = PLANCKSCONSTANTEV_hbar * au2THz * 1e13;  // hbar in amu A^2 THz
 static const double BEfactor = PLANCKSCONSTANTEV_hbar * 1e12/KBOLTZEV;  // hbar/kB in K/THz
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
+static const double TCOND_ITER_THRESHOLD = 1e-4;  // Convergence criterion for thermal conductivity
 
 using aurostd::xcomplex;
 using aurostd::xmatrix;
@@ -145,9 +146,15 @@ void TCONDCalculator::calculateThermalConductivity() {
   calculateTransitionProbabilities();
   vector<vector<int> > small_groups = calculateSmallGroups();
   thermal_conductivity.assign(temperatures.size(), xmatrix<double>(3, 3));
+  vector<vector<vector<double> > > rates_total, rates_anharm;
   for (uint t = 0; t < temperatures.size(); t++) {
-    thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], small_groups);
+    thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], small_groups, rates_total, rates_anharm);
   }
+
+  string filename_rates = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
+  writeTempDepOutput(filename_rates, "SCATTERING_RATES", "1/ps", temperatures, rates_total);
+  string filename_anharm = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_3RD_FILE);
+  writeTempDepOutput(filename_anharm, "SCATTERING_RATES_ANHARMONIC", "1/ps", temperatures, rates_anharm);
   writeThermalConductivity();
 }
 
@@ -238,98 +245,122 @@ void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
 
 }  // namespace apl
 
-/********************************** WEIGHTS *********************************/
+/******************************** GRUENEISEN ********************************/
 
 namespace apl {
 
-double fij(double ei, double ej, double e) {
-  return (e - ej)/(ei - ej);
+vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases) {
+  vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
+
+  const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
+  const Supercell& scell = _pc.getSupercell();
+
+  const vector<_cluster>& clusters = _pc._clusters[0].clusters;
+  uint nclusters = clusters.size();
+  vector<double> invmasses(nclusters);
+  for (uint c = 0; c < nclusters; c++) {
+    double mass = 1.0;
+    for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c].atoms[i]);
+    invmasses[c] = 1/sqrt(mass);
+  }
+
+  vector<vector<int> > cart_indices;
+  aurostd::xcombos cart(3, 3, 'E', true);
+  while (cart.increment()) cart_indices.push_back(cart.getCombo());
+  uint ncart = cart_indices.size();
+
+  int natoms = (int) _pc.getInputCellStructure().atoms.size();
+  vector<int> atpowers(2, 1);
+  vector<vector<int> > at_eigen;
+  aurostd::xcombos at_combos(natoms, 2, 'E' , true);
+  while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
+  uint nateigen = at_eigen.size();
+  vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
+
+  const xstructure& scell_xstr = scell.getSupercellStructure();
+  uint natoms_sc = scell_xstr.atoms.size();
+  vector<vector<xvector<double> > > min_dist(natoms, vector<xvector<double> >(natoms_sc));
+  for (int i = 0; i < natoms; i++) {
+    const xvector<double>& iat_cpos = scell_xstr.atoms[scell.pc2scMap(i)].cpos;
+    for (uint j = 0; j < natoms_sc; j++) {
+      min_dist[i][j] = SYM::minimizeDistanceCartesianMethod(scell_xstr.atoms[j].cpos, iat_cpos, scell_xstr.lattice);
+    }
+  }
+
+  int at1_pc, at2_sc, at2_pc, at3_sc, e, q;
+  double ifc_prod;
+  uint c, crt;
+  xcomplex<double> prefactor, eigen, g_mode;
+  for (int iq = 0; iq < nIQPs; iq++) {
+    q = _qm.getIbzqpts()[iq];
+    for (int br = 0; br < nBranches; br++) {
+      if (freq[q][br] > _AFLOW_APL_EPS_) {
+        g_mode.re = 0.0;
+        g_mode.im = 0.0;
+
+        // Precompute eigenvalue products
+        for (c = 0; c < nateigen; c++) {
+          for (crt = 0; crt < ncart; crt++) {
+            e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
+            eigen = conj(eigenvectors[q][e][br + 1]);
+            e = at_eigen[c][1] * 3 + cart_indices[crt][1] + 1;
+            eigen *= eigenvectors[q][e][br + 1];
+            eigenprods[c][crt] = eigen;
+          }
+        }
+
+        for (c = 0; c < nclusters; c++) {
+          at1_pc = scell.sc2pcMap(clusters[c].atoms[0]);
+          at2_sc = clusters[c].atoms[1];
+          at2_pc = scell.sc2pcMap(at2_sc);
+          at3_sc = clusters[c].atoms[2];
+          prefactor = invmasses[c] * phases[at1_pc][at2_sc][q];
+          e = at1_pc * natoms + at2_pc;
+          for (crt = 0; crt < ncart; crt++) {
+            ifc_prod = ifcs[c][crt] * min_dist[at1_pc][at3_sc][cart_indices[crt][2] + 1];
+            // Perform multiplication expliclty in place instead of using xcomplex.
+            // This is three times faster because constructors and destructors are not called.
+            g_mode.re += ifc_prod * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
+            g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
+          }
+        }
+        g_mode *= -10.0*au2THz/(6.0 * std::pow(freq[q][br], 2));
+        if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
+          _logger << apl::warning << " Grueneisen parameter at mode "
+                                  << iq << ", " << br << " is not real ("
+                                  << g_mode.re << ", " << g_mode.im << ")." << apl::endl;
+        }
+        grueneisen[iq][br] = g_mode.re;
+      } else {
+        grueneisen[iq][br] = 0.0;
+      }
+    }
+  }
+
+  return grueneisen;
 }
 
-void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
-                                   const vector<double>& energy, vector<double>& weights) {
-  for (int q = 0; q < nQPs; q++) weights[q] = 0;
-  const vector<vector<int> >& corners = _lt.getTetrahedra();
-  double vol = _lt.getVolumePerTetrahedron();
-  int ntet = _lt.getnTetrahedra();
-
-  double g, tmp;
-  int i, j, ii, jj;
-
-  double e_tmp[4];
-  int sort_arg[4], kindex[4];
-
-  for (i = 0; i < ntet; i++) {
-    for (j = 0; j < 4; j++) {
-      e_tmp[j] = energy[corners[i][j]];
-      kindex[j] = corners[i][j];
-    }
-
-    for (ii = 0; ii < 4; ii++) sort_arg[ii] = ii;
-
-    for (ii = 0; ii < 4; ii++) {
-      tmp = e_tmp[ii];
-      jj = ii;
-      while (jj > 0 && tmp < e_tmp[jj - 1]) {
-        e_tmp[jj] = e_tmp[jj - 1];
-        sort_arg[jj] = sort_arg[jj - 1];
-        jj--;
+double TCONDCalculator::calculateAverageGrueneisen(double T,
+                                                   const vector<vector<double> >& grueneisen_modes) {
+  vector<vector<double> > occ = getOccupationNumbers(T);
+  int iq;
+  double c, c_tot = 0, g_tot = 0;
+  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2));
+  for (int q = 0; q < nQPs; q++) {
+    iq = _qm.getIbzqpt(q);
+    for (int br = 0; br < nBranches; br++) {
+      if (freq[q][br] > _AFLOW_APL_EPS_) {
+        c = prefactor * occ[q][br] * (1.0 + occ[q][br]) * std::pow(freq[q][br], 2);
+        c_tot += c;
+        g_tot += grueneisen_modes[iq][br] * c;
       }
-      e_tmp[jj] = tmp;
-      sort_arg[jj] = ii;
     }
-
-    double e1 = e_tmp[0];
-    double e2 = e_tmp[1];
-    double e3 = e_tmp[2];
-    double e4 = e_tmp[3];
-
-    if (aurostd::isequal(e1, e4)) continue;
-
-    int k1 = kindex[sort_arg[0]];
-    int k2 = kindex[sort_arg[1]];
-    int k3 = kindex[sort_arg[2]];
-    int k4 = kindex[sort_arg[3]];
-
-    double I1 = 0.0;
-    double I2 = 0.0;
-    double I3 = 0.0;
-    double I4 = 0.0;
-
-    if (e3 <= e_ref && e_ref < e4) {
-        g = std::pow(e4 - e_ref, 2) / ((e4 - e1) * (e4 - e2) * (e4 - e3));
-
-        I1 = g * fij(e1, e4, e_ref);
-        I2 = g * fij(e2, e4, e_ref);
-        I3 = g * fij(e3, e4, e_ref);
-        I4 = g * (fij(e4, e1, e_ref) + fij(e4, e2, e_ref) + fij(e4, e3, e_ref));
-
-    } else if (e2 <= e_ref && e_ref < e3) {
-        g = (e2 - e1 + 2.0 * (e_ref - e2) - (e4 + e3 - e2 - e1)
-            * std::pow(e_ref - e2, 2) / ((e3 - e2) * (e4 - e2))) / ((e3 - e1) * (e4 - e1));
-
-        I1 = g * fij(e1, e4, e_ref) + fij(e1, e3, e_ref) * fij(e3, e1, e_ref) * fij(e2, e3, e_ref) / (e4 - e1);
-        I2 = g * fij(e2, e3, e_ref) + std::pow(fij(e2, e4, e_ref), 2) * fij(e3, e2, e_ref) / (e4 - e1);
-        I3 = g * fij(e3, e2, e_ref) + std::pow(fij(e3, e1, e_ref), 2) * fij(e2, e3, e_ref) / (e4 - e1);
-        I4 = g * fij(e4, e1, e_ref) + fij(e4, e2, e_ref) * fij(e2, e4, e_ref) * fij(e3, e2, e_ref) / (e4 - e1);
-
-    } else if (e1 <= e_ref && e_ref < e2) {
-        g = std::pow(e_ref - e1, 2) / ((e2 - e1) * (e3 - e1) * (e4 - e1));
-
-        I1 = g * (fij(e1, e2, e_ref) + fij(e1, e3, e_ref) + fij(e1, e4, e_ref));
-        I2 = g * fij(e2, e1, e_ref);
-        I3 = g * fij(e3, e1, e_ref);
-        I4 = g * fij(e4, e1, e_ref);
-
-    }
-    weights[k1] += vol * I1;
-    weights[k2] += vol * I2;
-    weights[k3] += vol * I3;
-    weights[k4] += vol * I4;
   }
+  return (g_tot/c_tot);
 }
 
 }  // namespace apl
+
 
 /************************* TRANSITION PROBABILITIES *************************/
 
@@ -403,10 +434,14 @@ void TCONDCalculator::calculateTransitionProbabilities() {
       _logger.finishProgressBar();
 #endif
     }
+    string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_ISOTOPE_FILE);
+    writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
   }
 
   if (calc_options.flag("BOUNADRY")) {
     rates_boundary = calculateTransitionProbabilitiesBoundary();
+    string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
+    writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
   }
 }
 
@@ -669,119 +704,95 @@ vector<vector<double> > TCONDCalculator::calculateTransitionProbabilitiesBoundar
   return rates;
 }
 
-/******************************** GRUENEISEN ********************************/
-
-vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases) {
-  vector<vector<double> > grueneisen(nIQPs, vector<double>(nBranches));
-
-  const vector<vector<double> >& ifcs = _pc._anharmonicIFCs[0].force_constants;
-  const Supercell& scell = _pc.getSupercell();
-
-  const vector<_cluster>& clusters = _pc._clusters[0].clusters;
-  uint nclusters = clusters.size();
-  vector<double> invmasses(nclusters);
-  for (uint c = 0; c < nclusters; c++) {
-    double mass = 1.0;
-    for (int i = 0; i < 2; i++) mass *= scell.getAtomMass(clusters[c].atoms[i]);
-    invmasses[c] = 1/sqrt(mass);
-  }
-
-  vector<vector<int> > cart_indices;
-  aurostd::xcombos cart(3, 3, 'E', true);
-  while (cart.increment()) cart_indices.push_back(cart.getCombo());
-  uint ncart = cart_indices.size();
-
-  int natoms = (int) _pc.getInputCellStructure().atoms.size();
-  vector<int> atpowers(2, 1);
-  vector<vector<int> > at_eigen;
-  aurostd::xcombos at_combos(natoms, 2, 'E' , true);
-  while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
-  uint nateigen = at_eigen.size();
-  vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
-
-  const xstructure& scell_xstr = scell.getSupercellStructure();
-  uint natoms_sc = scell_xstr.atoms.size();
-  vector<vector<xvector<double> > > min_dist(natoms, vector<xvector<double> >(natoms_sc));
-  for (int i = 0; i < natoms; i++) {
-    const xvector<double>& iat_cpos = scell_xstr.atoms[scell.pc2scMap(i)].cpos;
-    for (uint j = 0; j < natoms_sc; j++) {
-      min_dist[i][j] = SYM::minimizeDistanceCartesianMethod(scell_xstr.atoms[j].cpos, iat_cpos, scell_xstr.lattice);
-    }
-  }
-
-  int at1_pc, at2_sc, at2_pc, at3_sc, e, q;
-  double ifc_prod;
-  uint c, crt;
-  xcomplex<double> prefactor, eigen, g_mode;
-  for (int iq = 0; iq < nIQPs; iq++) {
-    q = _qm.getIbzqpts()[iq];
-    for (int br = 0; br < nBranches; br++) {
-      if (freq[q][br] > _AFLOW_APL_EPS_) {
-        g_mode.re = 0.0;
-        g_mode.im = 0.0;
-
-        // Precompute eigenvalue products
-        for (c = 0; c < nateigen; c++) {
-          for (crt = 0; crt < ncart; crt++) {
-            e = at_eigen[c][0] * 3 + cart_indices[crt][0] + 1;
-            eigen = conj(eigenvectors[q][e][br + 1]);
-            e = at_eigen[c][1] * 3 + cart_indices[crt][1] + 1;
-            eigen *= eigenvectors[q][e][br + 1];
-            eigenprods[c][crt] = eigen;
-          }
-        }
-
-        for (c = 0; c < nclusters; c++) {
-          at1_pc = scell.sc2pcMap(clusters[c].atoms[0]);
-          at2_sc = clusters[c].atoms[1];
-          at2_pc = scell.sc2pcMap(at2_sc);
-          at3_sc = clusters[c].atoms[2];
-          prefactor = invmasses[c] * phases[at1_pc][at2_sc][q];
-          e = at1_pc * natoms + at2_pc;
-          for (crt = 0; crt < ncart; crt++) {
-            ifc_prod = ifcs[c][crt] * min_dist[at1_pc][at3_sc][cart_indices[crt][2] + 1];
-            // Perform multiplication expliclty in place instead of using xcomplex.
-            // This is three times faster because constructors and destructors are not called.
-            g_mode.re += ifc_prod * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
-            g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
-          }
-        }
-        g_mode *= -10.0*au2THz/(6.0 * std::pow(freq[q][br], 2));
-        if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
-          _logger << apl::warning << " Grueneisen parameter at mode "
-                                  << iq << ", " << br << " is not real ("
-                                  << g_mode.re << ", " << g_mode.im << ")." << apl::endl;
-        }
-        grueneisen[iq][br] = g_mode.re;
-      } else {
-        grueneisen[iq][br] = 0.0;
-      }
-    }
-  }
-
-  return grueneisen;
+double fij(double ei, double ej, double e) {
+  return (e - ej)/(ei - ej);
 }
 
-double TCONDCalculator::calculateAverageGrueneisen(double T,
-                                                   const vector<vector<double> >& grueneisen_modes) {
-  vector<vector<double> > occ = getOccupationNumbers(T);
-  int iq;
-  double c, c_tot = 0, g_tot = 0;
-  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2));
-  for (int q = 0; q < nQPs; q++) {
-    iq = _qm.getIbzqpt(q);
-    for (int br = 0; br < nBranches; br++) {
-      if (freq[q][br] > _AFLOW_APL_EPS_) {
-        c = prefactor * occ[q][br] * (1.0 + occ[q][br]) * std::pow(freq[q][br], 2);
-        c_tot += c;
-        g_tot += grueneisen_modes[iq][br] * c;
-      }
+void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double e_ref,
+                                   const vector<double>& energy, vector<double>& weights) {
+  for (int q = 0; q < nQPs; q++) weights[q] = 0;
+  const vector<vector<int> >& corners = _lt.getTetrahedra();
+  double vol = _lt.getVolumePerTetrahedron();
+  int ntet = _lt.getnTetrahedra();
+
+  double g, tmp;
+  int i, j, ii, jj;
+
+  double e_tmp[4];
+  int sort_arg[4], kindex[4];
+
+  for (i = 0; i < ntet; i++) {
+    for (j = 0; j < 4; j++) {
+      e_tmp[j] = energy[corners[i][j]];
+      kindex[j] = corners[i][j];
     }
+
+    for (ii = 0; ii < 4; ii++) sort_arg[ii] = ii;
+
+    for (ii = 0; ii < 4; ii++) {
+      tmp = e_tmp[ii];
+      jj = ii;
+      while (jj > 0 && tmp < e_tmp[jj - 1]) {
+        e_tmp[jj] = e_tmp[jj - 1];
+        sort_arg[jj] = sort_arg[jj - 1];
+        jj--;
+      }
+      e_tmp[jj] = tmp;
+      sort_arg[jj] = ii;
+    }
+
+    double e1 = e_tmp[0];
+    double e2 = e_tmp[1];
+    double e3 = e_tmp[2];
+    double e4 = e_tmp[3];
+
+    if (aurostd::isequal(e1, e4)) continue;
+
+    int k1 = kindex[sort_arg[0]];
+    int k2 = kindex[sort_arg[1]];
+    int k3 = kindex[sort_arg[2]];
+    int k4 = kindex[sort_arg[3]];
+
+    double I1 = 0.0;
+    double I2 = 0.0;
+    double I3 = 0.0;
+    double I4 = 0.0;
+
+    if (e3 <= e_ref && e_ref < e4) {
+        g = std::pow(e4 - e_ref, 2) / ((e4 - e1) * (e4 - e2) * (e4 - e3));
+
+        I1 = g * fij(e1, e4, e_ref);
+        I2 = g * fij(e2, e4, e_ref);
+        I3 = g * fij(e3, e4, e_ref);
+        I4 = g * (fij(e4, e1, e_ref) + fij(e4, e2, e_ref) + fij(e4, e3, e_ref));
+
+    } else if (e2 <= e_ref && e_ref < e3) {
+        g = (e2 - e1 + 2.0 * (e_ref - e2) - (e4 + e3 - e2 - e1)
+            * std::pow(e_ref - e2, 2) / ((e3 - e2) * (e4 - e2))) / ((e3 - e1) * (e4 - e1));
+
+        I1 = g * fij(e1, e4, e_ref) + fij(e1, e3, e_ref) * fij(e3, e1, e_ref) * fij(e2, e3, e_ref) / (e4 - e1);
+        I2 = g * fij(e2, e3, e_ref) + std::pow(fij(e2, e4, e_ref), 2) * fij(e3, e2, e_ref) / (e4 - e1);
+        I3 = g * fij(e3, e2, e_ref) + std::pow(fij(e3, e1, e_ref), 2) * fij(e2, e3, e_ref) / (e4 - e1);
+        I4 = g * fij(e4, e1, e_ref) + fij(e4, e2, e_ref) * fij(e2, e4, e_ref) * fij(e3, e2, e_ref) / (e4 - e1);
+
+    } else if (e1 <= e_ref && e_ref < e2) {
+        g = std::pow(e_ref - e1, 2) / ((e2 - e1) * (e3 - e1) * (e4 - e1));
+
+        I1 = g * (fij(e1, e2, e_ref) + fij(e1, e3, e_ref) + fij(e1, e4, e_ref));
+        I2 = g * fij(e2, e1, e_ref);
+        I3 = g * fij(e3, e1, e_ref);
+        I4 = g * fij(e4, e1, e_ref);
+
+    }
+    weights[k1] += vol * I1;
+    weights[k2] += vol * I2;
+    weights[k3] += vol * I3;
+    weights[k4] += vol * I4;
   }
-  return (g_tot/c_tot);
 }
 
 }  // namespace apl
+
 
 /************************************ BTE ***********************************/
 
@@ -805,11 +816,14 @@ void TCONDCalculator::getProcess(const vector<int>& process,
 }
 
 xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
-                                                                    const vector<vector<int> >& small_groups) {
+                                                                    const vector<vector<int> >& small_groups,
+                                                                    vector<vector<vector<double> > >& rates_total,
+                                                                    vector<vector<vector<double> > >& rates_anharm) {
   _logger << "Calculating thermal conductivity for " << T << " K." << apl::endl;
   vector<vector<double> > occ = getOccupationNumbers(T);
   _logger << "Calculating scattering rates." << apl::endl;
-  vector<vector<double> > rates = getRates(occ);
+  vector<vector<double> > rates = getRates(occ, rates_anharm);
+  rates_total.push_back(rates);
 
   _logger << "Calculating RTA" << apl::endl;
   vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates);
@@ -827,6 +841,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
     do {
       tcond_prev = tcond;
       getMeanFreeDispFull(rates, occ, small_groups, mfd);
+
       tcond = calcTCOND(T, occ, mfd);
       norm = frobenius_norm(tcond_prev - tcond);
       std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -834,7 +849,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
       std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
       std::cout << std::setw(25) << std::dec << (norm) << std::endl;
       num_iter++;
-    } while ((std::abs(norm) > 1e-5) && (num_iter <= max_iter));
+    } while ((std::abs(norm) > TCOND_ITER_THRESHOLD) && (num_iter <= max_iter));
     if (num_iter > max_iter) {
       string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor()";
       stringstream message;
@@ -902,8 +917,10 @@ double TCONDCalculator::getOccupationTerm(const vector<vector<double> >& occ, in
   }
 }
 
-vector<vector<double> > TCONDCalculator::getRates(const vector<vector<double> >& occ) {
+vector<vector<double> > TCONDCalculator::getRates(const vector<vector<double> >& occ,
+                                                  vector<vector<vector<double> > >& rates_anharm) {
   vector<vector<double> > rates = calculateAnharmonicRates(occ);
+  rates_anharm.push_back(rates);
 
   if (calc_options.flag("ISOTOPE")) {
     for (int iq = 0; iq < nIQPs; iq++) {
@@ -1103,8 +1120,7 @@ void TCONDCalculator::writeTempDepOutput(const string& filename, string keyword,
   }
   output << key << "START" << std::endl;
   for (uint t = 0; t < temps.size(); t++) {
-    output << std::setiosflags(std::ios::fixed | std::ios::right);
-    output << key << "T = " << temps[t] << " K" << std::endl;
+    output << key << "T = " << std::fixed << std::setprecision(2) << temps[t] << " K" << std::endl;
     output << std::setw(10) << "# Q-point"
            << std::setw(20) << " "
            << keyword << " (" << unit << ")" << std::endl;

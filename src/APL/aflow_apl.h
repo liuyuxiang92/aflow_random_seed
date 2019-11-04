@@ -355,7 +355,6 @@ class AnharmonicIFCs {
     void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
     vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
                                                        const vector<vector<vector<xvector<double> > > >&);
-//    double calculateIFC(const vector<vector<xvector<double> > >&, int,
     double finiteDifference(const vector<vector<xvector<double> > >&, int,
                             const vector<int>&, const vector<int>&);
 
@@ -364,10 +363,7 @@ class AnharmonicIFCs {
     typedef vector<std::pair<vector<int>, vector<double> > > tform;
     typedef vector<vector<vector<vector<int> > > > v4int;
     void getTensorTransformations(v4int&, vector<vector<tform> >&);
-    //vector<vector<double> > initializeIFCTensor(const vector<aurostd::xtensor<double> >&);  - OBSOLETE ME190522
-    //aurostd::xtensor<double> initializeDeviationsFromZero(); - OBSOLETE ME190521
     vector<vector<int> > getReducedClusters();
-    // vector<vector<vector<int> > > getAllClusters(v5int&); - OBSOLETE ME190521
     void applyLinCombs(vector<vector<double> >&);
     void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
     void applyPermutations(vector<int>, vector<vector<double> >&);
@@ -1602,12 +1598,14 @@ class TCONDCalculator {
     void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
     vector<vector<double> > calculateTransitionProbabilitiesBoundary();
     void getProcess(const vector<int>&, vector<int>&, vector<int>&);
-    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&);
+    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&,
+                                                       vector<vector<vector<double> > >&,
+                                                       vector<vector<vector<double> > >&);
     vector<vector<double> > getOccupationNumbers(double);
     vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
-    void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
+    vector<vector<double> > getRates(const vector<vector<double> >&, vector<vector<vector<double> > >&);
     double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
-    vector<vector<double> > getRates(const vector<vector<double> >&);
+    void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
     vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
     xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
                               const vector<vector<xvector<double> > >&);
