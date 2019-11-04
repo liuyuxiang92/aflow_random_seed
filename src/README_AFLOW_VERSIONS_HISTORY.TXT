@@ -9,7 +9,6 @@
         -- Fixed bug in APL and AAPL that did not properly process -D option. (ME)
         -- Removed unused source files. (ME)
         -- Added matrix norms to aurostd::xmatrix. (ME)
-
 3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cache of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
