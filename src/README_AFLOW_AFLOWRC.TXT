@@ -48,6 +48,39 @@ DEFAULT_KZIP_EXT
   default: ".xz"
 
 ####################################################################################################
+DEFAULTS FOR THE AFLOW DATABASE
+
+DEFAULT_AFLOW_DB_FILE
+  description: The location of the AFLOW database file.
+  type: string
+  default: "/mnt/ramd/aflowlib.db"
+
+DEFAULT_AFLOW_DB_STATS_FILE
+  description: The location of the AFLOW database statistics file.
+  type: string
+  default: "/mnt/ramd/aflowlib.json"
+
+DEFAULT_AFLOW_DB_DATA_PATH
+  description: The location of the AFLOW database JSON files.
+  type: string
+  default: "/common/AFLOW/LIBS/"
+
+DEFAULT_AFLOW_DB_SCHEMA_FILE
+  description: The location of the AFLOW database schema file.
+  type: string
+  default: "/www/search/aapi_schema.json"
+
+DEFAULT_AFLOW_DB_LOCK_FILE
+  description: The location of the AFLOW database lock file.
+  type: string
+  default: "/mnt/ramd/ADB_Idle.lock"
+
+DEFAULT_AFLOW_DB_STALE_THRESHOLD
+  description: The time in seconds at which the AFLOW database rebuild process is considered stale.
+  type: double
+  default: 10,800 (3 hours)
+
+####################################################################################################
 FILENAMES FOR AFLOW.ORG ANALYSIS
 
 DEFAULT_FILE_AFLOWLIB_ENTRY_OUT
