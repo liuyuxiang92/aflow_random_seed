@@ -45,7 +45,7 @@ void PhononCalculator::setAnharmonicOptions(int iter, double mix, double thresho
 
 //buildVaspAAPL///////////////////////////////////////////////////////////////
 // Creates the folders for the VASP calculations.
-bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
+bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst, bool zerostate_chgcar) {
   bool stagebreak = false;
   _xInput.xvasp.AVASP_arun_mode = "AAPL";
   _logger << "Managing directories for ";
@@ -80,6 +80,12 @@ bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
   vector<_xinput>& xinp = xInputsAAPL.back();
   xinp.assign(nruns, _xInput);
   
+  string chgcar_file = "";
+  if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
+    chgcar_file = "../" + zerostate_dir + "/CHGCAR.static";
+    if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
+  }
+
   int idxRun = 0;
   for (uint ineq = 0; ineq < clst.ineq_distortions.size(); ineq++) {
     const vector<int>& atoms = clst.ineq_distortions[ineq].atoms;  // ME190108 - Declare to make code more legible
@@ -95,10 +101,9 @@ bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
       }
       xstr.title += " AAPL supercell=" + aurostd::joinWDelimiter(clst.sc_dim, 'x');
 
-      // ME 190113 - make sure that POSCAR has the correct format
-      if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
-          (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
-        xstr.is_vasp5_poscar_format = false;
+      xinp[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
+      if (zerostate_chgcar) {
+        xinp[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
       }
 
       // Set up runname and generate distorted structure
@@ -238,10 +243,12 @@ void PhononCalculator::calculateAnharmonicIFCs(ClusterSet& clst) {
         throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
       }
     }
-    subtractZeroStateForcesAAPL(xInputsAAPL[o], xInputs.back());
+    uint zeroindex = xInputs.size() - 1;
+    if (_isPolarMaterial) zeroindex--;
+    subtractZeroStateForcesAAPL(xInputsAAPL[o], xInputs[zeroindex]);
   }
   AnharmonicIFCs ifcs(xInputsAAPL[o], clst, DISTORTION_MAGNITUDE,
-                      anharmonic_IFC_options, _logger);
+                      anharmonic_IFC_options, _logger, _aflowFlags);
   _anharmonicIFCs.push_back(ifcs);
   // Clear runs from memory because they are no longer needed
   xInputsAAPL[o].clear();
@@ -252,7 +259,7 @@ void PhononCalculator::readAnharmonicIFCs(const string& filename, ClusterSet& cl
   _logger << "Reading anharmonic IFCs from file " << filename << "." << apl::endl;
   int o = clst.order - 3;
   AnharmonicIFCs ifcs(filename, clst, DISTORTION_MAGNITUDE,
-                      anharmonic_IFC_options, _logger);
+                      anharmonic_IFC_options, _logger, _aflowFlags);
   _anharmonicIFCs.push_back(ifcs);
   // Clear runs from memory because they are no longer needed
   xInputsAAPL[o].clear();
@@ -267,8 +274,8 @@ void PhononCalculator::subtractZeroStateForcesAAPL(vector<_xinput>& xinps, _xinp
       if (!aurostd::EFileExist(vasprunxml_file)) {
         vasprunxml_file = zerostate.getDirectory() + string("/vasprun.xml");
         if (!aurostd::EFileExist(vasprunxml_file)) {
-          _logger << apl::warning << "The vasprun.xml file in " << zerostate.getDirectory() << " directory is missing." << apl::endl;
-          throw APLRuntimeError("apl::PhononCalculator::subtractZeroStateForcesAAL(); Missing data from the ZEROSTATE calculation.");
+          _logger << apl::warning << "The output file in the directory " << zerostate.getDirectory() << " is missing." << apl::endl;
+          throw aurostd::xerror("apl::PhononCalculator::subtractZeroStateForcesAAPL()", "Missing data from the ZEROSTATE calculation.", _FILE_NOT_FOUND_);
         }
       }
       xVASPRUNXML vasprunxml;
@@ -277,14 +284,14 @@ void PhononCalculator::subtractZeroStateForcesAAPL(vector<_xinput>& xinps, _xinp
     } else if (_kbinFlags.AFLOW_MODE_AIMS) {
       if (!aurostd::EFileExist(zerostate.getDirectory() + string("/aims.out"))) {
         _logger << apl::warning << "The aims.out file in " << zerostate.getDirectory() << " directory is missing." << apl::endl;
-        throw APLRuntimeError("apl::PhononCalculator::subtractZeroStateForcesAAPL; Missing data from one job.");
+        throw aurostd::xerror("apl::PhononCalculator::subtractZeroStateForcesAAPL", "Missing data from the ZEROSTATE calculation", _FILE_NOT_FOUND_);
       }
       xAIMSOUT xaimsout(zerostate.getDirectory() + "/aims.out");
       zerostate.getXStr().qm_forces = xaimsout.vforces;
     }
     if ((int) zerostate.getXStr().qm_forces.size() != _supercell.getNumberOfAtoms()) {
-      _logger << apl::warning << "The output file in " << zerostate.getDirectory() << " is wrong." << apl::endl;
-      throw APLRuntimeError("apl::PhononCalculator::subtractZeroStateForcesAAPL(); Missing data from one job.");
+      _logger << apl::warning << "The output file in " << zerostate.getDirectory() << " is contains less entries than atoms in the supercell." << apl::endl;
+      throw aurostd::xerror("apl::PhononCalculator::subtractZeroStateForcesAAPL()", "Missing data from one job.", _RUNTIME_ERROR_);
     }
   }
   for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {

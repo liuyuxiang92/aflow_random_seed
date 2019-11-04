@@ -358,7 +358,11 @@ namespace apl
       }os_gp<<"\n";}
 
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.scqha_pdis_T");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.scqha_pdis_T");
+      string function = "T_spectra_SCQHA_QHA3P::write_T_dispersion()";
+      string message = "Cannot write aflow.scqha_pdis_T";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -366,7 +370,11 @@ namespace apl
   bool T_spectra_SCQHA_QHA3P::read_matrix(vector<xmatrix<xcomplex<double> > >&A, const string file)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P:: Missing file: "+file);
+      string function = "T_spectra_SCQHA_QHA3P::read_matrix()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
     }
 
     ifstream in;
@@ -400,12 +408,20 @@ namespace apl
   {
     string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  // ME190428
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      // ME191031
+      //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
     } 
     uint line_count = 0;  
     hash_lines.clear();

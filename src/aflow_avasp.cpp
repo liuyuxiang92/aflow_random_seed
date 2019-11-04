@@ -832,6 +832,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
     xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC", vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.isentry);
     xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF", vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry);
   }
+  xvasp.AVASP_LDAU_PARAMETERS_STRING = vflags.KBIN_VASP_LDAU_PARAMETERS;  // ME191010
 
   // INCAR
   xvasp.aopts.flag("FLAG::INCAR_MODE_IMPLICIT", vflags.KBIN_VASP_INCAR_MODE.flag("IMPLICIT"));
@@ -886,6 +887,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   // Output files
   xvasp.aopts.flag("FLAG::AVASP_BADER", vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
   xvasp.aopts.flag("FLAG::AVASP_CHGCAR", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
+  if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) xvasp.aopts.push_attached("AFLOWIN_FLAG::CHGCAR_FILE", vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string);  // ME191028
   xvasp.aopts.flag("FLAG::AVASP_ELF", vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
   xvasp.aopts.flag("FLAG::AVASP_WAVECAR", vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
 
@@ -939,6 +941,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CIF\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CIF") << endl;} //DX 20190123 - add CIF
+  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  // ME191028
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CONVERT_UNIT_CELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;}
@@ -1081,11 +1084,11 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
     xvasp.aopts.pop_attached("AFLOWIN_FLAG::PRECISION");xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION", xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC"));
 
     // Set Born charge and linear response parameters
-    if (xvasp.aopts.flag("FLAG::AVASP_BORN") || xvasp.aopts.flag("FLAG::AVASP_LR")) {
+    if (xvasp.aopts.flag("APL_FLAG::AVASP_BORN") || xvasp.aopts.flag("APL_FLAG::AVASP_LR")) {
       // Add INCAR flags
       xvasp.aopts.flag("FLAG::EXTRA_INCAR", true);
       xvasp.AVASP_EXTRA_INCAR << "# Added by [AFLOW_APL] begin" << std::endl;
-      if (xvasp.aopts.flag("FLAG::AVASP_LR")) {
+      if (xvasp.aopts.flag("APL_FLAG::AVASP_LR")) {
         xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << "# Linear Response method" << std::endl;
       } else {
         if (DEFAULT_APL_USE_LEPSILON) {
@@ -1097,17 +1100,24 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       }
       xvasp.AVASP_EXTRA_INCAR << "# Added by [AFLOW_APL] end" << std::endl;
 
-      if (xvasp.aopts.flag("FLAG::AVASP_BORN")) {
+      if (xvasp.aopts.flag("APL_FLAG::AVASP_BORN")) {
         // Change k-points for Born charges
         if (!DEFAULT_APL_USE_LEPSILON) {
         // LCALCEPS requires Gamma-centered grid
         xvasp.aopts.pop_attached("AFLOWIN_FLAG::KSCHEME_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC", "GAMMA");
         }
-        // Born charges need a denser k-point grid. Increase by 25%. ME 190207 - setr to 10,000
+        // Born charges need a denser k-point grid. Increase by 25%. ME 190207 - set to 10,000
         //int kpts = aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));
         //kpts = (5 * kpts)/4;
         xvasp.aopts.pop_attached("AFLOWIN_FLAG::KPPRA_STATIC");xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC", "10000");  // ME190207 - modified
       }
+    }
+
+    // ME191029 - ZEROSTATE CHGCAR
+    if (xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR")) {
+      xvasp.aopts.pop_attached("AFLOWIN_FLAG::CHGCAR_FILE");
+      if (xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE")) xvasp.aopts.flag("FLAG::AVASP_CHGCAR", true);
+      else xvasp.aopts.push_attached("AFLOWIN_FLAG::CHGCAR_FILE", xvasp.aopts.getattachedscheme("APL_FLAG::CHGCAR_FILE"));
     }
   }
   if (xvasp.AVASP_arun_mode == "POCC") {
@@ -1343,7 +1353,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     for(uint i=0;i<xvasp.str.species.size();i++) xvasp.str.species_mass.push_back(0);
   }
   //CO181226 - Marco, don't fix volume of ICSD's, these volumes are provided by experiment (of the cell)
-  //and hence we cannot stay what the volume of the atoms are individually
+  //and hence we cannot say what the volume of the atoms are individually
   bool skip_volume=(xvasp_in.AVASP_prototype_mode==LIBRARY_MODE_ICSD || xvasp_in.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD); //CO181226
   AVASP_fix_volumes_masses_XVASP(xvasp,skip_volume);  // ME 181103  //CO181226
   deque<double> vmass(xvasp.str.species_mass); // BACKUP
@@ -1902,23 +1912,26 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
   }
 
-  // check for LDAU1
-  if(0 && xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !aurostd::substring2bool(system,"_ICSD")) {
-    if(LDEBUG) cerr << "DEBUG - " << soliloquy << " with LDAU1 " << "[12p3]" << endl;
-    string ldau1_add_on=":LDAU1";
-    system+=ldau1_add_on;directory+=ldau1_add_on;xvasp.AVASP_label+=ldau1_add_on;
-  }
-  // check for LDAU2
-  if((xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2") ) && !aurostd::substring2bool(system,"_ICSD")) {
-    if(LDEBUG) cerr << "DEBUG - " << soliloquy << " with LDAU2 " << "[12p4]" << endl;
-    string ldau2_add_on=":LDAU2";
-    system+=ldau2_add_on;directory+=ldau2_add_on;xvasp.AVASP_label+=ldau2_add_on;
-  }
+  // ME191031 - no need to add LDAU to ARUNs as it should already be in the parent system name
+  if (!xvasp.AVASP_arun) {
+    // check for LDAU1
+    if(0 && xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !aurostd::substring2bool(system,"_ICSD")) {
+      if(LDEBUG) cerr << "DEBUG - " << soliloquy << " with LDAU1 " << "[12p3]" << endl;
+      string ldau1_add_on=":LDAU1";
+      system+=ldau1_add_on;directory+=ldau1_add_on;xvasp.AVASP_label+=ldau1_add_on;
+    }
+    // check for LDAU2
+    if((xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2") ) && !aurostd::substring2bool(system,"_ICSD")) {
+      if(LDEBUG) cerr << "DEBUG - " << soliloquy << " with LDAU2 " << "[12p4]" << endl;
+      string ldau2_add_on=":LDAU2";
+      system+=ldau2_add_on;directory+=ldau2_add_on;xvasp.AVASP_label+=ldau2_add_on;
+    }
 
-  // ME 181121
-  if (xvasp.AVASP_prototype_mode == LIBRARY_MODE_ARUN) {
-    string arun_add_on=":" + ARUN_DIRECTORY_PREFIX + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname; //CO181226
-    system+=arun_add_on;
+    // ME 181121
+    if (xvasp.AVASP_prototype_mode == LIBRARY_MODE_ARUN) {
+      string arun_add_on=":" + ARUN_DIRECTORY_PREFIX + xvasp.AVASP_arun_mode + "_" + xvasp.AVASP_arun_runname; //CO181226
+      system+=arun_add_on;
+    }
   }
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.2]" << endl;
@@ -2206,14 +2219,21 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.aopts.flag("FLAG::AVASP_WAVECAR")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
+    // ME191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   }
 
   // CHGCAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
+    // ME191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   } else {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
+  }
+
+  // ME191028 - CHGCAR_FILE
+  if (!xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE").empty()) {
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR_FILE="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE"),_aflowinpad_) << std::endl;
   }
 
   // KPOINTS WRITING - Modified (ME 181023)
@@ -3963,12 +3983,12 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(xvasp.aopts.flag("FLAG::AVASP_WAVECAR")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
   }
 
   // CHGCAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default ON)" << endl;
+    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default ON)" << endl;
   } else {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_aflowinpad_) << "// ON | OFF (default ON)" << endl;
   }

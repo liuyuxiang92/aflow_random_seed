@@ -22,8 +22,13 @@ namespace apl {
 					   Logger& l) : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) { //xvasp, aflags, kflags, vflags, l) {
     clear();
     _log.open(_logfile.c_str());
-    if (!_log.is_open())
-      throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon() Cannot create [aflow_qha_aflowcreate_information.out] file.");
+    if (!_log.is_open()) {
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon() Cannot create [aflow_qha_aflowcreate_information.out] file.");
+      string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon()";
+      string message = "Cannot create [" + _logfile + "] file.";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
+    }
     _log << std::setprecision(8) << std::fixed;
   }
   // ***************************************************************************************
@@ -132,13 +137,29 @@ namespace apl {
     if(_scqha_vol_distortion==0) 
       {
 	if(_is_sc_gp_on){
-	  throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp is on.");
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp is on.");
+	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+          string message = "scqha_distortion==0 but _is_sc_gp is on.";
+          throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
 	} else if(_is_sc_gp_A_on){
-	  throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_A is on.");
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_A is on.");
+	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+          string message = "scqha_distortion==0 but _is_sc_gp_A is on.";
+          throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
 	} else if(_is_sc_gp_B_on){
-	  throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_B is on.");
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_B is on.");
+	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+          string message = "scqha_distortion==0 but _is_sc_gp_B is on.";
+          throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
 	} else if(_is_sc_gp_C_on){
-	  throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_C is on.");
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_C is on.");
+	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+          string message = "scqha_distortion==0 but _is_sc_gp_C is on.";
+          throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
 	}
       }
    
@@ -482,7 +503,11 @@ namespace apl {
     }
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
-      throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT(); Input -> aflow.in conversion unknown.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT(); Input -> aflow.in conversion unknown.");
+      string function = "apl::QHA_AFLOWIN_CREATOR::write_phonon_OUTPUT()";
+      string message = "Input -> aflow.in conversion unknown.";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
     }
   }
   // ***************************************************************************************
@@ -490,7 +515,11 @@ namespace apl {
     if(xinput.AFLOW_MODE_VASP){return write_static_AFLOWIN(xinput.xvasp);}
     //if(xinput.AFLOW_MODE_AIMS){return create_aflowin_phonon_phonon(xinput.xaims);}
     else {
-      throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT(); Input -> aflow.in conversion unknown.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT(); Input -> aflow.in conversion unknown.");
+      string function = "apl::QHA_AFLOWIN_CREATOR::write_static_OUTPUT()";
+      string message = "Input -> aflow.in conversion unknown.";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
     }
   }
   // ***************************************************************************************
@@ -627,8 +656,12 @@ namespace apl {
 	    }
 	  }
       } else {
-      throw apl::APLRuntimeError("apl::PhononCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
-    }
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("apl::PhononCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
+        string function = "apl::PhononCalculator::createGPAFLOWIN()";
+        string message = "Cannot open [" + _AFLOWIN_ + "] file.";
+        throw aurostd::xerror(function, message, _FILE_ERROR_);
+      }
 
              if(!eos_included)
             {
@@ -665,7 +698,11 @@ namespace apl {
     string filename = xvasp.Directory + string("/") + string(_AFLOWIN_);
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
-      throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon; Cannot create [aflow.in] file.");
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon; Cannot create [aflow.in] file.");
+      string function = "apl::QHA_AFLOWIN_CREATOR::create_aflowin_phonon";
+      string message = "Cannot create [" + filename + "] file.";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::ChmodFile("a+rw", filename);
   }//function end
@@ -1009,7 +1046,11 @@ namespace apl {
     string filename = xvasp.Directory + string("/") + string(_AFLOWIN_);
     aurostd::stringstream2file(aflowin, filename);
     if (!aurostd::FileExist(filename)) {
-      throw apl::APLRuntimeError("apl::PhononCalculator::createEOSAFLOWIN(); Cannot create [aflow.in] file.");
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("apl::PhononCalculator::createEOSAFLOWIN(); Cannot create [aflow.in] file.");
+      string function = "apl::PhononCalculator::createEOSAFLOWIN()";
+      string message = "Cannot create [" + filename + "] file.";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::ChmodFile("a+rw", filename);
   }//fn end
@@ -1022,7 +1063,13 @@ namespace apl {
     uint line_count = 0;                             //CO
     aurostd::string2vectorstring(_AFLOWIN_,vlines);
     if (!vlines.size())  //CO
-      { throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file."); }
+    {
+      // ME191031 - usexerror
+      //throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
+      string function = "apl::PhononCalculator::get_special_inputs()";
+      string message = "Cannot read ["+_AFLOWIN_+"] file.";
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
+    }
     while (line_count < vlines.size())  //CO
       {
 	line = vlines[line_count++];  //CO

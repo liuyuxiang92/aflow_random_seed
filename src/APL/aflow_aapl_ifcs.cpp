@@ -49,7 +49,7 @@ AnharmonicIFCs::AnharmonicIFCs(vector<_xinput>& xInp,
                                ClusterSet& _clst,
                                const double& dist_mag, 
                                const aurostd::xoption& options,  // ME190501
-                               Logger& l) : clst(_clst), _logger(l) {
+                               Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
   free();
   distortion_magnitude = dist_mag;
   max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  // ME190501
@@ -74,7 +74,7 @@ AnharmonicIFCs::AnharmonicIFCs(const string& filename,
                                ClusterSet& _clst,
                                const double& dist_mag,
                                const aurostd::xoption& options,  // ME190501
-                               Logger& l) : clst(_clst), _logger(l) {
+                               Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
   free();
   distortion_magnitude = dist_mag;
   max_iter = aurostd::string2utype<int>(options.getattachedscheme("MAX_ITER"));  // ME190501
@@ -88,6 +88,7 @@ AnharmonicIFCs::AnharmonicIFCs(const string& filename,
 const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
   if (this != &that) {
     _logger = that._logger;
+    aflags = that.aflags;
     cart_indices = that.cart_indices;
     clst = that.clst;
     distortion_magnitude = that.distortion_magnitude;
@@ -712,7 +713,7 @@ string AnharmonicIFCs::writeParameters() {
   if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
   parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
   parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-  parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
+  parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
   parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
   parameters  << "</i>" << std::endl;
   parameters << tab << "</generator>" << std::endl;
@@ -892,7 +893,7 @@ bool AnharmonicIFCs::checkCompatibility(uint& line_count,
 
   t = line.find_first_of(">") + 1;
   tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-  if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
+  if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
     message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
     tokens.clear();

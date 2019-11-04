@@ -44,15 +44,15 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 #include <stdexcept>
 namespace apl {
 //
-class APLRuntimeError : public std::runtime_error {
- public:
-  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
-};
-//
-class APLLogicError : public std::logic_error {
- public:
-  APLLogicError(const std::string& s) : std::logic_error(s) {}
-};
+// OBSOLETE ME191031 - use xerror
+//class APLRuntimeError : public std::runtime_error {
+// public:
+//  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
+//};
+//class APLLogicError : public std::logic_error {
+// public:
+//  APLLogicError(const std::string& s) : std::logic_error(s) {}
+//};
 //
 class APLStageBreak : public std::exception {
  public:
@@ -164,7 +164,9 @@ template <typename T>
 inline std::string stringify(const T& x) {
   std::ostringstream o;
   if (!(o << x)) {
-    throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
+    // ME191031 - use xerror
+    //throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
+    throw aurostd::xerror("apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
   }
   return o.str();
 }
@@ -227,10 +229,10 @@ class Supercell;  // Forward declaration
 class ClusterSet {
 // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
  public:
-    ClusterSet(const Supercell&, const int&, double&, Logger&);  // Constructor
-    ClusterSet(const string&, const Supercell&, const int&, double&, int, Logger&);  // From file
+    ClusterSet(const Supercell&, const int&, double&, Logger&, _aflags&);  // Constructor
+    ClusterSet(const string&, const Supercell&, const int&, double&, int, Logger&, _aflags&);  // From file
     ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-    ClusterSet(Logger&);  // Does nothing - used as a placeholder for non-AAPL calculations
+    ClusterSet(Logger&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
     ~ClusterSet();  // Destructor
     const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
 
@@ -259,6 +261,7 @@ class ClusterSet {
 
  private:
     Logger& _logger;  // The AFLOW logger
+    _aflags& aflags;
     void free();
     double getMaxRad(const xstructure&, const int&);
     void buildShells();
@@ -322,9 +325,9 @@ class AnharmonicIFCs {
 // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
  public:
     AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
-                   const aurostd::xoption&, Logger&);  // ME190501
+                   const aurostd::xoption&, Logger&, _aflags&);  // ME190501
     AnharmonicIFCs(const string&, ClusterSet&, const double&,
-                   const aurostd::xoption&, Logger&);  // ME190501
+                   const aurostd::xoption&, Logger&, _aflags&);  // ME190501
     const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
     ~AnharmonicIFCs();
 
@@ -342,6 +345,7 @@ class AnharmonicIFCs {
 
  private:
     Logger& _logger;  // The AFLOW logger
+    _aflags& aflags;
     void free();
     vector<vector<int> > getCartesianIndices();
 
@@ -764,7 +768,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
 
  private:
-  virtual void calculateForceFields(bool) {}  // ME190412
+  virtual void calculateForceFields() {}  // ME190412  // ME191029
   void completeForceFields();
   void projectToCartesianDirections();
   void buildForceConstantMatrices();
@@ -791,7 +795,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   PhononCalculator(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
   virtual ~PhononCalculator();
   void clear();
-  void run(bool);
+  void run();  // ME191029
   xvector<double> getEigenvalues(const xvector<double>&);
   xvector<double> getEigenvalues(const xvector<double>&, xmatrix<xcomplex<double> >&,
                                  vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
@@ -809,7 +813,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   vector<ClusterSet>& _clusters;
   vector<AnharmonicIFCs> _anharmonicIFCs;
   void setAnharmonicOptions(int, double, double);
-  bool buildVaspAAPL(const ClusterSet&);
+  bool buildVaspAAPL(const ClusterSet&, bool);
   string buildRunNameAAPL(const vector<int>&, const vector<int>&,
                              const int&, const int&, const int&);// ME190108
   void applyDistortionsAAPL(_xinput&, const vector<aurostd::xvector<double> >&,
@@ -818,6 +822,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   void readAnharmonicIFCs(const string&, ClusterSet&);
   void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME190114
   //******* END ME ************
+  bool _stagebreak;  // ME191029
   // Interface
   xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
   xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME190624
@@ -836,6 +841,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   /* friend void readDielectricTensorFromOUTCAR(apl::PhononCalculator *pcalculator); */
   void runVASPCalculationsBE(_xinput&, uint=0); // ME190113
   void runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME181024 // ME190113
+  void calculateDielectricTensor(const _xinput&);  // ME191029
   void readBornEffectiveChargesFromAIMSOUT(void);
   void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME190113
   void symmetrizeBornEffectiveChargeTensors(void);
@@ -849,10 +855,12 @@ class PhononCalculator : virtual public IPhononCalculator {
   bool createAflowInPhonons(_xinput&); // ME190108
   void createAflowInPhonons(_xinput&, const string&);
   bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  void outfileFoundEverywherePhonons(vector<_xinput>&);
+  void outfileFoundEverywherePhonons(vector<_xinput>&, bool=false);  // ME191029
   void subtractZeroStateForces(vector<_xinput>&);
   // END ME 180518
   vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
+  virtual void runVASPCalculations(bool) {}  // ME191029
+  string zerostate_dir;  // ME191030
 };
 }  // namespace apl
 
@@ -888,7 +896,7 @@ class DirectMethodPC : public PhononCalculator {
   DirectMethodPC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
   ~DirectMethodPC();
   void clear();
-  void calculateForceFields(bool);  // ME190412
+  void calculateForceFields();  // ME190412  // ME191029
   // Easy access to global parameters
   //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
   void setGeneratePlusMinus(bool _auto_, bool _user_) {
@@ -897,6 +905,9 @@ class DirectMethodPC : public PhononCalculator {
   }  //CO
   void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
   void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
+
+  private:
+    vector<vector<bool> > vvgenerate_plus_minus;  // ME191029
 };
 }  // namespace apl
 
@@ -1034,7 +1045,8 @@ class LinearResponsePC : public PhononCalculator {
   LinearResponsePC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
   ~LinearResponsePC();
   void clear();
-  void calculateForceFields(bool);  // ME190412
+  void runVASPCalculations(bool);  // ME191029
+  void calculateForceFields();  // ME190412  // ME191029
 };
 }  // namespace apl
 
@@ -1147,13 +1159,13 @@ class PhononDispersionCalculator {
   void initPathLattice(const string&, int);
   void setPath(const string&);
   void calc(const IPCFreqFlags);
-  void writePDIS();
+  void writePDIS(const string&);
   bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
   std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PINKU]
   // ME190614 - START
   xEIGENVAL createEIGENVAL();
-  void writePHEIGENVAL();
-  void writePHKPOINTS();
+  void writePHEIGENVAL(const string&);
+  void writePHKPOINTS(const string&);
   string _system;
   // ME19614 - STOP
   //[OBSOLETE PN180705]std::vector<double> get_path() { return path; }                   //[PINKU]
@@ -1177,7 +1189,7 @@ namespace apl { //PN180705
     PhononHSQpoints(Logger&);
     ~PhononHSQpoints();
     void clear();
-    void read_qpointfile();
+    void read_qpointfile(const string&);
     //interface functions
     vector<xvector<double> > get_qpoints();
     vector<xvector<double> > get_hs_kpoints();
@@ -1437,10 +1449,10 @@ class DOSCalculator {  // ME190424
   void calc(int);
   void calc(int, double);
   void clear();
-  void writePDOS();
+  void writePDOS(const string&);
   void writePDOS(string, string);  //[PINKU]
   xDOSCAR createDOSCAR();  // ME190614
-  void writePHDOSCAR();  // ME190614
+  void writePHDOSCAR(const string&);  // ME190614
   // Interface IDOSCalculator
   std::vector<double> getBins();
   std::vector<double> getDOS();
@@ -1512,7 +1524,7 @@ class ThermalPropertiesCalculator {
   ThermalPropertiesCalculator(DOSCalculator&, Logger&);  // ME190423
   ~ThermalPropertiesCalculator();
   void clear();
-  void writeTHERMO(double, double, double);
+  void writeTHERMO(double, double, double, const string&);
   double getZeroPointVibrationEnergy(ThermalPropertiesUnits);
   double getInternalEnergy(double, ThermalPropertiesUnits);
   double getVibrationalFreeEnergy(double, ThermalPropertiesUnits);
@@ -1545,7 +1557,7 @@ namespace apl {
 class TCONDCalculator {
 // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
  public:
-    TCONDCalculator(PhononCalculator&, QMesh&, Logger&);
+    TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
     ~TCONDCalculator();
     void clear();
 
@@ -1571,6 +1583,7 @@ class TCONDCalculator {
     PhononCalculator& _pc;  // Reference to the phonon calculator
     QMesh& _qm;  // Reference to the q-point mesh
     Logger& _logger;  // The APL logger
+    _aflags& aflags;
 
     void free();
 
@@ -1607,7 +1620,6 @@ class TCONDCalculator {
     void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
     void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
     void writeDataBlock(stringstream&, const vector<vector<double> >&);
-    void writeFrequencies();
     void writeGroupVelocities();
     void writePhaseSpace(const vector<vector<vector<vector<double> > > >&);
     void writeGrueneisen(const vector<double>&, const vector<vector<double> >&);
@@ -2703,133 +2715,134 @@ void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<do
 #define cursor_attr_blink() printf("\033[5m")     /*Supposed to make text blink, usually bolds it instead*/
 #define cursor_attr_reverse() printf("\033[7m")   /*Swap background and foreground colors*/
 
+// OBSOLETE ME191031 - not used
 // ***************************************************************************
 // xtensor.hpp
-
-namespace apl {
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-class xtensor {
-  T* _data;
-  int _lindex;
-  int _hindex;
-  unsigned int _indexSize;
-  unsigned long long _arraySize;
-  std::vector<unsigned long long> _precomputedOffsets;
-
- private:
-  unsigned long long getOffset(const std::vector<unsigned int>&);
-
- public:
-  xtensor(int, int);
-  ~xtensor();
-  void zero();
-  void fill(const T&);
-  T& operator()(int, ...);
-};
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-xtensor<T, TENSOR_ORDER>::xtensor(int index1, int index2) {
-  _hindex = index1 > index2 ? index1 : index2;
-  _lindex = index1 < index2 ? index1 : index2;
-
-  _indexSize = _hindex - _lindex + 1;
-
-  // Allocate data
-  unsigned long long arraySizeBefore;
-  _arraySize = 1ULL;
-  _precomputedOffsets.push_back(_arraySize);
-  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER; i++) {
-    arraySizeBefore = _arraySize;
-    _arraySize *= _indexSize;
-    // Detect overflow
-    if (arraySizeBefore > _arraySize)
-      throw APLRuntimeError("apl::xtensor<T>::xtensor(); The setting is producing an array which can not by handled by this implementation.");
-    _precomputedOffsets.push_back(_arraySize);
-  }
-
-  try {
-    // FIX: Problem; new(std::size_t), where size_t is hardware/platform specific,
-    // for 32 bit systems it is uint = 2^32, if our array is bigger than this,
-    // there is a overflow -> use more pages of the same block _data[PAGE][2^32]???,
-    // or go to the 64 bits systems -> 2^64 (unsigned long long)
-    if (_arraySize > (1ULL << (8 * sizeof(std::size_t) - 1)))  // dont go overboard  STEFANO (-1)
-      throw APLRuntimeError("apl::xtensor<T>::xtensor(); Problem to allocate a required array. Hardware specific problem.");
-    _data = new T[(std::size_t)_arraySize];
-  } catch (std::bad_alloc& e) {
-    throw APLRuntimeError("apl::xtensor<T>::xtensor(); Bad allocation.");
-  }
-
-  // Reverse precomputed for better manipulation and shift by 1
-  std::vector<unsigned long long> temp(_precomputedOffsets.rbegin() + 1, _precomputedOffsets.rend());
-  _precomputedOffsets = temp;
-  temp.clear();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-xtensor<T, TENSOR_ORDER>::~xtensor() {
-  _precomputedOffsets.clear();
-  delete[] _data;
-  _data = NULL;
-  _arraySize = 0ULL;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-void xtensor<T, TENSOR_ORDER>::zero() {
-  // Take care! The last argument is of std::size_t, hence platform specific
-  memset(_data, 0, _arraySize * sizeof(T));
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-void xtensor<T, TENSOR_ORDER>::fill(const T& val) {
-  for (unsigned long long i = 0ULL; i < _arraySize; i++)
-    _data[i] = val;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-unsigned long long xtensor<T, TENSOR_ORDER>::getOffset(const std::vector<unsigned int>& idxs) {
-  unsigned long long offset = idxs.back();
-  for (_AFLOW_APL_REGISTER_ int i = idxs.size() - 2; i >= 0; i--)
-    offset += (unsigned long long)(idxs[i] * _precomputedOffsets[i]);
-  return offset;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-T& xtensor<T, TENSOR_ORDER>::operator()(int idx1, ...) {
-  // Get indices and transform to form 0...max
-  va_list arguments;
-  std::vector<unsigned int> idxs;
-
-  // The 1st index
-  idxs.push_back((unsigned int)(idx1 - _lindex));
-  //    if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-  if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-
-  // The rest of indices
-  va_start(arguments, idx1);
-  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER - 1; i++) {
-    idxs.push_back((unsigned int)(va_arg(arguments, int) - _lindex));
-    //   if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-    if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-  }
-  va_end(arguments);
-
-  // Calculate offset
-  unsigned long long offset = getOffset(idxs);
-  idxs.clear();
-
-  // Return value
-  return _data[offset];
-}
-//////////////////////////////////////////////////////////////////////////////
-}
+//
+//namespace apl {
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//class xtensor {
+//  T* _data;
+//  int _lindex;
+//  int _hindex;
+//  unsigned int _indexSize;
+//  unsigned long long _arraySize;
+//  std::vector<unsigned long long> _precomputedOffsets;
+//
+// private:
+//  unsigned long long getOffset(const std::vector<unsigned int>&);
+//
+// public:
+//  xtensor(int, int);
+//  ~xtensor();
+//  void zero();
+//  void fill(const T&);
+//  T& operator()(int, ...);
+//};
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//xtensor<T, TENSOR_ORDER>::xtensor(int index1, int index2) {
+//  _hindex = index1 > index2 ? index1 : index2;
+//  _lindex = index1 < index2 ? index1 : index2;
+//
+//  _indexSize = _hindex - _lindex + 1;
+//
+//  // Allocate data
+//  unsigned long long arraySizeBefore;
+//  _arraySize = 1ULL;
+//  _precomputedOffsets.push_back(_arraySize);
+//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER; i++) {
+//    arraySizeBefore = _arraySize;
+//    _arraySize *= _indexSize;
+//    // Detect overflow
+//    if (arraySizeBefore > _arraySize)
+//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); The setting is producing an array which can not by handled by this implementation.");
+//    _precomputedOffsets.push_back(_arraySize);
+//  }
+//
+//  try {
+//    // FIX: Problem; new(std::size_t), where size_t is hardware/platform specific,
+//    // for 32 bit systems it is uint = 2^32, if our array is bigger than this,
+//    // there is a overflow -> use more pages of the same block _data[PAGE][2^32]???,
+//    // or go to the 64 bits systems -> 2^64 (unsigned long long)
+//    if (_arraySize > (1ULL << (8 * sizeof(std::size_t) - 1)))  // dont go overboard  STEFANO (-1)
+//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); Problem to allocate a required array. Hardware specific problem.");
+//    _data = new T[(std::size_t)_arraySize];
+//  } catch (std::bad_alloc& e) {
+//    throw APLRuntimeError("apl::xtensor<T>::xtensor(); Bad allocation.");
+//  }
+//
+//  // Reverse precomputed for better manipulation and shift by 1
+//  std::vector<unsigned long long> temp(_precomputedOffsets.rbegin() + 1, _precomputedOffsets.rend());
+//  _precomputedOffsets = temp;
+//  temp.clear();
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//xtensor<T, TENSOR_ORDER>::~xtensor() {
+//  _precomputedOffsets.clear();
+//  delete[] _data;
+//  _data = NULL;
+//  _arraySize = 0ULL;
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//void xtensor<T, TENSOR_ORDER>::zero() {
+//  // Take care! The last argument is of std::size_t, hence platform specific
+//  memset(_data, 0, _arraySize * sizeof(T));
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//void xtensor<T, TENSOR_ORDER>::fill(const T& val) {
+//  for (unsigned long long i = 0ULL; i < _arraySize; i++)
+//    _data[i] = val;
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//unsigned long long xtensor<T, TENSOR_ORDER>::getOffset(const std::vector<unsigned int>& idxs) {
+//  unsigned long long offset = idxs.back();
+//  for (_AFLOW_APL_REGISTER_ int i = idxs.size() - 2; i >= 0; i--)
+//    offset += (unsigned long long)(idxs[i] * _precomputedOffsets[i]);
+//  return offset;
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//T& xtensor<T, TENSOR_ORDER>::operator()(int idx1, ...) {
+//  // Get indices and transform to form 0...max
+//  va_list arguments;
+//  std::vector<unsigned int> idxs;
+//
+//  // The 1st index
+//  idxs.push_back((unsigned int)(idx1 - _lindex));
+//  //    if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
+//  if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
+//
+//  // The rest of indices
+//  va_start(arguments, idx1);
+//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER - 1; i++) {
+//    idxs.push_back((unsigned int)(va_arg(arguments, int) - _lindex));
+//    //   if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
+//    if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
+//  }
+//  va_end(arguments);
+//
+//  // Calculate offset
+//  unsigned long long offset = getOffset(idxs);
+//  idxs.clear();
+//
+//  // Return value
+//  return _data[offset];
+//}
+////////////////////////////////////////////////////////////////////////////////
+//}
 // ***************************************************************************
 
 #endif  // _AFLOW_APL_H_

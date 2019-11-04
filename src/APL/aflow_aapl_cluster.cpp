@@ -30,7 +30,7 @@ namespace apl {
 
 //Constructors////////////////////////////////////////////////////////////////
 ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
-                       double& cut_rad, Logger& l) : _logger(l) {
+                       double& cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
   _logger << "CLUSTER: Building coordination shells." << apl::endl;
   free();  // Clear old vectors
 
@@ -56,8 +56,8 @@ ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
 //From file
 ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
                        const int& cut_shell, double& cut_rad,
-                       int _order, Logger& l) : _logger(l) {
-  _logger << "Reading ClusterSet from file " << filename << apl::endl;
+                       int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
+  _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
   free();  // Clear old vectors
 
   order = _order;
@@ -79,25 +79,23 @@ ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
   // quick, they are not stored in the output file
   distortion_vectors = getCartesianDistortionVectors();
   permutations = getPermutations(order);
-  nifcs = 1;
-  for (int i = 0; i < order; i++) {
-    nifcs *= 3;  // Naive method for powers since C++ has no integer power function
-  }
+  nifcs = (int) std::pow(3, order);
 }
 
 // Just allocates. Used for non-AAPL calculations.
-ClusterSet::ClusterSet(Logger& l) : _logger(l) {
+ClusterSet::ClusterSet(Logger& l, _aflags& a) : _logger(l), aflags(a) {
   free();
 }
 
 //Copy Constructors///////////////////////////////////////////////////////////
-ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger) {
+ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
   *this = that;
 }
 
 const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
   if (this != &that) {
     _logger = that._logger;
+    aflags = that.aflags;
     clusters = that.clusters;
     coordination_shells = that.coordination_shells;
     cutoff = that.cutoff;
@@ -343,10 +341,7 @@ void ClusterSet::build(int _order) {
     throw xerror(function, message, _VALUE_RANGE_);
   }
   _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
-  nifcs = 1;
-  for (int i = 0; i < order; i++){
-    nifcs *= 3; // Naive method for powers since C++ has no integer power function
-  }
+  nifcs = (int) std::pow(3, order);
 
   permutations = getPermutations(order);
   clusters = buildClusters();
@@ -1325,7 +1320,7 @@ string ClusterSet::writeParameters() {
   if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
   parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
   parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-  parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
+  parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
   parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
   parameters  << "</i>" << std::endl;
   parameters << tab << "</generator>" << std::endl;
@@ -1629,7 +1624,7 @@ bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlin
 
   t = line.find_first_of(">") + 1;
   tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-  if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
+  if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
     message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
     tokens.clear();

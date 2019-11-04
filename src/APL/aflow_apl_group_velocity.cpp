@@ -91,7 +91,11 @@ namespace apl
         // ME190726 - exit clean-up
 	//_logger<<apl::error<<"group velocity calculation _kpoints.size()==0 "<<apl::endl; 
 	//exit(0);
-        throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
+        // ME191031 - use xerror
+        //throw APLRuntimeError("group velocity calculation _kpoints.size()==0");
+        string function = "GroupVelocity::populate_variables()";
+        string message = "group velocity calculation _kpoints.size()==0";
+        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
       }
 
   }
@@ -190,7 +194,11 @@ namespace apl
     string filename = "aflow.apl.gamma_point.out";
     aurostd::stringstream2file(dm, filename);
     if (!aurostd::FileExist(filename)) {
-      throw apl::APLRuntimeError("Cannot open output aflow.apl.gamma_point.out.");
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("Cannot open output aflow.apl.gamma_point.out.");
+      string function = "GroupVelocity::sound_speed()";
+      string message = "Cannot open output " + filename;
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     //dm.close();
   }
@@ -228,7 +236,11 @@ namespace apl
     string filename = "aflow.apl.group_velocities.out";
     aurostd::stringstream2file(dm, filename);
     if (!aurostd::FileExist(filename)) {
-      throw apl::APLRuntimeError("Cannot open output aflow.apl.group_velocities.out file.");
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("Cannot open output aflow.apl.group_velocities.out file.");
+      string function = "GroupVelocity::write()";
+      string message = "Cannot open output file " + filename;
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     //clear unnecessary variables
     clear_auxiliary_variables();

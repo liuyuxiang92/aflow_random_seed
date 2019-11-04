@@ -575,7 +575,11 @@ namespace apl
 
     string outfile =  "aflow.scqha.gpdis.out";
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.scqha.gpdis.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.scqha.gpdis.out");
+      string function = "SCQHA_QHA3P::write_gruneisen_parameter_path";
+      string message = "Cannot write " + outfile;
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -610,7 +614,11 @@ namespace apl
 
     string outfile =  "aflow.qha3P.gp.mesh.out";
     if(!aurostd::stringstream2file(os_gp, outfile, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha3P.gp.mesh.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha3P.gp.mesh.out");
+      string function = "SCQHA_QHA3P::write_gruneisen_parameter_mesh";
+      string message = "Cannot write " + outfile;
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -652,7 +660,11 @@ namespace apl
     os_avg<<"[AFLOW] "<<STAR40<<"\n";
     string avg_out =  "aflow.qha3P.avg_gp.out";
     if(!aurostd::stringstream2file(os_avg, avg_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha3P.avg_gp.out");
+      // ME191031
+      //throw APLRuntimeError("Cannot write aflow.qha3P.avg_gp.out");
+      string function = "SCQHA_QHA3P::Writeaverage_gp";
+      string message = "Cannot write " + avg_out;
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_avg);
     //gruneisen_parameter_300K();
@@ -665,8 +677,20 @@ namespace apl
     // ME190726 - exit clean-up
     //[OBSOLETE] if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
     //[OBSOLETE] if(_qha_gp_mesh.size()==0){_logger<<apl::error<<"_qha_gp_mesh.size()==0"<<apl::endl;exit(0);}
-    if(_freqs_mesh.size()==0) throw APLRuntimeError("_freqs_mesh.size()==0");
-    if(_freqs_mesh.size()==0) throw APLRuntimeError("_freqs_mesh.size()==0");
+    if(_freqs_mesh.size()==0) {
+      // ME191031 - use xerror
+      //throw APLRuntimeError("_freqs_mesh.size()==0");
+      string function = "SCQHA_QHA3P::average_gruneisen_parameter()";
+      string message = "_freqs_mesh.size()==0";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    }
+    if(_freqs_mesh.size()==0) {
+      // ME191031 - use xerror
+      //throw APLRuntimeError("_freqs_mesh.size()==0");
+      string function = "SCQHA_QHA3P::average_gruneisen_parameter()";
+      string message = "_freqs_mesh.size()==0";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    }
     //if cutoff is not set then set it to 0.001 to avoid numerical error
     if(_iszero(_cutoff_freq)) _cutoff_freq=1.0e-3;
                 
@@ -709,7 +733,11 @@ namespace apl
     os_avg << "[APL_GRUNEISEN]STOP" <<"\n";
     string avg_out =  "aflow.scqha.avg_gp300K.out";
     if(!aurostd::stringstream2file(os_avg, avg_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.scqha.avg_gp300K.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.scqha.avg_gp300K.out");
+      string function = "SCQHA_QHA3P::gruneisen_paramter_300K()";
+      string message = "Cannot write " + avg_out;
+      throw aurostd::xerror(function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_avg);
   }
@@ -717,7 +745,11 @@ namespace apl
   bool SCQHA_QHA3P::read_matrix(vector<xmatrix<xcomplex<double> > >&A, const string file)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("SCQHA_QHA3P::read_matrix(() Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("SCQHA_QHA3P::read_matrix(() Missing file: "+file);
+      string function = "SCQHA_QHA3P::read_matrix()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
     }
 
     ifstream in;
@@ -737,12 +769,20 @@ namespace apl
     string file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE;  // ME190428
 
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      string function = "SCQHA_QHA3P::read_PDIS()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
+      string function = "SCQHA_QHA3P::read_PDIS()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
     }
 
     uint line_count = 0;
@@ -800,7 +840,11 @@ namespace apl
       // ME190728 - exit clean-up
       //_logger<< apl::error<<"Gruneisen calculation frequency negative "<<apl::endl;
       //exit(0);
-      throw APLRuntimeError("Grueneisen calculation frequency negative");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Grueneisen calculation frequency negative");
+      string function = "SCQHA_QHA3P::calculate_gruneisen_with_freq_derivative()";
+      string message = "Grueneisen calculation frequency negative";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
     }
     double gptest=-(fp-fm)/(2.0*_delta_V)*(_V0/f0);
     return gptest;

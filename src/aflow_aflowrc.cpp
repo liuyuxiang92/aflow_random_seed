@@ -461,6 +461,8 @@
 #define         DEFAULT_APL_RELAX                             XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX")
 #define AFLOWRC_DEFAULT_APL_ZEROSTATE                         TRUE  //CO181216
 #define         DEFAULT_APL_ZEROSTATE                         XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE")
+#define AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR                  FALSE  // ME191029
+#define         DEFAULT_APL_ZEROSTATE_CHGCAR                  XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE_CHGCAR")  // ME191029
 #define AFLOWRC_DEFAULT_APL_USE_LEPSILON                      TRUE
 #define         DEFAULT_APL_USE_LEPSILON                      XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_USE_LEPSILON")
 
@@ -522,9 +524,9 @@
 //[ME181226]#define         DEFAULT_AAPL_BZMETHOD                         XHOST.adefault.getattachedscheme("DEFAULT_AAPL_BZMETHOD")
 #define AFLOWRC_DEFAULT_AAPL_FOURTH_ORDER                     FALSE
 #define         DEFAULT_AAPL_FOURTH_ORDER                     XHOST.adefault.getattachedutype<bool>("DEFAULT_AAPL_FOURTH_ORDER")
-#define AFLOWRC_DEFAULT_AAPL_CUT_RAD                          string("0.0,0.0") // ME190308 - use CUT_SHELL by default
+#define AFLOWRC_DEFAULT_AAPL_CUT_RAD                          string("0.0") // ME190308 - use CUT_SHELL by default // ME191029
 #define         DEFAULT_AAPL_CUT_RAD                          XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_RAD")
-#define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6,3")  // ME190301  // ME190408
+#define AFLOWRC_DEFAULT_AAPL_CUT_SHELL                        string("6")  // ME190301  // ME190408  // ME191029
 #define         DEFAULT_AAPL_CUT_SHELL                        XHOST.adefault.getattachedscheme("DEFAULT_AAPL_CUT_SHELL")
 #define AFLOWRC_DEFAULT_AAPL_THERMALGRID                      string("26x26x26")
 #define         DEFAULT_AAPL_THERMALGRID                      XHOST.adefault.getattachedscheme("DEFAULT_AAPL_THERMALGRID")
@@ -1210,6 +1212,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DPM",AFLOWRC_DEFAULT_APL_DPM);
     aflowrc::load_default("DEFAULT_APL_RELAX",AFLOWRC_DEFAULT_APL_RELAX);
     aflowrc::load_default("DEFAULT_APL_ZEROSTATE",AFLOWRC_DEFAULT_APL_ZEROSTATE);
+    aflowrc::load_default("DEFAULT_APL_ZEROSTATE_CHGCAR",AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR);  // ME191029
     aflowrc::load_default("DEFAULT_APL_USE_LEPSILON",AFLOWRC_DEFAULT_APL_USE_LEPSILON);
 
     //// DEFAULT APL PHONON PROPERTIES
@@ -1714,6 +1717,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DPM=\"" << AFLOWRC_DEFAULT_APL_DPM << "\"" << endl;
     aflowrc << "DEFAULT_APL_RELAX=" << AFLOWRC_DEFAULT_APL_RELAX << endl;
     aflowrc << "DEFAULT_APL_ZEROSTATE=" << AFLOWRC_DEFAULT_APL_ZEROSTATE << endl;
+    aflowrc << "DEFAULT_APL_ZEROSTATE_CHGCAR=" << AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  // ME191029
     aflowrc << "DEFAULT_APL_USE_LEPSILON=" << AFLOWRC_DEFAULT_APL_USE_LEPSILON << endl;
     aflowrc << "DEFAULT_APL_FREQFORMAT=\"" << AFLOWRC_DEFAULT_APL_FREQFORMAT << "\"" << endl;
     aflowrc << "DEFAULT_APL_DC=" << AFLOWRC_DEFAULT_APL_DC << endl;
@@ -2181,6 +2185,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DPM\")=\"" << DEFAULT_APL_DPM << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_RELAX\")=" << DEFAULT_APL_RELAX << endl;  // ME190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ZEROSTATE\")=" << DEFAULT_APL_ZEROSTATE << endl;  // ME190112
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ZEROSTATE_CHGCAR\")=" << DEFAULT_APL_ZEROSTATE_CHGCAR << endl;  // ME191029
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_USE_LEPSILON\")=" << DEFAULT_APL_USE_LEPSILON << endl;  // ME190112
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_FREQFORMAT\")=\"" << DEFAULT_APL_FREQFORMAT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DC\")=" << DEFAULT_APL_DC << endl;  // ME190112

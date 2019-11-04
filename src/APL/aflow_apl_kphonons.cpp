@@ -201,6 +201,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
   /////////////////////////////////////////////////////////////////////////////
 
   xinput.xvasp.AVASP_arun = true;
+  string function = "KBIN::RunPhonons_APL()";  // ME191029
   // Test
     //if (!(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN180705
     if (!(kflags.KBIN_PHONONS_CALCULATION_APL ||
@@ -279,13 +280,13 @@ void RunPhonons_APL_181216(_xinput& xinput,
     xinput.xvasp.aopts.flag("FLAG::AVASP_BADER",xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
     if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry && DEFAULT_VASP_FORCE_OPTION_BADER) {
       logger << "Switching OFF BADER for APL calculations (default: OFF)." << apl::endl; //CO181226 - default OFF
-      }
+    }
 
     xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.options2entry(AflowIn,_STROPT_+"CHGCAR=",false);
     xinput.xvasp.aopts.flag("FLAG::AVASP_CHGCAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
     if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.isentry && DEFAULT_VASP_FORCE_OPTION_CHGCAR) {
       logger << "Switching OFF CHGCAR for APL calculations (default: OFF)." << apl::endl;  //CO181226 - default OFF
-      }
+    }
 
     xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.options2entry(AflowIn,_STROPT_+"ELF=",false);
     xinput.xvasp.aopts.flag("FLAG::AVASP_ELF",xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
@@ -297,8 +298,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
     xinput.xvasp.aopts.flag("FLAG::AVASP_WAVECAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
     if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.isentry && DEFAULT_VASP_FORCE_OPTION_WAVECAR) {
       logger << "Switching OFF WAVECAR for APL calculations (default: OFF)." << apl::endl;  //CO181226 - default OFF
-        }
     }
+  }
 
   // APL ----------------------------------------------------------------------
 
@@ -309,7 +310,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
   string USER_ENGINE="", USER_FREQFORMAT="", USER_SUPERCELL="", DOS_MESH_SCHEME="", USER_DOS_METHOD="", USER_TPT="", USER_DC_METHOD=""; //CO190114 - initialize everything
   string USER_DOS_PROJECTIONS_CART_SCHEME = "", USER_DOS_PROJECTIONS_FRAC_SCHEME = ""; // ME190625
   string USER_DC_INITLATTICE="", USER_DC_INITCOORDS_FRAC="", USER_DC_INITCOORDS_CART="", USER_DC_INITCOORDS_LABELS="", USER_DC_USERPATH=""; //CO190114 - initialize everything
-  bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false; //CO190114 - initialize everything
+  bool USER_DPM=false, USER_AUTO_DISTORTIONS=false, USER_DISTORTIONS_XYZ_ONLY=false, USER_DISTORTIONS_SYMMETRIZE=false, USER_DISTORTIONS_INEQUIVONLY=false, USER_RELAX=false, USER_ZEROSTATE=false, USER_ZEROSTATE_CHGCAR = false; //CO190114 - initialize everything
   bool USER_HIBERNATE=false, USER_POLAR=false, USER_DC=false, USER_DOS=false, USER_TP=false;  //CO190114 - initialize everything
   double USER_DISTORTION_MAGNITUDE=false, USER_DOS_SMEAR=false, USER_TP_TSTART=false, USER_TP_TEND=false, USER_TP_TSTEP=false;  //CO190114 - initialize everything  
   int USER_MAXSHELL = 0, USER_MINSHELL = 0, USER_MINATOMS = 0, USER_MINATOMS_RESTRICTED = 0, USER_DC_NPOINTS = 0, USER_DOS_NPOINTS = 0, START_RELAX = 0;  //CO190114 - initialize everything
@@ -335,8 +336,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
       USER_DPM = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option;
       USER_AUTO_DISTORTIONS=(!kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme.empty() && (kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'A' || kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme[0] == 'a')); //CO190131
       continue;
-      }
+    }
     if (key == "ZEROSTATE") {USER_ZEROSTATE = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
+    if (key == "ZEROSTATE_CHGCAR") {USER_ZEROSTATE_CHGCAR = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}  // ME191029
     if (key == "FREQFORMAT") {USER_FREQFORMAT = aurostd::toupper(kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme); continue;}
     if (key == "DC") {USER_DC = kflags.KBIN_MODULE_OPTIONS.aplflags[i].option; continue;}
     if (key == "DCPATH") {USER_DC_METHOD = kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme; continue;}
@@ -358,7 +360,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
   /***************************** CHECK PARAMETERS *****************************/
 
-  try {
+//  try {  OBSOLETE ME191029 - error handling switched to aurostd::xerror
     string message;
 
     // ME 190313 - START
@@ -374,12 +376,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if(xinput.AFLOW_MODE_VASP){
         // Check if the structure has already been relaxed
         for (int i = 1; i <= _NUM_RELAX_; i++) {
-          string contcar = "CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i);
+          string contcar = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i);
           if (aurostd::EFileExist(contcar)) {
             START_RELAX++;
           } else {
             break;
-      }
+          }
         }
         if (START_RELAX == _NUM_RELAX_ + 1) {
           logger << "Structure has already been relaxed. Relaxation will be skipped." << apl::endl;
@@ -402,7 +404,18 @@ void RunPhonons_APL_181216(_xinput& xinput,
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
       message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
       message += "See README_AFLOW_APL.TXT for more information.";
-      throw apl::APLRuntimeError(message);
+      //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+      throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+    }
+    // ME191029
+    if (USER_ZEROSTATE_CHGCAR) {
+      if (USER_ENGINE == "DM") {
+        logger << "ZEROSTATE_CHGCAR requires the calculation of the undistorted supercell. ZEROSTATE will be switched on." << apl::endl;
+        USER_ZEROSTATE = true;
+      } else if (USER_ENGINE == "LR") {
+        logger << "ZEROSTATE_CHGCAR cannot be used with Linear Response calculations and will be switched off." << apl::endl;
+        USER_ZEROSTATE_CHGCAR = false;
+      }
     }
 
     // Correct MINATOMS if restricted
@@ -416,7 +429,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        throw apl::APLRuntimeError(message);
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_NUMBER_);
       }
     }
 
@@ -438,12 +452,14 @@ void RunPhonons_APL_181216(_xinput& xinput,
           message = "Mismatch between the number of points and the number of labels for the phonon dispersions. ";
           message += "Check the parameters DCINITCOORDS" + string(USER_DC_INITCOORDS_FRAC.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
           message += "See README_AFLOW_APL.TXT for more information.";
-          throw apl::APLRuntimeError(message);
+          //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+          throw aurostd::xerror(function, message, _INPUT_NUMBER_);
         }
       } else {
         message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL. ";
         message += "See README_AFLOW_APL.TXT for more information.";
-        throw apl::APLRuntimeError(message);
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
       }
     }
 
@@ -453,7 +469,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (USER_DOS_METHOD != "LT" && USER_DOS_METHOD != "RS") {
         message = "Wrong setting in " + _ASTROPT_ + "DOSMETHOD. Use either LT or RS. ";
         message += "See README_AFLOW_APL.TXT for more information.";
-        throw apl::APLRuntimeError(message);
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
       }
       if ((USER_DOS_METHOD == "RS") && (USER_DOS_SMEAR < _ZERO_TOL_)) {
         logger << apl::warning << "Smearing value for DOS not set or set to zero. ";
@@ -464,7 +481,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "DOSMESH. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        throw apl::APLRuntimeError(message);
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_NUMBER_);
       } else {
         USER_DOS_MESH[0] = aurostd::string2utype<int>(tokens[0]);
         USER_DOS_MESH[1] = aurostd::string2utype<int>(tokens[1]);
@@ -475,7 +493,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
         if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty() && !USER_DOS_PROJECTIONS_FRAC_SCHEME.empty()) {
           message = "Ambiguous input in APL DOS projections. ";
           message += "Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
-          throw apl::APLRuntimeError(message);
+          //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+          throw aurostd::xerror(function, message, _INPUT_AMBIGUOUS_);
         } else {
           string projscheme;
           if (!USER_DOS_PROJECTIONS_CART_SCHEME.empty()) projscheme = USER_DOS_PROJECTIONS_CART_SCHEME;
@@ -490,7 +509,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
               message = "Wrong setting in " + _ASTROPT_ + "DOSPROJECTIONS_";
               message += string(USER_DOS_PROJECTIONS_CART_SCHEME.empty()?"FRAC":"CART") + ". ";
               message += "See README_AFLOW_APL.TXT for the correct format.";
-              throw apl::APLRuntimeError(message);
+              //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+              throw aurostd::xerror(function, message, _INPUT_NUMBER_);
             }
           }
         }
@@ -504,16 +524,18 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "TPT. ";
         message += "See README_AFLOW_APL.TXT for the correct format.";
-        throw apl::APLRuntimeError(message);
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_NUMBER_);
       }
       USER_TP_TSTART = aurostd::string2utype<double>(tokens[0]);
       USER_TP_TEND = aurostd::string2utype<double>(tokens[1]);
       USER_TP_TSTEP = aurostd::string2utype<double>(tokens[2]);
     }
-  } catch (std::exception& e) {
-    logger << apl::error << e.what() << apl::endl;
-    return;
-  }
+// OBSOLETE - ME191029
+//  } catch (std::exception& e) {
+//    logger << apl::error << e.what() << apl::endl;
+//    return;
+//  }
 
   /****************************** OUTPUT SUMMARY ******************************/
 
@@ -547,6 +569,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       logger << apl::warning << "Distortions will only be generated in the positive direction - this is NOT recommended." << apl::endl;
     }
     logger << "Forces from the undistored state will " << (USER_ZEROSTATE?"":"NOT ") << "be used." << apl::endl;
+    logger << "The CHGCAR file of the undistorted state will " << (USER_ZEROSTATE_CHGCAR?"":"NOT ") << "be used for distorted cells." << apl::endl;  // ME191029
   }
 
   logger << "Polar corrections will " << (USER_POLAR?"":"NOT ") << "be employed." << apl::endl;
@@ -645,116 +668,121 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
   /***************************** CHECK PARAMETERS *****************************/
 
-      try {
-      string message;
+//      try { OBSOLETE ME191029 - error handling will be done with aurostd::xerror
+//      string message;
       // Correct BTE
-      if (USER_BTE != "RTA" && USER_BTE != "FULL") {
-        message = "Wrong setting in " + _ASTROPT_ + "BTE. Use either RTA or FULL.";
+    if (USER_BTE != "RTA" && USER_BTE != "FULL") {
+      message = "Wrong setting in " + _ASTROPT_ + "BTE. Use either RTA or FULL.";
+      message += "See README_AFLOW_APL.TXT for more information.";
+      //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+      throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+    }
+
+    vector<string> tokens;
+    // CUT_SHELL and CUT_RAD
+    bool defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
+    if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) {
+      tokens.clear();
+      apl::tokenize(CUTOFF_SCHEME, tokens, string(" ,"));
+      if (tokens.size() < 1) {
+        message = "Not enought entries in " + _ASTROPT_ + "CUT_RAD. ";
         message += "See README_AFLOW_APL.TXT for more information.";
-        throw apl::APLRuntimeError(message);
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+      } else if (tokens.size() > 2) {
+        logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_RAD. ";
+        logger << "Excess entries will be ignored." << apl::endl;
       }
-
-      vector<string> tokens;
-      // CUT_SHELL and CUT_RAD
-      bool defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
-      if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) {
-        tokens.clear();
-        apl::tokenize(CUTOFF_SCHEME, tokens, string(" ,"));
-        if (tokens.size() < 1) {
-          message = "Not enought entries in " + _ASTROPT_ + "CUT_RAD. ";
-          message += "See README_AFLOW_APL.TXT for more information.";
-          throw apl::APLRuntimeError(message);
-        } else if (tokens.size() > 2) {
-          logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_RAD. ";
-          logger << "Excess entries will be ignored." << apl::endl;
-        }
-        USER_CUTOFF_DISTANCE[0] = aurostd::string2utype<double>(tokens[0]);
-        if (USER_AAPL_FOURTH_ORDER) {
-          if (tokens.size() == 1) {
-            logger << apl::warning << "Only one entry found for the cutoff radius. ";
-            logger << "3rd and 4th order anharmonic IFCs will use the same value." << apl::endl;
-            USER_CUTOFF_DISTANCE[1] = USER_CUTOFF_DISTANCE[0];
-            } else {
-            USER_CUTOFF_DISTANCE[1] = aurostd::string2utype<double>(tokens[1]);
-            }
-        }
-      }
-
-      if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
-        tokens.clear();
-        apl::tokenize(SHELL_SCHEME, tokens, string(" ,"));
-        if (tokens.size() < 1) {
-          message = "Not enought entries in " + _ASTROPT_ + "CUT_SHELL. ";
-          message += "See README_AFLOW_APL.TXT for more information.";
-          throw apl::APLRuntimeError(message);
-        } else if (tokens.size() > 2) {
-          logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_SHELL. ";
-          logger << "Excess entries will be ignored." << apl::endl;
-        }
-        USER_CUTOFF_SHELL[0] = aurostd::string2utype<int>(tokens[0]);
-        if (USER_AAPL_FOURTH_ORDER) {
-          if (tokens.size() == 1) {
-            logger << apl::warning << "Only one entry found for the number of coordination shells. ";
-            logger << "3rd and 4th order anharmonic IFCs will use the same value." << apl::endl;
-            USER_CUTOFF_SHELL[1] = USER_CUTOFF_SHELL[0];
+      USER_CUTOFF_DISTANCE[0] = aurostd::string2utype<double>(tokens[0]);
+      if (USER_AAPL_FOURTH_ORDER) {
+        if (tokens.size() == 1) {
+          logger << apl::warning << "Only one entry found for the cutoff radius. ";
+          logger << "3rd and 4th order anharmonic IFCs will use the same value." << apl::endl;
+          USER_CUTOFF_DISTANCE[1] = USER_CUTOFF_DISTANCE[0];
         } else {
-            USER_CUTOFF_SHELL[1] = aurostd::string2utype<int>(tokens[1]);
+          USER_CUTOFF_DISTANCE[1] = aurostd::string2utype<double>(tokens[1]);
         }
       }
     }
-      // If only one parameter is set in the aflow.in file, unset the other  
-      if (kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] != kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
-        if (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) USER_CUTOFF_DISTANCE.assign(2, 0.0);
-        if (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) USER_CUTOFF_SHELL.assign(2, 0);
-    }
 
-      // THERMALGRID
+    if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
       tokens.clear();
-      apl::tokenize(THERMALGRID_SCHEME, tokens, string(" xX"));
-      if (tokens.size() == 3) {
-        USER_THERMALGRID[0] = aurostd::string2utype<int>(tokens[0]);
-        USER_THERMALGRID[1] = aurostd::string2utype<int>(tokens[1]);
-        USER_THERMALGRID[2] = aurostd::string2utype<int>(tokens[2]);
-      } else {
-        message = "Wrong setting in " + _ASTROPT_ + "THERMALGRID. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        throw apl::APLRuntimeError(message);
-    }
-
-      // TCT
-      tokens.clear();
-      apl::tokenize(TCT_SCHEME, tokens, string(" :"));
-      if (tokens.size() == 3) {
-        USER_TCT_TSTART = aurostd::string2utype<double>(tokens[0]);
-        USER_TCT_TEND = aurostd::string2utype<double>(tokens[1]);
-        USER_TCT_TSTEP = aurostd::string2utype<double>(tokens[2]);
-        if (USER_TCT_TSTART == 0) {
-          logger << apl::warning << "Thermal conductivity is infinite at 0 K and will be skipped." << apl::endl;
-          USER_TCT_TSTART += USER_TCT_TSTEP;
-        }
-      } else {
-        message = "Wrong setting in " + _ASTROPT_ + "TCT. ";
-        message += "See README_AFLOW_APL.TXT for the correct format.";
-        throw apl::APLRuntimeError(message);
-    }
-
-      // BOUNDARY and CUMULATIVEK
-      if (USER_BOUNDARY && USER_CUMULATIVEK) {
-        USER_CUMULATIVEK = false;
-        logger << apl::warning << "Both boundary effects and cumulative thermal conductivity cannot be ";
-        logger << "set at the same time. Cumulative thermal conductivity has been switched off." << apl::endl;
+      apl::tokenize(SHELL_SCHEME, tokens, string(" ,"));
+      if (tokens.size() < 1) {
+        message = "Not enought entries in " + _ASTROPT_ + "CUT_SHELL. ";
+        message += "See README_AFLOW_APL.TXT for more information.";
+        //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+        throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+      } else if (tokens.size() > 2) {
+        logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_SHELL. ";
+        logger << "Excess entries will be ignored." << apl::endl;
       }
-    } catch (std::exception& e) {
-      logger << apl::error << e.what() << apl::endl;
-      return;
+      USER_CUTOFF_SHELL[0] = aurostd::string2utype<int>(tokens[0]);
+      if (USER_AAPL_FOURTH_ORDER) {
+        if (tokens.size() == 1) {
+          logger << apl::warning << "Only one entry found for the number of coordination shells. ";
+          logger << "3rd and 4th order anharmonic IFCs will use the same value." << apl::endl;
+          USER_CUTOFF_SHELL[1] = USER_CUTOFF_SHELL[0];
+        } else {
+          USER_CUTOFF_SHELL[1] = aurostd::string2utype<int>(tokens[1]);
+        }
+      }
     }
+    // If only one parameter is set in the aflow.in file, unset the other
+    if (kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] != kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) {
+      if (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) USER_CUTOFF_DISTANCE.assign(2, 0.0);
+      if (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]) USER_CUTOFF_SHELL.assign(2, 0);
+    }
+
+    // THERMALGRID
+    tokens.clear();
+    apl::tokenize(THERMALGRID_SCHEME, tokens, string(" xX"));
+    if (tokens.size() == 3) {
+      USER_THERMALGRID[0] = aurostd::string2utype<int>(tokens[0]);
+      USER_THERMALGRID[1] = aurostd::string2utype<int>(tokens[1]);
+      USER_THERMALGRID[2] = aurostd::string2utype<int>(tokens[2]);
+    } else {
+      message = "Wrong setting in " + _ASTROPT_ + "THERMALGRID. ";
+      message += "See README_AFLOW_APL.TXT for the correct format.";
+      //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+      throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+    }
+
+    // TCT
+    tokens.clear();
+    apl::tokenize(TCT_SCHEME, tokens, string(" :"));
+    if (tokens.size() == 3) {
+      USER_TCT_TSTART = aurostd::string2utype<double>(tokens[0]);
+      USER_TCT_TEND = aurostd::string2utype<double>(tokens[1]);
+      USER_TCT_TSTEP = aurostd::string2utype<double>(tokens[2]);
+      if (USER_TCT_TSTART == 0) {
+        logger << apl::warning << "Thermal conductivity is infinite at 0 K and will be skipped." << apl::endl;
+        USER_TCT_TSTART += USER_TCT_TSTEP;
+      }
+    } else {
+      message = "Wrong setting in " + _ASTROPT_ + "TCT. ";
+      message += "See README_AFLOW_APL.TXT for the correct format.";
+      //throw apl::APLRuntimeError(message);  OBSOLETE ME191029 - replace with xerror
+      throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+    }
+    // BOUNDARY and CUMULATIVEK
+    if (USER_BOUNDARY && USER_CUMULATIVEK) {
+      USER_CUMULATIVEK = false;
+      logger << apl::warning << "Both boundary effects and cumulative thermal conductivity cannot be ";
+      logger << "set at the same time. Cumulative thermal conductivity has been switched off." << apl::endl;
+    }
+// OBSOLETE ME191029      
+//    } catch (std::exception& e) {
+//      logger << apl::error << e.what() << apl::endl;
+//      return;
+//    }
 
   /****************************** OUTPUT SUMMARY ******************************/
 
     logger << "Parameters for the Automatic Anharmonic Phonon Library successfully read." << apl::endl;
     logger << "Four-phonon processes will " << (USER_AAPL_FOURTH_ORDER?"":"NOT ") << "be included in the calculations." << apl::endl;
 
-    bool defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
+    defaults = (!kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0] && !kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[1]);
     if (defaults || kflags.KBIN_MODULE_OPTIONS.cut_rad_shell[0]) {
       logger << "The cutoff to compute the 3rd order anharmonic IFCs will be ";
       logger << USER_CUTOFF_DISTANCE[0] << " Angstrom." << apl::endl;
@@ -785,9 +813,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
     logger << "The Boltzmann Transport Equation will be solved using ";
     if (USER_BTE == "RTA") {
       logger << "the Relaxation Time Approximation Approximation (RTA)." << apl::endl;
-      } else {
+    } else {
       logger << "an iterative scheme." << apl::endl;
-      }
+    }
     logger << "The equation will be solved using the adaptive broadening method along a ";
     logger << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << " q-point mesh." << apl::endl;
     logger << "Isotope effects will " << (USER_ISOTOPE?"":"NOT ") << "be included." << apl::endl;
@@ -805,10 +833,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
   } else {
     USER_TCOND = false;
     logger << "Anharmonic force constants and thermal conductivity will NOT be calculated." << apl::endl;
-    }
-  // ME 181027 START
-
-  vector<string> tokens;
+  }
+  // ME 181027 STOP
 
   // QHA ----------------------------------------------------------------------
 
@@ -937,7 +963,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
         SCQHA_PDIS_T_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "SCQHA_PDIS_T=" + "|" + _ASTROPT_APL_OLD_ + "SCQHA_PDIS_T="), SCQHA_PDIS_T_OPTION.option, SCQHA_PDIS_T_OPTION.xscheme);
         tokens.clear(); scqha_pdis_T.clear();
         apl::tokenize(SCQHA_PDIS_T_OPTION.content_string, tokens, string(" ,"));
-        if (tokens.size() == 0) {throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0");}
+        if (tokens.size() == 0) {
+          // ME191031 - use xerror
+          //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0");
+          throw aurostd::xerror(function, "Wrong setting in the"+_ASTROPT_+"SCQHA_PDIS_T. Specify as SCQHA_PDIS_T=-100.0, 300.0, 600.0", _INPUT_ILLEGAL_);
+        }
         if(tokens.size()!=0){
           for (uint i=0; i<tokens.size(); i++){
             scqha_pdis_T.push_back(aurostd::string2utype<double>(tokens.at(i)));
@@ -991,7 +1021,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
         if (SCQHA_DISTORTION_OPTION.isentry) {
           tokens.clear();
           apl::tokenize(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
-          if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION_OPTION=3.0.");}
+          if (tokens.size() != 1) {
+            // ME191031 - use xerror
+            //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION_OPTION=3.0.");
+            throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION_OPTION=3.0.", _INPUT_ILLEGAL_);
+          }
         }
         logger << (SCQHA_DISTORTION_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "SCQHA_DISTORTION=" << SCQHA_DISTORTION << "." << apl::endl;
       }
@@ -1005,7 +1039,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
         if (CUTOFF_FREQ_OPTION.isentry) {
       tokens.clear();
           apl::tokenize(CUTOFF_FREQ_OPTION.content_string, tokens, string(" "));
-          if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"CUTOFF_FREQ. Specify as CUTOFF_FREQ=0.01.");}
+          if (tokens.size() != 1) {
+            // ME191031 - use xerror
+            //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"CUTOFF_FREQ. Specify as CUTOFF_FREQ=0.01.");
+            throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"CUTOFF_FREQ. Specify as CUTOFF_FREQ=0.01.", _INPUT_ILLEGAL_);
+          }
         }
         logger << (CUTOFF_FREQ_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "CUTOFF_FREQ=" << CUTOFF_FREQ_OPTION.content_string << "." << apl::endl;
 
@@ -1022,7 +1060,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
           EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme);
           tokens.clear();
           apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
-          if (tokens.size() != 3) {throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1.");}
+          if (tokens.size() != 3) {
+            // ME191031
+            //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1.");
+            throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1.", _INPUT_ILLEGAL_);
+          }
           EOS_DISTORTION_START = aurostd::string2utype<double>(tokens.at(0));
           EOS_DISTORTION_END = aurostd::string2utype<double>(tokens.at(1));
           EOS_DISTORTION_DISTORTION_INC = aurostd::string2utype<double>(tokens.at(2));
@@ -1034,7 +1076,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
           if (FITTING_TYPE_OPTION.isentry) {
             tokens.clear();
             apl::tokenize(FITTING_TYPE_OPTION.content_string, tokens, string(" "));
-            if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"FITTING_TYPE. Specify as FITTING_TYPE=BM2.");}
+            if (tokens.size() != 1) {
+              // ME191031 - use xerror
+              //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"FITTING_TYPE. Specify as FITTING_TYPE=BM2.");
+              throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"FITTING_TYPE. Specify as FITTING_TYPE=BM2.", _INPUT_ILLEGAL_);
+            }
     }
           logger << (FITTING_TYPE_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "FITTING_TYPE=" << FITTING_TYPE_OPTION.content_string << "." << apl::endl;
           logger << "EOS fitting type found = " << FITTING_TYPE << "." << apl::endl;
@@ -1045,7 +1091,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
             if (EOS_STATIC_KPPRA_OPTION.isentry) {
               tokens.clear();
               apl::tokenize(EOS_STATIC_KPPRA_OPTION.content_string, tokens, string(" "));
-              if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_STATIC_KPPRA. Specify as EOS_STATIC_KPPRA=10000.");}
+              if (tokens.size() != 1) {
+                // ME191031 - use xerror
+                //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_STATIC_KPPRA. Specify as EOS_STATIC_KPPRA=10000.");
+                throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"EOS_STATIC_KPPRA. Specify as EOS_STATIC_KPPRA=10000.", _INPUT_ILLEGAL_);
+              }
             }
             logger << (EOS_STATIC_KPPRA_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "EOS_STATIC_KPPRA=" << EOS_STATIC_KPPRA_OPTION.content_string << "." << apl::endl;
           }
@@ -1054,7 +1104,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
           if (NEDOS_OPTION.isentry) {
             tokens.clear();
             apl::tokenize(NEDOS_OPTION.content_string, tokens, string(" "));
-            if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"NEDOS. Specify as NEDOS=5000.");}
+            if (tokens.size() != 1) {
+              // ME191031 - use xerror
+              //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"NEDOS. Specify as NEDOS=5000.");}
+              throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"NEDOS. Specify as NEDOS=5000.", _INPUT_ILLEGAL_);
+            }
           }
           logger << (NEDOS_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "NEDOS=" << NEDOS_OPTION.content_string << "." << apl::endl;
         }
@@ -1089,7 +1143,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (GP_DISTORTION_OPTION.isentry) {
       tokens.clear();
         apl::tokenize(GP_DISTORTION_OPTION.content_string, tokens, string(" "));
-        if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.");}
+        if (tokens.size() != 1) {
+          // ME191031 - use xerror
+          //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.");
+          throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"GP_DISTORTION. Specify as GP_DISTORTION=0.03.", _INPUT_ILLEGAL_);
+        }
     }
       logger << (GP_DISTORTION_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "GP_DISTORTION=" << GP_DISTORTION << "." << apl::endl;
     }
@@ -1100,7 +1158,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
       EOS_DISTORTION_RANGE_OPTION.options2entry(AflowIn, string( _ASTROPT_ + "EOS_DISTORTION_RANGE=" + "|" + _ASTROPT_APL_OLD_ + "EOS_DISTORTION_RANGE="), EOS_DISTORTION_RANGE_OPTION.option, EOS_DISTORTION_RANGE_OPTION.xscheme); //CO 170601
       tokens.clear();
       apl::tokenize(EOS_DISTORTION_RANGE_OPTION.content_string, tokens, string(" :"));
-      if (tokens.size() != 3) {throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1");}
+      if (tokens.size() != 3) {
+        // ME191031 - use xerror
+        //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1");
+        throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"EOS_DISTORTION_RANGE. Specify as EOS_DISTORTION_RANGE=-3:6:1", _INPUT_ILLEGAL_);
+      }
       EOS_DISTORTION_START = aurostd::string2utype<double>(tokens.at(0));
       EOS_DISTORTION_END = aurostd::string2utype<double>(tokens.at(1));
       EOS_DISTORTION_DISTORTION_INC = aurostd::string2utype<double>(tokens.at(2));
@@ -1138,7 +1200,11 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (SCQHA_DISTORTION_OPTION.isentry) {
         tokens.clear();
         apl::tokenize(SCQHA_DISTORTION_OPTION.content_string, tokens, string(" "));
-        if (tokens.size() != 1){throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.");}
+        if (tokens.size() != 1) {
+          // ME190131 - use xerror
+          //throw apl::APLRuntimeError("Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.");
+          throw aurostd::xerror(function, "Wrong setting in the "+_ASTROPT_+"SCQHA_DISTORTION. Specify as SCQHA_DISTORTION=3.0.", _INPUT_ILLEGAL_);
+        }
       }
       logger << (SCQHA_DISTORTION_OPTION.isentry ? "Setting" : "DEFAULT") << " " << _ASTROPT_ << "SCQHA_DISTORTION=" << SCQHA_DISTORTION << "." << apl::endl;
     }
@@ -1195,38 +1261,44 @@ void RunPhonons_APL_181216(_xinput& xinput,
     //fix vasp bin for LR or DM+POLAR
     if (USER_ENGINE == string("LR") || (USER_ENGINE == string("DM") && USER_POLAR)) {
       if(xflags.AFLOW_MODE_VASP && !XHOST.GENERATE_AFLOWIN_ONLY){  // ME190313 - Do not check the VASP binary for generate_aflowin_only
-  try {
-        // Check the version of VASP binary
-        logger << "Checking VASP version for linear response calculations.";
-        string vaspVersion;
-        vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
-        if (!vaspVersion.empty()) {
-          logger << "[" << vaspVersion << "]";
-          if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
-            logger << apl::warning << "." << apl::endl;
-            // if(_WITHIN_DUKE_){ OBSOLETE - ME 190108
+        try {
+          // Check the version of VASP binary
+          logger << "Checking VASP version for linear response calculations.";
+          string vaspVersion;
+          vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
+          if (!vaspVersion.empty()) {
+            logger << "[" << vaspVersion << "]";
+            if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+              logger << apl::warning << "." << apl::endl;
+              // if(_WITHIN_DUKE_){ OBSOLETE - ME 190108
               // ME 190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;
               kflags.KBIN_MPI_BIN = DEFAULT_VASP5_MPI_BIN;
               if (kflags.KBIN_MPI) {
                 kflags.KBIN_BIN = kflags.KBIN_MPI_BIN;
-            } else {
+              } else {
                 kflags.KBIN_BIN = kflags.KBIN_SERIAL_BIN;
-            }
+              }
               logger << apl::warning << "Modifying VASP bin to " << kflags.KBIN_BIN << " (AUTO modification)." << apl::endl;  // ME 190109
 //[ME190109]            } else {
 //[ME190109]              throw apl::APLRuntimeError("The LR engine needs VASP5 or higher.");
 //[ME190109]            }
-          } else {logger << " OK." << apl::endl;}
-        } else {
-          logger << "Failed." << apl::warning << apl::endl; 
-          throw apl::APLLogicError("Unexpected binary format.");
+            } else {
+              logger << " OK." << apl::endl;
+            }
+          } else {
+            logger << "Failed." << apl::warning << apl::endl;
+            // ME191031 - use xerror
+            //throw apl::APLLogicError("Unexpected binary format.");
+            throw aurostd::xerror(function, "Unexpected binary format.", _FILE_WRONG_FORMAT_);
+          }
+        //} catch (apl::APLLogicError& e) {
+        } catch (aurostd::xerror& excpt) {
+          logger << apl::warning << "Failed to identify the version of the VASP binary." << apl::endl;
+          logger << apl::warning << excpt.error_message << apl::endl;
+          //logger << apl::warning << excpt.what() << apl::endl;
         }
-      } catch (apl::APLLogicError& e) {
-        logger << apl::warning << "Failed to identify the version of VASP binary." << apl::endl;
-        logger << apl::warning << e.what() << apl::endl;
       }
-    }
     }
 
     // ME 190107 - Relax after fixing the vasp bin to make version consistent.
@@ -1339,9 +1411,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
     }
 
       for (int o = 3; o <= max_order; o++) {
-        apl::ClusterSet clst(logger);
+        apl::ClusterSet clst(logger, aflags);
         bool awakeClusterSet;
-        string clust_hib_file = DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
+        string clust_hib_file = aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + _CLUSTER_SET_FILE_[o-3];
         if (USER_HIBERNATE) {
           awakeClusterSet = (aurostd::EFileExist(clust_hib_file) ||
                              aurostd::FileExist(clust_hib_file));
@@ -1352,17 +1424,17 @@ void RunPhonons_APL_181216(_xinput& xinput,
         if (awakeClusterSet) {
           try {
             clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
-                                   USER_CUTOFF_DISTANCE[o-3], o, logger);
+                                   USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
           } catch (aurostd::xerror excpt) {
-            logger << apl::warning << excpt.where() << " " << excpt.error_message << std::endl;
-            logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
+            logger << apl::warning << excpt.where() << " " << excpt.error_message
+                   << " Skipping awakening of anharmonic IFCs." << apl::endl;
             awakeClusterSet = false;
           }
         }
 
         if (!awakeClusterSet) {
           clst = apl::ClusterSet(supercell, USER_CUTOFF_SHELL[o-3],
-                                 USER_CUTOFF_DISTANCE[o-3], logger);
+                                 USER_CUTOFF_DISTANCE[o-3], logger, aflags);
           clst.build(o);
           clst.buildDistortions();
           if (USER_HIBERNATE) {
@@ -1452,36 +1524,62 @@ void RunPhonons_APL_181216(_xinput& xinput,
     }
       //QHA/SCQHA/QHA3P END
 
+    // ME191029 - Reordered APL workflow to accommodate ZEROSTATE CHGCAR
+    phcalc->runVASPCalculations(USER_ZEROSTATE_CHGCAR);
+
     // ME180820 - set up VASP calculations for thermal conductivity calculations
-    bool aapl_stagebreak;
+    bool aapl_stagebreak = false;
     if (USER_TCOND) {
-      aapl_stagebreak = phcalc->buildVaspAAPL(phcalc->_clusters[0]);
+      aapl_stagebreak = phcalc->buildVaspAAPL(phcalc->_clusters[0], USER_ZEROSTATE_CHGCAR);
       if (USER_AAPL_FOURTH_ORDER) {
-        aapl_stagebreak = (phcalc->buildVaspAAPL(phcalc->_clusters[1]) || aapl_stagebreak);
+        aapl_stagebreak = (phcalc->buildVaspAAPL(phcalc->_clusters[1], USER_ZEROSTATE_CHGCAR) || aapl_stagebreak);
       }
     } else {
       aapl_stagebreak = false;
     }
+    // ME1901029 - BEGIN
+    phcalc->_stagebreak = (phcalc->_stagebreak || aapl_stagebreak);
+
+    // Run ZEROSTATE calculation if ZEROSTATE CHGCAR
+    if (USER_ZEROSTATE_CHGCAR && !XHOST.GENERATE_AFLOWIN_ONLY) {
+      string chgcar_file = phcalc->zerostate_dir + "/CHGCAR.static";
+      if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
+      if (!aurostd::FileExist(chgcar_file)) {
+        stringstream cmd;
+        cmd << "aflow --use_aflow.in=" << _AFLOWIN_
+            << " --use_LOCK=" << _AFLOWLOCK_
+            << " -D ./" << phcalc->zerostate_dir;
+        aurostd::execute(cmd.str());
+      }
+    }
+    
+    if (phcalc->_stagebreak) {
+      throw apl::APLStageBreak();
+    }
+    // ME1901029 - END
 
     // Run or awake
-    bool isHibFileAvailable = aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE);  //|| //CO
+    bool isHibFileAvailable = aurostd::EFileExist(aflags.Directory +"/"+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_HARMIFC_FILE);  //|| //CO
     //aurostd::FileExist(string("apl.xml")); //CO
 
     if (USER_HIBERNATE && isHibFileAvailable) {
-      if (aapl_stagebreak) {
-        throw apl::APLStageBreak();  // ME 180830
-      }
+      // OBSOLETE ME191029
+      //if (aapl_stagebreak) {
+      //  throw apl::APLStageBreak();  // ME 180830
+      //}
       try {
         phcalc->awake();
-      } catch (apl::APLLogicError& e) {
-        logger << apl::warning << e.what() << apl::endl;
+      // ME191031 - use xerror
+      //} catch (apl::APLLogicError& e) {
+      } catch (aurostd::xerror& e) {
+        logger << apl::warning << e.error_message << apl::endl;
         logger << apl::warning << "Skipping awakening..." << apl::endl;
         isHibFileAvailable = false;
       }
     }
 
     if (!isHibFileAvailable) {
-      phcalc->run(aapl_stagebreak);  // ME180830 -- added stagebreak bool
+      phcalc->run();
       if (USER_HIBERNATE)
         phcalc->hibernate();
     }
@@ -1664,7 +1762,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
     if (!USER_FREQFORMAT.empty()) {
-     try {
+//     try {
       // Convert format to machine representation
       tokens.clear();
       apl::tokenize(USER_FREQFORMAT, tokens, string(" |:;,"));
@@ -1692,11 +1790,13 @@ void RunPhonons_APL_181216(_xinput& xinput,
         }
       }
       // Check if there was specified unit keyword...
+      // ME191031 - use xerror
       if (((frequencyFormat & ~apl::OMEGA) & ~apl::ALLOW_NEGATIVE) == apl::NONE)
-        throw apl::APLLogicError("The mishmash frequency format.");
-     } catch (std::exception& e) {
-       logger << apl::error << e.what() << apl::endl;
-     }
+        throw aurostd::xerror(function, "Ambiguous frequency format.", _INPUT_AMBIGUOUS_);
+//        throw apl::APLLogicError("The mishmash frequency format.");
+//     } catch (std::exception& e) {
+//       logger << apl::error << e.what() << apl::endl;
+//     }
     } else {
       frequencyFormat = apl::THZ | apl::ALLOW_NEGATIVE;
     }
@@ -1732,12 +1832,12 @@ void RunPhonons_APL_181216(_xinput& xinput,
       pdisc.calc(frequencyFormat);
 
       // Write results into PDIS file
-      pdisc.writePDIS();
-      pdisc.writePHEIGENVAL();  // ME190614
+      pdisc.writePDIS(aflags.Directory);
+      pdisc.writePHEIGENVAL(aflags.Directory);  // ME190614
 	//QHA/SCQHA/QHA3P  START //PN180705
 	//////////////////////////////////////////////////////////////////////
         ptr_hsq.reset(new apl::PhononHSQpoints(logger));
-        ptr_hsq->read_qpointfile();
+        ptr_hsq->read_qpointfile(aflags.Directory);
       //compute Gruneisen dispersion curve
         if (CALCULATE_GRUNEISEN_OPTION.option ||
             CALCULATE_GRUNEISEN_A_OPTION.option ||
@@ -1793,15 +1893,15 @@ void RunPhonons_APL_181216(_xinput& xinput,
       // ME190428 - END
       dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
       if (USER_DOS) {
-        dosc.writePDOS();
-        dosc.writePHDOSCAR();  // ME190614
+        dosc.writePDOS(aflags.Directory);
+        dosc.writePHDOSCAR(aflags.Directory);  // ME190614
       }
 
       // Calculate thermal properties
       if (USER_TP) {
         if (!dosc.hasNegativeFrequencies()) {  // ME190423
           apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME190423
-          tpc.writeTHERMO(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
+          tpc.writeTHERMO(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP, aflags.Directory);
 	    //QHA/SCQHA/QHA3P START //PN180705
           //calculate Gruneisen
           // ME 190428 - START
@@ -2037,7 +2137,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       phcalc->setAnharmonicOptions(USER_AAPL_MAX_ITER, USER_AAPL_MIX, USER_EPS_SUM);
       bool awakeAnharmIFCs;
       for (uint i = 0; i < phcalc->_clusters.size(); i++) {
-        string ifcs_hib_file = DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
+        string ifcs_hib_file = aflags.Directory + "/" +  DEFAULT_AAPL_FILE_PREFIX + _ANHARMONIC_IFCS_FILE_[i];
         if (USER_HIBERNATE) {
           awakeAnharmIFCs = (aurostd::EFileExist(ifcs_hib_file) ||
                              aurostd::FileExist(ifcs_hib_file));
@@ -2070,7 +2170,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
       // Do the thermal conductivity calculation
       logger << "Starting thermal conductivity calculations." << apl::endl;
-      apl::TCONDCalculator tcond(*phcalc, qmtcond, logger);
+      apl::TCONDCalculator tcond(*phcalc, qmtcond, logger, aflags);
 
       // Set calculation options
       tcond.calc_options.flag("RTA", (USER_BTE == "RTA"));

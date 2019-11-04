@@ -81,7 +81,7 @@ namespace apl {
 
 //Constructor/////////////////////////////////////////////////////////////////
 TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm, 
-                                 Logger& l) : _pc(pc), _qm(qm), _logger(l) {
+                                 Logger& l, _aflags& a) : _pc(pc), _qm(qm), _logger(l), aflags(a) {
   free();
   nBranches = _pc.getNumberOfBranches();
   nQPs = _qm.getnQPs();
@@ -1069,6 +1069,7 @@ namespace apl {
 
 void TCONDCalculator::writeTempIndepOutput(const string& filename, string keyword,
                                            const string& unit, const vector<vector<double> >& data) {
+  string path = aurostd::CleanFileName(aflags.Directory + "/" + filename);
   stringstream output;
   output << AFLOWIN_SEPARATION_LINE << std::endl;
   string key = "[AAPL_" + aurostd::toupper(aurostd::StringSubst(keyword, " ", "_")) + "]";
@@ -1083,11 +1084,11 @@ void TCONDCalculator::writeTempIndepOutput(const string& filename, string keywor
   writeDataBlock(output, data);
   output << key << "STOP" << std::endl;
   output << AFLOWIN_SEPARATION_LINE << std::endl;
-  aurostd::stringstream2file(output, filename);
-  if (!aurostd::FileExist(filename)) {
+  aurostd::stringstream2file(output, path);
+  if (!aurostd::FileExist(path)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput()";
     stringstream message;
-    message << "Could not write file " << filename << ".";
+    message << "Could not write file " << path << ".";
     throw xerror(function, message, _FILE_ERROR_);
   }
 }
@@ -1133,53 +1134,12 @@ void TCONDCalculator::writeDataBlock(stringstream& output,
   }
 }
 
-//writeFrequencies////////////////////////////////////////////////////////////
-// Writes the frequencies into a file. Each row belongs to a q-point, and
-// each column belongs to a phonon branch.
-void TCONDCalculator::writeFrequencies() {
-  stringstream output;
-  string filename = DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_FREQ_FILE;
-
-  // Header
-  output << AFLOWIN_SEPARATION_LINE << std::endl;
-  if (!_pc.getSystemName().empty()) {
-    output << "[AAPL_FREQUENCY]SYSTEM=" << _pc.getSystemName() << std::endl;
-  }
-  output << "[AAPL_FREQUENCY]START" << std::endl;
-  output << std::setiosflags(std::ios::fixed | std::ios::right);
-  output << std::setw(10) << "# Q-point";
-  output << std::setw(20) << " ";
-  output << "Frequencies (THz)" << std::endl;
-
-  // Body
-  for (int q = 0; q < nQPs; q++) {
-    output << std::setiosflags(std::ios::fixed | std::ios::right);
-    output << std::setw(10) << q;
-    for (int br = 0; br < nBranches; br++) {
-      output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-      output << std::setw(20) << std::setprecision(10) << std::scientific << freq[q][br];
-    }
-    output << std::endl;
-  }
-
-  output << "[AAPL_FREQUENCY]STOP" << std::endl;
-  output << AFLOWIN_SEPARATION_LINE << std::endl;
-
-  // Write to file
-  aurostd::stringstream2file(output, filename);
-  if (!aurostd::FileExist(filename)) {
-    string function = _AAPL_TCOND_ERR_PREFIX_ + "writeFrequencies";
-    string message = "Could not write frequencies to file.";
-    throw xerror(function, message, _FILE_ERROR_);
-  }
-}
-
 //writeGroupVelocities////////////////////////////////////////////////////////
 // Writes the group velocities into a file. Each row belongs to a q-point,
 // and each column triplet belongs to a phonon branch.
 void TCONDCalculator::writeGroupVelocities() {
   stringstream output;
-  string filename = DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE;
+  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
 
   // Header
   output << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -1219,7 +1179,7 @@ void TCONDCalculator::writeGroupVelocities() {
 }
 
 void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> > > >& phase_space) {
-  string filename = DEFAULT_AAPL_FILE_PREFIX + "phase_space.out";
+  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + "phase_space.out");
 
   vector<double> ps_procs(4), ps_nu(2);
   vector<vector<double> > ps_modes(nIQPs, vector<double>(nBranches));
@@ -1241,6 +1201,7 @@ void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> 
   stringstream output;
   output << AFLOWIN_SEPARATION_LINE << std::endl;
   output << "# 3-phonon scattering phase space (in s)" << std::endl;
+  output << "[AAPL_SCATTERING_PHASE_SPACE]SYSTEM=" << _pc.getSystemName() << std::endl;
   output << "[AAPL_TOTAL_SCATTERING_PHASE_SPACE]START" << std::endl;
   output << std::setiosflags(std::ios::left | std::ios::fixed | std::ios::showpoint);
   output << std::setw(15) << "total" << std::setw(10) << std::setprecision(8) << std::dec << ps_total << std::endl;
@@ -1251,14 +1212,14 @@ void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> 
   output << std::setw(15) << "total AOO" << std::setw(10) << std::setprecision(8) << std::dec << ps_procs[2] << std::endl;
   output << std::setw(15) << "total OOO" << std::setw(10) << std::setprecision(8) << std::dec << ps_procs[3] << std::endl;
   output << "[AAPL_TOTAL_SCATTERING_PHASE_SPACE]STOP" << std::endl;
-  output << "[AAPL_MODE_SCATTERING_PHASE_SPACE]START" << std::endl;
+  output << "[AAPL_SCATTERING_PHASE_SPACE]START" << std::endl;
   for (int i = 0; i < nIQPs; i++) {
     for (int b = 0; b < nBranches; b++) {
       output << std::setw(17) << std::setprecision(10) << std::dec << ps_modes[i][b];
     }
     output << std::endl;
   }
-  output << "[AAPL_MODE_SCATTERING_PHASE_SPACE]STOP" << std::endl;
+  output << "[AAPL_SCATTERING_PHASE_SPACE]STOP" << std::endl;
   output << AFLOWIN_SEPARATION_LINE << std::endl;
   aurostd::stringstream2file(output, filename);
 }
@@ -1266,10 +1227,11 @@ void TCONDCalculator::writePhaseSpace(const vector<vector<vector<vector<double> 
 void TCONDCalculator::writeGrueneisen(const vector<double>& grueneisen_avg,
                                       const vector<vector<double> >& grueneisen_modes) {
   stringstream output;
-  string filename = DEFAULT_AAPL_FILE_PREFIX + "grueneisen.out";
+  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + "grueneisen.out");
 
   output << AFLOWIN_SEPARATION_LINE << std::endl;
-  output << "[AAPL_AVERAGE_GRUENEISEN]START" << std::endl;
+  output << "[AAPL_GRUENEISEN]SYSTEM=" << _pc.getSystemName() << std::endl;
+  output << "[AAPL_GRUENEISEN_AVERAGE]START" << std::endl;
   output << std::setiosflags(std::ios::right | std::ios::fixed | std::ios::showpoint);
   output << std::setw(8) << "# T (K)"
          << std::setw(23) << "Grueneisen parameter" << std::endl;
@@ -1277,22 +1239,22 @@ void TCONDCalculator::writeGrueneisen(const vector<double>& grueneisen_avg,
     output << std::setw(8) << std::fixed << std::setprecision(2) << temperatures[t];
     output << std::setw(23) << std::setprecision(10) << std::dec << grueneisen_avg[t] << std::endl;
   }
-  output << "[AAPL_AVERAGE_GRUENEISEN]STOP" << std::endl;
-  output << "[AAPL_MODE_GRUENEISEN]START" << std::endl;
+  output << "[AAPL_GRUENEISEN_AVERAGE]STOP" << std::endl;
+  output << "[AAPL_GRUENEISEN_MODE]START" << std::endl;
   for (int i = 0; i < nIQPs; i++) {
     for (int b = 0; b < nBranches; b++) {
       output << std::setw(17) << std::setprecision(10) << std::dec << grueneisen_modes[i][b];
     }
     output << std::endl;
   }
-  output << "[AAPL_MODE_GRUENEISEN]STOP" << std::endl;
+  output << "[AAPL_GRUENEISEN_MODE]STOP" << std::endl;
   output << AFLOWIN_SEPARATION_LINE << std::endl;
   aurostd::stringstream2file(output, filename);
 }
 
 void TCONDCalculator::writeThermalConductivity() {
   stringstream output;
-  string filename = DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE;
+  string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
 
   // Header
   output << AFLOWIN_SEPARATION_LINE << std::endl;

@@ -934,6 +934,28 @@ namespace KBIN {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
 
+    // ME1901028
+    if (Krun && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
+      string chgcar = vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string;
+      if (chgcar[0] != '/') chgcar = aurostd::CleanFileName(aflags.Directory + "/" + chgcar);  // relative path
+      if (aurostd::FileExist(chgcar)) {
+        if (aurostd::IsCompressed(chgcar)) {
+          string ext = aurostd::GetCompressionExtension(chgcar);
+          aurostd::CopyFile(chgcar, aflags.Directory + "/CHGCAR" + ext);  // relative path
+          aurostd::UncompressFile(aflags.Directory + "/CHGCAR" + ext);
+        } else {
+          aurostd::CopyFile(chgcar, aflags.Directory + "/CHGCAR");
+        }
+        aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 1, 0.0, true);
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+      } else {
+        string function = "KBIN::VASP_Modify_INCAR()";
+        string message = "Cannot use CHGCAR file " + chgcar + ". File not found.";
+        throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      }
+    }
+
     // LDAU0
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LDAU0.isentry) {          /*************** INCAR **************/
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]LDAU=OFF - " << Message(aflags,"user,host,time") << endl;
@@ -4015,6 +4037,25 @@ namespace KBIN {
       DONE=TRUE;
     }
 
+    // ME191028
+    // ICHARG ICHARG ICHARG ICHARG ICHARG ICHARG
+    if (command == "ICHARG") {
+      const string& chgcar = vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string;
+      for (int i = 1; i <= imax; i++) {
+        strline = aurostd::GetLineString(FileContent, i);
+        if (aurostd::substring2bool(strline, "ICHARG", TRUE) || aurostd::substring2bool(strline, "#ICHARG", TRUE)) {
+          if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC)" << std::endl;
+        } else {
+          if (!vflags.KBIN_VASP_INCAR_VERBOSE && !strline.empty()) xvasp.INCAR << strline << std::endl;
+          if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << std::endl;
+        }
+      }
+      if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] begin" << std::endl;
+      xvasp.INCAR << "ICHARG=" << ivalue << std::endl;
+      if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] end" << std::endl;
+      DONE = true;
+    }
+
     // ***************************************************************************
     // GENERIC GENERIC GENERIC GENERIC GENERIC GENERIC
     if(command=="GENERIC") {
@@ -4050,6 +4091,37 @@ namespace KBIN {
     return TRUE;
   }
 } 
+
+// ***************************************************************************
+// KBIN::XVASP_INCAR_ADJUST_ICHARG
+namespace KBIN {
+  void XVASP_INCAR_ADJUST_ICHARG(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, int step, ofstream& FileMESSAGE) {
+    if ((step == 1) && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
+      ostringstream aus;
+      aus << "00000  MESSAGE ICHARG: ICHARG will be set to 2 - " << Message(aflags, "user,host,time") << std::endl;
+      aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 2, 0.0, false);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
+      xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
+      xvasp.INCAR_orig.str(std::string());
+      xvasp.INCAR_orig << xvasp.INCAR.str();
+      aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+
+      // Comment out CHGCAR file in aflow.in
+      if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
+        stringstream aflowin_fixed;
+        string line, filecontent;
+        filecontent = aurostd::file2string(aurostd::CleanFileName(xvasp.Directory + "/" + _AFLOWIN_));
+        int nlines = aurostd::GetNLinesString(filecontent);
+        for (int l = 1; l <= nlines; l++) {
+          line = aurostd::GetLineString(filecontent, l);
+          if ((line[0] != '#') && (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line))) aflowin_fixed << "#";
+          aflowin_fixed << line << std::endl;
+        }
+      }
+    }
+  }
+}  // namespace KBIN
 
 // ***************************************************************************
 // KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX

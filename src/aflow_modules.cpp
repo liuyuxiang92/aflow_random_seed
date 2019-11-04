@@ -116,6 +116,7 @@ vector<aurostd::xoption> loadDefaultsAPL() {
   opt.keyword="DOSPROJECTIONS_FRAC"; opt.xscheme = ""; aplflags.push_back(opt); opt.clear();
   opt.keyword="TP"; opt.option = DEFAULT_APL_TP; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
   opt.keyword="TPT"; opt.xscheme = DEFAULT_APL_TPT; aplflags.push_back(opt); opt.clear();
+  opt.keyword="ZEROSTATE_CHGCAR"; opt.option = DEFAULT_APL_ZEROSTATE_CHGCAR; opt.xscheme = (opt.option?"ON":"OFF"); aplflags.push_back(opt); opt.clear();
   if (LDEBUG) {
     for (uint i = 0; i < aplflags.size(); i++) {
       std::cerr << soliloquy << " key: " << aplflags[i].keyword << ", xscheme: " << aplflags[i].xscheme << ", option: " << aplflags[i].option << std::endl;

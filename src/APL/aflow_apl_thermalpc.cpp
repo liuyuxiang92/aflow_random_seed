@@ -18,8 +18,13 @@ ThermalPropertiesCalculator::ThermalPropertiesCalculator(DOSCalculator& dosc, Lo
   // Get step
   if (_bins.size() > 2)
     _stepDOS = _bins[1] - _bins[0];
-  else
-    throw APLRuntimeError("ThermalPropertiesCalculator::ThermalPropertiesCalculator(); Problem to obtain the step of DOS.");
+  else {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("ThermalPropertiesCalculator::ThermalPropertiesCalculator(); Problem to obtain the step of DOS.");
+    string function = "ThermalPropertiesCalculator::ThermalPropertiesCalculator()";
+    string message = "Problem in obtaining the step of the phonon DOS.";
+    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  }
 
   // Precompute it, since it wil be used many times
   _isCalcZeroPointVibrationEnergy_meV = false;
@@ -132,7 +137,8 @@ double ThermalPropertiesCalculator::getScalingFactor(ThermalPropertiesUnits unit
 
 // ///////////////////////////////////////////////////////////////////////////
 
-void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER_TP_TEND, double USER_TP_TSTEP) {
+void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER_TP_TEND,
+                                              double USER_TP_TSTEP, const string& directory) {
   // The output file THERMO
   //CO - START
   //ofstream outfile("THERMO",ios_base::out);
@@ -143,7 +149,7 @@ void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER
   //}
   //CO - END
 
-  string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE; //ME181226
+  string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE); //ME181226
   _logger << "Writing thermodynamic properties into file " << filename << "." << apl::endl; //ME181226
   outfile << AFLOWIN_SEPARATION_LINE << std::endl;  // ME190614
   if (!_dosc._system.empty()) outfile << "[APL_THERMO]SYSTEM=" << _dosc._system << std::endl;  // ME190614
