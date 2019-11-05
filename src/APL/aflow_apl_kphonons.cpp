@@ -1545,11 +1545,13 @@ void RunPhonons_APL_181216(_xinput& xinput,
       string chgcar_file = phcalc->zerostate_dir + "/CHGCAR.static";
       if (kflags.KZIP_COMPRESS) chgcar_file += "." + kflags.KZIP_BIN;
       if (!aurostd::FileExist(chgcar_file)) {
+        logger << "Executing ZEROSTATE directory." << apl::endl;
         stringstream cmd;
         cmd << "aflow --use_aflow.in=" << _AFLOWIN_
             << " --use_LOCK=" << _AFLOWLOCK_
-            << " -D ./" << phcalc->zerostate_dir;
+            << " --quiet -D ./" << phcalc->zerostate_dir;
         aurostd::execute(cmd.str());
+        logger << "Finished executing ZEROSTATE directory." << apl::endl;
       }
     }
     
