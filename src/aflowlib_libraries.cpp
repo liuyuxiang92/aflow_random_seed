@@ -4734,7 +4734,10 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AEL_elastic_tensor.json",directory_RAW,"AEL_elastic_tensor.json",vfile,MESSAGE);  // AEL_elastic_tensor.json //CT181212
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AEL_energy_structures.json",directory_RAW,"AEL_energy_structures.json",vfile,MESSAGE);  // AEL_energy_structures.json //CT181212
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.ael.out") << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.ael.out"),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
+      // ME191105
+      string ael_out_str = aurostd::efile2string(directory_RAW + "/aflow.ael.out");
+      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_RESULTS]START", "[AEL_RESULTS]STOP");
+      //aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.ael.out"),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");  OBSOLETE ME191105
       aurostd::stream2vectorstring(aflow_ael_out,vline);
       for (uint i=0;i<vline.size();i++) {
 	aurostd::StringSubst(vline.at(i),"="," ");
@@ -4758,6 +4761,75 @@ namespace aflowlib {
 	  if(tokens.at(0)=="ael_average_external_pressure") data.ael_average_external_pressure=aurostd::string2utype<double>(tokens.at(1)); //CT181212
 	}
       }
+
+      // ME191105 - BEGIN
+      xmatrix<double> tensor(6, 6);
+      vector<double> row;
+      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_STIFFNESS_TENSOR]START", "[AEL_STIFFNESS_TENSOR]STOP");
+      aurostd::stream2vectorstring(aflow_ael_out, vline);
+      if (vline.size() > 0) {
+        vline.pop_back();  // Remove empty line at the end
+        try {
+          if (vline.size() != 6) {
+            string function = "aflowlib::LIB2RAW_loop_AEL()";
+            stringstream message;
+            message << "Could not read stiffness tensor: wrong number of lines"
+                    << " (found " << vline.size() << ", need 6).";
+            throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+          }
+          for (int i = 0; i < 6; i++) {
+            aurostd::string2tokens(vline[i], row);
+            if (row.size() != 6) {
+              string function = "aflowlib::LIB2RAW_loop_AEL()";
+              stringstream message;
+              message <<  "Could not read stiffness tensor."
+                      << " Wrong number of columns in line " << (i + 1)
+                      << " (found " << row.size() << ", need 6).";
+              throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+            }
+            for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
+          }
+          data.ael_stiffness_tensor = tensor;
+        } catch (aurostd::xerror& e) {
+          std::cout << MESSAGE << " ERROR - " << e.error_message << std::endl;
+        }
+      } else {
+        std::cout << MESSAGE << " WARNING - No stiffness tensor found in aflow.ael.out." << std::endl;
+      }
+
+      tensor.clear();
+      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_COMPLIANCE_TENSOR]START", "[AEL_COMPLIANCE_TENSOR]STOP");
+      aurostd::stream2vectorstring(aflow_ael_out, vline);
+      if (vline.size() > 0) {
+        vline.pop_back();  // Remove empty line at the end
+        try {
+          if (vline.size() != 6) {
+            string function = "aflowlib::LIB2RAW_loop_AEL()";
+            stringstream message;
+            message << "Could not read compliance tensor: wrong number of lines"
+                    << " (found " << vline.size() << ", need 6).";
+            throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+          }
+          for (int i = 0; i < 6; i++) {
+            aurostd::string2tokens(vline[i], row);
+            if (row.size() != 6) {
+              string function = "aflowlib::LIB2RAW_loop_AEL()";
+              stringstream message;
+              message <<  "Could not read compliance tensor:"
+                      << " wrong number of columns in line " << (i + 1)
+                      << " (found " << row.size() << ", need 6).";
+              throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+            }
+            for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
+          }
+          data.ael_compliance_tensor = tensor;
+        } catch (aurostd::xerror& e) {
+          std::cout << MESSAGE << " ERROR - " << e.error_message << std::endl;
+        }
+      } else {
+        std::cout << MESSAGE << " WARNING - No compliance tensor found in aflow.ael.out." << std::endl;
+      }
+      // ME191105 - END
     } else {
       return FALSE;
     }
@@ -4779,6 +4851,15 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ael_applied_pressure (GPa) = " << ((data.ael_applied_pressure!=AUROSTD_NAN)?aurostd::utype2string(data.ael_applied_pressure,10):"unavailable") << endl; //CT181212
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ael_average_external_pressure (GPa) = " << ((data.ael_average_external_pressure!=AUROSTD_NAN)?aurostd::utype2string(data.ael_average_external_pressure,10):"unavailable") << endl; //CT181212
     // done
+    if (AFLOWLIB_VERBOSE) {  // ME191105
+      std::cout << MESSAGE << " ael_stiffness_tensor = ";
+      if ((data.ael_stiffness_tensor.rows != 6) || (data.ael_stiffness_tensor.cols != 6)) std::cout << "unavailable" << std::endl;
+      else std::cout << std::endl << data.ael_stiffness_tensor << std::endl;
+
+      std::cout << MESSAGE << " ael_compliance_tensor = ";
+      if ((data.ael_compliance_tensor.rows != 6) || (data.ael_compliance_tensor.cols != 6)) std::cout << "unavailable" << std::endl;
+      else std::cout << std::endl << data.ael_compliance_tensor << std::endl;
+    }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_AEL - end " << directory_LIB << endl;
     return TRUE;
   }
@@ -5660,6 +5741,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
 	//	aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
 	aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+	aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   // ME191105 - otherwise aflow will not run
       }
       //   cerr << "CORMAC" << endl;exit(0);
       // if(_AFLOWIN_=="aflow.in")
