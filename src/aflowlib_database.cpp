@@ -451,12 +451,15 @@ void AflowDB::populateTable(const string& table, const vector<string>& columns, 
 vector<string> AflowDB::getSchemaKeys(const string& schema) {
   vector<string> keys_unfiltered = getJsonKeys(schema, "AAPI_schema");
 
-  vector<string> keys;
+  vector<string> keys, exclude;
+  string excluded_functions = "app,image,link";
+  aurostd::string2tokens(excluded_functions, exclude, ",");
+
   string function;
   for (uint k = 0; k < keys_unfiltered.size(); k++) {
     if ((keys_unfiltered[k] != "__schema^2__") && (keys_unfiltered[k] != "icsd_number")) {
       function = extractJsonValue(schema, "AAPI_schema." + keys_unfiltered[k] + ".function");
-      if ((function != "link") && (function != "image")) {
+      if (!aurostd::withinList(exclude, function)) {
         keys.push_back(keys_unfiltered[k]);
       }
     }
