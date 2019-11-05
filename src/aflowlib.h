@@ -219,6 +219,8 @@ namespace aflowlib {
     double ael_debye_temperature;// (K) //CT181212
     double ael_applied_pressure;// (GPa) //CT181212
     double ael_average_external_pressure; // (GPa) //CT181212
+    xmatrix<double> ael_stiffness_tensor;  // ME191105
+    xmatrix<double> ael_compliance_tensor;  // ME191105
 
     // BADER
     string bader_net_charges;vector<double> vbader_net_charges;//electrons
