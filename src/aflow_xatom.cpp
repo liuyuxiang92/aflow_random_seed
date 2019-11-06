@@ -13650,30 +13650,63 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
   const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
   const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
+  //DX 20190709 - calculate and store once = speed - START
+  vector<xvector<double> > l1, l2, l3;
+  vector<int> a_index, b_index, c_index;
+  for(int i=i1;i<=i2;i++){l1.push_back(i*a1);a_index.push_back(i);}
+  for(int j=j1;j<=j2;j++){l2.push_back(j*a2);b_index.push_back(j);}
+  for(int k=k1;k<=k2;k++){l3.push_back(k*a3);c_index.push_back(k);}
+  //DX 20190709 - calculate and store once = speed - END
+
   for(uint iat=0;iat<str.atoms.size();iat++){
-    str.grid_atoms.push_back(str.atoms.at(iat));  // put first the unit cell !
+    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
     str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
     str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
   }
-  for(int i=i1;i<=i2;i++) {
-    for(int j=j1;j<=j2;j++) {
-      for(int k=k1;k<=k2;k++) {
-	if(i!=0 || j!=0 || k!=0) {  //these are ALREADY included
-	  for(uint iat=0;iat<str.atoms.size();iat++) {
-	    atom=str.atoms.at(iat);
-	    atom.isincell=FALSE; // these are OUT OF CELL
-	    atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms.at(iat).cpos;
-	    atom.fpos[1]=i+str.atoms.at(iat).fpos[1];
-	    atom.fpos[2]=j+str.atoms.at(iat).fpos[2];
-	    atom.fpos[3]=k+str.atoms.at(iat).fpos[3];
-	    str.grid_atoms.push_back(atom);
+  //DX 20190709 [OBSOLETE-SLOW]  for(int i=i1;i<=i2;i++) {
+  //DX 20190709 [OBSOLETE-SLOW]    for(int j=j1;j<=j2;j++) {
+  //DX 20190709 [OBSOLETE-SLOW]      for(int k=k1;k<=k2;k++) {
+  //DX 20190709 [OBSOLETE-SLOW]	if(i!=0 || j!=0 || k!=0) {
+  //DX 20190709 [OBSOLETE-SLOW]	  for(uint iat=0;iat<str.atoms.size();iat++) {
+  //DX 20190709 [OBSOLETE-SLOW]	    atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
+  //DX 20190709 [OBSOLETE-SLOW]	    atom.isincell=FALSE; // these are OUT OF CELL
+  //DX 20190709 [OBSOLETE-SLOW]	    atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
+  //DX 20190709 [OBSOLETE-SLOW]	    atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
+  //DX 20190709 [OBSOLETE-SLOW]	    atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
+  //DX 20190709 [OBSOLETE-SLOW]	    atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+  //DX 20190709 [OBSOLETE-SLOW]	    str.grid_atoms.push_back(atom);
+  //DX 20190709 [OBSOLETE-SLOW]            str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+  //DX 20190709 [OBSOLETE-SLOW]      if(LDEBUG) { //CO190520
+  //DX 20190709 [OBSOLETE-SLOW]        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+  //DX 20190709 [OBSOLETE-SLOW]        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+  //DX 20190709 [OBSOLETE-SLOW]      } //CO190520
+  //DX 20190709 [OBSOLETE-SLOW]	  }
+  //DX 20190709 [OBSOLETE-SLOW]	}
+  //DX 20190709 [OBSOLETE-SLOW]      }
+  //DX 20190709 [OBSOLETE-SLOW]    }
+  //DX 20190709 [OBSOLETE-SLOW]  }
+  for(uint i=0;i<l1.size();i++) {
+    xvector<double> a_component = l1[i];                           // DX : i*lattice(1)
+    for(uint j=0;j<l2.size();j++) {
+      xvector<double> ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
+      for(uint k=0;k<l3.size();k++) {
+        if(i!=0 || j!=0 || k!=0) {
+          xvector<double> abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
+          for(uint iat=0;iat<str.atoms.size();iat++) {
+            atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
+            atom.isincell=FALSE; // these are OUT OF CELL
+            atom.cpos=abc_component+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
+            atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
+            atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
+            atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+            str.grid_atoms.push_back(atom);
             str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-      if(LDEBUG) { //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-      } //CO190520
-	  }
-	}
+            if(LDEBUG) { //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+            } //CO190520
+          }
+        }
       }
     }
   }

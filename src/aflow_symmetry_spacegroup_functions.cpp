@@ -515,7 +515,7 @@ namespace SYM {
 // splitSiteSymmetry 
 // ******************************************************************************
 namespace SYM {
-  vector<string> splitSiteSymmetry(string& site_symmetry){ 
+  vector<string> splitSiteSymmetry(const string& site_symmetry){ //DX 20190730 - added const
     
     // Split the site symmetry symbol into its primary, secondary, and teriary
     // directions (see ITC-A pgs. 28-29 for site symmetry info).

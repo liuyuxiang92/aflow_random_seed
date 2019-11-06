@@ -371,6 +371,33 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   //DAVID
 
+  //DX 20190314 - START
+  vpflow.flag("COMPARE_DATABASE_ENTRIES",aurostd::args2attachedflag(argv,cmds,"--compare_database_entries"));
+  if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX 20190201 - changed from fast_match to optimize_match
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::NO_SCALE_VOLUME",aurostd::args2flag(argv,cmds,"--no_scale_volume"));
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ALLOY","--compare_alloy=|--alloy=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ARITY","--arity=|--nspecies=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPECIES","--species=|--alloy=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::PROPERTY_LIST","--properties=|--property_list=|--property=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE","--geometry_file=|--file=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::CATALOG","--catalog=|--library=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::STOICHIOMETRY","--stoichiometry=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPACE_GROUP","--space_group=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::STRUCTURE",aurostd::args2flag(argv,cmds,"--structure|--structure_comparison|--ignore_species"));
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX 20190424
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry")); //DX 20190424
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_Wyckoff")); //DX 20190424
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::REMOVE_DUPLICATE_COMPOUNDS",aurostd::args2flag(argv,cmds,"--remove_duplicates|--remove_duplicate_compounds")); //DX 20190201
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX 20190724
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation|--add_prototype|--add_prototype_information")); //DX 20190724
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::PRINT",aurostd::args2flag(argv,cmds,"--print"));
+  }
+  //DX 20190314 - END
+
   vpflow.flag("COMPARE_MATERIAL",aurostd::args2attachedflag(argv,cmds,"--compare_material|--compare_materials")); //DX 20190424 - added plural variant
   vpflow.flag("COMPARE_STRUCTURE",aurostd::args2attachedflag(argv,cmds,"--compare_structure|--compare_structures")); //DX 20190424 - added plural variant
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {
@@ -413,6 +440,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX 20190424 [OBSOLETE]   vpflow.flag(scheme_name,TRUE);
     //DX 20190424 [OBSOLETE] }
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); // DX 8/3/17
     vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     vpflow.flag("COMPARE_STRUCTURE::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); // DX 8/3/17
     vpflow.flag("COMPARE_STRUCTURE::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX 20190201 - changed from fast_match to optimize_match
@@ -420,8 +448,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE_STRUCTURE::ICSD_COMPARISON",aurostd::args2flag(argv,cmds,"--ICSD")); //DX 20190201
     vpflow.flag("COMPARE_STRUCTURE::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry")); //DX 20190424
     vpflow.flag("COMPARE_STRUCTURE::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff")); //DX 20190424
+    vpflow.flag("COMPARE_STRUCTURE::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
     vpflow.flag("COMPARE_STRUCTURE::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX 20190424
     vpflow.flag("COMPARE_STRUCTURE::REMOVE_DUPLICATE_COMPOUNDS",aurostd::args2flag(argv,cmds,"--remove_duplicates|--remove_duplicate_compounds")); //DX 20190424
+    vpflow.flag("COMPARE_STRUCTURE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX 20190724
+    vpflow.flag("COMPARE_STRUCTURE::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation")); //DX 20190724
     vpflow.flag("COMPARE_STRUCTURE::USAGE",aurostd::args2flag(argv,cmds,"--usage")); //DX 20190424
   }
   //DX 20190424 [OBSOLETE]vpflow.flag("COMPARE_MATERIAL_DIRECTORY",aurostd::args2flag(argv,cmds,"--compare_material_directory|--compare_material_dir"));
@@ -460,6 +491,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_PERMUTATION::NP","--np=|--num_proc=","");
     vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print|--misfit|--print_misfit"));
     vpflow.flag("COMPARE_PERMUTATION::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("COMPARE_PERMUTATION::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX 20190201 - changed from fast_match to optimize_match
   }
   //DX 20181004 - add compare_permutations - END
   //DX 20181004 - add compare2database - START
@@ -476,6 +508,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE2DATABASE::NO_SCALE_VOLUME",aurostd::args2flag(argv,cmds,"--no_scale_volume"));
     vpflow.flag("COMPARE2DATABASE::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry"));
     vpflow.flag("COMPARE2DATABASE::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff"));
+    vpflow.flag("COMPARE2DATABASE::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
     vpflow.flag("COMPARE2DATABASE::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX 20190424
   }
   //DX 20181004 - add compare2database - END
@@ -1206,6 +1239,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::CATALOG","--catalog=|--library=","");
     vpflow.flag("COMPARE2PROTOTYPES::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry"));
     vpflow.flag("COMPARE2PROTOTYPES::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff"));
+    vpflow.flag("COMPARE2PROTOTYPES::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
     vpflow.flag("COMPARE2PROTOTYPES::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     vpflow.flag("COMPARE2PROTOTYPES::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); // DX 8/3/17
   }
@@ -1446,6 +1480,7 @@ namespace pflow {
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX 20190425 - START
+      if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << pflow::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()) {
           //vector<string> vinput;
@@ -2577,6 +2612,61 @@ namespace pflow {
   }
 }
 // DX 12/5/17 - add spin info to xstructure - START
+
+// DX 20190801 - consolidated to a function - START
+// ***************************************************************************
+// pflow::ProcessAndAddSpinToXstructure
+// ***************************************************************************
+namespace pflow {
+  void ProcessAndAddSpinToXstructure(xstructure& a, string& magmom_info){
+    
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "pflow::ProcessAndAddSpinToXstructure()";
+    stringstream message;
+   
+    // ---------------------------------------------------------------------------
+    // check if spin information is empty
+    if(magmom_info.size()==0){ 
+      if(LDEBUG){ cerr << function_name << " Spin information is empty; no spin information added to structure." << endl; }
+      return;
+    }
+
+    int num_atoms=a.atoms.size();
+    bool is_noncoll=false; 
+    vector<xvector<double> > vmag_noncoll;                                                
+    bool is_coll=false; 
+    vector<double> vmag;
+
+    // ---------------------------------------------------------------------------
+    // check for non-collinear spin
+    if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){                   
+      if(LDEBUG) {cerr << function_name << " Non-collinear spin system detected." << endl;}
+      is_noncoll = true;
+      if(!AddSpinToXstructure(a,vmag_noncoll)){
+        message << "(non-collinear): Number of magnetic moments (" << vmag_noncoll.size() << ") does not match the number of atoms (" << a.atoms.size() << ")." << endl;
+        throw aurostd::xerror(function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+      } 
+    }                                                                               
+    // ---------------------------------------------------------------------------
+    // check for non-collinear spin
+    if(!is_noncoll){
+      if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
+        if(LDEBUG) {cerr << function_name << " Collinear spin system detected." << endl;} 
+        is_coll = true;
+        if(!AddSpinToXstructure(a,vmag)){
+          message << "(collinear): Number of magnetic moments (" << vmag.size() << ") does not match the number of atoms (" << a.atoms.size() << ")." << endl;
+          throw aurostd::xerror(function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+        } 
+      } 
+    }
+    // ---------------------------------------------------------------------------
+    // could not detect; input error
+    if(!is_noncoll && !is_coll){
+      message << "Could not detect collinear or non-collinear spin(s). Check spin input.";
+      throw aurostd::xerror(function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+    }
+  } 
+}
 
 // ***************************************************************************
 // pflow::AFLOWIN

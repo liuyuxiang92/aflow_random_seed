@@ -3081,7 +3081,7 @@ namespace anrl {
         for(uint i=0;i<vparameters.size();i++){
           cerr << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
         }   
-        cerr << "Rerun command and specify the parameters or the preset suffix, e.g., ./aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1 << endl;
+        cerr << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1 << endl; //DX 20190826 - changed "./aflow" to "aflow"
         exit(1);
       }
     }

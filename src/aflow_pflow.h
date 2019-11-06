@@ -68,6 +68,7 @@ namespace pflow {
   bool PerformFullSymmetry(xstructure& a);
   bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
   bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
+  void ProcessAndAddSpinToXstructure(xstructure& a, string& magmom_info); //DX 20190801
   void defaultKFlags4SymWrite(_kflags& kflags,bool write=true);
   void defaultKFlags4SymCalc(_kflags& kflags,bool calc=true);
   bool CalculateFullSymmetry(istream& input,aurostd::xoption& vpflow,ostream& oss=cout);
@@ -97,6 +98,7 @@ namespace pflow {
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
   void COMPARE(string options);
+  string compareDatabaseEntries(aurostd::xoption& vpflow); //DX 20180314
   string comparePermutations(istream& input, aurostd::xoption& vpflow); //DAVID //DX 20181004
   string compareStructures(aurostd::xoption& vpflow); //DAVID
   //DX 20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID

@@ -502,7 +502,7 @@ namespace SYM {
   string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
   vector<vector<vector<string> > > getWyckoffLettersWithSameMultiplcityAndSiteSymmetry(uint& space_group_number, 
                                    vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX 20190201  
-  vector<string> splitSiteSymmetry(string& site_symmetry); //DX 20190219
+  vector<string> splitSiteSymmetry(const string& site_symmetry); //DX 20190219 //DX 20190730 - added const
 
   //TOPOLOGY FUNCTIONS
   vector<xvector<double> > find_vectors_inplane(const vector<xvector<double> >& big_expanded, const xvector<double>& perp_to_vec, double& tol); //DX 20190215
