@@ -1660,12 +1660,15 @@ namespace pflow {
     // load and store entries from the database 
     for(uint i=0; i<auids.size(); i++){
       // first, get stoichiometry from entry
-      vector<string> species; vector<double> natoms;
-      XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      vector<double> vcomposition;
+      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      for(uint j=0;j<natoms.size();j++){
-        if(aurostd::isinteger(natoms[j])){
-          tmp_stoich.push_back((uint)aurostd::nint(natoms[j]));
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
+      for(uint j=0;j<vcomposition.size();j++){ //DX 20191106
+        if(aurostd::isinteger(vcomposition[j])){
+          tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));
         }
         else {
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
@@ -1952,7 +1955,8 @@ namespace pflow {
       }
       // split by alloy species (no delimiter)
       else{
-        XATOM_SplitAlloySpecies(alloy_string, species);
+        //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(alloy_string, species);
+        species = pflow::stringElements2VectorElements(alloy_string); //DX 20191106
       }
     }
     
@@ -2183,12 +2187,15 @@ namespace pflow {
     for(uint i=0; i<auids.size(); i++){
       StructurePrototype tmp;
       // first, get stoichiometry from entry
-      vector<string> species; vector<double> natoms;
-      XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      vector<double> vcomposition;
+      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      for(uint j=0;j<natoms.size();j++){
-        if(aurostd::isinteger(natoms[j])){
-          tmp_stoich.push_back((uint)aurostd::nint(natoms[j]));
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
+      for(uint j=0;j<vcomposition.size();j++){ //DX 20191106
+        if(aurostd::isinteger(vcomposition[j])){
+          tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));
         }
         else{
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
@@ -2270,12 +2277,15 @@ namespace pflow {
     vector<StructurePrototype> all_structures;
     for(uint i=0; i<auids.size(); i++){
       // first, get stoichiometry from entry
-      vector<string> species; vector<double> natoms;
-      XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
+      vector<double> vcomposition;
+      vector<string> species = pflow::stringElements2VectorElements(compounds[i], vcomposition);
       vector<uint> tmp_stoich;
-      for(uint j=0;j<natoms.size();j++){
-        if(aurostd::isinteger(natoms[j])){
-          tmp_stoich.push_back((uint)aurostd::nint(natoms[j]));
+      //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] for(uint j=0;j<natoms.size();j++){
+      for(uint j=0;j<vcomposition.size();j++){ //DX 20191106
+        if(aurostd::isinteger(vcomposition[j])){
+          tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j]));
         }
         else{
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
