@@ -2101,7 +2101,6 @@ namespace SYM {
     vector<vector<string> > all_Wyckoff_positions;
 
     stringstream temp;
-    temp.clear();
     for(uint i=0;i<get_centering(spaceg).size();i++) {
       for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
         vector<string> vec_pos;
