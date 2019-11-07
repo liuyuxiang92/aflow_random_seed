@@ -540,8 +540,7 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
   representative_structure_name=b.duplicate_structures_names[index];
   // number_types=b.duplicate_structures[index].num_each_type.size();
   representative_structure_compound=b.duplicate_structures_compounds[index]; //DX 20190111 - added compound, e.g., Ag1Br2
-  //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] elements = pflow::getElements(representative_structure_compound); //DX 20191003 - add elements of this compound only!
-  elements = pflow::stringElements2VectorElements(representative_structure_compound); //DX 20191003 - add elements of this compound only! //DX 20191106 - phase in new function
+  elements = pflow::getElements(representative_structure_compound); //DX 20191003 - add elements of this compound only!
   representative_structure_generated=b.duplicate_structures_generated[index];
   representative_structure_from=b.duplicate_structures_from[index];
   grouped_Wyckoff_positions=b.duplicate_structures_grouped_Wyckoff_positions[index]; //DX 20190814
