@@ -3965,7 +3965,7 @@ namespace anrl {
         throw aurostd::xerror(function_name,"Cannot use --force_Wyckoff option, Wyckoff positions must be given.",_INPUT_ILLEGAL_);
       }
       if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
-        throw aurostd::xerror(function_name,"Cannot indicate use --setting and --force_Wyckoff option together.",_INPUT_ILLEGAL_);
+        throw aurostd::xerror(function_name,"Cannot use options --setting and --force_Wyckoff together.",_INPUT_AMBIGUOUS_);
       }
       setting = xstr.spacegroupnumberoption;
       recalculate_symmetry = false;
