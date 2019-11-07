@@ -1597,7 +1597,7 @@ class TCONDCalculator {
                                                 const vector<vector<vector<xcomplex<double> > > >&);
     void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
     vector<vector<double> > calculateTransitionProbabilitiesBoundary();
-    void getProcess(const vector<int>&, vector<int>&, vector<int>&);
+    void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
     xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&,
                                                        vector<vector<vector<double> > >&,
                                                        vector<vector<vector<double> > >&);

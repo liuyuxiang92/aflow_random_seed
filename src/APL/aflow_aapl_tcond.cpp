@@ -513,7 +513,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
 
   xcomplex<double> matrix, prefactor, eigen;
   vector<vector<double> > weights(3, vector<double>(nQPs)), frequencies(3, vector<double>(nQPs));
-  vector<int> qpts(3), proc(3), lastq(nQPs), q_minus(nQPs);
+  vector<int> qpts(3), proc(2), lastq(nQPs), q_minus(nQPs);
   int iat, j, e, q, p, w, lq;
   uint c, crt, br;
   double transprob, freq_ref, prod;
@@ -597,24 +597,26 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
             for (j = 0; j < 3; j++) {
               transprob = prod * probability_prefactor * weights[j][q];
               if (transprob > _ZERO_TOL_) {
+                // Instead of storing the sign as an integer, the q-point index
+                // will be signed to save memory. Adding 1 to the index is done
+                // to have a clear sign indication for q = 0. This will be reversed
+                // in getProcess().
                 if (j == 2) {
-                  proc[0] = 1;
-                  proc[1] = q;
-                  proc[2] = br;
+                  proc[0] = -(q + 1);
+                  proc[1] = br;
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
-                  proc[1] = lq;
-                  proc[2] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                  proc[0] = -(lq + 1);
+                  proc[1] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
                 } else {
-                  proc[0] = 0;
                   if (j == 0) {
-                    proc[1] = q_minus[q];
-                    proc[2] = br;
+                    proc[0] = q_minus[q] + 1;
+                    proc[1] = br;
                   } else{
-                    proc[1] = q_minus[lq];
-                    proc[2] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                    proc[0] = q_minus[lq] + 1;
+                    proc[1] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
                   }
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
@@ -798,15 +800,21 @@ void TCONDCalculator::getWeightsLT(const LTMethod& _lt, double freq_ref,
 
 namespace apl {
 
-void TCONDCalculator::getProcess(const vector<int>& process,
-                                 vector<int>& qpts, vector<int>& branches) {
+void TCONDCalculator::getProcess(const vector<int>& process, vector<int>& qpts,
+                                 vector<int>& branches, int& sign) {
   xvector<double> qsum = _qm.getQPoint(qpts[0]).fpos;
-  qpts[1] = process[1];
-  if (process[0]) qpts[2] = _qm.getQPointIndex(qsum - _qm.getQPoint(qpts[1]).fpos);
-  else qpts[2] = _qm.getQPointIndex(qsum + _qm.getQPoint(qpts[1]).fpos);
+  if (process[0] < 0) {
+    sign = 1;
+    qpts[1] = -process[0] - 1;
+    qpts[2] = _qm.getQPointIndex(_qm.getQPoint(qpts[0]).fpos - _qm.getQPoint(qpts[1]).fpos);
+  } else {
+    sign = 0;
+    qpts[1] = process[0] - 1;
+    qpts[2] = _qm.getQPointIndex(qsum + _qm.getQPoint(qpts[1]).fpos);
+  }
 
   int pw, br;
-  br = process[2];
+  br = process[1];
   for (int i = 0; i < 2; i++) {
     pw = (int) std::pow(nBranches, 2 - i);
     branches[i] = br/pw;
@@ -898,12 +906,13 @@ void TCONDCalculator::calcAnharmRates(int startIndex, int endIndex,
                                       const vector<vector<double> >& occ,
                                       vector<vector<double> >& rates) {
   vector<int> qpts(3), branches(3);
+  int sign;
 
   for (int i = startIndex; i < endIndex; i++) {
     qpts[0] = _qm.getIbzqpts()[i];
     for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
-      getProcess(processes[i][p], qpts, branches);
-      rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, processes[i][p][0], qpts, branches);
+      getProcess(processes[i][p], qpts, branches, sign);
+      rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, sign, qpts, branches);
     }
   }
 }
@@ -1024,15 +1033,16 @@ void TCONDCalculator::calculateDelta(int startIndex, int endIndex,
                                      vector<vector<xvector<double> > >& delta) {
   xvector<double> correction(3);
   vector<int> qpts(3), branches(3);
+  int sign;
 
   for (int i = startIndex; i < endIndex; i++) {
     qpts[0] = _qm.getIbzqpts()[i];
     for (uint p = 0, nprocs = processes[i].size(); p < nprocs; p++) {
-      getProcess(processes[i][p], qpts, branches);
+      getProcess(processes[i][p], qpts, branches, sign);
       correction = mfd[qpts[2]][branches[2]];
-      if (processes[i][p][0]) correction -= mfd[qpts[1]][branches[1]];
+      if (processes[i][p][0] < 0) correction -= mfd[qpts[1]][branches[1]];
       else correction += mfd[qpts[1]][branches[1]];
-      correction *= getOccupationTerm(occ, processes[i][p][0], qpts, branches);
+      correction *= getOccupationTerm(occ, sign, qpts, branches);
       delta[i][branches[0]] += intr_trans_probs[i][p] * correction;
     }
 
