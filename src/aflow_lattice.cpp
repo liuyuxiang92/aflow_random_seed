@@ -58,7 +58,7 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
-    throw aurostd::xerror(function_name,lattice_type+" is not a possible lattice type.",_INPUT_ILLEGAL_);
+    throw aurostd::xerror(function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
   }
