@@ -8166,6 +8166,7 @@ namespace pflow {
   string listPrototypeLabels(aurostd::xoption& vpflow) {
     
     string function_name = "listPrototypeLabels()";
+    stringstream message;
     vector<string> tokens;
     
     // ----- mode -----//
@@ -8195,8 +8196,8 @@ namespace pflow {
       aurostd::string2tokens(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::STOICHIOMETRY"),tokens,":");
       for(uint i=0;i<tokens.size();i++){ stoichiometry.push_back(aurostd::string2utype<uint>(tokens[i])); }
       if(arity!=0 && arity!=stoichiometry.size()){
-        cerr << "ERROR::" << function_name << ": arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match." << endl;
-        exit(1);
+        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match.";
+        throw aurostd::xerror(function_name,message,_INPUT_ILLEGAL_); //DX 20191107 - exit() -> throw
       }
       std::sort(stoichiometry.begin(),stoichiometry.end()); // must sort to properly filter
     }
@@ -8215,8 +8216,8 @@ namespace pflow {
       mode = 4;
       Wyckoff_letters = vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::WYCKOFF_STRING");
       if(space_group_number == 0){
-        cerr << "ERROR::" << function_name << ": Space group must be given with Wyckoff letters; please specify." << endl;
-        exit(1);
+        message << "Space group must be given with Wyckoff letters; please specify." << endl;
+        throw aurostd::xerror(function_name,message,_INPUT_ILLEGAL_); //DX 20191107 - exit() -> throw
       }
     }
 
@@ -8238,11 +8239,11 @@ namespace pflow {
     else if(mode==1){
       prototype_labels = aflowlib::GetPrototypesBySpeciesNumber(arity, library);
     }
-    // get n-nary prototype labels
+    // get prototype labels via stoichiometry
     else if(mode==2){
       prototype_labels = aflowlib::GetPrototypesByStoichiometry(stoichiometry, library);
     }
-    // get n-nary prototype labels
+    // get prototype labels via symmetry
     else if(mode==3){
       prototype_labels = aflowlib::GetPrototypesBySymmetry(
           stoichiometry, 

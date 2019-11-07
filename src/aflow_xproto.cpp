@@ -292,7 +292,7 @@ namespace aflowlib {
     uint number_of_prototypes = GetAllPrototypeLabels(prototype_labels, compositions, library);
     for(uint i=0;i<number_of_prototypes;i++){ 
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
-      if(prototype_number_of_species == species_number){
+      if(prototype_number_of_species == species_number || species_number==0){ //DX 20191107 - if species_number is not specified
         filtered_prototype_labels.push_back(prototype_labels[i]);
       }
     }
@@ -325,8 +325,8 @@ namespace aflowlib {
     uint number_of_prototypes = GetAllPrototypeLabels(prototype_labels, compositions, all_space_group_numbers, all_grouped_Wyckoff_letters, library);
     for(uint i=0;i<number_of_prototypes;i++){
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
-      if(prototype_number_of_species == species_number){
- 
+      if(prototype_number_of_species == species_number || species_number==0){ //DX 20191107 - add species_number==0 if stoich is not specified
+
         vector<uint> prototype_stoichiometry = ::composition2stoichiometry(compositions[i]);
         prototype_stoichiometry=compare::gcdStoich(prototype_stoichiometry);
 
@@ -372,7 +372,7 @@ namespace aflowlib {
     vector<string> prototype_labels = GetPrototypesByStoichiometry(stoichiometry, prototype_compositions, prototype_space_group_numbers, prototype_grouped_Wyckoff_letters, library);
     vector<string> filtered_prototype_labels, tokens, database;
     for(uint i=0;i<prototype_labels.size();i++){
-      if(compare::matchableSpaceGroups(prototype_space_group_numbers[i],space_group_number)){
+      if(compare::matchableSpaceGroups(prototype_space_group_numbers[i],space_group_number) || space_group_number==0){ //DX 20191107 - include space_group_number==0 if not specified
         if(LDEBUG) {
           cerr << "aflowlib::GetPrototypesBySymmetry(): Prototype labels with matching space group number: " << prototype_labels[i] << endl;
         }
