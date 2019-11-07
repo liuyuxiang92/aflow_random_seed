@@ -2626,7 +2626,7 @@ namespace pflow {
    
     // ---------------------------------------------------------------------------
     // check if spin information is empty
-    if(magmom_info.size()==0){ 
+    if(magmom_info.empty()){ 
       if(LDEBUG){ cerr << function_name << " Spin information is empty; no spin information added to structure." << endl; }
       return;
     }
