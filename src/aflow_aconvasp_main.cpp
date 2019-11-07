@@ -2631,7 +2631,7 @@ namespace pflow {
       return;
     }
 
-    int num_atoms=a.atoms.size();
+    uint num_atoms=a.atoms.size();
     bool is_noncoll=false; 
     vector<xvector<double> > vmag_noncoll;                                                
     bool is_coll=false; 
