@@ -474,7 +474,7 @@ namespace compare{
           ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
         }
         if(format=="json"){ //DX 20190506
-          ss_output << "{\"unique_permutations\":["; 
+          ss_output << "{\"atom_decorations_unique\":["; 
           ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]";
           ss_output << "]}" << endl;
         }
@@ -520,7 +520,7 @@ namespace compare{
     else if(format=="json"){
       stringstream sscontent_json;
       vector<string> vcontent_json;
-      sscontent_json << "\"unique_permutations\":[";
+      sscontent_json << "\"atom_decorations_unique\":[";
       for(uint j=0;j<final_permutations.size();j++){
         stringstream sstmp;
         vector<string> equivalent_permutations;
@@ -1313,7 +1313,7 @@ namespace pflow {
         }        
         vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,optimize_match,oss,FileMESSAGE); //DX 20190319 - added FileMESSAGE
         for(uint j=0;j<final_permutations.size();j++){
-          final_prototypes[i].unique_permutations.push_back(final_permutations[j].structure_representative_name);
+          final_prototypes[i].atom_decorations_unique.push_back(final_permutations[j].structure_representative_name);
         }
       }
       message << "Unique permutations found.";
@@ -2649,7 +2649,7 @@ namespace compare {
          
           // store permutation results in main StructurePrototype object
           for(uint j=0;j<final_permutations.size();j++){
-            final_prototypes[i].unique_permutations.push_back(final_permutations[j].structure_representative_name);
+            final_prototypes[i].atom_decorations_unique.push_back(final_permutations[j].structure_representative_name);
           }
           final_permutations.clear(); //DX 20190624
         }
@@ -2657,7 +2657,7 @@ namespace compare {
           vector<string> unique_permutations = generatePermutationString(final_prototypes[i].stoichiometry); //DX 20190508
           // store permutation results in main StructurePrototype object
           for(uint j=0;j<unique_permutations.size();j++){
-            final_prototypes[i].unique_permutations.push_back(unique_permutations[j]);
+            final_prototypes[i].atom_decorations_unique.push_back(unique_permutations[j]);
           }
         }
       }

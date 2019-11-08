@@ -42,7 +42,7 @@ StructurePrototype::StructurePrototype(){
   elements.clear();
   stoichiometry.clear();
   number_of_atoms=0;
-  unique_permutations.clear();
+  atom_decorations_unique.clear();
   Pearson="";
   space_group=0;
   grouped_Wyckoff_positions.clear();
@@ -87,7 +87,7 @@ StructurePrototype::~StructurePrototype(){
   structure_representative.Clear();
   elements.clear();
   stoichiometry.clear();
-  unique_permutations.clear();
+  atom_decorations_unique.clear();
   grouped_Wyckoff_positions.clear();
   wyckoff_site_symmetry.clear();
   wyckoff_multiplicity.clear();
@@ -140,7 +140,7 @@ void StructurePrototype::copy(const StructurePrototype& b) {
     elements=b.elements;
     stoichiometry=b.stoichiometry;
     number_of_atoms=b.number_of_atoms;
-    unique_permutations=b.unique_permutations;
+    atom_decorations_unique=b.atom_decorations_unique;
     Pearson=b.Pearson;
     space_group=b.space_group;
     grouped_Wyckoff_positions=b.grouped_Wyckoff_positions;
@@ -231,9 +231,9 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << "\"number_of_atoms\":" << StructurePrototype.number_of_atoms << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // unique_permutations
-    if(StructurePrototype.unique_permutations.size()!=0){ //DX 20190425 - only print if calculated
-      sscontent_json << "\"unique_permutations\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.unique_permutations,"\""),",") << "]" << eendl;
+    // atom_decorations_unique
+    if(StructurePrototype.atom_decorations_unique.size()!=0){ //DX 20190425 - only print if calculated
+      sscontent_json << "\"atom_decorations_unique\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_unique,"\""),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     } //DX 20190425
     
@@ -4905,8 +4905,8 @@ namespace compare{
           } 
           ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_name;
           // perhaps add which permutations are duplicates
-          if(final_prototypes[j].unique_permutations.size()!=0){
-            ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique permutations="+aurostd::joinWDelimiter(final_prototypes[j].unique_permutations,",");
+          if(final_prototypes[j].atom_decorations_unique.size()!=0){
+            ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_unique,",");
           }
         }
         ss_out << endl;
