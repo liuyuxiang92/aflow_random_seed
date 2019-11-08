@@ -1076,12 +1076,12 @@ uint xstructure::GetPrimitiveCell(void) {
       //DX 20191011 [OBSOLETE] tmp.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
       tmp.spin_is_given = false; // DX 9/21/17 - magnetic sym
       if(aurostd::abs(tmp.spin)>_ZERO_TOL_){
-      tmp.spin_is_given = true; // DX 9/21/17 - magnetic sym
+        tmp.spin_is_given = true; // DX 9/21/17 - magnetic sym
       }
       tmp.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
       tmp.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
       if(aurostd::abs(tmp.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(3))>_ZERO_TOL_){
-        tmp.spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear)
+        tmp.noncoll_spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear) //DX 20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
       }
       (*this).AddAtom(tmp);
     }
