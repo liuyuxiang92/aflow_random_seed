@@ -3258,8 +3258,8 @@ namespace SYM {
 }
 
 namespace SYM {
-  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint& start_index, uint& end_index){
-    for(uint i=start_index;i<=end_index;i++){
+  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint start_index, uint end_index){ //DX 20191108 removed & for uint
+    for(uint i=start_index;i<end_index;i++){ //DX 20191108 - [switching from compare::splitTaskIntoThreads to getThreadDistribution, end index conventions differ, <= vs <]
       vxstrs[i].SpaceGroup_ITC();
     }
   }

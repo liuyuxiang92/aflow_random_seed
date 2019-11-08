@@ -2042,11 +2042,12 @@ namespace SYM {
 namespace SYM {
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string function_name = "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
     //if(!invec<int>(mult_vec,mult)){cerr << "ERROR: no wyckoff position with multiplicity "<<mult << "."<<endl;exit(1);}
     if(!invec<int>(mult_vec, Wyckoff_multiplicity)) {
-      if(LDEBUG) { cerr << "SYM::get_wyckoff_pos: WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
+      if(LDEBUG) { cerr << function_name << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
       vector<vector<string> > none;
       return none;
     }
@@ -2059,7 +2060,7 @@ namespace SYM {
     // split up Wyckoff positions
     aurostd::string2tokens(spaceg, all_Wyckoff_strings, "\n");
 
-    for(uint i=0; i<all_Wyckoff_strings.size();i++){
+    for(uint i=2; i<all_Wyckoff_strings.size();i++){ //DX 20191107 starting at 2 since the first two lines are header and centering, repectively
       aurostd::string2tokens(all_Wyckoff_strings[i], Wyckoff_tokens, " ");
 
       // expected sequence: "24 h ..2 (x, y, z) (x, 0, z) ..."
@@ -2076,14 +2077,11 @@ namespace SYM {
           }
         }
       }
-      else{
-        //bad position
-      }
     }
     //DX 20191030 - remove stringstream assignment (used to be here)
     //DX 20191030 - use tokens instead of stringstream assignment - END
 
-    if(LDEBUG) {cerr << "SYM::get_wyckoff_pos:: Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
+    if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
 
     vector<vector<string> > non_shifted_Wyckoff_positions;
     vector<string> tokens;
@@ -2120,7 +2118,7 @@ namespace SYM {
     if(LDEBUG) {
       vector<string> tmp; 
       for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
-      cerr << "SYM::get_wyckoff_pos:: All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
     }
 
     return all_Wyckoff_positions;
@@ -2253,13 +2251,14 @@ namespace SYM {
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    bool reduce = true; // simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
+    string function_name = "SYM::getWyckoffInformation()";
+    bool reduce = true; // DEBUGGING variable: simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
     vector<string> split_Wyckoff_strings, Wyckoff_tokens, positions;
 
     // split up Wyckoff positions
     aurostd::string2tokens(Wyckoff_string, split_Wyckoff_strings, "\n");
 
-    for(uint i=0; i<split_Wyckoff_strings.size();i++){
+    for(uint i=2; i<split_Wyckoff_strings.size();i++){ //DX 20191107 starting at 2 since the first two lines are header and centering, repectively
       aurostd::string2tokens(split_Wyckoff_strings[i], Wyckoff_tokens, " ");
 
       // expected sequence: "24 h ..2 (x, y, z) (x, 0, z) ..."
@@ -2276,13 +2275,10 @@ namespace SYM {
           }
         }
       }
-      else{
-        //bad position
-      }
     }
 
 
-    if(LDEBUG) {cerr << "SYM::get_wyckoff_pos:: Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
+    if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
 
     vector<vector<string> > non_shifted_Wyckoff_positions;
     vector<string> tokens;
@@ -2333,7 +2329,7 @@ namespace SYM {
     if(LDEBUG) {
       vector<string> tmp; 
       for(uint i=0;i<all_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_positions[i],",")+")");}
-      cerr << "SYM::get_wyckoff_pos:: All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
     }
 
   }

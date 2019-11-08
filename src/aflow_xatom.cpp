@@ -4222,8 +4222,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           string spacegroupsymbol = aurostd::joinWDelimiter(tokens,"");
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\''); //clean
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\"'); //clean
-          try{ a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); } //DX 20191029 - added try/catch sequence
-          catch(aurostd::xerror& re){ if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(soliloquy, message, std::cerr, _LOGGER_WARNING_); } } //DX 20191029 - added try/catch sequence
+          try{ 
+            a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); 
+          } //DX 20191029 - added try/catch sequence
+          catch(aurostd::xerror& re){ 
+            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(soliloquy, message, std::cerr, _LOGGER_WARNING_); } 
+          } //DX 20191029 - added try/catch sequence
         }
       }
       //DX 20190708 - added another space group variant - END
@@ -4246,7 +4250,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX 20191029 - check if space group number is found - START
     if(a.spacegroupnumber==0){
       message << "Either space group number was not given or it was given in a non-standard setting.";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
     }
     //DX 20191029 - check if space group number is found - END
     bool found_setting = false;
@@ -13685,14 +13689,16 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   //DX 20190709 [OBSOLETE-SLOW]      }
   //DX 20190709 [OBSOLETE-SLOW]    }
   //DX 20190709 [OBSOLETE-SLOW]  }
+  xvector<double> a_component, ab_component, abc_component; //DX+ME 20191107 - define outside loop (speed increase)
+  uint natoms = str.atoms.size(); //DX 20191107 - initialize natoms outside loop (speed increase)
   for(uint i=0;i<l1.size();i++) {
-    xvector<double> a_component = l1[i];                           // DX : i*lattice(1)
+    a_component = l1[i];                           // DX : i*lattice(1)
     for(uint j=0;j<l2.size();j++) {
-      xvector<double> ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
+      ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
       for(uint k=0;k<l3.size();k++) {
         if(i!=0 || j!=0 || k!=0) {
-          xvector<double> abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
-          for(uint iat=0;iat<str.atoms.size();iat++) {
+          abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
+          for(uint iat=0;iat<natoms;iat++) { //DX 20191107 - replace str.atoms.size() with natoms
             atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
             atom.isincell=FALSE; // these are OUT OF CELL
             atom.cpos=abc_component+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase

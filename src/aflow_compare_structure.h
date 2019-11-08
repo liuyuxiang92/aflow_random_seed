@@ -75,13 +75,13 @@ class StructurePrototype{
     const StructurePrototype& operator=(const StructurePrototype& b);                       // assignment operator
     StructurePrototype(const StructurePrototype& b);                                        // copy constructor
     int iomode;                                                                             // mode for printing
-    string representative_structure_name;                                                   // name of representative structure
-    string representative_structure_compound;                                               // compound name of representative structure (w/reduced stoichometry), e.g., Ag1Br2
-    xstructure representative_structure;                                                    // xstructure of representative structure
-    bool representative_structure_generated;                                                // boolean indicating if xstructure is generated
-    string representative_structure_from;                                                   // string indicating where structure came from, i.e., input, auid, aflow protos, etc.
+    string structure_representative_name;                                                   // name of representative structure
+    string structure_representative_compound;                                               // compound name of representative structure (w/reduced stoichometry), e.g., Ag1Br2
+    xstructure structure_representative;                                                    // xstructure of representative structure
+    bool structure_representative_generated;                                                // boolean indicating if xstructure is generated
+    string structure_representative_from;                                                   // string indicating where structure came from, i.e., input, auid, aflow protos, etc.
     uint number_compounds_matching_representative;                                          // number of compounds that match with the representative structure
-    int number_types;                                                                       // number of types in prototype
+    int number_of_types;                                                                    // number of types in prototype
     vector<string> elements;                                                                // list of elements exhibiting in this protoype (from representative and duplicate structures)
     vector<uint> stoichiometry;                                                             // reduced stoichiometry of prototype
     uint number_of_atoms;                                                                   // number of atoms in the prototype (from the representative structure; not necessarily reduced)
@@ -92,35 +92,35 @@ class StructurePrototype{
     vector<string> wyckoff_site_symmetry;                                                   // vector of Wyckoff site symmetries of prototype
     vector<int> wyckoff_multiplicity;                                                       // vector of Wyckoff multiplicities of prototype
     vector<int> wyckoff_letter;                                                             // vector of Wyckoff letters of prototype
-    vector<AtomEnvironment> LFA_environments;                                               // vector of LFA atom environments
+    vector<AtomEnvironment> environments_LFA;                                               // vector of LFA atom environments
     string aflow_label;                                                                     // AFLOW label designation  
     vector<string> aflow_parameter_list;                                                    // vector of strings corresponding to AFLOW parameter variables 
     vector<double> aflow_parameter_values;                                                  // vector of doubles corresponding to AFLOW parameter values
     vector<string> matching_aflow_prototypes;                                               // vector of strings indicating matching AFLOW prototype labels
-    vector<string> duplicate_structures_names;                                              // vector of names for duplicate structures
-    vector<string> duplicate_structures_compounds;                                          // vector of compounds names for duplicate structures (w/reduced stoichometry), e.g., Ag1Br2
-    vector<xstructure> duplicate_structures;                                                // vector of xstructures for duplicate structures
-    vector<bool> duplicate_structures_generated;                                            // vector of booleans indicating if xstructure is generated for duplicate structures
-    vector<string> duplicate_structures_from;                                               // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc. 
-    vector<vector<GroupedWyckoffPosition> > duplicate_structures_grouped_Wyckoff_positions; // Wyckoff positions grouped by site type
+    vector<string> structures_duplicate_names;                                              // vector of names for duplicate structures
+    vector<string> structures_duplicate_compounds;                                          // vector of compounds names for duplicate structures (w/reduced stoichometry), e.g., Ag1Br2
+    vector<xstructure> structures_duplicate;                                                // vector of xstructures for duplicate structures
+    vector<bool> structures_duplicate_generated;                                            // vector of booleans indicating if xstructure is generated for duplicate structures
+    vector<string> structures_duplicate_from;                                               // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc. 
+    vector<vector<GroupedWyckoffPosition> > structures_duplicate_grouped_Wyckoff_positions; // Wyckoff positions grouped by site type
     vector<uint> number_compounds_matching_duplicate;                                       // vector of number of compounds that match with the duplicate structures
-    vector<string> duplicate_comparison_logs; //DX 20190506                                              // vector of comparison logs for duplicate structures, CAREFUL: very long string //DX 20190506
-    vector<string> family_structures_names;                                                 // vector of names for structures within the same family
-    vector<xstructure> family_structures;                                                   // vector of xstructures for structures within the same family
-    vector<bool> family_structures_generated;                                               // vector of booleans indicating if xstructure is generated for structures within the same family
-    vector<string> family_structures_from;                                                  // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc.
-    vector<vector<GroupedWyckoffPosition> > family_structures_grouped_Wyckoff_positions;    // Wyckoff positions grouped by site type
+    vector<string> duplicate_comparison_logs; //DX 20190506                                 // vector of comparison logs for duplicate structures, CAREFUL: very long string //DX 20190506
+    vector<string> structures_family_names;                                                 // vector of names for structures within the same family
+    vector<xstructure> structures_family;                                                   // vector of xstructures for structures within the same family
+    vector<bool> structures_family_generated;                                               // vector of booleans indicating if xstructure is generated for structures within the same family
+    vector<string> structures_family_from;                                                  // vector of strings indicating where structure came from, i.e., input, auid, aflow protos, etc.
+    vector<vector<GroupedWyckoffPosition> > structures_family_grouped_Wyckoff_positions;    // Wyckoff positions grouped by site type
     vector<uint> number_compounds_matching_family;                                          // vector of number of compounds that match with the same family structures
-    vector<string> family_comparison_logs; //DX 20190506                                                 // vector of comparison logs for same family structures, CAREFUL: very long string //DX 20190506
-    vector<double> misfits;                                                                 // vector of misfit values when comparing the duplicate to the representative structure
-    vector<double> family_misfits;                                                          // vector of misfit values when comparing the same family structure to the representative structure  
+    vector<string> family_comparison_logs; //DX 20190506                                    // vector of comparison logs for same family structures, CAREFUL: very long string //DX 20190506
+    vector<double> misfits_duplicate;                                                       // vector of misfit values when comparing the duplicate to the representative structure
+    vector<double> misfits_family;                                                          // vector of misfit values when comparing the same family structure to the representative structure  
     vector<string> property_names;                                                          // vector of property names (if using AFLUX)
     vector<string> property_units;                                                          // vector of property units (if using AFLUX)
-    vector<string> representative_structure_properties;                                     // vector of property values for the representative structure (if using AFLUX)
-    vector<vector<string> > duplicate_structures_properties;                                // vector of property values for the duplicate structures (if using AFLUX) 
-    vector<vector<string> > family_structures_properties; //DX 20190506                                   // vector of property values for the family structures (if using AFLUX) //DX 20190425 
+    vector<string> properties_structure_representative;                                     // vector of property values for the representative structure (if using AFLUX)
+    vector<vector<string> > properties_structures_duplicate;                                // vector of property values for the duplicate structures (if using AFLUX) 
+    vector<vector<string> > properties_structures_family; //DX 20190506                     // vector of property values for the family structures (if using AFLUX) //DX 20190425 
     // functions
-    uint numberOfDuplicates() const; //DX 20190506                                                // return the number of duplicate structures for this prototype (i.e., checks misfit value)
+    uint numberOfDuplicates() const; //DX 20190506                                          // return the number of duplicate structures for this prototype (i.e., checks misfit value)
     uint numberOfComparisons(); //DX 20181221                                               // return the number of comparisons for this prototype 
     bool isSymmetryCalculated(); //DX 20190228
     bool isLFAEnvironmentCalculated(); //DX 20191105
@@ -156,10 +156,10 @@ namespace compare{
       bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds, 
       bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      const bool& same_species, const bool& scale_volume, const bool& fast_match, ostream& oss, double& final_misfit); //Main function
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, const bool &same_species); //Overloaded, returns true (match), false (no match)
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, const bool& same_species, const bool& scale_volume, const bool& fast_match); 
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, const bool &same_species, const bool& fast_match); //Overloaded, returns misfit value
+      bool same_species, bool scale_volume, bool fast_match, ostream& oss, double& final_misfit); //Main function //DX 20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool fast_match);  //DX 20191108 - remove const & from bools
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool fast_match); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
 
   // permutaion comparisons
   vector<string> getUniquePermutations(xstructure& xstr);
@@ -187,16 +187,15 @@ namespace compare{
   vector<string> getElements(xstructure& xstr);
   vector<uint> gcdStoich(const vector<uint>& numbers); //DX 20181009
   vector<uint> gcdStoich(const deque<int>& numbers);
-  vector<vector<xstructure> > prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc);
-  bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
-      vector<uint>& start_indices, vector<uint>& end_indices);
-  bool prepareSymmetryThreads(uint& number_of_structures, uint& num_proc,
-      vector<uint>& start_indices, vector<uint>& end_indices);
-  bool splitTaskIntoThreads(uint& number_of_tasks, uint& num_proc,              
-      vector<uint>& start_indices, vector<uint>& end_indices); //DX 20190530 - renamed
+  //DX 20191108 [OBSOLETE - switching to getThreadDistribution] bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
+  //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<uint>& start_indices, vector<uint>& end_indices);
+  //DX 20191108 [OBSOLETE - switching to getThreadDistribution] bool prepareSymmetryThreads(uint& number_of_structures, uint& num_proc,
+  //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<uint>& start_indices, vector<uint>& end_indices);
+  //DX 20191108 [OBSOLETE - switching to getThreadDistribution] bool splitTaskIntoThreads(uint& number_of_tasks, uint& num_proc,              
+  //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<uint>& start_indices, vector<uint>& end_indices); //DX 20190530 - renamed
   void calculateSymmetries(vector<xstructure>& vxstrs, vector<string>& vpearsons, vector<uint>& vsgroups, 
       vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions, uint& num_proc);
-  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint& start_index, uint& end_index);
+  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index, uint end_index); //DX 20191107 - remove & from uint
   void calculateLFAEnvironmentsInSetRange(vector<StructurePrototype>& structures, uint start_index, uint end_index);  //DX 20191105
   void calculateLFAEnvironments(vector<StructurePrototype>& structures, uint num_proc);  //DX 20191105
   void calculateSymmetries(vector<StructurePrototype>& structures, uint& num_proc);  //DX 20190118

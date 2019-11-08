@@ -2631,7 +2631,7 @@ namespace pflow {
       return;
     }
 
-    int num_atoms=a.atoms.size();
+    uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
     bool is_noncoll=false; 
     vector<xvector<double> > vmag_noncoll;                                                
     bool is_coll=false; 
@@ -2910,30 +2910,30 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("SYMMETRY::MAGNETIC") && (mode == _AGROUP_ || mode == _FGROUP_ || mode == _PGROUP_XTAL_ || mode == _PGROUPK_XTAL_ || mode == _SGROUP_)){
       string magmom_info = vpflow.getattachedscheme("SYMMETRY::MAGNETIC");
-      int num_atoms=a.atoms.size();
+      uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
       bool is_noncoll=false; 
       vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
       if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){       // DX 12/5/17 - added non-collinear
-	if(LDEBUG) {cerr << "pflow::SYMMETRY: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-	is_noncoll = true;
-	if(!AddSpinToXstructure(a,vmag_noncoll)){
-	  exit(0);
-	} 
+        if(LDEBUG) {cerr << "pflow::SYMMETRY: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
+        is_noncoll = true;
+        if(!AddSpinToXstructure(a,vmag_noncoll)){
+          exit(0);
+        } 
       }                                                                               // DX 12/5/17 - added non-collinear
       bool is_coll=false; 
       vector<double> vmag;
       if(!is_noncoll){
-	if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-	  if(LDEBUG) {cerr << "pflow::SYMMETRY: Collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-	  is_coll = true;
-	  if(!AddSpinToXstructure(a,vmag)){
-	    exit(0);
-	  } 
-	} 
+        if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
+          if(LDEBUG) {cerr << "pflow::SYMMETRY: Collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
+          is_coll = true;
+          if(!AddSpinToXstructure(a,vmag)){
+            exit(0);
+          } 
+        } 
       }
       if(!is_noncoll && !is_coll){                                                                                // DX 12/5/17 - added non-collinear
-	cerr << "pflow::SYMMETRY: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl; // DX 12/5/17 - added non-collinear
-	exit(0);                                                                                                  // DX 12/5/17 - added non-collinear
+        cerr << "pflow::SYMMETRY: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl; // DX 12/5/17 - added non-collinear
+        exit(0);                                                                                                  // DX 12/5/17 - added non-collinear
       }
     } 
     // DX 9/21/17 - MAGNETIC SYMMETRY - END
@@ -5259,7 +5259,7 @@ namespace pflow {
     // DX 11/28/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("DATA::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("DATA::MAGNETIC");
-      int num_atoms=a.atoms.size();
+      uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
       bool is_noncoll=false; 
       vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
       if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
@@ -5683,7 +5683,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("SYMMETRY::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("SYMMETRY::MAGNETIC");
-      int num_atoms=a.atoms.size();
+      uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
       bool is_noncoll=false; 
       vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
       if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
@@ -6362,7 +6362,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("FULLSYMMETRY::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("FULLSYMMETRY::MAGNETIC");
-      int num_atoms=a.atoms.size();
+      uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
       bool is_noncoll=false; 
       vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
       if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
@@ -7101,7 +7101,7 @@ namespace pflow {
 // pflow::GetCollinearMagneticInfo
 // ***************************************************************************
 namespace pflow {
-  bool GetCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<double>& vmag){
+  bool GetCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<double>& vmag){ //DX 20191107 - int to uint
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(aurostd::substring2bool(magmom_info,"OUTCAR")){
       if(aurostd::FileExist(magmom_info)) {
@@ -7138,14 +7138,14 @@ namespace pflow {
                 if(mag_tokens[m].find("*") != std::string::npos){
                   vector<string> tokens;
                   aurostd::string2tokens(mag_tokens[m],tokens,"*");
-                  uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+                  uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
                   for(uint n=0;n<num_magmoms;n++){
                     vmag.push_back(aurostd::string2utype<double>(tokens[1]));
                   }
                 }
                 else {
-		  vmag.push_back(aurostd::string2utype<double>(mag_tokens[m]));
-		}
+                  vmag.push_back(aurostd::string2utype<double>(mag_tokens[m]));
+                }
               }
               magmom_found=true;
             }
@@ -7158,7 +7158,7 @@ namespace pflow {
       }
       else {
         cerr << "pflow::GetCollinearMagneticInfo: ERROR: INCAR file does not exist." << endl;
-	return false;
+        return false;
       }
     }
     else {
@@ -7169,7 +7169,7 @@ namespace pflow {
         if(mag_tokens[m].find("*") != std::string::npos){
           vector<string> tokens;
           aurostd::string2tokens(mag_tokens[m],tokens,"*");
-          uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+          uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
           for(uint n=0;n<num_magmoms;n++){
             vmag.push_back(aurostd::string2utype<double>(tokens[1]));
           }
@@ -7179,7 +7179,7 @@ namespace pflow {
         }
       }
     }
-    if((int)vmag.size()!=num_atoms){
+    if(vmag.size()!=num_atoms){ //DX 20191107 - remove (int) type casting
       if(LDEBUG) {
         cerr << "pflow::GetCollinearMagneticInfo: WARNING: Number of magnetic moments is not equivalent to the number of atoms." << endl;
       }
@@ -7195,7 +7195,7 @@ namespace pflow {
 // pflow::GetNonCollinearMagneticInfo
 // ***************************************************************************
 namespace pflow {
-  bool GetNonCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll){
+  bool GetNonCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll){ //DX 20191107 - int to uint
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(aurostd::substring2bool(magmom_info,"OUTCAR")){
       if(aurostd::FileExist(magmom_info)) {
@@ -7233,7 +7233,7 @@ namespace pflow {
                 if(mag_tokens[m].find("*") != std::string::npos){
                   vector<string> tokens;
                   aurostd::string2tokens(mag_tokens[m],tokens,"*");
-                  uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+                  uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
                   for(uint n=0;n<num_magmoms;n++){
                     all_magmom_tokens.push_back(aurostd::string2utype<double>(tokens[1]));
                   }
@@ -7243,7 +7243,7 @@ namespace pflow {
                 }
               }
               // non-collinear check (should be divisible by 3)
-              if((int)all_magmom_tokens.size()!=3*num_atoms){
+              if(all_magmom_tokens.size()!=3*num_atoms){ //DX 20191107 - removed (int) type casting
                 if(LDEBUG) {
                   cerr << "pflow::GetNonCollinearMagneticInfo: WARNING: From INCAR. Number of magnetic moments not divisible by 3; not non-collinear system." << endl;
                 }
@@ -7282,7 +7282,7 @@ namespace pflow {
         if(mag_tokens[m].find("*") != std::string::npos){
           vector<string> tokens;
           aurostd::string2tokens(mag_tokens[m],tokens,"*");
-          uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+          uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
           for(uint n=0;n<num_magmoms;n++){
             all_magmom_tokens.push_back(aurostd::string2utype<double>(tokens[1]));
           }
@@ -7292,7 +7292,7 @@ namespace pflow {
         }
       }
       // non-collinear check (should be divisible by 3)
-      if((int)all_magmom_tokens.size()!=3*num_atoms){
+      if(all_magmom_tokens.size()!=3*num_atoms){ //DX 20191107 - removed (int) type casting
         if(LDEBUG) {
           cerr << "pflow::GetNonCollinearMagneticInfo: WARNING: From manual input. Number of magnetic moments is not three times the number of atoms; not non-collinear system." << endl;
         }
@@ -13698,8 +13698,8 @@ namespace pflow {
       a.ReScale(1.0);
       // DX 9/21/17 - MAGNETIC SYMMETRY - START
       if(vpflow.flag("SG::MAGNETIC")){
-	string magmom_info = vpflow.getattachedscheme("SG::MAGNETIC");
-        int num_atoms=a.atoms.size();
+        string magmom_info = vpflow.getattachedscheme("SG::MAGNETIC");
+        uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
         bool is_noncoll=false; 
         vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
         if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
@@ -13716,7 +13716,7 @@ namespace pflow {
             if(LDEBUG) {cerr << "pflow::SG: Collinear spin system detected." << endl;}   // DX 12/5/17 - added non-collinear
             is_coll = true;
             if(!AddSpinToXstructure(a,vmag)){
-	      exit(0);
+              exit(0);
             } 
           } 
         }
@@ -13967,7 +13967,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("SGDATA::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("SGDATA::MAGNETIC");
-      int num_atoms=a.atoms.size();
+      uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
       bool is_noncoll=false; 
       vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
       if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
@@ -14363,30 +14363,30 @@ namespace pflow {
     // get magnetic moment
     if(vpflow.flag("WYCCAR::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("WYCCAR::MAGNETIC");
-      int num_atoms=str.atoms.size();
+      uint num_atoms=str.atoms.size(); //DX 20191107 - int to uint
       bool is_noncoll=false; 
       vector<xvector<double> > vmag_noncoll;
       if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){
-	if(LDEBUG) {cerr << "pflow::WYCCAR: Non-collinear spin system detected." << endl;}
-	is_noncoll = true;
-	if(!AddSpinToXstructure(str,vmag_noncoll)){
-	  exit(0);
-	} 
+        if(LDEBUG) {cerr << "pflow::WYCCAR: Non-collinear spin system detected." << endl;}
+        is_noncoll = true;
+        if(!AddSpinToXstructure(str,vmag_noncoll)){
+          exit(0);
+        } 
       }
       bool is_coll=false; 
       vector<double> vmag;
       if(!is_noncoll){
-	if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-	  if(LDEBUG) {cerr << "pflow::WYCCAR: Collinear spin system detected." << endl;}
-	  is_coll = true;
-	  if(!AddSpinToXstructure(str,vmag)){
-	    exit(0);
-	  } 
-	} 
+        if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
+          if(LDEBUG) {cerr << "pflow::WYCCAR: Collinear spin system detected." << endl;}
+          is_coll = true;
+          if(!AddSpinToXstructure(str,vmag)){
+            exit(0);
+          } 
+        } 
       }
       if(!is_noncoll && !is_coll){
-	cerr << "pflow::WYCCAR: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;
-	exit(0);
+        cerr << "pflow::WYCCAR: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;
+        exit(0);
       }
     }
 

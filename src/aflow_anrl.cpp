@@ -3858,7 +3858,7 @@ namespace anrl {
     for(uint i=0;i<all_lattice_parameters.size();i++){
       if(all_lattice_parameters[i]<=_ZERO_TOL_){
         stringstream message; message << "The " << i << "th lattice parameter is ill-defined. Please check input.";
-        throw aurostd::xerror(function_name, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(function_name, message, _VALUE_ERROR_);
       }
     }
 

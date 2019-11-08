@@ -131,8 +131,8 @@ namespace pflow {
   string FROZSL_ANALYZE(istream& input);
   string FROZSL_INPUT(void);
   string FROZSL_OUTPUT(void);
-  bool GetCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry
-  bool GetNonCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear
+  bool GetCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry //DX 20191107 - int to uint
+  bool GetNonCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear //DX 20191107 - int to uint
   vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF190329
   void GULP(istream& input);

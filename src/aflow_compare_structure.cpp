@@ -322,7 +322,7 @@ namespace pflow {
       store_comparison_logs = true; //DX 20190822 - add log bool
       // call main comparison function
       // DX 20190424 [OBSOLETE] compare::aflowCompareStructure(num_proc,xstr1,xstr2,same_species, scale_volume, optimize_match, oss,final_misfit);
-      compare::aflowCompareStructure(num_proc,all_structures[0].representative_structure,all_structures[1].representative_structure,same_species, scale_volume, optimize_match, oss,final_misfit); //DX 2010424
+      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, oss,final_misfit); //DX 2010424
       if(print==true){
         // return mapping details
         return oss.str();
@@ -486,18 +486,18 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // load input structure
     StructurePrototype structure;
-    structure.representative_structure = xstr;
-    structure.representative_structure_name = "input geometry";
+    structure.structure_representative = xstr;
+    structure.structure_representative_name = "input geometry";
     structure.stoichiometry = compare::getStoichiometry(xstr,true);
     structure.elements = compare::getElements(xstr);
     // update xstructure species
-    if(structure.representative_structure.species.size()==0){
+    if(structure.structure_representative.species.size()==0){
       deque<string> deque_species; for(uint j=0;j<structure.elements.size();j++){deque_species.push_back(structure.elements[j]);}
-      structure.representative_structure.SetSpecies(deque_species);
-      structure.representative_structure.SpeciesPutAlphabetic();
+      structure.structure_representative.SetSpecies(deque_species);
+      structure.structure_representative.SpeciesPutAlphabetic();
     }
-    structure.representative_structure_generated = true; 
-    structure.representative_structure_from = "input"; 
+    structure.structure_representative_generated = true; 
+    structure.structure_representative_from = "input"; 
 
     // ---------------------------------------------------------------------------
     // get the unique permutations for the structure
@@ -509,9 +509,9 @@ namespace compare{
       ss_output << "Unique permutations (" << final_permutations.size() << "): " << endl; 
 
       for(uint j=0;j<final_permutations.size();j++){
-        ss_output << " " << final_permutations[j].representative_structure_name;
-        for (uint k=0;k<final_permutations[j].duplicate_structures_names.size();k++){
-          ss_output << " = " << final_permutations[j].duplicate_structures_names[k];
+        ss_output << " " << final_permutations[j].structure_representative_name;
+        for (uint k=0;k<final_permutations[j].structures_duplicate_names.size();k++){
+          ss_output << " = " << final_permutations[j].structures_duplicate_names[k];
         }
         ss_output << endl;
       }
@@ -524,8 +524,8 @@ namespace compare{
       for(uint j=0;j<final_permutations.size();j++){
         stringstream sstmp;
         vector<string> equivalent_permutations;
-        equivalent_permutations.push_back(final_permutations[j].representative_structure_name);
-        equivalent_permutations.insert(equivalent_permutations.end(),final_permutations[j].duplicate_structures_names.begin(),final_permutations[j].duplicate_structures_names.end());
+        equivalent_permutations.push_back(final_permutations[j].structure_representative_name);
+        equivalent_permutations.insert(equivalent_permutations.end(),final_permutations[j].structures_duplicate_names.begin(),final_permutations[j].structures_duplicate_names.end());
         sstmp << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(equivalent_permutations,"\""),",") << "]";
         vcontent_json.push_back(sstmp.str()); sstmp.str("");
       }
@@ -555,7 +555,7 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // store unique permutations in vector
     for(uint j=0;j<final_permutations.size();j++){
-      unique_permutations.push_back(final_permutations[j].representative_structure_name);
+      unique_permutations.push_back(final_permutations[j].structure_representative_name);
     }
 
     // update oss
@@ -880,8 +880,8 @@ namespace pflow {
     if(file_list.size()==2){
       // return abbreviated results (i.e., misfit value along with match, same family, or no match text
       double final_misfit = -1.0;
-      if(final_prototypes[0].misfits.size()==1){
-        final_misfit =  final_prototypes[0].misfits[0];
+      if(final_prototypes[0].misfits_duplicate.size()==1){
+        final_misfit =  final_prototypes[0].misfits_duplicate[0];
       }
       message << final_misfit << " : ";
       if(final_misfit <=0.1 && (final_misfit+1.0)> 1e-3){
@@ -900,7 +900,7 @@ namespace pflow {
         pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
       if(print){
-        if(final_prototypes[0].misfits.size()==1){
+        if(final_prototypes[0].misfits_duplicate.size()==1){
           oss << final_prototypes[0].duplicate_comparison_logs[0];
         }
       }
@@ -981,7 +981,7 @@ namespace pflow {
     // global quiet back to default
     XHOST.QUIET=original_quiet;
 
-    return prototypes[0].duplicate_structures_names; // duplicates names are prototype labels 
+    return prototypes[0].structures_duplicate_names; // duplicates names are prototype labels 
   }
 }
 //DX 20190314 - added new function - START
@@ -1172,14 +1172,14 @@ namespace pflow {
     //DX 20190314 [OBSOLETE] xstructure xstr(input,IOAFLOW_AUTO);
 
     StructurePrototype input_structure;
-    input_structure.representative_structure = xstr;
-    input_structure.representative_structure_name = "input geometry";
+    input_structure.structure_representative = xstr;
+    input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = compare::getStoichiometry(xstr,true); //true preserves the stoich order for the structure
     input_structure.elements = compare::getElements(xstr);
-    input_structure.representative_structure_compound = compare::getCompoundName(xstr);
-    input_structure.representative_structure_generated = true;
+    input_structure.structure_representative_compound = compare::getCompoundName(xstr);
+    input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
-    input_structure.representative_structure_from = ss_input.str(); 
+    input_structure.structure_representative_from = ss_input.str(); 
     all_structures.push_back(input_structure);
 
     // ---------------------------------------------------------------------------
@@ -1194,9 +1194,9 @@ namespace pflow {
     }
     else if(!ignore_symmetry && xstr.space_group_ITC!=0){
       for(uint i=0;i<all_structures.size();i++){
-        all_structures[i].space_group = all_structures[i].representative_structure.space_group_ITC;
+        all_structures[i].space_group = all_structures[i].structure_representative.space_group_ITC;
         vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
-        compare::groupWyckoffPositions(all_structures[i].representative_structure, grouped_Wyckoff_positions);
+        compare::groupWyckoffPositions(all_structures[i].structure_representative, grouped_Wyckoff_positions);
         all_structures[i].grouped_Wyckoff_positions=grouped_Wyckoff_positions;
       }
     }
@@ -1302,18 +1302,18 @@ namespace pflow {
 
       for(uint i=0;i<final_prototypes.size();i++){
         // check if xstructure is generated; if not, make it
-        if(!final_prototypes[i].representative_structure_generated){
-          if(!compare::generateStructure(final_prototypes[i].representative_structure_name,final_prototypes[i].representative_structure_from,final_prototypes[i].representative_structure,oss)){
-            message << "Could not generate structure (" << final_prototypes[i].representative_structure_name << ").";
+        if(!final_prototypes[i].structure_representative_generated){
+          if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
+            message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
             throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
           }
         }        
         if(LDEBUG){ //DX 20190601 - added LDEBUG
-          cerr << "Finding unique permutations for " << final_prototypes[i].representative_structure_name << ".";
+          cerr << "Finding unique permutations for " << final_prototypes[i].structure_representative_name << ".";
         }        
         vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,optimize_match,oss,FileMESSAGE); //DX 20190319 - added FileMESSAGE
         for(uint j=0;j<final_permutations.size();j++){
-          final_prototypes[i].unique_permutations.push_back(final_permutations[j].representative_structure_name);
+          final_prototypes[i].unique_permutations.push_back(final_permutations[j].structure_representative_name);
         }
       }
       message << "Unique permutations found.";
@@ -1642,16 +1642,16 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // store input structure 
     StructurePrototype input_structure;
-    input_structure.representative_structure = xstr;
-    input_structure.representative_structure.ReScale(1.0); //DX 20191105
-    input_structure.representative_structure_name = "input geometry";
+    input_structure.structure_representative = xstr;
+    input_structure.structure_representative.ReScale(1.0); //DX 20191105
+    input_structure.structure_representative_name = "input geometry";
     input_structure.stoichiometry = compare::getStoichiometry(xstr,same_species);
     input_structure.elements = compare::getElements(xstr);
-    input_structure.representative_structure_compound = compare::getCompoundName(xstr);
-    //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.representative_structure); //DX 20190711
-    input_structure.representative_structure_generated = true; 
+    input_structure.structure_representative_compound = compare::getCompoundName(xstr);
+    //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] input_structure.LFA_environments= compare::computeLFAEnvironment(input_structure.structure_representative); //DX 20190711
+    input_structure.structure_representative_generated = true; 
     stringstream ss_input; ss_input << xstr;
-    input_structure.representative_structure_from = ss_input.str(); 
+    input_structure.structure_representative_from = ss_input.str(); 
     input_structure.property_names = property_list;
     input_structure.property_units = property_units;
     all_structures.push_back(input_structure);
@@ -1695,18 +1695,18 @@ namespace pflow {
           StructurePrototype tmp;
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
           entry.vstr[0].SetSpecies(deque_species);
-          tmp.representative_structure = entry.vstr[0];
-          tmp.representative_structure.ReScale(1.0); //DX 20191105
-          tmp.representative_structure_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
-          tmp.representative_structure.directory=tmp.representative_structure_name; //DX 20190718 - update xstructure.directoryr
-          tmp.representative_structure_generated=true;
-          tmp.representative_structure_from="aurl";
+          tmp.structure_representative = entry.vstr[0];
+          tmp.structure_representative.ReScale(1.0); //DX 20191105
+          tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
+          tmp.structure_representative.directory=tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
+          tmp.structure_representative_generated=true;
+          tmp.structure_representative_from="aurl";
           tmp.stoichiometry=tmp_reduced_stoich;
-          tmp.representative_structure_compound = compare::getCompoundName(entry.vstr[0]); //DX 20190430 - added
-          //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] tmp.LFA_environments= compare::computeLFAEnvironment(tmp.representative_structure); //DX 20190711
+          tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]); //DX 20190430 - added
+          //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX 20190711
           tmp.elements=species;
           tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
-          tmp.number_types = entry.vstr[0].num_each_type.size(); //DX 20191031
+          tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
           // store any properties 
           for(uint l=0;l<properties_response[i].size();l++){
             bool property_requested = false;
@@ -1714,11 +1714,11 @@ namespace pflow {
               if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
             }
             if(property_requested){
-              tmp.representative_structure_properties.push_back(properties_response[i][l].second);
+              tmp.properties_structure_representative.push_back(properties_response[i][l].second);
             }
           }
           if(LDEBUG) {
-            cerr << "pflow::compareStructureDirectory() Found structure: " << tmp.representative_structure_name << endl;
+            cerr << "pflow::compareStructureDirectory() Found structure: " << tmp.structure_representative_name << endl;
           }
           all_structures.push_back(tmp);
         }
@@ -1776,7 +1776,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // only compare entries to the input representation, the rest are extraneous comparisons
     vector<StructurePrototype> input_structure_comparison_scheme_only; input_structure_comparison_scheme_only.push_back(comparison_schemes[0]);
-    message << "Number of structures to compare to input structure: " << input_structure_comparison_scheme_only[0].duplicate_structures_names.size();
+    message << "Number of structures to compare to input structure: " << input_structure_comparison_scheme_only[0].structures_duplicate_names.size();
     pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
@@ -1801,7 +1801,7 @@ namespace pflow {
     compare::printResults(ss_json, same_species, final_prototypes, "json");
      
     // DEBUG oss << ss_out.str();
-    message << "Number of structures in database matching with the input structure: " << final_prototypes[0].duplicate_structures.size() << "." << endl;
+    message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate.size() << "." << endl;
     pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     
     //DX 20190429 - added screen only option - START
@@ -2054,10 +2054,9 @@ namespace pflow {
       matchbook.push_back(catalog_summons);
       message << "OPTIONS: Catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << endl; 
       pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-
-      if(catalog=="" || catalog=="icsd" || catalog=="all"){
-        ICSD_comparison=true;
-      }
+    }
+    if(catalog=="" || catalog=="icsd" || catalog=="all"){ //DX 20191108 - needs to be outside of loop
+      ICSD_comparison=true;
     }
     
     // ---------------------------------------------------------------------------
@@ -2176,8 +2175,9 @@ namespace pflow {
     // distribute threads via indices
     uint number_of_structures = auids.size();
     uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-    vector<uint> start_indices, end_indices;
-    compare::splitTaskIntoThreads(number_of_structures,num_threads,start_indices,end_indices);
+    //DX 20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
+    //DX 20191107 [switching to getThreadDistribution] - compare::splitTaskIntoThreads(number_of_structures,num_threads,start_indices,end_indices);
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX 20191107 
     message << "Done. Split into threads.";     
     pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
@@ -2214,24 +2214,26 @@ namespace pflow {
       }
       tmp.stoichiometry=tmp_reduced_stoich;
       tmp.elements=species;
-      tmp.representative_structure_name=aurls[i];
-      tmp.representative_structure_from="aurl";
+      tmp.structure_representative_name=aurls[i];
+      tmp.structure_representative_from="aurl";
       all_structures.push_back(tmp);
     }
     message << "Finished initializing StructurePrototype object, now spawn threads.";     
     pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     
     // ---------------------------------------------------------------------------
-    // Run threads 
-    vector<std::thread> threads;
+    // Run threads (now using pointer to thread)
+    vector<std::thread*> threads;
     for(uint n=0; n<num_threads; n++){
-	    threads.push_back(std::thread(compare::generateStructuresInRange,std::ref(all_structures),std::ref(oss),start_indices[n],end_indices[n]));
+	    //DX 20191107 [OBOSLETE - switch to getThreadDistribution convention] threads.push_back(std::thread(compare::generateStructuresInRange,std::ref(all_structures),std::ref(oss),start_indices[n],end_indices[n]));
+	    threads.push_back(new std::thread(&compare::generateStructuresInRange, std::ref(all_structures),std::ref(oss),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107
     }
     // ---------------------------------------------------------------------------
     // Join threads
-	  for(uint t=0;t<num_threads;t++){
-      threads[t].join();
-	  }
+    for(uint t=0;t<num_threads;t++){
+      threads[t]->join();
+      delete threads[t];
+    }
     message << "Threads complete. " << all_structures.size() << " structures. Adding properties.";     
     pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
    
@@ -2247,16 +2249,16 @@ namespace pflow {
           if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
         }
         if(property_requested){
-          all_structures[i].representative_structure_properties.push_back(properties_response[i][l].second);
+          all_structures[i].properties_structure_representative.push_back(properties_response[i][l].second);
         }
       }
     }
 
     for(uint i=0;i<all_structures.size();i++){
-      if(all_structures[i].representative_structure_generated){
+      if(all_structures[i].structure_representative_generated){
         deque<string> deque_species; for(uint j=0;j<all_structures[i].elements.size();j++){deque_species.push_back(all_structures[i].elements[j]);}
-        all_structures[i].representative_structure.SetSpecies(deque_species);
-        all_structures[i].representative_structure_compound = compare::getCompoundName(all_structures[i].representative_structure);
+        all_structures[i].structure_representative.SetSpecies(deque_species);
+        all_structures[i].structure_representative_compound = compare::getCompoundName(all_structures[i].structure_representative);
       }
     }
 
@@ -2267,8 +2269,8 @@ namespace pflow {
     compare::removeNonGeneratedStructures(all_structures);
           
     for(uint i=0;i<all_structures.size();i++){
-      all_structures[i].representative_structure.ReScale(1.0); //DX 20191105
-      //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] all_structures[i].LFA_environments= compare::computeLFAEnvironment(all_structures[i].representative_structure); //DX 20190711
+      all_structures[i].structure_representative.ReScale(1.0); //DX 20191105
+      //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] all_structures[i].LFA_environments= compare::computeLFAEnvironment(all_structures[i].structure_representative); //DX 20190711
     }
          
 #else
@@ -2312,18 +2314,18 @@ namespace pflow {
         StructurePrototype tmp;
         deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
         entry.vstr[0].SetSpecies(deque_species);
-        tmp.representative_structure = entry.vstr[0];
-        tmp.representative_structure.ReScale(1.0); //DX 20191105
-        tmp.representative_structure_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
-        tmp.representative_structure.directory=tmp.representative_structure_name; //DX 20190718 - update xstructure.directoryr
-        tmp.representative_structure_generated=true;
-        tmp.representative_structure_from="aurl";
+        tmp.structure_representative = entry.vstr[0];
+        tmp.structure_representative.ReScale(1.0); //DX 20191105
+        tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
+        tmp.structure_representative.directory=tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
+        tmp.structure_representative_generated=true;
+        tmp.structure_representative_from="aurl";
         tmp.stoichiometry=tmp_reduced_stoich;
         tmp.elements=species;
         tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
-        tmp.number_types = entry.vstr[0].num_each_type.size(); //DX 20191031
-        tmp.representative_structure_compound = compare::getCompoundName(entry.vstr[0]);
-        //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] tmp.LFA_environments= compare::computeLFAEnvironment(tmp.representative_structure); //DX 20190711
+        tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
+        tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]);
+        //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX 20190711
         tmp.property_names = property_list; //DX 20190326
         tmp.property_units = property_units; //DX 20190326
         // store any properties 
@@ -2333,11 +2335,11 @@ namespace pflow {
             if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
           }
           if(property_requested){
-            tmp.representative_structure_properties.push_back(properties_response[i][l].second);
+            tmp.properties_structure_representative.push_back(properties_response[i][l].second);
           }
         }
         if(LDEBUG){
-          cerr << "pflow::compareStructureDirectory() Found structure: " << tmp.representative_structure_name << endl;
+          cerr << "pflow::compareStructureDirectory() Found structure: " << tmp.structure_representative_name << endl;
         }
         all_structures.push_back(tmp);
       }
@@ -2637,9 +2639,9 @@ namespace compare {
         if(arePermutationsComparableViaStoichiometry(final_prototypes[i].stoichiometry) && 
            arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions)){
           // check if xstructure is generated; if not, make it
-          if(!final_prototypes[i].representative_structure_generated){
-            if(!compare::generateStructure(final_prototypes[i].representative_structure_name,final_prototypes[i].representative_structure_from,final_prototypes[i].representative_structure,oss)){
-              message << "Could not generate structure (" << final_prototypes[i].representative_structure_name << ").";
+          if(!final_prototypes[i].structure_representative_generated){
+            if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
+              message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
               throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
             }
           }
@@ -2647,7 +2649,7 @@ namespace compare {
          
           // store permutation results in main StructurePrototype object
           for(uint j=0;j<final_permutations.size();j++){
-            final_prototypes[i].unique_permutations.push_back(final_permutations[j].representative_structure_name);
+            final_prototypes[i].unique_permutations.push_back(final_permutations[j].structure_representative_name);
           }
           final_permutations.clear(); //DX 20190624
         }
@@ -2698,34 +2700,37 @@ namespace compare {
       // split task into threads 
       uint number_of_structures = final_prototypes.size();
       uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-      vector<uint> start_indices, end_indices;
-      splitTaskIntoThreads(number_of_structures, number_of_threads, start_indices, end_indices);
-      
-			// ---------------------------------------------------------------------------
+      //DX 20191107 [switching to getThreadDistribution] vector<uint> start_indices, end_indices;
+      //DX 20191107 [switching to getThreadDistribution] splitTaskIntoThreads(number_of_structures, number_of_threads, start_indices, end_indices);
+      vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX 20191107 
+
+      // ---------------------------------------------------------------------------
       // [THREADED] determine AFLOW standard designation 
-      vector<std::thread> threads;
+      vector<std::thread*> threads;
       for(uint n=0; n<number_of_threads; n++){
-        threads.push_back(std::thread(compare::getPrototypeDesignationsInRange,std::ref(final_prototypes),start_indices[n], end_indices[n]));
-			}
+        //DX 20191107 [switching to getThreadDistribution convention] threads.push_back(std::thread(compare::getPrototypeDesignationsInRange,std::ref(final_prototypes),start_indices[n], end_indices[n]));
+        threads.push_back(new std::thread(&compare::getPrototypeDesignationsInRange,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX 20191107
+      }
       for(uint t=0;t<threads.size();t++){
-        threads[t].join();
-	    }
-      
+        threads[t]->join();
+        delete threads[t];
+      }
+
       // ---------------------------------------------------------------------------
       // update once all are collected (safer) 
       for(uint i=0;i<final_prototypes.size();i++){
-        final_prototypes[i].aflow_label = final_prototypes[i].representative_structure.prototype;
-        final_prototypes[i].aflow_parameter_list = final_prototypes[i].representative_structure.prototype_parameter_list;
-        final_prototypes[i].aflow_parameter_values = final_prototypes[i].representative_structure.prototype_parameter_values;
+        final_prototypes[i].aflow_label = final_prototypes[i].structure_representative.prototype;
+        final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative.prototype_parameter_list;
+        final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative.prototype_parameter_values;
       }
 #else
       // ---------------------------------------------------------------------------
       // [NON-THREADED] determine AFLOW standard designation 
       for(uint i=0;i<final_prototypes.size();i++){
-        anrl::structure2anrl(final_prototypes[i].representative_structure,false); //DX 20190829 - false for recalculate_symmetry
-        final_prototypes[i].aflow_label = final_prototypes[i].representative_structure.prototype;
-        final_prototypes[i].aflow_parameter_list = final_prototypes[i].representative_structure.prototype_parameter_list;
-        final_prototypes[i].aflow_parameter_values = final_prototypes[i].representative_structure.prototype_parameter_values;
+        anrl::structure2anrl(final_prototypes[i].structure_representative,false); //DX 20190829 - false for recalculate_symmetry
+        final_prototypes[i].aflow_label = final_prototypes[i].structure_representative.prototype;
+        final_prototypes[i].aflow_parameter_list = final_prototypes[i].structure_representative.prototype_parameter_list;
+        final_prototypes[i].aflow_parameter_values = final_prototypes[i].structure_representative.prototype_parameter_values;
       }
 #endif
     }
@@ -2769,8 +2774,8 @@ namespace compare {
       // ---------------------------------------------------------------------------
       // match to AFLOW prototypes 
       for(uint i=0;i<final_prototypes.size();i++){
-        vector<StructurePrototype> matching_protos = pflow::compare2prototypes(final_prototypes[i].representative_structure, vpflow_protos);
-        final_prototypes[i].matching_aflow_prototypes = matching_protos[0].duplicate_structures_names;
+        vector<StructurePrototype> matching_protos = pflow::compare2prototypes(final_prototypes[i].structure_representative, vpflow_protos);
+        final_prototypes[i].matching_aflow_prototypes = matching_protos[0].structures_duplicate_names;
       }
     }
    
@@ -2782,7 +2787,7 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, const bool &same_species) {
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
     ostringstream oss;
     uint num_proc=1;
     double final_misfit=-1;
@@ -2793,7 +2798,7 @@ namespace compare {
 }
 
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, const bool& same_species, const bool& scale_volume, const bool& optimize_match) {
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match) { //DX 20191108 - remove const & from bools
     ostringstream oss;
     uint num_proc = 1;
     double final_misfit = -1;
@@ -2806,7 +2811,7 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, const bool &same_species) {
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
     ostringstream oss;
     uint num_proc=1;
     double final_misfit=-1;
@@ -2822,8 +2827,8 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      const bool &same_species, const bool& scale_volume, const bool& optimize_match, 
-      ostream& oss, double& final_misfit) {
+      bool same_species, bool scale_volume, bool optimize_match, 
+      ostream& oss, double& final_misfit) { //DX 20191108 - remove const & from bools
 
     // This is the main comparison function, which  compares two crystal structures
     // and determines their level of similarity based on the idea discussed 

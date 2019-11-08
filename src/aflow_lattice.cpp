@@ -41,7 +41,6 @@ namespace LATTICE {
 //DX 20191031 - START
 namespace LATTICE {
   string Lattice2TypeAndCentering(const string& lattice_type) {
-    string function_name = "LATTICE::lattice2typeAndCentering()";
 
     if(lattice_type=="TRI"){ return "aP"; }
     if(lattice_type=="MCL"){ return "mP"; }
@@ -58,6 +57,7 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
+    string function_name = "LATTICE::lattice2typeAndCentering()";
     throw aurostd::xerror(function_name,lattice_type+" is not a possible lattice type.",_INPUT_ILLEGAL_);
 
     return "";
