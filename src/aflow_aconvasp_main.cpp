@@ -2626,7 +2626,7 @@ namespace pflow {
    
     // ---------------------------------------------------------------------------
     // check if spin information is empty
-    if(magmom_info.size()==0){ 
+    if(magmom_info.empty()){ 
       if(LDEBUG){ cerr << function_name << " Spin information is empty; no spin information added to structure." << endl; }
       return;
     }
@@ -8197,7 +8197,7 @@ namespace pflow {
       for(uint i=0;i<tokens.size();i++){ stoichiometry.push_back(aurostd::string2utype<uint>(tokens[i])); }
       if(arity!=0 && arity!=stoichiometry.size()){
         message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match.";
-        throw aurostd::xerror(function_name,message,_INPUT_ILLEGAL_); //DX 20191107 - exit() -> throw
+        throw aurostd::xerror(function_name,message,_INPUT_ERROR_); //DX 20191107 - exit() -> throw
       }
       std::sort(stoichiometry.begin(),stoichiometry.end()); // must sort to properly filter
     }
