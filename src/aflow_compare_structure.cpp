@@ -2822,7 +2822,7 @@ namespace compare {
 // ***************************************************************************
 namespace compare {
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      const bool &same_species, const bool& scale_volume, const bool& optimize_match, 
+      bool same_species, bool scale_volume, bool optimize_match, 
       ostream& oss, double& final_misfit) {
 
     // This is the main comparison function, which  compares two crystal structures
