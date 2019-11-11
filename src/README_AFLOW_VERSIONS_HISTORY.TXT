@@ -1,4 +1,4 @@
-3.1.227 - 2019/11/01
+3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Fixed bug in xDOSCAR reader error detection. (ME)
         -- Additional web output for entry page applets. (ME)
