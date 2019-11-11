@@ -455,7 +455,7 @@ vector<string> AflowDB::getSchemaKeys(const string& schema) {
   string excluded_functions = "app,image,link";
   aurostd::string2tokens(excluded_functions, exclude, ",");
 
-  string function;
+  string function = "";
   for (uint k = 0; k < keys_unfiltered.size(); k++) {
     if ((keys_unfiltered[k] != "__schema^2__") && (keys_unfiltered[k] != "icsd_number")) {
       function = extractJsonValue(schema, "AAPI_schema." + keys_unfiltered[k] + ".function");
