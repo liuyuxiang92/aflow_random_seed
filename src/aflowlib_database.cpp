@@ -612,7 +612,7 @@ DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& ta
       if (stats.count[c] > 0) {
         string max = "", min = "";
         vector<string> set;
-        uint nset = 0, n;
+        uint nset = 0, n = 0;
         for (int t = 0; t < _N_AUID_TABLES_; t++) {
           if (counts[t][c] > 0) {
             if (max.empty()) {
