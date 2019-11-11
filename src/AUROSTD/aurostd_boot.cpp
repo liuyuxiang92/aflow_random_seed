@@ -156,7 +156,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   exp(m); // DX 1/15/18 - add exponential or complex matrices
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
-  vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
+  vx=m.getcol(1);m=m.getmat(1,1,1,1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904 //CO191110
 
   //  jacobi(m,vx,m);
  
@@ -254,7 +254,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   utype* mstar;mstar=NULL;
   aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);
-  vv=m.getcol(1);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y
+  vv=m.getcol(1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y  //CO191110
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO190329 - clang doesn't like x=x, changing to x=y
   o+=sum(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x);
   o+=isequal(m,m);o+=isequal(m,m,x);cout<<m<<endl;

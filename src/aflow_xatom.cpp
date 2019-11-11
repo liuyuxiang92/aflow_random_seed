@@ -9888,7 +9888,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     atomic_grid=a;atomic_grid.Clean();
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
-    ptr_atoms=&atomic_grid.atoms;
+    ptr_atoms=&atomic_grid.grid_atoms;  //CO190808 - GenerateGridAtoms() populates grid_atoms, not atoms
   }
   const deque<_atom> atoms=*ptr_atoms;
 
@@ -9943,9 +9943,12 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
   }
 
   if(check_min_dists){ //DX 20190613
-    double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
-    double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
+    double min_dist_orig=SYM::minimumDistance(atoms);  //lattice_orig //this does NOT work if we use GenerateGridAtoms (no longer periodic with lattice), so simply compare distances between atoms. NOTE: this is no longer the TRUE minimumDistance(), which requires knowledge of the lattice vectors
+    double min_dist_new=SYM::minimumDistance(atoms_in_cell);  //lattice_new
     if(LDEBUG){
+      cerr << soliloquy << " lattice_orig=" << endl;cerr << lattice_orig << endl;
+      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << soliloquy << " atoms_orig=" << endl;for(uint i=0;i<atoms.size();i++){cerr << atoms[i] << endl;}
       cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
       cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
     }
@@ -11718,6 +11721,61 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
   b.scale=std::pow((double) in_volume/det(b.lattice),(double) 1.0/3.0);
   b.FixLattices(); // touched scale, need to fix the lattices
   return b;
+}
+
+// ***************************************************************************
+// Function SetAutoVolume
+// ***************************************************************************
+void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
+  string soliloquy="xstructure::setAutoVolume():";
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  stringstream message;
+
+  if(LDEBUG) {cerr << soliloquy << " fixing volume" << endl;}
+  double volume=0; //,voli=0;
+  bool use_AFLOW_defaults=use_AFLOW_defaults_in;
+  //try and pull from species_volume first
+  for(uint i=0;i<atoms.size()&&!use_AFLOW_defaults;i++){
+    for(uint j=0;j<num_each_type.size()&&!use_AFLOW_defaults;j++){
+      if(atoms[i].name==species[j]){
+        const double& voli=species_volume[j];
+        if(LDEBUG) {cerr << soliloquy << " atoms[i].name=" << atoms[i].name << " atoms[i].vol=" << voli << endl;}
+        if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){use_AFLOW_defaults=true;}
+        if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
+          message << "partial_occupation_value==0.0 for atom=" << i;
+          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        }
+        volume+=atoms[i].partial_occupation_value*voli;
+      }
+    }
+  }
+  //otherwise get defaults from AFLOW
+  if(use_AFLOW_defaults || abs(volume)<_XPROTO_ZERO_VOL_){
+    if(LDEBUG) {cerr << soliloquy << " using automatic volumes" << endl;}
+    volume=0;
+    double voli;
+    for(uint i=0;i<atoms.size();i++){
+      for(uint j=0;j<num_each_type.size();j++){
+        if(atoms[i].name==species[j]){
+          voli=GetAtomVolume(atoms[i].name);
+          if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){
+            message << "No volume found for " << atoms[i].name << " (auto volumes)";
+            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          }
+          if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
+            message << "partial_occupation_value==0.0 for atom=" << i;
+            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          }
+          volume+=atoms[i].partial_occupation_value*voli;
+        }
+      }
+    }
+  }
+  if(abs(volume)<_XPROTO_ZERO_VOL_){
+    message << "Final volume==0, check species default volumes";
+    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  SetVolume(volume);
 }
 
 // ***************************************************************************
@@ -13632,24 +13690,41 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
-	if(i!=0 || j!=0 || k!=0) {  //these are ALREADY included
-	  for(uint iat=0;iat<str.atoms.size();iat++) {
-	    atom=str.atoms.at(iat);
-	    atom.isincell=FALSE; // these are OUT OF CELL
-	    atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms.at(iat).cpos;
-	    atom.fpos[1]=i+str.atoms.at(iat).fpos[1];
-	    atom.fpos[2]=j+str.atoms.at(iat).fpos[2];
-	    atom.fpos[3]=k+str.atoms.at(iat).fpos[3];
-	    str.grid_atoms.push_back(atom);
+        if(!(i==0 && j==0 && k==0)) {  //these are ALREADY included
+          for(uint iat=0;iat<str.atoms.size();iat++) {
+            atom=str.atoms.at(iat);
+            atom.isincell=FALSE; // these are OUT OF CELL
+            //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms.at(iat).cpos;  //CO190808
+            atom.cpos+=((double)i)*a1+((double)j)*a2+((double)k)*a3;  //CO190808
+            //atom.fpos[1]=i+str.atoms.at(iat).fpos[1]; //CO190808
+            //atom.fpos[2]=j+str.atoms.at(iat).fpos[2]; //CO190808
+            //atom.fpos[3]=k+str.atoms.at(iat).fpos[3]; //CO190808
+            atom.fpos[1]+=i;  //CO190808
+            atom.fpos[2]+=j;  //CO190808
+            atom.fpos[3]+=k;  //CO190808
+            str.grid_atoms.push_back(atom);
             str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-      if(LDEBUG) { //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-      } //CO190520
-	  }
-	}
+            if(LDEBUG) { //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+            } //CO190520
+          }
+        }
       }
     }
+  }
+  if(0){  //CO190808 - quick check of mindist
+    double tmp,tmp_min=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<str.grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<str.grid_atoms.size();j++){
+        tmp=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+        if(tmp<tmp_min){
+          tmp_min=tmp;
+          cerr << tmp_min << endl;
+        }
+      }
+    }
+    exit(0);
   }
   str.grid_atoms_calculated=TRUE;
   str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;

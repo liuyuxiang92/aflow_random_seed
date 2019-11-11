@@ -1534,7 +1534,10 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
       for(uint i=0;i<xvasp.str.species_pp.size();i++) {
         pp_add_on+=xvasp.str.species_pp.at(i);
         if(xvasp.POTCAR_TYPE_DATE_PRINT_flag || xvasp.POTCAR_TYPE_PRINT_flag) { // add potential type and date (or just type) //CO181226
-          if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
+          if(LDEBUG){
+            cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
+            cerr << "DEBUG - " << soliloquy << " xvasp.str.species_pp[i=" << i << "]=" << xvasp.str.species_pp[i] << endl;
+          }
           string FilePotcar,DataPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO190116
           if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
@@ -1587,7 +1590,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
         }
       }
       if(XHOST.GENERATE_AFLOWIN_ONLY){pottypedatestr="PAW_PBE";}  //CO190116 - set some sort of default for workshop stuff
-      if(specify_pottype_once){pp_add_on=aurostd::joinWDelimiter(xvasp.str.species_pp,"")+":"+pottypedatestr;}  //overwrite
+      if((xvasp.POTCAR_TYPE_DATE_PRINT_flag || xvasp.POTCAR_TYPE_PRINT_flag) && specify_pottype_once){pp_add_on=aurostd::joinWDelimiter(xvasp.str.species_pp,"")+":"+pottypedatestr;}  //overwrite  //CO191020 - xvasp.POTCAR_TYPE_PRINT_flag
       if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.3]" << endl;
       directory+=pp_add_on+"/"+xvasp.AVASP_label;
       //  cerr << "DEBUG - " << soliloquy << " xvasp.AVASP_prototype_from_library_ directory(1)=" << directory << endl;    
@@ -5558,6 +5561,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_ZVAL.push_back(0.0);}
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_vLDAU.push_back(deque<double>());}
               xaus.POTCAR_TYPE_PRINT_flag=true; //print :PAW_PBE afterwards
+              if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO191020 - exceptions, do not print for binaries/ternaries
               //[CO181226 - obsolete, spoke to stefano. As long as we have AVASP_Get_PseudoPotential_XX, we are fine]if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)){xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")){AVASP_ADD_LDAU(xaus);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")){AVASP_REMOVE_LDAU(xaus);}

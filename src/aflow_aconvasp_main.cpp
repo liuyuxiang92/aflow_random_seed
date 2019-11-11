@@ -172,7 +172,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"BANDGAP","--bandgap=","./");
 
   vpflow.flag("BANDGAPS",aurostd::args2flag(argv,cmds,"--bandgaps|--gaps"));
-  vpflow.flag("BANDGAPDOS",aurostd::args2flag(argv,cmds,"--bandgap_from_dos|--bandgap_from_DOS"));
+  //[CO191004]vpflow.flag("BANDGAPDOS",aurostd::args2flag(argv,cmds,"--bandgap_from_dos|--bandgap_from_DOS|--bandgap_dos|--bandgapdos")); //CO191004
+  vpflow.args2addattachedscheme(argv,cmds,"BANDGAPDOS","--bandgap_from_dos=|--bandgap_from_DOS=|--bandgap_dos=|--bandgapdos=","./");  //CO191004
   vpflow.flag("BANDGAPLISTDOS",aurostd::args2flag(argv,cmds,"--bandgaplist_from_dos|--bandgaplist_from_DOS"));
   // [OBSOLETE] vpflow.flag("BZDIRECTION",aurostd::args2flag(argv,cmds,"--bzdirection|--bzdirections|--bzd"));
   vpflow.args2addattachedscheme(argv,cmds,"BZDIRECTION","--bzdirection=|--bzdirections=|--bzd=","");
@@ -572,6 +573,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"GFA::AE_FILE","--atomic_environments_file=|--ae_file=|aef=","none");	//DF190329
     vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF190619
   }	//DF190329
+
+  vpflow.flag("GEOMETRY",aurostd::args2flag(argv,cmds,"--geometry|--abc_angles"));  //CO190808
   
   vpflow.flag("GULP",aurostd::args2flag(argv,cmds,"--gulp"));
   vpflow.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--Init::GetTEMPs|--gettemp|--gettemps|--getemp|--getemps"));
@@ -807,6 +810,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos","./");  // ME190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOS","--plotdos=","./");
+  vpflow.flag("PLOT_ALL_ATOMS",aurostd::args2flag(argv,cmds,"--plot_all_atoms|--plotallatoms"));  //CO191010
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOSWEB","--plotdosweb=","./");
 //  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOS","--plotpedos=","./,1"); OBSOLETE ME190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOS","--plotpedos=|--plotpdos=","./");  // ME190614
@@ -833,6 +837,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_MAG","--pocc_mag=","./");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_BANDGAP","--pocc_bandgap=","./");
+  vpflow.args2addattachedscheme(argv,cmds,"POCC_MINIMUM_CONFIGURATION","--pocc_minimum_configuration|--pocc_min","./");  //CO190803
 
   // ME 181113
 //  vpflow.args2addattachedscheme(argv,cmds,"MODULE","--module=",""); //ME 190112
@@ -1510,12 +1515,13 @@ namespace pflow {
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX 20190206 - add AFLUX command line functionality
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("BANDGAP"))       { pflow::BANDGAP(vpflow, cout) ; _PROGRAMRUN=true ; } // CAMILO  // CO 171006
+      if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  // CO 171006
       if(vpflow.flag("BZPLOTDATAUSEKPOINTS")) {LATTICE::BZPLOTDATA(vpflow.getattachedscheme("BZPLOTDATAUSEKPOINTS"),cin,10); _PROGRAMRUN=true;}
       if(vpflow.flag("BZPLOTUSEKPOINTS")) {LATTICE::BZPLOTDATA(vpflow.getattachedscheme("BZPLOTUSEKPOINTS"),cin,11); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDSTRUCTURE")) {pflow::BANDSTRUCTURE(aflags); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAPS")) {AConvaspBandgaps(cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("BANDGAPDOS")) {AConvaspBandgapFromDOS(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("BANDGAPDOS")) {pflow::BANDGAP_DOS(vpflow, cout); _PROGRAMRUN=true;} //CO191004
+      if(vpflow.flag("BANDGAPDOS_WAHYU")) {AConvaspBandgapFromDOS(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAPLISTDOS")) {AConvaspBandgapListFromDOS(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("BZDIRECTION")) {
         //DX 20181102 [OBSOLETE] if(vpflow.getattachedscheme("BZDIRECTION").empty()) {
@@ -1583,6 +1589,7 @@ namespace pflow {
       if(vpflow.flag("FRAC")) {cout << pflow::FRAC(cin); _PROGRAMRUN=true;}
       // G
       if(vpflow.flag("GETTEMP")) {AFLOW_getTEMP(argv); _PROGRAMRUN=true;} //cout << "TEMPERATURE " << Message("host") << endl;exit(0); _PROGRAMRUN=true;}
+      if(vpflow.flag("GEOMETRY")) {cout << pflow::GEOMETRY(cin) << endl; _PROGRAMRUN=true;}  //CO191110
       if(vpflow.flag("GULP")) {pflow::GULP(cin); _PROGRAMRUN=true;}
       // H
       if(vpflow.flag("HKL")) {pflow::HKL(vpflow.getattachedscheme("HKL"),aflags,cin); _PROGRAMRUN=true;}
@@ -1705,6 +1712,7 @@ namespace pflow {
       if(vpflow.flag("POCC_DOS")) {pocc::POCC_DOS(cout,vpflow.getattachedscheme("POCC_DOS")); _PROGRAMRUN=true;} 
       if(vpflow.flag("POCC_MAG")) {pocc::POCC_MAG(vpflow.getattachedscheme("POCC_MAG")); _PROGRAMRUN=true;} 
       if(vpflow.flag("POCC_BANDGAP")) {pocc::POCC_BANDGAP(vpflow.getattachedscheme("POCC_BANDGAP")); _PROGRAMRUN=true;} 
+      if(vpflow.flag("POCC_MINIMUM_CONFIGURATION")) {cout << pocc::POCC_MINIMUM_CONFIGURATION(vpflow) << endl; _PROGRAMRUN=true;}  //CO191110
       // 
       if(vpflow.flag("PROTO")) {cout << pflow::PROTO_LIBRARIES(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("PROTO_AFLOW")) {pflow::PROTO_AFLOW(vpflow,FALSE); _PROGRAMRUN=true;} // non reversed
@@ -2068,7 +2076,7 @@ namespace pflow {
   "<< x<<" --bands=PROOUT < POSCAR [AFLOW: NEED VERIFICATION] \n\
   "<< x<<" --bandgap[=bands_directory1[,bands_directory2,...]] \n\
   "<< x<<" --bandgaps < file_containing_bands_directories \n\
-  "<< x<<" --bandgapdos < DOSCAR \n\
+  "<< x<<" --bandgapdos[=bands_directory1[,bands_directory2,...]] \n\
   "<< x<<" --bandgaplistdos < DOSCAR_list \n\
   "<< x<<" --bandstructure | --bs \n\
   "<< x<<" --bzdirections | --bzd < POSCAR \n\
@@ -2233,6 +2241,7 @@ namespace pflow {
   "<< x<<" --pocc_dos[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
   "<< x<<" --pocc_mag[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
   "<< x<<" --pocc_bandgap[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
+  "<< x<<" --pocc_minimum_configuration[=directory] \n\
   "<< x<<" --poscar < ABCCAR | WYCCAR \n\
   "<< x<<" --poscar2aflowin < POSCAR \n\
   "<< x<<" --poscar2wyckoff < POSCAR \n\
@@ -3202,7 +3211,8 @@ namespace pflow {
 namespace pflow {
   void BANDGAP(aurostd::xoption& vpflow,ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::BANDGAP: BEGIN" << endl;
+    string soliloquy="pflow::BANDGAP():";  //CO191110
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     string input=aurostd::RemoveWhiteSpaces(vpflow.getattachedscheme("BANDGAP"));
     if(input.empty()){
       init::ErrorOption(cout,vpflow.getattachedscheme("BANDGAP"),"pflow::BANDGAP","aflow --bandgap[=bands_directory1[,bands_directory2,...]]");
@@ -3211,9 +3221,25 @@ namespace pflow {
     vector<string> dirs;
     aurostd::string2tokens(input,dirs,",");
     for(uint i=0;i<dirs.size();i++){
-      if(!PrintBandGap(dirs[i], oss)){oss << "pflow::BANDGAP: "+dirs[i]+" failed" << endl;}
+      if(!PrintBandGap(dirs[i], oss)){oss << soliloquy << " "+dirs[i]+" failed" << endl;}
     }
-    if(LDEBUG) cerr << "pflow::BANDGAP: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
+  }
+  void BANDGAP_DOS(aurostd::xoption& vpflow,ostream& oss) { //CO191004
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::BANDGAP_DOS()";
+    stringstream message;
+    string input=aurostd::RemoveWhiteSpaces(vpflow.getattachedscheme("BANDGAPDOS"));
+    if(input.empty()){
+      init::ErrorOption(cout,vpflow.getattachedscheme("BANDGAPDOS"),"pflow::BANDGAP_DOS","aflow --bandgap_dos[=bands_directory1[,bands_directory2,...]]");
+      exit(0);
+    } 
+    vector<string> dirs;
+    aurostd::string2tokens(input,dirs,",");
+    for(uint i=0;i<dirs.size();i++){
+      if(!PrintBandGap_DOS(dirs[i], oss)){oss << soliloquy << " "+dirs[i]+" failed" << endl;}
+    }
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
   }
 } // namespace pflow
 
@@ -7006,6 +7032,16 @@ namespace pflow {
   }
 } // namespace pflow
 
+// ***************************************************************************
+// pflow::GEOMETRY
+// ***************************************************************************
+namespace pflow {
+  string GEOMETRY(istream& input) {  //CO191110
+    xstructure a(input,IOAFLOW_AUTO);
+    return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(Getabc_angles(a.lattice,DEGREES),5,true),","); //roundoff
+  }
+} // namespace pflow
+
 // DX 9/27/17 - get collinear magnetic info - START
 // ***************************************************************************
 // pflow::GetCollinearMagneticInfo
@@ -8751,7 +8787,7 @@ namespace pflow {
 
     string soliloquy = "pflow::loadLIBX():";
     vector<string> velements =
-      stringElements2VectorElements(elements, FileMESSAGE, oss, true, true, composition_string, false); //clean and sort, do not keep_pp  //CO190712
+      stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO190712
       //[CO190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8909,7 +8945,7 @@ namespace pflow {
 
     string soliloquy = "pflow::loadLIBX():";
     vector<string> velements =
-      stringElements2VectorElements(elements, FileMESSAGE, oss, true, true, composition_string, false); //clean and sort, do not keep_pp  //CO190712
+      stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO190712
       //[CO190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9494,9 +9530,9 @@ namespace pflow {
       string input_new=input;
       //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO190712
       KBIN::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
-      input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, oss, clean, sort_elements, composition_string, false); //use composition_string (FASTER) //do not keep_pp
+      input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, clean, sort_elements, composition_string, false, oss); //use composition_string (FASTER) //do not keep_pp
     }else{  //default
-      input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, false); //do not keep_pp
+      input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, clean, sort_elements, c_desig, false, oss); //do not keep_pp
     }
     if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(input_velements,"\""),",") << endl;}
     return compoundsBelong(velements2check, input_velements, FileMESSAGE, oss, false); //already sorted
@@ -9841,25 +9877,25 @@ namespace pflow {
   // ***************************************************************************
   // returns UNSORTED vector<string> from string
   vector<string> stringElements2VectorElements(const string& input,
-					       ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {  // overload
+					       bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
     ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
+    return stringElements2VectorElements(input, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
   // ME190628 - added variant that also determines the composition
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {
     ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
   vector<string> stringElements2VectorElements(
-					       const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {  // overload
+					       const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
     vector<double> vcomposition;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
   vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
-                                               ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) { // main function
+                                               ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) { // main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "pflow::stringElements2VectorElements():";
     vector<string> velements;
@@ -12078,7 +12114,7 @@ namespace pflow {
                                                    "                --proto_icsd=label_ICSD_number",
                                                    "options = [--server=xxxxxxx]  [--vasp | --qe | --abinit | --aims | --cif | --abccar] [--params=... | --hex]]",
                                                    "To get the list of prototypes --protos or --protos_icsd ."));
-      exit(0);
+      throw aurostd::xerror(soliloquy,"params.size()==0",_INPUT_ILLEGAL_);  //CO191004 - use a throw so we can catch later
     }
     
     //CO181226 parsing label, species, volume, and pocc input
@@ -12141,11 +12177,11 @@ namespace pflow {
       
       int mode=LIBRARY_MODE_HTQC;
       if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
-	if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD_AFLOWLIB;
-	if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD_AFLOWLIB;
+        if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD_AFLOWLIB;
+        if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD_AFLOWLIB;
       } else {
-	if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD;
-	if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD;
+        if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD;
+        if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD;
       } 
 	
       // DEBUG=TRUE;
@@ -12240,19 +12276,19 @@ namespace pflow {
 
       if(!found && params.size()==1) {  // label: 	// no matter the species, print A
         if(LDEBUG) cerr << soliloquy << " label" << endl;
- 	str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
+        str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
       }  
-      
+
       if(!found && params.size()==1+nspecies) { // label:species:species...
         if(LDEBUG) cerr << soliloquy << " label:species:species..." << endl;
- 	atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
+        atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
       }
       
       if(!found && params.size()==1+nspecies+nspecies) { // label:species:species..:volume:volume...
         if(LDEBUG) cerr << soliloquy << " label:species:species...:volume:volume..." << endl;
-	atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
+        atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
         volumeX.clear();
         for(uint i=0;i<nspecies;i++) {
@@ -12269,15 +12305,15 @@ namespace pflow {
           //volumeX.push_back(aurostd::string2utype<double>(params.at(i+1+nspecies)));
         }
         if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;	
-	str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
+        str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
       }
-      
+
       if(!found && params.size()==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
         if(nspecies==1 && mode!=LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
         if(mode==LIBRARY_MODE_HTQC_ICSD) {
           atomX.clear();atomX.push_back(params.at(1));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
@@ -12288,20 +12324,20 @@ namespace pflow {
       if(!found && params.size()==3) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
-	if(mode==LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+        if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
+        if(mode==LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
       }
   
       if(!found && params.size()==4) {
-	atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
-	if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
-	  atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
+        atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
+        if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+          atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	  volumeX.clear();volumeX.push_back(0.0);volumeX.push_back(0.0);
+          volumeX.clear();volumeX.push_back(0.0);volumeX.push_back(0.0);
           if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;
           if(!aurostd::isfloat(params.at(3))){ //CO 180729 - check for string stupidity
             message << "Invalid volume specification (params[" << 3 << "]=" << params.at(3) << "), must be float input";
@@ -12314,20 +12350,20 @@ namespace pflow {
           }
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,vol,mode);found=TRUE;
           //str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,aurostd::string2utype<double>(params.at(3)),mode);found=TRUE;
-	}
-	if(nspecies==3 && mode!=LIBRARY_MODE_HTQC_ICSD) { // ternaries
-	  atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
+        }
+        if(nspecies==3 && mode!=LIBRARY_MODE_HTQC_ICSD) { // ternaries
+          atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
-	if(mode==LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
+        if(mode==LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
       }
   
       if(!found && params.size()==5) {
-	if(nspecies==2) {
-	  atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
+        if(nspecies==2) {
+          atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
           volumeX.clear();
           if(!aurostd::isfloat(params.at(3))){ //CO 180729 - check for string stupidity
@@ -12353,14 +12389,14 @@ namespace pflow {
           //volumeX.push_back(aurostd::string2utype<double>(params.at(3)));
           //volumeX.push_back(aurostd::string2utype<double>(params.at(4)));
           if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;	
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
-	}
-	if(nspecies==4) {  // quaternaries
-	  if(alphabetic==TRUE) label=AlphabetizePrototypeLabelSpeciesTokens(params);
-	  atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
+        }
+        if(nspecies==4) {  // quaternaries
+          if(alphabetic==TRUE) label=AlphabetizePrototypeLabelSpeciesTokens(params);
+          atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
       }
 
       if(!found){

@@ -317,6 +317,105 @@ namespace aurostd {  // namespace aurostd
   }
 }
 
+//CO190808
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  xmatrix<utype> xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol) const { //these are the starting lrow, lcol, end is dictated by size of mat //CO191110
+    string soliloquy="aurostd::getmat():";
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
+    xmatrix<utype> mat(lrow,lcol,urow,ucol);
+    for(int i=lrow;i<=urow;i++){
+      for(int j=lcol;j<=ucol;j++){mat[(i-lrow)+mat.lrows][(j-lcol)+mat.lcols]=corpus[i][j];}
+    }
+    return mat;
+  }
+}
+
+//CO190808
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  void xmatrix<utype>::setrow(const xvector<utype>& row,int irow) {  //CO191110
+    return setmat(row,irow,false);
+    //[OVERLOAD WITH SETMAT()]string soliloquy="aurostd::setrow():";
+    //[OVERLOAD WITH SETMAT()]if(row.lrows!=lcols){throw aurostd::xerror(soliloquy,"row.lrows!=lcols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(row.urows!=ucols){throw aurostd::xerror(soliloquy,"row.urows!=ucols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(irow<lrows){throw aurostd::xerror(soliloquy,"irow<lrows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(irow>urows){throw aurostd::xerror(soliloquy,"irow>urows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]for(int j=row.lrows;j<=row.urows;j++){corpus[irow][j]=row[j];}
+  }
+}
+
+//CO190808
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  void xmatrix<utype>::setcol(const xvector<utype>& col,int icol) {  //CO191110
+    return setmat(col,icol,true);
+    //[OVERLOAD WITH SETMAT()]string soliloquy="aurostd::setcol():";
+    //[OVERLOAD WITH SETMAT()]if(col.lrows!=lrows){throw aurostd::xerror(soliloquy,"col.lrows!=lrows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(col.urows!=urows){throw aurostd::xerror(soliloquy,"col.urows!=urows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(icol<lcols){throw aurostd::xerror(soliloquy,"icol<lcols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(icol>ucols){throw aurostd::xerror(soliloquy,"icol>ucols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]for(int j=col.lrows;j<=col.urows;j++){corpus[j][icol]=col[j];}
+  }
+}
+
+//CO190808
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO191110
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="aurostd::setmat():";
+    int urow=lrow+mat.rows-1; //ending row
+    int ucol=lcol+mat.cols-1; //ending col
+    if(LDEBUG){
+      cerr << soliloquy << " urow=" << urow << endl;
+      cerr << soliloquy << " ucol=" << ucol << endl;
+    }
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
+    for(int i=mat.lrows;i<=mat.urows;i++){
+      for(int j=mat.lcols;j<=mat.ucols;j++){corpus[lrow+i-mat.lrows][lcol+j-mat.lcols]=mat[i][j];}
+    }
+  }
+  template<class utype>
+  void xmatrix<utype>::setmat(const xvector<utype>& xv,int icol,bool col) { //replace icol (col==true) or row (col==false) //CO191110
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="aurostd::setmat():";
+    int lrow=1,lcol=1,urow=1,ucol=1;
+    if(col==true){
+      lrow=lrows; //starting row
+      lcol=icol; //starting col
+      urow=lrow+xv.rows-1; //ending row
+      ucol=icol; //ending col
+    }else{
+      lrow=icol; //starting row
+      lcol=lcols; //starting col
+      urow=icol; //ending row
+      ucol=lcols+xv.rows-1; //ending col
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " lrow=" << lrow << endl;
+      cerr << soliloquy << " urow=" << urow << endl;
+      cerr << soliloquy << " lcol=" << lcol << endl;
+      cerr << soliloquy << " ucol=" << ucol << endl;
+    }
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
+    if(col==true){
+      for(int i=xv.lrows;i<=xv.urows;i++){corpus[lrow+i-xv.lrows][icol]=xv[i];}
+    }else{
+      for(int i=xv.lrows;i<=xv.urows;i++){corpus[icol][lcol+i-xv.lrows]=xv[i];}
+    }
+  }
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------- index operators with boundary conditions
 
@@ -412,37 +511,37 @@ namespace aurostd {  // namespace aurostd
   xmatrix<utype>::operator *=(const xmatrix<utype>& b)
   {
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *=: ");
-    printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
-    printf("this->lcols=%i, this->ucols=%i\n",this->lcols,this->ucols);
-    printf("                 ");
-    printf("b.lrows=%i, b.urows=%i, ",b.lrows,b.urows);
-    printf("b.lcols=%i, b.ucols=%i\n",b.lcols,b.ucols);
+      printf("M -> operator *=: ");
+      printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
+      printf("this->lcols=%i, this->ucols=%i\n",this->lcols,this->ucols);
+      printf("                 ");
+      printf("b.lrows=%i, b.urows=%i, ",b.lrows,b.urows);
+      printf("b.lcols=%i, b.ucols=%i\n",b.lcols,b.ucols);
 #endif
-    if(!this->issquare||!b.issquare||this->rows!=b.rows)
+      if(!this->issquare||!b.issquare||this->rows!=b.rows)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*=: "
-	    <<  "defined only for square xmatrixes with equal dimensions " << endl;exit(0);}
-      
-    xmatrix<utype> a(this->urows,this->ucols,this->lrows,this->lcols);
-    int i,j,k,ii,jj,kk;
-    utype *bk,*ai,aik,*thisi;
-      
-    for(i=this->lrows;i<=this->urows;i++)
-      for(j=this->lcols;j<=this->ucols;j++) {
-	a.corpus[i][j]=this->corpus[i][j];
-	this->corpus[i][j]=(utype) 0;
+        <<  "defined only for square xmatrixes with equal dimensions " << endl;exit(0);}
+
+      xmatrix<utype> a(this->urows,this->ucols,this->lrows,this->lcols);
+      int i,j,k,ii,jj,kk;
+      utype *bk,*ai,aik,*thisi;
+
+      for(i=this->lrows;i<=this->urows;i++)
+        for(j=this->lcols;j<=this->ucols;j++) {
+          a.corpus[i][j]=this->corpus[i][j];
+          this->corpus[i][j]=(utype) 0;
+        }
+      for(i=this->lrows,ii=a.lrows;i<=this->urows;i++,ii++) {
+        thisi=this->corpus[i];
+        ai=a[ii];
+        for(k=a.lcols,kk=b.lcols;k<=a.ucols;k++,kk++) {
+          bk=b[kk];
+          aik=ai[k];
+          for(j=this->lrows,jj=b.lcols;j<=this->urows;j++,jj++)
+            thisi[j]+=aik*bk[jj];
+        }
       }
-    for(i=this->lrows,ii=a.lrows;i<=this->urows;i++,ii++) {
-      thisi=this->corpus[i];
-      ai=a[ii];
-      for(k=a.lcols,kk=b.lcols;k<=a.ucols;k++,kk++) {
-	bk=b[kk];
-	aik=ai[k];
-	for(j=this->lrows,jj=b.lcols;j<=this->urows;j++,jj++)
-	  thisi[j]+=aik*bk[jj];
-      }
-    }
-    return *this;
+      return *this;
   }
 }
 
