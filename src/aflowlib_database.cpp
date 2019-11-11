@@ -764,7 +764,7 @@ void AflowDB::writeStatsToJson(std::stringstream& json, const DBStats& db_stats)
   }
   json << indent << tab << "\"columns\": {" << std::endl;
   uint ncols = db_stats.columns.size();
-  string str_formatted;
+  string str_formatted = "";
   for (uint c = 0; c < ncols; c++) {
     json << indent << tab << tab << "\"" << db_stats.columns[c] << "\": {" << std::endl;
     json << indent << tab << tab << tab << "\"count\": ";
