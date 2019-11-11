@@ -1559,12 +1559,18 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
               if(tokens.at(2)=="US" && (aurostd::substring2bool(FilePotcar,"GGA") || aurostd::substring2bool(FilePotcar,"gga")) ) {pottype="GGA";date=DEFAULT_VASP_POTCAR_DATE_POT_GGA;}  //CO181226 - I think this is a bug - aurostd::substring2bool(FilePotcar,"GGA","gga")
             }
             if(tokens.size()==5) {
+              if(LDEBUG){ //CO191020
+                cerr << soliloquy << " xvasp.AVASP_potential=" << xvasp.AVASP_potential << endl;
+                cerr << soliloquy << " xvasp.str.species_pp[i=" << i << "]=" << xvasp.str.species_pp.at(i) << endl;
+                cerr << soliloquy << " tokens=" << aurostd::joinWDelimiter(tokens,",") << endl;
+              }
               if(tokens.at(2)=="PAW") {pottype="PAW_LDA";date=tokens.at(4);}
               if(tokens.at(2)=="PAW_GGA") {pottype="PAW_GGA";date=tokens.at(4);}
               if(tokens.at(2)=="PAW_RPBE") {pottype="PAW_RPBE";date=tokens.at(4);}  // potpaw_GGA/DEFAULT_VASP_POTCAR_DATE/Ge_h
-              if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);}
-              //if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO181226 - Stefano, if we want to change PAW_PBE to PAW_PBE_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO PBE_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
+              if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);} //CO181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized" //CO191110
               if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA";date=tokens.at(4);} //CO181226 - Stefano, if we want to change PAW_LDA to PAW_LDA_KIN, then we need to change xvasp.AVASP_potential earlier (start of function, as many strings depend on it) // FIX COREY/STEFANIO LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
+              if(xvasp.AVASP_potential=="potpaw_PBE.54" && tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);}  //CO191020
+              if(xvasp.AVASP_potential=="potpaw_LDA.54" && tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);}  //CO191020
               // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
             }
             if(pottype.empty()) {
@@ -5493,10 +5499,20 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
       aurostd::string2tokens(string_POTENTIAL,tokens_string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_DELIMITER_);
       if(tokens_string_POTENTIAL.size()>=1)
         xvasp.AVASP_potential=tokens_string_POTENTIAL.at(0);
+      //xvasp.POTCAR_TYPE_PRINT_flag=FALSE;  //CO191110 - do not set FALSE, could be TRUE from earlier
       xvasp.POTCAR_TYPE_DATE_PRINT_flag=FALSE;
-      if(tokens_string_POTENTIAL.size()>=2)
-        if(tokens_string_POTENTIAL.at(1)==_AVASP_PSEUDOPOTENTIAL_POTENTIAL_COMPLETE_)
+      if(tokens_string_POTENTIAL.size()>=2){ //CO191110
+        if(tokens_string_POTENTIAL.at(1)==_AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_){ //CO191110
+          xvasp.POTCAR_TYPE_PRINT_flag=TRUE; //CO191110
+        }
+        if(tokens_string_POTENTIAL.at(1)==_AVASP_PSEUDOPOTENTIAL_POTENTIAL_COMPLETE_){ //CO191110
           xvasp.POTCAR_TYPE_DATE_PRINT_flag=TRUE;
+    }
+  } 
+      if(LDEBUG){  //CO191110
+        cerr << soliloquy << " xvasp.POTCAR_TYPE_PRINT_flag=" << xvasp.POTCAR_TYPE_PRINT_flag << endl;
+        cerr << soliloquy << " xvasp.POTCAR_TYPE_DATE_PRINT_flag=" << xvasp.POTCAR_TYPE_DATE_PRINT_flag << endl;
+      }
     }
   } 
 
@@ -5560,8 +5576,10 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_version.push_back("");}
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_ZVAL.push_back(0.0);}
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_vLDAU.push_back(deque<double>());}
-              xaus.POTCAR_TYPE_PRINT_flag=true; //print :PAW_PBE afterwards
-              if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO191020 - exceptions, do not print for binaries/ternaries
+              if(xaus.POTCAR_TYPE_PRINT_flag==false){   //[CO191020]if it haven't been set previously - see _AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_
+                xaus.POTCAR_TYPE_PRINT_flag=true; //print :PAW_PBE afterwards
+                if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO191020 - exceptions, do not print for binaries/ternaries
+              }
               //[CO181226 - obsolete, spoke to stefano. As long as we have AVASP_Get_PseudoPotential_XX, we are fine]if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)){xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")){AVASP_ADD_LDAU(xaus);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_NOLDAU")){AVASP_REMOVE_LDAU(xaus);}
