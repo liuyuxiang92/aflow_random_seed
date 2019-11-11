@@ -723,7 +723,7 @@ void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
 // Determines the unique array elements in a set of 1D-array strings.
 vector<string> AflowDB::getUniqueFromJsonArrays(const vector<string>& arrays) {
   vector<string> unique, tokens;
-  string arr;
+  string arr = "";
   int nunique = 0, u = 0;
   for (uint a = 0; a < arrays.size(); a++) {
     vector<string> tokens;
