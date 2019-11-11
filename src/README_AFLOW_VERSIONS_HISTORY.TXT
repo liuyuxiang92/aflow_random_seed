@@ -37,6 +37,13 @@
         -- streamlined xvector constructors and copy() methods (CO)
         -- added xvector constructor for xmatrix input (CO)
         -- added getcol(), getmat(), setrow(), setcol(), setmat() to xmatrix, with relevant unit tests called by —test_xmatrix (CO)
+        -- added operator *=(utype r) and operator /=(utype r) to xmatrix (CO)
+        -- added modulus(), modulussquare(), modulus2() to xmatrix (CO)
+        -- getmat() now returns void, xmatrix is an input (CO)
+        -- added lrows_out, lcols_out input getmat() as well as a overload for returning xvector (as input) (CO)
+        -- added xmatrix2xvector() (CO)
+        -- patched QRDecomposition_HouseHolder() not to assume lrows, lcols (CO)
+        -- updated generalHouseHolderQRDecomposition()->QRDecomposition_HouseHolder() (CO)
         -- added EFileEmpty() and EFileNotEmpty() (CO)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
