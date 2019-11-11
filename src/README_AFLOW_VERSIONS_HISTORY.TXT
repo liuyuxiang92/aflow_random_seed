@@ -1,10 +1,15 @@
-3.1.227 - 2019/10/16
-        Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
+3.1.228 - 2019/11/15
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- ADD BELOW
         -- Fixed bug in xDOSCAR reader error detection. (ME)
         -- Additional web output for entry page applets. (ME)
         -- Fixed bug that prevented LDA parameters from being passed into ARUN aflow.ins. (ME)
         -- Added ael_stiffness_tensor and ael_compliance_tensor to aentry. (ME)
         -- Fixed bug that prevented AGL from running during LIB2LIB. (ME)
+3.1.227 - 2019/10/16
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
+	      -- Bug fixes for MPI (SC)
+	      -- Verbosity fixes (Message("")) (SC)
 3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
