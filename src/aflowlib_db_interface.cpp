@@ -172,7 +172,7 @@ string extractJsonValue(const string& json, const string& key) {
 // than using SQLite's JSON extension, but has was designed to only work for
 // the aflowlib.json. It cannot handle nested JSONs!
 string extractJsonValueAflow(const string& json, string key) {
-  string value;
+  string value = "";
   key = "\"" + key + "\":";
   string::size_type start, end;
   start = json.find(key);
