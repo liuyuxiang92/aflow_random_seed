@@ -104,7 +104,7 @@ void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<st
       uint njson = json.size();
       uint nentry = entries.size();
       vector<string> auids(njson);
-      uint j;
+      uint j = 0;
       for (j = 0; j < njson; j++) auids[j] = extractJsonValueAflow(json[j], "auid");
 
       string auid = "";
