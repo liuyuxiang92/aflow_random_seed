@@ -694,7 +694,7 @@ void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
   }
 
   uint ncols = cols.size();
-  string where, where_loop;
+  string where = "", where_loop = "";
   for (int i = startIndex; i < endIndex; i++) {
     for (uint c = 0; c < ncols; c++) {
       where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
