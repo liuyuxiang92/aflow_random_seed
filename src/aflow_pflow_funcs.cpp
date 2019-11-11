@@ -126,22 +126,24 @@ xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,cons
 }
 
 //normalize === set first coefficient to 1
-xvector<double> balanceChemicalEquation(const xmatrix<double>& _composition_matrix,bool normalize,double tol){
+xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matrix,bool normalize,double tol){ //CO191110
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="balanceChemicalEquation():";
   stringstream message;
-  if(_composition_matrix.rows<=_composition_matrix.cols){
+  if(composition_matrix.rows<=composition_matrix.cols){
     message << "Composition matrix (m<=n) will NOT yield a viable null space for this analysis";
     throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_); //CO190226
     //exit(1);  //CO190226
   }
-  xmatrix<double> composition_matrix=_composition_matrix;
-  xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(composition_matrix);
+  //[CO191110 - OBSOLETE]xmatrix<double> composition_matrix=_composition_matrix;
+  //[CO191110 - OBSOLETE]xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(composition_matrix);
+  xmatrix<double> Q,R;
+  aurostd::QRDecomposition_HouseHolder(composition_matrix,Q,R);
   if(LDEBUG) {
     cerr << soliloquy << " Q:" << endl;
     cerr << Q << endl;
   }
-  xvector<double> coef(composition_matrix.rows);
+  xvector<double> coef(R.rows);
   for(int i=1;i<Q.rows+1;i++){coef[i]=Q(i,Q.ucols);}
   if(LDEBUG) {cerr << soliloquy << " PRE-coefficients =" << coef << endl;}
   if(normalize){
@@ -160,10 +162,10 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& _composition_matr
   }
   if(LDEBUG) {cerr << soliloquy << " checking: all scalar products should yield 0" << endl;}
   double sum;
-  for(int i=1;i<_composition_matrix.cols+1;i++){
+  for(int i=1;i<composition_matrix.cols+1;i++){
     if(LDEBUG) {cerr << "component-" << i << ": sum=";}
     sum=0.0;
-    for(int j=1;j<_composition_matrix.rows+1;j++){sum+=coef(j)*_composition_matrix(j,i);}
+    for(int j=1;j<composition_matrix.rows+1;j++){sum+=coef(j)*composition_matrix(j,i);}
     if(LDEBUG) {cerr << sum << endl;}
     if(abs(sum)>_ZERO_TOL_){
       message << "Chemical equation was not balanced (run with --debug to see): coef=" << coef;
