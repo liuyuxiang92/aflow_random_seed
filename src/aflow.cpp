@@ -569,7 +569,8 @@ int main(int _argc,char **_argv) {
     mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
     if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
     //getmat()
-    xmatrix<double> submat=mat.getmat(2,3,2,3);
+    xmatrix<double> submat;
+    mat.getmat(submat,3,3,2,2);
     if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
     //setmat()
     mat.setmat(submat,1,1); //do nothing

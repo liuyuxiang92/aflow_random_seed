@@ -3492,8 +3492,10 @@ xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl
   lattice_slab_origbasis(3,1)=v1[3];lattice_slab_origbasis(3,2)=v2[3];lattice_slab_origbasis(3,3)=v3[3];
   
   //orthogonalize as much as possible (rotate)
-  xmatrix<double> lattice_slab_newbasis=lattice_slab_origbasis;
-  xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(lattice_slab_newbasis); //lattice_slab_newbasis is now R
+  //[CO191110 - OBSOLETE]xmatrix<double> lattice_slab_newbasis=lattice_slab_origbasis;
+  //[CO191110 - OBSOLETE]xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(lattice_slab_newbasis); //lattice_slab_newbasis is now R
+  xmatrix<double> Q,lattice_slab_newbasis;
+  QRDecomposition_HouseHolder(lattice_slab_origbasis,Q,lattice_slab_newbasis);
   
   //immediate check for NEGATIVE determinant, VASP has issues here (see aflow_ivasp.cpp for negative triple product)
   //fix with S diagonal matrix with +-1: http://www.math.purdue.edu/~kkloste/cs515fa14/qr-uniqueness.pdf

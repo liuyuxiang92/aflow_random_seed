@@ -320,17 +320,28 @@ namespace aurostd {  // namespace aurostd
 //CO190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  xmatrix<utype> xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol) const { //these are the starting lrow, lcol, end is dictated by size of mat //CO191110
+  void xmatrix<utype>::getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
     string soliloquy="aurostd::getmat():";
     if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
     if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
     if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
     if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
-    xmatrix<utype> mat(lrow,lcol,urow,ucol);
-    for(int i=lrow;i<=urow;i++){
-      for(int j=lcol;j<=ucol;j++){mat[(i-lrow)+mat.lrows][(j-lcol)+mat.lcols]=corpus[i][j];}
+    int rows_out=(urow-lrow)+1;
+    int cols_out=(ucol-lcol)+1;
+    if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
+      xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
+      mat_out=mat;
     }
-    return mat;
+    for(int i=lrow;i<=urow;i++){
+      for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j];}
+    }
+  }
+  template<class utype>
+  void xmatrix<utype>::getmat(xvector<utype>& xv_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO191110
+    string soliloquy="aurostd::getmat():";
+    xmatrix<utype> xmat;
+    (*this).getmat(xmat,urow,ucol,lrow,lcol,lrows_out,lcols_out);
+    xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
   }
 }
 
@@ -366,7 +377,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
   void xmatrix<utype>::setmat(const xmatrix<utype>& mat,int lrow,int lcol) { //these are the starting lrow, lcol, end is dictated by size of mat //CO191110
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::setmat():";
     int urow=lrow+mat.rows-1; //ending row
     int ucol=lcol+mat.cols-1; //ending col
@@ -384,7 +395,7 @@ namespace aurostd {  // namespace aurostd
   }
   template<class utype>
   void xmatrix<utype>::setmat(const xvector<utype>& xv,int icol,bool col) { //replace icol (col==true) or row (col==false) //CO191110
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::setmat():";
     int lrow=1,lcol=1,urow=1,ucol=1;
     if(col==true){
@@ -541,6 +552,50 @@ namespace aurostd {  // namespace aurostd
             thisi[j]+=aik*bk[jj];
         }
       }
+      return *this;
+  }
+}
+
+// -------------------------------------------------- operator xmatrix *= utype
+namespace aurostd {  // namespace aurostd
+  template<class utype> xmatrix<utype>&                  
+  // removed inline
+  xmatrix<utype>::operator *=(utype r)
+  {  //CO191110
+#ifdef _XMATH_DEBUG_OPERATORS
+      printf("M -> operator *=: ");
+      printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
+      printf("this->lcols=%i, this->ucols=%i\n",this->lcols,this->ucols);
+      printf("                 ");
+      printf("b.lrows=%i, b.urows=%i, ",b.lrows,b.urows);
+      printf("b.lcols=%i, b.ucols=%i\n",b.lcols,b.ucols);
+#endif
+      for(int i=lrows;i<=urows;i++)
+        for(int j=lcols;j<=ucols;j++) {
+          corpus[i][j]*=r;
+        }
+      return *this;
+  }
+}
+
+// -------------------------------------------------- operator xmatrix /= utype
+namespace aurostd {  // namespace aurostd
+  template<class utype> xmatrix<utype>&                  
+  // removed inline
+  xmatrix<utype>::operator /=(utype r)
+  {  //CO191110
+#ifdef _XMATH_DEBUG_OPERATORS
+      printf("M -> operator *=: ");
+      printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
+      printf("this->lcols=%i, this->ucols=%i\n",this->lcols,this->ucols);
+      printf("                 ");
+      printf("b.lrows=%i, b.urows=%i, ",b.lrows,b.urows);
+      printf("b.lcols=%i, b.ucols=%i\n",b.lcols,b.ucols);
+#endif
+      for(int i=lrows;i<=urows;i++)
+        for(int j=lcols;j<=ucols;j++) {
+          corpus[i][j]/=r;
+        }
       return *this;
   }
 }
@@ -1184,7 +1239,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to long double
-  xmatrix<long double> xlongdouble(const xmatrix<utype> &a) {
+  xmatrix<long double> xlongdouble(const xmatrix<utype> &a) __xprototype {
     xmatrix<long double> c(a.urows,a.ucols,a.lrows,a.lcols);
     for (int i=a.lrows;i<=a.urows;i++)
       for (int j=a.lcols;j<=a.ucols;j++)
@@ -1195,7 +1250,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to double
-  xmatrix<double> xdouble(const xmatrix<utype> &a) {
+  xmatrix<double> xdouble(const xmatrix<utype> &a) __xprototype {
     xmatrix<double> c(a.urows,a.ucols,a.lrows,a.lcols);
     for (int i=a.lrows;i<=a.urows;i++)
       for (int j=a.lcols;j<=a.ucols;j++)
@@ -1206,7 +1261,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to float
-  xmatrix<float> xfloat(const xmatrix<utype> &a) {
+  xmatrix<float> xfloat(const xmatrix<utype> &a) __xprototype {
     xmatrix<float> c(a.urows,a.ucols,a.lrows,a.lcols);
     for (int i=a.lrows;i<=a.urows;i++)
       for (int j=a.lcols;j<=a.ucols;j++)
@@ -1217,7 +1272,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to long int
-  xmatrix<long int> xlongint(const xmatrix<utype> &a) {
+  xmatrix<long int> xlongint(const xmatrix<utype> &a) __xprototype {
     xmatrix<long int> c(a.urows,a.ucols,a.lrows,a.lcols);
     for (int i=a.lrows;i<=a.urows;i++)
       for (int j=a.lcols;j<=a.ucols;j++)
@@ -1228,7 +1283,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to int
-  xmatrix<int> xint(const xmatrix<utype> &a) {
+  xmatrix<int> xint(const xmatrix<utype> &a) __xprototype {
     xmatrix<int> c(a.urows,a.ucols,a.lrows,a.lcols);
     for (int i=a.lrows;i<=a.urows;i++)
       for (int j=a.lcols;j<=a.ucols;j++)
@@ -1239,7 +1294,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to char
-  xmatrix<char> xchar(const xmatrix<utype> &a) {
+  xmatrix<char> xchar(const xmatrix<utype> &a) __xprototype {
     xmatrix<char> c(a.urows,a.ucols,a.lrows,a.lcols);
     for (int i=a.lrows;i<=a.urows;i++)
       for (int j=a.lcols;j<=a.ucols;j++)
@@ -1250,7 +1305,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {                   // conversion to vector<vector<utype> >
   template<class utype> vector<vector<utype> >
-  xmatrix2vectorvector(const xmatrix<utype>& xmat) {
+  xmatrix2vectorvector(const xmatrix<utype>& xmat) __xprototype {
     int isize=xmat.rows,jsize=xmat.cols;
     // vector<vector<utype> > mat; vector<utype> v; mat=vector<vector<utype> > (m,v); // by hand
     // vector<vector<utype> > vectorvector(isize,jsize);              // WORKS WITH gcc/g++ 4.2 and 4.1
@@ -1265,13 +1320,30 @@ namespace aurostd {                   // conversion to vector<vector<utype> >
 
 namespace aurostd {                   // conversion to xmatrix<utype>
   template<class utype> xmatrix<utype>
-  vectorvector2xmatrix(const vector<vector<utype> >& mat) {
+  vectorvector2xmatrix(const vector<vector<utype> >& mat) __xprototype {
     int isize=mat.size(),jsize=mat.at(0).size();
     xmatrix<utype> xmat(isize,jsize);
     for(int i=1;i<=isize;i++)
       for(int j=1;j<=jsize;j++)
 	xmat(i,j)=mat.at(i-1).at(j-1);
     return xmat;
+  }
+}
+
+namespace aurostd {                   // conversion to xvector
+  template<class utype> xvector<utype>
+  xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO191110
+    string soliloquy="aurostd::xmatrix2xvector():";
+    if(urow==lrow){
+      xvector<utype> xv((ucol-lcol)+1,lrows_out);
+      for(int i=lcol;i<=ucol;i++){xv(i-lcol+xv.lrows)=xmat[i][lrow];}
+      return xv;
+    }else if(ucol==lcol){
+      xvector<utype> xv((urow-lrow)+1,lrows_out);
+      for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[lcol][i];}
+      return xv;
+    }else{throw aurostd::xerror(soliloquy,"cannot create 2D xvector",_INPUT_ILLEGAL_);}
+    return xvector<utype>(0);
   }
 }
 
@@ -1656,6 +1728,39 @@ namespace aurostd {  // namespace aurostd
   roundoff(const xmatrix<utype>& a) {
     return roundoff(a,(utype) _AUROSTD_XMATRIX_TOLERANCE_ROUNDOFF_);
   }
+}
+
+// ----------------------------------------------------------------------------
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function sum xmatrix<>
+  utype modulus(const xmatrix<utype>& a) {  //CO191110
+#ifdef _XMATH_DEBUG_FUNCTIONS
+    printf("M -> function sum: ");
+    printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
+    printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
+#endif
+    return sqrt(sum(trasp(a) * a));
+}
+  template<class utype>                                 // function sum xmatrix<>
+  utype modulussquare(const xmatrix<utype>& a) {  //CO191110
+#ifdef _XMATH_DEBUG_FUNCTIONS
+    printf("M -> function sum: ");
+    printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
+    printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
+#endif
+    return sum(trasp(a) * a);
+}
+  
+  template<class utype>                                 // function sum xmatrix<>
+  utype modulus2(const xmatrix<utype>& a) { //CO191110
+#ifdef _XMATH_DEBUG_FUNCTIONS
+    printf("M -> function sum: ");
+    printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
+    printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
+#endif
+    return modulussquare(a);
+}
+
 }
 
 // ----------------------------------------------------------------------------
@@ -3129,87 +3234,81 @@ namespace aurostd {
 // CO 171129
 namespace aurostd {
   template<class utype>
-  xmatrix<utype> generalHouseHolderQRDecomposition(xmatrix<utype>& mat,utype tol) {
+  void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
     // mat is mxn, m>=n
-    // output:  Q
-    // mat will change to R
     // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
 
-    string soliloquy="aurostd::generalHouseHolderQRDecomposition():";
-    if(mat.rows<mat.cols){cerr << soliloquy << " ERROR! m<n, please flip the matrix." << endl;exit(1);}
+    string soliloquy="aurostd::QRDecomposition_HouseHolder():";
+    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(soliloquy,"m<n, please flip the matrix",_INPUT_ERROR_);}
 
-    xmatrix<utype> mat_orig=mat;
+    R=mat_orig; //reset
 
-    utype vModulus, xModulus;
+    //utype xModulus; //vModulus
+    utype vModulus;
     std::vector<xmatrix<utype> > V;
 
-    for (uint i = 1; i < (uint)mat.cols + 1; i++) {
-      // create x
-      xmatrix<utype> x(mat.rows - i + 1, 1);
-      for (uint j = i; j < (uint)mat.rows + 1; j++) {
-	x(j - i + 1, 1) = mat(j, i);
+    for (int i = R.lcols; i <= R.ucols; i++) {
+      // create x, faster than getmat() because we need trasp (col->row)
+      xmatrix<utype> x(R.urows - i + R.lrows, 1);
+      for (int j = i; j <= R.urows; j++) {
+        x(j - i + R.lrows, 1) = R(j, i);
       }
       // create identity vector
-      xmatrix<utype> e1(x.rows, 1);  // automatically sets all to 0
-      e1(1, 1) = (utype)1.0;
-      xModulus = sqrt(sum(trasp(x) * x));
-      xmatrix<utype> v(x.rows, 1);
-      if(xModulus >= tol) {
-	v = xModulus * e1;
-	if(std::signbit(x(1, 1))) {
-	  // negative
-	  v = v * (utype)-1.0;
-	}
-	v += x;
-	// modulus of v
-	vModulus = sqrt(sum(trasp(v) * v));
-	v = v / vModulus;
-	xmatrix<utype> A(mat.rows - i + 1, mat.cols - i + 1);
-	for (uint j = i; j < (uint)mat.rows + 1; j++) {
-	  for (uint k = i; k < (uint)mat.cols + 1; k++) {
-	    A(j - i + 1, k - i + 1) = mat(j, k);
-	  }
-	}
-	A = A - (utype)2.0 * v * trasp(v) * A;
-	//A = A;	//CO190329 - seems like a dud
-	for (uint j = i; j < (uint)mat.rows + 1; j++) {
-	  for (uint k = i; k < (uint)mat.cols + 1; k++) {
-	    mat(j, k) = A(j - i + 1, k - i + 1);
-	  }
-	}
+      //[SLOW]xmatrix<utype> e1(x.rows, 1);  // automatically sets all to 0
+      //[SLOW]e1(e1.lrows, e1.lcols) = (utype)1.0;
+      //[SLOW]xModulus=aurostd::modulus(x); //sqrt(sum(trasp(x) * x));
+      //[SLOW]xmatrix<utype> v(x.rows, 1);
+      xmatrix<utype> v=x;
+      v(v.lrows,v.lcols)+=aurostd::sign(x(x.lrows,x.lcols))*aurostd::modulus(x);
+      vModulus=aurostd::modulus(v);
+      if(vModulus>=tol){  //prevents division by 0
+      //[SLOW]if(xModulus >= tol) { //prevents division by 0
+      //[SLOW]  v = xModulus * e1;
+      //[SLOW]  if(std::signbit(x(x.lrows, x.lcols))) {v*=(utype)-1.0;}// negate
+      //[SLOW]  v += x;
+      //[SLOW]  v/=aurostd::modulus(v); //normalize
+        v/=vModulus;
+        //[OBSOLETE]// modulus of v
+        //[OBSOLETE]vModulus = sqrt(sum(trasp(v) * v));
+        //[OBSOLETE]v /= vModulus;
+        xmatrix<utype> A(R.urows - i + R.lrows, R.ucols - i + R.lcols); //faster than getmat() because we need trasp
+        for (int j = i; j <= R.urows; j++) {
+          for (int k = i; k <= R.ucols; k++) {
+            A(j - i + R.lrows, k - i + R.lcols) = R(j, k);
+          }
+        }
+        A -= (utype)2.0 * v * trasp(v) * A;
+        for (int j = i; j <= R.urows; j++) {
+          for (int k = i; k <= R.ucols; k++) {
+            R(j, k) = A(j - i + R.lrows, k - i + R.lcols);
+          }
+        }
       }
       V.push_back(v);
     }
 
-    xmatrix<utype> Q(mat.rows, mat.rows);
-    xmatrix<utype> ek(mat.rows, 1);
-    for (uint k = 1; k < (uint)mat.rows + 1; k++) {
-      // create identity vector
-      for (uint i = 1; i < (uint)mat.rows + 1; i++) {
-	if(i == k) {
-	  ek(i, 1) = (utype)1;
-	} else {
-	  ek(i, 1) = (utype)0;
-	}
+    Q=xmatrix<utype>(R.rows, R.rows); //reset
+    xmatrix<utype> ek(R.rows, 1); // create identity vector
+    for (int k = R.lcols; k <= R.urows; k++) {
+      for (int i = R.lrows; i <= R.urows; i++) {
+        ek(i,ek.lcols)=(i==k) ? (utype)1 : (utype)0;
+        //[OBSOLETE]if(i == k) {ek(i, 1) = (utype)1;} 
+        //[OBSOLETE]else {ek(i, 1) = (utype)0;}
       }
-      for (uint i = (uint)mat.cols; i > 0; i--) {
-	xmatrix<utype> x(mat.rows - i + 1, 1);
-	for (uint j = i; j < (uint)mat.rows + 1; j++) {
-	  x(j - i + 1, 1) = ek(j, 1);
-	}
-	x = x - (utype)2.0 * V.at(i - 1) * trasp(V.at(i - 1)) * x;
-	for (uint j = i; j < (uint)mat.rows + 1; j++) {
-	  ek(j, 1) = x(j - i + 1, 1);
-	}
+      for (int i = R.ucols; i > 0; i--) {
+        xmatrix<utype> x(R.urows - i + R.lrows, 1);
+        for (int j = i; j <= R.urows; j++) {
+          x(j - i + R.lrows, x.lcols) = ek(j, ek.lcols);
+        }
+        x = x - (utype)2.0 * V[i - R.lcols] * trasp(V[i - R.lcols]) * x;
+        for (int j = i; j <= R.urows; j++) {
+          ek(j, ek.lcols) = x(j - i + R.lrows, x.lcols);
+        }
       }
-      for (uint i = 1; i < (uint)mat.rows + 1; i++) {
-	Q(i, k) = ek(i, 1);
-      }
+      for (int i = R.lrows; i <= R.urows; i++) {Q(i, k) = ek(i, ek.lcols);}
     }
 
-    if(!aurostd::isequal(mat_orig,Q*mat)){throw aurostd::xerror(soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
-
-    return Q;
+    if(!aurostd::isequal(mat_orig,Q*R)){throw aurostd::xerror(soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
   }
 }
 
