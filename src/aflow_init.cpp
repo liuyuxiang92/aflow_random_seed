@@ -370,7 +370,8 @@ namespace init {
     XHOST.is_SLURM=FALSE;
     XHOST.SLURM_CPUS_ON_NODE=aurostd::getenv2int("SLURM_CPUS_ON_NODE");
     XHOST.SLURM_NNODES=aurostd::getenv2int("SLURM_NNODES");          
-    if(XHOST.SLURM_CPUS_ON_NODE!=0 || XHOST.SLURM_NNODES!=0) XHOST.is_SLURM=TRUE;
+    XHOST.SLURM_NTASKS=aurostd::getenv2int("SLURM_NTASKS");          
+    if(XHOST.SLURM_CPUS_ON_NODE!=0 || XHOST.SLURM_NNODES!=0 || XHOST.SLURM_NTASKS!=0) XHOST.is_SLURM=TRUE;
     if(INIT_VERBOSE) {
       oss << "--- QUEUES --------------- " << endl;
       oss << "is_PBS=" << XHOST.is_PBS << endl;
@@ -379,6 +380,7 @@ namespace init {
       oss << "is_SLURM=" << XHOST.is_SLURM << endl;
       oss << "SLURM_CPUS_ON_NODE=" << XHOST.SLURM_CPUS_ON_NODE << endl;
       oss << "SLURM_NNODES=" << XHOST.SLURM_NNODES << endl;
+      oss << "SLURM_NTASKS=" << XHOST.SLURM_NTASKS << endl;
     }
     // maxmem
     XHOST.maxmem=aurostd::args2attachedutype<double>(XHOST.argv,"--mem=|--maxmem=",101.0);
@@ -448,15 +450,6 @@ namespace init {
       oss << "MPI_OPTIONS_FULTON_MARYLOU=" << MPI_OPTIONS_FULTON_MARYLOU << "\"" << endl;
       oss << "MPI_COMMAND_FULTON_MARYLOU=" << MPI_COMMAND_FULTON_MARYLOU << "\"" << endl;
       oss << "MPI_BINARY_DIR_FULTON_MARYLOU=" << MPI_BINARY_DIR_FULTON_MARYLOU << "\"" << endl;
-      oss << "MPI_OPTIONS_TRINITY_PARSONS=" << MPI_OPTIONS_TRINITY_PARSONS << "\"" << endl;
-      oss << "MPI_COMMAND_TRINITY_PARSONS=" << MPI_COMMAND_TRINITY_PARSONS << "\"" << endl;
-      oss << "MPI_BINARY_DIR_TRINITY_PARSONS=" << MPI_BINARY_DIR_TRINITY_PARSONS << "\"" << endl;
-      oss << "MPI_OPTIONS_TERAGRID_RANGER=" << MPI_OPTIONS_TERAGRID_RANGER << "\"" << endl;
-      oss << "MPI_COMMAND_TERAGRID_RANGER=" << MPI_COMMAND_TERAGRID_RANGER << "\"" << endl;
-      oss << "MPI_BINARY_DIR_TERAGRID_RANGER=" << MPI_BINARY_DIR_TERAGRID_RANGER << "\"" << endl;
-      oss << "MPI_OPTIONS_TERAGRID_KRAKEN=" << MPI_OPTIONS_TERAGRID_KRAKEN << "\"" << endl;
-      oss << "MPI_COMMAND_TERAGRID_KRAKEN=" << MPI_COMMAND_TERAGRID_KRAKEN << "\"" << endl;
-      oss << "MPI_BINARY_DIR_TERAGRID_KRAKEN=" << MPI_BINARY_DIR_TERAGRID_KRAKEN << "\"" << endl;
       oss << "MPI_OPTIONS_MACHINE1=" << MPI_OPTIONS_MACHINE1 << "\"" << endl;
       oss << "MPI_COMMAND_MACHINE1=" << MPI_COMMAND_MACHINE1 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE1=" << MPI_BINARY_DIR_MACHINE1 << "\"" << endl;
@@ -1364,7 +1357,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
     double Tzero=30.0;
-    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message("host") << endl; exit(1);
+    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message("host",_AFLOW_FILE_NAME_) << endl; exit(1);
     if(RUNSTAT || (!RUNSTAT && !RUNBAR)) {
       string soss="- [temp(C)=";
       for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {soss+=aurostd::utype2string(XHOST.vTemperatureCore.at(i),3)+(i<XHOST.vTemperatureCore.size()-1?",":"]");}
@@ -1573,7 +1566,7 @@ string Message(string list2print) {
 string Message(string str1,string list2print) {return string(" - "+str1+Message(list2print));}
 //string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
 string Message(const _aflags& aflags) {
-  string strout=" - [dir="+aflags.Directory+"]"+=Message("user,host,time");
+  string strout=" - [dir="+aflags.Directory+"]"+=Message("user,host,time",_AFLOW_FILE_NAME_);
   if(AFLOW_PTHREADS::FLAG) strout+=" - [thread="+aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER)+"/"+aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS)+"]";
   return strout;}
 string Message(const _aflags& aflags,string list2print1,string list2print2) {

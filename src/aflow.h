@@ -342,7 +342,7 @@ class _XHOST {
   uint AFLOW_RUNXnumber;
   // QUEQUE STUFF
   bool is_PBS;int PBS_NUM_PPN,PBS_NNODES;
-  bool is_SLURM;int SLURM_CPUS_ON_NODE,SLURM_NNODES;
+  bool is_SLURM;int SLURM_CPUS_ON_NODE,SLURM_NNODES,SLURM_NTASKS;
   bool is_MACHINE_FULTON_MARYLOU; // some flags
   // APENNST stuff
   bool APENNSY_USE_SERVER;

@@ -289,8 +289,8 @@ namespace AFLOW_PTHREADS {
     AFLOW_PTHREADS::FLAG=TRUE;
     AFLOW_PTHREADS::MAX_PTHREADS=PTHREAD_DEFAULT; // safety...
 
-    if(!aurostd::FileExist(file_name)) {aus << "EEEEE FILE_NOT_FOUND = " << file_name << Message(aflags,"user,host,time") << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
-    if( aurostd::FileEmpty(file_name)) {aus << "EEEEE FILE_EMPTY = " << file_name << Message(aflags,"user,host,time") << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+    if(!aurostd::FileExist(file_name)) {aus << "EEEEE FILE_NOT_FOUND = " << file_name << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+    if( aurostd::FileEmpty(file_name)) {aus << "EEEEE FILE_EMPTY = " << file_name << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
     aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
     vector<string> vcmds;
     vcmds.clear();
@@ -398,8 +398,8 @@ namespace AFLOW_PTHREADS {
     //  bool free_thread;int ithread=0;
     bool VERBOSE=FALSE;
 
-    if(!aurostd::FileExist(file_name)) {aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,"user,host,time") << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
-    if( aurostd::FileEmpty(file_name)) {aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,"user,host,time") << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+    if(!aurostd::FileExist(file_name)) {aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+    if( aurostd::FileEmpty(file_name)) {aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
     if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
     vector<string> vcmds;vcmds.clear();
     aurostd::file2vectorstring(file_name,vcmds);
@@ -500,8 +500,8 @@ namespace AFLOW_PTHREADS {
     if(XHOST.vflag_control.flag("FILE")) {
       string file_name=XHOST.vflag_control.getattachedscheme("FILE");
       // if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
-      if(!aurostd::FileExist(file_name)) {aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,"user,host,time") << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
-      if( aurostd::FileEmpty(file_name)) {aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,"user,host,time") << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+      if(!aurostd::FileExist(file_name)) {aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
+      if( aurostd::FileEmpty(file_name)) {aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);}
       if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
       aurostd::file2vectorstring(file_name,vdirs);
     }
