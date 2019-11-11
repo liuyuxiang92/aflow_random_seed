@@ -1984,7 +1984,7 @@ namespace aurostd {
   long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     ifstream FileStream;
-    long int sizeout;
+    long int sizeout = 0;
     FileStream.open(FileName.c_str(),std::ios::in);
     if(!FileStream.good()) {
       sizeout=0;
