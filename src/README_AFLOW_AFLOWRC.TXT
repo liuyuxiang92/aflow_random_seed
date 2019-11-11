@@ -1629,36 +1629,6 @@ MPI_BINARY_DIR_MPCDF_HYDRA
   type: string
   default: "~/bin/"
 
-MPI_OPTIONS_TERAGRID_RANGER
-  description: MPI options for --machine=teragrid_ranger.
-  type: string
-  default: ""
-
-MPI_COMMAND_TERAGRID_RANGER
-  description: MPI command for --machine=teragrid_ranger.
-  type: string
-  default: "/share/sge6.2/default/pe_scripts/ibrun"
-
-MPI_BINARY_DIR_TERAGRID_RANGER
-  description: MPI executable directory for --machine=teragrid_ranger.
-  type: string
-  default: "~/bin/"
-
-MPI_OPTIONS_TERAGRID_KRAKEN
-  description: MPI options for --machine=teragrid_kraken.
-  type: string
-  default: ""
-
-MPI_COMMAND_TERAGRID_KRAKEN
-  description: MPI command for --machine=teragrid_kraken.
-  type: string
-  default: "aprun -n"
-
-MPI_BINARY_DIR_TERAGRID_KRAKEN
-  description: MPI executable directory for --machine=teragrid_kraken.
-  type: string
-  default: "/nics/a/proj/aflow/bin/"
-
 MPI_OPTIONS_FULTON_MARYLOU
   description: MPI options for --machine=marylou.
   type: string
@@ -1673,21 +1643,6 @@ MPI_BINARY_DIR_FULTON_MARYLOU
   description: MPI executable directory for --machine=marylou.
   type: string
   default: "/fslgroup/fslg_datamining/bin/"
-
-MPI_OPTIONS_TRINITY_PARSONS
-  description: MPI options for --machine=parsons.
-  type: string
-  default: ""
-
-MPI_COMMAND_TRINITY_PARSONS
-  description: MPI command for --machine=parsons.
-  type: string
-  default: "mpirun -np"
-
-MPI_BINARY_DIR_TRINITY_PARSONS
-  description: MPI executable directory for --machine=parsons.
-  type: string
-  default: "/home/users/aflow/bin/"
 
 MPI_OPTIONS_MACHINE1
   description: MPI options for --machine=host1.

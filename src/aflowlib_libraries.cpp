@@ -1161,7 +1161,7 @@ namespace aflowlib {
 	_aflags aflags;
  	aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",FALSE); // PATCH FOR REFRESH (to be removed)
 	aurostd::ZIP2ZIP(directory_LIB,"gz","xz",FALSE); // PATCH FOR REFRESH (to be removed)
-	cout << "aflowlib::LIB2RAW: ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time") << endl;
+	cout << "aflowlib::LIB2RAW: ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
 	return FALSE;
       }
       if(perform_BANDS) {
@@ -1208,7 +1208,7 @@ namespace aflowlib {
     cout << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
     if((perform_THERMODYNAMICS || perform_BANDS ||  perform_MAGNETIC)) {
       _aflags aflags;
-      cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   BEGIN_DATE = " << Message(aflags,"user,host,time") << endl;
+      cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   BEGIN_DATE = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::ZIP2ZIP(directory_LIB,"bz2","xz");
       aurostd::ZIP2ZIP(directory_LIB,"gz","xz");
 
@@ -1698,7 +1698,7 @@ namespace aflowlib {
 	
 	// for(uint i=0;i<aflowlib_data.vauid.size();i++) {cout << "aflowlib::LIB2RAW: DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
 	// DONE
-	cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time") << endl;
+	cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
 	if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
      

@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.1.226
+VERSNUMBER=3.1.227
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
@@ -281,12 +281,12 @@ aflow.o: aflow.cpp aflow_test.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 aurostd.o: $(AUROSTD_HPP) $(AUROSTD_CPP) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) ./AUROSTD/aurostd.cpp -c -o aurostd.o 
 .cpp.o: .cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(@:.o=.cpp) -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(@:.o=.cpp) -c
 	touch $@
 aflow_init.o: aflow_init.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_init.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflow_init.cpp -c
 aflow_apennsy_phases.o: aflow_apennsy_phases.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS)  aflow_apennsy_phases.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS)  aflow_apennsy_phases.cpp -c
 #aflow_mix_nomix_table.o: aflow_mix_nomix_table.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_mix_nomix_table.cpp -c
 #CO 170622 - START
@@ -808,7 +808,7 @@ aflow_compare_structure.o: aflow_compare_structure.cpp Makefile $(AFLOW_HPP) $(A
 #[OBSOLETE] [JUNKAI] aflow_contrib_junkai_phasediag.o:aflow_contrib_junkai_phasediag.cpp aflow_contrib_junkai_basic.h
 ###### ACONVASP #################################################
 aflow_aconvasp_main.o: aflow_aconvasp_main.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_aconvasp_main.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_aconvasp_main.cpp -c
 aflow_apennsy.o: aflow_apennsy.cpp $(AFLOW_HPP) $(AUROSTD_HPP) aflow_apennsy.h Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_apennsy.cpp -c
 aflow_apennsy_main.o: aflow_apennsy_main.cpp $(AFLOW_HPP) $(AUROSTD_HPP) aflow_apennsy.h Makefile
