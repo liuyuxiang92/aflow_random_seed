@@ -303,7 +303,7 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     if (!rebuild_db) {
       vector<string> types_db = getColumnTypes(table);
       vector<string> types_schema(nkeys);
-      uint k;
+      uint k = 0;
       string type;
       for (k = 0; k < nkeys; k++) {
         type = extractJsonValue(schema, "AAPI_schema." + keys[k] + ".type");
