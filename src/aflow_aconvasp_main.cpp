@@ -964,7 +964,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::ENMAX_MULTIPLY")) vlist+="--enmax_multiply="+vpflow.getattachedscheme("PROTO_AFLOW::ENMAX_MULTIPLY")+" ";   // recursion is GNU's pleasure (SC2017)
 
     vpflow.flag("PROTO_AFLOW::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
-    vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE",aurostd::args2flag(argv,cmds,"--potential_complete|--potcomplete|--potentials_complete|--potscomplete|--potc"));
+    vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE",aurostd::args2flag(argv,cmds,"--potential_type|--pottype|--potentials_type|--potstype|--pott")); //CO191110
+    if(vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE")) vlist+="--potential_type ";                       // recursion is GNU's pleasure (SC2014) //CO191110
+    vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE",aurostd::args2flag(argv,cmds,"--potential_complete|--potcomplete|--potentials_complete|--potscomplete|--potc|--potential_type_date|--potentialtypedate")); //CO191110
     if(vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE")) vlist+="--potential_complete ";                       // recursion is GNU's pleasure (SC2014)
     vpflow.flag("PROTO_AFLOW::MISSING",aurostd::args2flag(argv,cmds,"--missing"));
     if(vpflow.flag("PROTO_AFLOW::MISSING")) vlist+="--missing ";                                             // recursion is GNU's pleasure (SC2014)
@@ -12557,6 +12559,11 @@ namespace pflow {
     //   PARAMS.vparams.flag("AFLOWING_STRING_POTENTIAL",vpflow.flag("PROTO_AFLOW::POTENTIAL"));
     // if(PARAMS.vparams.flag("AFLOWING_STRING_POTENTIAL")) PARAMS.vparams.push_attached("AFLOWING_STRING_POTENTIAL",vpflow.getattachedscheme("PROTO_AFLOW::POTENTIAL"));
 
+    // check potential_type  //CO191110
+    if(LDEBUG) cerr << soliloquy << " CHECK POTENTIAL_TYPE" << endl;   //CO191110
+    if(vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE")) string_POTENTIAL+=_AVASP_PSEUDOPOTENTIAL_DELIMITER_+_AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_; //CO191110
+    if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PROTO_AFLOW::POTENTIAL_TYPE\")=" << vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE") << endl; //CO191110
+    
     // check potential_complete
     if(LDEBUG) cerr << soliloquy << " CHECK POTENTIAL_COMPLETE" << endl; 
     if(vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE")) string_POTENTIAL+=_AVASP_PSEUDOPOTENTIAL_DELIMITER_+_AVASP_PSEUDOPOTENTIAL_POTENTIAL_COMPLETE_;

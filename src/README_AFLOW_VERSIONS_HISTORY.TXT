@@ -34,6 +34,7 @@
         -- added option for printing ensemble average IDOS in pocc data files (CO) 
         -- patch distinction between POTCAR_TYPE_DATE_PRINT_flag and POTCAR_TYPE_PRINT_flag in avasp (CO)
         -- patching xvasp.POTCAR_TYPE_PRINT_flag for LIB2/LIB3 (CO)
+        -- added --potential_type for auto aflow.in generator (CO)
         -- streamlined xvector constructors and copy() methods (CO)
         -- added xvector constructor for xmatrix input (CO)
         -- added getcol(), getmat(), setrow(), setcol(), setmat() to xmatrix, with relevant unit tests called by —test_xmatrix (CO)

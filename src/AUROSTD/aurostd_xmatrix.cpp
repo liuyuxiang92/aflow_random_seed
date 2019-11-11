@@ -3263,10 +3263,10 @@ namespace aurostd {
       vModulus=aurostd::modulus(v);
       if(vModulus>=tol){  //prevents division by 0
       //[SLOW]if(xModulus >= tol) { //prevents division by 0
-      //[SLOW]  v = xModulus * e1;
-      //[SLOW]  if(std::signbit(x(x.lrows, x.lcols))) {v*=(utype)-1.0;}// negate
-      //[SLOW]  v += x;
-      //[SLOW]  v/=aurostd::modulus(v); //normalize
+        //[SLOW]  v = xModulus * e1;
+        //[SLOW]  if(std::signbit(x(x.lrows, x.lcols))) {v*=(utype)-1.0;}// negate
+        //[SLOW]  v += x;
+        //[SLOW]  v/=aurostd::modulus(v); //normalize
         v/=vModulus;
         //[OBSOLETE]// modulus of v
         //[OBSOLETE]vModulus = sqrt(sum(trasp(v) * v));
