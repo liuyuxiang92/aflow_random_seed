@@ -224,7 +224,7 @@ string SQLexecuteCommandSCALAR(sqlite3* cursor, const string& command) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG) && _SQL_COMMAND_DEBUG_);
   if (LDEBUG) std::cerr << "aflowlib::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
   char* sqlErrMsg = 0;
-  string returnstring;
+  string returnstring = "";
   int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackSCALAR, &returnstring, &sqlErrMsg);
   if (sql_code != SQLITE_OK) {
     string function = "aflowlib::SQLexecuteCommandSCALAR()";
