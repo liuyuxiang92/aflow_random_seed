@@ -329,7 +329,7 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     }
 
     long int tm_db = aurostd::FileModificationTime(database_file);
-    string dir;
+    string dir  = "";
     int i;
     for (i = 0; i < _N_AUID_TABLES_; i++) {
       dir = data_path + "/" + paths[i];
