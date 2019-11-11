@@ -108,7 +108,7 @@ void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<st
       for (j = 0; j < njson; j++) auids[j] = extractJsonValueAflow(json[j], "auid");
 
       string auid = "";
-      int index;
+      int index = 0;
       for (uint e = 0; e < nentry; e++) {
         auid = extractJsonValueAflow(entries[e], "auid");
         if (aurostd::withinList(auids, auid, index)) json[index] = entries[e];
