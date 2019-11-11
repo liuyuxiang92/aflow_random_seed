@@ -59,6 +59,7 @@ namespace pflow {
   string ATOMSMAX(string options,istream& input);
   void BANDS(string options,istream& input);
   void BANDGAP(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  // CO 171006
+  void BANDGAP_DOS(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  // CO 171006  //CO191110
   void BANDSTRUCTURE(_aflags &aflags);
   string BZDirectionsLATTICE(string options);
   //DX 20181102 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input);
@@ -129,6 +130,7 @@ namespace pflow {
   string FROZSL_ANALYZE(istream& input);
   string FROZSL_INPUT(void);
   string FROZSL_OUTPUT(void);
+  string GEOMETRY(istream& input); //CO191110
   bool GetCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry
   bool GetNonCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear
   vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
@@ -294,10 +296,10 @@ namespace pflow {
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO190712
   ////////////////////////////////////////////////////////////////////////////////
   // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  // ME190628
   ////////////////////////////////////////////////////////////////////////////////
   //[CO190712 - OBSOLETE]// functions for making input alphabetic
   //[CO190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters

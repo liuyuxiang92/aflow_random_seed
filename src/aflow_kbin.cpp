@@ -232,6 +232,18 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir) { ostringstream aus; return KBIN::Legitimate_aflowin(aflowindir,FALSE,aus);};
 }
 
+namespace KBIN {
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO191110
+    string soliloquy="getAflowInFromAFlags():";
+    AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
+    if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
+    pflow::logger(soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    aurostd::file2string(AflowIn_file,AflowIn);
+    AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+  }
+}
+
 // ***************************************************************************
 // KBIN::Main
 // ***************************************************************************

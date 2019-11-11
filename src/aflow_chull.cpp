@@ -260,7 +260,7 @@ namespace chull {
       aurostd::xcombos xc(vsizes,'E');
       while(xc.increment()){
         velements=xc.applyCombo(vcomponents);
-        if(verbose_elimination){velements=pflow::stringElements2VectorElements(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss,true,true,pp_string,false);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO190712
+        if(verbose_elimination){velements=pflow::stringElements2VectorElements(aurostd::joinWDelimiter(velements,""),FileMESSAGE,true,true,pp_string,false,oss);}  //fast way to eliminate pseudopotential information  //clean and sort, do not keep_pp  //CO190712
         //[CO190712 - OBSOLETE]if(verbose_elimination){velements=pflow::getAlphabeticVectorString(aurostd::joinWDelimiter(velements,""),FileMESSAGE,oss);}  //fast way to eliminate pseudopotential information
         std::sort(velements.begin(),velements.end());
         original_input=aurostd::joinWDelimiter(velements,"");
@@ -276,7 +276,7 @@ namespace chull {
     } else {  //simple list mode
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
-        velements=pflow::stringElements2VectorElements(tokens_comma[i],FileMESSAGE,oss,true,true,pp_string,false);  //clean and sort, do not keep_pp  //CO190712
+        velements=pflow::stringElements2VectorElements(tokens_comma[i],FileMESSAGE,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp  //CO190712
         //[CLO190712 - OBSOLETE]velements=pflow::getAlphabeticVectorString(tokens_comma[i], FileMESSAGE,oss);
         nary=velements.size();
         original_input=aurostd::joinWDelimiter(velements,"");
@@ -321,7 +321,7 @@ namespace chull {
     for(uint i=0,fl_size_i=vinputs.size();i<fl_size_i;i++) {
       // go through each request
       // create log specific to that request
-      velements = pflow::stringElements2VectorElements(vinputs[i],FileMESSAGE,oss,true,true,pp_string,false); //clean and sort, do not keep_pp  //CO190712
+      velements = pflow::stringElements2VectorElements(vinputs[i],FileMESSAGE,true,true,pp_string,false,oss); //clean and sort, do not keep_pp  //CO190712
       //[CO190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
       if(!velements.size()){
         message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
@@ -614,9 +614,8 @@ namespace chull {
       // END Stability criterion calculation
       ////////////////////////////////////////////////////////////////////////////
 
-
       ////////////////////////////////////////////////////////////////////////////
-      // START Distance to hull calculation
+      // START Hull formation enthalpy calculation
       ////////////////////////////////////////////////////////////////////////////
       if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
         message << "Starting calculation of the formation enthalpy at " << vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY");
@@ -634,7 +633,7 @@ namespace chull {
         //proceed otherwise at your own risk
         try{
           ChullPoint cp(coords,FileMESSAGE,oss,hull.m_has_stoich_coords,hull.m_formation_energy_hull,false);  //not a real point
-          dist2hull=hull.getDistanceToHull(cp);
+          dist2hull=hull.getDistanceToHull(cp,false,true);  //do not redo, get signed distance (this is energy)
         }
         catch(aurostd::xerror& re){
           pflow::logger(re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -670,7 +669,7 @@ namespace chull {
         continue;
       }
       ////////////////////////////////////////////////////////////////////////////
-      // END Distance to hull calculation
+      // END Hull formation enthalpy calculation
       ////////////////////////////////////////////////////////////////////////////
 
       ////////////////////////////////////////////////////////////////////////////
@@ -3408,7 +3407,7 @@ void ConvexHull::loadPoints(string alloy) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::loadPoints():";
   if(LDEBUG) {cerr << soliloquy << " initializing alloy, compound=" << alloy << endl;}
-  vector<string> velements = pflow::stringElements2VectorElements(alloy, *p_FileMESSAGE, *p_oss, true, true, pp_string, false); //clean and sort, do not keep_pp  //CO190712
+  vector<string> velements = pflow::stringElements2VectorElements(alloy, *p_FileMESSAGE, true, true, pp_string, false, *p_oss); //clean and sort, do not keep_pp  //CO190712
   //[CO190712 - OBSOLETE]vector<string> velements = pflow::getAlphabeticVectorString(alloy, *p_FileMESSAGE, *p_oss);
   return loadPoints(velements);
 }
@@ -5058,13 +5057,13 @@ double ConvexHull::getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,
   return dist;
 }
 
-double ConvexHull::getDistanceToHull(uint i_point,bool redo) const{
+double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
   string soliloquy="ConvexHull::getDistanceToHull():";
   if(i_point>m_points.size()-1){throw aurostd::xerror(soliloquy,"Invalid index within points");}
-  return getDistanceToHull(m_points[i_point],redo);
+  return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
 }
 
-double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo) const{
+double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo,bool get_signed_distance) const{
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::getDistanceToHull():";
   if(!point.m_initialized){throw aurostd::xerror(soliloquy,"Uninitialized point");}
@@ -5078,7 +5077,7 @@ double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo) const{
     if(getCoordGroupIndex(point,i_coord_group,true)){
       if(LDEBUG) {cerr << soliloquy << " found coordgroup[" << i_coord_group << "] (coords=" << m_coord_groups[i_coord_group].m_coords << ")" << endl;}
       dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
-      dist=abs(dist); //CO 180828
+      if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
       if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
       return dist;
     }
@@ -5123,7 +5122,7 @@ double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo) const{
       uint i_coord_group=AUROSTD_MAX_UINT;
       if(!getCoordGroupIndex(point,i_coord_group,true)){throw aurostd::xerror(soliloquy,"Cannot find unary coordgroup");}
       dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
-      dist=abs(dist); //CO 180828
+      if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
       if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
       return dist;
     }
@@ -5132,7 +5131,7 @@ double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo) const{
   //otherwise, all facets are relevant (same dimension)
   uint i_facet=getNearestFacetVertically(i_facets,point);
   dist=m_facets[i_facet].getSignedVerticalDistance(point);
-  dist=abs(dist); //CO 180828
+  if(get_signed_distance==false){dist=abs(dist);} //CO 180828 //CO190808
   if(LDEBUG) {cerr << soliloquy << " dist=" << dist << endl;}
   return dist;
 }

@@ -4397,22 +4397,22 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OUTCAR.static",directory_RAW,"OUTCAR.static",vfile,MESSAGE);  // OUTCAR.static
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"OUTCAR.static") << endl;
       if(outcar_static.GetPropertiesFile(directory_RAW+"/"+"OUTCAR.static")) {
-	EFERMI=outcar_static.Efermi;
-	data.spin_cell=outcar_static.mag_cell;
-	data.spin_atom=outcar_static.mag_atom;
-	data.spinD="";
-	data.vspinD.clear();
-	if(outcar_static.vmag.size()) {
-	  for(uint i=0;i<(uint) outcar_static.vmag.size();i++) {
-	    data.spinD+=aurostd::utype2string<double>(outcar_static.vmag.at(i),5)+(i<outcar_static.vmag.size()-1?",":"");
-	    data.vspinD.push_back(outcar_static.vmag.at(i));
-	  }
-	} else {
-	  for(uint i=0;i<outcar_static.natoms;i++) {  //use outcar_static.natoms as there can be a primitivization between relax and static
-	    data.spinD+=aurostd::utype2string<double>(0)+(i<outcar_static.natoms-1?",":"");
-	    data.vspinD.push_back(0.0);
-	  }
-	}
+        EFERMI=outcar_static.Efermi;
+        data.spin_cell=outcar_static.mag_cell;
+        data.spin_atom=outcar_static.mag_atom;
+        data.spinD="";
+        data.vspinD.clear();
+        if(outcar_static.vmag.size()) {
+          for(uint i=0;i<(uint) outcar_static.vmag.size();i++) {
+            data.spinD+=aurostd::utype2string<double>(outcar_static.vmag.at(i),5)+(i<outcar_static.vmag.size()-1?",":"");
+            data.vspinD.push_back(outcar_static.vmag.at(i));
+          }
+        } else {
+          for(uint i=0;i<outcar_static.natoms;i++) {  //use outcar_static.natoms as there can be a primitivization between relax and static
+            data.spinD+=aurostd::utype2string<double>(0)+(i<outcar_static.natoms-1?",":"");
+            data.vspinD.push_back(0.0);
+          }
+        }
       } else { cout << MESSAGE << " ERROR OUTCAR.static properties cannot be extracted: " << outcar_static.ERROR << endl; }
     } else { cout << MESSAGE << " MISSING OUTCAR.static" << endl; }
     if(EFERMI==AUROSTD_NAN) { cout << MESSAGE << " unable to load OUTCAR.static, using Efermi from bands" << endl; }
@@ -4429,31 +4429,32 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OUTCAR.bands",directory_RAW,"OUTCAR.bands",vfile,MESSAGE);  // OUTCAR.bands
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"OUTCAR.bands") << endl;
       if(outcar_bands.GetPropertiesFile(directory_RAW+"/"+"OUTCAR.bands")) {
-	outcar_bands.GetBandGap(EFERMI);
-	data.Egap=outcar_bands.Egap_net;
-	data.Egap_fit=outcar_bands.Egap_fit_net;
-	data.Egap_type=outcar_bands.Egap_type_net;
-	if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap=0.0;      //half-metal
-	if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap_fit=0.0;  //half-metal
-   
-	// SPIN POLARIZATION AT FERMI LEVEL
-	if(data.Egap<MAG_EPS && aurostd::abs(data.spin_cell)>MAG_EPS) { //must be metal and magnetic
-	  if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.static"))) {
-	    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.static",directory_RAW,"DOSCAR.static",vfile,MESSAGE);  // DOSCAR.static
-	    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.static") << endl;
-	    doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.static");
-	  }
-	  if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.relax2") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.relax2"))) {
-	    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.relax2",directory_RAW,"DOSCAR.relax",vfile,MESSAGE);  // DOSCAR.relax2
-	    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.relax") << endl;
-	    doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.relax");
-	  }
-	  if(!doscar.content.empty()) {
-	    data.spinF=doscar.spinF;
-	  } else {
-	    cout << MESSAGE << " MISSING DOSCAR.static and DOSCAR.relax[2]" << endl;
-	  }
-	}
+        if(outcar_bands.GetBandGap(EFERMI)){
+          data.Egap=outcar_bands.Egap_net;
+          data.Egap_fit=outcar_bands.Egap_fit_net;
+          data.Egap_type=outcar_bands.Egap_type_net;
+          if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap=0.0;      //half-metal
+          if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap_fit=0.0;  //half-metal
+
+          // SPIN POLARIZATION AT FERMI LEVEL
+          if(data.Egap<MAG_EPS && aurostd::abs(data.spin_cell)>MAG_EPS) { //must be metal and magnetic
+            if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.static"))) {
+              aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.static",directory_RAW,"DOSCAR.static",vfile,MESSAGE);  // DOSCAR.static
+              if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.static") << endl;
+              doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.static");
+            }
+            if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.relax2") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.relax2"))) {
+              aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.relax2",directory_RAW,"DOSCAR.relax",vfile,MESSAGE);  // DOSCAR.relax2
+              if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.relax") << endl;
+              doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.relax");
+            }
+            if(!doscar.content.empty()) {
+              data.spinF=doscar.spinF;
+            } else {
+              cout << MESSAGE << " MISSING DOSCAR.static and DOSCAR.relax[2]" << endl;
+            }
+          }
+        } else { cout << MESSAGE << " ERROR OUTCAR.bands BandGap() cannot be extracted: " << outcar_static.ERROR << endl; }  //CO181129
       } else { cout << MESSAGE << " ERROR OUTCAR.bands properties cannot be extracted: " << outcar_static.ERROR << endl; }  //CO181129
     } else { cout << MESSAGE << " MISSING OUTCAR.bands" << endl; }  //CO181129
 

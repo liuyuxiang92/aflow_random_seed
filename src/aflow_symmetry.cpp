@@ -56,6 +56,17 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
+  double minimumDistance(const deque<_atom>& atoms){  //CO190808
+    //for NON periodic systems, use the default with lattice otherwise: minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale)
+    double dist=0,dist_min=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<atoms.size()-1;i++){
+      for(uint j=i+1;j<atoms.size();j++){
+        dist=aurostd::modulus(atoms[i].cpos-atoms[j].cpos);
+        if(dist<dist_min){dist_min=dist;}
+      }
+    }
+    return dist_min;
+  }
   double minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double min_dist=AUROSTD_MAX_DOUBLE;
@@ -92,7 +103,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
     
     //combos of two lattice vectors
-    for(uint i=0;i<lattice_lengths.size();i++){     
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -135,7 +146,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of three lattice vectors 
-    for(uint i=0;i<lattice_lengths.size();i++){     
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -186,7 +197,6 @@ namespace SYM {
     // than the minimum distance, it becomes the radius for the new lattice dimensions sphere for the next iteration. 
 
 
-
     //DX 5/8/18 - FASTER MIN CART DISTANCE CALCULATOR - START
     //DX 5/8/18 - only calculate multiplication once (time-saver)
     vector<xvector<double> > l1, l2, l3;
@@ -197,7 +207,7 @@ namespace SYM {
 
     xvector<double> tmp;
 
-    for(uint i=0; i<atoms.size(); i++){
+    for(uint i=0; i<atoms.size()-1; i++){ //CO190808 - .size()-1
       // Cannot reduce more than (1,1,1), so don't recalculate
       if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
         dims=LatticeDimensionSphere(lattice,min_dist);

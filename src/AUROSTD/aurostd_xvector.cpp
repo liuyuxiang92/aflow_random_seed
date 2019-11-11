@@ -32,70 +32,31 @@
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // default constructor
-  xvector<utype>::xvector(int nh,int nl) {        
-    // allocate a xvector with subscript range [nl..nh]
-    int i;
-    lrows=std::min(nl,nh);// if(!nh)lrows=0; this messes up convasp
-    urows=std::max(nl,nh);// if(!nh)urows=0; this messes up convasp
-    rows=urows-lrows+1;   // if(!nh) rows=0; this messes up convasp
-// [[BUG]    if(nh==0 && nl==0) {
-    if(rows==0) {
-      cerr << "XVECTOR constructor: creating EMPTY xvector<utype>" << endl;
-      lrows=0;urows=0;rows=0;
-    };
-
-    // cerr << "XVECTOR constructor:  nh=" << nh << " nl=" << nl << " lrows=" << lrows << " urows=" << urows << " rows=" << rows << endl;
-    isfloat=aurostd::_isfloat((utype) 0);      
-    iscomplex=aurostd::_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    vsize=(long int) size*rows;
+    xvector<utype>::xvector(int nh,int nl) : vsize(0) {        
+      // allocate a xvector with subscript range [nl..nh]
+      lrows=std::min(nl,nh);// if(!nh)lrows=0; this messes up convasp
+      urows=std::max(nl,nh);// if(!nh)urows=0; this messes up convasp
+      refresh(); //CO191110
 #ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-    cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
+      cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
 #endif
-    if(vsize>0) {
-      corpus=new utype[rows+XXEND];
-      if(!corpus) {
-	cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xvector<utype>: allocation failure in default constructor" << endl;
-	exit(0);
+      if(vsize>0) {
+        corpus=new utype[rows+XXEND];
+        if(!corpus) {throw aurostd::xerror("aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
+        corpus+= -lrows+XXEND;
+        reset(); //CO191110
       }
-      corpus+= -lrows+XXEND;
-      for(i=lrows;i<=urows;i++)
-	corpus[i]=(utype) 0.0;  // clear
-    }
 #ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-    cerr << " isfloat=" << isfloat << ", iscomplex=" << iscomplex << ", sizeof=" << size << ", vsize=" << vsize << endl;
+      cerr << " isfloat=" << isfloat << ", iscomplex=" << iscomplex << ", sizeof=" << size << ", vsize=" << vsize << endl;
 #endif
-  }
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-  xvector<utype>::xvector(const xvector<utype>& a) {
-    int i;
-    lrows=a.lrows;
-    urows=a.urows;
-    rows=a.rows;
-    isfloat=aurostd::_isfloat((utype) 0);
-    iscomplex=aurostd::_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    vsize=(long int) size*rows;
-#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-    cerr << "xxvector -> copy constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
-#endif
-    if(vsize>0) {
-      corpus=new utype[rows+XXEND];
-      if(!corpus) {
-	cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xvector<utype>: allocation failure in copy constructor" << endl;
-	exit(0);
-      }
-      corpus+= -lrows+XXEND;
-      for(i=lrows;i<=urows;i++)
-	corpus[i]=(utype) a.corpus[i];
-    }
-#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-    cerr << " isfloat=" << isfloat << ", iscomplex=" << iscomplex << ", sizeof=" << size << ", vsize=" << vsize << endl;
-#endif
-  }
+    xvector<utype>::xvector(const xvector<utype>& b) : vsize(0) {copy(b);} //CO191110
+  template<class utype>                                       // copy constructor
+    xvector<utype>::xvector(const xmatrix<utype>& b) : vsize(0) {copy(b);} //CO191110
 }
 
 // ----------------------------------------------------------------------------
@@ -104,14 +65,80 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>                                     // default destructor
   xvector<utype>::~xvector() {
-    // cerr << "problem destructor xvector [1]" << endl;
-    // free a xvector allocated with xvector()
 #ifdef _AUROSTD_XVECTOR_DEBUG_DESTRUCTORS
     cerr << "xxvector -> default destructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
 #endif
-    if(vsize>0) delete [] (corpus+lrows-XXEND);
-    // cerr << "problem destructor xvector [2]" << endl;
+    free(); //CO190808
   }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  void xvector<utype>::free() { //CO190808
+    if(vsize>0) delete [] (corpus+lrows-XXEND);
+    lrows=urows=0;refresh();
+  }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    void xvector<utype>::copy(const xvector<utype>& b) { //CO190808
+      //[CO190808 - this assumes you have corpus, perhaps it is not constructed yet]if(corpus!=b.corpus||rows!=b.rows||lrows!=b.lrows||urows!=b.urows) {     // check  for a=a */
+      //CO 170803 - ODD CORNER CASE, same corpus and rows, but different lrows and urows
+      //if(rows!=b.rows) {    // if dims(this)!=dims(a) => build a new xvector !!!
+      if(lrows!=b.lrows||urows!=b.urows||vsize!=b.vsize) {    // if dims(this)!=dims(a) => build a new xvector !!!  //CO190808 - VERY IMPORTANT that we not only check lrows and urows, but vsize, as xvector could just have been initialized (vsize==0)
+        free();
+        lrows=b.lrows;
+        urows=b.urows;
+        //[simply copy instead]refresh();
+        rows=b.rows;
+        isfloat=b.isfloat;
+        iscomplex=b.iscomplex;
+        size=b.size;
+        vsize=b.vsize;
+#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
+        printf("xxvector -> default constructor: lrows=%i, urows=%i,",lrows,urows);
+#endif
+        if(vsize>0) {
+          corpus=new utype[rows+XXEND];
+          if(!corpus) {throw aurostd::xerror("aurostd::xvector<utype>::copy():","allocation failure in COPY",_ALLOC_ERROR_);}
+          corpus+= -lrows+XXEND;
+        }
+#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
+        printf(" isfloat=%i, iscomplex=%i, sizeof=%i, vsize=%i\n",isfloat,iscomplex,size,vsize);
+#endif
+        //[CO190808 - this assumes you have corpus, perhaps it is not constructed yet]}
+        //[CO190808 OBSOLETE]for(int i=0;i<rows;i++)
+        //[CO190808 OBSOLETE]  this->corpus[i+lrows] =
+        //[CO190808 OBSOLETE]    (utype) b.corpus[i+b.lrows];
+    }
+      if(corpus!=b.corpus){
+        for(int i=lrows;i<=urows;i++){this->corpus[i]=b.corpus[i];}
+      } //CO190808 - we definitely have corpus now
+    }
+  template<class utype>
+    void xvector<utype>::copy(const xmatrix<utype>& b) { //CO190808
+      if(b.rows==1){return copy(b(b.lrows));}
+      else if(b.cols==1)return copy(b.getcol(b.lcols));
+      throw aurostd::xerror("aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_INPUT_ILLEGAL_);
+    }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    void xvector<utype>::refresh(void) { //CO190808
+      rows=urows-lrows+1;   // if(!nh) rows=0; this messes up convasp
+      // [[BUG]    if(nh==0 && nl==0) {
+      if(rows==0) {
+        cerr << "XVECTOR constructor: creating EMPTY xvector<utype>" << endl;
+        lrows=0;urows=0;rows=0;
+      };
+      // cerr << "XVECTOR constructor:  nh=" << nh << " nl=" << nl << " lrows=" << lrows << " urows=" << urows << " rows=" << rows << endl;
+      isfloat=aurostd::_isfloat((utype) 0);      
+      iscomplex=aurostd::_iscomplex((utype) 0);
+      size=(char) (sizeof(utype));
+      vsize=(long int) size*rows;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -119,41 +146,10 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                             // operator =
-  xvector<utype>& xvector<utype>::operator=(const xvector<utype>& a) {
-    int i;  
-    if(corpus!=a.corpus||rows!=a.rows||lrows!=a.lrows||urows!=a.urows) {     // check  for a=a */
-      //CO 170803 - ODD CORNER CASE, same corpus and rows, but different lrows and urows
-      //if(rows!=a.rows) {    // if dims(this)!=dims(a) => build a new xvector !!!
-      if(rows!=a.rows||lrows!=a.lrows||urows!=a.urows) {    // if dims(this)!=dims(a) => build a new xvector !!!
-	if(vsize>0) delete [] (corpus+lrows-XXEND);
-	lrows=a.lrows;
-	urows=a.urows;
-	rows=a.rows;
-	isfloat=aurostd::_isfloat((utype) 0);        
-	iscomplex=aurostd::_iscomplex((utype) 0);
-	size=(char) sizeof(utype);
-	vsize=(long int) size*rows;
-#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-	printf("xxvector -> default constructor: lrows=%i, urows=%i,",lrows,urows);
-#endif
-	if(vsize>0) {
-	  corpus=new utype[rows+XXEND];
-	  if(!corpus) {
-	    cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xvector<utype>: allocation failure in ASSIGNEMENT" << endl;
-	    exit(0);
-	  }
-	  corpus+= -lrows+XXEND;
-	}
-#ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
-	printf(" isfloat=%i, iscomplex=%i, sizeof=%i, vsize=%i\n",isfloat,iscomplex,size,vsize);
-#endif
-      }
-      for(i=0;i<rows;i++)
-	this->corpus[i+lrows] =
-          (utype) a.corpus[i+a.lrows];
+    xvector<utype>& xvector<utype>::operator=(const xvector<utype>& b) { //CO191110
+      if(this!=&b) {copy(b);}
+      return *this;
     }
-    return *this;
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -1177,11 +1173,13 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
   void xvector<utype>::clear(void) {
-    for(int i=lrows;i<=urows;i++) corpus[i]=(utype) 0.0;
+    //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;copy(a);
+    reset(); //CO191110
   }
   template<class utype>                              // function clear xvector<>
-  void clear(xvector<utype>& a) {
-    for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) 0.0;
+  void clear(xvector<utype>& b) {
+    //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;b=a;
+    b.reset(); //CO191110
   }
 }
 
@@ -2586,7 +2584,7 @@ namespace aurostd {
     int lrows=signal_input.lrows; //fixed
     int size=signal_input.rows+response_input.rows-1;
     vector<uint> sum_counts_full((uint)size,0);
-    xvector<utype> conv(size+(lrows-1),lrows);conv.clear();  //set it all to 0
+    xvector<utype> conv(size+(lrows-1),lrows);conv.reset();  //set it all to 0 //CO191110
     vector<int> ind_zero_padding; //keep indices that require zero-padding for 'valid'
     int ind=0;
     bool k_added=false;

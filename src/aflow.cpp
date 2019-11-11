@@ -580,6 +580,50 @@ int main(int _argc,char **_argv) {
     if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
     return 1;
   }
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO190911
+    string soliloquy="test_xmatrix()::";
+    bool LDEBUG=TRUE; // TRUE;
+    xmatrix<double> mat;
+    mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
+    mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
+    mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
+    if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
+    //getmat()
+    xmatrix<double> submat=mat.getmat(2,3,2,3);
+    if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
+    //setmat()
+    mat.setmat(submat,1,1); //do nothing
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with submat at 1,1" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    xvector<double> xv;
+    xv(1)=2;xv(2)=3;xv(3)=4;
+    if(LDEBUG){cerr << soliloquy << " xv=" << xv << endl;}
+    mat.setmat(xv,1,false); //row
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at row=1" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    mat.setmat(xv,2,true); //col
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at col=2" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    //setrow()
+    mat.setrow(xv,2);
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at row=2" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    //setcol()
+    mat.setcol(xv,3);
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at col=3" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    return 1;
+  }
   if(!Arun && aurostd::args2flag(argv,cmds,"--test_stefano")) {
     uint y=2017,m=11;
     m+=1;

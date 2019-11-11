@@ -2008,6 +2008,8 @@ void xStream::copy(const xStream& b){
   else {p_FileMESSAGE=b.p_FileMESSAGE;}
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
 }
+ostream* xStream::getOSS() const {return p_oss;} //CO191110
+ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 

@@ -33,20 +33,25 @@ namespace aurostd {
   template<class utype>
     class xmatrix  {
   public:
-    //  xmatrix ();                                        // default constructor
-    //  xmatrix (int=3);                                   // default constructor
-    xmatrix (int=3,int=3,int=1,int=1);                     // default constructor
-    //    xmatrix (int,int,int,int);                       // default constructor
-    xmatrix (const xmatrix<utype>&);                          // copy constructor
-    xmatrix (int,int,utype*);                                 // copy constructor
-    xmatrix<utype>& operator=(const xmatrix<utype>&);               // assignment
-    ~xmatrix ();                                            // default destructor
-    utype* operator[](int) const;                                 // indicize i,j
-    xvector<utype> operator()(int) const;                           // indicize i
-    xvector<utype> getcol(int) const;                          // return column i
-    utype& operator()(int,int) const;                             // indicize i,j
-    utype& operator()(int,int,bool) const;        // indicize boundary conditions
-    //      xmatrix operator()(int,int,int,int) const;    // indicize i1,j1,i2,j2
+    //  xmatrix ();                                                     // default constructor
+    //  xmatrix (int=3);                                                // default constructor
+    xmatrix (int=3,int=3,int=1,int=1);                                  // default constructor
+    //    xmatrix (int,int,int,int);                                    // default constructor
+    xmatrix (const xmatrix<utype>&);                                    // copy constructor
+    xmatrix (int,int,utype*);                                           // copy constructor
+    xmatrix<utype>& operator=(const xmatrix<utype>&);                   // assignment
+    ~xmatrix ();                                                        // default destructor
+    utype* operator[](int) const;                                       // indicize i,j
+    xvector<utype> operator()(int) const;                               // indicize i
+    xvector<utype> getcol(int) const;                                   // return column i  //CO191110
+    xmatrix<utype> getmat(int lrow=1,int urow=1,int lcol=1,int ucol=1) const;     // return column i  //CO191110
+    void setrow(const xvector<utype>& row,int irow=1);                  // set row of matrix //CO190808
+    void setcol(const xvector<utype>& col,int icol=1);                  // set col of matrix //CO190808
+    void setmat(const xmatrix<utype>& mat,int irow=1,int icol=1);       // set submat  //CO190808
+    void setmat(const xvector<utype>& xv,int icol=1,bool col=true);     // set submat  //CO190808
+    utype& operator()(int,int) const;                                   // indicize i,j
+    utype& operator()(int,int,bool) const;                              // indicize boundary conditions
+    //      xmatrix operator()(int,int,int,int) const;                  // indicize i1,j1,i2,j2
     // math operators
     xmatrix<utype>& operator +=(const xmatrix<utype>&);
     xmatrix<utype>& operator -=(const xmatrix<utype>&);
