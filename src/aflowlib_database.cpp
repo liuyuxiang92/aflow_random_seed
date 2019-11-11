@@ -513,7 +513,7 @@ namespace aflowlib {
 
 //analyzeDatabase/////////////////////////////////////////////////////////////
 // Provides analytics for the database in JSON format.
-void AflowDB::analyzeDatabase(string outfile) {
+void AflowDB::analyzeDatabase(const string& outfile) {
 
   // Get properties and tables for which statistics need to be collected
   // Since all tables have the same columns, only one table needs to be searched

@@ -520,7 +520,7 @@ class AflowDB {
     bool isTMP();
 
     bool rebuildDatabase(bool=false);
-    void analyzeDatabase(string);
+    void analyzeDatabase(const string&);
 
     vector<string> getTables(string="");
     vector<string> getTables(sqlite3*, string="");
