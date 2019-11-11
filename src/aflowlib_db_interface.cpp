@@ -44,7 +44,7 @@ void updateDatabaseJsonFiles(const string& data_path) {
   string auid_path = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
 
   // Fetch the files to update first
-  long int tm;
+  long int tm = 0;
   string json, json_compressed, path;
   vector<long int> mod_times;
   vector<string> json_files, entry_paths;
