@@ -42,7 +42,7 @@ StructurePrototype::StructurePrototype(){
   elements.clear();
   stoichiometry.clear();
   number_of_atoms=0;
-  atom_decorations_unique.clear();
+  atom_decorations_equivalent.clear();
   Pearson="";
   space_group=0;
   grouped_Wyckoff_positions.clear();
@@ -87,7 +87,7 @@ StructurePrototype::~StructurePrototype(){
   structure_representative.Clear();
   elements.clear();
   stoichiometry.clear();
-  atom_decorations_unique.clear();
+  atom_decorations_equivalent.clear();
   grouped_Wyckoff_positions.clear();
   wyckoff_site_symmetry.clear();
   wyckoff_multiplicity.clear();
@@ -140,7 +140,7 @@ void StructurePrototype::copy(const StructurePrototype& b) {
     elements=b.elements;
     stoichiometry=b.stoichiometry;
     number_of_atoms=b.number_of_atoms;
-    atom_decorations_unique=b.atom_decorations_unique;
+    atom_decorations_equivalent=b.atom_decorations_equivalent;
     Pearson=b.Pearson;
     space_group=b.space_group;
     grouped_Wyckoff_positions=b.grouped_Wyckoff_positions;
@@ -231,9 +231,15 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << "\"number_of_atoms\":" << StructurePrototype.number_of_atoms << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // atom_decorations_unique
-    if(StructurePrototype.atom_decorations_unique.size()!=0){ //DX 20190425 - only print if calculated
-      sscontent_json << "\"atom_decorations_unique\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_unique,"\""),",") << "]" << eendl;
+    // atom_decorations_equivalent
+    if(StructurePrototype.atom_decorations_equivalent.size()!=0){ //DX 20190425 - only print if calculated
+      //DX 20191111 [OBSOLETE] sscontent_json << "\"atom_decorations_equivalent\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent,"\""),",") << "]" << eendl;
+      sscontent_json << "\"atom_decorations_equivalent\":[";
+      tmp.clear();
+      for(uint i=0;i<StructurePrototype.atom_decorations_equivalent.size();i++){
+        tmp.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent[i],"\""),",")+"]");
+      }
+      sscontent_json << aurostd::joinWDelimiter(tmp,",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     } //DX 20190425
     
@@ -4905,8 +4911,11 @@ namespace compare{
           } 
           ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_name;
           // perhaps add which permutations are duplicates
-          if(final_prototypes[j].atom_decorations_unique.size()!=0){
-            ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_unique,",");
+          if(final_prototypes[j].atom_decorations_equivalent.size()!=0){
+            //ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_equivalent,",");
+            vector<string> unique_decorations;
+            for(uint d=0;d<final_prototypes[j].atom_decorations_equivalent.size();d++){ unique_decorations.push_back(final_prototypes[j].atom_decorations_equivalent[d][0]); }
+            ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(unique_decorations,",");
           }
         }
         ss_out << endl;

@@ -85,7 +85,8 @@ class StructurePrototype{
     vector<string> elements;                                                                // list of elements exhibiting in this protoype (from representative and duplicate structures)
     vector<uint> stoichiometry;                                                             // reduced stoichiometry of prototype
     uint number_of_atoms;                                                                   // number of atoms in the prototype (from the representative structure; not necessarily reduced)
-    vector<string> atom_decorations_unique;                                                 // unique atom decorations (permutations) of prototype
+    //DX 20191111 [OBSOLETE] vector<string> atom_decorations_unique;                                                 // unique atom decorations (permutations) of prototype
+    vector<vector<string> > atom_decorations_equivalent;                                    // equivalent atom decorations (permutations) of prototype
     string Pearson;                                                                         // Pearson symbol of prototype
     uint space_group;                                                                       // space group number of prototype
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;                               // Wyckoff positions grouped by site type
