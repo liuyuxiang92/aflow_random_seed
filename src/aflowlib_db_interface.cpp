@@ -136,7 +136,7 @@ void fetchUpdatedJsonFiles(vector<string>& json_files, const string& parent_path
     }
   } else {
     vector<string> child_paths;
-    string child_path;
+    string child_path = "";
     aurostd::DirectoryLS(parent_path, child_paths);
     for (uint p = 0, npaths = child_paths.size(); p < npaths; p++) {
       child_path = parent_path + "/" + child_paths[p];
