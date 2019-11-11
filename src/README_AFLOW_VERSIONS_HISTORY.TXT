@@ -1,7 +1,9 @@
-3.1.227 - 2019/11/01
+3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
+	-- Bug fixes for MPI (SC)
+	-- Verbosity fixes (Message("")) (SC)
 3.1.226 - 2019/10/01
-        Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
         -- Bug fixes in producing html/json for icsd# entries (SC)
         -- Modified aflow.in generation in AEL and AGL to use common routines in aflow_avasp.cpp and aflow_modules.cpp (CT)  
