@@ -1161,18 +1161,6 @@ namespace pocc {
     if(this!=&b){copy(b);}
     return *this;
   }
-  void POccSuperCell::free(){
-    hnf_index=AUROSTD_MAX_UINT;
-    site_config_index=AUROSTD_MAX_UINT;
-    degeneracy=AUROSTD_MAX_UINT;
-    m_uff_energy=AUROSTD_MAX_DOUBLE;
-  }
-  void POccSuperCell::copy(const POccSuperCell& b){
-    hnf_index=b.hnf_index;
-    site_config_index=b.site_config_index;
-    degeneracy=b.degeneracy;
-    m_uff_energy=b.m_uff_energy;
-  }
   bool POccSuperCell::operator<(const POccSuperCell& other) const {
     if(m_hnf_index!=other.m_hnf_index){return m_hnf_index<other.m_hnf_index;}
     return m_site_config_index<other.m_site_config_index;

@@ -8155,7 +8155,7 @@ bool xQMVASP::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO191110
 }
 
 bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool VERBOSE) {  //CO191110
-  string tmpfile=XHOST.Tmpfs+"/_aflow_"+XHOST.User+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
+  string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
   aurostd::url2file(url+"/"+file,tmpfile,VERBOSE);
   bool out=GetPropertiesFile(tmpfile);
   aurostd::RemoveFile(tmpfile);
