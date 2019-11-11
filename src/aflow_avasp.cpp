@@ -1538,7 +1538,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
           string FilePotcar,DataPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO190116
           if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
-            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time") << endl;
+            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
             return FALSE; // dont die
             //exit(0);
           } else {
@@ -3532,7 +3532,7 @@ bool AVASP_MakeSingleAFLOWIN_180101(_xvasp& xvasp_in,stringstream &_aflowin,bool
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
           string FilePotcar,DataPotcar;
           if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar)) {
-            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time") << endl;
+            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
             return FALSE; // dont die
             //exit(0);
           } else {

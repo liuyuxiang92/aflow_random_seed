@@ -12516,8 +12516,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //////////////////////////////////////////////////////////////////////////
     }
     if(!KRUN){
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,"user,host,time") << endl;
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,"user,host,time") << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       b.ClearSymmetry(); //CO181226
       pflow::PerformFullSymmetry(b,FileMESSAGE,aflags,kflags,osswrite,oss);
       //FOOLPROOF!!!!!!!!!

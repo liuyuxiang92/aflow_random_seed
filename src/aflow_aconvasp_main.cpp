@@ -1617,7 +1617,7 @@ namespace pflow {
       if(vpflow.flag("FGROUP")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} // DX 8/18/17
       if(vpflow.flag("FRAC")) {cout << pflow::FRAC(cin); _PROGRAMRUN=true;}
       // G
-      if(vpflow.flag("GETTEMP")) {AFLOW_getTEMP(argv); _PROGRAMRUN=true;} //cout << "TEMPERATURE " << Message("host") << endl;exit(0); _PROGRAMRUN=true;}
+      if(vpflow.flag("GETTEMP")) {AFLOW_getTEMP(argv); _PROGRAMRUN=true;} //cout << "TEMPERATURE " << Message("host",_AFLOW_FILE_NAME_) << endl;exit(0); _PROGRAMRUN=true;}
       if(vpflow.flag("GULP")) {pflow::GULP(cin); _PROGRAMRUN=true;}
       // H
       if(vpflow.flag("HKL")) {pflow::HKL(vpflow.getattachedscheme("HKL"),aflags,cin); _PROGRAMRUN=true;}
@@ -5863,7 +5863,7 @@ namespace pflow {
       return FALSE;
     }
 
-    // MOVED DOWN A BIT if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << _EPS_sym_ << " " << Message(aflags,"user,host,time") << endl;
+    // MOVED DOWN A BIT if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << _EPS_sym_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     if(1 || a.dist_nn_min == AUROSTD_NAN){  // CO 171024 - always recalculate min_dist (SAFE)
       if(LDEBUG) cerr << "pflow::PerformFullSymmetry: CALCULATING MIN DISTANCE" << print_directory << endl;
@@ -5894,7 +5894,7 @@ namespace pflow {
     //}
     //a.sym_eps = SYM::defaultTolerance(a);
     double orig_tolerance = a.sym_eps;
-    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Symmetry: starting tolerance " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     
     while(symmetry_commensurate==FALSE){
@@ -5925,7 +5925,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -5947,7 +5947,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -5970,7 +5970,7 @@ namespace pflow {
               return FALSE;
             }
           }
-          if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+          if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
           continue;
         }
@@ -5990,7 +5990,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -6011,7 +6011,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -6034,7 +6034,7 @@ namespace pflow {
               return FALSE;
             }
 	  }
-	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	  continue;
         }
@@ -6059,7 +6059,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -6079,7 +6079,7 @@ namespace pflow {
                 return FALSE;
               }
             }
-            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+            if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
             continue;
           }
@@ -6111,22 +6111,22 @@ namespace pflow {
       //[DX OBSOLETE]        return FALSE;
       //[DX OBSOLETE]      }
       //[DX OBSOLETE]    }
-      //[DX OBSOLETE]	 if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+      //[DX OBSOLETE]	 if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       //[DX OBSOLETE]  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       //[DX OBSOLETE]	  continue;
       //[DX OBSOLETE]  }
       //[DX OBSOLETE]}
       //[DX OBSOLETE]else if(!space_and_point_group_match && derivative_structure){
-      //[DX OBSOLETE]  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL WARNING: Point Group Crystal of Original Cell: " << a.point_group_Hermann_Mauguin << " | Space Group of Primitive Cell: " << GetSpaceGroupName(a.space_group_ITC) << " -- This is a derivative structure." << Message(aflags,"user,host,time") << endl;
+      //[DX OBSOLETE]  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTAL WARNING: Point Group Crystal of Original Cell: " << a.point_group_Hermann_Mauguin << " | Space Group of Primitive Cell: " << GetSpaceGroupName(a.space_group_ITC) << " -- This is a derivative structure." << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       //[DX OBSOLETE]  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       //[DX OBSOLETE]}
       if(kflags.KBIN_SYMMETRY_CALCULATE_SGROUP){ // DX 8/14/17
 	if(kflags.KBIN_SYMMETRY_SGROUP_RADIUS>0.0) {
-	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,"user,host,time") << endl;
+	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: found RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	} else {
 	  kflags.KBIN_SYMMETRY_SGROUP_RADIUS=KBIN_SYMMETRY_SGROUP_RADIUS_DEFAULT;
-	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,"user,host,time") << endl;
+	  if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "POSCAR SGROUP: Default RADIUS="<<kflags.KBIN_SYMMETRY_SGROUP_RADIUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	}
 	a.sgroup_radius=kflags.KBIN_SYMMETRY_SGROUP_RADIUS;
@@ -6144,7 +6144,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "SGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -6165,7 +6165,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -6194,7 +6194,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "IATOMS ATOMS: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -6215,7 +6215,7 @@ namespace pflow {
 		return FALSE;
 	      }
 	    }
-	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time") << endl;
+	    if(!aflags.QUIET) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: changing tolerance to " << a.sym_eps << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 	    continue;
 	  }
@@ -10229,7 +10229,7 @@ namespace pflow {
 	  oss << soliloquy;
 	  oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags, message_metadata);
+	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	  oss << endl;
 	}
 	oss << ErrorBarString;  // make it clear in log file that an error
@@ -10250,7 +10250,7 @@ namespace pflow {
 	FileMESSAGE << soliloquy;
 	FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags, message_metadata);
+	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	FileMESSAGE << endl;
       }
       FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
@@ -10288,7 +10288,7 @@ namespace pflow {
 	  oss << soliloquy;
 	  oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags, message_metadata);
+	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	  oss << endl;
 	}
 	oss << WarningBarString;  // make it clear in log file that an warning
@@ -10310,7 +10310,7 @@ namespace pflow {
 	FileMESSAGE << soliloquy;
 	FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags, message_metadata);
+	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	FileMESSAGE << endl;
       }
       FileMESSAGE << WarningBarString;  // make it clear in log file that a
@@ -10346,7 +10346,7 @@ namespace pflow {
 	  oss << soliloquy;
 	  oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags, message_metadata);
+	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	  oss << endl;
 	}
 	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
@@ -10362,7 +10362,7 @@ namespace pflow {
 	FileMESSAGE << soliloquy;
 	FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags, message_metadata);
+	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
@@ -10387,7 +10387,7 @@ namespace pflow {
 	  oss << soliloquy;
 	  oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags, message_metadata);
+	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	  oss << endl;
 	}
 	oss.flush();
@@ -10402,7 +10402,7 @@ namespace pflow {
 	FileMESSAGE << soliloquy;
 	FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags, message_metadata);
+	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
@@ -10451,7 +10451,7 @@ namespace pflow {
 	  oss << soliloquy;
 	  oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags, message_metadata);
+	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	  oss << endl;
 	}
 	oss.flush();
@@ -10466,7 +10466,7 @@ namespace pflow {
 	FileMESSAGE << soliloquy;
 	FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags, message_metadata);
+	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
 	FileMESSAGE << endl;
       }
       FileMESSAGE.flush();

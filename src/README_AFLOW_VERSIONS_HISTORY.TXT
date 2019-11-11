@@ -1,5 +1,5 @@
-3.1.227 - 2019/11/01
-        Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
+3.1.228 - 2019/11/15
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- fixed tolerance "WARNING" in symmetry screw axis determination (DX)
         -- added missing partial occupation value when printing CIF (DX)
         -- added site occupation to Wyckoff object (DX)
@@ -36,6 +36,10 @@
         -- allow for mix of ICSD and non-ICSD structures during sorting by ICSD number for structure comparison (DX)
         -- created generalized function for adding magnetic information to structure (DX)
         -- fixed non-collinear spin lattice primitivization function (DX)
+3.1.227 - 2019/10/16
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
+	      -- Bug fixes for MPI (SC)
+	      -- Verbosity fixes (Message("")) (SC)
 3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
         -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
