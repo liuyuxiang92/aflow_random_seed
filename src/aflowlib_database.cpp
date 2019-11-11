@@ -492,7 +492,7 @@ vector<string> AflowDB::getDataTypes(const string& schema, const vector<string>&
 //getDataValues///////////////////////////////////////////////////////////////
 // Retrieves the values of each property from the aflowlib.json file.
 vector<string> AflowDB::getDataValues(const string& entry, const vector<string>& cols, const vector<string>& types) {
-  string value, id;
+  string value = "", id = "";
   uint ncols = cols.size();
   vector<string> values(ncols, "NULL");
   for (uint c = 0; c < ncols; c++) {
