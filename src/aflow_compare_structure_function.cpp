@@ -7329,7 +7329,7 @@ namespace compare{
               lfa_str2,
               type_match,
               lattices,clattices,latt_devs,
-              start_indices[n], end_indices[n],
+              start_index, end_index,
               possible_minMis[n],possible_minLattDev[n],
               possible_minCoordDis[n],possible_minFail[n],
               possible_minMagneticDis[n],possible_minMagneticFail[n],
