@@ -6176,7 +6176,8 @@ namespace compare{
     vector<double> dev;
 
     for(i=0; i<3; i++) 
-      dev.push_back((abs(diag_sum1[i]-diag_sum2[i])+abs(diag_diff1[i]-diag_diff2[i]))/(diag_sum2[i]+diag_diff2[i]));
+      //DX 20191112 [ORIG] dev.push_back((abs(diag_sum1[i]-diag_sum2[i])+abs(diag_diff1[i]-diag_diff2[i]))/(diag_sum2[i]+diag_diff2[i]));
+      dev.push_back((abs(diag_sum2[i]-diag_sum1[i])+abs(diag_diff2[i]-diag_diff1[i]))/(diag_sum1[i]+diag_diff1[i])); //DX 20191112 - should be compared to the reference, (1) not (2)?
 
     d=1;
     for(i=0;i<dev.size();i++) 

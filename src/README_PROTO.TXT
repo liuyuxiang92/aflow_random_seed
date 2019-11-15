@@ -885,7 +885,7 @@ AB_oF8_22_a_c-001.AB                             oF8       F222                -
 A3B_oI32_23_ij2k_k-001.{AB}                      oI32      I222                -         H3S                 #23       H3S (part 2)        
 AB_oP2_25_b_a-001.AB                             oP2       Pmm2                -         CdTe                #25       High-Pressure CdTe (part 1)
 A2B_oP12_26_abc_ab-001.{AB}                      oP12      Pmc2_{1}            -         H2S                 #26       H2S (part 2)        
-A2B_oP12_26_abc_ab-001.{AB}                      oP12      Pmc2_{1}            -         beta-SeO2           #26       beta-SeO2 (part 2)  
+A2B_oP12_26_abc_ab-002.{AB}                      oP12      Pmc2_{1}            -         beta-SeO2           #26       beta-SeO2 (part 2)  
 A5B_oP24_26_3a3b2c_ab-001.{AB}                   oP24      Pmc2_{1}            -         TlP5                #26       TlP5 (part 2)       
 AB2_oP24_28_acd_2c3d-001.{AB}                    oP24      Pma2                C46       AuTe2               #28       Krennerite (part 1) 
 A2B_oP12_29_2a_a-001.{AB}                        oP12      Pca2_{1}            -         ZrO2                #29       ZrO2 (part 2)       
