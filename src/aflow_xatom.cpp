@@ -10059,6 +10059,12 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
+  if (std::signbit(tolerance)) { //DX 20191115 
+    string function_name = "BringInCellInPlace()";
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
+    message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
+    throw aurostd::xerror(function_name,message,_INPUT_ERROR_);
+  }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
 }
@@ -10101,6 +10107,12 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
     throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+  }
+  if (std::signbit(tolerance)) { //DX 20191115 
+    string function_name = "BringInCell()";
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
+    message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
+    throw aurostd::xerror(function_name,message,_INPUT_ERROR_);
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
