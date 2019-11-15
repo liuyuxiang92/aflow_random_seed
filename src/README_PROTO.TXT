@@ -950,7 +950,7 @@ AB_oC8_65_j_g-001.{AB}                           oC8       Cmmm                -
 A3B_oC64_66_gi2lm_2l-001.{AB}                    oC64      Cccm                -         H3S                 #66       H3S (part 2)        
 A3B_oC64_66_kl2m_bdl-001.{AB}                    oC64      Cccm                -         beta-ThI3           #66       beta-ThI3 (part 2)  
 AB_oC8_67_a_g-001.{AB}                           oC8       Cmme                -         alpha-FeSe          #67       alpha-FeSe (part 2) 
-AB_oC8_67_a_g-001.{AB}                           oC8       Cmme                -         alpha-PbO           #67       alpha-PbO (part 2)  
+AB_oC8_67_a_g-002.{AB}                           oC8       Cmme                -         alpha-PbO           #67       alpha-PbO (part 2)  
 AB4_oC20_68_a_i-001.{AB}                         oC20      Ccce                -         PdSn4               #68       PdSn4 (part 2)      
 AB_oF8_69_a_b-001.AB                             oF8       Fmmm                B24       TlF                 #69       TlF (part 1)        
 A2B_oF24_70_e_a-001.{AB}                         oF24      Fddd                C54       TiSi2               #70       TiSi2 (part 1)      
