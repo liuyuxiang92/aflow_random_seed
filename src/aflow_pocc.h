@@ -491,6 +491,7 @@ namespace pocc {
       vector<string> m_ARUN_directories;
       double m_efa;
       double m_energy_dft_ground;
+      uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;
       vector<double> m_Egap;
       double m_Egap_net;

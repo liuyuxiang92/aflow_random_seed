@@ -686,7 +686,11 @@ namespace pocc {
       if((*it).m_energy_dft==AUROSTD_NAN){(*it).m_energy_dft=qmvasp.H_atom_relax;}
       if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_INPUT_ERROR_);}
       //energy_dft_ground
-      m_energy_dft_ground=std::min(m_energy_dft_ground,(*it).m_energy_dft);
+      if((*it).m_energy_dft<m_energy_dft_ground){
+        m_energy_dft_ground=(*it).m_energy_dft;
+        m_ARUN_directory_ground=isupercell;
+      }
+      //m_energy_dft_ground=std::min(m_energy_dft_ground,(*it).m_energy_dft);
       if(LDEBUG){cerr << " H_atom[isupercell=" << isupercell << "]=" << (*it).m_energy_dft << endl;}
     }
     if(LDEBUG){cerr << " H_atom_ground=" << m_energy_dft_ground << endl;}
@@ -933,7 +937,7 @@ namespace pocc {
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
     plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
-    if(1){  //turn off for marco
+    if(1){  //turn off for marco - POCC+APL
     plot_opts.push_attached("PROJECTION","ORBITALS");
     plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
     plotter::PLOT_DOS(plot_opts,m_xdoscar);
@@ -944,7 +948,7 @@ namespace pocc {
     plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
     plotter::PLOT_DOS(plot_opts,m_xdoscar);
 
-    if(1){
+    if(0){  //turn on for shachar - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
       plot_opts.pop_attached("PROJECTION");
       plot_opts.push_attached("PROJECTION","ORBITALS");
       plot_opts.push_attached("DATATYPE","SPECIES");
@@ -988,7 +992,7 @@ namespace pocc {
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
+    if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)  " << "[" << m_ARUN_directories[m_ARUN_directory_ground] << "]" << endl;
     if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "EFA=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
@@ -1020,7 +1024,8 @@ namespace pocc {
     int isupercell=0;
     for(std::list<POccSuperCellSet>::const_iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
-      pocc_out_ss << "probability[" << m_ARUN_directories[isupercell] << "]=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << endl;
+      //pocc_out_ss << "probability[" << m_ARUN_directories[isupercell] << "]=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << endl;
+      pocc_out_ss << "probability_supercell_" << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets.size())) << isupercell+1  << "=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  [" << m_ARUN_directories[isupercell] << "]" << endl; //+1 so we start at 1, not 0 (count)
     }
 
     //fix m_Egap and m_Egap_net for metals (Egap==0!)
@@ -1543,6 +1548,7 @@ void POccCalculator::free() {
   m_ARUN_directories.clear();
   m_efa=AUROSTD_MAX_DOUBLE;
   m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
+  m_ARUN_directory_ground=AUROSTD_MAX_UINT;
   m_xdoscar.clear();
   m_Egap.clear();
   m_Egap_net=AUROSTD_MAX_DOUBLE;
@@ -1576,6 +1582,7 @@ void POccCalculator::copy(const POccCalculator& b) { // copy PRIVATE
   l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=b.l_supercell_sets.begin();it!=b.l_supercell_sets.end();++it){l_supercell_sets.push_back(*it);}
   m_efa=b.m_efa;
   m_energy_dft_ground=b.m_energy_dft_ground;
+  m_ARUN_directory_ground=b.m_ARUN_directory_ground;
   m_ARUN_directories.clear();for(uint i=0;i<b.m_ARUN_directories.size();i++){m_ARUN_directories.push_back(b.m_ARUN_directories[i]);}
   m_xdoscar=b.m_xdoscar;
   m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}
