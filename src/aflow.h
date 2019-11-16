@@ -748,6 +748,7 @@ class _kflags {
   // pocc operation lists
   bool   KBIN_POCC;
   bool   KBIN_POCC_CALCULATION;
+  string KBIN_POCC_TEMPERATURE_STRING;  //CO191114
   // frozsl operation lists
   bool   KBIN_FROZSL;
   bool   KBIN_FROZSL_DOWNLOAD;

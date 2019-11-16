@@ -695,13 +695,20 @@ namespace pocc {
   }
 
   void POccCalculator::setPOccStructureProbabilities(double temperature) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy="setPOccStructureProbabilities():";
+    stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " temperature=" << temperature << endl;}
     if(l_supercell_sets.size()==0){throw aurostd::xerror(soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
     if(m_energy_dft_ground==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"m_energy_dft_ground not set",_RUNTIME_ERROR_);}
     
+    if(std::signbit(temperature)){throw aurostd::xerror(soliloquy,"Negative temperature found",_INPUT_ERROR_);}
+    if(aurostd::isequal(temperature,0.0)){
+      temperature=_ZERO_TOL_; //1e-6;
+      message << "Converting T=0 -> T=" << temperature << " for Boltzmann probabilities";pflow::logger(soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //WARNING
+    }
+
     double denom=0.0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       denom+=(*it).getDegeneracy()*exp( -( (*it).m_energy_dft-m_energy_dft_ground ) / (KBOLTZEV*temperature) );
@@ -961,7 +968,9 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
 
-  void POccCalculator::writeResults(double temperature){  //COREY COME BACK and make this temperature-intelligent
+#define pocc_precision 12
+#define pocc_roundoff_tol 5.0*pow(10,-((int)pocc_precision)-1)
+  void POccCalculator::writeResults() const { //TEMPERATURE-INDEPENDENT
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="POccCalculator::writeResults():";
     stringstream message;
@@ -970,15 +979,42 @@ namespace pocc {
     
     string enthalpy_tag="enthalpy"; //H
 
-    int pocc_precision=12;
-    double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
+    //int pocc_precision=12;
+    //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
 
     //POCC.OUT
-    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE;pflow::logger(soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (temperature-independent properties)";pflow::logger(soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << POCC_AFLOWIN_tag << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
-    if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << POCC_AFLOWIN_tag << "EFA=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
+    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=ALL" << endl;  //"  (K)"
+    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    if(m_energy_dft_ground!=AUROSTD_MAX_DOUBLE) pocc_out_ss << enthalpy_tag << "_atom_ground=" << aurostd::utype2string(m_energy_dft_ground,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)" << endl;
+    if(m_efa!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "EFA=" << aurostd::utype2string(m_efa,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV/at)^{-1}" << endl;
+    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=ALL" << endl;  //"  (K)"
+    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    
+    aurostd::stringstream2file(pocc_out_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE);  //NO APPEND, write clean
+    
+    if(LDEBUG){cerr << soliloquy << " END" << endl;}
+  }
+
+  void POccCalculator::writeResults(double temperature) const { //TEMPERATURE-DEPENDENT
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="POccCalculator::writeResults():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    
+    //int pocc_precision=12;
+    //double pocc_roundoff_tol=5.0*pow(10,-((int)pocc_precision)-1);
+
+    //POCC.OUT
+    message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (temperature = " << temperature << "  (K) properties)";pflow::logger(soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    stringstream pocc_out_ss;
+    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << temperature << "_K" << endl;  //"  (K)"
+    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     //fix m_Egap and m_Egap_net for metals (Egap==0!)
     vector<double> Egap;Egap.assign(m_Egap.size(),0.0);
@@ -993,13 +1029,15 @@ namespace pocc {
     if(m_Egap_net!=_METALGAP_){Egap_net=m_Egap_net;}
 
     if(Egap.size()==2){
-      pocc_out_ss << POCC_AFLOWIN_tag << "Egap_spin_up=" << aurostd::utype2string(Egap[0],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
-      pocc_out_ss << POCC_AFLOWIN_tag << "Egap_spin_dn=" << aurostd::utype2string(Egap[1],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
+      pocc_out_ss << "Egap_spin_up=" << aurostd::utype2string(Egap[0],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
+      pocc_out_ss << "Egap_spin_dn=" << aurostd::utype2string(Egap[1],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     }
-    if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << POCC_AFLOWIN_tag << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
+    if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
+    pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << temperature << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
-    aurostd::stringstream2file(pocc_out_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE);
+    aurostd::stringstream2file(pocc_out_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE,"APPEND");
     
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
@@ -1030,6 +1068,47 @@ namespace pocc {
     return true;
   }
 
+  vector<double> getVTemperatures(const string& temp_string){
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    string soliloquy="POccCalculator::getVTemperatures():";
+
+    if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
+    if(temp_string.empty()){throw aurostd::xerror(soliloquy,"temp_string.empty()",_INPUT_ERROR_);}
+
+    vector<string> tokens;
+    if(aurostd::substring2bool(temp_string,":")){aurostd::string2tokens(temp_string,tokens,":");}
+    else if(aurostd::substring2bool(temp_string,"-")){aurostd::string2tokens(temp_string,tokens,"-");}
+    else{tokens.push_back(temp_string);}
+    
+    if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(soliloquy,"Unknown temp_string format",_INPUT_ERROR_);}
+
+    vector<double> dtokens;
+    for(uint i=0;i<tokens.size();i++){
+      if(!aurostd::isfloat(tokens[i])){throw aurostd::xerror(soliloquy,"temp_string token[i="+tokens[i]+"] is not a float",_INPUT_ERROR_);} //check that all doubles
+      dtokens.push_back(aurostd::string2utype<double>(tokens[i]));
+    }
+
+    vector<double> vtemperatures;
+    if(dtokens.size()==1){vtemperatures.push_back(dtokens.front());return vtemperatures;}
+
+    double interval=100.0;
+    if(dtokens.size()==3){interval=dtokens.back();}
+    for(double temp=dtokens[0];temp<=dtokens[1];temp+=interval){
+      if(std::signbit(temp)){throw aurostd::xerror(soliloquy,"Negative temperature found in temp_string",_INPUT_ERROR_);}
+      vtemperatures.push_back(temp);
+    }
+
+    if(vtemperatures.size()==0){throw aurostd::xerror(soliloquy,"No temperatures extracted from temp_string",_INPUT_ERROR_);}
+
+    if(LDEBUG){
+      for(uint i=0;i<vtemperatures.size();i++){
+        cerr << soliloquy << " vtemperatures[i=" << i << "]=" << vtemperatures[i] << endl;
+      }
+    }
+    
+    return vtemperatures;
+  }
+
   void POccCalculator::postProcessing(){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="POccCalculator::postProcessing():";
@@ -1044,12 +1123,16 @@ namespace pocc {
     if(!QMVASPsFound()){return;}
     setDFTEnergies();
     setEFA();
+
     //START: TEMPERATURE DEPENDENT PROPERTIES
-    vector<double> v_temperatures;
-    v_temperatures.push_back(300);  //1000
+    //v_temperatures.push_back(300);  //1000
+    vector<double> v_temperatures=getVTemperatures(m_kflags.KBIN_POCC_TEMPERATURE_STRING);
+    
+    aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
+    writeResults(); //write temperature-independent properties first
     for(uint itemp=0;itemp<v_temperatures.size();itemp++){
       calculateSTATICProperties(v_temperatures[itemp]);
-      writeResults(v_temperatures[itemp]);
+      writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
     }
     //END: TEMPERATURE DEPENDENT PROPERTIES
 
