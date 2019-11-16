@@ -45,6 +45,8 @@ namespace pocc {
   string POCC_MINIMUM_CONFIGURATION(const string& directory="./");
   bool structuresGenerated(const string& directory=".");
   xstructure extractPARTCAR(const string& AflowIn);
+
+  vector<double> getVTemperatures(const string& temp_string);
   
   string getPOCCHashFromXStructureTitle(const string& title);
   bool patchStructuresAllFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
@@ -585,7 +587,8 @@ namespace pocc {
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
       void plotAvgDOSCAR(double temperature=300);
-      void writeResults(double temperature=300);
+      void writeResults() const;
+      void writeResults(double temperature) const;
 
     private:
       //NECESSARY PRIVATE CLASS METHODS - START

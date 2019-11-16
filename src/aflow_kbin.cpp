@@ -1559,6 +1559,14 @@ namespace KBIN {
 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
 	  }
 	  if(kflags.KBIN_POCC_CALCULATION) {kflags.KBIN_POCC=TRUE;} // CO 180419
+    if(kflags.KBIN_POCC){ //CO191110
+	    kflags.KBIN_POCC_TEMPERATURE_STRING=aurostd::substring2string(AflowIn,"[AFLOW_POCC]TEMPERATURE=");  //CO191110
+      if(kflags.KBIN_POCC_TEMPERATURE_STRING.empty()){  //CO191110
+        kflags.KBIN_POCC_TEMPERATURE_STRING=DEFAULT_POCC_TEMPERATURE_STRING;  //CO191110
+      }
+	    aus << "00000  MESSAGE POCC_TEMPERATURE_STRING=" << kflags.KBIN_POCC_TEMPERATURE_STRING << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  //CO191110
+	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);  //CO191110
+    }
 	  // ---------------------------------------------------------
 	  // parameters for FROZSL
 	  kflags.KBIN_FROZSL=FALSE;
