@@ -815,6 +815,12 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JPG\")=" << XHOST.vflag_control.flag("PRINT_MODE::JPG") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PNG\")=" << XHOST.vflag_control.flag("PRINT_MODE::PNG") << endl;
 
+    //[CO191110]run pocc post-processing for particular temperatures from command line
+    XHOST.vflag_control.flag("CALCULATION_TEMPERATURE",aurostd::args2attachedflag(argv,"--temperature=|--temp="));  //CO191110
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.flag("CALCULATION_TEMPERATURE") << endl;  //CO191110
+    if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")) XHOST.vflag_control.push_attached("CALCULATION_TEMPERATURE",aurostd::args2attachedstring(argv,"--temperature=|--temp=","300")); //CO191110
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE") << endl;  //CO191110
+
     XHOST.vflag_control.flag("XPLUG_DO_CLEAN",aurostd::args2flag(XHOST.argv,cmds,"--doclean"));
     XHOST.vflag_control.flag("XPLUG_DO_ADD",aurostd::args2flag(argv,"--add"));
 

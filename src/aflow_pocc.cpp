@@ -1127,6 +1127,11 @@ namespace pocc {
     //START: TEMPERATURE DEPENDENT PROPERTIES
     //v_temperatures.push_back(300);  //1000
     vector<double> v_temperatures=getVTemperatures(m_kflags.KBIN_POCC_TEMPERATURE_STRING);
+    if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")){v_temperatures.clear();v_temperatures=getVTemperatures(XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE"));}  //command line input
+    if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);}  //user aflow.rc
+    if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);}  //internal aflow.rc, will always work
+
+    message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     
     aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
     writeResults(); //write temperature-independent properties first
