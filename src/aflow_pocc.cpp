@@ -21,7 +21,7 @@
 #include "aflow_pocc.h"
 #include "aflow_compare_structure.h"
 
-#define _DEBUG_POCC_ true  //CO190116
+#define _DEBUG_POCC_ false  //CO190116
 #define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO190116
 
 const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //period is important
@@ -699,7 +699,7 @@ namespace pocc {
   }
 
   void POccCalculator::setPOccStructureProbabilities(double temperature) {
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="setPOccStructureProbabilities():";
     stringstream message;
 
@@ -1081,7 +1081,7 @@ namespace pocc {
   }
 
   vector<double> getVTemperatures(const string& temp_string){
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="POccCalculator::getVTemperatures():";
 
     if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
