@@ -1015,6 +1015,13 @@ namespace pocc {
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << temperature << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    
+    //supercell probabilities
+    int isupercell=0;
+    for(std::list<POccSuperCellSet>::const_iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+      isupercell=std::distance(l_supercell_sets.begin(),it);
+      pocc_out_ss << "probability[" << m_ARUN_directories[isupercell] << "]=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << endl;
+    }
 
     //fix m_Egap and m_Egap_net for metals (Egap==0!)
     vector<double> Egap;Egap.assign(m_Egap.size(),0.0);
