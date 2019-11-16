@@ -4536,6 +4536,7 @@ void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
     xvasp.AVASP_arun=true;
     xvasp.AVASP_arun_mode = "POCC"; //CO181226
     xvasp.AVASP_arun_runname = getARUNString(i);
+    xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO191110]high-entropy offers increased solubility over binaries
     
     XHOST.QUIET=true;
     

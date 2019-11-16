@@ -2206,7 +2206,7 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   }
 
   // NOMIX WRITING
-  if(!pocc && xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX")) {
+  if(!pocc && xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX")) { //[CO191110]high-entropy offers increased solubility over binaries
     aflowin << "[VASP_FORCE_OPTION]NEGLECT_NOMIX " << endl;
   } else {
     aflowin << "#[VASP_FORCE_OPTION]NEGLECT_NOMIX " << endl;

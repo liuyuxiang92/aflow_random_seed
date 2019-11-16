@@ -33,6 +33,7 @@
         -- pocc writes out results of ensemble average band gap to aflow.pocc.out (CO) 
         -- pocc plots ensemble average DOS projected by orbitals and species (CO)
         -- added KBIN_POCC_TEMPERATURE_STRING (aflow.in) and --temperature (command line) for pocc post-processing (CO)
+        -- avoiding NEGLECT_NOMIX for pocc, high-entropy offers increased solubility over binaries (CO)
         -- added option for printing ensemble average IDOS in pocc data files (aflow_pocc_old.cpp) (CO) 
         -- patch distinction between POTCAR_TYPE_DATE_PRINT_flag and POTCAR_TYPE_PRINT_flag in avasp (CO)
         -- patching xvasp.POTCAR_TYPE_PRINT_flag for LIB2/LIB3 (CO)
