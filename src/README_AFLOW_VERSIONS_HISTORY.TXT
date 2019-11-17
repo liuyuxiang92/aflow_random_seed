@@ -1,5 +1,5 @@
-3.1.228 - 2019/11/10
-        Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+3.1.228 - 2019/11/20
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- patching warning for writing aflow.rc, only issue if it was written, should fix www-data (CO)
         -- added xQMVASP (CO)
         -- force signed distance for hull formation enthalpy (CO)
