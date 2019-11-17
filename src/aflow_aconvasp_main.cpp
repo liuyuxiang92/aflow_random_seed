@@ -11556,7 +11556,7 @@ namespace pflow {
 // pflow::PROTO_TEST_INPUT
 // ***************************************************************************
 namespace pflow {
-  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint nspeciesHTQC,bool patch_nspecies){ //CO181226
+  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint& nspeciesHTQC,bool patch_nspecies){ //CO181226
     string soliloquy="pflow::PROTO_TEST_INPUT():";
     stringstream message;
     //patch for ICSD/pocc
@@ -12167,14 +12167,13 @@ namespace pflow {
     xstructure str;
     deque<string> atomX;
     deque<double> volumeX;
-    uint nspecies=0;
+    uint nspecies=0,nspeciesHTQC=0; //CO191110 - NOTE: nspeciesHTQC is what is expected from label (proto), nspecies is REAL input number of species separated by colons, not commas (different for pocc)
     bool alphabetic=TRUE; // DEFAULT
-
     
     // ***************************************************************************
     // MODE LIBRARY FROM HTQC OR ICSD      
     if(modeLIBRARY) {
-      nspecies=aflowlib::PrototypeLibrariesSpeciesNumber(label);  //CO181226 - recently revamped, now nspecies should be exact!
+      nspeciesHTQC=nspecies=aflowlib::PrototypeLibrariesSpeciesNumber(label);  //CO181226 - recently revamped, now nspecies should be exact!
       alphabetic=RequestedAlphabeticLabeling(label);
       
       int mode=LIBRARY_MODE_HTQC;
@@ -12186,10 +12185,19 @@ namespace pflow {
         if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD;
       } 
 	
+      bool found=FALSE;
+      double vol;
+      
+      //CO181226 START
+      PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc);  //test if inputs are correct in number and type (not negative, etc.)  //CO191110 - note nspecies changes here if pocc, so below we use nspeciesHTQC to fetch correct proto
+      
+      //CO191110 - moved down from above so it prints updated values from pocc
       // DEBUG=TRUE;
       if(LDEBUG) cerr << soliloquy << " params.size()=" << params.size() << endl;
       if(LDEBUG) cerr << soliloquy << " vstr.size()=" << vstr.size() << endl; //CO181226
       if(LDEBUG) cerr << soliloquy << " vnum.size()=" << vnum.size() << endl; //CO181226
+      if(LDEBUG) cerr << soliloquy << " pocc=" << pocc << endl;
+      if(LDEBUG) cerr << soliloquy << " nspeciesHTQC=" << nspeciesHTQC << endl;
       if(LDEBUG) cerr << soliloquy << " nspecies=" << nspecies << endl;
       if(LDEBUG) cerr << soliloquy << " alphabetic=" << alphabetic << endl;
       if(LDEBUG) cerr << soliloquy << " label=" << label << endl;
@@ -12201,28 +12209,22 @@ namespace pflow {
       if(LDEBUG) if(mode==LIBRARY_MODE_ICSD_AFLOWLIB) cerr << soliloquy << " mode=LIBRARY_MODE_ICSD_AFLOWLIB" << endl;
       if(LDEBUG) if(mode==LIBRARY_MODE_HTQC_ICSD_AFLOWLIB) cerr << soliloquy << " mode=LIBRARY_MODE_HTQC_ICSD_AFLOWLIB" << endl;
       
-      bool found=FALSE;
-      double vol;
-      
-      //CO181226 START
-      PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc);  //test if inputs are correct in number and type (not negative, etc.)
-      
       //get a vector of species and volume that fits exactly what is expected for xproto
       if(pocc){
-        vstr.clear();for(uint i=0;i<nspecies&&i<vstr_orig.size();i++){vstr.push_back(vstr_orig[i]);}
-        vnum.clear();for(uint i=0;i<nspecies&&i<vnum_orig.size();i++){vnum.push_back(vnum_orig[i]);}
+        vstr.clear();for(uint i=0;i<nspeciesHTQC&&i<vstr_orig.size();i++){vstr.push_back(vstr_orig[i]);}
+        vnum.clear();for(uint i=0;i<nspeciesHTQC&&i<vnum_orig.size();i++){vnum.push_back(vnum_orig[i]);}
       }
       
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//do some checks
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//[CO181226 - nspecies now exact]if(!aurostd::substring2bool(label,"ICSD_")){  //sometimes we need to search database for ICSD nspecies
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspecies vs. vstr
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vstr.size()>0 && vstr.size()!=nspecies){
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspecies and string inputs (nspecies==" << nspecies << ", vstr.size()==" << vstr.size() << ")";
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//[CO181226 - nspeciesHTQC now exact]if(!aurostd::substring2bool(label,"ICSD_")){  //sometimes we need to search database for ICSD nspeciesHTQC
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspeciesHTQC vs. vstr
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vstr.size()>0 && vstr.size()!=nspeciesHTQC){
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspeciesHTQC and string inputs (nspeciesHTQC==" << nspeciesHTQC << ", vstr.size()==" << vstr.size() << ")";
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]}
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspecies vs. vnum
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vnum.size()>1 && vnum.size()!=nspecies){
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspecies and number inputs (nspecies==" << nspecies << ", vnum.size()==" << vnum.size() << ")";
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspeciesHTQC vs. vnum
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vnum.size()>1 && vnum.size()!=nspeciesHTQC){
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspeciesHTQC and number inputs (nspeciesHTQC==" << nspeciesHTQC << ", vnum.size()==" << vnum.size() << ")";
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]}
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//}
@@ -12245,25 +12247,25 @@ namespace pflow {
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
       }
 
-      atomX.clear();for(uint i=0;i<nspecies&&i<vstr.size();i++) atomX.push_back(vstr[i]);
+      atomX.clear();for(uint i=0;i<nspeciesHTQC&&i<vstr.size();i++) atomX.push_back(vstr[i]);
       
-      if(!found && vstr.size()==nspecies && vnum.size()==0){
+      if(!found && vstr.size()==nspeciesHTQC && vnum.size()==0){
         if(LDEBUG) cerr << soliloquy << " label:species:species..." << endl;
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX[" << i << "]=" << atomX[i] << endl;
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
       }
 
-      if(!found && vstr.size()==nspecies && (vnum.size()==1 || vstr.size()==vnum.size())){
+      if(!found && vstr.size()==nspeciesHTQC && (vnum.size()==1 || vstr.size()==vnum.size())){
         volumeX.clear();
         if(vnum.size()==1){
           if(LDEBUG) cerr << soliloquy << " label:species:species...:volume" << endl;
           vol=vnum[0];
-          for(uint i=0;i<nspecies&&i<atomX.size();i++){volumeX.push_back(0);}
+          for(uint i=0;i<nspeciesHTQC&&i<atomX.size();i++){volumeX.push_back(0);}
         }
         else {
           if(LDEBUG) cerr << soliloquy << " label:species:species...:volume:volume..." << endl;
           vol=-1.0;
-          for(uint i=0;i<nspecies&&i<vnum.size();i++){volumeX.push_back(vnum[i]);}
+          for(uint i=0;i<nspeciesHTQC&&i<vnum.size();i++){volumeX.push_back(vnum[i]);}
         }
         if(LDEBUG) { 
           for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX[" << i << "]=" << volumeX[i] << endl;	
@@ -12281,30 +12283,30 @@ namespace pflow {
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
       }  
 
-      if(!found && params.size()==1+nspecies) { // label:species:species...
+      if(!found && params.size()==1+nspeciesHTQC) { // label:species:species...
         if(LDEBUG) cerr << soliloquy << " label:species:species..." << endl;
-        atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
+        atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(i+1));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
       }
       
-      if(!found && params.size()==1+nspecies+nspecies) { // label:species:species..:volume:volume...
+      if(!found && params.size()==1+nspeciesHTQC+nspeciesHTQC) { // label:species:species..:volume:volume...
         if(LDEBUG) cerr << soliloquy << " label:species:species...:volume:volume..." << endl;
-        atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
+        atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(i+1));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
         volumeX.clear();
-        for(uint i=0;i<nspecies;i++) {
-          if(!aurostd::isfloat(params.at(i+1+nspecies))){ //CO 180729 - check for string stupidity
-            message << "Invalid volume specification (params[" << i+1+nspecies << "]=" << params.at(i+1+nspecies) << "), must be float input";
+        for(uint i=0;i<nspeciesHTQC;i++) {
+          if(!aurostd::isfloat(params.at(i+1+nspeciesHTQC))){ //CO 180729 - check for string stupidity
+            message << "Invalid volume specification (params[" << i+1+nspeciesHTQC << "]=" << params.at(i+1+nspeciesHTQC) << "), must be float input";
             throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
           }
-          vol=aurostd::string2utype<double>(params.at(i+1+nspecies));
+          vol=aurostd::string2utype<double>(params.at(i+1+nspeciesHTQC));
           if(vol==0.0){ //CO 180705 - check for volume stupidity
-            message << "Invalid volume specification (params[" << i+1+nspecies << "]=" << params.at(i+1+nspecies) << "), must be >0";
+            message << "Invalid volume specification (params[" << i+1+nspeciesHTQC << "]=" << params.at(i+1+nspeciesHTQC) << "), must be >0";
             throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
           }
           volumeX.push_back(vol);
-          //volumeX.push_back(aurostd::string2utype<double>(params.at(i+1+nspecies)));
+          //volumeX.push_back(aurostd::string2utype<double>(params.at(i+1+nspeciesHTQC)));
         }
         if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;	
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
@@ -12313,7 +12315,7 @@ namespace pflow {
       if(!found && params.size()==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-        if(nspecies==1 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+        if(nspeciesHTQC==1 && mode!=LIBRARY_MODE_HTQC_ICSD) {
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
         }
         if(mode==LIBRARY_MODE_HTQC_ICSD) {
@@ -12326,7 +12328,7 @@ namespace pflow {
       if(!found && params.size()==3) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-        if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+        if(nspeciesHTQC==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
         }
         if(mode==LIBRARY_MODE_HTQC_ICSD) {
@@ -12336,7 +12338,7 @@ namespace pflow {
   
       if(!found && params.size()==4) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
-        if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+        if(nspeciesHTQC==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
           atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
           volumeX.clear();volumeX.push_back(0.0);volumeX.push_back(0.0);
@@ -12353,8 +12355,8 @@ namespace pflow {
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,vol,mode);found=TRUE;
           //str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,aurostd::string2utype<double>(params.at(3)),mode);found=TRUE;
         }
-        if(nspecies==3 && mode!=LIBRARY_MODE_HTQC_ICSD) { // ternaries
-          atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
+        if(nspeciesHTQC==3 && mode!=LIBRARY_MODE_HTQC_ICSD) { // ternaries
+          atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(1+i));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
         }
@@ -12364,7 +12366,7 @@ namespace pflow {
       }
   
       if(!found && params.size()==5) {
-        if(nspecies==2) {
+        if(nspeciesHTQC==2) {
           atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
           volumeX.clear();
@@ -12393,16 +12395,16 @@ namespace pflow {
           if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;	
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
         }
-        if(nspecies==4) {  // quaternaries
+        if(nspeciesHTQC==4) {  // quaternaries
           if(alphabetic==TRUE) label=AlphabetizePrototypeLabelSpeciesTokens(params);
-          atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
+          atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(1+i));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
         }
       }
 
       if(!found){
-        message << "Unknown label+input specification (label=" << label << ",nspecies=" << nspecies << ",ninput=" << params.size()-1 << ")";  //params.size()-1 means skip label
+        message << "Unknown label+input specification (label=" << label << ",nspeciesHTQC=" << nspeciesHTQC << ",ninput=" << params.size()-1 << ")";  //params.size()-1 means skip label
         throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);  //CO 180801
       }
     }

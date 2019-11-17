@@ -392,7 +392,7 @@ bool AlphabetizePrototypeLabelSpecies(deque<string> &species,string &label);
 string AlphabetizePrototypeLabelSpeciesArgv(vector<string> &argv);
 namespace pflow {
   bool PROTO_PARSE_INPUT(const vector<string>& params,vector<vector<string> >& vstr,vector<vector<double> >& vnum,bool ignore_label=false,bool reverse=false); //CO181226
-  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint nspeciesHTQC,bool patch_nspecies=false); //CO181226
+  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint& nspeciesHTQC,bool patch_nspecies=false); //CO181226
   bool sortPOCCSites(const string& p1,const string& p2); //CO181226
   bool sortPOCCOccs(const string& occ1,const string& occ2); //CO181226
   bool FIX_PRECISION_POCC(const string& occ,string& new_occ); //CO181226

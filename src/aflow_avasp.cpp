@@ -5106,7 +5106,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
 
   //[CO181226 - OBSOLETE PROTO_AFLOW::RUN_RELAX_STATIC_BANDS]if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS")) {xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;xvasp.AVASP_flag_RUN_RELAX=FALSE;}
 
-  bool HTQC=FALSE,flag_LIB2=FALSE,flag_LIB2U=FALSE,flag_LIB3=FALSE,flag_LIB4=FALSE;
+  bool flag_LIB2=FALSE,flag_LIB2U=FALSE,flag_LIB3=FALSE,flag_LIB4=FALSE; //[CO191110]HTQC=FALSE is OBSOLETE variable
   if(!PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=FALSE;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::MISSING")) xvasp.AVASP_aflowin_only_if_missing=TRUE;
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX")==TRUE) xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE);
@@ -5144,9 +5144,8 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   label_raw = aurostd::joinWDelimiter(new_labels,",");
   // DX 20190708 - END
 
-  //get nspecies
-  uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label_raw); //PARAMS->ucell.at(0)); //CO181226
-  uint nspecies=nspeciesHTQC; //0
+  //get nspecies //CO191110 - NOTE: nspeciesHTQC is what is expected from label (proto), nspecies is REAL input number of species separated by colons, not commas (different for pocc)
+  uint nspeciesHTQC=aflowlib::PrototypeLibrariesSpeciesNumber(label_raw),nspecies=nspeciesHTQC; //PARAMS->ucell.at(0)); //CO181226
   
   //decide alphabetic
   bool alphabetic=TRUE;
@@ -5192,21 +5191,6 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO181226 - moved down and qualified]if(nspeciesHTQC==3) {xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;xvasp.AVASP_flag_RUN_RELAX=FALSE;} // force bands for ternary
   //[CO181226 - moved down and qualified]if(nspeciesHTQC==4) {xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;xvasp.AVASP_flag_RUN_RELAX=FALSE;} // force bands for quaternary
 
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " labels=" << label_raw << endl; //PARAMS->ucell.at(0) << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " nspecies=" << nspecies << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " nspeciesHTQC=" << nspeciesHTQC << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " alphabetic=" << alphabetic << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->ucell.at(0)=" << PARAMS->ucell.at(0) << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->ucell.size()=" << PARAMS->ucell.size() << endl;
-  for(uint i=0;i<PARAMS->ucell.size();i++)
-    if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->ucell.at(" << i << ")=" << PARAMS->ucell.at(i) << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->vparams.flag(\"AFLOWIN_FLAG::HTQC_ICSD\")=" << PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD") << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " 1+nspecies=" << 1+nspecies << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " 1+nspecies+1=" << 1+nspecies+1 << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " 2+nspecies=" << 2+nspecies << endl;
-  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.AVASP_potential=" << xvasp.AVASP_potential << endl;
-  if(LDEBUG) {cerr << "DEBUG - " << soliloquy << " ";for(uint i=0;i<PARAMS->ucell.size();i++) cerr << PARAMS->ucell.at(i) << " ";cerr << endl;}
-
   //parse input
   vector<vector<string> > vvstr;
   vector<vector<double> > vvnum;
@@ -5220,9 +5204,25 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   }
   
   //now check everything else, including vvstr.size()==nspecies
-  pflow::PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc==true);  //patch for pocc
-  //if(pocc){nspecies=vvstr.size();}  //patch nspecies for pocc //keep nspecies loosely associated with nspeciesHTQC, and not based on pocc
+  pflow::PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc==true);  //patch for pocc //CO191110 - note nspecies changes here if pocc
   
+  //CO191110 - moved down from above so it prints updated values from pocc
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " labels=" << label_raw << endl; //PARAMS->ucell.at(0) << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " pocc=" << pocc << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " nspecies=" << nspecies << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " nspeciesHTQC=" << nspeciesHTQC << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " alphabetic=" << alphabetic << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->ucell.at(0)=" << PARAMS->ucell.at(0) << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->ucell.size()=" << PARAMS->ucell.size() << endl;
+  for(uint i=0;i<PARAMS->ucell.size();i++)
+    if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->ucell.at(" << i << ")=" << PARAMS->ucell.at(i) << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " PARAMS->vparams.flag(\"AFLOWIN_FLAG::HTQC_ICSD\")=" << PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD") << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " 1+nspeciesHTQC=" << 1+nspeciesHTQC << endl; //CO191110 - nspeciesHTQC makes sense here
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " 1+nspeciesHTQC+1=" << 1+nspeciesHTQC+1 << endl; //CO191110 - nspeciesHTQC makes sense here
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " 2+nspeciesHTQC=" << 2+nspeciesHTQC << endl; //CO191110 - nspeciesHTQC makes sense here
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.AVASP_potential=" << xvasp.AVASP_potential << endl;
+  if(LDEBUG) {cerr << "DEBUG - " << soliloquy << " ";for(uint i=0;i<PARAMS->ucell.size();i++) cerr << PARAMS->ucell.at(i) << " ";cerr << endl;}
+
   //recombine vvstr so we can do subst for LIB strings
   vector<string> specieX_raw;
   for(uint i=0;i<vvstr.size();i++){specieX_raw.push_back(aurostd::joinWDelimiter(vvstr[i],","));}
@@ -5339,8 +5339,14 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   }
 
   ostringstream aus;
-  if(nspecies>=2) if(specieX.at(0).size()>1 || specieX.at(1).size()>1) HTQC=TRUE;
-  if(HTQC) xvasp.AVASP_alpha_fix=TRUE;
+  //[CO191110]generalizing alphabetization concept for nspecies
+  if(nspecies>=2){  //CO191110
+    for(uint i=0;i<specieX.size();i++){ //CO191110
+      if(specieX[i].size()>1){xvasp.AVASP_alpha_fix=TRUE;}  //CO191110
+    } //CO191110
+  } //CO191110
+  //[CO191110 OBSOLETE]if(nspecies>=2) if(specieX.at(0).size()>1 || specieX.at(1).size()>1) HTQC=TRUE;
+  //[CO191110 OBSOLETE]if(HTQC) xvasp.AVASP_alpha_fix=TRUE;
   if(flag_LIB4) xvasp.AVASP_alpha_fix=TRUE;   // some fix for historic reasons
   if(flag_LIB3) xvasp.AVASP_alpha_fix=TRUE;   // some fix for historic reasons
   if(flag_LIB2U) xvasp.AVASP_alpha_fix=TRUE;   // some fix for historic reasons
@@ -5579,7 +5585,9 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
               for(uint i=0;i<xaus.str.species.size();i++){xaus.str.species_pp_vLDAU.push_back(deque<double>());}
               if(xaus.POTCAR_TYPE_PRINT_flag==false){   //[CO191020]if it haven't been set previously - see _AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_
                 xaus.POTCAR_TYPE_PRINT_flag=true; //print :PAW_PBE afterwards
-                if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO191020 - exceptions, do not print for binaries/ternaries
+                if(pocc==false){  //CO191110 - always print date for pocc structures
+                  if((nspeciesHTQC==2) || (nspeciesHTQC==3)){xaus.POTCAR_TYPE_PRINT_flag=false;}  //CO191020 - exceptions, do not print for binaries/ternaries
+                }
               }
               //[CO181226 - obsolete, spoke to stefano. As long as we have AVASP_Get_PseudoPotential_XX, we are fine]if(!aurostd::substring2bool(string_POTENTIAL,_AVASP_PSEUDOPOTENTIAL_AUTO_)){xaus.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE);}
               if(xaus.aopts.flag("FLAG::AVASP_FORCE_LDAU")){AVASP_ADD_LDAU(xaus);}
@@ -5589,7 +5597,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
                 xaus.aopts.flag("AFLOWIN_FLAG::PSTRESS",FALSE);xaus.aopts.push_attached("AFLOWIN_FLAG::PSTRESS","0.0");
               }
               //special cases below - override stuff above
-              if(nspeciesHTQC==3 && 
+              if(pocc==false && nspeciesHTQC==3 &&  //CO191110 - no special treatment for pocc YET
                   (aurostd::substring2bool(xaus.AVASP_label,"T0001") || aurostd::substring2bool(xaus.AVASP_label,"T0002") || aurostd::substring2bool(xaus.AVASP_label,"T0003") || //sanvito heuslers
                    aurostd::substring2bool(xaus.AVASP_label,"T0009") || //perovskites
                    aurostd::substring2bool(xaus.AVASP_label,"TS001") || //L12 sqs gus
@@ -5599,13 +5607,13 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
                 xvasp.AVASP_flag_RUN_RELAX=FALSE;xvasp.AVASP_flag_RUN_RELAX_STATIC=FALSE;xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;xvasp.AVASP_flag_RUN_STATIC_BANDS=FALSE; //force bands for ternary
               }
               //special cases
-              if(nspeciesHTQC==4 && 
+              if(pocc==false && nspeciesHTQC==4 &&  //CO191110 - no special treatment for pocc YET
                   (aurostd::substring2bool(xaus.AVASP_label,"Q0001") || //elpasolite
                    FALSE)
                 ){
                 xvasp.AVASP_flag_RUN_RELAX=FALSE;xvasp.AVASP_flag_RUN_RELAX_STATIC=FALSE;xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;xvasp.AVASP_flag_RUN_STATIC_BANDS=FALSE; //force bands for ternary
               }
-              if(nspeciesHTQC==4 && aurostd::substring2bool(xaus.AVASP_label,"Q0001")){  //previously just nspeciesHTQC==4
+              if(pocc==false && nspeciesHTQC==4 && aurostd::substring2bool(xaus.AVASP_label,"Q0001")){  //previously just nspeciesHTQC==4 //CO191110 - no special treatment for pocc YET
                 if(alphabetic==TRUE) AlphabetizePrototypeLabelSpecies(xaus.str.species,xaus.str.species_pp,xaus.str.species_volume,xaus.str.species_mass,xaus.AVASP_label);
                 // LDAU
                 // bool CHECK_LDAU=TRUE;
