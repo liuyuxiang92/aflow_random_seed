@@ -1862,7 +1862,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   string compareDatabaseEntries(aurostd::xoption& vpflow){
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     
     string function_name = "pflow::compareDatabaseEntries()";
     string directory = ".";
