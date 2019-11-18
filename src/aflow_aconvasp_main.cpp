@@ -13828,7 +13828,9 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss) {
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::SGDATA()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string options = vpflow.getattachedscheme("SGDATA");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
