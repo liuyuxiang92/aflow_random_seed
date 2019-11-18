@@ -5825,7 +5825,7 @@ namespace compare{
     // C |      C1, C2     with A,B,C,D 
     // D |      D1, D2    
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
     string function_name = "compare::findMatch()";
