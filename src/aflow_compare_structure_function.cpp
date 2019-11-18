@@ -2407,7 +2407,7 @@ namespace compare{
     // split comparisons into threads via indices
     string function_name = "compare::splitComparisonIntoThreads()";
     stringstream message;
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     
     bool safety_check=false; // safety check if split incorrectly
 
