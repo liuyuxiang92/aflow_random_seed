@@ -2707,7 +2707,9 @@ namespace pflow {
 
 namespace pflow {
   bool SYMMETRY_GROUPS(_aflags &aflags,istream& input, aurostd::xoption& vpflow, ostream& oss){
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::SYMMETRY_GROUPS()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     _kflags kflags;                                   // DX 8/15/17 - Add in consistency checks
     xstructure _a(input,IOAFLOW_AUTO);
     bool osswrite=TRUE;
