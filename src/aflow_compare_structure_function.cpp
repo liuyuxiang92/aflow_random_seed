@@ -2753,7 +2753,7 @@ namespace compare{
     // Calculates the LFA environments for a structure and
     // stores it in the StructurePrototype object
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name="compare::calculateLFAEnvironments()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
