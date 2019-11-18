@@ -1485,7 +1485,7 @@ namespace compare{
 namespace compare{
   vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE){ //DX 20190319 - added FileMESSAGE
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::comparePermutations()";
     stringstream message;
