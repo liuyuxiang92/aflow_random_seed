@@ -238,7 +238,7 @@ namespace KBIN {
     string soliloquy="getAflowInFromAFlags():";
     AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
     if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
-    pflow::logger(soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::file2string(AflowIn_file,AflowIn);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
   }

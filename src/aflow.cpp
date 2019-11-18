@@ -973,17 +973,17 @@ int main(int _argc,char **_argv) {
 }
   // CO 180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
-  //[OBSOLETE]  pflow::logger(soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(re.where(), re.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   //[OBSOLETE]catch(AFLOWLogicError& le){
-  //[OBSOLETE]  pflow::logger(soliloquy, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(le.where(), le.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {
-    pflow::logger(excpt.where(), excpt.error_message, oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, excpt.where(), excpt.error_message, oss, _LOGGER_ERROR_);
     return excpt.error_code;
   }
 }

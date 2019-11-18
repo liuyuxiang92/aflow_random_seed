@@ -188,7 +188,7 @@ namespace chull {
         //} else {
         if(!found) {
           message << "Incorrect input for loadlibraries \"" << vlibraries[i] << "\"";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return FALSE;
         }
@@ -207,7 +207,7 @@ namespace chull {
               (out_forms[i][0] == 'W' || out_forms[i][0] == 'w') ||
               (out_forms[i][0] == 'L' || out_forms[i][0] == 'l' || out_forms[i][0] == 'P' || out_forms[i][0] == 'p'))) {
           message << "Incorrect input for output \"" << out_forms[i] << "\"";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return FALSE;
         }
@@ -223,16 +223,16 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
 
     message << aflow::Banner("BANNER_NORMAL");
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_);  //first to screen (not logged, file not opened)
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_);  //first to screen (not logged, file not opened)
     message << "Processing inputs. Eliminating degenerate (duplicate-element) inputs and duplicates.";
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
     
     // get elements input
     vector<string> vinputs, velements;
     string inputs = vpflow.getattachedscheme("PFLOW::ALLOY");
     if(inputs.empty()) {
       message << "No input given for elements";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       //really drive the point home
       if(!vpflow.flag("CHULL::SCREEN_ONLY")){init::ErrorOption(cout, "--alloy=" + vpflow.getattachedscheme("PFLOW::ALLOY"), "PFLOW()", usage_options);}
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
@@ -269,7 +269,7 @@ namespace chull {
         else {
           if(verbose_elimination){
             message << "Ignoring degenerate (duplicate-element) input (" << original_input << ")";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
       }
@@ -285,7 +285,7 @@ namespace chull {
         else {
           if(verbose_elimination){
             message << "Ignoring degenerate (duplicate-element) input (" << original_input << ")";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
       }
@@ -298,7 +298,7 @@ namespace chull {
       for(uint i=1,fl_size_i=_vinputs.size();i<fl_size_i;i++){ //VERBOSE
         if(aurostd::withinList(vinputs,_vinputs[i])){
           message << "Ignoring duplicate input (" << _vinputs[i] << ")";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);  
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);  
           continue;
         }
         vinputs.push_back(_vinputs[i]);
@@ -306,7 +306,7 @@ namespace chull {
     } else {std::sort(vinputs.begin(),vinputs.end());vinputs.erase( std::unique( vinputs.begin(), vinputs.end() ), vinputs.end() );}
 
     message << "Total convex hull inputs: " << vinputs.size();
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Gathering hull inputs
@@ -325,12 +325,12 @@ namespace chull {
       //[CO190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
       if(!velements.size()){
         message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         Krun=false;continue;/*return FALSE;*/
       }
       if(velements.size()<2){
         message << "Trivial input (" << vinputs[i] << "), enter binaries or higher";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         Krun=false;continue;/*return FALSE;*/
       }
       alloy=aurostd::joinWDelimiter(velements,"");
@@ -341,9 +341,9 @@ namespace chull {
       }
       // spit out banner for only the first request
       message << aflow::Banner("BANNER_NORMAL");
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_, true);  //i //no screen, first to be logged
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_, true);  //i //no screen, first to be logged
       message << "Starting " << aurostd::joinWDelimiter(velements,"") << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
       getPath(vpflow, FileMESSAGE, oss, false); // CO 180220 - directory stuff for logging
       chull::flagCheck(vpflow, velements, FileMESSAGE, oss, i);  // spit out all flag options
       
@@ -353,7 +353,7 @@ namespace chull {
       //if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
       //  message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
       //  message << " on " << vinputs[i] << " hull";
-      //  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
       //  vector<string> vauid;
       //  vector<double> vscriterion;
       //  aurostd::string2tokens(vpflow.getattachedscheme("CHULL::STABILITY_CRITERION"), vauid, ",");
@@ -374,7 +374,7 @@ namespace chull {
       //      oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
       //    } else { //.log only, but obsolete now anyway since it defaults to json
       //      message << "Unknown print option, only --print=text or --print=json available";
-      //      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      //      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       //      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
       //      Krun=false;continue;/*return FALSE;*/
       //    }
@@ -384,14 +384,14 @@ namespace chull {
       //        message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";
       //        if(std::signbit(vscriterion[ia])) {  //-4e-13 is still negative!
       //          message << ", may NOT be on the hull (negative value)";
-      //          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-      //        } else {pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+      //          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+      //        } else {pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
       //      } else {
       //        message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";
       //        if(!std::signbit(vscriterion[ia])) {
       //          message << ", may NOT be on the hull (positive value)";
-      //          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-      //        } else {pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+      //          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+      //        } else {pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
       //      }
       //    }
       //  }
@@ -437,7 +437,7 @@ namespace chull {
         aurostd::stringstream2file(output4,jupyter_directory+'/'+"requirements.txt");	
 
         message << "Created " << aflow_chull_jupyter_subdir << " directory for " << vinputs[i] << " hull";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
 
         continue;
       }     
@@ -453,7 +453,7 @@ namespace chull {
       ConvexHull hull(vpflow,velements,FileMESSAGE,oss);
       if(!hull.m_initialized) {
         message << "Hull was not created successfully";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
         if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";}
         Krun=false;continue;/*return FALSE;*/
@@ -461,19 +461,19 @@ namespace chull {
       uint dimension = hull.getDim();
       if(!dimension) {
         message << "Hull has no dimensions";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
         Krun=false;continue;/*return FALSE;*/
       }
       if(dimension < 2) {
         message << "Unable to calculate hulls with dimensions less than 2";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
         Krun=false;continue;/*return FALSE;*/
       }
       if(dimension != velements.size()) {
         message << "Dimension of hull does not reflect the number of elements";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
         Krun=false;continue;/*return FALSE;*/
       }
@@ -488,7 +488,7 @@ namespace chull {
       if(vpflow.flag("CHULL::DIST2HULL")) {
         message << "Starting distance to hull calculation of " << vpflow.getattachedscheme("CHULL::DIST2HULL");
         message << " on " << vinputs[i] << " hull";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         vector<string> vauid;
         aurostd::string2tokens(vpflow.getattachedscheme("CHULL::DIST2HULL"), vauid, ",");
         vector<double> vdist2hull;
@@ -498,7 +498,7 @@ namespace chull {
         //proceed otherwise at your own risk
         try{vdist2hull=hull.getDistancesToHull(vauid);}
         catch(aurostd::xerror& re){
-          pflow::logger(re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return false;
@@ -515,12 +515,12 @@ namespace chull {
           else {message << vauid[ia] << " dist2hull = " << vdist2hull[ia] << " (K)";}
           if(zeroWithinTol(vdist2hull[ia])) {  //do not issue a warning either way, it's simply the distance
             message << ", may be on the hull";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
-          } else {pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
+          } else {pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
           //if(0&&!std::signbit(vdist2hull[ia])) {  //do not issue a warning either way, it's simply the distance
           //  message << ", may NOT be off the hull (positive value)";
-          //  pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-          //} else {pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+          //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          //} else {pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
         }
 
         if(vpflow.flag("CHULL::SCREEN_ONLY")){
@@ -539,7 +539,7 @@ namespace chull {
             oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
           } else { //.log only, but obsolete now anyway since it defaults to json
             message << "Unknown print option, only --print=text or --print=json available";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
             if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
             Krun=false;continue;/*return FALSE;*/
           }
@@ -556,7 +556,7 @@ namespace chull {
       if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
         message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
         message << " on " << vinputs[i] << " hull";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         vector<string> vauid;
         aurostd::string2tokens(vpflow.getattachedscheme("CHULL::STABILITY_CRITERION"), vauid, ",");
         vector<double> vscriterion;
@@ -566,7 +566,7 @@ namespace chull {
         //proceed otherwise at your own risk
         try{vscriterion=hull.getStabilityCriterion(vauid);}
         catch(aurostd::xerror& re){
-          pflow::logger(re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return false;
@@ -583,8 +583,8 @@ namespace chull {
           else {message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";}
           if(std::signbit(vscriterion[ia])) {
             message << ", may NOT be on the hull (negative value)";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-          } else {pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          } else {pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
         }
 
         if(vpflow.flag("CHULL::SCREEN_ONLY")){
@@ -603,7 +603,7 @@ namespace chull {
             oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
           } else { //.log only, but obsolete now anyway since it defaults to json
             message << "Unknown print option, only --print=text or --print=json available";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
             if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
             Krun=false;continue;/*return FALSE;*/
           }
@@ -620,7 +620,7 @@ namespace chull {
       if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
         message << "Starting calculation of the formation enthalpy at " << vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY");
         message << " on " << vinputs[i] << " hull";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         vector<double> _coords;
         xvector<double> coords(dimension);
         aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
@@ -636,7 +636,7 @@ namespace chull {
           dist2hull=hull.getDistanceToHull(cp,false,true);  //do not redo, get signed distance (this is energy)
         }
         catch(aurostd::xerror& re){
-          pflow::logger(re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return false;
@@ -664,7 +664,7 @@ namespace chull {
           message << " = ";
           if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << -chull::convertUnits(dist2hull, _m_) << " (meV/atom)";} //dist2hull here needs negative sign
           else {message << dist2hull << " (K)";}
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
         }
         continue;
       }
@@ -713,7 +713,7 @@ string getPath(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& o
     string pwd = getPath();
     if(!silent){
       message << "Directing output to current directory: " << pwd;
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  // CO 180220 - silent now means print AT ALL
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  // CO 180220 - silent now means print AT ALL
     }
     return pwd;
   }
@@ -765,13 +765,13 @@ string getPath(string _path, ofstream& FileMESSAGE, ostream& oss, bool silent) {
   //test of stupidity
   if(!aurostd::IsDirectory(path)){
     message << path << " does not seem to be a viable directory, changing to pwd=" << pwd;
-    pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
     path=pwd+"/";
   }
 
   if(!silent){
     message << "Directing output to " << path;
-    pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  // CO 180220 - silent now means print AT AL
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_OPTION_); //, silent);  // CO 180220 - silent now means print AT AL
   }
   return path;
 }
@@ -792,122 +792,122 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
   string directory=getPath(vpflow,FileMESSAGE,oss);
   _aflags aflags; aflags.Directory=directory;
   if(vpflow.flag("CHULL::TEXT_DOC")) {
-    pflow::logger(soliloquy, "CHULL::TEXT_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::TEXT_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::JSON_DOC")) {
-    pflow::logger(soliloquy, "CHULL::JSON_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::JSON_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::WEB_DOC")) {
-    pflow::logger(soliloquy, "CHULL::WEB_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::WEB_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::LATEX_DOC")||vpflow.flag("CHULL::PNG_IMAGE")) {
     if(vpflow.flag("CHULL::LATEX_DOC")){
-    pflow::logger(soliloquy, "CHULL::LATEX_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::LATEX_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::PNG_IMAGE")){
-      pflow::logger(soliloquy, "CHULL::PNG_IMAGE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::PNG_IMAGE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::IMAGE_ONLY")) {
-      pflow::logger(soliloquy, "CHULL::IMAGE_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::IMAGE_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::NO_DOC")) {
-      pflow::logger(soliloquy, "CHULL::NO_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::NO_DOC set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::DOC_ONLY")) {
-      pflow::logger(soliloquy, "CHULL::DOC_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::DOC_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::KEEP_TEX")) {
-      pflow::logger(soliloquy, "CHULL::KEEP_TEX set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::KEEP_TEX set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::LATEX_OUTPUT")) {
-      pflow::logger(soliloquy, "CHULL::LATEX_OUTPUT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::LATEX_OUTPUT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::LATEX_INTERACTIVE")) {
-      pflow::logger(soliloquy, "CHULL::LATEX_INTERACTIVE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::LATEX_INTERACTIVE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::LIGHT_CONTRAST")) {
-      pflow::logger(soliloquy, "CHULL::LIGHT_CONTRAST set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::LIGHT_CONTRAST set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::LARGE_FONT")) {
-      pflow::logger(soliloquy, "CHULL::LARGE_FONT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::LARGE_FONT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::PLOT_ISO_MAX_LATENT_HEAT")) {
-      pflow::logger(soliloquy, "CHULL::PLOT_ISO_MAX_LATENT_HEAT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::PLOT_ISO_MAX_LATENT_HEAT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
   }
   if(vpflow.flag("CHULL::SCREEN_ONLY")) {
-    pflow::logger(soliloquy, "CHULL::SCREEN_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SCREEN_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::LOG")) {
-    pflow::logger(soliloquy, "CHULL::LOG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::LOG set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   string lib_count_string,load_lib_flag_name;
   for(uint lib=1,fl_size_lib=velements.size();lib<=fl_size_lib && lib<=_AFLOW_LIB_MAX_;lib++) {
     lib_count_string=aurostd::utype2string(lib);
     load_lib_flag_name="PFLOW::LOAD_ENTRIES_LOAD_LIB"+lib_count_string;
     if(vpflow.flag(load_lib_flag_name)) {
-      pflow::logger(soliloquy, load_lib_flag_name+" set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, load_lib_flag_name+" set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
   }
   if(vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE")) {
-    pflow::logger(soliloquy, "PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_ICSD")) {
-    pflow::logger(soliloquy, "PFLOW::LOAD_ENTRIES_LOAD_ICSD set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "PFLOW::LOAD_ENTRIES_LOAD_ICSD set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("PFLOW::LOAD_API")) {
-    pflow::logger(soliloquy, "PFLOW::LOAD_API set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "PFLOW::LOAD_API set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
-    pflow::logger(soliloquy, "PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::NEGLECT")) {
-    pflow::logger(soliloquy, "CHULL::NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::SEE_NEGLECT")) {
-    pflow::logger(soliloquy, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::REMOVE_EXTREMA")) {
-    pflow::logger(soliloquy, "CHULL::REMOVE_EXTREMA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::REMOVE_EXTREMA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {
-    pflow::logger(soliloquy, "CHULL::ENTROPIC_TEMPERATURE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::ENTROPIC_TEMPERATURE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::INCLUDE_PAW_GGA")) {
-    pflow::logger(soliloquy, "CHULL::INCLUDE_PAW_GGA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_PAW_GGA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::DIST2HULL")) {
-    pflow::logger(soliloquy, "CHULL::DIST2HULL set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::DIST2HULL set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
-    pflow::logger(soliloquy, "CHULL::STABILITY_CRITERION set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::STABILITY_CRITERION set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
-    pflow::logger(soliloquy, "CHULL::HULL_FORMATION_ENTHALPY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::HULL_FORMATION_ENTHALPY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON")) {
-    pflow::logger(soliloquy, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")) {
-    pflow::logger(soliloquy, "CHULL::SKIP_STABILITY_CRITERION_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_STABILITY_CRITERION_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS")) {
-    pflow::logger(soliloquy, "CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::SKIP_N_PLUS_1_ENERGY_GAIN_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS")) {
-    pflow::logger(soliloquy, "CHULL::INCLUDE_SKEWED_HULLS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_SKEWED_HULLS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")) {
-    pflow::logger(soliloquy, "CHULL::INCLUDE_UNRELIABLE_HULLS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_UNRELIABLE_HULLS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::INCLUDE_OUTLIERS")) {
-    pflow::logger(soliloquy, "CHULL::INCLUDE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_OUTLIERS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("CHULL::INCLUDE_ILL_CONVERGED")) {
-    pflow::logger(soliloquy, "CHULL::INCLUDE_ILL_CONVERGED set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::INCLUDE_ILL_CONVERGED set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
   if(vpflow.flag("FORCE")) {
-    pflow::logger(soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "CHULL::FORCE set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
   }
 }
 } // namespace chull
@@ -942,14 +942,14 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //    string soliloquy="chull::calculateStabilityCriterion():";
 //    stringstream message;
 //    if(!vpflow.flag("CHULL::NEGLECT")) {
-//      pflow::logger(soliloquy,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
+//      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
 //      return false;
 //    }
 //    vector<string> points_neglect;
 //    aurostd::string2tokens(vpflow.getattachedscheme("CHULL::NEGLECT"),points_neglect,",");
 //    if(points_neglect.size()!=1) {
 //      message << "Can only handle one AUID at a time, " << points_neglect.size() << " given";
-//      pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //      return FALSE;
 //    }
 //    return calculateStabilityCriterion(vpflow,velements,points_neglect[0],scriterion,FileMESSAGE,oss);
@@ -974,7 +974,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //    string soliloquy="chull::calculateStabilityCriterion():";
 //    stringstream message;
 //    if(!vpflow.flag("CHULL::NEGLECT")) {
-//      pflow::logger(soliloquy,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
+//      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
 //      return FALSE;
 //    }
 //    vector<string> points_neglect;
@@ -994,7 +994,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //    //we need organized points, simply initialize dummy hull instead of calculating TWO full hulls
 //    ConvexHull dummy(vpflow,FileMESSAGE,oss);
 //    try{dummy.initializePoints(velements);}
-//    catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
+//    catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
 //    dummy.m_initialized=true; //hack so we can get at the g-states
 //    uint i_point,i_coord_group,g_state;
 //    vector<uint> eq_gstates;
@@ -1004,23 +1004,23 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //      const string& auid=vauid[i];
 //      if(auid.empty()){
 //        message << "Empty auid found";
-//        pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //        return false;
 //      }
 //      if(!dummy.findPoint(auid,i_point)){
 //        message << "Specified auid not found on hull (auid=" << auid << ")";
-//        pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //        return false;
 //      }
 //      const ChullPoint& point=dummy.m_points[i_point];  //this point may not be on the hull, it may be an equivalent structure, but coordgroup is
 //      if(!dummy.getCoordGroupIndex(point,i_coord_group)){
 //        message << "Coordgroup index not set (auid=" << auid << ")";
-//        pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //        return false;
 //      }
 //      if(!dummy.m_coord_groups[i_coord_group].m_points.size()){
 //        message << "No points found within coordgroup (auid=" << auid << ")";
-//        pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //        return false;
 //      }
 //      //assume user knows what he's doing, we will check for sure later
@@ -1037,7 +1037,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //      }
 //      if(!found){
 //        message << "Point was not found to be an equivalent ground-state structure (auid=" << auid << ")";
-//        pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //        return false;
 //      }
 //    }
@@ -1054,7 +1054,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //      for(uint j=0,fl_size_j=points_to_neglect.size();j<fl_size_j&&!found;j++){
 //        if(points[i].m_entry.auid==points_to_neglect[j].m_entry.auid){
 //          message << "Removing equivalent ground-state (auid=" << points_to_neglect[j].m_entry.auid << ")";
-//          pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 //          found=true;
 //        }
 //      }
@@ -1067,7 +1067,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //    //////////////////////////////////////////////////////////////////////////////
 //    
 //    message << "Creating new hull without relevant g-states";
-//    pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 //    aurostd::xoption cflags=vpflow;
 //    cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true); //thermo properties NOT needed, just need hull
 //    cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true); //thermo properties NOT needed, just need hull
@@ -1079,7 +1079,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //      ChullPoint& point=points_to_neglect[i];
 //      if(!dummy.getAlloyIndex(point,i_nary,i_alloy)){
 //        message << "Alloy index not set (auid=" << point.m_entry.auid << ")";
-//        pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
+//        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_ERROR_);
 //        return false;
 //      }
 //      if(point.isUnary()){point.setHullCoords();} //set to most general coords (m_coords), this reflects relevantFacets()
@@ -1089,7 +1089,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //        point.setHullCoords(elements_present);  //just to be sure
 //      }
 //      try{vscriterion.push_back(hull.getDistanceToHull(point));}
-//      catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
+//      catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
 //    }
 //
 //    return true;
@@ -1945,7 +1945,7 @@ void ChullFacet::addVertex(const FacetPoint& fp){
     //if(m_has_stoich_coords && !point.m_has_stoich_coords){
     if(m_has_stoich_coords != point.m_has_stoich_coords){ //spit warning for either mismatch
       message << "Mismatch among coord types (stoich vs. non-stoich coords), assuming non-stoich coords";
-      pflow::logger(soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       m_has_stoich_coords=false; //(m_has_stoich_coords && point.m_has_stoich_coords);
       if(LDEBUG) {
         cerr << soliloquy << " facet.m_has_stoich_coords=" << m_has_stoich_coords << endl;
@@ -1959,7 +1959,7 @@ void ChullFacet::addVertex(const FacetPoint& fp){
     //if(m_formation_energy_coord && !point.m_formation_energy_coord){
     if(m_formation_energy_coord != point.m_formation_energy_coord){ //spit warning for either mismatch
       message << "Mismatch among coord types (formation_energy vs. non-formation_energy), assuming non-formation_energy coords";
-      pflow::logger(soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       m_formation_energy_coord=false; //(m_formation_energy_coord && point.m_formation_energy_coord);
       if(LDEBUG) {
         cerr << soliloquy << " facet.m_formation_energy_coord=" << m_formation_energy_coord << endl;
@@ -2635,7 +2635,7 @@ bool ConvexHull::initialize(ofstream& FileMESSAGE,ostream& oss) {
     setDirectory();
     m_initialized=false;  //no points
   }
-  catch(aurostd::xerror& le){pflow::logger(le.where(), le.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& le){pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2647,7 +2647,7 @@ bool ConvexHull::initialize(string alloy,ofstream& FileMESSAGE,ostream& oss) {
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(alloy);
 }
 
@@ -2659,7 +2659,7 @@ bool ConvexHull::initialize(const vector<string>& velements,ofstream& FileMESSAG
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(velements);
 }
 
@@ -2671,7 +2671,7 @@ bool ConvexHull::initialize(const vector<string>& velements,const vector<vector<
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(velements,entries);
 }
 
@@ -2683,7 +2683,7 @@ bool ConvexHull::initialize(const vector<xvector<double> >& vcoords,ofstream& Fi
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
 }
 
@@ -2695,7 +2695,7 @@ bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,ofstream& FileMESS
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(vpoints,formation_enthalpy_hull,add_artificial_unaries);
 }
 
@@ -2707,7 +2707,7 @@ bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,const vector<strin
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
 }
 
@@ -2776,7 +2776,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE
     setDirectory();
     m_initialized=false;  //no points
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2789,7 +2789,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,string alloy,ofstream
     setDirectory();
     m_initialized=createHull(alloy);
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2802,7 +2802,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>&
     setDirectory();
     m_initialized=createHull(velements);
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2815,7 +2815,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>&
     setDirectory();
     m_initialized=createHull(velements,entries);
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2828,7 +2828,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<xvector<
     setDirectory();
     m_initialized=createHull(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
   }
-  catch(aurostd::xerror& le){pflow::logger(le.where(), le.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& le){pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2841,7 +2841,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoi
     setDirectory();
     m_initialized=createHull(vpoints,formation_enthalpy_hull,add_artificial_unaries);
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2854,7 +2854,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoi
     setDirectory();
     m_initialized=createHull(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -3192,7 +3192,7 @@ bool ConvexHull::write(filetype ftype) const {
     else if(ftype==latex_ft){writeLatex();written=true;}
     else if(ftype==chull_web_ft){writeWebApp();written=true;}
   }
-  catch(aurostd::xerror& re){pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return written;
 }
 
@@ -3213,7 +3213,7 @@ bool ConvexHull::createHull(string alloy) {
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
   catch(aurostd::xerror& re){
-    pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3229,7 +3229,7 @@ bool ConvexHull::createHull(const vector<string>& velements) {
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
   catch(aurostd::xerror& re){
-    pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3245,7 +3245,7 @@ bool ConvexHull::createHull(const vector<string>& velements,const vector<vector<
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
   catch(aurostd::xerror& re){
-    pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3261,7 +3261,7 @@ bool ConvexHull::createHull(const vector<xvector<double> >& vcoords,bool has_sto
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
   catch(aurostd::xerror& re){
-    pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3277,7 +3277,7 @@ bool ConvexHull::createHull(const vector<ChullPoint>& vpoints,bool formation_ene
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
   catch(aurostd::xerror& re){
-    pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3293,7 +3293,7 @@ bool ConvexHull::createHull(const vector<ChullPoint>& vpoints,const vector<strin
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
   catch(aurostd::xerror& re){
-    pflow::logger(re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3460,7 +3460,7 @@ void ConvexHull::loadPoints(const vector<string>& _velements,const vector<vector
   if(!points.size()){
     message << "No entries loaded";
     //simply always die here, we cannot grab dimensionality of hull without ANY points
-    if(0&&m_cflags.flag("FORCE")){pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+    if(0&&m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
     else {throw aurostd::xerror(soliloquy,message);}
   }
   return loadPoints(points,velements,m_formation_energy_hull,m_add_artificial_unaries);
@@ -3515,7 +3515,7 @@ void ConvexHull::loadPoints(const vector<ChullPoint>& vpoints,const vector<strin
     if(m_points[i].getDim()!=m_dim){throw aurostd::xerror(soliloquy,"Dimension mismatch among points");}
     if(m_points[i].m_has_stoich_coords!=m_has_stoich_coords){
       message << "Mismatch among coord types (stoich vs. non-stoich coords), assuming non-stoich coords";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       m_has_stoich_coords=false;
       break;
     }
@@ -3569,7 +3569,7 @@ void ConvexHull::calculateOutlierThreshold(const xvector<double>& energies,doubl
     message << "Not enough degrees of freedom for outlier detection analysis per interquartile-range (count=" << energies.rows << " < " << iqr_count_threshold << ")";
     if(m_cflags.flag("FORCE")){
       message << ", skipping outlier analysis";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       return;
     } else {
       message << ". Override with --force (results may not be reliable).";
@@ -3642,7 +3642,7 @@ vector<uint> ConvexHull::calculateOutliers(const vector<uint>& points_to_conside
           ", aurl=" << m_points[i_point].m_entry.aurl << 
           ", lastCoord()=" << m_points[i_point].getLastCoord() << 
           " (<threshold=" << threshold << ")"; 
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE);
       }
     }
   }
@@ -3656,21 +3656,21 @@ vector<uint> ConvexHull::calculateOutliers(const vector<uint>& points_to_conside
           ", aurl=" << m_points[i_point].m_entry.aurl << 
           ", lastCoord()=" << m_points[i_point].getLastCoord() << 
           " (>threshold=" << threshold << ")"; 
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE);
       }
     }
   }
   //if we request outliers, lets get them, we can neglect them later
   //if(keep_outliers){
   //  message << "NOT removing outliers";
-  //  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+  //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
   //  outliers.clear();
   //}
   ////remove outliers
   //std::sort(outliers.rbegin(),outliers.rend()); //descending
   //for(uint i=0,fl_size_i=outliers.size();i<fl_size_i;i++){
   //  message << "Removing outlier auid=" << m_points[outliers[i]].m_entry.auid;
-  //  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+  //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
   //  m_points.erase(m_points.begin()+outliers[i]);
   //}
   if(LDEBUG) {cerr << soliloquy << " done" << endl;}
@@ -3715,7 +3715,7 @@ vector<uint> ConvexHull::getOutliers(const xvector<int>& elements_present) {
           if(m_points[i_point].m_has_entry){message << "[auid=" << m_points[i_point].m_entry.auid << ",aurl=" << m_points[i_point].m_entry.aurl << "] ";}
           else {message << "[i_point=" << i_point << "] ";}
           message << "from outlier analysis: entry not within " << (m_lower_hull?"lower":"upper") << " half hull";
-          pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
         }
       }
     }
@@ -3738,7 +3738,7 @@ vector<uint> ConvexHull::getOutliers(const xvector<int>& elements_present) {
       message << "Not enough degrees of freedom for outlier detection analysis per user defined threshold (count=" << points_to_consider.size() << " < " << binaries_half_hull_threshold << ")";
       if(m_cflags.flag("FORCE")){
         message << ", skipping outlier analysis";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         vector<uint> outliers;
         return outliers;
       }
@@ -3933,13 +3933,13 @@ void ConvexHull::structurePoints() {
     if(m_formation_energy_hull){
       if(greaterEqualZero(extrema_val)){
         message << "Ignoring remove extreme points flag -- you provided a number >= 0. H_f convex hull sits below 0";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         remove_extreme=false;
       }
     } else {
       if(lessEqualZero(extrema_val)){
         message << "Ignoring remove extreme points flag -- you provided a number <= 0. T_S convex hull sits above 0";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         remove_extreme=false;
       }
     }
@@ -3953,7 +3953,7 @@ void ConvexHull::structurePoints() {
   if(remove_outliers){removing_messages.push_back("outlier");}
   if(removing_messages.size()){
     message << "Filtering out " << aurostd::joinWDelimiter(removing_messages,"/") << " entries";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
   
   //quick add in of PAW_GGA if not already included in allowed list
@@ -3982,33 +3982,33 @@ void ConvexHull::structurePoints() {
         if(!invalid_reason.empty()){
           silent=(!see_neglect && LOGGER_TYPE==_LOGGER_OPTION_);
           message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: " << invalid_reason;
-          pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
         }
         continue;
       }
       if(remove_duplicate_entries && !entryUnique(unique_entries,entry,canonical_auid)){
         silent=(!see_neglect);
         message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: duplicate database entry (see " << canonical_auid << ")";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_, silent);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_, silent);
         continue;
       }
       unique_entries.push_back(i);
       if(aurostd::withinList(points_neglect,entry.auid)){
         message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: as requested";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
         continue;
       }
       if(remove_extreme){
         if(m_formation_energy_hull){
           if(chull::H_f_atom(entry, _m_) < extrema_val){
             message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with H_f = " << chull::H_f_atom(entry, _m_) << " (meV/atom)";
-            pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
             continue;
           }
         } else {
           if(chull::T_S(entry) > extrema_val){
             message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with T_S = " << chull::T_S(entry) << " (K)";
-            pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
             continue;
           }
         }
@@ -4031,7 +4031,7 @@ void ConvexHull::structurePoints() {
     m_coord_groups[i_coord_group_sort].m_points.push_back(i);
     if(m_coord_groups[i_coord_group_sort].m_has_stoich_coords && !point.m_has_stoich_coords){
       message << "Mismatch among coord types (stoich vs. non-stoich coords), assuming non-stoich coords";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       m_coord_groups[i_coord_group_sort].m_has_stoich_coords=false;
     }
     if(point.isUnary()&&point.m_is_artificial){m_coord_groups[i_coord_group_sort].m_has_artificial_unary=true;}
@@ -4058,7 +4058,7 @@ void ConvexHull::structurePoints() {
 
   if(!remove_outliers){
     message << "NOT removing outliers";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
     outliers.clear();
   }
 
@@ -4084,14 +4084,14 @@ void ConvexHull::structurePoints() {
         message << "Removing outlier ";
         if(m_points[i_point].m_has_entry){message << "auid=" << m_points[i_point].m_entry.auid;}
         else {message << "m_coords=" << m_points[i_point].m_coords;}
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
         m_coord_groups[i_coord_group].m_points.erase(m_coord_groups[i_coord_group].m_points.begin()+points_to_remove[i]);
       }
       if(LDEBUG) {cerr << soliloquy << " after outlier removal, m_coord_groups[" << i_coord_group << "].m_points.size() = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
     }
   }
   message << "Employing " << valid_count << " total entries for " << pflow::arity_string(m_dim,false,false) << " convex hull analysis";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   
   //remove empty m_coord_groups
   vector<uint> empty_coord_groups;
@@ -4140,7 +4140,7 @@ void ConvexHull::structurePoints() {
   if(m_has_stoich_coords){
     if(LDEBUG) {cerr << soliloquy << " stoich_coords found, also sorting into n-aries and alloys" << endl;}
     message << "Stoichiometric coordinates detected, structuring entries by arity";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     initializeNaries(); //create empty bins first, we can do this combinatorially
 
@@ -4165,7 +4165,7 @@ void ConvexHull::structurePoints() {
     vector<vector<uint> > hull_sizes=getHullSizes(only_within_half_hull);
     if(only_within_half_hull){
       message << "Half hull detected, reducing entry count to those within the relevant hemisphere";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     }
     for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
@@ -4175,7 +4175,7 @@ void ConvexHull::structurePoints() {
         message << " entries, ";
         message << hull_sizes[i_nary][i_alloy] << " entries total for ";
         message << pflow::arity_string(i_nary+1,false,false) << " convex hull analysis";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       }
     }
   
@@ -4261,7 +4261,7 @@ void ConvexHull::checkStructurePoints() {
             message << " (auid=" << m_points[i_point_real].m_entry.auid << ")";
             message << ": abs(" << m_points[i_point_real].getLastCoord() << ")>=" << ENERGY_TOL << " [eV]";
             message << " (please report on AFLOW Forum: aflow.org/forum)";
-            if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+            if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
             else {
               message << ". Override with --force (results may not be reliable).";
               throw aurostd::xerror(soliloquy,message);
@@ -4272,7 +4272,7 @@ void ConvexHull::checkStructurePoints() {
         message << "No ground-state available for";
         if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
         message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
     //UNARIES - STOP
@@ -4290,7 +4290,7 @@ void ConvexHull::checkStructurePoints() {
           if(m_velements.size()){hull << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " ";}
           hull << "[i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
           message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
-          if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
+          if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
           else {
             message << ". Override with --force (results may not be reliable).";
             throw aurostd::xerror(soliloquy,message);
@@ -4449,7 +4449,7 @@ void ConvexHull::setNeighbors() {
         cerr << soliloquy << " is_vertical=" << h_facets[i].m_is_vertical << endl;
       }
       message << "Neighbor count (" << h_facets[i].f_neighbors.size() << ") and facet dimension (" << h_dim << ") mismatch";
-      if(m_cflags.flag("FORCE")){pflow::logger(soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
+      if(m_cflags.flag("FORCE")){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
       else {throw aurostd::xerror(soliloquy,message);}
     }
   }
@@ -5206,7 +5206,7 @@ void ConvexHull::setDistancesToHull(uint i_nary,uint i_alloy) {
   message << "Gathering hull distance data for";
   if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
   message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   uint i_coord_group=AUROSTD_MAX_UINT;
   for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
@@ -5447,7 +5447,7 @@ void ConvexHull::setOffHullProperties(uint i_nary,uint i_alloy){
   message << "Gathering decomposition reaction data for";
   if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
   message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   uint i_coord_group=AUROSTD_MAX_UINT;
   for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
@@ -5826,7 +5826,7 @@ void ConvexHull::setOnHullProperties(uint i_nary,uint i_alloy){
   if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
   message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
   message << ", please be patient";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   uint i_coord_group=AUROSTD_MAX_UINT;
   for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
@@ -5871,7 +5871,7 @@ void ConvexHull::storeHullData(uint i_nary,uint i_alloy){
   message << "Hull properties stored for";
   if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
   message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 }
 
 void ConvexHull::storeHullData() {
@@ -5895,7 +5895,7 @@ void ConvexHull::extractThermodynamicProperties(uint i_nary,uint i_alloy){
   if(!perform_thermo_properties_extraction){return;}
   if(!m_thermo_hull){
     message << "Cannot extract thermodynamic properties, thermodynamic hull NOT detected";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return;
   }
   
@@ -5903,14 +5903,14 @@ void ConvexHull::extractThermodynamicProperties(uint i_nary,uint i_alloy){
   if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
   message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
   if(i_nary==0){message << " (last)";}
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   setOffHullProperties(i_nary,i_alloy);
   setOnHullProperties(i_nary,i_alloy);
   
   message << "Thermodynamic properties calculated for";
   if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
   message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 }
 
 void ConvexHull::thermodynamicsPostProcessing(){
@@ -5921,7 +5921,7 @@ void ConvexHull::thermodynamicsPostProcessing(){
   if(!m_thermo_hull){return;}
   
   message << "Performing thermodynamic post-processing";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     
   bool perform_stability_criterion=(1&&thermoPostProcessingExtractionRequired()&&(!m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
   if(perform_stability_criterion){setStabilityCriterion();}
@@ -5949,14 +5949,14 @@ void ConvexHull::calculate(){
   //we first run through alloy hulls IF stoich_coords, grabbing hull_members
   if(m_has_stoich_coords){
     message << "Calculating the hull(s) in increasing dimensionality (stoichiometric coordinates)";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     if(!m_naries.size()){throw aurostd::xerror(soliloquy,"Points have yet to be structured");}
     for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){ //start at binaries
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
         message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
         if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
         message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
         cleanHull();
         setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
         preparePointsForHullCalculation(i_nary,i_alloy);  //will have unary duplicates, but don't worry, we remove in calculateFacets()
@@ -5964,7 +5964,7 @@ void ConvexHull::calculate(){
         message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
         if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
         message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
         storeHullData(i_nary,i_alloy);
         setDistancesToHull(i_nary,i_alloy); //do this always
         if(m_thermo_hull){extractThermodynamicProperties(i_nary,i_alloy);}
@@ -5977,7 +5977,7 @@ void ConvexHull::calculate(){
     for(uint i_alloy=0,fl_size_i_alloy=m_naries[0].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){setDistancesToHull(0,i_alloy);} //do this always
     if(m_thermo_hull){  //very safe, not sure how these algorithms perform outside of this domain, already know we have m_has_stoich_coords
       //message << "Calculating thermodynamic properties for " << pflow::arity_string(1,false,true) << " (last)";
-      //pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      //pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[0].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){extractThermodynamicProperties(0,i_alloy);} //knows to skip facet storage //setOnHullProperties(0,i_alloy);}
     }
     //print counts of g_states by dimension
@@ -5987,26 +5987,26 @@ void ConvexHull::calculate(){
       message << "Found " << gstate_count << " " << pflow::arity_string(i_nary+1,false,false) << " ";
       if(m_thermo_hull){message << "ground-state phases";}
       else {message << "points on the hull";}
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       total_gstate_count+=gstate_count;
     }
     message << "Found " << total_gstate_count << " ";
     if(m_thermo_hull){message << "ground-state phases";}
     else {message << "points on the hull";}
     message << " total";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   } else {
     message << "Entering default convex hull calculation (full-dimensional)";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     cleanHull();
     preparePointsForHullCalculation();
     calculateFacets();
     message << "Hull calculated";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     //print count of gstates (hull points)
     for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
       message << "Found " << getGStateCount() << " points on the hull total";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     }
   }
   storeHullData();  //that way, the largest dim facets get stored in m_facets!
@@ -6165,7 +6165,7 @@ void ConvexHull::getFakeHull(const vector<uint>& vcpoint,ConvexHull& fake_hull) 
   if(!new_points.size()){throw aurostd::xerror(soliloquy,"No points found for pseudo convex hull");}
 
   if(LDEBUG) {cerr << soliloquy << " Creating new (pseudo) hull without relevant g-states" << endl;}
-  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
   aurostd::xoption cflags=m_cflags;
   cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true); //thermo properties NOT needed, just need hull
   cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true); //this would be circular
@@ -6250,7 +6250,7 @@ void ConvexHull::setStabilityCriterion() {
   stringstream message;
   
   message << "Determining stability criteria for ground-state structures, please be patient";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   
   vector<uint> g_states=getGStates(true);
   uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
@@ -6296,7 +6296,7 @@ void ConvexHull::setStabilityCriterion() {
     //this check should STILL work for unaries, as it's the difference of distances, and
     //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive scriterion
     //by convention, stability criterion are NEGATIVE as they are outside the hull
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     m_points[i_point].m_stability_criterion=scriterion;
     //set equivalent ones
     if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(soliloquy,"Coordgroup index not set");}
@@ -6329,7 +6329,7 @@ void ConvexHull::setNPlus1EnergyGain() {
   stringstream message;
   
   message << "Determining N+1 energy gain for ground-state structures, please be patient";
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   
   vector<uint> g_states=getGStates(true);
   uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT;
@@ -6379,7 +6379,7 @@ void ConvexHull::setNPlus1EnergyGain() {
     //this check should STILL work for unaries, as it's the difference of distances, and
     //the actual hull points should ALWAYS be lower than pseudo hull points, hence a positive np1egain
     //by convention, energy gains are NEGATIVE as they are outside the hull
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     m_points[i_point].m_n_plus_1_energy_gain=np1egain;
     //set equivalent ones
     if(!getCoordGroupIndex(i_point,i_coord_group)){throw aurostd::xerror(soliloquy,"Coordgroup index not set");}
@@ -6430,7 +6430,7 @@ string ConvexHull::prettyPrintCompound(const aflowlib::_aflowlib_entry& entry,ve
     stringstream message;
     message << "Entry (auid=" << entry.auid << ") is ill-defined: vspecies.size()!=vcomposition.size()";
     message << " (please report on AFLOW Forum: aflow.org/forum)";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return entry.compound;
   }
   return pflow::prettyPrintCompound(entry.vspecies,entry.vcomposition,vred,exclude1,ftype);  // ME190628
@@ -6518,7 +6518,7 @@ string ConvexHull::prettyPrintPrototype(const aflowlib::_aflowlib_entry& entry, 
     stringstream message;
     message << "Entry (auid=" << entry.auid << ") is ill-defined: empty prototype";
     message << " (please report on AFLOW Forum: aflow.org/forum)";
-    pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return entry.prototype;
   }
   bool fix_icsd_labels=true;
@@ -6628,7 +6628,7 @@ string ConvexHull::prettyPrintPrototype(const aflowlib::_aflowlib_entry& entry, 
 //[CO190419 - moved to aurostd_main.cpp]        if(!found_escaped_char) {
 //[CO190419 - moved to aurostd_main.cpp]          stringstream message;
 //[CO190419 - moved to aurostd_main.cpp]          message << "Extraneous backslash found in \"" << input << "\" which may cause problems for LaTeX/gnuplot";
-//[CO190419 - moved to aurostd_main.cpp]          pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+//[CO190419 - moved to aurostd_main.cpp]          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
 //[CO190419 - moved to aurostd_main.cpp]          return input;
 //[CO190419 - moved to aurostd_main.cpp]        }
 //[CO190419 - moved to aurostd_main.cpp]      }
@@ -7215,12 +7215,12 @@ aurostd::xoption ConvexHull::resolvePlotLabelSettings() const {
   if(no_labels){
     if(labels_off_hull){
       //[verbose once in writeLatex()]message << "LABEL_NAME set to NONE but LABELS_OFF_HULL requested (fix .aflow.rc), toggling LABELS_OFF_HULL off"
-      //[verbose once in writeLatex()]pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      //[verbose once in writeLatex()]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       labels_off_hull=false;
     }
     if(meta_labels){
       //[verbose once in writeLatex()]message << "LABEL_NAME set to NONE but META_LABELS requested (fix .aflow.rc), toggling META_LABELS off"
-      //[verbose once in writeLatex()]pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      //[verbose once in writeLatex()]pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       meta_labels=false;
     }
   }
@@ -7244,7 +7244,7 @@ void ConvexHull::writeLatex() const {
     if(!aurostd::IsCommandAvailable("convert")) {throw aurostd::xerror(soliloquy,"\"convert\" needs to be in your path");}
   }
   message << "Starting LaTeX PDF generator";
-  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
   //////////////////////////////////////////////////////////////////////////////
   // START Getting hull attributes
@@ -7367,12 +7367,12 @@ void ConvexHull::writeLatex() const {
   if(no_labels){
     if(labels_off_hull){
       message << "LABEL_NAME set to NONE but LABELS_OFF_HULL requested (fix .aflow.rc), toggling LABELS_OFF_HULL off";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       //[turned off already in resolvePlotLabelSettings()]labels_off_hull=false;
     }
     if(meta_labels){
       message << "LABEL_NAME set to NONE but META_LABELS requested (fix .aflow.rc), toggling META_LABELS off";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       //[turned off already in resolvePlotLabelSettings()]meta_labels=false;
     }
   }
@@ -7385,7 +7385,7 @@ void ConvexHull::writeLatex() const {
   if(no_labels){
     if(plot_reduced_composition){
       message << "LABEL_NAME set to NONE but PLOT_REDUCED_COMPOSITION requested (fix .aflow.rc), toggling PLOT_REDUCED_COMPOSITION off";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       plot_reduced_composition=false;
     }
   }
@@ -7395,7 +7395,7 @@ void ConvexHull::writeLatex() const {
   if(no_labels){
     if(rotate_labels){
       message << "LABEL_NAME set to NONE but ROTATE_LABELS requested (fix .aflow.rc), toggling ROTATE_LABELS off";
-      pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       rotate_labels=false;
     }
   }
@@ -7428,7 +7428,7 @@ void ConvexHull::writeLatex() const {
   if(dimension>3) {
     doc_only=true;
     message << "CHULL::DOC_ONLY set to TRUE (dimension>3)";
-    pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
   }
 
   // initializing stringstreams to use
@@ -7588,12 +7588,12 @@ void ConvexHull::writeLatex() const {
   if(plot_iso_max_latent_heat){
     if(!m_formation_energy_hull){
       message << "CHULL::PLOT_ISO_MAX_LATENT_HEAT set to FALSE (limited to formation energy hulls only)";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       plot_iso_max_latent_heat=false;
     }
     if(dimension!=2){
       message << "CHULL::PLOT_ISO_MAX_LATENT_HEAT set to FALSE (dimension!=2)";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       plot_iso_max_latent_heat=false;
     }
   }
@@ -7629,7 +7629,7 @@ void ConvexHull::writeLatex() const {
         else {if(z_filter_cutoff < 0.0){plot_unstable=true;}}
         if(plot_unstable_old!=plot_unstable){
           message << "CHULL::PLOT_UNSTABLE set to TRUE, z_filter_cutoff=" << z_filter_cutoff;
-          pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         }
         //[OBSOLETE CO 180227]if(!plot_unstable) {
         //[OBSOLETE CO 180227]  if(m_formation_energy_hull){if(z_filter_cutoff > 0.0){z_filter_cutoff = 0.0;}}
@@ -7644,7 +7644,7 @@ void ConvexHull::writeLatex() const {
       if(zeroWithinTol(dist_filter_cutoff) && plot_off_hull) {
         plot_off_hull=false;
         message << "CHULL::OFF_HULL set to FALSE, filter_by_distance=0.0";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       }
     }
 
@@ -7684,7 +7684,7 @@ void ConvexHull::writeLatex() const {
                 //[CO181226 - print later]  message << "Excluding entry " << point.m_entry.auid;
                 //[CO181226 - print later]  message << " with H_f = " << chull::H_f_atom(point, _m_);
                 //[CO181226 - print later]  message << " (meV/atom) from plot";
-                //[CO181226 - print later]  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
+                //[CO181226 - print later]  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
                 //[CO181226 - print later]}
                 continue;
               }
@@ -7694,7 +7694,7 @@ void ConvexHull::writeLatex() const {
                 //[CO181226 - print later]  message << "Excluding entry " << point.m_entry.auid;
                 //[CO181226 - print later]  message << " with T_S = " << chull::T_S(point);
                 //[CO181226 - print later]  message << " (K) from plot";
-                //[CO181226 - print later]  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
+                //[CO181226 - print later]  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
                 //[CO181226 - print later]}
                 continue;
               }
@@ -7706,7 +7706,7 @@ void ConvexHull::writeLatex() const {
                 //[CO181226 - print later]message << "Excluding entry " << point.m_entry.auid;
                 //[CO181226 - print later]message << " with enthalpy_formation_atom_difference = " << aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION);
                 //[CO181226 - print later]message << " (meV/atom) from plot";
-                //[CO181226 - print later]pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
+                //[CO181226 - print later]pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                 continue;
               }
             } else {
@@ -7714,7 +7714,7 @@ void ConvexHull::writeLatex() const {
                 //[CO181226 - print later]message << "Excluding entry " << point.m_entry.auid;
                 //[CO181226 - print later]message << " with entropic_temperature_difference = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
                 //[CO181226 - print later]message << " (K) from plot";
-                //[CO181226 - print later]pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
+                //[CO181226 - print later]pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                 continue;
               }
             }
@@ -7739,7 +7739,7 @@ void ConvexHull::writeLatex() const {
       message << "CHULL::FILTER_SCHEME set to Z-axis (no stable points found)" << endl;
       message << "CHULL::FILTER_VALUE set to " << z_filter_cutoff << " (no stable found)" << endl;
       message << "CHULL::PLOT_UNSTABLE set to TRUE (no stable found)" << endl;
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -7773,7 +7773,7 @@ void ConvexHull::writeLatex() const {
                   message << "Excluding entry " << point.m_entry.auid;
                   message << " with H_f = " << chull::H_f_atom(point, _m_);
                   message << " (meV/atom) from plot";
-                  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
+                  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
                 }
                 continue;
               }
@@ -7783,7 +7783,7 @@ void ConvexHull::writeLatex() const {
                   message << "Excluding entry " << point.m_entry.auid;
                   message << " with T_S = " << chull::T_S(point);
                   message << " (K) from plot";
-                  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
+                  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_,!filter_by_z);  // too much output to screen
                 }
                 continue;
               }
@@ -7795,7 +7795,7 @@ void ConvexHull::writeLatex() const {
                 message << "Excluding entry " << point.m_entry.auid;
                 message << " with enthalpy_formation_atom_difference = " << aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION);
                 message << " (meV/atom) from plot";
-                pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
+                pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                 continue;
               }
             } else {
@@ -7803,7 +7803,7 @@ void ConvexHull::writeLatex() const {
                 message << "Excluding entry " << point.m_entry.auid;
                 message << " with entropic_temperature_difference = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
                 message << " (K) from plot";
-                pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
+                pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                 continue;
               }
             }
@@ -7826,7 +7826,7 @@ void ConvexHull::writeLatex() const {
     if(!plot_points_count){
       doc_only=true;
       message << "CHULL::DOC_ONLY set to TRUE (no plot points found)";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
     }
     //[CO1812226 - OBSOLETE]}
 
@@ -8157,11 +8157,11 @@ void ConvexHull::writeLatex() const {
     if(dimension == 2) {
       include_color_bar=false;
       message << "CHULL::COLOR_BAR set to FALSE (dimension==2)";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       
       show_heat_map=false;
       message << "CHULL::HEAT_MAP set to FALSE (dimension==2)";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
     }
     // determine whether we can have a colorbar
     // recently added: (plot_points_count==1&&!show_heat_map)
@@ -8176,27 +8176,27 @@ void ConvexHull::writeLatex() const {
       }
       if(!plot_points_count) {
         message << "CHULL::COLOR_BAR set to FALSE, no entries found";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         message << "CHULL::COLOR_GRADIENT set to FALSE, no entries found";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         message << "CHULL::HEAT_MAP set to FALSE, no entries found";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       }
       if(dimension==3 && !show_heat_map && plot_points_count<2) {
         message << "CHULL::COLOR_BAR set to FALSE, not enough non-unary entries found";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         message << "CHULL::COLOR_GRADIENT set to FALSE, not enough non-unary entries found";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         message << "CHULL::HEAT_MAP set to FALSE, not enough non-unary entries found";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       }
       if(zeroWithinTol(point_range)) {
         message << "CHULL::COLOR_BAR set to FALSE, hull has no depth";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         message << "CHULL::COLOR_GRADIENT set to FALSE, hull has no depth";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         message << "CHULL::HEAT_MAP set to FALSE, hull has no depth";
-        pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
       }
     }
 
@@ -10132,7 +10132,7 @@ void ConvexHull::writeLatex() const {
   }
   if(!show_latex_output) {command << "1>/dev/null ";}
   message << "Attempting to compile " << main_TEX_file;  // CO 180220 //the .tex file";
-  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
   if(show_latex_output) {
     if(latex_interactive_mode) {for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // will not save output, allows you to interact with LaTEX
@@ -10140,7 +10140,7 @@ void ConvexHull::writeLatex() const {
   } else {for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // no output to save
   if(!aurostd::FileExist(main_PDF_file)) {
     message << main_PDF_file << " was not created successfully, likely a LaTeX issue";
-    pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     files_2_move.clear(); //only move these files
     files_2_move.push_back(main_TEX_file);
     if(!doc_only){files_2_move.push_back(aflow_logo_skinny_file);}
@@ -10148,9 +10148,9 @@ void ConvexHull::writeLatex() const {
     if(print_logo_2){files_2_move.push_back(logo_file_2);}
 
     message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; // CO 180220 - current directory";
-    pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     message << "Try running \"" << aurostd::RemoveWhiteSpacesFromTheBack(clean_command.str()) << "\"";
-    pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     
     aurostd::file2directory(files_2_move, path);
     chdir(PWD.c_str());
@@ -10164,16 +10164,16 @@ void ConvexHull::writeLatex() const {
     if(!resolution_input.empty()){
       if(!aurostd::isfloat(resolution_input)){
         message << "PNG_RESOLUTION input is not a number, defaulting to " << default_resolution;
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else {resolution=aurostd::string2utype<int>(resolution_input);}
       if(resolution==0){
         message << "PNG_RESOLUTION input is 0, defaulting to " << default_resolution;
-        pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         resolution=default_resolution;
       }
     }
     message << "Attempting to convert " << main_PDF_file << " to " << main_PNG_file;  // CO 180220 //the .tex file";
-    pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
     clean_command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
     command << " 1>/dev/null 2>&1";
@@ -10181,14 +10181,14 @@ void ConvexHull::writeLatex() const {
     string convert_output=aurostd::execute2string(command.str());
     if(!aurostd::RemoveWhiteSpaces(convert_output).empty()){
       message << main_PNG_file << " was not created successfully, likely a convert issue";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       files_2_move.clear(); //only move these files
       files_2_move.push_back(main_PDF_file);
 
       message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; // CO 180220 - current directory";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       message << "Try running \"" << aurostd::RemoveWhiteSpacesFromTheBack(clean_command.str()) << "\"";
-      pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       
       aurostd::file2directory(files_2_move, path);
       chdir(PWD.c_str());
@@ -10204,7 +10204,7 @@ void ConvexHull::writeLatex() const {
     if(print_aflow_logo_full){files_2_move.push_back(aflow_logo_full_file);} //files_2_move.push_back(aflow_logo_skinny_file);
     if(print_logo_2){files_2_move.push_back(logo_file_2);}
     message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; // CO 180220 - current directory";
-    pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
   }
   if(!aurostd::file2directory(files_2_move, path)) {
     chdir(PWD.c_str());
@@ -10215,7 +10215,7 @@ void ConvexHull::writeLatex() const {
   aurostd::RemoveDirectory(LATEX_dir);
   if(!aurostd::FileExist(destination)){throw aurostd::xerror(soliloquy,"Unable to write "+main_output_file+" to "+path);}
   message << main_output_file << " was created successfully, see destination=" << path;
-  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
 
   //////////////////////////////////////////////////////////////////////////////
   // END Create tmp directory for compilation of .tex document
@@ -10921,7 +10921,7 @@ void ConvexHull::writeText(filetype ftype) const {
 
   if(ftype==txt_ft){message << "Starting plain text generator";}
   else {message << "Starting JSON generator";}
-  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
   string properties_str_points=getPointsPropertyHeaderList(ftype);
   
@@ -11016,14 +11016,14 @@ void ConvexHull::writeText(filetype ftype) const {
   aurostd::stringstream2file(main_text_ss,destination);
   if(!aurostd::FileExist(destination)){throw aurostd::xerror(soliloquy,"Unable to write "+file_name+" to "+path);}
   message << file_name << " was created successfully, see destination=" << path;
-  pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
 }
 
 void ConvexHull::writeWebApp() const {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ConvexHull::writeWebApp():";
   stringstream message;
-  pflow::logger(soliloquy, "Starting web-specific JSONifier", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Starting web-specific JSONifier", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   // initializing stringstreams to use
   stringstream main_JSON_ss;
@@ -11516,7 +11516,7 @@ void ConvexHull::writeWebApp() const {
   //////////////////////////////////////////////////////////////////////////////
 
   message << main_JSON_file << " was created successfully, see destination=" << path;
-  pflow::logger(soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 }
 
 void ConvexHull::writeAPool() const {

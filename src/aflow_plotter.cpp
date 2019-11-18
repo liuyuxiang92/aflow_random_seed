@@ -407,7 +407,7 @@ string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version
   
   if(!aurostd::substring2bool(default_title,POCC_TAG)){  //use generic
     ostream& oss=cout;
-    message << "No POCC_TAG found [" << POCC_TAG << "], using generic SYSTEM name as title";pflow::logger(soliloquy, message, oss, _LOGGER_WARNING_);
+    message << "No POCC_TAG found [" << POCC_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_);
     return aurostd::fixStringLatex(default_title, false, false);
   }
   //Get all the pieces of the default title
@@ -473,7 +473,7 @@ string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version
 
   if(xstr.atoms.size()==0){  //use generic
     ostream& oss=cout;
-    message << "Cannot extract identifiable prototype from SYSTEM [" << default_title << "], using generic SYSTEM name as title";pflow::logger(soliloquy, message, oss, _LOGGER_WARNING_);
+    message << "Cannot extract identifiable prototype from SYSTEM [" << default_title << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_);
     return aurostd::fixStringLatex(default_title, false, false);
   }
 
@@ -481,7 +481,7 @@ string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version
 
   if(xstr.species.size()!=xstr.comp_each_type.size()){ //use generic
     ostream& oss=cout;
-    message << "Cannot extract composition from prototype [" << proto << "], using generic SYSTEM name as title";pflow::logger(soliloquy, message, oss, _LOGGER_WARNING_);
+    message << "Cannot extract composition from prototype [" << proto << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, oss, _LOGGER_WARNING_);
     return aurostd::fixStringLatex(default_title, false, false);
   }
 

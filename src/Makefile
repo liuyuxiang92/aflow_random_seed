@@ -267,7 +267,7 @@ mac:
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
 aflow.o: aflow.cpp aflow_test.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow.cpp -c
 #aurostd.o: aurostd.cpp aurostd.h Makefile
 #	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aurostd.cpp -c -o aurostd.o
 #aurostd.cpp:
@@ -335,7 +335,7 @@ aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt
 	echo "\";" >> $@
 #MB 190301 - END
 aflowlib_web_interface.o: aflowlib_web_interface.cpp aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflowlib_web_interface.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflowlib_web_interface.cpp -c
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
@@ -792,9 +792,9 @@ aflow_contrib_shidong_statistic.o: aflow_contrib_shidong_statistic.cpp aflow_con
 
 #####COMPARE###################################################
 aflow_compare_structure_function.o: aflow_compare_structure_function.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
-	${CPP} $(VERS) ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure_function.cpp -c
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure_function.cpp -c
 aflow_compare_structure.o: aflow_compare_structure.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
-	${CPP} $(VERS) ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure.cpp -c
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure.cpp -c
 
 #[OBSOLETE] [JUNKAI]###### JUNKAI #################################################
 #[OBSOLETE] [JUNKAI] aflow_contrib_junkai_cproto.o:aflow_contrib_junkai_cproto.cpp aflow_contrib_junkai_basic.h

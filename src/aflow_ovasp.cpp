@@ -3825,7 +3825,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
                            " DOSCAR is lm-resolved. If this is not the case, please put an"
                            " INCAR" + ext + ", a vasprun.xml " + ext + ", or an"
                            " OUTCAR" +  ext + " file into the working directory and try again.";
-          pflow::logger("xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, "xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
           isLSCOUPLING = true;
         }
         lmResolved = !(isLSCOUPLING);  // With 16 columns, it cannot be both
@@ -3860,7 +3860,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if (d == (int) ndos) {
         string message = "DOSCAR contains more lines than the header suggests."
                          " xDOSCAR object may not be properly populated.";
-        pflow::logger("xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, "xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_);
         break;
       }
       e = 0;

@@ -3105,7 +3105,7 @@ namespace aflowlib {
         enthalpy_formation_cell = natoms * enthalpy_formation_atom;
         if(verbose){
           message << "Fixing enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       //gamma_IrV
@@ -3116,7 +3116,7 @@ namespace aflowlib {
         enthalpy_atom -= 0.005;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // HfPd
@@ -3127,7 +3127,7 @@ namespace aflowlib {
         enthalpy_cell = natoms * enthalpy_atom;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // sigma
@@ -3142,7 +3142,7 @@ namespace aflowlib {
         enthalpy_atom += 0.005;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // sigma
@@ -3153,7 +3153,7 @@ namespace aflowlib {
         enthalpy_cell = natoms * enthalpy_atom;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
     }
@@ -3468,7 +3468,7 @@ namespace aflowlib {
     if(0){
       if (tokens.size() != 2) {
 	message << "Odd AURL format for entry " << auid << ": " << aurl;
-	pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+	pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
 	return path;
       }
     }

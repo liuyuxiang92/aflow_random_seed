@@ -144,7 +144,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       ostream& oss=cout;
       //ofstream FileMESSAGE;
       message << "Creating list of (primitivized) unique derivative supercells. Please be patient as primitivization can be slow";
-      pflow::logger(soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       
       for(unsigned long long int i=0;i<Num_calculated;i++) {
         ss.str("");

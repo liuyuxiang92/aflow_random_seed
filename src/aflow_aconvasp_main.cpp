@@ -8303,11 +8303,11 @@ namespace pflow {
     vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX", true);  // silence some output
 
     message << "Loading entries for: " << aurostd::joinWDelimiter(velements, ",");
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     if(vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) {
       message << "Loading NON-alphabetized entries as well";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
 
     vector<vector<string> > combinations;
@@ -8321,17 +8321,17 @@ namespace pflow {
 
       if( load_from_common ) {
         message << "Loading entries from COMMON";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       } else {
         if(server == "materials.duke.edu") {
           message << "Using materials.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         } else if(server == "aflowlib.duke.edu") {
           message << "Using aflowlib.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         } else {
           message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;  //entries;
         }
       }
@@ -8350,12 +8350,12 @@ namespace pflow {
         load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
         if(vpflow.flag(load_lib_flag_name)) {
           message << "Loading " + lib_name;
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
           combinations = pflow::elementalCombinations(velements, lib);
           for (uint i = 0; i < combinations.size(); i++) {
             if(!loadAndMergeLIBX(vpflow, combinations[i], lib_count_string, server, _entries, FileMESSAGE, oss)) {
               message << "Merging entries for " + lib_name + " failed";
-              pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
               return false;
             }
           }
@@ -8374,10 +8374,10 @@ namespace pflow {
       load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
       if(vpflow.flag(load_lib_flag_name)) {
         message << "Loading " + lib_name;
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         if(!loadAndMergeLIBX(vpflow, velements, lib_name, server, _entries, FileMESSAGE, oss)) {
           message << "Merging entries for " + lib_name + " failed";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;
         }
       }
@@ -8451,10 +8451,10 @@ namespace pflow {
       //  message << (i + 1) << "-naries: ";
       //}
       //message << sizes.at(i) << " entries";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
     }
     message << "Loaded " << totalNum << " entries total";
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Print loaded entries summary
@@ -8695,7 +8695,7 @@ namespace pflow {
           } else {
             message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(i + 1) + "-naries) failed";
           }
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;
         }
       }
@@ -8706,7 +8706,7 @@ namespace pflow {
       } else {
         message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
       }
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
     return true;
@@ -9060,20 +9060,20 @@ namespace pflow {
       for (uint i = 0; i < lib_count_string.size(); i++) {
         if(!isdigit(lib_count_string[i])) {
           message << "Unknown LIB specification (" << LIB << "), should be \"LIB1\", \"LIB2\", or \"1\", \"2\", etc.";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;  //entries;
         }
       }
       uint lib_count_uint = aurostd::string2utype<int>(lib_count_string);
       if(velements.size() != lib_count_uint) {
         message << "LIB" << lib_count_uint << " loads " << lib_count_uint << "-naries ONLY";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;  //entries;
       }
     }
 
     message << "Loading " << lib_name << " entries for: " << aurostd::joinWDelimiter(velements, "");
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     bool load_from_common = pflow::loadFromCommon(vpflow);
     bool override_load_from_common = false;
@@ -9082,13 +9082,13 @@ namespace pflow {
     if(load_from_common) {
       if(!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX")) {
         message << "Loading entries from COMMON";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
       LIB_path = "/common/" + lib_name + "/RAW/";
       if(!aurostd::IsDirectory(LIB_path)) {
         load_from_common = false;
         message << LIB_path << " does not exist! Cannot load from COMMON, switching to API";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         override_load_from_common = true;
       }
     }
@@ -9096,16 +9096,16 @@ namespace pflow {
       if(server == "materials.duke.edu") {
         if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
           message << "Using materials.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       } else if(server == "aflowlib.duke.edu") {
         if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
           message << "Using aflowlib.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       } else {
         message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;  //entries;
       }
       if(isICSD) {
@@ -9136,7 +9136,7 @@ namespace pflow {
         else {aurostd::url2tokens(symmetry_path + "/?aflowlib_entries", icsds, ",");}
         if(icsds.size() && icsds[0]=="<!DOCTYPE"){ //CO 180627
           message << "REST-API appears to be down";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;
         }
         for (uint j = 0; j < icsds.size(); j++) {
@@ -9148,7 +9148,7 @@ namespace pflow {
 
               //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
               message << "Loading " << (load_from_common ? "path" : "url") << "=" << symmetry_path << "/" << icsds[j];
-              pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+              pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
               //}
               //complicated ternary operator, returns bool, but necessary to avoid double code
               if(
@@ -9191,7 +9191,7 @@ namespace pflow {
       else {aurostd::url2tokens(LIB_path + "/?aflowlib_entries", systems, ",");}
       if(systems.size() && systems[0]=="<!DOCTYPE"){ //CO 180627
         message << "REST-API appears to be down";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;
       }
       for (uint i = 0; i < systems.size(); i++) {
@@ -9204,14 +9204,14 @@ namespace pflow {
           else {aurostd::url2tokens(calculation_path + "/?aflowlib_entries", calculations, ",");}
           if(calculations.size() && calculations[0]=="<!DOCTYPE"){ //CO 180627
             message << "REST-API appears to be down";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
             return false;
           }
           for (uint j = 0; j < calculations.size(); j++) {
             if(load_from_common && !aurostd::IsDirectory(calculation_path + "/" + calculations[j])) { continue; }
             //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
             message << "Loading " << (load_from_common ? "path" : "url") << "=" << calculation_path << "/" << calculations[j];
-            pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+            pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
             //}
             //complicated ternary operator, returns bool, but necessary to avoid double code
             if(
@@ -9270,7 +9270,7 @@ namespace pflow {
     //////////////////////////////////////////////////////////////////////////////
 
     message << "Loaded " << total_count << " entries";
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Print loaded entries summary
@@ -9548,7 +9548,7 @@ namespace pflow {
     stringstream message;
     if(velements2check.size()==0||input_velements.size()==0){  //null case, simply return false
       message << "Invalid input (velements2check.size()==" << velements2check.size() << ",input_velements.size()==" << input_velements.size() << ")";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
     if(input_velements.size()>velements2check.size()){return false;}  //fast return
@@ -9599,7 +9599,7 @@ namespace pflow {
     if(path.empty()){path = entry.getPathAURL(FileMESSAGE,oss,false);is_url_path=true;}
     if (path.empty()) {
       message << "Path cannot be loaded from entry, skipping loadXstructure()";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     }
 
@@ -9616,7 +9616,7 @@ namespace pflow {
         (!aurostd::substring2bool(files, "CONTCAR.relax") &&
          !aurostd::substring2bool(files, "CONTCAR.relax2"))) {
       message << "path=" << path << " missing structure files. Ignoring entry";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     } else {
       if (!relaxed_only) {
@@ -9641,7 +9641,7 @@ namespace pflow {
           }
         }
         if (!xstrAux.atoms.size()) {
-          pflow::logger(soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
           return false;
         }
         entry.vstr.push_back(xstrAux);
@@ -9673,7 +9673,7 @@ namespace pflow {
           }
         }
         if (!xstrAux.atoms.size()) {
-          pflow::logger(soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
           return false;
         }
         entry.vstr.push_back(xstrAux);
@@ -9706,7 +9706,7 @@ namespace pflow {
         }
       }
       if (!xstrAux.atoms.size()) {
-        pflow::logger(soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
       entry.vstr.push_back(xstrAux);
@@ -9769,7 +9769,7 @@ namespace pflow {
     //  }
     //}
     //if(numberOfElements == 0) {
-    //  pflow::logger(soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
     //  return velements;
     //}
 
@@ -9910,7 +9910,7 @@ namespace pflow {
     if(LDEBUG) {cerr << soliloquy << " original input=" << _input << endl;}
 
     if(_input.empty()) {
-      pflow::logger(soliloquy, "Empty input", FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Empty input", FileMESSAGE, oss, _LOGGER_ERROR_);
       return velements;
     }
 
@@ -9919,7 +9919,7 @@ namespace pflow {
     if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){KBIN::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
 
     if(!isupper(input[0])) {
-      pflow::logger(soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
       return velements;
     }
   
@@ -9949,7 +9949,7 @@ namespace pflow {
     //  }
     //}
     //if(numberOfElements == 0) {
-    //  pflow::logger(soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
     //  return velements;
     //}
 
@@ -9978,7 +9978,7 @@ namespace pflow {
     // END Parsing input
     //////////////////////////////////////////////////////////////////////////////
 
-    if(velements.size()==0){pflow::logger(soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
+    if(velements.size()==0){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
 
     if(sort_elements && velements.size()>1){
       string etmp="";
@@ -10060,18 +10060,18 @@ namespace pflow {
       vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT", true);
       if(!silent) {
         message << "PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT set to TRUE";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
     }
     //[CO190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL", true);  // un-alphabetized entries are crap
     if(!silent) {
       message << "PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL set to TRUE";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
     vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE", true);  //if loading ternary, also load relevant binaries and unaries
     if(!silent) {
       message << "PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE set to TRUE";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
     input = aurostd::toupper(input);  //removes ALL ambiguity with case
     //must be specific LIB1, LIB2, etc.
@@ -10084,7 +10084,7 @@ namespace pflow {
       vpflow.flag(load_lib_flag_name, true);
       if(!silent) {
         message << load_lib_flag_name << " set to TRUE";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
     } else {
       if(input == "A") {
@@ -10100,7 +10100,7 @@ namespace pflow {
           vpflow.flag(load_lib_flag_name, true);
           if(!silent) {
             message << load_lib_flag_name << " set to TRUE";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
           }
         }
       }
@@ -10108,7 +10108,7 @@ namespace pflow {
         vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_ICSD", true);
         if(!silent) {
           message << "PFLOW::LOAD_ENTRIES_LOAD_ICSD set to TRUE";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       }
     }
@@ -10149,70 +10149,70 @@ namespace pflow {
   // message can be string or stringstream (if stringstream, it gets cleared out)
   // oss = cout, cerr (as you prefer)
   // FileMESSAGE - logfile
-  void logger(const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, directory, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, directory, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, aflags, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, const string& _message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     ofstream FileMESSAGE;
-    logger(function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
     if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::execute2string(XHOST.command("pwd"))+"/";} //".";  // CO 180220
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     ofstream FileMESSAGE;
-    logger(function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     ofstream FileMESSAGE;
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     _aflags aflags; aflags.Directory=directory;
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // main function
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // main function
     // five types:  M - Message, W - Warning, E - Error, O - Option, C - Complete, R - RAW
     // treat E, W, O, C, and R as special, otherwise treat as a message
     // no need for function name for R, you can put ""
@@ -10235,14 +10235,8 @@ namespace pflow {
     bool fancy_print=(!XHOST.WEB_MODE);
 
     string soliloquy = aurostd::RemoveWhiteSpaces(function_name);
-    string ErrorBarString =
-      "EEEEE  "
-      "------------------------------------------------------------------------"
-      "---------------------------------------------------- ";
-    string WarningBarString =
-      "WWWWW  "
-      "------------------------------------------------------------------------"
-      "---------------------------------------------------- ";
+    string ErrorBarString =   "EEEEE  ---------------------------------------------------------------------------------------------------------------------------- ";
+    string WarningBarString = "WWWWW  ---------------------------------------------------------------------------------------------------------------------------- ";
 
     if (type == _LOGGER_ERROR_) {
       ////////////////////////////////////////////////////////////////////////////
@@ -10251,50 +10245,50 @@ namespace pflow {
 
       // write to screen if not quiet
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
-	if(fancy_print) printf("\033[31m");     // red
-	oss << ErrorBarString;  // make it clear in log file that an error
-	// occurred
-	oss << endl;
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[31m");     // red
+        oss << ErrorBarString;  // make it clear in log file that an error
+        // occurred
+        oss << endl;
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "EEEEE";
-	  oss << "  ";
+          oss << "EEEEE";
+          oss << "  ";
 
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[31m");  // red
-	  if(fancy_print) printf("\033[5m");   // bold/blink
-	  oss << "ERROR";
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[31m");  // red
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[31m");  // red
+          if(fancy_print) printf("\033[5m");   // bold/blink
+          oss << "ERROR";
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[31m");  // red
 
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss << ErrorBarString;  // make it clear in log file that an error
-	// occurred
-	oss << endl;
-	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss << ErrorBarString;  // make it clear in log file that an error
+        // occurred
+        oss << endl;
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
       }
       // write to log
       FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
       FileMESSAGE << endl;
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "EEEEE";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "ERROR";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "EEEEE";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "ERROR";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
       FileMESSAGE << endl;
@@ -10310,35 +10304,35 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
-	if(fancy_print) printf("\033[33m\033[1m");  // yellow
-	oss << WarningBarString;    // make it clear in log file that an warning
-	// occurred
-	oss << endl;
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[33m\033[1m");  // yellow
+        oss << WarningBarString;    // make it clear in log file that an warning
+        // occurred
+        oss << endl;
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "WWWWW";
-	  oss << "  ";
+          oss << "WWWWW";
+          oss << "  ";
 
-	  if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
-	  if(fancy_print) printf("\033[33m\033[1m");  // yellow
-	  if(fancy_print) printf("\033[5m");          // bold/blink
-	  oss << "WARNING";
-	  if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
-	  if(fancy_print) printf("\033[33m\033[1m");  // yellow
+          if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
+          if(fancy_print) printf("\033[33m\033[1m");  // yellow
+          if(fancy_print) printf("\033[5m");          // bold/blink
+          oss << "WARNING";
+          if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
+          if(fancy_print) printf("\033[33m\033[1m");  // yellow
 
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss << WarningBarString;  // make it clear in log file that an warning
-	// occurred
-	oss << endl;
-	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss << WarningBarString;  // make it clear in log file that an warning
+        // occurred
+        oss << endl;
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
       }
       // write to log
       FileMESSAGE << WarningBarString;  // make it clear in log file that an
@@ -10346,15 +10340,15 @@ namespace pflow {
       FileMESSAGE << endl;
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "WWWWW";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "WARNING";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "WWWWW";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "WARNING";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE << WarningBarString;  // make it clear in log file that a
       // warning occurred
@@ -10371,42 +10365,42 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
-	if(fancy_print) printf("\033[32m");  // green
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[32m");  // green
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "CCCCC";
-	  oss << "  ";
+          oss << "CCCCC";
+          oss << "  ";
 
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[32m");  // green
-	  if(fancy_print) printf("\033[5m");   // bold/blink
-	  oss << "COMPLETE";
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[32m");  // green
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
+          if(fancy_print) printf("\033[5m");   // bold/blink
+          oss << "COMPLETE";
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
 
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "CCCCC";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "COMPLETE";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "CCCCC";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "COMPLETE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
@@ -10420,33 +10414,33 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
+        // borrowed from APL/aflow_apl.h
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "-OPT-";
-	  oss << "  ";
-	  oss << "MESSAGE-OPTION";
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << "-OPT-";
+          oss << "  ";
+          oss << "MESSAGE-OPTION";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "-OPT-";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "MESSAGE-OPTION";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "-OPT-";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "MESSAGE-OPTION";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
@@ -10455,17 +10449,18 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
     } else if (type == _LOGGER_RAW_) {
+
       ////////////////////////////////////////////////////////////////////////////
       // START Option logger
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
+        // borrowed from APL/aflow_apl.h
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
           oss << message_parts[i] << endl; //CO181226 //message;
-	}
-	oss.flush();
+        }
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
@@ -10477,46 +10472,48 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
       // END Raw logger
       ////////////////////////////////////////////////////////////////////////////
-
+    
     } else {
+
       ////////////////////////////////////////////////////////////////////////////
       // START Message logger
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
+        // borrowed from APL/aflow_apl.h
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "00000";
-	  oss << "  ";
-	  oss << "MESSAGE";
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << "00000";
+          oss << "  ";
+          oss << "MESSAGE";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "00000";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "MESSAGE";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "00000";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "MESSAGE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
       ////////////////////////////////////////////////////////////////////////////
       // END Message logger
       ////////////////////////////////////////////////////////////////////////////
+    
     }
   }
 } // namespace pflow
@@ -11730,7 +11727,7 @@ namespace pflow {
     if(occupancy<default_pocc_tol){
       message << "Cannot set desired precision (" << default_pocc_tol << ") for [occupation=" << occ << "]" << endl;
       message << "Doping is VERY small, requiring MANY representative ordered structures (not recommended)" << endl;
-      pflow::logger(soliloquy, message, cout, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cout, _LOGGER_WARNING_);
       return false;
     }
     new_occ=occ;
@@ -14713,14 +14710,14 @@ namespace pflow {
 
     if(0||keep_gp){
       if(aurostd::FileExist(XRAY_DATA_PLOT_FILE)){files2move.push_back(PLOT_tmp_dir+"/"+XRAY_DATA_PLOT_FILE);}
-      else {message << XRAY_DATA_PLOT_FILE << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+      else {message << XRAY_DATA_PLOT_FILE << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
       if(aurostd::FileExist(XRAY_DATA_PEAKS_FILE)){files2move.push_back(PLOT_tmp_dir+"/"+XRAY_DATA_PEAKS_FILE);}
-      else {message << XRAY_DATA_PEAKS_FILE << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+      else {message << XRAY_DATA_PEAKS_FILE << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
       if(aurostd::FileExist(plot_file)){files2move.push_back(PLOT_tmp_dir+"/"+plot_file);}
-      else {message << plot_file << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+      else {message << plot_file << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
     }
     if(aurostd::FileExist(xray_pdf)){files2move.push_back(PLOT_tmp_dir+"/"+xray_pdf);}
-    else {message << xray_pdf << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+    else {message << xray_pdf << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
 
     chdir(curdir.c_str());
     aurostd::file2directory(files2move,directory);
@@ -14729,7 +14726,7 @@ namespace pflow {
     string destination=directory+"/"+xray_pdf;
     aurostd::StringSubst(destination,"//","/");
     message << "Done. See " << destination << "." << endl;
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     if(LDEBUG) cerr << soliloquy <<" END" << endl;  
   }
