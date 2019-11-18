@@ -7101,7 +7101,7 @@ namespace compare{
 
     // Performs lattice and origin search
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::latticeAndOriginSearch()";
 
     bool test_one_lfa_only = false; //DX 20190318
