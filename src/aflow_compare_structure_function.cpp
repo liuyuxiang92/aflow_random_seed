@@ -8010,7 +8010,7 @@ namespace compare{
                             xvector<double>& abc_angles_q1, vector<xmatrix<double> >& lattices, vector<xmatrix<double> >& clattices, 
                             vector<double>& latt_devs, const bool& optimize_match){
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::buildSimilarLattices():";
 
