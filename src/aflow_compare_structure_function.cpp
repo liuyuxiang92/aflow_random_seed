@@ -7039,7 +7039,7 @@ namespace compare{
     // build a supercell comprised only of LFA atoms
     // to speed up translation vector search
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::GetLFASupercell()";
 
     // ---------------------------------------------------------------------------
