@@ -7691,7 +7691,7 @@ namespace compare{
 			vector<xstructure>& vprotos,
       bool optimize_match){ 
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
     double mis=1;  
