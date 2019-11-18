@@ -14,9 +14,12 @@
 // * Database builder
 // * Database analyzer
 // * User-level functions to interact with the database
+//
+//
 
 #include "aflowlib.h"
 #include "SQLITE/sqlite3.h"
+// signal and unistd are required to use kill when compiling with clang++
 #include <signal.h>
 #include <unistd.h>
 
@@ -80,6 +83,7 @@ AflowDB::~AflowDB() {
 void AflowDB::free() {
   data_path = "";
   database_file = "";
+  lock_file = "";
   schema_file = "";
   is_tmp = false;
 }

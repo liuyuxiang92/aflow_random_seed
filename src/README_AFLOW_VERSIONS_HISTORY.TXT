@@ -2,7 +2,7 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- ADD BELOW
         -- Added a handler for the AFLOW database. (ME)
-        -- Updated SQLite to version 3.26.0. (ME)
+        -- Updated SQLite to version 3.26.0 (https://sqlite.org/2018/sqlite-amalgamation-3260000.zip). (ME)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
 	      -- Bug fixes for MPI (SC)

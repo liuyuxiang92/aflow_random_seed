@@ -1058,7 +1058,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
-  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database") && argv.at(1)=="--rebuild_database");  // ME191001
+  vpflow.flag("REBUILDDB", aurostd::args2flag(argv,cmds,"--rebuild_database"));  // ME191001
 
   vpflow.flag("CCE_CORRECTION::USAGE",aurostd::args2flag(argv,cmds,"--cce_correction|--cce"));
   vpflow.args2addattachedscheme(argv,cmds,"CCE_CORRECTION::POSCAR_PATH","--cce_correction=|--cce=","");
@@ -1226,8 +1226,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("TERDATA_EXIST",aurostd::args2flag(argv,cmds,"--terdata_exist"));
   
   vpflow.flag("UFFENERGY",aurostd::args2flag(argv,cmds,"--uffenergy|--ue"));
-  vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database") && argv.at(1)=="--update_database");  // ME191001
-  vpflow.flag("UPDATEDBJSONS", aurostd::args2flag(argv,cmds,"--update_database_jsons") && argv.at(1)=="--update_database_jsons");  // ME191001
+  vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database"));  // ME191001
+  vpflow.flag("UPDATEDBJSONS", aurostd::args2flag(argv,cmds,"--update_database_jsons"));  // ME191001
   
   //DX 20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX 20180710 - check if used in proto
@@ -1498,7 +1498,10 @@ namespace pflow {
         db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         _PROGRAMRUN = true;
       }
-      if (vpflow.flag("UPDATEDBJSONS")) {aflowlib::updateDatabaseJsonFiles(DEFAULT_AFLOW_DB_DATA_PATH); _PROGRAMRUN = true;}
+      if (vpflow.flag("UPDATEDBJSONS")) {
+        aflowlib::updateDatabaseJsonFiles(DEFAULT_AFLOW_DB_DATA_PATH);
+        _PROGRAMRUN = true;
+      }
       // ME191001 - END
       // [OBSOLETE CO 180703]if(vpflow.flag("QMVASP")) {pflow::QMVASP(argv); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("SG::FINDSYM_PRINT")) {pflow::FINDSYM(vpflow.getattachedscheme("SG::FINDSYM_PRINT"),0,cin); _PROGRAMRUN=true;}
