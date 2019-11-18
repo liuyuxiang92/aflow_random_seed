@@ -5118,7 +5118,7 @@ namespace compare{
 
     // Determine if the structures have the same types and counts of species
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::sameSpecies()";
 
     // ---------------------------------------------------------------------------
