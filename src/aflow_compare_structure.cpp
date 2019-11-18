@@ -2511,7 +2511,7 @@ namespace compare {
       for(uint i=0; i<all_structures.size(); i++){
         all_structures[i].Pearson = "xX";
         all_structures[i].space_group = 0;
-        vector<GroupedWyckoffPosition> tmp;
+        vector<GroupedWyckoffPosition> vGWyckoffPos_tmp;
         all_structures[i].grouped_Wyckoff_positions = tmp;
       }
     }
