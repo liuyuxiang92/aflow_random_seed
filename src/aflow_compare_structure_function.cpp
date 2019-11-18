@@ -4182,7 +4182,7 @@ namespace compare{
       bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
       ostream& oss, ofstream& FileMESSAGE, bool quiet){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonScheme()";
 
     ostream& logstream = cout;
