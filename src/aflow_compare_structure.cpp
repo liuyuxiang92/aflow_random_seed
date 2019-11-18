@@ -2512,7 +2512,7 @@ namespace compare {
         all_structures[i].Pearson = "xX";
         all_structures[i].space_group = 0;
         vector<GroupedWyckoffPosition> vGWyckoffPos_tmp;
-        all_structures[i].grouped_Wyckoff_positions = tmp;
+        all_structures[i].grouped_Wyckoff_positions = vGWyckoffPos_tmp;
       }
     }
     
