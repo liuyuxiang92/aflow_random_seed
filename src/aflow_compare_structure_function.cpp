@@ -1232,7 +1232,7 @@ namespace compare {
     // 2) AURL
     // 3) input (cin)
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::generateStructure()";
     ofstream FileMESSAGE;
     vector<string> tokens;
