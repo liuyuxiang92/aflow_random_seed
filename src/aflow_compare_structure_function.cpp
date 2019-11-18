@@ -4104,7 +4104,7 @@ namespace compare{
     // If the xstructure is not generated, it will generate a local copy for 
     // the single comparison only (prevents overwriting in the comparisons) 
  
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonThreads()";
     stringstream message;
     //bool store_comparison_logs = false; //DX 20190624
