@@ -6277,7 +6277,9 @@ namespace pflow {
   
   // COMMAND LINE SYMMETRY CALCULATION, calls main function PerformFullSymmetry()!!!!!!!!!!!
   bool CalculateFullSymmetry(_aflags &aflags, _kflags& kflags, xstructure& _a, aurostd::xoption& vpflow, bool osswrite,ostream& oss){ //main function
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::CalculateFullSymmetry()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string options = vpflow.getattachedscheme("FULLSYMMETRY");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
