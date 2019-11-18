@@ -7887,7 +7887,7 @@ namespace compare{
     // to find a lattice which is commensurate with the reference structure (xstr1). 
     // This function is parallelized since it is the time-limiting function.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::quadrupletSearch()";
     bool relative_tolerance=true;
 
