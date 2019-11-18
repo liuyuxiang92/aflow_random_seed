@@ -5206,7 +5206,9 @@ namespace pflow {
 namespace pflow {
   //void DATA(string smode,istream& input) {
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss) {
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::DATA()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string aliases = "";
     string options = "";
     if(smode == "EDATA"){
