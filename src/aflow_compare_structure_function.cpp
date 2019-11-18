@@ -6320,7 +6320,7 @@ namespace compare{
     // exact_match      : signals if an exact match (remove duplicates) or conversely 
     //                    if it possible to match later via structure comparison
    
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::compatibleEnvironments()";
 
