@@ -221,7 +221,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   int count_check_min_dist=0;
   
   message << aflow::Banner("BANNER_NORMAL");
-  pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
   if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
  
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
     if(!aurostd::isequal(min_dist_orig,min_dist)){
       //throw a warning here instead, minimum distance MIGHT change with sconv
       //throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);
-      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
       min_dist_orig=min_dist;
     }
   }
@@ -259,8 +259,8 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
   //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
   
-  message << "structure(standard conventional)=";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << xstr_bulk << endl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+  message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
   
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
@@ -337,11 +337,11 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   message.precision(prec);
   message.unsetf(std::ios_base::floatfield);
   
-  message << "shear_direction" << hkl_s;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "step_size=" << step_size;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "fixed_layers=" << fixed_layers;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "shear_direction" << hkl_s;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "step_size=" << step_size;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "fixed_layers=" << fixed_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   
   message.precision(prec_original); //set back
   message.flags(ff_original); //set back
@@ -356,7 +356,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   // START - create slab
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  message << "Creating slab";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   xvector<int> hkl_i;
   int total_layers;
@@ -387,7 +387,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
     cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;
   }
   
-	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
   
   //rotate n_s too
   //[CO190408 - do rotation last!]bool rotate_shear=false;
@@ -502,7 +502,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   if(!partial_dissociation){
     if(!aurostd::isequal(rad2deg*angle_ns_unrotated,90.0) || aurostd::isequal(n_s_rotated[3],0.0)){ //not sure about partial dissociation
       message << "Need to find symmetrically equivalent n_s (angle_ns_unrotated(degrees)=" << rad2deg*angle_ns_unrotated << ",n_s(rotated)=" << n_s_rotated << ")";
-      pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
       
       const vector<_sym_op>& v_pgroups=xstr_sym.pgroup_xtal;
       vector<xvector<double> > v_n_s_sym,v_n_s_sym_rotated;
@@ -636,7 +636,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
       message << "n_s=" << n_s << endl;
       message << "n_s(rotated)=" << n_s_rotated << endl;
-      pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     }
   }
   
@@ -741,7 +741,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above!=count_below){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above!=count_below";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+  //[CO190423 - too much work, rely on atom.ijk instead!]  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above+count_below!=count_total){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above+count_below!=count_total";
@@ -953,7 +953,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   }
   dir_count=0;shear_fraction=0.0;
 
-  if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+  if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
 
   //create directories if vasp is not done
   int half_k=supercell_layers_i/2;  //floor
@@ -1086,7 +1086,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   if(!all_vasp_done){
-	  message << "Now waiting for sheared VASP runs";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+	  message << "Now waiting for sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
     return;
   }
 
@@ -1142,7 +1142,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   int count_check_min_dist=0;
   
   message << aflow::Banner("BANNER_NORMAL");
-  pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
   if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
  
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1169,7 +1169,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     if(!aurostd::isequal(min_dist_orig,min_dist)){
       //throw a warning here instead, minimum distance MIGHT change with sconv
       //throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);
-      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
       min_dist_orig=min_dist;
     }
   }
@@ -1180,8 +1180,8 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
   //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
   
-  message << "structure(standard conventional)=";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << xstr_bulk << endl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+  message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
   
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
@@ -1244,8 +1244,8 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   message.precision(prec);
   message.unsetf(std::ios_base::floatfield);
   
-  message << "relaxation_layers=" << relaxation_layers;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "relaxation_layers=" << relaxation_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   
   message.precision(prec_original); //set back
   message.flags(ff_original); //set back
@@ -1299,7 +1299,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
 
   bool convert_sprim=true;
   if(!all_vasp_done){
-    message << "Creating bulk VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Creating bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     
     xvasp.clear();
 
@@ -1350,7 +1350,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   dir_count++;
 
   if(!all_vasp_done){
-	  message << "Now waiting for the bulk VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+	  message << "Now waiting for the bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
     return;
   }
 
@@ -1363,8 +1363,8 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   xstructure xstr_relaxed=KBIN::GetMostRelaxedStructure(xvasp.Directory);
-  message << "structure(bulk_relaxed)=";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << xstr_relaxed << endl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+  message << "structure(bulk_relaxed)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << xstr_relaxed << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - grab relaxed bulk
@@ -1374,7 +1374,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   // START - create slab
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  message << "Creating slab";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   //xvector<int> hkl_i;
   int total_layers;
@@ -1384,7 +1384,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
 
   xstructure xstr_slab=slab::CreateSlab_SurfaceLattice(vpflow,xstr_relaxed,hkl_i,total_layers,rotation,xstr_slablattice,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,AUROSTD_MAX_DOUBLE,oss);
   
-	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
   
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - create slab
@@ -1498,7 +1498,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
 
   if(!all_vasp_done){
-    message << "Creating slab VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Creating slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     
     xvasp.clear();
     //load in xstructure
@@ -1542,7 +1542,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   dir_count++;
   
   if(!all_vasp_done){
-	  message << "Now waiting for the slab VASP run";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+	  message << "Now waiting for the slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
     return;
   }
 

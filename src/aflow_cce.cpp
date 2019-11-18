@@ -268,7 +268,7 @@ namespace pflow {
   bool scan=0;
   if(functionals.empty() && dft_energies.size() == 1){
     message << "Setting functionals=PBE since only 1 DFT formation energy is provided and PBE is the default functional!";
-              pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
     functionals="PBE";
     pbe=1;
     aurostd::string2tokens(functionals,vfunctionals,","); // if functionals input string is not empty, convert it to vector of strings
