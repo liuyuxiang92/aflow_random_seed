@@ -3738,7 +3738,7 @@ namespace compare{
     // this function checks if other groups based on 
 
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::checkForBetterMatches()";
     stringstream message;
     ostream& logstream = cout;
