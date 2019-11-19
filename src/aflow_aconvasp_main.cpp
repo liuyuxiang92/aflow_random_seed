@@ -1227,7 +1227,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   
   vpflow.flag("UFFENERGY",aurostd::args2flag(argv,cmds,"--uffenergy|--ue"));
   vpflow.flag("UPDATEDB", aurostd::args2flag(argv,cmds,"--update_database"));  // ME191001
-  vpflow.flag("UPDATEDBJSONS", aurostd::args2flag(argv,cmds,"--update_database_jsons"));  // ME191001
   
   //DX 20180710 - we do not want to run if the flag was used in proto - vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp"));
   vpflow.flag("VASP",aurostd::args2flag(argv,cmds,"--vasp") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX 20180710 - check if used in proto
@@ -1496,10 +1495,6 @@ namespace pflow {
       if (vpflow.flag("ANALYZEDB")) {
         aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);
         db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
-        _PROGRAMRUN = true;
-      }
-      if (vpflow.flag("UPDATEDBJSONS")) {
-        aflowlib::updateDatabaseJsonFiles(DEFAULT_AFLOW_DB_DATA_PATH);
         _PROGRAMRUN = true;
       }
       // ME191001 - END

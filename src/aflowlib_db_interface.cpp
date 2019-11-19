@@ -15,137 +15,14 @@
 #define _SQL_CALLBACK_DEBUG_ false  // debug SQL callbacks - extremely verbose output
 #define _DB_INTERFACE_DEBUG_ true   // switched on for logging
 
-// Some parts are written within the C++0x support in GCC, especially std::thread,
-// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400
-#define AFLOW_DB_MULTITHREADS_ENABLE
-#include <thread>
-static const int _MAX_CPU_ = 16;
-#else
-#warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
-
 using std::string;
 using std::vector;
 
 static const int _N_AUID_TABLES_ = 256;
-static const string _COMPRESSION_ = "xz";
 
 /*********************************** JSON ***********************************/
 
 namespace aflowlib {
-
-//updateDatabaseJsonFiles/////////////////////////////////////////////////////
-// Walks the data path for new AFLOW JSON files and updates the JSON
-// collection files accordingly.
-void updateDatabaseJsonFiles(const string& data_path) {
-  bool LDEBUG = (FALSE || XHOST.DEBUG || _DB_INTERFACE_DEBUG_);
-  string auid_path = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID);
-
-  // Fetch the files to update first
-  long int tm = 0;
-  string json = "", json_compressed = "", path = "";
-  vector<long int> mod_times;
-  vector<string> json_files, entry_paths;
-  for (int i = 0; i < _N_AUID_TABLES_; i++) {
-    stringstream t;
-    t << std::setfill('0') << std::setw(2) << std::hex << i;
-    json = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
-    json_compressed = json + "." + _COMPRESSION_;
-    if (aurostd::FileExist(json_compressed)) tm = aurostd::FileModificationTime(json_compressed);
-    else tm = 0;
-    path = auid_path + "/aflow:" + t.str();
-    if (aurostd::FileModificationTime(path) > tm) {
-      json_files.push_back(json);
-      entry_paths.push_back(path);
-      mod_times.push_back(tm);
-    }
-  }
-
-  int njson = (int) json_files.size();
-  if (LDEBUG) {
-    std::cerr << "aflowlib::updateDatabaseJsonFiles(): ";
-    if (njson > 0) std::cerr << "Files to update: "
-                             << aurostd::joinWDelimiter(json_files, ", ") << std::endl;
-    else std::cerr << "No files to update." << std::endl;
-  }
-  if (njson > 0) {  // Necessary to prevent a floating point exception
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
-    int ncpu = init::GetCPUCores();
-    if (ncpu < 1) ncpu = 1;
-    if (ncpu > _MAX_CPU_) ncpu = _MAX_CPU_;
-    if (ncpu > njson) ncpu = njson;
-    vector<vector<int> > thread_dist = getThreadDistribution(njson, ncpu);
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpu; i++) {
-      threads.push_back(new std::thread(&updateDatabaseJsonFilesThread,
-                                        thread_dist[i][0], thread_dist[i][1],
-                                        std::ref(json_files), std::ref(entry_paths), std::ref(mod_times)));
-    }
-    for (int i = 0; i < ncpu; i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
-#else
-    updateDatabaseJsonFilesThread(0, njson, json_files, entry_paths, mod_times);
-#endif
-  }
-}
-
-void updateDatabaseJsonFilesThread(int startIndex, int endIndex, const vector<string>& json_files,
-                                   const vector<string>& entry_paths, const vector<long int>& mod_times) {
-  for (int i = startIndex; i < endIndex; i++) {
-    vector<string> entries;
-    fetchUpdatedJsonFiles(entries, entry_paths[i], 1, 8, mod_times[i]);
-    if (mod_times[i] > 0) {
-      vector<string> json;
-      aurostd::efile2vectorstring(json_files[i], json);
-      uint njson = json.size();
-      uint nentry = entries.size();
-      vector<string> auids(njson);
-      uint j = 0;
-      for (j = 0; j < njson; j++) auids[j] = extractJsonValueAflow(json[j], "auid");
-
-      string auid = "";
-      int index = 0;
-      for (uint e = 0; e < nentry; e++) {
-        auid = extractJsonValueAflow(entries[e], "auid");
-        if (aurostd::withinList(auids, auid, index)) json[index] = entries[e];
-        else json.push_back(entries[e]);
-      }
-      aurostd::string2file(aurostd::joinWDelimiter(json, ""), json_files[i]);
-      aurostd::RemoveFile(json_files[i] + "." + _COMPRESSION_);
-      aurostd::CompressFile(json_files[i], _COMPRESSION_);
-    } else {
-      aurostd::string2file(aurostd::joinWDelimiter(entries, ""), json_files[i]);
-      aurostd::CompressFile(json_files[i], _COMPRESSION_);
-    }
-  }
-}
-
-//fetchUpdatedJsonFiles///////////////////////////////////////////////////////
-// Walks the file system and retrieves the contents of the JSON files that
-// need to be added to the database.
-void fetchUpdatedJsonFiles(vector<string>& json_files, const string& parent_path,
-                           int depth, int maxdepth, long int mod_time) {
-  if (depth == maxdepth) {
-    string filename = parent_path + "/RAW/aflowlib.json";
-    if (aurostd::FileExist(filename)) {
-      json_files.push_back(aurostd::file2string(filename));
-    }
-  } else {
-    vector<string> child_paths;
-    string child_path = "";
-    aurostd::DirectoryLS(parent_path, child_paths);
-    for (uint p = 0, npaths = child_paths.size(); p < npaths; p++) {
-      child_path = parent_path + "/" + child_paths[p];
-      if (mod_time == 0 || aurostd::FileModificationTime(child_path) > mod_time) {
-        fetchUpdatedJsonFiles(json_files, child_path, depth + 1, maxdepth, mod_time);
-      }
-    }
-  }
-}
 
 //getJsonKeys/////////////////////////////////////////////////////////////////
 // Gets the keys of a JSON object using SQLite's JSON extension.

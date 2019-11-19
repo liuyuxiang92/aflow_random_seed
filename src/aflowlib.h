@@ -584,10 +584,6 @@ class AflowDB {
 }  // namespace aflowlib
 
 namespace aflowlib {
-  void updateDatabaseJsonFiles(const string&);
-  void updateDatabaseJsonFilesThread(int, int, const vector<string>&, const vector<string>&, const vector<long int>&);
-  void fetchUpdatedJsonFiles(vector<string>&, const string&, int, int, long int);
-
   vector<string> getJsonKeys(const string&, string="");
   string extractJsonValue(const string&, const string&);
   string extractJsonValueAflow(const string&, string);

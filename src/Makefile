@@ -875,9 +875,6 @@ APL/aflow_scqha_T_freqs.o: APL/aflow_scqha_T_freqs.cpp $(AFLOW_HPP) $(AUROSTD_HP
 aflowlib_database.o: aflowlib_database.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x aflowlib_database.cpp -c
 	touch @
-aflowlib_db_interface.o: aflowlib_db_interface.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x aflowlib_db_interface.cpp -c
-	touch @
 ################################################################################################
 install: all
 	cp -f aflow $(BIN)/aflow.$(VERSNUMBER)

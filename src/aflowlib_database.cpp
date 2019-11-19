@@ -57,6 +57,7 @@ using std::vector;
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
 static const int _DEFAULT_SET_LIMIT_ = 16;
 static const int _N_AUID_TABLES_ = 256;
+static const string _JSONZIP_ = ".xz";
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
 
@@ -227,31 +228,92 @@ void AflowDB::openTmpFile(int open_flags) {
 }
 
 //closeTmpFile////////////////////////////////////////////////////////////////
-// Closes a database file and overwrites the original unless nocopy is true.
+// Closes a temporary database file and overwrites the original if the build
+// was successful. Unless --rebuild_database was selected by the user, this
+// function tests whether the new database has less entries than the old one.
+// To avoid data loss, the original file should not be overwritten.
 bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   string tmp_file = database_file + ".tmp";
-  if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "closeTmpFile(): Closing " << tmp_file << std::endl;
+  string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
+  if (LDEBUG) std::cerr << function << " Closing " << tmp_file << std::endl;
+
+  // If the tmp file is empty, the build was a failure and all other tests
+  // will fail.
+  bool file_empty = aurostd::FileEmpty(tmp_file);
+
+  // If the user does not force a rebuild, test that the new database does not
+  // result in less data than the old one. To build a database with less
+  // properties, aflow needs to be run with the --rebuild_database option.
+  uint nentries_tmp = 0, ncols_tmp = 0, nentries_old = 0, ncols_old = 0;
+  if (!force_copy && !file_empty) {
+    vector<string> props, tables;
+    tables = getTables();
+
+    // Get number of properties
+    props = getColumnNames(tables[0]);  // All tables have the same columns, so any table is good
+    ncols_tmp = props.size();
+
+    // Get number of entries
+    props = getPropertyMultiTables("COUNT", tables, "*");
+    for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_tmp += aurostd::string2utype<uint>(props[i]);
+  }
+
   int sql_code = sqlite3_close(db);
   if (sql_code != SQLITE_OK) {
-    string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
     string message = "Could not close tmp database file " + tmp_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
 
   bool copied = false;
-  if (force_copy) {
+  if (file_empty) {
+    if (LDEBUG) std::cerr << "Temporary database file empty. Database will not be overwritten." << std::endl;
+    copied = false;
+  } else if (force_copy) {
     if (LDEBUG) std::cerr << "Force copy selected. Database will be overwritten." << std::endl;
     copied = aurostd::CopyFile(tmp_file, database_file);
   } else {
-    long int database_size = aurostd::FileSize(database_file);
-    long int tmp_size = aurostd::FileSize(tmp_file);
+    open();
+    vector<string> props, tables;
+    tables = getTables();
+
+    // Get number of properties
+    props = getColumnNames(tables[0]);
+    ncols_old = props.size();
+
+    // Get number of entries
+    props = getPropertyMultiTables("COUNT", tables, "*");
+    for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
+    close();
+
     if (LDEBUG) {
-      std::cerr << "Size of database file: " << database_size << std::endl;
-      std::cerr << "Size of temporary database file: " << tmp_size << std::endl;
+      std::cerr << "Number of entries: " << nentries_tmp << " (current database: " << nentries_old << ")." << std::endl;
+      std::cerr << "Number of properties: " << ncols_tmp << " (current database: " << ncols_old << ")." << std::endl;
     }
-    if (tmp_size > database_size) copied = aurostd::CopyFile(tmp_file, database_file);
+
+    if (nentries_tmp < nentries_old) {
+      std::cerr << "The rebuild process resulted in less entries"
+                << " than in the current database. To avoid accidental"
+                << " data loss, the temporary database will not be copied."
+                << " Rerun as aflow --rebuild_database if the database should"
+                << " be updated regardless. The temporary database file will be"
+                << " kept to allow debugging." << std::endl;
+      keep = true;
+      copied = false;
+    } else if (ncols_tmp < ncols_old) {
+      std::cerr << "The rebuild process resulted in less properties"
+                << " than in the current database. To avoid accidental"
+                << " data loss, the temporary database will not be copied."
+                << " Rerun as aflow --rebuild_database if the database should"
+                << " be updated regardless. The temporary database file will be"
+                << " kept to allow debugging." << std::endl;
+      keep = true;
+      copied = false;
+    } else {
+      // No problems found, so replace old database file with new file
+      copied = aurostd::CopyFile(tmp_file, database_file);
+    }
     if (LDEBUG) {
       std::cerr << "Database file " << (copied?"successfully":"not") << " copied." << std::endl;
     }
@@ -317,7 +379,15 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     keys = getSchemaKeys(schema);
 
     uint nkeys = keys.size();
-    rebuild_db = (nkeys != columns.size());
+    if (nkeys > columns.size()) {
+      rebuild_db = true;
+    } else if (nkeys < columns.size()) {
+      string message = "The number of properties is smaller than in the current"
+                       " database. To avoid accidental data loss, AFLOW will abort"
+                       " the update process. Rerun as aflow --rebuild_database if"
+                       " the database should be updated regardless.";
+      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    }
     if (!rebuild_db) {
       vector<string> types_db = getColumnTypes(table);
       vector<string> types_schema(nkeys);
@@ -339,31 +409,32 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
 
   // Check if any relevant files are newer than the database.
   if (!rebuild_db) {
-    vector<string> paths;
-    aurostd::DirectoryLS(data_path, paths);
-    if (paths.size() != _N_AUID_TABLES_) {
-      string message = "Directory " + data_path + " is not a valid AUID directory.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    vector<string> json_files(_N_AUID_TABLES_);
+    for (int i = 0; i < _N_AUID_TABLES_; i++) {
+      stringstream t;
+      t << std::setfill('0') << std::setw(2) << std::hex << i;
+      json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
+      if (!aurostd::EFileExist(json_files[i])) {
+        string message = data_path + " is not a valid data path. Missing file for aflow:" + t.str() + ".";
+        throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      }
     }
 
     long int tm_db = aurostd::FileModificationTime(database_file);
-    string dir  = "";
     int i = 0;
     for (i = 0; i < _N_AUID_TABLES_; i++) {
-      dir = data_path + "/" + paths[i];
-      if (aurostd::FileModificationTime(dir) > tm_db) break;
+      if (aurostd::FileModificationTime(json_files[i]) > tm_db) break;
     }
     rebuild_db = (i != _N_AUID_TABLES_);
 
     if (LDEBUG) {
-      if (rebuild_db) std::cerr << function << ": Rebuilding database (new files found)." << std::endl;
-      else std::cerr << function << ": No new files found. Database will not be rebuilt." << std::endl;
+      if (rebuild_db) std::cerr << function << ": Rebuilding database (updated files found)." << std::endl;
+      else std::cerr << function << ": No updated files found. Database will not be rebuilt." << std::endl;
     }
   }
 
   if (rebuild_db) {
     openTmpFile();
-    updateDatabaseJsonFiles(data_path);
     rebuildDB();
     return closeTmpFile(force_rebuild);
   } else {
