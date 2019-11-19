@@ -4515,7 +4515,7 @@ void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
   //[NO NEED, AVASP_populateXVASP() is now const]_aflags aflags=m_aflags; //make copies
   _xvasp xvasp=in_xvasp; //[NO NEED, AVASP_populateXVASP() is now const]_kflags kflags=in_kflags;_vflags vflags=in_vflags; //make copies
 
-  if(!m_initialized){throw aurostd::xerror(soliloquy,"POccCalculator failed to initialized");}
+  if(!m_initialized){throw aurostd::xerror(soliloquy,"POccCalculator failed to initialize");}
   writePARTCAR();
   calculateHNF();
   getTotalPermutationsCount();
