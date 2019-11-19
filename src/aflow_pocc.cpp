@@ -262,7 +262,7 @@ namespace pocc {
     string structures_file_str=structures_file_ss.str();
     string structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
     if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";}
-    if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){throw aurostd::xerror(soliloquy,"Cannot find structure group tag",_INPUT_ERROR_);}
+    if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){throw aurostd::xerror(soliloquy,"Cannot find structure group tag",_FILE_CORRUPT_);}
     if(!aurostd::substring2bool(structures_file_str,POSCAR_series_START_tag)){
       if(!aurostd::substring2bool(structures_file_str,POSCAR_START_tag)){
         add_POSCAR_START_tag=true;
