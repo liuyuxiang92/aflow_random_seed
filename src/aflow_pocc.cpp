@@ -567,7 +567,7 @@ namespace pocc {
           m_ARUN_directories.push_back(arun_directory);
           pocc_directory_abs=m_aflags.Directory+"/"+arun_directory;
           if(LDEBUG){cerr << soliloquy << " pocc_directory_abs=" << pocc_directory_abs << endl;}
-          if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_INPUT_ERROR_);}
+          if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_NOT_FOUND_);}
           //m_ARUN_directories.push_back(pocc_directory_abs); //do not save full path
         }
         //debug
