@@ -769,7 +769,7 @@ namespace pocc {
     bool metal_found=false,insulator_found=false;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
-      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/DOSCAR.static",DOSCAR_file)){throw aurostd::xerror(soliloquy,"DOSCAR.static not found in "+m_ARUN_directories[isupercell],_INPUT_ERROR_);}
+      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/DOSCAR.static",DOSCAR_file)){throw aurostd::xerror(soliloquy,"DOSCAR.static not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
       message << "Processing xDOSCAR of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       xdoscar.GetPropertiesFile(DOSCAR_file);
       message << "xDOSCAR read";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
