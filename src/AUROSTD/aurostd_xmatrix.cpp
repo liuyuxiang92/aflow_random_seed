@@ -324,7 +324,7 @@ namespace aurostd {  // namespace aurostd
     string soliloquy="aurostd::getmat():";
     if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
     if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
     if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
     int rows_out=(urow-lrow)+1;
     int cols_out=(ucol-lcol)+1;
