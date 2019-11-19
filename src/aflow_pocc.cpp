@@ -267,7 +267,7 @@ namespace pocc {
       if(!aurostd::substring2bool(structures_file_str,POSCAR_START_tag)){
         add_POSCAR_START_tag=true;
         if(!aurostd::substring2bool(structures_file_str,POccStructure_title_tag)){
-          throw aurostd::xerror(soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+" file: cannot find POSCAR title tag",_INPUT_ERROR_);
+          throw aurostd::xerror(soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+" file: cannot find POSCAR title tag",_FILE_ERROR_);
         }
       }
       aurostd::string2vectorstring(structures_file_str,vlines); //aurostd::efile2vectorstring(structures_file,vlines);
