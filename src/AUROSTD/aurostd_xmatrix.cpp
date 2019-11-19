@@ -415,7 +415,7 @@ namespace aurostd {  // namespace aurostd
       cerr << soliloquy << " lcol=" << lcol << endl;
       cerr << soliloquy << " ucol=" << ucol << endl;
     }
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
     if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
     if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
     if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
