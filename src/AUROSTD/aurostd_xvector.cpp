@@ -120,7 +120,7 @@ namespace aurostd {  // namespace aurostd
     void xvector<utype>::copy(const xmatrix<utype>& b) { //CO190808
       if(b.rows==1){return copy(b(b.lrows));}
       else if(b.cols==1)return copy(b.getcol(b.lcols));
-      throw aurostd::xerror("aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_INPUT_ILLEGAL_);
+      throw aurostd::xerror("aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_VALUE_ILLEGAL_);
     }
 }
 
