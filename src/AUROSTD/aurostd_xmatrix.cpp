@@ -3239,7 +3239,7 @@ namespace aurostd {
     // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
 
     string soliloquy="aurostd::QRDecomposition_HouseHolder():";
-    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(soliloquy,"m<n, please flip the matrix",_INPUT_ERROR_);}
+    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
 
     R=mat_orig; //reset
 
