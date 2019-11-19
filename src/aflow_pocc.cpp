@@ -124,7 +124,7 @@ namespace pocc {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::POCC_MINIMUM_CONFIGURATION():";
 
-    if(!aurostd::IsDirectory(directory)){throw aurostd::xerror(soliloquy,"Directory="+directory+" does not exist",_INPUT_ERROR_);}
+    if(!aurostd::IsDirectory(directory)){throw aurostd::xerror(soliloquy,"Directory="+directory+" does not exist",_FILE_NOT_FOUND_);}
     vector<string> ls_contents;
     aurostd::DirectoryLS(directory,ls_contents);
     vector<xQMVASP> v_qmvasp;
