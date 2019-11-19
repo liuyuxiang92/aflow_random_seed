@@ -541,7 +541,7 @@ namespace pocc {
         //site_configuration
         aurostd::string2tokens(vlines[iline],vtokens,"C");
         if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (C1) line",_INPUT_ERROR_);}
-        if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(soliloquy,"site_config_index is not an integer",_INPUT_ERROR_);}
+        if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(soliloquy,"site_config_index is not an integer",_VALUE_ERROR_);}
         l_supercell_sets.back().m_psc_set.back().m_site_config_index=(unsigned long long int)aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(vtokens.back()));
         //degeneracy
         l_supercell_sets.back().m_psc_set.back().m_degeneracy=1;
