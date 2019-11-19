@@ -310,7 +310,7 @@ namespace pocc {
           }
         }
         if(found_POccStructure==true && aurostd::substring2bool(vlines[iline],poscar_stop_tag)){
-          if(pocc_addendum_ss.str().empty()){throw aurostd::xerror(soliloquy,"STOP tag found before START",_INPUT_ERROR_);}
+          if(pocc_addendum_ss.str().empty()){throw aurostd::xerror(soliloquy,"STOP tag found before START",_FILE_CORRUPT_);}
           if(aurostd::substring2bool(vlines[iline],POSCAR_STOP_tag)){aurostd::StringSubst(vlines[iline],POSCAR_STOP_tag,POSCAR_series_STOP_tag+pocc_addendum_ss.str());}
           else{vlines.insert(vlines.begin()+iline++,POSCAR_series_STOP_tag+pocc_addendum_ss.str());}
           pocc_addendum_ss.str("");
