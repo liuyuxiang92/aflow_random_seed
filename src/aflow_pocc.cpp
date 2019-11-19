@@ -375,7 +375,7 @@ namespace pocc {
     string structures_file_str=structures_file_ss.str();
     if(!aurostd::substring2bool(structures_file_str,POSCAR_series_START_tag)){
       if(!aurostd::substring2bool(structures_file_str,POSCAR_START_tag)){
-        throw aurostd::xerror(soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" file",_INPUT_ERROR_);
+        throw aurostd::xerror(soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" file",_FILE_WRONG_FORMAT_);
       }
       aurostd::string2vectorstring(structures_file_str,vlines); //aurostd::efile2vectorstring(structures_file,vlines);
       if(LDEBUG){cerr << soliloquy << " looking for l_supercell_sets_size" << endl;}
