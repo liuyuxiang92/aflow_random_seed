@@ -561,7 +561,7 @@ namespace pocc {
         aurostd::StringSubst(pocc_directory_abs,"[VASP_POSCAR_MODE_EXPLICIT]START.","");
         aurostd::string2tokens(pocc_directory_abs,vtokens,"_");  //POCC_01_01_H0C0
         if(vtokens.size()!=4){throw aurostd::xerror(soliloquy,"Unknown POcc hash format (_)",_INPUT_ERROR_);}
-        if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(soliloquy,"Cannot determine POcc degeneracy index",_INPUT_ERROR_);}
+        if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(soliloquy,"Cannot determine POcc degeneracy index",_VALUE_ILLEGAL_);}
         if(aurostd::string2utype<int>(vtokens[2])==1){
           arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[3];
           m_ARUN_directories.push_back(arun_directory);
