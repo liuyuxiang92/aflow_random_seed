@@ -322,7 +322,7 @@ namespace aurostd {  // namespace aurostd
   template<class utype>
   void xmatrix<utype>::getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
     string soliloquy="aurostd::getmat():";
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
     if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
     if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
     if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
