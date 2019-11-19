@@ -353,7 +353,7 @@ namespace pocc {
     bool found_file=false;
     if(!found_file && aurostd::EFileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,structures_file)){aurostd::efile2stringstream(structures_file,structures_file_ss);found_file=true;}
     if(!found_file && aurostd::FileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,structures_file)){aurostd::file2stringstream(structures_file,structures_file_ss);found_file=true;}
-    if(!found_file){throw aurostd::xerror(soliloquy,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" does not exist",_INPUT_ERROR_);}
+    if(!found_file){throw aurostd::xerror(soliloquy,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" does not exist",_FILE_NOT_FOUND_);}
     if(aurostd::substring2bool(structures_file_ss,POSCAR_series_START_tag)){return false;}
       
     stringstream message;
