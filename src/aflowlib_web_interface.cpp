@@ -530,6 +530,7 @@ namespace aflowlib {
   
   // Load overload
   uint _aflowlib_entry::Load(const string& _entry,ostream& oss) {
+    string function = "aflowlib::_aflowlib_entry::Load()";  // ME191119
     clear(); // start from clean
     entry=_entry; // start from loading it up !
     if(entry.empty()) {cerr << "ERROR - _aflowlib_entry::Load: entry.empty()" << endl;return 0;} //exit(0);}  // CO 170609, this is a dud 
@@ -787,7 +788,6 @@ namespace aflowlib {
           vector<double> r;
           aurostd::string2tokens(content, rows, ";");
           if (rows.size() != 6) {
-            string function = "aflowlib::_aflowlib_entry::Load()";
             stringstream message;
             message << "Could not read ael_stiffness_tensor: wrong number of rows"
                     << " (found " << rows.size() << ", need 6).";
@@ -796,7 +796,6 @@ namespace aflowlib {
             for (int i = 0; i < 6; i++) {
               aurostd::string2tokens(rows[i], r, ",");
               if (r.size() != 6) {
-                string function = "aflowlib::_aflowlib_entry::Load()";
                 stringstream message;
                 message << "Could not read ael_stiffness_tensor: wrong number of columns"
                         << " in row " << (i + 1)
@@ -816,7 +815,6 @@ namespace aflowlib {
           vector<double> r;
           aurostd::string2tokens(content, rows, ";");
           if (rows.size() != 6) {
-            string function = "aflowlib::_aflowlib_entry::Load()";
             stringstream message;
             message << "Could not read ael_compliance_tensor: wrong number of rows"
                     << " (found " << rows.size() << ", need 6).";
@@ -825,7 +823,6 @@ namespace aflowlib {
             for (int i = 0; i < 6; i++) {
               aurostd::string2tokens(rows[i], r, ",");
               if (r.size() != 6) {
-                string function = "aflowlib::_aflowlib_entry::Load()";
                 stringstream message;
                 message << "Could not read ael_compliance_tensor: wrong number of columns"
                         << " in row " << (i + 1)
@@ -3079,7 +3076,7 @@ namespace aflowlib {
         }
         sscontent_json << "]";
       } else {
-        if (PRINT_NULL) sscontent_json << "\"ael_stiffness_tensor\":null" << eendl;
+        if (PRINT_NULL) sscontent_json << "\"ael_compliance_tensor\":null" << eendl;
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
