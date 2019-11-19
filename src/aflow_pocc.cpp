@@ -707,7 +707,7 @@ namespace pocc {
     if(l_supercell_sets.size()==0){throw aurostd::xerror(soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
     if(m_energy_dft_ground==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"m_energy_dft_ground not set",_RUNTIME_ERROR_);}
     
-    if(std::signbit(temperature)){throw aurostd::xerror(soliloquy,"Negative temperature found",_INPUT_ERROR_);}
+    if(std::signbit(temperature)){throw aurostd::xerror(soliloquy,"Negative temperature found",_VALUE_ILLEGAL_);}
     if(aurostd::isequal(temperature,0.0)){
       temperature=_ZERO_TOL_; //1e-6;
       message << "Converting T=0 -> T=" << temperature << " for Boltzmann probabilities";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //WARNING
