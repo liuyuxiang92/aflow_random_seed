@@ -612,7 +612,7 @@ namespace pocc {
         if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (H1) line",_INPUT_ERROR_);}
         aurostd::string2tokens(vtokens.back(),vtokens2,"C");
         if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (H2) line",_INPUT_ERROR_);}
-        if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(soliloquy,"hnf_index is not an integer",_INPUT_ERROR_);}
+        if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
         l_supercell_sets.back().m_psc_set.back().m_hnf_index=(unsigned long long int)aurostd::string2utype<int>(vtokens2[0]);
         //site_configuration
         aurostd::string2tokens(vlines[iline],vtokens,"C");
