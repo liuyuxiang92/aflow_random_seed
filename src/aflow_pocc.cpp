@@ -135,7 +135,7 @@ namespace pocc {
         if(v_qmvasp.back().H_atom_static==AUROSTD_NAN){throw aurostd::xerror(soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
       }
     }
-    if(v_qmvasp.size()<1){throw aurostd::xerror(soliloquy,"No ARUN.POCC found in Directory="+directory,_INPUT_ERROR_);}
+    if(v_qmvasp.size()<1){throw aurostd::xerror(soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
     //sort by H_atom_static
     xQMVASP qmvasp_tmp;
     for(uint i=0;i<v_qmvasp.size()-1;i++){
