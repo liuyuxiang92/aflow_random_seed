@@ -684,7 +684,7 @@ namespace pocc {
       qmvasp.GetPropertiesFile(qmvasp_filename);
       (*it).m_energy_dft=qmvasp.H_atom_static;
       if((*it).m_energy_dft==AUROSTD_NAN){(*it).m_energy_dft=qmvasp.H_atom_relax;}
-      if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_INPUT_ERROR_);}
+      if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_FILE_CORRUPT_);}
       //energy_dft_ground
       if((*it).m_energy_dft<m_energy_dft_ground){
         m_energy_dft_ground=(*it).m_energy_dft;
