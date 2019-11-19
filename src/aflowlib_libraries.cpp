@@ -4718,6 +4718,7 @@ namespace aflowlib {
 namespace aflowlib {
   bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,string MESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function = "aflowlib::LIB2RAW_loop_AEL()";  // ME191119
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_AEL [1]" << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_AEL - begin " << directory_LIB << endl;
     // [OBSOLETE]  aflowlib_out << _AFLOWLIB_ENTRY_SEPARATOR_ << "loop=ael";
@@ -4772,7 +4773,6 @@ namespace aflowlib {
         vline.pop_back();  // Remove empty line at the end
         try {
           if (vline.size() != 6) {
-            string function = "aflowlib::LIB2RAW_loop_AEL()";
             stringstream message;
             message << "Could not read stiffness tensor: wrong number of lines"
                     << " (found " << vline.size() << ", need 6).";
@@ -4781,7 +4781,6 @@ namespace aflowlib {
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
             if (row.size() != 6) {
-              string function = "aflowlib::LIB2RAW_loop_AEL()";
               stringstream message;
               message <<  "Could not read stiffness tensor."
                       << " Wrong number of columns in line " << (i + 1)
