@@ -525,7 +525,7 @@ namespace pocc {
       if(aurostd::substring2bool(vlines[iline],POCC_AFLOWIN_tag+"UFF_ENERGY=")){
         aurostd::string2tokens(vlines[iline],vtokens,"=");
         if(vtokens.size()!=2){throw aurostd::xerror(soliloquy,"Unknown UFF_ENERGY line format",_INPUT_ERROR_);}
-        if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(soliloquy,"UFF_ENERGY is not a double",_INPUT_ERROR_);}
+        if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(soliloquy,"UFF_ENERGY is not a double",_VALUE_ERROR_);}
         l_supercell_sets.back().m_psc_set.push_back(POccSuperCell()); //this comes before structure
         l_supercell_sets.back().m_psc_set.back().m_energy_uff=aurostd::string2utype<double>(vtokens[1]);
         continue;
