@@ -628,7 +628,7 @@ namespace pocc {
           if(aurostd::substring2bool(vtokens[i],"DG=")){
             aurostd::string2tokens(vtokens[i],vtokens2,"=");
             if(vtokens2.size()!=2){throw aurostd::xerror(soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_INPUT_ERROR_);}
-            if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(soliloquy,"degeneracy is not an integer",_INPUT_ERROR_);}
+            if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
             l_supercell_sets.back().m_psc_set.back().m_degeneracy*=(unsigned long long int)aurostd::string2utype<int>(vtokens2[1]); //backwards compatible with old pocc scheme, but this should be obsolete
           }
         }
