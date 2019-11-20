@@ -1702,15 +1702,6 @@ namespace aflowlib {
 	if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
      
-      // ME190830 - Update AUID timestamps for the database
-      string directory_raw = vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID) + "/RAW";
-      for (uint i = 0; i < aflowlib_data.vauid.size(); i++) {
-        directory_raw += "/" + aflowlib_data.vauid.at(i);
-        if (utimes(directory_raw.c_str(), NULL) != 0) {
-          std::cerr << "aflowlib::LIB2RAW() WARNING - Failed to update timestamp for folder " << directory_raw
-                    << " (errno = " << errno << ")." << std::endl;
-        }
-      }
     }
     // COMPRESS
     /*
