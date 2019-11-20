@@ -58,7 +58,6 @@ using std::vector;
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
 static const int _DEFAULT_SET_LIMIT_ = 16;
 static const int _N_AUID_TABLES_ = 256;
-static const string _JSONZIP_ = ".xz";
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
 
