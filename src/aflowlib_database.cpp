@@ -17,9 +17,9 @@
 //
 // The database rebuild process has the following steps:
 //   * Check if the database needs to be rebuild. This can be triggered either
-//     by the user, by new entries in the schema file, or by new/updated
-//     aflowlib.json files.
-//   * Update the JSON files containing the data if updated entries are available.
+//     by the user, by new entries in the schema file, or by new/updated dat
+//     files. The dat files are collections of aflowlib.json files for a set of
+//     AUIDs (i.e. aflow:00.dat, aflow:01.dat, etc.).
 //   * Create a temporary database file and populate with data from these JSONs.
 //     Rebuilding from scratch instead of incrementally adding into the existing
 //     database protects the database from corruption and injection attacks.
@@ -27,8 +27,9 @@
 //     get corrupted due to an error in the build process.
 //   * Compare temporary and current database file and copy over if necessary.
 //     The database file only gets copied after successful completion of the
-//     rebuild process. A rebuild is considered successful when the file size
-//     of the new database file is larger than that of the old file.
+//     rebuild process. A rebuild is considered successful when the number of
+//     entries and properties of the new database file is greater than or equal
+//     to that of the old file.
 //   * Analyze the database and output the database statistics.
 
 #include "aflowlib.h"
