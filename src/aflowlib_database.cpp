@@ -181,7 +181,7 @@ void AflowDB::openTmpFile(int open_flags) {
     }
 
     if (del_tmp) {
-      if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile(): "
+      if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "openTmpFile():"
                             << " Temporary database file already exists,"
                             << " but process has become stale. Removing temporary files"
                             << " and killing outstanding process." << std::endl;
@@ -265,6 +265,7 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
     throw aurostd::xerror(function, message, _FILE_ERROR_);
   }
+  is_tmp = false;
 
   bool copied = false;
   if (file_empty) {
@@ -326,7 +327,6 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
   }
 
   open();
-  is_tmp = false;
 
   aurostd::string2file("", lock_file);
   if (copied) aurostd::ChmodFile("444", database_file);
@@ -458,20 +458,26 @@ void AflowDB::rebuildDB() {
   vector<string> types = getDataTypes(schema, columns);
 
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
-  int ncpus = init::GetCPUCores();
-  int max_cpu = 16;
-  if (ncpus < 1) ncpus = 1;
-  if (ncpus > max_cpu) ncpus = max_cpu;
-  vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-  vector<std::thread*> threads;
-  for (int i = 0; i < ncpus; i++) {
-    threads.push_back(new std::thread(&AflowDB::buildTables, this,
-                                      thread_dist[i][0], thread_dist[i][1],
-                                      std::ref(columns), std::ref(types)));
-  }
-  for (int i = 0; i < ncpus; i++) {
-    threads[i]->join();
-    delete threads[i];
+  // Put into a try statement so that exceptions thrown in a thread
+  // can be properly displayed.
+  try {
+    int ncpus = init::GetCPUCores();
+    int max_cpu = 16;
+    if (ncpus < 1) ncpus = 1;
+    if (ncpus > max_cpu) ncpus = max_cpu;
+    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
+    vector<std::thread*> threads;
+    for (int i = 0; i < ncpus; i++) {
+      threads.push_back(new std::thread(&AflowDB::buildTables, this,
+                                        thread_dist[i][0], thread_dist[i][1],
+                                        std::ref(columns), std::ref(types)));
+    }
+    for (int i = 0; i < ncpus; i++) {
+      threads[i]->join();
+      delete threads[i];
+    }
+  } catch (aurostd::xerror& excpt) {
+    throw aurostd::xerror(excpt.where(), excpt.what(), excpt.error_code);
   }
 #else
   buildTables(0, _N_AUID_TABLES_, columns, types);
@@ -664,28 +670,34 @@ DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& ta
     vector<vector<int> > counts(_N_AUID_TABLES_, vector<int>(ncols));
     vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
-    int ncpus = init::GetCPUCores();
-    if (ncpus < 1) ncpus = 1;
-    // The maximum number of CPUs are empirically found values that appear
-    // to result in the shortest run times. Further testing may be necessary.
-    int cpu_max = 32;
-    if (stats.nentries < 100000) cpu_max = 16;
-    if (stats.nentries < 50000) cpu_max = 8;
-    if (stats.nentries < 10000) cpu_max = 4;
-    if (ncpus > cpu_max) ncpus = cpu_max;
-    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&AflowDB::getColStats, this,
-                                        thread_dist[i][0], thread_dist[i][1],
-                                        std::ref(catalog), std::ref(tables),
-                                        std::ref(cols), std::ref(loops),
-                                        std::ref(counts), std::ref(loop_counts),
-                                        std::ref(maxmin), std::ref(sets)));
-    }
-    for (int i = 0; i < ncpus; i++) {
-      threads[i]->join();
-      delete threads[i];
+    // Put into a try statement so that exceptions thrown in a thread
+    // can be properly displayed.
+    try {
+      int ncpus = init::GetCPUCores();
+      if (ncpus < 1) ncpus = 1;
+      // The maximum number of CPUs are empirically found values that appear
+      // to result in the shortest run times. Further testing may be necessary.
+      int cpu_max = 32;
+      if (stats.nentries < 100000) cpu_max = 16;
+      if (stats.nentries < 50000) cpu_max = 8;
+      if (stats.nentries < 10000) cpu_max = 4;
+      if (ncpus > cpu_max) ncpus = cpu_max;
+      vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
+      vector<std::thread*> threads;
+      for (int i = 0; i < ncpus; i++) {
+        threads.push_back(new std::thread(&AflowDB::getColStats, this,
+                                          thread_dist[i][0], thread_dist[i][1],
+                                          std::ref(catalog), std::ref(tables),
+                                          std::ref(cols), std::ref(loops),
+                                          std::ref(counts), std::ref(loop_counts),
+                                          std::ref(maxmin), std::ref(sets)));
+      }
+      for (int i = 0; i < ncpus; i++) {
+        threads[i]->join();
+        delete threads[i];
+      }
+    } catch (aurostd::xerror& excpt) {
+      throw aurostd::xerror(excpt.where(), excpt.what(), excpt.error_code);
     }
 #else
     getColStats(0, _N_AUID_TABLES_, catalog, tables, cols,

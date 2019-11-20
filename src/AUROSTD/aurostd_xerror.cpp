@@ -54,7 +54,7 @@ xerror::xerror(const std::stringstream& function, const std::stringstream& msg, 
 
 //buildExeption///////////////////////////////////////////////////////////////
 // builds the xerror object.
-void xerror::buildException(const std::string& function, const std::string& msg, const int& code) {
+void xerror::buildException(const std::string& function, const std::string& msg, int code) {
   f_name = function;
   message = msg;
   error_code = code;

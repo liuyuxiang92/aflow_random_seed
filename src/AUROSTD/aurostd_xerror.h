@@ -54,7 +54,7 @@ class xerror {
     int error_type, error_number;
     std::string f_name, message;
 
-    void buildException(const std::string&, const std::string&, const int&);
+    void buildException(const std::string&, const std::string&, int);
     bool codeValid();
     std::string buildMessageString();
     std::string error_string();
