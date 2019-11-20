@@ -3146,9 +3146,6 @@ LATTICES = (the ones with "")
   aflow --update_database
         Fetches new entries and rebuilds the AFLOW database file if new entries are available.
 
-  aflow --update_database_jsons
-        Fetches new data and updates the database JSON files.
-
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
         VASP format.                                          

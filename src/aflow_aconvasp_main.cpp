@@ -88,7 +88,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("AFLUX::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
   //DX 20190206 - add AFLUX functionality to command line - END
-  vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database") && argv.at(1)=="--analyze_database");  // ME191001
+  vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database"));  // ME191001
 
   // Commands for serializing bands and DOS data to JSON
   vpflow.args2addattachedscheme(argv,cmds,"DOSDATA2JSON","--dosdata2json=","./"); // Eric G

@@ -1701,7 +1701,6 @@ namespace aflowlib {
 	cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
 	if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
-     
     }
     // COMPRESS
     /*
