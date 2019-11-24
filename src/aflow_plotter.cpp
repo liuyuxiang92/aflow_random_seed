@@ -211,8 +211,6 @@ void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
   // Convert to the desired format if not pdf
   if (format != "pdf") {
     aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white " + filename_latex + ".pdf " + filename_latex  + "." + format);
-  //}else{
-  //  aurostd::file2file(filename_latex + ".pdf ",filename  + "." + format);
   }
   chdir(current_dir.c_str());
   aurostd::CopyFile(tmp + filename_latex + "." + format, directory + "/" + filename + "." + format);
