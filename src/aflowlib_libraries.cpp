@@ -755,7 +755,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_CheckProjectFromDirectory" << endl;	 
     CheckMaterialServer("aflowlib::LIB2RAW_CheckProjectFromDirectory"); // must be in AFLOW_MATERIALS_SERVER
     // find from PWD
-    string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::execute2string("pwd");aurostd::StringSubst(directory_pwd,"\n","");
+    string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::getPWD();aurostd::StringSubst(directory_pwd,"\n","");  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     if(directory_pwd=="/common/GNDSTATE") directory_pwd="/common/LIB2"; // [HISTORIC]
     aurostd::StringSubst(directory_pwd,"common/SCINT","common/ICSD"); // [HISTORIC]
     aurostd::StringSubst(directory_pwd,"common/ELPASOLITES","common/AURO"); // [HISTORIC]
@@ -840,7 +840,7 @@ namespace aflowlib {
     CheckMaterialServer("aflowlib::LIB2RAW_ALL"); // must be in AFLOW_MATERIALS_SERVER
     string PROJECT_LIBRARY;
     if(tokens.size()==2) PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(tokens.at(1));
-    else PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(aurostd::execute2string("pwd"));
+    else PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(aurostd::getPWD()); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     cerr << "aflowlib::LIB2RAW_ALL FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
 
     int multi_sh_value=XHOST.CPU_Cores;
@@ -1023,7 +1023,7 @@ namespace aflowlib {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
       aurostd::StringSubst(directory,"./","");
-      if(directory=="." || directory.empty()) { directory=aurostd::execute2string("pwd"); }
+      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
       flag_WEB=FALSE;
       flag_files_LIB=FALSE,flag_files_RAW=FALSE,flag_files_WEB=FALSE;
       directory_LIB=directory;
@@ -1718,7 +1718,7 @@ namespace aflowlib {
     LDEBUG=FALSE; //CO 180321
     // CO 180216 - more robust for any type of directory/file setup
     vector<string> Chmod_Files;
-    if(LDEBUG) {cerr << soliloquy << " pwd=" << aurostd::execute2string("pwd") << endl;}
+    if(LDEBUG) {cerr << soliloquy << " pwd=" << aurostd::getPWD() << endl;}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     
     //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_RAW+"\" -type d`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type d"),Chmod_Files);
@@ -1999,13 +1999,15 @@ namespace aflowlib {
       aurostd::execute(command);
 
       // EXECUTE PLOTBAND
-      char work_dir[1024];
-      string cdir; //, wdir;
-      cdir = getcwd(work_dir, 1024);  //Get the working directory
+      //[CO191112 - OBSOLETE]char work_dir[1024];
+      //[CO191112 - OBSOLETE]string cdir; //, wdir;
+      //[CO191112 - OBSOLETE]cdir = getcwd(work_dir, 1024);  //Get the working directory
+      string work_dir=aurostd::getPWD();    //Get the working directory //CO191112
 
-      char raw_dir[1024];
-      strcpy(raw_dir, directory_RAW.c_str());
-      chdir(raw_dir);               //Change into the RAW direcotry
+      //[CO191112 - OBSOLETE]char raw_dir[1024];
+      //[CO191112 - OBSOLETE]strcpy(raw_dir, directory_RAW.c_str());
+      //[CO191112 - OBSOLETE]chdir(raw_dir);               //Change into the RAW directory
+      chdir(directory_RAW.c_str());                //Change into the RAW directory  //CO191112
 
       // [OBSOLETE]  vector<string> directory;
       // [OBSOLETE]  directory.push_back(" ");
@@ -2017,7 +2019,7 @@ namespace aflowlib {
       // [OBSOLETE - ME190614]  estructure::PLOT_BANDDOS("./");
       // [OBSOLETE - ME190614]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
 
-      chdir(work_dir);  //Go to the working direcotry
+      chdir(work_dir.c_str());  //Go to the working directory //CO191112
     }
 
     // Kesong adds it
@@ -5613,7 +5615,7 @@ namespace aflowlib {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
       aurostd::StringSubst(directory,"./","");
-      if(directory=="." || directory.empty()) { directory=aurostd::execute2string("pwd"); }
+      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
       // OBSOLETE flag_files_LIB=FALSE;
       directory_LIB=directory;
       PROJECT_LIBRARY=directory_LIB;

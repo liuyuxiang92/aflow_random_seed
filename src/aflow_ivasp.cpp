@@ -5628,15 +5628,17 @@ namespace KBIN {
       if(aurostd::FileExist(doscarfile_tmp)) aurostd::RemoveFile(doscarfile_tmp);
       
       //Get the working directory
-      const int PATH_LENGTH_MAX=1024;
-      char work_dir[PATH_LENGTH_MAX];
-      getcwd(work_dir, PATH_LENGTH_MAX);  
+      //[CO191112 - OBSOLETE]const int PATH_LENGTH_MAX=1024;
+      //[CO191112 - OBSOLETE]char work_dir[PATH_LENGTH_MAX];
+      //[CO191112 - OBSOLETE]getcwd(work_dir, PATH_LENGTH_MAX);  
+      string work_dir=aurostd::getPWD();  //CO191112
 
       //Get the data directory
       chdir(directory.c_str());  //Jump into the data directory
-      char data_dir[PATH_LENGTH_MAX];
-      getcwd(data_dir, PATH_LENGTH_MAX);  
-      chdir(work_dir); //Jump back into the work directory
+      //[CO191112 - OBSOLETE]char data_dir[PATH_LENGTH_MAX];
+      //[CO191112 - OBSOLETE]getcwd(data_dir, PATH_LENGTH_MAX);  
+      string data_dir=aurostd::getPWD();  //CO191112
+      chdir(work_dir.c_str()); //Jump back into the work directory  //CO191112
 
       //Check whether it is MAGNETIC DATABASE
       bool FLAG_MAGNETIC=FALSE;
@@ -5647,7 +5649,7 @@ namespace KBIN {
 	return SystemName;
       } else {
 	vector<string> data;
-	aurostd::string2tokens(data_dir, data, "/");
+	aurostd::string2tokens(data_dir.c_str(), data, "/");  //CO191112
 	int datasize=data.size();
 	bool FLAG_DIRECTORY_ICSD=FALSE;
 	for (uint i=0; i<data.size();i++) {

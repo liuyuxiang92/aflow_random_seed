@@ -461,7 +461,8 @@ namespace KBIN {
       if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
     } else {
       if(!aflags.AFLOW_PERFORM_FILE)
-	vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
+	vruns.push_back(aurostd::getPWD()); //CO191112
+	//[CO191112 - OBSOLETE]vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
       // vruns.push_back(aurostd::execute2string(XHOST.command("pwd"))+" ./");
     }
     // if file found

@@ -634,7 +634,7 @@ namespace init {
     if(XHOST.vflag_control.flag("DIRECTORY")){directory_clean=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
     aurostd::StringSubst(directory_clean,"//","/");  //clean
     directory_clean=aurostd::RemoveWhiteSpaces(directory_clean);
-    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::execute2string(XHOST.command("pwd"))+"/";}
+    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::getPWD()+"/";}  //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
     //CO190402 STOP - cleaning directory, giving us something to print with logger

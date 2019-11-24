@@ -2814,7 +2814,7 @@ namespace pflow {
     xstructure a(_a);
     a.ReScale(1.0);
     // DX 2/21/18 [OBSOLETE] string directory=".";
-    string directory=aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
+    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory=XHOST.vflag_control.getattachedscheme("DIRECTORY");
     }
@@ -5190,7 +5190,7 @@ namespace pflow {
     a.ReScale(1.0);
     // DX 4/26/18 - use pwd - START
     if(a.directory == ""){
-      a.directory = aurostd::execute2string("pwd");
+      a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
     // DX 4/26/18 - use pwd - END
     string print_directory = " [dir=" + a.directory + "]";
@@ -5611,7 +5611,7 @@ namespace pflow {
         a.directory = aflags.Directory;
       }
       else {
-        a.directory = aurostd::execute2string("pwd");
+        a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
         aflags.Directory = a.directory;
       }
     }
@@ -5859,7 +5859,7 @@ namespace pflow {
 	a.directory = aflags.Directory;
       }
       else {
-        a.directory = aurostd::execute2string("pwd");
+        a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
         aflags.Directory = a.directory;
       }
     }
@@ -6399,7 +6399,7 @@ namespace pflow {
     bool tocompress = TRUE;
     ofstream FileMESSAGE("/dev/null");
     // DX 2/21/18 [OBSOLETE] string directory=".";
-    string directory=aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
+    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
     if(XHOST.vflag_control.flag("DIRECTORY")) { 
       directory=XHOST.vflag_control.getattachedscheme("DIRECTORY");
     }
@@ -10193,7 +10193,7 @@ namespace pflow {
   void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::execute2string(XHOST.command("pwd"))+"/";} //".";  // CO 180220
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
@@ -13637,7 +13637,7 @@ namespace pflow {
     xstructure a(input,IOAFLOW_AUTO);
     // DX 20180527 - use pwd - START
     if(a.directory == ""){
-      a.directory = aurostd::execute2string("pwd");
+      a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
     // DX 20180527 - use pwd - END
     // DX 1/24/18 [OBSOLETE] a.is_vasp4_poscar_format=TRUE; a.is_vasp5_poscar_format=FALSE;
@@ -13911,7 +13911,7 @@ namespace pflow {
     a.ReScale(1.0);
     // DX 2/21/18 - use pwd - START
     if(a.directory == ""){
-      a.directory = aurostd::execute2string("pwd");
+      a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
     string print_directory = " [dir=" + a.directory + "]";
     // DX 2/21/18 - use pwd - END
@@ -14635,7 +14635,7 @@ namespace pflow {
     if(directory.empty()){directory=".";}
     if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
 
-    string curdir=aurostd::execute2string("pwd");
+    string curdir=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
 
     string PLOT_tmp_dir=aurostd::TmpDirectoryCreate("XRAY_PLOT");
     chdir(PLOT_tmp_dir.c_str());

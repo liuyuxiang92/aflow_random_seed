@@ -639,6 +639,18 @@ namespace aurostd {
     return std::tolower(in);
   }
   
+  // ***************************************************************************
+  // Function getPWD()
+  // ***************************************************************************
+  // a function to get current directory
+  string getPWD(){  //CO191112
+    //old way also needs PATH_LENGTH_MAX, not good for current LONG pocc directories
+    //[old way - need to convert char array -> string]const int PATH_LENGTH_MAX=1024;
+    //[old way - need to convert char array -> string]char work_dir[PATH_LENGTH_MAX];
+    //[old way - need to convert char array -> string]getcwd(work_dir, PATH_LENGTH_MAX); 
+    
+    return aurostd::execute2string("pwd"); //XHOST.command("pwd") ?
+  }
 
   // ***************************************************************************
   // Function GetNumFields

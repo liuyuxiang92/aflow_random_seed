@@ -3018,11 +3018,13 @@ namespace pocc {
     int NumCell=cRangeFrac.at(0).at(2)/nDFull;
     if(NumCell>nMax) {nMax=NumCell;}
     if(!CheckPartialOccupation(xstr)) {nMax=1;}
-    char *cur_dir_name = getcwd(NULL, 0);
+    //[CO191112 - OBSOLETE]char *cur_dir_name = getcwd(NULL, 0);
+    string cur_dir_name=aurostd::getPWD();
     string tmpdir=aurostd::TmpDirectoryCreate("PartialOccupation");
-    char new_dir_name[1024];
-    strcpy(new_dir_name, tmpdir.c_str());
-    chdir(new_dir_name);
+    //[CO191112 - OBSOLETE]char new_dir_name[1024];
+    //[CO191112 - OBSOLETE]strcpy(new_dir_name, tmpdir.c_str());
+    //[CO191112 - OBSOLETE]chdir(new_dir_name);
+    chdir(tmpdir.c_str());  //CO191112
 
     __aflow_call_enum_MOD_aflow_pass_parameter(parLV, &nDFull,dFull,&rdFull,&cdFull,&k, &nMin, &nMax, pLatTyp,&eps, &full, labelFull,&rlabelFull,&clabelFull,digitFull,&ndigitFull,equivalencies,&nequivalencies,&conc_check,cRange,&rcRange,&ccRange);
 
@@ -3095,7 +3097,7 @@ namespace pocc {
     ss_cmd << "rm -rf " << tmpdir << endl;
     aurostd::execute(ss_cmd);
     
-    chdir(cur_dir_name);
+    chdir(cur_dir_name.c_str());  //CO191112
     return groupxstr;
   }
 }

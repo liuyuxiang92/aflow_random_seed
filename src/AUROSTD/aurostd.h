@@ -274,6 +274,7 @@ namespace aurostd {
   string tolower(const string& in)  __xprototype;
   char toupper(const char& in)  __xprototype;
   char tolower(const char& in)  __xprototype;
+  string getPWD();  //CO191112
   int GetNumFields(const string& s);
   string GetNextVal(const string& s,int& id);
   string PaddedNumString(const int num,const int ndigits);
