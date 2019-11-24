@@ -325,10 +325,10 @@ namespace aurostd {  // namespace aurostd
   //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   void xmatrix<utype>::getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
     string soliloquy="aurostd::getmat():";
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
     int rows_out=(urow-lrow)+1;
     int cols_out=(ucol-lcol)+1;
     if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
@@ -388,10 +388,10 @@ namespace aurostd {  // namespace aurostd
       cerr << soliloquy << " urow=" << urow << endl;
       cerr << soliloquy << " ucol=" << ucol << endl;
     }
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
     for(int i=mat.lrows;i<=mat.urows;i++){
       for(int j=mat.lcols;j<=mat.ucols;j++){corpus[lrow+i-mat.lrows][lcol+j-mat.lcols]=mat[i][j];}
     }
@@ -418,10 +418,10 @@ namespace aurostd {  // namespace aurostd
       cerr << soliloquy << " lcol=" << lcol << endl;
       cerr << soliloquy << " ucol=" << ucol << endl;
     }
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_INPUT_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_INPUT_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_INPUT_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_INPUT_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
     if(col==true){
       for(int i=xv.lrows;i<=xv.urows;i++){corpus[lrow+i-xv.lrows][icol]=xv[i];}
     }else{
@@ -3242,7 +3242,7 @@ namespace aurostd {
     // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
 
     string soliloquy="aurostd::QRDecomposition_HouseHolder():";
-    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(soliloquy,"m<n, please flip the matrix",_INPUT_ERROR_);}
+    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
 
     R=mat_orig; //reset
 
