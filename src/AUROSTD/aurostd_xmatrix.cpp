@@ -535,7 +535,7 @@ namespace aurostd {  // namespace aurostd
       if(!this->issquare||!b.issquare||this->rows!=b.rows)
       //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*=: "
       //  <<  "defined only for square xmatrixes with equal dimensions " << endl;exit(0);}
-      throw aurostd::xerror(soliloquy,"failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO191112
+        throw aurostd::xerror("xmatrix<utype>::operator *=():","failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO191112
 
       xmatrix<utype> a(this->urows,this->ucols,this->lrows,this->lcols);
       int i,j,k,ii,jj,kk;

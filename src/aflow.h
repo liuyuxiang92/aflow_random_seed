@@ -3246,6 +3246,7 @@ class xQMVASP {  //CO191110
   string content;vector<string> vcontent;string filename;        // the content, and lines of it
   double H_atom_relax;
   double H_atom_static;
+  vector<aurostd::xvector<double> > vforces;                     // for APL - only one (no relax vs. static), get most relaxed forces  //CO191112
   bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
   bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
