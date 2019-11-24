@@ -320,6 +320,9 @@ namespace aurostd {  // namespace aurostd
 //CO190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
+  //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
+  //lrows_out,lcols_out specifies lrows,lcols of mat_out
+  //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   void xmatrix<utype>::getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
     string soliloquy="aurostd::getmat():";
     if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
