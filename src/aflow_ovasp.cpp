@@ -8104,14 +8104,16 @@ void xQMVASP::free() { //CO191110
   filename="";                  // for aflowlib_libraries.cpp
   H_atom_relax=AUROSTD_NAN;
   H_atom_static=AUROSTD_NAN;
+  vforces.clear();              //CO191112
 }
 
 void xQMVASP::copy(const xQMVASP& b) { // copy PRIVATE //CO191110
   content=b.content;
-  vcontent.clear(); for(uint i=0;i<b.vcontent.size();i++) vcontent.push_back(b.vcontent.at(i));  // for aflowlib_libraries.cpp
+  vcontent.clear();for(uint i=0;i<b.vcontent.size();i++){vcontent.push_back(b.vcontent[i]);}  // for aflowlib_libraries.cpp
   filename=b.filename;
   H_atom_relax=b.H_atom_relax;
   H_atom_static=b.H_atom_static;
+  vforces.clear();for(uint i=0;i<b.vforces.size();i++){vforces.push_back(b.vforces[i]);}  //CO191112
 }
 
 const xQMVASP& xQMVASP::operator=(const xQMVASP& b) {  // operator= PUBLIC //CO191110
@@ -8194,6 +8196,20 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
           if(!aurostd::isfloat(tokens2[0])){throw aurostd::xerror(soliloquy,"H_atom input cannot be parsed (!isfloat)",_INPUT_ERROR_);}
           if(inside_relax){H_atom_relax=aurostd::string2utype<double>(tokens2[0]);}
           else if(inside_static){H_atom_static=aurostd::string2utype<double>(tokens2[0]);}
+        }
+      } else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){  //CO191112 - forces for APL
+        vforces.clear();
+        iline++;  //skip first [AFLOW]
+        while(iline<vcontent.size() && aurostd::substring2bool(vcontent[iline],"[AFLOW]")==FALSE){
+          vforces.push_back(xvector<double>(3));
+          aurostd::string2tokens(vcontent[iline++],tokens," ");
+          if(tokens.size()==6){
+            for(int i=1;i<4;i++){
+              if(aurostd::isfloat(tokens[i+2])){vforces.back()[i]=aurostd::string2utype<double>(tokens[i+2]);}
+              else{throw aurostd::xerror(soliloquy,"Expected force input to be a number",_FILE_CORRUPT_);}
+            }
+          }
+          else{throw aurostd::xerror(soliloquy,"Unexpected count of force components",_FILE_CORRUPT_);}
         }
       }
     }
