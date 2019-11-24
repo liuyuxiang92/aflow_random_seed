@@ -1984,12 +1984,13 @@ namespace aflowlib {
       command << "mv KPOINTS.bands KPOINTS.bands.old" << endl; vfile.push_back("KPOINTS.bands.old"); // so it is compressed
       command << "mv EIGENVAL.bands EIGENVAL.bands.old" << endl; vfile.push_back("EIGENVAL.bands.old"); // so it is compressed
       aurostd::execute(command);
+      
       command.clear();command.str(std::string());
       _aflags aflags;
       aflags.Directory=directory_RAW;
       if(pflow::FIXBANDS(aflags,"POSCAR.bands,KPOINTS.bands.old,EIGENVAL.bands.old,KPOINTS.bands,EIGENVAL.bands")==FALSE) {
-	cout << "ERROR_RERUN " << directory_LIB << endl;
-	return FALSE;
+        cout << "ERROR_RERUN " << directory_LIB << endl;
+        return FALSE;
       }
 
       // EXECUTE PLOTBZ.SH using ksh
@@ -2022,10 +2023,11 @@ namespace aflowlib {
       //[CO191112 - OBSOLETE back and forth directory change]chdir(work_dir.c_str());  //Go to the working directory //CO191112
     }
 
-    // Kesong adds it
-    command << "cd \"" << directory_RAW << "\"" << endl;
-    command << "rm -f *pdf *jpg " << endl;
-    aurostd::execute(command);
+    //[CO191112] - NO PDF JPG detected in aflow_gnuplot_funcs.cpp, so this is useless anyway
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]// Kesong adds it
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "cd \"" << directory_RAW << "\"" << endl;
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "rm -f *pdf *jpg " << endl;
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]aurostd::execute(command);
 
     // DONE
     cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Bands: end " << directory_LIB << endl;
