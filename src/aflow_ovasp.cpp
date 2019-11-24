@@ -8127,10 +8127,7 @@ xQMVASP::xQMVASP(const string& fileIN,bool QUIET) {  //CO191110
   GetPropertiesFile(fileIN,QUIET);
 }
 
-xQMVASP::xQMVASP(const xQMVASP& b) { // copy PUBLIC  //CO191110
-  //  free(); *this=b;
-  copy(b);
-}
+xQMVASP::xQMVASP(const xQMVASP& b) {copy(b);} // copy PUBLIC  //CO191110
 
 void xQMVASP::clear() {  // clear PRIVATE  //CO191110
   xQMVASP _temp;
