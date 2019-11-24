@@ -24,8 +24,8 @@
 #define _DEBUG_POCC_ false  //CO190116
 #define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO190116
 
-const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //period is important
-const string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //period is important
+const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
+const string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
 const string POSCAR_series_START_tag=POSCAR_START_tag+"."; //period is important
 const string POSCAR_series_STOP_tag=POSCAR_STOP_tag+"."; //period is important
 const string POCC_AFLOWIN_tag="[AFLOW_POCC]";
