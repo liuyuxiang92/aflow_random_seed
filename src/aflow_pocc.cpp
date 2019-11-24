@@ -135,11 +135,12 @@ namespace pocc {
         if(v_qmvasp.back().H_atom_static==AUROSTD_NAN){throw aurostd::xerror(soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
       }
     }
-    if(v_qmvasp.size()<1){throw aurostd::xerror(soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
+    uint v_qmvasp_size=v_qmvasp.size(); //NO MORE PUSH_BACK BELOW! Will save time for AAPL calculations
+    if(v_qmvasp_size<1){throw aurostd::xerror(soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
     //sort by H_atom_static
     xQMVASP qmvasp_tmp;
-    for(uint i=0;i<v_qmvasp.size()-1;i++){
-      for(uint j=i;j<v_qmvasp.size();j++){
+    for(uint i=0;i<v_qmvasp_size-1;i++){
+      for(uint j=i;j<v_qmvasp_size;j++){
         if(v_qmvasp[i].H_atom_static>v_qmvasp[j].H_atom_static){
           qmvasp_tmp=v_qmvasp[i];
           v_qmvasp[i]=v_qmvasp[j];
@@ -149,7 +150,7 @@ namespace pocc {
     }
     string qmvasp_filename="";
     if(LDEBUG){
-      for(uint i=0;i<v_qmvasp.size()-1;i++){
+      for(uint i=0;i<v_qmvasp_size-1;i++){
         qmvasp_filename=v_qmvasp[i].filename;
         aurostd::StringSubst(qmvasp_filename,"/"+DEFAULT_AFLOW_QMVASP_OUT,"");
         cerr << soliloquy << " H_atom_static(" << qmvasp_filename << ")=" << v_qmvasp[i].H_atom_static << endl;
