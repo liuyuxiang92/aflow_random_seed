@@ -1742,7 +1742,7 @@ namespace aurostd {  // namespace aurostd
     printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
     printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
-    return sqrt(sum(trasp(a) * a));
+    return sqrt(modulussquare(a)); //sqrt(sum(trasp(a) * a))
 }
   template<class utype>                                 // function sum xmatrix<>
   utype modulussquare(const xmatrix<utype>& a) {  //CO191110
