@@ -2002,12 +2002,12 @@ namespace aflowlib {
       //[CO191112 - OBSOLETE]char work_dir[1024];
       //[CO191112 - OBSOLETE]string cdir; //, wdir;
       //[CO191112 - OBSOLETE]cdir = getcwd(work_dir, 1024);  //Get the working directory
-      string work_dir=aurostd::getPWD();    //Get the working directory //CO191112
+      //[CO191112 - OBSOLETE back and forth directory change]string work_dir=aurostd::getPWD();    //Get the working directory //CO191112
 
       //[CO191112 - OBSOLETE]char raw_dir[1024];
       //[CO191112 - OBSOLETE]strcpy(raw_dir, directory_RAW.c_str());
       //[CO191112 - OBSOLETE]chdir(raw_dir);               //Change into the RAW directory
-      chdir(directory_RAW.c_str());                //Change into the RAW directory  //CO191112
+      //[CO191112 - OBSOLETE back and forth directory change]chdir(directory_RAW.c_str());                //Change into the RAW directory  //CO191112
 
       // [OBSOLETE]  vector<string> directory;
       // [OBSOLETE]  directory.push_back(" ");
@@ -2019,7 +2019,7 @@ namespace aflowlib {
       // [OBSOLETE - ME190614]  estructure::PLOT_BANDDOS("./");
       // [OBSOLETE - ME190614]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
 
-      chdir(work_dir.c_str());  //Go to the working directory //CO191112
+      //[CO191112 - OBSOLETE back and forth directory change]chdir(work_dir.c_str());  //Go to the working directory //CO191112
     }
 
     // Kesong adds it
