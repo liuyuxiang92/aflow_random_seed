@@ -55,6 +55,10 @@ xoption getPlotOptions(const aurostd::xoption& xopt, const string& key, bool dat
     if (tokens[0][tokens[0].size() - 1] != '/') tokens[0] += '/';
     plotoptions.push_attached("DIRECTORY", tokens[0]);
   }
+  
+  plotoptions.flag("DATATYPE",xopt.flag("ATOMS")); //CO191010 - which table to look at, "atoms-projected" by default
+  plotoptions.flag("PLOT_ALL_ATOMS",xopt.flag("PLOT_ALL_ATOMS")); //CO191010
+
   // Need to shift options if partial DOS are plotted
   uint shift = 0;
   if (datasets) { // DATASET = -1: all data sets
@@ -100,9 +104,6 @@ xoption getPlotOptions(const aurostd::xoption& xopt, const string& key, bool dat
 // Sets the plot options that are specific to electronic structure plots.
 xoption getPlotOptionsEStructure(const aurostd::xoption& xopt, const string& key, bool datasets) {
   xoption plotoptions = getPlotOptions(xopt, key, datasets);
-
-  plotoptions.flag("DATATYPE",xopt.flag("ATOMS")); //CO191010 - which table to look at, "atoms-projected" by default
-  plotoptions.flag("PLOT_ALL_ATOMS",xopt.flag("PLOT_ALL_ATOMS")); //CO191010
 
   // Projection
   string scheme = xopt.getattachedscheme("PLOTTER::PROJECTION");
