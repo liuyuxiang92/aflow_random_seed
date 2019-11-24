@@ -1513,7 +1513,16 @@ double getDosLimits(const xoption& plotoptions, const xDOSCAR& xdos,
   //[CO191110 OBSOLETE]  dosmax = (x + 1) * std::pow(10.0, l);
   //[CO191110 OBSOLETE]}
   
-  if (!((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0))) {x++;} //THIS LOGIC NEEDS EXPLAINING
+  // The DOS axis of the DOS plot should be divided into four tics,
+  // which gives a nice grid density. However, this often makes the
+  // numbers on the axis look ugly because some will have a decimal
+  // point and some won't. To avoid this, the scalar multiple may
+  // need to be increased except for the following circumstances:
+  //  * The DOS is spin-polarized, in which case we only have two tics per spin.
+  //  * The maximum is larger than 10, so there are no decimal points.
+  //  * The maximum is smaller than 1, in which case they all have decimal points.
+  //  * The number is divisible by 4.
+  if (!((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0))) {x++;}
   if(LDEBUG){cerr << soliloquy << " x(new2)=" << x << endl;}
   
   dosmax = x * std::pow(10.0, l); 
@@ -2156,4 +2165,3 @@ void generatePlotGNUPLOT(stringstream& out, const xoption& plotoptions,
 // *                  Marco Esters - Duke University 2019                    *
 // *                                                                         *
 // ***************************************************************************
-
