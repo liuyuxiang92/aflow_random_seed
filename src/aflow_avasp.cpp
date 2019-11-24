@@ -3091,7 +3091,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(print_directory && xvasp.AVASP_prototype_mode==LIBRARY_MODE_ARUN && directory_to_print[0]=='/'){print_directory=false;} //root directory
   if(!print_directory){
     //attempt 1 to fix
-    aurostd::StringSubst(directory_to_print,aurostd::execute2string("pwd"),"./");
+    //[CO191112 - OBSOLETE]aurostd::StringSubst(directory_to_print,aurostd::execute2string("pwd"),"./");
+    aurostd::StringSubst(directory_to_print,aurostd::getPWD(),"./");
     aurostd::StringSubst(directory_to_print,"//","/");
     print_directory=(!directory_to_print.empty());
   }
@@ -3100,7 +3101,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
   if(!print_directory){
     //attempt 2 to fix
     //look for current directory, dumb way to fix this
-    vector<string> pwdtokens;aurostd::string2tokens(aurostd::execute2string("pwd"),pwdtokens,"/");
+    //[CO191112 - OBSOLETE]vector<string> pwdtokens;aurostd::string2tokens(aurostd::execute2string("pwd"),pwdtokens,"/");
+    vector<string> pwdtokens;aurostd::string2tokens(aurostd::getPWD(),pwdtokens,"/");
     if(pwdtokens.size()>0){
       string token_to_find=pwdtokens.back();  //basename $(pwd)
       vector<string> dirtokens,dirtokens_save;

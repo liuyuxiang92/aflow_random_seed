@@ -192,7 +192,7 @@ void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
   string soliloquy="plotter::savePlotGNUPLOT():";
   string directory = plotoptions.getattachedscheme("DIRECTORY");
-  if(directory.empty()){directory=aurostd::execute2string("pwd");}  //CO191004
+  if(directory.empty()){directory=aurostd::getPWD();}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")//CO191004
   if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
   string filename = plotoptions.getattachedscheme("FILE_NAME");
   if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
@@ -200,7 +200,7 @@ void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
   // PDF is default since we use pdflatex to compile
   string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
   if (format.empty()) format = "pdf";
-  string current_dir = aurostd::execute2string("pwd");
+  string current_dir = aurostd::getPWD();  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
   // Create temp directory
   string tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
   chdir(tmp.c_str());

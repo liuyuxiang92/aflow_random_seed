@@ -6826,7 +6826,7 @@ namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     //CALCULATION_MODE == 0 (default) - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for all
     //CALCULATION_MODE == 1 - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for iatoms ONLY
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
@@ -7127,7 +7127,7 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
     a.sym_eps=_eps_;

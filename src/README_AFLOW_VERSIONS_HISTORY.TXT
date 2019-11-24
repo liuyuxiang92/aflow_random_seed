@@ -55,6 +55,7 @@
         -- updated generalHouseHolderQRDecomposition()->QRDecomposition_HouseHolder() (CO)
         -- added EFileEmpty() and EFileNotEmpty() (CO)
         -- added _AFLOW_FILE_NAME_ to logger() and patched Makefile for some missing cpp (CO)
+        -- added aurostd::getPWD() (CO)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)

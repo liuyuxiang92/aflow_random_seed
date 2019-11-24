@@ -701,7 +701,7 @@ namespace chull {
 // oss,ofstream& FileMESSAGE)
 //***************************************************************************//
 // gets path to redirect output
-string getPath(bool add_backslash) {return aurostd::execute2string(XHOST.command("pwd")) + (add_backslash?string("/"):string(""));}
+string getPath(bool add_backslash) {return aurostd::getPWD() + (add_backslash?string("/"):string(""));} //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 string getPath(const aurostd::xoption& vpflow, ostream& oss, bool silent) {  // overload
   ofstream FileMESSAGE;
   return getPath(vpflow, FileMESSAGE, oss, silent);
@@ -732,7 +732,7 @@ string getPath(string _path, ofstream& FileMESSAGE, ostream& oss, bool silent) {
   string soliloquy="chull::getPath():";
   stringstream message;
   string pwd = getPath(false);
-  string home = aurostd::execute2string(XHOST.command("echo") + " $HOME");
+  string home = XHOST.home; //aurostd::execute2string(XHOST.command("echo") + " $HOME");
   string path;
   // add '/' if _path doesn't already have it
   if(_path[_path.length() - 1] != '/') {

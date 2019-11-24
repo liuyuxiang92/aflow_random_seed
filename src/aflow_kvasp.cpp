@@ -3826,14 +3826,15 @@ namespace KBIN {
 // ***************************************************************************
 namespace KBIN {
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi) { // loop GetStatDiel
-    int PATH_LENGTH_MAX = 1024 ;
-    char work_dir[PATH_LENGTH_MAX] ;
+    //[CO191112 - OBSOLETE]int PATH_LENGTH_MAX = 1024 ;
+    //[CO191112 - OBSOLETE]char work_dir[PATH_LENGTH_MAX] ;
     string outcarfile, outcarpath ;
     string outcarpath_tmp = aurostd::TmpFileCreate("OUTCARc1.tmp") ;
     vector<string> outcarlines, endline, startline, vasptoken ;
     xmatrix<double> statdiel(3,3), eigenvec(3,3) ;
     double eps = 1.0E-5 ; // need to define this more rigorously
-    getcwd(work_dir, PATH_LENGTH_MAX) ;
+    //[CO191112 - OBSOLETE]getcwd(work_dir, PATH_LENGTH_MAX) ;
+    string work_dir=aurostd::getPWD();  //CO191112
 
     if(!aurostd::FileExist(outcar)) {
       cout << "KBIN::GetStatDiel: check filename || file missing" << endl ;
@@ -3944,14 +3945,15 @@ namespace KBIN {
   // ***************************************************************************
 namespace KBIN {
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi) {
-    int PATH_LENGTH_MAX = 1024 ;
-    char work_dir[PATH_LENGTH_MAX] ;
+    //[CO191112 - OBSOLETE]int PATH_LENGTH_MAX = 1024 ;
+    //[CO191112 - OBSOLETE]char work_dir[PATH_LENGTH_MAX] ;
     string outcarfile, outcarpath ;
     string outcarpath_tmp = aurostd::TmpFileCreate("OUTCARc2.tmp") ;
     vector<string> outcarlines, endline, startline, vasptoken ;
     xmatrix<double> statdiel(3,3), eigenvec(3,3) ;
     // double eps = 1.0E-5 ; // need to define this more rigorously
-    getcwd(work_dir, PATH_LENGTH_MAX) ;
+    //[CO191112 - OBSOLETE]getcwd(work_dir, PATH_LENGTH_MAX) ;
+    string work_dir=aurostd::getPWD();  //CO191112
 
     eigr(1)=0.00 ; eigr(2)=0.00 ; eigr(3)=0.00 ;
     eigi(1)=0.00 ; eigi(2)=0.00 ; eigi(3)=0.00 ;
