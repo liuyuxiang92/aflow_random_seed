@@ -1863,7 +1863,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   string compareDatabaseEntries(const aurostd::xoption& vpflow){
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     
     string function_name = "pflow::compareDatabaseEntries()";
     string directory = ".";
@@ -2512,8 +2512,8 @@ namespace compare {
       for(uint i=0; i<all_structures.size(); i++){
         all_structures[i].Pearson = "xX";
         all_structures[i].space_group = 0;
-        vector<GroupedWyckoffPosition> tmp;
-        all_structures[i].grouped_Wyckoff_positions = tmp;
+        vector<GroupedWyckoffPosition> vGWyckoffPos_tmp;
+        all_structures[i].grouped_Wyckoff_positions = vGWyckoffPos_tmp;
       }
     }
     

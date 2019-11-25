@@ -2707,7 +2707,9 @@ namespace pflow {
 
 namespace pflow {
   bool SYMMETRY_GROUPS(_aflags &aflags,istream& input, aurostd::xoption& vpflow, ostream& oss){
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::SYMMETRY_GROUPS()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     _kflags kflags;                                   // DX 8/15/17 - Add in consistency checks
     xstructure _a(input,IOAFLOW_AUTO);
     bool osswrite=TRUE;
@@ -5204,7 +5206,9 @@ namespace pflow {
 namespace pflow {
   //void DATA(string smode,istream& input) {
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss) {
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::DATA()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string aliases = "";
     string options = "";
     if(smode == "EDATA"){
@@ -6273,7 +6277,9 @@ namespace pflow {
   
   // COMMAND LINE SYMMETRY CALCULATION, calls main function PerformFullSymmetry()!!!!!!!!!!!
   bool CalculateFullSymmetry(_aflags &aflags, _kflags& kflags, xstructure& _a, aurostd::xoption& vpflow, bool osswrite,ostream& oss){ //main function
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::CalculateFullSymmetry()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string options = vpflow.getattachedscheme("FULLSYMMETRY");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -13822,7 +13828,9 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss) {
-    //DX 20191108 [not used] bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::SGDATA()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string options = vpflow.getattachedscheme("SGDATA");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");

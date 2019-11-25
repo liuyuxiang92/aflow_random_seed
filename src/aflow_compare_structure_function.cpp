@@ -1098,7 +1098,7 @@ namespace compare {
     // 2) AURL
     // 3) input (cin)
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::generateStructure()";
     ofstream FileMESSAGE;
     vector<string> tokens;
@@ -1351,7 +1351,7 @@ namespace compare{
 namespace compare{
   vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE){ //DX 20190319 - added FileMESSAGE
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::comparePermutations()";
     stringstream message;
@@ -2273,7 +2273,7 @@ namespace compare{
     // split comparisons into threads via indices
     string function_name = "compare::splitComparisonIntoThreads()";
     stringstream message;
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     
     bool safety_check=false; // safety check if split incorrectly
 
@@ -2622,7 +2622,7 @@ namespace compare{
     // Calculates the LFA environments for a structure and
     // stores it in the StructurePrototype object
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name="compare::calculateLFAEnvironments()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
@@ -3605,7 +3605,7 @@ namespace compare{
     // this function checks if other groups based on 
 
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::checkForBetterMatches()";
     stringstream message;
     ostream& logstream = cout;
@@ -3971,7 +3971,7 @@ namespace compare{
     // If the xstructure is not generated, it will generate a local copy for 
     // the single comparison only (prevents overwriting in the comparisons) 
  
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonThreads()";
     stringstream message;
     //bool store_comparison_logs = false; //DX 20190624
@@ -4049,7 +4049,7 @@ namespace compare{
       bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
       ostream& oss, ofstream& FileMESSAGE, bool quiet){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonScheme()";
 
     ostream& logstream = cout;
@@ -4985,7 +4985,7 @@ namespace compare{
 
     // Determine if the structures have the same types and counts of species
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::sameSpecies()";
 
     // ---------------------------------------------------------------------------
@@ -5692,7 +5692,7 @@ namespace compare{
     // C |      C1, C2     with A,B,C,D 
     // D |      D1, D2    
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
     string function_name = "compare::findMatch()";
@@ -6188,7 +6188,7 @@ namespace compare{
     // exact_match      : signals if an exact match (remove duplicates) or conversely 
     //                    if it possible to match later via structure comparison
    
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::compatibleEnvironments()";
 
@@ -6907,7 +6907,7 @@ namespace compare{
     // build a supercell comprised only of LFA atoms
     // to speed up translation vector search
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::GetLFASupercell()";
 
     // ---------------------------------------------------------------------------
@@ -6969,7 +6969,7 @@ namespace compare{
 
     // Performs lattice and origin search
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::latticeAndOriginSearch()";
 
     bool test_one_lfa_only = false; //DX 20190318
@@ -7559,7 +7559,7 @@ namespace compare{
 			vector<xstructure>& vprotos,
       bool optimize_match){ 
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
     double mis=1;  
@@ -7755,7 +7755,7 @@ namespace compare{
     // to find a lattice which is commensurate with the reference structure (xstr1). 
     // This function is parallelized since it is the time-limiting function.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::quadrupletSearch()";
     bool relative_tolerance=true;
 
@@ -7878,7 +7878,7 @@ namespace compare{
                             xvector<double>& abc_angles_q1, vector<xmatrix<double> >& lattices, vector<xmatrix<double> >& clattices, 
                             vector<double>& latt_devs, const bool& optimize_match){
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::buildSimilarLattices():";
 
