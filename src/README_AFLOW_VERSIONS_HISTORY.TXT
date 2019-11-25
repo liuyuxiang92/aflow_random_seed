@@ -38,6 +38,10 @@
         -- fixed non-collinear spin lattice primitivization function (DX)
         -- fixed typos in README_PROTO.TXT: A2B_oP12_26_abc_ab-001 to A2B_oP12_26_abc_ab-002 and AB_oC8_67_a_g-001 to AB_oC8_67_a_g-002 (DX)
         -- check if tolerance input is negative for BringInCell() (DX)
+        -- added AtomEnvironment class in aflow_xatom.cpp (DX)
+        -- generalized inCell() and added atomInCell() (DX)
+        -- added aurostd::GCD(), aurostd::LCM(), and aurostd::reduceByGCD(), for vector and deque (DX)
+        -- added FileMESSAGE and logstream overloads for comparison functions (DX)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
 	      -- Bug fixes for MPI (SC)

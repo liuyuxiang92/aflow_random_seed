@@ -5989,7 +5989,7 @@ namespace compare{
     vector<uint> QTA1,QTA2;
     vector<vector<uint> > I1,I2;
 
-    vector<int> flag,checkType;
+    vector<int> vflags,checkType;
 
     clusterize(xstr1,im1,TYPE1,QTA1,I1);
     clusterize(xstr2,im2,TYPE2,QTA2,I2);
@@ -5999,7 +5999,7 @@ namespace compare{
     for(i=0; i<TYPE1.size(); i++){
       for(j=0; j<TYPE2.size(); j++){
         if(QTA1[i]==QTA2[j]){	
-          flag.clear();
+          vflags.clear();
           for(w=0; w<I1[i].size(); w++){
             for(z=0; z<I2[j].size(); z++){
               for(k=0; k<im1.size(); k++){
@@ -6008,15 +6008,15 @@ namespace compare{
                   if(I1[i][w]==im1[k] && I2[j][z]==im2[k] && 
                       xstr1.atoms[im1[k]].name == xstr2.atoms[im2[k]].name
                     ) 
-                    flag.push_back(1);
+                    vflags.push_back(1);
                 }
                 else {
-                  if(I1[i][w]==im1[k] && I2[j][z]==im2[k]) flag.push_back(1);
+                  if(I1[i][w]==im1[k] && I2[j][z]==im2[k]) vflags.push_back(1);
                 }
               }
             }
           }
-          if(flag.size()==QTA1[i])
+          if(vflags.size()==QTA1[i])
             checkType.push_back(1);	
         }
       }
