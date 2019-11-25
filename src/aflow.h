@@ -507,6 +507,13 @@ extern _XHOST XHOST; // this will be global
 #define SG_SETTING_ANRL 3
 //DX 20180131 - add symmetry definitions - END
 
+//DX 20191122 - START
+// atom environment modes
+#define ATOM_ENVIRONMENT_MODE_1    1 // minimum coordination shell
+#define ATOM_ENVIRONMENT_MODE_2    2 // [FUTURE] out to a given radius
+#define ATOM_ENVIRONMENT_MODE_3    3 // [FUTURE] largest gap in radial distribution function (GFA)
+//DX 20191122 - END
+
 // ----------------------------------------------------------------------------
 // aflow_aflowrc.cpp
 #define _AFLOW_AFLOWRC_H_
@@ -1349,6 +1356,31 @@ class GroupedWyckoffPosition{
 // --------------------------------------------------------------------------
 //DX 20181010 - grouped Wyckoff class - END
 
+// --------------------------------------------------------------------------
+// AtomEnvironment Class //DX 20191120 
+class AtomEnvironment{
+  public:
+    AtomEnvironment();                                                                      // constructor operator
+    ~AtomEnvironment();                                                                     // destructor operator
+    friend ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment);       // stringstream operator (printing)
+    const AtomEnvironment& operator=(const AtomEnvironment& b);                             // assignment operator
+    AtomEnvironment(const AtomEnvironment& b);                                              // copy constructor
+    string element_center;                                                                  // species/element at center of environment                                                                   
+    uint type_center;                                                                       // type (uint) at center of environment
+    vector<string> elements_neighbor;                                                       // species/element of atoms neighboring center atom
+    vector<uint> types_neighbor;                                                            // types (uint) of atoms neighboring center atom
+    vector<double> distances_neighbor;                                                      // distances to atoms neighboring atoms (typically put in a bin with small tolerance threshold)                                             
+    vector<uint> coordinations_neighbor;                                                    // coordination of neighboring distance                                              
+    vector<vector<xvector<double> > > coordinates_neighbor;                                 // coordinates of atoms neighboring atoms (center is assumed to be zero,i.e. coord=neighbor-origin)
+    //functions
+    void getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode=ATOM_ENVIRONMENT_MODE_1);                                          // get environment around atom index                                               
+    void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
+  private:
+    void free();                                                                            // free operator
+    void copy(const AtomEnvironment& b);                                                    // copy constructor
+};
+// --------------------------------------------------------------------------
+
 #define MAX_TITLE_SIZE 512
 
 #define IOAFLOW_AUTO   0
@@ -2132,6 +2164,10 @@ xstructure GetIntpolStr(xstructure strA,xstructure strB,const double& f,const st
 double RadiusSphereLattice(const xmatrix<double>& lattice,double scale=1.0); // CO 180409
 xvector<int> LatticeDimensionSphere(const xmatrix<double>& lattice,double radius,double scale=1.0); // CO 180409
 xvector<int> LatticeDimensionSphere(const xstructure& str,double radius);
+void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
+    vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, vector<int>& a_index, 
+    vector<int>& b_index, vector<int>& c_index); //DX 20191122
 xvector<double> F2C(const double& scale,const xmatrix<double>& lattice,const xvector<double>& fpos);    // fpos are F components per COLUMS !
 xvector<double> F2C(const xmatrix<double>& lattice,const xvector<double>& fpos);                        // fpos are F components per COLUMS !
 xvector<double> C2F(const double& scale,const xmatrix<double>& lattice,const xvector<double>& cpos);    // cpos are C components per COLUMS !
@@ -2333,6 +2369,24 @@ xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input);
 
 // ----------------------------------------------------------------------------
+// functions related to AtomEnvironment - DX 20191122
+vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode=ATOM_ENVIRONMENT_MODE_1);
+vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode=ATOM_ENVIRONMENT_MODE_1);
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191122
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius); //DX 20191122
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
+    vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
+    vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
+    double radius); //DX 20191122
+void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191122
+void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX 20191122
+
+// ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
 #define _HTQC_PROJECT_STRING_ "HTQC Project"
@@ -2408,7 +2462,7 @@ namespace aflowlib {
   uint GetAllPrototypeLabels(vector<string>& prototype_labels, vector<string>& compositions, 
                              vector<uint>& space_group_numbers, vector<vector<vector<string> > >& Wyckoff_letter_strings, 
                              string library="all");
-  vector<string> GetPrototypesBySpeciesNumber(uint species_number, string library="all"); //DX 20181009
+  vector<string> GetPrototypesBySpeciesNumber(uint number_of_species, string library="all"); //DX 20181009
   vector<string> GetPrototypesByStoichiometry(vector<uint> stoichiometry, string library="all"); //DX 20181009
   vector<string> GetPrototypesByStoichiometry(vector<uint> stoichiometry, vector<string>& protototype_composition, vector<uint>& prototype_space_group_numbers, 
                              vector<vector<vector<string> > >& prototype_grouped_Wyckoff_letters, string library="all");

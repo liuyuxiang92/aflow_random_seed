@@ -2098,16 +2098,16 @@ namespace SYM {
 
     vector<vector<string> > all_Wyckoff_positions;
 
-    stringstream temp;
+    stringstream tmp_Wyckoff_equation;
     for(uint i=0;i<get_centering(spaceg).size();i++) {
       for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
         vector<string> vec_pos;
         for(uint k=0;k<non_shifted_Wyckoff_positions[j].size();k++){
-          temp << non_shifted_Wyckoff_positions[j][k];
-          temp << "+" << get_centering(spaceg)[i][k];
-          vec_pos.push_back(temp.str());
-          temp.str(std::string());
-          temp.clear();
+          tmp_Wyckoff_equation << non_shifted_Wyckoff_positions[j][k];
+          tmp_Wyckoff_equation << "+" << get_centering(spaceg)[i][k];
+          vec_pos.push_back(tmp_Wyckoff_equation.str());
+          tmp_Wyckoff_equation.str(std::string());
+          tmp_Wyckoff_equation.clear();
         }
         all_Wyckoff_positions.push_back(vec_pos);
       }
@@ -2299,35 +2299,35 @@ namespace SYM {
       non_shifted_Wyckoff_positions.push_back(vec_pos);
     }
 
-    stringstream temp;
-    temp.str(std::string());
-    temp.clear();
+    stringstream tmp_Wyckoff_equation;
+    tmp_Wyckoff_equation.str(std::string());
+    tmp_Wyckoff_equation.clear();
     for(uint i=0;i<get_centering(Wyckoff_string).size();i++) {
       for(uint j=0;j<non_shifted_Wyckoff_positions.size();j++){
         vector<string> vec_pos;
         for(uint k=0;k<non_shifted_Wyckoff_positions[j].size();k++){
-          temp << non_shifted_Wyckoff_positions[j][k];
-          temp << "+" << get_centering(Wyckoff_string)[i][k];
+          tmp_Wyckoff_equation << non_shifted_Wyckoff_positions[j][k];
+          tmp_Wyckoff_equation << "+" << get_centering(Wyckoff_string)[i][k];
           // ---------------------------------------------------------------------------
           // split into equation entities (number, variable) 
           if(reduce){
-            vector<sdouble> sd_coordinate = simplify(temp.str());
+            vector<sdouble> sd_coordinate = simplify(tmp_Wyckoff_equation.str());
             vec_pos.push_back(SYM::formatWyckoffPosition(sd_coordinate));
           }
           else{
-            vec_pos.push_back(temp.str());
+            vec_pos.push_back(tmp_Wyckoff_equation.str());
           }
-          temp.str(std::string());
-          temp.clear();
+          tmp_Wyckoff_equation.str(std::string());
+          tmp_Wyckoff_equation.clear();
         }
         all_positions.push_back(vec_pos);
       }
     }
 
     if(LDEBUG) {
-      vector<string> tmp; 
-      for(uint i=0;i<all_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_positions[i],",")+")");}
-      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+      vector<string> tmp_vposition; 
+      for(uint i=0;i<all_positions.size();i++){tmp_vposition.push_back("("+aurostd::joinWDelimiter(all_positions[i],",")+")");}
+      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp_vposition," ") << endl;
     }
 
   }
@@ -2887,11 +2887,11 @@ namespace SYM {
 // Map equivalent atoms in the xstructure to the ITC Wyckoff positions
 namespace SYM {
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring, 
-			    deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted, 
-			    bool& foundspacegroup, string& spacegroupstring, bool& orig_origin_shift, xvector<double>& OriginShift, 
-			    vector<int>& wyckoffmult, vector<string>& wyckoffsymbols, vector<wyckoffsite_ITC>& wyckoffVariables, 
-			    deque<_atom>& wyckoffPositionsVector, vector<string>& wyckoffSymbols, ostringstream& woss, 
-			    bool& obverse_force_transformed){
+      deque<deque<_atom> >& equivalent_atoms, deque<deque<_atom> >& equivalent_atoms_shifted, 
+      bool& foundspacegroup, string& spacegroupstring, bool& orig_origin_shift, xvector<double>& OriginShift, 
+      vector<int>& wyckoffmult, vector<string>& wyckoffsymbols, vector<wyckoffsite_ITC>& wyckoffVariables, 
+      deque<_atom>& wyckoffPositionsVector, vector<string>& wyckoffSymbols, ostringstream& woss, 
+      bool& obverse_force_transformed){
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
 
@@ -2906,13 +2906,13 @@ namespace SYM {
       // Find set of Wyckoff positions in the ITC with the same multiplicity 
       vector<int> wyckoffsymbols_mult_index;  //wyckoff symbols with specified multiplicity index
       for (uint ixx = 0; ixx < wyckoffmult.size(); ixx++) {
-	if(wyckoffmult[ixx] == mtmp) {
-	  wyckoffsymbols_mult_index.push_back(ixx);
-	}
+        if(wyckoffmult[ixx] == mtmp) {
+          wyckoffsymbols_mult_index.push_back(ixx);
+        }
       }
       first_wyckoff = true;
       uint found_count = 0;
-      wyckoffsite_ITC tmp;
+      wyckoffsite_ITC tmp_Wyckoff_site;
       _atom wyckoff_atom;
       found_wyckoff = true;
       tmpvvvstring.clear();
@@ -2920,14 +2920,14 @@ namespace SYM {
       // Get string of Wyckoff positions
       tmpvvvstring = get_wyckoff_pos(spacegroupstring, mtmp);
       if(tmpvvvstring.size() == 0) {
-	if(LDEBUG) { cerr << "SYM::findWyckoffPositions: Could not find wyckoff position based on multiplicity provided [1]. Return string = " << tmpvvvstring.size() << endl; }
-	foundspacegroup = false;
-	found_wyckoff = false;
-	wyckoffVariables.clear();
-	wyckoffPositionsVector.clear();
-	woss.str("");
-	wyckoffSymbols.clear();
-	break;
+        if(LDEBUG) { cerr << "SYM::findWyckoffPositions: Could not find wyckoff position based on multiplicity provided [1]. Return string = " << tmpvvvstring.size() << endl; }
+        foundspacegroup = false;
+        found_wyckoff = false;
+        wyckoffVariables.clear();
+        wyckoffPositionsVector.clear();
+        woss.str("");
+        wyckoffSymbols.clear();
+        break;
       }
       //xb();
       //print_wyckoff_pos(tmpvvvstring);
@@ -2936,313 +2936,313 @@ namespace SYM {
       // Convert string to string and doubles to perform math operations on them
       vector<vector<vector<vector<sdouble> > > > tmpvvvsd = convert_wyckoff_pos_sd(tmpvvvstring);
       xvector<double> xyz_params;
-      
+
       // Loop over the ITC Wyckoff sites with a give multiplicity
       for (uint j = 0; j < tmpvvvsd.size(); j++) {  //LOOP OF WYCKOFF POSITIONS WITH MULTIPLICITY EQUAL TO EQUIVALENT ATOM SET:
-	deque<_atom> tmp_equivalent_atoms_shifted = equivalent_atoms_shifted[i];
-	vector<vector<vector<sdouble> > > wyckoff_set = tmpvvvsd[j];
-	uint variable_changes = 0;
-	bool x_variable_set = false;
-	bool y_variable_set = false;
-	bool z_variable_set = false;
-   
-	// Loop over the coordinates for a given ITC Wyckoff set
-	for (int m = 0; m < (int)wyckoff_set.size(); m++) {
-	  bool contains_variable = false;
-	  bool contains_x_variable = false;
-	  bool contains_y_variable = false;
-	  bool contains_z_variable = false;
+        deque<_atom> tmp_equivalent_atoms_shifted = equivalent_atoms_shifted[i];
+        vector<vector<vector<sdouble> > > wyckoff_set = tmpvvvsd[j];
+        uint variable_changes = 0;
+        bool x_variable_set = false;
+        bool y_variable_set = false;
+        bool z_variable_set = false;
 
-	  // Loop over the equivalent atoms in the structure
-	  for (uint ix = 0; ix < tmp_equivalent_atoms_shifted.size(); ix++) {  //PERMUTE THROUGH ATOMS IN SET (first may not work)
-	    xmatrix<double> W(3, 4);
-	    for (int k = 0; k < 3; k++) {  //TAKE FIRST SYMMETRY-RELATED SITE TO ASSIGN VARIABLES (HENCE: [j][0])
-	      W(k + 1, 4) = tmp_equivalent_atoms_shifted[ix].fpos(k + 1);
-	      for (uint l = 0; l < wyckoff_set[m][k].size(); l++) {
-          //cerr <<"is " << wyckoff_set[m][k][l].dbl << " " << wyckoff_set[m][k][l].chr << " equal to: " << tmp_equivalent_atoms_shifted[ix].fpos(k+1) << endl;//DEBUG MODE
-          // === Compare constent components in Wyckoff positions first === //
-          if(wyckoff_set[m][k][l].chr == '\0') {
-            W(k + 1, 4) -= wyckoff_set[m][k][l].dbl;
-          } 
-          else {
-            int neg_pos = 1;
-            //If the coefficient is negative then multiply both sides by negative one and take RHS modulo 1
-            //cerr << "wyckoff_set[m][k][l].chr: " << wyckoff_set[m][k][l].chr << endl;
-            if(wyckoff_set[m][k][l].chr == 'x') {
-              contains_variable = true;
-              contains_x_variable = true;
-              W(k + 1, 1) = neg_pos * wyckoff_set[m][k][l].dbl;
+        // Loop over the coordinates for a given ITC Wyckoff set
+        for (int m = 0; m < (int)wyckoff_set.size(); m++) {
+          bool contains_variable = false;
+          bool contains_x_variable = false;
+          bool contains_y_variable = false;
+          bool contains_z_variable = false;
+
+          // Loop over the equivalent atoms in the structure
+          for (uint ix = 0; ix < tmp_equivalent_atoms_shifted.size(); ix++) {  //PERMUTE THROUGH ATOMS IN SET (first may not work)
+            xmatrix<double> W(3, 4);
+            for (int k = 0; k < 3; k++) {  //TAKE FIRST SYMMETRY-RELATED SITE TO ASSIGN VARIABLES (HENCE: [j][0])
+              W(k + 1, 4) = tmp_equivalent_atoms_shifted[ix].fpos(k + 1);
+              for (uint l = 0; l < wyckoff_set[m][k].size(); l++) {
+                //cerr <<"is " << wyckoff_set[m][k][l].dbl << " " << wyckoff_set[m][k][l].chr << " equal to: " << tmp_equivalent_atoms_shifted[ix].fpos(k+1) << endl;//DEBUG MODE
+                // === Compare constent components in Wyckoff positions first === //
+                if(wyckoff_set[m][k][l].chr == '\0') {
+                  W(k + 1, 4) -= wyckoff_set[m][k][l].dbl;
+                } 
+                else {
+                  int neg_pos = 1;
+                  //If the coefficient is negative then multiply both sides by negative one and take RHS modulo 1
+                  //cerr << "wyckoff_set[m][k][l].chr: " << wyckoff_set[m][k][l].chr << endl;
+                  if(wyckoff_set[m][k][l].chr == 'x') {
+                    contains_variable = true;
+                    contains_x_variable = true;
+                    W(k + 1, 1) = neg_pos * wyckoff_set[m][k][l].dbl;
+                  }
+                  if(wyckoff_set[m][k][l].chr == 'y') {
+                    contains_variable = true;
+                    contains_y_variable = true;
+                    W(k + 1, 2) = neg_pos * wyckoff_set[m][k][l].dbl;
+                  }
+                  if(wyckoff_set[m][k][l].chr == 'z') {
+                    contains_variable = true;
+                    contains_z_variable = true;
+                    W(k + 1, 3) = neg_pos * wyckoff_set[m][k][l].dbl;
+                  }
+                  //DX 20190905 [OBSOLETE-no more mod_one_xvec] W(k + 1, 4) = SYM::mod_one(neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1));
+                  W(k + 1, 4) = neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1); //DX 20190905
+                  BringInCellInPlace(W(k + 1, 4)); //DX 20190905
+                }
+              }
             }
-            if(wyckoff_set[m][k][l].chr == 'y') {
-              contains_variable = true;
-              contains_y_variable = true;
-              W(k + 1, 2) = neg_pos * wyckoff_set[m][k][l].dbl;
+            // ===== Linear algebra problem: Solve for Wyckoff position (if positions are not constant) ===== //
+            vector<xvector<double> > LHS;
+            xvector<double> tmp1; tmp1(1) = W(1, 1); tmp1(2) = W(1, 2); tmp1(3) = W(1, 3);
+            xvector<double> tmp2; tmp2(1) = W(2, 1); tmp2(2) = W(2, 2); tmp2(3) = W(2, 3);
+            xvector<double> tmp3; tmp3(1) = W(3, 1); tmp3(2) = W(3, 2); tmp3(3) = W(3, 3);
+            LHS.push_back(tmp1);
+            LHS.push_back(tmp2);
+            LHS.push_back(tmp3);
+            for (uint i = 0; i < 3; i++) {
+              for (uint j = 0; j < 3; j++) {
+                for (uint k = 0; k < 3; k++) {
+                  vector<double> dS_mod;
+                  dS_mod.push_back(W(1, 4));
+                  dS_mod.push_back(W(2, 4));
+                  dS_mod.push_back(W(3, 4));
+                  dS_mod[0] = dS_mod[0] + double(i);
+                  dS_mod[1] = dS_mod[1] + double(j);
+                  dS_mod[2] = dS_mod[2] + double(k);
+                  xmatrix<double> W_tmp = xvec2xmat(LHS, dS_mod);
+                  //cerr <<"W_tmp: " <<  endl; //DEBUG MODE
+                  //cerr << W_tmp << endl; //DEBUG MODE
+                  //xb(); //DEBUG MODE
+                  ReducedRowEchelonForm(W_tmp,CCell.sym_eps); //DX 20190215
+                  //cerr << "RR FORM: " << endl; //DEBUG MODE
+                  //cerr << W_tmp << endl; //DEBUG MODE
+                  xvector<double> solution; solution(1) = (W_tmp(1, 4)); solution(2) = (W_tmp(2, 4)); solution(3) = (W_tmp(3, 4));
+                  solution = SYM::minimizeDistanceFractionalMethod(solution); //DX 20190613
+                  //DX 20190613 [OBSOLETE] SYM::PBC(solution); 
+                  xvector<double> cart_solution = trasp(CCell.lattice)*solution;
+
+                  xvector<double> ideal_wyckoff = solution;
+                  found_wyckoff = true;
+                  if((aurostd::abs(W_tmp(1, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(1, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(1, 3)) < _ZERO_TOL_)){
+                    ideal_wyckoff(1) = 0.0;
+                  }
+                  if((aurostd::abs(W_tmp(2, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(2, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(2, 3)) < _ZERO_TOL_)){
+                    ideal_wyckoff(2) = 0.0;
+                  }
+                  if((aurostd::abs(W_tmp(3, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(3, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(3, 3)) < _ZERO_TOL_)){
+                    ideal_wyckoff(3) = 0.0;
+                  }
+                  ideal_wyckoff = SYM::minimizeDistanceFractionalMethod(ideal_wyckoff); //DX 20190613
+                  //DX 20190613 [OBSOLETE] SYM::PBC(ideal_wyckoff);
+                  xvector<double> ideal_cart_position = trasp(CCell.lattice)*ideal_wyckoff;
+                  if(aurostd::modulus(cart_solution-ideal_cart_position)>CCell.sym_eps){ //DX 20190215
+                    found_wyckoff = false;
+                  }
+                  if(found_wyckoff) {
+                    //cerr << "FOUND: " << W_tmp << endl;
+                    W = W_tmp;
+                    break;
+                  }
+                }
+                if(found_wyckoff) {
+                  break;
+                }
+              }
+              if(found_wyckoff) {
+                break;
+              }
             }
-            if(wyckoff_set[m][k][l].chr == 'z') {
-              contains_variable = true;
-              contains_z_variable = true;
-              W(k + 1, 3) = neg_pos * wyckoff_set[m][k][l].dbl;
+            //cerr << "FOUND WYCKOFF: " << found_wyckoff << endl;
+            if(found_wyckoff == true) {
+              for (int ixx = 1; ixx < 4; ixx++) {
+                for (int jx = 1; jx < 4; jx++) {
+                  if(aurostd::abs(W(ixx, jx) - 1.0) < _ZERO_TOL_) {
+                    if(jx == 1) {
+                      if(contains_x_variable && !x_variable_set){
+                        xyz_params(1) = W(ixx,4);
+                        x_variable_set = true;
+                      }
+                      if(first_wyckoff == true){
+                        tmp_Wyckoff_site.coord(1) = W(ixx, 4);
+                      }
+                    }
+                    if(jx == 2) {
+                      //cerr << "y = " << W(ix,4) << " ";
+                      if(contains_y_variable && !y_variable_set){
+                        xyz_params(2) = W(ixx,4);
+                        y_variable_set = true;
+                      }
+                      if(first_wyckoff == true){
+                        tmp_Wyckoff_site.coord(2) = W(ixx, 4);
+                      }
+                    }
+                    if(jx == 3) {
+                      if(contains_z_variable && !z_variable_set){
+                        xyz_params(3) = W(ixx,4);
+                        z_variable_set = true;
+                      }
+                      if(first_wyckoff == true){
+                        tmp_Wyckoff_site.coord(3) = W(ixx, 4);
+                      }
+                    }
+                  }
+                }
+                if(first_wyckoff == true){
+                  //cerr << "FOUND LINEAR SOLUTION: " << endl;
+                  //cerr << endl << W << endl;
+                  //cerr << endl;
+                  first_wyckoff = false;
+                  // ========== Store Wyckoff Position ========== //
+                  tmp_Wyckoff_site.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX 12/12/17 - need to updated coord to include non-parametrized Wyckoff positions
+                  tmp_Wyckoff_site.type = tmp_equivalent_atoms_shifted[ix].name;
+                  //DX 20191010 - update partial occupation value - START
+                  if(CCell.partial_occupation_flag){
+                    tmp_Wyckoff_site.site_occupation=tmp_equivalent_atoms_shifted[ix].partial_occupation_value;
+                  }
+                  else{ tmp_Wyckoff_site.site_occupation=1.0; }
+                  //DX 20191010 - update partial occupation value - END
+                  tmp_Wyckoff_site.wyckoffSymbol = wyckoffsymbols[wyckoffsymbols_mult_index[j] - 1];
+                  tmp_Wyckoff_site.equations.clear(); //DX 20190130 - clear for safety
+                  //DX 20190128 - add multiplicity, letter, and site symmetry - START 
+                  vector<string> tokens,pos_tokens;
+                  if(aurostd::string2tokens(tmp_Wyckoff_site.wyckoffSymbol,tokens," ") == 3){
+                    tmp_Wyckoff_site.multiplicity = aurostd::string2utype<int>(tokens[0]);
+                    tmp_Wyckoff_site.letter = tokens[1];
+                    tmp_Wyckoff_site.site_symmetry = tokens[2];
+                    vector<string> positions = SYM::findWyckoffEquations(spacegroupstring, tmp_Wyckoff_site.letter, 
+                        tmp_Wyckoff_site.multiplicity);
+                    for(uint p=0;p<positions.size();p++){
+                      aurostd::string2tokens(positions[p],pos_tokens,",");
+                      tmp_Wyckoff_site.equations.push_back(pos_tokens);
+                    }
+                  }
+                  //DX 20190128 - add multiplicity, letter, and site symmetry - END
+                  wyckoff_atom = tmp_equivalent_atoms_shifted[ix];
+                }
+              }
+              if(contains_variable){
+                xvector<double> diff;
+                //cerr << "contains variable" << endl;
+                for (int ixx = 1; ixx < 4; ixx++) {
+                  for (int jx = 1; jx < 4; jx++) {
+                    if(aurostd::abs(W(ixx, jx) - 1.0) < CCell.sym_eps) { //DX 20190215
+                      if(contains_x_variable && x_variable_set && jx ==1){
+                        diff(1) = xyz_params(1)-W(ixx,4);
+                      }
+                      if(contains_y_variable && y_variable_set && jx == 2){
+                        diff(2) = xyz_params(2)-W(ixx,4);
+                      }
+                      if(contains_z_variable && z_variable_set && jx == 3){
+                        diff(3) = xyz_params(3)-W(ixx,4);
+                      }
+                    }
+                    if(!found_wyckoff){
+                      break;
+                    }
+                  }
+                }
+                diff = SYM::minimizeDistanceFractionalMethod(diff); //DX 20190613
+                //DX 20190613 [OBSOLETE] SYM::PBC(diff);
+                if(aurostd::modulus(trasp(CCell.lattice)*diff)>CCell.sym_eps){ //DX 20190215
+                  found_wyckoff = false;
+                }
+              }
+              if(!found_wyckoff){
+                continue;
+              }
+              found_count++;
+              tmp_equivalent_atoms_shifted.erase(tmp_equivalent_atoms_shifted.begin() + ix);
+              wyckoff_set.erase(wyckoff_set.begin() + m);
+              m--;
+              break;
             }
-            //DX 20190905 [OBSOLETE-no more mod_one_xvec] W(k + 1, 4) = SYM::mod_one(neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1));
-            W(k + 1, 4) = neg_pos * tmp_equivalent_atoms_shifted[ix].fpos(k + 1); //DX 20190905
-            BringInCellInPlace(W(k + 1, 4)); //DX 20190905
+          }  //for ix: loop through equivalent atoms
+          if(found_wyckoff == false) {
+            //cerr << "COULDN'T FIND MATCH: equivalent atoms : " << i << " with " << m << endl;
+            first_wyckoff = true;
+            found_count = 0;
+            //found_position = 0;
+            // Perhaps we found the wrong parameter for a variable, rearrange equivalent atom order to find new parameter
+            if(contains_variable && variable_changes < equivalent_atoms_shifted[i].size() - 1) {
+              variable_changes += 1;
+              x_variable_set = false;
+              y_variable_set = false;
+              z_variable_set = false;
+              contains_x_variable = false;
+              contains_y_variable = false;
+              contains_z_variable = false;
+              xyz_params.clear();
+              tmp_equivalent_atoms_shifted = equivalent_atoms_shifted[i];
+              wyckoff_set = tmpvvvsd[j];
+              for (uint s = 0; s < variable_changes; s++) {
+                tmp_equivalent_atoms_shifted.push_back(tmp_equivalent_atoms_shifted[0]);
+                tmp_equivalent_atoms_shifted.erase(tmp_equivalent_atoms_shifted.begin() + 0);
+              }
+              m = -1;
+            }
+            else {
+              break;
+            }
           }
-        }
-      }
-	    // ===== Linear algebra problem: Solve for Wyckoff position (if positions are not constant) ===== //
-	    vector<xvector<double> > LHS;
-	    xvector<double> tmp1; tmp1(1) = W(1, 1); tmp1(2) = W(1, 2); tmp1(3) = W(1, 3);
-	    xvector<double> tmp2; tmp2(1) = W(2, 1); tmp2(2) = W(2, 2); tmp2(3) = W(2, 3);
-	    xvector<double> tmp3; tmp3(1) = W(3, 1); tmp3(2) = W(3, 2); tmp3(3) = W(3, 3);
-	    LHS.push_back(tmp1);
-	    LHS.push_back(tmp2);
-	    LHS.push_back(tmp3);
-	    for (uint i = 0; i < 3; i++) {
-	      for (uint j = 0; j < 3; j++) {
-		for (uint k = 0; k < 3; k++) {
-		  vector<double> dS_mod;
-		  dS_mod.push_back(W(1, 4));
-		  dS_mod.push_back(W(2, 4));
-		  dS_mod.push_back(W(3, 4));
-		  dS_mod[0] = dS_mod[0] + double(i);
-		  dS_mod[1] = dS_mod[1] + double(j);
-		  dS_mod[2] = dS_mod[2] + double(k);
-		  xmatrix<double> W_tmp = xvec2xmat(LHS, dS_mod);
-		  //cerr <<"W_tmp: " <<  endl; //DEBUG MODE
-		  //cerr << W_tmp << endl; //DEBUG MODE
-		  //xb(); //DEBUG MODE
-		  ReducedRowEchelonForm(W_tmp,CCell.sym_eps); //DX 20190215
-		  //cerr << "RR FORM: " << endl; //DEBUG MODE
-		  //cerr << W_tmp << endl; //DEBUG MODE
-		  xvector<double> solution; solution(1) = (W_tmp(1, 4)); solution(2) = (W_tmp(2, 4)); solution(3) = (W_tmp(3, 4));
-		  solution = SYM::minimizeDistanceFractionalMethod(solution); //DX 20190613
-		  //DX 20190613 [OBSOLETE] SYM::PBC(solution); 
-		  xvector<double> cart_solution = trasp(CCell.lattice)*solution;
-
-		  xvector<double> ideal_wyckoff = solution;
-		  found_wyckoff = true;
-		  if((aurostd::abs(W_tmp(1, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(1, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(1, 3)) < _ZERO_TOL_)){
-		    ideal_wyckoff(1) = 0.0;
-		  }
-		  if((aurostd::abs(W_tmp(2, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(2, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(2, 3)) < _ZERO_TOL_)){
-		    ideal_wyckoff(2) = 0.0;
-		  }
-		  if((aurostd::abs(W_tmp(3, 1)) < _ZERO_TOL_ && aurostd::abs(W_tmp(3, 2)) < _ZERO_TOL_ && aurostd::abs(W_tmp(3, 3)) < _ZERO_TOL_)){
-		    ideal_wyckoff(3) = 0.0;
-		  }
-		  ideal_wyckoff = SYM::minimizeDistanceFractionalMethod(ideal_wyckoff); //DX 20190613
-		  //DX 20190613 [OBSOLETE] SYM::PBC(ideal_wyckoff);
-		  xvector<double> ideal_cart_position = trasp(CCell.lattice)*ideal_wyckoff;
-		  if(aurostd::modulus(cart_solution-ideal_cart_position)>CCell.sym_eps){ //DX 20190215
-		    found_wyckoff = false;
-		  }
-		  if(found_wyckoff) {
-		    //cerr << "FOUND: " << W_tmp << endl;
-		    W = W_tmp;
-		    break;
-		  }
-		}
-		if(found_wyckoff) {
-		  break;
-		}
-	      }
-	      if(found_wyckoff) {
-		break;
-	      }
-	    }
-	    //cerr << "FOUND WYCKOFF: " << found_wyckoff << endl;
-	    if(found_wyckoff == true) {
-	      for (int ixx = 1; ixx < 4; ixx++) {
-		for (int jx = 1; jx < 4; jx++) {
-		  if(aurostd::abs(W(ixx, jx) - 1.0) < _ZERO_TOL_) {
-		    if(jx == 1) {
-		      if(contains_x_variable && !x_variable_set){
-			xyz_params(1) = W(ixx,4);
-			x_variable_set = true;
-		      }
-		      if(first_wyckoff == true){
-			tmp.coord(1) = W(ixx, 4);
-		      }
-		    }
-		    if(jx == 2) {
-		      //cerr << "y = " << W(ix,4) << " ";
-		      if(contains_y_variable && !y_variable_set){
-			xyz_params(2) = W(ixx,4);
-			y_variable_set = true;
-		      }
-		      if(first_wyckoff == true){
-			tmp.coord(2) = W(ixx, 4);
-		      }
-		    }
-		    if(jx == 3) {
-		      if(contains_z_variable && !z_variable_set){
-			xyz_params(3) = W(ixx,4);
-			z_variable_set = true;
-		      }
-		      if(first_wyckoff == true){
-			tmp.coord(3) = W(ixx, 4);
-		      }
-		    }
-		  }
-		}
-		if(first_wyckoff == true){
-		  //cerr << "FOUND LINEAR SOLUTION: " << endl;
-		  //cerr << endl << W << endl;
-		  //cerr << endl;
-		  first_wyckoff = false;
-		  // ========== Store Wyckoff Position ========== //
-      tmp.coord = tmp_equivalent_atoms_shifted[ix].fpos; // DX 12/12/17 - need to updated coord to include non-parametrized Wyckoff positions
-      tmp.type = tmp_equivalent_atoms_shifted[ix].name;
-      //DX 20191010 - update partial occupation value - START
-      if(CCell.partial_occupation_flag){
-        tmp.site_occupation=tmp_equivalent_atoms_shifted[ix].partial_occupation_value;
-      }
-      else{ tmp.site_occupation=1.0; }
-      //DX 20191010 - update partial occupation value - END
-		  tmp.wyckoffSymbol = wyckoffsymbols[wyckoffsymbols_mult_index[j] - 1];
-      tmp.equations.clear(); //DX 20190130 - clear for safety
-      //DX 20190128 - add multiplicity, letter, and site symmetry - START 
-      vector<string> tokens,pos_tokens;
-      if(aurostd::string2tokens(tmp.wyckoffSymbol,tokens," ") == 3){
-        tmp.multiplicity = aurostd::string2utype<int>(tokens[0]);
-        tmp.letter = tokens[1];
-        tmp.site_symmetry = tokens[2];
-        vector<string> positions = SYM::findWyckoffEquations(spacegroupstring, tmp.letter, 
-                                     tmp.multiplicity);
-        for(uint p=0;p<positions.size();p++){
-          aurostd::string2tokens(positions[p],pos_tokens,",");
-          tmp.equations.push_back(pos_tokens);
-        }
-      }
-      //DX 20190128 - add multiplicity, letter, and site symmetry - END
-		  wyckoff_atom = tmp_equivalent_atoms_shifted[ix];
-		}
-	      }
-	      if(contains_variable){
-		xvector<double> diff;
-		//cerr << "contains variable" << endl;
-		for (int ixx = 1; ixx < 4; ixx++) {
-		  for (int jx = 1; jx < 4; jx++) {
-		    if(aurostd::abs(W(ixx, jx) - 1.0) < CCell.sym_eps) { //DX 20190215
-		      if(contains_x_variable && x_variable_set && jx ==1){
-			diff(1) = xyz_params(1)-W(ixx,4);
-		      }
-		      if(contains_y_variable && y_variable_set && jx == 2){
-			diff(2) = xyz_params(2)-W(ixx,4);
-		      }
-		      if(contains_z_variable && z_variable_set && jx == 3){
-			diff(3) = xyz_params(3)-W(ixx,4);
-		      }
-		    }
-		    if(!found_wyckoff){
-		      break;
-		    }
-		  }
-		}
-		diff = SYM::minimizeDistanceFractionalMethod(diff); //DX 20190613
-		//DX 20190613 [OBSOLETE] SYM::PBC(diff);
-		if(aurostd::modulus(trasp(CCell.lattice)*diff)>CCell.sym_eps){ //DX 20190215
-		  found_wyckoff = false;
-		}
-	      }
-	      if(!found_wyckoff){
-		continue;
-	      }
-	      found_count++;
-	      tmp_equivalent_atoms_shifted.erase(tmp_equivalent_atoms_shifted.begin() + ix);
-	      wyckoff_set.erase(wyckoff_set.begin() + m);
-	      m--;
-	      break;
-	    }
-	  }  //for ix: loop through equivalent atoms
-	  if(found_wyckoff == false) {
-	    //cerr << "COULDN'T FIND MATCH: equivalent atoms : " << i << " with " << m << endl;
-	    first_wyckoff = true;
-	    found_count = 0;
-	    //found_position = 0;
-	    // Perhaps we found the wrong parameter for a variable, rearrange equivalent atom order to find new parameter
-	    if(contains_variable && variable_changes < equivalent_atoms_shifted[i].size() - 1) {
-	      variable_changes += 1;
-	      x_variable_set = false;
-	      y_variable_set = false;
-	      z_variable_set = false;
-	      contains_x_variable = false;
-	      contains_y_variable = false;
-	      contains_z_variable = false;
-	      xyz_params.clear();
-	      tmp_equivalent_atoms_shifted = equivalent_atoms_shifted[i];
-	      wyckoff_set = tmpvvvsd[j];
-	      for (uint s = 0; s < variable_changes; s++) {
-		tmp_equivalent_atoms_shifted.push_back(tmp_equivalent_atoms_shifted[0]);
-		tmp_equivalent_atoms_shifted.erase(tmp_equivalent_atoms_shifted.begin() + 0);
-	      }
-	      m = -1;
-	    }
-	    else {
-	      break;
-	    }
-	  }
-	}  // for m: loop through positions in a given Wyckoff set
-	if(found_count == equivalent_atoms_shifted[i].size()) {
-	  wyckoffVariables.push_back(tmp);
+        }  // for m: loop through positions in a given Wyckoff set
+        if(found_count == equivalent_atoms_shifted[i].size()) {
+          wyckoffVariables.push_back(tmp_Wyckoff_site);
           if(LDEBUG) {
-            cerr << "SYM::findWyckoffPosition: Found a Wyckoff position: " << endl << tmp << endl;
+            cerr << "SYM::findWyckoffPosition: Found a Wyckoff position: " << endl << tmp_Wyckoff_site << endl;
           } 
-	  //cerr << "wyckoff site: ";
-	  //woss << equivalent_atoms_shifted[i][ix].coord <<"   Atom" <<  equivalent_atoms_shifted[i][ix].type << wyckoffsymbols[wyckoffsymbols_mult_index[j]-1] << endl; //GET WYCKOFF SITE SYMBOL FOR APPROPRIATE MULT
+          //cerr << "wyckoff site: ";
+          //woss << equivalent_atoms_shifted[i][ix].coord <<"   Atom" <<  equivalent_atoms_shifted[i][ix].type << wyckoffsymbols[wyckoffsymbols_mult_index[j]-1] << endl; //GET WYCKOFF SITE SYMBOL FOR APPROPRIATE MULT
 
-	  //woss << equivalent_atoms_shifted[i][ix].coord <<" " <<  CCell.chemical_labels[atoi(equivalent_atoms_shifted[i][ix].name.c_str())] << wyckoffsymbols[wyckoffsymbols_mult_index[j]-1] << endl; //GET WYCKOFF SITE SYMBOL FOR APPROPRIATE MULT
-	  wyckoffPositionsVector.push_back(wyckoff_atom);                                                                                                                                                   //Modified (RHT)
-	  woss << setprecision(14) << fixed << "   " << wyckoff_atom.fpos(1) << "   " << wyckoff_atom.fpos(2) << "   " << wyckoff_atom.fpos(3) << "   " << wyckoff_atom.name << tmp.wyckoffSymbol << endl;  //GET WYCKOFF SITE SYMBOL FOR APPROPRIATE MULT
-	  wyckoffSymbols.push_back(tmp.wyckoffSymbol);
-	  found_position++;
-	}
-	if(found_count == equivalent_atoms_shifted[i].size()) {
-	  break;
-	}
+          //woss << equivalent_atoms_shifted[i][ix].coord <<" " <<  CCell.chemical_labels[atoi(equivalent_atoms_shifted[i][ix].name.c_str())] << wyckoffsymbols[wyckoffsymbols_mult_index[j]-1] << endl; //GET WYCKOFF SITE SYMBOL FOR APPROPRIATE MULT
+          wyckoffPositionsVector.push_back(wyckoff_atom);                                                                                                                                                   //Modified (RHT)
+          woss << setprecision(14) << fixed << "   " << wyckoff_atom.fpos(1) << "   " << wyckoff_atom.fpos(2) << "   " << wyckoff_atom.fpos(3) << "   " << wyckoff_atom.name << tmp_Wyckoff_site.wyckoffSymbol << endl;  //GET WYCKOFF SITE SYMBOL FOR APPROPRIATE MULT
+          wyckoffSymbols.push_back(tmp_Wyckoff_site.wyckoffSymbol);
+          found_position++;
+        }
+        if(found_count == equivalent_atoms_shifted[i].size()) {
+          break;
+        }
       }  //for j : loop through Wyckoff sets with multiplicity
       if(found_count != equivalent_atoms_shifted[i].size() && orig_origin_shift == true) {
-	//if(LDEBUG) { cerr << "SYM::findWyckoffPositions WARNING: Equivalent atoms were not matched with ITC Wyckoff positions." << endl; }
+        //if(LDEBUG) { cerr << "SYM::findWyckoffPositions WARNING: Equivalent atoms were not matched with ITC Wyckoff positions." << endl; }
         if(LDEBUG) {
           cerr << "SYM::findWyckoffPositions WARNING: Could not match the " << equivalent_atoms_shifted[i][0].name << " atom(s) with multiplicity " << equivalent_atoms_shifted[i].size() << "." << endl;
         }
-	first_wyckoff = true;
-	wyckoffVariables.clear();
-	wyckoffPositionsVector.clear();
-	woss.str("");
-	wyckoffSymbols.clear();
-	if(CCell.lattice_label_ITC == 'R' && obverse_force_transformed == false) {
-	  transformToObverse(CCell.lattice, equivalent_atoms_shifted);
-	  obverse_force_transformed = true;
-	  xvector<double> ReverseOriginShift = -OriginShift;
-	  equivalent_atoms = shiftSymmetryEquivalentAtoms(equivalent_atoms_shifted, CCell.lattice, ReverseOriginShift, CCell.dist_nn_min, CCell.sym_eps); //DX 20190215 - added CCell.sym_eps
-	  deque<_atom> atoms_tmp;
-	  for (uint k = 0; k < equivalent_atoms.size(); k++) {
-	    for (uint l = 0; l < equivalent_atoms[k].size(); l++) {
-	      atoms_tmp.push_back(equivalent_atoms[k][l]);
-	    }
-	  }
-	  atomicbasis = atoms_tmp;
-	  CCell.atoms = atoms_tmp;
-	  i = -1;
+        first_wyckoff = true;
+        wyckoffVariables.clear();
+        wyckoffPositionsVector.clear();
+        woss.str("");
+        wyckoffSymbols.clear();
+        if(CCell.lattice_label_ITC == 'R' && obverse_force_transformed == false) {
+          transformToObverse(CCell.lattice, equivalent_atoms_shifted);
+          obverse_force_transformed = true;
+          xvector<double> ReverseOriginShift = -OriginShift;
+          equivalent_atoms = shiftSymmetryEquivalentAtoms(equivalent_atoms_shifted, CCell.lattice, ReverseOriginShift, CCell.dist_nn_min, CCell.sym_eps); //DX 20190215 - added CCell.sym_eps
+          deque<_atom> atoms_tmp;
+          for (uint k = 0; k < equivalent_atoms.size(); k++) {
+            for (uint l = 0; l < equivalent_atoms[k].size(); l++) {
+              atoms_tmp.push_back(equivalent_atoms[k][l]);
+            }
+          }
+          atomicbasis = atoms_tmp;
+          CCell.atoms = atoms_tmp;
+          i = -1;
           found_position=0; // DX 9/12/17
-	} 
-	else {
-	  break;
-	}
+        } 
+        else {
+          break;
+        }
       } 
       else if(found_count != equivalent_atoms_shifted[i].size() && orig_origin_shift == false) {
-	first_wyckoff = true;
-	wyckoffVariables.clear();
-	wyckoffPositionsVector.clear();
-	woss.str("");
-	wyckoffSymbols.clear();
-	//sum_wyckoff_letters.push_back(100);
-	break;
+        first_wyckoff = true;
+        wyckoffVariables.clear();
+        wyckoffPositionsVector.clear();
+        woss.str("");
+        wyckoffSymbols.clear();
+        //sum_wyckoff_letters.push_back(100);
+        break;
       }
       if(tmpvvvstring.size() == 0) {
-	if(LDEBUG) { cerr << "SYM::findWyckoffPositions: Could not find wyckoff position based on multiplicity provided [2]. Return string = " << tmpvvvstring.size() << endl; }
-	break;
+        if(LDEBUG) { cerr << "SYM::findWyckoffPositions: Could not find wyckoff position based on multiplicity provided [2]. Return string = " << tmpvvvstring.size() << endl; }
+        break;
       }
     }
     return (found_position == equivalent_atoms_shifted.size());

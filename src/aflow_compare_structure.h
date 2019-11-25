@@ -1,6 +1,12 @@
 // ***************************************************************************
-// AFLOW_COMPARE_STRUCTURE
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *                                                                         *
 // ***************************************************************************
+// AFLOW-XTAL-MATCH (compare crystal structures) - Functions
+// Written by David Hicks (david.hicks@duke.edu) 
+// Contributors: Carlo De Santo
 
 #include<iostream>
 #include "aflow_pflow.h"
@@ -44,27 +50,9 @@
 //    void copy(const GroupedWyckoffPosition& b);
 //};
 
-// ===== AtomEnvironment Class ===== //
-class AtomEnvironment{
-  public:
-    AtomEnvironment();                                                                      // constructor operator
-    ~AtomEnvironment();                                                                     // destructor operator
-    friend ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment);       // stringstream operator (printing)
-    const AtomEnvironment& operator=(const AtomEnvironment& b);                             // assignment operator
-    AtomEnvironment(const AtomEnvironment& b);                                              // copy constructor
-    string center_element;                                                                  // species/element at center of environment                                                                   
-    uint center_type;                                                                       // type (uint) at center of environment
-    vector<string> neighbor_elements;                                                       // species/element of atoms neighboring center atom
-    vector<uint> neighbor_types;                                                            // types (uint) of atoms neighboring center atom
-    vector<double> neighbor_distances;                                                      // distances to atoms neighboring atoms (typically put in a bin with small tolerance threshold)                                             
-    vector<uint> neighbor_frequencies;                                                      // frequency of neighboring distance                                              
-    vector<vector<xvector<double> > > neighbor_coordinates;                                 // coordinates of atoms neighboring atoms (center is assumed to be zero,i.e. coord=neighbor-origin)
-    //functions
-  private:
-    void free();                                                                            // free operator
-    void copy(const AtomEnvironment& b);                                                    // copy constructor
-};
 
+// ===== AtomEnvironment Class ===== //
+//DX 20191120 [MOVED TO aflow.h]
 
 // ===== StructurePrototype Class ===== //
 class StructurePrototype{
@@ -157,10 +145,10 @@ namespace compare{
       bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds, 
       bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool fast_match, ostream& oss, double& final_misfit); //Main function //DX 20191108 - remove const & from bools
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool fast_match);  //DX 20191108 - remove const & from bools
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool fast_match); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
+      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, ostream& oss=cout); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss=cout); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match, ostream& oss=cout);  //DX 20191108 - remove const & from bools
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, ostream& oss=cout); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
 
   // permutaion comparisons
   vector<string> getUniquePermutations(xstructure& xstr);
@@ -173,11 +161,13 @@ namespace compare{
   //  string CompareStructureDirectory(aurostd::xoption& vpflow);
 
   // ===== Compare Directory Functions ===== //
-  vector<StructurePrototype> loadStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE); //DX 20190424 //DX 20190801 - added vector<string>& magmoms_for_systems
-  vector<StructurePrototype> loadStructuresFromDirectory(string& directory, vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE); //DX 20190319 - added FileMESSAGE //DX 20190801 - added vector<string>& magmoms_for_systems,
-  vector<StructurePrototype> loadStructuresFromFile(string& directory, vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE); //DX 20190319 - added FileMESSAGE //DX 20190801 - added vector<string>& magmoms_for_systems,
-  void generateStructures(vector<StructurePrototype>& structures, ostream& oss); //DX 20191105
-  void generateStructuresInRange(vector<StructurePrototype>& structures, ostream& oss, uint start_index, uint end_index); //DX 20191105
+  vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX 20191122
+  vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190424 //DX 20190801 - added vector<string>& magmoms_for_systems //DX 20191122 - added ostream and consts
+  vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX 20191122 
+  vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190319 - added FileMESSAGE //DX 20190801 - added vector<string>& magmoms_for_systems //DX 20191122 - added ostream and consts
+  vector<StructurePrototype> loadStructuresFromFile(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX 20191122
+  vector<StructurePrototype> loadStructuresFromFile(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190319 - added FileMESSAGE //DX 20190801 - added vector<string>& magmoms_for_systems, //DX 20191122 - added ostream and consts
+  void generateStructures(vector<StructurePrototype>& structures, ostream& oss=cout, uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX 20191122
   bool generateStructure(string& structure_name, string& structure_from, xstructure& structure, ostream& oss);
   void removeNonGeneratedStructures(vector<StructurePrototype>& structures); //DX 20191105
   vector<uint> getStoichiometry(string& compositions, const bool& same_species);
@@ -197,7 +187,6 @@ namespace compare{
   void calculateSymmetries(vector<xstructure>& vxstrs, vector<string>& vpearsons, vector<uint>& vsgroups, 
       vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions, uint& num_proc);
   void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index, uint end_index); //DX 20191107 - remove & from uint
-  void calculateLFAEnvironmentsInSetRange(vector<StructurePrototype>& structures, uint start_index, uint end_index);  //DX 20191105
   void calculateLFAEnvironments(vector<StructurePrototype>& structures, uint num_proc);  //DX 20191105
   void calculateSymmetries(vector<StructurePrototype>& structures, uint& num_proc);  //DX 20190118
   void calculateSymmetry(xstructure& xstr, vector<string>& vpearsons, vector<uint>& vsgroups,
@@ -362,23 +351,23 @@ namespace compare{
   bool checkTolerance(xvector<double> d1, xmatrix<double> Q2);
   bool checkABCTolerance(xvector<double> d1, xvector<double> d2);
   bool checkAngleTolerance(xvector<double> d1, xvector<double> d2);
-  void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
-      vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
-      vector<xvector<double> >& l3, vector<int>& a_index, 
-      vector<int>& b_index, vector<int>& c_index); //DX 20190705
-  void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-      double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191105
-  void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
-      double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius); //DX 20191105
-  void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
-      vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
-      vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
-      double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
-      double radius); //DX 20191105
-  void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
-      double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191105
-  void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
-      double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX 20191105
+  //DX 20191122 [MOVED TO XATOM] void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
+  //DX 20191122 [MOVED TO XATOM]     vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
+  //DX 20191122 [MOVED TO XATOM]     vector<xvector<double> >& l3, vector<int>& a_index, 
+  //DX 20191122 [MOVED TO XATOM]     vector<int>& b_index, vector<int>& c_index); //DX 20190705
+  //DX 20191122 [MOVED TO XATOM] void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+  //DX 20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191105
+  //DX 20191122 [MOVED TO XATOM] void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+  //DX 20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius); //DX 20191105
+  //DX 20191122 [MOVED TO XATOM] void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
+  //DX 20191122 [MOVED TO XATOM]     vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
+  //DX 20191122 [MOVED TO XATOM]     vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
+  //DX 20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
+  //DX 20191122 [MOVED TO XATOM]     double radius); //DX 20191105
+  //DX 20191122 [MOVED TO XATOM] void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+  //DX 20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191105
+  //DX 20191122 [MOVED TO XATOM] void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+  //DX 20191122 [MOVED TO XATOM]     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX 20191105
   xvector<double> centroid_with_PBC(const xstructure& xstr);
   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, const xmatrix<double>& lattice);
   xvector<double> centroid_with_PBC(vector<xvector<double> >& coordinates, vector<double>& weights,
@@ -397,6 +386,7 @@ namespace compare{
   void cellDiagonal(xmatrix<double>& lattice, vector<double>& diag_sum, vector<double>& diag_diff, const double& scale);
   double latticeDeviation(const vector<double>& diag_sum1,const vector<double>& diag_sum2, 
       const vector<double>& diag_diff1,const vector<double>& diag_diff2); 
+  void computeLFAEnvironments(vector<StructurePrototype>& structures, uint start_index=0, uint end_index=AUROSTD_MAX_UINT);  //DX 20191122
   vector<AtomEnvironment> computeLFAEnvironment(const xstructure& xstr, bool unique_only=true); //DX 20190711
   bool compatibleEnvironmentSets(const vector<AtomEnvironment>& env_set1, 
       const vector<AtomEnvironment>& env_set2, bool same_species, bool exact_match); //DX 20190711
@@ -487,8 +477,7 @@ namespace compare{
   // [OBSOLETE - DX 20190717]                      vector<double>& latt_devs,
   // [OBSOLETE - DX 20190717]                      const bool& optimize_match);
 
-  void getPrototypeDesignations(vector<StructurePrototype>& prototypes); //DX 20190725
-  void getPrototypeDesignationsInRange(vector<StructurePrototype>& prototypes, uint start_index, uint end_index); //DX 20190725
+  void getPrototypeDesignations(vector<StructurePrototype>& prototypes, uint start_index=0, uint end_index=AUROSTD_MAX_UINT); //DX 20191122
 
 } // end namespace
 

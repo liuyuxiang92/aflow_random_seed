@@ -1537,6 +1537,461 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
 }
 
 // ***************************************************************************
+// AtomEnvironment Class - DX 20191122
+// ***************************************************************************
+// ---------------------------------------------------------------------------
+// AtomEnvironment (constructor)
+AtomEnvironment::AtomEnvironment(){
+  free();
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::free
+void AtomEnvironment::free(){
+  element_center="";
+  type_center=0;
+  elements_neighbor.clear();
+  types_neighbor.clear();
+  distances_neighbor.clear();
+  coordinations_neighbor.clear();
+  coordinates_neighbor.clear();
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment (destructor)
+AtomEnvironment::~AtomEnvironment(){
+  free();
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment (copy constructor)
+AtomEnvironment::AtomEnvironment(const AtomEnvironment& b){
+  copy(b);
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::copy
+void AtomEnvironment::copy(const AtomEnvironment& b) {
+  if(this != &b){
+    element_center=b.element_center;
+    type_center=b.type_center;
+    elements_neighbor=b.elements_neighbor;
+    types_neighbor=b.types_neighbor;
+    distances_neighbor=b.distances_neighbor;
+    coordinations_neighbor=b.coordinations_neighbor;
+    coordinates_neighbor=b.coordinates_neighbor;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::operator=
+const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
+  if(this!=&b){
+    free();
+    copy(b);
+  }
+  return *this;
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::operator<< 
+ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
+  
+  // operator<< for the AtomEnvironment object (looks like a JSON)
+
+  //if(AtomEnvironment.iomode!=JSON_MODE){ //A safeguard until we construct more output schemes.
+  //  AtomEnvironment.iomode=JSON_MODE;
+  //}
+
+  string eendl="";
+  stringstream sscontent_json;
+  vector<string> vcontent_json, tmp;
+  
+  // element_center 
+  sscontent_json << "\"element_center\":\"" << AtomEnvironment.element_center << "\"" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+  
+  // type_center
+  sscontent_json << "\"type_center\":" << AtomEnvironment.type_center << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // elements_neighbor
+  sscontent_json << "\"elements_neighbor\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(AtomEnvironment.elements_neighbor,"\""),",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+  
+  // distances_neighbor
+  sscontent_json << "\"distances_neighbor\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(AtomEnvironment.distances_neighbor,8,true,1e-6),",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+  
+  // coordinations_neighbor
+  sscontent_json << "\"coordinations_neighbor\":[" << aurostd::joinWDelimiter(AtomEnvironment.coordinations_neighbor,",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+  
+  // coordinates_neighbor
+  sscontent_json << "\"coordinates_neighbor\":[";
+  vector<string> coordinate_sets;
+  for(uint i=0;i<AtomEnvironment.coordinates_neighbor.size();i++){
+    vector<string> coordinates;
+    for(uint j=0;j<AtomEnvironment.coordinates_neighbor[i].size();j++){
+      stringstream ss_tmp; ss_tmp << "[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(AtomEnvironment.coordinates_neighbor[i][j],8,true,1e-6),",") << "]";
+      coordinates.push_back(ss_tmp.str());
+      ss_tmp.clear();
+    }
+    coordinate_sets.push_back("["+aurostd::joinWDelimiter(coordinates,",")+"]");
+  }
+  sscontent_json << aurostd::joinWDelimiter(coordinate_sets,",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // Put into json AtomEnvironment object
+  oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
+  vcontent_json.clear();
+
+  return oss;
+}
+
+// ***************************************************************************
+// AtomEnvironment::getAtomEnvironment() - DX 20191122 
+// ***************************************************************************
+// determines the atomic environment around a central atom 
+// current functionality:
+//   - calculates the nearest neighbors by element-type, i.e., minimum coordination shell for a given element-type
+//     the neighbor elements, types, distance, coordination, and coordinates are stored in the object
+//     only one distance is sto
+// preliminary functionality, can/will be expanded in the future
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode){ 
+  vector<string> neighbor_elements;
+  getAtomEnvironment(xstr, center_index, neighbor_elements, mode); 
+}
+
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode){ 
+  
+  // ---------------------------------------------------------------------------
+  // ATOM_ENVIRONMENT_MODE_1 : default minimum coordination shell
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_2 : out to a certain radius
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_3 : largest gap in radial distribution function
+
+  // ---------------------------------------------------------------------------
+  // get central atom info
+  for(uint i=0;i<xstr.atoms.size();i++){
+    if(i==center_index){
+      element_center = xstr.atoms[i].name;
+      type_center = xstr.atoms[i].type;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // ATOM_ENVIRONMENT_MODE_1 : minimum coordination environment for each type 
+  if(mode==ATOM_ENVIRONMENT_MODE_1){
+    for(uint i=0;i<xstr.species.size();i++){
+      // check if types are restricted, otherwise get closest neighbors by type
+      if(aurostd::withinList(neighbor_elements, xstr.species[i]) || neighbor_elements.empty()){
+        uint frequency = 0;
+        double min_dist = AUROSTD_MAX_DOUBLE;
+        vector<xvector<double> > coordinates;
+      
+        // calculate minimum coordination shell to a particular element-type 
+        minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, xstr.species[i]);
+     
+        // store 
+        elements_neighbor.push_back(xstr.species[i]);
+        types_neighbor.push_back(i);
+        distances_neighbor.push_back(min_dist);
+        coordinations_neighbor.push_back(frequency);
+        coordinates_neighbor.push_back(coordinates);
+      }
+    }
+  }
+  
+  // ---------------------------------------------------------------------------
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_2 : environment out to a given radius 
+
+  // ---------------------------------------------------------------------------
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_3 : environment out to largest gap in radial distribution function 
+  // i.e., GFA convention
+
+}
+
+// ***************************************************************************
+// getAtomEnvironments() - DX 20191122
+// ***************************************************************************
+vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
+
+  // Calculate the atomic environments in the structure
+
+  vector<AtomEnvironment> environments;
+
+  for(uint i=0;i<xstr.atoms.size();i++){
+    AtomEnvironment env; 
+    env.getAtomEnvironment(xstr, i, mode);
+    environments.push_back(env);
+  }
+  return environments;
+}
+
+// ***************************************************************************
+// getLFAAtomEnvironments() - DX 20191122
+// ***************************************************************************
+vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode){
+
+  // Calculate the LFA atomic environments
+  // i.e., only environments comprised of the least frequent atom (LFA) type
+  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XTAL-MATCH)
+
+  vector<AtomEnvironment> environments_LFA;
+
+  for(uint i=0;i<xstr.atoms.size();i++){
+    if(xstr.atoms[i].name == lfa){
+      AtomEnvironment LFA_env; 
+      LFA_env.getAtomEnvironment(xstr, i, LFAs, mode);
+      environments_LFA.push_back(LFA_env);
+    }
+  }
+  return environments_LFA;
+}
+
+// ***************************************************************************
+// Reset dims for RadiusSphereLattice() - DX 20191122
+// ***************************************************************************
+void resetLatticeDimensions(const xmatrix<double>& lattice, 
+    double radius, 
+    xvector<int>& dims,
+    vector<xvector<double> >& l1, 
+    vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, 
+    vector<int>& a_index, 
+    vector<int>& b_index, 
+    vector<int>& c_index){
+
+  // resets the lattice dimensions (dims) based on radius
+  // generates lattice vectors (l1,l2,l3) right away = speed increase
+  // stores dimension indices (a_index,b_index,c_index)
+  // new dims explore order : zeroth cell to max dims = speed increase 
+  // (can break early if match is found)
+  // DX create function date: 20190705
+
+  // ---------------------------------------------------------------------------
+  // get new dimensions based on radius
+  if(radius<=_ZERO_TOL_){ dims[1]=1; dims[2]=1; dims[3]=1; }
+  else{ dims=LatticeDimensionSphere(lattice,radius); }
+  // ---------------------------------------------------------------------------
+  // clear old 
+  l1.clear(); l2.clear(); l3.clear();
+  a_index.clear(); b_index.clear(); c_index.clear();
+
+  // ---------------------------------------------------------------------------
+  // [NEW] - go from zeroth cell out
+  // more likely to find match close to origin, why start so far away
+  
+  // push back zeroth cell : dims[1]=dims[2]=dims[3]=0
+  l1.push_back(0*lattice(1));a_index.push_back(0);
+  l2.push_back(0*lattice(2));b_index.push_back(0);
+  l3.push_back(0*lattice(3));c_index.push_back(0);
+
+  // push back 1,-1,2,-2,...dims,-dims
+  for(int a=1;a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a); l1.push_back(-a*lattice(1));a_index.push_back(-a);}
+  for(int b=1;b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b); l2.push_back(-b*lattice(2));b_index.push_back(-b);}
+  for(int c=1;c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c); l3.push_back(-c*lattice(3));c_index.push_back(-c);}
+
+}
+
+// ***************************************************************************
+// minimumCoordinationShellLatticeOnly() - DX 20191122 
+// ***************************************************************************
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates){
+  
+  // determine the minimum coordination shell of the lattice
+  // i.e., find the set of closest neighbors to the origin
+  // (overload: uses lattice radius) 
+
+  // ---------------------------------------------------------------------------
+  // determine necessary search radius
+  double radius=RadiusSphereLattice(lattice);
+
+  minimumCoordinationShellLatticeOnly(lattice, min_dist, frequency, coordinates, radius);
+}
+
+// ***************************************************************************
+// minimumCoordinationShellLatticeOnly() - DX 20191122 
+// ***************************************************************************
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates, 
+    double radius){
+  
+  // determine the minimum coordination shell of the lattice
+  // i.e., find the set of closest neighbors to the origin
+  // (overload: instantiates lattice dimension information) 
+
+  // ---------------------------------------------------------------------------
+  // instantiate lattice vectors 
+  vector<xvector<double> > l1, l2, l3; 
+  vector<int> a_index, b_index, c_index;
+  xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+  resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+  minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
+      a_index, b_index, c_index, 
+      min_dist, frequency, coordinates, radius);
+}
+
+// ***************************************************************************
+// minimumCoordinationShellLatticeOnly() - DX 20191122
+// ***************************************************************************
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, 
+    xvector<int>& dims,
+    vector<xvector<double> >& l1, 
+    vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, 
+    vector<int>& a_index, 
+    vector<int>& b_index, 
+    vector<int>& c_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates,
+    double radius){
+
+  // determine the minimum coordination shell environment of the lattice
+  // i.e., find the set of closest neighbors to the origin
+  // stores l1, l2, l3, a_index, b_index, and c_index for external use
+  // optional "radius" as enables more control over search space 
+  // (and potential speed up, may not need to search as far as the lattice radius)
+  
+  xvector<double> tmp;
+
+  // ---------------------------------------------------------------------------
+  // reset lattice dimensions 
+  resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+  double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+
+  // ---------------------------------------------------------------------------
+  // loop through lattice vectors (stored before-hand in l1,l2,l3)
+  for(uint m=0;m<l1.size();m++){
+    xvector<double> a_component = l1[m];                  // DX : coord1-coord2+a*lattice(1)
+    for(uint n=0;n<l2.size();n++){
+      xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+      for(uint p=0;p<l3.size();p++){
+        if(!(m==0 && n==0 && p==0)){
+          tmp = ab_component + l3[p];                     // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+          double tmp_mod = aurostd::modulus(tmp);
+          // ---------------------------------------------------------------------------
+          // if found a new minimum distance and update coordination/frequency and coordinate 
+          if(tmp_mod<min_dist){
+            // ---------------------------------------------------------------------------
+            // if new distance is close to the original it is the same coordination shell (add to coordination)
+            // otherwise, reset coordination shell
+            // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+            else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+            min_dist=tmp_mod;
+            // ---------------------------------------------------------------------------
+            // diminishing dims: if minimum distance changed, then we may not need to search as far
+            // reset loop and search again based on new minimum distance
+            if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+              resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+              m=n=p=0;
+              frequency=0; //reset
+            }
+          }
+          // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+          else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
+        }
+      }
+    }
+  }
+}
+
+// ***************************************************************************
+// minimumCoordinationShell() - DX 20191122 
+// ***************************************************************************
+void minimumCoordinationShell(const xstructure& xstr, 
+    uint center_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates){
+
+  string type = "";
+
+  minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, type);
+}
+
+// ***************************************************************************
+// minimumCoordinationShell() - DX 20191122
+// ***************************************************************************
+void minimumCoordinationShell(const xstructure& xstr, 
+    uint center_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates, 
+    const string& type){
+
+  // determine the minimum coordination shell environment
+  // "type" enables the search of environments by certain elements/types only
+  // (e.g., find the neighborhood of oxygen atoms surrounding a magnesium center)
+  
+  xvector<double> tmp;
+
+  // ---------------------------------------------------------------------------
+  // instantiate lattice vectors 
+  vector<xvector<double> > l1, l2, l3; 
+  vector<int> a_index, b_index, c_index;
+  xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+  //resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+  double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+
+  for(uint ii=0; ii<xstr.atoms.size(); ii++){
+    // ---------------------------------------------------------------------------
+    // if atom ii is not environment center, find minimum distance between center atom ii's images 
+    if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type=="" 
+      xvector<double> incell_dist = xstr.atoms[center_index].cpos-xstr.atoms[ii].cpos;
+      double incell_mod = aurostd::modulus(incell_dist);
+      if(!(dims[1]==1 && dims[2]==1 && dims[3]==1) && incell_mod!=1e9){
+        resetLatticeDimensions(xstr.lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+      }
+      //DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+      for(uint m=0;m<l1.size();m++){
+        xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+        for(uint n=0;n<l2.size();n++){
+          xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+          for(uint p=0;p<l3.size();p++){
+            tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+            double tmp_mod = aurostd::modulus(tmp);
+            if(tmp_mod<min_dist){
+              //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+              if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+              else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+              min_dist=tmp_mod;
+            }
+            //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+          }
+        }
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // if atom is environment center check its images, but only need to search as 
+    // far as min_dist or lattice_radius (whichever is smaller)
+    else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type==""
+      double lattice_radius=RadiusSphereLattice(xstr.lattice);
+      double search_radius=min(lattice_radius,min_dist);
+
+      // ---------------------------------------------------------------------------
+      // use variant that stores the lattice dimension information so it can be 
+      // updated for the "minimumCoordinationShell" function
+      minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
+          a_index, b_index, c_index, 
+          min_dist, frequency, coordinates, search_radius);
+    }
+  }
+}
+
+
+// ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
 // STRUCTURE
@@ -4442,30 +4897,30 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         //DX 20190718 - check tokens first; Springer Materials has extra spaces - END
         if(tokens.size()==atom_site_fields.size()){
-          _atom tmp;
+          _atom atom_tmp;
           wyckoffsite_ITC wyckoff_tmp; //DX 20191029
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ atom_tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); atom_tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ atom_tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ atom_tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ atom_tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_occupancy")){ 
-              tmp.partial_occupation_value = aurostd::string2utype<double>(tokens[t]); 
-              wyckoff_tmp.site_occupation = tmp.partial_occupation_value; //DX 20191029 
-              if(aurostd::abs(tmp.partial_occupation_value-1.0)<1e-6){ tmp.partial_occupation_flag = FALSE; }
-              else { tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
+              atom_tmp.partial_occupation_value = aurostd::string2utype<double>(tokens[t]); 
+              wyckoff_tmp.site_occupation = atom_tmp.partial_occupation_value; //DX 20191029 
+              if(aurostd::abs(atom_tmp.partial_occupation_value-1.0)<1e-6){ atom_tmp.partial_occupation_flag = FALSE; }
+              else { atom_tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
             }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_symmetry_multiplicity")){ wyckoff_tmp.multiplicity=aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label")){ wyckoff_tmp.letter=tokens[t]; }
           }
-          wyckoff_tmp.type = tmp.name; //DX 20191029
-          wyckoff_tmp.coord = tmp.fpos; //DX 20191029
+          wyckoff_tmp.type = atom_tmp.name; //DX 20191029
+          wyckoff_tmp.coord = atom_tmp.fpos; //DX 20191029
           if(wyckoff_tmp.multiplicity!=0 && wyckoff_tmp.letter!=""){
             SYM::getWyckoffInformation(a.spacegroupnumber, a.spacegroupoption, wyckoff_tmp.letter, wyckoff_tmp.multiplicity, wyckoff_tmp.site_symmetry, wyckoff_tmp.equations);
           }
           a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
-          tmp.cpos=a.f2c*tmp.fpos;
-          a.AddAtom(tmp);
+          atom_tmp.cpos=a.f2c*atom_tmp.fpos;
+          a.AddAtom(atom_tmp);
           already_storing_atoms=TRUE; //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
           //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
@@ -13674,10 +14129,22 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   for(int k=k1;k<=k2;k++){l3.push_back(k*a3);c_index.push_back(k);}
   //DX 20190709 - calculate and store once = speed - END
 
+  // resize vectors - DX 20191122
+  uint num_grid_atoms = str.atoms.size()*l1.size()*l2.size()*l3.size();
+  str.grid_atoms.resize(num_grid_atoms);
+  str.grid_atoms_sc2pcMap.resize(num_grid_atoms);
+  str.grid_atoms_pc2scMap.resize(num_grid_atoms);
+
+  uint grid_atom_count = 0; // keep track of index - DX 20191122
+
   for(uint iat=0;iat<str.atoms.size();iat++){
-    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
-    str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+    //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
+    //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
+    //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+    str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
+    str.grid_atoms_pc2scMap[grid_atom_count] = str.grid_atoms.size()-1; // CO 171025 
+    str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
+    grid_atom_count++; //DX 20191122
   }
   //DX 20190709 [OBSOLETE-SLOW]  for(int i=i1;i<=i2;i++) {
   //DX 20190709 [OBSOLETE-SLOW]    for(int j=j1;j<=j2;j++) {
@@ -13701,7 +14168,7 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   //DX 20190709 [OBSOLETE-SLOW]      }
   //DX 20190709 [OBSOLETE-SLOW]    }
   //DX 20190709 [OBSOLETE-SLOW]  }
-  xvector<double> a_component, ab_component, abc_component; //DX+ME 20191107 - define outside loop (speed increase)
+  xvector<double> a_component(3), ab_component(3), abc_component(3); //DX+ME 20191107 - define outside loop (speed increase)
   uint natoms = str.atoms.size(); //DX 20191107 - initialize natoms outside loop (speed increase)
   for(uint i=0;i<l1.size();i++) {
     a_component = l1[i];                           // DX : i*lattice(1)
@@ -13717,12 +14184,17 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
             atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
             atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
             atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
-            str.grid_atoms.push_back(atom);
-            str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+            //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
+            //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+            str.grid_atoms[grid_atom_count] = atom;
+            str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
             if(LDEBUG) { //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+              //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+              //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO190520
             } //CO190520
+            grid_atom_count++; //DX 20191122
           }
         }
       }

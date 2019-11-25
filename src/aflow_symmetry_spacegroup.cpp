@@ -824,18 +824,18 @@ uint xstructure::GetPrimitiveCell(void) {
 
   // Copy deque<_atoms> atoms (IN XSTRUCTURE) to atomic_basis_ to manipulate free of xstructure
   for (int i = 0; i < atom_count; i++) {
-    _atom tmp = (*this).atoms[i]; //DX 20191011 - initialized here instead of explicitly setting individual attributes below
-    //DX 20191011 [OBSOLETE] tmp.fpos = (*this).atoms[i].fpos;
-    //DX 20191011 [OBSOLETE] tmp.cpos = (*this).atoms[i].cpos;
-    //DX 20191011 [OBSOLETE] tmp.type = (*this).atoms[i].type;
-    //DX 20191011 [OBSOLETE] tmp.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
-    //DX 20191011 [OBSOLETE] tmp.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
-    //DX 20191011 [OBSOLETE] tmp.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-    //DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+    _atom tmp_atom = (*this).atoms[i]; //DX 20191011 - initialized here instead of explicitly setting individual attributes below
+    //DX 20191011 [OBSOLETE] tmp_atom.fpos = (*this).atoms[i].fpos;
+    //DX 20191011 [OBSOLETE] tmp_atom.cpos = (*this).atoms[i].cpos;
+    //DX 20191011 [OBSOLETE] tmp_atom.type = (*this).atoms[i].type;
+    //DX 20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
+    //DX 20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
+    //DX 20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+    //DX 20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
     string tmpname = (*this).atoms[i].name;
     SYM::cleanupstring(tmpname);
-    tmp.name = tmpname;
-    atomic_basis_.push_back(tmp);
+    tmp_atom.name = tmpname;
+    atomic_basis_.push_back(tmp_atom);
   }
 
   // ===== Expand the lattice and atomic basis ===== //
@@ -1067,23 +1067,23 @@ uint xstructure::GetPrimitiveCell(void) {
     }
     (*this).species.clear(); // DX
     for (uint i = 0; i < newbasis.size(); i++) {
-      _atom tmp = newbasis[i]; //DX 20191011 - initialized instead of setting individually below
-      //DX 20191011 [OBSOLETE] tmp.fpos = newbasis[i].fpos;
-      //DX 20191011 [OBSOLETE] tmp.cpos = newbasis[i].cpos;
-      //DX 20191011 [OBSOLETE] tmp.name = newbasis[i].name;
-      //DX 20191011 [OBSOLETE] tmp.type = newbasis[i].type;
-      //DX 20191011 [OBSOLETE] tmp.name_is_given = true;
-      //DX 20191011 [OBSOLETE] tmp.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
-      tmp.spin_is_given = false; // DX 9/21/17 - magnetic sym
-      if(aurostd::abs(tmp.spin)>_ZERO_TOL_){
-        tmp.spin_is_given = true; // DX 9/21/17 - magnetic sym
+      _atom tmp_atom = newbasis[i]; //DX 20191011 - initialized instead of setting individually below
+      //DX 20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
+      //DX 20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
+      //DX 20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
+      //DX 20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
+      //DX 20191011 [OBSOLETE] tmp_atom.name_is_given = true;
+      //DX 20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
+      tmp_atom.spin_is_given = false; // DX 9/21/17 - magnetic sym
+      if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
+        tmp_atom.spin_is_given = true; // DX 9/21/17 - magnetic sym
       }
-      tmp.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-      tmp.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
-      if(aurostd::abs(tmp.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(3))>_ZERO_TOL_){
-        tmp.noncoll_spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear) //DX 20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
+      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
+      if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
+        tmp_atom.noncoll_spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear) //DX 20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
       }
-      (*this).AddAtom(tmp);
+      (*this).AddAtom(tmp_atom);
     }
   }
   (*this).num_each_type = numtypes;

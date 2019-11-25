@@ -2618,7 +2618,7 @@ namespace pflow {
 // pflow::ProcessAndAddSpinToXstructure
 // ***************************************************************************
 namespace pflow {
-  void ProcessAndAddSpinToXstructure(xstructure& a, string& magmom_info){
+  void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info){
     
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "pflow::ProcessAndAddSpinToXstructure()";
@@ -7005,7 +7005,7 @@ namespace pflow {
 // pflow::GetCollinearMagneticInfo
 // ***************************************************************************
 namespace pflow {
-  bool GetCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<double>& vmag){ //DX 20191107 - int to uint
+  bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag){ //DX 20191107 - int to uint
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(aurostd::substring2bool(magmom_info,"OUTCAR")){
       if(aurostd::FileExist(magmom_info)) {
@@ -7099,7 +7099,7 @@ namespace pflow {
 // pflow::GetNonCollinearMagneticInfo
 // ***************************************************************************
 namespace pflow {
-  bool GetNonCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll){ //DX 20191107 - int to uint
+  bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll){ //DX 20191107 - int to uint
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(aurostd::substring2bool(magmom_info,"OUTCAR")){
       if(aurostd::FileExist(magmom_info)) {

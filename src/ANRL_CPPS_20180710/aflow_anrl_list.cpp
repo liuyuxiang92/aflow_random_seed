@@ -677,6 +677,10 @@ namespace anrl {
     //part2:0
     //part2:1
     //...
+    
+    string function_name = "anrl::getANRLParameters()";
+    stringstream message;
+
     vector<string> tokens;
     vector<string> vparameters;
     
@@ -3072,17 +3076,17 @@ namespace anrl {
           vparameters=tmp;
         }
         else{
-          cerr << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices." << endl;
-          exit(1);
+          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices.";
+          throw aurostd::xerror(function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
-        cerr << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
+        message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
         for(uint i=0;i<vparameters.size();i++){
-          cerr << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
+          message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
         }   
-        cerr << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1 << endl; //DX 20190826 - changed "./aflow" to "aflow"
-        exit(1);
+        message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
+        throw aurostd::xerror(function_name, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }
     }
     return vparameters;  

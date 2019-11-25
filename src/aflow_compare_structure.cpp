@@ -1,6 +1,7 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
 // *                                                                         *
 // ***************************************************************************
 // AFLOW-XTAL-MATCH (compare crystal structures)
@@ -100,7 +101,7 @@
 // pflow::CompareStructures - Prepares comparison from command line input 
 // ***************************************************************************
 namespace pflow {
-  string compareStructures(aurostd::xoption& vpflow){ 
+  string compareStructures(const aurostd::xoption& vpflow){ 
     bool LDEBUG=(false || XHOST.DEBUG);
     ostringstream oss;
     ofstream FileMESSAGE; //DX 20190319 - added FileMESSAGE
@@ -322,7 +323,7 @@ namespace pflow {
       store_comparison_logs = true; //DX 20190822 - add log bool
       // call main comparison function
       // DX 20190424 [OBSOLETE] compare::aflowCompareStructure(num_proc,xstr1,xstr2,same_species, scale_volume, optimize_match, oss,final_misfit);
-      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, oss,final_misfit); //DX 2010424
+      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, final_misfit, oss); //DX 2010424 //DX 20191122 - move ostream to end
       if(print==true){
         // return mapping details
         return oss.str();
@@ -354,7 +355,7 @@ namespace pflow {
 // pflow::comparePermutations()
 // ***************************************************************************
 namespace pflow {
-  string comparePermutations(istream& input, aurostd::xoption& vpflow){
+  string comparePermutations(istream& input, const aurostd::xoption& vpflow){
     ostringstream oss;
     ofstream FileMESSAGE; //DX 20190319 - added FileMESSAGE
   
@@ -568,7 +569,7 @@ namespace compare{
 // pflow::compareMultipleStructures()
 // ***************************************************************************
 namespace pflow {
-  string compareMultipleStructures(aurostd::xoption& vpflow){ //DX 20190425 - changed name, more general
+  string compareMultipleStructures(const aurostd::xoption& vpflow){ //DX 20190425 - changed name, more general
     
     // This function compares multiple structures (i.e., more than two).
 
@@ -991,7 +992,7 @@ namespace pflow {
 // pflow::compare2prototypes - identifies corresponding protos 
 // ***************************************************************************
 namespace pflow {
-  vector<StructurePrototype> compare2prototypes(istream& input, aurostd::xoption& vpflow){ 
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow){ 
     
     // ---------------------------------------------------------------------------
     // load input structure
@@ -1005,7 +1006,7 @@ namespace pflow {
 // pflow::printMatchingPrototypes - returns list of matching structures 
 // ***************************************************************************
 namespace pflow {
-  string printMatchingPrototypes(istream& input, aurostd::xoption& vpflow){ 
+  string printMatchingPrototypes(istream& input, const aurostd::xoption& vpflow){ 
     
     // ---------------------------------------------------------------------------
     // load input structure
@@ -1019,7 +1020,7 @@ namespace pflow {
 // pflow::printMatchingPrototypes - returns list of matching structures 
 // ***************************************************************************
 namespace pflow {
-  string printMatchingPrototypes(xstructure& xstr, aurostd::xoption& vpflow){ 
+  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow){ 
     
     //DX 20190425 - added print flag - START
     // ---------------------------------------------------------------------------
@@ -1074,7 +1075,7 @@ namespace pflow {
 // pflow::compare2prototypes - identifies corresponding protos 
 // ***************************************************************************
 namespace pflow {
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, aurostd::xoption& vpflow){ 
+  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow){ 
     bool LDEBUG=(false || XHOST.DEBUG);
     
     string function_name = "pflow::compare2prototypes()";
@@ -1338,7 +1339,7 @@ namespace pflow {
 // pflow::compare2database - compares database 
 // ***************************************************************************
 namespace pflow {
-  string compare2database(istream& input, aurostd::xoption& vpflow){
+  string compare2database(istream& input, const aurostd::xoption& vpflow){
     bool LDEBUG=(false || XHOST.DEBUG);
     
     string function_name = "pflow::compare2database()";
@@ -1861,7 +1862,7 @@ namespace pflow {
 // pflow::compareDatabaseEntries - compares database entries
 // ***************************************************************************
 namespace pflow {
-  string compareDatabaseEntries(aurostd::xoption& vpflow){
+  string compareDatabaseEntries(const aurostd::xoption& vpflow){
     bool LDEBUG=(false || XHOST.DEBUG);
     
     string function_name = "pflow::compareDatabaseEntries()";
@@ -2228,8 +2229,8 @@ namespace pflow {
     // Run threads (now using pointer to thread)
     vector<std::thread*> threads;
     for(uint n=0; n<num_threads; n++){
-	    //DX 20191107 [OBOSLETE - switch to getThreadDistribution convention] threads.push_back(std::thread(compare::generateStructuresInRange,std::ref(all_structures),std::ref(oss),start_indices[n],end_indices[n]));
-	    threads.push_back(new std::thread(&compare::generateStructuresInRange, std::ref(all_structures),std::ref(oss),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107
+	    //DX 20191107 [OBOSLETE - switch to getThreadDistribution convention] threads.push_back(std::thread(compare::generateStructures,std::ref(all_structures),std::ref(oss),start_indices[n],end_indices[n]));
+	    threads.push_back(new std::thread(&compare::generateStructures, std::ref(all_structures),std::ref(oss),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107
     }
     // ---------------------------------------------------------------------------
     // Join threads
@@ -2715,8 +2716,8 @@ namespace compare {
       // [THREADED] determine AFLOW standard designation 
       vector<std::thread*> threads;
       for(uint n=0; n<number_of_threads; n++){
-        //DX 20191107 [switching to getThreadDistribution convention] threads.push_back(std::thread(compare::getPrototypeDesignationsInRange,std::ref(final_prototypes),start_indices[n], end_indices[n]));
-        threads.push_back(new std::thread(&compare::getPrototypeDesignationsInRange,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX 20191107
+        //DX 20191107 [switching to getThreadDistribution convention] threads.push_back(std::thread(compare::getPrototypeDesignations,std::ref(final_prototypes),start_indices[n], end_indices[n]));
+        threads.push_back(new std::thread(&compare::getPrototypeDesignations,std::ref(final_prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX 20191107
       }
       for(uint t=0;t<threads.size();t++){
         threads[t]->join();
@@ -2794,22 +2795,20 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
-    ostringstream oss;
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc=1;
     double final_misfit=-1;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, oss, final_misfit);
+    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end
   }
 }
 
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match) { //DX 20191108 - remove const & from bools
-    ostringstream oss;
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc = 1;
     double final_misfit = -1;
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, oss, final_misfit);
+    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end and add default
   }
 }
 
@@ -2818,13 +2817,12 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
-    ostringstream oss;
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss) { //DX 20191108 - remove const & from bools
     uint num_proc=1;
     double final_misfit=-1;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, oss, final_misfit);
+    aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end
     return final_misfit;
   }
 }
@@ -2835,7 +2833,7 @@ namespace compare {
 namespace compare {
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, 
-      ostream& oss, double& final_misfit) { //DX 20191108 - remove const & from bools
+      double& final_misfit, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
 
     // This is the main comparison function, which  compares two crystal structures
     // and determines their level of similarity based on the idea discussed 
@@ -3289,5 +3287,6 @@ namespace compare {
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
 // *                                                                         *
 // ***************************************************************************

@@ -68,7 +68,7 @@ namespace pflow {
   bool PerformFullSymmetry(xstructure& a);
   bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
   bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
-  void ProcessAndAddSpinToXstructure(xstructure& a, string& magmom_info); //DX 20190801
+  void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info); //DX 20190801
   void defaultKFlags4SymWrite(_kflags& kflags,bool write=true);
   void defaultKFlags4SymCalc(_kflags& kflags,bool calc=true);
   bool CalculateFullSymmetry(istream& input,aurostd::xoption& vpflow,ostream& oss=cout);
@@ -98,14 +98,14 @@ namespace pflow {
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
   void COMPARE(string options);
-  string compareDatabaseEntries(aurostd::xoption& vpflow); //DX 20180314
-  string comparePermutations(istream& input, aurostd::xoption& vpflow); //DAVID //DX 20181004
-  string compareStructures(aurostd::xoption& vpflow); //DAVID
+  string compareDatabaseEntries(const aurostd::xoption& vpflow); //DX 20180314
+  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
+  string compareStructures(const aurostd::xoption& vpflow); //DAVID
   //DX 20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID
-  string compareMultipleStructures(aurostd::xoption& vpflow); //DAVID //DX 20190425
-  string compare2database(istream& input, aurostd::xoption& vpflow); //DAVID //DX 20181004
-  vector<StructurePrototype> compare2prototypes(istream& input, aurostd::xoption& vpflow); //DX 20181004 //DX 20190314 - changed return value
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, aurostd::xoption& vpflow); //DX 20190314 - overloaded 
+  string compareMultipleStructures(const aurostd::xoption& vpflow); //DAVID //DX 20190425
+  string compare2database(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow); //DX 20181004 //DX 20190314 - changed return value
+  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 - overloaded 
   // DX 9/1/17 [OBSOLETE] void DATA(string smode,istream& input);
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); // DX 9/1/17 - SGDATA + JSON
   void DATA1(string options,istream& input);
@@ -131,8 +131,8 @@ namespace pflow {
   string FROZSL_ANALYZE(istream& input);
   string FROZSL_INPUT(void);
   string FROZSL_OUTPUT(void);
-  bool GetCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry //DX 20191107 - int to uint
-  bool GetNonCollinearMagneticInfo(uint& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear //DX 20191107 - int to uint
+  bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry //DX 20191107 - int to uint
+  bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear //DX 20191107 - int to uint
   vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF190329
   void GULP(istream& input);
@@ -377,8 +377,8 @@ namespace pflow {
   void POCC(vector<string>);
   string POSCAR2AFLOWIN(istream& input, const string& ="");  // Modified ME 181113
   void POSCAR2WYCKOFF(istream& input);
-  string printMatchingPrototypes(xstructure& xstr, aurostd::xoption& vpflow); //DX 20190314 
-  string printMatchingPrototypes(istream& cin, aurostd::xoption& vpflow); //DX 20190314 
+  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 
+  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX 20190314 
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO 180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); // DX 1/23/18 - added more robust QE reader
