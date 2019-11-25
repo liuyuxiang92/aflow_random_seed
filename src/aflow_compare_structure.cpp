@@ -1862,15 +1862,18 @@ namespace pflow {
 // pflow::compareDatabaseEntries - compares database entries
 // ***************************************************************************
 namespace pflow {
-  string compareDatabaseEntries(const aurostd::xoption& vpflow){
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream){ // DX 20191125 - added ofstream overload and added ostream as input
+    ofstream FileMESSAGE;
+    return compareDatabaseEntries(vpflow, FileMESSAGE, logstream);
+  }
+  
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream){ //DX 20191125 - added ofstream and ostream
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     
     string function_name = "pflow::compareDatabaseEntries()";
     string directory = ".";
-    ostringstream oss;
-    ostream& logstream = cout;
     stringstream message;
-    ofstream FileMESSAGE;
+    stringstream oss;
 
     string usage="aflow --compare_database_entries < POSCAR";
     string options="";

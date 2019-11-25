@@ -98,7 +98,8 @@ namespace pflow {
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
   void COMPARE(string options);
-  string compareDatabaseEntries(const aurostd::xoption& vpflow); //DX 20180314
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20191125
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20191125
   string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
   string compareStructures(const aurostd::xoption& vpflow); //DAVID
   //DX 20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID

@@ -7079,17 +7079,19 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
     return output.str();
   }
   xvector<double> comp=vcomposition;
-  if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+  xvector<double> final_comp=comp; //DX 20191125
+  //DX 20191125 [OBSOLETE] if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+  if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX 20191125 - new function form
+  else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
   else if(vred==no_vrt){;}
   else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
+  if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
     output << vspecies[i];
-    if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
+    if(!(exclude1 && aurostd::identical(final_comp[i+final_comp.lrows],1.0,ZERO_TOL))) {
       if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
       } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
-      output << comp[i+comp.lrows];
+      output << final_comp[i+final_comp.lrows];
       if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
       else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
     }
