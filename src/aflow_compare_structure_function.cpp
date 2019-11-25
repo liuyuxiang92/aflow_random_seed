@@ -173,7 +173,7 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     string eendl="";
     bool roff=true; //round off
     stringstream sscontent_json;
-    vector<string> vcontent_json, tmp;
+    vector<string> vcontent_json, tmp_vstring;
     
     // structure_representative 
     sscontent_json << "\"structure_representative\":\"" << StructurePrototype.structure_representative_name << "\"" << eendl;
@@ -203,11 +203,11 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     if(StructurePrototype.atom_decorations_equivalent.size()!=0){ //DX 20190425 - only print if calculated
       //DX 20191111 [OBSOLETE] sscontent_json << "\"atom_decorations_equivalent\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent,"\""),",") << "]" << eendl;
       sscontent_json << "\"atom_decorations_equivalent\":[";
-      tmp.clear();
+      tmp_vstring.clear();
       for(uint i=0;i<StructurePrototype.atom_decorations_equivalent.size();i++){
-        tmp.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent[i],"\""),",")+"]");
+        tmp_vstring.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent[i],"\""),",")+"]");
       }
-      sscontent_json << aurostd::joinWDelimiter(tmp,",") << "]" << eendl;
+      sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     } //DX 20190425
     
@@ -221,13 +221,13 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     
     // grouped_Wyckoff_positions
     sscontent_json << "\"grouped_Wyckoff_positions\":[";
-    tmp.clear();
+    tmp_vstring.clear();
     for(uint i=0;i<StructurePrototype.grouped_Wyckoff_positions.size();i++){
       stringstream ss_tmp;
       ss_tmp << StructurePrototype.grouped_Wyckoff_positions[i];
-      tmp.push_back(ss_tmp.str());
+      tmp_vstring.push_back(ss_tmp.str());
     }
-    sscontent_json << aurostd::joinWDelimiter(tmp,",") << "]" << eendl;
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     //DX 20190425 [OBSOLETE] // Wyckoff_multiplicities
@@ -264,13 +264,13 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
 
     // environments_LFA
     sscontent_json << "\"environments_LFA\":[";
-    tmp.clear();
+    tmp_vstring.clear();
     for(uint i=0;i<StructurePrototype.environments_LFA.size();i++){
       stringstream ss_tmp;
       ss_tmp << StructurePrototype.environments_LFA[i];
-      tmp.push_back(ss_tmp.str());
+      tmp_vstring.push_back(ss_tmp.str());
     }
-    sscontent_json << aurostd::joinWDelimiter(tmp,",") << "]" << eendl;
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // structures_duplicate
@@ -312,23 +312,23 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
 
       // duplicate_structure_properties
       sscontent_json << "\"properties_structures_duplicate\":[";
-      tmp.clear();
+      tmp_vstring.clear();
       //DX 20190326 - should be duplicate for(uint i=0;i<StructurePrototype.properties_structure_representative.size();i++){
       for(uint i=0;i<StructurePrototype.properties_structures_duplicate.size();i++){ // DX 20190326 - correctly changed to duplicate_sturctures_properties
-        tmp.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_duplicate[i],"\""),","));
+        tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_duplicate[i],"\""),","));
       }
-      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp,"[","]"),",");
+      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
       sscontent_json << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
       //DX 20190425 - START
       // family_structure_properties
       sscontent_json << "\"properties_structures_family\":[";
-      tmp.clear();
+      tmp_vstring.clear();
       for(uint i=0;i<StructurePrototype.properties_structures_family.size();i++){
-        tmp.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_family[i],"\""),","));
+        tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_family[i],"\""),","));
       }
-      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp,"[","]"),",");
+      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
       sscontent_json << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //DX 20190425 - END
@@ -801,7 +801,7 @@ namespace compare {
     // objects
     string function_name = "compare:loadStructuresFromDirectory()";
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
     
     vector<StructurePrototype> all_structures;
@@ -894,7 +894,7 @@ namespace compare {
 
     string function_name = "compare:loadStructuresFromFile()";
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     //DX 20191122 [OBSOLETE] ostream& logstream = cout;
     stringstream message;
     //DX [OBSOLETE] ofstream FileMESSAGE;
@@ -1004,7 +1004,7 @@ namespace compare {
 
     // load all structures from a vector of filenames into a vector of StructurePrototype object
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare:loadStructuresFromStructureList()";
     stringstream message;
     //DX 20191122 [OBSOLETE] ostream& logstream = cout;
@@ -1257,7 +1257,7 @@ namespace compare{
     // In order for this to work, the following ICSD name format must be 
     // present in the string (e.g., Ag1_ICSD_#####)
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     string ICSD_substring = "";
     bool ICSD_substring_found = false;
@@ -1389,12 +1389,12 @@ namespace compare{
     //cerr << "store naming" << endl;
     vector<vector<string> > name_order;
     for(uint i=0;i<permutation_structures.size();i++){
-      vector<string> vtmp; 
+      vector<string> vtmp_name; 
       for(uint j=0;j<permutation_structures[i].structure_representative_name.size();j++){
         stringstream ss_tmp; ss_tmp << permutation_structures[i].structure_representative_name[j];
-        vtmp.push_back(ss_tmp.str());
+        vtmp_name.push_back(ss_tmp.str());
       }
-      name_order.push_back(vtmp);
+      name_order.push_back(vtmp_name);
     }
 
     // ---------------------------------------------------------------------------
@@ -1953,7 +1953,7 @@ namespace compare{
     // Note: The AFLOW labels should already be filtered to the relevant
     // strutures for comparison
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "addAFLOWPrototypes2StructurePrototypeVector()";
 
     for(uint i=0;i<vlabel.size();i++){
@@ -2084,7 +2084,7 @@ namespace compare{
     
     // Obtains the elements in the xstructure.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<string> velements;
     // If atoms in poscar not labeled in either POSCAR; assign fake names
     if (xstr.atoms[0].name == ""){
@@ -2407,7 +2407,7 @@ namespace compare{
     // and stores it in the relevant vector
     // Same as the StructurePrototype version, just not as concise
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name="compare::calculateSymmetries()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
@@ -2556,7 +2556,7 @@ namespace compare{
     // and stores it in the StructurePrototype object
     // Same as the vector<xstructure> version, just more concise
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name="compare::calculateSymmetries()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
@@ -2844,7 +2844,7 @@ namespace compare{
     // with one another, i.e., checks if the Wyckoff multiplicities and site 
     // symmetries are the same.  Comparing the same species is optional.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     // quick check: are the number of Wyckoff positions the same; cannot match otherwise
     if(temp_grouped_Wyckoffs.size() != representative_grouped_Wyckoffs.size()){
       if(LDEBUG) {
@@ -2995,7 +2995,7 @@ namespace compare{
 namespace compare{
   bool matchableWyckoffPositionSet(vector<vector<vector<string> > > grouped_possible_Wyckoff_letters,
                                    vector<vector<string> > grouped_Wyckoff_letters){
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool all_Wyckoffs_matched = false;
     //quick check
     if(grouped_possible_Wyckoff_letters.size() != grouped_Wyckoff_letters.size()){
@@ -3230,7 +3230,7 @@ namespace compare{
     //cerr << "vstoichs: " << vstoichs.size() << endl;
     //cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
     //cerr << "vstructures_from: " << vstructures_from.size() << endl;
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     // First, separate by stoichiometry
     for(uint i=0;i<vstoichs.size(); i++){
@@ -3437,7 +3437,7 @@ namespace compare{
     // A "representative" structure is chosen and will be compared to the 
     // possible "duplicates". The misfit values are set to -1.0 until compared.
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::groupStructurePrototypes()";
    
     // variable to store structure sets to compare 
@@ -4913,7 +4913,7 @@ namespace compare{
     // Determine if it is possible to match up species based on the number of atoms
     // (i.e, reduced stoichiometries are equal)
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<uint> stoich1;
     vector<uint> stoich2;
     bool matchable=true;
@@ -6479,7 +6479,7 @@ namespace compare{
     xvector<int> dims(3); //DX 20190710 - use robust method
     dims[1]=dims[2]=dims[3]=0; //reset
     
-    xvector<double> tmp;
+    xvector<double> tmp_coord;
 
     for(uint ii=0; ii<xstr.atoms.size(); ii++){
       if(ii!=k){
@@ -6503,8 +6503,8 @@ namespace compare{
           for(uint n=0;n<l2.size();n++){
             xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
             for(uint p=0;p<l3.size();p++){
-              tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-              min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
+              tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+              min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
             }
           }
         }
@@ -6603,7 +6603,7 @@ namespace compare{
 
     // BETA functionality: Determine magnetic deviation between magnetic structures
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::magneticDeviation()";
     double projection_sum = 0.0;
     double mag_fail = 0.0;
@@ -6775,23 +6775,23 @@ namespace compare{
 // ***************************************************************************
 // atomInCell() 
 // ***************************************************************************
-namespace compare{
-  bool atomInCell(const _atom& atom){ 
-
-    // check if the atom is in the unit cell based on fractional coordinates
-    // this alone is not robust; this should be used in tandem with 
-    // SYM::MapAtom() to account for periodic boundary conditions
-    // filtering with this first with soft cutoffs is much faster, 
-    // especially if there are many atoms to check (e.g., 20,000)
-    
-    for(uint f=1;f<4;f++){
-      if(atom.fpos[f] > 1.05 || atom.fpos[f] < -0.05){ //soft cutoff, use hard cutoff later
-        return false;
-      }
-    }
-    return true;
-  }
-}
+//DX 20191125 [OBSOLETE - MOVED TO XATOM] namespace compare{
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]   bool atomInCell(const _atom& atom){ 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM] 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // check if the atom is in the unit cell based on fractional coordinates
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // this alone is not robust; this should be used in tandem with 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // SYM::MapAtom() to account for periodic boundary conditions
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // filtering with this first with soft cutoffs is much faster, 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // especially if there are many atoms to check (e.g., 20,000)
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     for(uint f=1;f<4;f++){
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]       if(atom.fpos[f] > 1.05 || atom.fpos[f] < -0.05){ //soft cutoff, use hard cutoff later
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]         return false;
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]       }
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     }
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     return true;
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]   }
+//DX 20191125 [OBSOLETE - MOVED TO XATOM] }
 
 // ***************************************************************************
 // Determine if vector is Periodic
@@ -6825,10 +6825,10 @@ namespace compare{
     for(uint d=0;d<atoms.size();d++){
       //DX 20190702 - no name information: _atom tmp;
       //DX 20190702 - use assignment op to get type - tmp.type = atoms[d].type;
-      _atom tmp = atoms[d]; //copy names, types, etc. //DX 20190702
-      tmp.cpos = atoms[d].cpos+vec;
-      tmp.fpos = C2F(lattice,tmp.cpos);
-      if(SYM::MapAtom(atoms,tmp,true,lattice,f2c,skew,tolerance)){ //DX 20190619 - removed c2f
+      _atom tmp_atom = atoms[d]; //copy names, types, etc. //DX 20190702
+      tmp_atom.cpos = atoms[d].cpos+vec;
+      tmp_atom.fpos = C2F(lattice,tmp_atom.cpos);
+      if(SYM::MapAtom(atoms,tmp_atom,true,lattice,f2c,skew,tolerance)){ //DX 20190619 - removed c2f
         //transformed.push_back(tmp);
         //index_to_check.push_back(d);
         count++;
@@ -6861,29 +6861,29 @@ namespace compare{
     vector<int> ind(4); ind[0]=i, ind[1]=j; ind[2]=k; ind[3]=w;
     vector<xvector<double> > latt_vecs(3); 
     latt_vecs[0]=quad(1); latt_vecs[1]=quad(2); latt_vecs[2]=quad(3);
-    xvector<double> tmp;
+    xvector<double> tmp_coord;
 
     for(uint b=0; b<ind.size();b++){
       for(uint c=0;c<latt_vecs.size();c++){
-        tmp=lfa_supercell.atoms.at(ind[b]).cpos+latt_vecs[c];
+        tmp_coord=lfa_supercell.atoms.at(ind[b]).cpos+latt_vecs[c];
         bool match_found=false;
         for(uint d=0;d<lfa_supercell.atoms.size();d++){
-          if(abs(lfa_supercell.atoms.at(d).cpos(1)-tmp(1))<0.01 && 
-              abs(lfa_supercell.atoms.at(d).cpos(2)-tmp(2))<0.01 && 
-              abs(lfa_supercell.atoms.at(d).cpos(3)-tmp(3))<0.01){ // Less than hundredth of Angstrom?
+          if(abs(lfa_supercell.atoms.at(d).cpos(1)-tmp_coord(1))<0.01 && 
+              abs(lfa_supercell.atoms.at(d).cpos(2)-tmp_coord(2))<0.01 && 
+              abs(lfa_supercell.atoms.at(d).cpos(3)-tmp_coord(3))<0.01){ // Less than hundredth of Angstrom?
             match_found=true;
             break;
           }
         }
         if(match_found==false){
-          xvector<double> tmp_frac=C2F(lfa_supercell.lattice,tmp);
-          tmp_frac=bringCoordinateInCell(tmp_frac);
+          xvector<double> tmp_coord_frac=C2F(lfa_supercell.lattice,tmp_coord);
+          tmp_coord_frac=bringCoordinateInCell(tmp_coord_frac);
           xstructure lfa_supercell_tmp = lfa_supercell;
           for(uint f=0;f<lfa_supercell_tmp.atoms.size();f++){
             lfa_supercell_tmp.atoms.at(f).fpos=C2F(lfa_supercell_tmp.lattice,lfa_supercell_tmp.atoms.at(f).cpos);
-            if(abs(lfa_supercell_tmp.atoms.at(f).fpos(1)-tmp_frac(1))<0.01 && 
-                abs(lfa_supercell_tmp.atoms.at(f).fpos(2)-tmp_frac(2))<0.01 && 
-                abs(lfa_supercell_tmp.atoms.at(f).fpos(3)-tmp_frac(3))<0.01){
+            if(abs(lfa_supercell_tmp.atoms.at(f).fpos(1)-tmp_coord_frac(1))<0.01 && 
+                abs(lfa_supercell_tmp.atoms.at(f).fpos(2)-tmp_coord_frac(2))<0.01 && 
+                abs(lfa_supercell_tmp.atoms.at(f).fpos(3)-tmp_coord_frac(3))<0.01){
               match_found=true;
               break;
             }
@@ -7610,7 +7610,7 @@ namespace compare{
       deque<_atom> new_basis_2;
       for(uint iat=0;iat<proto.atoms.size();iat++){
 	      proto.atoms[iat].fpos=C2F(proto.lattice,proto.atoms[iat].cpos);
-        if(atomInCell(proto.atoms[iat])){
+        if(atomInCell(proto.atoms[iat],0.05)){ //DX 20191125 - soft cutoff, using robust MapAtom later on resulting subset 
           new_basis_2.push_back(proto.atoms[iat]);
         }
       }

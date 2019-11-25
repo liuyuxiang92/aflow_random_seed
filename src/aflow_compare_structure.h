@@ -421,7 +421,7 @@ namespace compare{
   bool quadrupletPeriodic(const xmatrix<double>& quad, const xstructure& lfa_supercell, const int& i, 
       const int& j, const int& k, const int& w);
   xstructure GetLFASupercell(const xstructure& xstr, const xvector<int>& dims, const string& lfa_name); //DX 20190530
-  bool atomInCell(const _atom& atom); //DX 20190717 
+  //DX 20191125 [OBSOLETE - MOVED TO XATOM] bool atomInCell(const _atom& atom); //DX 20190717 
   bool vectorPeriodic(const xvector<double>& vec, const xstructure& lfa_supercell, const int& i, 
       const int& j);
   // [OBSOLETE - DX 20190717] void threadGeneration(const uint& num_proc,xmatrix<double>& q1, xstructure& xstr2, 

@@ -2295,7 +2295,8 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms);
 bool alreadyInCell(_atom& atom, deque<_atom> atoms);
 //DX 20180726 - END
 // DX and CO - START
-bool inCell(xvector<double>& pos_vec); // DX
+bool atomInCell(const _atom& atom, double tolerance=_ZERO_TOL_); // DX 20191125
+bool inCell(const xvector<double>& pos_vec, double tolerance=_ZERO_TOL_); // DX 20191125 - added tolerance
 // DX and CO - END
 xstructure GetSuperCell(const xstructure& a,const xmatrix<double>& sc);
 xstructure GetSuperCell(const xstructure& a,const xvector<double>& sc);

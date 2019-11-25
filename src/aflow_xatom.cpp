@@ -1933,7 +1933,7 @@ void minimumCoordinationShell(const xstructure& xstr,
   // "type" enables the search of environments by certain elements/types only
   // (e.g., find the neighborhood of oxygen atoms surrounding a magnesium center)
   
-  xvector<double> tmp;
+  xvector<double> tmp_coord;
 
   // ---------------------------------------------------------------------------
   // instantiate lattice vectors 
@@ -1959,16 +1959,16 @@ void minimumCoordinationShell(const xstructure& xstr,
         for(uint n=0;n<l2.size();n++){
           xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
           for(uint p=0;p<l3.size();p++){
-            tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-            double tmp_mod = aurostd::modulus(tmp);
+            tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+            double tmp_mod = aurostd::modulus(tmp_coord);
             if(tmp_mod<min_dist){
               //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
-              if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
-              else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+              if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
+              else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp_coord); } //initialize
               min_dist=tmp_mod;
             }
             //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
-            else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+            else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
           }
         }
       }
@@ -12310,18 +12310,54 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
 }
 
 // DX - START
-bool inCell(xvector<double>& pos_vec){
-  //DX 20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
-  //DX 20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
-  //DX 20180726 [OBSOLETE]    pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0-_ZERO_TOL_) {      // found something inside
-  if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-     pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-     pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0+_ZERO_TOL_) {      // found something inside //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-    return TRUE;
-  }
-  return FALSE;
-}
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW] bool inCell(xvector<double>& pos_vec){
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   //DX 20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   //DX 20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
+////DX 20180726 [OBSOLETE]    pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0-_ZERO_TOL_) {      // found something inside
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0+_ZERO_TOL_) {      // found something inside //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]     return TRUE;
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   }
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   return FALSE;
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW] }
 // DX - END
+
+// ***************************************************************************
+// atomInCell() 
+// ***************************************************************************
+bool atomInCell(const _atom& atom, double tolerance){ 
+
+  // check if the atom is in the unit cell based on fractional coordinates
+  // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
+  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
+  // filtering with this function with soft cutoffs before MapAtom() is faster, 
+  // especially if there are many atoms to check (e.g., 20,000)
+  // Note: check over each component and returning false immediately (faster)
+ 
+  return inCell(atom.fpos, tolerance);
+
+}
+
+// ***************************************************************************
+// inCell() 
+// ***************************************************************************
+bool inCell(const xvector<double>& pos_vec, double tolerance){ 
+
+  // check if the position is in the unit cell based on fractional coordinates
+  // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
+  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
+  // filtering with this function with soft cutoffs before MapAtom() is faster, 
+  // especially if there are many positions to check (e.g., 20,000)
+  // Note: check over each component and returning false immediately (faster)
+
+  for(uint f=1;f<4;f++){
+    if(pos_vec[f] > 1.0+tolerance || pos_vec[f] < -tolerance){ //allows tunable cutoff
+      return false;
+    }
+  }
+  return true;
+}
 
 
 //DX 20180726 - check if already in cell - START
