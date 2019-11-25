@@ -5044,11 +5044,13 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::sameSpecies()";
 
+    bool VERBOSE = (display && LDEBUG); //DX 20191125
+
     // ---------------------------------------------------------------------------
     // Check number of types
     if(xstr1.num_each_type.size() != xstr2.num_each_type.size()){
       // Display counts
-      if(display && LDEBUG) { //DX 20190702 - condense if-statements
+      if(VERBOSE) { //DX 20190702 - condense if-statements
         cerr << function_name << ": Number of element types are not the same." 
           << " xstr 1: " << xstr1.num_each_type.size() 
           << " and xstr2: " << xstr2.num_each_type.size() << endl;
@@ -5066,10 +5068,10 @@ namespace compare{
     std::sort(xstr2_num_each_type.begin(), xstr2_num_each_type.end());
 
     if(xstr1_num_each_type!=xstr2_num_each_type){
-      if(display && LDEBUG) { cerr << function_name << ": Number of each type of element are incompatible." << endl; }
+      if(VERBOSE) { cerr << function_name << ": Number of each type of element are incompatible." << endl; }
       return false;
     }
-    if(display && LDEBUG) { cerr << function_name << ": Number of each type of element are compatible; proceeding." << endl; }
+    if(VERBOSE) { cerr << function_name << ": Number of each type of element are compatible; proceeding." << endl; }
 
     //DX 20190702 [OBSOLETE - not robust and slow] for(uint i=0;i<xstr1.num_each_type.size();i++){
     //DX 20190702 [OBSOLETE - not robust and slow]   bool matched = false;
