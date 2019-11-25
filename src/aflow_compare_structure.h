@@ -176,8 +176,8 @@ namespace compare{
   string getCompoundName(vector<string>& elements, vector<uint>& stoichiometry, bool remove_ones=false);
   vector<uint> getStoichiometry(const xstructure& xstr, const bool& same_species);
   vector<string> getElements(xstructure& xstr);
-  vector<uint> gcdStoich(const vector<uint>& numbers); //DX 20181009
-  vector<uint> gcdStoich(const deque<int>& numbers);
+  //DX 20191125 [OBSOLETE - USING AUROSTD VERSION] vector<uint> gcdStoich(const vector<uint>& numbers); //DX 20181009
+  //DX 20191125 [OBSOLETE - USING AUROSTD VERSION] vector<uint> gcdStoich(const deque<int>& numbers);
   //DX 20191108 [OBSOLETE - switching to getThreadDistribution] bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
   //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<uint>& start_indices, vector<uint>& end_indices);
   //DX 20191108 [OBSOLETE - switching to getThreadDistribution] bool prepareSymmetryThreads(uint& number_of_structures, uint& num_proc,
@@ -266,9 +266,13 @@ namespace compare{
       bool same_species, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool duplicates_removed); //DX 20190731 - remove const and & //DX 20190830 - added duplicates_removed
 
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
-      ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool check_for_better_matches, bool same_species,
+      ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
       bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, bool quiet=false); //DX 20190730 
+      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, bool quiet=false, ostream& logstream=cout); //DX 20191125 
+  vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
+      ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
+      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
+      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX 20191125
   vector<StructurePrototype> compareDuplicateCompounds(vector<StructurePrototype>& prototype_schemes, uint& num_proc, 
       bool& ICSD_comparison, ostringstream& oss);
   vector<StructurePrototype> createComparisonSchemeForDuplicateCompounds(StructurePrototype& prototype_scheme); 
@@ -290,7 +294,11 @@ namespace compare{
   vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
       bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
       bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
-      ostream& oss, ofstream& FileMESSAGE, bool quiet=false); //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool
+      ostream& oss, bool quiet=false, ostream& logstream=cout); //DX 20191125
+  vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
+      bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
+      ostream& oss, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX 20191125
   vector<std::pair<uint,uint> > calculateDivisors(const int& number);
   bool checkNumberOfGroupings(vector<StructurePrototype>& comparison_schemes, uint number);
   void createStructurePermutations(vector<StructurePrototype>& comparison_schemes, const vector<vector<string> >& name_order,
@@ -301,7 +309,14 @@ namespace compare{
   void appendStructurePrototypes(vector<StructurePrototype>& comparison_schemes, 
       vector<StructurePrototype>& final_prototypes,
       bool clean_unmatched, //DX 20190506
-      bool quiet=false);
+      bool quiet=false,
+      ostream& logstream=cout);
+  void appendStructurePrototypes(vector<StructurePrototype>& comparison_schemes, 
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, 
+      ofstream& FileMESSAGE,
+      bool quiet=false,
+      ostream& logstream=cout); //DX 20191125
   void checkPrototypes(const uint& num_proc, const bool& same_species, vector<StructurePrototype>& final_prototypes);
   void printResults(ostream& ss_out, const bool& same_species, const vector<StructurePrototype>& final_prototypes, string mode="txt");
   void printStructureMappingResults(ostream& oss, 
@@ -324,9 +339,11 @@ namespace compare{
   string findMinimumICSDEntry(vector<string>& ICSD_entries);
   bool groupSameRatios(vector<int>& stoich, vector<int>& unique_stoich, vector<vector<int> >& type_index);
   //vector<vector<int> > generatePermutations(uint& num_elements, vector<int>& indices);
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optmize_match, ostream& oss, ofstream& FileMESSAGE); //DX 20190319 - added FileMESSAGE
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optmize_match, ostream& oss, ostream& logstream=cout); //DX 20191125 
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optmize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190319 - added FileMESSAGE //DX 20191125 - added ostream
   vector<StructurePrototype> generatePermutationStructures(StructurePrototype& structure);
-  vector<string> generatePermutationString(vector<uint>& stoichiometry); //DX 20190508
+  void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX 20190508 //DX 20191125 - changed from vector to deque
+  void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX 20190508
   bool generatePermutations(uint& num_elements, vector<uint>& indices, vector<string>& names, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, vector<vector<uint> >& permutations, vector<vector<string> >&name_order, vector<vector<GroupedWyckoffPosition> >& permutation_grouped_Wyckoff_positions);
   bool arePermutationsComparableViaStoichiometry(const xstructure& xstr); //DX 20190624 
   bool arePermutationsComparableViaStoichiometry(vector<uint>& stoichiometry, bool reduce_stoichiometry=false); //DX 20190624

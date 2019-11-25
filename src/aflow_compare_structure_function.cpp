@@ -1349,13 +1349,18 @@ namespace compare{
 // generatePermutations 
 // ***************************************************************************
 namespace compare{
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE){ //DX 20190319 - added FileMESSAGE
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ostream& logstream){ //DX 20191125 - added overload
+    ofstream FileMESSAGE;
+    return comparePermutations(structure, num_proc, optimize_match, oss, FileMESSAGE, logstream);
+  }
+
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
     string function_name = "compare::comparePermutations()";
     stringstream message;
-    ostream& logstream = cout;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
 
     // ---------------------------------------------------------------------------
     // fixed options for permutation comparisons 
@@ -1451,7 +1456,7 @@ namespace compare{
 
         // ---------------------------------------------------------------------------
         // check if better matchings; perhaps matched structures would have smaller misfits if matched to different representatives
-        final_permutations = compare::checkForBetterMatches(final_permutations, oss, FileMESSAGE, num_proc, true, same_species, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, clean_unmatched, false, quiet); 
+        final_permutations = compare::checkForBetterMatches(final_permutations, oss, num_proc, true, same_species, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, clean_unmatched, false, FileMESSAGE, quiet, logstream); //DX 20191125 
 
         // ---------------------------------------------------------------------------
         // check if NEW matched permutations are physically possible
@@ -1616,7 +1621,14 @@ namespace compare{
 // generatePermutationString
 // ***************************************************************************
 namespace compare{
-  vector<string> generatePermutationString(vector<uint>& stoichiometry){
+  //deque input
+  void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation){
+    vector<uint> stoichiometry_vstring = aurostd::deque2vector(stoichiometry);
+    generatePermutationString(stoichiometry_vstring, permutation);
+  }
+
+  //vector input
+  void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation){
    
     vector<StructurePrototype> permutation_structures;
  
@@ -1660,10 +1672,9 @@ namespace compare{
       }   
     }
 
-    vector<string> permuted_string;
-    for(uint i=0;i<name_order.size();i++){ permuted_string.push_back(aurostd::joinWDelimiter(name_order[i],"")); }
+    for(uint i=0;i<name_order.size();i++){ permutation.push_back(aurostd::joinWDelimiter(name_order[i],"")); }
 
-    return permuted_string; 
+    return; 
   }
 }
 //DX 20190508 - added permutation string function - END
@@ -1767,8 +1778,9 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // reduce stoichiometry first if necessary 
-    vector<uint> tmp_stoich;
-    if(reduce_stoichiometry){ tmp_stoich = compare::gcdStoich(stoichiometry); }
+    vector<uint> tmp_stoich=stoichiometry;
+    //DX 20191125 [OBSOLETE] if(reduce_stoichiometry){ tmp_stoich = compare::gcdStoich(stoichiometry); }
+    if(reduce_stoichiometry){ aurostd::reduceByGCD(stoichiometry, tmp_stoich); } //DX 20191125
     else{ tmp_stoich = stoichiometry; } // assuming it is already reduced
 
     // ---------------------------------------------------------------------------
@@ -1929,7 +1941,9 @@ namespace compare{
         tmp.str("");
       }
       //::print(stoichiometry);
-      stoich=gcdStoich(stoichiometry);
+      //DX 20191125 [OBSOLETE] stoich=gcdStoich(stoichiometry);
+      stoich = stoichiometry;
+      aurostd::reduceByGCD(stoichiometry, stoich); //DX 20191125
     }
     // If a structure prototype comparison (not material type), ensure 
     // stoichiometries are in numerical order for comparison.  Else, 
@@ -2057,22 +2071,28 @@ namespace compare{
     
     // Obtains the least common multiple representation of the stoichiometry.
 
-    vector<uint> stoich;
+    deque<int> stoich;
     if(xstr.species.size()==1){
       stoich.push_back(1);
     }
     else {
-      stoich=gcdStoich(xstr.num_each_type);
+      //DX 20191125 stoich=gcdStoich(xstr.num_each_type);
+      stoich = xstr.num_each_type;
+      aurostd::reduceByGCD(xstr.num_each_type, stoich); //DX 20191125
     }
     // If a structure prototype comparison (not material type), ensure 
     // stoichiometries are in numerical order for comparison.  Else, 
     // leave in position indicating atomic species count.
     if(same_species==false){
-      for(uint i=0; i<stoich.size(); i++){
-        std::sort(stoich.begin(),stoich.end());
-      }
+      //DX 20191125 for(uint i=0; i<stoich.size(); i++){
+      std::sort(stoich.begin(),stoich.end());
+      //DX 20191125 }
     }
-    return stoich;
+    
+    // convert to vector<uint>
+    vector<uint> stoich_uint;
+    for(uint i=0;i<stoich.size();i++){ stoich_uint.push_back((uint)stoich[i]); }
+    return stoich_uint;
   }
 }
 
@@ -2103,92 +2123,92 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-// gcdStoich - Euler's Greatest Common Divisor Algorithm
-// ***************************************************************************
-namespace compare{
-  vector<uint> gcdStoich(const vector<uint>& numbers){
-
-    // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
-    // the least common multiple representation for the stoichiometry.
-    // vector version
-
-    deque<int> number_deque; 
-    for(uint i=0;i<numbers.size();i++){number_deque.push_back((int)numbers[i]);}
-    return gcdStoich(number_deque);
-  }
-}
-
-namespace compare{
-  vector<uint> gcdStoich(const deque<int>& numbers){
-
-    // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
-    // the least common multiple representation for the stoichiometry.
-    // deque version
-
-    string function_name = "compare::gcdStoich():";
-    stringstream message;
-
-    int global_GCD = 0; //DX 5/14/18 - added initialization
-    int GCD = 0; //DX 5/14/18 - added initialization
-    vector<uint> reduced_numbers;
-    // Find min number first
-    int min=0;
-    for(uint i=0; i<numbers.size(); i++){
-      if(i==0){
-        min=numbers[i];
-      }
-      else {
-        if(numbers[i]<min){
-          min=numbers[i];
-        }
-      }
-    }
-    bool found_GCD=true;
-    for(uint i=0; i<numbers.size(); i++){
-      if(numbers[i]%min != 0){
-        found_GCD=false;
-        break;
-      }
-    }
-    if(found_GCD==true){
-      global_GCD=min;
-    }
-    else if(found_GCD==false){
-      int remainder=1000;
-      int divisor=min;
-      for(uint i=0; i<numbers.size(); i++){
-        int num=numbers[i];
-        while(remainder != 0){
-          remainder=(num%divisor);
-          if(remainder==0){
-            GCD=divisor;
-          }
-          else {
-            num=divisor;
-            divisor=remainder;
-          }
-        }
-        divisor=GCD;
-        if(i==0){
-          global_GCD=GCD;
-        }
-        else if(GCD < global_GCD){
-          global_GCD=GCD;
-        }
-        remainder=100;
-      }
-    }
-    for(uint i=0; i<numbers.size(); i++){
-      reduced_numbers.push_back((uint)(numbers[i]/global_GCD));
-      if(numbers[i]%global_GCD){
-        message << "Error in GCD procedure. Contact David Hicks (david.hicks@duke.edu)";
-        throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_);
-      }
-    }
-    return reduced_numbers;
-  }
-}
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] // ***************************************************************************
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] // gcdStoich - Euler's Greatest Common Divisor Algorithm
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] // ***************************************************************************
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] namespace compare{
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   vector<uint> gcdStoich(const vector<uint>& numbers){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // the least common multiple representation for the stoichiometry.
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // vector version
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     deque<int> number_deque; 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0;i<numbers.size();i++){number_deque.push_back((int)numbers[i]);}
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     return gcdStoich(number_deque);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] namespace compare{
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   vector<uint> gcdStoich(const deque<int>& numbers){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // the least common multiple representation for the stoichiometry.
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // deque version
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     string function_name = "compare::gcdStoich():";
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     stringstream message;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     int global_GCD = 0; //DX 5/14/18 - added initialization
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     int GCD = 0; //DX 5/14/18 - added initialization
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     vector<uint> reduced_numbers;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // Find min number first
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     int min=0;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(i==0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         min=numbers[i];
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       else {
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         if(numbers[i]<min){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           min=numbers[i];
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     bool found_GCD=true;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(numbers[i]%min != 0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         found_GCD=false;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         break;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     if(found_GCD==true){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       global_GCD=min;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     else if(found_GCD==false){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       int remainder=1000;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       int divisor=min;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         int num=numbers[i];
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         while(remainder != 0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           remainder=(num%divisor);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           if(remainder==0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]             GCD=divisor;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           else {
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]             num=divisor;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]             divisor=remainder;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         divisor=GCD;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         if(i==0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           global_GCD=GCD;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         else if(GCD < global_GCD){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           global_GCD=GCD;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         remainder=100;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       reduced_numbers.push_back((uint)(numbers[i]/global_GCD));
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(numbers[i]%global_GCD){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         message << "Error in GCD procedure. Contact David Hicks (david.hicks@duke.edu)";
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     return reduced_numbers;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] }
 
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution] // ***************************************************************************
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution] // prepareSymmetryThreads - 
@@ -3598,17 +3618,27 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
-    ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool check_for_better_matches, bool same_species,
-    bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-    bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, bool quiet){ 
+      ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
+      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
+      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, bool quiet, ostream& logstream){ 
 
-    // this function checks if other groups based on 
+    ofstream FileMESSAGE;
+    return checkForBetterMatches(prototype_schemes, oss, num_proc, check_for_better_matches, same_species,
+        scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, 
+        ignore_environment, clean_unmatched, ICSD_comparison, FileMESSAGE, quiet, logstream);
+  }
 
+  vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
+      ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
+      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
+      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, ofstream& FileMESSAGE, bool quiet, ostream& logstream){ 
+
+    // this function checks if compounds/structures match better with another group 
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::checkForBetterMatches()";
     stringstream message;
-    ostream& logstream = cout;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
 
     double misfit_min = 0.01; // used for check_for_better_matches : this is quite strict; if too expensive, make more loose
     double misfit_max = 0.1; // used for check_for_better_matches : otherwise we will compare same family structures which have already been moved (if using !clean_unmatched)
@@ -4047,13 +4077,26 @@ namespace compare{
   vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
       bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
       bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
-      ostream& oss, ofstream& FileMESSAGE, bool quiet){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
+      ostream& oss, bool quiet, ostream& logstream){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
+  
+    ofstream FileMESSAGE;
+  
+    return runComparisonScheme(num_proc, comparison_schemes, 
+      same_species, check_other_grouping, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, 
+      ignore_environment, single_comparison_round, clean_unmatched, ICSD_comparison, store_comparison_logs, 
+      oss, FileMESSAGE, quiet, logstream);
+  }
+
+  vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
+      bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
+      ostream& oss, ofstream& FileMESSAGE, bool quiet, ostream& logstream){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonScheme()";
 
-    ostream& logstream = cout;
     stringstream message;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
     //DX 20190319 [OBSOLETE] ofstream FileMESSAGE;
 
     // print initial grouped sets of comparisons
@@ -4160,7 +4203,7 @@ namespace compare{
     // OR after removing duplicate compounds these compounds remain separate, so for !same_species comparisons we need to check 
     // if they should match with other groups
     if(!ignore_environment || check_other_grouping){
-      comparison_schemes = compare::checkForBetterMatches(comparison_schemes, oss, FileMESSAGE, num_proc, false, same_species, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, true, clean_unmatched, false, quiet); 
+      comparison_schemes = compare::checkForBetterMatches(comparison_schemes, oss, num_proc, false, same_species, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, true, clean_unmatched, false, FileMESSAGE, quiet, logstream); //DX 20191125
     }
 
     // regroup comparisons based on misfit value
@@ -4470,9 +4513,20 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   void appendStructurePrototypes(vector<StructurePrototype>& comparison_schemes, 
-				 vector<StructurePrototype>& final_prototypes,
-         bool clean_unmatched, //DX 20190506
-         bool quiet){
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX 20190506
+      bool quiet,
+      ostream& logstream){
+    ofstream FileMESSAGE;
+    appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, FileMESSAGE, quiet, logstream);
+  }
+
+  void appendStructurePrototypes(vector<StructurePrototype>& comparison_schemes, 
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX 20190506
+      ofstream& FileMESSAGE,
+      bool quiet,
+      ostream& logstream){
 
     // This cleans the StrucuturePrototype objects by removing all the mismatches.
     // Then, it takes the mismatches and makes them into new StructurePrototype objects
@@ -4483,9 +4537,9 @@ namespace compare{
     //LDEBUG cerr << ss_test.str() << endl;
 
     ostringstream oss;
-    ostream& logstream = cout;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
     stringstream message;
-    ofstream FileMESSAGE;
+    //DX 20191125 [OBSOLETE] ofstream FileMESSAGE;
     string function_name = "compare::appendStructurePrototypes()";
 
     vector<StructurePrototype> tmp_list;
@@ -4914,16 +4968,18 @@ namespace compare{
     // (i.e, reduced stoichiometries are equal)
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    vector<uint> stoich1;
-    vector<uint> stoich2;
+    deque<int> stoich1; //DX 20191125
+    deque<int> stoich2; //DX 20191125
     bool matchable=true;
     if(xstr1.species.size()==xstr2.species.size()){
       if(xstr1.species.size()==1){
      	  stoich1.push_back(1); stoich2.push_back(1);
       }
       else {
-        stoich1=gcdStoich(xstr1.num_each_type);
-        stoich2=gcdStoich(xstr2.num_each_type);
+        //DX 20191125 [OBSOLETE] stoich1=gcdStoich(xstr1.num_each_type);
+        //DX 20191125 [OBSOLETE] stoich2=gcdStoich(xstr2.num_each_type);
+        aurostd::reduceByGCD(xstr1.num_each_type, stoich1); //DX 20191125
+        aurostd::reduceByGCD(xstr2.num_each_type, stoich2); //DX 20191125
       }
       uint matches=0;
       // Check if we can match to same species (atoms and stoichs)

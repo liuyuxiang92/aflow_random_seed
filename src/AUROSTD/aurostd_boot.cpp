@@ -189,6 +189,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::sort(vstring,vstring,vdouble,vstring);aurostd::sort(vstring,vstring,vdouble,vdouble,vstring);
   aurostd::sort_remove_duplicates(vstring);
   aurostd::reduceByGCD(vutype,vutype); //DX 201911225
+  aurostd::reduceByGCD(vuint,vuint); //DX 201911225
   // cout << vutype << vint << vdouble << vstring;
   deque<utype> dutype;deque<int> dint;deque<uint> duint;deque<double> ddouble;deque<string> dstring;
   // aurostd::sort(dstring);aurostd::sort(dstring,dint);aurostd::sort(dstring,ddouble);aurostd::sort(dstring,dstring);
@@ -196,6 +197,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::sort(dstring,dint,dstring);aurostd::sort(dstring,ddouble,dstring);aurostd::sort(dstring,dstring,dstring);
   aurostd::sort(dstring,dstring,ddouble,dstring);aurostd::sort(dstring,dstring,ddouble,ddouble,dstring);
   aurostd::reduceByGCD(dutype,dutype); //DX 201911225
+  aurostd::reduceByGCD(duint,duint); //DX 201911225
 
   // initialize vector/deque 
   aurostd::string2tokens(s,vstring,"");aurostd::string2tokens(s,dstring,"");

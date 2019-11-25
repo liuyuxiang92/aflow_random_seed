@@ -468,15 +468,17 @@ namespace compare{
     // quick check: check if any sites have the same number of atoms; if not, then no need to try comparing
     if(!print_misfit){
       if(!arePermutationsComparableViaStoichiometry(xstr)){ //DX 20190624 - put into function
-        vector<uint> reduced_stoichiometry = gcdStoich(xstr.num_each_type); //DX 20190508
-        unique_permutations = generatePermutationString(reduced_stoichiometry); //DX 20190508
+        //DX 20191125 [OBSOLETE] vector<uint> reduced_stoichiometry = gcdStoich(xstr.num_each_type); //DX 20190508
+        deque<int> reduced_stoichiometry; aurostd::reduceByGCD(xstr.num_each_type, reduced_stoichiometry); //DX 20191125
+        deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX 20191125
+        generatePermutationString(reduced_stoichiometry_uint, unique_permutations); //DX 20190508
         if(format=="text"){ //DX 20190506
           ss_output << "Unique permutations (" << unique_permutations.size() << "): " << endl; 
           ss_output << " " << aurostd::joinWDelimiter(unique_permutations,"\n ") << endl;
         }
         if(format=="json"){ //DX 20190506
           ss_output << "{\"atom_decorations_equivalent\":["; 
-          ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]";
+          ss_output << "[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(unique_permutations,"\""),",") << "]"; //DX 20191125 - Vec to Dec
           ss_output << "]}" << endl;
         }
         oss << ss_output.str();
@@ -1680,12 +1682,13 @@ namespace pflow {
         }
       }
 
-      vector<uint> tmp_reduced_stoich = compare::gcdStoich(tmp_stoich);
+      //DX 20191125 [OBSOLETE] vector<uint> tmp_reduced_stoich = compare::gcdStoich(tmp_stoich);
+      vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX 20191125
       //DX 20190402 - need to sort if ignoring species - START
       if(!same_species){
-        for(uint i=0; i<tmp_reduced_stoich.size(); i++){
-	        std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
-        }
+        //DX 20191125 [OBSOLETE - REDUNDANT] for(uint i=0; i<tmp_reduced_stoich.size(); i++){
+	      std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
+        //DX 20191125 [OBSOLETE - REDUNDANT] }
       }
       //DX 20190402 - need to sort if ignoring species - END
       // second, check if stoichiometries are compatible
@@ -2212,12 +2215,13 @@ namespace pflow {
         }
       }
 
-      vector<uint> tmp_reduced_stoich = compare::gcdStoich(tmp_stoich);
+      //DX 20191125 [OBSOLETE] vector<uint> tmp_reduced_stoich = compare::gcdStoich(tmp_stoich);
+      vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX 20191125
       //DX 20190402 - need to sort if ignoring species - START
       if(!same_species){
-        for(uint i=0; i<tmp_reduced_stoich.size(); i++){
-	        std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
-        }
+        //DX 20191125 [OBSOLETE - REDUNDANT]for(uint i=0; i<tmp_reduced_stoich.size(); i++){
+	      std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
+        //DX 20191125 [OBSOLETE - REDUNDANT] }
       }
       tmp.stoichiometry=tmp_reduced_stoich;
       tmp.elements=species;
@@ -2302,12 +2306,13 @@ namespace pflow {
         }
       }
 
-      vector<uint> tmp_reduced_stoich = compare::gcdStoich(tmp_stoich);
+      //DX 20191125 [OBSOLETE} vector<uint> tmp_reduced_stoich = compare::gcdStoich(tmp_stoich);
+      vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX 20191125
       //DX 20190402 - need to sort if ignoring species - START
       if(!same_species){
-        for(uint i=0; i<tmp_reduced_stoich.size(); i++){
-          std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
-        }
+        //DX 20191125 [OBSOLETE - REDUNDANT] for(uint i=0; i<tmp_reduced_stoich.size(); i++){
+        std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
+        //DX 20191125 [OBSOLETE - REDUNDANT] }
       }
       //DX 20190402 - need to sort if ignoring species - END
       // second, check if stoichiometries are compatible
@@ -2664,7 +2669,7 @@ namespace compare {
           final_permutations.clear(); //DX 20190624
         }
         else{
-          vector<string> unique_permutations = generatePermutationString(final_prototypes[i].stoichiometry); //DX 20190508
+          vector<string> unique_permutations; generatePermutationString(final_prototypes[i].stoichiometry, unique_permutations); //DX 20191125
           // store permutation results in main StructurePrototype object
           for(uint j=0;j<unique_permutations.size();j++){
             vector<string> tmp; tmp.push_back(unique_permutations[j]);

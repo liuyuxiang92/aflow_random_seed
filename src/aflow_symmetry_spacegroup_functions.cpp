@@ -4673,19 +4673,20 @@ namespace SYM {
       return false;
     }
     bool consistent_ratio = true;
-    int GCD = 0;
+    int GCD_num = 0;
     if(split_atom_types.size() > 1) {
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
         if(p == 0) {
-          GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
+          //DX 20191125 [OBSOLETE] GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
+          GCD_num = aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
         } else {
-          GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
+          GCD_num = aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size());
         }
       }
       for (uint p = 0; p < prim_split_atom_types.size(); p++) {
         for (uint s = 0; s < split_atom_types.size(); s++) {
           if(prim_split_atom_types[p][0].name == split_atom_types[s][0].name) {
-            if((prim_split_atom_types[p].size() * GCD) / prim_GCD != split_atom_types[s].size()) {
+            if((prim_split_atom_types[p].size() * GCD_num) / prim_GCD != split_atom_types[s].size()) {
               consistent_ratio = false;
             }
           }

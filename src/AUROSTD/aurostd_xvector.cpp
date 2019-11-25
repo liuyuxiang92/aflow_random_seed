@@ -1423,6 +1423,7 @@ namespace aurostd {
   template<class utype> void reduceByGCD(const xvector<utype>& in_V, xvector<utype>& out_V, utype tol){
   // DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,const utype& tol){
     //DX 20191125 [OBSOLETE] xvector<utype> out_V=in_V;
+    out_V=in_V;
     if(!isinteger(out_V,tol)){return;} //nothing to reduce //DX 20191125 - return type is void
 
     xvector<int> v1(in_V.lrows,in_V.urows); //cast to xvector of ints
@@ -1480,7 +1481,8 @@ namespace aurostd {
 
 namespace aurostd {
   template<class utype> void reduceByGCD(const vector<utype>& in_V, vector<utype>& out_V, utype tol){
-    //DX 20191125 [OBSOLETE] xvector<utype> out_V=in_V;
+    //DX 20191125 [OBSOLETE] vector<utype> out_V=in_V;
+    out_V=in_V;
     for(uint i=0;i<out_V.size();i++){ 
       if(!isinteger(out_V[i],tol)){return;}
     }
@@ -1537,6 +1539,7 @@ namespace aurostd {
 namespace aurostd {
   template<class utype> void reduceByGCD(const deque<utype>& in_V, deque<utype>& out_V, utype tol){
     //DX 20191125 [OBSOLETE] deque<utype> out_V=in_V;
+    out_V=in_V;
     for(uint i=0;i<out_V.size();i++){ 
       if(!isinteger(out_V[i],tol)){return;}
     }

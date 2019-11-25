@@ -435,7 +435,8 @@ namespace aurostd {
   // namespace aurostd
   template<class utype>
   bool _isinteger(utype x,utype tolerance) {
-    if(aurostd::abs(x-((utype)aurostd::nint(x)))<tolerance) return TRUE;
+    //DX 20191125 [OBSOLETE] if(aurostd::abs(x-((utype)aurostd::nint(x)))<tolerance) return TRUE;
+    if(aurostd::abs(x-((utype)aurostd::nint(x)))<=tolerance) return TRUE; //DX 20191125 - added <= to account for int and uint and tolerance=0, e.g., 3-nint(3)=0 is not less than 0
     return FALSE;
   }
   
