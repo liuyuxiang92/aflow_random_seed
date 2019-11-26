@@ -1182,7 +1182,7 @@ void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plot
       if (pdos == 0) {
         if (xdos.vDOS.size() > 1) {
           pflow::PerformFullSymmetry(xstr);
-          int iat;
+          int iat = 0;
           for (uint i = 0; i < xstr.iatoms.size(); i++) {
             iat = xstr.iatoms[i][0];
             dos.push_back(xdos.vDOS[iat + 1][0]);
