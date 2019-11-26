@@ -9952,7 +9952,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
       cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
       cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
     }
-    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
 
   return atoms_in_cell;
@@ -13714,17 +13714,16 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
     }
   }
   if(0){  //CO190808 - quick check of mindist
-    double tmp,tmp_min=AUROSTD_MAX_DOUBLE;
+    double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
     for(uint i=0;i<str.grid_atoms.size()-1;i++){
       for(uint j=i+1;j<str.grid_atoms.size();j++){
-        tmp=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
-        if(tmp<tmp_min){
-          tmp_min=tmp;
-          cerr << tmp_min << endl;
+        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+        if(min_dist_local<min_dist){
+          min_dist=min_dist_local;
         }
       }
     }
-    exit(0);
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   str.grid_atoms_calculated=TRUE;
   str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
