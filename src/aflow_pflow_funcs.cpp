@@ -1377,7 +1377,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   //xvector<int> hkl_i;
-  int total_layers;
+  int total_layers = 0;
 	xmatrix<double> rotation;
   xstructure xstr_slablattice;
   vector<int> sc2pcMap_slab,pc2scMap_slab;
