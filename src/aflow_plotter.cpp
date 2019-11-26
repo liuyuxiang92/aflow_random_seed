@@ -755,7 +755,7 @@ void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO191110
   if(aurostd::FileExist(aflowin_path)){
     string aflowin="";
     aurostd::file2string(aflowin_path,aflowin);
-	  string SYSTEM=aurostd::RemoveWhiteSpaces(aurostd::substring2string(aflowin,"[AFLOW]SYSTEM=",FALSE));
+    string SYSTEM=aurostd::RemoveWhiteSpaces(aurostd::substring2string(aflowin,"[AFLOW]SYSTEM=",FALSE));
     if(!SYSTEM.empty()){
       if(LDEBUG){cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
       plotoptions.pop_attached("DEFAULT_TITLE");
