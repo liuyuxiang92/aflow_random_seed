@@ -267,7 +267,7 @@ mac:
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
 aflow.o: aflow.cpp aflow_test.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow.cpp -c
 #aurostd.o: aurostd.cpp aurostd.h Makefile
 #	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aurostd.cpp -c -o aurostd.o
 #aurostd.cpp:
@@ -276,7 +276,7 @@ aflow.o: aflow.cpp aflow_test.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	cd ./AUROSTD && ppp4cpp.py
 
 aurostd.o: $(AUROSTD_HPP) $(AUROSTD_CPP) Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) ./AUROSTD/aurostd.cpp -c -o aurostd.o 
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) ./AUROSTD/aurostd.cpp -c -o aurostd.o 
 .cpp.o: .cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(@:.o=.cpp) -c
 	touch $@
@@ -335,7 +335,7 @@ aflow_chull_jupyter_requirements.cpp: aflow_chull_jupyter_requirements.txt
 	echo "\";" >> $@
 #MB 190301 - END
 aflowlib_web_interface.o: aflowlib_web_interface.cpp aflowlib_webapp_entry.cpp aflowlib_webapp_bands.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflowlib_web_interface.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) aflowlib_web_interface.cpp -c
 aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
 	rm -rf nomix.tmp
 	find $(PROJECT_DIRECTORY_GNDSTATE)/NOMIX/ -name aflow.in | sed "s/\/common\/$(PROJECT_DIRECTORY_GNDSTATE)\/NOMIX\/LIB2\/LIB\///g" | sed "s/aflow.in//g" >> nomix.tmp
@@ -350,7 +350,7 @@ aflow_mix_nomix_table.cpp: Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
 aflow_mix_experiments.o: aflow_mix_experiments.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_mix_experiments.cpp -c
 aflow_xproto.o: aflow_xproto.cpp aflow_xproto_library_default.cpp Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_xproto.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_xproto.cpp -c
 aflow_library_icsd.dat.xz: $(ICSD_LIB)/README_LIBRARY_ICSD1.TXT $(ICSD_LIB)/README_LIBRARY_ICSD2.TXT $(ICSD_LIB)/README_LIBRARY_ICSD3.TXT $(ICSD_LIB)/README_LIBRARY_ICSD4.TXT $(ICSD_LIB)/README_LIBRARY_ICSD5.TXT $(ICSD_LIB)/README_LIBRARY_ICSD6.TXT $(ICSD_LIB)/README_LIBRARY_ICSD7.TXT $(ICSD_LIB)/README_LIBRARY_ICSD8.TXT $(ICSD_LIB)/README_LIBRARY_ICSD9.TXT
 	$(MAKE) aflow -j 16
 	rm -rf aflow_library_icsd.dat
@@ -792,9 +792,9 @@ aflow_contrib_shidong_statistic.o: aflow_contrib_shidong_statistic.cpp aflow_con
 
 #####COMPARE###################################################
 aflow_compare_structure_function.o: aflow_compare_structure_function.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
-	${CPP} $(VERS) ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure_function.cpp -c
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure_function.cpp -c
 aflow_compare_structure.o: aflow_compare_structure.cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP)
-	${CPP} $(VERS) ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure.cpp -c
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" ${INCLUDE} ${CFLAGS} -std=gnu++0x aflow_compare_structure.cpp -c
 
 #[OBSOLETE] [JUNKAI]###### JUNKAI #################################################
 #[OBSOLETE] [JUNKAI] aflow_contrib_junkai_cproto.o:aflow_contrib_junkai_cproto.cpp aflow_contrib_junkai_basic.h
@@ -807,61 +807,61 @@ aflow_compare_structure.o: aflow_compare_structure.cpp Makefile $(AFLOW_HPP) $(A
 aflow_aconvasp_main.o: aflow_aconvasp_main.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_aconvasp_main.cpp -c
 aflow_apennsy.o: aflow_apennsy.cpp $(AFLOW_HPP) $(AUROSTD_HPP) aflow_apennsy.h Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_apennsy.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_apennsy.cpp -c
 aflow_apennsy_main.o: aflow_apennsy_main.cpp $(AFLOW_HPP) $(AUROSTD_HPP) aflow_apennsy.h Makefile
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_apennsy_main.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) $(OPTS) aflow_apennsy_main.cpp -c
 aflow_wyckoff.o: aflow_wyckoff.cpp $(AFLOW_HPP) $(AUROSTD_HPP)
-	$(CPP) $(VERS) -D_WICKOFF_PRE_ aflow_wyckoff.cpp -c
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" -D_WICKOFF_PRE_ aflow_wyckoff.cpp -c
 ####### APL STUFF ####################################################
 #DX and CO - START
 APL/aflow_apl_doscalc.o: APL/aflow_apl_doscalc.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_doscalc.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_doscalc.cpp -c
 	touch $@
 APL/aflow_apl_pdisc.o: APL/aflow_apl_pdisc.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_pdisc.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_pdisc.cpp -c
 	touch $@
 APL/aflow_aapl_tcond.o: APL/aflow_aapl_tcond.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
 	touch $@
 APL/aflow_qha_dm_pdos_save.o: APL/aflow_qha_dm_pdos_save.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_qha_dm_pdos_save.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_qha_dm_pdos_save.cpp -c
 	touch $@
 APL/aflow_apl_group_velocity.o: APL/aflow_apl_group_velocity.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_group_velocity.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_group_velocity.cpp -c
 	touch $@
 APL/aflow_apl_atomic_disp.o: APL/aflow_apl_atomic_disp.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_atomic_disp.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_apl_atomic_disp.cpp -c
 	touch $@
 APL/aflow_qha_gruneisen.o: APL/aflow_qha_gruneisen.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_qha_gruneisen.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_qha_gruneisen.cpp -c
 	touch $@
 APL/aflow_scqha_gruneisen.o: APL/aflow_scqha_gruneisen.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_scqha_gruneisen.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_scqha_gruneisen.cpp -c
 	touch $@
 APL/aflow_scqha_eos.o: APL/aflow_scqha_eos.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_scqha_eos.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_scqha_eos.cpp -c
 	touch $@
 APL/aflow_qha3phonons_eos.o: APL/aflow_qha3phonons_eos.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_qha3phonons_eos.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_qha3phonons_eos.cpp -c
 	touch $@
 APL/aflow_scqha_T_freqs.o: APL/aflow_scqha_T_freqs.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_scqha_T_freqs.cpp -c
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_scqha_T_freqs.cpp -c
 	touch $@
 #DX - CO - END
 #APL/aflow_apl_gsa.o: APL/aflow_apl_gsa.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
-##	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
-#	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_GSA) APL/aflow_apl_gsa.cpp -c
+##	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
+#	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_GSA) APL/aflow_apl_gsa.cpp -c
 #	touch $@
 
 ################################################################################################

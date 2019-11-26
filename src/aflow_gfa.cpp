@@ -1057,7 +1057,7 @@ namespace pflow {
     chull::ConvexHull the_hull;
     vector<chull::ChullPoint> Vpoint, vcpt;
     ostream& oss=cout;
-    vector<string> species=stringElements2VectorElements(alloy,oss,true,true,pp_string,false);  //clean and sort, do not keep_pp //[CO190712 - OBSOLETE]getAlphabeticVectorString(alloy);
+    vector<string> species=stringElements2VectorElements(alloy,true,true,pp_string,false,oss);  //clean and sort, do not keep_pp //[CO190712 - OBSOLETE]getAlphabeticVectorString(alloy);
     string input=aurostd::joinWDelimiter(species,""); //getAlphabeticString(alloy); //CO190712
     vector<chull::CoordGroup> VCoordGroup;
     
