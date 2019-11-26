@@ -538,7 +538,7 @@ namespace aurostd {  // namespace aurostd
         throw aurostd::xerror("xmatrix<utype>::operator *=():","failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO191112
 
       xmatrix<utype> a(this->urows,this->ucols,this->lrows,this->lcols);
-      int i,j,k,ii,jj,kk;
+      int i=0,j=0,k=0,ii=0,jj=0,kk=0;
       utype *bk,*ai,aik,*thisi;
 
       for(i=this->lrows;i<=this->urows;i++)
@@ -4327,4 +4327,3 @@ namespace aurostd { // namespace aurostd
 // *             STEFANO CURTAROLO - Duke University 2003-2019              *
 // *                                                                        *
 // **************************************************************************
-
