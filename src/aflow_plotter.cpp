@@ -529,7 +529,7 @@ string formatDefaultTitlePOCC_190101(const xoption& plotoptions) {  //ME version
 
   // Get the HNF matrix string
   vector<string> tokens;
-  string hnf;
+  string hnf = "";
   if (!generic && aurostd::substring2bool(pocc, ":")) {  // Is there an ARUN?
     t = pocc.find(":");
     hnf = pocc.substr(t + 1, string::npos);
