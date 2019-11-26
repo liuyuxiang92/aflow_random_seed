@@ -8167,7 +8167,6 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   vcontent.clear();
   vector<string> tokens,tokens2;
   aurostd::string2vectorstring(content,vcontent);
-  string line;
   if(filename=="") filename="stringstream";
   
   // crunching to eat the info
