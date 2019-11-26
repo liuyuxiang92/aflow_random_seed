@@ -224,7 +224,7 @@ void savePlotGNUPLOT(const xoption& plotoptions, const stringstream& gpfile) {
   if (!aurostd::FileExist(directory + "/" + filename + "." + format)) {
     string function = "plotter::savePlotGNUPLOT():";
     string message = "Error while generating plot.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
   }
 }
 
@@ -1161,7 +1161,7 @@ void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plot
     if (!xdos.lmResolved) {
       string function = "plotter::generateDosPlot()";
       string message = "Projection scheme LM chosen, but DOSCAR is not lm-resolved.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
     for (uint i = 1; i < xdos.vDOS[pdos].size(); i++) {
       labels.push_back("$" + LM_ORBITALS[i-1] + "$");
@@ -1216,7 +1216,7 @@ void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plot
   } else {
     string function = "plotter::genertateDosPlot()";
     string message = "Unknown projection scheme " + projection + ".";
-    throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
   }
   string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
   if (outformat == "GNUPLOT") {
@@ -1240,7 +1240,7 @@ void generateBandPlot(stringstream& out, const xEIGENVAL& xeigen, const xKPOINTS
   if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
     string function = "plotter::generateBandPlot()";
     string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
   }
 
   // Labels
@@ -1882,7 +1882,7 @@ void PLOT_THERMO(xoption& plotoptions, stringstream& out) {
   } else {
     string function = "plotter::PLOT_THERMO()";
     string message = "Could not find file " + thermo_file + ".";
-    throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
   }
 }
 
@@ -1909,7 +1909,7 @@ void PLOT_TCOND(xoption& plotoptions, stringstream& out) {
   } else {
     string function = "plotter::PLOT_TCOND()";
     string message = "Could not find file " + tcond_file + ".";
-    throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
   }
 }
 
@@ -2040,14 +2040,14 @@ vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
     if (iline == nlines) {
       string function = "plotter::readAflowDataFile()";
       string message = "Wrong file format. No STOP tag found.";
-      throw aurostd::xerror(function, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
     }
   }
   if (data.size() == 0) {
     string function = "plotter::readAflowDataFile()";
     string message = "No data extracted from file " + path_to_file + ".";
     message += "File is either empty or has the wrong format.";
-    throw aurostd::xerror(function, message, _FILE_WRONG_FORMAT_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
   }
   return data;
 }

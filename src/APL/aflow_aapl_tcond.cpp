@@ -142,7 +142,7 @@ void TCONDCalculator::setCalculationOptions(string USER_BTE, bool isotope,
     calc_options.rta_only = false;
   } else {
     string message = "Illegal value for the flag BTE. Use RTA or FULL.";
-    throw xerror(function, message, _INPUT_ILLEGAL_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
   }
 
   calc_options.calc_isotopes = isotope;
@@ -389,7 +389,7 @@ vector<vector<int> >
                   stringstream message;
                   message << "Could not find the symmetry operation to map q-point ";
                   message << qpoints[iqpts[i][j][q]].fpos;
-                  throw xerror(function, message, _RUNTIME_ERROR_);
+                  throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
                 }
               }
             }
@@ -501,11 +501,11 @@ void TCONDCalculator::calculateTransitionProbabilities(int order) {
   if (order < 3) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateScatteringRates()";
     string message = "Phonon process order needs to be three or higher.";
-    throw xerror(function, message, _VALUE_RANGE_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
   } else if (order > 4) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateScatteringRates()";
     string message = "Phonon process order higher than four not implemented yet.";
-    throw xerror(function, message, _VALUE_RANGE_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
   }
 
   // Prepare processes and intr_trans_probs
@@ -1015,7 +1015,7 @@ void TCONDCalculator::calculateThermalConductivity() {
         stringstream message;
         message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
         message << "at " << temp << " K.";
-        throw xerror(function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
       _logger << "End SCF for the Boltzmann transport equation." << apl::endl;
     }
@@ -1377,7 +1377,7 @@ void TCONDCalculator::writeQpoints() {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeQpoints";
     string message = "Could not write q-points to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1420,7 +1420,7 @@ void TCONDCalculator::writeIrredQpoints() {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeIrredQpoints";
     string message = "Could not write irreducible q-points to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1458,7 +1458,7 @@ void TCONDCalculator::writeFrequencies() {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeFrequencies";
     string message = "Could not write frequencies to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1499,7 +1499,7 @@ void TCONDCalculator::writeGroupVelocities() {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeGroupVelocities";
     string message = "Could not write group velocities to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1532,7 +1532,7 @@ void TCONDCalculator::writeTempIndepRatesFile(string tag, string filename,
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepRateFile";
     stringstream message;
     message << "Could not write file " << filename << ".";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1575,7 +1575,7 @@ void TCONDCalculator::writeTempDepRatesFile(string filename,
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepRateFile";
     stringstream message;
     message << "Could not write file " << filename << ".";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1628,7 +1628,7 @@ void TCONDCalculator::writeThermalConductivity() {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity";
     string message = "Could not write thermal conductivities to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 

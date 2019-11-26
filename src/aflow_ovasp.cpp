@@ -3716,7 +3716,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if (vcontent.size() < 7) {
     string function = "xDOSCAR::GetProperties()";
     string message = "Broken DOSCAR: no content.";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
   for(uint iline = 0; iline < 7;iline++) { // ME190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
@@ -3936,7 +3936,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if ((d + 1 < (int) ndos) || (e < (int) number_energies)) {  // ME191010: needs to be d + 1
     string function = "xDOSCAR::GetProperties()";
     string message = "Broken DOSCAR: not enough lines.";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
   // fix denergy
   denergy=venergy.at(1)-venergy.at(0);
@@ -4074,7 +4074,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   }
   if(LDEBUG) {cerr << soliloquy << " DOSCAR content found" << endl;}
 
-  if(!checkDOS(ERROR)){throw aurostd::xerror(soliloquy,ERROR,_INPUT_ERROR_);};  //quick check if GetProperties() failed
+  if(!checkDOS(ERROR)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR,_INPUT_ERROR_);};  //quick check if GetProperties() failed
   
   //this should all work now that we checkDOS()
   uint IENERGY=venergy.size();
@@ -4240,12 +4240,12 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
     message << "       GetProperties(const stringstream&);" << endl;
     message << "       GetProperties(const string&);" << endl;
     message << "       GetPropertiesFile(const string&);";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
   }
   if(LDEBUG) {cerr << soliloquy << " DOSCAR content found" << endl;}
 
   string ERROR_out; //keep this function const for plotter
-  if(!checkDOS(ERROR_out)){throw aurostd::xerror(soliloquy,ERROR_out,_INPUT_ERROR_);};  //quick check if GetProperties() failed
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INPUT_ERROR_);};  //quick check if GetProperties() failed
   
   //this should all work now that we checkDOS()
   uint IENERGY=venergy.size();
@@ -4270,7 +4270,7 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
 
   if(atoms_total+1!=IATOM){ //total column
     message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()";
-    throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
 
   //create vDOS_species with appropriate dimensions
@@ -8189,7 +8189,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
         aurostd::string2tokens(vcontent[iline],tokens,"=");
         if(tokens.size()){aurostd::string2tokens(tokens[1],tokens2," ");}
         if(tokens2.size()){
-          if(!aurostd::isfloat(tokens2[0])){throw aurostd::xerror(soliloquy,"H_atom input cannot be parsed (!isfloat)",_INPUT_ERROR_);}
+          if(!aurostd::isfloat(tokens2[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"H_atom input cannot be parsed (!isfloat)",_INPUT_ERROR_);}
           if(inside_relax){H_atom_relax=aurostd::string2utype<double>(tokens2[0]);}
           else if(inside_static){H_atom_static=aurostd::string2utype<double>(tokens2[0]);}
         }
@@ -8202,10 +8202,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
           if(tokens.size()==6){
             for(int i=1;i<4;i++){
               if(aurostd::isfloat(tokens[i+2])){vforces.back()[i]=aurostd::string2utype<double>(tokens[i+2]);}
-              else{throw aurostd::xerror(soliloquy,"Expected force input to be a number",_FILE_CORRUPT_);}
+              else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Expected force input to be a number",_FILE_CORRUPT_);}
             }
           }
-          else{throw aurostd::xerror(soliloquy,"Unexpected count of force components",_FILE_CORRUPT_);}
+          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected count of force components",_FILE_CORRUPT_);}
         }
       }
     }

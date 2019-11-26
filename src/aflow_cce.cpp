@@ -242,12 +242,12 @@ namespace pflow {
   // if species of atoms are not known as in VASP4 format, throw error
   if (a.atoms[0].name == ""){
     message << "BAD NEWS: It seems you are providing a POSCAR without species information as input. This implementation requires a POSCAR in VASP5 format with the species information included. Please adjust the structure file and rerun.";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   }
   // if there is only one specie it must be an elemental phase and is hence not correctable
   if (a.species.size() == 1){
     message << "BAD NEWS: There is only one species in this system. Hence it is an elemental phase whose enthalpy cannot be corrected based on the CCE methodology.";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   }
 
   //read precalculated DFT formation energies if provided
@@ -275,7 +275,7 @@ namespace pflow {
   // otherwise if sizes of provided DFT formation energies and functionals do not match, throw error
   } else if(dft_energies.size()!=vfunctionals.size()){ // checking only whether the sizes are equal should suffice since then none of them alone can be empty
     message << "BAD NEWS: The number of provided precalculated DFT formation energies and functionals must match.";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   }
   //let the program spit out what it thinks
   if(LDEBUG){
@@ -328,7 +328,7 @@ namespace pflow {
     //sizes of oxidation numbers and atoms must match
     if(!oxidation_states_vec.empty() && oxidation_states_vec.size()!=a.atoms.size()){ 
       message << "BAD NEWS: The number of provided oxidation numbers does not match the number of atoms in the structure! Please correct and rerun.";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     for(uint k=0,ksize=a.atoms.size();k<ksize;k++){
       oxidation_states[k]=oxidation_states_vec[k];
@@ -348,7 +348,7 @@ namespace pflow {
     // system should not be regarded correctable if sum over oxidation states is not zero
     if (oxidation_sum != 0){
       message << "BAD NEWS: The formation energy of this system is not correctable! The oxidation numbers that you provided do not add up to zero! Please correct and rerun.";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
   } else {
     ox_nums_provided=0;

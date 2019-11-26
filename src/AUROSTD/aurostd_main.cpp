@@ -2077,7 +2077,7 @@ namespace aurostd {
     if (!infile.is_open()) {
       string function = "aurostd::getFileCheckSum()";
       string message = "Cannot open file " + filename + ".";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 
     // Get file length
@@ -5059,7 +5059,7 @@ namespace aurostd {
     } //DX 20180726 - added
     else {
       message << "Could not find hard-coded fraction for the double " << a << ".";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
     }
     if(sign_prefix){
       if(neg == true) {

@@ -9,6 +9,8 @@
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
 
+#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO191112 - this file is not compiled like the rest
+
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
@@ -284,7 +286,7 @@ std::string _XHOST::command(const string& command) {
   }
   //CO 180705 - STOP
   //[CO190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
-  throw aurostd::xerror(soliloquy,"command="+command+" not found",_INPUT_MISSING_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 

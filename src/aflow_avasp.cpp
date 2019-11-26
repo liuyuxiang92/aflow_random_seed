@@ -5025,7 +5025,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
   if(xvasp.AVASP_parameters.size()!=0 && PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     message << "Cannot have both --params=<...> and --use_anrl_lattice_param at the same time; use one or the other.";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   }
   else if(xvasp.AVASP_parameters.size()==0 && PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     xvasp.AVASP_parameters="use_anrl_lattice_param";
@@ -5118,7 +5118,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->ucell.size()==0){
     message << "No --aflow_proto input" << endl;
     message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-    throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
   
   //make a working copy of PARAMS->ucell
@@ -5202,7 +5202,7 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(vvstr.size()==0){
     message << "No species input" << endl;
     message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-    throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
   
   //now check everything else, including vvstr.size()==nspecies
@@ -5385,13 +5385,13 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   if(specieX.size()!=volumeX.size()){
     message << "specieX.size() != volumeX.size() ( " << specieX.size() << " != " << volumeX.size() << " )" << endl;
     message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-    throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
   for(uint i=0;i<specieX.size();i++){
     if(specieX[i].size()!=volumeX[i].size()){
       message << "specieX[" << i << "].size() != volumeX[" << i << "].size() ( " << specieX[i].size() << " != " << volumeX[i].size() << " )" << endl;
       message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-      throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
     }
   }
 
@@ -5423,12 +5423,12 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO181226 OBSOLETE]    for(uint i=0;i<specieX.at(ispecies).size();i++) {
   //[CO181226 OBSOLETE]      if(!aurostd::isfloat(tokens.at(tokens.size()-1))){ //CO 180729 - check for string stupidity
   //[CO181226 OBSOLETE]        message << "Invalid volume specification (params[" << tokens.size()-1 << "]=" << tokens.at(tokens.size()-1) << "), must be float input";
-  //[CO181226 OBSOLETE]        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+  //[CO181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   //[CO181226 OBSOLETE]      }
   //[CO181226 OBSOLETE]      vol=aurostd::string2utype<double>(tokens.at(tokens.size()-1));  //CO 180705
   //[CO181226 OBSOLETE]      if(vol==0.0){ //CO 180705 - check for volume stupidity
   //[CO181226 OBSOLETE]        message << "Invalid volume specification (params[" << 1+nspecies+1-1 << "]=" << tokens.at(tokens.size()-1) << "), must be >0";
-  //[CO181226 OBSOLETE]        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+  //[CO181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   //[CO181226 OBSOLETE]      }
   //[CO181226 OBSOLETE]      volumeX.at(ispecies).push_back(vol);
   //[CO181226 OBSOLETE]      //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1)));
@@ -5446,12 +5446,12 @@ bool AVASP_MakePrototype_AFLOWIN_181226(_AVASP_PROTO *PARAMS) {
   //[CO181226 OBSOLETE]    for(uint i=0;i<tokens.size();i++) {
   //[CO181226 OBSOLETE]      if(!aurostd::isfloat(tokens.at(i))){ //CO 180729 - check for string stupidity
   //[CO181226 OBSOLETE]        message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be float input";
-  //[CO181226 OBSOLETE]        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+  //[CO181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   //[CO181226 OBSOLETE]      }
   //[CO181226 OBSOLETE]      vol=aurostd::string2utype<double>(tokens.at(i));
   //[CO181226 OBSOLETE]      if(vol==0.0){ //CO 180705 - check for stupidity
   //[CO181226 OBSOLETE]        message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be >0";
-  //[CO181226 OBSOLETE]        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+  //[CO181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   //[CO181226 OBSOLETE]      }
   //[CO181226 OBSOLETE]      volumeX.at(ispecies).push_back(vol);
   //[CO181226 OBSOLETE]      //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(i)));
@@ -5934,7 +5934,7 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
   if(xvasp.AVASP_parameters.size()!=0 && vpflow.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     message << "Cannot have both --params=<...> and --use_anrl_lattice_param at the same time; use one or the other.";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   }
   else if(xvasp.AVASP_parameters.size()==0 && vpflow.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     xvasp.AVASP_parameters="use_anrl_lattice_param";
@@ -6177,12 +6177,12 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       for(uint i=0;i<specieX.at(ispecies).size();i++) {
         if(!aurostd::isfloat(tokens.at(tokens.size()-1))){ //CO 180729 - check for string stupidity
           message << "Invalid volume specification (params[" << tokens.size()-1 << "]=" << tokens.at(tokens.size()-1) << "), must be float input";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         vol=aurostd::string2utype<double>(tokens.at(tokens.size()-1));  //CO 180705
         if(vol==0.0){ //CO 180705 - check for volume stupidity
           message << "Invalid volume specification (params[" << 1+nspecies+1-1 << "]=" << tokens.at(tokens.size()-1) << "), must be >0";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         volumeX.at(ispecies).push_back(vol);
         //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1)));
@@ -6199,12 +6199,12 @@ bool AVASP_MakePrototype_AFLOWIN_180101(_AVASP_PROTO *PARAMS) {
       for(uint i=0;i<tokens.size();i++) {
         if(!aurostd::isfloat(tokens.at(i))){ //CO 180729 - check for string stupidity
           message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be float input";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         vol=aurostd::string2utype<double>(tokens.at(i));
         if(vol==0.0){ //CO 180705 - check for stupidity
           message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be >0";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         volumeX.at(ispecies).push_back(vol);
         //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(i)));

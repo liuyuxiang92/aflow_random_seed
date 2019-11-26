@@ -99,7 +99,7 @@ const xcombos& xcombos::operator=(const xcombos& other) {
 
 xcombos& xcombos::operator++() {  //remember, this is PREFIX (faster than POSTFIX)
   if(!m_initialized) {
-    throw xerror("xcombos::operator++()", "Cannot increment uninitialized xcombos class.",  _RUNTIME_INIT_);
+    throw xerror(_AFLOW_FILE_NAME_,"xcombos::operator++()", "Cannot increment uninitialized xcombos class.",  _RUNTIME_INIT_);
   }
   if(m_mode=='P') {incrementPermutation();}
   else {
@@ -256,7 +256,7 @@ template<class utype> std::vector<utype> xcombos::applyCombo(const std::vector<u
   std::vector<int> v_indices=m_current;
   if((m_mode=='C') && !(m_repeat)){v_indices.clear();v_indices=getIndices();} // combo indices
   for(uint i=0;i<v_indices.size();i++){
-    if(v_indices[i]>=(int)v_items.size()){throw xerror(soliloquy,"Invalid index",_INDEX_MISMATCH_);}
+    if(v_indices[i]>=(int)v_items.size()){throw xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index",_INDEX_MISMATCH_);}
     v_items_new.push_back(v_items[v_indices[i]]);
   }
   return v_items_new;
@@ -268,7 +268,7 @@ template<class utype> std::vector<utype> xcombos::applyCombo(const std::vector<s
   if(m_mode!='E'){return v_items_new;} //only applies to enumerations
   std::vector<int> v_indices=m_current;
   for(uint i=0;i<v_indices.size();i++){
-    if(v_indices[i]>=(int)v_items[i].size()){throw xerror(soliloquy,"Invalid index",_INDEX_MISMATCH_);}
+    if(v_indices[i]>=(int)v_items[i].size()){throw xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index",_INDEX_MISMATCH_);}
     v_items_new.push_back(v_items[i][v_indices[i]]);
   }
   return v_items_new;

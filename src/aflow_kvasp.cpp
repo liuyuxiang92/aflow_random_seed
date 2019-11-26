@@ -4011,7 +4011,7 @@ namespace KBIN {
     if (fullPathBinaryName.empty()) {
       string function = "KBIN::getVASPVersionString";
       string message = "Binary file name empty";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   
     // Open the binary
@@ -4019,7 +4019,7 @@ namespace KBIN {
     if (!infile.is_open()) {
       string function = "KBIN::getVASPVersionString";
       string message = "Cannot open binary file";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 
     // Read bytes...

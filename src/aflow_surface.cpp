@@ -1945,7 +1945,7 @@ namespace slab {
             newatom.type=k-1;	//CO 180724 - assign type needed for AddAtom()
             specie=str_in.SpeciesLabel(k-1);	//CO 180724 - this should be NON-empty as per assigning_fake_names above
             if(specie.empty() || aurostd::substring2bool(specie,"name not given")){
-              throw aurostd::xerror(soliloquy,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO 180724
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO 180724
             }
             newatom.name=specie;         //CO 180724 - assign name needed for AddAtom()
             newatom.name_is_given=TRUE;  //CO 180724 - assign name needed for AddAtom()
@@ -2122,7 +2122,7 @@ bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xve
   for(int i=dhkl_frac.lrows;i<=dhkl_frac.urows;i++){
     if(abs(dhkl_frac[i])>zero_tol && abs(dhkl_frac[i])<abs(min)){min=dhkl_frac[i];}
   }
-  if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
+  if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
   dhkl_frac/=min;
   if(LDEBUG) {cerr << soliloquy << " dhkl_frac=" << dhkl_frac << endl;}
 
@@ -2136,7 +2136,7 @@ bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xve
     if(aurostd::isinteger(dhkl,zero_tol)){found=true;break;}
   }
   if(!found){
-    //throw aurostd::xerror(soliloquy,"Could not find valid hkl",_VALUE_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not find valid hkl",_VALUE_ERROR_);
     return false;
   }
 
@@ -2163,7 +2163,7 @@ vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,co
   string soliloquy="surface::getHKLPlaneIntercepts():";
   stringstream message;
 
-  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
+  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
   if(LDEBUG){cerr << soliloquy << " hkl=" << hkl << endl;}
   
   xmatrix<double> f2c=trasp(lattice);
@@ -2238,16 +2238,16 @@ vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,co
     cerr << soliloquy << " v3=" << v3 << endl;
   }
   xvector<double> fpos;
-  fpos=c2f*v1;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(soliloquy,"v1 is not a Bravais lattice",_INPUT_ERROR_);}
-  fpos=c2f*v2;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(soliloquy,"v2 is not a Bravais lattice",_INPUT_ERROR_);}
-  fpos=c2f*v3;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(soliloquy,"v3 is not a Bravais lattice",_INPUT_ERROR_);}
+  fpos=c2f*v1;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v1 is not a Bravais lattice",_INPUT_ERROR_);}
+  fpos=c2f*v2;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v2 is not a Bravais lattice",_INPUT_ERROR_);}
+  fpos=c2f*v3;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v3 is not a Bravais lattice",_INPUT_ERROR_);}
 
   //check that normal is orthogonal with vectors created
   xvector<double> n=HKLPlane2Normal(lattice,hkl);
   if(LDEBUG){cerr << soliloquy << " n=" << n << endl;}
-  if(!aurostd::isequal(aurostd::scalar_product(n,v1),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n,v1) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::scalar_product(n,v2),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n,v2) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::scalar_product(n,v3),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n,v3) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
+  if(!aurostd::isequal(aurostd::scalar_product(n,v1),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+  if(!aurostd::isequal(aurostd::scalar_product(n,v2),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+  if(!aurostd::isequal(aurostd::scalar_product(n,v3),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
 
   return intercepts;
 }
@@ -2424,7 +2424,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
   }
   if(starting_atom==AUROSTD_MAX_UINT){
     if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}
-    else{throw aurostd::xerror(soliloquy,"Cannot find starting atom",_INPUT_ERROR_);}
+    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find starting atom",_INPUT_ERROR_);}
   }
   if(LDEBUG){cerr << soliloquy << " fpos_starting matches atom[" << starting_atom << "]" << endl;}
   if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::withinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
@@ -2502,7 +2502,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
         cerr << "dist=" << dist_rorigin_new << "], ";
         cerr << "cpos_final=" << cpos_final << endl;
       }
-      if(!aurostd::isequal(dist_rorigin_new,0.0,sym_eps)){throw aurostd::xerror(soliloquy,"Mismatch between atom.fpos and fpos_final",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(dist_rorigin_new,0.0,sym_eps)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Mismatch between atom.fpos and fpos_final",_RUNTIME_ERROR_);}
       atoms2skip.push_back(ind_min);
       //[CO190520 - safe-guard for working in fractional space (skew)]return atoms[ind_min].fpos;
       return cpos_final;
@@ -2530,7 +2530,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
           !(aurostd::isequal(line_plane_intersection_fpos_BIC[1],0.0) || 
             aurostd::isequal(line_plane_intersection_fpos_BIC[2],0.0) ||
             aurostd::isequal(line_plane_intersection_fpos_BIC[3],0.0))
-        ){throw aurostd::xerror(soliloquy,"Line did not intersect plane",_RUNTIME_ERROR_);}
+        ){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Line did not intersect plane",_RUNTIME_ERROR_);}
       if(LDEBUG){
         cerr << soliloquy << " v_line_plane_intersect[i=" << i << "]=" << v_line_plane_intersect[i];
         cerr << ", v_d[i=" << i << "]=" << v_d[i]  << endl;
@@ -2557,7 +2557,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
       }
     }
 
-    if(ind_min==AUROSTD_MAX_UINT){throw aurostd::xerror(soliloquy,"Cannot find intersecting plane",_RUNTIME_ERROR_);}
+    if(ind_min==AUROSTD_MAX_UINT){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find intersecting plane",_RUNTIME_ERROR_);}
 
     //[CO190520 - do NOT take FPOSDistance(), we do not want to minimize vector]cpos_final += aurostd::modulus(f2c*SYM::FPOSDistance(fpos_current,v_line_plane_intersection_fpos[ind_min],lattice,c2f,f2c,skew)) + sym_eps;
     
@@ -2602,7 +2602,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
     loop_iteration++;
   }
 
-  throw aurostd::xerror(soliloquy,"Cannot find next atom",_RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find next atom",_RUNTIME_ERROR_);
   //[CO190520 - safe-guard for working in fractional space (skew)]return fpos_current;
   return cpos_final;
 }
@@ -2617,7 +2617,7 @@ double getDistanceBetweenImages(const xstructure& xstr_in,const xvector<double>&
   if(distanceBetweenImages_HKL(xstr_in,n_cpos,dist,outside_cell)){return dist;}
   if(distanceBetweenImages_Tracing(xstr_in,n_cpos,dist,outside_cell)){return dist;}
 
-  throw aurostd::xerror(soliloquy,"Cannot find distance between images",_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find distance between images",_INPUT_ERROR_);
   return dist;
 }
 bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& n_cpos,double& distance_between_images,bool outside_cell){ //CO190320
@@ -2630,7 +2630,7 @@ bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& 
     cerr << soliloquy << " xstr_in" << endl;cerr << xstr_in << endl;
     cerr << soliloquy << " n_cpos" << n_cpos << endl;
   }
-  if(!xstr_in.atoms.size()){throw aurostd::xerror(soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
+  if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
 
   //assume NO changes in xstr_in (too slow)
   const xmatrix<double>& lattice=xstr_in.lattice;
@@ -2662,7 +2662,7 @@ bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& 
   _sym_op symop; symop.is_fgroup=true;
   symop.Uc=symop.Uf=aurostd::eye<double>(); //no rotation
   
-  if(!xstr_in.atoms.size()){throw aurostd::xerror(soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
+  if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
   vector<int> basis_atoms_map,basis_types_map;  //dummies
   uint loop_iteration=0;
   //[CO190520 - safe-guard for working in fractional space (skew)]xvector<double> fpos_prev;
@@ -2687,7 +2687,7 @@ bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& 
   }
 
   if(loop_iteration==LOOP_ITERATION_MAX){
-    //throw aurostd::xerror(soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
     return false;
   }
 
@@ -2736,7 +2736,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
     cerr << soliloquy << " xstr_in" << endl;cerr << xstr_in << endl;
     cerr << soliloquy << " n_cpos" << n_cpos << endl;
   }
-  if(!xstr_in.atoms.size()){throw aurostd::xerror(soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
+  if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
 
   //assume NO changes in xstr_in (too slow)
   const xmatrix<double>& lattice=xstr_in.lattice;
@@ -2819,11 +2819,11 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
       cerr << soliloquy << " cpos_new(post)=" << cpos_new[1] << "," << cpos_new[2] << "," << cpos_new[3] << endl;
       cerr << soliloquy << " cpos_diff=" << cpos_diff << endl;
     }
-    if(!aurostd::isequal(cpos_diff,0.0,sym_eps)){throw aurostd::xerror(soliloquy,"cpos_diff!=0 (cpos_diff="+aurostd::utype2string(cpos_diff)+")",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(cpos_diff,0.0,sym_eps)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cpos_diff!=0 (cpos_diff="+aurostd::utype2string(cpos_diff)+")",_RUNTIME_ERROR_);}
   }
 
   if(loop_iteration==LOOP_ITERATION_MAX){
-    //throw aurostd::xerror(soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
     return false;
   }
 
@@ -2928,7 +2928,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    l_i=aurostd::string2utype<int>(tokens[2]);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::isfloat(total_layers_string)){
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    int _total_layers=aurostd::string2utype<int>(total_layers_string);
@@ -3017,7 +3017,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_bulk.MinDist();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3036,7 +3036,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that we can go back and forth between n and hkl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Cannot convert normal -> (hkl): normal=" << n_i;
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " hkl_i=" << hkl_i << endl;
@@ -3045,7 +3045,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(hkl_i,hkl)){
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that hkl plane is orthogonal to n
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
@@ -3058,9 +3058,9 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v2=" << v2 << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v3=" << v3 << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v1),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_i,v1) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v2),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_i,v2) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v3),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_i,v3) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v1),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_i,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v2),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_i,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v3),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_i,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<int> hkl_test;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> n_test;
@@ -3069,7 +3069,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Cannot convert normal -> (hkl): normal=" << n_test;
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " hkl_test=" << hkl_test << endl;
@@ -3078,7 +3078,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(hkl_test,hkl)){
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that hkl plane is orthogonal to n
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
@@ -3091,9 +3091,9 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v2=" << v2 << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v3=" << v3 << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v1),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_test,v1) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v2),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_test,v2) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v3),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_test,v3) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v1),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_test,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v2),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_test,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v3),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_test,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - defining hkl normals
@@ -3119,7 +3119,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " pseudo_z=" << pseudo_z << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " z=" << z << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " aurostd::modulus(pseudo_z-z)=" << aurostd::modulus(pseudo_z - z) << endl;
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3130,7 +3130,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - rotate structure
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::modulus(xstr_bulk.origin)>_ZERO_TOL_){throw aurostd::xerror(soliloquy,"xstr_bulk.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::modulus(xstr_bulk.origin)>_ZERO_TOL_){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"xstr_bulk.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " rotating structure" << endl;}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis=Rotate(xstr_bulk,rotation); //WARNING! check if structure has origin, this will screw things up
@@ -3154,10 +3154,10 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " vol_pre=" << vol_pre << endl;cerr << soliloquy << " vol_post=" << vol_post << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(soliloquy,"lattice vector a length changed",_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(soliloquy,"lattice vector b length changed",_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(soliloquy,"lattice vector c length changed",_VALUE_ERROR_);}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(soliloquy,"volume changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lattice vector a length changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lattice vector b length changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lattice vector c length changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"volume changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]xstr_slab_newbasis.FixLattices();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
@@ -3169,7 +3169,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab_newbasis.MinDist();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(0){  //WRONG, we are simply undoing the rotation we applied previously
@@ -3200,7 +3200,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " sym_eps=" << sym_eps << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " skew=" << skew << endl;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(volume_original,volume_new)){throw aurostd::xerror(soliloquy,"volume changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(volume_original,volume_new)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"volume changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //now we can convert cpos for xstr_slab_newbasis.lattice
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    deque<_atom> atoms=xstr_slab_newbasis.atoms;
@@ -3216,7 +3216,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(check_min_dist){ //sanity check as we rotate structure/atoms
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      min_dist=xstr_slab_newbasis.MinDist();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -3262,7 +3262,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab.MinDist();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //clean up structure
@@ -3304,7 +3304,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab.MinDist();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3442,7 +3442,7 @@ xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl
     }
   }
   
-  if(adiff_max==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"Cannot find acceptable v3",_INPUT_ERROR_);}
+  if(adiff_max==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find acceptable v3",_INPUT_ERROR_);}
   
   //try linear combinations with v1, v2
   bool try_once=true;
@@ -3524,12 +3524,12 @@ xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl
         if(LDEBUG){cerr << soliloquy << " S=" << endl;cerr << S << endl;}
         Q_tmp=Q*S;
         lat_tmp=S*lattice_slab_newbasis;
-        if(!aurostd::isequal(lattice_slab_origbasis,Q_tmp*lat_tmp)){throw aurostd::xerror(soliloquy,"S matrix is not a viable triple-product correction",_RUNTIME_ERROR_);}
+        if(!aurostd::isequal(lattice_slab_origbasis,Q_tmp*lat_tmp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"S matrix is not a viable triple-product correction",_RUNTIME_ERROR_);}
         trip_prod=det(lat_tmp);
         if(trip_prod>=0.0){Q=Q_tmp;lattice_slab_newbasis=lat_tmp;break;}
       }
     }
-    if(det(lattice_slab_newbasis)<0.0){throw aurostd::xerror(soliloquy,"Triple product of lattice remains negative despite attempts to rectify",_INPUT_ERROR_);}
+    if(det(lattice_slab_newbasis)<0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Triple product of lattice remains negative despite attempts to rectify",_INPUT_ERROR_);}
   }
 
   lattice_slab_newbasis=aurostd::roundoff(lattice_slab_newbasis,1e-12); //even smaller than _ZERO_TOL_  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
@@ -3634,7 +3634,7 @@ xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstruc
     l_i=aurostd::string2utype<int>(tokens[2]);
   }
   hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
-  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
+  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
   string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
   if(aurostd::isfloat(total_layers_string)){
     int _total_layers=aurostd::string2utype<int>(total_layers_string);
@@ -3723,7 +3723,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3742,7 +3742,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   //test that we can go back and forth between n and hkl
   if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
     message << "Cannot convert normal -> (hkl): normal=" << n_i;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   if(LDEBUG) {
     cerr << soliloquy << " hkl_i=" << hkl_i << endl;
@@ -3751,7 +3751,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   }
   if(!aurostd::isequal(hkl_i,hkl)){
     message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   //test that hkl plane is orthogonal to n
   intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
@@ -3764,7 +3764,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
   if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
     message << "Cannot convert normal -> (hkl): normal=" << n_test;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   if(LDEBUG) {
     cerr << soliloquy << " hkl_test=" << hkl_test << endl;
@@ -3773,7 +3773,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   }
   if(!aurostd::isequal(hkl_test,hkl)){
     message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   //test that hkl plane is orthogonal to n
   intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
@@ -3790,7 +3790,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   //test whether fpos/cpos work
@@ -3799,8 +3799,8 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   for(uint i=0;i<xstr_bulk.atoms.size();i++){
     fpos=xstr_bulk.c2f*xstr_bulk.atoms[i].cpos;
     cpos=xstr_bulk.f2c*xstr_bulk.atoms[i].fpos;
-    if(!aurostd::isequal(xstr_bulk.atoms[i].fpos,fpos)){throw aurostd::xerror(soliloquy,"atoms[i="+aurostd::utype2string(i)+"].fpos mismatch",_INPUT_ERROR_);}
-    if(!aurostd::isequal(xstr_bulk.atoms[i].cpos,cpos)){throw aurostd::xerror(soliloquy,"atoms[i="+aurostd::utype2string(i)+"].cpos mismatch",_INPUT_ERROR_);}
+    if(!aurostd::isequal(xstr_bulk.atoms[i].fpos,fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atoms[i="+aurostd::utype2string(i)+"].fpos mismatch",_INPUT_ERROR_);}
+    if(!aurostd::isequal(xstr_bulk.atoms[i].cpos,cpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atoms[i="+aurostd::utype2string(i)+"].cpos mismatch",_INPUT_ERROR_);}
   }
   
   stringstream title;
@@ -3877,7 +3877,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_slab_newbasis.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3922,7 +3922,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_slab.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
   
   //clean up structure
@@ -3956,7 +3956,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_slab.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4074,7 +4074,7 @@ bool slabTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     min_dist=xstr_slab_correct.MinDist();
     cerr << soliloquy << " xstr_slab_correct.MinDist()=" << min_dist << endl;
   }
-  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(soliloquy,"Minimum distance changed (correct)",_INPUT_ERROR_);}
+  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (correct)",_INPUT_ERROR_);}
 
   xmatrix<double> lattice_slab_origbasis;
   xstructure xstr_slab_test=slab::CreateSlab_SurfaceLattice(xstr_in,hkl,1,0,5.0); //the v3len_max_strict is very important here, as the test from Sun et al. takes a shortcut here
@@ -4084,11 +4084,11 @@ bool slabTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     min_dist=xstr_slab_test.MinDist();
     cerr << soliloquy << " xstr_slab_test.MinDist()=" << min_dist << endl;
   }
-  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
+  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
 
   bool structures_match=compare::aflowCompareStructure(xstr_slab_correct,xstr_slab_test,true,false,false);
   if(LDEBUG){cerr << soliloquy << " structures_match=" << structures_match << endl;}
-  if(!structures_match){throw aurostd::xerror(soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
+  if(!structures_match){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
   message << "Slab test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return structures_match;
 }
