@@ -12177,7 +12177,7 @@ namespace pflow {
       } 
 	
       bool found=FALSE;
-      double vol;
+      double vol = 0.0;
       
       //CO181226 START
       PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc);  //test if inputs are correct in number and type (not negative, etc.)  //CO191110 - note nspecies changes here if pocc, so below we use nspeciesHTQC to fetch correct proto
