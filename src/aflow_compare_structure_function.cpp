@@ -981,6 +981,7 @@ namespace compare{
     xmatrix<double> ATA = aurostd::trasp(A)*A;
     //to bidiagonal
     xmatrix<double> test = ATA;
+    xmatrix<double> Q; 
     pflow::QRDecomposition_HouseHolder(ATA,Q,test); //CO190808
     //cerr << "A: " << A << endl;
     //cerr << "ATA: " << ATA << endl;
