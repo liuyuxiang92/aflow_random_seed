@@ -530,7 +530,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       //not absolutely necessary, but it will prevent us from rerunning symmetrically equivalent in the future (directory name)
       //it's also cleaner
       xvector<double> xvtmp,xvtmp_rotated;
-      uint uitmp;
+      uint uitmp=0;
       bool swap=false;
       bool sing_dir_vec_i=false;      //if direction i is single direction vector (prefer these)
       bool sing_dir_vec_j=false;      //if direction j is single direction vector (prefer these)
