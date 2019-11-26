@@ -2031,7 +2031,7 @@ double xOUTCAR::minimumDistanceKPoints(xvector<double>& kpoint1_kl,xvector<doubl
 bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,double occ_tol) { // CO 171004 - redoing camilo's function more robustly
   
   //some nice examples when debugging - validated by CO 171006
-  //corey@aflowlib:Ag1Ni1O2_ICSD_73974$ aflow --bandgap=/common/ICSD/LIB/RHL/Ag1Ni1O2_ICSD_73974
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/RHL/Ag1Ni1O2_ICSD_73974
   //System        :   Ag1Ni1O2_ICSD_73974
   //Spin tag      :   2
   //Fermi level   :  +3.2142e+00
@@ -2040,7 +2040,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //Minority Spin :  -1.1228e+00   +1.2232e+00   +2.3460e+00   +4.0754e+00   insulator-indirect
   //Net Result    :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   half-metal
   //
-  //corey@aflowlib:Ni1O1_ICSD_92133$ aflow --bandgap=/common/ICSD/LIB/FCC/Ni1O1_ICSD_92133
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/FCC/Ni1O1_ICSD_92133
   //System        :   Ni1O1_ICSD_92133
   //Spin tag      :   2
   //Fermi level   :  +6.3759e+00
@@ -2049,7 +2049,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //Minority Spin :  -1.6986e+00   +1.2234e+00   +2.9220e+00   +4.8519e+00   insulator-indirect
   //Net Result    :  -9.9810e-01   +1.2234e+00   +2.2215e+00   +3.9076e+00   insulator-indirect_spin-polarized
   //
-  //corey@aflowlib:Cr1O2_ICSD_186838$ aflow --bandgap=/common/ICSD/LIB/FCC/Cr1O2_ICSD_186838
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/FCC/Cr1O2_ICSD_186838
   //System        :   Cr1O2_ICSD_186838
   //Spin tag      :   2
   //Fermi level   :  +5.2091e+00
@@ -2058,21 +2058,21 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //Minority Spin :  -4.9230e-01   +2.1851e+00   +2.6774e+00   +4.5221e+00   insulator-indirect
   //Net Result    :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   half-metal
   //
-  //corey@aflowlib:Ba2Dy1Nb1O6_ICSD_109156$ aflow --bandgap=/common/ICSD/LIB/FCC/Ba2Dy1Nb1O6_ICSD_109156
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/FCC/Ba2Dy1Nb1O6_ICSD_109156
   //System        :   Ba2Dy1Nb1O6_ICSD_109156
   //Spin tag      :   1
   //Fermi level   :  +3.1773e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
   //Net Result    :  -3.7000e-01   +2.7214e+00   +3.0914e+00   +5.0802e+00   insulator-direct
   //
-  //corey@aflowlib:Si1_ICSD_150530$ aflow --bandgap=/common/ICSD/LIB/FCC/Si1_ICSD_150530
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/FCC/Si1_ICSD_150530
   //System        :   Si1_ICSD_150530
   //Spin tag      :   1
   //Fermi level   :  +5.9186e+00
   //                  VBT           CBB           Egap          Egap_fit     Type
   //Net Result    :  -2.9430e-01   +3.1570e-01   +6.1000e-01   +1.7353e+00   insulator-indirect
   //
-  //corey@aflowlib:Fe1_ICSD_52258$ aflow --bandgap=/common/ICSD/LIB/BCC/Fe1_ICSD_52258
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/BCC/Fe1_ICSD_52258
   //System        :   Fe1_ICSD_52258
   //Spin tag      :   2
   //Fermi level   :  +5.2672e+00
@@ -2081,14 +2081,14 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //Minority Spin :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   metal
   //Net Result    :  -1.0000e+00   -1.0000e+00   -1.0000e+09   -1.0000e+09   metal
   //
-  //corey@aflowlib:H2_ICSD_68271$ aflow --bandgap=.
+  //corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/HEX/H2_ICSD_68271
   //WARNING - xOUTCAR::GetBandGap: unable to detect band edge for k-point 1 (spin=2), this system should be rerun with a wider energy range
   //
   //   filename=[stringstream]
   //
   //   pflow::BANDGAP: . failed
   //
-  //[OBSOLETE]corey@aflowlib:H2_ICSD_68271$ aflow --bandgap=. (SHOULD GIVE WARNING NOW)
+  //[OBSOLETE]corey@aflowlib$ aflow --bandgap=/common/ICSD/LIB/HEX/H2_ICSD_68271 (SHOULD GIVE WARNING NOW)
   //[OBSOLETE]System        :   H2_ICSD_68271
   //[OBSOLETE]Spin tag      :   2
   //[OBSOLETE]Fermi level   :  -5.6146e+00
