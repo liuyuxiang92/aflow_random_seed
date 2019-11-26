@@ -42,7 +42,7 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(vsize>0) {
         corpus=new utype[rows+XXEND];
-        if(!corpus) {throw aurostd::xerror("aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
+        if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
         corpus+= -lrows+XXEND;
         reset(); //CO191110
       }
@@ -101,7 +101,7 @@ namespace aurostd {  // namespace aurostd
 #endif
         if(vsize>0) {
           corpus=new utype[rows+XXEND];
-          if(!corpus) {throw aurostd::xerror("aurostd::xvector<utype>::copy():","allocation failure in COPY",_ALLOC_ERROR_);}
+          if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","allocation failure in COPY",_ALLOC_ERROR_);}
           corpus+= -lrows+XXEND;
         }
 #ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
@@ -120,7 +120,7 @@ namespace aurostd {  // namespace aurostd
     void xvector<utype>::copy(const xmatrix<utype>& b) { //CO190808
       if(b.rows==1){return copy(b(b.lrows));}
       else if(b.cols==1)return copy(b.getcol(b.lcols));
-      throw aurostd::xerror("aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_VALUE_ILLEGAL_);
     }
 }
 
@@ -999,7 +999,7 @@ namespace aurostd {
     return gaussian_filter_xv<utype>(sigma,window); //if you need lrows!=1, use shiftlrows()
   }
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows) __xprototype { //CO190419
-    if(window%2==0){throw aurostd::xerror("aurostd::gaussian_filter_xv():","window should NOT be even (window="+aurostd::utype2string(window)+")",_INPUT_ILLEGAL_);}
+    if(window%2==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::gaussian_filter_xv():","window should NOT be even (window="+aurostd::utype2string(window)+")",_INPUT_ILLEGAL_);}
     xvector<utype> filter(window+(lrows-1),lrows);
     int ind=lrows;utype x=0.0;
     for(int val=-window/2;val<=window/2;val++){
@@ -2453,30 +2453,30 @@ namespace aurostd {  // namespace aurostd
     compareVecElement<utype>::compareVecElement(uint ind,bool ascending) : m_uindex_sort((uint)ind),m_iindex_sort((int)ind),m_ascending_sort(ascending) {} //CO190629
   template<class utype> 
     bool compareVecElement<utype>::operator() (const vector<utype>& a,const vector<utype>& b) { //CO190629
-      if(a.size()!=b.size()){throw aurostd::xerror("compareVecElement::operator()():","a.size()!=b.size()",_INDEX_MISMATCH_);}
-      if(m_uindex_sort>=a.size()){throw aurostd::xerror("compareVecElement::operator()():","index_sort>=a.size()",_INDEX_BOUNDS_);}
+      if(a.size()!=b.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareVecElement::operator()():","a.size()!=b.size()",_INDEX_MISMATCH_);}
+      if(m_uindex_sort>=a.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareVecElement::operator()():","index_sort>=a.size()",_INDEX_BOUNDS_);}
       if(m_ascending_sort){return a[m_uindex_sort]<b[m_uindex_sort];}
       return a[m_uindex_sort]>b[m_uindex_sort]; //descending sort
   }
   template<class utype> 
     bool compareVecElement<utype>::operator() (const xvector<utype>& a,const xvector<utype>& b) { //CO190629
-      if(a.lrows!=b.lrows){throw aurostd::xerror("compareVecElement::operator()():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
-      if(a.rows!=b.rows){throw aurostd::xerror("compareVecElement::operator()():","a.rows!=b.rows",_INDEX_MISMATCH_);}
-      if(m_iindex_sort<a.lrows||m_iindex_sort>a.urows){throw aurostd::xerror("compareVecElement::operator()():","index_sort<a.lrows||index_sort>a.urows",_INDEX_BOUNDS_);}
+      if(a.lrows!=b.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareVecElement::operator()():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
+      if(a.rows!=b.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareVecElement::operator()():","a.rows!=b.rows",_INDEX_MISMATCH_);}
+      if(m_iindex_sort<a.lrows||m_iindex_sort>a.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareVecElement::operator()():","index_sort<a.lrows||index_sort>a.urows",_INDEX_BOUNDS_);}
       if(m_ascending_sort){return a[m_iindex_sort]<b[m_iindex_sort];}
       return a[m_iindex_sort]>b[m_iindex_sort]; //descending sort
   }
   //sort by all indices in increasing order
   template<class utype>
     bool compareVecElements(const vector<utype>& a,const vector<utype>& b) { //CO190629
-      if(a.size()!=b.size()){throw aurostd::xerror("compareVecElements():","a.size()!=b.size()",_INDEX_MISMATCH_);}
+      if(a.size()!=b.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareVecElements():","a.size()!=b.size()",_INDEX_MISMATCH_);}
       for(uint i=0;i<a.size();i++){if(a[i]!=b[i]){return a[i]<b[i];}}
       return false;
     }
   template<class utype>
     bool compareXVecElements(const aurostd::xvector<utype>& a,const aurostd::xvector<utype>& b) { //CO190629
-      if(a.lrows!=b.lrows){throw aurostd::xerror("compareXVecElements():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
-      if(a.rows!=b.rows){throw aurostd::xerror("compareXVecElements():","a.rows!=b.rows",_INDEX_MISMATCH_);}
+      if(a.lrows!=b.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareXVecElements():","a.lrows!=b.lrows",_INDEX_MISMATCH_);}
+      if(a.rows!=b.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"compareXVecElements():","a.rows!=b.rows",_INDEX_MISMATCH_);}
       for(int i=a.lrows;i<=a.urows;i++){if(a[i]!=b[i]){return a[i]<b[i];}}
       return false;
     }
@@ -2580,7 +2580,7 @@ namespace aurostd {
       cerr << soliloquy << " signal_input=" << signal_input << endl;
       cerr << soliloquy << " response_input=" << response_input << endl;
     }
-    if(signal_input.lrows!=response_input.lrows){throw aurostd::xerror(soliloquy,"signal_input.lrows!=response_input.lrows",_INDEX_MISMATCH_);}
+    if(signal_input.lrows!=response_input.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"signal_input.lrows!=response_input.lrows",_INDEX_MISMATCH_);}
     int lrows=signal_input.lrows; //fixed
     int size=signal_input.rows+response_input.rows-1;
     vector<uint> sum_counts_full((uint)size,0);
@@ -2644,7 +2644,7 @@ namespace aurostd {
       if(LDEBUG){cerr << soliloquy << " valid conv=" << conv_shape << endl;}
       return conv_shape;
     }
-    else{throw aurostd::xerror(soliloquy,"SHAPE specification unknown",_INPUT_UNKNOWN_);}
+    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"SHAPE specification unknown",_INPUT_UNKNOWN_);}
     return conv;
   }
   template<class utype> xvector<utype> moving_average(const xvector<utype>& signal_input,int window) {

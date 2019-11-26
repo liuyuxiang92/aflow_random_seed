@@ -132,7 +132,7 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
   stringstream message;
   if(composition_matrix.rows<=composition_matrix.cols){
     message << "Composition matrix (m<=n) will NOT yield a viable null space for this analysis";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_); //CO190226
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO190226
     //exit(1);  //CO190226
   }
   //[CO191110 - OBSOLETE]xmatrix<double> composition_matrix=_composition_matrix;
@@ -156,7 +156,7 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
   for(int i=1;i<coef.rows+1;i++){
     if(coef[i]<-_ZERO_TOL_){
       message << "Found negative coef[" << i << "], invalid chemical equation (run with --debug to see): coef=" << coef;
-      throw aurostd::xerror(soliloquy,message,_VALUE_RANGE_); //CO190226
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190226
       //exit(1);  //CO190226
     }
   }
@@ -169,7 +169,7 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
     if(LDEBUG) {cerr << sum << endl;}
     if(abs(sum)>_ZERO_TOL_){
       message << "Chemical equation was not balanced (run with --debug to see): coef=" << coef;
-      throw aurostd::xerror(soliloquy,message,_VALUE_RANGE_); //CO190226
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190226
       //exit(1);  //CO190226
     }
   }
@@ -237,7 +237,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
   
   bool convert_sconv=true;
@@ -247,7 +247,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
     if(!aurostd::isequal(min_dist_orig,min_dist)){
       //throw a warning here instead, minimum distance MIGHT change with sconv
-      //throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);
+      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);
       message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
       min_dist_orig=min_dist;
     }
@@ -265,7 +265,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -312,7 +312,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
     l_s=aurostd::string2utype<int>(tokens[2]);
   }
   hkl_s[1]=h_s;hkl_s[2]=k_s;hkl_s[3]=l_s;
-  if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(soliloquy,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
+  if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
   hkl_s_ORIG=hkl_s;
   string step_size_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE"); //step size
   if(aurostd::isfloat(step_size_string)){
@@ -405,7 +405,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190408 - do rotation last!]  } else {  //try ApplyAtomValidate
   //[CO190408 - do rotation last!]    for(uint i=0;i<xstr_bulk.atoms.size();i++){
   //[CO190408 - do rotation last!]      if(!SYM::ApplyAtomValidate(xstr_bulk.atoms[i],xstr_slab_newbasis.atoms[i],rot,xstr_bulk,true,false)){
-  //[CO190408 - do rotation last!]        throw aurostd::xerror(soliloquy,"ApplyAtomValidate() failed",_VALUE_ERROR_);
+  //[CO190408 - do rotation last!]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ApplyAtomValidate() failed",_VALUE_ERROR_);
   //[CO190408 - do rotation last!]      }
   //[CO190408 - do rotation last!]    }
   //[CO190408 - do rotation last!]  }
@@ -421,7 +421,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO190408 - do rotation last!]  min_dist=xstr_slab_newbasis.MinDist();
   //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+  //[CO190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO190408 - do rotation last!]}
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -443,7 +443,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]if(!aurostd::isequal(aurostd::scalar_product(n_i,n_s),0.0,0.1)){
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i(" << n_i << ") is not perpendicular to n_s(" << n_s << ")" << endl;
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i DOT n_s = " << aurostd::scalar_product(n_i,n_s) << endl;
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]}
   
   //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
@@ -471,7 +471,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   if(!aurostd::isequal(abs(n_i_rotated[3]),1.0)){
     message << "Rotation unsuccessful, n_i should be aligned along the z-axis" << endl;
     message << "n_i(rotated)  =" << n_i_rotated << endl;
-    throw aurostd::xerror(soliloquy,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
   }
   
   if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "](unrotated)=" << n_s << endl;}
@@ -488,7 +488,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
     message << "Rotation unsuccessful" << endl;
     message << "angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;
     message << "angle_ns(rotated)  =" << rad2deg*angle_ns_rotated << endl;
-    throw aurostd::xerror(soliloquy,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -523,7 +523,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
         }
       }
       
-      if(v_n_s_sym.size()==0){throw aurostd::xerror(soliloquy,"Cannot find any viable symmetrically equivalent n_s",_RUNTIME_ERROR_);}
+      if(v_n_s_sym.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find any viable symmetrically equivalent n_s",_RUNTIME_ERROR_);}
 
       //sort the two lists (symmetrically equivalent and rotated variants) by the rotated variants
       //look for 1 0 0 first, then -1 0 0, then
@@ -679,7 +679,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
     cerr << soliloquy << " layers_per_cell_s=" << layers_per_cell_s << endl;
     cerr << soliloquy << " supercell_layers_s=" << supercell_layers_s << endl;
   }
-  //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s<1){throw aurostd::xerror(soliloquy,"layers_per_cell_s<1 (="+aurostd::utype2string(layers_per_cell_s)+")",_INPUT_ERROR_);}
+  //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"layers_per_cell_s<1 (="+aurostd::utype2string(layers_per_cell_s)+")",_INPUT_ERROR_);}
   //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s>1){  //let's adjust total_layers input to CreateSlab_RigidRotation() which builds supercell assuming layers_per_cell_s==1
   //[CO190520 - do NOT reduce total_layers based on shear direction]  int total_layers=DEFAULT_TOTAL_LAYERS;
   //[CO190520 - do NOT reduce total_layers based on shear direction]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
@@ -713,7 +713,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       message << "rotation=" << endl; message << rotation << endl;
       message << "hkl_i=" << hkl_i << ", n_i(rotated)=" << n_i << endl;
       message << "hkl_s=" << hkl_s << ", n_s(rotated)=" << n_s << endl;
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
   }
   
@@ -745,7 +745,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above+count_below!=count_total){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above+count_below!=count_total";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]
   //[CO190423 - too much work, rely on atom.ijk instead!]//half-plane is bad idea, too much room for error
@@ -797,7 +797,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
   if(k_max-k_min+1!=supercell_layers_i){  //test of stupidity
     message << "k_max-k_min+1!=supercell_layers_i";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
 
   uint count_total_fixed=0,count_bottom_fixed=0,count_top_fixed=0; //tests of stupidity
@@ -832,7 +832,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   }
   if(count_total_fixed!=count_bottom_fixed+count_top_fixed){
     message << "count_total_fixed!=count_bottom_fixed+count_top_fixed (" << count_total_fixed << "!=" << count_bottom_fixed+count_top_fixed << ")";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
   }
   
   //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
@@ -861,7 +861,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " count_keep_fixed=" << count_keep_fixed << endl;}
   //[CO190423 - too much work, rely on atom.ijk instead!]if(2*count_keep_fixed>xstr_slab.atoms.size()){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "2*count_keep_fixed>xstr_slab.atoms.size()";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]
   //[CO190423 - too much work, rely on atom.ijk instead!]//fixed selective dynamics stuff at once
@@ -869,13 +869,13 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<count_keep_fixed;i++){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //bottom
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [1]";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]count_check=0;
   //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_keep_fixed;i--){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //top
   //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
   //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [2]";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
   //[CO190423 - too much work, rely on atom.ijk instead!]}
   //[CO190423 - too much work, rely on atom.ijk instead!]}
 
@@ -996,11 +996,11 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       }
       if(count_total!=xstr_shear.atoms.size()){
         message << "count_total!=xstr_shear.atoms.size()";
-        throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
       }
       if(count_total!=count_bottom+count_top){
         message << "count_total!=count_bottom+count_top";
-        throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
       }
 
       //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
@@ -1023,7 +1023,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       if(check_min_dist){ //sanity check as we rotate structure/atoms
         min_dist=xstr_shear.MinDist();
         if(LDEBUG) {cerr << soliloquy << " mindist[" << (count_check_min_dist++)+dir_count << "]=" << min_dist << endl;}
-        if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+        if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
       }
 
       //if(0){
@@ -1158,7 +1158,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
   
   bool convert_sconv=true;
@@ -1168,7 +1168,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
     if(!aurostd::isequal(min_dist_orig,min_dist)){
       //throw a warning here instead, minimum distance MIGHT change with sconv
-      //throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);
+      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);
       message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
       min_dist_orig=min_dist;
     }
@@ -1186,7 +1186,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1231,7 +1231,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     l_i=aurostd::string2utype<int>(tokens[2]);
   }
   hkl_i[1]=h_i;hkl_i[2]=k_i;hkl_i[3]=l_i;
-  if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(soliloquy,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
+  if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
   string relaxation_layers_string=vpflow.getattachedscheme("CLEAVAGE_ENERGY::RELAXATION_LAYERS"); //step size
   if(aurostd::isfloat(relaxation_layers_string)){
     int _relaxation_layers=aurostd::string2utype<int>(relaxation_layers_string);
@@ -1436,7 +1436,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
   if(k_max-k_min+1!=supercell_layers){  //test of stupidity
     message << "k_max-k_min!=supercell_layers";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
 
   uint count_total_relaxing=0,count_bottom_relaxing=0,count_top_relaxing=0; //tests of stupidity
@@ -1469,7 +1469,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   }
   if(count_total_relaxing!=count_bottom_relaxing+count_top_relaxing){
     message << "count_total_relaxing!=count_bottom_relaxing+count_top_relaxing (" << count_total_relaxing << "!=" << count_bottom_relaxing+count_top_relaxing << ")";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
   }
   
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1740,8 +1740,8 @@ vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>&
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="GetXrayPeaks():";
 
-  if(v_twotheta.size()<2){throw aurostd::xerror(soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
-  if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+  if(v_twotheta.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
+  if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
 
   xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
   uint smoothing_iterations=4,avg_window=4;int width_maximum=1;double significance_multiplier=1.0;  //defaults
@@ -2139,7 +2139,7 @@ namespace pflow {
       _atom& atom=sstr.atoms[i]; atom.CleanName();
       if(atom.name_is_given==FALSE || atom.cleanname.empty()){  //CO190322
         message << "Need to provide atom names";
-        throw aurostd::xerror(soliloquy, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _VALUE_ILLEGAL_);
       }
       scatt_fact[i]=GetXrayScattFactor(atom.cleanname,lambda);
       mass[i]=GetAtomMass(atom.cleanname);
@@ -7351,7 +7351,7 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
   string soliloquy="pflow::prettyPrintCompound():";
   uint precision=COEF_PRECISION;
   stringstream output;output.precision(precision);
-  if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}
+  if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}
   // special case, unary
   if(vspecies.size() == 1) {
     output << vspecies[0];
@@ -7362,8 +7362,8 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
   if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
   else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
   else if(vred==no_vrt){;}
-  else {throw aurostd::xerror(soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
+  else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+  if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
     output << vspecies[i];
     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {

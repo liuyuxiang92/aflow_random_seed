@@ -1542,7 +1542,7 @@ namespace apl {
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::writeDYNMAT()";
       string message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 //      throw apl::APLRuntimeError("PhononCalculator::writeDYNMAT(); Cannot open output file.");
     //CO - END
@@ -1858,7 +1858,7 @@ namespace apl {
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::hibernate()";
       string message = "Cannot open output file " + filename + "."; //ME181226
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //      throw apl::APLRuntimeError("PhononCalculator::hibernate(); Cannot open output apl.xml.");
     }
     //}
@@ -1889,7 +1889,7 @@ namespace apl {
     if (!vlines.size()) {
       string function = "PhononCalculator::awake()";
       string message = "Cannot open output file " + hibfile + "."; //ME181226
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //      throw apl::APLRuntimeError("apl::PhononCalculator::awake(); Cannot open input apl.xml.");
     }
 
@@ -2346,7 +2346,7 @@ namespace apl {
   vector<xvector<double> > PhononCalculator::readForcesFromQmvasp(const string& directory) {
     //[CO191112 - OBSOLETE]vector<xvector<double> > forces;
     string file = directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
-    if(aurostd::EFileExist(file)==FALSE){throw aurostd::xerror("APL::PhononCalculator::readForcesFromQmvasp():","qmvasp file not found ["+file+"]",_FILE_NOT_FOUND_);}  //CO191112
+    if(aurostd::EFileExist(file)==FALSE){throw aurostd::xerror(_AFLOW_FILE_NAME_,"APL::PhononCalculator::readForcesFromQmvasp():","qmvasp file not found ["+file+"]",_FILE_NOT_FOUND_);}  //CO191112
     xQMVASP qmvasp(file); //CO191112
     return qmvasp.vforces;  //CO191112
     //[CO191112 - OBSOLETE]vector<string> vlines;

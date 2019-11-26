@@ -1024,11 +1024,11 @@ namespace SYM {
       }
       if((min_cdiff_dist<=tol)!=(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
       if((min_cdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)!=(min_fdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)){
         message << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
     }
     double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX 20190620

@@ -124,19 +124,19 @@ namespace pocc {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy="pocc::POCC_MINIMUM_CONFIGURATION():";
 
-    if(!aurostd::IsDirectory(directory)){throw aurostd::xerror(soliloquy,"Directory="+directory+" does not exist",_FILE_NOT_FOUND_);}
+    if(!aurostd::IsDirectory(directory)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Directory="+directory+" does not exist",_FILE_NOT_FOUND_);}
     vector<string> ls_contents;
     aurostd::DirectoryLS(directory,ls_contents);
     vector<xQMVASP> v_qmvasp;
     for(uint i=0;i<ls_contents.size();i++){
       if(aurostd::IsDirectory(ls_contents[i]) && aurostd::substring2bool(ls_contents[i],"ARUN.POCC")){
-        if(!(aurostd::EFileExist(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT))){throw aurostd::xerror(soliloquy,ls_contents[i]+" does not contain "+DEFAULT_AFLOW_QMVASP_OUT,_FILE_NOT_FOUND_);}
+        if(!(aurostd::EFileExist(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+" does not contain "+DEFAULT_AFLOW_QMVASP_OUT,_FILE_NOT_FOUND_);}
         v_qmvasp.push_back(xQMVASP(ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT));
-        if(v_qmvasp.back().H_atom_static==AUROSTD_NAN){throw aurostd::xerror(soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
+        if(v_qmvasp.back().H_atom_static==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ls_contents[i]+"/"+DEFAULT_AFLOW_QMVASP_OUT+" does not show a static run",_FILE_ERROR_);}
       }
     }
     uint v_qmvasp_size=v_qmvasp.size(); //NO MORE PUSH_BACK BELOW! Will save time for AAPL calculations
-    if(v_qmvasp_size<1){throw aurostd::xerror(soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
+    if(v_qmvasp_size<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC found in Directory="+directory,_FILE_NOT_FOUND_);}
     //sort by H_atom_static
     xQMVASP qmvasp_tmp;
     for(uint i=0;i<v_qmvasp_size-1;i++){
@@ -169,7 +169,7 @@ namespace pocc {
     stringstream ss_pocc_structure;
     aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
     if(ss_pocc_structure.str().empty()){
-      throw aurostd::xerror(soliloquy,"No PARTCAR found (looking for [POCC_MODE_EXPLICIT]START.POCC_STRUCTURE / [POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE)");
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No PARTCAR found (looking for [POCC_MODE_EXPLICIT]START.POCC_STRUCTURE / [POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE)");
     }
     xstructure xstr_pocc(ss_pocc_structure, IOVASP_POSCAR);
     return xstr_pocc;
@@ -238,7 +238,7 @@ namespace pocc {
     bool found_file=false;
     if(!found_file && aurostd::EFileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,structures_file)){aurostd::efile2stringstream(structures_file,structures_file_ss);found_file=true;}
     if(!found_file && aurostd::FileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,structures_file)){aurostd::file2stringstream(structures_file,structures_file_ss);found_file=true;}
-    if(!found_file){throw aurostd::xerror(soliloquy,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+" does not exist",_FILE_NOT_FOUND_);}
+    if(!found_file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+" does not exist",_FILE_NOT_FOUND_);}
     if(aurostd::substring2bool(structures_file_ss,POSCAR_series_START_tag)){return false;}
     
     stringstream message;
@@ -263,12 +263,12 @@ namespace pocc {
     string structures_file_str=structures_file_ss.str();
     string structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
     if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";}
-    if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){throw aurostd::xerror(soliloquy,"Cannot find structure group tag",_FILE_CORRUPT_);}
+    if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find structure group tag",_FILE_CORRUPT_);}
     if(!aurostd::substring2bool(structures_file_str,POSCAR_series_START_tag)){
       if(!aurostd::substring2bool(structures_file_str,POSCAR_START_tag)){
         add_POSCAR_START_tag=true;
         if(!aurostd::substring2bool(structures_file_str,POccStructure_title_tag)){
-          throw aurostd::xerror(soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+" file: cannot find POSCAR title tag",_FILE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE+" file: cannot find POSCAR title tag",_FILE_ERROR_);
         }
       }
       aurostd::string2vectorstring(structures_file_str,vlines); //aurostd::efile2vectorstring(structures_file,vlines);
@@ -277,8 +277,8 @@ namespace pocc {
           if(l_supercell_sets_size==0 && aurostd::substring2bool(vlines[iline],"/")){
             aurostd::string2tokens(vlines[iline],vtokens," ");
             aurostd::string2tokens(vtokens.back(),vtokens2,"/");
-            if(vtokens2.size()!=2){break;}  //didn't work //throw aurostd::xerror(soliloquy,"Unknown format for line containing l_supercell_sets_size",_FILE_CORRUPT_);
-            if(!aurostd::isfloat(vtokens2.back())){break;}  //didn't work //throw aurostd::xerror(soliloquy,vtokens2.back()+" is not a number",_FILE_CORRUPT_);
+            if(vtokens2.size()!=2){break;}  //didn't work //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown format for line containing l_supercell_sets_size",_FILE_CORRUPT_);
+            if(!aurostd::isfloat(vtokens2.back())){break;}  //didn't work //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,vtokens2.back()+" is not a number",_FILE_CORRUPT_);
             l_supercell_sets_size=aurostd::string2utype<int>(vtokens2.back());
             if(LDEBUG){cerr << soliloquy << " l_supercell_sets_size=" << l_supercell_sets_size << endl;}
             break;
@@ -292,11 +292,11 @@ namespace pocc {
         if(aurostd::substring2bool(vlines[iline],poscar_start_tag)){pscs_psc_set_sizes.back()++;}
       }
       if(l_supercell_sets_size==0){add_l_supercell_sets_size=true;l_supercell_sets_size=pscs_psc_set_sizes.size();} //could not find from structure_group_tag
-      if(l_supercell_sets_size==0){throw aurostd::xerror(soliloquy,"Cannot find l_supercell_sets_size",_RUNTIME_INIT_);}
-      if(pscs_psc_set_sizes.size()==0){throw aurostd::xerror(soliloquy,"Cannot find pscs_psc_set_sizes",_RUNTIME_INIT_);}
-      if((uint)l_supercell_sets_size!=pscs_psc_set_sizes.size()){throw aurostd::xerror(soliloquy,"l_supercell_sets_size[="+aurostd::utype2string((uint)l_supercell_sets_size)+"]!=pscs_psc_set_sizes.size()[="+aurostd::utype2string(pscs_psc_set_sizes.size())+"]",_INDEX_MISMATCH_);}
+      if(l_supercell_sets_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find l_supercell_sets_size",_RUNTIME_INIT_);}
+      if(pscs_psc_set_sizes.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find pscs_psc_set_sizes",_RUNTIME_INIT_);}
+      if((uint)l_supercell_sets_size!=pscs_psc_set_sizes.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets_size[="+aurostd::utype2string((uint)l_supercell_sets_size)+"]!=pscs_psc_set_sizes.size()[="+aurostd::utype2string(pscs_psc_set_sizes.size())+"]",_INDEX_MISMATCH_);}
       for(uint i=0;i<pscs_psc_set_sizes.size();i++){
-        if(pscs_psc_set_sizes[i]==0){throw aurostd::xerror(soliloquy,"pscs_psc_set_sizes[i="+aurostd::utype2string(i)+"]==0",_RUNTIME_INIT_);}
+        if(pscs_psc_set_sizes[i]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"pscs_psc_set_sizes[i="+aurostd::utype2string(i)+"]==0",_RUNTIME_INIT_);}
         if(LDEBUG){cerr << soliloquy << " pscs_psc_set_sizes[i=" << i << "]=" << pscs_psc_set_sizes[i] << endl;}
       }
       i_l_supercell_sets_size=-1;i_pscs_psc_set=0;
@@ -311,7 +311,7 @@ namespace pocc {
           }
         }
         if(found_POccStructure==true && aurostd::substring2bool(vlines[iline],poscar_stop_tag)){
-          if(pocc_addendum_ss.str().empty()){throw aurostd::xerror(soliloquy,"STOP tag found before START",_FILE_CORRUPT_);}
+          if(pocc_addendum_ss.str().empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"STOP tag found before START",_FILE_CORRUPT_);}
           if(aurostd::substring2bool(vlines[iline],POSCAR_STOP_tag)){aurostd::StringSubst(vlines[iline],POSCAR_STOP_tag,POSCAR_series_STOP_tag+pocc_addendum_ss.str());}
           else{vlines.insert(vlines.begin()+iline++,POSCAR_series_STOP_tag+pocc_addendum_ss.str());}
           pocc_addendum_ss.str("");
@@ -320,15 +320,15 @@ namespace pocc {
         if(aurostd::substring2bool(vlines[iline],poscar_start_tag)){
           found_POccStructure=true;
           if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
-          if(i_l_supercell_sets_size>=l_supercell_sets_size){throw aurostd::xerror(soliloquy,"Found more unique supercells than expected",_INDEX_MISMATCH_);}
+          if(i_l_supercell_sets_size>=l_supercell_sets_size){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found more unique supercells than expected",_INDEX_MISMATCH_);}
           if(aurostd::substring2bool(vlines[iline],POSCAR_START_tag)){
-            if(iline+1>vlines.size()-1){throw aurostd::xerror(soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
+            if(iline+1>vlines.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
             pocc_hash=getPOCCHashFromXStructureTitle(vlines[iline+1]);
           }else{pocc_hash=getPOCCHashFromXStructureTitle(vlines[iline]);} //SHACHAR OLD FORMAT
-          if(pocc_hash.empty()){throw aurostd::xerror(soliloquy,"Could not find pocc_hash at iline="+aurostd::utype2string(iline+1),_FILE_CORRUPT_);}
+          if(pocc_hash.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not find pocc_hash at iline="+aurostd::utype2string(iline+1),_FILE_CORRUPT_);}
           pocc_addendum_ss << "POCC_";
           pocc_addendum_ss << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets_size)) << i_l_supercell_sets_size+1 << "_";
-          if((uint)i_l_supercell_sets_size>pscs_psc_set_sizes.size()-1){throw aurostd::xerror(soliloquy,"i_l_supercell_sets_size>pscs_psc_set_sizes.size()-1",_INDEX_MISMATCH_);}
+          if((uint)i_l_supercell_sets_size>pscs_psc_set_sizes.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"i_l_supercell_sets_size>pscs_psc_set_sizes.size()-1",_INDEX_MISMATCH_);}
           pocc_addendum_ss << std::setfill('0') << std::setw(aurostd::getZeroPadding(pscs_psc_set_sizes[(uint)i_l_supercell_sets_size])) << (i_pscs_psc_set++)+1 << "_";
           pocc_addendum_ss << pocc_hash;
           if(LDEBUG){cerr << soliloquy << " pocc_addendum=" << pocc_addendum_ss.str() << endl;}
@@ -354,7 +354,7 @@ namespace pocc {
     bool found_file=false;
     if(!found_file && aurostd::EFileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,structures_file)){aurostd::efile2stringstream(structures_file,structures_file_ss);found_file=true;}
     if(!found_file && aurostd::FileExist(aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,structures_file)){aurostd::file2stringstream(structures_file,structures_file_ss);found_file=true;}
-    if(!found_file){throw aurostd::xerror(soliloquy,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" does not exist",_FILE_NOT_FOUND_);}
+    if(!found_file){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" does not exist",_FILE_NOT_FOUND_);}
     if(aurostd::substring2bool(structures_file_ss,POSCAR_series_START_tag)){return false;}
       
     stringstream message;
@@ -376,7 +376,7 @@ namespace pocc {
     string structures_file_str=structures_file_ss.str();
     if(!aurostd::substring2bool(structures_file_str,POSCAR_series_START_tag)){
       if(!aurostd::substring2bool(structures_file_str,POSCAR_START_tag)){
-        throw aurostd::xerror(soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" file",_FILE_WRONG_FORMAT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown format for "+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+" file",_FILE_WRONG_FORMAT_);
       }
       aurostd::string2vectorstring(structures_file_str,vlines); //aurostd::efile2vectorstring(structures_file,vlines);
       if(LDEBUG){cerr << soliloquy << " looking for l_supercell_sets_size" << endl;}
@@ -384,20 +384,20 @@ namespace pocc {
         if(aurostd::substring2bool(vlines[iline],POSCAR_START_tag)){l_supercell_sets_size++;}
       }
       if(LDEBUG){cerr << soliloquy << " l_supercell_sets_size=" << l_supercell_sets_size << endl;}
-      if(l_supercell_sets_size==0){throw aurostd::xerror(soliloquy,"Cannot find l_supercell_sets_size",_RUNTIME_INIT_);}
+      if(l_supercell_sets_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find l_supercell_sets_size",_RUNTIME_INIT_);}
       i_l_supercell_sets_size=0;
       for(uint iline=0;iline<vlines.size();iline++){
         if(aurostd::substring2bool(vlines[iline],POSCAR_STOP_tag)){
-          if(pocc_addendum_ss.str().empty()){throw aurostd::xerror(soliloquy,"STOP tag found before START",_FILE_CORRUPT_);}
+          if(pocc_addendum_ss.str().empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"STOP tag found before START",_FILE_CORRUPT_);}
           aurostd::StringSubst(vlines[iline],POSCAR_STOP_tag,POSCAR_series_STOP_tag+pocc_addendum_ss.str());
           pocc_addendum_ss.str("");
         }
         if(aurostd::substring2bool(vlines[iline],POSCAR_START_tag)){
           if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
-          if(i_l_supercell_sets_size>=l_supercell_sets_size){throw aurostd::xerror(soliloquy,"Found more unique supercells than expected",_INDEX_MISMATCH_);}
-          if(iline+1>vlines.size()-1){throw aurostd::xerror(soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
+          if(i_l_supercell_sets_size>=l_supercell_sets_size){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found more unique supercells than expected",_INDEX_MISMATCH_);}
+          if(iline+1>vlines.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
           pocc_hash=getPOCCHashFromXStructureTitle(vlines[iline+1]);
-          if(pocc_hash.empty()){throw aurostd::xerror(soliloquy,"Could not find pocc_hash at iline="+aurostd::utype2string(iline+1),_FILE_CORRUPT_);}
+          if(pocc_hash.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not find pocc_hash at iline="+aurostd::utype2string(iline+1),_FILE_CORRUPT_);}
           pocc_addendum_ss << "POCC_";
           pocc_addendum_ss << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets_size)) << (i_l_supercell_sets_size++)+1 << "_";
           pocc_addendum_ss << pocc_hash;
@@ -436,7 +436,7 @@ namespace pocc {
         cerr << soliloquy << " structures_file=" << structures_file << endl;
         cerr << soliloquy << " structures_file_new=" << structures_file_new << endl;
       }
-      if(!aurostd::file2file(structures_file,structures_file_new)){throw aurostd::xerror(soliloquy,"Could not move structures_file to structures_file_new="+structures_file_new,_RUNTIME_ERROR_);}
+      if(!aurostd::file2file(structures_file,structures_file_new)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not move structures_file to structures_file_new="+structures_file_new,_RUNTIME_ERROR_);}
       aurostd::stringstream2file(structures_file_ss,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE);structures_file_ss.str("");
     }
 
@@ -449,7 +449,7 @@ namespace pocc {
         cerr << soliloquy << " structures_file=" << structures_file << endl;
         cerr << soliloquy << " structures_file_new=" << structures_file_new << endl;
       }
-      if(!aurostd::file2file(structures_file,structures_file_new)){throw aurostd::xerror(soliloquy,"Could not move structures_file to structures_file_new="+structures_file_new,_RUNTIME_ERROR_);}
+      if(!aurostd::file2file(structures_file,structures_file_new)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not move structures_file to structures_file_new="+structures_file_new,_RUNTIME_ERROR_);}
       aurostd::stringstream2file(structures_file_ss,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);structures_file_ss.str("");
     }
     
@@ -525,8 +525,8 @@ namespace pocc {
       }
       if(aurostd::substring2bool(vlines[iline],POCC_AFLOWIN_tag+"UFF_ENERGY=")){
         aurostd::string2tokens(vlines[iline],vtokens,"=");
-        if(vtokens.size()!=2){throw aurostd::xerror(soliloquy,"Unknown UFF_ENERGY line format",_FILE_CORRUPT_);}
-        if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(soliloquy,"UFF_ENERGY is not a double",_VALUE_ERROR_);}
+        if(vtokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown UFF_ENERGY line format",_FILE_CORRUPT_);}
+        if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"UFF_ENERGY is not a double",_VALUE_ERROR_);}
         l_supercell_sets.back().m_psc_set.push_back(POccSuperCell()); //this comes before structure
         l_supercell_sets.back().m_psc_set.back().m_energy_uff=aurostd::string2utype<double>(vtokens[1]);
         continue;
@@ -534,26 +534,26 @@ namespace pocc {
       if(aurostd::substring2bool(vlines[iline],"[VASP_POSCAR_MODE_EXPLICIT]START.POCC_")){
         //hnf_matrix
         aurostd::string2tokens(vlines[iline],vtokens,"H");
-        if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (H1) line",_FILE_CORRUPT_);}
+        if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H1) line",_FILE_CORRUPT_);}
         aurostd::string2tokens(vtokens.back(),vtokens2,"C");
-        if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (H2) line",_FILE_CORRUPT_);}
-        if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
+        if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H2) line",_FILE_CORRUPT_);}
+        if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
         l_supercell_sets.back().m_psc_set.back().m_hnf_index=(unsigned long long int)aurostd::string2utype<int>(vtokens2[0]);
         //site_configuration
         aurostd::string2tokens(vlines[iline],vtokens,"C");
-        if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (C1) line",_FILE_CORRUPT_);}
-        if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(soliloquy,"site_config_index is not an integer",_VALUE_ERROR_);}
+        if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (C1) line",_FILE_CORRUPT_);}
+        if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"site_config_index is not an integer",_VALUE_ERROR_);}
         l_supercell_sets.back().m_psc_set.back().m_site_config_index=(unsigned long long int)aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(vtokens.back()));
         //degeneracy
         l_supercell_sets.back().m_psc_set.back().m_degeneracy=1;
-        if(iline+1>vlines.size()-1){throw aurostd::xerror(soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
-        if(!aurostd::substring2bool(vlines[iline+1],"DG=")){throw aurostd::xerror(soliloquy,"DG= is not present in POSCAR title line",_FILE_CORRUPT_);}
+        if(iline+1>vlines.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
+        if(!aurostd::substring2bool(vlines[iline+1],"DG=")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DG= is not present in POSCAR title line",_FILE_CORRUPT_);}
         aurostd::string2tokens(vlines[iline+1],vtokens," ");
         for(uint i=0;i<vtokens.size();i++){
           if(aurostd::substring2bool(vtokens[i],"DG=")){
             aurostd::string2tokens(vtokens[i],vtokens2,"=");
-            if(vtokens2.size()!=2){throw aurostd::xerror(soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_FILE_CORRUPT_);}
-            if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
+            if(vtokens2.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_FILE_CORRUPT_);}
+            if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
             l_supercell_sets.back().m_psc_set.back().m_degeneracy*=(unsigned long long int)aurostd::string2utype<int>(vtokens2[1]); //backwards compatible with old pocc scheme, but this should be obsolete
           }
         }
@@ -561,14 +561,14 @@ namespace pocc {
         pocc_directory_abs=vlines[iline];
         aurostd::StringSubst(pocc_directory_abs,"[VASP_POSCAR_MODE_EXPLICIT]START.","");
         aurostd::string2tokens(pocc_directory_abs,vtokens,"_");  //POCC_01_01_H0C0
-        if(vtokens.size()!=4){throw aurostd::xerror(soliloquy,"Unknown POcc hash format (_)",_FILE_CORRUPT_);}
-        if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(soliloquy,"Cannot determine POcc degeneracy index",_VALUE_ILLEGAL_);}
+        if(vtokens.size()!=4){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown POcc hash format (_)",_FILE_CORRUPT_);}
+        if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc degeneracy index",_VALUE_ILLEGAL_);}
         if(aurostd::string2utype<int>(vtokens[2])==1){
           arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[3];
           m_ARUN_directories.push_back(arun_directory);
           pocc_directory_abs=m_aflags.Directory+"/"+arun_directory;
           if(LDEBUG){cerr << soliloquy << " pocc_directory_abs=" << pocc_directory_abs << endl;}
-          if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_NOT_FOUND_);}
+          if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_NOT_FOUND_);}
           //m_ARUN_directories.push_back(pocc_directory_abs); //do not save full path
         }
         //debug
@@ -610,26 +610,26 @@ namespace pocc {
         l_supercell_sets.back().m_psc_set.push_back(POccSuperCell());
         //hnf_matrix
         aurostd::string2tokens(vlines[iline],vtokens,"H");
-        if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (H1) line",_FILE_CORRUPT_);}
+        if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H1) line",_FILE_CORRUPT_);}
         aurostd::string2tokens(vtokens.back(),vtokens2,"C");
-        if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (H2) line",_FILE_CORRUPT_);}
-        if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
+        if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H2) line",_FILE_CORRUPT_);}
+        if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
         l_supercell_sets.back().m_psc_set.back().m_hnf_index=(unsigned long long int)aurostd::string2utype<int>(vtokens2[0]);
         //site_configuration
         aurostd::string2tokens(vlines[iline],vtokens,"C");
-        if(vtokens.size()<=1){throw aurostd::xerror(soliloquy,"Unknown START.POCC_ (C1) line",_FILE_CORRUPT_);}
-        if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(soliloquy,"site_config_index is not an integer",_VALUE_ILLEGAL_);}
+        if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (C1) line",_FILE_CORRUPT_);}
+        if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"site_config_index is not an integer",_VALUE_ILLEGAL_);}
         l_supercell_sets.back().m_psc_set.back().m_site_config_index=(unsigned long long int)aurostd::string2utype<int>(aurostd::RemoveWhiteSpaces(vtokens.back()));
         //degeneracy
         l_supercell_sets.back().m_psc_set.back().m_degeneracy=1;
-        if(iline+1>vlines.size()-1){throw aurostd::xerror(soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
-        if(!aurostd::substring2bool(vlines[iline+1],"DG=")){throw aurostd::xerror(soliloquy,"DG= is not present in POSCAR title line",_FILE_CORRUPT_);}
+        if(iline+1>vlines.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
+        if(!aurostd::substring2bool(vlines[iline+1],"DG=")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DG= is not present in POSCAR title line",_FILE_CORRUPT_);}
         aurostd::string2tokens(vlines[iline+1],vtokens," ");
         for(uint i=0;i<vtokens.size();i++){
           if(aurostd::substring2bool(vtokens[i],"DG=")){
             aurostd::string2tokens(vtokens[i],vtokens2,"=");
-            if(vtokens2.size()!=2){throw aurostd::xerror(soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_FILE_CORRUPT_);}
-            if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
+            if(vtokens2.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_FILE_CORRUPT_);}
+            if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
             l_supercell_sets.back().m_psc_set.back().m_degeneracy*=(unsigned long long int)aurostd::string2utype<int>(vtokens2[1]); //backwards compatible with old pocc scheme, but this should be obsolete
           }
         }
@@ -640,7 +640,7 @@ namespace pocc {
         m_ARUN_directories.push_back(arun_directory);
         pocc_directory_abs=m_aflags.Directory+"/"+arun_directory;
         if(LDEBUG){cerr << soliloquy << " pocc_directory_abs=" << pocc_directory_abs << endl;}
-        if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_CORRUPT_);}
+        if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_CORRUPT_);}
         //m_ARUN_directories.push_back(pocc_directory_abs); //do not save full path
         //debug
         if(LDEBUG){
@@ -668,8 +668,8 @@ namespace pocc {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
-    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
 
     xQMVASP qmvasp;
     int isupercell=0;
@@ -681,11 +681,11 @@ namespace pocc {
       if(LDEBUG){cerr << soliloquy << " look at pocc_directory_abs=" << pocc_directory_abs << endl;}
       //energy_dft
       qmvasp_filename=pocc_directory_abs+"/"+DEFAULT_AFLOW_QMVASP_OUT;
-      if(!aurostd::EFileExist(qmvasp_filename,qmvasp_filename)){throw aurostd::xerror(soliloquy,"No qmvasp file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
+      if(!aurostd::EFileExist(qmvasp_filename,qmvasp_filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No qmvasp file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
       qmvasp.GetPropertiesFile(qmvasp_filename);
       (*it).m_energy_dft=qmvasp.H_atom_static;
       if((*it).m_energy_dft==AUROSTD_NAN){(*it).m_energy_dft=qmvasp.H_atom_relax;}
-      if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_FILE_CORRUPT_);}
+      if((*it).m_energy_dft==AUROSTD_NAN){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No H_atom found in qmvasp [dir="+pocc_directory_abs+"]",_FILE_CORRUPT_);}
       //energy_dft_ground
       if((*it).m_energy_dft<m_energy_dft_ground){
         m_energy_dft_ground=(*it).m_energy_dft;
@@ -705,10 +705,10 @@ namespace pocc {
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " temperature=" << temperature << endl;}
-    if(l_supercell_sets.size()==0){throw aurostd::xerror(soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
-    if(m_energy_dft_ground==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"m_energy_dft_ground not set",_RUNTIME_ERROR_);}
+    if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
+    if(m_energy_dft_ground==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_energy_dft_ground not set",_RUNTIME_ERROR_);}
     
-    if(std::signbit(temperature)){throw aurostd::xerror(soliloquy,"Negative temperature found",_VALUE_ILLEGAL_);}
+    if(std::signbit(temperature)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative temperature found",_VALUE_ILLEGAL_);}
     if(aurostd::isequal(temperature,0.0)){
       temperature=_ZERO_TOL_; //1e-6;
       message << "Converting T=0 -> T=" << temperature << " for Boltzmann probabilities";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //WARNING
@@ -728,14 +728,14 @@ namespace pocc {
       prob_total+=(*it).m_probability;
       if(LDEBUG){cerr << soliloquy << " prob[isupercell=" << isupercell << "]=" << (*it).m_probability << endl;}
     }
-    if(!aurostd::isequal(prob_total,1.0)){throw aurostd::xerror(soliloquy,"prob_total != 1.0",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(prob_total,1.0)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"prob_total != 1.0",_RUNTIME_ERROR_);}
   }
 
   void POccCalculator::setEFA(){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="POccCalculator::getEFA():";
     
-    if(l_supercell_sets.size()==0){throw aurostd::xerror(soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
+    if(l_supercell_sets.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"l_supercell_sets.size()==0",_RUNTIME_ERROR_);}
     xvector<double> v_dg(l_supercell_sets.size()),v_energies(l_supercell_sets.size());
     int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
@@ -758,8 +758,8 @@ namespace pocc {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
-    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
     
     setPOccStructureProbabilities(temperature);
     
@@ -770,7 +770,7 @@ namespace pocc {
     bool metal_found=false,insulator_found=false;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
-      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/DOSCAR.static",DOSCAR_file)){throw aurostd::xerror(soliloquy,"DOSCAR.static not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/DOSCAR.static",DOSCAR_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DOSCAR.static not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
       message << "Processing xDOSCAR of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       xdoscar.GetPropertiesFile(DOSCAR_file);
       message << "xDOSCAR read";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
@@ -797,27 +797,27 @@ namespace pocc {
       }else{ //check that all dimensions match
         //these are VERY important checks, make sure venergyEf can be ensemble averaged
         //otherwise none of the properties can be averaged (comparing values at two different energies)
-        if(m_xdoscar.energy_max!=xdoscar.energy_max){throw  aurostd::xerror(soliloquy,"m_xdoscar.energy_max!=xdoscar.energy_max",_INDEX_MISMATCH_);}
-        if(m_xdoscar.energy_min!=xdoscar.energy_min){throw  aurostd::xerror(soliloquy,"m_xdoscar.energy_min!=xdoscar.energy_min",_INDEX_MISMATCH_);}
-        if(m_xdoscar.number_energies!=xdoscar.number_energies){throw  aurostd::xerror(soliloquy,"m_xdoscar.number_energies!=xdoscar.number_energies",_INDEX_MISMATCH_);}
+        if(m_xdoscar.energy_max!=xdoscar.energy_max){throw  aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.energy_max!=xdoscar.energy_max",_INDEX_MISMATCH_);}
+        if(m_xdoscar.energy_min!=xdoscar.energy_min){throw  aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.energy_min!=xdoscar.energy_min",_INDEX_MISMATCH_);}
+        if(m_xdoscar.number_energies!=xdoscar.number_energies){throw  aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.number_energies!=xdoscar.number_energies",_INDEX_MISMATCH_);}
         
-        if(m_xdoscar.venergy.size()!=xdoscar.venergy.size()){throw aurostd::xerror(soliloquy,"m_xdoscar.venergy.size()!=xdoscar.venergy.size()",_INDEX_MISMATCH_);}
-        if(m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()){throw aurostd::xerror(soliloquy,"m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()",_INDEX_MISMATCH_);}
-        if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){throw aurostd::xerror(soliloquy,"m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()",_INDEX_MISMATCH_);}
+        if(m_xdoscar.venergy.size()!=xdoscar.venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.venergy.size()!=xdoscar.venergy.size()",_INDEX_MISMATCH_);}
+        if(m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.venergyEf.size()!=xdoscar.venergyEf.size()",_INDEX_MISMATCH_);}
+        if(m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.viDOS.size()!=xdoscar.viDOS.size()",_INDEX_MISMATCH_);}
         for(uint ispin=0;ispin<m_xdoscar.viDOS.size();ispin++){
-          if(m_xdoscar.viDOS[ispin].size()!=xdoscar.viDOS[ispin].size()){throw aurostd::xerror(soliloquy,"m_xdoscar.viDOS[ispin].size()!=xdoscar.viDOS[ispin].size()",_INDEX_MISMATCH_);}
+          if(m_xdoscar.viDOS[ispin].size()!=xdoscar.viDOS[ispin].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.viDOS[ispin].size()!=xdoscar.viDOS[ispin].size()",_INDEX_MISMATCH_);}
         }
-        if(m_xdoscar.vDOS.size()!=xdoscar.vDOS.size()){throw aurostd::xerror(soliloquy,"m_xdoscar.vDOS.size()!=xdoscar.vDOS.size()",_INDEX_MISMATCH_);}
+        if(m_xdoscar.vDOS.size()!=xdoscar.vDOS.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS.size()!=xdoscar.vDOS.size()",_INDEX_MISMATCH_);}
         for(uint iatom=0;iatom<m_xdoscar.vDOS.size();iatom++){
-          if(m_xdoscar.vDOS[iatom].size()!=xdoscar.vDOS[iatom].size()){throw aurostd::xerror(soliloquy,"m_xdoscar.vDOS[iatom].size()!=xdoscar.vDOS[iatom].size()",_INDEX_MISMATCH_);}
+          if(m_xdoscar.vDOS[iatom].size()!=xdoscar.vDOS[iatom].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS[iatom].size()!=xdoscar.vDOS[iatom].size()",_INDEX_MISMATCH_);}
           for(uint iorbital=0;iorbital<m_xdoscar.vDOS[iatom].size();iorbital++){
-            if(m_xdoscar.vDOS[iatom][iorbital].size()!=xdoscar.vDOS[iatom][iorbital].size()){throw aurostd::xerror(soliloquy,"m_xdoscar.vDOS[iatom][iorbital].size()!=xdoscar.vDOS[iatom][iorbital].size()",_INDEX_MISMATCH_);}
+            if(m_xdoscar.vDOS[iatom][iorbital].size()!=xdoscar.vDOS[iatom][iorbital].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS[iatom][iorbital].size()!=xdoscar.vDOS[iatom][iorbital].size()",_INDEX_MISMATCH_);}
             for(uint ispin=0;ispin<m_xdoscar.vDOS[iatom][iorbital].size();ispin++){
-              if(m_xdoscar.vDOS[iatom][iorbital][ispin].size()!=xdoscar.vDOS[iatom][iorbital][ispin].size()){throw aurostd::xerror(soliloquy,"m_xdoscar.vDOS[iatom][iorbital][ispin].size()!=xdoscar.vDOS[iatom][iorbital][ispin].size()",_INDEX_MISMATCH_);}
+              if(m_xdoscar.vDOS[iatom][iorbital][ispin].size()!=xdoscar.vDOS[iatom][iorbital][ispin].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS[iatom][iorbital][ispin].size()!=xdoscar.vDOS[iatom][iorbital][ispin].size()",_INDEX_MISMATCH_);}
             }
           }
         }
-        if(m_Egap.size()!=xdoscar.Egap.size()){throw aurostd::xerror(soliloquy,"m_Egap.size()!=xdoscar.Egap.size()",_INDEX_MISMATCH_);}
+        if(m_Egap.size()!=xdoscar.Egap.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_Egap.size()!=xdoscar.Egap.size()",_INDEX_MISMATCH_);}
       }
       
       //these are all VECTORS and not xvectors, if we change in the future, this can be reduced by ienergy for loop
@@ -909,7 +909,7 @@ namespace pocc {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="POccCalculator::calculateSTATICProperties():";
     
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
     bool found_all_OUTCARs=true;
     for(uint isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_OUTCARs==true;isupercell++){
@@ -931,7 +931,7 @@ namespace pocc {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
     
     aurostd::xoption cmdline_opts, plot_opts;
     cmdline_opts.push_attached("PLOT_DOS", m_aflags.Directory);
@@ -1062,8 +1062,8 @@ namespace pocc {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
-    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
     
     bool found_all_QMVASPs=true;
     for(uint isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_QMVASPs==true;isupercell++){
@@ -1086,18 +1086,18 @@ namespace pocc {
     string soliloquy="POccCalculator::getVTemperatures():";
 
     if(LDEBUG){cerr << soliloquy << " temp_string=" << temp_string << endl;}
-    if(temp_string.empty()){throw aurostd::xerror(soliloquy,"temp_string.empty()",_INPUT_ILLEGAL_);}
+    if(temp_string.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temp_string.empty()",_INPUT_ILLEGAL_);}
 
     vector<string> tokens;
     if(aurostd::substring2bool(temp_string,":")){aurostd::string2tokens(temp_string,tokens,":");}
     else if(aurostd::substring2bool(temp_string,"-")){aurostd::string2tokens(temp_string,tokens,"-");}
     else{tokens.push_back(temp_string);}
     
-    if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
+    if(tokens.size()<1 || tokens.size()>3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown temp_string format",_INPUT_ILLEGAL_);}
 
     vector<double> dtokens;
     for(uint i=0;i<tokens.size();i++){
-      if(!aurostd::isfloat(tokens[i])){throw aurostd::xerror(soliloquy,"temp_string token[i="+tokens[i]+"] is not a float",_INPUT_ILLEGAL_);} //check that all doubles
+      if(!aurostd::isfloat(tokens[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temp_string token[i="+tokens[i]+"] is not a float",_INPUT_ILLEGAL_);} //check that all doubles
       dtokens.push_back(aurostd::string2utype<double>(tokens[i]));
     }
 
@@ -1107,11 +1107,11 @@ namespace pocc {
     double interval=100.0;
     if(dtokens.size()==3){interval=dtokens.back();}
     for(double temp=dtokens[0];temp<=dtokens[1];temp+=interval){
-      if(std::signbit(temp)){throw aurostd::xerror(soliloquy,"Negative temperature found in temp_string",_INPUT_ILLEGAL_);}
+      if(std::signbit(temp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative temperature found in temp_string",_INPUT_ILLEGAL_);}
       vtemperatures.push_back(temp);
     }
 
-    if(vtemperatures.size()==0){throw aurostd::xerror(soliloquy,"No temperatures extracted from temp_string",_INPUT_ILLEGAL_);}
+    if(vtemperatures.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No temperatures extracted from temp_string",_INPUT_ILLEGAL_);}
 
     if(LDEBUG){
       for(uint i=0;i<vtemperatures.size();i++){
@@ -1127,7 +1127,7 @@ namespace pocc {
     string soliloquy="POccCalculator::postProcessing():";
     stringstream message;
   
-    if(!m_initialized){throw aurostd::xerror(soliloquy,"POccCalculator failed to initialized");}
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
     
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
@@ -1291,7 +1291,7 @@ namespace pocc {
   const POccSuperCell& POccSuperCellSet::getSuperCell() const {
     if(m_psc_set.size()==0){
       string soliloquy=" POccSuperCellSet::getSuperCell():";
-      throw aurostd::xerror(soliloquy,"m_psc_set.size()==0",_INDEX_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_psc_set.size()==0",_INDEX_ERROR_);
     }
     return m_psc_set[0];
   }
@@ -2097,7 +2097,7 @@ void POccCalculator::writePARTCAR() const {
   string soliloquy="POccCalculator::writePARTCAR():";
   stringstream message;
 
-  if(!m_initialized){throw aurostd::xerror(soliloquy,"POccCalculator failed to initialized");}
+  if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
 
   message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
   stringstream partcar_ss;
@@ -2848,9 +2848,9 @@ vector<UFFParamAtom> getTypes2UFFParamsMap(const vector<string>& elements){
     
     if(LDEBUG) {cerr << soliloquy << " element[i=" << i << "]=" << element << endl;}
     uff_parameters_string=getUFFParameterString(element);
-    if(uff_parameters_string.empty()){throw aurostd::xerror(soliloquy,"Unable to fetch UFF parameters (requested "+element+")");}
+    if(uff_parameters_string.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to fetch UFF parameters (requested "+element+")");}
     aurostd::string2tokens(uff_parameters_string,tokens," ");
-    if(tokens.size()!=12){throw aurostd::xerror(soliloquy,"Unexpected UFF Parameters size",_VALUE_ILLEGAL_);}
+    if(tokens.size()!=12){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected UFF Parameters size",_VALUE_ILLEGAL_);}
 
     types2uffparams_map.push_back(uffp);
     types2uffparams_map.back().symbol=tokens[0];
@@ -3067,7 +3067,7 @@ void POccCalculator::getHNFMatSiteConfig(const POccSuperCell& psc,
       return;
     }
   }
-  throw aurostd::xerror(soliloquy,"Invalid hnf site configuration indices");
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid hnf site configuration indices");
 }
 
 bool POccCalculator::areEquivalentStructures(const POccSuperCell& psc_a,const POccSuperCell& psc_b) {
@@ -3131,7 +3131,7 @@ unsigned long long int POccCalculator::runRobustStructureComparison(std::list<PO
     for(uint j=0;j<unique_structure_bins.size()&&!found_equivalent;j++){
       if(unique_structure_bins[j].size()==0){
         message << "No structure groups found";
-        throw aurostd::xerror(soliloquy,message,_VALUE_RANGE_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
       }
       if(LDEBUG) {cerr << soliloquy << " comparing structure[" << i << "] with structure[bin=" << j << ",i=" << 0 << "] (max=" << vpsc.size() << ")" << endl;}
       const POccSuperCell& psc_a=vpsc[unique_structure_bins[j][0]];
@@ -3164,7 +3164,7 @@ unsigned long long int POccCalculator::runRobustStructureComparison(std::list<PO
   }
   if(count_structures!=vpsc.size()){
     message << "count_structures == " << count_structures << " != " << vpsc.size() << " == vpsc.size()";
-    throw aurostd::xerror(soliloquy,message,_VALUE_RANGE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
   }
 
   if(unique_structure_bins.size()==1){return unique_structure_bins.size();}  //they are all equivalent as dictated by UFF
@@ -3356,7 +3356,7 @@ void POccCalculator::calculate(){
   //tests of stupidity - START
   if(!l_supercell_sets.size()){
     message << "No supercells detected by UFF. Please run calculate() to determine unique supercells";
-    throw aurostd::xerror(soliloquy,message);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
     //pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     //cerr << "probably broken pointers" << endl;
     //exit(1);
@@ -3397,7 +3397,7 @@ void POccCalculator::calculate(){
   }
   
   if(total_permutations_count!=total_degeneracy){
-    throw aurostd::xerror(soliloquy,"Unexpected degeneracy count (does not match expected total permutations count)");
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected degeneracy count (does not match expected total permutations count)");
   }
   
   message << "Resorting unique supercell order by HNF matrix/site configuration indices";
@@ -3541,7 +3541,7 @@ xstructure POccCalculator::getUniqueSuperCell(unsigned long long int i) {
   stringstream message;
 
   if(i>l_supercell_sets.size()-1){
-    throw aurostd::xerror(soliloquy,"Invalid supercell index");
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid supercell index");
   }
 
   std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();
@@ -3919,12 +3919,12 @@ void replaceRandomSitesSuperCell(
 #if _DEBUG_POCC_CLUSTER_ANALYSIS_
   if(types2pc_map.size()==0){
     message << "types2pc_map.size()==0";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
 
   if(pc2sc_map.size()==0){
     message << "pc2sc_map.size()==0";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
 #endif
 
@@ -4014,7 +4014,7 @@ void rebuildSuperCell(const xstructure& xstr_pocc,const vector<uint>& v_vacancie
 
   //make sure they are in order
   for(uint type=1;type<new_types.size();type++){
-    if(new_types[type-1]>new_types[type]){throw aurostd::xerror(soliloquy,"Error in atom types reassignment, atoms are out of order");}
+    if(new_types[type-1]>new_types[type]){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Error in atom types reassignment, atoms are out of order");}
   }
 
   //load in to new clean structure
@@ -4072,49 +4072,49 @@ void rebuildSuperCell(const xstructure& xstr_pocc,const vector<uint>& v_vacancie
     for(uint type=0;type<new_types.size();type++){
       if(type>xstr_pocc.species.size()-1){
         message << "Bad index with supercell.species[i=" << type << ">" << xstr_pocc.species.size()-1 << "=species.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species.push_back(xstr_pocc.species[type]);
       
       if(type>xstr_pocc.species_pp.size()-1){
         message << "Bad index with supercell.species_pp[i=" << type << ">" << xstr_pocc.species_pp.size()-1 << "=species_pp.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_pp.push_back(xstr_pocc.species_pp[type]);
       
       if(type>xstr_pocc.species_pp_type.size()-1){
         message << "Bad index with supercell.species_pp_type[i=" << type << ">" << xstr_pocc.species_pp_type.size()-1 << "=species_pp_type.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_pp_type.push_back(xstr_pocc.species_pp_type[type]);
       
       if(type>xstr_pocc.species_pp_version.size()-1){
         message << "Bad index with supercell.species_pp_version[i=" << type << ">" << xstr_pocc.species_pp_version.size()-1 << "=species_pp_version.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_pp_version.push_back(xstr_pocc.species_pp_version[type]);
       
       if(type>xstr_pocc.species_pp_ZVAL.size()-1){
         message << "Bad index with supercell.species_pp_ZVAL[i=" << type << ">" << xstr_pocc.species_pp_ZVAL.size()-1 << "=species_pp_ZVAL.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_pp_ZVAL.push_back(xstr_pocc.species_pp_ZVAL[type]);
       
       if(type>xstr_pocc.species_pp_vLDAU.size()-1){
         message << "Bad index with supercell.species_pp_vLDAU[i=" << type << ">" << xstr_pocc.species_pp_vLDAU.size()-1 << "=species_pp_vLDAU.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_pp_vLDAU.push_back(xstr_pocc.species_pp_vLDAU[type]);
       
       if(type>xstr_pocc.species_volume.size()-1){
         message << "Bad index with supercell.species_volume[i=" << type << ">" << xstr_pocc.species_volume.size()-1 << "=species_volume.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_volume.push_back(xstr_pocc.species_volume[type]);
       
       if(type>xstr_pocc.species_mass.size()-1){
         message << "Bad index with supercell.species_mass[i=" << type << ">" << xstr_pocc.species_mass.size()-1 << "=species_mass.size()-1], likely not properly copied over";
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
       supercell.species_mass.push_back(xstr_pocc.species_mass[type]);
     }
@@ -4130,7 +4130,7 @@ void rebuildSuperCell(const xstructure& xstr_pocc,const vector<uint>& v_vacancie
           xstr_pocc.species_volume.push_back(GetAtomVolume(xstr_pocc.species[species]));
           if(xstr_pocc.species_volume.back()==NNN){
             message << "No volume found for " << xstr_pocc.species[species];
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
         }
       }
@@ -4143,7 +4143,7 @@ void rebuildSuperCell(const xstructure& xstr_pocc,const vector<uint>& v_vacancie
           xstr_pocc.species_mass.push_back(GetAtomMass(xstr_pocc.species[species]));
           if(xstr_pocc.species_mass.back()==NNN){
             message << "No mass found for " << xstr_pocc.species[species];
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
         }
       }
@@ -4516,7 +4516,7 @@ void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
   //[NO NEED, AVASP_populateXVASP() is now const]_aflags aflags=m_aflags; //make copies
   _xvasp xvasp=in_xvasp; //[NO NEED, AVASP_populateXVASP() is now const]_kflags kflags=in_kflags;_vflags vflags=in_vflags; //make copies
 
-  if(!m_initialized){throw aurostd::xerror(soliloquy,"POccCalculator failed to initialize");}
+  if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
   writePARTCAR();
   calculateHNF();
   getTotalPermutationsCount();
@@ -4605,7 +4605,7 @@ vector<uint> getTypes2PCMap(const xstructure& xstr) {
           message << "show to have the same name (" << xstr.atoms[types2pc_map[i]].name << "). ";
           message << "Please reorganize your input by type.";
         }
-        throw aurostd::xerror(soliloquy,message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
       }
     }
   }
@@ -4633,7 +4633,7 @@ void POccCalculator::initializePOccStructure() {
   
   if(!xstr_pocc.partial_occupation_flag){
     message << "No partially occupied sites detected in this structure";
-    throw aurostd::xerror(soliloquy,message);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
   }
   
   message << "Input PARTCAR" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
@@ -4648,15 +4648,15 @@ void POccCalculator::initializePOccStructure() {
   //quick tests of stupidity
   if(xstr_pocc.species.size()==0){
     message << "xstr_pocc.species.size()==0";
-    throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
   if(xstr_pocc.species.size()!=xstr_pocc.num_each_type.size()){
     message << "xstr_pocc.species.size() != xstr_pocc.num_each_type.size()";
-    throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
   if(aurostd::StringsAlphabetic(xstr_pocc.species,false)==false){
     message << "xstr_pocc.species() not alphabetized!";
-    throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
   
   preparePOccStructure();  //first pass to prepare pocc structure, need symmetry to reshuffle atoms by equivalent sites
@@ -4823,7 +4823,7 @@ void POccCalculator::getOptimizedSiteCountConfigurations(
   //test of stupidity
   if(m_pocc_sites[site].m_pocc_groups.size()<1){
     message << "Invalid count of POCC site groups (m_pocc_sites[" << site << "].m_pocc_groups.size()=" << m_pocc_sites[site].m_pocc_groups.size() << ")";
-    throw aurostd::xerror(soliloquy,message);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
   }
   
   //if it's truly non-pocc, then there's only one m_pocc_sites[site].m_pocc_groups; 
@@ -5160,7 +5160,7 @@ xstructure createNonPOccStructure(const xstructure& xstr_pocc,const vector<POccU
           voli=GetAtomVolume(elements[j]);
           if(voli==NNN){
             message << "No volume found for " << elements[j];
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           volume+=voli*xstr_nopocc.atoms[i].partial_occupation_value;
         }
@@ -5323,7 +5323,7 @@ void POccCalculator::redecorateXStructures(){
 
   if(species.size()!=xstr_pocc.species.size()){
     message << "species.size()!=xstr_pocc.species.size()";
-    throw aurostd::xerror(soliloquy,message,_VALUE_RANGE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
   }
 
   /*
@@ -5337,9 +5337,9 @@ void POccCalculator::redecorateXStructures(){
     
     if(LDEBUG) {cerr << soliloquy << " element[i=" << i << "]=" << element << endl;}
     uff_parameters_string=getUFFParameterString(element);
-    if(uff_parameters_string.empty()){throw aurostd::xerror(soliloquy,"Unable to fetch UFF parameters (requested "+element+")");}
+    if(uff_parameters_string.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to fetch UFF parameters (requested "+element+")");}
     aurostd::string2tokens(uff_parameters_string,uff_params," ");
-    if(uff_params.size()!=12){throw aurostd::xerror(soliloquy,"Unexpected UFF Parameters size",_VALUE_ILLEGAL_);}
+    if(uff_params.size()!=12){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unexpected UFF Parameters size",_VALUE_ILLEGAL_);}
 
     //where to start tomorrow
     //we get types2uffparams_map here (poccstructure) but use in uffenergyanalyzer
@@ -5393,7 +5393,7 @@ void POccCalculator::calculateSymNonPOccStructure(bool verbose) {
   pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE_sym,*p_oss_sym,_LOGGER_MESSAGE_);
   bool sym_calculated=pflow::PerformFullSymmetry(xstr_sym,*p_FileMESSAGE_sym,m_aflags,m_kflags,osswrite,*p_oss_sym);
   if(!badbit_set){(*p_oss_sym).clear();}  //clear NULL
-  if(sym_calculated==false){throw aurostd::xerror(soliloquy,"AFLOW-SYM failed to calculate the symmetry of the clean (non-pocc'd) structure");}
+  if(sym_calculated==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLOW-SYM failed to calculate the symmetry of the clean (non-pocc'd) structure");}
 
   if(LDEBUG) {
     xstructure xstr_sym2=xstr_sym;
@@ -5513,7 +5513,7 @@ string POccCalculator::hnfTableLineOutput(int i_hnf,int str_config){
             message << "site_config.xv_occupation_multiple[pocc_group]/((double)i_hnf)=" << site_config.xv_occupation_multiple[pocc_group]/((double)i_hnf);
             message << " != ";
             message << site_config.xv_partial_occupation_value[pocc_group] << "=site_config.xv_partial_occupation_value[pocc_group]";
-            throw aurostd::xerror(soliloquy,message);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
           }
           //output - START
           tmp_ss.str("");
@@ -5560,7 +5560,7 @@ void POccCalculator::writeHNFTableOutput(int i_hnf,double& stoich_error,double& 
 
   if(v_str_configs.size()==0){
     message << "No structural configurations found";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
   
   stoich_error=v_str_configs[0].max_stoich_error; //same for all
@@ -5570,7 +5570,7 @@ void POccCalculator::writeHNFTableOutput(int i_hnf,double& stoich_error,double& 
   for(uint str_config=0;str_config<v_str_configs.size();str_config++){
     if(!v_str_configs[str_config].site_configs.size()){
       message << "No site configurations found";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     centering_padding=hnfTableLineOutput(i_hnf,str_config).size();
     break;  //get one, they are all the same
@@ -6142,14 +6142,14 @@ double POccUFFEnergyAnalyzer::getUFFBondEnergy(xstructure& xstr,vector<vector<ui
   else if(MODE==NONBOND_MODE){BondEnergy=&POccUFFEnergyAnalyzer::bondEnergyNoBond;}  //lennard-jones potential
   else {
     message << "Invalid energy mode (MODE=" << MODE << ")";
-    throw aurostd::xerror(soliloquy,message);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
   }
 
   if(LDEBUG) {cerr << soliloquy << " v_bonded_atom_indices.size()=" << v_bonded_atom_indices.size() << endl;}
 
   if(types2uffparams_map.size()==0){
     message << "types2uffparams_map.size()==0";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
 
   for(uint i=0;i<v_bonded_atom_indices.size();i++){
@@ -6192,7 +6192,7 @@ double POccUFFEnergyAnalyzer::getUFFBondEnergy(xstructure& xstr,vector<vector<ui
       message << " vs. ";
       message << "cluster atom 2 " << v_bonded_atom_indices[i][1] << " " << xstr_cluster.grid_atoms[v_bonded_atom_indices[i][1]].cpos;
       message << ")";
-      throw aurostd::xerror(soliloquy,message);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
     }
     //cerr << "OK " << xstr_cluster.grid_atoms[v_bonded_atom_indices[i][0]].cpos << " " << xstr_cluster.grid_atoms[v_bonded_atom_indices[i][1]]  << " " ;
     //cerr << "DIST " << distij <<endl;
@@ -6343,7 +6343,7 @@ double POccUFFEnergyAnalyzer::getUFFEnergy() {
     cout << "DIFF " << std::fixed << std::setprecision(15) << diff << endl;
     if(diff>=DEFAULT_UFF_ENERGY_TOLERANCE){
       message << "Difference in energy between pocc_old and pocc_new schemes is TOO large, please check.";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
     }
     cout << supercell << endl;
     //exit(0);

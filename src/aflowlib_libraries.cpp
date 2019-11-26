@@ -4780,7 +4780,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read stiffness tensor: wrong number of lines"
                     << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -4789,7 +4789,7 @@ namespace aflowlib {
               message <<  "Could not read stiffness tensor."
                       << " Wrong number of columns in line " << (i + 1)
                       << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -4812,7 +4812,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read compliance tensor: wrong number of lines"
                     << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -4822,7 +4822,7 @@ namespace aflowlib {
               message <<  "Could not read compliance tensor:"
                       << " wrong number of columns in line " << (i + 1)
                       << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5580,7 +5580,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!"<<endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(!gfound && (FILE=="DOSCAR")) {
@@ -5601,7 +5601,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(!gfound && (FILE=="POSCAR")) {
@@ -5622,7 +5622,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!"<<endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(!gfound) {
@@ -5642,7 +5642,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(LDEBUG) cerr << "vaspfile2stringstream: END" << endl;

@@ -325,10 +325,10 @@ namespace aurostd {  // namespace aurostd
   //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   void xmatrix<utype>::getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
     string soliloquy="aurostd::getmat():";
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
     int rows_out=(urow-lrow)+1;
     int cols_out=(ucol-lcol)+1;
     if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
@@ -354,10 +354,10 @@ namespace aurostd {  // namespace aurostd
   void xmatrix<utype>::setrow(const xvector<utype>& row,int irow) {  //CO191110
     return setmat(row,irow,false);
     //[OVERLOAD WITH SETMAT()]string soliloquy="aurostd::setrow():";
-    //[OVERLOAD WITH SETMAT()]if(row.lrows!=lcols){throw aurostd::xerror(soliloquy,"row.lrows!=lcols",_INPUT_ILLEGAL_);}
-    //[OVERLOAD WITH SETMAT()]if(row.urows!=ucols){throw aurostd::xerror(soliloquy,"row.urows!=ucols",_INPUT_ILLEGAL_);}
-    //[OVERLOAD WITH SETMAT()]if(irow<lrows){throw aurostd::xerror(soliloquy,"irow<lrows",_INPUT_ILLEGAL_);}
-    //[OVERLOAD WITH SETMAT()]if(irow>urows){throw aurostd::xerror(soliloquy,"irow>urows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(row.lrows!=lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"row.lrows!=lcols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(row.urows!=ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"row.urows!=ucols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(irow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"irow<lrows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(irow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"irow>urows",_INPUT_ILLEGAL_);}
     //[OVERLOAD WITH SETMAT()]for(int j=row.lrows;j<=row.urows;j++){corpus[irow][j]=row[j];}
   }
 }
@@ -368,10 +368,10 @@ namespace aurostd {  // namespace aurostd
   void xmatrix<utype>::setcol(const xvector<utype>& col,int icol) {  //CO191110
     return setmat(col,icol,true);
     //[OVERLOAD WITH SETMAT()]string soliloquy="aurostd::setcol():";
-    //[OVERLOAD WITH SETMAT()]if(col.lrows!=lrows){throw aurostd::xerror(soliloquy,"col.lrows!=lrows",_INPUT_ILLEGAL_);}
-    //[OVERLOAD WITH SETMAT()]if(col.urows!=urows){throw aurostd::xerror(soliloquy,"col.urows!=urows",_INPUT_ILLEGAL_);}
-    //[OVERLOAD WITH SETMAT()]if(icol<lcols){throw aurostd::xerror(soliloquy,"icol<lcols",_INPUT_ILLEGAL_);}
-    //[OVERLOAD WITH SETMAT()]if(icol>ucols){throw aurostd::xerror(soliloquy,"icol>ucols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(col.lrows!=lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"col.lrows!=lrows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(col.urows!=urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"col.urows!=urows",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(icol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"icol<lcols",_INPUT_ILLEGAL_);}
+    //[OVERLOAD WITH SETMAT()]if(icol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"icol>ucols",_INPUT_ILLEGAL_);}
     //[OVERLOAD WITH SETMAT()]for(int j=col.lrows;j<=col.urows;j++){corpus[j][icol]=col[j];}
   }
 }
@@ -388,10 +388,10 @@ namespace aurostd {  // namespace aurostd
       cerr << soliloquy << " urow=" << urow << endl;
       cerr << soliloquy << " ucol=" << ucol << endl;
     }
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
     for(int i=mat.lrows;i<=mat.urows;i++){
       for(int j=mat.lcols;j<=mat.ucols;j++){corpus[lrow+i-mat.lrows][lcol+j-mat.lcols]=mat[i][j];}
     }
@@ -418,10 +418,10 @@ namespace aurostd {  // namespace aurostd
       cerr << soliloquy << " lcol=" << lcol << endl;
       cerr << soliloquy << " ucol=" << ucol << endl;
     }
-    if(lrow<lrows){throw aurostd::xerror(soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+    if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+    if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+    if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+    if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
     if(col==true){
       for(int i=xv.lrows;i<=xv.urows;i++){corpus[lrow+i-xv.lrows][icol]=xv[i];}
     }else{
@@ -535,7 +535,7 @@ namespace aurostd {  // namespace aurostd
       if(!this->issquare||!b.issquare||this->rows!=b.rows)
       //{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*=: "
       //  <<  "defined only for square xmatrixes with equal dimensions " << endl;exit(0);}
-        throw aurostd::xerror("xmatrix<utype>::operator *=():","failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO191112
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xmatrix<utype>::operator *=():","failure in operator*=: defined only for square xmatrixes with equal dimensions",_INPUT_ILLEGAL_);  //CO191112
 
       xmatrix<utype> a(this->urows,this->ucols,this->lrows,this->lcols);
       int i=0,j=0,k=0,ii=0,jj=0,kk=0;
@@ -1346,7 +1346,7 @@ namespace aurostd {                   // conversion to xvector
       xvector<utype> xv((urow-lrow)+1,lrows_out);
       for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[lcol][i];}
       return xv;
-    }else{throw aurostd::xerror(soliloquy,"cannot create 2D xvector",_INPUT_ILLEGAL_);}
+    }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot create 2D xvector",_INPUT_ILLEGAL_);}
     return xvector<utype>(0);
   }
 }
@@ -1522,8 +1522,8 @@ namespace aurostd { // namespace aurostd
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       string soliloquy="aurostd::getRotationMatrix3D():";
       //tests of stupidity
-      if(a.rows!=3){throw aurostd::xerror(soliloquy,"a.rows!=3",_INPUT_ILLEGAL_);}
-      if(b.rows!=3){throw aurostd::xerror(soliloquy,"b.rows!=3",_INPUT_ILLEGAL_);}
+      if(a.rows!=3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a.rows!=3",_INPUT_ILLEGAL_);}
+      if(b.rows!=3){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"b.rows!=3",_INPUT_ILLEGAL_);}
       if(LDEBUG){
         cerr << soliloquy << " a=" << a << endl;
         cerr << soliloquy << " b=" << b << endl;
@@ -3243,7 +3243,7 @@ namespace aurostd {
     // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
 
     string soliloquy="aurostd::QRDecomposition_HouseHolder():";
-    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
+    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
 
     R=mat_orig; //reset
 
@@ -3312,7 +3312,7 @@ namespace aurostd {
       for (int i = R.lrows; i <= R.urows; i++) {Q(i, k) = ek(i, ek.lcols);}
     }
 
-    if(!aurostd::isequal(mat_orig,Q*R)){throw aurostd::xerror(soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(mat_orig,Q*R)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
   }
 }
 
