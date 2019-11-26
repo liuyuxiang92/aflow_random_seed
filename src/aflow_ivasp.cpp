@@ -214,7 +214,7 @@ namespace KBIN {
   }
   string VASP_PseudoPotential_CleanName_190101(const string& speciesIN) {
     string species=speciesIN;
-    uint i,imax=2;
+    uint i=1,imax=2;
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_GW");  //CO190712
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_new");  //CO190712
     for(i=1;i<=imax;i++) species=aurostd::RemoveSubStringFirst(species,"_AE");  //CO190712
@@ -5720,4 +5720,3 @@ namespace KBIN {
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
 // *                                                                         *
 // ***************************************************************************
-
