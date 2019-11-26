@@ -1,5 +1,10 @@
 3.1.228 - 2019/11/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- Fixed bug in xDOSCAR reader error detection. (ME)
+        -- Additional web output for entry page applets. (ME)
+        -- Fixed bug that prevented LDA+U parameters from being passed into ARUN aflow.ins. (ME)
+        -- Added ael_stiffness_tensor and ael_compliance_tensor to aentry. (ME)
+        -- Fixed bug that prevented AGL from running during LIB2LIB. (ME)
         -- patching warning for writing aflow.rc, only issue if it was written, should fix www-data (CO)
         -- added xQMVASP (CO)
         -- force signed distance for hull formation enthalpy (CO)
