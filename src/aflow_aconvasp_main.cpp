@@ -3216,10 +3216,7 @@ namespace pflow {
     string soliloquy="pflow::BANDGAP():";  //CO191110
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     string input=aurostd::RemoveWhiteSpaces(vpflow.getattachedscheme("BANDGAP"));
-    if(input.empty()){
-      init::ErrorOption(cout,vpflow.getattachedscheme("BANDGAP"),"pflow::BANDGAP","aflow --bandgap[=bands_directory1[,bands_directory2,...]]");
-      exit(0);
-    } 
+    if(input.empty()){throw aurostd::xerror(soliloquy,"input empty",_INPUT_MISSING_);}
     vector<string> dirs;
     aurostd::string2tokens(input,dirs,",");
     for(uint i=0;i<dirs.size();i++){
@@ -3232,10 +3229,7 @@ namespace pflow {
     string soliloquy="pflow::BANDGAP_DOS()";
     stringstream message;
     string input=aurostd::RemoveWhiteSpaces(vpflow.getattachedscheme("BANDGAPDOS"));
-    if(input.empty()){
-      init::ErrorOption(cout,vpflow.getattachedscheme("BANDGAPDOS"),"pflow::BANDGAP_DOS","aflow --bandgap_dos[=bands_directory1[,bands_directory2,...]]");
-      exit(0);
-    } 
+    if(input.empty()){throw aurostd::xerror(soliloquy,"input empty",_INPUT_MISSING_);}
     vector<string> dirs;
     aurostd::string2tokens(input,dirs,",");
     for(uint i=0;i<dirs.size();i++){
