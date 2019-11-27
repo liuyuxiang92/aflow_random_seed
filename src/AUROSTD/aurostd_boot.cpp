@@ -57,7 +57,7 @@ using aurostd::_real;
 using aurostd::jacobi;
 using aurostd::eigsrt;
 using aurostd::tred2;
-using aurostd::generalHouseHolderQRDecomposition;
+using aurostd::QRDecomposition_HouseHolder; //CO191110
 using aurostd::tqli;
 using aurostd::balanc;
 using aurostd::elmhes;
@@ -165,9 +165,10 @@ template<class utype> bool initialize_xcomplex(utype d) {
 
 template<class utype> bool initialize_eigenproblems(utype x) {
   aurostd::xvector<utype> v(3);v[1]=x;
-  aurostd::xmatrix<utype> m(3,3);m[1][1]=x;
+  aurostd::xmatrix<utype> m(3,3),q(3,3),r(3,3);m[1][1]=x; //CO191110
   int i=0;i+=jacobi(m,v,m);
-  eigsrt(v,m);generalHouseHolderQRDecomposition(m);tred2(m,v,v);tqli(v,v,m);balanc(m);elmhes(m);hqr(m,v,v);eigen(m,v,v); // EIGENVECTORS
+  eigsrt(v,m);QRDecomposition_HouseHolder(m,q,r); //CO191110
+  tred2(m,v,v);tqli(v,v,m);balanc(m);elmhes(m);hqr(m,v,v);eigen(m,v,v); // EIGENVECTORS
   return TRUE;
 }
 
@@ -258,9 +259,11 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   utype* mstar;mstar=NULL;
   aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);
-  vv=m.getcol(1);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y
+  vv=m.getcol(1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y  //CO191110
+  m*=(utype)5;m/=(utype)6;  //CO190911
+  m.getmat(m,1,1,1,1,1,1);m.getmat(vv,1,1,1,1,1,1); //CO190911
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO190329 - clang doesn't like x=x, changing to x=y
-  o+=sum(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x);
+  o+=sum(m);o+=modulus(m);o+=modulussquare(m);o+=modulus2(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x); //CO191110
   o+=isequal(m,m);o+=isequal(m,m,x);cout<<m<<endl;
   roundoff(m);roundoff(m,x);m=exp(m);aurostd::abs(m);o+=max(m);xdouble(v);xint(v);
   m.clear();m.set(x);m.reset();m.reset();clear(m);reset(m);clear(m);set(m,x);abs(m);mabs(m);

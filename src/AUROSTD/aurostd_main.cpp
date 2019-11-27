@@ -639,6 +639,18 @@ namespace aurostd {
     return std::tolower(in);
   }
   
+  // ***************************************************************************
+  // Function getPWD()
+  // ***************************************************************************
+  // a function to get current directory
+  string getPWD(){  //CO191112
+    //old way also needs PATH_LENGTH_MAX, not good for current LONG pocc directories
+    //[old way - need to convert char array -> string]const int PATH_LENGTH_MAX=1024;
+    //[old way - need to convert char array -> string]char work_dir[PATH_LENGTH_MAX];
+    //[old way - need to convert char array -> string]getcwd(work_dir, PATH_LENGTH_MAX); 
+    
+    return aurostd::execute2string("pwd"); //XHOST.command("pwd") ?
+  }
 
   // ***************************************************************************
   // Function GetNumFields
@@ -1702,10 +1714,10 @@ namespace aurostd {
     //Corey Oses
     //Decompresses file to temp file, and return its path
     //SAFE: Will return FileNameIn if compression not needed
-    string FileNameIN = aurostd::CleanFileName(_FileNameIN);
-    if((!aurostd::FileExist(FileNameIN)) || aurostd::FileEmpty(FileNameIN)) {
+    string FileNameIN="";
+    if(!(aurostd::FileExist(_FileNameIN,FileNameIN) || aurostd::EFileExist(_FileNameIN,FileNameIN))) {  //CO191110 - get FileNameIN from functions
       cerr << endl;
-      cerr << "ERROR - aurostd::efile2tempfile: file=" << FileNameIN << " not present/is empty !" << endl;
+      cerr << "ERROR - aurostd::efile2tempfile: file=" << _FileNameIN << " not present !" << endl;  ///is empty
       cerr << endl;
       return FALSE;
     }
@@ -1966,7 +1978,8 @@ namespace aurostd {
   // ***************************************************************************
   // Corey Oses
   // tells you if the compressed variant exists
-  bool EFileExist(const string& FileName, string& FileNameOut){
+  bool EFileExist(const string& _FileName, string& FileNameOut){
+    string FileName=aurostd::CleanFileName(_FileName); //CO191110
     if(FileExist(FileName+".xz")) {FileNameOut=FileName+".xz";return TRUE;}
     if(FileExist(FileName+".bz2")) {FileNameOut=FileName+".bz2";return TRUE;}
     if(FileExist(FileName+".gz")) {FileNameOut=FileName+".gz";return TRUE;}
@@ -2024,6 +2037,16 @@ namespace aurostd {
   bool FileNotEmpty(const string& FileName) {
     return !FileEmpty(FileName);
   }
+  bool EFileEmpty(const string& FileName) {  //CO190808
+    string decompressed_file=""; //CO190808
+    efile2tempfile(FileName,decompressed_file);  //CO190808
+    bool fileempty=FileEmpty(decompressed_file);
+    RemoveFile(decompressed_file);
+    return fileempty;
+  }
+  bool EFileNotEmpty(const string& FileName) {  //CO190808
+    return !EFileEmpty(FileName);
+  }
 
   // ***************************************************************************
   // Function FileModificationTime
@@ -2054,7 +2077,7 @@ namespace aurostd {
     if (!infile.is_open()) {
       string function = "aurostd::getFileCheckSum()";
       string message = "Cannot open file " + filename + ".";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 
     // Get file length
@@ -3212,35 +3235,39 @@ namespace aurostd {
   // write string to file - Stefano Curtarolo
   bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& _file,string mode) {
     string file=aurostd::CleanFileName(_file);
+    bool writeable=true;  //CO190808 - captures whether we can open/write file
     if(mode=="POST" || mode=="APPEND") {
       stringstream FileINPUT;
       aurostd::file2stringstream(file,FileINPUT);
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
+      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return TRUE;  // return FALSE if something got messed up
+      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }
     if(mode=="PRE") {
       stringstream FileINPUT;
       aurostd::file2stringstream(file,FileINPUT);
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
+      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT << FileINPUT.str();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return TRUE;  // return FALSE if something got messed up
+      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }
     if(mode=="WRITE" || mode=="") {
       ofstream FileOUTPUT;
       FileOUTPUT.open(file.c_str(),std::ios::out);
+      writeable=FileOUTPUT.is_open(); //CO190808 - captures whether we can open/write file
       FileOUTPUT << StringstreamOUTPUT.str();
       // FileOUTPUT << StringstreamOUTPUT.rdbuf();
       FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-      return TRUE;  // return FALSE if something got messed up
+      return writeable; //TRUE;  // return FALSE if something got messed up //CO190808 - captures whether we can open/write file
     }   
     return FALSE;
   }
@@ -3399,8 +3426,9 @@ namespace aurostd {
     return StringIN.length();  // return 0 if something got messed up
   }
   //CO - END
-  uint efile2string(string _FileNameIN,string& StringIN) {
-    string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //corey
+  uint efile2string(const string& FileNameIN,string& StringIN) {
+    //[CO190808 - OBSOLETE, we clean inside FileExist()]string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //corey
+    string FileNameOUT=""; //CO191110
     // cerr << "efile2string; BEGIN FileNameIN=[" << FileNameIN << "]" << endl;
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       // cerr << "ERROR - aurostd::efile2string: file=" << FileNameIN << " not present !" << endl;
@@ -5031,7 +5059,7 @@ namespace aurostd {
     } //DX 20180726 - added
     else {
       message << "Could not find hard-coded fraction for the double " << a << ".";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
     }
     if(sign_prefix){
       if(neg == true) {

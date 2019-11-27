@@ -1945,7 +1945,7 @@ namespace slab {
             newatom.type=k-1;	//CO 180724 - assign type needed for AddAtom()
             specie=str_in.SpeciesLabel(k-1);	//CO 180724 - this should be NON-empty as per assigning_fake_names above
             if(specie.empty() || aurostd::substring2bool(specie,"name not given")){
-              throw aurostd::xerror(soliloquy,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO 180724
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO 180724
             }
             newatom.name=specie;         //CO 180724 - assign name needed for AddAtom()
             newatom.name_is_given=TRUE;  //CO 180724 - assign name needed for AddAtom()
@@ -2122,7 +2122,7 @@ bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xve
   for(int i=dhkl_frac.lrows;i<=dhkl_frac.urows;i++){
     if(abs(dhkl_frac[i])>zero_tol && abs(dhkl_frac[i])<abs(min)){min=dhkl_frac[i];}
   }
-  if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
+  if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
   dhkl_frac/=min;
   if(LDEBUG) {cerr << soliloquy << " dhkl_frac=" << dhkl_frac << endl;}
 
@@ -2136,7 +2136,7 @@ bool Normal2HKLPlane(const xmatrix<double>& lattice,const xvector<double>& n,xve
     if(aurostd::isinteger(dhkl,zero_tol)){found=true;break;}
   }
   if(!found){
-    //throw aurostd::xerror(soliloquy,"Could not find valid hkl",_VALUE_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not find valid hkl",_VALUE_ERROR_);
     return false;
   }
 
@@ -2163,7 +2163,7 @@ vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,co
   string soliloquy="surface::getHKLPlaneIntercepts():";
   stringstream message;
 
-  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
+  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
   if(LDEBUG){cerr << soliloquy << " hkl=" << hkl << endl;}
   
   xmatrix<double> f2c=trasp(lattice);
@@ -2238,16 +2238,16 @@ vector<xvector<double> > getHKLPlaneIntercepts(const xmatrix<double>& lattice,co
     cerr << soliloquy << " v3=" << v3 << endl;
   }
   xvector<double> fpos;
-  fpos=c2f*v1;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(soliloquy,"v1 is not a Bravais lattice",_INPUT_ERROR_);}
-  fpos=c2f*v2;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(soliloquy,"v2 is not a Bravais lattice",_INPUT_ERROR_);}
-  fpos=c2f*v3;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(soliloquy,"v3 is not a Bravais lattice",_INPUT_ERROR_);}
+  fpos=c2f*v1;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v1 is not a Bravais lattice",_INPUT_ERROR_);}
+  fpos=c2f*v2;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v2 is not a Bravais lattice",_INPUT_ERROR_);}
+  fpos=c2f*v3;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v3 is not a Bravais lattice",_INPUT_ERROR_);}
 
   //check that normal is orthogonal with vectors created
   xvector<double> n=HKLPlane2Normal(lattice,hkl);
   if(LDEBUG){cerr << soliloquy << " n=" << n << endl;}
-  if(!aurostd::isequal(aurostd::scalar_product(n,v1),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n,v1) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::scalar_product(n,v2),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n,v2) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::scalar_product(n,v3),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n,v3) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
+  if(!aurostd::isequal(aurostd::scalar_product(n,v1),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+  if(!aurostd::isequal(aurostd::scalar_product(n,v2),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+  if(!aurostd::isequal(aurostd::scalar_product(n,v3),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
 
   return intercepts;
 }
@@ -2424,7 +2424,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
   }
   if(starting_atom==AUROSTD_MAX_UINT){
     if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}
-    else{throw aurostd::xerror(soliloquy,"Cannot find starting atom",_INPUT_ERROR_);}
+    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find starting atom",_INPUT_ERROR_);}
   }
   if(LDEBUG){cerr << soliloquy << " fpos_starting matches atom[" << starting_atom << "]" << endl;}
   if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::withinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
@@ -2502,7 +2502,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
         cerr << "dist=" << dist_rorigin_new << "], ";
         cerr << "cpos_final=" << cpos_final << endl;
       }
-      if(!aurostd::isequal(dist_rorigin_new,0.0,sym_eps)){throw aurostd::xerror(soliloquy,"Mismatch between atom.fpos and fpos_final",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(dist_rorigin_new,0.0,sym_eps)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Mismatch between atom.fpos and fpos_final",_RUNTIME_ERROR_);}
       atoms2skip.push_back(ind_min);
       //[CO190520 - safe-guard for working in fractional space (skew)]return atoms[ind_min].fpos;
       return cpos_final;
@@ -2530,7 +2530,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
           !(aurostd::isequal(line_plane_intersection_fpos_BIC[1],0.0) || 
             aurostd::isequal(line_plane_intersection_fpos_BIC[2],0.0) ||
             aurostd::isequal(line_plane_intersection_fpos_BIC[3],0.0))
-        ){throw aurostd::xerror(soliloquy,"Line did not intersect plane",_RUNTIME_ERROR_);}
+        ){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Line did not intersect plane",_RUNTIME_ERROR_);}
       if(LDEBUG){
         cerr << soliloquy << " v_line_plane_intersect[i=" << i << "]=" << v_line_plane_intersect[i];
         cerr << ", v_d[i=" << i << "]=" << v_d[i]  << endl;
@@ -2557,7 +2557,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
       }
     }
 
-    if(ind_min==AUROSTD_MAX_UINT){throw aurostd::xerror(soliloquy,"Cannot find intersecting plane",_RUNTIME_ERROR_);}
+    if(ind_min==AUROSTD_MAX_UINT){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find intersecting plane",_RUNTIME_ERROR_);}
 
     //[CO190520 - do NOT take FPOSDistance(), we do not want to minimize vector]cpos_final += aurostd::modulus(f2c*SYM::FPOSDistance(fpos_current,v_line_plane_intersection_fpos[ind_min],lattice,c2f,f2c,skew)) + sym_eps;
     
@@ -2602,7 +2602,7 @@ xvector<double> getNextAtomInPath(const xstructure& xstr_in,const xvector<double
     loop_iteration++;
   }
 
-  throw aurostd::xerror(soliloquy,"Cannot find next atom",_RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find next atom",_RUNTIME_ERROR_);
   //[CO190520 - safe-guard for working in fractional space (skew)]return fpos_current;
   return cpos_final;
 }
@@ -2617,7 +2617,7 @@ double getDistanceBetweenImages(const xstructure& xstr_in,const xvector<double>&
   if(distanceBetweenImages_HKL(xstr_in,n_cpos,dist,outside_cell)){return dist;}
   if(distanceBetweenImages_Tracing(xstr_in,n_cpos,dist,outside_cell)){return dist;}
 
-  throw aurostd::xerror(soliloquy,"Cannot find distance between images",_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find distance between images",_INPUT_ERROR_);
   return dist;
 }
 bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& n_cpos,double& distance_between_images,bool outside_cell){ //CO190320
@@ -2630,7 +2630,7 @@ bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& 
     cerr << soliloquy << " xstr_in" << endl;cerr << xstr_in << endl;
     cerr << soliloquy << " n_cpos" << n_cpos << endl;
   }
-  if(!xstr_in.atoms.size()){throw aurostd::xerror(soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
+  if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
 
   //assume NO changes in xstr_in (too slow)
   const xmatrix<double>& lattice=xstr_in.lattice;
@@ -2662,7 +2662,7 @@ bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& 
   _sym_op symop; symop.is_fgroup=true;
   symop.Uc=symop.Uf=aurostd::eye<double>(); //no rotation
   
-  if(!xstr_in.atoms.size()){throw aurostd::xerror(soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
+  if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
   vector<int> basis_atoms_map,basis_types_map;  //dummies
   uint loop_iteration=0;
   //[CO190520 - safe-guard for working in fractional space (skew)]xvector<double> fpos_prev;
@@ -2687,7 +2687,7 @@ bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& 
   }
 
   if(loop_iteration==LOOP_ITERATION_MAX){
-    //throw aurostd::xerror(soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
     return false;
   }
 
@@ -2736,7 +2736,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
     cerr << soliloquy << " xstr_in" << endl;cerr << xstr_in << endl;
     cerr << soliloquy << " n_cpos" << n_cpos << endl;
   }
-  if(!xstr_in.atoms.size()){throw aurostd::xerror(soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
+  if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No atoms found in xstructure",_INPUT_ERROR_);}
 
   //assume NO changes in xstr_in (too slow)
   const xmatrix<double>& lattice=xstr_in.lattice;
@@ -2819,11 +2819,11 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
       cerr << soliloquy << " cpos_new(post)=" << cpos_new[1] << "," << cpos_new[2] << "," << cpos_new[3] << endl;
       cerr << soliloquy << " cpos_diff=" << cpos_diff << endl;
     }
-    if(!aurostd::isequal(cpos_diff,0.0,sym_eps)){throw aurostd::xerror(soliloquy,"cpos_diff!=0 (cpos_diff="+aurostd::utype2string(cpos_diff)+")",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(cpos_diff,0.0,sym_eps)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cpos_diff!=0 (cpos_diff="+aurostd::utype2string(cpos_diff)+")",_RUNTIME_ERROR_);}
   }
 
   if(loop_iteration==LOOP_ITERATION_MAX){
-    //throw aurostd::xerror(soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
+    //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find distance between images",_RUNTIME_ERROR_);
     return false;
   }
 
@@ -2838,482 +2838,493 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190520 - OBSOLETE]  bool operator<(const atom_plane_dist& other) const {return distance<other.distance;}
 //[CO190520 - OBSOLETE]};
 
-// START - EASY INPUTS
-//follows procedure outlined in: De Leon et al., PRL 114, 165502 (2015) (supp info)
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,aflags,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ostream& oss){
-  ofstream FileMESSAGE;
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-  xmatrix<double> rotation;
-  xstructure xstr_rotated;
-  vector<int> sc2pcMap_slab,pc2scMap_slab;
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
-  ofstream FileMESSAGE;
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-} //CO190321
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-  xmatrix<double> rotation;
-  xstructure xstr_rotated;
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-} //CO190321
-// STOP - EASY INPUTS
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]// START - EASY INPUTS
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]//follows procedure outlined in: De Leon et al., PRL 114, 165502 (2015) (supp info)
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,aflags,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ofstream FileMESSAGE;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xmatrix<double> rotation;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_slab_newbasis;  //xstr_rotated
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  vector<int> sc2pcMap_slab,pc2scMap_slab;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ofstream FileMESSAGE;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xmatrix<double> rotation;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_slab_newbasis;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]} //CO190321
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]// STOP - EASY INPUTS
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ofstream FileMESSAGE;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool LDEBUG=(FALSE || XHOST.DEBUG);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string soliloquy="surface::CreateSlab_RigidRotation():";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream message;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  std::streamsize prec = 8;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - read flags
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  int h_i=1,k_i=1,l_i=1;  //hkl of interest
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  total_layers=DEFAULT_TOTAL_LAYERS;        //size of supercell (~ 2x layers)
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double vacuum=15;       //vacuum in Angstroms
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  vector<string> tokens;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  aurostd::string2tokens(vpflow.getattachedscheme("CREATE_SLAB::PLANE_INTEREST"),tokens,",");
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(tokens.size()==3){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    h_i=aurostd::string2utype<int>(tokens[0]);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    k_i=aurostd::string2utype<int>(tokens[1]);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    l_i=aurostd::string2utype<int>(tokens[2]);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::isfloat(total_layers_string)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    int _total_layers=aurostd::string2utype<int>(total_layers_string);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(_total_layers>0){total_layers=_total_layers;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string vacuum_string=vpflow.getattachedscheme("CREATE_SLAB::VACUUM");
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::isfloat(vacuum_string)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    double _vacuum=aurostd::string2utype<double>(vacuum_string);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(_vacuum>0){vacuum=_vacuum;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  std::streamsize prec_original = message.precision(); //original
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  std::ios_base::fmtflags ff_original = message.flags();  //original
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.precision(prec);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.unsetf(std::ios_base::floatfield);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "plane_interest=" << hkl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "total_layers=" << total_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "vacuum=" << vacuum;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.precision(prec_original); //set back
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.flags(ff_original); //set back
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - read flags
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ofstream FileMESSAGE;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  _aflags aflags; aflags.Directory=".";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_in(input,IOAFLOW_AUTO);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl_i,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool LDEBUG=(FALSE || XHOST.DEBUG);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string soliloquy="surface::CreateSlab_RigidRotation():";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream message;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool check_min_dist=true; //turn off if it gets too slow
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  int count_check_min_dist=0;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  int xy_dims=1;          //dimensions of supercell in x-y dimensions
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_bulk(xstr_in);xstr_bulk.ReScale(1.0); //do NOT modify further
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double min_dist=xstr_bulk.dist_nn_min;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(min_dist==AUROSTD_NAN){min_dist=xstr_bulk.dist_nn_min=SYM::minimumDistance(xstr_bulk);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double min_dist_orig=min_dist;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double sym_eps=xstr_bulk.sym_eps;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(sym_eps==AUROSTD_NAN){sym_eps=xstr_bulk.sym_eps=SYM::defaultTolerance(xstr_bulk);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,min_dist,sym_eps);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " min_dist=" << min_dist << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " sym_eps=" << sym_eps << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " skew=" << skew << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "Constructing slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_bulk.MinDist();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - defining hkl normals
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> n_i=HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //quick test to make sure everything works
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<int> hkl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  vector<xvector<double> > intercepts;  //plane intercepts
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> v1,v2,v3; //plane-defining vectors (need only two)
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that we can go back and forth between n and hkl
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Cannot convert normal -> (hkl): normal=" << n_i;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " hkl_i=" << hkl_i << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " n(hkl_i)=" << n_i << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " hkl_i(test)=" << hkl << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(hkl_i,hkl)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that hkl plane is orthogonal to n
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG){for(uint i=0;i<intercepts.size();i++){cerr << soliloquy << " intercepts[" << i << "]=" << intercepts[i] << endl;}}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]v1=intercepts[0]-intercepts[2];
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]v2=intercepts[1]-intercepts[2];
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]v3=intercepts[0]-intercepts[1];
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(LDEBUG){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v1=" << v1 << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v2=" << v2 << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v3=" << v3 << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v1),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_i,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v2),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_i,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v3),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_i,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<int> hkl_test;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> n_test;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that we can go back and forth between n and hkl
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  hkl_test[1]=7;hkl_test[2]=3;hkl_test[3]=2;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Cannot convert normal -> (hkl): normal=" << n_test;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " hkl_test=" << hkl_test << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " n(hkl_test)=" << n_test << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " hkl_test(test)=" << hkl << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(hkl_test,hkl)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that hkl plane is orthogonal to n
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG){for(uint i=0;i<intercepts.size();i++){cerr << soliloquy << " intercepts[" << i << "]=" << intercepts[i] << endl;}}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]v1=intercepts[0]-intercepts[2];
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]v2=intercepts[1]-intercepts[2];
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]v3=intercepts[0]-intercepts[1];
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(LDEBUG){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v1=" << v1 << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v2=" << v2 << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v3=" << v3 << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v1),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_test,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v2),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_test,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v3),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_test,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - defining hkl normals
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - create rotation matrix
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " creating rotation matrix" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> z(3);z(1)=0;z(2)=0;z(3)=-1; //this vector points in -z direction
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //find rotation from n_i to z
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  rotation=aurostd::getRotationMatrix3D(n_i,z);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test of stupidity
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> pseudo_z=rotation*n_i;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " testing if " << pseudo_z << " == " << z << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(pseudo_z,z)){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "pseudo_z != z";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " pseudo_z=" << pseudo_z << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " z=" << z << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " aurostd::modulus(pseudo_z-z)=" << aurostd::modulus(pseudo_z - z) << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - create rotation matrix
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - rotate structure
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::modulus(xstr_bulk.origin)>_ZERO_TOL_){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"xstr_bulk.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " rotating structure" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis=Rotate(xstr_bulk,rotation); //WARNING! check if structure has origin, this will screw things up
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //clean up structure
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ReScale(1.0);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.BringInCell();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.Clean();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //tests of stupidity
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> alat_pre=xstr_bulk.lattice(1);xvector<double> blat_pre=xstr_bulk.lattice(2);xvector<double> clat_pre=xstr_bulk.lattice(3);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> alat_post=xstr_slab_newbasis.lattice(1);xvector<double> blat_post=xstr_slab_newbasis.lattice(2);xvector<double> clat_post=xstr_slab_newbasis.lattice(3);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double vol_pre=abs(aurostd::det(xstr_bulk.lattice));
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double vol_post=abs(aurostd::det(xstr_slab_newbasis.lattice));
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " alat_pre=" << alat_pre << endl;cerr << soliloquy << " alat_post=" << alat_post << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " blat_pre=" << blat_pre << endl;cerr << soliloquy << " blat_post=" << blat_post << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " clat_pre=" << clat_pre << endl;cerr << soliloquy << " clat_post=" << clat_post << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " vol_pre=" << vol_pre << endl;cerr << soliloquy << " vol_post=" << vol_post << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lattice vector a length changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lattice vector b length changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lattice vector c length changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"volume changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]xstr_slab_newbasis.FixLattices();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.Clean();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis(rotation_only)=" << endl;cerr << xstr_slab_newbasis << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab_newbasis.MinDist();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(0){  //WRONG, we are simply undoing the rotation we applied previously
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //fix basis, important for defining k-points grid
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xmatrix<double> basis_orig=xstr_slab_newbasis.lattice,Q,basis_new;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    QRDecomposition_HouseHolder(trasp(basis_orig),Q,basis_new); //transpose before householder //lattice_slab_newbasis is now R
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    basis_new=aurostd::roundoff(basis_new,1e-12); //even smaller than _ZERO_TOL_  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    basis_new=trasp(basis_new);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.lattice=basis_new;xstr_slab_newbasis.FixLattices();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //[CO190803 - too complicated, forget about intermediate step as these operations are all rotations]xmatrix<double> transformation_matrix=trasp(trasp(basis_new)*inverse(trasp(basis_orig)));rotation=transformation_matrix*rotation;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    rotation=trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_bulk.lattice));
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //inverse(xstr_bulk.lattice)*xstr_slab_newbasis.lattice; //equivalent to trasp( trasp(new) * inv(trasp(orig)) )  //new = rotation * orig
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      //[CO190803 - too complicated, forget about intermediate step]cerr << soliloquy << " basis_orig=" << endl;cerr << basis_orig << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      //[CO190803 - too complicated, forget about intermediate step]cerr << soliloquy << " basis_new=" << endl;cerr << basis_new << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      //[CO190803 - too complicated, forget about intermediate step]cerr << soliloquy << " transformation_matrix=" << endl;cerr << transformation_matrix << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " xstr_bulk.lattice=" << endl;cerr << xstr_bulk.lattice << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " xstr_slab_newbasis.lattice=" << endl;cerr << xstr_slab_newbasis.lattice << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    double volume_original=abs(aurostd::det(basis_orig));
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    double volume_new=abs(aurostd::det(basis_new));
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG){
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " volume_original=" << volume_original << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " volume_new=" << volume_new << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " sym_eps=" << sym_eps << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << soliloquy << " skew=" << skew << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(volume_original,volume_new)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"volume changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //now we can convert cpos for xstr_slab_newbasis.lattice
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    deque<_atom> atoms=xstr_slab_newbasis.atoms;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    for(uint i=0;i<atoms.size();i++){atoms[i].cpos=xstr_slab_newbasis.f2c*atoms[i].fpos;} //rotate to new lattice
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ReplaceAtoms(atoms);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //clean up structure
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ReScale(1.0);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.BringInCell();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.Clean();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(check_min_dist){ //sanity check as we rotate structure/atoms
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      min_dist=xstr_slab_newbasis.MinDist();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - rotate structure
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - resolve layers count
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG){cerr << soliloquy << " resolving layers count" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double d_spacing=slab::getSpacingHKLPlane(xstr_bulk,hkl_i); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double d_layers=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  double d_cells=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  int layers_per_cell=(int)(d_cells/d_layers);  //floor
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " d_spacing=" << d_spacing << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " d_layers=" << d_layers << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " d_cells=" << d_cells << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " abs(d_layers-d_cells)=" << abs(d_layers-d_cells) << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << soliloquy << " layers_per_cell=" << layers_per_cell << endl;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - resolve layers count
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - create supercell
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " creating supercell" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //now create a supercell
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xmatrix<double> supercell_mat;supercell_mat(1,1)=supercell_mat(2,2)=supercell_mat(3,3)=(double)total_layers;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xmatrix<double> supercell_mat;supercell_mat(1,1)=(double)xy_dims;supercell_mat(2,2)=(double)xy_dims;supercell_mat(3,3)=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil //(double)total_layers;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  supercell_mat=rotation*supercell_mat;  //we need to redefine the lattice vectors, this function is NOT viable as is, use CreateSlab_SurfaceLattice()
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstructure xstr_slab=GetSuperCell(xstr_slab_newbasis,supercell_mat,sc2pcMap_slab,pc2scMap_slab,false,false,false);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " xstr_slab=" << endl;cerr << xstr_slab << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab.MinDist();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //clean up structure
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ReScale(1.0);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.BringInCell();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab.Clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate()
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //set title
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream title;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  title << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr_bulk.title) << " (SLAB rigid rotation: ";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  title << "hkl=(" << aurostd::joinWDelimiter(hkl_i,",") << "), ";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  title << "total_layers=" << total_layers << ", ";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  title << "vacuum=" << vacuum << ")";
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.title=title.str();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - create supercell
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - add vacuum
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " adding vacuum" << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " old_c_lattice=" << endl;cerr << xstr_slab.lattice << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> new_c_lattice=xstr_slab.lattice(3);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  new_c_lattice+= vacuum * new_c_lattice/aurostd::modulus(new_c_lattice);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.lattice[3][1]=new_c_lattice(1);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.lattice[3][2]=new_c_lattice(2);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.lattice[3][3]=new_c_lattice(3);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " new_c_lattice=" << endl;cerr << xstr_slab.lattice << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead] 
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //fix fpos
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.FixLattices();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  const xmatrix<double>& c2f=xstr_slab.c2f;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  for(uint i=0;i<xstr_slab.atoms.size();i++){xstr_slab.atoms[i].fpos=c2f*xstr_slab.atoms[i].cpos;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab.MinDist();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - add vacuum
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "Slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return xstr_slab;
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
+
+xmatrix<double> getSlabLattice(istream& input,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis,double ang_dev,double vlen_max_strict){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,oss);
+  return getSlabLattice(xstr_in,hkl,lattice_slab_origbasis,ang_dev,vlen_max_strict);
 }
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
-}
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
-}
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
-  ofstream FileMESSAGE;
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(vpflow,xstr_in,hkl,total_layers,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="surface::CreateSlab_RigidRotation():";
-  stringstream message;
-  std::streamsize prec = 8;
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - read flags
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
-  
-  int h_i=1,k_i=1,l_i=1;  //hkl of interest
-  total_layers=DEFAULT_TOTAL_LAYERS;        //size of supercell (~ 2x layers)
-  double vacuum=15;       //vacuum in Angstroms
-
-  vector<string> tokens;
-  aurostd::string2tokens(vpflow.getattachedscheme("CREATE_SLAB::PLANE_INTEREST"),tokens,",");
-  if(tokens.size()==3){
-    h_i=aurostd::string2utype<int>(tokens[0]);
-    k_i=aurostd::string2utype<int>(tokens[1]);
-    l_i=aurostd::string2utype<int>(tokens[2]);
-  }
-  hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
-  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
-  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
-  if(aurostd::isfloat(total_layers_string)){
-    int _total_layers=aurostd::string2utype<int>(total_layers_string);
-    if(_total_layers>0){total_layers=_total_layers;}
-  }
-  string vacuum_string=vpflow.getattachedscheme("CREATE_SLAB::VACUUM");
-  if(aurostd::isfloat(vacuum_string)){
-    double _vacuum=aurostd::string2utype<double>(vacuum_string);
-    if(_vacuum>0){vacuum=_vacuum;}
-  }
-
-  std::streamsize prec_original = message.precision(); //original
-  std::ios_base::fmtflags ff_original = message.flags();  //original
-  message.precision(prec);
-  message.unsetf(std::ios_base::floatfield);
-  
-  message << "plane_interest=" << hkl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "total_layers=" << total_layers;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "vacuum=" << vacuum;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  
-  message.precision(prec_original); //set back
-  message.flags(ff_original); //set back
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - read flags
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-
-xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,oss);
-}
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
-}
-xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
-}
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
-  ofstream FileMESSAGE;
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_RigidRotation(xstr_in,hkl,total_layers,vacuum,rotation,xstr_rotated,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-}
-xstructure CreateSlab_RigidRotation(const xstructure& xstr_in,const xvector<int>& hkl_i,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_rotated,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="surface::CreateSlab_RigidRotation():";
-  stringstream message;
-  bool check_min_dist=true; //turn off if it gets too slow
-  int count_check_min_dist=0;
-  
-  if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
-  
-  int xy_dims=1;          //dimensions of supercell in x-y dimensions
-
-  xstructure xstr_bulk(xstr_in);xstr_bulk.ReScale(1.0); //do NOT modify further
-  double min_dist=xstr_bulk.dist_nn_min;
-  if(min_dist==AUROSTD_NAN){min_dist=xstr_bulk.dist_nn_min=SYM::minimumDistance(xstr_bulk);}
-  double min_dist_orig=min_dist;
-  double sym_eps=xstr_bulk.sym_eps;
-  if(sym_eps==AUROSTD_NAN){sym_eps=xstr_bulk.sym_eps=SYM::defaultTolerance(xstr_bulk);}
-  bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,min_dist,sym_eps);
-  if(LDEBUG){
-    cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;
-    cerr << soliloquy << " min_dist=" << min_dist << endl;
-    cerr << soliloquy << " sym_eps=" << sym_eps << endl;
-    cerr << soliloquy << " skew=" << skew << endl;
-  }
-  
-  message << "Constructing slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
-  
-  xvector<double> n_i=HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
-  if(LDEBUG) {cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;}
-
-  //quick test to make sure everything works
-  xvector<int> hkl;
-  vector<xvector<double> > intercepts;  //plane intercepts
-  xvector<double> v1,v2,v3; //plane-defining vectors (need only two)
-  //test that we can go back and forth between n and hkl
-  if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
-    message << "Cannot convert normal -> (hkl): normal=" << n_i;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  }
-  if(LDEBUG) {
-    cerr << soliloquy << " hkl_i=" << hkl_i << endl;
-    cerr << soliloquy << " n(hkl_i)=" << n_i << endl;
-    cerr << soliloquy << " hkl_i(test)=" << hkl << endl;
-  }
-  if(!aurostd::isequal(hkl_i,hkl)){
-    message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  }
-  //test that hkl plane is orthogonal to n
-  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
-  if(LDEBUG){for(uint i=0;i<intercepts.size();i++){cerr << soliloquy << " intercepts[" << i << "]=" << intercepts[i] << endl;}}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]v1=intercepts[0]-intercepts[2];
-  //[CO190520 - test inside getHKLPlaneIntercepts()]v2=intercepts[1]-intercepts[2];
-  //[CO190520 - test inside getHKLPlaneIntercepts()]v3=intercepts[0]-intercepts[1];
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(LDEBUG){
-  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v1=" << v1 << endl;
-  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v2=" << v2 << endl;
-  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v3=" << v3 << endl;
-  //[CO190520 - test inside getHKLPlaneIntercepts()]}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v1),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_i,v1) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v2),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_i,v2) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v3),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_i,v3) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  
-  xvector<int> hkl_test;
-  xvector<double> n_test;
-  //test that we can go back and forth between n and hkl
-  hkl_test[1]=7;hkl_test[2]=3;hkl_test[3]=2;
-  n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
-  if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
-    message << "Cannot convert normal -> (hkl): normal=" << n_test;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  }
-  if(LDEBUG) {
-    cerr << soliloquy << " hkl_test=" << hkl_test << endl;
-    cerr << soliloquy << " n(hkl_test)=" << n_test << endl;
-    cerr << soliloquy << " hkl_test(test)=" << hkl << endl;
-  }
-  if(!aurostd::isequal(hkl_test,hkl)){
-    message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
-  }
-  //test that hkl plane is orthogonal to n
-  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
-  if(LDEBUG){for(uint i=0;i<intercepts.size();i++){cerr << soliloquy << " intercepts[" << i << "]=" << intercepts[i] << endl;}}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]v1=intercepts[0]-intercepts[2];
-  //[CO190520 - test inside getHKLPlaneIntercepts()]v2=intercepts[1]-intercepts[2];
-  //[CO190520 - test inside getHKLPlaneIntercepts()]v3=intercepts[0]-intercepts[1];
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(LDEBUG){
-  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v1=" << v1 << endl;
-  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v2=" << v2 << endl;
-  //[CO190520 - test inside getHKLPlaneIntercepts()]  cerr << soliloquy << " v3=" << v3 << endl;
-  //[CO190520 - test inside getHKLPlaneIntercepts()]}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v1),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_test,v1) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v2),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_test,v2) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-  //[CO190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v3),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_test,v3) << endl;throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);}
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create rotation matrix
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " creating rotation matrix" << endl;}
-  
-  xvector<double> z(3);z(1)=0;z(2)=0;z(3)=-1; //this vector points in -z direction
-  
-  //find rotation from n_i to z
-  rotation=aurostd::getRotationMatrix3D(n_i,z);
-  if(LDEBUG) {cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;}
-  
-  //test of stupidity
-  xvector<double> pseudo_z=rotation*n_i;
-  if(LDEBUG) {cerr << soliloquy << " testing if " << pseudo_z << " == " << z << endl;}
-  if(!aurostd::isequal(pseudo_z,z)){
-    message << "pseudo_z != z";
-    cerr << soliloquy << " pseudo_z=" << pseudo_z << endl;
-    cerr << soliloquy << " z=" << z << endl;
-    cerr << soliloquy << " aurostd::modulus(pseudo_z-z)=" << aurostd::modulus(pseudo_z - z) << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_); //CO190226
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create rotation matrix
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - rotate structure
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(aurostd::modulus(xstr_bulk.origin)>_ZERO_TOL_){throw aurostd::xerror(soliloquy,"xstr_bulk.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
-
-  if(LDEBUG) {cerr << soliloquy << " rotating structure" << endl;}
-  xstr_rotated=Rotate(xstr_bulk,rotation); //WARNING! check if structure has origin, this will screw things up
-  
-  //clean up structure
-  xstr_rotated.ReScale(1.0);
-  xstr_rotated.ShifOriginToAtom(0);xstr_rotated.origin=0.0; //reset origin
-  xstr_rotated.BringInCell();
-  xstr_rotated.Clean();
-
-  //tests of stupidity
-  xvector<double> alat_pre=xstr_bulk.lattice(1);xvector<double> blat_pre=xstr_bulk.lattice(2);xvector<double> clat_pre=xstr_bulk.lattice(3);
-  xvector<double> alat_post=xstr_rotated.lattice(1);xvector<double> blat_post=xstr_rotated.lattice(2);xvector<double> clat_post=xstr_rotated.lattice(3);
-  double vol_pre=abs(aurostd::det(xstr_bulk.lattice));
-  double vol_post=abs(aurostd::det(xstr_rotated.lattice));
-
-  if(LDEBUG) {
-    cerr << soliloquy << " alat_pre=" << alat_pre << endl;cerr << soliloquy << " alat_post=" << alat_post << endl;
-    cerr << soliloquy << " blat_pre=" << blat_pre << endl;cerr << soliloquy << " blat_post=" << blat_post << endl;
-    cerr << soliloquy << " clat_pre=" << clat_pre << endl;cerr << soliloquy << " clat_post=" << clat_post << endl;
-    cerr << soliloquy << " vol_pre=" << vol_pre << endl;cerr << soliloquy << " vol_post=" << vol_post << endl;
-  }
-
-  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(soliloquy,"lattice vector a length changed",_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(soliloquy,"lattice vector b length changed",_VALUE_ERROR_);}
-  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(soliloquy,"lattice vector c length changed",_VALUE_ERROR_);}
-  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(soliloquy,"volume changed",_VALUE_ERROR_);}
-
-  //[CO190423 - already done in Rotate()]xstr_rotated.FixLattices();
-  //[CO190423 - already done in Rotate()]const xmatrix<double>& f2c=xstr_rotated.f2c;
-  //[CO190423 - already done in Rotate()]for(uint i=0;i<xstr_rotated.atoms.size();i++){xstr_rotated.atoms[i].cpos=f2c*xstr_rotated.atoms[i].fpos;}
-  //xstr_rotated=Standard_Conventional_UnitCellForm(a);xstr_rotated.Clean();
-  
-  if(LDEBUG) {cerr << soliloquy << " xstr_rotated(rotation_only)=" << endl;cerr << xstr_rotated << endl;}
-
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_rotated.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  //fix basis, important for defining k-points grid
-  xmatrix<double> basis_orig=xstr_rotated.lattice,basis_new=trasp(basis_orig);  //transpose before householder
-  xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(basis_new); //lattice_slab_newbasis is now R
-  basis_new=aurostd::roundoff(basis_new,1e-12); //even smaller than _ZERO_TOL_  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
-  basis_new=trasp(basis_new);
-  xmatrix<double> transformation_matrix=trasp(basis_new)*inverse(trasp(basis_orig));rotation=transformation_matrix*rotation;
-  rotation=aurostd::roundoff(rotation,1e-12); //even smaller than _ZERO_TOL_  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
-  xstr_rotated.lattice=basis_new;xstr_rotated.FixLattices();
-  if(LDEBUG){
-    cerr << soliloquy << " basis_orig=" << endl;cerr << basis_orig << endl;
-    cerr << soliloquy << " basis_new=" << endl;cerr << basis_new << endl;
-    cerr << soliloquy << " transformation_matrix=" << endl;cerr << transformation_matrix << endl;
-    cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;
-  }
-  
-  double volume_original=abs(aurostd::det(basis_orig));
-  double volume_new=abs(aurostd::det(basis_new));
-  if(LDEBUG){
-    cerr << soliloquy << " volume_original=" << volume_original << endl;
-    cerr << soliloquy << " volume_new=" << volume_new << endl;
-    cerr << soliloquy << " sym_eps=" << sym_eps << endl;
-    cerr << soliloquy << " skew=" << skew << endl;
-  }
-  if(!aurostd::isequal(volume_original,volume_new)){throw aurostd::xerror(soliloquy,"volume changed",_VALUE_ERROR_);}
-
-  //now we can convert cpos for xstr_rotated.lattice
-  deque<_atom> atoms=xstr_rotated.atoms;
-  for(uint i=0;i<atoms.size();i++){atoms[i].cpos=xstr_rotated.f2c*atoms[i].fpos;} //rotate to new lattice
-  xstr_rotated.ReplaceAtoms(atoms);
-  
-  //clean up structure
-  xstr_rotated.ReScale(1.0);
-  xstr_rotated.ShifOriginToAtom(0);xstr_rotated.origin=0.0; //reset origin
-  xstr_rotated.BringInCell();
-  xstr_rotated.Clean();
-
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_rotated.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - rotate structure
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - resolve layers count
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG){cerr << soliloquy << " resolving layers count" << endl;}
-  
-  double d_spacing=slab::getSpacingHKLPlane(xstr_bulk,hkl_i); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
-  double d_layers=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
-  double d_cells=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
-  int layers_per_cell=(int)(d_cells/d_layers);  //floor
-  if(LDEBUG) {
-    cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;
-    cerr << soliloquy << " d_spacing=" << d_spacing << endl;
-    cerr << soliloquy << " d_layers=" << d_layers << endl;
-    cerr << soliloquy << " d_cells=" << d_cells << endl;
-    cerr << soliloquy << " abs(d_layers-d_cells)=" << abs(d_layers-d_cells) << endl;
-    cerr << soliloquy << " layers_per_cell=" << layers_per_cell << endl;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - resolve layers count
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create supercell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " creating supercell" << endl;}
-  
-  //now create a supercell
-  //xmatrix<double> supercell_mat;supercell_mat(1,1)=supercell_mat(2,2)=supercell_mat(3,3)=(double)total_layers;
-  xmatrix<double> supercell_mat;supercell_mat(1,1)=(double)xy_dims;supercell_mat(2,2)=(double)xy_dims;supercell_mat(3,3)=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil //(double)total_layers;
-  xstructure xstr_slab=GetSuperCell(xstr_rotated,supercell_mat,sc2pcMap_slab,pc2scMap_slab,false,false,false);
-  if(LDEBUG) {cerr << soliloquy << " xstr_slab=" << endl;cerr << xstr_slab << endl;}
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_slab.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-  
-  //clean up structure
-  xstr_slab.ReScale(1.0);
-  xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
-  xstr_slab.BringInCell();
-  //xstr_slab.Clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate()
-  
-  //set title
-  stringstream title;
-  title << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr_bulk.title) << " (SLAB rigid rotation: ";
-  title << "hkl=(" << aurostd::joinWDelimiter(hkl_i,",") << "), ";
-  title << "total_layers=" << total_layers << ", ";
-  title << "vacuum=" << vacuum << ")";
-  xstr_slab.title=title.str();
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create supercell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - add vacuum
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " adding vacuum" << endl;}
-  if(LDEBUG) {cerr << soliloquy << " old_c_lattice=" << endl;cerr << xstr_slab.lattice << endl;}
-  xvector<double> new_c_lattice=xstr_slab.lattice(3);
-  new_c_lattice+= vacuum * new_c_lattice/aurostd::modulus(new_c_lattice);
-  xstr_slab.lattice[3][1]=new_c_lattice(1);
-  xstr_slab.lattice[3][2]=new_c_lattice(2);
-  xstr_slab.lattice[3][3]=new_c_lattice(3);
-  if(LDEBUG) {cerr << soliloquy << " new_c_lattice=" << endl;cerr << xstr_slab.lattice << endl;}
- 
-  //fix fpos
-  xstr_slab.FixLattices();
-  const xmatrix<double>& c2f=xstr_slab.c2f;
-  for(uint i=0;i<xstr_slab.atoms.size();i++){xstr_slab.atoms[i].fpos=c2f*xstr_slab.atoms[i].cpos;}
-
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_slab.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - add vacuum
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  message << "Slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  return xstr_slab;
-}
-
-xmatrix<double> getSlabLattice(istream& input,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return getSlabLattice(xstr_in,hkl,lattice_slab_origbasis);
-}
-xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis){
+xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl,xmatrix<double>& lattice_slab_origbasis,double ang_dev,double vlen_max_strict){
+  //ang_dev is acceptable angle deviation from v1Xv2 in degrees (5 degrees, W. Sun and G. Ceder, Surface Science 617 (2013) 53-59)
+  //vlen_max_strict is the absolute limit for vlen (default -> infinity)
+  //restricting vlen is NOT a priority (unless you want a particular v3), it is better to restrict angle via ang_dev
+  //hence, the order of the default variables
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="surface::getSlabLattice():";
 
@@ -3327,26 +3338,26 @@ xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl
   intercepts=getHKLPlaneIntercepts(lattice,hkl);
   xvector<double> v1=intercepts[1]-intercepts[0];
   xvector<double> v2=intercepts[2]-intercepts[0];
-  xvector<double> _v3=aurostd::vector_product(v1,v2); //pseudo v3, NOT a basis vector
+  xvector<double> v1Xv2=aurostd::vector_product(v1,v2); //pseudo v3, NOT a basis vector
 
   if(LDEBUG){
     cerr << soliloquy << " v1=" << v1 << endl;
     cerr << soliloquy << " v2=" << v2 << endl;
-    cerr << soliloquy << " v1Xv2=" << _v3 << endl;
+    cerr << soliloquy << " v1Xv2=" << v1Xv2 << endl;
   }
 
   //need to search for v3
-  double radius=RadiusSphereLattice(lattice);
-  xvector<int> dims=LatticeDimensionSphere(lattice,radius);
-  int dim=1; //max(dims);  //+1  //do not go too far out
+  int dim=1;  //initial search
 
   xvector<double> v3_test,v3;
-  double adiff_v1,adiff_v2,adiff_v3;
+  double adiff_v1,adiff_v2,adiff_v1Xv2;
   double adiff_max=AUROSTD_MAX_DOUBLE;
-  double vlen_max=max(aurostd::modulus(v1),aurostd::modulus(v2));
+  double vlen=AUROSTD_MAX_DOUBLE;
+  double vlen_maxv1v2=max(aurostd::modulus(v1),aurostd::modulus(v2));
+  double vlen_max=min(vlen_maxv1v2,vlen_max_strict);
   if(LDEBUG){cerr << soliloquy << " vlen_max=" << vlen_max << endl;}
 
-  if(LDEBUG){cerr << soliloquy << " searching for v3 with length constraint" << endl;}
+  if(LDEBUG){cerr << soliloquy << " searching for v3 with search constraint" << endl;}  //tight search, this should be the best
   for(int i=-dim;i<=dim;i++){
     for(int j=-dim;j<=dim;j++){
       for(int k=-dim;k<=dim;k++){
@@ -3354,47 +3365,118 @@ xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl
         v3_test=(double)i*a1+(double)j*a2+(double)k*a3;
         adiff_v1=aurostd::angle(v1,v3_test);
         adiff_v2=aurostd::angle(v2,v3_test);
-        adiff_v3=aurostd::angle(_v3,v3_test);
+        adiff_v1Xv2=aurostd::angle(v1Xv2,v3_test);
+        vlen=aurostd::modulus(v3_test);
+        if(0&&LDEBUG){
+          cerr << soliloquy << " i=" << i << ",j=" << j << ",k=" << k << endl;
+          cerr << soliloquy << " v3_test=" << v3_test << endl;
+          cerr << soliloquy << " adiff_v1=" << adiff_v1 << endl;
+          cerr << soliloquy << " adiff_v2=" << adiff_v2 << endl;
+          cerr << soliloquy << " adiff_v1Xv2=" << adiff_v1Xv2 << endl;
+          cerr << soliloquy << " vlen=" << vlen << " ?<= " << vlen_max << " == " << bool(vlen<=vlen_max) << endl;
+        }
         if(
-            (adiff_v1>=0.0 && adiff_v1<=PI/2.0) &&      //angle with v1 must be within acceptable range
-            (adiff_v2>=0.0 && adiff_v2<=PI/2.0) &&      //angle with v2 must be within acceptable range
-            (adiff_v3>=0.0 && adiff_v3<=PI/2.0) &&      //angle with _v3 must be within acceptable range
-            (adiff_v3<adiff_max) &&                     //angle with _v3 is minimized
-            (aurostd::modulus(v3_test)<vlen_max)        //look for vectors smaller than max(||v1||,||v2||) (initial constraint to keep cell size from EXPLODING)
+            (adiff_v1>=0.0 && adiff_v1<=PI/2.0) &&        //angle with v1 must be within acceptable range
+            (adiff_v2>=0.0 && adiff_v2<=PI/2.0) &&        //angle with v2 must be within acceptable range
+            (adiff_v1Xv2>=0.0 && adiff_v1Xv2<=PI/2.0) &&  //angle with v1Xv2 must be within acceptable range
+            (adiff_v1Xv2<adiff_max) &&                    //angle with v1Xv2 is minimized
+            (vlen<=vlen_max)                              //look for vectors same length or smaller than max(||v1||,||v2||) (initial constraint to keep cell size from EXPLODING)
           ){
-          adiff_max=adiff_v3;
+          adiff_max=adiff_v1Xv2;
           v3=v3_test;
+          vlen_max=vlen;
+          if(LDEBUG){
+            cerr << soliloquy << " adiff_max[i=" << i << ",j=" << j << ",k=" << k << "](degrees)=" << rad2deg*adiff_max << endl;
+            cerr << soliloquy << " v3[i=" << i << ",j=" << j << ",k=" << k << "]=" << v3 << endl;
+          }
         }
       }
     }
   }
 
-  if(adiff_max==AUROSTD_MAX_DOUBLE){  //if not found, relax length constraint
-    if(LDEBUG){cerr << soliloquy << " searching for v3 WITHOUT length constraint" << endl;}
-    for(int i=-dim;i<=dim;i++){
-      for(int j=-dim;j<=dim;j++){
-        for(int k=-dim;k<=dim;k++){
+  if(adiff_max>deg2rad*ang_dev){  //if not found or it's greater than acceptable angle deviation, relax length constraint
+    if(LDEBUG){cerr << soliloquy << " searching for v3 WITHOUT search constraint" << endl;}
+    double radius=RadiusSphereLattice(lattice);
+    xvector<int> dims=LatticeDimensionSphere(lattice,radius);
+    dim=max(dims);  //+1  //do not go too far out
+    int dim_found=dim;
+    vlen_max=vlen_max_strict;
+    if(LDEBUG){cerr << soliloquy << " dim=" << dim << endl;}
+    for(int i=-dim;i<=dim&&i<=dim_found;i++){
+      for(int j=-dim;j<=dim&&j<=dim_found;j++){
+        for(int k=-dim;k<=dim&&k<=dim_found;k++){
           if(!i && !j && !k){continue;} //no vector
           v3_test=(double)i*a1+(double)j*a2+(double)k*a3;
           adiff_v1=aurostd::angle(v1,v3_test);
           adiff_v2=aurostd::angle(v2,v3_test);
-          adiff_v3=aurostd::angle(_v3,v3_test);
+          adiff_v1Xv2=aurostd::angle(v1Xv2,v3_test);
+          vlen=aurostd::modulus(v3_test);
+          if(0&&LDEBUG){
+            cerr << soliloquy << " i=" << i << ",j=" << j << ",k=" << k << endl;
+            cerr << soliloquy << " v3_test=" << v3_test << endl;
+            cerr << soliloquy << " adiff_v1=" << adiff_v1 << endl;
+            cerr << soliloquy << " adiff_v2=" << adiff_v2 << endl;
+            cerr << soliloquy << " adiff_v1Xv2=" << adiff_v1Xv2 << endl;
+            cerr << soliloquy << " vlen=" << vlen << " ?<= " << vlen_max << " == " << bool(vlen<=vlen_max) << endl;
+          }
           if(
-              (adiff_v1>=0.0 && adiff_v1<=PI/2.0) &&      //angle with v1 must be within acceptable range
-              (adiff_v2>=0.0 && adiff_v2<=PI/2.0) &&      //angle with v2 must be within acceptable range
-              (adiff_v3>=0.0 && adiff_v3<=PI/2.0) &&      //angle with _v3 must be within acceptable range
-              (adiff_v3<adiff_max) //[RELAX CONSTRAINT]&&                     //angle with _v3 is minimized
-              //[RELAX CONSTRAINT](aurostd::modulus(v3_test)<vlen_max)        //look for vectors smaller than max(||v1||,||v2||) (constraint 1)
+              (adiff_v1>=0.0 && adiff_v1<=PI/2.0) &&        //angle with v1 must be within acceptable range
+              (adiff_v2>=0.0 && adiff_v2<=PI/2.0) &&        //angle with v2 must be within acceptable range
+              (adiff_v1Xv2>=0.0 && adiff_v1Xv2<=PI/2.0) &&  //angle with v1Xv2 must be within acceptable range
+              (adiff_v1Xv2<adiff_max) &&                    //angle with v1Xv2 is minimized
+              (vlen<=vlen_max)                              //look for vectors smaller than current vlen_max
             ){
-            adiff_max=adiff_v3;
+            adiff_max=adiff_v1Xv2;
             v3=v3_test;
+            if(adiff_max<=deg2rad*ang_dev){ //constrain search here, we found a good one
+              vlen_max=vlen;
+              //[not needed, add if you want]if(dim_found==dim){dim_found=max(abs(i),max(abs(j),abs(k)));}  //max of abs(i),abs(j),abs(k)
+            }
+            if(LDEBUG){
+              cerr << soliloquy << " adiff_max[i=" << i << ",j=" << j << ",k=" << k << "](degrees)=" << rad2deg*adiff_max << endl;
+              cerr << soliloquy << " v3[i=" << i << ",j=" << j << ",k=" << k << "]=" << v3 << endl;
+            }
           }
         }
       }
     }
   }
   
-  if(adiff_max==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(soliloquy,"Cannot find acceptable v3",_INPUT_ERROR_);}
+  if(adiff_max==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find acceptable v3",_INPUT_ERROR_);}
+  
+  //try linear combinations with v1, v2
+  bool try_once=true;
+  int multiplier=1;
+  vlen_max=min(vlen_maxv1v2,vlen_max_strict);
+  while(try_once || (double)multiplier*aurostd::modulus(v3)<=vlen_max){
+    v3*=(double)multiplier++;
+    adiff_v1Xv2=aurostd::angle(v1Xv2,v3); //shouldn't change
+    while(true){
+      if(rad2deg*aurostd::angle(v1Xv2,v3)<5.0){break;}
+      else if(aurostd::modulus(v3-v1)<=vlen_max && rad2deg*aurostd::angle(v1Xv2,v3-v1)<adiff_v1Xv2){
+        v3-=v1;
+        adiff_v1Xv2=aurostd::angle(v1Xv2,v3);
+      }
+      else if(aurostd::modulus(v3+v1)<=vlen_max && rad2deg*aurostd::angle(v1Xv2,v3+v1)<adiff_v1Xv2){
+        v3+=v1;
+        adiff_v1Xv2=aurostd::angle(v1Xv2,v3);
+      }
+      else if(aurostd::modulus(v3-v2)<=vlen_max && rad2deg*aurostd::angle(v1Xv2,v3-v2)<adiff_v1Xv2){
+        v3-=v2;
+        adiff_v1Xv2=aurostd::angle(v1Xv2,v3);
+      }
+      else if(aurostd::modulus(v3+v2)<=vlen_max && rad2deg*aurostd::angle(v1Xv2,v3+v2)<adiff_v1Xv2){
+        v3+=v2;
+        adiff_v1Xv2=aurostd::angle(v1Xv2,v3);
+      }else{break;}
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " found viable v3=" << v3;
+      cerr << ", len(v3)=" << aurostd::modulus(v3);
+      cerr << ", adiff_v1Xv2=" << aurostd::angle(v1Xv2,v3) << endl;
+    }
+    try_once=false;
+  }
   
   if(LDEBUG){
     cerr << soliloquy << " v1=" << v1 << endl;
@@ -3404,97 +3486,131 @@ xmatrix<double> getSlabLattice(const xstructure& xstr_in,const xvector<int>& hkl
     cerr << soliloquy << " adiff_v3=" << adiff_max << endl;
   }
 
-  xmatrix<double> lattice_slab_newbasis;
-  
   //load in vectors as columns of matrix (as opposed to usual rows) for householder, we will transpose later
-  lattice_slab_newbasis(1,1)=v1[1];lattice_slab_newbasis(1,2)=v2[1];lattice_slab_newbasis(1,3)=v3[1];
-  lattice_slab_newbasis(2,1)=v1[2];lattice_slab_newbasis(2,2)=v2[2];lattice_slab_newbasis(2,3)=v3[2];
-  lattice_slab_newbasis(3,1)=v1[3];lattice_slab_newbasis(3,2)=v2[3];lattice_slab_newbasis(3,3)=v3[3];
+  lattice_slab_origbasis(1,1)=v1[1];lattice_slab_origbasis(1,2)=v2[1];lattice_slab_origbasis(1,3)=v3[1];
+  lattice_slab_origbasis(2,1)=v1[2];lattice_slab_origbasis(2,2)=v2[2];lattice_slab_origbasis(2,3)=v3[2];
+  lattice_slab_origbasis(3,1)=v1[3];lattice_slab_origbasis(3,2)=v2[3];lattice_slab_origbasis(3,3)=v3[3];
   
-  //orthogonalize as much as possible
-  lattice_slab_origbasis=lattice_slab_newbasis;
-  xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(lattice_slab_newbasis); //lattice_slab_newbasis is now R
+  //orthogonalize as much as possible (rotate)
+  //[CO191110 - OBSOLETE]xmatrix<double> lattice_slab_newbasis=lattice_slab_origbasis;
+  //[CO191110 - OBSOLETE]xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(lattice_slab_newbasis); //lattice_slab_newbasis is now R
+  xmatrix<double> Q,lattice_slab_newbasis;
+  QRDecomposition_HouseHolder(lattice_slab_origbasis,Q,lattice_slab_newbasis);
+  
+  //immediate check for NEGATIVE determinant, VASP has issues here (see aflow_ivasp.cpp for negative triple product)
+  //fix with S diagonal matrix with +-1: http://www.math.purdue.edu/~kkloste/cs515fa14/qr-uniqueness.pdf
+  double trip_prod=det(lattice_slab_newbasis);
+  if(trip_prod<0.0){
+    if(LDEBUG){cerr << soliloquy << " applying triple product correction" << endl;}
+    int n_neg=1;
+    aurostd::xcombos xc;
+    vector<int> v_combo;
+    xmatrix<double> S=aurostd::eye<double>(),Q_tmp,lat_tmp;
+    int index,row,col;
+    while(trip_prod<0.0){
+      if(n_neg>S.rows){break;}
+      xc.reset(lattice_slab_newbasis.cols,n_neg++,'C');
+      while(xc.increment()){
+        v_combo=xc.getCombo();
+        S=aurostd::eye<double>();
+        for(uint i=0;i<v_combo.size();i++){
+          if(v_combo[i]==1){
+            index=i+(S.urows-1);  //shift index to start by negating z first (keep x-y as calculated)
+            row=aurostd::boundary_conditions_periodic(S.lrows,S.urows,index+S.lrows);
+            col=aurostd::boundary_conditions_periodic(S.lcols,S.ucols,index+S.lcols);
+            S(row,col)=-1;
+          }
+        }
+        if(LDEBUG){cerr << soliloquy << " S=" << endl;cerr << S << endl;}
+        Q_tmp=Q*S;
+        lat_tmp=S*lattice_slab_newbasis;
+        if(!aurostd::isequal(lattice_slab_origbasis,Q_tmp*lat_tmp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"S matrix is not a viable triple-product correction",_RUNTIME_ERROR_);}
+        trip_prod=det(lat_tmp);
+        if(trip_prod>=0.0){Q=Q_tmp;lattice_slab_newbasis=lat_tmp;break;}
+      }
+    }
+    if(det(lattice_slab_newbasis)<0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Triple product of lattice remains negative despite attempts to rectify",_INPUT_ERROR_);}
+  }
 
-  //[CO190520 - already check inside generalHouseHolderQRDecomposition()]if(!aurostd::isequal(lattice_slab_origbasis,Q*lattice_slab_newbasis)){throw aurostd::xerror(soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
-
-  //transpose
-  lattice_slab_origbasis=trasp(lattice_slab_origbasis);
+  lattice_slab_newbasis=aurostd::roundoff(lattice_slab_newbasis,1e-12); //even smaller than _ZERO_TOL_  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
   lattice_slab_newbasis=trasp(lattice_slab_newbasis);
+  lattice_slab_origbasis=trasp(lattice_slab_origbasis); //do AFTER triple product correction
 
-  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
-  lattice_slab_newbasis=aurostd::roundoff(lattice_slab_newbasis,1e-12); //even smaller than _ZERO_TOL_
-
-  if(LDEBUG){cerr << soliloquy << " lattice_slab_newbasis=" << endl;cerr << lattice_slab_newbasis << endl;}
+  if(LDEBUG){
+    cerr << soliloquy << " Q=" << endl;cerr << Q << endl;
+    cerr << soliloquy << " lattice_slab_origbasis=" << endl;cerr << lattice_slab_origbasis << endl;
+    cerr << soliloquy << " lattice_slab_newbasis=" << endl;cerr << lattice_slab_newbasis << endl;
+  }
 
   return lattice_slab_newbasis;
 }
 
 //follows procedure outlined in: W. Sun and G. Ceder, Surface Science 617 (2013) 53-59
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,aflags,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,aflags,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,double v3len_max_strict,ostream& oss){
   ofstream FileMESSAGE;
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,aflags,FileMESSAGE,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   xmatrix<double> rotation;
-  xstructure xstr_slab_newbasis;
+  xstructure xstr_slab_newbasis;  //xstr_rotated
   vector<int> sc2pcMap_slab,pc2scMap_slab;
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict,ostream& oss){
   ofstream FileMESSAGE;
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 } //CO190321
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   xmatrix<double> rotation;
   xstructure xstr_slab_newbasis;
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 } //CO190321
 // STOP - EASY INPUTS
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict,ostream& oss){
   ofstream FileMESSAGE;
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,istream& input,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(vpflow,xstr_in,hkl,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstructure& xstr_in,xvector<int>& hkl,int& total_layers,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="surface::CreateSlab_SurfaceLattice():";
   stringstream message;
@@ -3518,7 +3634,7 @@ xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstruc
     l_i=aurostd::string2utype<int>(tokens[2]);
   }
   hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
-  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
+  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl=(0,0,0)",_INPUT_ERROR_);}
   string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
   if(aurostd::isfloat(total_layers_string)){
     int _total_layers=aurostd::string2utype<int>(total_layers_string);
@@ -3535,9 +3651,9 @@ xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstruc
   message.precision(prec);
   message.unsetf(std::ios_base::floatfield);
   
-  message << "plane_interest=" << hkl;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "total_layers=" << total_layers;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "vacuum=" << vacuum;pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "plane_interest=" << hkl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "total_layers=" << total_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "vacuum=" << vacuum;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   
   message.precision(prec_original); //set back
   message.flags(ff_original); //set back
@@ -3546,38 +3662,38 @@ xstructure CreateSlab_SurfaceLattice(const aurostd::xoption& vpflow,const xstruc
   // STOP - read flags
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
 
-xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict,ostream& oss){
   ofstream FileMESSAGE;
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   _aflags aflags; aflags.Directory=".";
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+  return CreateSlab_SurfaceLattice(xstr_in,hkl,total_layers,vacuum,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,v3len_max_strict,oss);
 }
-xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl_i,int total_layers,double vacuum,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss){
+xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl_i,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,ofstream& FileMESSAGE,double v3len_max_strict,ostream& oss){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="surface::CreateSlab_SurfaceLattice():";
   stringstream message;
@@ -3602,12 +3718,12 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
     cerr << soliloquy << " skew=" << skew << endl;
   }
 
-  message << "Constructing slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "Constructing slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3626,7 +3742,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   //test that we can go back and forth between n and hkl
   if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
     message << "Cannot convert normal -> (hkl): normal=" << n_i;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   if(LDEBUG) {
     cerr << soliloquy << " hkl_i=" << hkl_i << endl;
@@ -3635,7 +3751,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   }
   if(!aurostd::isequal(hkl_i,hkl)){
     message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   //test that hkl plane is orthogonal to n
   intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
@@ -3648,7 +3764,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
   if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
     message << "Cannot convert normal -> (hkl): normal=" << n_test;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   if(LDEBUG) {
     cerr << soliloquy << " hkl_test=" << hkl_test << endl;
@@ -3657,7 +3773,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   }
   if(!aurostd::isequal(hkl_test,hkl)){
     message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
   }
   //test that hkl plane is orthogonal to n
   intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
@@ -3674,7 +3790,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   //test whether fpos/cpos work
@@ -3683,14 +3799,17 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   for(uint i=0;i<xstr_bulk.atoms.size();i++){
     fpos=xstr_bulk.c2f*xstr_bulk.atoms[i].cpos;
     cpos=xstr_bulk.f2c*xstr_bulk.atoms[i].fpos;
-    if(!aurostd::isequal(xstr_bulk.atoms[i].fpos,fpos)){throw aurostd::xerror(soliloquy,"atoms[i="+aurostd::utype2string(i)+"].fpos mismatch",_INPUT_ERROR_);}
-    if(!aurostd::isequal(xstr_bulk.atoms[i].cpos,cpos)){throw aurostd::xerror(soliloquy,"atoms[i="+aurostd::utype2string(i)+"].cpos mismatch",_INPUT_ERROR_);}
+    if(!aurostd::isequal(xstr_bulk.atoms[i].fpos,fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atoms[i="+aurostd::utype2string(i)+"].fpos mismatch",_INPUT_ERROR_);}
+    if(!aurostd::isequal(xstr_bulk.atoms[i].cpos,cpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atoms[i="+aurostd::utype2string(i)+"].cpos mismatch",_INPUT_ERROR_);}
   }
   
   stringstream title;
   xstr_slab_newbasis.Clear();
   xstructure xstr_slab_origbasis;
-  xstr_slab_newbasis.lattice=getSlabLattice(xstr_bulk,hkl_i,xstr_slab_origbasis.lattice);xstr_slab_newbasis.FixLattices();
+  xstr_slab_newbasis.lattice=getSlabLattice(xstr_bulk,hkl_i,xstr_slab_origbasis.lattice,DEFAULT_V3_ANGLE_DEVIATION,v3len_max_strict);xstr_slab_newbasis.FixLattices();  //ang_dev==5.0 is standard (DEFAULT_V3_ANGLE_DEVIATION), the vlen_max_strict is very important here, as the test from Sun et al. takes a shortcut here
+  rotation=trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_slab_origbasis.lattice));
+  //  inverse(xstr_slab_origbasis.lattice)*xstr_slab_newbasis.lattice; //equivalent to trasp( trasp(new) * inv(trasp(orig)) )  //new = rotation * orig
+
   //quick check
   //xstr_slab_newbasis.lattice[1][1]=4.736233;xstr_slab_newbasis.lattice[1][2]=0.0;xstr_slab_newbasis.lattice[1][3]=0.0;
   //xstr_slab_newbasis.lattice[2][1]=9.472473;xstr_slab_newbasis.lattice[2][2]=21.242108;xstr_slab_newbasis.lattice[2][3]=0.0;
@@ -3698,6 +3817,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(LDEBUG){
     cerr << soliloquy << " xstr_slab_origbasis.lattice=" << endl;cerr << xstr_slab_origbasis.lattice << endl;
     cerr << soliloquy << " xstr_slab_newbasis.lattice=" << endl;cerr << xstr_slab_newbasis.lattice << endl;
+    cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;
     cerr << soliloquy << " xstr_slab_newbasis.c2f=" << endl;cerr << xstr_slab_newbasis.c2f << endl;
     cerr << soliloquy << " xstr_slab_newbasis.f2c=" << endl;cerr << xstr_slab_newbasis.f2c << endl;
   }
@@ -3757,7 +3877,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_slab_newbasis.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3774,6 +3894,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   double d_layers=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
   double d_cells=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
   int layers_per_cell=(int)(d_cells/d_layers);  //floor
+  int supercell_layers=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil //(double)total_layers;
   if(LDEBUG) {
     cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;
     cerr << soliloquy << " d_spacing=" << d_spacing << endl;
@@ -3781,6 +3902,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
     cerr << soliloquy << " d_cells=" << d_cells << endl;
     cerr << soliloquy << " abs(d_layers-d_cells)=" << abs(d_layers-d_cells) << endl;
     cerr << soliloquy << " layers_per_cell=" << layers_per_cell << endl;
+    cerr << soliloquy << " supercell_layers=" << supercell_layers << endl;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3794,13 +3916,13 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   if(LDEBUG) {cerr << soliloquy << " creating supercell" << endl;}
   
   //now create a supercell
-  xmatrix<double> supercell_mat;supercell_mat(1,1)=(double)xy_dims;supercell_mat(2,2)=(double)xy_dims;supercell_mat(3,3)=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil //(double)total_layers;
+  xmatrix<double> supercell_mat;supercell_mat(1,1)=(double)xy_dims;supercell_mat(2,2)=(double)xy_dims;supercell_mat(3,3)=supercell_layers;
   xstructure xstr_slab=GetSuperCell(xstr_slab_newbasis,supercell_mat,sc2pcMap_slab,pc2scMap_slab,false,false,false);
   if(LDEBUG) {cerr << soliloquy << " xstr_slab=" << endl;cerr << xstr_slab << endl;}
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_slab.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
   
   //clean up structure
@@ -3830,18 +3952,18 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   xstr_slab.FixLattices();
   const xmatrix<double>& c2f=xstr_slab.c2f;
   for(uint i=0;i<xstr_slab.atoms.size();i++){xstr_slab.atoms[i].fpos=c2f*xstr_slab.atoms[i].cpos;}
-
+  
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_slab.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - add vacuum
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  message << "Slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "Slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   return xstr_slab;
 }
@@ -3854,7 +3976,7 @@ bool slabTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   stringstream message;
   _aflags aflags;aflags.Directory=".";
   
-  message << "Performing slab test";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  message << "Performing slab test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   
   double min_dist=0.0,min_dist_orig=0.0;
 
@@ -3952,22 +4074,22 @@ bool slabTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     min_dist=xstr_slab_correct.MinDist();
     cerr << soliloquy << " xstr_slab_correct.MinDist()=" << min_dist << endl;
   }
-  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(soliloquy,"Minimum distance changed (correct)",_INPUT_ERROR_);}
+  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (correct)",_INPUT_ERROR_);}
 
   xmatrix<double> lattice_slab_origbasis;
-  xstructure xstr_slab_test=slab::CreateSlab_SurfaceLattice(xstr_in,hkl,1,0);
+  xstructure xstr_slab_test=slab::CreateSlab_SurfaceLattice(xstr_in,hkl,1,0,5.0); //the v3len_max_strict is very important here, as the test from Sun et al. takes a shortcut here
   min_dist=xstr_slab_test.MinDist();
   if(LDEBUG){
     cerr << soliloquy << " xstr_slab_test=" << endl;cerr << xstr_slab_test << endl;
     min_dist=xstr_slab_test.MinDist();
     cerr << soliloquy << " xstr_slab_test.MinDist()=" << min_dist << endl;
   }
-  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
+  if(!aurostd::isequal(min_dist,min_dist_orig)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed (test)",_INPUT_ERROR_);}
 
   bool structures_match=compare::aflowCompareStructure(xstr_slab_correct,xstr_slab_test,true,false,false);
   if(LDEBUG){cerr << soliloquy << " structures_match=" << structures_match << endl;}
-  if(!structures_match){throw aurostd::xerror(soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
-  message << "Slab test successful";pflow::logger(soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  if(!structures_match){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Structures do not match",_RUNTIME_ERROR_);}
+  message << "Slab test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return structures_match;
 }
 } // namespace slab

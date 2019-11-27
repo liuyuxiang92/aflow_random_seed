@@ -3251,7 +3251,7 @@ namespace LATTICE {
 namespace LATTICE {
   bool Bravais_Lattice_StructureDefault_20170401(xstructure& str_in,xstructure& str_sp,xstructure& str_sc, bool full_sym) {
     bool LDEBUG=(FALSE || XHOST.DEBUG); // DX 4/26/18 - added LDEBUG
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory 
+    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory 
     bool same_eps = false;
     bool no_scan = false;
     bool ignore_checks = false;

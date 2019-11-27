@@ -173,7 +173,7 @@ void ThermalPropertiesCalculator::writeTHERMO(double USER_TP_TSTART, double USER
   if (!aurostd::FileExist(filename)) { //ME181226
     string function = "ThermalPropertiesCalculator::writeTHERMO()";
     string message = "Cannot open output file " + filename + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("ThermalPropertiesCalculator::writeTHERMO(); Cannot open output THERMO file.");
   }
   //outfile.clear();

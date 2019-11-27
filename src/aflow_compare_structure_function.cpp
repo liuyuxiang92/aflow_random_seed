@@ -810,7 +810,7 @@ namespace compare {
     std::sort(vfiles.begin(),vfiles.end()); //CO 180830
 
     message << "Loading " << vfiles.size() << " files in directory ... ";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     for(uint i=0; i<vfiles.size(); i++){
       if(LDEBUG) {cerr << "compare:: " << i << "/" << vfiles.size() << " " << vfiles[i] << endl;}
       if(vfiles[i].find("comparison_output.json") != std::string::npos || 
@@ -859,7 +859,7 @@ namespace compare {
         // check if fake names for same species comparison
         if(structure_tmp.structure_representative.species[0]=="A" && same_species){
           message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping structure.";     
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
           continue;
         }
         //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA= compare::computeLFAEnvironment(xstr1); //DX 20190711
@@ -922,7 +922,7 @@ namespace compare {
     aurostd::substring2strings(input_file.str(),start_string,START);
     
     message << "Loading " << start_string.size() << " structures in file ... ";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     bool structure_lines = false;
     uint structure_count = 0;
@@ -971,7 +971,7 @@ namespace compare {
         // check if fake names for same species comparison
         if(structure_tmp.structure_representative.species[0]=="A" && same_species){
           message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping strucutre.";     
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
           continue;
         }
         //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX 20190711
@@ -1050,7 +1050,7 @@ namespace compare {
       // check if fake names for same species comparison
       if(structure_tmp.structure_representative.species[0]=="A" && same_species){
         message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping strucutre.";     
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
         continue;
       }
       //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX 20190711
@@ -1239,6 +1239,8 @@ namespace compare {
 //DX 20191108 [OBOSLETE]     //to bidiagonal
 //DX 20191108 [OBOSLETE]     xmatrix<double> test = ATA;
 //DX 20191108 [OBOSLETE]     xmatrix<double> Q = pflow::generalHouseHolderQRDecomposition(test);
+//DX 20191108 [OBOSLETE]     xmatrix<double> Q; 
+//DX 20191108 [OBOSLETE]     pflow::QRDecomposition_HouseHolder(ATA,Q,test); //CO190808
 //DX 20191108 [OBOSLETE]     //cerr << "A: " << A << endl;
 //DX 20191108 [OBOSLETE]     //cerr << "ATA: " << ATA << endl;
 //DX 20191108 [OBOSLETE]     //cerr << "Q: " << Q << endl;
@@ -3575,7 +3577,7 @@ namespace compare{
     ofstream FileMESSAGE;
 
     message << "Grouping sets of comparisons.";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     // === Organize into objects based on stoichiometry and symmetry (Pearson and space group)
 
     cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
@@ -3592,7 +3594,7 @@ namespace compare{
     }
 
     message << "Running comparisons ...";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(num_proc, comparison_schemes, same_species, scale_volume, optimize_match, single_comparison_round, structures_generated, ICSD_comparison, oss); 
     
     if(final_prototypes.size()==0){
@@ -3606,7 +3608,7 @@ namespace compare{
     //DX - BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
  
     message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << vxstrs.size() << " structures).";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
    
     return final_prototypes; 
   }
@@ -3787,7 +3789,7 @@ namespace compare{
     //bool structures_generated=false;
 
     message << "Running comparisons to remove duplicate compounds ...";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(num_proc, duplicate_check_schemes, same_species, check_other_groupings, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, clean_unmatched, ICSD_comparison, store_comparison_logs, oss, FileMESSAGE); //DX 20190319 - added FileMESSAGE //DX 20190731 - //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool
 
     return final_prototypes_reduced;
@@ -4193,7 +4195,7 @@ namespace compare{
 
     if(num_mismatches > 0 && !single_comparison_round && !quiet){
       message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // create new object for comparisons
@@ -4269,7 +4271,7 @@ namespace compare{
 
       if(num_mismatches > 0 && !quiet){
         message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       }
 
       // ensure while loop is not uncontrolled
@@ -4604,7 +4606,7 @@ namespace compare{
                     << setw(15) << std::left << comparison_schemes[i].misfits_duplicate[d] << endl;
           }
         }
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       }
       
       // Store finished (already compared) schemes in final_prototypes

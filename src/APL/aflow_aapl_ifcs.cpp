@@ -202,7 +202,7 @@ int AnharmonicIFCs::getTransformedAtom(const vector<int>& symmap, const int& at)
   string function = _AAPL_IFCS_ERR_PREFIX_ + "getTransformedAtom";
   stringstream message;
   message << "Could not transform atom " << at;
-  throw xerror(function, message, _RUNTIME_ERROR_);
+  throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
 }
 //END Forces
 
@@ -358,7 +358,7 @@ aurostd::xtensor<double>
     string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
     stringstream message;
     message << "Anharmonic force constants did not converge within " << max_iter << " iterations.";
-    throw xerror(function, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
   } else {
     return ifcs;
   }
@@ -771,7 +771,7 @@ void AnharmonicIFCs::writeIFCsToFile(const string& filename) {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_IFCS_ERR_PREFIX_ + "writeIFCsToFile";
     string message = "Could not write tensor to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -914,13 +914,13 @@ void AnharmonicIFCs::readIFCsFromFile(const string& filename) {
 
   if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
     message << "Could not open file " << filename << ". File not found.";
-    throw xerror(function, message, _FILE_NOT_FOUND_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
   }
   vector<string> vlines;
   aurostd::efile2vectorstring(filename, vlines);
   if (vlines.size() == 0) {
     message << "Cannot open file " << filename << ". File empty or corrupt.";
-    throw xerror(function, message, _FILE_CORRUPT_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
   }
 
   // Start reading
@@ -930,7 +930,7 @@ void AnharmonicIFCs::readIFCsFromFile(const string& filename) {
   // Check that this is a valid xml file
   if (line.find("xml") == string::npos) {
     message << "File is not a valid xml file.";
-    throw xerror(function, message, _FILE_WRONG_FORMAT_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
   }
 
   // Check if xml file can be used to read anharmonic IFCs
@@ -938,7 +938,7 @@ void AnharmonicIFCs::readIFCsFromFile(const string& filename) {
     force_constants = readIFCs(line_count, vlines);
   } else {
     message << "The settings in the hibernate file and the aflow.in file are incompatible.";
-    throw xerror(function, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
   }
 }
 
@@ -963,7 +963,7 @@ bool AnharmonicIFCs::checkCompatibility(uint& line_count,
   while (true) {
     if (line_count == vsize) {
       message << "Checksum not found in hibernate file.";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("checksum") != string::npos) {
@@ -1270,7 +1270,7 @@ aurostd::xtensor<double> AnharmonicIFCs::readIFCs(uint& line_count,
   while (true) {
     if (line_count == vsize) {
       message = "force_constants tag not found.";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("force_constants") != string::npos) {
@@ -1282,7 +1282,7 @@ aurostd::xtensor<double> AnharmonicIFCs::readIFCs(uint& line_count,
   while (line.find("/force_constants") == string::npos) {
     if (line_count == vsize) {
       message = "force_constants tag incomplete.";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("atoms") != string::npos) {

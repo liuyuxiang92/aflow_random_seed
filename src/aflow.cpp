@@ -560,6 +560,51 @@ int main(int _argc,char **_argv) {
     if(KBIN::VASP_PseudoPotential_CleanName_TEST()){return 0;}
     return 1;
   }
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO190911
+    string soliloquy="test_xmatrix()::";
+    bool LDEBUG=TRUE; // TRUE;
+    xmatrix<double> mat;
+    mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
+    mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
+    mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
+    if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
+    //getmat()
+    xmatrix<double> submat;
+    mat.getmat(submat,3,3,2,2);
+    if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
+    //setmat()
+    mat.setmat(submat,1,1); //do nothing
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with submat at 1,1" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    xvector<double> xv;
+    xv(1)=2;xv(2)=3;xv(3)=4;
+    if(LDEBUG){cerr << soliloquy << " xv=" << xv << endl;}
+    mat.setmat(xv,1,false); //row
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at row=1" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    mat.setmat(xv,2,true); //col
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at col=2" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    //setrow()
+    mat.setrow(xv,2);
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at row=2" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    //setcol()
+    mat.setcol(xv,3);
+    if(LDEBUG){
+      cerr << soliloquy << " replacing with xv at col=3" << endl;
+      cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+    }
+    return 1;
+  }
   if(!Arun && aurostd::args2flag(argv,cmds,"--test_stefano")) {
     uint y=2017,m=11;
     m+=1;
@@ -928,17 +973,17 @@ int main(int _argc,char **_argv) {
 }
   // CO 180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
-  //[OBSOLETE]  pflow::logger(soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(re.where(), re.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   //[OBSOLETE]catch(AFLOWLogicError& le){
-  //[OBSOLETE]  pflow::logger(soliloquy, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(le.where(), le.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {
-    pflow::logger(excpt.where(), excpt.error_message, oss, _LOGGER_ERROR_);
+    pflow::logger(_AFLOW_FILE_NAME_, excpt.where(), excpt.error_message, oss, _LOGGER_ERROR_);
     return excpt.error_code;
   }
 }

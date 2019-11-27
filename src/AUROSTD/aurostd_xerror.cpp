@@ -36,26 +36,27 @@ static const std::string errors[_AFLOW_NUM_ERR_TYPES_][9] =
      {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
 //Constructors////////////////////////////////////////////////////////////////
-xerror::xerror(const std::string& function, const std::string& msg, int code) {
-  buildException(function, msg, code);
+xerror::xerror(const std::string& filename, const std::string& function, const std::string& msg, int code) {
+  buildException(filename, function, msg, code);
 }
 
-xerror::xerror(const std::string& function, const std::stringstream& msg, int code) {
-  buildException(function, msg.str(), code);
+xerror::xerror(const std::string& filename, const std::string& function, const std::stringstream& msg, int code) {
+  buildException(filename, function, msg.str(), code);
 }
 
-xerror::xerror(const std::stringstream& function, const std::string& msg, int code) {
-  buildException(function.str(), msg, code);
+xerror::xerror(const std::string& filename, const std::stringstream& function, const std::string& msg, int code) {
+  buildException(filename, function.str(), msg, code);
 }
 
-xerror::xerror(const std::stringstream& function, const std::stringstream& msg, int code) {
-  buildException(function.str(), msg.str(), code);
+xerror::xerror(const std::string& filename, const std::stringstream& function, const std::stringstream& msg, int code) {
+  buildException(filename, function.str(), msg.str(), code);
 }
 
 //buildExeption///////////////////////////////////////////////////////////////
 // builds the xerror object.
-void xerror::buildException(const std::string& function, const std::string& msg, const int& code) {
-  f_name = function;
+void xerror::buildException(const std::string& filename, const std::string& function, const std::string& msg, const int& code) {
+  file_name = filename;
+  function_name = function;
   message = msg;
   error_code = code;
   error_type = error_code/10;
@@ -96,7 +97,7 @@ std::string xerror::buildMessageString() {
 }
 
 std::string xerror::where() {
-  return f_name;
+  return function_name+" in "+file_name;
 }
 
 std::string xerror::error_string() {

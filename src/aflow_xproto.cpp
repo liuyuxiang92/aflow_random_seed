@@ -406,13 +406,13 @@ namespace aflowlib {
     if(LDEBUG) cerr << "aflowlib::PrototypeLibrariesSpeciesNumber: label=" << _label << endl;
     // search for _ICSD_XXXX or ICSD_XXXX
     //CO 180705 - START
-    if(_label.empty()){throw aurostd::xerror(soliloquy,"label empty [1]",_VALUE_ILLEGAL_);}
+    if(_label.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"label empty [1]",_VALUE_ILLEGAL_);}
     //in avasp, input here can be comma-separated series of labels
     //assume user intelligent and that all labels provided are same nspecies count
     //take first one
     vector<string> labeltokens;
     aurostd::string2tokens(_label,labeltokens,",");
-    if(labeltokens.size()==0){throw aurostd::xerror(soliloquy,"label empty [2]",_VALUE_ILLEGAL_);}
+    if(labeltokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"label empty [2]",_VALUE_ILLEGAL_);}
     string label=labeltokens[0];
     if(aurostd::substring2bool(label,"ICSD_")) { // found ICSD // CO 181226
       vector<string> vline,tokens;
@@ -487,7 +487,7 @@ namespace aflowlib {
 	      if(!silent){oss << "[" << data.vaflowlib_entries.size() << " entries]" << endl;}
       }
     }
-    if(aurostd::substring2bool(label,"ICSD_")){throw aurostd::xerror(soliloquy,label+" cannot be found",_VALUE_ILLEGAL_);} //will NOT be found
+    if(aurostd::substring2bool(label,"ICSD_")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,label+" cannot be found",_VALUE_ILLEGAL_);} //will NOT be found
     //CO 180705 - STOP
     if(LDEBUG) { cerr << "uint aflowlib::PrototypeLibrariesSpeciesNumber(const string& label)" << endl; }
     // check ternaries 

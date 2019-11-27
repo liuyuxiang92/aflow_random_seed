@@ -188,7 +188,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::IGNORE_WYCKOFF")) {
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring Wyckoff positions when grouping comparisons, but will group by space group (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -198,7 +198,7 @@ namespace pflow {
       ignore_symmetry=true;
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring symmetry when grouping comparisons, i.e., do not group by space group and Wyckoff positions (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       }
     
     // ---------------------------------------------------------------------------
@@ -216,7 +216,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::REMOVE_DUPLICATE_COMPOUNDS")) {
       remove_duplicate_compounds=true;
       message << "OPTIONS: Remove duplicate compounds first, useful for non-biased prototype statistics."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       }
     
     // ---------------------------------------------------------------------------
@@ -225,7 +225,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::ICSD_COMPARISON")) {
       ICSD_comparison=true;
       message << "OPTIONS: Running on ICSD structures; use oldest ICSD number as representative prototype.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     //DX 20190424 - END 
 
@@ -629,18 +629,18 @@ namespace pflow {
     if(structures_from=="structure_list") {
       aurostd::string2tokens(vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST"),file_list,",");
       message << "List of files to compare: " << aurostd::joinWDelimiter(file_list,",");
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     //DX 20190424 - END
     else if(structures_from=="directory") {
       directory=vpflow.getattachedscheme("COMPARE_STRUCTURE::DIRECTORY");
       if(!aurostd::FileExist(directory)) {
         message << "Unable to locate directory: " << directory << ". Exiting." << endl;
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
         return oss.str();
       }
       message << "Comparison directory: " << directory;
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     // ---------------------------------------------------------------------------
     // FLAG: file of structures to compare
@@ -648,15 +648,15 @@ namespace pflow {
       filename=vpflow.getattachedscheme("COMPARE_STRUCTURE::FILE");
       if(!aurostd::FileExist(filename)) {
         message << "Unable to locate file: " << filename << ". Exiting." << endl;
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
         return oss.str();
       }
       message << "Comparison file: " << filename;
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     else {
       message << "Need to specify location of structures to compare: -D <directory> or -F=<filename>. Exiting." << endl;
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
     }
     
     // ---------------------------------------------------------------------------
@@ -665,7 +665,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::NP")) {
       num_proc=aurostd::string2utype<uint>(vpflow.getattachedscheme("COMPARE_STRUCTURE::NP"));
       message << "OPTIONS: Using multiple threads; np = " << num_proc << ".";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
   
     // ---------------------------------------------------------------------------
@@ -674,12 +674,12 @@ namespace pflow {
     if(vpflow.flag("COMPARE_MATERIAL")){  // material comparisons (find duplicates) //DX 20190429 - generalized
       same_species=true;
       message << "OPTIONS: Performing material type comparisons (comparing alike atomic species).";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     else if (vpflow.flag("COMPARE_STRUCTURE")){ // structure comparisons (find structure prototypes) //DX 20190425 - generalized
       same_species=false;
       message << "OPTIONS: Performing structure type comparisons (any atomic species).";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
    
     // ---------------------------------------------------------------------------
@@ -701,7 +701,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::ICSD_COMPARISON")) {
       ICSD_comparison=true;
       message << "OPTIONS: Running on ICSD structures; use oldest ICSD number as representative prototype.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -710,7 +710,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::OPTIMIZE_MATCH")) {
       optimize_match=true;
       message << "OPTIONS: Finding optimal match; exploring all possible lattices and origins to find the best match (note: this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -719,7 +719,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::NO_SCALE_VOLUME")) {
       scale_volume=false;
       message << "OPTIONS: Suppressing volume scaling; useful for distinguishing structures at different pressures."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -728,7 +728,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::IGNORE_WYCKOFF")) {
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring Wyckoff positions when grouping comparisons, but will group by space group (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -738,7 +738,7 @@ namespace pflow {
       ignore_symmetry=true;
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring symmetry when grouping comparisons, i.e., do not group by space group and Wyckoff positions (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -756,7 +756,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_STRUCTURE::REMOVE_DUPLICATE_COMPOUNDS")) {
       remove_duplicate_compounds=true;
       message << "OPTIONS: Remove duplicate compounds first, useful for non-biased prototype statistics."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
    
     // ---------------------------------------------------------------------------
@@ -839,7 +839,7 @@ namespace pflow {
     //BETA if(vpflow.flag("COMPARE_STRUCTURE::REMOVE_DUPLICATE_COMPOUNDS_LAST")) {
     //BETA   remove_duplicate_compounds_last=true;
     //BETA   message << "OPTIONS: Remove duplicate compounds after performing structure-type comparisons, useful for non-biased prototype statistics."; 
-    //BETA   pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    //BETA   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     //BETA }
     
     // ---------------------------------------------------------------------------
@@ -900,7 +900,7 @@ namespace pflow {
         oss << message.str();
       }
       else {
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
       if(print){
         if(final_prototypes[0].misfits_duplicate.size()==1){
@@ -926,7 +926,7 @@ namespace pflow {
         aurostd::stringstream2file(ss_out,directory+"/material_comparison_output.out");
         message << "RESULTS: See " << directory << "/material_comparison_output.out" << " or " << directory << "/material_comparison_output.json" << " for list of unique/duplicate materials.";
       }
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
     else if(same_species==false){
       if(format=="json"){
@@ -942,7 +942,7 @@ namespace pflow {
         aurostd::stringstream2file(ss_out,directory+"/structure_comparison_output.out");
         message << "RESULTS: See " << directory << "/structure_comparison_output.out" << " or " << directory << "/structure_comparison_output.json" << " for list of unique/duplicate structures.";
       }
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
     //DX 20190429 - added format options - END
 
@@ -1105,10 +1105,10 @@ namespace pflow {
       catalog=aurostd::tolower(vpflow.getattachedscheme("COMPARE2PROTOTYPES::CATALOG"));
       if(catalog!="htqc" && catalog!="anrl" && catalog!="all"){
         message << "Catalog/library can only be htqc, anrl, or all.";     
-        throw aurostd::xerror(function_name,message,_INPUT_ILLEGAL_); //DX 20191031 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_INPUT_ILLEGAL_); //DX 20191031 - exit to xerror
       }
       message << "OPTIONS: Catalog/library (htqc, anrl, or all): " << catalog << endl; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1132,7 +1132,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE2PROTOTYPES::IGNORE_WYCKOFF")) {
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring Wyckoff positions when grouping comparisons, but will group by space group (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1142,7 +1142,7 @@ namespace pflow {
       ignore_symmetry=true;
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring symmetry when grouping comparisons, i.e., do not group by space group and Wyckoff positions (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1189,11 +1189,11 @@ namespace pflow {
     // symmetry
     if(!ignore_symmetry && xstr.space_group_ITC==0){ //DX 20190829 - don't recalculate symmetry if already calcualted
       message << "Calculating the symmetry of the input structure.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       uint one_proc=1;
       compare::calculateSymmetries(all_structures,one_proc); 
       message << "Symmetry calculated.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
     else if(!ignore_symmetry && xstr.space_group_ITC!=0){
       for(uint i=0;i<all_structures.size();i++){
@@ -1232,24 +1232,24 @@ namespace pflow {
     // find prototypes based on stoichiometry only
     if(ignore_symmetry){
       message << "Load prototypes with the same stoichiometry as the input.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       vlabel = aflowlib::GetPrototypesByStoichiometry(stoichiometry, catalog);
     }
     // find prototypes based on stoichiometry and space group only
     else if(!ignore_symmetry && ignore_Wyckoff){
       message << "Load prototypes with the same stoichiometry and space group as the input.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       vector<GroupedWyckoffPosition> empty_Wyckoff_positions;
       vlabel = aflowlib::GetPrototypesBySymmetry(stoichiometry, space_group_num, empty_Wyckoff_positions, prototype_space_groups, 2, catalog);
     }
     // find prototypes based on stoichiometry, space group, and Wyckoff positions only (recommended/default)
     else {
       message << "Load prototypes with the same stoichiometry, space group, and Wyckoff positions as the input.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       vlabel = aflowlib::GetPrototypesBySymmetry(stoichiometry, space_group_num, grouped_Wyckoff_positions, prototype_space_groups, 2, catalog);
     }
     message << "Potential compatible prototypes: " << vlabel.size() << " (" << aurostd::joinWDelimiter(vlabel,",") << ").";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     if(LDEBUG) {
       cerr << function_name << ": Wyckoff positions of input structure:" << endl;
       for(uint i=0;i<all_structures[0].grouped_Wyckoff_positions.size();i++){
@@ -1275,19 +1275,19 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // group into objects based on stoichiometry and symmetry (Pearson and space group)
     message << "Grouping sets of comparisons.";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> comparison_schemes = compare::groupStructurePrototypes(all_structures, same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, false); //DX 20190731 - add ignore_environment //DX 20190829 - false for duplicates_removed 
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
    
     // ---------------------------------------------------------------------------
     // compare structures 
     message << "Running comparisons ...";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(num_proc, comparison_schemes, same_species, false, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, clean_unmatched, false, store_comparison_logs, oss, FileMESSAGE);  //DX 20190319 - added FileMESSAGE //DX 20190506 - added clean unmatched //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool //DX 20190930 - false=duplicates_removed
 
     message << "Comparisons complete ...";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     
     AFLOW_PTHREADS::MAX_PTHREADS = uint_backup; // DX 20190830 - set back to original setting
     
@@ -1301,14 +1301,14 @@ namespace pflow {
     // get unique permutations 
     if(calculate_unique_permutations){
       message << "Identifying unique permutations for representative structures ...";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
       for(uint i=0;i<final_prototypes.size();i++){
         // check if xstructure is generated; if not, make it
         if(!final_prototypes[i].structure_representative_generated){
           if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
             message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
-            throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
           }
         }        
         if(LDEBUG){ //DX 20190601 - added LDEBUG
@@ -1323,7 +1323,7 @@ namespace pflow {
         }
       }
       message << "Unique permutations found.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1376,7 +1376,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE2DATABASE::OPTIMIZE_MATCH")) {
       optimize_match=true;
       message << "OPTIONS: Finding optimal match; exploring all possible lattices and origins to find the best match (note: this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1385,7 +1385,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE2DATABASE::NO_SCALE_VOLUME")) {
       scale_volume=false;
       message << "OPTIONS: Suppressing volume scaling; useful for distinguishing structures at different pressures."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1394,7 +1394,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE2DATABASE::IGNORE_WYCKOFF")) {
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring Wyckoff positions when grouping comparisons, but will group by space group (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1404,7 +1404,7 @@ namespace pflow {
       ignore_symmetry=true;
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring symmetry when grouping comparisons, i.e., do not group by space group and Wyckoff positions (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1423,7 +1423,7 @@ namespace pflow {
       structure_comparison=true;
       same_species = false;
       message << "OPTIONS: Structure-type comparison, i.e., ignore atomic species."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1437,7 +1437,7 @@ namespace pflow {
       matchbook.insert(matchbook.end(), property_list.begin(), property_list.end());
 
       message << "OPTIONS: Extracting the following properties: " << aurostd::joinWDelimiter(property_list,", "); 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1447,7 +1447,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE2DATABASE::GEOMETRY_FILE")) {
       geometry_file = vpflow.getattachedscheme("COMPARE2DATABASE::GEOMETRY_FILE");
       message << "OPTIONS: Structure type (POSCAR.orig, POSCAR.relax1, POSCAR.relax2, CONTCAR.relax1, ...): " << geometry_file << endl; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1461,7 +1461,7 @@ namespace pflow {
         matchbook.push_back(catalog_summons);
       } //DX 20190329 - added if-statement since AFLUX doesn't use "all"
       message << "OPTIONS: Catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << endl; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     //DX 20190425 - added print flag - START
@@ -1503,7 +1503,7 @@ namespace pflow {
     // check if fake names for same species comparison
     if(xstr.species[0]=="A" && !structure_comparison){
       message << "Atomic species are missing for the input structure. Cannot compare to database materials without species.";     
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_ERROR_);
       return "";
     }
     //DX 20190329 - added species check - END
@@ -1564,14 +1564,14 @@ namespace pflow {
     // construct aflux summons, i.e., combine matchbook
     string Summons = aurostd::joinWDelimiter(matchbook,",");
     message << "AFLUX matchbook request: " << Summons;
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
     // call AFLUX 
     string response = aflowlib::AFLUXCall(Summons);
 
     message << "Number of entries returned: " << aurostd::string2tokens(response,tokens,"\n");
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     if(LDEBUG) {cerr << function_name << "::AFLUX response:" << endl << response << endl;}
    
@@ -1638,9 +1638,9 @@ namespace pflow {
     }
 
     message << "Total number of candidate structures from database: " << auids.size();
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     message << "Loading structures ... ";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
 
     vector<StructurePrototype> all_structures;
@@ -1678,7 +1678,7 @@ namespace pflow {
         }
         else {
           message << "Expected natoms in " << auids[i] << " to be an integer.";     
-          throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
         }
       }
 
@@ -1731,24 +1731,24 @@ namespace pflow {
         }
         else {
           message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
-          throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
         }
       }
     }
     message << "Total number of candidate structures loaded: " << all_structures.size(); //DX 20190403
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_); //DX 20190403
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_); //DX 20190403
 
     // ---------------------------------------------------------------------------
     // calculate symmetry of database entries (need Wyckoff positions, but database is not sufficiently populated)
     // in the meantime, we calculate
     if(!ignore_symmetry){
       message << "Calculating the symmetry of the structures.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
       compare::calculateSymmetries(all_structures,num_proc); 
 
       message << "Symmetries calculated.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }  
     else {
       for(uint i=0; i<all_structures.size(); i++){
@@ -1774,7 +1774,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // group into objects based on stoichiometry and symmetry (Pearson and space group)
     message << "Grouping sets of comparisons.";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> comparison_schemes = compare::groupStructurePrototypes(all_structures, same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, false); //DX 20190731 - add ignore_environment //DX 20190829 - false for duplicates_removed
     //cerr << "number of schemes: " << comparison_schemes.size() << endl;
     //cerr << "comparison_schemes: " << comparison_schemes.size() << endl;
@@ -1784,12 +1784,12 @@ namespace pflow {
     // only compare entries to the input representation, the rest are extraneous comparisons
     vector<StructurePrototype> input_structure_comparison_scheme_only; input_structure_comparison_scheme_only.push_back(comparison_schemes[0]);
     message << "Number of structures to compare to input structure: " << input_structure_comparison_scheme_only[0].structures_duplicate_names.size();
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
     // compare structures
     message << "Running comparisons...";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(num_proc, input_structure_comparison_scheme_only, same_species, false, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, clean_unmatched, false, store_comparison_logs, oss, FileMESSAGE); //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool //DX 20190830 - false=duplicates_removed
     
     // ---------------------------------------------------------------------------
@@ -1809,7 +1809,7 @@ namespace pflow {
      
     // DEBUG oss << ss_out.str();
     message << "Number of structures in database matching with the input structure: " << final_prototypes[0].structures_duplicate.size() << "." << endl;
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     
     //DX 20190429 - added screen only option - START
     // ---------------------------------------------------------------------------
@@ -1853,7 +1853,7 @@ namespace pflow {
         message << "RESULTS: See database_structure_comparison_output.out or database_structure_comparison_output.json for list of unique/duplicate structures in database.";
       }
     }
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
 
     return oss.str();
 
@@ -1903,7 +1903,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::OPTIMIZE_MATCH")) {
       optimize_match=true;
       message << "OPTIONS: Finding optimal match; exploring all possible lattices and origins to find the best match (note: this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1912,7 +1912,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::NO_SCALE_VOLUME")) {
       scale_volume=false;
       message << "OPTIONS: Suppressing volume scaling; useful for distinguishing structures at different pressures."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -1921,7 +1921,7 @@ namespace pflow {
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_WYCKOFF")) {
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring Wyckoff positions when grouping comparisons, but will group by space group (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1931,7 +1931,7 @@ namespace pflow {
       ignore_symmetry=true;
       ignore_Wyckoff=true;
       message << "OPTIONS: Ignoring symmetry when grouping comparisons, i.e., do not group by space group and Wyckoff positions (note: do not use for making prototypes; this will slow down the comparisons)."; 
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
     
     // ---------------------------------------------------------------------------
@@ -2577,18 +2577,18 @@ namespace compare {
       if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
         aurostd::stringstream2file(ss_json_remove_duplicates,directory+"/duplicate_compounds_output.json");
         message << "RESULTS: See " << directory << "/duplicate_compounds_output.json for list of unique/duplicate structures.";
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
       else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
         aurostd::stringstream2file(ss_out_remove_duplicates,directory+"/duplicate_compounds_output.out");
         message << "RESULTS: See " << directory << "/duplicate_compounds_output.out for list of unique/duplicate structures.";
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
       else {
         aurostd::stringstream2file(ss_json_remove_duplicates,directory+"/duplicate_compounds_output.json");
         aurostd::stringstream2file(ss_out_remove_duplicates,directory+"/duplicate_compounds_output.out");
         message << "RESULTS: See " << directory << "/duplicate_compounds_output.out" << " or " << directory << "/duplicate_compounds_output.json" << " for list of unique/duplicate structures.";
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
 
       // overwrite original all_structures variable
@@ -2606,12 +2606,12 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // group structures based on stoichiometry and symmetry (unless ignoring symmetry/Wyckoff)
     message << "Grouping sets of comparisons.";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     vector<StructurePrototype> comparison_schemes = compare::groupStructurePrototypes(all_structures, same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, false); //DX 20190731 - add ignore_environment //DX 20190829 - added remove_duplicate_compounds
 
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
    
     // ---------------------------------------------------------------------------
     // if ICSD comparison, make structure with minimum ICSD number the representative structure
@@ -2622,7 +2622,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // compare structures 
     message << "Running comparisons ...";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(num_proc, comparison_schemes, same_species, false, scale_volume, optimize_match, 
         ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, clean_unmatched, ICSD_comparison, store_comparison_logs, oss, FileMESSAGE);  //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool
     
@@ -2639,13 +2639,13 @@ namespace compare {
     // BETA TESTING (perhaps we shouldn't do this) - compare::checkPrototypes(num_proc,same_species,final_prototypes);
  
     message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << all_structures.size() << " structures).";
-    pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
 
     // ---------------------------------------------------------------------------
     // get unique permutations of prototype (representative) structures
     if(!same_species && calculate_unique_permutations){ 
       message << "Determining the unique permuations for each prototype.";
-      pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       // find unique permutations of prototype
       for(uint i=0;i<final_prototypes.size();i++){
         if(arePermutationsComparableViaStoichiometry(final_prototypes[i].stoichiometry) && 
@@ -2654,7 +2654,7 @@ namespace compare {
           if(!final_prototypes[i].structure_representative_generated){
             if(!compare::generateStructure(final_prototypes[i].structure_representative_name,final_prototypes[i].structure_representative_from,final_prototypes[i].structure_representative,oss)){
               message << "Could not generate structure (" << final_prototypes[i].structure_representative_name << ").";
-              throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_); //DX 20191031 - exit to xerror
             }
           }
           vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,optimize_match,oss,FileMESSAGE);
@@ -2683,12 +2683,12 @@ namespace compare {
     // for structure-type comparisons, remove duplicate compounds (avoid biased duplicate statistics)
     if(same_species==false && remove_duplicate_compounds){
     //DX 20190220 [BETA]  message << "Performing comparisons to removing duplicate compounds";
-    //DX 20190220 [BETA]  pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    //DX 20190220 [BETA]  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     //DX 20190220 [BETA]
     //DX 20190220 [BETA]  vector<StructurePrototype> duplicate_compound_comparisons = compare::compareDuplicateCompounds(final_prototypes, num_proc, ICSD_comparison, oss);
     //DX 20190220 [BETA]  
     //DX 20190220 [BETA]  message << "Removing duplicates from final comparison list";
-    //DX 20190220 [BETA]  pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    //DX 20190220 [BETA]  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     //DX 20190220 [BETA]  // remove duplicates compounds from final comparison results
     //DX 20190220 [BETA]  compare::removeDuplicateCompounds(final_prototypes, duplicate_compound_comparisons);
     //DX 20190220 [BETA]
@@ -2704,7 +2704,7 @@ namespace compare {
     //DX 20190220 [BETA]  aurostd::stringstream2file(ss_json_remove_duplicates,directory+"/structure_comparison_no_duplicate_compounds_output.json");
     //DX 20190220 [BETA]  aurostd::stringstream2file(ss_out_remove_duplicates,directory+"/structure_comparison_no_duplicate_compounds_output.out");
     //DX 20190220 [BETA]  message << "RESULTS: See " << directory << "/structure_comparison_no_duplicate_compounds_output.out" << " or " << directory << "/structure_comparison_no_duplicate_compounds_output.json" << " for list of unique/duplicate structures.";
-    //DX 20190220 [BETA]  pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+    //DX 20190220 [BETA]  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
 
     if(get_aflow_prototype_designation){

@@ -454,7 +454,7 @@ void DOSCalculator::writePDOS() {
   if (!aurostd::FileExist(filename)) { //ME181226
     string function = "DOSCalculator::writePDOS()";
     string message = "Cannot open output file " + filename + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
   }
   //outfile.clear();
@@ -473,7 +473,7 @@ void DOSCalculator::writePHDOSCAR() {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHPOSCAR()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
   if (xdos.partial) {  // Write PHDOSCAR if there are projected DOS
     filename = DEFAULT_APL_PHPOSCAR_FILE;
@@ -485,7 +485,7 @@ void DOSCalculator::writePHDOSCAR() {
     if (!aurostd::FileExist(filename)) {
       string function = "PhononDispersionCalculator::writePHPOSCAR()";
       string message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
   }
 }
@@ -593,7 +593,7 @@ void DOSCalculator::writePDOS(string path, string ex)  //[PINKU]
   if (!aurostd::FileExist(file)) {
     string function = "DOSCalculator::writePDOS()";
     string message = "Cannot open output file " + filename + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
   }
   //outfile.clear();

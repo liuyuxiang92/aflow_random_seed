@@ -1542,7 +1542,7 @@ namespace apl {
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::writeDYNMAT()";
       string message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
 //      throw apl::APLRuntimeError("PhononCalculator::writeDYNMAT(); Cannot open output file.");
     //CO - END
@@ -1858,7 +1858,7 @@ namespace apl {
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::hibernate()";
       string message = "Cannot open output file " + filename + "."; //ME181226
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //      throw apl::APLRuntimeError("PhononCalculator::hibernate(); Cannot open output apl.xml.");
     }
     //}
@@ -1889,7 +1889,7 @@ namespace apl {
     if (!vlines.size()) {
       string function = "PhononCalculator::awake()";
       string message = "Cannot open output file " + hibfile + "."; //ME181226
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //      throw apl::APLRuntimeError("apl::PhononCalculator::awake(); Cannot open input apl.xml.");
     }
 
@@ -2344,35 +2344,37 @@ namespace apl {
 
   // ME 190607
   vector<xvector<double> > PhononCalculator::readForcesFromQmvasp(const string& directory) {
-    vector<xvector<double> > forces;
+    //[CO191112 - OBSOLETE]vector<xvector<double> > forces;
     string file = directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
-    if (aurostd::EFileExist(file)) {
-      vector<string> vlines;
-      aurostd::efile2vectorstring(file, vlines);
-      uint vsize = vlines.size();
-      uint line_count = 0;
-      string line;
-      while (line_count != vsize) {
-        line = vlines[line_count++];
-        if (line.find("TOTAL-FORCE") != string::npos) {
-          vector<double> tokens;
-          xvector<double> f(3);
-          line = vlines[++line_count];  // Skip [AFLOW] line
-          while ((line_count < vsize) && (line.find("[AFLOW]") == string::npos)) {
-            aurostd::string2tokens(line, tokens, " ");
-            if (tokens.size() == 6) {
-              for (int i = 1; i < 4; i++) f[i] = tokens[i+2];
-              forces.push_back(f);
-            } else {  // size has to be six, or there is an error in the file
-              forces.clear();
-              return forces;
-            }
-            line = vlines[++line_count];
-          }
-          return forces;
-        }
-      }
-    }
-    return forces;
+    if(aurostd::EFileExist(file)==FALSE){throw aurostd::xerror(_AFLOW_FILE_NAME_,"APL::PhononCalculator::readForcesFromQmvasp():","qmvasp file not found ["+file+"]",_FILE_NOT_FOUND_);}  //CO191112
+    xQMVASP qmvasp(file); //CO191112
+    return qmvasp.vforces;  //CO191112
+    //[CO191112 - OBSOLETE]vector<string> vlines;
+    //[CO191112 - OBSOLETE]aurostd::efile2vectorstring(file, vlines);
+    //[CO191112 - OBSOLETE]uint vsize = vlines.size();
+    //[CO191112 - OBSOLETE]uint line_count = 0;
+    //[CO191112 - OBSOLETE]string line;
+    //[CO191112 - OBSOLETE]while (line_count != vsize) {
+    //[CO191112 - OBSOLETE]  line = vlines[line_count++];
+    //[CO191112 - OBSOLETE]  if (line.find("TOTAL-FORCE") != string::npos) {
+    //[CO191112 - OBSOLETE]    vector<double> tokens;
+    //[CO191112 - OBSOLETE]    xvector<double> f(3);
+    //[CO191112 - OBSOLETE]    line = vlines[++line_count];  // Skip [AFLOW] line
+    //[CO191112 - OBSOLETE]    while ((line_count < vsize) && (line.find("[AFLOW]") == string::npos)) {
+    //[CO191112 - OBSOLETE]      aurostd::string2tokens(line, tokens, " ");
+    //[CO191112 - OBSOLETE]      if (tokens.size() == 6) {
+    //[CO191112 - OBSOLETE]        for (int i = 1; i < 4; i++) f[i] = tokens[i+2];
+    //[CO191112 - OBSOLETE]        forces.push_back(f);
+    //[CO191112 - OBSOLETE]      } else {  // size has to be six, or there is an error in the file
+    //[CO191112 - OBSOLETE]        forces.clear();
+    //[CO191112 - OBSOLETE]        return forces;
+    //[CO191112 - OBSOLETE]      }
+    //[CO191112 - OBSOLETE]      line = vlines[++line_count];
+    //[CO191112 - OBSOLETE]    }
+    //[CO191112 - OBSOLETE]    return forces;
+    //[CO191112 - OBSOLETE]  }
+    //[CO191112 - OBSOLETE]}
+    //[CO191112 - OBSOLETE]}
+    //[CO191112 - OBSOLETE]return forces;
   }
 }  // namespace apl

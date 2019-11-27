@@ -202,6 +202,8 @@ namespace aflowlib {
     ael_debye_temperature=AUROSTD_NAN; //CT181212
     ael_applied_pressure=AUROSTD_NAN; //CT181212
     ael_average_external_pressure=AUROSTD_NAN; //CT181212
+    ael_stiffness_tensor.clear();  // ME191105
+    ael_compliance_tensor.clear();  // ME191105
     // BADER
     bader_net_charges.clear();vbader_net_charges.clear();
     bader_atomic_volumes.clear();vbader_atomic_volumes.clear();
@@ -404,6 +406,8 @@ namespace aflowlib {
     ael_debye_temperature=b.ael_debye_temperature; //CT181212
     ael_applied_pressure=b.ael_applied_pressure; //CT181212
     ael_average_external_pressure=b.ael_average_external_pressure; //CT181212
+    ael_stiffness_tensor = b.ael_stiffness_tensor;  // ME191105
+    ael_compliance_tensor = b.ael_compliance_tensor;  // ME191105
     // BADER
     bader_net_charges=b.bader_net_charges;vbader_net_charges.clear();for(uint i=0;i<b.vbader_net_charges.size();i++) vbader_net_charges.push_back(b.vbader_net_charges.at(i));
     bader_atomic_volumes=b.bader_atomic_volumes;vbader_atomic_volumes.clear();for(uint i=0;i<b.vbader_atomic_volumes.size();i++) vbader_atomic_volumes.push_back(b.vbader_atomic_volumes.at(i));
@@ -526,6 +530,7 @@ namespace aflowlib {
   
   // Load overload
   uint _aflowlib_entry::Load(const string& _entry,ostream& oss) {
+    string function = "aflowlib::_aflowlib_entry::Load()";  // ME191119
     clear(); // start from clean
     entry=_entry; // start from loading it up !
     if(entry.empty()) {cerr << "ERROR - _aflowlib_entry::Load: entry.empty()" << endl;return 0;} //exit(0);}  // CO 170609, this is a dud 
@@ -776,6 +781,63 @@ namespace aflowlib {
 	else if(keyword=="ael_debye_temperature") {ael_debye_temperature=aurostd::string2utype<double>(content);} //CT181212
 	else if(keyword=="ael_applied_pressure") {ael_applied_pressure=aurostd::string2utype<double>(content);} //CT181212
 	else if(keyword=="ael_average_external_pressure") {ael_average_external_pressure=aurostd::string2utype<double>(content);} //CT181212
+        // ME191105 - BEGIN
+        else if(keyword=="ael_stiffness_tensor") {
+          xmatrix<double> tensor(6,6);
+          vector<string> rows;
+          vector<double> r;
+          aurostd::string2tokens(content, rows, ";");
+          if (rows.size() != 6) {
+            stringstream message;
+            message << "Could not read ael_stiffness_tensor: wrong number of rows"
+                    << " (found " << rows.size() << ", need 6).";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+          } else {
+            for (int i = 0; i < 6; i++) {
+              aurostd::string2tokens(rows[i], r, ",");
+              if (r.size() != 6) {
+                stringstream message;
+                message << "Could not read ael_stiffness_tensor: wrong number of columns"
+                        << " in row " << (i + 1)
+                        << " (found " << rows.size() << ", need 6).";
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+              } else {
+                for (int j = 0; j < 6; j++) {
+                  tensor[i + 1][j + 1] = r[j];
+                }
+              }
+            }
+          }
+          ael_stiffness_tensor = tensor;
+        } else if (keyword == "ael_compliance_tensor") {
+          xmatrix<double> tensor(6,6);
+          vector<string> rows;
+          vector<double> r;
+          aurostd::string2tokens(content, rows, ";");
+          if (rows.size() != 6) {
+            stringstream message;
+            message << "Could not read ael_compliance_tensor: wrong number of rows"
+                    << " (found " << rows.size() << ", need 6).";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+          } else {
+            for (int i = 0; i < 6; i++) {
+              aurostd::string2tokens(rows[i], r, ",");
+              if (r.size() != 6) {
+                stringstream message;
+                message << "Could not read ael_compliance_tensor: wrong number of columns"
+                        << " in row " << (i + 1)
+                        << " (found " << rows.size() << ", need 6).";
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+              } else {
+                for (int j = 0; j < 6; j++) {
+                  tensor[i + 1][j + 1] = r[j];
+                }
+              }
+            }
+          }
+          ael_compliance_tensor = tensor;
+        }
+        // ME191105 - END
 	// BADER
 	else if(keyword=="bader_net_charges") {bader_net_charges=content;aurostd::string2tokens<double>(content,vbader_net_charges,",");}
 	else if(keyword=="bader_atomic_volumes") {bader_atomic_volumes=content;aurostd::string2tokens<double>(content,vbader_atomic_volumes,",");}
@@ -1014,6 +1076,10 @@ namespace aflowlib {
       oss << "ael_debye_temperature" << ael_debye_temperature << (html?"<br>":"") << endl; //CT181212 
       oss << "ael_applied_pressure" << ael_applied_pressure << (html?"<br>":"") << endl; //CT181212 
       oss << "ael_average_external_pressure" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT181212 
+      // ME191105 - BEGIN
+      oss << "ael_stiffness_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} // ME191105
+      oss << "ael_compliance_tensor = "; for (int i = 1; i <= 6; i++) {for (int j = 1; j <= 6; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} // ME191105
+      // ME191105 - END
       // BADER
       oss << "bader_net_charges" << bader_net_charges << "  vbader_net_charges= ";for(uint j=0;j<vbader_net_charges.size();j++) oss << vbader_net_charges.at(j) << " "; oss << (html?"<br>":"") << endl; 
       oss << "bader_atomic_volumes" << bader_atomic_volumes << "  vbader_atomic_volumes= ";for(uint j=0;j<vbader_atomic_volumes.size();j++) oss << vbader_atomic_volumes.at(j) << " "; oss << (html?"<br>":"") << endl; 
@@ -1231,6 +1297,24 @@ namespace aflowlib {
       if(ael_debye_temperature!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_debye_temperature=" << ael_debye_temperature << eendl; //CT181212
       if(ael_applied_pressure!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_applied_pressure=" << ael_applied_pressure << eendl; //CT181212
       if(ael_average_external_pressure!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_average_external_pressure=" << ael_average_external_pressure << eendl; //CT181212
+      // ME191105 - BEGIN
+      sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_stiffness_tensor=";
+      if ((ael_stiffness_tensor.rows == 6) && (ael_stiffness_tensor.cols == 6)) {
+        for (int i = 1; i <= 6; i++) {
+          for (int j = 1; j <= 6; j++) sss << ael_stiffness_tensor[i][j] << ((j < 6)?",":"");
+          sss << ((i < 6)?";":"") << eendl;
+        }
+      }
+      sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ael_compliance_tensor=";
+      if ((ael_compliance_tensor.rows == 6) && (ael_compliance_tensor.cols == 6)) {
+        for (int i = 1; i <= 6; i++) {
+          for (int j = 1; j <= 6; j++) {
+            sss << ael_compliance_tensor[i][j] << ((j < 6)?",":"");
+          }
+          sss << ((i < 6)?";":"") << eendl;
+        }
+      }
+      // ME191105 - END
       // BADER
       if(bader_net_charges.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_net_charges=" << bader_net_charges << eendl;
       if(bader_atomic_volumes.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "bader_atomic_volumes=" << bader_atomic_volumes << eendl;
@@ -2968,6 +3052,34 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //////////////////////////////////////////////////////////////////////////
 
+      //////////////////////////////////////////////////////////////////////////  ME191105
+      if ((ael_stiffness_tensor.rows == 6) && (ael_stiffness_tensor.cols == 6)) {
+        sscontent_json << "\"ael_stiffness_tensor\":[";
+        for (int i = 1; i <= 6; i++) {
+          sscontent_json << "[";
+          for (int j = 1; j <= 6; j++) sscontent_json << ael_stiffness_tensor[i][j] << ((j < 6)?",":"]");
+          sscontent_json << ((i < 6)?",":"");
+        }
+        sscontent_json << "]";
+      } else {
+        if (PRINT_NULL) sscontent_json << "\"ael_stiffness_tensor\":null" << eendl;
+      }
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      //////////////////////////////////////////////////////////////////////////  ME191105
+      if ((ael_compliance_tensor.rows == 6) && (ael_compliance_tensor.cols == 6)) {
+        sscontent_json << "\"ael_compliance_tensor\":[";
+        for (int i = 1; i <= 6; i++) {
+          sscontent_json << "[";
+          for (int j = 1; j <= 6; j++) sscontent_json << ael_compliance_tensor[i][j] << ((j < 6)?",":"]");
+          sscontent_json << ((i < 6)?",":"");
+        }
+        sscontent_json << "]";
+      } else {
+        if (PRINT_NULL) sscontent_json << "\"ael_compliance_tensor\":null" << eendl;
+      }
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
       // BADER
       //////////////////////////////////////////////////////////////////////////
       if(vbader_net_charges.size()) {
@@ -3105,7 +3217,7 @@ namespace aflowlib {
         enthalpy_formation_cell = natoms * enthalpy_formation_atom;
         if(verbose){
           message << "Fixing enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       //gamma_IrV
@@ -3116,7 +3228,7 @@ namespace aflowlib {
         enthalpy_atom -= 0.005;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // HfPd
@@ -3127,7 +3239,7 @@ namespace aflowlib {
         enthalpy_cell = natoms * enthalpy_atom;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // sigma
@@ -3142,7 +3254,7 @@ namespace aflowlib {
         enthalpy_atom += 0.005;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
       // sigma
@@ -3153,7 +3265,7 @@ namespace aflowlib {
         enthalpy_cell = natoms * enthalpy_atom;
         if(verbose){
           message << "Fixing enthalpy/enthalpy_formation of " << pseudoA << pseudoB << ":" << prototype;
-          pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         }
       }
     }
@@ -3468,7 +3580,7 @@ namespace aflowlib {
     if(0){
       if (tokens.size() != 2) {
 	message << "Odd AURL format for entry " << auid << ": " << aurl;
-	pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+	pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
 	return path;
       }
     }
@@ -5927,6 +6039,27 @@ namespace aflowlib {
 	// XHOST.FLAG::BADER
 	aflowlib_json << "," << "\"XHOST.FLAG::BADER\":" << (vflags.flag("FLAG::BADER")?"true":"false");
 	aflowlib_out << " | " << "XHOST.FLAG::BADER=" << (vflags.flag("FLAG::BADER")?"1":"0");
+
+        // ME191004 - START
+        // Grab compressed files
+        if(XHOST.vflag_control.flag("PRINT_MODE::JSON") || !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
+          string content;
+          // fgroup for JMOL applet
+          if (aurostd::EFileExist(directory_RAW + "/aflow.fgroup.bands.json")) {
+            content = aurostd::efile2string(directory_RAW + "/aflow.fgroup.bands.json");
+          } else if (aurostd::EFileExist(directory_RAW + "/aflow.fgroup.relax.json")) {
+            content = aurostd::efile2string(directory_RAW + "/aflow.fgroup.relax.json");
+          }
+          aflowlib_json << ", \"fgroup\":" << (content.empty()?"null":content);
+
+          content = "";
+          if (vflags.flag("FLAG::ELECTRONIC")) {
+            string system_name = KBIN::ExtractSystemName(directory_LIB);
+            content = aurostd::efile2string(directory_RAW + "/" + system_name + "_bandsdata.json");
+          }
+          aflowlib_json << ", \"bandsdata\":" << (content.empty()?"null":content);
+        }
+        // ME1901004 - STOP
       }
 
       // XHOST.machine_type
