@@ -14271,13 +14271,17 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
       for(uint k=0;k<l3.size();k++) {
         if(i!=0 || j!=0 || k!=0) {
           abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
-          for(uint iat=0;iat<natoms;iat++) { //DX 20191107 - replace str.atoms.size() with natoms
-            atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
-            atom.isincell=FALSE; // these are OUT OF CELL
-            atom.cpos=abc_component+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
-            atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
-            atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
-            atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+          for(uint iat=0;iat<natoms;iat++) {       //DX 20191107 - replace str.atoms.size() with natoms
+            atom=str.atoms[iat];                   //DX 20190709 - at to [] = speed increase
+            atom.isincell=FALSE;                   // these are OUT OF CELL
+            //DX 20191127 [OBOSLETE] atom.cpos=abc_component+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
+            atom.cpos+=abc_component;              //DX 20190709 - at to [] = speed increase // CO 20191127 
+            //DX 20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
+            //DX 20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
+            //DX 20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+            atom.fpos[1]+=a_index[i];              //DX 20190709 - at to [] = speed increase //CO 20191127
+            atom.fpos[2]+=b_index[j];              //DX 20190709 - at to [] = speed increase //CO 20191127
+            atom.fpos[3]+=c_index[k];              //DX 20190709 - at to [] = speed increase //CO 20191127
             //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
             //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
             str.grid_atoms[grid_atom_count] = atom;
