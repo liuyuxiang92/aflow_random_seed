@@ -821,7 +821,7 @@ namespace compare {
          vfiles[i].find("duplicate_compounds_output.out") != std::string::npos || 
          vfiles[i].find("nohup.out") != std::string::npos){
         message << "Ignoring file=" << vfiles[i] << endl;
-        pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
         vfiles.erase(vfiles.begin()+i);
         i--;
       }
@@ -831,11 +831,11 @@ namespace compare {
         aurostd::efile2stringstream(directory+"/"+vfiles[i],sss1);
         xstructure xstr1; //DX 20190718
         try { xstr1 = sss1; } //DX 20190718
-        catch(aurostd::xerror& excpt) { message << "Could not load structure " << vfiles[i] << "...skipping structure"; pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX 20190718
+        catch(aurostd::xerror& excpt) { message << "Could not load structure " << vfiles[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX 20190718
         xstr1.directory = directory+"/"+vfiles[i]; //DX 20190718 - need to pass in since passing structure as a string
         if(magmoms_for_systems.size()==vfiles.size()){
           try { pflow::ProcessAndAddSpinToXstructure(xstr1, magmoms_for_systems[i]); } //DX 20190801
-          catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX 20190801
+          catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX 20190801
         }
         structure_tmp.structure_representative = xstr1;
         structure_tmp.structure_representative.ReScale(1.0); //DX 20190715
@@ -942,12 +942,12 @@ namespace compare {
         StructurePrototype structure_tmp;
         xstructure xstr1; //DX 20190718
         try { xstr1 = geometry; } //DX 20190718
-        catch(aurostd::xerror& excpt) { message << "Could not load structure " << structure_count << "/" << start_string.size() << "...skipping structure"; pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX 20190718
+        catch(aurostd::xerror& excpt) { message << "Could not load structure " << structure_count << "/" << start_string.size() << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX 20190718
         stringstream designation; designation << "file structure # " << structure_count << "/" << start_string.size();
         xstr1.directory = designation.str(); //DX 20190718 - need to pass in since passing structure as a string
         if(magmoms_for_systems.size()==lines.size()){
           try { pflow::ProcessAndAddSpinToXstructure(xstr1, magmoms_for_systems[i]); } //DX 20190801
-          catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX 20190801
+          catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX 20190801
         }
         structure_tmp.structure_representative = xstr1;
         structure_tmp.structure_representative.ReScale(1.0); //DX 20190715
@@ -1018,7 +1018,7 @@ namespace compare {
       StructurePrototype structure_tmp;
       if(!aurostd::FileExist(filenames[i])){
         message << filenames[i] << " file not found.";
-        throw aurostd::xerror(function_name,message,_FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_FILE_NOT_FOUND_);
       }
       stringstream sss;
       aurostd::efile2stringstream(filenames[i],sss);
@@ -1026,7 +1026,7 @@ namespace compare {
       xstr.directory = filenames[i]; //DX 20190718 - need to pass in since passing structure as a string
       if(magmoms_for_systems.size()==filenames.size()){
         try { pflow::ProcessAndAddSpinToXstructure(xstr, magmoms_for_systems[i]); } //DX 20190801
-        catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(function_name, message, _INPUT_ERROR_); } //DX 20190801
+        catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); } //DX 20190801
       }
       structure_tmp.structure_representative = xstr;
       structure_tmp.structure_representative.ReScale(1.0); //DX 20190715
@@ -1412,14 +1412,14 @@ namespace compare{
       if(mode==0){
         if(!quiet || LDEBUG){
           message << "Considering environment analysis in grouping permutations (mode=0)." << endl;
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
         }
       }
       if(mode==1){ 
         ignore_environment=true; 
         if(!quiet || LDEBUG){
           message << "Could not find commensurate pemutations when grouping via environment. Ignoring environment analysis in grouping permutations (mode=1)." << endl;
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
         }
       }
       final_permutations.clear();
@@ -1453,7 +1453,7 @@ namespace compare{
             for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",")  << ")" << endl; } 
           }
           message << "Trying to check if duplicates match better with other representative structures ... " << endl;
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
         }
 
         // ---------------------------------------------------------------------------
@@ -1474,7 +1474,7 @@ namespace compare{
           }
           if(mode==1){  // exhausted checks
             message << "Please contact David Hicks (david.hicks@duke.edu) and provide the corresponding example." << endl;
-            throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
           }
         }
         else{ break; }
@@ -2205,7 +2205,7 @@ namespace compare{
 //DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       reduced_numbers.push_back((uint)(numbers[i]/global_GCD));
 //DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(numbers[i]%global_GCD){
 //DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         message << "Error in GCD procedure. Contact David Hicks (david.hicks@duke.edu)";
-//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
 //DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
 //DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
 //DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     return reduced_numbers;
@@ -2273,7 +2273,7 @@ namespace compare{
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     } 
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     if(recovered != vxstrs.size()){
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]       message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << vxstrs.size();
-//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20190717 - exit to xerror
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_); //DX 20190717 - exit to xerror
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG for(uint i=0;i<vxstrs_split.size();i++){
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG   cerr << "num of xstrs for thread: " << i << " = " << vxstrs_split[i].size() << endl;
@@ -2411,7 +2411,7 @@ namespace compare{
       } 
       if(recovered != number_of_comparisons){
         message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_comparisons;
-        throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_); //DX 20190717 - exit to xerror
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_); //DX 20190717 - exit to xerror
       }
     }
     return true;
@@ -2541,7 +2541,7 @@ namespace compare{
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]       } 
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(recovered != number_of_tasks){
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]         message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_tasks;
-//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
 //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     return true;
@@ -3667,7 +3667,7 @@ namespace compare{
             if(structuresCompatible(prototype_schemes[i], prototype_schemes[k], same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, duplicates_removed)){ // can check based on representatives; duplicate info matches its representative info //DX 20190829 - added duplicates_removed
               if(!quiet || LDEBUG){
                 message << "Found potential match for " << prototype_schemes[i].structures_duplicate_names[j] << ": " << prototype_schemes[k].structure_representative_name; 
-                pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+                pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
               }
 
               // ---------------------------------------------------------------------------
@@ -3717,7 +3717,7 @@ namespace compare{
           if(prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[min_index]){
             if(!quiet || LDEBUG){
               message << other_matches_schemes[i].structure_representative_name << " matches better with " << prototype_schemes[j].structure_representative_name; 
-              pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+              pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
             }
             prototype_schemes[j].addStructurePrototypeAsDuplicate(other_matches_schemes[i]);
             prototype_schemes[j].misfits_duplicate.back()=other_matches_schemes[i].misfits_duplicate[min_index];
@@ -3728,7 +3728,7 @@ namespace compare{
               if(prototype_schemes[j].structures_duplicate_names[k] == other_matches_schemes[i].structure_representative_name){
                 if(!quiet || LDEBUG){
                   message << "removing " << other_matches_schemes[i].structure_representative_name << " from " << prototype_schemes[j].structure_representative_name << " set"; 
-                  pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+                  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
                 }
                 prototype_schemes[j].removeNonDuplicate(k);
                 break;
@@ -3740,7 +3740,7 @@ namespace compare{
       else{
         if(!quiet){
           message << other_matches_schemes[i].structure_representative_name << " matches better with original set " << other_matches_schemes[i].structures_duplicate_names[0];
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
         }
       }
     }
@@ -4034,7 +4034,7 @@ namespace compare{
         if(!comparison_schemes[i].structure_representative_generated){
           if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_from,structure_representative,oss)){
             message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
-            throw aurostd::xerror(function_name,message,_INPUT_ERROR_); //DX 20190717 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
           }
         }
         else {
@@ -4047,7 +4047,7 @@ namespace compare{
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
           if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
             message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
-            throw aurostd::xerror(function_name,message,_INPUT_ERROR_); //DX 20190717 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
           }
         }
         else {
@@ -4151,7 +4151,7 @@ namespace compare{
           if(!comparison_schemes[i].structure_representative_generated){
             if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_from,structure_representative,oss)){
               message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
-              throw aurostd::xerror(function_name,message,_INPUT_ERROR_); //DX 20190717 - exit to xerror
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
             }
           }
           else {
@@ -4165,7 +4165,7 @@ namespace compare{
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
           if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
             message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
-            throw aurostd::xerror(function_name,message,_INPUT_ERROR_); //DX 20190717 - exit to xerror
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
           }
         }
         else {
@@ -4232,7 +4232,7 @@ namespace compare{
       if(number_of_comparisons>0){
         if(!quiet){
           message << "Continuing comparisons to match " << num_mismatches << " structures ...";
-          pflow::logger(function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
         }
         if(LDEBUG) { cerr << function_name << ": Number of comparisons is not zero... " << number_of_comparisons << endl; }
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
@@ -4424,7 +4424,7 @@ namespace compare{
         message << comparison_schemes[i] << endl;
       }
       message << "Please contact David Hicks (david.hicks@duke.edu) and provide the corresponding example." << endl;
-      throw aurostd::xerror(function_name,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
   }
 }

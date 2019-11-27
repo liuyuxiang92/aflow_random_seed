@@ -4681,7 +4681,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); 
           } //DX 20191029 - added try/catch sequence
           catch(aurostd::xerror& re){ 
-            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(soliloquy, message, std::cerr, _LOGGER_WARNING_); } 
+            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_); } 
           } //DX 20191029 - added try/catch sequence
         }
       }
@@ -4705,7 +4705,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX 20191029 - check if space group number is found - START
     if(a.spacegroupnumber==0){
       message << "Either space group number was not given or it was given in a non-standard setting.";
-      throw aurostd::xerror(soliloquy,message,_VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_VALUE_ERROR_);
     }
     //DX 20191029 - check if space group number is found - END
     bool found_setting = false;
@@ -10521,7 +10521,7 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
     string function_name = "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
-    throw aurostd::xerror(function_name,message,_INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
   }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
@@ -10570,7 +10570,7 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
     string function_name = "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
-    throw aurostd::xerror(function_name,message,_INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }

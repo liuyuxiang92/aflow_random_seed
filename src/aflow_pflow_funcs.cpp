@@ -7365,7 +7365,7 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
   else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
   else if(vred==no_vrt){;}
   else {throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(soliloquy,"Empty composition");}
+  if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
     output << vspecies[i];
     if(!(exclude1 && aurostd::identical(final_comp[i+final_comp.lrows],1.0,ZERO_TOL))) {

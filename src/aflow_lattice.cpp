@@ -58,7 +58,7 @@ namespace LATTICE {
     if(lattice_type=="BCC"){ return "cI"; }
 
     string function_name = "LATTICE::lattice2typeAndCentering()";
-    throw aurostd::xerror(function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
   }

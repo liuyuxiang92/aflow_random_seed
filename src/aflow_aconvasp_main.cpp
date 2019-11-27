@@ -2655,7 +2655,7 @@ namespace pflow {
       is_noncoll = true;
       if(!AddSpinToXstructure(a,vmag_noncoll)){
         message << "(non-collinear): Number of magnetic moments (" << vmag_noncoll.size() << ") does not match the number of atoms (" << a.atoms.size() << ")." << endl;
-        throw aurostd::xerror(function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
       } 
     }                                                                               
     // ---------------------------------------------------------------------------
@@ -2666,7 +2666,7 @@ namespace pflow {
         is_coll = true;
         if(!AddSpinToXstructure(a,vmag)){
           message << "(collinear): Number of magnetic moments (" << vmag.size() << ") does not match the number of atoms (" << a.atoms.size() << ")." << endl;
-          throw aurostd::xerror(function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
         } 
       } 
     }
@@ -2674,7 +2674,7 @@ namespace pflow {
     // could not detect; input error
     if(!is_noncoll && !is_coll){
       message << "Could not detect collinear or non-collinear spin(s). Check spin input.";
-      throw aurostd::xerror(function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
     }
   } 
 }
@@ -8139,7 +8139,7 @@ namespace pflow {
       for(uint i=0;i<tokens.size();i++){ stoichiometry.push_back(aurostd::string2utype<uint>(tokens[i])); }
       if(arity!=0 && arity!=stoichiometry.size()){
         message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match.";
-        throw aurostd::xerror(function_name,message,_INPUT_ERROR_); //DX 20191107 - exit() -> throw
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_); //DX 20191107 - exit() -> throw
       }
       std::sort(stoichiometry.begin(),stoichiometry.end()); // must sort to properly filter
     }
@@ -8159,7 +8159,7 @@ namespace pflow {
       Wyckoff_letters = vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::WYCKOFF_STRING");
       if(space_group_number == 0){
         message << "Space group must be given with Wyckoff letters; please specify." << endl;
-        throw aurostd::xerror(function_name,message,_INPUT_ILLEGAL_); //DX 20191107 - exit() -> throw
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX 20191107 - exit() -> throw
       }
     }
 

@@ -3858,7 +3858,7 @@ namespace anrl {
     for(uint i=0;i<all_lattice_parameters.size();i++){
       if(all_lattice_parameters[i]<=_ZERO_TOL_){
         stringstream message; message << "The " << i << "th lattice parameter is ill-defined. Please check input.";
-        throw aurostd::xerror(function_name, message, _VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_);
       }
     }
 
@@ -3962,10 +3962,10 @@ namespace anrl {
     if(vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF")){
       // check if Wyckoff information is available
       if(xstr.wyckoff_sites_ITC.size()==0){
-        throw aurostd::xerror(function_name,"Cannot use --force_Wyckoff option, Wyckoff positions must be given.",_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Cannot use --force_Wyckoff option, Wyckoff positions must be given.",_INPUT_ILLEGAL_);
       }
       if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
-        throw aurostd::xerror(function_name,"Cannot use options --setting and --force_Wyckoff together.",_INPUT_AMBIGUOUS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Cannot use options --setting and --force_Wyckoff together.",_INPUT_AMBIGUOUS_);
       }
       setting = xstr.spacegroupnumberoption;
       recalculate_symmetry = false;
@@ -4000,7 +4000,7 @@ namespace anrl {
       if(user_setting==1){setting=SG_SETTING_1;}
       else if(user_setting==2){setting=SG_SETTING_2;}
         if(user_setting!=SG_SETTING_1 && user_setting!=SG_SETTING_2){  //DX 20190318
-          throw aurostd::xerror(function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX 20191030
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX 20191030
           //DX 20191030 [OBSOLETE] cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX 20190318
           //DX 20191030 [OBSOLETE] return "";
         } //DX 20190318
