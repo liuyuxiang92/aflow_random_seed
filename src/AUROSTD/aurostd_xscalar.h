@@ -116,6 +116,7 @@ namespace aurostd {
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
+  int GCD(int a,int b, int& x, int& y); //CO180409  //CO191112 - extended GCD, get Bezout coefficients
   int GCD(int a,int b); //CO180409
   int LCM(int a,int b); //CO190520
   template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;

@@ -390,6 +390,23 @@ namespace aurostd {
 // Function GCD
 // ***************************************************************************
 namespace aurostd {
+//CO191112 - extended GCD, get Bezout coefficients
+//algorithm inspired by python solution of https://brilliant.org/wiki/extended-euclidean-algorithm/
+int GCD(int a,int b,int& x,int& y){ //CO180409
+  x=0;y=1;
+  int u=1,v=0;
+  int q=0,r=0,m=0,n=0;
+	while(a){ //is not 0
+    q=int(std::floor(b/a)); //beware of negative numbers, not just /
+    r=b%a;
+    m=x-u*q;
+    n=y-v*q;
+    b=a;a=r;
+    x=u;y=v;
+    u=m;v=n;
+  }
+  return b;
+}
 int GCD(int a,int b){ //CO180409
   // added for safety, will always give nonzero result, important for division!
   if(!a && !b) {return 1;} // you can always divide by 1
