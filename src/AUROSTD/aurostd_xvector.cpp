@@ -88,10 +88,8 @@ namespace aurostd {  // namespace aurostd
       //if(rows!=b.rows) {    // if dims(this)!=dims(a) => build a new xvector !!!
       if(lrows!=b.lrows||urows!=b.urows||vsize!=b.vsize) {    // if dims(this)!=dims(a) => build a new xvector !!!  //CO190808 - VERY IMPORTANT that we not only check lrows and urows, but vsize, as xvector could just have been initialized (vsize==0)
         free();
-        lrows=b.lrows;
-        urows=b.urows;
+        lrows=b.lrows;urows=b.urows;rows=b.rows;
         //[simply copy instead]refresh();
-        rows=b.rows;
         isfloat=b.isfloat;
         iscomplex=b.iscomplex;
         size=b.size;
@@ -112,10 +110,10 @@ namespace aurostd {  // namespace aurostd
         //[CO190808 OBSOLETE]  this->corpus[i+lrows] =
         //[CO190808 OBSOLETE]    (utype) b.corpus[i+b.lrows];
     }
-      if(corpus!=b.corpus){
-        for(int i=lrows;i<=urows;i++){this->corpus[i]=b.corpus[i];}
-      } //CO190808 - we definitely have corpus now
-    }
+    if(corpus!=b.corpus){
+      for(int i=lrows;i<=urows;i++){this->corpus[i]=b.corpus[i];}
+    } //CO190808 - we definitely have corpus now
+  }
   template<class utype>
     void xvector<utype>::copy(const xmatrix<utype>& b) { //CO190808
       if(b.rows==1){return copy(b(b.lrows));}
@@ -1161,37 +1159,37 @@ namespace aurostd {                   // conversion from xvector<int> to xvector
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  void xvector<utype>::reset(void) {
-    for(int i=lrows;i<=urows;i++) corpus[i]=(utype) 0.0;
-  }
+    void xvector<utype>::reset(void) {
+      for(int i=lrows;i<=urows;i++) corpus[i]=(utype) 0.0;
+    }
   template<class utype>                              // function reset xvector<>
-  void reset(xvector<utype>& a) {
-    for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) 0.0;
-  }
+    void reset(xvector<utype>& a) {
+      for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) 0.0;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  void xvector<utype>::clear(void) {
-    //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;copy(a);
-    reset(); //CO191110
-  }
+    void xvector<utype>::clear(void) {
+      //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;copy(a);
+      reset(); //CO191110
+    }
   template<class utype>                              // function clear xvector<>
-  void clear(xvector<utype>& b) {
-    //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;b=a;
-    b.reset(); //CO191110
-  }
+    void clear(xvector<utype>& b) {
+      //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;b=a;
+      b.reset(); //CO191110
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  void xvector<utype>::set(const utype& s) {
-    for(int i=lrows;i<=urows;i++) corpus[i]=(utype) s;
-  }
+    void xvector<utype>::set(const utype& s) {
+      for(int i=lrows;i<=urows;i++) corpus[i]=(utype) s;
+    }
   template<class utype>                                // function set xvector<>
-  void set(xvector<utype>& a, const utype& s) {
-    for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) s;
-  }
+    void set(xvector<utype>& a, const utype& s) {
+      for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) s;
+    }
 }
 
 // ----------------------------------------------------------------------------

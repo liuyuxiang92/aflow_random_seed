@@ -48,126 +48,75 @@
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // constructor
-  xmatrix<utype>::xmatrix(int nrh,int nch,int nrl,int ncl) {
-    int i,j;
-    lrows=std::min(nrl,nrh); //if(!nrh||!nch) lrows=0; this messes up convasp
-    urows=std::max(nrl,nrh); //if(!nrh||!nch) urows=0; this messes up convasp
-    lcols=std::min(ncl,nch); //if(!nrh||!nch) lcols=0; this messes up convasp
-    ucols=std::max(ncl,nch); //if(!nrh||!nch) ucols=0; this messes up convasp
-    rows=urows-lrows+1;      //if(!nrh||!nch) rows=0; this messes up convasp
-    cols=ucols-lcols+1;      //if(!nrh||!nch) cols=0; this messes up convasp
-    issquare=bool(rows == cols);
-    isfloat=_isfloat((utype) 0);
-    iscomplex=_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    msize=(long int) size*rows*cols;
+    xmatrix<utype>::xmatrix(int nrh,int nch,int nrl,int ncl) : msize(0) {
+      lrows=std::min(nrl,nrh); //if(!nrh||!nch) lrows=0; this messes up convasp
+      urows=std::max(nrl,nrh); //if(!nrh||!nch) urows=0; this messes up convasp
+      lcols=std::min(ncl,nch); //if(!nrh||!nch) lcols=0; this messes up convasp
+      ucols=std::max(ncl,nch); //if(!nrh||!nch) ucols=0; this messes up convasp
+      refresh();  //CO191112
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "M -> constructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
+      cerr << "M -> constructor:"
+        << "  lrows=" << lrows << ", urows=" << urows
+        << ", lcols=" << lcols << ", ucols=" << ucols
+        << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    if(msize>0) {
-      //Pass **passes = new ( Pass (*[ 10 ]) );
-      //Pass** passes = new Pass*[10];
-      corpus=new utype *[rows+XXEND]; // TRY
-      if(!corpus)
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in constructor (int,int,int,int)" << endl;exit(0);}
-      corpus+= -lrows+ XXEND;
-      corpus[lrows]= new utype[rows*cols+XXEND];
-      if(!corpus[lrows])
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in constructor (int,int,int,int)" << endl;exit(0);}
-      corpus[lrows] += -lcols +XXEND;
-      for(i=lrows+1;i<=urows;i++)
-	corpus[i]=corpus[i-1]+cols;
-      for(i=lrows;i<=urows;i++)                      // clear
-	for(j=lcols;j<=ucols;j++)                    // clear
-	  corpus[i][j]=(utype) 0.0;                    // clear
+      if(msize>0) {
+        corpus=new utype *[rows+XXEND];
+        if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,int,int)",_ALLOC_ERROR_);}
+        corpus+= -lrows+ XXEND;
+        corpus[lrows]= new utype[rows*cols+XXEND];
+        if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,int,int)",_ALLOC_ERROR_);}
+        corpus[lrows]+= -lcols+XXEND;
+        for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
+        clear();
+      }
+#ifdef _XMATH_DEBUG_CONSTRUCTORS
+      cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
+        << ", sizeof=" << size << ", msize=" << msize << endl;
+#endif
     }
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	 << ", sizeof=" << size << ", msize=" << msize << endl;
-#endif
-  }
-}
-  
-namespace aurostd {  // namespace aurostd
-  template<class utype>                                       // copy constructor
-  xmatrix<utype>::xmatrix(const xmatrix<utype>& a) {
-    int i,j;
-    lrows=a.lrows;urows=a.urows;rows=urows-lrows+1;
-    lcols=a.lcols;ucols=a.ucols;cols=ucols-lcols+1;
-    issquare=bool(rows == cols);
-    isfloat=_isfloat((utype) 0);  
-    iscomplex=_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    msize=(long int) size*rows*cols;
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "M -> copy constructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
-#endif
-    if(msize>0) {
-      corpus=new utype *[rows+XXEND];
-      if(!corpus)
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in constructor (xmatrix)" << endl;exit(0);}
-      corpus+= -lrows + XXEND;
-      corpus[lrows]= new utype[rows*cols+XXEND];
-      if(!corpus[lrows])
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in constructor (xmatrix)" << endl;exit(0);}
-      corpus[lrows] += -lcols +XXEND;
-      for(i=lrows+1;i<=urows;i++)
-	corpus[i]=corpus[i-1]+cols;
-      for(i=lrows;i<=urows;i++)          
-	for(j=lcols;j<=ucols;j++)        
-	  corpus[i][j]=(utype) a.corpus[i][j];
-    }
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	 << ", sizeof=" << size << ", msize=" << msize << endl;
-#endif
-  }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-  xmatrix<utype>::xmatrix(int vrows,int vcols, utype* a) {  // a starts from 0..
-    int i,j;
-    lrows=1;urows=vrows;rows=urows-lrows+1;
-    lcols=1;ucols=vcols;cols=ucols-lcols+1;
-    issquare=bool(rows == cols);
-    isfloat=_isfloat((utype) 0);  
-    iscomplex=_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    msize=(long int) size*rows*cols;
+    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) : msize(0) {copy(b);}  //CO191112
+  template<class utype>                                       // copy constructor
+    xmatrix<utype>::xmatrix(const xvector<utype>& b) : msize(0) {copy(b);}  //CO191112
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                       // copy constructor
+    xmatrix<utype>::xmatrix(int vrows,int vcols, utype* a) : msize(0) {  // a starts from 0..
+      lrows=1;urows=vrows;
+      lcols=1;ucols=vcols;
+      refresh();  //CO191112
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "M -> copy constructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
+      cerr << "M -> copy constructor:"
+        << "  lrows=" << lrows << ", urows=" << urows
+        << ", lcols=" << lcols << ", ucols=" << ucols
+        << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    if(msize>0) {
-      corpus=new utype *[rows+XXEND];
-      if(!corpus)
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in constructor (xmatrix)" << endl;exit(0);}
-      corpus+= -lrows + XXEND;
-      corpus[lrows]= new utype[rows*cols+XXEND];
-      if(!corpus[lrows])
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in constructor (xmatrix)" << endl;exit(0);}
-      corpus[lrows] += -lcols +XXEND;
-      for(i=lrows+1;i<=urows;i++)
-	corpus[i]=corpus[i-1]+cols;
-      for(i=lrows;i<=urows;i++)          
-	for(j=lcols;j<=ucols;j++)        
-	  corpus[i][j]=(utype) a[(i-1)*ucols+(j-1)]; // a.corpus[i][j];  // LIKE FORTRAN
-      //      delete [] a;
+      if(msize>0) {
+        corpus=new utype *[rows+XXEND];
+        if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,utype*)",_ALLOC_ERROR_);}
+        corpus+= -lrows+ XXEND;
+        corpus[lrows]= new utype[rows*cols+XXEND];
+        if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,utype*)",_ALLOC_ERROR_);}
+        corpus[lrows]+= -lcols+XXEND;
+        int i=0,j=0;
+        for(i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
+        for(i=lrows;i<=urows;i++){
+          for(j=lcols;j<=ucols;j++){
+            corpus[i][j]=(utype) a[(i-1)*ucols+(j-1)]; // a.corpus[i][j];  // LIKE FORTRAN
+          }
+        }
+        //      delete [] a;
+      }
+#ifdef _XMATH_DEBUG_CONSTRUCTORS
+      cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
+        << ", sizeof=" << size << ", msize=" << msize << endl;
+#endif
     }
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	 << ", sizeof=" << size << ", msize=" << msize << endl;
-#endif
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -180,70 +129,101 @@ namespace aurostd {  // namespace aurostd
     // free a xmatrix allocated with xmatrix()
 #ifdef _XMATH_DEBUG_DESTRUCTORS
     cerr << "M -> default destructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
+      << "  lrows=" << lrows << ", urows=" << urows
+      << ", lcols=" << lcols << ", ucols=" << ucols
+      << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    if(msize>0) {
-      delete [] (corpus[lrows]+lcols-XXEND);
-      delete [] (corpus+lrows-XXEND);
-    }
-    // cerr << "problem destructor xmatrix [2]" << endl;
+    free(); //CO190808
   }
 }
 // ----------------------------------------------------------------------------
 // -------------------------------------------------------- assigment operators
-  
+ 
+namespace aurostd { // namespace aurostd
+  template<class utype>
+  void xmatrix<utype>::free() { //CO190808
+    if(msize>0) {
+      delete [] (corpus[lrows]+lcols-XXEND);
+      delete [] (corpus+lrows-XXEND);
+    }
+    lrows=urows=lcols=ucols=0;refresh();
+  }
+}
+
 namespace aurostd {  // namespace aurostd
-  template<class utype>                                             // operator =
-  xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& a) {
-    int i,j;
-    if(corpus!=a.corpus||rows!=a.rows||cols!=a.cols||lrows!=a.lrows||urows!=a.urows||lcols!=a.lcols||ucols!=a.ucols) {                // check  for a=a
-      //CO 170803 - ODD CORNER CASE, same corpus and rows, but different lrows and urows
-      //if(rows!=a.rows||cols!=a.cols) {
-      if(rows!=a.rows||cols!=a.cols||lrows!=a.lrows||urows!=a.urows||lcols!=a.lcols||ucols!=a.ucols) {
-	// if dims(this)!=dims(a) => build a new xmatrix !!!
-	if(msize>0) {
-	  delete [] (corpus[lrows]+lcols-XXEND);
-	  delete [] (corpus+lrows-XXEND);
-	}
-	lrows=a.lrows;urows=a.urows;rows=a.rows;
-	lcols=a.lcols;ucols=a.ucols;cols=a.cols;
-	issquare=bool(rows == cols);
-	isfloat=_isfloat((utype) 0);
-	iscomplex=_iscomplex((utype) 0);
-	size=(char) sizeof(utype);
-	msize=(long int) size*rows*cols;
+  template<class utype>
+    void xmatrix<utype>::copy(const xmatrix<utype>& b) { //CO190808
+      if(lrows!=b.lrows||urows!=b.urows||lcols!=b.lrows||ucols!=b.ucols||msize!=b.msize) {    // if dims(this)!=dims(a) => build a new xmatrix !!!  //CO190808 - VERY IMPORTANT that we not only check lrows/urows/lcols/ucols, but msize, as xmatrix could just have been initialized (msize==0)
+        free();
+        lrows=b.lrows;urows=b.urows;rows=b.rows;
+        lcols=b.lcols;ucols=b.ucols;cols=b.cols;
+        //[simply copy instead]refresh();
+        issquare=bool(rows == cols);
+        isfloat=_isfloat((utype) 0);
+        iscomplex=_iscomplex((utype) 0);
+        size=(char) sizeof(utype);
+        msize=(long int) size*rows*cols;
 #ifdef _XMATH_DEBUG_OPERATORS
-	cerr << "M -> operator =::"
-	     << "  lrows=" << lrows << ", urows=" << urows
-	     << ", lcols=" << lcols << ", ucols=" << ucols
-	     << ", rows="  << rows  << ", cols="  << cols << endl;
+        cerr << "M -> operator =::"
+          << "  lrows=" << lrows << ", urows=" << urows
+          << ", lcols=" << lcols << ", ucols=" << ucols
+          << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-	if(msize>0) {
-	  corpus=new utype *[rows+XXEND];
-	  if(!corpus)
-	    {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in assignment" << endl;exit(0);}
-	  corpus+= -lrows+ XXEND;
-	  corpus[lrows]= new utype[rows*cols+XXEND];
-	  if(!corpus[lrows])
-	    {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in assignment" << endl;exit(0);}
-	  corpus[lrows]+= -lcols+XXEND;
-	  for(i=lrows+1;i<=urows;i++)
-	    corpus[i]=corpus[i-1]+cols;
-	}
+        if(msize>0) {
+          corpus=new utype *[rows+XXEND];
+          if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 1 in COPY",_ALLOC_ERROR_);}
+          corpus+= -lrows+ XXEND;
+          corpus[lrows]= new utype[rows*cols+XXEND];
+          if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 2 in COPY",_ALLOC_ERROR_);}
+          corpus[lrows]+= -lcols+XXEND;
+          for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
+        }
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
-	cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	     << ", sizeof=" << size << ", msize=" << msize << endl;
+        cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
+          << ", sizeof=" << size << ", msize=" << msize << endl;
 #endif
       }
-      for(j=0;j<cols;j++)
-	for(i=0;i<rows;i++)
-	  this->corpus[i+lrows][j+lcols] =
-	    a.corpus[i+a.lrows][j+a.lcols];
+      if(corpus!=b.corpus){
+        int i=0,j=0;
+        for(i=0;i<rows;i++){
+          for(j=0;j<cols;j++){
+            corpus[i+lrows][j+lcols] = b.corpus[i+b.lrows][j+b.lcols];
+          }
+        }
+      } //CO190808 - we definitely have corpus now
     }
+  template<class utype>
+    void xmatrix<utype>::copy(const xvector<utype>& b) { //CO190808
+      xmatrix<utype> a(b.urows,1,b.lrows,1);
+      for(int i=b.lrows;i<=b.urows;i++){a[i][1]=b[i];}
+      copy(a);
+    }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                             // operator =
+  xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& b) {  //CO191112
+    if(this!=&b) {copy(b);}
     return *this;
   }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    void xmatrix<utype>::refresh(void) { //CO190808
+      rows=urows-lrows+1;      //if(!nrh||!nch) rows=0; this messes up convasp
+      cols=ucols-lcols+1;      //if(!nrh||!nch) cols=0; this messes up convasp
+      if(rows==0||cols==0) {
+        cerr << "XMATRIX constructor: creating EMPTY xmatrix<utype>" << endl;
+        lrows=0;urows=0;rows=0;
+        lcols=0;ucols=0;cols=0;
+      };
+      issquare=bool(rows == cols);
+      isfloat=_isfloat((utype) 0);
+      iscomplex=_iscomplex((utype) 0);
+      size=(char) (sizeof(utype));
+      msize=(long int) size*rows*cols;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1355,48 +1335,44 @@ namespace aurostd {                   // conversion to xvector
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // function reset xmatrix<>
-  void xmatrix<utype>::reset(void) {
+    void xmatrix<utype>::reset(void) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function reset: "
-	<<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
+      cout<<"M -> function reset: "
+        <<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
 #endif
-    for(int i=lrows;i<=urows;i++)
-      for(int j=lcols;j<=ucols;j++)
-	corpus[i][j]=(utype) 0.0;
-  }
+      for(int i=lrows;i<=urows;i++)
+        for(int j=lcols;j<=ucols;j++)
+          corpus[i][j]=(utype) 0.0;
+    }
   template<class utype>                               // function reset xmatrix<>
-  void reset(xmatrix<utype>& a) {
+    void reset(xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function reset: "
-	<<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
+      cout<<"M -> function reset: "
+        <<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
 #endif
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-	a[i][j]=(utype) 0.0;
-  }
+      for(int i=a.lrows;i<=a.urows;i++)
+        for(int j=a.lcols;j<=a.ucols;j++)
+          a[i][j]=(utype) 0.0;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // function clear xmatrix<>
-  void xmatrix<utype>::clear(void) {
+    void xmatrix<utype>::clear(void) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function clear: "
-	<<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
+      cout<<"M -> function clear: "
+        <<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
 #endif
-    for(int i=lrows;i<=urows;i++)
-      for(int j=lcols;j<=ucols;j++)
-	corpus[i][j]=(utype) 0.0;
-  }
+      reset();
+    }
   template<class utype>                               // function clear xmatrix<>
-  void clear(xmatrix<utype>& a) {
+    void clear(xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function clear: "
-	<<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
+      cout<<"M -> function clear: "
+        <<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
 #endif
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-	a[i][j]=(utype) 0.0;
-  }
+      reset(a);
+    }
 }
 
 namespace aurostd {  // namespace aurostd

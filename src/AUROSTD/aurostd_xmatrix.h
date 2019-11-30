@@ -37,8 +37,9 @@ namespace aurostd {
     //  xmatrix (int=3);                                                // default constructor
     xmatrix (int=3,int=3,int=1,int=1);                                  // default constructor
     //    xmatrix (int,int,int,int);                                    // default constructor
-    xmatrix (const xmatrix<utype>&);                                    // copy constructor
     xmatrix (int,int,utype*);                                           // copy constructor
+    xmatrix (const xmatrix<utype>&);                                    // copy constructor
+    xmatrix (const xvector<utype>&);                                    // copy constructor
     xmatrix<utype>& operator=(const xmatrix<utype>&);                   // assignment
     ~xmatrix ();                                                        // default destructor
     utype* operator[](int) const;                                       // indicize i,j
@@ -77,6 +78,13 @@ namespace aurostd {
     //  bool isfloat,iscomplex;
     char size;
     long int msize;
+    
+    //NECESSARY PRIVATE CLASS METHODS - START
+    void free();  //CO190808
+    void copy(const xmatrix<utype>& b);  //CO190808
+    void copy(const xvector<utype>& b);  //CO190808
+    void refresh(); //CO190808 - refresh internal properties dependent on lrows, urows, utype
+    //NECESSARY END CLASS METHODS - END
   };
 }
 
