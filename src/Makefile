@@ -1013,6 +1013,7 @@ patch_makefile2: Makefile
 check:
 	$(MAKE) proto_check
 check_full:
+	$(MAKE) gcd_check
 	$(MAKE) proto_check
 	$(MAKE) slab_check
 proto_check:
@@ -1030,6 +1031,8 @@ proto_check:
 #	./aflow --checki | grep FAIL
 slab_check:
 	./aflow --slab_test
+gcd_check:
+	./aflow --gcd_test
 www:	web
 clean:
 	rm -rf *~ *.o *.o-* *.rpo AUROSTD/*~ AUROSTD/*.o AUROSTD/*.rpo ./APL/*~ ./APL/*o ./APL/*a ./ANRL/*~ ./ANRL/*o ./ANRL/*a ./ANRL*/*~ ./ANRL*/*o ./ANRL*/*a ./SQLITE/*o aflow aflow_data aflowd aflow2 aflowd2 aflow1 aflowd1 aflow.exe aconvasp apennsy aflow_convasp* *.eps *.pdf *ps *aux *dvi *log *m *tex nohup* core* VASP_TEST* GRND_TEST* xa xb xc xd xe xf aflow.out* core* *~ \#* *.o aflow_pennsy *.eps *.pdf *ps *aux *dvi *log *m *tex *exe aurostd_xtensor_extra.cpp aflow_data_*cpp xaflowauto boo* xlist* _xdat `find . -name *~`

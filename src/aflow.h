@@ -2397,6 +2397,10 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
 void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX 20191122
 
+//makefile tests
+bool gcdTest(ostream& oss=cout);
+bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
+
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp

@@ -392,7 +392,12 @@ namespace aurostd {
 namespace aurostd {
 //CO191112 - extended GCD, get Bezout coefficients
 //algorithm inspired by python solution of https://brilliant.org/wiki/extended-euclidean-algorithm/
+//ax+by=gcd(a,b)
+//a=Z,b=0;gcd=Z;x=1;y=0;
+//a=0,b=Z;gcd=Z;x=0;y=1;
+//a=0,b=0;gcd=undefined;x=undefined;y=undefined  //all integers are common divisors of 0 and 0, so there is no greatest one.
 int GCD(int a,int b,int& x,int& y){ //CO180409
+  if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
   x=0;y=1;
   int u=1,v=0;
   int q=0,r=0,m=0,n=0;

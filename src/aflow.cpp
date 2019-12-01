@@ -526,6 +526,41 @@ namespace aflowlib {
   }
 }
 
+bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO190520
+bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
+  string soliloquy="test_gcd():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+  
+  message << "Performing gcd test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  
+  int a=0,b=0,x1=0,y1=0,gcd=0;
+
+  a=25;b=15;
+  gcd=aurostd::GCD(a,b,x1,y1);
+  if(!(gcd==5 && x1==-1 && y1==2)){
+    if(LDEBUG){cerr << soliloquy << " gcd(25,15) failed" << endl;}
+    return FALSE;
+  }
+
+  a=25;b=0;
+  gcd=aurostd::GCD(a,b,x1,y1);
+  if(!(gcd==25 && x1==1 && y1==0)){
+    if(LDEBUG){cerr << soliloquy << " gcd(25,0) failed" << endl;}
+    return FALSE;
+  }
+  
+  a=0;b=15;
+  gcd=aurostd::GCD(a,b,x1,y1);
+  if(!(gcd==15 && x1==0 && y1==1)){
+    if(LDEBUG){cerr << soliloquy << " gcd(0,15) failed" << endl;}
+    return FALSE;
+  }
+
+  message << "gcd test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return TRUE; // CO 180419
+}
 
 int main(int _argc,char **_argv) {
   string soliloquy="main():"; // CO 180419
@@ -624,7 +659,9 @@ int main(int _argc,char **_argv) {
       //exit(0);
       return 0; // CO 180419
    }
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
   if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
+
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
     deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");
     if(vext.size()!=vcat.size()) { cerr << "ERROR - aflow.cpp:main: vext.size()!=vcat.size(), aborting." << endl; exit(0); }
