@@ -422,7 +422,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
     if (USER_DC) {
       if (USER_DC_METHOD == "LATTICE") {
-        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_type;
+        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // ME191202 - must be variation_type to get e.g. MCLC3
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
         tokens.clear();
