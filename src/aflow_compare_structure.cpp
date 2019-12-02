@@ -2803,19 +2803,21 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc=1;
     double final_misfit=-1;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
+    ostringstream oss; //DX 20191202 - oss is the mapping info
     return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end
   }
 }
 
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc = 1;
     double final_misfit = -1;
+    ostringstream oss; //DX 20191202 - oss is the mapping info
     return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end and add default
   }
 }
@@ -2825,11 +2827,12 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss) { //DX 20191108 - remove const & from bools
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
     uint num_proc=1;
     double final_misfit=-1;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
+    ostringstream oss; //DX 20191202 - oss is the mapping info
     aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end
     return final_misfit;
   }
@@ -2847,7 +2850,7 @@ namespace compare {
     // and determines their level of similarity based on the idea discussed 
     // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     oss << "==================================================================================" << endl;
 

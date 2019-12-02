@@ -255,19 +255,21 @@ namespace SYM {
 // the primitive atomic basis. This is used to check the consistency between the
 // ratio of atoms when we find a conventional cell
 namespace SYM {
-  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD) {
+  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num) {
     split_atom_types = SYM::break_up_by_type(atomic_basis);
     if(split_atom_types.size() > 1) {
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
-	if(p == 0) {
-	  GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
-	} else {
-	  GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
-	}
+        if(p == 0) {
+          //DX 20191202 [OBSOLETE] GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
+          gcd_num = aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size()); //DX 20191202 [OBSOLETE]
+        } else {
+          //DX 20191202 [OBSOLETE] GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
+          gcd_num = aurostd::GCD(gcd_num, (int)split_atom_types[p + 1].size()); //DX 20191202
+        }
       }
     } else {
       // If only one type of atom, set to 1
-      GCD = 1;
+      gcd_num = 1;
     }
     return true;
   }
@@ -5189,87 +5191,87 @@ namespace SYM {
 // gcdD (Dijkstra's Algorithm)
 // **********************************************************************************************************************
 //Dijkstra's Algorithm
-namespace SYM {
-  int gcdD(int m, int n) {
-    if(m == 1 || n == 1)
-      return 1;
-    if(m == n)
-      return m;
-    else if(m > n)
-      return gcdD(m - n, n);
-    else
-      return gcdD(m, n - m);
-  }
-} //namespace SYM
+//DX 20191202 [OBSOLETE]namespace SYM {
+//DX 20191202 [OBSOLETE]  int gcdD(int m, int n) {
+//DX 20191202 [OBSOLETE]    if(m == 1 || n == 1)
+//DX 20191202 [OBSOLETE]      return 1;
+//DX 20191202 [OBSOLETE]    if(m == n)
+//DX 20191202 [OBSOLETE]      return m;
+//DX 20191202 [OBSOLETE]    else if(m > n)
+//DX 20191202 [OBSOLETE]      return gcdD(m - n, n);
+//DX 20191202 [OBSOLETE]    else
+//DX 20191202 [OBSOLETE]      return gcdD(m, n - m);
+//DX 20191202 [OBSOLETE]  }
+//DX 20191202 [OBSOLETE]} //namespace SYM
 
 //ASSUME POSITIVE INPUTS
 
 // **********************************************************************************************************************
 // gcd
 // **********************************************************************************************************************
-namespace SYM {
-  unsigned long long int gcd(unsigned long long int m, unsigned long long int n) {
-    //cerr << "GCD algorithm " << m << " " << n <<  endl;
-    //double tol = 1e-6;
-    double tol = _ZERO_TOL_;
-    //make largest input 'm'
-    if(n > m) {
-      unsigned long long int tmp = n;
-      n = m;
-      m = tmp;
-    }
-    //cast to INT
-    unsigned long long int a1 = (unsigned long long int)m;
-    unsigned long long int a2 = (unsigned long long int)n;
-    unsigned long long int b;
-
-    //Check if one of the inputs is unity:
-    if(aurostd::abs(m - 1) < tol || aurostd::abs(n - 1) < tol) {
-      return 1.0;
-    }
-    //Check if the inputs are equal:
-    long double dividend = aurostd::abs(m / n);
-    if(aurostd::abs(dividend - floor(dividend)) < tol || aurostd::abs(dividend - ceil(dividend)) < tol)
-      return n;
-    //Procede with algorithm:
-    /////////////////////
-    //NON RECURSIVE FUNCTION:
-    else {
-      while ((b = a1 % a2) != 0) {
-	a1 = a2;
-	a2 = b;
-      }
-    }
-    return (unsigned long long int)a2;
-    ////////////////////
-
-    //else if(aurostd::abs(m/n-1) > tol)
-    //  return gcd(m-n, n);
-    //else
-    //  return gcd(m, n-m);
-  }
-} //namespace SYM
-
-// **********************************************************************************************************************
-// gcd (Euclid's Algorithm)
-// **********************************************************************************************************************
-//Euclid's algorithm
-namespace SYM {
-  long long int gcd(long long int x, long long int y) {
-    if(y > x) {
-      int tmp = x;
-      x = y;
-      y = tmp;
-    }
-    //  cerr << x << " " << y << endl;
-    if(y == 0)
-      return x;
-    else if(x >= y && y > 0)
-      return gcd(y, x % y);
-    else
-      return -1;
-  }
-} //namespace SYM
+//DX 20191202 [OBSOLETE]namespace SYM {
+//DX 20191202 [OBSOLETE]  unsigned long long int gcd(unsigned long long int m, unsigned long long int n) {
+//DX 20191202 [OBSOLETE]    //cerr << "GCD algorithm " << m << " " << n <<  endl;
+//DX 20191202 [OBSOLETE]    //double tol = 1e-6;
+//DX 20191202 [OBSOLETE]    double tol = _ZERO_TOL_;
+//DX 20191202 [OBSOLETE]    //make largest input 'm'
+//DX 20191202 [OBSOLETE]    if(n > m) {
+//DX 20191202 [OBSOLETE]      unsigned long long int tmp = n;
+//DX 20191202 [OBSOLETE]      n = m;
+//DX 20191202 [OBSOLETE]      m = tmp;
+//DX 20191202 [OBSOLETE]    }
+//DX 20191202 [OBSOLETE]    //cast to INT
+//DX 20191202 [OBSOLETE]    unsigned long long int a1 = (unsigned long long int)m;
+//DX 20191202 [OBSOLETE]    unsigned long long int a2 = (unsigned long long int)n;
+//DX 20191202 [OBSOLETE]    unsigned long long int b;
+//DX 20191202 [OBSOLETE]
+//DX 20191202 [OBSOLETE]    //Check if one of the inputs is unity:
+//DX 20191202 [OBSOLETE]    if(aurostd::abs(m - 1) < tol || aurostd::abs(n - 1) < tol) {
+//DX 20191202 [OBSOLETE]      return 1.0;
+//DX 20191202 [OBSOLETE]    }
+//DX 20191202 [OBSOLETE]    //Check if the inputs are equal:
+//DX 20191202 [OBSOLETE]    long double dividend = aurostd::abs(m / n);
+//DX 20191202 [OBSOLETE]    if(aurostd::abs(dividend - floor(dividend)) < tol || aurostd::abs(dividend - ceil(dividend)) < tol)
+//DX 20191202 [OBSOLETE]      return n;
+//DX 20191202 [OBSOLETE]    //Procede with algorithm:
+//DX 20191202 [OBSOLETE]    /////////////////////
+//DX 20191202 [OBSOLETE]    //NON RECURSIVE FUNCTION:
+//DX 20191202 [OBSOLETE]    else {
+//DX 20191202 [OBSOLETE]      while ((b = a1 % a2) != 0) {
+//DX 20191202 [OBSOLETE]	a1 = a2;
+//DX 20191202 [OBSOLETE]	a2 = b;
+//DX 20191202 [OBSOLETE]      }
+//DX 20191202 [OBSOLETE]    }
+//DX 20191202 [OBSOLETE]    return (unsigned long long int)a2;
+//DX 20191202 [OBSOLETE]    ////////////////////
+//DX 20191202 [OBSOLETE]
+//DX 20191202 [OBSOLETE]    //else if(aurostd::abs(m/n-1) > tol)
+//DX 20191202 [OBSOLETE]    //  return gcd(m-n, n);
+//DX 20191202 [OBSOLETE]    //else
+//DX 20191202 [OBSOLETE]    //  return gcd(m, n-m);
+//DX 20191202 [OBSOLETE]  }
+//DX 20191202 [OBSOLETE]} //namespace SYM
+//DX 20191202 [OBSOLETE]
+//DX 20191202 [OBSOLETE]// **********************************************************************************************************************
+//DX 20191202 [OBSOLETE]// gcd (Euclid's Algorithm)
+//DX 20191202 [OBSOLETE]// **********************************************************************************************************************
+//DX 20191202 [OBSOLETE]//Euclid's algorithm
+//DX 20191202 [OBSOLETE]namespace SYM {
+//DX 20191202 [OBSOLETE]  long long int gcd(long long int x, long long int y) {
+//DX 20191202 [OBSOLETE]    if(y > x) {
+//DX 20191202 [OBSOLETE]      int tmp = x;
+//DX 20191202 [OBSOLETE]      x = y;
+//DX 20191202 [OBSOLETE]      y = tmp;
+//DX 20191202 [OBSOLETE]    }
+//DX 20191202 [OBSOLETE]    //  cerr << x << " " << y << endl;
+//DX 20191202 [OBSOLETE]    if(y == 0)
+//DX 20191202 [OBSOLETE]      return x;
+//DX 20191202 [OBSOLETE]    else if(x >= y && y > 0)
+//DX 20191202 [OBSOLETE]      return gcd(y, x % y);
+//DX 20191202 [OBSOLETE]    else
+//DX 20191202 [OBSOLETE]      return -1;
+//DX 20191202 [OBSOLETE]  }
+//DX 20191202 [OBSOLETE]} //namespace SYM
 
 // **********************************************************************************************************************
 // allsame
