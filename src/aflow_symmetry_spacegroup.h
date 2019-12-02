@@ -628,7 +628,7 @@ namespace SYM {
   //NUMBER THEORY FUNCTIONS
   long long int gcd(long long int u, long long int v);                             //Euclid's
   unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
-  int gcdD(int u, int v);
+  //[CO191201 - OBSOLETE]int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
   //DX 20190905 [OBSOLETE] double mod_one(double d);

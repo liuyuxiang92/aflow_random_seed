@@ -255,19 +255,19 @@ namespace SYM {
 // the primitive atomic basis. This is used to check the consistency between the
 // ratio of atoms when we find a conventional cell
 namespace SYM {
-  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD) {
+  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd) {
     split_atom_types = SYM::break_up_by_type(atomic_basis);
     if(split_atom_types.size() > 1) {
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
 	if(p == 0) {
-	  GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
+    aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size(),gcd);  //CO191201
 	} else {
-	  GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
+    aurostd::GCD(gcd, (int)split_atom_types[p + 1].size(),gcd);  //CO191201
 	}
       }
     } else {
       // If only one type of atom, set to 1
-      GCD = 1;
+      gcd = 1;
     }
     return true;
   }
@@ -4678,9 +4678,9 @@ namespace SYM {
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
         if(p == 0) {
           //DX 20191125 [OBSOLETE] GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
-          GCD_num = aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
+          aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size(),GCD_num); //CO191201
         } else {
-          GCD_num = aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size());
+          aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size(),GCD_num); //CO191201
         }
       }
       for (uint p = 0; p < prim_split_atom_types.size(); p++) {
@@ -5189,18 +5189,18 @@ namespace SYM {
 // gcdD (Dijkstra's Algorithm)
 // **********************************************************************************************************************
 //Dijkstra's Algorithm
-namespace SYM {
-  int gcdD(int m, int n) {
-    if(m == 1 || n == 1)
-      return 1;
-    if(m == n)
-      return m;
-    else if(m > n)
-      return gcdD(m - n, n);
-    else
-      return gcdD(m, n - m);
-  }
-} //namespace SYM
+//[CO191201 - OBSOLETE]namespace SYM {
+//[CO191201 - OBSOLETE]  int gcdD(int m, int n) {
+//[CO191201 - OBSOLETE]    if(m == 1 || n == 1)
+//[CO191201 - OBSOLETE]      return 1;
+//[CO191201 - OBSOLETE]    if(m == n)
+//[CO191201 - OBSOLETE]      return m;
+//[CO191201 - OBSOLETE]    else if(m > n)
+//[CO191201 - OBSOLETE]      return gcdD(m - n, n);
+//[CO191201 - OBSOLETE]    else
+//[CO191201 - OBSOLETE]      return gcdD(m, n - m);
+//[CO191201 - OBSOLETE]  }
+//[CO191201 - OBSOLETE]} //namespace SYM
 
 //ASSUME POSITIVE INPUTS
 

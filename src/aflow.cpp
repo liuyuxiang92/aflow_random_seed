@@ -538,21 +538,21 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   int a=0,b=0,x1=0,y1=0,gcd=0;
 
   a=25;b=15;
-  gcd=aurostd::GCD(a,b,x1,y1);
+  aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==5 && x1==-1 && y1==2)){
     if(LDEBUG){cerr << soliloquy << " gcd(25,15) failed" << endl;}
     return FALSE;
   }
 
   a=25;b=0;
-  gcd=aurostd::GCD(a,b,x1,y1);
+  aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==25 && x1==1 && y1==0)){
     if(LDEBUG){cerr << soliloquy << " gcd(25,0) failed" << endl;}
     return FALSE;
   }
   
   a=0;b=15;
-  gcd=aurostd::GCD(a,b,x1,y1);
+  aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==15 && x1==0 && y1==1)){
     if(LDEBUG){cerr << soliloquy << " gcd(0,15) failed" << endl;}
     return FALSE;

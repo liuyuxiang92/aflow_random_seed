@@ -1147,8 +1147,13 @@ namespace aurostd {                   // conversion from xvector<int> to xvector
 
 //CO190516
 namespace aurostd {                   // conversion from xvector<int> to xvector<double>
-  xvector<int> xvectordouble2int(const xvector<double>& a){
+  xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
     xvector<int> b(a.urows,a.lrows);
+    if(check_int){
+      for(int i=a.lrows;i<=a.urows;i++){
+        if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvectordouble2int():","non-integer found",_INPUT_ILLEGAL_);}
+      }
+    }
     for(int i=a.lrows;i<=a.urows;i++){b[i]=(int)nint(a[i]);}  //nint is for safety
     return b;
   }
@@ -1383,20 +1388,37 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 // GCD //CO 180409
 namespace aurostd {
-  int GCD(const xvector<int>& in_V){
+  void GCD(const xvector<int>& vab,int& gcd){
     // find first nonzero entry
-    int counter;
+    int counter=0;
     bool set=false;
-    for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
-      if(in_V[i]) {
+    for(int i=vab.lrows;i<=vab.urows&&!set;i++) { //find first non-zero entry
+      if(vab[i]) {
         counter=i;
         set=true;
       }
     }
-    if(!set) {return 1;}  // always works
-    int gcd=in_V[counter];
-    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
-    return gcd;
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
+    gcd=vab[counter];
+    for(int i=counter+1;i<=vab.urows;i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
+  }
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd){
+    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INPUT_NUMBER_);}
+    xvector<int> vx(va.urows,va.lrows),vy(va.urows,va.lrows);
+    return GCD(va,vb,vgcd,vx,vy);
+  }
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy){
+    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INPUT_NUMBER_);}
+    //va vs. vb
+    if(va.lrows!=vb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.lrows!=vb.lrows",_INDEX_MISMATCH_);}
+    if(va.urows!=vb.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.urows!=vb.urows",_INDEX_MISMATCH_);}
+    //va vs. vgcd
+    if(va.lrows!=vgcd.lrows || va.urows!=vgcd.urows){xvector<int> vgcd_tmp(va);vgcd=vgcd_tmp;}
+    //va vs. vx
+    if(va.lrows!=vx.lrows || va.urows!=vx.urows){xvector<int> vx_tmp(va);vx=vx_tmp;}
+    //va vs. vy
+    if(va.lrows!=vy.lrows || va.urows!=vy.urows){xvector<int> vy_tmp(va);vy=vy_tmp;}
+    for(int i=va.lrows;i<=va.urows;i++){GCD(va[i],vb[i],vgcd[i],vx[i],vy[i]);}
   }
   int LCM(const xvector<int>& in_V){
     // find first nonzero entry
@@ -1424,10 +1446,10 @@ namespace aurostd {
 
     xvector<int> v1(in_V.lrows,in_V.urows); //cast to xvector of ints
     for(int i=in_V.lrows;i<=in_V.urows;i++){v1[i]=nint(in_V[i]);}
-    int denom=GCD(v1);
+    int denom=0;
+    GCD(v1,denom);
     if(denom!=0){v1/=denom;}  //safety
     for(int i=v1.lrows;i<=v1.urows;i++){out_V[i]=(utype)v1[i];}  //cast back
-    
     //DX 20191125 [OBSOLETE] return out_V;
   }
   //xvector<int> reduceByGCD(const xvector<int>& in_V){
@@ -1442,21 +1464,20 @@ namespace aurostd {
 // GCD //DX 20191122
 // vector version (modeled after CO's xvector version)
 namespace aurostd {
-  int GCD(const vector<int>& in_V){
+  void GCD(const vector<int>& vab,int& gcd){
     // find first nonzero entry
-    int counter;
+    int counter=0;
     bool set=false;
-    // REMOVE for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
-    for(uint i=0;i<in_V.size()&&!set;i++) {
-      if(in_V[i]) {
+    // REMOVE for(int i=vab.lrows;i<=vab.urows&&!set;i++) {
+    for(uint i=0;i<vab.size()&&!set;i++) {
+      if(vab[i]) {
         counter=i;
         set=true;
       }
     }
-    if(!set) {return 1;}  // always works
-    int gcd=in_V[counter];
-    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
-    return gcd;
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
+    gcd=vab[counter];
+    for(uint i=counter+1;i<vab.size();i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
   }
   int LCM(const vector<int>& in_V){
     // find first nonzero entry
@@ -1485,12 +1506,10 @@ namespace aurostd {
 
     vector<int> v1; v1.resize(in_V.size()); //cast to vector of ints
     for(uint i=0;i<in_V.size();i++){v1[i]=nint(in_V[i]);}
-    int denom=GCD(v1);
-    if(denom!=0){
-      for(uint i=0;i<v1.size();i++){v1[i]/=denom;}
-    }
+    int denom=0;
+    GCD(v1,denom);
+    if(denom!=0){for(uint i=0;i<v1.size();i++){v1[i]/=denom;}}
     for(uint i=0;i<v1.size();i++){out_V[i]=(utype)v1[i];}  //cast back
-    
     //DX 20191125 [OBSOLETE] return out_V;
   }
 }
@@ -1499,21 +1518,20 @@ namespace aurostd {
 // GCD //DX 20191122
 // deque version (modeled after CO's xvector version)
 namespace aurostd {
-  int GCD(const deque<int>& in_V){
+  void GCD(const deque<int>& vab,int& gcd){
     // find first nonzero entry
     int counter;
     bool set=false;
-    // REMOVE for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
-    for(uint i=0;i<in_V.size()&&!set;i++) {
-      if(in_V[i]) {
+    // REMOVE for(int i=vab.lrows;i<=vab.urows&&!set;i++) {
+    for(uint i=0;i<vab.size()&&!set;i++) {
+      if(vab[i]) {
         counter=i;
         set=true;
       }
     }
-    if(!set) {return 1;}  // always works
-    int gcd=in_V[counter];
-    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
-    return gcd;
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
+    gcd=vab[counter];
+    for(uint i=counter+1;i<vab.size();i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
   }
   int LCM(const deque<int>& in_V){
     // find first nonzero entry
@@ -1542,12 +1560,10 @@ namespace aurostd {
 
     vector<int> v1; v1.resize(in_V.size()); //cast to vector of ints
     for(uint i=0;i<in_V.size();i++){v1[i]=nint(in_V[i]);}
-    int denom=GCD(v1);
-    if(denom!=0){
-      for(uint i=0;i<v1.size();i++){v1[i]/=denom;}
-    }
+    int denom=0;
+    GCD(v1,denom);
+    if(denom!=0){for(uint i=0;i<v1.size();i++){v1[i]/=denom;}}
     for(uint i=0;i<v1.size();i++){out_V[i]=(utype)v1[i];}  //cast back
-    
     //DX 20191125 [OBSOLETE] return out_V;
   }
 }

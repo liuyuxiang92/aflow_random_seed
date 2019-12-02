@@ -396,37 +396,103 @@ namespace aurostd {
 //a=Z,b=0;gcd=Z;x=1;y=0;
 //a=0,b=Z;gcd=Z;x=0;y=1;
 //a=0,b=0;gcd=undefined;x=undefined;y=undefined  //all integers are common divisors of 0 and 0, so there is no greatest one.
-int GCD(int a,int b,int& x,int& y){ //CO180409
-  if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
-  x=0;y=1;
-  int u=1,v=0;
-  int q=0,r=0,m=0,n=0;
-	while(a){ //is not 0
-    q=int(std::floor(b/a)); //beware of negative numbers, not just /
-    r=b%a;
-    m=x-u*q;
-    n=y-v*q;
-    b=a;a=r;
-    x=u;y=v;
-    u=m;v=n;
+  template<class utype>
+    void _GCD(utype a,utype b,utype& gcd,utype& x,utype& y){ //CO180409
+      if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
+      x=(utype)0;y=(utype)1;
+      utype u=(utype)1,v=(utype)0;
+      utype q=(utype)0,r=(utype)0,m=(utype)0,n=(utype)0;
+      while(a){ //is not 0
+        q=(utype)std::floor(b/a); //beware of negative numbers, not just /
+        r=b%a;
+        m=x-u*q;
+        n=y-v*q;
+        b=a;a=r;
+        x=u;y=v;
+        u=m;v=n;
+      }
+      gcd=b;
+    }
+  template<class utype>
+    void _GCD(utype a,utype b,utype& gcd){ //CO180409  //keep this one too, fewer operations than if you need x and y too
+      // added for safety, will always give nonzero result, important for division!
+      if(a==(utype)0 && b==(utype)0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
+      else if(a==(utype)0) {gcd=b;return;} //special case
+      else if(b==(utype)0) {gcd=a;return;} //special case
+      // borrowed from Kesong aflow_contrib_kesong_pocc_basic.cpp
+      // calculate greatest common denominator of two integers
+      if(a % b == (utype)0) {gcd=b;return;}
+      else {return GCD(b, a % b, gcd);}
+    }
+  void GCD(int a,int b,int& gcd,int& x,int& y){return _GCD(a,b,gcd,x,y);} //CO191201
+  void GCD(int a,int b,int& gcd){return _GCD(a,b,gcd);} //CO191201
+  void GCD(uint a,uint b,uint& gcd,uint& x,uint& y){return _GCD(a,b,gcd,x,y);}  //CO191201
+  void GCD(uint a,uint b,uint& gcd){return _GCD(a,b,gcd);}  //CO191201
+  void GCD(long int a,long int b,long int& gcd,long int& x,long int& y){return _GCD(a,b,gcd,x,y);}  //CO191201
+  void GCD(long int a,long int b,long int& gcd){return _GCD(a,b,gcd);}  //CO191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd,unsigned long int& x,unsigned long int& y){return _GCD(a,b,gcd,x,y);} //CO191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd){return _GCD(a,b,gcd);} //CO191201
+  void GCD(long long int a,long long int b,long long int& gcd,long long int& x,long long int& y){return _GCD(a,b,gcd,x,y);} //CO191201
+  void GCD(long long int a,long long int b,long long int& gcd){return _GCD(a,b,gcd);} //CO191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd,unsigned long long int& x,unsigned long long int& y){return _GCD(a,b,gcd,x,y);}  //CO191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd){return _GCD(a,b,gcd);}  //CO191201
+
+  void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance){  //CO191201
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
+    int igcd=0,ix=0,iy=0;
+    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd,ix,iy);
+    gcd=(float)igcd;
+    x=(float)ix;
+    y=(float)iy;
   }
-  return b;
-}
-int GCD(int a,int b){ //CO180409
-  // added for safety, will always give nonzero result, important for division!
-  if(!a && !b) {return 1;} // you can always divide by 1
-  else if(!a) {return b;}
-  else if(!b) {return a;}
-  // borrowed from Kesong aflow_contrib_kesong_pocc_basic.cpp
-  // calculate greatest common denominator of two integers
-  if(a % b == 0) {return b;}
-  else {return GCD(b, a % b);}
-}
-//https://www.geeksforgeeks.org/program-to-find-lcm-of-two-numbers/
-int LCM(int a,int b){ //CO190520
-  if(!a || !b){return 0;} //special, trivial case: lcm must really be positive
-  return a*b/GCD(a,b);
-} //CO190520
+  void GCD(float a,float b,float& gcd,float tolerance){  //CO191201
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
+    int igcd=0;
+    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd);
+    gcd=(float)igcd;
+  }
+  void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance){  //CO191201
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
+    int igcd=0,ix=0,iy=0;
+    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd,ix,iy);
+    gcd=(double)igcd;
+    x=(double)ix;
+    y=(double)iy;
+  }
+  void GCD(double a,double b,double& gcd,double tolerance){  //CO191201
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
+    int igcd=0;
+    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd);
+    gcd=(double)igcd;
+  }
+  void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance){  //CO191201
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
+    int igcd=0,ix=0,iy=0;
+    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd,ix,iy);
+    gcd=(long double)igcd;
+    x=(long double)ix;
+    y=(long double)iy;
+  }
+  void GCD(long double a,long double b,long double& gcd,long double tolerance){  //CO191201
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
+    int igcd=0;
+    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd);
+    gcd=(long double)igcd;
+  }
+
+  //https://www.geeksforgeeks.org/program-to-find-lcm-of-two-numbers/
+  int LCM(int a,int b){ //CO190520
+    if(!a || !b){return 0;} //special, trivial case: lcm must really be positive
+    int gcd=0;  //CO191201
+    GCD(a,b,gcd); //CO191201
+    return a*b/gcd; //CO191201
+  } //CO190520
 } // namespace aurostd
 
 // ***************************************************************************
@@ -456,12 +522,12 @@ int LCM(int a,int b){ //CO190520
 namespace aurostd {
   // namespace aurostd
   template<class utype>
-  bool _isinteger(utype x,utype tolerance) {
-    //DX 20191125 [OBSOLETE] if(aurostd::abs(x-((utype)aurostd::nint(x)))<tolerance) return TRUE;
-    if(aurostd::abs(x-((utype)aurostd::nint(x)))<=tolerance) return TRUE; //DX 20191125 - added <= to account for int and uint and tolerance=0, e.g., 3-nint(3)=0 is not less than 0
-    return FALSE;
-  }
-  
+    bool _isinteger(utype x,utype tolerance) {
+      //DX 20191125 [OBSOLETE] if(aurostd::abs(x-((utype)aurostd::nint(x)))<tolerance) return TRUE;
+      if(aurostd::abs(x-((utype)aurostd::nint(x)))<=tolerance) return TRUE; //DX 20191125 - added <= to account for int and uint and tolerance=0, e.g., 3-nint(3)=0 is not less than 0
+      return FALSE;
+    }
+
   //bool isinteger(bool x,bool tolerance){return _isinteger(x,tolerance);}
   //bool isinteger(char x,char tolerance){return _isinteger(x,tolerance);}
   bool isinteger(int x,int tolerance){return _isinteger(x,tolerance);}

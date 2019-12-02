@@ -116,8 +116,26 @@ namespace aurostd {
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
-  int GCD(int a,int b, int& x, int& y); //CO180409  //CO191112 - extended GCD, get Bezout coefficients
-  int GCD(int a,int b); //CO180409
+  template<class utype> void _GCD(int a,int b, int& gcd, int& x, int& y); //CO180409  //CO191112 - extended GCD, get Bezout coefficients
+  template<class utype> void _GCD(int a,int b, int& gcd); //CO180409
+  void GCD(int a,int b,int& gcd,int& x,int& y); //CO191201
+  void GCD(int a,int b,int& gcd); //CO191201
+  void GCD(uint a,uint b,uint& gcd,uint& x,uint& y);  //CO191201
+  void GCD(uint a,uint b,uint& gcd);  //CO191201
+  void GCD(long int a,long int b,long int& gcd,long int& x,long int& y);  //CO191201
+  void GCD(long int a,long int b,long int& gcd);  //CO191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd,unsigned long int& x,unsigned long int& y); //CO191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd); //CO191201
+  void GCD(long long int a,long long int b,long long int& gcd,long long int& x,long long int& y); //CO191201
+  void GCD(long long int a,long long int b,long long int& gcd); //CO191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd,unsigned long long int& x,unsigned long long int& y);  //CO191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd);  //CO191201
+  void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance=0.01);  //CO191201
+  void GCD(float a,float b,float& gcd,float tolerance=0.01);  //CO191201
+  void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance=0.01);  //CO191201
+  void GCD(double a,double b,double& gcd,double tolerance=0.01);  //CO191201
+  void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO191201
+  void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO191201
   int LCM(int a,int b); //CO190520
   template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;
 

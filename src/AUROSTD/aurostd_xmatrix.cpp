@@ -2718,6 +2718,33 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
   }
 }
 
+namespace aurostd {  // namespace aurostd
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd){ //CO191201
+    if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
+    xmatrix<int> mx(ma.urows,ma.ucols,ma.lrows,ma.lcols),my(ma.urows,ma.ucols,ma.lrows,ma.lcols);
+    return GCD(ma,mb,mgcd,mx,my);
+  }
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO191291
+    if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
+    //ma vs. mb
+    if(ma.lrows!=mb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lrows!=mb.lrows",_INDEX_MISMATCH_);}
+    if(ma.urows!=mb.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.urows!=mb.urows",_INDEX_MISMATCH_);}
+    if(ma.lcols!=mb.lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lcols!=mb.lcols",_INDEX_MISMATCH_);}
+    if(ma.ucols!=mb.ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.ucols!=mb.ucols",_INDEX_MISMATCH_);}
+    //ma vs. mgcd
+    if(ma.lrows!=mgcd.lrows || ma.urows!=mgcd.urows || ma.lcols!=mgcd.lcols || ma.ucols!=mgcd.ucols){xmatrix<int> mgcd_tmp(ma);mgcd=mgcd_tmp;}
+    //ma vs. mx
+    if(ma.lrows!=mx.lrows || ma.urows!=mx.urows || ma.lcols!=mx.lcols || ma.ucols!=mx.ucols){xmatrix<int> mx_tmp(ma);mx=mx_tmp;}
+    //ma vs. my
+    if(ma.lrows!=my.lrows || ma.urows!=my.urows || ma.lcols!=my.lcols || ma.ucols!=my.ucols){xmatrix<int> my_tmp(ma);my=my_tmp;}
+    for(int i=ma.lrows;i<=ma.urows;i++){
+      for(int j=ma.lcols;j<=ma.ucols;j++){
+        GCD(ma[i][j],mb[i][j],mgcd[i][j],mx[i][j],my[i][j]);
+      }
+    }
+  }
+} // namespace aurostd
+
 // ----------------------------------------------------------------------------
 
 namespace aurostd {  // namespace aurostd

@@ -24,6 +24,7 @@ using aurostd::_isodd;
 using aurostd::_iseven;
 using aurostd::_isfloat;
 using aurostd::_iscomplex;
+using aurostd::_GCD;
 using aurostd::_isinteger;
 using aurostd::_roundoff;
 using aurostd::mod;
@@ -463,11 +464,13 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     aurostd::ones_xm<int>();aurostd::ones_xm<int>(3);aurostd::ones_xm<int>(3,3);aurostd::ones_xm<int>(1,2,3,4); //CO 180515 //CO190520
     aurostd::eye<int>();aurostd::eye<int>(3);aurostd::eye<int>(3,3);aurostd::eye<int>(1,2,3,4); //CO 180515 //CO190520
     aurostd::CMdet<int>(mx);  //CO 180515 //CO190520
+    int igcd=1;_GCD(igcd,igcd,igcd,igcd,igcd);_GCD(igcd,igcd,igcd);  //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
     o+=initialize_scalar(uint(1));
     //  o+=initialize_xscalar_xvector_xmatrix_xtensor(uint(1));
+    uint uigcd=1;_GCD(uigcd,uigcd,uigcd,uigcd,uigcd);_GCD(uigcd,uigcd,uigcd);  //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
@@ -533,6 +536,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=initialize_xscalar_xvector_xmatrix_xtensor((long int)(1));
     // o+=initialize_xcomplex((long int)(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
+    long int ligcd=1;_GCD(ligcd,ligcd,ligcd,ligcd,ligcd);_GCD(ligcd,ligcd,ligcd);  //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
@@ -540,12 +544,14 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     // o+=initialize_xscalar_xvector_xmatrix_xtensor(((unsigned long int))(1));
     // o+=initialize_xcomplex(((unsigned long int))(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
+    unsigned long int uligcd=1;_GCD(uligcd,uligcd,uligcd,uligcd,uligcd);_GCD(uligcd,uligcd,uligcd);  //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_LONG_LONG_INT
     o+=initialize_scalar((long long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((long long int)(1));
     // o+=initialize_xcomplex((long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);
+    long long int lligcd=1;_GCD(lligcd,lligcd,lligcd,lligcd,lligcd);_GCD(lligcd,lligcd,lligcd);  //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
@@ -553,6 +559,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);
+    unsigned long long int ulligcd=1;_GCD(ulligcd,ulligcd,ulligcd,ulligcd,ulligcd);_GCD(ulligcd,ulligcd,ulligcd);  //CO191201
 #endif
   }
   return TRUE;

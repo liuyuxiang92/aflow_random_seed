@@ -502,6 +502,9 @@ namespace aurostd {
               xvector<utype>& a, xvector<int> ia, 
               xmatrix<utype>& covar, utype& chisq, 
               void (*funcs)(utype, xvector<utype>&));
+
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd); //CO191201
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my); //CO191201
 }
 
 namespace aurostd {
