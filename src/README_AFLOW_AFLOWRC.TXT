@@ -977,6 +977,11 @@ ARUN_DIRECTORY_PREFIX
 ####################################################################################################
 DEFAULTS POCC
 
+POCC_FILE_PREFIX
+  description: Temperature range over which POCC will perform post-processing. Scan 0 to 1200 (K) in 300 (K) increments. 0 is converted to _ZERO_TOL_ since T=0 exactly is undefined for the Boltzmann distribution.
+  type: string
+  default: "0:1200:300"
+
 DEFAULT_POCC_SITE_TOL
   description: Default site tolerance for HNF calculation.
   type: double
@@ -1015,7 +1020,7 @@ DEFAULT_POCC_WRITE_OUT_ALL_DERIVATIVE_STRUCTURES
 POCC_FILE_PREFIX
   description: Prefix for files written by POCC module.
   type: string
-  default: "aflow.apl."
+  default: "aflow.pocc."
 
 POCC_ALL_DERIVATIVE_STRUCTURES_FILE
   description: Name for all derivative structures file.
@@ -1036,6 +1041,16 @@ POCC_ALL_SITE_CONFIGURATIONS_FILE
   description: Name for site configurations file.
   type: string
   default: "site_configurations.out"
+
+POCC_OUT_FILE
+  description: Name for POCC post-processing properties file.
+  type: string
+  default: "out"
+
+POCC_DOSCAR_FILE
+  description: Name for ensemble average DOSCAR.
+  type: string
+  default: "DOSCAR.pocc"
 
 ####################################################################################################
 DEFAULTS APL

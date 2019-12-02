@@ -56,6 +56,17 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
+  double minimumDistance(const deque<_atom>& atoms){  //CO190808
+    //for NON periodic systems, use the default with lattice otherwise: minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale)
+    double dist=0,dist_min=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<atoms.size()-1;i++){
+      for(uint j=i+1;j<atoms.size();j++){
+        dist=aurostd::modulus(atoms[i].cpos-atoms[j].cpos);
+        if(dist<dist_min){dist_min=dist;}
+      }
+    }
+    return dist_min;
+  }
   double minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double min_dist=AUROSTD_MAX_DOUBLE;
@@ -92,7 +103,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
     
     //combos of two lattice vectors
-    for(uint i=0;i<lattice_lengths.size();i++){     
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -135,7 +146,7 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of three lattice vectors 
-    for(uint i=0;i<lattice_lengths.size();i++){     
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -186,7 +197,6 @@ namespace SYM {
     // than the minimum distance, it becomes the radius for the new lattice dimensions sphere for the next iteration. 
 
 
-
     //DX 5/8/18 - FASTER MIN CART DISTANCE CALCULATOR - START
     //DX 5/8/18 - only calculate multiplication once (time-saver)
     vector<xvector<double> > l1, l2, l3;
@@ -197,7 +207,7 @@ namespace SYM {
 
     xvector<double> tmp;
 
-    for(uint i=0; i<atoms.size(); i++){
+    for(uint i=0; i<atoms.size()-1; i++){ //CO190808 - .size()-1
       // Cannot reduce more than (1,1,1), so don't recalculate
       if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
         dims=LatticeDimensionSphere(lattice,min_dist);
@@ -1002,23 +1012,23 @@ namespace SYM {
       stringstream message; 
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)<_ZERO_TOL_){
         message << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(soliloquy, message, cerr, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_MESSAGE_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist<=tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist>tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)!=(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
       if((min_cdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)!=(min_fdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)){
         message << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
     }
     double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX 20190620
@@ -6816,7 +6826,7 @@ namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     //CALCULATION_MODE == 0 (default) - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for all
     //CALCULATION_MODE == 1 - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for iatoms ONLY
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
@@ -7117,7 +7127,7 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
     a.sym_eps=_eps_;

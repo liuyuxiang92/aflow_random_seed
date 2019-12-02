@@ -30,7 +30,7 @@ LTMethod::LTMethod(QMesh& qm, Logger& l) : _qm(qm), _logger(l) {
   if (_qm.getnQPs() < 4) {
     string function = _APL_LTET_ERR_PREFIX_ + "LTMethod()";
     string message = "At least four q-points are required for the linear tetrahedron method.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
   }
   free();
   _volumePerTetrahedron = 1.0/(double)(6 * _qm.getGrid(1) * _qm.getGrid(2) * _qm.getGrid(3));
