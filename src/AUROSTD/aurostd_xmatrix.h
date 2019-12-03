@@ -386,6 +386,15 @@ namespace aurostd {
   template<class utype> void                                           // swap_rows
     swap_rows(xmatrix<utype>&,const int&,const int&) __xprototype;    // swap_rows
 
+  template<class utype> void  // function shift lrows so first index is i
+    shiftlrows(xmatrix<utype>& a,int i); //CO191201
+  
+  template<class utype> void  // function shift lcols so first index is i
+    shiftlcols(xmatrix<utype>& a,int i); //CO191201
+  
+  template<class utype> void  // function shift lrows and lcols so first index is i, j
+    shiftlrowscols(xmatrix<utype>& a,int i,int j); //CO191201
+
   template<class utype> xmatrix<utype>
     identity(const xmatrix<utype>&) __xprototype;
     
@@ -542,6 +551,8 @@ namespace aurostd {
     void QRDecomposition_HouseHolder(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO191110
   // general Householder, mat is mxn, m>=n
   // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
+  void getEHermite(int a,int b,xmatrix<int>& ehermite); //CO+YL191201
+  void getSmithNormalForm(const xmatrix<int>& A,xmatrix<int>& U,xmatrix<int>& V,xmatrix<int>& S); //CO+YL191201
   template<class utype>
     void tred2(const xmatrix<utype> &a,xvector<utype> &d,xvector<utype> &e) __xprototype;
   // Householder reduction of a real, symmetric matrix a[1..n][1..n].

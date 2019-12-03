@@ -528,7 +528,7 @@ namespace aflowlib {
 
 bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO190520
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
-  string soliloquy="test_gcd():";
+  string soliloquy="gcdTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -562,6 +562,32 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   return TRUE; // CO 180419
 }
 
+bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO190520
+bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
+  string soliloquy="smithTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+  
+  //test ehermite
+  xmatrix<int> ehermite(2,2);
+  aurostd::getEHermite(5,12,ehermite);
+  if(!(
+        ehermite[1][1]==5 &&
+        ehermite[1][2]==-2 &&
+        ehermite[2][1]==-12 &&
+        ehermite[2][2]==5 &&
+        TRUE
+      )
+    ){
+    if(LDEBUG){cerr << soliloquy << " getEHermite(5,12) failed" << endl;}
+    return FALSE;
+  }
+  
+  message << "gcd test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  return TRUE; // CO 180419
+}
+  
 int main(int _argc,char **_argv) {
   string soliloquy="main():"; // CO 180419
   ostream& oss=cout;  // CO 180419
@@ -660,6 +686,7 @@ int main(int _argc,char **_argv) {
       return 0; // CO 180419
    }
   if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
+  if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO190601
   if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");

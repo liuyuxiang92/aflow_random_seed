@@ -2400,6 +2400,8 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
 //makefile tests
 bool gcdTest(ostream& oss=cout);
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool smithTest(ostream& oss=cout);
+bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes

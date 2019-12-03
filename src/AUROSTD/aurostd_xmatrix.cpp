@@ -2268,6 +2268,50 @@ namespace aurostd {  // namespace aurostd
 
 // ****************************************************************************
 // ----------------------------------------------------------------------------
+namespace aurostd { // namespace aurostd
+  
+  template<class utype> void  // function shift lrows so first index is i
+    shiftlrows(xmatrix<utype>& a,int i){ //CO191201
+      if(a.lrows==i){return;}
+      xmatrix<utype> b(a.rows+i-1,a.ucols,i,a.lcols);
+      int k=i;
+      for(int ii=a.lrows;ii<=a.urows;ii++){
+        for(int jj=a.lcols;jj<=a.ucols;jj++){
+          b[k++][jj]=a[ii][jj];
+        }
+      }
+      a=b;
+    }
+  
+  template<class utype> void  // function shift lcols so first index is i
+    shiftlcols(xmatrix<utype>& a,int i){ //CO191201
+      if(a.lcols==i){return;}
+      xmatrix<utype> b(a.urows,a.cols+i-1,a.lrows,i);
+      int k=i;
+      for(int ii=a.lrows;ii<=a.urows;ii++){
+        for(int jj=a.lcols;jj<=a.ucols;jj++){
+          b[ii][k++]=a[ii][jj];
+        }
+      }
+      a=b;
+    }
+  
+  template<class utype> void  // function shift lrows and lcols so first index is i, j
+    shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO191201
+      if(a.lrows==i && a.lcols==j){return;}
+      xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
+      int k=i,l=j;
+      for(int ii=a.lrows;ii<=a.urows;ii++){
+        for(int jj=a.lcols;jj<=a.ucols;jj++){
+          b[k++][l++]=a[ii][jj];
+        }
+      }
+      a=b;
+    }
+} // namespace aurostd
+
+// ****************************************************************************
+// ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                          // sign xmatrix
   sign(const xmatrix<utype>& a) {
@@ -3316,6 +3360,68 @@ namespace aurostd {
     }
 
     if(!aurostd::isequal(mat_orig,Q*R)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
+  }
+  void getEHermite(int a,int b,xmatrix<int>& ehermite){ //CO+YL191201
+    // Elementary Hermite transformation.
+    // For integers a and b, E = ehermite(a,b) returns
+    // an integer matrix with determinant 1 such that E * [a;b] = [g;0],
+    // where g is the gcd of a and b.
+    // E = ehermite(a,b)
+    // This function is in some ways analogous to GIVENS.
+    // John Gilbert, 415-812-4487, December 1993
+    // gilbert@parc.xerox.com
+    // Xerox Palo Alto Research Center
+
+    int gcd=0,x=0,y=0;
+    GCD(a,b,gcd,x,y);
+    //ehermite is 2x2
+    if(ehermite.rows!=2 || ehermite.cols!=2){xmatrix<int> ehermite_tmp(2,2);ehermite=ehermite_tmp;}
+    if(gcd){
+      ehermite[ehermite.lrows][ehermite.lcols]=x;
+      ehermite[ehermite.lrows][ehermite.ucols]=y;
+      ehermite[ehermite.urows][ehermite.lcols]=-b/gcd;
+      ehermite[ehermite.urows][ehermite.ucols]=a/gcd;
+    }else{
+      ehermite[ehermite.lrows][ehermite.lcols]=1;
+      ehermite[ehermite.lrows][ehermite.ucols]=0;
+      ehermite[ehermite.urows][ehermite.lcols]=0;
+      ehermite[ehermite.urows][ehermite.ucols]=1;
+    }
+  }
+  void getSmithNormalForm(const xmatrix<int>& A,xmatrix<int>& U,xmatrix<int>& V,xmatrix<int>& S){  //CO+YL191201
+    // Smith normal form of an integer matrix.
+    // [U,S,V] = smith(A) returns integer matrices U, S, and V such that
+    // A = U*S*V,  and not A=U*S*V' !!!!!!!!
+    // S is diagonal and nonnegative, S(i,i) divides S(i+1,i+1) for all i,
+    // det U =+-1, and det V =+-1.
+    // s = smith(A) just returns diag(S).
+    // Uses function ehermite.
+    // [U,S,V] = smith(A);
+    // This function is in some ways analogous to SVD.
+    // John Gilbert, 415-812-4487, December 1993
+    // gilbert@parc.xerox.com
+    // Xerox Palo Alto Research Center
+    // This looks much like an SVD algorithm that first bidiagonalizes
+    // A by Givens rotations and then chases zeros, except for
+    // the construction of the 2 by 2 elementary transformation.
+    
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="aurostd::getSmithNormalForm():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    //algorithm depends on lrows==lcols==1
+    //[make copy?]aurostd::shiftlrowscols(A,1,1);
+
+    if(A.lrows!=A.lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::getSmithNormalForm():","A.lrows!=A.lcols",_ALLOC_ERROR_);}
+
+    int min_mn=std::min(A.urows,A.ucols);
+
+    for(int j=A.lcols;j<=min_mn;j++){
+      for(int i=j+1;i<=A.urows;i++){
+      }
+    }
+    
+    if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
 }
 
