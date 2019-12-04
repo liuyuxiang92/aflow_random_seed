@@ -45,6 +45,7 @@ namespace aurostd {
     utype* operator[](int) const;                                       // indicize i,j
     xvector<utype> operator()(int) const;                               // indicize i
     xvector<utype> getcol(int) const;                                   // return column i  //CO191110
+    xvector<utype> getdiag(int k=0,int _lrows=1) const;                 //return diagonal, k=0 is main diagonal, k>0 is above diagonal //CO191201
     void getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out=1,int lcols_out=1) const; // return submatrix as xmatrix //CO191110
     void getmat(xvector<utype>& xv_out,int urow,int ucol,int lrow,int lcol,int lrows_out=1,int lcols_out=1) const; //return submatrix as xvector //CO191110
     void setrow(const xvector<utype>& row,int irow=1);                  // set row of matrix //CO190808
@@ -61,6 +62,7 @@ namespace aurostd {
     xmatrix<utype>& operator *=(utype r); //CO190911
     // xmatrix<utype>& operator /=(const xmatrix<utype>&);
     xmatrix<utype>& operator /=(utype r); //CO190911
+    xmatrix<utype>& operator /=(const xmatrix<utype>&); //CO191201 - right matrix division
     // std::ostream operator
     //      friend std::ostream& operator<<<utype>(std::ostream&,const xmatrix<utype>&);
     // friend std::ostream& operator<<<utype>(std::ostream&,const xmatrix<utype>&);
@@ -116,6 +118,9 @@ namespace aurostd {
   
   template<class utype> xmatrix<utype>
     operator/(const xmatrix<utype>&,const utype) __xprototype;
+  
+  template<class utype> xmatrix<utype>
+    operator/(const xmatrix<utype>&,const xmatrix<utype>&) __xprototype;  //CO191201 - right matrix division
   
   template<class utype>
     std::ostream& operator<<(std::ostream&,const xmatrix<utype>&) __xprototype;
@@ -245,7 +250,7 @@ namespace aurostd {
 namespace aurostd {
   //171008 - CO
   template<class utype> xmatrix<utype>
-    eye(int=3,int=3,int=1,int=1) __xprototype; //CO190520
+    eye(int=3,int=AUROSTD_MAX_INT,int=1,int=1) __xprototype; //CO190520
   template<class utype> xmatrix<utype>
     ones_xm(int=3,int=3,int=1,int=1) __xprototype; //CO190520
 }
@@ -278,6 +283,9 @@ namespace aurostd {
 
   template<class utype> xvector<utype>
     xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype; //CO191110
+
+  xmatrix<double> xmatrixint2double(const xmatrix<int>& a); //CO191201
+  xmatrix<int> xmatrixdouble2int(const xmatrix<double>& a,bool check_int=true); //CO191201
 }  
 
 // ----------------------------------------------------------- xmatrix functions
@@ -551,7 +559,8 @@ namespace aurostd {
     void QRDecomposition_HouseHolder(const xmatrix<utype>& mat,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); //CO191110
   // general Householder, mat is mxn, m>=n
   // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
-  void getEHermite(int a,int b,xmatrix<int>& ehermite); //CO+YL191201
+  template<class utype> 
+    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite); //CO+YL191201
   void getSmithNormalForm(const xmatrix<int>& A,xmatrix<int>& U,xmatrix<int>& V,xmatrix<int>& S); //CO+YL191201
   template<class utype>
     void tred2(const xmatrix<utype> &a,xvector<utype> &d,xvector<utype> &e) __xprototype;

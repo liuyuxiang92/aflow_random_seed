@@ -3,6 +3,11 @@
         -- adding free(), copy(), refresh() to xmatrix (CO)
         -- templated GCD() (CO)
         -- added shiftlrows, shiftlcols, shiftlrowscols to xmatrix (CO)
+        -- added inverse of 2x2 matrix (CO)
+        -- added xmatrixint2double() and xmatrixdouble2int() (CO)
+        -- added getdiag(S) for xmatrix (CO)
+        -- added right matrix division to xmatrix (CO)
+        -- added smith normal form calculator to xmatrix (CO)
 3.1.228 - 2019/11/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- Fixed bug in xDOSCAR reader error detection. (ME)

@@ -103,6 +103,11 @@ using std::vector;
 #endif
 
 //CO 171002 - USEFUL!
+#ifndef AUROSTD_MAX_INT
+#define AUROSTD_MAX_INT std::numeric_limits<int>::max()
+#endif
+
+//CO 171002 - USEFUL!
 #ifndef AUROSTD_MAX_UINT
 #define AUROSTD_MAX_UINT std::numeric_limits<uint>::max()
 #endif

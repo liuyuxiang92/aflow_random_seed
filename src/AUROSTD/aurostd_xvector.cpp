@@ -792,32 +792,30 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype> bool
-  isinteger(const xvector<utype>& a,const utype& tol) { //CO 180409
-    for(int i=a.lrows;i<=a.urows;i++)
-      if(isinteger(a[i],tol)==FALSE) return FALSE; //CO 180409
-    return TRUE;
-  }
-  bool _aurostd_initialize_isinteger(const xvector<int>& a) { return isinteger(a);}
-  bool _aurostd_initialize_isinteger(const xvector<uint>& a) { return isinteger(a);} //CO 180409
-  bool _aurostd_initialize_isinteger(const xvector<float>& a) { return isinteger(a);}
-  bool _aurostd_initialize_isinteger(const xvector<double>& a) { return isinteger(a);}
+    isinteger(const xvector<utype>& a,const utype& tol) { //CO 180409
+      for(int i=a.lrows;i<=a.urows;i++)
+        if(isinteger(a[i],tol)==FALSE) return FALSE; //CO 180409
+      return TRUE;
+    }
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<int>& a) { return isinteger(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<uint>& a) { return isinteger(a);} //CO 180409
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<float>& a) { return isinteger(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<double>& a) { return isinteger(a);}
 }
 
 // ME 180702 - Tests if vector is the zero vector
 namespace aurostd {
   template<class utype> bool
-  iszero(const xvector<utype>& a, const double& tol) {
-    for (int i = a.lrows; i <= a.urows; i++) {
-      if (abs(a(i)) > tol) {
-        return false;
+    iszero(const xvector<utype>& a,double tol) {
+      for(int i=a.lrows;i<=a.urows;i++){
+        if(!iszero(a[i],tol)){return false;}
       }
+      return true; 
     }
-    return true; 
-  }
-  bool _aurostd_initialize_iszero(const xvector<int>& a) { return iszero(a);}
-  bool _aurostd_initialize_iszero(const xvector<uint>& a) { return iszero(a);}
-  bool _aurostd_initialize_iszero(const xvector<float>& a) { return iszero(a);}
-  bool _aurostd_initialize_iszero(const xvector<double>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<int>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<uint>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<float>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<double>& a) { return iszero(a);}
 }
 
 // ------------------------------------------------------------ std::cout operations

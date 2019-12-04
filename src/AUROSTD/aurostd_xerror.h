@@ -47,7 +47,8 @@ class xerror {
     ~xerror() throw() {};
     int error_code;
     std::string what();
-    std::string where();
+    std::string whereFunction();  //CO191201
+    std::string whereFileName();  //CO191201
     std::string error_message;
   private:
     int error_type, error_number;

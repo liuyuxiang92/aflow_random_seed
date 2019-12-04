@@ -208,7 +208,7 @@ namespace aurostd {
     isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO 180409
   
   template<class utype> bool
-    iszero(const xvector<utype>&, const double& tol=1e-7) __xprototype;  // ME180702
+    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  // ME180702 //CO191201 - 1e-7 seems arbitrary
   // CONSTRUCTIONS OF VECTORS FROM SCALARS
   
   template<class utype> xvector<utype>

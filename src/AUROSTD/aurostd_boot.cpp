@@ -26,6 +26,7 @@ using aurostd::_isfloat;
 using aurostd::_iscomplex;
 using aurostd::_GCD;
 using aurostd::_isinteger;
+using aurostd::_iszero;
 using aurostd::_roundoff;
 using aurostd::mod;
 using aurostd::min;
@@ -59,6 +60,7 @@ using aurostd::jacobi;
 using aurostd::eigsrt;
 using aurostd::tred2;
 using aurostd::QRDecomposition_HouseHolder; //CO191110
+using aurostd::getEHermite; //CO191110
 using aurostd::tqli;
 using aurostd::balanc;
 using aurostd::elmhes;
@@ -139,7 +141,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   cout << vx << endl; // DX 1/15/18 - ostream was missing
   conj(vx);  // ME180904
 
-  aurostd::xmatrix<utype > mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
+  aurostd::xmatrix<utype> mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
   mx+mx;mx+=my;mx-mx;mx-=my;mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y
   sin(mx);sinh(mx);cos(mx);cosh(mx);exp(mx);
   aurostd::ones_xv<utype>();aurostd::ones_xv<utype>(3);aurostd::ones_xv<utype>(3,3); //CO190520
@@ -153,7 +155,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x+=issymmetric(m)+isantisymmetric(m)+ishermitian(m)+isantihermitian(m);
   trace(m); // DX 1/15/17 - initialize trace for xcomplex
   m(1,1)=n(1,1);m[1][1]=n[1][1];m=n;m=m+m;m=m*m;m=m-m;m.clear();//m=m*r;m=r*m;		//CO190329 - clang doesn't like x=x, changing to x=y
-  m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1]; // DX 1/15/18 - operator and equal operator initialzied for xcomplex		//CO190329 - clang doesn't like x=x, changing to x=y
+  m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; // DX 1/15/18 - operator and equal operator initialized for xcomplex		//CO190329 - clang doesn't like x=x, changing to x=y
   exp(m); // DX 1/15/18 - add exponential or complex matrices
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
@@ -169,6 +171,7 @@ template<class utype> bool initialize_eigenproblems(utype x) {
   aurostd::xmatrix<utype> m(3,3),q(3,3),r(3,3);m[1][1]=x; //CO191110
   int i=0;i+=jacobi(m,v,m);
   eigsrt(v,m);QRDecomposition_HouseHolder(m,q,r); //CO191110
+  getEHermite(x,x,m); //CO191201
   tred2(m,v,v);tqli(v,v,m);balanc(m);elmhes(m);hqr(m,v,v);eigen(m,v,v); // EIGENVECTORS
   return TRUE;
 }
@@ -217,7 +220,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=nint(x)+factorial(x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
   o+=max(x,x);o+=max(x,x,x);o+=max(x,x,x,x);o+=max(x,x,x,x,x);o+=max(x,x,x,x,x,x);o+=sign(x);
   o+=min(x,x);o+=min(x,x,x);o+=min(x,x,x,x);o+=min(x,x,x,x,x);o+=min(x,x,x,x,x,x);o+=sign(x);
-  o+=_isinteger(x,x)+uniform(x)+uniform(x,x)+gaussian(x)+gaussian(x,x)+expdev(x)+laplacedev(x)+laplacedev(x,x);
+  o+=_isinteger(x,x)+_iszero(x,x)+uniform(x)+uniform(x,x)+gaussian(x)+gaussian(x,x)+expdev(x)+laplacedev(x)+laplacedev(x,x);
   o+=_roundoff(x,x);
   o+=combinations(x,x)+Cnk(x,x);
 
@@ -260,7 +263,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   utype* mstar;mstar=NULL;
   aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);
-  vv=m.getcol(1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y  //CO191110
+  vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y  //CO191110  //CO191201
   m*=(utype)5;m/=(utype)6;  //CO190911
   m.getmat(m,1,1,1,1,1,1);m.getmat(vv,1,1,1,1,1,1); //CO190911
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO190329 - clang doesn't like x=x, changing to x=y
@@ -458,6 +461,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #ifdef AUROSTD_INITIALIZE_INT
     o+=initialize_scalar(int(1));
     o+=initialize_xscalar_xvector_xmatrix_xtensor(int(1));
+    o+=initialize_eigenproblems(int(1));  //CO191201
     aurostd::xvector<int> xv; //CO190520
     aurostd::ones_xv<int>();aurostd::ones_xv<int>(3);aurostd::ones_xv<int>(3,3); //CO 180515 //CO190520
     aurostd::xmatrix<int> mx; //CO190520

@@ -86,7 +86,7 @@ bool xerror::codeValid() {
 std::string xerror::buildMessageString() {
   std::stringstream msgstr;
   msgstr << "ERROR " << error_code << " in ";
-  msgstr << where() << ": ";  // function name
+  msgstr << whereFunction() << ": ";  // function name
   msgstr << error_string() << endl; //<< " - ";  // error type  //CO181226
   if (error_code == 2) {
     msgstr << "There was an error, but the supplied error code is invalid. Please contact the developers. ";
@@ -96,8 +96,12 @@ std::string xerror::buildMessageString() {
   return msgstr.str();
 }
 
-std::string xerror::where() {
-  return function_name+" in "+file_name;
+std::string xerror::whereFunction() { //CO191201
+  return function_name;
+}
+
+std::string xerror::whereFileName() { //CO191201
+  return file_name;
 }
 
 std::string xerror::error_string() {

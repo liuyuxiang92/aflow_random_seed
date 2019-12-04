@@ -137,19 +137,30 @@ namespace aurostd {
   void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO191201
   void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO191201
   int LCM(int a,int b); //CO190520
-  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;
+  
+  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO191201
+  //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO191201
+  //bool isinteger(char x,char tolerance=(char)0.01); //CO191201
+  bool isinteger(int x,int tolerance=(int)0.01);  //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(long int x,long int tolerance=(long)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(uint x,uint tolerance=(uint)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);  //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(float x,float tolerance=(float)0.01);  //CO191201
+  bool isinteger(double x,double tolerance=(double)0.01); //CO191201
+  bool isinteger(long double x,long double tolerance=(long double)0.01);  //CO191201
 
-  //bool isinteger(bool x,bool tolerance=(bool)0.01);
-  //bool isinteger(char x,char tolerance=(char)0.01);
-  bool isinteger(int x,int tolerance=(int)0.01);
-  bool isinteger(long x,long tolerance=(long)0.01);
-  bool isinteger(uint x,uint tolerance=(uint)0.01);
-  bool isinteger(float x,float tolerance=(float)0.01);
-  bool isinteger(double x,double tolerance=(double)0.01);
-  //bool isinteger(long int x,long int tolerance=(long int)0.01);
-  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01);
-  bool isinteger(long double x,long double tolerance=(long double)0.01);
+  template<class utype> bool _iszero(utype a,utype tol=(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);  //CO191201
+  //bool iszero(bool x,bool tolerance); //CO191201
+  //bool iszero(char x,char tolerance); //CO191201
+  bool iszero(int x,int tolerance=(int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(long int x,long int tolerance=(long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(uint x,uint tolerance=(uint)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(long long int x,long long int tolerance=(long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
 
   template<class utype> utype fact(utype) __xprototype;
   template<class utype> utype factorial(utype) __xprototype;

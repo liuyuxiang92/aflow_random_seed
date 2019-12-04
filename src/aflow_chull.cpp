@@ -497,8 +497,8 @@ namespace chull {
         //in try/catch's to avoid hard exits
         //proceed otherwise at your own risk
         try{vdist2hull=hull.getDistancesToHull(vauid);}
-        catch(aurostd::xerror& re){
-          pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        catch(aurostd::xerror& err){
+          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return false;
@@ -565,8 +565,8 @@ namespace chull {
         //in try/catch's to avoid hard exits
         //proceed otherwise at your own risk
         try{vscriterion=hull.getStabilityCriterion(vauid);}
-        catch(aurostd::xerror& re){
-          pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        catch(aurostd::xerror& err){
+          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return false;
@@ -635,8 +635,8 @@ namespace chull {
           ChullPoint cp(coords,FileMESSAGE,oss,hull.m_has_stoich_coords,hull.m_formation_energy_hull,false);  //not a real point
           dist2hull=hull.getDistanceToHull(cp,false,true);  //do not redo, get signed distance (this is energy)
         }
-        catch(aurostd::xerror& re){
-          pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        catch(aurostd::xerror& err){
+          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
           if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
           return false;
@@ -994,7 +994,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //    //we need organized points, simply initialize dummy hull instead of calculating TWO full hulls
 //    ConvexHull dummy(vpflow,FileMESSAGE,oss);
 //    try{dummy.initializePoints(velements);}
-//    catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
+//    catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
 //    dummy.m_initialized=true; //hack so we can get at the g-states
 //    uint i_point,i_coord_group,g_state;
 //    vector<uint> eq_gstates;
@@ -1089,7 +1089,7 @@ void flagCheck(aurostd::xoption& vpflow, const vector<string>& velements, ofstre
 //        point.setHullCoords(elements_present);  //just to be sure
 //      }
 //      try{vscriterion.push_back(hull.getDistanceToHull(point));}
-//      catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
+//      catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), FileMESSAGE, oss, _LOGGER_ERROR_);return false;}
 //    }
 //
 //    return true;
@@ -2639,7 +2639,7 @@ bool ConvexHull::initialize(ofstream& FileMESSAGE,ostream& oss) {
     setDirectory();
     m_initialized=false;  //no points
   }
-  catch(aurostd::xerror& le){pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2651,7 +2651,7 @@ bool ConvexHull::initialize(string alloy,ofstream& FileMESSAGE,ostream& oss) {
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(alloy);
 }
 
@@ -2663,7 +2663,7 @@ bool ConvexHull::initialize(const vector<string>& velements,ofstream& FileMESSAG
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(velements);
 }
 
@@ -2675,7 +2675,7 @@ bool ConvexHull::initialize(const vector<string>& velements,const vector<vector<
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(velements,entries);
 }
 
@@ -2687,7 +2687,7 @@ bool ConvexHull::initialize(const vector<xvector<double> >& vcoords,ofstream& Fi
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
 }
 
@@ -2699,7 +2699,7 @@ bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,ofstream& FileMESS
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(vpoints,formation_enthalpy_hull,add_artificial_unaries);
 }
 
@@ -2711,7 +2711,7 @@ bool ConvexHull::initialize(const vector<ChullPoint>& vpoints,const vector<strin
     setDefaultCFlags();
     setDirectory();
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return createHull(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
 }
 
@@ -2780,7 +2780,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,ofstream& FileMESSAGE
     setDirectory();
     m_initialized=false;  //no points
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2793,7 +2793,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,string alloy,ofstream
     setDirectory();
     m_initialized=createHull(alloy);
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2806,7 +2806,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>&
     setDirectory();
     m_initialized=createHull(velements);
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2819,7 +2819,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<string>&
     setDirectory();
     m_initialized=createHull(velements,entries);
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2832,7 +2832,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<xvector<
     setDirectory();
     m_initialized=createHull(vcoords,has_stoich_coords,formation_enthalpy_hull,add_artificial_unaries);
   }
-  catch(aurostd::xerror& le){pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2845,7 +2845,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoi
     setDirectory();
     m_initialized=createHull(vpoints,formation_enthalpy_hull,add_artificial_unaries);
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -2858,7 +2858,7 @@ bool ConvexHull::initialize(const aurostd::xoption& vpflow,const vector<ChullPoi
     setDirectory();
     m_initialized=createHull(vpoints,velements,formation_enthalpy_hull,add_artificial_unaries);
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return m_initialized;
 }
 
@@ -3196,7 +3196,7 @@ bool ConvexHull::write(filetype ftype) const {
     else if(ftype==latex_ft){writeLatex();written=true;}
     else if(ftype==chull_web_ft){writeWebApp();written=true;}
   }
-  catch(aurostd::xerror& re){pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
+  catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
   return written;
 }
 
@@ -3216,8 +3216,8 @@ bool ConvexHull::createHull(string alloy) {
     //hull must be initialized for these analyses
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
-  catch(aurostd::xerror& re){
-    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3232,8 +3232,8 @@ bool ConvexHull::createHull(const vector<string>& velements) {
     //hull must be initialized for these analyses
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
-  catch(aurostd::xerror& re){
-    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3248,8 +3248,8 @@ bool ConvexHull::createHull(const vector<string>& velements,const vector<vector<
     //hull must be initialized for these analyses
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
-  catch(aurostd::xerror& re){
-    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3264,8 +3264,8 @@ bool ConvexHull::createHull(const vector<xvector<double> >& vcoords,bool has_sto
     //hull must be initialized for these analyses
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
-  catch(aurostd::xerror& re){
-    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3280,8 +3280,8 @@ bool ConvexHull::createHull(const vector<ChullPoint>& vpoints,bool formation_ene
     //hull must be initialized for these analyses
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
-  catch(aurostd::xerror& re){
-    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;
@@ -3296,8 +3296,8 @@ bool ConvexHull::createHull(const vector<ChullPoint>& vpoints,const vector<strin
     //hull must be initialized for these analyses
     thermodynamicsPostProcessing(); // will return if not m_thermo_hull
   }
-  catch(aurostd::xerror& re){
-    pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     clear();
   }
   return m_initialized;

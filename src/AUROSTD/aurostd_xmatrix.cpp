@@ -297,6 +297,27 @@ namespace aurostd {  // namespace aurostd
   }
 }
 
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    xvector<utype> xmatrix<utype>::getdiag(int k,int _lrows) const { //CO191210
+      //first get length
+      int _rows=0,i=0,j=0;
+      for(i=lrows;i<=urows;i++){
+        j=i+k;
+        if(j>ucols){break;}
+        _rows++;
+      }
+      xvector<utype> diag(_rows,_lrows);
+      int index=_lrows;
+      for(i=lrows;i<=urows;i++){
+        j=i+k;
+        if(j>ucols){break;}
+        diag[index++]=corpus[i][j];
+      }
+      return diag;
+    }
+}
+
 //CO190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
@@ -582,6 +603,21 @@ namespace aurostd {  // namespace aurostd
         }
       return *this;
   }
+  template<class utype> xmatrix<utype>&                  
+  // removed inline
+  xmatrix<utype>::operator /=(const xmatrix<utype>& a)
+  {  //CO191201 - right matrix division
+#ifdef _XMATH_DEBUG_OPERATORS
+      printf("M -> operator *=: ");
+      printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
+      printf("this->lcols=%i, this->ucols=%i\n",this->lcols,this->ucols);
+      printf("                 ");
+      printf("b.lrows=%i, b.urows=%i, ",b.lrows,b.urows);
+      printf("b.lcols=%i, b.ucols=%i\n",b.lcols,b.ucols);
+#endif
+      *this=*this*inverse(a);
+      return *this;
+  }
 }
 
 // ----------------------------------------------------------- operator +xmatrix
@@ -757,8 +793,12 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
-  operator/(const xmatrix<utype>& a,const utype s) {
-    return (utype) ((utype)1/s)*a;                     // DX 1/15/17 - add utype to 1/s to account for xcomplex
+    operator/(const xmatrix<utype>& a,const utype s) {
+      return (utype) ((utype)1/s)*a;                     // DX 1/15/17 - add utype to 1/s to account for xcomplex
+    }
+  template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
+    operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO191201
+      return a*inverse(b);
   }
 }
 
@@ -1194,6 +1234,7 @@ namespace aurostd {  // namespace aurostd
   //doesn't have to be square like identity
   template<class utype> xmatrix<utype>
   eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
+    if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
     xmatrix<utype> a(nrh,nch,nrl,ncl);
     for (int i=a.lrows;i<=a.urows;i++){
       for (int j=a.lcols;j<=a.ucols;j++){
@@ -1328,6 +1369,41 @@ namespace aurostd {                   // conversion to xvector
       return xv;
     }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot create 2D xvector",_INPUT_ILLEGAL_);}
     return xvector<utype>(0);
+  }
+}
+
+//CO191201
+namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
+  xmatrix<double> xmatrixint2double(const xmatrix<int>& a){ //CO191201
+    xmatrix<double> b(a.urows,a.ucols,a.lrows,a.lcols);
+    int i=0,j=0;
+    for(i=a.lrows;i<=a.urows;i++){
+      for(j=a.lcols;j<=a.ucols;j++){
+        b[i][j]=(double)a[i][j];  //nint is for safety
+      }
+    }
+    return b;
+  }
+}
+
+//CO191201
+namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
+  xmatrix<int> xmatrixdouble2int(const xmatrix<double>& a,bool check_int){  //CO191201
+    xmatrix<int> b(a.urows,a.ucols,a.lrows,a.lcols);
+    int i=0,j=0;
+    if(check_int){
+      for(i=a.lrows;i<=a.urows;i++){
+        for(j=a.lcols;j<=a.ucols;j++){
+          if(!isinteger(a[i][j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrixdouble2int():","non-integer found",_INPUT_ILLEGAL_);}
+        }
+      }
+    }
+    for(i=a.lrows;i<=a.urows;i++){
+      for(j=a.lcols;j<=a.ucols;j++){
+        b[i][j]=(int)nint(a[i][j]);  //nint is for safety
+      }
+    }
+    return b;
   }
 }
 
@@ -1601,9 +1677,14 @@ namespace aurostd {  // namespace aurostd
     utype adet=det(a);
     if(adet==(utype) 0)  {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: singular matrix" << endl;exit(0);}
     if(size==1) {b[1][1]=1/a[1][1]; return b;}
-    if(size==2) {{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: 2x2 not written yet" << endl;exit(0);} return b;}
+    if(size==2) { //CO191201
+      //[CO191201 - OBSOLETE]{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: 2x2 not written yet" << endl;exit(0);} return b;
+      b[1][1]=a[2][2]/adet;b[1][2]=-a[1][2]/adet;
+      b[2][1]=-a[2][1]/adet;b[2][2]=a[1][1]/adet;
+      return b;
+    }
     if(size==3) {
-      adet=det(a);
+      //[CO191201 - already calculated above]adet=det(a);
       /*
 	b[1][1]=(+a[2][2]*a[3][3]-a[2][3]*a[3][2])/adet;   // with fast index []
 	b[1][2]=(-a[1][2]*a[3][3]+a[1][3]*a[3][2])/adet;   // with fast index []
@@ -1627,7 +1708,7 @@ namespace aurostd {  // namespace aurostd
       return b;
     }
     if(size==4) {
-      adet=det(a);
+      //[CO191201 - already calculated above]adet=det(a);
       /*
 	b[1][1]=(+a[2][2]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])-a[2][3]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])+a[2][4]*(a[3][2]*a[4][3]-a[3][3]*a[4][2]))/adet;   // with fast index []
 	b[2][1]=(-a[2][1]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])+a[2][3]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])-a[2][4]*(a[3][1]*a[4][3]-a[3][3]*a[4][1]))/adet;   // with fast index []
@@ -3361,66 +3442,476 @@ namespace aurostd {
 
     if(!aurostd::isequal(mat_orig,Q*R)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
   }
-  void getEHermite(int a,int b,xmatrix<int>& ehermite){ //CO+YL191201
-    // Elementary Hermite transformation.
-    // For integers a and b, E = ehermite(a,b) returns
-    // an integer matrix with determinant 1 such that E * [a;b] = [g;0],
-    // where g is the gcd of a and b.
-    // E = ehermite(a,b)
-    // This function is in some ways analogous to GIVENS.
-    // John Gilbert, 415-812-4487, December 1993
-    // gilbert@parc.xerox.com
-    // Xerox Palo Alto Research Center
+  template<class utype>
+    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite){ //CO+YL191201
+      //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
+      //original license: GNU-GPL Style.
+      //Elementary Hermite transformation.
+      //For integers a and b, E = ehermite(a,b) returns
+      //an integer matrix with determinant 1 such that E * [a;b] = [g;0],
+      //where g is the gcd of a and b.
+      //E = ehermite(a,b)
+      //This function is in some ways analogous to GIVENS.
+    
+      bool LDEBUG=(TRUE || XHOST.DEBUG);
+      string soliloquy="aurostd::getSmithNormalForm():";
+      if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    int gcd=0,x=0,y=0;
-    GCD(a,b,gcd,x,y);
-    //ehermite is 2x2
-    if(ehermite.rows!=2 || ehermite.cols!=2){xmatrix<int> ehermite_tmp(2,2);ehermite=ehermite_tmp;}
-    if(gcd){
-      ehermite[ehermite.lrows][ehermite.lcols]=x;
-      ehermite[ehermite.lrows][ehermite.ucols]=y;
-      ehermite[ehermite.urows][ehermite.lcols]=-b/gcd;
-      ehermite[ehermite.urows][ehermite.ucols]=a/gcd;
-    }else{
-      ehermite[ehermite.lrows][ehermite.lcols]=1;
-      ehermite[ehermite.lrows][ehermite.ucols]=0;
-      ehermite[ehermite.urows][ehermite.lcols]=0;
-      ehermite[ehermite.urows][ehermite.ucols]=1;
+      utype gcd=0,x=0,y=0;
+      GCD(a,b,gcd,x,y);
+      if(LDEBUG){cerr << soliloquy << " gcd(" << a << "," << b << ")=" << gcd << ", x=" << x << ", y=" << y << endl;}
+      //ehermite is 2x2
+      if(ehermite.rows!=2 || ehermite.cols!=2){xmatrix<utype> ehermite_tmp(2,2);ehermite=ehermite_tmp;}
+      if(gcd){
+        ehermite[ehermite.lrows][ehermite.lcols]=x;
+        ehermite[ehermite.lrows][ehermite.ucols]=y;       //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.lcols]=-b/gcd;  //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.ucols]=a/gcd;   //urows=lrows+1, ucols=lcols+1
+      }else{
+        ehermite[ehermite.lrows][ehermite.lcols]=(utype)1;
+        ehermite[ehermite.lrows][ehermite.ucols]=(utype)0;       //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.lcols]=(utype)0;       //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.ucols]=(utype)1;       //urows=lrows+1, ucols=lcols+1
+      }
+      
+      if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
-  }
-  void getSmithNormalForm(const xmatrix<int>& A,xmatrix<int>& U,xmatrix<int>& V,xmatrix<int>& S){  //CO+YL191201
-    // Smith normal form of an integer matrix.
-    // [U,S,V] = smith(A) returns integer matrices U, S, and V such that
-    // A = U*S*V,  and not A=U*S*V' !!!!!!!!
-    // S is diagonal and nonnegative, S(i,i) divides S(i+1,i+1) for all i,
-    // det U =+-1, and det V =+-1.
-    // s = smith(A) just returns diag(S).
-    // Uses function ehermite.
-    // [U,S,V] = smith(A);
-    // This function is in some ways analogous to SVD.
-    // John Gilbert, 415-812-4487, December 1993
-    // gilbert@parc.xerox.com
-    // Xerox Palo Alto Research Center
-    // This looks much like an SVD algorithm that first bidiagonalizes
-    // A by Givens rotations and then chases zeros, except for
-    // the construction of the 2 by 2 elementary transformation.
+  void getSmithNormalForm(const xmatrix<int>& A_in,xmatrix<int>& U_out,xmatrix<int>& V_out,xmatrix<int>& S_out){  //CO+YL191201
+    //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
+    //original license: GNU-GPL Style.
+    //Smith normal form of an integer matrix.
+    //[U,S,V] = smith(A) returns integer matrices U, S, and V such that
+    //A = U*S*V,  and not A=U*S*V' !!!!!!!!
+    //S is diagonal and nonnegative, S(i,i) divides S(i+1,i+1) for all i,
+    //det U =+-1, and det V =+-1.
+    //s = smith(A) just returns diag(S).
+    //Uses function ehermite.
+    //[U,S,V] = smith(A);
+    //This function is in some ways analogous to SVD.
+    //This looks much like an SVD algorithm that first bidiagonalizes
+    //A by Givens rotations and then chases zeros, except for
+    //the construction of the 2 by 2 elementary transformation.
+    //we work with doubles inside, return int matrices later
     
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="aurostd::getSmithNormalForm():";
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    //algorithm depends on lrows==lcols==1
-    //[make copy?]aurostd::shiftlrowscols(A,1,1);
+    if(LDEBUG){cerr << soliloquy << " A=" << endl;cerr << A_in << endl;}
+    
+    xmatrix<double> S=aurostd::xmatrixint2double(A_in);aurostd::shiftlrowscols(S,1,1); //algorithm depends on lrows==lcols==1
 
-    if(A.lrows!=A.lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::getSmithNormalForm():","A.lrows!=A.lcols",_ALLOC_ERROR_);}
+    int m=S.rows,n=S.cols;
+    int min_mn=std::min(m,n);
+    xmatrix<double> U=eye<double>(m),V=eye<double>(n);
 
-    int min_mn=std::min(A.urows,A.ucols);
+    if(LDEBUG){cerr << soliloquy << " bidiagonalizing S with elementary Hermite transforms" << endl;}
+    
+    xmatrix<double> E(2,2);
+    xmatrix<double> twoXthree_in(2,3),twoXthree_out(2,3),threeXtwo_in(3,2),threeXtwo_out(3,2);
+    int j=0,i=0,jj=0;
+    for(j=S.lcols;j<=min_mn;j++){
+      //Zero column j below the diagonal.
+      for(i=j+1;i<=m;i++){
+        if(!iszero(S[i][j])){
+          //Construct an elementary Hermite transformation E
+          //to zero S(i,j) by combining rows i and j.
+          getEHermite(S[j][j],S[i][j],E);
+          if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j=" << j << "]="<< S[j][j] <<",S[i=" << i << "][j=" << j << "]=" << S[i][j] << ")=" << endl;cerr << E << endl;}
+          
+          //Apply the transform to S
+          if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+          //build S([j i],:)
+          for(jj=twoXthree_in.lcols;jj<=twoXthree_in.ucols;jj++){
+            twoXthree_in[twoXthree_in.lrows][jj]=S[j][jj];
+            twoXthree_in[twoXthree_in.urows][jj]=S[i][jj];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " S([j=" << j << " i=" << i << "],:)=" << endl;cerr << twoXthree_in << endl;}
+          twoXthree_out=E*twoXthree_in; //2x2 x 2x3 = 2x3
+          //store twoXthree_out into S([j i],:)
+          for(jj=twoXthree_out.lcols;jj<=twoXthree_out.ucols;jj++){
+            S[j][jj]=twoXthree_out[twoXthree_in.lrows][jj];
+            S[i][jj]=twoXthree_out[twoXthree_in.urows][jj];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+          
+          //Apply the transform to U
+          if(LDEBUG){cerr << soliloquy << " U(pre)=" << endl;cerr << U << endl;}
+          //build U(:,[j i])
+          for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+            threeXtwo_in[jj][threeXtwo_in.lcols]=U[jj][j];
+            threeXtwo_in[jj][threeXtwo_in.ucols]=U[jj][i];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " U(:,[j=" << j << " i=" << i << "])=" << endl;cerr << threeXtwo_in << endl;}
+          threeXtwo_out=threeXtwo_in/E;
+          //store threeXtwo_out into U(:,[j i])
+          for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+            U[jj][j]=threeXtwo_out[jj][threeXtwo_out.lcols];
+            U[jj][i]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " U(post)=" << endl;cerr << U << endl;}
+        }
+      }
+      //Zero row j after the superdiagonal.
+      for(i=j+2;i<=n;i++){
+        if(!iszero(S[j][i])){
+          //Construct an elementary Hermite transformation E
+          //to zero S(j,i) by combining columns j+1 and i.
+          getEHermite(S[j][j+1],S[j][i],E);
+          if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j+1=" << j+1 << "]="<< S[j][j+1] <<",S[j=" << j << "][i=" << i << "]=" << S[j][i] << ")=" << endl;cerr << E << endl;}
+          
+          //Apply the transform to S
+          if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+          //build S(:,[j+1 i])
+          for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+            threeXtwo_in[jj][threeXtwo_in.lcols]=S[jj][j+1];
+            threeXtwo_in[jj][threeXtwo_in.ucols]=S[jj][i];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " S(:,[j+1=" << j+1 << " i=" << i << "])=" << endl;cerr << threeXtwo_in << endl;}
+          threeXtwo_out=threeXtwo_in*trasp(E);
+          //store threeXtwo_out into S(:,[j+1 i])
+          for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+            S[jj][j+1]=threeXtwo_out[jj][threeXtwo_out.lcols];
+            S[jj][i]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+          
+          //Apply the transform to V
+          if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+          //build V(:,[j+1 i])
+          for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+            threeXtwo_in[jj][threeXtwo_in.lcols]=V[jj][j+1];
+            threeXtwo_in[jj][threeXtwo_in.ucols]=V[jj][i];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " V(:,[j+1=" << j+1 << " i=" << i << "])=" << endl;cerr << threeXtwo_in << endl;}
+          threeXtwo_out=threeXtwo_in/E;
+          //store threeXtwo_out into V(:,[j+1 i])
+          for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+            V[jj][j+1]=threeXtwo_out[jj][threeXtwo_out.lcols];
+            V[jj][i]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+        }
+      }
+    }
 
-    for(int j=A.lcols;j<=min_mn;j++){
-      for(int i=j+1;i<=A.urows;i++){
+    //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+    if(LDEBUG){
+      cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+      cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+      cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+    }
+
+    if(LDEBUG){cerr << soliloquy << " S is now upper bidiagonal, eliminating superdiagonal non-zeros" << endl;}
+    
+    xvector<double> D=S.getdiag(1);
+    if(LDEBUG){cerr << soliloquy << " D=" << D << endl;}
+
+    int k=0;
+    double q=0.0;
+    while(!iszero(D)){
+      //Start chasing bulge at first nonzero superdiagonal element.
+      k=-1;
+      for(i=D.lrows;i<=D.urows;i++){
+        if(!iszero(D[i])){k=i;break;}
+      }
+      //be careful, k refers to index of D, not S
+      
+      //To guarantee reduction in S(k,k), first make S(k,k) positive
+      //and make S(k,k+1) nonnegative and less than S(k,k).
+      if(std::signbit(S[k][k])){
+        for(i=S.lcols;i<=S.ucols;i++){S[k][i]=-S[k][i];}
+        for(i=U.lrows;i<=U.urows;i++){U[i][k]=-U[i][k];}
+      }
+      q=std::floor(S[k][k+1]/S[k][k]);
+      E[1][1]=1;E[1][2]=0;
+      E[2][1]=-q;E[2][2]=1;
+
+      //Apply the transform to S
+      if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+      //build S(:,[k k+1])
+      for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+        threeXtwo_in[jj][threeXtwo_in.lcols]=S[jj][k];
+        threeXtwo_in[jj][threeXtwo_in.ucols]=S[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+      }
+      if(LDEBUG){cerr << soliloquy << " S(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << threeXtwo_in << endl;}
+      threeXtwo_out=threeXtwo_in*trasp(E);
+      //store threeXtwo_out into S(:,[k k+1])
+      for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+        S[jj][k]=threeXtwo_out[jj][threeXtwo_out.lcols];
+        S[jj][k+1]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+      }
+      if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+
+      //Apply the transform to V
+      if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+      //build V(:,[k k+1])
+      for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+        threeXtwo_in[jj][threeXtwo_in.lcols]=V[jj][k];
+        threeXtwo_in[jj][threeXtwo_in.ucols]=V[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+      }
+      if(LDEBUG){cerr << soliloquy << " V(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << threeXtwo_in << endl;}
+      threeXtwo_out=threeXtwo_in/E;
+      //store threeXtwo_out into V(:,[k k+1])
+      for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+        V[jj][k]=threeXtwo_out[jj][threeXtwo_out.lcols];
+        V[jj][k+1]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+      }
+      if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+
+      if(!iszero(S[k][k+1])){
+        //Zero the first nonzero superdiagonal element
+        //using columns k and k+1, to start the bulge at S(k+1,k).
+        getEHermite(S[k][k],S[k][k+1],E);
+        if(LDEBUG){cerr << soliloquy << " getEHermite(S[k=" << k <<"][k=" << k << "]="<< S[k][k] <<",S[k=" << k << "][k+1=" << k+1 << "]=" << S[k][k+1] << ")=" << endl;cerr << E << endl;}
+
+        //Apply the transform to S
+        if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+        //build S(:,[k k+1])
+        for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+          threeXtwo_in[jj][threeXtwo_in.lcols]=S[jj][k];
+          threeXtwo_in[jj][threeXtwo_in.ucols]=S[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " S(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << threeXtwo_in << endl;}
+        threeXtwo_out=threeXtwo_in*trasp(E);
+        //store threeXtwo_out into S(:,[k k+1])
+        for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+          S[jj][k]=threeXtwo_out[jj][threeXtwo_out.lcols];
+          S[jj][k+1]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+
+        //Apply the transform to V
+        if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+        //build V(:,[k k+1])
+        for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+          threeXtwo_in[jj][threeXtwo_in.lcols]=V[jj][k];
+          threeXtwo_in[jj][threeXtwo_in.ucols]=V[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " V(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << threeXtwo_in << endl;}
+        threeXtwo_out=threeXtwo_in/E;
+        //store threeXtwo_out into V(:,[k k+1])
+        for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+          V[jj][k]=threeXtwo_out[jj][threeXtwo_out.lcols];
+          V[jj][k+1]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+
+        for(j=S.lcols;j<=min_mn;j++){
+          if(j+1<=m){
+            //Zero S(j+1,j) using rows j and j+1.
+            getEHermite(S[j][j],S[j+1][j],E);
+            if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j=" << j << "]="<< S[j][j] <<",S[j+1=" << j+1 << "][j=" << j << "]=" << S[j+1][j] << ")=" << endl;cerr << E << endl;}
+          
+            //Apply the transform to S
+            if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+            //build S([j j+1],:)
+            for(jj=twoXthree_in.lcols;jj<=twoXthree_in.ucols;jj++){
+              twoXthree_in[twoXthree_in.lrows][jj]=S[j][jj];
+              twoXthree_in[twoXthree_in.urows][jj]=S[j+1][jj];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S([j=" << j << " j+1=" << j+1 << "],:)=" << endl;cerr << twoXthree_in << endl;}
+            twoXthree_out=E*twoXthree_in; //2x2 x 2x3 = 2x3
+            //store twoXthree_out into S([j j+1],:)
+            for(jj=twoXthree_out.lcols;jj<=twoXthree_out.ucols;jj++){
+              S[j][jj]=twoXthree_out[twoXthree_in.lrows][jj];
+              S[j+1][jj]=twoXthree_out[twoXthree_in.urows][jj];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+            
+            //Apply the transform to U
+            if(LDEBUG){cerr << soliloquy << " U(pre)=" << endl;cerr << U << endl;}
+            //build U(:,[j j+1])
+            for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+              threeXtwo_in[jj][threeXtwo_in.lcols]=U[jj][j];
+              threeXtwo_in[jj][threeXtwo_in.ucols]=U[jj][j+1];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " U(:,[j=" << j << " j+1=" << j+1 << "])=" << endl;cerr << threeXtwo_in << endl;}
+            threeXtwo_out=threeXtwo_in/E;
+            //store threeXtwo_out into U(:,[j j+1])
+            for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+              U[jj][j]=threeXtwo_out[jj][threeXtwo_out.lcols];
+              U[jj][j+1]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " U(post)=" << endl;cerr << U << endl;}
+          }
+          if(j+2<=n){
+            //Zero S(j,j+2) using columns j+1 and j+2.
+            getEHermite(S[j][j+1],S[j][j+2],E);
+            if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j+1=" << j+1 << "]="<< S[j][j+1] <<",S[j=" << j << "][j+2=" << j+2 << "]=" << S[j][j+2] << ")=" << endl;cerr << E << endl;}
+            
+            //Apply the transform to S
+            if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+            //build S(:,[j+1 j+2])
+            for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+              threeXtwo_in[jj][threeXtwo_in.lcols]=S[jj][j+1];
+              threeXtwo_in[jj][threeXtwo_in.ucols]=S[jj][j+2];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S(:,[j+1=" << j+1 << " j+2=" << j+2 << "])=" << endl;cerr << threeXtwo_in << endl;}
+            threeXtwo_out=threeXtwo_in*trasp(E);
+            //store threeXtwo_out into S(:,[j+1 j+2])
+            for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+              S[jj][j+1]=threeXtwo_out[jj][threeXtwo_out.lcols];
+              S[jj][j+2]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+            
+            //Apply the transform to V
+            if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+            //build V(:,[j+1 j+2])
+            for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+              threeXtwo_in[jj][threeXtwo_in.lcols]=V[jj][j+1];
+              threeXtwo_in[jj][threeXtwo_in.ucols]=V[jj][j+2];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " V(:,[j+1=" << j+1 << " j+2=" << j+2 << "])=" << endl;cerr << threeXtwo_in << endl;}
+            threeXtwo_out=threeXtwo_in/E;
+            //store threeXtwo_out into V(:,[j+1 j+2])
+            for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+              V[jj][j+1]=threeXtwo_out[jj][threeXtwo_out.lcols];
+              V[jj][j+2]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+          }
+        }
+      }
+      D=S.getdiag(1);
+    }
+
+    //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+    if(LDEBUG){
+      cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+      cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+      cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+    }
+
+    if(LDEBUG){cerr << soliloquy << " S is now diagonal, make it non-negative" << endl;}
+
+    for(j=S.lcols;j<=min_mn;j++){
+      if(std::signbit(S[j][j])){
+        for(i=S.lcols;i<=S.ucols;i++){S[j][i]=-S[j][i];}
+        for(i=U.lrows;i<=U.urows;i++){U[i][j]=-U[i][j];}
       }
     }
     
+    if(LDEBUG){
+      cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+      cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+      cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+    }
+
+    if(LDEBUG){cerr << soliloquy << " squeezing factors to lower right to enforce divisibility condition" << endl;}
+    
+    double a=0.0,b=0.0,gcd=0.0,x=0.0,y=0.0;
+    xmatrix<double> F(E),twoXtwo_in(2,2),twoXtwo_out(2,2);
+    for(i=S.lcols;i<=min_mn;i++){
+      for(j=i+1;j<=min_mn;j++){
+        //Replace S(i,i), S(j,j) by their gcd and lcm respectively.
+        a=S[i][i];
+        b=S[j][j];
+        GCD(a,b,gcd,x,y);
+        
+        if(LDEBUG){
+          cerr << soliloquy << " a=" << a << endl;
+          cerr << soliloquy << " b=" << b << endl;
+          cerr << soliloquy << " gcd=" << gcd << endl;
+          cerr << soliloquy << " x=" << x << endl;
+          cerr << soliloquy << " y=" << y << endl;
+        }
+        
+        E[1][1]=1.0;E[1][2]=y;
+        E[2][1]=-b/gcd;E[2][2]=a*x/gcd;
+        
+        F[1][1]=x;F[1][2]=1.0;
+        F[2][1]=-b*y/gcd;F[2][2]=a/gcd;
+
+        if(LDEBUG){
+          cerr << soliloquy << " E=" << endl;cerr << E << endl;
+          cerr << soliloquy << " F=" << endl;cerr << F << endl;
+        }
+
+        //Apply the transform to S
+        if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+        //build S([i j],[i j])
+        twoXtwo_in[twoXtwo_in.lrows][twoXtwo_in.lcols]=S[i][i];twoXtwo_in[twoXtwo_in.lrows][twoXtwo_in.ucols]=S[i][j];  //urows=lrows+1, ucols=lcols+1
+        twoXtwo_in[twoXtwo_in.urows][twoXtwo_in.lcols]=S[j][i];twoXtwo_in[twoXtwo_in.urows][twoXtwo_in.ucols]=S[j][j];  //urows=lrows+1, ucols=lcols+1
+        if(LDEBUG){cerr << soliloquy << " S([i=" << i << " j=" << j << "],[i=" << i << " j=" << j << "])=" << endl;cerr << twoXtwo_in << endl;}
+        twoXtwo_out=E*twoXtwo_in*trasp(F);
+        //store twoXtwo_out into S([i j],[i j])
+        S[i][i]=twoXtwo_out[twoXtwo_out.lrows][twoXtwo_out.lcols];S[i][j]=twoXtwo_out[twoXtwo_out.lrows][twoXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        S[j][i]=twoXtwo_out[twoXtwo_out.urows][twoXtwo_out.lcols];S[j][j]=twoXtwo_out[twoXtwo_out.urows][twoXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+
+        //Apply the transform to U
+        if(LDEBUG){cerr << soliloquy << " U(pre)=" << endl;cerr << U << endl;}
+        //build U(:,[i j])
+        for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+          threeXtwo_in[jj][threeXtwo_in.lcols]=U[jj][i];
+          threeXtwo_in[jj][threeXtwo_in.ucols]=U[jj][j];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " U(:,[i=" << i << " j=" << j << "])=" << endl;cerr << threeXtwo_in << endl;}
+        threeXtwo_out=threeXtwo_in/E;
+        //store threeXtwo_out into U(:,[i j])
+        for(jj=threeXtwo_out.lrows;jj<=threeXtwo_out.urows;jj++){
+          U[jj][i]=threeXtwo_out[jj][threeXtwo_out.lcols];
+          U[jj][j]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " U(post)=" << endl;cerr << U << endl;}
+
+        //Apply the transform to V
+        if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+        //build V(:,[i j])
+        for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+          threeXtwo_in[jj][threeXtwo_in.lcols]=V[jj][i];
+          threeXtwo_in[jj][threeXtwo_in.ucols]=V[jj][j];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " V(:,[i=" << i << " j=" << j << "])=" << endl;cerr << threeXtwo_in << endl;}
+        threeXtwo_out=threeXtwo_in/F;
+        //store threeXtwo_out into V(:,[i j])
+        for(jj=threeXtwo_in.lrows;jj<=threeXtwo_in.urows;jj++){
+          V[jj][i]=threeXtwo_out[jj][threeXtwo_out.lcols];
+          V[jj][j]=threeXtwo_out[jj][threeXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+      }
+    }
+    
+    if(LDEBUG){
+      cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+      cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+      cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+    }
+
+    if(LDEBUG){cerr << soliloquy << " transposing V" << endl;}
+    V=trasp(V);//such that A=U*S*V  and not A=U*S*V'
+    
+    if(LDEBUG){cerr << soliloquy << " inverting V and U to match Matlab" << endl;}
+    V=inverse(V);U=inverse(U);  //to be identical to matlab's smithForm we need V -> inv(V) U-> inv(U)
+    
+    if(LDEBUG){
+      cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+      cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+      cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+    }
+    
+    if(LDEBUG){cerr << soliloquy << " converting to xmatrix<int>" << endl;}
+
+    //convert to int's - do LAST
+    U_out=xmatrixdouble2int(U);
+    V_out=xmatrixdouble2int(V);
+    S_out=xmatrixdouble2int(S);
+
+    //shift everything to match A_in
+    aurostd::shiftlrowscols(U_out,A_in.lrows,A_in.lcols);
+    aurostd::shiftlrowscols(V_out,A_in.lrows,A_in.lcols);
+    aurostd::shiftlrowscols(S_out,A_in.lrows,A_in.lcols);
+    
+    //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+    if(LDEBUG){
+      cerr << soliloquy << " U=" <<endl;cerr << U_out << endl;
+      cerr << soliloquy << " V=" <<endl;cerr << V_out << endl;
+      cerr << soliloquy << " S=" <<endl;cerr << S_out << endl;
+    }
+
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
 }

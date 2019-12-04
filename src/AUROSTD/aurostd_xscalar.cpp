@@ -396,9 +396,11 @@ namespace aurostd {
 //a=Z,b=0;gcd=Z;x=1;y=0;
 //a=0,b=Z;gcd=Z;x=0;y=1;
 //a=0,b=0;gcd=undefined;x=undefined;y=undefined  //all integers are common divisors of 0 and 0, so there is no greatest one.
+//note this implementation gives different results from matlab for gcd(1,1): either x or y can be 1, the other is zero
   template<class utype>
     void _GCD(utype a,utype b,utype& gcd,utype& x,utype& y){ //CO180409
       if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
+      if(isequal(a,(utype)1) && isequal(b,(utype)1)){gcd=1;x=0;y=1;return;} //matlab implementation
       x=(utype)0;y=(utype)1;
       utype u=(utype)1,v=(utype)0;
       utype q=(utype)0,r=(utype)0,m=(utype)0,n=(utype)0;
@@ -530,15 +532,14 @@ namespace aurostd {
 
   //bool isinteger(bool x,bool tolerance){return _isinteger(x,tolerance);}
   //bool isinteger(char x,char tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(int x,int tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(long x,long tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(uint x,uint tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(float x,float tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(double x,double tolerance){return _isinteger(x,tolerance);}
-  //bool isinteger(long int x,long int tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(long long int x,long long int tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(long double x,long double tolerance){return _isinteger(x,tolerance);}
+  bool isinteger(int x,int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
+  bool isinteger(long int x,long int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
+  bool isinteger(uint x,uint tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
+  bool isinteger(long long int x,long long int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
+  bool isinteger(unsigned long long int x,unsigned long long int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
+  bool isinteger(float x,float tolerance){return _isinteger(x,tolerance);}  //CO191201
+  bool isinteger(double x,double tolerance){return _isinteger(x,tolerance);}  //CO191201
+  bool isinteger(long double x,long double tolerance){return _isinteger(x,tolerance);}  //CO191201
 
   // bool _aurostd_initialize_isinteger(bool x) { return _isinteger(x);}
   // bool _aurostd_initialize_isinteger(char x) { return _isinteger(x);}
@@ -563,6 +564,24 @@ namespace aurostd {
   //bool _aurostd_initialize_isinteger(long long int x,long long int tolerance) { return _isinteger(x,tolerance);}
   //bool _aurostd_initialize_isinteger(unsigned long long int x,unsigned long long int tolerance) { return _isinteger(x,tolerance);}
   //bool _aurostd_initialize_isinteger(long double x,long double tolerance) { return isinteger(x,_tolerance);}
+}
+
+// ***************************************************************************
+// Function iszero
+// ***************************************************************************
+namespace aurostd {
+  template<class utype> bool _iszero(utype a,utype tol) {return abs(a) <= tol;}  //CO191201
+  
+  //bool iszero(bool x,bool tolerance){return _iszero(x,tolerance);}  //CO191201
+  //bool iszero(char x,char tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(int x,int tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(long int x,long int tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(uint x,uint tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(float x,float tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(double x,double tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(long long int x,long long int tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(unsigned long long int x,unsigned long long int tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(long double x,long double tolerance){return _iszero(x,tolerance);}  //CO191201
 }
 
 // ***************************************************************************

@@ -583,8 +583,48 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     if(LDEBUG){cerr << soliloquy << " getEHermite(5,12) failed" << endl;}
     return FALSE;
   }
+
+  xmatrix<int> A(3,3),U,V,S;
+  A[1][1]=3;A[1][2]=2;A[1][3]=1;
+  A[2][1]=5;A[2][2]=3;A[2][3]=1;
+  A[3][1]=6;A[3][2]=8;A[3][3]=9;
+
+  aurostd::getSmithNormalForm(A,U,V,S);
+
+  if(!(
+        U[1][1]==24 && U[1][2]==-13 && U[1][3]==-1 && 
+        U[2][1]==13 && U[2][2]==-7  && U[2][3]==-1 && 
+        U[3][1]==2  && U[3][2]==-1  && U[3][3]==0  && 
+        TRUE
+      )
+    ){
+    if(LDEBUG){cerr << soliloquy << " U failed of getSmithNormalForm()" << endl;}
+    return FALSE;
+  }
+
+  if(!(
+        V[1][1]==0  && V[1][2]==1  && V[1][3]==3  && 
+        V[2][1]==-1 && V[2][2]==-1 && V[2][3]==-1 && 
+        V[3][1]==1  && V[3][2]==0  && V[3][3]==-1 && 
+        TRUE
+      )
+    ){
+    if(LDEBUG){cerr << soliloquy << " V failed of getSmithNormalForm()" << endl;}
+    return FALSE;
+  }
   
-  message << "gcd test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  if(!(
+        S[1][1]==1 && S[1][2]==0 && S[1][3]==0 && 
+        S[2][1]==0 && S[2][2]==1 && S[2][3]==0 && 
+        S[3][1]==0 && S[3][2]==0 && S[3][3]==1 &&
+        TRUE
+      )
+    ){
+    if(LDEBUG){cerr << soliloquy << " S failed of getSmithNormalForm()" << endl;}
+    return FALSE;
+  }
+  
+  message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return TRUE; // CO 180419
 }
   
@@ -1047,7 +1087,7 @@ int main(int _argc,char **_argv) {
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {
-    pflow::logger(_AFLOW_FILE_NAME_, excpt.where(), excpt.error_message, oss, _LOGGER_ERROR_);
+    pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.error_message, oss, _LOGGER_ERROR_);
     return excpt.error_code;
   }
 }
