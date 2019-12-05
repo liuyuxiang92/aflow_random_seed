@@ -172,7 +172,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"BANDGAP","--bandgap=","./");
 
   vpflow.flag("BANDGAPS",aurostd::args2flag(argv,cmds,"--bandgaps|--gaps"));
-  vpflow.flag("BANDGAPDOS",aurostd::args2flag(argv,cmds,"--bandgap_from_dos|--bandgap_from_DOS"));
+  //[CO191004]vpflow.flag("BANDGAPDOS",aurostd::args2flag(argv,cmds,"--bandgap_from_dos|--bandgap_from_DOS|--bandgap_dos|--bandgapdos")); //CO191004
+  vpflow.args2addattachedscheme(argv,cmds,"BANDGAPDOS","--bandgap_from_dos=|--bandgap_from_DOS=|--bandgap_dos=|--bandgapdos=","./");  //CO191004
   vpflow.flag("BANDGAPLISTDOS",aurostd::args2flag(argv,cmds,"--bandgaplist_from_dos|--bandgaplist_from_DOS"));
   // [OBSOLETE] vpflow.flag("BZDIRECTION",aurostd::args2flag(argv,cmds,"--bzdirection|--bzdirections|--bzd"));
   vpflow.args2addattachedscheme(argv,cmds,"BZDIRECTION","--bzdirection=|--bzdirections=|--bzd=","");
@@ -572,6 +573,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"GFA::AE_FILE","--atomic_environments_file=|--ae_file=|aef=","none");	//DF190329
     vpflow.args2addattachedscheme(argv,cmds,"GFA::FORMATION_ENTHALPY_CUTOFF","--cutoff_formation_enthalpy=|--cutoff_enthalpy=|--cutoff_energy=|--cut=","0.05"); //DF190619
   }	//DF190329
+
+  vpflow.flag("GEOMETRY",aurostd::args2flag(argv,cmds,"--geometry|--abc_angles"));  //CO190808
   
   vpflow.flag("GULP",aurostd::args2flag(argv,cmds,"--gulp"));
   vpflow.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--Init::GetTEMPs|--gettemp|--gettemps|--getemp|--getemps"));
@@ -807,6 +810,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos","./");  // ME190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOS","--plotdos=","./");
+  vpflow.flag("PLOT_ALL_ATOMS",aurostd::args2flag(argv,cmds,"--plot_all_atoms|--plotallatoms"));  //CO191010
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_DOSWEB","--plotdosweb=","./");
 //  vpflow.args2addattachedscheme(argv,cmds,"PLOT_PEDOS","--plotpedos=","./,1"); OBSOLETE ME190614
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_PDOS","--plotpedos=|--plotpdos=","./");  // ME190614
@@ -833,6 +837,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_MAG","--pocc_mag=","./");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_BANDGAP","--pocc_bandgap=","./");
+  vpflow.args2addattachedscheme(argv,cmds,"POCC_MINIMUM_CONFIGURATION","--pocc_minimum_configuration|--pocc_min","./");  //CO190803
 
   // ME 181113
 //  vpflow.args2addattachedscheme(argv,cmds,"MODULE","--module=",""); //ME 190112
@@ -959,7 +964,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::ENMAX_MULTIPLY")) vlist+="--enmax_multiply="+vpflow.getattachedscheme("PROTO_AFLOW::ENMAX_MULTIPLY")+" ";   // recursion is GNU's pleasure (SC2017)
 
     vpflow.flag("PROTO_AFLOW::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
-    vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE",aurostd::args2flag(argv,cmds,"--potential_complete|--potcomplete|--potentials_complete|--potscomplete|--potc"));
+    vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE",aurostd::args2flag(argv,cmds,"--potential_type|--pottype|--potentials_type|--potstype|--pott")); //CO191110
+    if(vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE")) vlist+="--potential_type ";                       // recursion is GNU's pleasure (SC2014) //CO191110
+    vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE",aurostd::args2flag(argv,cmds,"--potential_complete|--potcomplete|--potentials_complete|--potscomplete|--potc|--potential_type_date|--potentialtypedate")); //CO191110
     if(vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE")) vlist+="--potential_complete ";                       // recursion is GNU's pleasure (SC2014)
     vpflow.flag("PROTO_AFLOW::MISSING",aurostd::args2flag(argv,cmds,"--missing"));
     if(vpflow.flag("PROTO_AFLOW::MISSING")) vlist+="--missing ";                                             // recursion is GNU's pleasure (SC2014)
@@ -1510,12 +1517,13 @@ namespace pflow {
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX 20190206 - add AFLUX command line functionality
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
-      if(vpflow.flag("BANDGAP"))       { pflow::BANDGAP(vpflow, cout) ; _PROGRAMRUN=true ; } // CAMILO  // CO 171006
+      if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  // CO 171006
       if(vpflow.flag("BZPLOTDATAUSEKPOINTS")) {LATTICE::BZPLOTDATA(vpflow.getattachedscheme("BZPLOTDATAUSEKPOINTS"),cin,10); _PROGRAMRUN=true;}
       if(vpflow.flag("BZPLOTUSEKPOINTS")) {LATTICE::BZPLOTDATA(vpflow.getattachedscheme("BZPLOTUSEKPOINTS"),cin,11); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDSTRUCTURE")) {pflow::BANDSTRUCTURE(aflags); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAPS")) {AConvaspBandgaps(cin,cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("BANDGAPDOS")) {AConvaspBandgapFromDOS(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("BANDGAPDOS")) {pflow::BANDGAP_DOS(vpflow, cout); _PROGRAMRUN=true;} //CO191004
+      if(vpflow.flag("BANDGAPDOS_WAHYU")) {AConvaspBandgapFromDOS(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAPLISTDOS")) {AConvaspBandgapListFromDOS(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("BZDIRECTION")) {
         //DX 20181102 [OBSOLETE] if(vpflow.getattachedscheme("BZDIRECTION").empty()) {
@@ -1583,6 +1591,7 @@ namespace pflow {
       if(vpflow.flag("FRAC")) {cout << pflow::FRAC(cin); _PROGRAMRUN=true;}
       // G
       if(vpflow.flag("GETTEMP")) {AFLOW_getTEMP(argv); _PROGRAMRUN=true;} //cout << "TEMPERATURE " << Message("host",_AFLOW_FILE_NAME_) << endl;exit(0); _PROGRAMRUN=true;}
+      if(vpflow.flag("GEOMETRY")) {cout << pflow::GEOMETRY(cin) << endl; _PROGRAMRUN=true;}  //CO191110
       if(vpflow.flag("GULP")) {pflow::GULP(cin); _PROGRAMRUN=true;}
       // H
       if(vpflow.flag("HKL")) {pflow::HKL(vpflow.getattachedscheme("HKL"),aflags,cin); _PROGRAMRUN=true;}
@@ -1705,6 +1714,7 @@ namespace pflow {
       if(vpflow.flag("POCC_DOS")) {pocc::POCC_DOS(cout,vpflow.getattachedscheme("POCC_DOS")); _PROGRAMRUN=true;} 
       if(vpflow.flag("POCC_MAG")) {pocc::POCC_MAG(vpflow.getattachedscheme("POCC_MAG")); _PROGRAMRUN=true;} 
       if(vpflow.flag("POCC_BANDGAP")) {pocc::POCC_BANDGAP(vpflow.getattachedscheme("POCC_BANDGAP")); _PROGRAMRUN=true;} 
+      if(vpflow.flag("POCC_MINIMUM_CONFIGURATION")) {cout << pocc::POCC_MINIMUM_CONFIGURATION(vpflow) << endl; _PROGRAMRUN=true;}  //CO191110
       // 
       if(vpflow.flag("PROTO")) {cout << pflow::PROTO_LIBRARIES(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("PROTO_AFLOW")) {pflow::PROTO_AFLOW(vpflow,FALSE); _PROGRAMRUN=true;} // non reversed
@@ -2068,7 +2078,7 @@ namespace pflow {
   "<< x<<" --bands=PROOUT < POSCAR [AFLOW: NEED VERIFICATION] \n\
   "<< x<<" --bandgap[=bands_directory1[,bands_directory2,...]] \n\
   "<< x<<" --bandgaps < file_containing_bands_directories \n\
-  "<< x<<" --bandgapdos < DOSCAR \n\
+  "<< x<<" --bandgapdos[=bands_directory1[,bands_directory2,...]] \n\
   "<< x<<" --bandgaplistdos < DOSCAR_list \n\
   "<< x<<" --bandstructure | --bs \n\
   "<< x<<" --bzdirections | --bzd < POSCAR \n\
@@ -2233,6 +2243,7 @@ namespace pflow {
   "<< x<<" --pocc_dos[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
   "<< x<<" --pocc_mag[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
   "<< x<<" --pocc_bandgap[=directory[,T[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]]] \n\
+  "<< x<<" --pocc_minimum_configuration[=directory] \n\
   "<< x<<" --poscar < ABCCAR | WYCCAR \n\
   "<< x<<" --poscar2aflowin < POSCAR \n\
   "<< x<<" --poscar2wyckoff < POSCAR \n\
@@ -2803,7 +2814,7 @@ namespace pflow {
     xstructure a(_a);
     a.ReScale(1.0);
     // DX 2/21/18 [OBSOLETE] string directory=".";
-    string directory=aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
+    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
     if(XHOST.vflag_control.flag("DIRECTORY")) {
       directory=XHOST.vflag_control.getattachedscheme("DIRECTORY");
     }
@@ -3202,18 +3213,29 @@ namespace pflow {
 namespace pflow {
   void BANDGAP(aurostd::xoption& vpflow,ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::BANDGAP: BEGIN" << endl;
+    string soliloquy="pflow::BANDGAP():";  //CO191110
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     string input=aurostd::RemoveWhiteSpaces(vpflow.getattachedscheme("BANDGAP"));
-    if(input.empty()){
-      init::ErrorOption(cout,vpflow.getattachedscheme("BANDGAP"),"pflow::BANDGAP","aflow --bandgap[=bands_directory1[,bands_directory2,...]]");
-      exit(0);
-    } 
+    if(input.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"input empty",_INPUT_MISSING_);}
     vector<string> dirs;
     aurostd::string2tokens(input,dirs,",");
     for(uint i=0;i<dirs.size();i++){
-      if(!PrintBandGap(dirs[i], oss)){oss << "pflow::BANDGAP: "+dirs[i]+" failed" << endl;}
+      if(!PrintBandGap(dirs[i], oss)){oss << soliloquy << " "+dirs[i]+" failed" << endl;}
     }
-    if(LDEBUG) cerr << "pflow::BANDGAP: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
+  }
+  void BANDGAP_DOS(aurostd::xoption& vpflow,ostream& oss) { //CO191004
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::BANDGAP_DOS()";
+    stringstream message;
+    string input=aurostd::RemoveWhiteSpaces(vpflow.getattachedscheme("BANDGAPDOS"));
+    if(input.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"input empty",_INPUT_MISSING_);}
+    vector<string> dirs;
+    aurostd::string2tokens(input,dirs,",");
+    for(uint i=0;i<dirs.size();i++){
+      if(!PrintBandGap_DOS(dirs[i], oss)){oss << soliloquy << " "+dirs[i]+" failed" << endl;}
+    }
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
   }
 } // namespace pflow
 
@@ -5162,7 +5184,7 @@ namespace pflow {
     a.ReScale(1.0);
     // DX 4/26/18 - use pwd - START
     if(a.directory == ""){
-      a.directory = aurostd::execute2string("pwd");
+      a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
     // DX 4/26/18 - use pwd - END
     string print_directory = " [dir=" + a.directory + "]";
@@ -5583,7 +5605,7 @@ namespace pflow {
         a.directory = aflags.Directory;
       }
       else {
-        a.directory = aurostd::execute2string("pwd");
+        a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
         aflags.Directory = a.directory;
       }
     }
@@ -5831,7 +5853,7 @@ namespace pflow {
 	a.directory = aflags.Directory;
       }
       else {
-        a.directory = aurostd::execute2string("pwd");
+        a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
         aflags.Directory = a.directory;
       }
     }
@@ -6371,7 +6393,7 @@ namespace pflow {
     bool tocompress = TRUE;
     ofstream FileMESSAGE("/dev/null");
     // DX 2/21/18 [OBSOLETE] string directory=".";
-    string directory=aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
+    string directory=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd"); // DX 2/21/18 - use pwd
     if(XHOST.vflag_control.flag("DIRECTORY")) { 
       directory=XHOST.vflag_control.getattachedscheme("DIRECTORY");
     }
@@ -7006,6 +7028,16 @@ namespace pflow {
   }
 } // namespace pflow
 
+// ***************************************************************************
+// pflow::GEOMETRY
+// ***************************************************************************
+namespace pflow {
+  string GEOMETRY(istream& input) {  //CO191110
+    xstructure a(input,IOAFLOW_AUTO);
+    return aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(Getabc_angles(a.lattice,DEGREES),5,true),","); //roundoff
+  }
+} // namespace pflow
+
 // DX 9/27/17 - get collinear magnetic info - START
 // ***************************************************************************
 // pflow::GetCollinearMagneticInfo
@@ -7364,7 +7396,7 @@ namespace pflow {
     stringstream message;
     if(aurostd::substring2bool(pocc_tol_string,",")){
       message << "Cannot handle more than one pocc_tol specification";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     vector<string> tokens;
     aurostd::string2tokens(pocc_tol_string,tokens,":");
@@ -7372,12 +7404,12 @@ namespace pflow {
     if(tokens.size()>0){
       if(!aurostd::isfloat(tokens[0])){
         message << "Input is not a float [input=" << tokens[0] << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       tol=aurostd::string2utype<double>(tokens[0]);
       if(aurostd::isequal(tol,0.0,_AFLOW_POCC_ZERO_TOL_)){
         message << "Tolerance is too small (0) [input=" << tokens[0] << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       if(std::signbit(tol)){
         xstr.neg_scale_second=true;
@@ -7387,16 +7419,16 @@ namespace pflow {
     if(tokens.size()>1){
       if(!aurostd::isfloat(tokens[1])){
         message << "Input is not a float [input=" << tokens[1] << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       tol=aurostd::string2utype<double>(tokens[1]);
       if(aurostd::isequal(tol,0.0,_AFLOW_POCC_ZERO_TOL_)){
         message << "Tolerance is too small (0) [input=" << tokens[1] << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       if(std::signbit(tol)){
         message << "Tolerance cannot be negative [input=" << tokens[1] << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       xstr.scale_third.isentry=true;
       xstr.partial_occupation_stoich_tol=tol;
@@ -7424,7 +7456,7 @@ namespace pflow {
     xstructure xstr(input,IOAFLOW_AUTO);
     if(vpflow.flag("POCC_TOL")){setPOCCTOL(xstr,vpflow.getattachedscheme("POCC_TOL"));}
     pocc::POccCalculator pcalc(xstr,vpflow,oss); //CO 20190319
-    if(!pcalc.m_initialized){throw aurostd::xerror(soliloquy,"POccCalculator failed to initialized");}
+    if(!pcalc.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
     pcalc.calculateHNF();
     if(vpflow.flag("HNF")){return pcalc.m_initialized;}
     pcalc.getTotalPermutationsCount();
@@ -8265,11 +8297,11 @@ namespace pflow {
     vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX", true);  // silence some output
 
     message << "Loading entries for: " << aurostd::joinWDelimiter(velements, ",");
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     if(vpflow.flag("PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL")) {
       message << "Loading NON-alphabetized entries as well";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
 
     vector<vector<string> > combinations;
@@ -8283,17 +8315,17 @@ namespace pflow {
 
       if( load_from_common ) {
         message << "Loading entries from COMMON";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       } else {
         if(server == "materials.duke.edu") {
           message << "Using materials.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         } else if(server == "aflowlib.duke.edu") {
           message << "Using aflowlib.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         } else {
           message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;  //entries;
         }
       }
@@ -8312,12 +8344,12 @@ namespace pflow {
         load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
         if(vpflow.flag(load_lib_flag_name)) {
           message << "Loading " + lib_name;
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
           combinations = pflow::elementalCombinations(velements, lib);
           for (uint i = 0; i < combinations.size(); i++) {
             if(!loadAndMergeLIBX(vpflow, combinations[i], lib_count_string, server, _entries, FileMESSAGE, oss)) {
               message << "Merging entries for " + lib_name + " failed";
-              pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
               return false;
             }
           }
@@ -8336,10 +8368,10 @@ namespace pflow {
       load_lib_flag_name = "PFLOW::LOAD_ENTRIES_LOAD_" + lib_name;
       if(vpflow.flag(load_lib_flag_name)) {
         message << "Loading " + lib_name;
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
         if(!loadAndMergeLIBX(vpflow, velements, lib_name, server, _entries, FileMESSAGE, oss)) {
           message << "Merging entries for " + lib_name + " failed";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;
         }
       }
@@ -8413,10 +8445,10 @@ namespace pflow {
       //  message << (i + 1) << "-naries: ";
       //}
       //message << sizes.at(i) << " entries";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
     }
     message << "Loaded " << totalNum << " entries total";
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Print loaded entries summary
@@ -8657,7 +8689,7 @@ namespace pflow {
           } else {
             message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(i + 1) + "-naries) failed";
           }
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;
         }
       }
@@ -8668,7 +8700,7 @@ namespace pflow {
       } else {
         message << "Merging entries for LIB" + LIB + " (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
       }
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
     return true;
@@ -8751,7 +8783,7 @@ namespace pflow {
 
     string soliloquy = "pflow::loadLIBX():";
     vector<string> velements =
-      stringElements2VectorElements(elements, FileMESSAGE, oss, true, true, composition_string, false); //clean and sort, do not keep_pp  //CO190712
+      stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO190712
       //[CO190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -8909,7 +8941,7 @@ namespace pflow {
 
     string soliloquy = "pflow::loadLIBX():";
     vector<string> velements =
-      stringElements2VectorElements(elements, FileMESSAGE, oss, true, true, composition_string, false); //clean and sort, do not keep_pp  //CO190712
+      stringElements2VectorElements(elements, FileMESSAGE, true, true, composition_string, false, oss); //clean and sort, do not keep_pp  //CO190712
       //[CO190712 - OBSOLETE]pflow::getAlphabeticVectorString(elements, FileMESSAGE, oss);
     return loadLIBX(vpflow, LIB, velements, server, entries, FileMESSAGE, oss);
   }
@@ -9022,20 +9054,20 @@ namespace pflow {
       for (uint i = 0; i < lib_count_string.size(); i++) {
         if(!isdigit(lib_count_string[i])) {
           message << "Unknown LIB specification (" << LIB << "), should be \"LIB1\", \"LIB2\", or \"1\", \"2\", etc.";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;  //entries;
         }
       }
       uint lib_count_uint = aurostd::string2utype<int>(lib_count_string);
       if(velements.size() != lib_count_uint) {
         message << "LIB" << lib_count_uint << " loads " << lib_count_uint << "-naries ONLY";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;  //entries;
       }
     }
 
     message << "Loading " << lib_name << " entries for: " << aurostd::joinWDelimiter(velements, "");
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     bool load_from_common = pflow::loadFromCommon(vpflow);
     bool override_load_from_common = false;
@@ -9044,13 +9076,13 @@ namespace pflow {
     if(load_from_common) {
       if(!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX")) {
         message << "Loading entries from COMMON";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
       LIB_path = "/common/" + lib_name + "/RAW/";
       if(!aurostd::IsDirectory(LIB_path)) {
         load_from_common = false;
         message << LIB_path << " does not exist! Cannot load from COMMON, switching to API";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         override_load_from_common = true;
       }
     }
@@ -9058,16 +9090,16 @@ namespace pflow {
       if(server == "materials.duke.edu") {
         if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
           message << "Using materials.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       } else if(server == "aflowlib.duke.edu") {
         if(override_load_from_common || (!vpflow.flag("PFLOW::LOAD_ENTRIES_COMING_FROM_LOADENTRIESX"))) {
           message << "Using aflowlib.duke.edu as server";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       } else {
         message << "Server must be either materials.duke.edu or aflowlib.duke.edu";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;  //entries;
       }
       if(isICSD) {
@@ -9098,7 +9130,7 @@ namespace pflow {
         else {aurostd::url2tokens(symmetry_path + "/?aflowlib_entries", icsds, ",");}
         if(icsds.size() && icsds[0]=="<!DOCTYPE"){ //CO 180627
           message << "REST-API appears to be down";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           return false;
         }
         for (uint j = 0; j < icsds.size(); j++) {
@@ -9110,7 +9142,7 @@ namespace pflow {
 
               //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
               message << "Loading " << (load_from_common ? "path" : "url") << "=" << symmetry_path << "/" << icsds[j];
-              pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+              pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
               //}
               //complicated ternary operator, returns bool, but necessary to avoid double code
               if(
@@ -9153,7 +9185,7 @@ namespace pflow {
       else {aurostd::url2tokens(LIB_path + "/?aflowlib_entries", systems, ",");}
       if(systems.size() && systems[0]=="<!DOCTYPE"){ //CO 180627
         message << "REST-API appears to be down";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
         return false;
       }
       for (uint i = 0; i < systems.size(); i++) {
@@ -9166,14 +9198,14 @@ namespace pflow {
           else {aurostd::url2tokens(calculation_path + "/?aflowlib_entries", calculations, ",");}
           if(calculations.size() && calculations[0]=="<!DOCTYPE"){ //CO 180627
             message << "REST-API appears to be down";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
             return false;
           }
           for (uint j = 0; j < calculations.size(); j++) {
             if(load_from_common && !aurostd::IsDirectory(calculation_path + "/" + calculations[j])) { continue; }
             //if(vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")) {
             message << "Loading " << (load_from_common ? "path" : "url") << "=" << calculation_path << "/" << calculations[j];
-            pflow::logger(std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
+            pflow::logger(_AFLOW_FILE_NAME_, std::string("aurostd::") + std::string((load_from_common ? "file" : "url")) + std::string("2string():"), message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_,!vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT")); //print to log anyway
             //}
             //complicated ternary operator, returns bool, but necessary to avoid double code
             if(
@@ -9232,7 +9264,7 @@ namespace pflow {
     //////////////////////////////////////////////////////////////////////////////
 
     message << "Loaded " << total_count << " entries";
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Print loaded entries summary
@@ -9494,9 +9526,9 @@ namespace pflow {
       string input_new=input;
       //aurostd::RemoveSubStringInPlace(input_new,"_GW");  //CO190712
       KBIN::VASP_PseudoPotential_CleanName_InPlace(input_new,true); //capital_letters_only==true
-      input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, oss, clean, sort_elements, composition_string, false); //use composition_string (FASTER) //do not keep_pp
+      input_velements = stringElements2VectorElements(input_new, input_vcomposition, FileMESSAGE, clean, sort_elements, composition_string, false, oss); //use composition_string (FASTER) //do not keep_pp
     }else{  //default
-      input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, false); //do not keep_pp
+      input_velements = stringElements2VectorElements(input, input_vcomposition, FileMESSAGE, clean, sort_elements, c_desig, false, oss); //do not keep_pp
     }
     if(LDEBUG) {cerr << soliloquy << " input=\"" << input << "\", elements=" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(input_velements,"\""),",") << endl;}
     return compoundsBelong(velements2check, input_velements, FileMESSAGE, oss, false); //already sorted
@@ -9510,7 +9542,7 @@ namespace pflow {
     stringstream message;
     if(velements2check.size()==0||input_velements.size()==0){  //null case, simply return false
       message << "Invalid input (velements2check.size()==" << velements2check.size() << ",input_velements.size()==" << input_velements.size() << ")";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_ERROR_);
       return false;
     }
     if(input_velements.size()>velements2check.size()){return false;}  //fast return
@@ -9561,7 +9593,7 @@ namespace pflow {
     if(path.empty()){path = entry.getPathAURL(FileMESSAGE,oss,false);is_url_path=true;}
     if (path.empty()) {
       message << "Path cannot be loaded from entry, skipping loadXstructure()";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     }
 
@@ -9578,7 +9610,7 @@ namespace pflow {
         (!aurostd::substring2bool(files, "CONTCAR.relax") &&
          !aurostd::substring2bool(files, "CONTCAR.relax2"))) {
       message << "path=" << path << " missing structure files. Ignoring entry";
-      pflow::logger(soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     } else {
       if (!relaxed_only) {
@@ -9603,7 +9635,7 @@ namespace pflow {
           }
         }
         if (!xstrAux.atoms.size()) {
-          pflow::logger(soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
           return false;
         }
         entry.vstr.push_back(xstrAux);
@@ -9635,7 +9667,7 @@ namespace pflow {
           }
         }
         if (!xstrAux.atoms.size()) {
-          pflow::logger(soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
           return false;
         }
         entry.vstr.push_back(xstrAux);
@@ -9668,7 +9700,7 @@ namespace pflow {
         }
       }
       if (!xstrAux.atoms.size()) {
-        pflow::logger(soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
       entry.vstr.push_back(xstrAux);
@@ -9731,7 +9763,7 @@ namespace pflow {
     //  }
     //}
     //if(numberOfElements == 0) {
-    //  pflow::logger(soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
     //  return velements;
     //}
 
@@ -9841,25 +9873,25 @@ namespace pflow {
   // ***************************************************************************
   // returns UNSORTED vector<string> from string
   vector<string> stringElements2VectorElements(const string& input,
-					       ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {  // overload
+					       bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
     ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
+    return stringElements2VectorElements(input, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
   // ME190628 - added variant that also determines the composition
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {
     ofstream FileMESSAGE;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
   vector<string> stringElements2VectorElements(
-					       const string& input, ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) {  // overload
+					       const string& input, ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) {  // overload
     vector<double> vcomposition;
-    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, oss, clean, sort_elements, c_desig, keep_pp);
+    return stringElements2VectorElements(input, vcomposition, FileMESSAGE, clean, sort_elements, c_desig, keep_pp, oss);
   }
 
   vector<string> stringElements2VectorElements(const string& _input, vector<double>& vcomposition,
-                                               ofstream& FileMESSAGE, ostream& oss, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp) { // main function
+                                               ofstream& FileMESSAGE, bool clean, bool sort_elements, compound_designation c_desig, bool keep_pp, ostream& oss) { // main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = "pflow::stringElements2VectorElements():";
     vector<string> velements;
@@ -9872,7 +9904,7 @@ namespace pflow {
     if(LDEBUG) {cerr << soliloquy << " original input=" << _input << endl;}
 
     if(_input.empty()) {
-      pflow::logger(soliloquy, "Empty input", FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Empty input", FileMESSAGE, oss, _LOGGER_ERROR_);
       return velements;
     }
 
@@ -9881,7 +9913,7 @@ namespace pflow {
     if(clean && (c_desig==composition_string || (c_desig==pp_string && keep_pp==false))){KBIN::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
 
     if(!isupper(input[0])) {
-      pflow::logger(soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
       return velements;
     }
   
@@ -9911,7 +9943,7 @@ namespace pflow {
     //  }
     //}
     //if(numberOfElements == 0) {
-    //  pflow::logger(soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
+    //  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized", FileMESSAGE, oss, _LOGGER_ERROR_);
     //  return velements;
     //}
 
@@ -9926,7 +9958,7 @@ namespace pflow {
     if(c_desig==composition_string){elementsFromCompositionString(input,velements,vcomposition);}
     else if(c_desig==pp_string){elementsFromPPString(input,velements,keep_pp);}
     else{
-      throw aurostd::xerror(soliloquy,"Unknown compound designation",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown compound designation",_INPUT_ILLEGAL_);
     }
         
     if(clean){
@@ -9940,7 +9972,7 @@ namespace pflow {
     // END Parsing input
     //////////////////////////////////////////////////////////////////////////////
 
-    if(velements.size()==0){pflow::logger(soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
+    if(velements.size()==0){pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "No elements found", FileMESSAGE, oss, _LOGGER_ERROR_);}
 
     if(sort_elements && velements.size()>1){
       string etmp="";
@@ -10022,18 +10054,18 @@ namespace pflow {
       vpflow.flag("PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT", true);
       if(!silent) {
         message << "PFLOW::LOAD_ENTRIES_ENTRY_OUTPUT set to TRUE";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
     }
     //[CO190715 - LOAD_ENTRIES_ONLY_ALPHABETICAL -> LOAD_ENTRIES_NON_ALPHABETICAL]vpflow.flag("PFLOW::LOAD_ENTRIES_ONLY_ALPHABETICAL", true);  // un-alphabetized entries are crap
     if(!silent) {
       message << "PFLOW::LOAD_ENTRIES_NON_ALPHABETICAL set to TRUE";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
     vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE", true);  //if loading ternary, also load relevant binaries and unaries
     if(!silent) {
       message << "PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE set to TRUE";
-      pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
     }
     input = aurostd::toupper(input);  //removes ALL ambiguity with case
     //must be specific LIB1, LIB2, etc.
@@ -10046,7 +10078,7 @@ namespace pflow {
       vpflow.flag(load_lib_flag_name, true);
       if(!silent) {
         message << load_lib_flag_name << " set to TRUE";
-        pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
       }
     } else {
       if(input == "A") {
@@ -10062,7 +10094,7 @@ namespace pflow {
           vpflow.flag(load_lib_flag_name, true);
           if(!silent) {
             message << load_lib_flag_name << " set to TRUE";
-            pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
           }
         }
       }
@@ -10070,7 +10102,7 @@ namespace pflow {
         vpflow.flag("PFLOW::LOAD_ENTRIES_LOAD_ICSD", true);
         if(!silent) {
           message << "PFLOW::LOAD_ENTRIES_LOAD_ICSD set to TRUE";
-          pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_OPTION_);
         }
       }
     }
@@ -10111,70 +10143,70 @@ namespace pflow {
   // message can be string or stringstream (if stringstream, it gets cleared out)
   // oss = cout, cerr (as you prefer)
   // FileMESSAGE - logfile
-  void logger(const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, directory, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, directory, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, aflags, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     string _message = message.str();
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
     message.str("");
   }
 
-  void logger(const string& function_name, const string& _message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     ofstream FileMESSAGE;
-    logger(function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     _aflags aflags;
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO190402
-    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::execute2string(XHOST.command("pwd"))+"/";} //".";  // CO 180220
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  // CO 180220 //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     ofstream FileMESSAGE;
-    logger(function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, directory, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     ofstream FileMESSAGE;
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // overload
     _aflags aflags; aflags.Directory=directory;
-    logger(function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
+    logger(filename, function_name, _message, aflags, FileMESSAGE, oss, type, silent, message_metadata);
   }
 
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // main function
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss, const char& type, bool silent, const string& message_metadata) {  // main function
     // five types:  M - Message, W - Warning, E - Error, O - Option, C - Complete, R - RAW
     // treat E, W, O, C, and R as special, otherwise treat as a message
     // no need for function name for R, you can put ""
@@ -10197,14 +10229,8 @@ namespace pflow {
     bool fancy_print=(!XHOST.WEB_MODE);
 
     string soliloquy = aurostd::RemoveWhiteSpaces(function_name);
-    string ErrorBarString =
-      "EEEEE  "
-      "------------------------------------------------------------------------"
-      "---------------------------------------------------- ";
-    string WarningBarString =
-      "WWWWW  "
-      "------------------------------------------------------------------------"
-      "---------------------------------------------------- ";
+    string ErrorBarString =   "EEEEE  ---------------------------------------------------------------------------------------------------------------------------- ";
+    string WarningBarString = "WWWWW  ---------------------------------------------------------------------------------------------------------------------------- ";
 
     if (type == _LOGGER_ERROR_) {
       ////////////////////////////////////////////////////////////////////////////
@@ -10213,50 +10239,50 @@ namespace pflow {
 
       // write to screen if not quiet
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
-	if(fancy_print) printf("\033[31m");     // red
-	oss << ErrorBarString;  // make it clear in log file that an error
-	// occurred
-	oss << endl;
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[31m");     // red
+        oss << ErrorBarString;  // make it clear in log file that an error
+        // occurred
+        oss << endl;
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "EEEEE";
-	  oss << "  ";
+          oss << "EEEEE";
+          oss << "  ";
 
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[31m");  // red
-	  if(fancy_print) printf("\033[5m");   // bold/blink
-	  oss << "ERROR";
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[31m");  // red
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[31m");  // red
+          if(fancy_print) printf("\033[5m");   // bold/blink
+          oss << "ERROR";
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[31m");  // red
 
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss << ErrorBarString;  // make it clear in log file that an error
-	// occurred
-	oss << endl;
-	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss << ErrorBarString;  // make it clear in log file that an error
+        // occurred
+        oss << endl;
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
       }
       // write to log
       FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
       FileMESSAGE << endl;
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "EEEEE";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "ERROR";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "EEEEE";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "ERROR";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE << ErrorBarString;  // make it clear in log file that an error occurred
       FileMESSAGE << endl;
@@ -10272,35 +10298,35 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
-	if(fancy_print) printf("\033[33m\033[1m");  // yellow
-	oss << WarningBarString;    // make it clear in log file that an warning
-	// occurred
-	oss << endl;
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[33m\033[1m");  // yellow
+        oss << WarningBarString;    // make it clear in log file that an warning
+        // occurred
+        oss << endl;
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "WWWWW";
-	  oss << "  ";
+          oss << "WWWWW";
+          oss << "  ";
 
-	  if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
-	  if(fancy_print) printf("\033[33m\033[1m");  // yellow
-	  if(fancy_print) printf("\033[5m");          // bold/blink
-	  oss << "WARNING";
-	  if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
-	  if(fancy_print) printf("\033[33m\033[1m");  // yellow
+          if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
+          if(fancy_print) printf("\033[33m\033[1m");  // yellow
+          if(fancy_print) printf("\033[5m");          // bold/blink
+          oss << "WARNING";
+          if(fancy_print) printf("\033[0m");          // turn off all cursor attributes
+          if(fancy_print) printf("\033[33m\033[1m");  // yellow
 
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss << WarningBarString;  // make it clear in log file that an warning
-	// occurred
-	oss << endl;
-	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss << WarningBarString;  // make it clear in log file that an warning
+        // occurred
+        oss << endl;
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
       }
       // write to log
       FileMESSAGE << WarningBarString;  // make it clear in log file that an
@@ -10308,15 +10334,15 @@ namespace pflow {
       FileMESSAGE << endl;
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "WWWWW";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "WARNING";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "WWWWW";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "WARNING";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE << WarningBarString;  // make it clear in log file that a
       // warning occurred
@@ -10333,42 +10359,42 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
-	if(fancy_print) printf("\033[32m");  // green
+        // borrowed from APL/aflow_apl.h
+        if(fancy_print) printf("\033[32m");  // green
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "CCCCC";
-	  oss << "  ";
+          oss << "CCCCC";
+          oss << "  ";
 
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[32m");  // green
-	  if(fancy_print) printf("\033[5m");   // bold/blink
-	  oss << "COMPLETE";
-	  if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
-	  if(fancy_print) printf("\033[32m");  // green
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
+          if(fancy_print) printf("\033[5m");   // bold/blink
+          oss << "COMPLETE";
+          if(fancy_print) printf("\033[0m");   // turn off all cursor attributes
+          if(fancy_print) printf("\033[32m");  // green
 
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        if(fancy_print) printf("\033[0m");  // turn off all cursor attributes
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "CCCCC";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "COMPLETE";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "CCCCC";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "COMPLETE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
@@ -10382,33 +10408,33 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
+        // borrowed from APL/aflow_apl.h
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "-OPT-";
-	  oss << "  ";
-	  oss << "MESSAGE-OPTION";
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << "-OPT-";
+          oss << "  ";
+          oss << "MESSAGE-OPTION";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "-OPT-";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "MESSAGE-OPTION";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "-OPT-";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "MESSAGE-OPTION";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
@@ -10417,17 +10443,18 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
 
     } else if (type == _LOGGER_RAW_) {
+
       ////////////////////////////////////////////////////////////////////////////
       // START Option logger
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
+        // borrowed from APL/aflow_apl.h
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
           oss << message_parts[i] << endl; //CO181226 //message;
-	}
-	oss.flush();
+        }
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
@@ -10439,46 +10466,48 @@ namespace pflow {
       ////////////////////////////////////////////////////////////////////////////
       // END Raw logger
       ////////////////////////////////////////////////////////////////////////////
-
+    
     } else {
+
       ////////////////////////////////////////////////////////////////////////////
       // START Message logger
       ////////////////////////////////////////////////////////////////////////////
 
       if(verbose) {
-	// borrowed from APL/aflow_apl.h
+        // borrowed from APL/aflow_apl.h
         //[CO181226 OBSOLETE]if(!message.empty()) {
         for(uint i=0;i<message_parts.size();i++){ //CO181226
-	  oss << "00000";
-	  oss << "  ";
-	  oss << "MESSAGE";
-	  oss << " ";
-	  oss << soliloquy;
-	  oss << " ";
+          oss << "00000";
+          oss << "  ";
+          oss << "MESSAGE";
+          oss << " ";
+          oss << soliloquy;
+          oss << " ";
           oss << message_parts[i]; //CO181226 //message;
-	  oss << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	  oss << endl;
-	}
-	oss.flush();
+          oss << Message(aflags,message_metadata,filename);
+          oss << endl;
+        }
+        oss.flush();
       }
       // write to log
       //[CO181226 OBSOLETE]if(!message.empty()) {
       for(uint i=0;i<message_parts.size();i++){ //CO181226
-	FileMESSAGE << "00000";
-	FileMESSAGE << "  ";
-	FileMESSAGE << "MESSAGE";
-	FileMESSAGE << " ";
-	FileMESSAGE << soliloquy;
-	FileMESSAGE << " ";
+        FileMESSAGE << "00000";
+        FileMESSAGE << "  ";
+        FileMESSAGE << "MESSAGE";
+        FileMESSAGE << " ";
+        FileMESSAGE << soliloquy;
+        FileMESSAGE << " ";
         FileMESSAGE << message_parts[i]; //CO181226 //message;
-	FileMESSAGE << Message(aflags,message_metadata,_AFLOW_FILE_NAME_);
-	FileMESSAGE << endl;
+        FileMESSAGE << Message(aflags,message_metadata,filename);
+        FileMESSAGE << endl;
       }
       FileMESSAGE.flush();
 
       ////////////////////////////////////////////////////////////////////////////
       // END Message logger
       ////////////////////////////////////////////////////////////////////////////
+    
     }
   }
 } // namespace pflow
@@ -11495,7 +11524,7 @@ namespace pflow {
       aurostd::string2tokens(params[i],tokens,",");
       if(!tokens.size()){
         message << "No inputs found in params[" << i << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       isfloat1=aurostd::isfloat(tokens[0]);
       if(isfloat1){vvnum.push_back(vector<double>(0));}
@@ -11504,7 +11533,7 @@ namespace pflow {
         isfloat2=aurostd::isfloat(tokens[j]);
         if(isfloat1 != isfloat2){
           message << "Mixed string/number input at params[" << i << "]=" << params[i];
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         if(isfloat2){vvnum.back().push_back(aurostd::string2utype<double>(tokens[j]));}
         else {vvstr.back().push_back(tokens[j]);}
@@ -11518,7 +11547,7 @@ namespace pflow {
 // pflow::PROTO_TEST_INPUT
 // ***************************************************************************
 namespace pflow {
-  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint nspeciesHTQC,bool patch_nspecies){ //CO181226
+  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint& nspeciesHTQC,bool patch_nspecies){ //CO181226
     string soliloquy="pflow::PROTO_TEST_INPUT():";
     stringstream message;
     //patch for ICSD/pocc
@@ -11530,27 +11559,27 @@ namespace pflow {
     if(vvstr.size()>0 && vvstr.size()!=nspecies){
       message << "Invalid input specification, mismatch between nspecies and species inputs (nspecies==" << nspecies << ", vvstr.size()==" << vvstr.size() << ")" << endl;
       message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-      throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
     }
     if(check_volumes){
       //check nspecies vs. vvnum
       if(vvnum.size()!=nspecies){
         message << "Invalid input specification, mismatch between nspecies and volume inputs (nspecies==" << nspecies << ", vvnum.size()==" << vvnum.size() << ")" << endl;
         message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-        throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
 
       }
       //check vvstr vs. vvnum
       if(vvstr.size()!=vvnum.size()){
         message << "Invalid input specification, mismatch between species and volume inputs (vvstr.size()==" << vvstr.size() << ", vvnum.size()==" << vvnum.size() << ")" << endl;
         message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-        throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
       }
       for(uint i=0;i<vvstr.size();i++){
         if(vvstr[i].size()!=vvnum[i].size()){
           message << "Invalid input specification, mismatch between combo species and volume inputs (vvstr[" << i << "].size()==" << vvstr[i].size() << ", vvnum[" << i << "].size()==" << vvnum[i].size() << ")" << endl;
           message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-          throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
         }
       }
     }
@@ -11560,7 +11589,7 @@ namespace pflow {
         if(vvnum[i][j]<=0){ //also includes 0
           message << "Invalid input specification, negative/zero number input found (vvnum[" << i << "][" << j << "]=" << vvnum[i][j] << ")" << endl;
           message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-          throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
         }
       }
     }
@@ -11581,36 +11610,36 @@ namespace pflow {
     aurostd::string2tokens(p1,tokens,"-");
     if(tokens.size()==0){
       message << "No occupants specified for [designation=" << p1 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     designation1=tokens[0];
     if(designation1.empty()){
       message << "No mode specified [designation=" << p1 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     mode1=designation1[0];
     _site1=designation1;_site1.erase(_site1.begin());
     if(!aurostd::isfloat(_site1)){
       message << "Designation ill-written, no site provided [designation=" << p1 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     site1=aurostd::string2utype<int>(_site1);
     //p2
     aurostd::string2tokens(p2,tokens,"-");
     if(tokens.size()==0){
       message << "No occupants specified for [designation=" << p2 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     designation2=tokens[0];
     if(designation2.empty()){
       message << "No mode specified [designation=" << p2 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     mode2=designation2[0];
     _site2=designation2;_site2.erase(_site2.begin());
     if(!aurostd::isfloat(_site2)){
       message << "Designation ill-written, no site provided [designation=" << p2 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     site2=aurostd::string2utype<int>(_site2);
     //check sites first
@@ -11621,7 +11650,7 @@ namespace pflow {
       else {return false;} //S > P
     }
     message << "Double specification for the same site [designation1=" << p1 << ",designation2=" << p2 << "]";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     return true;
   }
   bool sortPOCCOccs(const string& occ1,const string& occ2){ //CO181226
@@ -11636,34 +11665,34 @@ namespace pflow {
     aurostd::string2tokens(occ1,tokens,"x");
     if(tokens.size()!=2){
       message << "Occupancy x Occupant pair ill-defined for [occupation=" << occ1 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     _occupancy1=tokens[0];_occupant1=tokens[1];
     occupant1=(int)_occupant1[0] - 65;
     if(LDEBUG) {cerr << soliloquy << " occupant to int conversion: " << _occupant1 << " == " << occupant1 << endl;} //[0] to convert to char
     if(!aurostd::isfloat(_occupancy1)){
       message << "Occupancy is not a float for [occupation=" << occ1 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     occupancy1=aurostd::string2utype<double>(_occupancy1);
     //occ2
     aurostd::string2tokens(occ2,tokens,"x");
     if(tokens.size()!=2){
       message << "Occupancy x Occupant pair ill-defined for [occupation=" << occ2 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     _occupancy2=tokens[0];_occupant2=tokens[1];
     occupant2=(int)_occupant2[0] - 65;
     if(LDEBUG) {cerr << soliloquy << " occupant to int conversion: " << _occupant2 << " == " << occupant2 << endl;} //[0] to convert to char
     if(!aurostd::isfloat(_occupancy2)){
       message << "Occupancy is not a float for [occupation=" << occ2 << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     occupancy2=aurostd::string2utype<double>(_occupancy2);
     if(occupant1!=occupant2){return occupant1<occupant2;} //sort A then B then C
     if(occupancy1!=occupancy2){return occupancy1>occupancy2;} //sort most preferred first
     message << "Double specification for the same occupant [occupation1=" << occ1 << ",occupation2=" << occ2 << "]";
-    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     return true;
   }
   bool FIX_PRECISION_POCC(const string& occ,string& new_occ){ //CO181226
@@ -11678,21 +11707,21 @@ namespace pflow {
     aurostd::string2tokens(occ,tokens,"x");
     if(tokens.size()!=2){
       message << "Occupancy x Occupant pair ill-defined for [occupation=" << occ << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     _occupancy=tokens[0];_occupant=tokens[1];
     occupant=(int)_occupant[0] - 65;
     if(LDEBUG) {cerr << soliloquy << " occupant to int conversion: " << _occupant << " == " << occupant << endl;} //[0] to convert to char
     if(!aurostd::isfloat(_occupancy)){
       message << "Occupancy is not a float for [occupation=" << occ << "]";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     occupancy=aurostd::string2utype<double>(_occupancy);
     double default_pocc_tol=DEFAULT_POCC_STOICH_TOL; //AFLOWRC_DEFAULT_POCC_STOICH_TOL;  //1e-3
     if(occupancy<default_pocc_tol){
       message << "Cannot set desired precision (" << default_pocc_tol << ") for [occupation=" << occ << "]" << endl;
       message << "Doping is VERY small, requiring MANY representative ordered structures (not recommended)" << endl;
-      pflow::logger(soliloquy, message, cout, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cout, _LOGGER_WARNING_);
       return false;
     }
     new_occ=occ;
@@ -11723,28 +11752,28 @@ namespace pflow {
       const string& ps=pocc_sites[i];
       if(ps.empty()){
         message << "POCC_site[i=" << i << "] empty";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       aurostd::string2tokens(ps,tokens,"-");
       if(tokens.size()==0){
         message << "No occupants specified for [designation=" << ps << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       designation=tokens[0];
       if(designation.empty()){
         message << "No mode specified [designation=" << ps << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       if(aurostd::withinList(pocc_designations,designation)){
         message << "Duplicate POCC designation: " << designation;
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       pocc_designations.push_back(designation);
       mode=designation[0];
       _site=designation;_site.erase(_site.begin());
       if(!aurostd::isfloat(_site)){
         message << "Designation ill-written, no site provided [designation=" << ps << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       site=aurostd::string2utype<int>(_site);
       pss.input_string=ps;
@@ -11763,7 +11792,7 @@ namespace pflow {
       }
       if(pss.positions.size()==0){
         message << "No positions found: " << ps;
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       //replace P IFF positions.size()==1
       if(pss.mode!='P' && pss.positions.size()==1){
@@ -11789,11 +11818,11 @@ namespace pflow {
     stringstream message;
     if(p1.positions.empty()){
       message << "No positions found: " << p1.input_string;
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     if(p2.positions.empty()){
       message << "No positions found: " << p2.input_string;
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     uint position1=p1.positions[0];
     uint position2=p2.positions[0];
@@ -11806,7 +11835,7 @@ namespace pflow {
       }
       else {
         message << "Unknown modes: p1.mode=" << p1.mode << ", p2.mode=" << p2.mode;
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
     }
     return position1<position2;
@@ -11841,7 +11870,7 @@ namespace pflow {
         aurostd::string2tokens(tokens1[j],_tokens2,"-");
         if(_tokens2.size()<2){
           message << "No occupants specified for [designation=" << tokens1[j] << "]";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         tokens2.clear();tokens2_save.clear();
         fix_precision_occupancy=true;
@@ -11898,31 +11927,31 @@ namespace pflow {
       aurostd::string2tokens(tokens1[i],tokens2,"-");
       if(!tokens2.size()){
         message << "No occupants specified for [designation=" << tokens1[i] << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       designation=tokens2[0];tokens2.erase(tokens2.begin());
       if(designation.empty()){
         message << "Designation empty [i=" << i << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       mode=designation[0];
       _site=designation;_site.erase(_site.begin());
       if(!aurostd::isfloat(_site)){
         message << "Designation ill-written, no site provided [designation=" << designation << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       site=aurostd::string2utype<uint>(_site);  //this is a hash, so start from 0 //-1
       if(mode=='P'){
         //site here refers to position (atom)
         if(site>=xstr_orig.atoms.size()){
           message << "Invalid position index " << site << " >= xstr.atoms.size()=" << xstr_orig.atoms.size();
-          throw aurostd::xerror(soliloquy,message,_INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_BOUNDS_);
         }
         atoms2remove.push_back(site);
       } else if(mode=='S'){
         if(site>=xstr_orig.num_each_type.size()){ //site here is type
           message << "Invalid type index " << site << " >= xstr.num_each_type.size()=" << xstr_orig.num_each_type.size();
-          throw aurostd::xerror(soliloquy,message,_INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_BOUNDS_);
         }
         iatom=0;
         for(uint ii=0;ii<xstr_orig.num_each_type.size();ii++){
@@ -11933,7 +11962,7 @@ namespace pflow {
         }
       } else {
         message << "Unknown POCC designation mode [designation=" << designation << "]";
-        throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       }
       positions_already_added_tmp.clear();  //do not ignore at the 'x' level
       for(uint j=0;j<tokens2.size();j++){
@@ -11941,18 +11970,18 @@ namespace pflow {
         aurostd::string2tokens(tokens2[j],tokens3,"x");
         if(tokens3.size()!=2){
           message << "Occupancy x Occupant pair ill-defined for [designation=" << tokens1[i] << ",occupant=" << j << "]";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         _occupancy=tokens3[0];_occupant=tokens3[1];
         occupant=(int)_occupant[0] - 65;
         if(LDEBUG) {cerr << soliloquy << " occupant to int conversion: " << _occupant << " == " << occupant << endl;} //[0] to convert to char
         if(occupant>=vspecies.size()){
           message << "Invalid occupant specification: occupant[char=" << _occupant << ",int=" << occupant << "] vs. vspecies.size()=" << vspecies.size();
-          throw aurostd::xerror(soliloquy,message,_INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_BOUNDS_);
         }
         if(!aurostd::isfloat(_occupancy)){
           message << "Occupancy is not a float for [designation=" << tokens1[i] << ",occupant=" << j << "]";
-          throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
         }
         occupancy=aurostd::string2utype<double>(_occupancy);
         if(LDEBUG) {
@@ -12078,7 +12107,7 @@ namespace pflow {
                                                    "                --proto_icsd=label_ICSD_number",
                                                    "options = [--server=xxxxxxx]  [--vasp | --qe | --abinit | --aims | --cif | --abccar] [--params=... | --hex]]",
                                                    "To get the list of prototypes --protos or --protos_icsd ."));
-      exit(0);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"params.size()==0",_INPUT_ILLEGAL_);  //CO191004 - use a throw so we can catch later
     }
     
     //CO181226 parsing label, species, volume, and pocc input
@@ -12086,7 +12115,7 @@ namespace pflow {
     aurostd::string2tokens(labels_raw,tokens,",");
     if(tokens.size()!=1){
       message << "Too many labels provided, --proto can only handle one label at at time: labels.size()==" << tokens.size();
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     string label=""; //params.at(0);
     if(tokens.size()>0){label=tokens[0];}
@@ -12102,7 +12131,7 @@ namespace pflow {
     // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
     if(parameters.size()!=0 && vpflow.flag("PROTO::USE_ANRL_LATTICE_PARAM")){
       message << "Cannot have both --params=<...> and --use_anrl_lattice_param at the same time; use one or the other.";
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     else if(parameters.size()==0 && vpflow.flag("PROTO::USE_ANRL_LATTICE_PARAM")){
       parameters="use_anrl_lattice_param";
@@ -12114,7 +12143,7 @@ namespace pflow {
     aurostd::string2tokens(pocc_parameters_raw,tokens,",");
     if(!(tokens.size()==0 || tokens.size()==1)){
       message << "Too many sets of pocc_parameters provided, --proto can only handle one set of pocc_parameters at at time: pocc_parameters.size()==" << tokens.size();
-      throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
     }
     string pocc_parameters="";
     if(tokens.size()>0){pocc_parameters=tokens[0];}
@@ -12129,29 +12158,37 @@ namespace pflow {
     xstructure str;
     deque<string> atomX;
     deque<double> volumeX;
-    uint nspecies=0;
+    uint nspecies=0,nspeciesHTQC=0; //CO191110 - NOTE: nspeciesHTQC is what is expected from label (proto), nspecies is REAL input number of species separated by colons, not commas (different for pocc)
     bool alphabetic=TRUE; // DEFAULT
-
     
     // ***************************************************************************
     // MODE LIBRARY FROM HTQC OR ICSD      
     if(modeLIBRARY) {
-      nspecies=aflowlib::PrototypeLibrariesSpeciesNumber(label);  //CO181226 - recently revamped, now nspecies should be exact!
+      nspeciesHTQC=nspecies=aflowlib::PrototypeLibrariesSpeciesNumber(label);  //CO181226 - recently revamped, now nspecies should be exact!
       alphabetic=RequestedAlphabeticLabeling(label);
       
       int mode=LIBRARY_MODE_HTQC;
       if(XHOST.vflag_control.flag("AFLOWLIB_SERVER")) {
-	if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD_AFLOWLIB;
-	if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD_AFLOWLIB;
+        if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD_AFLOWLIB;
+        if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD_AFLOWLIB;
       } else {
-	if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD;
-	if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD;
+        if(aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_ICSD;
+        if(aurostd::substring2bool(label,"ICSD_") && !aurostd::substring2bool(label,"_ICSD_")) mode=LIBRARY_MODE_HTQC_ICSD;
       } 
 	
+      bool found=FALSE;
+      double vol = 0.0;
+      
+      //CO181226 START
+      PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc);  //test if inputs are correct in number and type (not negative, etc.)  //CO191110 - note nspecies changes here if pocc, so below we use nspeciesHTQC to fetch correct proto
+      
+      //CO191110 - moved down from above so it prints updated values from pocc
       // DEBUG=TRUE;
       if(LDEBUG) cerr << soliloquy << " params.size()=" << params.size() << endl;
       if(LDEBUG) cerr << soliloquy << " vstr.size()=" << vstr.size() << endl; //CO181226
       if(LDEBUG) cerr << soliloquy << " vnum.size()=" << vnum.size() << endl; //CO181226
+      if(LDEBUG) cerr << soliloquy << " pocc=" << pocc << endl;
+      if(LDEBUG) cerr << soliloquy << " nspeciesHTQC=" << nspeciesHTQC << endl;
       if(LDEBUG) cerr << soliloquy << " nspecies=" << nspecies << endl;
       if(LDEBUG) cerr << soliloquy << " alphabetic=" << alphabetic << endl;
       if(LDEBUG) cerr << soliloquy << " label=" << label << endl;
@@ -12163,42 +12200,36 @@ namespace pflow {
       if(LDEBUG) if(mode==LIBRARY_MODE_ICSD_AFLOWLIB) cerr << soliloquy << " mode=LIBRARY_MODE_ICSD_AFLOWLIB" << endl;
       if(LDEBUG) if(mode==LIBRARY_MODE_HTQC_ICSD_AFLOWLIB) cerr << soliloquy << " mode=LIBRARY_MODE_HTQC_ICSD_AFLOWLIB" << endl;
       
-      bool found=FALSE;
-      double vol;
-      
-      //CO181226 START
-      PROTO_TEST_INPUT(vvstr,vvnum,nspecies,pocc);  //test if inputs are correct in number and type (not negative, etc.)
-      
       //get a vector of species and volume that fits exactly what is expected for xproto
       if(pocc){
-        vstr.clear();for(uint i=0;i<nspecies&&i<vstr_orig.size();i++){vstr.push_back(vstr_orig[i]);}
-        vnum.clear();for(uint i=0;i<nspecies&&i<vnum_orig.size();i++){vnum.push_back(vnum_orig[i]);}
+        vstr.clear();for(uint i=0;i<nspeciesHTQC&&i<vstr_orig.size();i++){vstr.push_back(vstr_orig[i]);}
+        vnum.clear();for(uint i=0;i<nspeciesHTQC&&i<vnum_orig.size();i++){vnum.push_back(vnum_orig[i]);}
       }
       
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//do some checks
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//[CO181226 - nspecies now exact]if(!aurostd::substring2bool(label,"ICSD_")){  //sometimes we need to search database for ICSD nspecies
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspecies vs. vstr
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vstr.size()>0 && vstr.size()!=nspecies){
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspecies and string inputs (nspecies==" << nspecies << ", vstr.size()==" << vstr.size() << ")";
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//[CO181226 - nspeciesHTQC now exact]if(!aurostd::substring2bool(label,"ICSD_")){  //sometimes we need to search database for ICSD nspeciesHTQC
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspeciesHTQC vs. vstr
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vstr.size()>0 && vstr.size()!=nspeciesHTQC){
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspeciesHTQC and string inputs (nspeciesHTQC==" << nspeciesHTQC << ", vstr.size()==" << vstr.size() << ")";
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]}
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspecies vs. vnum
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vnum.size()>1 && vnum.size()!=nspecies){
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspecies and number inputs (nspecies==" << nspecies << ", vnum.size()==" << vnum.size() << ")";
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check nspeciesHTQC vs. vnum
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vnum.size()>1 && vnum.size()!=nspeciesHTQC){
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  message << "Invalid input specification, mismatch between nspeciesHTQC and number inputs (nspeciesHTQC==" << nspeciesHTQC << ", vnum.size()==" << vnum.size() << ")";
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]}
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//}
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]//check vstr vs. vnum
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]if(vnum.size()>1){  //==1 means global volume, i.e., volume=str.atoms.size()*volume_in;
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  if(vstr.size()!=vnum.size()){
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]    message << "Invalid input specification, mismatch between string and number inputs (vstr.size()==" << vstr.size() << ", vnum.size()==" << vnum.size() << ")";
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  }
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]}
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]for(uint i=0;i<vnum.size();i++){
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  if(vnum[i]<=0){ //also includes 0
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]    message << "Invalid input specification, negative/zero number input found (vnum[" << i << "]=" << vnum[i] << ")";
-      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]    throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+      //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]  }
       //[CO181226 OBSOLETE as per PROTO_TEST_INPUT()]}
 
@@ -12207,25 +12238,25 @@ namespace pflow {
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
       }
 
-      atomX.clear();for(uint i=0;i<nspecies&&i<vstr.size();i++) atomX.push_back(vstr[i]);
+      atomX.clear();for(uint i=0;i<nspeciesHTQC&&i<vstr.size();i++) atomX.push_back(vstr[i]);
       
-      if(!found && vstr.size()==nspecies && vnum.size()==0){
+      if(!found && vstr.size()==nspeciesHTQC && vnum.size()==0){
         if(LDEBUG) cerr << soliloquy << " label:species:species..." << endl;
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX[" << i << "]=" << atomX[i] << endl;
         str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
       }
 
-      if(!found && vstr.size()==nspecies && (vnum.size()==1 || vstr.size()==vnum.size())){
+      if(!found && vstr.size()==nspeciesHTQC && (vnum.size()==1 || vstr.size()==vnum.size())){
         volumeX.clear();
         if(vnum.size()==1){
           if(LDEBUG) cerr << soliloquy << " label:species:species...:volume" << endl;
           vol=vnum[0];
-          for(uint i=0;i<nspecies&&i<atomX.size();i++){volumeX.push_back(0);}
+          for(uint i=0;i<nspeciesHTQC&&i<atomX.size();i++){volumeX.push_back(0);}
         }
         else {
           if(LDEBUG) cerr << soliloquy << " label:species:species...:volume:volume..." << endl;
           vol=-1.0;
-          for(uint i=0;i<nspecies&&i<vnum.size();i++){volumeX.push_back(vnum[i]);}
+          for(uint i=0;i<nspeciesHTQC&&i<vnum.size();i++){volumeX.push_back(vnum[i]);}
         }
         if(LDEBUG) { 
           for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX[" << i << "]=" << volumeX[i] << endl;	
@@ -12240,44 +12271,44 @@ namespace pflow {
 
       if(!found && params.size()==1) {  // label: 	// no matter the species, print A
         if(LDEBUG) cerr << soliloquy << " label" << endl;
- 	str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
+        str=aflowlib::PrototypeLibraries(cerr,label,parameters,mode);found=TRUE; // good for binary, ternary etc etc...
       }  
-      
-      if(!found && params.size()==1+nspecies) { // label:species:species...
+
+      if(!found && params.size()==1+nspeciesHTQC) { // label:species:species...
         if(LDEBUG) cerr << soliloquy << " label:species:species..." << endl;
- 	atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
+        atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(i+1));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
       }
       
-      if(!found && params.size()==1+nspecies+nspecies) { // label:species:species..:volume:volume...
+      if(!found && params.size()==1+nspeciesHTQC+nspeciesHTQC) { // label:species:species..:volume:volume...
         if(LDEBUG) cerr << soliloquy << " label:species:species...:volume:volume..." << endl;
-	atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(i+1));
+        atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(i+1));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
         volumeX.clear();
-        for(uint i=0;i<nspecies;i++) {
-          if(!aurostd::isfloat(params.at(i+1+nspecies))){ //CO 180729 - check for string stupidity
-            message << "Invalid volume specification (params[" << i+1+nspecies << "]=" << params.at(i+1+nspecies) << "), must be float input";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+        for(uint i=0;i<nspeciesHTQC;i++) {
+          if(!aurostd::isfloat(params.at(i+1+nspeciesHTQC))){ //CO 180729 - check for string stupidity
+            message << "Invalid volume specification (params[" << i+1+nspeciesHTQC << "]=" << params.at(i+1+nspeciesHTQC) << "), must be float input";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
-          vol=aurostd::string2utype<double>(params.at(i+1+nspecies));
+          vol=aurostd::string2utype<double>(params.at(i+1+nspeciesHTQC));
           if(vol==0.0){ //CO 180705 - check for volume stupidity
-            message << "Invalid volume specification (params[" << i+1+nspecies << "]=" << params.at(i+1+nspecies) << "), must be >0";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            message << "Invalid volume specification (params[" << i+1+nspeciesHTQC << "]=" << params.at(i+1+nspeciesHTQC) << "), must be >0";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           volumeX.push_back(vol);
-          //volumeX.push_back(aurostd::string2utype<double>(params.at(i+1+nspecies)));
+          //volumeX.push_back(aurostd::string2utype<double>(params.at(i+1+nspeciesHTQC)));
         }
         if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;	
-	str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
+        str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
       }
-      
+
       if(!found && params.size()==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-        if(nspecies==1 && mode!=LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+        if(nspeciesHTQC==1 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
         if(mode==LIBRARY_MODE_HTQC_ICSD) {
           atomX.clear();atomX.push_back(params.at(1));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
@@ -12288,84 +12319,84 @@ namespace pflow {
       if(!found && params.size()==3) {
         atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
         if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
-	if(mode==LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+        if(nspeciesHTQC==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
+        if(mode==LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
       }
   
       if(!found && params.size()==4) {
-	atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
-	if(nspecies==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
-	  atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
+        atomX.clear();for(uint i=1;i<params.size();i++) atomX.push_back(params.at(i));
+        if(nspeciesHTQC==2 && mode!=LIBRARY_MODE_HTQC_ICSD) {
+          atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	  volumeX.clear();volumeX.push_back(0.0);volumeX.push_back(0.0);
+          volumeX.clear();volumeX.push_back(0.0);volumeX.push_back(0.0);
           if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;
           if(!aurostd::isfloat(params.at(3))){ //CO 180729 - check for string stupidity
             message << "Invalid volume specification (params[" << 3 << "]=" << params.at(3) << "), must be float input";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           vol=aurostd::string2utype<double>(params.at(3));
           if(vol==0.0){ //CO 180705 - check for volume stupidity
             message << "Invalid volume specification (params[" << 3 << "]=" << params.at(3) << "), must be >0";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,vol,mode);found=TRUE;
           //str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,aurostd::string2utype<double>(params.at(3)),mode);found=TRUE;
-	}
-	if(nspecies==3 && mode!=LIBRARY_MODE_HTQC_ICSD) { // ternaries
-	  atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
+        }
+        if(nspeciesHTQC==3 && mode!=LIBRARY_MODE_HTQC_ICSD) { // ternaries
+          atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(1+i));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
-	if(mode==LIBRARY_MODE_HTQC_ICSD) {
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
+        if(mode==LIBRARY_MODE_HTQC_ICSD) {
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
       }
   
       if(!found && params.size()==5) {
-	if(nspecies==2) {
-	  atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
+        if(nspeciesHTQC==2) {
+          atomX.clear();atomX.push_back(params.at(1));atomX.push_back(params.at(2));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
           volumeX.clear();
           if(!aurostd::isfloat(params.at(3))){ //CO 180729 - check for string stupidity
             message << "Invalid volume specification (params[" << 3 << "]=" << params.at(3) << "), must be float input";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           vol=aurostd::string2utype<double>(params.at(3));
           if(vol==0.0){ //CO 180705 - check for volume stupidity
             message << "Invalid volume specification (params[" << 3 << "]=" << params.at(3) << "), must be >0";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           volumeX.push_back(vol);
           if(!aurostd::isfloat(params.at(4))){ //CO 180729 - check for string stupidity
             message << "Invalid volume specification (params[" << 4 << "]=" << params.at(4) << "), must be float input";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           vol=aurostd::string2utype<double>(params.at(4));
           if(vol==0.0){ //CO 180705 - check for volume stupidity
             message << "Invalid volume specification (params[" << 4 << "]=" << params.at(4) << "), must be >0";
-            throw aurostd::xerror(soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
           }
           volumeX.push_back(vol);
           //volumeX.push_back(aurostd::string2utype<double>(params.at(3)));
           //volumeX.push_back(aurostd::string2utype<double>(params.at(4)));
           if(LDEBUG) for(uint i=0;i<volumeX.size();i++) cerr << soliloquy << " volumeX.at(" << i << ")=" << volumeX.at(i) << endl;	
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
-	}
-	if(nspecies==4) {  // quaternaries
-	  if(alphabetic==TRUE) label=AlphabetizePrototypeLabelSpeciesTokens(params);
-	  atomX.clear();for(uint i=0;i<nspecies;i++) atomX.push_back(params.at(1+i));
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,volumeX,-1.0,mode);found=TRUE;
+        }
+        if(nspeciesHTQC==4) {  // quaternaries
+          if(alphabetic==TRUE) label=AlphabetizePrototypeLabelSpeciesTokens(params);
+          atomX.clear();for(uint i=0;i<nspeciesHTQC;i++) atomX.push_back(params.at(1+i));
           if(LDEBUG) for(uint i=0;i<atomX.size();i++) cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-	  str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
-	}
+          str=aflowlib::PrototypeLibraries(cerr,label,parameters,atomX,mode);found=TRUE;
+        }
       }
 
       if(!found){
-        message << "Unknown label+input specification (label=" << label << ",nspecies=" << nspecies << ",ninput=" << params.size()-1 << ")";  //params.size()-1 means skip label
-        throw aurostd::xerror(soliloquy,message,_INPUT_NUMBER_);  //CO 180801
+        message << "Unknown label+input specification (label=" << label << ",nspeciesHTQC=" << nspeciesHTQC << ",ninput=" << params.size()-1 << ")";  //params.size()-1 means skip label
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);  //CO 180801
       }
     }
     
@@ -12521,6 +12552,11 @@ namespace pflow {
     //   PARAMS.vparams.flag("AFLOWING_STRING_POTENTIAL",vpflow.flag("PROTO_AFLOW::POTENTIAL"));
     // if(PARAMS.vparams.flag("AFLOWING_STRING_POTENTIAL")) PARAMS.vparams.push_attached("AFLOWING_STRING_POTENTIAL",vpflow.getattachedscheme("PROTO_AFLOW::POTENTIAL"));
 
+    // check potential_type  //CO191110
+    if(LDEBUG) cerr << soliloquy << " CHECK POTENTIAL_TYPE" << endl;   //CO191110
+    if(vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE")) string_POTENTIAL+=_AVASP_PSEUDOPOTENTIAL_DELIMITER_+_AVASP_PSEUDOPOTENTIAL_POTENTIAL_TYPE_; //CO191110
+    if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"PROTO_AFLOW::POTENTIAL_TYPE\")=" << vpflow.flag("PROTO_AFLOW::POTENTIAL_TYPE") << endl; //CO191110
+    
     // check potential_complete
     if(LDEBUG) cerr << soliloquy << " CHECK POTENTIAL_COMPLETE" << endl; 
     if(vpflow.flag("PROTO_AFLOW::POTENTIAL_COMPLETE")) string_POTENTIAL+=_AVASP_PSEUDOPOTENTIAL_DELIMITER_+_AVASP_PSEUDOPOTENTIAL_POTENTIAL_COMPLETE_;
@@ -13595,7 +13631,7 @@ namespace pflow {
     xstructure a(input,IOAFLOW_AUTO);
     // DX 20180527 - use pwd - START
     if(a.directory == ""){
-      a.directory = aurostd::execute2string("pwd");
+      a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
     // DX 20180527 - use pwd - END
     // DX 1/24/18 [OBSOLETE] a.is_vasp4_poscar_format=TRUE; a.is_vasp5_poscar_format=FALSE;
@@ -13869,7 +13905,7 @@ namespace pflow {
     a.ReScale(1.0);
     // DX 2/21/18 - use pwd - START
     if(a.directory == ""){
-      a.directory = aurostd::execute2string("pwd");
+      a.directory = aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
     }
     string print_directory = " [dir=" + a.directory + "]";
     // DX 2/21/18 - use pwd - END
@@ -14373,7 +14409,7 @@ namespace pflow {
     
     double lambda=aurostd::string2utype<double>(vpflow.getattachedscheme("XRAY_PEAKS"));
     if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
-    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
+    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
     
     cout << aflow::Banner("BANNER_TINY") << endl;
  
@@ -14381,8 +14417,8 @@ namespace pflow {
 
     vector<double> v_twotheta,v_intensity,v_intensity_smooth;
     vector<uint> peak_indices=GetXrayPeaks(a,v_twotheta,v_intensity,v_intensity_smooth,lambda);
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
-    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
     
     //get amplitude
     vector<double> v_amplitude,v_peaks_amplitude;
@@ -14397,7 +14433,7 @@ namespace pflow {
       v_peaks_intensity.push_back(v_intensity[peak_indices[i]]);
       v_peaks_amplitude.push_back(v_amplitude[peak_indices[i]]);
     }
-    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_VALUE_ILLEGAL_);}
 
     cout << "X-Ray Peaks:" << endl;
     cout << "Two-Theta=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_peaks_twotheta,5,false),",") << endl; //no roff
@@ -14411,9 +14447,9 @@ namespace pflow {
     string soliloquy="pflow::READ_XRAY_DATA():";
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
 
-    if(filename.empty()){throw aurostd::xerror(soliloquy,"No filename provided",_FILE_ERROR_);}
-    if(!aurostd::FileExist(filename)){throw aurostd::xerror(soliloquy,"File does not exist: ",_FILE_NOT_FOUND_);}
-    if(aurostd::FileEmpty(filename)){throw aurostd::xerror(soliloquy,"File empty: ",_FILE_ERROR_);}
+    if(filename.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No filename provided",_FILE_ERROR_);}
+    if(!aurostd::FileExist(filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"File does not exist: ",_FILE_NOT_FOUND_);}
+    if(aurostd::FileEmpty(filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"File empty: ",_FILE_ERROR_);}
 
     vector<string> data_file_lines;
     aurostd::file2vectorstring(filename,data_file_lines);
@@ -14427,8 +14463,8 @@ namespace pflow {
       line=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line);
       if(!line.empty()){
         aurostd::string2tokens<double>(line,tokens,",");  //csv style
-        //if(tokens.size()!=2){throw aurostd::xerror(soliloquy,"Line[i="+aurostd::utype2string(i)+"] has "+aurostd::utype2string(tokens.size())+" tokens (expected 2): line=\""+line+"\"",_FILE_WRONG_FORMAT_);}
-        if(tokens.size()!=2){throw aurostd::xerror(soliloquy,"Line[i="+aurostd::utype2string(i)+"] has "+aurostd::utype2string(tokens.size())+" tokens (expected 2)",_FILE_WRONG_FORMAT_);}
+        //if(tokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Line[i="+aurostd::utype2string(i)+"] has "+aurostd::utype2string(tokens.size())+" tokens (expected 2): line=\""+line+"\"",_FILE_WRONG_FORMAT_);}
+        if(tokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Line[i="+aurostd::utype2string(i)+"] has "+aurostd::utype2string(tokens.size())+" tokens (expected 2)",_FILE_WRONG_FORMAT_);}
         v_twotheta.push_back(tokens[0]);
         v_intensity.push_back(tokens[1]);
       }
@@ -14449,10 +14485,10 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;  
     
     if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
-    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
+    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
     vector<double> v_twotheta,v_intensity;
     GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
     return PRINT_XRAY_DATA_PLOT(v_twotheta,v_intensity,directory);
   }
   void PRINT_XRAY_DATA_PLOT(const aurostd::xoption& vpflow,const string& directory) { //CO190520
@@ -14482,7 +14518,7 @@ namespace pflow {
     
     vector<double> v_intensity_smooth;
     vector<uint> peak_indices=GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
-    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity_smooth.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity_smooth.size()",_VALUE_ILLEGAL_);}
     
     //get amplitude
     vector<double> v_amplitude,v_peaks_amplitude;
@@ -14497,7 +14533,7 @@ namespace pflow {
       v_peaks_intensity.push_back(v_intensity[peak_indices[i]]);
       v_peaks_amplitude.push_back(v_amplitude[peak_indices[i]]);
     }
-    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_INDEX_MISMATCH_);}
+    if(v_peaks_twotheta.size()!=v_peaks_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_peaks_twotheta.size()!=v_peaks_intensity.size()",_INDEX_MISMATCH_);}
 
     stringstream data_file_ss;
     string data_file;
@@ -14547,10 +14583,10 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;  
     
     if(LDEBUG) {cerr << soliloquy << " lambda=" << lambda << endl;}
-    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
+    if(lambda<=0.0 || aurostd::isequal(lambda,0.0)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lambda <= 0",_VALUE_ILLEGAL_);}
     vector<double> v_twotheta,v_intensity;
     GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_INDEX_MISMATCH_);}
     
     string title=aurostd::fixStringLatex(str.title,true,false);  //double_back_slash==true (gnuplot), not symmetry sting
     if(0||force_generic_title){title.clear();}  //force generic
@@ -14582,18 +14618,18 @@ namespace pflow {
 
     if(!aurostd::IsCommandAvailable("gnuplot")){
       message << "gnuplot is not available, please put in path" << endl;
-      throw aurostd::xerror(soliloquy,message,_RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_INIT_);
     }
     if(!aurostd::IsCommandAvailable("pdflatex")){
       message << "pdflatex is not available, please put in path" << endl;
-      throw aurostd::xerror(soliloquy,message,_RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_INIT_);
     }
     
     string directory=_directory;
     if(directory.empty()){directory=".";}
     if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
 
-    string curdir=aurostd::execute2string("pwd");
+    string curdir=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
 
     string PLOT_tmp_dir=aurostd::TmpDirectoryCreate("XRAY_PLOT");
     chdir(PLOT_tmp_dir.c_str());
@@ -14668,14 +14704,14 @@ namespace pflow {
 
     if(0||keep_gp){
       if(aurostd::FileExist(XRAY_DATA_PLOT_FILE)){files2move.push_back(PLOT_tmp_dir+"/"+XRAY_DATA_PLOT_FILE);}
-      else {message << XRAY_DATA_PLOT_FILE << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+      else {message << XRAY_DATA_PLOT_FILE << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
       if(aurostd::FileExist(XRAY_DATA_PEAKS_FILE)){files2move.push_back(PLOT_tmp_dir+"/"+XRAY_DATA_PEAKS_FILE);}
-      else {message << XRAY_DATA_PEAKS_FILE << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+      else {message << XRAY_DATA_PEAKS_FILE << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
       if(aurostd::FileExist(plot_file)){files2move.push_back(PLOT_tmp_dir+"/"+plot_file);}
-      else {message << plot_file << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+      else {message << plot_file << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
     }
     if(aurostd::FileExist(xray_pdf)){files2move.push_back(PLOT_tmp_dir+"/"+xray_pdf);}
-    else {message << xray_pdf << " was not created";pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
+    else {message << xray_pdf << " was not created";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);}
 
     chdir(curdir.c_str());
     aurostd::file2directory(files2move,directory);
@@ -14684,7 +14720,7 @@ namespace pflow {
     string destination=directory+"/"+xray_pdf;
     aurostd::StringSubst(destination,"//","/");
     message << "Done. See " << destination << "." << endl;
-    pflow::logger(soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     if(LDEBUG) cerr << soliloquy <<" END" << endl;  
   }

@@ -2583,7 +2583,7 @@ namespace SYM {
 
     if(tokens.size()!=3){ 
       message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
     }
     
     // ---------------------------------------------------------------------------

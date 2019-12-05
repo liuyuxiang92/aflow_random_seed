@@ -697,8 +697,8 @@ namespace chull {
       uint getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const;
       double getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,uint i_point) const;
       double getSignedVerticalDistanceWithinCoordGroup(uint i_coord_group,const ChullPoint& point) const;
-      double getDistanceToHull(uint i_point,bool redo=false) const;
-      double getDistanceToHull(const ChullPoint& point,bool redo=false) const;
+      double getDistanceToHull(uint i_point,bool redo=false,bool get_signed_distance=false) const;  //CO190808
+      double getDistanceToHull(const ChullPoint& point,bool redo=false,bool get_signed_distance=false) const; //CO190808
       vector<double> getDistancesToHull(const vector<string>& vauid,bool redo=false) const;
       vector<uint> extractDecompositionPhases(const ChullFacet& facet) const;
       vector<uint> getDecompositionPhases(uint i_point) const;

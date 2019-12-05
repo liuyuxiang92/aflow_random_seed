@@ -60,7 +60,7 @@ bool PhononCalculator::buildVaspAAPL(const ClusterSet& clst) {
   if (!_supercell.isConstructed()) {
     string function = _AAPL_FORCES_ERR_PREFIX_ + "buildVaspAAPL";
     string message = "The supercell has not been initialized yet.";
-    throw xerror(function, message, _RUNTIME_INIT_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_INIT_);
   }
 
   // Determine the number of runs so the run ID in the folder name can be
@@ -195,7 +195,7 @@ void PhononCalculator::calculateAnharmonicIFCs(ClusterSet& clst) {
       if (xInputs.size() == 0) {
         string function = _AAPL_FORCES_ERR_PREFIX_ + "calculateAnharmonicIFCs()";
         string message = "Could not find ZEROSTATE directory.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
     subtractZeroStateForcesAAPL(xInputsAAPL[o], xInputs.back());

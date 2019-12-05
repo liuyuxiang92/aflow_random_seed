@@ -1101,7 +1101,7 @@ namespace pflow {
       xvector<double> data(6);
       data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
       if(data.rows){
-        sscontent_json << "\"lattice_parameters\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
+        sscontent_json << "\"lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
       } else {
         if(PRINT_NULL){ sscontent_json << "\"lattice_parameters\":null" << eendl;}
       }
@@ -1117,7 +1117,7 @@ namespace pflow {
         Bohr_Degs_data(5) =  data(5);
         Bohr_Degs_data(6) =  data(6);
         if(data.rows){
-          sscontent_json << "\"lattice_parameters_Bohr_deg\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(Bohr_Degs_data,5,roff),",") << "]" << eendl;
+          sscontent_json << "\"lattice_parameters_Bohr_deg\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(Bohr_Degs_data,5,roff),",") << "]" << eendl;
         } else {
           if(PRINT_NULL){ sscontent_json << "\"lattice_parameters_Bohr_deg\":null" << eendl;}
         }
@@ -1368,7 +1368,7 @@ namespace pflow {
       // Reciprocal lattice parameters
       data=Getabc_angles(str.klattice,DEGREES);
       if(data.rows){
-        sscontent_json << "\"reciprocal_lattice_parameters\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
+        sscontent_json << "\"reciprocal_lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
       } else {
         sscontent_json << "\"reciprocal_lattice_parameters\":null" << eendl;
       }
@@ -1444,7 +1444,7 @@ namespace pflow {
     vpflow.flag("EDATA::CALCULATED",TRUE);
     xvector<double> data(6);
     data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
-    vpflow.push_attached("EDATA::LATTICE_PARAMETERS",aurostd::joinWDelimiter(xvecDouble2vecString(data,5,true),",")); 
+    vpflow.push_attached("EDATA::LATTICE_PARAMETERS",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,true),",")); 
     vpflow.push_attached("EDATA::COVERA",aurostd::utype2string<double>(data(3)/data(1))); 
     vpflow.push_attached("EDATA::VOLUME",aurostd::utype2string<double>(vol)); 
     vpflow.push_attached("EDATA::BRAVAIS_LATTICE_TYPE",str_aus.bravais_lattice_type); 
@@ -1468,7 +1468,7 @@ namespace pflow {
     vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM",str_aus.bravais_superlattice_system); 
     vpflow.push_attached("EDATA::PEARSON_SYMBOL_SUPERLATTICE",str_aus.pearson_symbol_superlattice); 
     data=Getabc_angles(str.klattice,DEGREES);
-    vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_PARAMETERS",aurostd::joinWDelimiter(xvecDouble2vecString(data,5,true),",")); 
+    vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_PARAMETERS",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,true),",")); 
     vpflow.push_attached("EDATA::RECIPROCAL_SPACE_VOLUME",aurostd::utype2string<double>(GetVol(str.klattice))); 
     vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_TYPE",str_aus.reciprocal_lattice_type); 
     vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE",str_aus.reciprocal_lattice_variation_type); 
@@ -2808,7 +2808,7 @@ namespace pflow {
 
       // ITC origin
       if(str_sg.origin_ITC.rows){
-        sscontent_json << "\"origin_ITC\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(str_sg.origin_ITC,5,roff),",") << "]" << eendl;
+        sscontent_json << "\"origin_ITC\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,5,roff),",") << "]" << eendl;
       } else {
         if(PRINT_NULL){ sscontent_json << "\"origin_ITC\":null" << eendl;}
       }
@@ -2869,7 +2869,7 @@ namespace pflow {
                 site_symmetry += "\""+tokens[t]+"\"";
               }
             }
-            sswyckoff << "\"position\":[" << aurostd::joinWDelimiter(xvecDouble2vecString(position,5,roff),",") << "]" << eendl;
+            sswyckoff << "\"position\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(position,5,roff),",") << "]" << eendl;
             vwyckoff_json.push_back(sswyckoff.str()); sswyckoff.str("");
             sswyckoff << name << eendl;
             vwyckoff_json.push_back(sswyckoff.str()); sswyckoff.str("");
@@ -2937,7 +2937,7 @@ namespace pflow {
     vpflow.push_attached("SGDATA::LAUE",GetLaueLabel(str_sg.point_group_ITC)); 
     vpflow.push_attached("SGDATA::CRYSTAL_CLASS",str_sg.point_group_ITC); 
     vpflow.push_attached("SGDATA::SETTING_ITC",aurostd::utype2string<uint>(str_sg.setting_ITC)); 
-    vpflow.push_attached("SGDATA::ORIGIN_ITC",aurostd::joinWDelimiter(xvecDouble2vecString(str_sg.origin_ITC,5,true),",")); 
+    vpflow.push_attached("SGDATA::ORIGIN_ITC",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(str_sg.origin_ITC,5,true),",")); 
     // turn vector of strings into single string
     stringstream general_position;
     general_position << "[";

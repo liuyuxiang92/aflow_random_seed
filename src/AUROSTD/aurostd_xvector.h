@@ -23,6 +23,7 @@
 // -------------------------------------------------------------- class xvector
 
 namespace aurostd {
+  template<class utype> class xmatrix;  //forward declaration  //CO191110
   // namespace aurostd
   template<class utype>
     class xvector {
@@ -31,6 +32,7 @@ namespace aurostd {
     // xvector(int);                                       // default constructor
     xvector(int=3,int=1);                                  // default constructor
     xvector(const xvector<utype>&);                        // copy constructor
+    xvector(const xmatrix<utype>&);                        // copy constructor //CO191110
     // xvector (const xmatrix<utype>&);                    // make a vector of a xmatrix
     xvector<utype>& operator=(const xvector<utype>&);	   // assignment
     //     operator xvector<utype>() { return *this;};      // IBM_CPP
@@ -59,6 +61,13 @@ namespace aurostd {
     // bool isfloat,iscomplex;
     char size;
     long int vsize;
+    
+    //NECESSARY PRIVATE CLASS METHODS - START
+    void free();  //CO190808
+    void copy(const xvector<utype>& b);  //CO190808
+    void copy(const xmatrix<utype>& b);  //CO190808
+    void refresh(); //CO190808 - refresh internal properties dependent on lrows, urows, utype
+    //NECESSARY END CLASS METHODS - END
   };
 }
 

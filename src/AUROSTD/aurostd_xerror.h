@@ -40,10 +40,10 @@ namespace aurostd {
 
 class xerror {
   public:
-    xerror(const std::string&, const std::string&, int = 1);
-    xerror(const std::string&, const std::stringstream&, int = 1);
-    xerror(const std::stringstream&, const std::stringstream&, int = 1);
-    xerror(const std::stringstream&, const std::string&, int = 1);
+    xerror(const std::string&, const std::string&, const std::string&, int = 1);
+    xerror(const std::string&, const std::string&, const std::stringstream&, int = 1);
+    xerror(const std::string&, const std::stringstream&, const std::stringstream&, int = 1);
+    xerror(const std::string&, const std::stringstream&, const std::string&, int = 1);
     ~xerror() throw() {};
     int error_code;
     std::string what();
@@ -51,9 +51,9 @@ class xerror {
     std::string error_message;
   private:
     int error_type, error_number;
-    std::string f_name, message;
+    std::string file_name,function_name, message;
 
-    void buildException(const std::string&, const std::string&, const int&);
+    void buildException(const std::string&, const std::string&, const std::string&, const int&);
     bool codeValid();
     std::string buildMessageString();
     std::string error_string();

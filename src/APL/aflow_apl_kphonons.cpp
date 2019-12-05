@@ -422,7 +422,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
     if (USER_DC) {
       if (USER_DC_METHOD == "LATTICE") {
-        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_type;
+        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // ME191202 - must be variation_type to get e.g. MCLC3
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
         tokens.clear();
@@ -1241,7 +1241,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       }
       if (!Krun) {
         string message = "Relaxation calculations did not run successfully.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
     }
 
@@ -2454,7 +2454,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
         string function = "apl::RunPhonons_APL";
         stringstream message;
         message << "Wrong setting in "+_ASTROPT_+"BTE. Specify as BTE=RTA or FULL.";
-        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
       }
 
       // THERMALGRID, e.g., THERMALGRID = 2x2x2
@@ -2474,7 +2474,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
         string function = "apl::RunPhonons_APL";
         stringstream message;
         message << "Wrong setting in "+_ASTROPT_+"TCT. Specify as TCT=1000:2000:10.";
-        throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_NUMBER_);
       }
       USER_TCT_TSTART = aurostd::string2utype<double>(tokens.at(0));
       USER_TCT_TEND = aurostd::string2utype<double>(tokens.at(1));
@@ -2500,7 +2500,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
           string function = "apl::RunPhonons_APL";
           stringstream message;
           message << "Not enough entries in "+_ASTROPT_+"CUT_RAD.";
-          throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_NUMBER_);
         } else if (tokens.size() > USER_CUTOFF_DISTANCE.size()) {
           logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_RAD. ";
           logger << "Excess entries will be ignored." << apl::endl;
@@ -2533,7 +2533,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
           string function = "apl::RunPhonons_APL";
           stringstream message;
           message << "Not enough entries in "+_ASTROPT_+"CUT_SHELL.";
-          throw aurostd::xerror(function, message, _INPUT_NUMBER_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_NUMBER_);
         } else if (tokens.size() > USER_CUTOFF_SHELL.size()) {
           logger << apl::warning << "Too many entries for " << _ASTROPT_ << "CUT_SHELL. ";
           logger << "Excess entries will be ignored." << apl::endl;
@@ -3914,7 +3914,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
       } else {
         string function = "apl::RunPhonons_APL";
         string message = "Incorrect q-point settings in the THERMALGRID flag.";
-        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
       }
 
       // Calculate lattice thermal conductivity

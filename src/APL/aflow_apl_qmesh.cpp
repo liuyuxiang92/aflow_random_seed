@@ -134,7 +134,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
       string message = "Error while opening /dev/null/. ";
       message += "Point group of the reciprocal cell cannot be calculated.";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
     _aflags aflags;
     aflags.QUIET = true;
@@ -146,7 +146,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
     if (!xs.pgroupk_calculated) {  // ME190625
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
       string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
   _recCell.pgroup = xs.pgroupk;  // ME190625
@@ -454,7 +454,7 @@ void QMesh::writeQpoints(string filename, bool cartesian) {
   if (!aurostd::FileExist(filename)) {
     string function = _APL_QMESH_ERR_PREFIX_ + "writeQpoints";
     string message = "Could not write q-points to file.";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -496,7 +496,7 @@ void QMesh::writeIrredQpoints(string filename, bool cartesian) {
   if (!aurostd::FileExist(filename)) {
     string function = _APL_QMESH_ERR_PREFIX_ + "writeIrredQpoints";
     string message = "Could not write irreducible q-points to file.";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
