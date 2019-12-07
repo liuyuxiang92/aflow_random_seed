@@ -1,13 +1,19 @@
 3.1.229 - 2019/12/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- added unsigned long long to _isfloat(), _iscomplex(), _isreal(), _size(), _real(), isinteger() (CO)
+        -- added aurostd::powint() for fast powers of integers (CO)
+        -- added all variants of iszero() (CO)
+        -- templated GCD(), patched for positive/negative inputs, and added Bezout coefficients as output (CO)
         -- adding free(), copy(), refresh() to xmatrix (CO)
-        -- templated GCD() (CO)
         -- added shiftlrows, shiftlcols, shiftlrowscols to xmatrix (CO)
         -- added inverse of 2x2 matrix (CO)
         -- added xmatrixint2double() and xmatrixdouble2int() (CO)
-        -- added getdiag(S) for xmatrix (CO)
-        -- added right matrix division to xmatrix (CO)
+        -- added right matrix division, traspInPlace(), traspSquareInPlace(), submatrixInPlace(), and getdiag() to xmatrix (CO)
+        -- added getmatInplace() and getvec() to xmatrix (CO)
+        -- patched inverse() for xmatrix, now uses matrix of minors approach which is more stable than GaussJordan (CO)
+        -- converted bool inverse() to bool isNonInvertible() in xmatrix() (CO)
         -- added smith normal form calculator to xmatrix (CO)
+        -- updated QR decomposition algorithm to avoid saving householder rotations to form Q at the end (CO)
 3.1.228 - 2019/11/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- Fixed bug in xDOSCAR reader error detection. (ME)

@@ -41,14 +41,15 @@ namespace aurostd {
   // namespace aurostd
   bool _isfloat(bool)          { return (bool) FALSE; }
   bool _isfloat(char)          { return (bool) FALSE; }
-  bool _isfloat(int)           { return (bool) FALSE; }
   bool _isfloat(uint)          { return (bool) FALSE; }
+  bool _isfloat(int)           { return (bool) FALSE; }
+  bool _isfloat(long int)      { return (bool) FALSE; }
+  bool _isfloat(unsigned long int)      { return (bool) FALSE; }  //CO191201
+  bool _isfloat(long long int) { return (bool) FALSE; }
+  bool _isfloat(unsigned long long int) { return (bool) FALSE; }
   bool _isfloat(float)         { return (bool) TRUE;  }
   bool _isfloat(double)        { return (bool) TRUE;  }
   bool _isfloat(long double)   { return (bool) TRUE;  }
-  bool _isfloat(long int)      { return (bool) FALSE; }
-  bool _isfloat(long long int) { return (bool) FALSE; }
-  bool _isfloat(unsigned long long int) { return (bool) FALSE; }
 #ifdef _AUROSTD_XCOMPLEX_
   bool _isfloat(xcomplex<float>) { return (bool) TRUE;}
   bool _isfloat(xcomplex<double>) { return (bool) TRUE;}
@@ -67,14 +68,15 @@ namespace aurostd {
 namespace aurostd {
   bool _iscomplex(bool)        { return (bool) FALSE; }
   bool _iscomplex(char)        { return (bool) FALSE; }
-  bool _iscomplex(int)         { return (bool) FALSE; }
   bool _iscomplex(uint)        { return (bool) FALSE; }
+  bool _iscomplex(int)         { return (bool) FALSE; }
+  bool _iscomplex(long int)    { return (bool) FALSE; }
+  bool _iscomplex(unsigned long int)    { return (bool) FALSE; }  //CO191201
+  bool _iscomplex(long long int) { return (bool) FALSE; }
+  bool _iscomplex(unsigned long long int) { return (bool) FALSE; }
   bool _iscomplex(float)       { return (bool) FALSE; }
   bool _iscomplex(double)      { return (bool) FALSE; }
   bool _iscomplex(long double) { return (bool) FALSE; }
-  bool _iscomplex(long int)    { return (bool) FALSE; }
-  bool _iscomplex(long long int) { return (bool) FALSE; }
-  bool _iscomplex(unsigned long long int) { return (bool) FALSE; }
 #ifdef _AUROSTD_XCOMPLEX_
   bool _iscomplex(xcomplex<float>) { return (bool) TRUE;}
   bool _iscomplex(xcomplex<double>) { return (bool) TRUE;}
@@ -87,13 +89,14 @@ namespace aurostd {
 namespace aurostd {
   bool _isreal(bool)           { return (bool) TRUE; }
   bool _isreal(char)           { return (bool) TRUE; }
-  bool _isreal(int)            { return (bool) TRUE; }
   bool _isreal(uint)           { return (bool) TRUE; }
-  bool _isreal(float)          { return (bool) TRUE; }
-  bool _isreal(double)         { return (bool) TRUE; }
+  bool _isreal(int)            { return (bool) TRUE; }
   bool _isreal(long int)       { return (bool) TRUE; }
+  bool _isreal(unsigned long int)       { return (bool) TRUE; } //CO191201
   bool _isreal(long long int)  { return (bool) TRUE; }
   bool _isreal(unsigned long long int)  { return (bool) TRUE; }
+  bool _isreal(float)          { return (bool) TRUE; }
+  bool _isreal(double)         { return (bool) TRUE; }
   bool _isreal(long double)    { return (bool) TRUE; }
 #ifdef _AUROSTD_XCOMPLEX_
   bool _isreal(xcomplex<float>) { return (bool) FALSE;}
@@ -107,13 +110,14 @@ namespace aurostd {
 namespace aurostd {
   int _size(bool)              { return (int) sizeof(bool);}
   int _size(char)              { return (int) sizeof(char);}
-  int _size(int)               { return (int) sizeof(int);}
   int _size(uint)              { return (int) sizeof(uint);}
-  int _size(float)             { return (int) sizeof(float);}
-  int _size(double)            { return (int) sizeof(double);}
+  int _size(int)               { return (int) sizeof(int);}
   int _size(long int)          { return (int) sizeof(long int);}
+  int _size(unsigned long int)          { return (int) sizeof(unsigned long int);} //CO191201
   int _size(long long int)     { return (int) sizeof(long long int);}
   int _size(unsigned long long int)     { return (int) sizeof(unsigned long long int);}
+  int _size(float)             { return (int) sizeof(float);}
+  int _size(double)            { return (int) sizeof(double);}
   int _size(long double)       { return (int) sizeof(long double);}
 #ifdef _AUROSTD_XCOMPLEX_
   int _size(xcomplex<float>)   { return (int) 2*sizeof(float);}
@@ -129,11 +133,12 @@ namespace aurostd {
   char _real(char x) { return (char) x;}
   uint _real(uint x) { return (uint) x;}
   int _real(int x) { return (int) x;}
-  float _real(float x) { return (float) x;}
-  double _real(double x) { return (double) x;}
   long int _real(long int x) { return (long int) x;}
+  unsigned long int _real(unsigned long int x) { return (unsigned long int) x;} //CO191201
   long long int _real(long long int x) { return (long long int) x;}
   unsigned long long int _real(unsigned long long int x) { return (unsigned long long int) x;}
+  float _real(float x) { return (float) x;}
+  double _real(double x) { return (double) x;}
   long double _real(long double x) { return (long double) x;}
 #ifdef _AUROSTD_XCOMPLEX_
   int _real(xcomplex<int> x) { return (int) real(x);}
@@ -400,7 +405,8 @@ namespace aurostd {
   template<class utype>
     void _GCD(utype a,utype b,utype& gcd,utype& x,utype& y){ //CO180409
       if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
-      if(isequal(a,(utype)1) && isequal(b,(utype)1)){gcd=1;x=0;y=1;return;} //matlab implementation
+      if(false && isequal(a,(utype)1) && isequal(b,(utype)1)){gcd=1;x=0;y=1;return;} //matlab implementation, this algorithm gives x=1,y=0 which IS valid
+      utype a_orig=a,b_orig=b;
       x=(utype)0;y=(utype)1;
       utype u=(utype)1,v=(utype)0;
       utype q=(utype)0,r=(utype)0,m=(utype)0,n=(utype)0;
@@ -414,6 +420,8 @@ namespace aurostd {
         u=m;v=n;
       }
       gcd=b;
+      if(std::signbit(gcd)){gcd=-gcd;x=-x;y=-y;}  //GCD(a,-b)==GCD(a,b), so flip all the signs
+      if(!isequal(a_orig*x+b_orig*y,gcd)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","Bezout's identity not satisfied",_RUNTIME_ERROR_);}
     }
   template<class utype>
     void _GCD(utype a,utype b,utype& gcd){ //CO180409  //keep this one too, fewer operations than if you need x and y too
@@ -440,51 +448,51 @@ namespace aurostd {
   void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd){return _GCD(a,b,gcd);}  //CO191201
 
   void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance){  //CO191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
-    int igcd=0,ix=0,iy=0;
-    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd,ix,iy);
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    long long int igcd=0,ix=0,iy=0; //CO191201 - long long int as SNF matrices can get big
+    GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd,ix,iy);  //CO191201 - long long int as SNF matrices can get big
     gcd=(float)igcd;
     x=(float)ix;
     y=(float)iy;
   }
   void GCD(float a,float b,float& gcd,float tolerance){  //CO191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
-    int igcd=0;
-    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd);
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    long long int igcd=0; //CO191201 - long long int as SNF matrices can get big
+    GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd);  //CO191201 - long long int as SNF matrices can get big
     gcd=(float)igcd;
   }
   void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance){  //CO191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
-    int igcd=0,ix=0,iy=0;
-    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd,ix,iy);
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    long long int igcd=0,ix=0,iy=0; //CO191201 - long long int as SNF matrices can get big
+    GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd,ix,iy);  //CO191201 - long long int as SNF matrices can get big
     gcd=(double)igcd;
     x=(double)ix;
     y=(double)iy;
   }
   void GCD(double a,double b,double& gcd,double tolerance){  //CO191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
-    int igcd=0;
-    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd);
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    long long int igcd=0; //CO191201 - long long int as SNF matrices can get big
+    GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd);  //CO191201 - long long int as SNF matrices can get big
     gcd=(double)igcd;
   }
   void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance){  //CO191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
-    int igcd=0,ix=0,iy=0;
-    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd,ix,iy);
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    long long int igcd=0,ix=0,iy=0; //CO191201 - long long int as SNF matrices can get big
+    GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd,ix,iy);  //CO191201 - long long int as SNF matrices can get big
     gcd=(long double)igcd;
     x=(long double)ix;
     y=(long double)iy;
   }
   void GCD(long double a,long double b,long double& gcd,long double tolerance){  //CO191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b is not an integer",_INPUT_ILLEGAL_);}
-    int igcd=0;
-    GCD((int)aurostd::nint(a),(int)aurostd::nint(b),igcd);
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    long long int igcd=0;
+    GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd);
     gcd=(long double)igcd;
   }
 
@@ -532,11 +540,12 @@ namespace aurostd {
 
   //bool isinteger(bool x,bool tolerance){return _isinteger(x,tolerance);}
   //bool isinteger(char x,char tolerance){return _isinteger(x,tolerance);}
-  bool isinteger(int x,int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
-  bool isinteger(long int x,long int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
-  bool isinteger(uint x,uint tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
-  bool isinteger(long long int x,long long int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance){return _isinteger(x,tolerance);}  //CO191201 - obvious but define for boot
+  bool isinteger(uint,uint){return true;}  //CO191201 - obvious but define for boot
+  bool isinteger(int,int){return true;}  //CO191201 - obvious but define for boot
+  bool isinteger(long int,long int){return true;}  //CO191201 - obvious but define for boot
+  bool isinteger(unsigned long int,long int){return true;}  //CO191201 - obvious but define for boot
+  bool isinteger(long long int,long long int){return true;}  //CO191201 - obvious but define for boot
+  bool isinteger(unsigned long long int,unsigned long long int){return true;}  //CO191201 - obvious but define for boot
   bool isinteger(float x,float tolerance){return _isinteger(x,tolerance);}  //CO191201
   bool isinteger(double x,double tolerance){return _isinteger(x,tolerance);}  //CO191201
   bool isinteger(long double x,long double tolerance){return _isinteger(x,tolerance);}  //CO191201
@@ -574,13 +583,14 @@ namespace aurostd {
   
   //bool iszero(bool x,bool tolerance){return _iszero(x,tolerance);}  //CO191201
   //bool iszero(char x,char tolerance){return _iszero(x,tolerance);}  //CO191201
-  bool iszero(int x,int tolerance){return _iszero(x,tolerance);}  //CO191201
-  bool iszero(long int x,long int tolerance){return _iszero(x,tolerance);}  //CO191201
-  bool iszero(uint x,uint tolerance){return _iszero(x,tolerance);}  //CO191201
+  bool iszero(uint x,uint){return (bool) x==(uint)0;}  //CO191201
+  bool iszero(int x,int){return (bool) x==(int)0;}  //CO191201
+  bool iszero(long int x,long int){return (bool) x==(long int)0;}  //CO191201
+  bool iszero(unsigned long int x,long int){return (bool) x==(unsigned long int)0;}  //CO191201
+  bool iszero(long long int x,long long int){return (bool) x==(long long int)0;}  //CO191201
+  bool iszero(unsigned long long int x,unsigned long long int){return (bool) x==(unsigned long long int)0;}  //CO191201
   bool iszero(float x,float tolerance){return _iszero(x,tolerance);}  //CO191201
   bool iszero(double x,double tolerance){return _iszero(x,tolerance);}  //CO191201
-  bool iszero(long long int x,long long int tolerance){return _iszero(x,tolerance);}  //CO191201
-  bool iszero(unsigned long long int x,unsigned long long int tolerance){return _iszero(x,tolerance);}  //CO191201
   bool iszero(long double x,long double tolerance){return _iszero(x,tolerance);}  //CO191201
 }
 
@@ -918,6 +928,15 @@ namespace aurostd { //CO190419
     if(ii<lrows) ii=urows-mod(urows-i,urows-lrows+1);
     return ii;
   }
+}
+
+namespace aurostd { //CO191201
+  uint powint(uint x,uint exp){uint y=1;for(uint i=0;i<exp;i++){y*=x;}return y;}  //CO191201
+  int powint(int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO191201
+  long int powint(long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO191201
+  unsigned long int powint(unsigned long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO191201
+  long long int powint(long long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO191201
+  unsigned long long int powint(unsigned long long int x,uint exp){int y=1;for(uint i=0;i<exp;i++){y*=x;}return y;} //CO191201
 }
 
 #endif // _AUROSTD_XSCALAR_CPP_

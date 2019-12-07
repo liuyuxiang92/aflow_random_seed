@@ -540,21 +540,48 @@ bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
   a=25;b=15;
   aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==5 && x1==-1 && y1==2)){
-    if(LDEBUG){cerr << soliloquy << " gcd(25,15) failed" << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " gcd(25,15) failed" << endl;
+      cerr << soliloquy << " gcd=" << gcd << endl;
+      cerr << soliloquy << " x=" << x1 << endl;
+      cerr << soliloquy << " y=" << y1 << endl;
+    }
     return FALSE;
   }
 
   a=25;b=0;
   aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==25 && x1==1 && y1==0)){
-    if(LDEBUG){cerr << soliloquy << " gcd(25,0) failed" << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " gcd(25,0) failed" << endl;
+      cerr << soliloquy << " gcd=" << gcd << endl;
+      cerr << soliloquy << " x=" << x1 << endl;
+      cerr << soliloquy << " y=" << y1 << endl;
+    }
     return FALSE;
   }
   
   a=0;b=15;
   aurostd::GCD(a,b,gcd,x1,y1);
   if(!(gcd==15 && x1==0 && y1==1)){
-    if(LDEBUG){cerr << soliloquy << " gcd(0,15) failed" << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " gcd(0,15) failed" << endl;
+      cerr << soliloquy << " gcd=" << gcd << endl;
+      cerr << soliloquy << " x=" << x1 << endl;
+      cerr << soliloquy << " y=" << y1 << endl;
+    }
+    return FALSE;
+  }
+  
+  a=-5100;b=30450;
+  aurostd::GCD(a,b,gcd,x1,y1);
+  if(!(gcd==150 && x1==-6 && y1==-1)){
+    if(LDEBUG){
+      cerr << soliloquy << " gcd(-5100,30450) failed" << endl;
+      cerr << soliloquy << " gcd=" << gcd << endl;
+      cerr << soliloquy << " x=" << x1 << endl;
+      cerr << soliloquy << " y=" << y1 << endl;
+    }
     return FALSE;
   }
 
@@ -584,44 +611,65 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO190520
     return FALSE;
   }
 
-  xmatrix<int> A(3,3),U,V,S;
-  A[1][1]=3;A[1][2]=2;A[1][3]=1;
-  A[2][1]=5;A[2][2]=3;A[2][3]=1;
-  A[3][1]=6;A[3][2]=8;A[3][3]=9;
+  xmatrix<int> A1(3,3),U1,V1,S1;
+  A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
+  A1[2][1]=5;A1[2][2]=3;A1[2][3]=1;
+  A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
 
-  aurostd::getSmithNormalForm(A,U,V,S);
-
-  if(!(
-        U[1][1]==24 && U[1][2]==-13 && U[1][3]==-1 && 
-        U[2][1]==13 && U[2][2]==-7  && U[2][3]==-1 && 
-        U[3][1]==2  && U[3][2]==-1  && U[3][3]==0  && 
-        TRUE
-      )
-    ){
-    if(LDEBUG){cerr << soliloquy << " U failed of getSmithNormalForm()" << endl;}
-    return FALSE;
-  }
-
-  if(!(
-        V[1][1]==0  && V[1][2]==1  && V[1][3]==3  && 
-        V[2][1]==-1 && V[2][2]==-1 && V[2][3]==-1 && 
-        V[3][1]==1  && V[3][2]==0  && V[3][3]==-1 && 
-        TRUE
-      )
-    ){
-    if(LDEBUG){cerr << soliloquy << " V failed of getSmithNormalForm()" << endl;}
-    return FALSE;
-  }
+  aurostd::getSmithNormalForm(A1,U1,V1,S1);
   
-  if(!(
-        S[1][1]==1 && S[1][2]==0 && S[1][3]==0 && 
-        S[2][1]==0 && S[2][2]==1 && S[2][3]==0 && 
-        S[3][1]==0 && S[3][2]==0 && S[3][3]==1 &&
-        TRUE
-      )
-    ){
-    if(LDEBUG){cerr << soliloquy << " S failed of getSmithNormalForm()" << endl;}
-    return FALSE;
+  if(LDEBUG){
+    cerr << soliloquy << " A=" << endl;cerr << A1 << endl;
+    cerr << soliloquy << " U=" << endl;cerr << U1 << endl;
+    cerr << soliloquy << " V=" << endl;cerr << V1 << endl;
+    cerr << soliloquy << " S=" << endl;cerr << S1 << endl;
+  }
+
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " U1(1) failed of getSmithNormalForm()" << endl;}
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " V1(1) failed of getSmithNormalForm()" << endl;}
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 && 
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << soliloquy << " S1(1) failed of getSmithNormalForm()" << endl;}
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
+  //[CO191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
+
+  xmatrix<long long int> A2(5,5),U2,V2,S2;  //long long int is CRUCIAL, Matlab actually gets this wrong because it uses long int by default
+  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
+  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
+  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
+  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
+  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
+  
+  aurostd::getSmithNormalForm(A2,U2,V2,S2);
+
+  if(LDEBUG){ //COME BACK AND PATCH FOR ANSWERS
+    cerr << soliloquy << " A=" << endl;cerr << A2 << endl;
+    cerr << soliloquy << " U=" << endl;cerr << U2 << endl;
+    cerr << soliloquy << " V=" << endl;cerr << V2 << endl;
+    cerr << soliloquy << " S=" << endl;cerr << S2 << endl;
   }
   
   message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
@@ -671,7 +719,7 @@ int main(int _argc,char **_argv) {
     if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
     //getmat()
     xmatrix<double> submat;
-    mat.getmat(submat,3,3,2,2);
+    mat.getmatInPlace(submat,2,3,2,3);
     if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
     //setmat()
     mat.setmat(submat,1,1); //do nothing

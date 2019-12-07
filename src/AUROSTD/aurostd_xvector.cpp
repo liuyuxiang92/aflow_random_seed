@@ -2076,7 +2076,7 @@ namespace aurostd {
       //https://ef.gy/linear-algebra:normal-vectors-in-higher-dimensional-spaces
       //"it can be defined in a coordinate independent way as the Hodge dual of the wedge product of the arguments"
       xvector<utype> normal(dim-1,0);
-      xmatrix<utype> mat(dim,dim-1,1,1); //must start at 1 to work with det(), minordet()
+      xmatrix<utype> mat(dim,dim-1,1,1),submat(dim-1,dim-1,1,1); //must start at 1 to work with det(), minordet()
       for(int i=0;i<dim;i++){
         for(int j=0;j<dim-1;j++){
           mat(i+1,j+1)=directive_vectors[j][i];
@@ -2094,7 +2094,12 @@ namespace aurostd {
       //is useless, they are the same for even/odd n, I checked.
       //so we keep as implemented
       //this is also verified in http://www.jstor.org/stable/2323537
-      for(int i=0;i<dim;i++){normal[i]=std::pow(-1,i)*minordet(mat,i+1,0);}
+      //get "cofactor" vector
+      //[CO191201 - OBSOLETE SLOW]for(int i=0;i<dim;i++){normal[i]=std::pow(-1,i)*minordet(mat,i+1,0);}
+      for(int i=0;i<dim;i++){ //CO191201 - faster
+        submatrixInPlace(mat,submat,i+1,0);
+        normal[i]=(double)aurostd::powint(-1,i)*det(submat);
+      }
       normal/=modulus(normal);    //normalize
 
       aurostd::shiftlrows(normal,lrows); //shift back to original!
