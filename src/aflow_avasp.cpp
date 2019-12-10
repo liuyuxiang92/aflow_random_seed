@@ -2020,12 +2020,16 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   string MODULE = aurostd::toupper(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE"));
+  // OBSOLETE - ME191206
+  // This would set CONVERT_UNIT_CELL=PRES for aflow_proto.
+  // Setting to PRES should only be done for ARUNs and thus set in
+  // AVASP_populateXVASP_ARUN
   // ME 190107
-  if (MODULE == "APL" || MODULE == "AAPL") {
-    // (A)APL should not convert the unit cell as this would lead to discrepancies between the
-    // structure in the aflow.in file and the supercell.
-    setPreserveUnitCell(xvasp);
-  }
+  //if (MODULE == "APL" || MODULE == "AAPL") {
+  //  // (A)APL should not convert the unit cell as this would lead to discrepancies between the
+  //  // structure in the aflow.in file and the supercell.
+  //  setPreserveUnitCell(xvasp);
+  // }
   
 // APL WRITING - ME 181027
   if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { // CO 180214 - I interpret this flag to refer to WRITING APL options, not if they are on

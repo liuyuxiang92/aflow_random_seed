@@ -437,7 +437,7 @@ void DOSCalculator::writePDOS(const string& directory) {
   double factorRaw2rcm = _pc.getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
   double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
-  _logger << "Writing phonon density of states into file " << filename << "." << apl::endl; //ME181226
+  _logger << "Writing phonon density of states into file " << aurostd::CleanFileName(filename) << "." << apl::endl; //ME181226
   //outfile << "############### ############### ############### ###############" << std::endl;
   outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
   outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);

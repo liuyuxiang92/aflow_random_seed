@@ -128,7 +128,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
 
   // Calculate the point group of the reciprocal cell. This requires some dummy
   // ofstream objects to parse into the function. These objects will be removed
-  // when CalculatePointGroupKCrystal is redesigned to work without ofstreams.
+  // when CalculatePointGroupKlattice is redesigned to work without ofstreams.
   if (!xs.pgroupk_calculated) {  // ME190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
     ofstream FileDevNull("/dev/null");
     if (!FileDevNull.is_open()) {
@@ -164,7 +164,7 @@ void QMesh::generateGridPoints(bool force_gamma) {
 
   // Use Monkhorst-Pack formula to generate a mesh - do not center yet. Cartesian
   // coordinates will be calculated after all shifts have been performed.
-  double q1, q2, q3;
+  double q1 = 0.0, q2 = 0.0, q3 = 0.0;
   _qpoint qpt;
   int q = 0;
   for (int s = 1; s <= _qptGrid[3]; s++) {

@@ -184,9 +184,8 @@ void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
   xinp.setXStr(_supercell.getSupercellStructureLight());  // Light copy because we don't need symmetry, etc.
   xstructure& xstr = xinp.getXStr();  // ME 190109
   for (uint at = 0; at < atoms.size(); at++) {
-    int atsc, dist_index;
-    atsc = atoms[at];
-    dist_index = distortions[at];
+    int atsc = atoms[at];
+    int dist_index = distortions[at];
     xvector<double> dist_cart = distortion_vectors[dist_index];
     while (((at + 1) < atoms.size()) && (atoms[at] == atoms[at+1])) {
        at++;
@@ -256,7 +255,7 @@ void PhononCalculator::calculateAnharmonicIFCs(ClusterSet& clst) {
 
 
 void PhononCalculator::readAnharmonicIFCs(const string& filename, ClusterSet& clst) {
-  _logger << "Reading anharmonic IFCs from file " << filename << "." << apl::endl;
+  _logger << "Reading anharmonic IFCs from file " << aurostd::CleanFileName(filename) << "." << apl::endl;
   int o = clst.order - 3;
   AnharmonicIFCs ifcs(filename, clst, DISTORTION_MAGNITUDE,
                       anharmonic_IFC_options, _logger, _aflowFlags);

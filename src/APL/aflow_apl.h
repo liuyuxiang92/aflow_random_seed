@@ -1603,14 +1603,14 @@ class TCONDCalculator {
                                                        vector<vector<vector<double> > >&);
     vector<vector<double> > getOccupationNumbers(double);
     vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
-    vector<vector<double> > getRates(const vector<vector<double> >&, vector<vector<vector<double> > >&);
+    vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<vector<double> > >&);
     double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
     void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
     vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
     xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
                               const vector<vector<xvector<double> > >&);
-    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<double> >&,
-                             const vector<vector<int> >&, vector<vector<xvector<double> > >&);
+    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<int> >&,
+                             const vector<vector<double> >&, vector<vector<xvector<double> > >&);
     void calculateDelta(int, int, const vector<vector<int> >&, const vector<vector<double> >&,
                         const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
     void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
@@ -1618,10 +1618,10 @@ class TCONDCalculator {
     void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
     void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
     void writeDataBlock(stringstream&, const vector<vector<double> >&);
-    void writeGroupVelocities();
-    void writePhaseSpace(const vector<vector<vector<vector<double> > > >&);
-    void writeGrueneisen(const vector<double>&, const vector<vector<double> >&);
-    void writeThermalConductivity();
+    void writeGroupVelocities(const string&);
+    void writePhaseSpace(const string&, const vector<vector<vector<vector<double> > > >&);
+    void writeGrueneisen(const string&, const vector<double>&, const vector<vector<double> >&);
+    void writeThermalConductivity(const string&);
 };
 
 }  // namespace apl

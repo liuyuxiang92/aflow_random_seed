@@ -169,9 +169,9 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
       throw xerror(function, message, _RUNTIME_ERROR_);
     }
   }
-  if (!pcell.pgroup_calculated) {
-    if (!SYM::CalculatePointGroup(FileDevNull, pcell, aflags,
-                                  false, false, dummy_os, pcell.sym_eps)) {
+  if (!pcell.pgroup_xtal_calculated) {
+    if (!SYM::CalculatePointGroupCrystal(FileDevNull, pcell, aflags,
+                                         false, false, dummy_os, pcell.sym_eps)) {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
       string message = "Could not calculate the point group of the primitive cell.";
       throw xerror(function, message, _RUNTIME_ERROR_);
@@ -180,7 +180,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
   FileDevNull.clear();
   FileDevNull.close();
 
-  if (SYM::PointGroupsIdentical(scell.pgroup, pcell.pgroup, scell.sym_eps, false)) {
+  if (SYM::PointGroupsIdentical(scell.pgroup_xtal, pcell.pgroup_xtal, scell.sym_eps, false)) {
     bool mapped;
     // Minimum distance for pcell is the same for scell and cheaper to compute
     pcell.dist_nn_min = SYM::minimumDistance(pcell.atoms, pcell.lattice);
@@ -210,11 +210,11 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
         if (!mapped) {
           string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
           string message = "At least one atom of the supercell could not be mapped.";
-          throw xerror(function, message, _RUNTIME_ERROR_);
           if (LDEBUG) {
             std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc;
             std::cerr << "using symmetry fgroup number " << fg << std::endl;
           }
+          throw xerror(function, message, _RUNTIME_ERROR_);
         }
       }
     }
@@ -237,8 +237,8 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
 double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
   bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_) || _DEBUG_AAPL_CLUSTERS_;
   if (cut_shell > 0) {
-    int countshell;
-    double shell_rad;
+    int countshell = 0;
+    double shell_rad = 0.0;
     double max_rad = 0.0;
     const double _DIST_TOL_ = 0.1;
     uint natoms = cell.atoms.size();
@@ -281,7 +281,7 @@ double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
 // Creates coordination shells around the atoms of the primitive cell.
 void ClusterSet::buildShells() {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
-  int at1sc;
+  int at1sc = 0;
   vector<int> shell;
   coordination_shells.clear();
   uint natoms_pcell = pcell.atoms.size();
@@ -438,7 +438,7 @@ vector<_cluster> ClusterSet::buildClusters() {
 void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
                                          vector<vector<int> > & ineq_clst) {
   _logger << "CLUSTER: Determining inequivalent clusters." << apl::endl;
-  int equivalent_clst;
+  int equivalent_clst = -1;
   vector<int> unique_atoms;
   vector<vector<int> > compositions;
   uint nspecies = scell.species.size();
@@ -497,7 +497,7 @@ int ClusterSet::getNumUniqueAtoms(const vector<int>& atoms) {
 // each other.
 vector<int> ClusterSet::getComposition(const vector<int>& atoms) {
   vector<int> composition(scell.species.size());
-  int type;
+  int type = -1;
   for (int at = 0; at < order; at++) {
     type = scell.atoms[atoms[at]].type;
     composition[type]++;
@@ -605,12 +605,10 @@ vector<int> ClusterSet::translateToPcell(const vector<int>& atoms, int at) {
 // in lexicographical order, which is done by xcombos.
 int ClusterSet::comparePermutations(const vector<int>& cluster_ineq,
                                     const vector<int>& cluster_compare) {
-  int index, iper;
-  uint depth, jump, jump_size, n;
-  index = iper = 0;
-  depth = jump = 0;
-  n = cluster_ineq.size();
-  jump_size = permutations.size()/n;
+  int index = 0, iper = 0;
+  uint depth = 0, jump = 0;
+  uint n = cluster_ineq.size();
+  uint jump_size = permutations.size()/n;
   while ((jump < n - depth) && (depth < n)) {
     if (atomsMatch(permutations[iper], cluster_compare, cluster_ineq, depth)) {
       index += jump_size * jump;
@@ -646,7 +644,7 @@ bool ClusterSet::atomsMatch(const vector<int>& permutation, const vector<int>& c
 // the inequivalent cluster into the equivalent cluster.
 void ClusterSet::getSymOp(_cluster& cluster, const vector<int>& atoms_orig) {
   vector<int> cluster_transformed(order), cluster_transl(order);
-  int perm_index;
+  int perm_index = -1;
   for (uint fg = 0; fg < pcell.fgroup.size(); fg++) {
     for (int at = 0; at < order; at++) {
       cluster_transformed[at] = symmetry_map[fg][atoms_orig[at]];
@@ -902,7 +900,7 @@ void ClusterSet::appendDistortion(_ineq_distortions& ineq_dists, vector<int> dis
 // lexicographical order, which is true when the clusters were created using
 // xcombos.
 bool ClusterSet::allZeroDistortions(const vector<int>& atoms, const vector<int>& dist) {
-  int atom, at_count;
+  int atom = 0, at_count = 0;
   uint natoms = atoms.size();
   for (uint at = 0; at < natoms; at++) {
     atom = atoms[at];
@@ -1038,7 +1036,7 @@ vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
     int at = pc2scMap[pcell.iatoms[iat][0]];
     vector<int> atoms(1, at);
     ineq_dists[iat].atoms = atoms; 
-    int cl;
+    int cl = 0;
     for (cl = 0; cl < (int) clusters.size(); cl++) {
       int a;
       for (a = 0; a < order; a++) {
@@ -1187,8 +1185,8 @@ vector<vector<int> > ClusterSet::getInvariantSymOps(const _cluster& ineq_clst) {
 vector<vector<double> > ClusterSet::buildCoefficientMatrix(const vector<vector<int> >& symops) {
   vector<vector<double> > coeff_mat;
   vector<double> row;
-  bool append;
-  int rw, cl, perm, fg, p;
+  bool append = true;
+  int rw = 0, cl = 0, perm = 0, fg = 0, p = 0;
   // Build Cartesian indices - faster and easier to read than running
   // an xcombo within an xcombo
   vector<vector<int> > cart_indices;
@@ -1236,8 +1234,8 @@ vector<vector<double> > ClusterSet::buildCoefficientMatrix(const vector<vector<i
 // Obtains the reduced row echelon form (RREF) of the coefficient matrix
 // using Gaussian elimination.
 vector<vector<double> > ClusterSet::getRREF(vector<vector<double> > mat) {
-  uint currentrow, nrows, ncols;
-  double swap;
+  uint currentrow = 0, nrows = 0, ncols = 0;
+  double swap = 0.0;
   nrows = mat.size();
   ncols = mat[0].size();
   currentrow = 0;
@@ -1603,10 +1601,10 @@ void ClusterSet::readClusterSetFromFile(const string& filename) {
 // post-processing parameters are changed.
 bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlines) {
   string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility";
-  string line;
+  string line = "";
   std::stringstream message;
   bool compatible = true;
-  int t;
+  int t = 0;
   vector<string> tokens;
   uint vsize = vlines.size();
 
@@ -1827,9 +1825,9 @@ bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlin
 void ClusterSet::readInequivalentClusters(uint& line_count,
                                           const vector<string>& vlines) {
   string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters";
-  string line, message;
+  string line = "", message = "";
   vector<string> tokens;
-  int t;
+  int t = 0;
   uint vsize = vlines.size();
 
   // Find inequivalent_clusters tag
@@ -1877,10 +1875,10 @@ void ClusterSet::readInequivalentClusters(uint& line_count,
 vector<_cluster> ClusterSet::readClusters(uint& line_count,
                                           const vector<string>& vlines) {
   string function = "readClusters";
-  string message, line;
+  string message = "", line = "";
   vector<_cluster> clusters;
   vector<string> tokens;
-  int t;
+  int t = 0;
   uint vsize = vlines.size();
 
   while (line.find("/clusters") == string::npos) {
@@ -1928,10 +1926,10 @@ vector<_cluster> ClusterSet::readClusters(uint& line_count,
 _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
                                                        const vector<string>& vlines) {
   string function = "readLinearCombinations";
-  string message, line;
+  string message = "", line = "";
   _linearCombinations lcombs;
   vector<string> tokens;
-  int t;
+  int t = 0;
   uint vsize = vlines.size();
 
   while (line.find("/linear_combinations") == string::npos) {
@@ -2025,7 +2023,7 @@ _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
 void ClusterSet::readInequivalentDistortions(uint& line_count,
                                              const vector<string>& vlines) {
   string function = "readInequivalentDistortions";
-  string line, message;
+  string line = "", message = "";
   uint vsize = vlines.size();
 
   while (line.find("/inequivalent_distortions") == string::npos) {
@@ -2043,10 +2041,10 @@ void ClusterSet::readInequivalentDistortions(uint& line_count,
 
 _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string>& vlines) {
   string function = "readIneqDist";
-  string line, message;
+  string line = "", message = "";
   uint vsize = vlines.size();
   vector<string> tokens;
-  int t;
+  int t = 0;
 
   _ineq_distortions idist;
   while (line.find("/ineq_dist") == string::npos) {
@@ -2168,7 +2166,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
 void ClusterSet::readHigherOrderDistortions(uint& line_count,
                                             const vector<string>& vlines) {
   string function = "readHigherOrderDistortions";
-  string line, message;
+  string line = "", message = "";
   uint vsize = vlines.size();
 
   while (line.find("/higher_order_distortions") == string::npos) {

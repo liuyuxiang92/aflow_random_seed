@@ -52,42 +52,6 @@ bool relaxStructureAPL_VASP(int start_relax,
                              ofstream& fileMessage) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   ostringstream aus;
-  // Store original settings
-  string prec = vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme;
-  bool prec_entry = vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry;
-  string kppra = vflags.KBIN_VASP_KPOINTS_KPPRA.xscheme;
-  bool kppra_entry = vflags.KBIN_VASP_KPOINTS_KPPRA.isentry;
-  string kscheme = vflags.KBIN_VASP_KPOINTS_KSCHEME.xscheme;
-  bool kscheme_entry = vflags.KBIN_VASP_KPOINTS_KSCHEME.isentry;
-  string kpoints = vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.xscheme;
-  bool kpoints_entry = vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.isentry;
-
-  // Change to phonon settings
-  string prec_phonons = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC");
-  vflags.KBIN_VASP_FORCE_OPTION_PREC.pop(prec);
-  vflags.KBIN_VASP_FORCE_OPTION_PREC.push(prec_phonons);
-  vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry = true;
-
-  string kppra_phonons = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPPRA");
-  if (!kppra_phonons.empty()) {
-    vflags.KBIN_VASP_KPOINTS_KPPRA.pop(kppra);
-    vflags.KBIN_VASP_KPOINTS_KPPRA.push(kppra_phonons);
-    vflags.KBIN_VASP_KPOINTS_KPPRA.isentry = true;
-  }
-
-  string kscheme_phonons = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KSCHEME");
-  if (!kscheme_phonons.empty()) {
-    vflags.KBIN_VASP_KPOINTS_KSCHEME.pop(kscheme);
-    vflags.KBIN_VASP_KPOINTS_KSCHEME.push(kscheme_phonons);
-    vflags.KBIN_VASP_KPOINTS_KSCHEME.isentry = true;
-  }
-
-  string kpoints_phonons = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_KPOINTS");
-  if (!kpoints_phonons.empty()) {
-    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.pop(kpoints);
-    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.push(kpoints_phonons);
-    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.isentry = true;
-  }
   
   bool Krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, fileMessage, aflags, kflags, vflags);
   Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
@@ -104,10 +68,10 @@ bool relaxStructureAPL_VASP(int start_relax,
       } else { 
         Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
       }
-      }
-      if (Krun && (i == _NUM_RELAX_)) {
-        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
-      }
+    }
+    if (Krun && (i == _NUM_RELAX_)) {
+      aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+    }
   }
 
   // Update structure - do not set xvasp.str = str_fin or all other
@@ -125,18 +89,14 @@ bool relaxStructureAPL_VASP(int start_relax,
   str_fin.species_pp_ZVAL = xvasp.str.species_pp_ZVAL; // ME190109
   str_fin.species_pp_vLDAU = xvasp.str.species_pp_vLDAU; // ME190109
 
-//[ME190109] Can't just set the updated positions because the symmetry may have changed
-//[ME190109]  xvasp.str.lattice = str_fin.lattice;
-//[ME190109]  for (uint i = 0; i < xvasp.str.atoms.size(); i++) {
-//[ME190109]    xvasp.str.atoms[i].cpos = str_fin.atoms[i].cpos;
-//[ME190109]    xvasp.str.atoms[i].fpos = str_fin.atoms[i].fpos;
-//[ME190109]  }
-
   xvasp.str = str_fin; // ME190109
   if(LDEBUG){std::cout << xvasp.str << std::endl;} // ME190308
   pflow::fixEmptyAtomNames(xvasp.str,true);  // ME190308
 
   // Safeguard for when CONVERT is set in the aflow.in file
+  // CONVERT_UNIT_CELL may shift the origin, so not doing it here
+  // would lead to inconsistencies when between the supercell creation
+  // and the APL/AAPL analysis
   if (!vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") &&
       !vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme.empty()) { // ME190109
     xvasp.str.Standard_Lattice_primitive = false;
@@ -144,28 +104,6 @@ bool relaxStructureAPL_VASP(int start_relax,
     VASP_Convert_Unit_Cell(xvasp, vflags, aflags, fileMessage, aus);
   }
 
-  // Restore original settings
-  vflags.KBIN_VASP_FORCE_OPTION_PREC.pop(prec_phonons);
-  vflags.KBIN_VASP_FORCE_OPTION_PREC.push(prec);
-  vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.isentry = prec_entry;
-
-  if (!kppra_phonons.empty()) {
-    vflags.KBIN_VASP_KPOINTS_KPPRA.pop(kppra_phonons);
-    vflags.KBIN_VASP_KPOINTS_KPPRA.push(kppra);
-    vflags.KBIN_VASP_KPOINTS_KPPRA.isentry = kppra_entry;
-  }
-
-  if (!kscheme_phonons.empty()) {
-    vflags.KBIN_VASP_KPOINTS_KSCHEME.pop(kscheme_phonons);
-    vflags.KBIN_VASP_KPOINTS_KSCHEME.push(kscheme);
-    vflags.KBIN_VASP_KPOINTS_KSCHEME.isentry = kscheme_entry;
-  }
-
-  if (!kpoints_phonons.empty()) {
-    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.pop(kpoints_phonons);
-    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.push(kpoints);
-    vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.isentry = kpoints_entry;
-  }
   return Krun;
 }
 

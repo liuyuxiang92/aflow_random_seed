@@ -167,7 +167,7 @@ vector<vector<xvector<double> > > AnharmonicIFCs::getForces(int id, int& idxRun,
   }
   vector<vector<xvector<double> > > force_tensor(ndist, vector<xvector<double> >(natoms, xvector<double>(3)));
 
-  int attrans, fg, index;
+  int attrans = 0, fg = 0, index = 0;
   for (uint ineq = 0; ineq < ineq_dists.distortions.size(); ineq++) {
     // For the inequivalent distortion, just read the forces from VASP 
     const vector<xvector<double> >& qmforces = xInp[idxRun].getXStr().qm_forces;
@@ -219,7 +219,7 @@ void AnharmonicIFCs::addHigherOrderForces(vector<vector<vector<xvector<double> >
       const vector<xvector<double> >& qmforces = xInp[idxRun].getXStr().qm_forces;
       int d = ineq_dists[ineq].distortions[dist][0][0];
       force_tensor[idist][ndist + d][at] = qmforces[at];
-      int fg;
+      int fg = 0;
       for (uint i = 1; i < ineq_dists[ineq].distortions[dist].size(); i++) {
         d = ineq_dists[ineq].distortions[dist][i][0];
         fg = ineq_dists[ineq].rotations[dist][i];
@@ -255,7 +255,7 @@ vector<vector<double> >
     AnharmonicIFCs::calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>& idist,
                                                const vector<vector<vector<xvector<double> > > >& forces) {
   vector<vector<double> > ifcs(clst.clusters.size(), vector<double>(cart_indices.size()));
-  int at, cl, ic;
+  int at = 0, cl = 0, ic = 0;
   double denom = std::pow(distortion_magnitude, order - 1);
   for (uint f = 0; f < forces.size(); f++) {
     for (uint c = 0; c < idist[f].clusters.size(); c++) {
@@ -294,7 +294,7 @@ double AnharmonicIFCs::finiteDifference(const vector<vector<xvector<double> > >&
   }
 
   vector<int> derivatives;
-  int count;
+  int count = 0;
   for (uint a = 0; a < atoms.size(); a++) {
     count = 1;
     while (((int) a + count < order - 1) &&
@@ -324,8 +324,8 @@ double AnharmonicIFCs::finiteDifference(const vector<vector<xvector<double> > >&
     uint nder = derivatives.size();
     vector<int> index(nder);
     xcombos ind(3, nder, 'E', true);
-    double coeff;
-    int d, dist;
+    double coeff = 0.0;
+    int d = 0, dist = 0;
     while (ind.increment()) {
       coeff = 1.0;
       index = ind.getCombo();
@@ -382,7 +382,7 @@ vector<vector<double> > AnharmonicIFCs::symmetrizeIFCs(vector<vector<double> > i
 
   // Do iterations
   int num_iter = 0;
-  double max_err;
+  double max_err = 0.0;
   _logger << "Begin SCF for anharmonic force constants." << apl::endl;
   std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
   std::cout << std::setw(15) << "Iteration";
@@ -479,7 +479,7 @@ void AnharmonicIFCs::getTensorTransformations(v4int& eq_ifcs,
     for (uint c = 1; c < clst.ineq_clusters[ineq].size(); c++) {
       tform trf;
       _cluster cluster_trans = clst.getCluster(clst.ineq_clusters[ineq][c]);
-      int fg, perm, rw, cl, p;
+      int fg = 0, perm = 0, rw = 0, cl = 0, p = 0;
       vector<int> atoms_trans = cluster_trans.atoms;
       atoms_trans[0] = clst.sc2pcMap[atoms_trans[0]];  // transfer to pcell
       fg = cluster_trans.fgroup;
@@ -522,7 +522,7 @@ void AnharmonicIFCs::getTensorTransformations(v4int& eq_ifcs,
 // Sets the lineraly dependent IFCs according to the obtained linear
 // combinations.
 void AnharmonicIFCs::applyLinCombs(vector<vector<double> >& ifcs) {
-  int c, cart_ind, cart_ind_indep;
+  int c = 0, cart_ind = 0, cart_ind_indep = 0;
   for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
     c = clst.ineq_clusters[ineq][0];
     _linearCombinations lcomb = clst.linear_combinations[ineq];
@@ -545,8 +545,8 @@ void AnharmonicIFCs::applyLinCombs(vector<vector<double> >& ifcs) {
 // See the top of this file for the typedef of tform.
 void AnharmonicIFCs::transformIFCs(const vector<vector<tform> >& transformations,
                                    vector<vector<double> >& ifcs) {
-  int clst_orig, clst_trans, cart_indices_orig;
-  double coeff;
+  int clst_orig = 0, clst_trans = 0, cart_indices_orig = 0;
+  double coeff = 0.0;
   for (uint ineq = 0; ineq < clst.ineq_clusters.size(); ineq++) {
     clst_orig = clst.ineq_clusters[ineq][0];
     for (uint c = 1; c < clst.ineq_clusters[ineq].size(); c++) {
@@ -610,7 +610,7 @@ void AnharmonicIFCs::correctIFCs(vector<vector<double> >& ifcs,
     const _linearCombinations& lcomb = clst.linear_combinations[ineq];
     const vector<int>& indep = lcomb.independent;
     for (uint i = 0; i < indep.size(); i++) {
-      int neq = 0, cl;
+      int neq = 0, cl = 0;
       double corrected_ifc = 0.0;
       for (uint c = 0; c < nclusters; c++) {
         cl = clst.ineq_clusters[ineq][c];
@@ -662,7 +662,7 @@ vector<double>
 uint AnharmonicIFCs::findReducedCluster(const vector<vector<int> >& reduced_clusters,
                                         const vector<int>& atoms) {
   for (uint r = 0; r < reduced_clusters.size(); r++) {
-    int at;
+    int at = 0;
     for (at = 0; at < order - 1; at++) {
       if (reduced_clusters[r][at] != atoms[at]) break;
     }
@@ -872,10 +872,10 @@ void AnharmonicIFCs::readIFCsFromFile(const string& filename) {
 bool AnharmonicIFCs::checkCompatibility(uint& line_count, 
                                         const vector<string>& vlines) {
   string function = _AAPL_IFCS_ERR_PREFIX_ + "checkCompatibility";
-  string line;
+  string line = "";
   stringstream message;
   bool compatible = true;
-  int t;
+  int t = 0;
   vector<string> tokens;
   uint vsize = vlines.size();
 
@@ -1165,10 +1165,10 @@ bool AnharmonicIFCs::checkCompatibility(uint& line_count,
 vector<vector<double> > AnharmonicIFCs::readIFCs(uint& line_count,
                                                  const vector<string>& vlines) {
   string function = _AAPL_IFCS_ERR_PREFIX_ + "readIFCs";
-  string line, message;
+  string line = "", message = "";
   vector<int> atoms(order), slice(order - 2);
   vector<string> tokens;
-  int t;
+  int t = 0;
   uint vsize = vlines.size();
   vector<vector<double> > ifcs;
 
