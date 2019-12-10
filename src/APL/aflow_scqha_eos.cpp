@@ -517,7 +517,7 @@ namespace apl
               //throw APLRuntimeError("Frequency too small at " + aurostd::utype2string<double>(temperature) + " K");
               string function = "SCQHAEOS::sccycle()";
               string message = "Frequency too small at " + aurostd::utype2string<double>(temperature) + " K";
-              throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
 	    }
 	    double F_ph_i=free_energy(omega_T[i][j][k],temperature);
 	    double U_ph_i=internal_energy(omega_T[i][j][k],temperature);
@@ -636,7 +636,7 @@ namespace apl
       //throw apl::APLRuntimeError("Cannot open output aflow.scqha.iter.out file.");
       string function = "SCQHAEOS::sccycle()";
       string message = "Cannot open output " + filename;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
 
@@ -647,7 +647,7 @@ namespace apl
       //throw apl::APLRuntimeError("Cannot open output aflow.scqha.thermo.out file.");
       string function = "SCQHAEOS::sccycle()";
       string message = "Cannot open output " + filename;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     filename = "aflow.scqha.pressure.out";
@@ -657,7 +657,7 @@ namespace apl
       //throw apl::APLRuntimeError("Cannot open output aflow.scqha.pressure.out file.");
       string function = "SCQHAEOS::sccycle()";
       string message = "Cannot open output " + filename;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     //calculating total enthalpy
@@ -704,7 +704,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.scqha.enthalpy.out");
       string function = "SCQHAEOS::total_enthalpy()";
       string message = "Cannot write" + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();
@@ -722,7 +722,7 @@ namespace apl
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for U_vib(T)");
       string function = "SCQHAEOS::internal_energy()";
       string message = "Frequency too small (<0.001 THz) for U_vib(T)";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     double betaa=47.9924*omeg/temp;
@@ -755,7 +755,7 @@ namespace apl
         //throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
         string function = "SCQHAEOS::free_energy()";
         string message = "Frequency too small (<0.001 THz) for F_vib(T)";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
     double betaa=47.9924*omeg/temp;
@@ -774,7 +774,7 @@ namespace apl
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for S_vib(T)");
       string function = "SCQHAEOS::entropy()";
       string message = "Frequency too small (<0.001 THz) for S_vib(T)";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     double  betaa=47.9924*omeg/temp;
     double  S=4.14129*omeg/temp/(exp(betaa)-1.0)-0.0861733* log(1.0-exp(-1.0*betaa));
@@ -793,7 +793,7 @@ namespace apl
         //throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
         string function = "SCQHAEOS::heat_capacity()";
         string message = "Frequency too small (<0.001 THz) for Cv(T)";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
     double betaa=47.9924*omeg/temp;
@@ -848,7 +848,7 @@ namespace apl
       //throw apl::APLRuntimeError("Cannot open aflow.mesh.taylor_cofficients.out file.");
       string function = "SCQHAEOS::print_freq_taylor_coefficients()";
       string message = "Cannot open " + filename + " file.";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
   }
   // ***************************************************************************************

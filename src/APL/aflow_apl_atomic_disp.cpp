@@ -296,7 +296,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.apl.displacements.out");
       string function = "AtomicDisplacements::thermal_displacements()";
       string message = "Cannot write " + outfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_disp);
   }
@@ -447,7 +447,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.apl.projected_displacements.out");
       string function = "AtomicDisplacements::projected_displacements()";
       string message = "Cannot write " + outfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_disp);
   }
@@ -498,7 +498,7 @@ namespace apl
         //throw APLRuntimeError("aflow.apl.normal_mode_direction.axsf unable to open");
         string function = "AtomicDisplacements::write_normal_mode_direction()";
         string message = "aflow.apl.normal_mode_direction.axsf unable to open";
-        throw aurostd::xerror(function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
     ofs_anime.setf(std::ios::scientific);
 

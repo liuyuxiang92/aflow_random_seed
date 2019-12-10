@@ -277,7 +277,7 @@ apl_block<T> *MVops::apl_block_alloc(const size_t n) {
     //throw APLRuntimeError("block length n must be positive integer");
     string function = "MVops::apl_block_alloc()";
     string message = "block length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   b = (apl_block<T> *)malloc(sizeof(apl_block<T>));
@@ -290,7 +290,7 @@ apl_block<T> *MVops::apl_block_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for block struct");
     string function = "MVops::apl_block_alloc()";
     string message = "failed to allocate space for block struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   b->data = (T *)calloc(1, MULTIPLICITY * n * sizeof(T));
@@ -434,7 +434,7 @@ void md_lsquares::birch_murnaghan_fit() {
     //throw APLRuntimeError("Unable to allocate memory.");
     string function = "md_lsquares::birch_murnaghan_fit()";
     string message = "Unable to allocate memory";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -562,7 +562,7 @@ void md_lsquares::birch_murnaghan_4th_order_fit(const xvector<double> &user_gues
     //throw APLRuntimeError("Unable to allocate memory.");
     string function = "md_lsquares::birch_murnaghan_4th_order_fit()";
     string message = "Unable to allocate memory";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -693,7 +693,7 @@ void md_lsquares::birch_murnaghan_3rd_order_fit(const xvector<double> &user_gues
     //throw APLRuntimeError("Unable to allocate memory.");
     string function = "md_lsquares::birch_murnaghan_3rd_order_fit()";
     string message = "Unable to allocate memory";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
   struct data d = {n, y, sigma, xdata};
   apl_multifit_function_fdf f;
@@ -803,7 +803,7 @@ apl_vector<T> *MVops::apl_vector_alloc(const size_t n) {
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_alloc()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   v = (apl_vector<T> *)malloc(sizeof(apl_vector<T>));
@@ -816,7 +816,7 @@ apl_vector<T> *MVops::apl_vector_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for vector struct");
     string function = "MVops::apl_vector_alloc()";
     string message = "failed to allocate space for vector struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   block = apl_block_alloc<T>(n);
@@ -831,7 +831,7 @@ apl_vector<T> *MVops::apl_vector_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for block");
     string function = "MVops::apl_vector_alloc()";
     string message = "failed to allocate space for block";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   v->data = block->data;
@@ -891,7 +891,7 @@ inline void MVops::apl_vector_set(apl_vector<T> *v, const size_t i, T x) {
     //throw APLRuntimeError("index out of range");
     string function = "MVops::apl_vector_set()";
     string message = "index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   v->data[i * v->stride] = x;
@@ -908,7 +908,7 @@ inline T MVops::apl_vector_get(const apl_vector<T> *v, const size_t i) {
     //throw APLRuntimeError("index out of range");
     string function = "MVops::apl_vector_get()";
     string message = "index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return v->data[i * v->stride];
@@ -927,7 +927,7 @@ apl_vector_view<T> MVops::apl_vector_subvector(apl_vector<T> *v, size_t offset, 
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_subvector()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   if (offset + (n - 1) >= v->size) {
@@ -938,7 +938,7 @@ apl_vector_view<T> MVops::apl_vector_subvector(apl_vector<T> *v, size_t offset, 
     //throw APLRuntimeError("view would extend past end of vector");
     string function = "MVops::apl_vector_subvector()";
     string message = "view would extend past end of vector";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -969,7 +969,7 @@ const apl_vector_view<T> MVops::apl_vector_const_subvector(const apl_vector<T> *
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_const_subvector()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   if (offset + (n - 1) >= v->size) {
@@ -980,7 +980,7 @@ const apl_vector_view<T> MVops::apl_vector_const_subvector(const apl_vector<T> *
     //throw APLRuntimeError("view would extend past end of vector");
     string function = "MVops::apl_vector_const_subvector()";
     string message = "view would extend past end of vector";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1024,7 +1024,7 @@ int MVops::apl_vector_div(apl_vector<T> *a, const apl_vector<T> *b) {
     //throw APLRuntimeError("vectors must have same length");
     string function = "MVops::apl_vector_div()";
     string message = "vectors must have same length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     const size_t stride_a = a->stride;
     const size_t stride_b = b->stride;
@@ -1069,7 +1069,7 @@ int MVops::apl_vector_memcpy(apl_vector<T> *dest,
     //throw APLRuntimeError("vector lengths are not equal");
     string function = "MVops::apl_vector_memcpy()";
     string message = "vector lengths are not equal";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   {
@@ -1105,7 +1105,7 @@ int MVops::apl_vector_swap_elements(apl_vector<T> *v, const size_t i, const size
     //throw APLRuntimeError("first index is out of range");
     string function = "MVops::apl_vector_swap_elements()";
     string message = "first index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (j >= size) {
@@ -1116,7 +1116,7 @@ int MVops::apl_vector_swap_elements(apl_vector<T> *v, const size_t i, const size
     //throw APLRuntimeError("second index is out of range");
     string function = "MVops::apl_vector_swap_elements()";
     string message = "second index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (i != j) {
@@ -1147,7 +1147,7 @@ MVops::apl_vector_view_array(T *base, size_t n) {
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_view_array()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   {
@@ -1194,7 +1194,7 @@ MVops::apl_matrix_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("matrix dimension n1 must be positive integer");
     string function = "MVops::apl_matrix_alloc()";
     string message = "matrix dimension n1 must be positive integer.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   } else if (n2 == 0) {
     // ME190726 - exit clean-up
     //cerr << "matrix dimension n2 must be positive integer" << std::endl;
@@ -1203,7 +1203,7 @@ MVops::apl_matrix_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("matrix dimension n2 must be positive integer");
     string function = "MVops::apl_matrix_alloc()";
     string message = "matrix dimension n2 must be positive integer.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   m = (apl_matrix<T> *)malloc(sizeof(apl_matrix<T>));
@@ -1216,7 +1216,7 @@ MVops::apl_matrix_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("failed to allocate space for matrix struct");
     string function = "MVops::apl_matrix_alloc()";
     string message = "failed to allocate space for matrix struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   // FIXME: n1*n2 could overflow for large dimensions //
@@ -1231,7 +1231,7 @@ MVops::apl_matrix_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("failed to allocate space for block");
     string function = "MVops::apl_matrix_alloc()";
     string message = "failed to allocate space for block";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   m->data = block->data;
@@ -1266,7 +1266,7 @@ MVops::apl_matrix_get(const apl_matrix<T> *m, const size_t i, const size_t j) {
     //throw APLRuntimeError("first index out of range");
     string function = "MVops::apl_matrix_get()";
     string message = "first index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j >= m->size2) {
     // ME190726 - exit clean-up
     //cerr << "second index out of range" << std::endl;
@@ -1275,7 +1275,7 @@ MVops::apl_matrix_get(const apl_matrix<T> *m, const size_t i, const size_t j) {
     //throw APLRuntimeError("second index out of range");
     string function = "MVops::apl_matrix_get()";
     string message = "second index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
   return m->data[i * m->tda + j];
 }
@@ -1291,7 +1291,7 @@ MVops::apl_matrix_set(apl_matrix<T> *m, const size_t i, const size_t j, const T 
     //throw APLRuntimeError("first index out of range");
     string function = "MVops::apl_matrix_set()";
     string message = "first index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j >= m->size2) {
     // ME190726 - exit clean-up
     //cerr << "second index out of range" << std::endl;
@@ -1300,7 +1300,7 @@ MVops::apl_matrix_set(apl_matrix<T> *m, const size_t i, const size_t j, const T 
     //throw APLRuntimeError("first index out of range");
     string function = "MVops::apl_matrix_set()";
     string message = "second index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
   m->data[i * m->tda + j] = x;
 }
@@ -1322,7 +1322,7 @@ int MVops::apl_matrix_memcpy(apl_matrix<T> *dest,
     //throw APLRuntimeError("matrix sizes are different");
     string function = "MVops::apl_matrix_memcpy()";
     string message = "matrix sizes are different";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   {
@@ -1355,7 +1355,7 @@ MVops::apl_matrix_const_row(const apl_matrix<T> *m, const size_t i) {
     //throw APLRuntimeError("row index is out of range");
     string function = "MVops::apl_matrix_const_row()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1387,7 +1387,7 @@ MVops::apl_matrix_row(apl_matrix<T> *m, const size_t i) {
     //throw APLRuntimeError("row index is out of range");
     string function = "MVops::apl_matrix_row()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1419,7 +1419,7 @@ MVops::apl_matrix_column(apl_matrix<T> *m, const size_t j) {
     //throw APLRuntimeError("column index is out of range");
     string function = "MVops::apl_matrix_column()";
     string message = "column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1451,7 +1451,7 @@ MVops::apl_matrix_const_column(const apl_matrix<T> *m, const size_t j) {
     //throw APLRuntimeError("column index is out of range");
     string function = "MVops::apl_matrix_column()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1485,7 +1485,7 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
     //throw APLRuntimeError("row index is out of range");
     string function = "MVops::apl_matrix_submatrix()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j >= m->size2) {
     // ME190726 - exit clean-up
     //cerr << "column index is out of range" << std::endl;
@@ -1494,7 +1494,7 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
     //throw APLRuntimeError("column index is out of range");
     string function = "MVops::apl_matrix_submatrix()";
     string message = "column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (n1 == 0) {
     // ME190726 - exit clean-up
     //cerr << "first dimension must be non-zero" << std::endl;
@@ -1503,7 +1503,7 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
     //throw APLRuntimeError("first dimension must be non-zero");
     string function = "MVops::apl_matrix_submatrix()";
     string message = "first dimension must be non-zero";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   } else if (n2 == 0) {
     // ME190726 - exit clean-up
     //cerr << "second dimension must be non-zero" << std::endl;
@@ -1512,7 +1512,7 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
     //throw APLRuntimeError("second dimension must be non-zero");
     string function = "MVops::apl_matrix_submatrix()";
     string message = "second dimension must be non-zero";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   } else if (i + n1 > m->size1) {
     // ME190726 - exit clean-up
     //cerr << "first dimension overflows matrix" << std::endl;
@@ -1521,7 +1521,7 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
     //throw APLRuntimeError("first dimension overflows matrix");
     string function = "MVops::apl_matrix_submatrix()";
     string message = "first dimension overflows matrix";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j + n2 > m->size2) {
     // ME190726 - exit clean-up
     //cerr << "second dimension overflows matrix" << std::endl;
@@ -1530,7 +1530,7 @@ MVops::apl_matrix_submatrix(apl_matrix<T> *m,
     //throw APLRuntimeError("second dimension overflows matrix");
     string function = "MVops::apl_matrix_submatrix()";
     string message = "second dimension overflows matrix";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1581,7 +1581,7 @@ int MVops::apl_matrix_swap_columns(apl_matrix<T> *m,
     //throw APLRuntimeError("first column index is out of range");
     string function = "MVops::apl_matrix_swap_columns()";
     string message = "first column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (j >= size2) {
@@ -1592,7 +1592,7 @@ int MVops::apl_matrix_swap_columns(apl_matrix<T> *m,
     //throw APLRuntimeError("second column index is out of range");
     string function = "MVops::apl_matrix_swap_columns()";
     string message = "second column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (i != j) {
@@ -1702,7 +1702,7 @@ apl_block_complex<T> *MVops::apl_block_complex_alloc(const size_t n) {
     //throw APLRuntimeError("block length n must be positive integer");
     string function = "MVops::apl_block_complex_alloc()";
     string message = "block length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   b = (apl_block_complex<T> *)malloc(sizeof(apl_block_complex<T>));
@@ -1715,7 +1715,7 @@ apl_block_complex<T> *MVops::apl_block_complex_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for block struct");
     string function = "MVops::apl_block_complex_alloc()";
     string message = "failed to allocate space for block struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   b->data = (T *)calloc(1, MULTIPLICITY * n * sizeof(T));
@@ -1745,7 +1745,7 @@ apl_vector_complex<T> *MVops::apl_vector_complex_alloc(const size_t n) {
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_complex_alloc()";
     string message = "block length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   v = (apl_vector_complex<T> *)malloc(sizeof(apl_vector_complex<T>));
@@ -1758,7 +1758,7 @@ apl_vector_complex<T> *MVops::apl_vector_complex_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for vector struct");
     string function = "MVops::apl_vector_complex_alloc()";
     string message = "failed to allocate space vector struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   block = apl_block_complex_alloc<T>(n);
@@ -1773,7 +1773,7 @@ apl_vector_complex<T> *MVops::apl_vector_complex_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for block");
     string function = "MVops::apl_vector_complex_alloc()";
     string message = "failed to allocate space for block";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   v->data = block->data;
@@ -1834,7 +1834,7 @@ inline void MVops::apl_vector_complex_set(apl_vector_complex<T> *v, const size_t
     //throw APLRuntimeError("index out of range");
     string function = "MVops::apl_vector_complex_set()";
     string message = "index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   *APL_MV_COMPLEX_AT(v, i) = z;
@@ -1851,7 +1851,7 @@ inline apl_complex<T> MVops::apl_vector_complex_get(const apl_vector_complex<T> 
     //throw APLRuntimeError("index out of range");
     string function = "MVops::apl_vector_complex_get()";
     string message = "index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return *APL_MV_COMPLEX_AT(v, i);
@@ -1870,7 +1870,7 @@ apl_vector_complex_view<T> MVops::apl_vector_complex_subvector(apl_vector_comple
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_complex_subvector()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   if (offset + (n - 1) >= v->size) {
@@ -1881,7 +1881,7 @@ apl_vector_complex_view<T> MVops::apl_vector_complex_subvector(apl_vector_comple
     //throw APLRuntimeError("view would extend past end of vector");
     string function = "MVops::apl_vector_complex_subvector()";
     string message = "view would extend past end of vector";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1912,7 +1912,7 @@ const apl_vector_complex_view<T> MVops::apl_vector_complex_const_subvector(const
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_complex_const_subvector()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   if (offset + (n - 1) >= v->size) {
@@ -1923,7 +1923,7 @@ const apl_vector_complex_view<T> MVops::apl_vector_complex_const_subvector(const
     //throw APLRuntimeError("view would extend past end of vector");
     string function = "MVops::apl_vector_complex_const_subvector()";
     string message = "view would extend past end of vector";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -1974,7 +1974,7 @@ int MVops::apl_vector_complex_div(apl_vector_complex<T> *a, const apl_vector_com
     //throw APLRuntimeError("vectors must have same length");
     string function = "MVops::apl_vector_complex_div()";
     string message = "vectors must have same length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     const size_t stride_a = a->stride;
     const size_t stride_b = b->stride;
@@ -2031,7 +2031,7 @@ int MVops::apl_vector_complex_memcpy(apl_vector_complex<T> *dest,
     //throw APLRuntimeError("vector lengths are not equal");
     string function = "MVops::apl_vector_complex_memcpy()";
     string message = "vectors lengths are not equal";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   {
@@ -2067,7 +2067,7 @@ int MVops::apl_vector_complex_swap_elements(apl_vector_complex<T> *v, const size
     //throw APLRuntimeError("first index is out of range");
     string function = "MVops::apl_vector_complex_swap_elements()";
     string message = "first index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (j >= size) {
@@ -2078,7 +2078,7 @@ int MVops::apl_vector_complex_swap_elements(apl_vector_complex<T> *v, const size
     //throw APLRuntimeError("Second index is out of range");
     string function = "MVops::apl_vector_complex_swap_elements()";
     string message = "second index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (i != j) {
@@ -2109,7 +2109,7 @@ MVops::apl_vector_complex_view_array(T *base, size_t n) {
     //throw APLRuntimeError("vector length n must be positive integer");
     string function = "MVops::apl_vector_complex_view_array()";
     string message = "vector length n must be positive integer";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -2156,7 +2156,7 @@ MVops::apl_matrix_complex_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("matrix dimension n1 must be positive integer");
     string function = "MVops::apl_matrix_complex_alloc()";
     string message = "matrix dimension n1 must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   } else if (n2 == 0) {
     // ME190726 - exit clean-up
     //cerr << "matrix dimension n2 must be positive integer" << std::endl;
@@ -2165,7 +2165,7 @@ MVops::apl_matrix_complex_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("matrix dimension n2 must be positive integer");
     string function = "MVops::apl_matrix_complex_alloc()";
     string message = "matrix dimension n2 must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   m = (apl_matrix_complex<T> *)malloc(sizeof(apl_matrix_complex<T>));
@@ -2178,7 +2178,7 @@ MVops::apl_matrix_complex_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("failed to allocate space for matrix struct");
     string function = "MVops::apl_matrix_complex_alloc()";
     string message = "failed to allocate space for matrix struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   // FIXME: n1*n2 could overflow for large dimensions //
@@ -2193,7 +2193,7 @@ MVops::apl_matrix_complex_alloc(const size_t n1, const size_t n2) {
     //throw APLRuntimeError("failed to allocate space for block");
     string function = "MVops::apl_matrix_complex_alloc()";
     string message = "failed to allocate space for block";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   m->data = block->data;
@@ -2228,7 +2228,7 @@ MVops::apl_matrix_complex_get(const apl_matrix_complex<T> *m, const size_t i, co
     //throw APLRuntimeError("first index out of range");
     string function = "MVops::apl_matrix_complex_get()";
     string message = "first index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j >= m->size2) {
     // ME190726 - exit clean-up
     //cerr << "second index out of range" << std::endl;
@@ -2237,7 +2237,7 @@ MVops::apl_matrix_complex_get(const apl_matrix_complex<T> *m, const size_t i, co
     //throw APLRuntimeError("second index out of range");
     string function = "MVops::apl_matrix_complex_get()";
     string message = "second index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
   return *(apl_complex<T> *)(m->data + 2 * (i * m->tda + j));
 }
@@ -2253,7 +2253,7 @@ MVops::apl_matrix_complex_set(apl_matrix_complex<T> *m, const size_t i, const si
     //throw APLRuntimeError("first index out of range");
     string function = "MVops::apl_matrix_complex_set()";
     string message = "first index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j >= m->size2) {
     // ME190726 - exit clean-up
     //cerr << "second index out of range" << std::endl;
@@ -2262,7 +2262,7 @@ MVops::apl_matrix_complex_set(apl_matrix_complex<T> *m, const size_t i, const si
     //throw APLRuntimeError("second index out of range");
     string function = "MVops::apl_matrix_complex_set()";
     string message = "second index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
   *(apl_complex<T> *)(m->data + 2 * (i * m->tda + j)) = x;
 }
@@ -2284,7 +2284,7 @@ int MVops::apl_matrix_complex_memcpy(apl_matrix_complex<T> *dest,
     //throw APLRuntimeError("matrix sizes are different");
     string function = "MVops::apl_matrix_complex_memcpy()";
     string message = "matrix sizes are different";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   {
@@ -2317,7 +2317,7 @@ MVops::apl_matrix_complex_const_row(const apl_matrix_complex<T> *m, const size_t
     //throw APLRuntimeError("row index out of range");
     string function = "MVops::apl_matrix_complex_const_row()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -2349,7 +2349,7 @@ MVops::apl_matrix_complex_row(apl_matrix_complex<T> *m, const size_t i) {
     //throw APLRuntimeError("first index out of range");
     string function = "MVops::apl_matrix_complex_row()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -2381,7 +2381,7 @@ MVops::apl_matrix_complex_column(apl_matrix_complex<T> *m, const size_t j) {
     //throw APLRuntimeError("column index out of range");
     string function = "MVops::apl_matrix_complex_column()";
     string message = "column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -2413,7 +2413,7 @@ MVops::apl_matrix_complex_const_column(const apl_matrix_complex<T> *m, const siz
     //throw APLRuntimeError("column index out of range");
     string function = "MVops::apl_matrix_complex_const_column()";
     string message = "column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -2447,7 +2447,7 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("row index out of range");
     string function = "MVops::apl_matrix_complex_submatrix()";
     string message = "row index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j >= m->size2) {
     // ME190726 - exit clean-up
     //cerr << "column index is out of range" << std::endl;
@@ -2456,7 +2456,7 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("column index out of range");
     string function = "MVops::apl_matrix_complex_submatrix()";
     string message = "column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (n1 == 0) {
     // ME190726 - exit clean-up
     //cerr << "first dimension must be non-zero" << std::endl;
@@ -2465,7 +2465,7 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("first dimension must be non-zero");
     string function = "MVops::apl_matrix_complex_submatrix()";
     string message = "first dimension must be non-zero";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   } else if (n2 == 0) {
     // ME190726 - exit clean-up
     //cerr << "second dimension must be non-zero" << std::endl;
@@ -2474,7 +2474,7 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("second dimension must be non-zero");
     string function = "MVops::apl_matrix_complex_submatrix()";
     string message = "second dimension must be non-zero";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   } else if (i + n1 > m->size1) {
     // ME190726 - exit clean-up
     //cerr << "first dimension overflows matrix" << std::endl;
@@ -2483,7 +2483,7 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("first dimension must be overflows matrix");
     string function = "MVops::apl_matrix_complex_submatrix()";
     string message = "first dimension overflows matrix";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   } else if (j + n2 > m->size2) {
     // ME190726 - exit clean-up
     //cerr << "second dimension overflows matrix" << std::endl;
@@ -2492,7 +2492,7 @@ MVops::apl_matrix_complex_submatrix(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("second dimension must be overflows matrix");
     string function = "MVops::apl_matrix_complex_submatrix()";
     string message = "second dimension overflows matrix";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   {
@@ -2543,7 +2543,7 @@ int MVops::apl_matrix_complex_swap_columns(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("first column index is out of range");
     string function = "MVops::apl_matrix_complex_swap_columns()";
     string message = "first column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (j >= size2) {
@@ -2554,7 +2554,7 @@ int MVops::apl_matrix_complex_swap_columns(apl_matrix_complex<T> *m,
     //throw APLRuntimeError("second column index is out of range");
     string function = "MVops::apl_matrix_complex_swap_columns()";
     string message = "second column index is out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (i != j) {
@@ -2695,7 +2695,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for multifit_linear struct");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for multifit_linear struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->n = n;  // number of observations //
@@ -2712,7 +2712,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for A");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for A";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->Q = apl_matrix_alloc<T>(p, p);
@@ -2727,7 +2727,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for Q");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for Q";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->QSI = apl_matrix_alloc<T>(p, p);
@@ -2743,7 +2743,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for QSI");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for QSI";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->S = apl_vector_alloc<T>(p);
@@ -2760,7 +2760,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for S");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for S";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->t = apl_vector_alloc<T>(n);
@@ -2778,7 +2778,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for t");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for t";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->xt = apl_vector_calloc<T>(p);
@@ -2797,7 +2797,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for xt");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for xt";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->D = apl_vector_calloc<T>(p);
@@ -2817,7 +2817,7 @@ MVops::apl_multifit_linear_alloc(size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for xt");
     string function = "MVops::apl_multifit_linear_alloc()";
     string message = "failed to allocate space for D";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
   return w;
 }
@@ -2964,7 +2964,7 @@ int MVops::apl_linalg_balance_columns(apl_matrix<T> *A, apl_vector<T> *D) {
     //throw APLRuntimeError("length of D must match second dimension of A");
     string function = "MVops::apl_linalg_balance_columns()";
     string message = "length of D must match second dimension of A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   apl_vector_set_all<T>(D, 1.0);
@@ -3192,7 +3192,7 @@ int MVops::apl_linalg_bidiag_decomp(apl_matrix<T> *A, apl_vector<T> *tau_U, apl_
     //throw APLRuntimeError("bidiagonal decomposition requires M>=N");
     string function = "MVops::apl_linalg_bidiag_decomp()";
     string message = "bidiagonal decomposition requires M>=N";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (tau_U->size != A->size2) {
     // ME190726 - exit clean-up
     //cerr << "size of tau_U must be N" << std::endl;
@@ -3201,7 +3201,7 @@ int MVops::apl_linalg_bidiag_decomp(apl_matrix<T> *A, apl_vector<T> *tau_U, apl_
     //throw APLRuntimeError("size of tau_U must be N");
     string function = "MVops::apl_linalg_bidiag_decomp()";
     string message = "size of tau_U bust be N";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (tau_V->size + 1 != A->size2) {
     // ME190726 - exit clean-up
     //cerr << "size of tau_V must be (N - 1)" << std::endl;
@@ -3210,7 +3210,7 @@ int MVops::apl_linalg_bidiag_decomp(apl_matrix<T> *A, apl_vector<T> *tau_U, apl_
     //throw APLRuntimeError("size of tau_V must be (N - 1)");
     string function = "MVops::apl_linalg_bidiag_decomp()";
     string message = "size of tau_V bust be (N - 1)";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else {
     const size_t M = A->size1;
     const size_t N = A->size2;
@@ -3276,7 +3276,7 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
     //throw APLRuntimeError("matrix A must have M >= N");
     string function = "MVops::apl_linalg_bidiag_unpack2()";
     string message = "matrix A must have M >= N";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (tau_U->size != K) {
     // ME190726 - exit clean-up
     //cerr << "size of tau must be MIN(M,N)" << std::endl;
@@ -3285,7 +3285,7 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
     //throw APLRuntimeError("size of tau must be MIN(M,N)");
     string function = "MVops::apl_linalg_bidiag_unpack2()";
     string message = "size of tau must be MIN(M,N)";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (tau_V->size + 1 != K) {
     // ME190726 - exit clean-up
     //cerr << "size of tau must be MIN(M,N) - 1" << std::endl;
@@ -3294,7 +3294,7 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
     //throw APLRuntimeError("size of tau must be MIN(M,N) - 1");
     string function = "MVops::apl_linalg_bidiag_unpack2()";
     string message = "size of tau must be MIN(M,N) - 1";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (V->size1 != N || V->size2 != N) {
     // ME190726 - exit clean-up
     //cerr << "size of V must be N x N" << std::endl;
@@ -3303,7 +3303,7 @@ int MVops::apl_linalg_bidiag_unpack2(apl_matrix<T> *A,
     //throw APLRuntimeError("size of V must be N x N");
     string function = "MVops::apl_linalg_bidiag_unpack2()";
     string message = "size of V must be N x N";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else {
     size_t i, j;
 
@@ -3857,7 +3857,7 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
     //throw APLRuntimeError("svd of MxN matrix, M<N, is not implemented");
     string function = "MVops::apl_linalg_SV_decomp()";
     string message = "svd od MxN matrix, M<N, is not implemented";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (V->size1 != N) {
     // ME190726 - exit clean-up
     //cerr << "square matrix V must match second dimension of matrix A" << std::endl;
@@ -3866,7 +3866,7 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
     //throw APLRuntimeError("square matrix V must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp()";
     string message = "square matrix V must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (V->size1 != V->size2) {
     // ME190726 - exit clean-up
     //cerr << "matrix V must be square" << std::endl;
@@ -3875,7 +3875,7 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
     //throw APLRuntimeError("matrix V must be square");
     string function = "MVops::apl_linalg_SV_decomp()";
     string message = "matrix V must be square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (S->size != N) {
     // ME190726 - exit clean-up
     //cerr << "length of vector S must match second dimension of matrix A" << std::endl;
@@ -3884,7 +3884,7 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
     //throw APLRuntimeError("length of vector S must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp()";
     string message = "length of vector S must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (work->size != N) {
     // ME190726 - exit clean-up
     //cerr << "length of workspace must match second dimension of matrix A" << std::endl;
@@ -3893,7 +3893,7 @@ int MVops::apl_linalg_SV_decomp(apl_matrix<T> *A, apl_matrix<T> *V, apl_vector<T
     //throw APLRuntimeError("length of workspace must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp()";
     string message = "length of workspace must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   // Handle the case of N = 1 (SVD of a column vector) //
@@ -4102,7 +4102,7 @@ int MVops::apl_blas_daxpy(double alpha, const apl_vector<T> *u, apl_vector<T> *v
     //throw APLRuntimeError("invalid length in apl_blas_daxpy()");
     string function = "MVops::apl_blas_daxpy()";
     string message = "invalid length in apl_blas_daxpy()";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 }
 // ******************************************************
@@ -4183,7 +4183,7 @@ void MVops::cblas_dgemv(const enum APL_ORDER order, const enum APL_TRANSPOSE Tra
       //throw APLRuntimeError("unrecognized operation");
       string function = "MVops::cblas_dgemv()";
       string message = "unrecognized operation";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
 }
@@ -4211,7 +4211,7 @@ int MVops::apl_blas_dgemv(APL_TRANSPOSE_t TransA,
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_dgemv()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 }
 // ******************************************************
@@ -4230,7 +4230,7 @@ int MVops::apl_blas_ddot(const apl_vector<T> *X, const apl_vector<T> *Y, T *resu
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_ddot()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 }
 // ******************************************************
@@ -4268,7 +4268,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("svd of MxN matrix, M<N, is not implemented");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "svd of MxN matrix, M<N, is not implemented";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else if (V->size1 != N) {
     // ME190726 - exit clean-up
     //cerr << "square matrix V must match second dimension of matrix A" << std::endl;
@@ -4277,7 +4277,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("square matrix V must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "square matrix V must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (V->size1 != V->size2) {
     // ME190726 - exit clean-up
     //cerr << "matrix V must be square" << std::endl;
@@ -4286,7 +4286,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("matrix V must be square");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "matrix V must be square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (X->size1 != N) {
     // ME190726 - exit clean-up
     //cerr << "square matrix X must match second dimension of matrix A" << std::endl;
@@ -4295,7 +4295,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("square matrix X must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "square matrix X must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (X->size1 != X->size2) {
     // ME190726 - exit clean-up
     //cerr << "matrix X must be square" << std::endl;
@@ -4304,7 +4304,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("matrix X must be square");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "matrix X must be square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (S->size != N) {
     // ME190726 - exit clean-up
     //cerr << "length of vector S must match second dimension of matrix A" << std::endl;
@@ -4313,7 +4313,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("length of vector S must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "length of vector S must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (work->size != N) {
     // ME190726 - exit clean-up
     //cerr << "length of workspace must match second dimension of matrix A" << std::endl;
@@ -4322,7 +4322,7 @@ int MVops::apl_linalg_SV_decomp_mod(apl_matrix<T> *A,
     //throw APLRuntimeError("length of workspace must match second dimension of matrix A");
     string function = "MVops::apl_linalg_SV_decomp_mod()";
     string message = "length of workspace must match second dimension of matrix A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
   if (N == 1) {
     apl_vector_view<T> column = apl_matrix_column<T>(A, 0);
@@ -4423,7 +4423,7 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
     //throw APLRuntimeError("number of observations in y does not match rows of matrix X");
     string function = "MVops::multifit_wlinear_svd()";
     string message = "number of observations in y does not match rows of matrix X";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (X->size2 != c->size) {
     // ME190726 - exit clean-up
     //cerr << "number of parameters c does not match columns of matrix X" << std::endl;
@@ -4432,7 +4432,7 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
     //throw APLRuntimeError("number of parameters c does not match columns of matrix X");
     string function = "MVops::multifit_wlinear_svd()";
     string message = "number of parameters c does not match rows of matrix X";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (w->size != y->size) {
     // ME190726 - exit clean-up
     //cerr << "number of weights does not match number of observations" << std::endl;
@@ -4441,7 +4441,7 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
     //throw APLRuntimeError("number of weights does not match number of observations");
     string function = "MVops::multifit_wlinear_svd()";
     string message = "number of weights does not match number of observations";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (cov->size1 != cov->size2) {
     // ME190726 - exit clean-up
     //cerr << "covariance matrix is not square" << std::endl;
@@ -4450,7 +4450,7 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
     //throw APLRuntimeError("covariance matrix is not square");
     string function = "MVops::multifit_wlinear_svd()";
     string message = "covariance matrix is not square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (c->size != cov->size1) {
     // ME190726 - exit clean-up
     //cerr << "number of parameters does not match size of covariance matrix" << std::endl;
@@ -4459,7 +4459,7 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
     //throw APLRuntimeError("number of parameters does not match size of covariance matrix");
     string function = "MVops::multifit_wlinear_svd()";
     string message = "number of parameters does not match size of covariance matrix";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (X->size1 != work->n || X->size2 != work->p) {
     // ME190726 - exit clean-up
     //cerr << "size of workspace does not match size of observation matrix" << std::endl;
@@ -4468,7 +4468,7 @@ int MVops::multifit_wlinear_svd(const apl_matrix<T> *X,
     //throw APLRuntimeError("size of workspace does not match size of observation matrix");
     string function = "MVops::multifit_wlinear_svd()";
     string message = "size of workspace does not match size of observation matrix";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     MVops fit;
     const size_t n = X->size1;
@@ -4610,7 +4610,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("insufficient data points, n < p");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "insufficient data points, n < p";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   s = (apl_multifit_fdfsolver<utype> *)malloc(sizeof(apl_multifit_fdfsolver<utype>));
@@ -4622,7 +4622,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to allocate space for multifit solver struct");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to allocate space for multifit solver struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   s->x = apl_vector_calloc<utype>(p);
@@ -4636,7 +4636,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to allocate space for x");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to allocate space for x";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   s->f = apl_vector_calloc<utype>(n);
@@ -4651,7 +4651,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to allocate space for f");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to allocate space for f";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   s->J = apl_matrix_calloc<utype>(n, p);
@@ -4667,7 +4667,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to allocate space for g");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to allocate space for g";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   s->dx = apl_vector_calloc<utype>(p);
@@ -4684,7 +4684,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to allocate space for dx");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to allocate space for dx";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   s->state = malloc(T->size);
@@ -4703,7 +4703,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to allocate space for multifit solver state");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to allocate space for multifit solver state";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
   s->type = T;
 
@@ -4724,7 +4724,7 @@ MVops::apl_multifit_fdfsolver_alloc(const apl_multifit_fdfsolver_type<utype> *T,
     //throw APLRuntimeError("failed to set solver");
     string function = "MVops::apl_multifit_fdfsolver_alloc()";
     string message = "failed to set solver";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   s->fdf = NULL;
@@ -4743,7 +4743,7 @@ int MVops::apl_multifit_fdfsolver_set(apl_multifit_fdfsolver<utype> *s,
     //throw APLRuntimeError("function size does not match solver");
     string function = "MVops::apl_multifit_fdfsolver_set()";
     string message = "function size does not match solver";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   if (s->x->size != x->size) {
@@ -4754,7 +4754,7 @@ int MVops::apl_multifit_fdfsolver_set(apl_multifit_fdfsolver<utype> *s,
     //throw APLRuntimeError("vector length does not match solver");
     string function = "MVops::apl_multifit_fdfsolver_set()";
     string message = "vector length does not match solver";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   s->fdf = f;
@@ -4783,7 +4783,7 @@ int MVops::apl_multifit_test_delta(const apl_vector<utype> *dx, const apl_vector
     //throw APLRuntimeError("relative tolerance is negative");
     string function = "MVops::apl_multifit_test_delta()";
     string message = "relative tolerance is negative";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   for (i = 0; i < n; i++) {
@@ -4817,7 +4817,7 @@ MVops::apl_permutation_alloc(const size_t n) {
     //throw APLRuntimeError("permutation length n must be positive integer");
     string function = "MVops::apl_permutation_alloc()";
     string message = "permutation length n must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   p = (apl_permutation *)malloc(sizeof(apl_permutation));
@@ -4830,7 +4830,7 @@ MVops::apl_permutation_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for permutation struct");
     string function = "MVops::apl_permutation_alloc()";
     string message = "failed to allocate space for permutation struct";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   p->data = (size_t *)malloc(n * sizeof(size_t));
@@ -4845,7 +4845,7 @@ MVops::apl_permutation_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for permutation data");
     string function = "MVops::apl_permutation_alloc()";
     string message = "failed to allocate space for permutation data";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   p->size = n;
@@ -4882,7 +4882,7 @@ MVops::apl_permutation_get(const apl_permutation *p, const size_t i) {
     //throw APLRuntimeError("index out of range");
     string function = "MVops::apl_permuation_get()";
     string message = "index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return p->data[i];
@@ -4916,7 +4916,7 @@ int MVops::apl_permutation_swap(apl_permutation *p, const size_t i, const size_t
     //throw APLRuntimeError("first index is out of range");
     string function = "MVops::apl_permuation_swap()";
     string message = "first index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (j >= size) {
@@ -4927,7 +4927,7 @@ int MVops::apl_permutation_swap(apl_permutation *p, const size_t i, const size_t
     //throw APLRuntimeError("second index is out of range");
     string function = "MVops::apl_permuation_swap()";
     string message = "second index out of range";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (i != j) {
@@ -4952,7 +4952,7 @@ int MVops::apl_linalg_QRPT_decomp(apl_matrix<utype> *A, apl_vector<utype> *tau, 
     //throw APLRuntimeError("size of tau must be MIN(M,N)");
     string function = "MVops::apl_linalg_QRPT()";
     string message = "size of tau must be MIN(M,N)";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (p->size != N) {
     // ME190726 - exit clean-up
     //cerr << "permutation size must be N" << std::endl;
@@ -4961,7 +4961,7 @@ int MVops::apl_linalg_QRPT_decomp(apl_matrix<utype> *A, apl_vector<utype> *tau, 
     //throw APLRuntimeError("permutation size must be N");
     string function = "MVops::apl_linalg_QRPT()";
     string message = "permutation size must be N";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (norm->size != N) {
     // ME190726 - exit clean-up
     //cerr << "norm size must be N" << std::endl;
@@ -4970,7 +4970,7 @@ int MVops::apl_linalg_QRPT_decomp(apl_matrix<utype> *A, apl_vector<utype> *tau, 
     //throw APLRuntimeError("norm size must be N");
     string function = "MVops::apl_linalg_QRPT()";
     string message = "norm size must be N";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     size_t i;
 
@@ -5086,7 +5086,7 @@ int MVops::apl_multifit_covar(const apl_matrix<utype> *J, double epsrel, apl_mat
     //throw APLRuntimeError("Jacobian must be rectangular M x N with M >= N");
     string function = "MVops::apl_multifit_covar()";
     string message = "Jacobian must be rectangular M x N with M >= N";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   if (covar->size1 != covar->size2 || covar->size1 != n) {
@@ -5097,7 +5097,7 @@ int MVops::apl_multifit_covar(const apl_matrix<utype> *J, double epsrel, apl_mat
     //throw APLRuntimeError("covariance matrix must be square and match second dimension of jacobian");
     string function = "MVops::apl_multifit_covar()";
     string message = "covariance matrix must be square and match second dimension of jacobian";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   r = apl_matrix_alloc<utype>(m, n);
@@ -5260,7 +5260,7 @@ int MVops::apl_linalg_QR_QTvec(const apl_matrix<utype> *QR, const apl_vector<uty
     //throw APLRuntimeError("size of tau must be MIN(M,N)");
     string function = "MVops::apl_linalg_QR_QTvec()";
     string message = "size of tau must be MIN(M,N)";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (v->size != M) {
     // ME190726 - exit clean-up
     //cerr << "vector size must be M" << std::endl;
@@ -5269,7 +5269,7 @@ int MVops::apl_linalg_QR_QTvec(const apl_matrix<utype> *QR, const apl_vector<uty
     //throw APLRuntimeError("vector size must be M");
     string function = "MVops::apl_linalg_QR_QTvec()";
     string message = "vector size must be M";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     size_t i;
 
@@ -5321,7 +5321,7 @@ int MVops::apl_permute_vector_inverse(const apl_permutation *p, apl_vector<utype
     //throw APLRuntimeError("vector and permutation must have the same length");
     string function = "MVops::apl_permute_vector_inverse()";
     string message = "vector and permutation must have the same length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   apl_permute_inverse(p->data, v->data, v->stride, v->size);
@@ -6075,7 +6075,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for r");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for r";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->r = r;
@@ -6092,7 +6092,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for tau");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for tau";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->tau = tau;
@@ -6110,7 +6110,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for diag");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for diag";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->diag = diag;
@@ -6129,7 +6129,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for qtf");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for qtf";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->qtf = qtf;
@@ -6149,7 +6149,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for newton");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for newton";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->newton = newton;
@@ -6170,7 +6170,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for gradient");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for gradient";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->gradient = gradient;
@@ -6192,7 +6192,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for x_trial");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for x_trial";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->x_trial = x_trial;
@@ -6215,7 +6215,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for f_trial");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for f_trial";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->f_trial = f_trial;
@@ -6239,7 +6239,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for df");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for df";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->df = df;
@@ -6264,7 +6264,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for sdiag");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for sdiag";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->sdiag = sdiag;
@@ -6290,7 +6290,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for rptdx");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for rptdx";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->rptdx = rptdx;
@@ -6317,7 +6317,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for w");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for w";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->w = w;
@@ -6345,7 +6345,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for work1");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for work1";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->work1 = work1;
@@ -6374,7 +6374,7 @@ int MVops::lmder_alloc(void *vstate, size_t n, size_t p) {
     //throw APLRuntimeError("failed to allocate space for perm");
     string function = "MVops::lmder_alloc()";
     string message = "failed to allocate space for perm";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   state->perm = perm;
@@ -6589,7 +6589,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("matrix dimension must be positive integer");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "matrix dimension must be positive integer";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   w = (apl_eigen_hermv_workspace *)malloc(sizeof(apl_eigen_hermv_workspace));
@@ -6602,7 +6602,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for workspace");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "failed to allocate space for workspace";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->d = (double *)malloc(n * sizeof(double));
@@ -6616,7 +6616,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for diagonal");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "failed to allocate space for diagonal";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->sd = (double *)malloc(n * sizeof(double));
@@ -6631,7 +6631,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for subdiagonal");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "failed to allocate space for subdiagonal";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->tau = (double *)malloc(2 * n * sizeof(double));
@@ -6647,7 +6647,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for tau");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "failed to allocate space for subdiagonal";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->gc = (double *)malloc(n * sizeof(double));
@@ -6664,7 +6664,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for cosines");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "failed to allocate space for cosines";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->gs = (double *)malloc(n * sizeof(double));
@@ -6682,7 +6682,7 @@ MVops::apl_eigen_hermv_alloc(const size_t n) {
     //throw APLRuntimeError("failed to allocate space for sines");
     string function = "MVops::apl_eigen_hermv_alloc()";
     string message = "failed to allocate space for sines";
-    throw aurostd::xerror(function, message, _ALLOC_ALLOCATE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _ALLOC_ALLOCATE_);
   }
 
   w->size = n;
@@ -6850,7 +6850,7 @@ int MVops::apl_blas_zhemv(APL_UPLO Uplo, const apl_complex<T> alpha,
     //throw APLRuntimeError("matrix must be square");
     string function = "MVops::apl_blas_zhemv()";
     string message = "matrix must be square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (N != X->size || N != Y->size) {
     // ME190726 - exit clean-up
     //cerr << "\ninvalid length\n";
@@ -6859,7 +6859,7 @@ int MVops::apl_blas_zhemv(APL_UPLO Uplo, const apl_complex<T> alpha,
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_zhemv()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   cblas_zhemv(aplRowMajor, Uplo, int(N), APL_MV_COMPLEX_P(&alpha), A->data,
@@ -6991,7 +6991,7 @@ void MVops::cblas_zhemv(const enum APL_ORDER order, const enum APL_UPLO Uplo,
       //throw APLRuntimeError("unrecognized operation");
       string function = "MVops::clas_zhemv()";
       string message = "unrecognized operation";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
 }
@@ -7011,7 +7011,7 @@ int MVops::apl_blas_zdotc(const apl_vector_complex<T> *X, const apl_vector_compl
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_zdotc()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 }
 // ******************************************************
@@ -7053,7 +7053,7 @@ int MVops::apl_blas_zaxpy(const apl_complex<T> alpha, const apl_vector_complex<T
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_zaxpy()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 }
 // ******************************************************
@@ -7095,7 +7095,7 @@ int MVops::apl_blas_zher2(APL_UPLO_t Uplo, const apl_complex<T> alpha,
     //throw APLRuntimeError("matrix must be square");
     string function = "MVops::apl_blas_zher2()";
     string message = "matrix must be square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (X->size != N || Y->size != N) {
     // ME190726 - exit clean-up
     //cerr << "\n invalid length \n ";
@@ -7104,7 +7104,7 @@ int MVops::apl_blas_zher2(APL_UPLO_t Uplo, const apl_complex<T> alpha,
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_zher2()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 
   cblas_zher2(aplRowMajor, Uplo, int(N), APL_MV_COMPLEX_P(&alpha), X->data,
@@ -7213,7 +7213,7 @@ void MVops::cblas_zher2(const enum APL_ORDER order, const enum APL_UPLO Uplo,
       //throw APLRuntimeError("unrecognized operation");
       string function = "MVops::cblas_zher2()";
       string message = "unrecognized operation";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
 }
@@ -7228,7 +7228,7 @@ int MVops::apl_linalg_hermtd_decomp(apl_matrix_complex<T> *A, apl_vector_complex
     //throw APLRuntimeError("hermitian tridiagonal decomposition requires square matrix");
     string function = "MVops::apl_linalg_hermtd_decomp()";
     string message = "hermitian tridiagonal decomposition requires square matrix";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (tau->size + 1 != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "\n size of tau must be (matrix size - 1) \n ";
@@ -7237,7 +7237,7 @@ int MVops::apl_linalg_hermtd_decomp(apl_matrix_complex<T> *A, apl_vector_complex
     //throw APLRuntimeError("size of tau must be (matrix size - 1)");
     string function = "MVops::apl_linalg_hermtd_decomp()";
     string message = "size of tau must be (matrix size - 1)";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     const size_t N = A->size1;
     size_t i;
@@ -7345,7 +7345,7 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
     //throw APLRuntimeError("matrix A must be sqaure");
     string function = "MVops::apl_linalg_hermtd_unpack()";
     string message = "matrix A must be sqeare";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (tau->size + 1 != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "\n size of tau must be (matrix size - 1) \n";
@@ -7354,7 +7354,7 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
     //throw APLRuntimeError("size of tau must be (matrix size - 1)");
     string function = "MVops::apl_linalg_hermtd_unpack()";
     string message = "size of tau must be (matrix size - 1)";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (U->size1 != A->size1 || U->size2 != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "\n size of U must match size of A \n";
@@ -7363,7 +7363,7 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
     //throw APLRuntimeError("size of U must match size of A");
     string function = "MVops::apl_linalg_hermtd_unpack()";
     string message = "size of U must match size of A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (diag->size != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "\n size of diagonal must match size of A \n";
@@ -7372,7 +7372,7 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
     //throw APLRuntimeError("size of diagonal must match size of A");
     string function = "MVops::apl_linalg_hermtd_unpack()";
     string message = "size of diagonal must match size of A";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (sdiag->size + 1 != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "\n  size of subdiagonal must be (matrix size - 1) \n ";
@@ -7381,7 +7381,7 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
     //throw APLRuntimeError("size of subdiagonal must be (matrix size - 1)");
     string function = "MVops::apl_linalg_hermtd_unpack()";
     string message = "size of subdiagonal must be (matrix size - 1)";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     const size_t N = A->size1;
 
@@ -7580,7 +7580,7 @@ int MVops::apl_eigen_hermv(apl_matrix_complex<T> *A, apl_vector<T> *eval,
     //throw APLRuntimeError("matrix must be square to compute eigenvalues");
     string function = "MVops::apl_eigen_hermv()";
     string message = "matrix must be square to compute eigenvalues";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (eval->size != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "eigenvalue vector must match matrix size";
@@ -7589,7 +7589,7 @@ int MVops::apl_eigen_hermv(apl_matrix_complex<T> *A, apl_vector<T> *eval,
     //throw APLRuntimeError("eigenvalue vector must match matrix size");
     string function = "MVops::apl_eigen_hermv()";
     string message = "eigenvalue vector must match matrix size";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (evec->size1 != A->size1 || evec->size2 != A->size1) {
     // ME190726 - exit clean-up
     //cerr << "eigenvector matrix must match matrix size";
@@ -7598,7 +7598,7 @@ int MVops::apl_eigen_hermv(apl_matrix_complex<T> *A, apl_vector<T> *eval,
     //throw APLRuntimeError("eigenvector vector must match matrix size");
     string function = "MVops::apl_eigen_hermv()";
     string message = "eigenvector vector must match matrix size";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     const size_t N = A->size1;
     double *const d = w->d;
@@ -7734,7 +7734,7 @@ int MVops::apl_eigen_hermv_sort(apl_vector<double> *eval, apl_matrix_complex<dou
     //throw APLRuntimeError("eigenvector matrix must be square");
     string function = "MVops::apl_eigen_hermv_sort()";
     string message = "eigenvector matrix must be square";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (eval->size != evec->size1) {
     // ME190726 - exit clean-up
     //cerr << "eigenvalues must match eigenvector matrix \n";
@@ -7743,7 +7743,7 @@ int MVops::apl_eigen_hermv_sort(apl_vector<double> *eval, apl_matrix_complex<dou
     //throw APLRuntimeError("eigenvalues must match eigenvector matrix");
     string function = "MVops::apl_eigen_hermv_sort()";
     string message = "eigenvalues must match eigenvector matrix";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else {
     const size_t N = eval->size;
     size_t i;
@@ -7780,7 +7780,7 @@ int MVops::apl_eigen_hermv_sort(apl_vector<double> *eval, apl_matrix_complex<dou
             //throw APLRuntimeError("unrecognized sort type");
             string function = "MVops::apl_eigen_hermv_sort()";
             string message = "unrecognized sort type";
-            throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
         }
 
         if (test) {
@@ -7826,7 +7826,7 @@ void aplEigensystems::eigen_calculation(const aurostd::xmatrix<xcomplex<double> 
     //throw APLRuntimeError("apl eigenvalue calculation is not working");
     string function = "aplEigensystems::eigen_calculation()";
     string message = "apl eigenvalue calculation is not working";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   };
   //apl_eigen_hermv_sort (eval, evec, APL_MV_EIGEN_SORT_ABS_ASC);
   apl_eigen_hermv_free(w);
@@ -7873,7 +7873,7 @@ void aplEigensystems::eigen_calculation(const aurostd::xmatrix<xcomplex<double> 
     //throw APLRuntimeError("apl eigenvalue calculation is not working");
     string function = "aplEigensystems::eigen_calculation()";
     string message = "apl eigenvalue calculation is not working";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   };
 
   apl_eigen_hermv_sort(eval, evec, t);
@@ -7917,7 +7917,7 @@ int MVops::apl_blas_zgemv(APL_TRANSPOSE_t TransA, const apl_complex<double> alph
     //throw APLRuntimeError("invalid length");
     string function = "MVops::apl_blas_zgemv()";
     string message = "invalid length";
-    throw aurostd::xerror(function, message, _INDEX_MISMATCH_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   }
 }
 // ******************************************************
@@ -8066,7 +8066,7 @@ void MVops::cblas_zgemv(const enum APL_ORDER order, const enum APL_TRANSPOSE Tra
       //throw APLRuntimeError("unrecognized operation");
       string function = "MVops::cblas_zgemv()";
       string message = "unrecognized operation";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
 }
@@ -8109,7 +8109,7 @@ MVops::calculate_gruneisen(xmatrix<xcomplex<double> > &m0, xmatrix<xcomplex<doub
     //throw APLRuntimeError("apl eigenvalue calculation is not working");
     string function = "MVops::eigen_calculation()";
     string message = "apl eigenvalue calculation is not working";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   };
   apl_eigen_hermv_sort(apleval0, aplevec0, APL_MV_EIGEN_SORT_ABS_ASC);
   apl_eigen_hermv_free(w);

@@ -127,7 +127,7 @@ void LinearResponsePC::calculateForceFields() {
     //throw APLRuntimeError("apl::LinearResponsePC::calculateForceFields(); The supercell structure has not been initialized yet.");
     string function = "apl::LinearResponsePC::calculateForceFields()";
     string message = "The supercell structure has not been initialized yet.";
-    throw aurostd::xerror(function, message, _RUNTIME_INIT_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
   }
 
   readForceFieldsFromDYNMAT(xInputs[0]);
@@ -174,7 +174,7 @@ void PhononCalculator::readBornEffectiveChargesFromAIMSOUT(void) {
 //  throw APLLogicError("apl::LinearResponsePC::readBornEffectiveChargesFromAIMSOUT(); This functionality has yet to be implemented.");
   string function = "PhononCalculator::readBornEffectiveChargesFromAIMSOUT()";
   string message = "This functionality has not been implemented yet.";
-  throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ void PhononCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {
     //  throw apl::APLLogicError("apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR(); Cannot open input OUTCAR.static file.");
     string function = "apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR()";
     string message = "Cannot open input file OUTCAR.static.";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 
   string line;
@@ -230,7 +230,7 @@ void PhononCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {
       //throw apl::APLLogicError("apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR(); No information about Born effective charges in OUTCAR.");
       string function = "apl::LinearResponsePC::readBornEffectiveChargesFromOUTCAR()";
       string message = "No information on Born effective charges in OUTCAR file.";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     line = vlines[line_count++];  //CO
 
@@ -283,7 +283,7 @@ void PhononCalculator::symmetrizeBornEffectiveChargeTensors(void) {
     //throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); Need to define symmetry tolerance.");
     string function = "apl::PhononCalculator::symmetrizeEffectiveChargeTensors()";
     string message = "Symmetry tolerance not defined.";
-    throw aurostd::xerror(function, message, _VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
   }
   //CO - END
   // Show charges
@@ -322,7 +322,7 @@ void PhononCalculator::symmetrizeBornEffectiveChargeTensors(void) {
         //throw APLLogicError("apl::PhononCalculator::symmetrizeBornEffectiveChargeTensors(); Mapping failed.");
         string function = "apl::PhononCalculator::symmetrizeBornEffectiveChargeTensors()";
         string message = "Mapping failed.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
       //CO - END
     }
@@ -406,7 +406,7 @@ void PhononCalculator::readDielectricTensorFromAIMSOUT(void) {
 //  throw APLLogicError("apl::LinearResponsePC::readDielectricTensorFromAIMSOUT(); This functionality has yet to be implemented.");
   string function = "apl::PhononCalculator::readDielectricTensorFromAIMSOUT()";
   string message = "This functionality has not been implemented yet.";
-  throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -438,7 +438,7 @@ void PhononCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  //
     //throw apl::APLLogicError("LinearResponsePC::readDielectricTensorFromOUTCAR(); Cannot open input OUTCAR file.");
     string function = "apl::LinearResponsePC::readDielectricTensorFromOUTCAR()";
     string message = "Cannot open input file OUTCAR.";
-    aurostd::xerror(function, message, _FILE_ERROR_);
+    aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 //CO - END
 
@@ -460,7 +460,7 @@ void PhononCalculator::readDielectricTensorFromOUTCAR(const _xinput& xinp) {  //
       //throw apl::APLLogicError("LinearResponsePC::readDielectricTensorFromOUTCAR(); No information about dielectric tensor in OUTCAR.");
       string function = "apl::LinearResponsePC::readDielectricTensorFromOUTCAR()";
       string message = "No information on dielectric tensor in OUTCAR.";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     line = vlines[line_count++];
     //CO - END
@@ -570,7 +570,7 @@ void LinearResponsePC::readForceFieldsFromDYNMAT(const _xinput& xinp) { // ME190
     //throw apl::APLRuntimeError("LinearResponsePC::readForceFieldsFromDYNMAT(); Cannot open input DYNMAT file.");
     string function = "apl::LinearResponsePC::readForceFieldsFromDYNMAT()";
     string message = "Cannot open input file DYNMAT.";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 
   // Header

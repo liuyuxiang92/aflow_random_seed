@@ -579,7 +579,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.scqha.gpdis.out");
       string function = "SCQHA_QHA3P::write_gruneisen_parameter_path";
       string message = "Cannot write " + outfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -618,7 +618,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha3P.gp.mesh.out");
       string function = "SCQHA_QHA3P::write_gruneisen_parameter_mesh";
       string message = "Cannot write " + outfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -664,7 +664,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha3P.avg_gp.out");
       string function = "SCQHA_QHA3P::Writeaverage_gp";
       string message = "Cannot write " + avg_out;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_avg);
     //gruneisen_parameter_300K();
@@ -682,14 +682,14 @@ namespace apl
       //throw APLRuntimeError("_freqs_mesh.size()==0");
       string function = "SCQHA_QHA3P::average_gruneisen_parameter()";
       string message = "_freqs_mesh.size()==0";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if(_freqs_mesh.size()==0) {
       // ME191031 - use xerror
       //throw APLRuntimeError("_freqs_mesh.size()==0");
       string function = "SCQHA_QHA3P::average_gruneisen_parameter()";
       string message = "_freqs_mesh.size()==0";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     //if cutoff is not set then set it to 0.001 to avoid numerical error
     if(_iszero(_cutoff_freq)) _cutoff_freq=1.0e-3;
@@ -737,7 +737,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.scqha.avg_gp300K.out");
       string function = "SCQHA_QHA3P::gruneisen_paramter_300K()";
       string message = "Cannot write " + avg_out;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_avg);
   }
@@ -749,7 +749,7 @@ namespace apl
       //throw apl::APLRuntimeError("SCQHA_QHA3P::read_matrix(() Missing file: "+file);
       string function = "SCQHA_QHA3P::read_matrix()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
     ifstream in;
@@ -773,7 +773,7 @@ namespace apl
       //throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
@@ -782,7 +782,7 @@ namespace apl
       //throw apl::APLRuntimeError("SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
     uint line_count = 0;
@@ -844,7 +844,7 @@ namespace apl
       //throw APLRuntimeError("Grueneisen calculation frequency negative");
       string function = "SCQHA_QHA3P::calculate_gruneisen_with_freq_derivative()";
       string message = "Grueneisen calculation frequency negative";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     double gptest=-(fp-fm)/(2.0*_delta_V)*(_V0/f0);
     return gptest;

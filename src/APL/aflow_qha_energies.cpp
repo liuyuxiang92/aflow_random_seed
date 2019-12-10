@@ -340,7 +340,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha.static_energies.out");
       string function = "QH_ENERGIES::write_energies()";
       string message = "Cannot write " + eos_out;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(out);
     return true;
@@ -385,7 +385,7 @@ namespace apl
 	//throw APLRuntimeError("Cannot write aflow.apl.static_corrected.out");
         string function = "QH_ENERGIES::write_imag_freq_corrected_energies()";
         string message = "Cannot write " + outfile;
-        throw aurostd::xerror(function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::StringstreamClean(out);
     }
@@ -462,7 +462,7 @@ namespace apl
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_pdos()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
@@ -471,7 +471,7 @@ namespace apl
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_pdos()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     uint line_count = 0;
     string line;
@@ -490,7 +490,7 @@ namespace apl
           //throw APLRuntimeError("Wrong format in file " + file + ".");
           string function = "QH_ENERGIES::get_pdos()";
           string message = "Wrong format in file " + file + ".";
-          throw aurostd::xerror(function, message, _FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
 	}
       vector<double>  tmp(2, 0.0);
       tmp[0]=atof(vstr[0].c_str());
@@ -513,7 +513,7 @@ namespace apl
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_edos()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
@@ -522,7 +522,7 @@ namespace apl
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_edos()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     fermi=0.0;
@@ -558,7 +558,7 @@ namespace apl
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_E0K()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
@@ -567,7 +567,7 @@ namespace apl
       //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
       string function = "QHE_ENERGIES::get_E0K()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     pv=0.0;

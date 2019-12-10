@@ -223,7 +223,7 @@ void Supercell::calculateWholeSymmetry(xstructure& xstr) {
     //throw APLRuntimeError("apl::Supercell::calculateWholeSymmetry(): Symmetry routine failed.");
     string function = "apl::Supercell::calculateWholeSymmetry()";
     string message = "Symmetry routine failed.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 }
 //[CO190218 - OBSOLETE]#else
@@ -790,7 +790,7 @@ int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, 
         //throw APLRuntimeError("apl::Supercell::buildSuitableForShell(); Mapping error.");
         string function = "apl::Supercell::buildSuitableForShell()";
         string message = "Mapping error.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
       // Map with this center
@@ -1022,7 +1022,7 @@ int Supercell::getNumberOfEquivalentAtomsOfType(int i) const { //CO190218
     //throw APLRuntimeError("apl::Supercell::getNumberOfEquivalentAtomsOfType: Wrong index."); //CO190218
     string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
     string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return _scStructure.iatoms[i].size();
@@ -1038,7 +1038,7 @@ int Supercell::getUniqueAtomID(int i) const {
     //throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index.");
     string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
     string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return _scStructure.iatoms[i][0];
@@ -1054,7 +1054,7 @@ int Supercell::getUniqueAtomID(int i, int j) const {
     //throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index 1.");
     string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
     string message = "Wrong index[1] " + aurostd::utype2string<int>(i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (j >= (int)_scStructure.iatoms[i].size()) {
@@ -1062,7 +1062,7 @@ int Supercell::getUniqueAtomID(int i, int j) const {
     //throw APLRuntimeError("apl::Supercell::getUniqueAtoms(): Wrong index 2.");
     string function = "apl::Supercell::getNumberOfEquivalentAtomsOfType";
     string message = "Wrong index[2] " + aurostd::utype2string<int>(i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return _scStructure.iatoms[i][j];
@@ -1135,7 +1135,7 @@ int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool t
     //throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong atomID index."); //CO190218
     string function = "apl::Supercell::atomGoesTo()";
     string message = "Wrong atomID index " + aurostd::utype2string<int>(atomID) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (centerID >= (int)_scStructure.atoms.size()) {
@@ -1143,7 +1143,7 @@ int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool t
     //throw APLRuntimeError("apl::Supercell::atomGoesTo(); Wrong centerID index."); //CO190218
     string function = "apl::Supercell::atomGoesTo()";
     string message = "Wrong centerID index " + aurostd::utype2string<int>(centerID) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
 
@@ -1159,7 +1159,7 @@ int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool t
     //throw APLLogicError("apl::Supercell::atomGoesTo(); Illegitimate mapping."); //CO190218
     string function = "apl::Supercell::atomGoesTo()";
     string message = "Illegitimate mapping.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Find its id...
@@ -1187,7 +1187,7 @@ int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool t
     //throw APLLogicError("apl::Supercell::atomGoesTo(); Mapping failed."); //CO190218
     string function = "apl::Supercell::atomGoesTo()";
     string message = "Mapping failed.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Move center back to zero atom...
@@ -1300,14 +1300,14 @@ int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, boo
     //throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong atomID index."); //CO190218
     string function = "apl::Supercell::atomComesFrom()";
     string message = "Wrong atomID index " + aurostd::utype2string<int>(atomID) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (centerID >= (int)_scStructure.atoms.size()) {
     //throw APLRuntimeError("apl::Supercell::atomComesFrom(); Wrong centerID index."); //CO190218
     string function = "apl::Supercell::atomComesFrom()";
     string message = "Wrong centerID index " + aurostd::utype2string<int>(centerID) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
 
@@ -1324,7 +1324,7 @@ int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, boo
       //throw APLLogicError("apl::Supercell::atomComesFrom(); Illegitimate mapping."); //CO190218
       string function = "apl::Supercell::atomComesFrom()";
       string message = "Illegitimate mapping.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if (compareFPositions(rotatedAtom.fpos, _scStructure.atoms[atomID].fpos)) {  //COREY NEW, default to symmetry tolerance
       break;
@@ -1348,7 +1348,7 @@ int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, boo
     //throw APLLogicError("apl::Supercell::atomComesFrom(); Mapping failed."); //CO190218
     string function = "apl::Supercell::atomComesFrom()";
     string message = "Mapping failed.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Move center back to zero atom...
@@ -1470,14 +1470,14 @@ const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID,
     //throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom1ID index.");
     string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
     string message = "Wrong atom1ID index " + aurostd::utype2string<int>(whichAtomID) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 
   if (toAtomID >= (int)_scStructure.atoms.size()) {
     //throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Wrong atom2ID index.");
     string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
     string message = "Wrong atom2ID index " + aurostd::utype2string<int>(toAtomID) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
 
@@ -1491,7 +1491,7 @@ const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID,
     //throw APLRuntimeError("apl::Supercell::getSymOpWhichMatchAtoms(); Unknown group type.");
     string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
     string message = "Unknown group type.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Apply all symmetry operations on atom1 and find which one produce atom2
@@ -1505,7 +1505,7 @@ const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID,
       //throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Illegitimate mapping.");
       string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
       string message = "Illegitimate mapping.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if (compareFPositions(newAtom.fpos, _scStructure.atoms[toAtomID].fpos)) {  //COREY NEW, default to symmetry tolerance
       break;
@@ -1541,7 +1541,7 @@ const _sym_op& Supercell::getSymOpWhichMatchAtoms(int whichAtomID, int toAtomID,
     //throw APLLogicError("apl::Supercell::getSymOpWhichMatchAtoms(); Mapping failed.");
     string function = "apl::Supercell::getSymOpWhichMatchAtoms()";
     string message = "Mapping failed.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
 #if MAP_VERBOSE
@@ -1737,7 +1737,7 @@ string Supercell::getUniqueAtomSymbol(int i) const {
     //throw APLRuntimeError("apl::Supercell::getUniqueAtomSymbol(): Wrong index.");
     string function = "apl::Supercell::getUniqueAtomSymbol():";
     string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return _scStructure.atoms[_scStructure.iatoms[i][0]].cleanname;
@@ -1753,7 +1753,7 @@ double Supercell::getUniqueAtomMass(int i) const {
     //throw APLRuntimeError("apl::Supercell::getUniqueAtomMass(): Wrong index.");
     string function = "apl::Supercell::getUniqueAtomMass()";
     string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   //return( GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].cleanname) * KILOGRAM2AMU ); //JAHNATEK ORIGINAL
@@ -1765,7 +1765,7 @@ double Supercell::getUniqueAtomMass(int i) const {
     //throw APLRuntimeError("apl::Supercell::getUniqueAtomMass(): Unknown atom types.");
     string function = "apl::Supercell::getUniqueAtomMass()";
     string message = "Unknown atom types.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
   return mass * KILOGRAM2AMU;
   //COREY - END
@@ -1780,7 +1780,7 @@ double Supercell::getAtomMass(int i) const {
     //throw APLRuntimeError("apl::Supercell::getAtomMass(): Wrong index.");
     string function = "apl::Supercell::getAtomMass()";
     string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   //return (GetAtomMass(_scStructure.atoms[i].cleanname) * KILOGRAM2AMU); ME 190111 - too slow since version 3.216
@@ -1797,7 +1797,7 @@ int Supercell::getAtomNumber(int i) const {
     //throw APLRuntimeError("apl::Supercell::getAtomNumber(): Wrong index.");
     string function = "apl::Supercell::getAtomNumber()";
     string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-    throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
   return ((int)GetAtomNumber(_scStructure.atoms[i].cleanname));

@@ -49,7 +49,7 @@ namespace apl
         // ME191031 - use xerror
         string function = "PhononHSQpoints::read_qpointfile()";
         string message = "File " + file + " doesn't exist";
-        throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
       }
     }
 
@@ -62,7 +62,7 @@ namespace apl
       //throw APLRuntimeError("File " + file + " doesn't exist");
       string function = "PhononHSQpoints::read_qpointfile()";
       string message = "File " + file + " doesn't exist";
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     while ( getline (in,line) )
       {
@@ -86,7 +86,7 @@ namespace apl
             //throw APLRuntimeError("Format error in file " + file + ".");
             string function = "PhononHSQpoints::read_qpointfile()";
             string message = "Format error in file " + file + ".";
-            throw aurostd::xerror(function, message, _FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
          }
          xvector<double> tmp(3,1);
          tmp[1]=atof(vsr[0].c_str());

@@ -173,7 +173,7 @@ namespace apl {
       //throw APLRuntimeError("qpoints.size()==0 in create_pdispath()");
       string function = "QHAsubdirectoryData::create_pdispath()";
       string message = "qpoints.size()==0";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     _logger<<"Preparing to create dynamical matrices for high-symmetry qpoint"<<apl::endl;
@@ -320,7 +320,7 @@ return lines;
       //throw APLRuntimeError("Cannot execute bash command.");
       string function = "QHAsubdirectoryData::directory_list()";
       string message = "Cannot execute bash command.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     while(fgets(buff, sizeof(buff), in)!=NULL)
       {stringstream AFLOW;
@@ -400,7 +400,7 @@ template<typename T>
       //throw APLRuntimeError("QHAsubdirectoryData:: unable to create [kweights-file]");
       string function = "QHAsubdirectoryData::write_weight";
       string message = "unable to create [" + file + "]";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     kout1 << std::setiosflags(std::ios::fixed|std::ios::showpoint|std::ios::right);

@@ -166,7 +166,7 @@ inline std::string stringify(const T& x) {
   if (!(o << x)) {
     // ME191031 - use xerror
     //throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
-    throw aurostd::xerror("apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
   }
   return o.str();
 }

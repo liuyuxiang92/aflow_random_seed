@@ -482,7 +482,7 @@ namespace apl
 	//throw APLRuntimeError("Cannot write aflow.qha3P.FVT.out");
         string function = "QHA3POINTS::qha3pts_temperature_loop()";
         string message = "Cannot write " + FVTfile;
-        throw aurostd::xerror(function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::StringstreamClean(osfvt);
     }
@@ -496,7 +496,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha3P.thermo.out");
       string function = "QHA3POINTS::qha3pts_temperature_loop()";
       string message = "Cannot write " + FVTfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
  
@@ -522,7 +522,7 @@ namespace apl
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for U_vib(T)");
       string function = "QHA3POINTS::internal_energy()";
       string message = "Frequency too small (<0.001 THz) for U_vib(T)";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     double betaa=47.9924*omeg/temp;
@@ -542,7 +542,7 @@ namespace apl
         //throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
         string function = "QHA3POINTS::free_energy()";
         string message = "Frequency too small (<0.001 THz) for F_vib(T)";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
     double betaa=47.9924*omeg/temp;
@@ -561,7 +561,7 @@ namespace apl
       //throw APLRuntimeError("Frequency too small (<0.001 THz) for S_vib(T)");
       string function = "QHA3POINTS::entropy()";
       string message = "Frequency too small (<0.001 THz) for S_vib(T)";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     double  betaa=47.9924*omeg/temp;
     double  S=4.14129*omeg/temp/(exp(betaa)-1.0)-0.0861733* log(1.0-exp(-1.0*betaa));
@@ -580,7 +580,7 @@ namespace apl
         //throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
         string function = "QHA3POINTS::heat_capacity()";
         string message = "Frequency too small (<0.001 THz) for Cv(T)";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
     double betaa=47.9924*omeg/temp;
@@ -661,7 +661,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha3P.enthalpy.out");
       string function = "QHA3POINTS::total_enthalpy()";
       string message = "Cannot write " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();
@@ -745,7 +745,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha3P.FVT.out");
       string function = "QHA3POINTS::enthalpy_including_ele()";
       string message = "Cannot write " + FVTfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(osfvt);
 
@@ -784,7 +784,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha3P.enthalpy.out");
       string function = "QHA3POINTS::enthalpy_including_ele()";
       string message = "Cannot write " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();

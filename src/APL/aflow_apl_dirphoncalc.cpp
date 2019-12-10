@@ -42,7 +42,7 @@ void DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
     // ME191029 - use xerror
     //throw APLRuntimeError("apl::DirectMethodPC::calculateForceFields(); The supercell structure has not been initialized yet.");
     string message = "The supercell structure has not been initialized yet.";
-    throw aurostd::xerror(soliloquy, message, _RUNTIME_INIT_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
   }
   _xInput.xvasp.AVASP_arun_mode = "APL";
 
@@ -245,7 +245,7 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
     //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the inequivalent atoms is missing.");
     string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
     string message = "The list of the inequivalent atoms is missing.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Clear old stuff
@@ -335,7 +335,7 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
         //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); Site point group operations are missing.");
         string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
         string message = "Site point group operations are missing.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
       // Loop over test directions vectors - we count the number of unique
@@ -389,7 +389,7 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
     //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the site point group operations is missing.");
     string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
     string message = "The list of the site point group operations is missing.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Print some information

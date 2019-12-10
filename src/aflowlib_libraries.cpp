@@ -755,7 +755,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_CheckProjectFromDirectory" << endl;	 
     CheckMaterialServer("aflowlib::LIB2RAW_CheckProjectFromDirectory"); // must be in AFLOW_MATERIALS_SERVER
     // find from PWD
-    string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::execute2string("pwd");aurostd::StringSubst(directory_pwd,"\n","");
+    string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::getPWD();aurostd::StringSubst(directory_pwd,"\n","");  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     if(directory_pwd=="/common/GNDSTATE") directory_pwd="/common/LIB2"; // [HISTORIC]
     aurostd::StringSubst(directory_pwd,"common/SCINT","common/ICSD"); // [HISTORIC]
     aurostd::StringSubst(directory_pwd,"common/ELPASOLITES","common/AURO"); // [HISTORIC]
@@ -840,7 +840,7 @@ namespace aflowlib {
     CheckMaterialServer("aflowlib::LIB2RAW_ALL"); // must be in AFLOW_MATERIALS_SERVER
     string PROJECT_LIBRARY;
     if(tokens.size()==2) PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(tokens.at(1));
-    else PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(aurostd::execute2string("pwd"));
+    else PROJECT_LIBRARY=aflowlib::LIB2RAW_CheckProjectFromDirectory(aurostd::getPWD()); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     cerr << "aflowlib::LIB2RAW_ALL FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
 
     int multi_sh_value=XHOST.CPU_Cores;
@@ -1023,7 +1023,7 @@ namespace aflowlib {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
       aurostd::StringSubst(directory,"./","");
-      if(directory=="." || directory.empty()) { directory=aurostd::execute2string("pwd"); }
+      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
       flag_WEB=FALSE;
       flag_files_LIB=FALSE,flag_files_RAW=FALSE,flag_files_WEB=FALSE;
       directory_LIB=directory;
@@ -1161,7 +1161,7 @@ namespace aflowlib {
 	_aflags aflags;
  	aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",FALSE); // PATCH FOR REFRESH (to be removed)
 	aurostd::ZIP2ZIP(directory_LIB,"gz","xz",FALSE); // PATCH FOR REFRESH (to be removed)
-	cout << "aflowlib::LIB2RAW: ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time") << endl;
+	cout << "aflowlib::LIB2RAW: ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
 	return FALSE;
       }
       if(perform_BANDS) {
@@ -1208,7 +1208,7 @@ namespace aflowlib {
     cout << "aflowlib::LIB2RAW: FOUND Project= " << XHOST.hostname << ": " << PROJECT_LIBRARY << endl;
     if((perform_THERMODYNAMICS || perform_BANDS ||  perform_MAGNETIC)) {
       _aflags aflags;
-      cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   BEGIN_DATE = " << Message(aflags,"user,host,time") << endl;
+      cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   BEGIN_DATE = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::ZIP2ZIP(directory_LIB,"bz2","xz");
       aurostd::ZIP2ZIP(directory_LIB,"gz","xz");
 
@@ -1698,7 +1698,7 @@ namespace aflowlib {
 	
 	// for(uint i=0;i<aflowlib_data.vauid.size();i++) {cout << "aflowlib::LIB2RAW: DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
 	// DONE
-	cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time") << endl;
+	cout << "aflowlib::LIB2RAW: dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(aflags,"time",_AFLOW_FILE_NAME_) << endl;
 	if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
       }
     }
@@ -1718,7 +1718,7 @@ namespace aflowlib {
     LDEBUG=FALSE; //CO 180321
     // CO 180216 - more robust for any type of directory/file setup
     vector<string> Chmod_Files;
-    if(LDEBUG) {cerr << soliloquy << " pwd=" << aurostd::execute2string("pwd") << endl;}
+    if(LDEBUG) {cerr << soliloquy << " pwd=" << aurostd::getPWD() << endl;}  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     
     //[CO190321 - bust if find grabs nothing]aurostd::execute("chmod 755 `find \""+directory_RAW+"\" -type d`");
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" \""+directory_RAW+"\" -type d"),Chmod_Files);
@@ -1984,12 +1984,13 @@ namespace aflowlib {
       command << "mv KPOINTS.bands KPOINTS.bands.old" << endl; vfile.push_back("KPOINTS.bands.old"); // so it is compressed
       command << "mv EIGENVAL.bands EIGENVAL.bands.old" << endl; vfile.push_back("EIGENVAL.bands.old"); // so it is compressed
       aurostd::execute(command);
+      
       command.clear();command.str(std::string());
       _aflags aflags;
       aflags.Directory=directory_RAW;
       if(pflow::FIXBANDS(aflags,"POSCAR.bands,KPOINTS.bands.old,EIGENVAL.bands.old,KPOINTS.bands,EIGENVAL.bands")==FALSE) {
-	cout << "ERROR_RERUN " << directory_LIB << endl;
-	return FALSE;
+        cout << "ERROR_RERUN " << directory_LIB << endl;
+        return FALSE;
       }
 
       // EXECUTE PLOTBZ.SH using ksh
@@ -1999,13 +2000,15 @@ namespace aflowlib {
       aurostd::execute(command);
 
       // EXECUTE PLOTBAND
-      char work_dir[1024];
-      string cdir; //, wdir;
-      cdir = getcwd(work_dir, 1024);  //Get the working directory
+      //[CO191112 - OBSOLETE]char work_dir[1024];
+      //[CO191112 - OBSOLETE]string cdir; //, wdir;
+      //[CO191112 - OBSOLETE]cdir = getcwd(work_dir, 1024);  //Get the working directory
+      //[CO191112 - OBSOLETE back and forth directory change]string work_dir=aurostd::getPWD();    //Get the working directory //CO191112
 
-      char raw_dir[1024];
-      strcpy(raw_dir, directory_RAW.c_str());
-      chdir(raw_dir);               //Change into the RAW direcotry
+      //[CO191112 - OBSOLETE]char raw_dir[1024];
+      //[CO191112 - OBSOLETE]strcpy(raw_dir, directory_RAW.c_str());
+      //[CO191112 - OBSOLETE]chdir(raw_dir);               //Change into the RAW directory
+      //[CO191112 - OBSOLETE back and forth directory change]chdir(directory_RAW.c_str());                //Change into the RAW directory  //CO191112
 
       // [OBSOLETE]  vector<string> directory;
       // [OBSOLETE]  directory.push_back(" ");
@@ -2017,13 +2020,14 @@ namespace aflowlib {
       // [OBSOLETE - ME190614]  estructure::PLOT_BANDDOS("./");
       // [OBSOLETE - ME190614]  estructure::PLOT_PEDOSALL_AFLOWLIB("./", aflags);
 
-      chdir(work_dir);  //Go to the working direcotry
+      //[CO191112 - OBSOLETE back and forth directory change]chdir(work_dir.c_str());  //Go to the working directory //CO191112
     }
 
-    // Kesong adds it
-    command << "cd \"" << directory_RAW << "\"" << endl;
-    command << "rm -f *pdf *jpg " << endl;
-    aurostd::execute(command);
+    //[CO191112] - NO PDF JPG detected in aflow_gnuplot_funcs.cpp, so this is useless anyway
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]// Kesong adds it
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "cd \"" << directory_RAW << "\"" << endl;
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]command << "rm -f *pdf *jpg " << endl;
+    //[CO191112 - dangerous command, will delete ANY pdf jpg created before this routine]aurostd::execute(command);
 
     // DONE
     cout << MESSAGE << " aflowlib::LIB2RAW_Loop_Bands: end " << directory_LIB << endl;
@@ -4397,22 +4401,22 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OUTCAR.static",directory_RAW,"OUTCAR.static",vfile,MESSAGE);  // OUTCAR.static
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"OUTCAR.static") << endl;
       if(outcar_static.GetPropertiesFile(directory_RAW+"/"+"OUTCAR.static")) {
-	EFERMI=outcar_static.Efermi;
-	data.spin_cell=outcar_static.mag_cell;
-	data.spin_atom=outcar_static.mag_atom;
-	data.spinD="";
-	data.vspinD.clear();
-	if(outcar_static.vmag.size()) {
-	  for(uint i=0;i<(uint) outcar_static.vmag.size();i++) {
-	    data.spinD+=aurostd::utype2string<double>(outcar_static.vmag.at(i),5)+(i<outcar_static.vmag.size()-1?",":"");
-	    data.vspinD.push_back(outcar_static.vmag.at(i));
-	  }
-	} else {
-	  for(uint i=0;i<outcar_static.natoms;i++) {  //use outcar_static.natoms as there can be a primitivization between relax and static
-	    data.spinD+=aurostd::utype2string<double>(0)+(i<outcar_static.natoms-1?",":"");
-	    data.vspinD.push_back(0.0);
-	  }
-	}
+        EFERMI=outcar_static.Efermi;
+        data.spin_cell=outcar_static.mag_cell;
+        data.spin_atom=outcar_static.mag_atom;
+        data.spinD="";
+        data.vspinD.clear();
+        if(outcar_static.vmag.size()) {
+          for(uint i=0;i<(uint) outcar_static.vmag.size();i++) {
+            data.spinD+=aurostd::utype2string<double>(outcar_static.vmag.at(i),5)+(i<outcar_static.vmag.size()-1?",":"");
+            data.vspinD.push_back(outcar_static.vmag.at(i));
+          }
+        } else {
+          for(uint i=0;i<outcar_static.natoms;i++) {  //use outcar_static.natoms as there can be a primitivization between relax and static
+            data.spinD+=aurostd::utype2string<double>(0)+(i<outcar_static.natoms-1?",":"");
+            data.vspinD.push_back(0.0);
+          }
+        }
       } else { cout << MESSAGE << " ERROR OUTCAR.static properties cannot be extracted: " << outcar_static.ERROR << endl; }
     } else { cout << MESSAGE << " MISSING OUTCAR.static" << endl; }
     if(EFERMI==AUROSTD_NAN) { cout << MESSAGE << " unable to load OUTCAR.static, using Efermi from bands" << endl; }
@@ -4429,31 +4433,32 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"OUTCAR.bands",directory_RAW,"OUTCAR.bands",vfile,MESSAGE);  // OUTCAR.bands
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"OUTCAR.bands") << endl;
       if(outcar_bands.GetPropertiesFile(directory_RAW+"/"+"OUTCAR.bands")) {
-	outcar_bands.GetBandGap(EFERMI);
-	data.Egap=outcar_bands.Egap_net;
-	data.Egap_fit=outcar_bands.Egap_fit_net;
-	data.Egap_type=outcar_bands.Egap_type_net;
-	if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap=0.0;      //half-metal
-	if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap_fit=0.0;  //half-metal
-   
-	// SPIN POLARIZATION AT FERMI LEVEL
-	if(data.Egap<MAG_EPS && aurostd::abs(data.spin_cell)>MAG_EPS) { //must be metal and magnetic
-	  if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.static"))) {
-	    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.static",directory_RAW,"DOSCAR.static",vfile,MESSAGE);  // DOSCAR.static
-	    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.static") << endl;
-	    doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.static");
-	  }
-	  if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.relax2") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.relax2"))) {
-	    aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.relax2",directory_RAW,"DOSCAR.relax",vfile,MESSAGE);  // DOSCAR.relax2
-	    if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.relax") << endl;
-	    doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.relax");
-	  }
-	  if(!doscar.content.empty()) {
-	    data.spinF=doscar.spinF;
-	  } else {
-	    cout << MESSAGE << " MISSING DOSCAR.static and DOSCAR.relax[2]" << endl;
-	  }
-	}
+        if(outcar_bands.GetBandGap(EFERMI)){
+          data.Egap=outcar_bands.Egap_net;
+          data.Egap_fit=outcar_bands.Egap_fit_net;
+          data.Egap_type=outcar_bands.Egap_type_net;
+          if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap=0.0;      //half-metal
+          if(aurostd::substring2bool(data.Egap_type,"metal")) data.Egap_fit=0.0;  //half-metal
+
+          // SPIN POLARIZATION AT FERMI LEVEL
+          if(data.Egap<MAG_EPS && aurostd::abs(data.spin_cell)>MAG_EPS) { //must be metal and magnetic
+            if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.static") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.static"))) {
+              aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.static",directory_RAW,"DOSCAR.static",vfile,MESSAGE);  // DOSCAR.static
+              if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.static") << endl;
+              doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.static");
+            }
+            if(doscar.content=="" && (aurostd::FileExist(directory_LIB+"/"+"DOSCAR.relax2") || aurostd::EFileExist(directory_LIB+"/"+"DOSCAR.relax2"))) {
+              aflowlib::LIB2RAW_FileNeeded(directory_LIB,"DOSCAR.relax2",directory_RAW,"DOSCAR.relax",vfile,MESSAGE);  // DOSCAR.relax2
+              if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"DOSCAR.relax") << endl;
+              doscar.GetPropertiesFile(directory_RAW+"/"+"DOSCAR.relax");
+            }
+            if(!doscar.content.empty()) {
+              data.spinF=doscar.spinF;
+            } else {
+              cout << MESSAGE << " MISSING DOSCAR.static and DOSCAR.relax[2]" << endl;
+            }
+          }
+        } else { cout << MESSAGE << " ERROR OUTCAR.bands BandGap() cannot be extracted: " << outcar_static.ERROR << endl; }  //CO181129
       } else { cout << MESSAGE << " ERROR OUTCAR.bands properties cannot be extracted: " << outcar_static.ERROR << endl; }  //CO181129
     } else { cout << MESSAGE << " MISSING OUTCAR.bands" << endl; }  //CO181129
 
@@ -4717,6 +4722,7 @@ namespace aflowlib {
 namespace aflowlib {
   bool LIB2RAW_Loop_AEL(string& directory_LIB,string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,string MESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function = "aflowlib::LIB2RAW_loop_AEL()";  // ME191119
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_AEL [1]" << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_AEL - begin " << directory_LIB << endl;
     // [OBSOLETE]  aflowlib_out << _AFLOWLIB_ENTRY_SEPARATOR_ << "loop=ael";
@@ -4734,7 +4740,10 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AEL_elastic_tensor.json",directory_RAW,"AEL_elastic_tensor.json",vfile,MESSAGE);  // AEL_elastic_tensor.json //CT181212
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AEL_energy_structures.json",directory_RAW,"AEL_energy_structures.json",vfile,MESSAGE);  // AEL_energy_structures.json //CT181212
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.ael.out") << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.ael.out"),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
+      // ME191105
+      string ael_out_str = aurostd::efile2string(directory_RAW + "/aflow.ael.out");
+      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_RESULTS]START", "[AEL_RESULTS]STOP");
+      //aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.ael.out"),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");  OBSOLETE ME191105
       aurostd::stream2vectorstring(aflow_ael_out,vline);
       for (uint i=0;i<vline.size();i++) {
 	aurostd::StringSubst(vline.at(i),"="," ");
@@ -4758,6 +4767,73 @@ namespace aflowlib {
 	  if(tokens.at(0)=="ael_average_external_pressure") data.ael_average_external_pressure=aurostd::string2utype<double>(tokens.at(1)); //CT181212
 	}
       }
+
+      // ME191105 - BEGIN
+      xmatrix<double> tensor(6, 6);
+      vector<double> row;
+      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_STIFFNESS_TENSOR]START", "[AEL_STIFFNESS_TENSOR]STOP");
+      aurostd::stream2vectorstring(aflow_ael_out, vline);
+      if (vline.size() > 0) {
+        vline.pop_back();  // Remove empty line at the end
+        try {
+          if (vline.size() != 6) {
+            stringstream message;
+            message << "Could not read stiffness tensor: wrong number of lines"
+                    << " (found " << vline.size() << ", need 6).";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+          }
+          for (int i = 0; i < 6; i++) {
+            aurostd::string2tokens(vline[i], row);
+            if (row.size() != 6) {
+              stringstream message;
+              message <<  "Could not read stiffness tensor."
+                      << " Wrong number of columns in line " << (i + 1)
+                      << " (found " << row.size() << ", need 6).";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+            }
+            for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
+          }
+          data.ael_stiffness_tensor = tensor;
+        } catch (aurostd::xerror& e) {
+          std::cout << MESSAGE << " ERROR - " << e.error_message << std::endl;
+        }
+      } else {
+        std::cout << MESSAGE << " WARNING - No stiffness tensor found in aflow.ael.out." << std::endl;
+      }
+
+      tensor.clear();
+      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_COMPLIANCE_TENSOR]START", "[AEL_COMPLIANCE_TENSOR]STOP");
+      aurostd::stream2vectorstring(aflow_ael_out, vline);
+      if (vline.size() > 0) {
+        vline.pop_back();  // Remove empty line at the end
+        try {
+          if (vline.size() != 6) {
+            string function = "aflowlib::LIB2RAW_loop_AEL()";
+            stringstream message;
+            message << "Could not read compliance tensor: wrong number of lines"
+                    << " (found " << vline.size() << ", need 6).";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+          }
+          for (int i = 0; i < 6; i++) {
+            aurostd::string2tokens(vline[i], row);
+            if (row.size() != 6) {
+              string function = "aflowlib::LIB2RAW_loop_AEL()";
+              stringstream message;
+              message <<  "Could not read compliance tensor:"
+                      << " wrong number of columns in line " << (i + 1)
+                      << " (found " << row.size() << ", need 6).";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+            }
+            for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
+          }
+          data.ael_compliance_tensor = tensor;
+        } catch (aurostd::xerror& e) {
+          std::cout << MESSAGE << " ERROR - " << e.error_message << std::endl;
+        }
+      } else {
+        std::cout << MESSAGE << " WARNING - No compliance tensor found in aflow.ael.out." << std::endl;
+      }
+      // ME191105 - END
     } else {
       return FALSE;
     }
@@ -4779,6 +4855,15 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ael_applied_pressure (GPa) = " << ((data.ael_applied_pressure!=AUROSTD_NAN)?aurostd::utype2string(data.ael_applied_pressure,10):"unavailable") << endl; //CT181212
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ael_average_external_pressure (GPa) = " << ((data.ael_average_external_pressure!=AUROSTD_NAN)?aurostd::utype2string(data.ael_average_external_pressure,10):"unavailable") << endl; //CT181212
     // done
+    if (AFLOWLIB_VERBOSE) {  // ME191105
+      std::cout << MESSAGE << " ael_stiffness_tensor = ";
+      if ((data.ael_stiffness_tensor.rows != 6) || (data.ael_stiffness_tensor.cols != 6)) std::cout << "unavailable" << std::endl;
+      else std::cout << std::endl << data.ael_stiffness_tensor << std::endl;
+
+      std::cout << MESSAGE << " ael_compliance_tensor = ";
+      if ((data.ael_compliance_tensor.rows != 6) || (data.ael_compliance_tensor.cols != 6)) std::cout << "unavailable" << std::endl;
+      else std::cout << std::endl << data.ael_compliance_tensor << std::endl;
+    }
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_AEL - end " << directory_LIB << endl;
     return TRUE;
   }
@@ -5495,7 +5580,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!"<<endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(!gfound && (FILE=="DOSCAR")) {
@@ -5516,7 +5601,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(!gfound && (FILE=="POSCAR")) {
@@ -5537,7 +5622,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!"<<endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(!gfound) {
@@ -5557,7 +5642,7 @@ namespace aflowlib {
       // [OBSOLETE] cerr<< FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!" << endl;
       // [OBSOLETE] exit(1);
       string message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror("aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       // ME190627 - END
     }
     if(LDEBUG) cerr << "vaspfile2stringstream: END" << endl;
@@ -5612,7 +5697,7 @@ namespace aflowlib {
       flag_FORCE=true;
       string directory=aurostd::CleanFileName(options);
       aurostd::StringSubst(directory,"./","");
-      if(directory=="." || directory.empty()) { directory=aurostd::execute2string("pwd"); }
+      if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
       // OBSOLETE flag_files_LIB=FALSE;
       directory_LIB=directory;
       PROJECT_LIBRARY=directory_LIB;
@@ -5660,6 +5745,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
 	//	aurostd::file2file(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
 	aurostd::CopyFile(directory_LIB+"/agl.LOCK",directory_LIB+"/agl.LOCK.run");   // LINK
+	aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   // ME191105 - otherwise aflow will not run
       }
       //   cerr << "CORMAC" << endl;exit(0);
       // if(_AFLOWIN_=="aflow.in")

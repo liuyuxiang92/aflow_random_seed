@@ -977,6 +977,11 @@ ARUN_DIRECTORY_PREFIX
 ####################################################################################################
 DEFAULTS POCC
 
+POCC_FILE_PREFIX
+  description: Temperature range over which POCC will perform post-processing. Scan 0 to 1200 (K) in 300 (K) increments. 0 is converted to _ZERO_TOL_ since T=0 exactly is undefined for the Boltzmann distribution.
+  type: string
+  default: "0:1200:300"
+
 DEFAULT_POCC_SITE_TOL
   description: Default site tolerance for HNF calculation.
   type: double
@@ -1015,7 +1020,7 @@ DEFAULT_POCC_WRITE_OUT_ALL_DERIVATIVE_STRUCTURES
 POCC_FILE_PREFIX
   description: Prefix for files written by POCC module.
   type: string
-  default: "aflow.apl."
+  default: "aflow.pocc."
 
 POCC_ALL_DERIVATIVE_STRUCTURES_FILE
   description: Name for all derivative structures file.
@@ -1036,6 +1041,16 @@ POCC_ALL_SITE_CONFIGURATIONS_FILE
   description: Name for site configurations file.
   type: string
   default: "site_configurations.out"
+
+POCC_OUT_FILE
+  description: Name for POCC post-processing properties file.
+  type: string
+  default: "out"
+
+POCC_DOSCAR_FILE
+  description: Name for ensemble average DOSCAR.
+  type: string
+  default: "DOSCAR.pocc"
 
 ####################################################################################################
 DEFAULTS APL
@@ -1611,36 +1626,6 @@ MPI_BINARY_DIR_MPCDF_HYDRA
   type: string
   default: "~/bin/"
 
-MPI_OPTIONS_TERAGRID_RANGER
-  description: MPI options for --machine=teragrid_ranger.
-  type: string
-  default: ""
-
-MPI_COMMAND_TERAGRID_RANGER
-  description: MPI command for --machine=teragrid_ranger.
-  type: string
-  default: "/share/sge6.2/default/pe_scripts/ibrun"
-
-MPI_BINARY_DIR_TERAGRID_RANGER
-  description: MPI executable directory for --machine=teragrid_ranger.
-  type: string
-  default: "~/bin/"
-
-MPI_OPTIONS_TERAGRID_KRAKEN
-  description: MPI options for --machine=teragrid_kraken.
-  type: string
-  default: ""
-
-MPI_COMMAND_TERAGRID_KRAKEN
-  description: MPI command for --machine=teragrid_kraken.
-  type: string
-  default: "aprun -n"
-
-MPI_BINARY_DIR_TERAGRID_KRAKEN
-  description: MPI executable directory for --machine=teragrid_kraken.
-  type: string
-  default: "/nics/a/proj/aflow/bin/"
-
 MPI_OPTIONS_FULTON_MARYLOU
   description: MPI options for --machine=marylou.
   type: string
@@ -1655,21 +1640,6 @@ MPI_BINARY_DIR_FULTON_MARYLOU
   description: MPI executable directory for --machine=marylou.
   type: string
   default: "/fslgroup/fslg_datamining/bin/"
-
-MPI_OPTIONS_TRINITY_PARSONS
-  description: MPI options for --machine=parsons.
-  type: string
-  default: ""
-
-MPI_COMMAND_TRINITY_PARSONS
-  description: MPI command for --machine=parsons.
-  type: string
-  default: "mpirun -np"
-
-MPI_BINARY_DIR_TRINITY_PARSONS
-  description: MPI executable directory for --machine=parsons.
-  type: string
-  default: "/home/users/aflow/bin/"
 
 MPI_OPTIONS_MACHINE1
   description: MPI options for --machine=host1.

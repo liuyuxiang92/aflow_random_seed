@@ -78,7 +78,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::addPoint(); Wrong dimension of the point.");
       string function = "apl::PathBuilder::addPoint()";
       string message = "Wrong dimension of the point.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     if( p.lrows != _pointsVectorStartingIndex ) {
@@ -107,7 +107,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::setDensity(); The density should be >= 0.");
       string function = "apl::PathBuilder::setDensity()";
       string message = "The density should be >= 0.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     _nPointsPerSubPath = n;
   }
@@ -124,7 +124,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::buildPath; There are no points.");
       string function = "apl::PathBuilder::buildPath";
       string message ="There are no points.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     };
 
     // Create path in the SINGLE_POINT_MODE
@@ -152,7 +152,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::buildPath(); The number of points is odd.");
 	string function = "apl::PathBuilder::buildPath()";
         string message = "The number of points is odd.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
       xvector<double> startPoint(3), endPoint(3);
@@ -197,7 +197,7 @@ namespace apl {
     //throw APLRuntimeError("apl::PathBuilder::getPointSize(); Unknown mode.");
     string function = "apl::PathBuilder::getPointSize()";
     string message = "Unknown mode.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::getPointLength(); Unknown mode.");
       string function = "apl::PathBuilder::getPointLength()";
       string message = "Unknown mode.";
-      throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
     }
 
     //
@@ -238,7 +238,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index. The index has to start from 1.");
       string function = "apl::PathBuilder::getPathLength()";
       string message = "Wrong index. The index has to start from 1.";
-      throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
 
     // Quick solution 1...
@@ -252,7 +252,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
 	string function = "apl::PathBuilder::getPathLength()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( _store == RECIPROCAL_LATTICE ) {
 	length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[i]) - F2C(trasp(reciprocalLattice),_points[i-1]) );
@@ -270,7 +270,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
 	string function = "apl::PathBuilder::getPathLength()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( _store == RECIPROCAL_LATTICE ) {
 	length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[(i*2)-1]) - F2C(trasp(reciprocalLattice),_points[(i-1)*2]) );
@@ -284,7 +284,7 @@ namespace apl {
     //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Unknown mode.");
     string function = "apl::PathBuilder::getPathLength()";
     string message = "Unknown mode.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
   
   // ///////////////////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index. The index has to start from 1.");
       string function = "apl::PathBuilder::getPoint()";
       string message = "Wrong index. The index has to start from 1.";
-      throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _points.size() ) {
@@ -303,7 +303,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
 	string function = "apl::PathBuilder::getPoint()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       return _points[i-1];
     } else if( _mode == COUPLE_POINT_MODE ) {
@@ -312,7 +312,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
 	string function = "apl::PathBuilder::getPoint()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( i == 1 ) return _points[0];
       if( i == (_points.size()/2)+1 ) return _points[_points.size()-1];
@@ -323,7 +323,7 @@ namespace apl {
     //throw APLRuntimeError("apl::PathBuilder::getPoint(); Unknown mode.");
     string function = "apl::PathBuilder::getPoint()";
     string message = "Unknown mode.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
   
   // ///////////////////////////////////////////////////////////////////////////
@@ -334,7 +334,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index. The index has to start from 1.");
       string function = "apl::PathBuilder::getPointLabel()";
       string message = "Wrong index. The index has to start from 1.";
-      throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
     
     if( _mode == SINGLE_POINT_MODE ) {
@@ -343,7 +343,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
 	string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       return _labels[i-1];
     } else if( _mode == COUPLE_POINT_MODE ) {
@@ -352,7 +352,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
 	string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( i == 1 ) return _labels[0];
       if( i == (_labels.size()/2)+1 ) return _labels[_labels.size()-1];
@@ -370,7 +370,7 @@ namespace apl {
     //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Unknown mode.");
     string function = "apl::PathBuilder::getPointLabel()";
     string message = "Unknown mode.";
-    throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
   
   // ///////////////////////////////////////////////////////////////////////////
@@ -397,7 +397,7 @@ namespace apl {
 	//throw APLRuntimeError("apl::PathBuilder::getPath(); Undefined label of the point.");
 	string function = "apl::PathBuilder::getPath()";
         string message = "Undefined label of the point.";
-        throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
       new_points.push_back(_points[j]);      
@@ -518,28 +518,28 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); No input coordinates found");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "No input coordinates found";
-      throw aurostd::xerror(function, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vlabels.empty()){
       // ME191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); No input labels found");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "No input labels found";
-      throw aurostd::xerror(function, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()!=vlabels.size()){
       // ME191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Size of input coordinates does not match size of input labels");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Size of input coordinates does not match size of input labels";
-      throw aurostd::xerror(function, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()<2){
        // ME191031 - use xerro
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Path size should include at least two points");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Path size should include at least two points";
-      throw aurostd::xerror(function, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
 
     for(uint i=0;i<vcoords.size();i++){
@@ -549,7 +549,7 @@ namespace apl {
         //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3");
         string function = "apl::PathBuilder::defineCustomPoints()";
         string message = "Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3";
-        throw aurostd::xerror(function, message, _INPUT_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
       }
       if(LDEBUG){cerr << soliloquy << " found point " << vlabels[i] << ": (" << (CARTESIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
       addPoint(vlabels[i],3,coordinate[0],coordinate[1],coordinate[2]);
@@ -580,7 +580,7 @@ namespace apl {
       //throw APLRuntimeError("apl::PathBuilder::takeAflowElectronicPath(); The BZ not found for this lattice.");
       string function = "apl::PathBuilder::takeAflowElectronicPath()";
       string message = "The Brillouin zone was not found for this lattice.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     //   cerr << fileKPOINTS.str() << std::endl;

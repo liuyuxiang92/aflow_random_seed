@@ -166,7 +166,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
                                   false, false, dummy_os, scell.sym_eps)) {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
       string message = "Could not calculate the point group of the supercell.";
-      throw xerror(function, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
   if (!pcell.pgroup_xtal_calculated) {
@@ -174,7 +174,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
                                          false, false, dummy_os, pcell.sym_eps)) {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
       string message = "Could not calculate the point group of the primitive cell.";
-      throw xerror(function, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
   FileDevNull.clear();
@@ -214,7 +214,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
             std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc;
             std::cerr << "using symmetry fgroup number " << fg << std::endl;
           }
-          throw xerror(function, message, _RUNTIME_ERROR_);
+          throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
       }
     }
@@ -227,7 +227,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
       std::cerr << "ClusterSet::getSymmetryMap: Point group mismatch. Primitive cell: ";
       std::cerr << pcell.point_group_Hermann_Mauguin << "; supercell: " << scell.point_group_Hermann_Mauguin << std::endl;
     }
-    throw xerror(function, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
   }
 }
 
@@ -338,7 +338,7 @@ void ClusterSet::build(int _order) {
     string function = _AAPL_CLUSTER_ERR_PREFIX_ + "build";
     stringstream message;
     message << "Cluster order must be larger than 1 (is " << _order << ").";
-    throw xerror(function, message, _VALUE_RANGE_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
   }
   _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
   nifcs = (int) std::pow(3, order);
@@ -1301,7 +1301,7 @@ void ClusterSet::writeClusterSetToFile(const string& filename) {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_CLUSTER_ERR_PREFIX_ + "writeClusterSetToFile";
     string message = "Could not write ClusterSet to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1561,13 +1561,13 @@ void ClusterSet::readClusterSetFromFile(const string& filename) {
 
   if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
     message << "Could not open file " << filename << ". File not found.";
-    throw xerror(function, message, _FILE_NOT_FOUND_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
   }
   vector<string> vlines;
   aurostd::efile2vectorstring(filename, vlines);
   if (vlines.size() == 0) {
     message << "Cannot open file " << filename << ". File empty or corrupt.";
-    throw xerror(function, message, _FILE_CORRUPT_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
   }
 
   // Start reading
@@ -1577,7 +1577,7 @@ void ClusterSet::readClusterSetFromFile(const string& filename) {
   // Check that this is a valid xml file
   if (line.find("xml") == string::npos) {
     message << "File is not a valid xml file.";
-    throw xerror(function, message, _FILE_WRONG_FORMAT_);
+    throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
   }
 
   //Check if xml file can be used to read the ClusterSet object
@@ -1588,7 +1588,7 @@ void ClusterSet::readClusterSetFromFile(const string& filename) {
     if (order == 4) readHigherOrderDistortions(line_count, vlines);
   } else {
     message << "The settings in the hibernate file and the aflow.in file are incompatible.";
-    throw xerror(function, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 }
 
@@ -1612,7 +1612,7 @@ bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlin
   while (true) {
     if (line_count == vsize) {
       message << "Checksum not found in hibernate file.";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("checksum") != string::npos) {
@@ -1834,7 +1834,7 @@ void ClusterSet::readInequivalentClusters(uint& line_count,
   while (true) {
     if (line_count == vsize) {
       message = "inequivalent_clusters tag not found";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("inequivalent_clusters") != string::npos) {
@@ -1846,14 +1846,14 @@ void ClusterSet::readInequivalentClusters(uint& line_count,
   while (line.find("/inequivalent_clusters") == string::npos) {
     if (line_count == vsize) {
       message = "inequivalent_clusters tag incomplete";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("ineq_cluster") != string::npos) {
       while (line.find("/ineq_cluster") == string::npos) {
         if (line_count == vsize) {
           message = "ineq_cluster tag incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("varray name=\"clusters\"") != string::npos) {
@@ -1884,7 +1884,7 @@ vector<_cluster> ClusterSet::readClusters(uint& line_count,
   while (line.find("/clusters") == string::npos) {
     if (line_count == vsize) {
       message = "clusters tag incomplete";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     } 
     line = vlines[line_count++];
     if (line.find("<cluster>") != string::npos) {
@@ -1892,7 +1892,7 @@ vector<_cluster> ClusterSet::readClusters(uint& line_count,
       while(line.find("</cluster>") == string::npos) {
         if (line_count == vsize) {
           message = "cluster tag incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("atoms") != string::npos) {
@@ -1935,7 +1935,7 @@ _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
   while (line.find("/linear_combinations") == string::npos) {
     if (line_count == vsize) {
       message = "linear_combinations tag incomplete";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("independent") != string::npos) {
@@ -1956,7 +1956,7 @@ _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       while(true) {
         if (line_count == vsize) {
           message = "indices varray incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("/varray") != string::npos) {
@@ -1976,7 +1976,7 @@ _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       while(true) {
         if (line_count == vsize) {
           message = "coefficients varray incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("/varray") != string::npos) {
@@ -1996,7 +1996,7 @@ _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
       while(true) {
         if (line_count == vsize) {
           message = "indep2depMap varray incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("/varray") != string::npos) {
@@ -2029,7 +2029,7 @@ void ClusterSet::readInequivalentDistortions(uint& line_count,
   while (line.find("/inequivalent_distortions") == string::npos) {
     if (line_count == vsize) {
       message = "inequivalent_distortions tag incomplete";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("ineq_dist") != string::npos) {
@@ -2050,7 +2050,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
   while (line.find("/ineq_dist") == string::npos) {
     if (line_count == vsize) {
       message = "ineq_dist tag incomplete";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("atoms") != string::npos) {
@@ -2070,8 +2070,8 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
     } else if (line.find("distortions") != string::npos) {
       while (line.find("/distortions") == string::npos) {
         if (line_count == vsize) {
-          message = "distortions tag incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          message = "ineq_dist tag incomplete";
+          throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("varray") != string::npos) {
@@ -2079,7 +2079,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
           while (true) {
             if (line_count == vsize) {
               message = "incomplete distortions varray";
-              throw xerror(function, message, _FILE_CORRUPT_);
+              throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
             if (line.find("/varray") != string::npos) {
@@ -2102,14 +2102,14 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
       while (line.find("/rotations") == string::npos) {
         if (line_count == vsize) {
           message = "rotations tag incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("varray") != string::npos) {
           while (true) {
             if (line_count == vsize) {
               message = "incomplete rotations varray";
-              throw xerror(function, message, _FILE_CORRUPT_);
+              throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
             if (line.find("/varray") != string::npos) {
@@ -2131,7 +2131,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
       while (line.find("/transformation_maps") == string::npos) {
         if (line_count == vsize) {
           message = "transformation_maps tag incomplete";
-          throw xerror(function, message, _FILE_CORRUPT_);
+          throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
         if (line.find("varray") != string::npos) {
@@ -2139,7 +2139,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
           while (true) {
             if (line_count == vsize) {
               message = "incomplete distortios varray";
-              throw xerror(function, message, _FILE_CORRUPT_);
+              throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
             if (line.find("/varray") != string::npos) {
@@ -2172,7 +2172,7 @@ void ClusterSet::readHigherOrderDistortions(uint& line_count,
   while (line.find("/higher_order_distortions") == string::npos) {
     if (line_count == vsize) {
       message = "higher_order_distortions tag incomplete";
-      throw xerror(function, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
     }
     line = vlines[line_count++];
     if (line.find("ineq_dist") != string::npos) {

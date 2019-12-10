@@ -515,7 +515,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha.gpdis.out");
       string function = "QHA::write_gruneisen_parameter_path()";
       string message = "Cannot write " + outfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -555,7 +555,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha.gp.mesh.out");
       string function = "QHA::write_gruneisen_parameter_mesh()";
       string message = "Cannot write " + outfile;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -602,7 +602,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha.avg_gp.out");
       string function = "QHA::Writeaverage_gp()";
       string message = "Cannot write " + avg_out;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_avg);
     //gruneisen_parameter_300K();
@@ -619,14 +619,14 @@ namespace apl
       //throw APLRuntimeError("_qha_gp_mesh.size()==0");
       string function = "QHA::average_gruneisen_parameter()";
       string message = "_qha_gp_mesh.size()==0";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if(_freqs_mesh.size()==0) {
       // ME191031 - use xerror
       //throw APLRuntimeError("_freqs_mesh.size()==0");
       string function = "QHA::average_gruneisen_parameter()";
       string message = "_freqs_mesh.size()==0";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     //if cutoff is not set then set it to 0.001 to avoid numerical error
     if(_iszero(_cutoff_freq)) _cutoff_freq=1.0e-3;
@@ -674,7 +674,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.qha.avg_gp300K.out");
       string function = "QHA::gruneisen_parameter_300K()";
       string message = "Cannot write " + avg_out;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_avg);
   }
@@ -685,7 +685,7 @@ namespace apl
       //throw apl::APLRuntimeError("QHA::read_matrix() Missing file: "+file);
       string function = "QHA::read_matrix()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     ifstream in;
@@ -709,7 +709,7 @@ namespace apl
       //throw apl::APLRuntimeError("QHA::read_PDIS() Missing file: "+file);
       string function = "QHA::read_PDIS()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     
     vector<string> vlines;
@@ -719,7 +719,7 @@ namespace apl
       //throw apl::APLRuntimeError("QHA::read_PDIS() Missing file: "+file);
       string function = "QHA::read_PDIS()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
     hash_lines.clear();

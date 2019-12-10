@@ -370,7 +370,8 @@ namespace init {
     XHOST.is_SLURM=FALSE;
     XHOST.SLURM_CPUS_ON_NODE=aurostd::getenv2int("SLURM_CPUS_ON_NODE");
     XHOST.SLURM_NNODES=aurostd::getenv2int("SLURM_NNODES");          
-    if(XHOST.SLURM_CPUS_ON_NODE!=0 || XHOST.SLURM_NNODES!=0) XHOST.is_SLURM=TRUE;
+    XHOST.SLURM_NTASKS=aurostd::getenv2int("SLURM_NTASKS");          
+    if(XHOST.SLURM_CPUS_ON_NODE!=0 || XHOST.SLURM_NNODES!=0 || XHOST.SLURM_NTASKS!=0) XHOST.is_SLURM=TRUE;
     if(INIT_VERBOSE) {
       oss << "--- QUEUES --------------- " << endl;
       oss << "is_PBS=" << XHOST.is_PBS << endl;
@@ -379,6 +380,7 @@ namespace init {
       oss << "is_SLURM=" << XHOST.is_SLURM << endl;
       oss << "SLURM_CPUS_ON_NODE=" << XHOST.SLURM_CPUS_ON_NODE << endl;
       oss << "SLURM_NNODES=" << XHOST.SLURM_NNODES << endl;
+      oss << "SLURM_NTASKS=" << XHOST.SLURM_NTASKS << endl;
     }
     // maxmem
     XHOST.maxmem=aurostd::args2attachedutype<double>(XHOST.argv,"--mem=|--maxmem=",101.0);
@@ -448,15 +450,6 @@ namespace init {
       oss << "MPI_OPTIONS_FULTON_MARYLOU=" << MPI_OPTIONS_FULTON_MARYLOU << "\"" << endl;
       oss << "MPI_COMMAND_FULTON_MARYLOU=" << MPI_COMMAND_FULTON_MARYLOU << "\"" << endl;
       oss << "MPI_BINARY_DIR_FULTON_MARYLOU=" << MPI_BINARY_DIR_FULTON_MARYLOU << "\"" << endl;
-      oss << "MPI_OPTIONS_TRINITY_PARSONS=" << MPI_OPTIONS_TRINITY_PARSONS << "\"" << endl;
-      oss << "MPI_COMMAND_TRINITY_PARSONS=" << MPI_COMMAND_TRINITY_PARSONS << "\"" << endl;
-      oss << "MPI_BINARY_DIR_TRINITY_PARSONS=" << MPI_BINARY_DIR_TRINITY_PARSONS << "\"" << endl;
-      oss << "MPI_OPTIONS_TERAGRID_RANGER=" << MPI_OPTIONS_TERAGRID_RANGER << "\"" << endl;
-      oss << "MPI_COMMAND_TERAGRID_RANGER=" << MPI_COMMAND_TERAGRID_RANGER << "\"" << endl;
-      oss << "MPI_BINARY_DIR_TERAGRID_RANGER=" << MPI_BINARY_DIR_TERAGRID_RANGER << "\"" << endl;
-      oss << "MPI_OPTIONS_TERAGRID_KRAKEN=" << MPI_OPTIONS_TERAGRID_KRAKEN << "\"" << endl;
-      oss << "MPI_COMMAND_TERAGRID_KRAKEN=" << MPI_COMMAND_TERAGRID_KRAKEN << "\"" << endl;
-      oss << "MPI_BINARY_DIR_TERAGRID_KRAKEN=" << MPI_BINARY_DIR_TERAGRID_KRAKEN << "\"" << endl;
       oss << "MPI_OPTIONS_MACHINE1=" << MPI_OPTIONS_MACHINE1 << "\"" << endl;
       oss << "MPI_COMMAND_MACHINE1=" << MPI_COMMAND_MACHINE1 << "\"" << endl;
       oss << "MPI_BINARY_DIR_MACHINE1=" << MPI_BINARY_DIR_MACHINE1 << "\"" << endl;
@@ -641,7 +634,7 @@ namespace init {
     if(XHOST.vflag_control.flag("DIRECTORY")){directory_clean=XHOST.vflag_control.getattachedscheme("DIRECTORY");}
     aurostd::StringSubst(directory_clean,"//","/");  //clean
     directory_clean=aurostd::RemoveWhiteSpaces(directory_clean);
-    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::execute2string(XHOST.command("pwd"))+"/";}
+    if(directory_clean.empty() || directory_clean=="./" || directory_clean=="."){directory_clean=aurostd::getPWD()+"/";}  //[CO191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
     if(!directory_clean.empty()){XHOST.vflag_control.flag("DIRECTORY_CLEAN",TRUE);XHOST.vflag_control.push_attached("DIRECTORY_CLEAN",directory_clean);}
     if(LDEBUG) {cerr << directory_clean << endl;/*exit(0);*/}
     //CO190402 STOP - cleaning directory, giving us something to print with logger
@@ -821,6 +814,12 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::GIF\")=" << XHOST.vflag_control.flag("PRINT_MODE::GIF") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JPG\")=" << XHOST.vflag_control.flag("PRINT_MODE::JPG") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PNG\")=" << XHOST.vflag_control.flag("PRINT_MODE::PNG") << endl;
+
+    //[CO191110]run pocc post-processing for particular temperatures from command line
+    XHOST.vflag_control.flag("CALCULATION_TEMPERATURE",aurostd::args2attachedflag(argv,"--temperature=|--temp="));  //CO191110
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.flag("CALCULATION_TEMPERATURE") << endl;  //CO191110
+    if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")) XHOST.vflag_control.push_attached("CALCULATION_TEMPERATURE",aurostd::args2attachedstring(argv,"--temperature=|--temp=","300")); //CO191110
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE") << endl;  //CO191110
 
     XHOST.vflag_control.flag("XPLUG_DO_CLEAN",aurostd::args2flag(XHOST.argv,cmds,"--doclean"));
     XHOST.vflag_control.flag("XPLUG_DO_ADD",aurostd::args2flag(argv,"--add"));
@@ -1364,7 +1363,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
     double Tmin=aurostd::min(XHOST.vTemperatureCore);
     double Tzero=30.0;
-    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message("host") << endl; exit(1);
+    oss << "00000  MESSAGE " << aurostd::get_time() << " ";// << Message("host",_AFLOW_FILE_NAME_) << endl; exit(1);
     if(RUNSTAT || (!RUNSTAT && !RUNBAR)) {
       string soss="- [temp(C)=";
       for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {soss+=aurostd::utype2string(XHOST.vTemperatureCore.at(i),3)+(i<XHOST.vTemperatureCore.size()-1?",":"]");}
@@ -1573,7 +1572,7 @@ string Message(string list2print) {
 string Message(string str1,string list2print) {return string(" - "+str1+Message(list2print));}
 //string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
 string Message(const _aflags& aflags) {
-  string strout=" - [dir="+aflags.Directory+"]"+=Message("user,host,time");
+  string strout=" - [dir="+aflags.Directory+"]"+=Message("user,host,time",_AFLOW_FILE_NAME_);
   if(AFLOW_PTHREADS::FLAG) strout+=" - [thread="+aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER)+"/"+aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS)+"]";
   return strout;}
 string Message(const _aflags& aflags,string list2print1,string list2print2) {

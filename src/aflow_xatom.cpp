@@ -937,7 +937,7 @@ double GetPearsonCoefficient(const string& symbol) {
   // If not found throw xerror
   string function = "GetPearsonCoefficient";
   string message = symbol + " is not a valid element name or symbol.";
-  throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_ILLEGAL_);
 }
 
 double GetPearsonCoefficient(const int& iat) {
@@ -953,7 +953,7 @@ double GetCompoundAttenuationLength(const vector<string>& species,const vector<d
     //[CO190629 - no exit()]exit(0);
     stringstream message; //CO190629
     message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO190629
-    throw aurostd::xerror("GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
   }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
@@ -2534,7 +2534,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       } else {
 	      //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
 	      message << "QE needs atoms species names";  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
       }
       for(uint j=1;j<=3;j++) {
 	//  oss << " ";
@@ -3037,7 +3037,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
     //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
   }  // CO 180702
 
   if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
@@ -3060,7 +3060,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   if(vinput.size()==0) {
     //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
   }  // CO 180420
   
   //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
@@ -3121,7 +3121,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     if(QE==5 && QE_ERROR) {
       //[CO190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
-      throw aurostd::xerror(soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
     }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
@@ -3205,7 +3205,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             message << "lattice_vector "; //CO190629
             message << "at line[" << i+1 << "] is ill-defined" << endl; //CO190629
             message << "line: " << vinput[i] << endl; //CO190629
-            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
             //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
@@ -3221,14 +3221,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO190629
             else {message << "is ill-defined" << endl;} //CO190629
             message << "line: " << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
           }
         }
       }
       if(!atom_found_anywhere){
         //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
         //[CO190629 - no exit()]exit(1);
-        throw aurostd::xerror(soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -3246,14 +3246,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else {
               //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
               //[CO190629 - no exit()]exit(1);
-              throw aurostd::xerror(soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
           //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
           //[CO190629 - no exit()]exit(1);
-          throw aurostd::xerror(soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
         }
       }
     }
@@ -3301,7 +3301,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     a.title=vinput.at(iline++);
     // -------------- SCALE
@@ -3312,7 +3312,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
@@ -3323,7 +3323,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing second line in poscar" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
     a.scale=0.0;
@@ -3341,7 +3341,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -3364,7 +3364,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
@@ -3374,7 +3374,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -3445,7 +3445,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO190629
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
     }
 
     // VASP 4
@@ -3470,7 +3470,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
     }
   
     //[CO190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
@@ -3520,7 +3520,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -3532,7 +3532,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -3548,7 +3548,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -3591,7 +3591,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               //[CO190629 - no exit()]exit(0);
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
             }
             nnumber=aurostd::string2utype<int>(tokens_k.at(0));
             if(tokens_k.size()==1) dpocc=1.0;
@@ -3608,7 +3608,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               //[CO190629 - no exit()]exit(0);
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
             }
           } // loop on +
           a.num_each_type.push_back(number);
@@ -3629,7 +3629,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -3642,7 +3642,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     } else {
       if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
@@ -3655,7 +3655,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "missing line[" << iline << "]" << endl; //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }  // CO 180420 - check for missing lines
         stmp=vinput.at(iline++);
         sstmp=aurostd::RemoveSpaces(stmp);
@@ -3676,7 +3676,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             //[CO190629 - no exit()]exit(0);
             message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO190629
             for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
           }
         } else {
           //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
@@ -3684,7 +3684,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Did not find coordinate type D/d or C/c." << endl;  //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }
       }
       a.coord_type[1]='\0';
@@ -3742,7 +3742,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Insufficient number of atom lines." << endl;  //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }  
         if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
@@ -3756,7 +3756,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }  
 
         int id=0;
@@ -3833,7 +3833,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               message << " where x,y,z are the coordinates " << endl; //CO190629
               message << " Name is the symbol of the atom  " << endl; //CO190629
               message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO190629
-              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
             }
           }
           if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
@@ -4119,7 +4119,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  
       int id=0;
       string name;
@@ -4352,7 +4352,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO190629
           << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }
     }
     if(!found_setting){
@@ -4361,7 +4361,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -4446,7 +4446,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }
       }
     }
@@ -4645,7 +4645,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -4727,7 +4727,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << "You need to specify the same number of species and atoms types" << endl;  //CO190629
       message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO190629
       message << "      tokens.size()=" << tokens.size() << endl; //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -4856,7 +4856,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
     //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
@@ -4864,7 +4864,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
     //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
@@ -4872,7 +4872,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   
   // ---------------------------------------------------------------
@@ -5627,7 +5627,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -6107,7 +6107,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
      spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -6575,7 +6575,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   else{
     message << "routine: space group specified invalid; perhaps non-ITC setting: ";
     message << "space group symbol=" << spacegroupsymbol << " [dir=" << directory << "].";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
   return spacegroupnumber;
 }
@@ -6590,7 +6590,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -7071,7 +7071,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   if(setting==0){ //signals default //DX 20180807
@@ -7087,7 +7087,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   }
   if(setting < 1 || setting > 2) {
     message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -9073,12 +9073,12 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
   stringstream message; //CO190317
   if(vspecies.size()!=species.size() ) {
     message << "vspecies.size()!=species.size()"; //CO190317
-    aurostd::xerror(soliloquy,message,_VALUE_RANGE_); //CO190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
     //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
   }
   if(vspecies.size()!=num_each_type.size() ) {
     message << "vspecies.size()!=num_each_type.size()"; //CO190317
-    aurostd::xerror(soliloquy,message,_VALUE_RANGE_); //CO190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
     //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
   }
   int iatom=0;
@@ -9889,7 +9889,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     atomic_grid=a;atomic_grid.Clean();
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
-    ptr_atoms=&atomic_grid.atoms;
+    ptr_atoms=&atomic_grid.grid_atoms;  //CO190808 - GenerateGridAtoms() populates grid_atoms, not atoms
   }
   const deque<_atom> atoms=*ptr_atoms;
 
@@ -9944,13 +9944,16 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
   }
 
   if(check_min_dists){ //DX 20190613
-    double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
-    double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
+    double min_dist_orig=SYM::minimumDistance(atoms);  //lattice_orig //this does NOT work if we use GenerateGridAtoms (no longer periodic with lattice), so simply compare distances between atoms. NOTE: this is no longer the TRUE minimumDistance(), which requires knowledge of the lattice vectors
+    double min_dist_new=SYM::minimumDistance(atoms_in_cell);  //lattice_new
     if(LDEBUG){
+      cerr << soliloquy << " lattice_orig=" << endl;cerr << lattice_orig << endl;
+      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << soliloquy << " atoms_orig=" << endl;for(uint i=0;i<atoms.size();i++){cerr << atoms[i] << endl;}
       cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
       cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
     }
-    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
 
   return atoms_in_cell;
@@ -10028,7 +10031,7 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
     string function_name = "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
-    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
@@ -10071,7 +10074,7 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
     string function_name = "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
-    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
@@ -11722,6 +11725,61 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
 }
 
 // ***************************************************************************
+// Function SetAutoVolume
+// ***************************************************************************
+void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
+  string soliloquy="xstructure::setAutoVolume():";
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  stringstream message;
+
+  if(LDEBUG) {cerr << soliloquy << " fixing volume" << endl;}
+  double volume=0; //,voli=0;
+  bool use_AFLOW_defaults=use_AFLOW_defaults_in;
+  //try and pull from species_volume first
+  for(uint i=0;i<atoms.size()&&!use_AFLOW_defaults;i++){
+    for(uint j=0;j<num_each_type.size()&&!use_AFLOW_defaults;j++){
+      if(atoms[i].name==species[j]){
+        const double& voli=species_volume[j];
+        if(LDEBUG) {cerr << soliloquy << " atoms[i].name=" << atoms[i].name << " atoms[i].vol=" << voli << endl;}
+        if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){use_AFLOW_defaults=true;}
+        if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
+          message << "partial_occupation_value==0.0 for atom=" << i;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        }
+        volume+=atoms[i].partial_occupation_value*voli;
+      }
+    }
+  }
+  //otherwise get defaults from AFLOW
+  if(use_AFLOW_defaults || abs(volume)<_XPROTO_ZERO_VOL_){
+    if(LDEBUG) {cerr << soliloquy << " using automatic volumes" << endl;}
+    volume=0;
+    double voli;
+    for(uint i=0;i<atoms.size();i++){
+      for(uint j=0;j<num_each_type.size();j++){
+        if(atoms[i].name==species[j]){
+          voli=GetAtomVolume(atoms[i].name);
+          if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){
+            message << "No volume found for " << atoms[i].name << " (auto volumes)";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          }
+          if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
+            message << "partial_occupation_value==0.0 for atom=" << i;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          }
+          volume+=atoms[i].partial_occupation_value*voli;
+        }
+      }
+    }
+  }
+  if(abs(volume)<_XPROTO_ZERO_VOL_){
+    message << "Final volume==0, check species default volumes";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  SetVolume(volume);
+}
+
+// ***************************************************************************
 // Function InflateLattice
 // ***************************************************************************
 void xstructure::InflateLattice(const double &coefficient) {
@@ -11873,7 +11931,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   string soliloquy="GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);} //exit(0)
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);} //exit(0)
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -12050,7 +12108,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
         if(ignore_pcmap==false && pcmap==false){
           if(force_strict_pc2scMap){
             message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-            throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
           }
           ignore_pcmap=true;
           pc2scMap.clear();
@@ -12139,7 +12197,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       if(ignore_pcmap==false && pcmap==false){
         if(force_strict_pc2scMap){
           message << "pc2scMap not found for atom[i=" << ia << "]";
-          throw aurostd::xerror(soliloquy, message, _INDEX_MISMATCH_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
         }
         ignore_pcmap=true;
         pc2scMap.clear();
@@ -12190,7 +12248,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     message << "a.lattice          = " << endl;
     message << a.lattice << endl;
 
-    throw aurostd::xerror(soliloquy,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     //exit(0);
   }
 
@@ -12487,8 +12545,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //////////////////////////////////////////////////////////////////////////
     }
     if(!KRUN){
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,"user,host,time") << endl;
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,"user,host,time") << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       b.ClearSymmetry(); //CO181226
       pflow::PerformFullSymmetry(b,FileMESSAGE,aflags,kflags,osswrite,oss);
       //FOOLPROOF!!!!!!!!!
@@ -12524,7 +12582,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
   string soliloquy="GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -12546,7 +12604,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
   string soliloquy="GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -13633,24 +13691,40 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
-	if(i!=0 || j!=0 || k!=0) {  //these are ALREADY included
-	  for(uint iat=0;iat<str.atoms.size();iat++) {
-	    atom=str.atoms.at(iat);
-	    atom.isincell=FALSE; // these are OUT OF CELL
-	    atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms.at(iat).cpos;
-	    atom.fpos[1]=i+str.atoms.at(iat).fpos[1];
-	    atom.fpos[2]=j+str.atoms.at(iat).fpos[2];
-	    atom.fpos[3]=k+str.atoms.at(iat).fpos[3];
-	    str.grid_atoms.push_back(atom);
+        if(!(i==0 && j==0 && k==0)) {  //these are ALREADY included
+          for(uint iat=0;iat<str.atoms.size();iat++) {
+            atom=str.atoms.at(iat);
+            atom.isincell=FALSE; // these are OUT OF CELL
+            //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms.at(iat).cpos;  //CO190808
+            atom.cpos+=((double)i)*a1+((double)j)*a2+((double)k)*a3;  //CO190808
+            //atom.fpos[1]=i+str.atoms.at(iat).fpos[1]; //CO190808
+            //atom.fpos[2]=j+str.atoms.at(iat).fpos[2]; //CO190808
+            //atom.fpos[3]=k+str.atoms.at(iat).fpos[3]; //CO190808
+            atom.fpos[1]+=i;  //CO190808
+            atom.fpos[2]+=j;  //CO190808
+            atom.fpos[3]+=k;  //CO190808
+            str.grid_atoms.push_back(atom);
             str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-      if(LDEBUG) { //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-      } //CO190520
-	  }
-	}
+            if(LDEBUG) { //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+            } //CO190520
+          }
+        }
       }
     }
+  }
+  if(0){  //CO190808 - quick check of mindist
+    double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<str.grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<str.grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+        if(min_dist_local<min_dist){
+          min_dist=min_dist_local;
+        }
+      }
+    }
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   str.grid_atoms_calculated=TRUE;
   str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;

@@ -362,7 +362,7 @@ namespace apl
       //throw APLRuntimeError("Cannot write aflow.scqha_pdis_T");
       string function = "T_spectra_SCQHA_QHA3P::write_T_dispersion()";
       string message = "Cannot write aflow.scqha_pdis_T";
-      throw aurostd::xerror(function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(os_gp);
   }//fn end
@@ -374,7 +374,7 @@ namespace apl
       //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P:: Missing file: "+file);
       string function = "T_spectra_SCQHA_QHA3P::read_matrix()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
 
     ifstream in;
@@ -412,7 +412,7 @@ namespace apl
       //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
@@ -421,7 +421,7 @@ namespace apl
       //throw apl::APLRuntimeError("T_spectra_SCQHA_QHA3P::read_PDIS() Missing file: "+file);
       string function = "T_spectra_SCQHA_QHA3P::read_PDIS()";
       string message = "Missing file: " + file;
-      throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     } 
     uint line_count = 0;  
     hash_lines.clear();

@@ -994,7 +994,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
       stringstream message;
       message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
       message << "at " << T << " K.";
-      throw xerror(function, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
   return tcond;
@@ -1276,7 +1276,7 @@ void TCONDCalculator::writeTempIndepOutput(const string& filename, string keywor
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput()";
     stringstream message;
     message << "Could not write file " << path << ".";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 }
 
@@ -1305,7 +1305,7 @@ void TCONDCalculator::writeTempDepOutput(const string& filename, string keyword,
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput()";
     stringstream message;
     message << "Could not write file " << filename << ".";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 }
 
@@ -1364,7 +1364,7 @@ void TCONDCalculator::writeGroupVelocities(const string& filename) {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeGroupVelocities()";
     string message = "Could not write group velocities to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -1495,7 +1495,7 @@ void TCONDCalculator::writeThermalConductivity(const string& filename) {
   if (!aurostd::FileExist(filename)) {
     string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity";
     string message = "Could not write thermal conductivities to file.";
-    throw xerror(function, message, _FILE_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 

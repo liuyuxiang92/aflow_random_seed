@@ -48,7 +48,7 @@ void PhononDispersionCalculator::initPathCoords(  //CO 180406
     //throw APLRuntimeError("apl::PhononDispersionCalculator::initPathCoords; Inputs are empty.");
     string function = "apl::PhononDispersionCalculator::initPathCoords";
     string message = "Inputs are empty.";
-    throw aurostd::xerror(function, message, _INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
   }
   _pb.defineCustomPoints(USER_DC_INITCOORDS,USER_DC_INITLABELS,_pc.getSupercell(),CARTESIAN_COORDS);
   _pb.setDensity(USER_DC_NPOINTS);
@@ -113,7 +113,7 @@ void PhononDispersionCalculator::setPath(const string& USER_DC_OWNPATH) {
       if (tokens[0].find('|') != string::npos) {
         string function = "PhononDispersionCalculator::setPath()";
         string message = "Cannot have | in the first path coordinate";
-        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
       } else {
         path = tokens[0];
       }
@@ -154,7 +154,7 @@ void PhononDispersionCalculator::calc(const IPCFreqFlags frequencyFormat) {
     //throw apl::APLRuntimeError("There are no points for calculation.");
     string function = "PhononDispersionCalculator::calc()";
     string message = "There are no points for the calculation.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
 // Compute frequencies for each q-point
@@ -357,7 +357,7 @@ void PhononDispersionCalculator::writePDIS(const string& directory) {
   if (!aurostd::FileExist(filename)) { //ME181226
     string function = "PhononDispersionCalculator::writePDIS()";
     string message = "Cannot open output file " + filename + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("Cannot open output PDIS file.");
   }
   //
@@ -371,7 +371,7 @@ void PhononDispersionCalculator::writePDIS(const string& directory) {
   if (!aurostd::FileExist(hskptsfile)) { //ME181226
     string function = "PhononDispersionCalculator::writePDIS()";
     string message = "Cannot open output file " + hskptsfile + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("Cannot open output aflow.apl_hskpoints.out file.");
   }
   //PINKU
@@ -418,7 +418,7 @@ void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHEIGENVAL()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 
   // Also write PHKPOINTS and PHPOSCAR file
@@ -432,7 +432,7 @@ void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHPOSCAR()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -494,7 +494,7 @@ void PhononDispersionCalculator::writePHKPOINTS(const string& directory) {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHKPOINTS()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 

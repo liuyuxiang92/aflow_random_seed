@@ -59,6 +59,7 @@ namespace pflow {
   string ATOMSMAX(string options,istream& input);
   void BANDS(string options,istream& input);
   void BANDGAP(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  // CO 171006
+  void BANDGAP_DOS(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  // CO 171006  //CO191110
   void BANDSTRUCTURE(_aflags &aflags);
   string BZDirectionsLATTICE(string options);
   //DX 20181102 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input);
@@ -129,6 +130,7 @@ namespace pflow {
   string FROZSL_ANALYZE(istream& input);
   string FROZSL_INPUT(void);
   string FROZSL_OUTPUT(void);
+  string GEOMETRY(istream& input); //CO191110
   bool GetCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry
   bool GetNonCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear
   vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
@@ -294,10 +296,10 @@ namespace pflow {
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO190712
   ////////////////////////////////////////////////////////////////////////////////
   // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  // ME190628
   ////////////////////////////////////////////////////////////////////////////////
   //[CO190712 - OBSOLETE]// functions for making input alphabetic
   //[CO190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters
@@ -318,18 +320,18 @@ namespace pflow {
   ////////////////////////////////////////////////////////////////////////////////
   // START - added by Corey Oses - May 2017
   // effectively logs EVERYTHING, deals with cout and logger
-  void logger(const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
+  void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
   // END - added by Corey Oses - May 2017
   xstructure LTCELL(string options,istream& input);
   // [OBSOLETE]  xstructure LTCELLFV(string options,istream& input);
@@ -390,7 +392,7 @@ bool AlphabetizePrototypeLabelSpecies(deque<string> &species,string &label);
 string AlphabetizePrototypeLabelSpeciesArgv(vector<string> &argv);
 namespace pflow {
   bool PROTO_PARSE_INPUT(const vector<string>& params,vector<vector<string> >& vstr,vector<vector<double> >& vnum,bool ignore_label=false,bool reverse=false); //CO181226
-  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint nspeciesHTQC,bool patch_nspecies=false); //CO181226
+  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint& nspeciesHTQC,bool patch_nspecies=false); //CO181226
   bool sortPOCCSites(const string& p1,const string& p2); //CO181226
   bool sortPOCCOccs(const string& occ1,const string& occ2); //CO181226
   bool FIX_PRECISION_POCC(const string& occ,string& new_occ); //CO181226

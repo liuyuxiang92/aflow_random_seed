@@ -408,6 +408,8 @@
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
 
 //DEFAULT POCC //CO181226
+#define AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING                   string("0:1200:300")
+#define         DEFAULT_POCC_TEMPERATURE_STRING                   XHOST.adefault.getattachedscheme("DEFAULT_POCC_TEMPERATURE_STRING")
 #define AFLOWRC_DEFAULT_POCC_SITE_TOL                             0.001
 #define         DEFAULT_POCC_SITE_TOL                             XHOST.adefault.getattachedutype<double>("DEFAULT_POCC_SITE_TOL")
 #define AFLOWRC_DEFAULT_POCC_STOICH_TOL                           0.001
@@ -432,6 +434,10 @@
 #define         POCC_ALL_HNF_MATRICES_FILE                        XHOST.adefault.getattachedscheme("POCC_ALL_HNF_MATRICES_FILE")
 #define AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE                 string("site_configurations.out")
 #define         POCC_ALL_SITE_CONFIGURATIONS_FILE                 XHOST.adefault.getattachedscheme("POCC_ALL_SITE_CONFIGURATIONS_FILE")
+#define AFLOWRC_POCC_OUT_FILE                                     string("out")
+#define         POCC_OUT_FILE                                     XHOST.adefault.getattachedscheme("POCC_OUT_FILE")
+#define AFLOWRC_POCC_DOSCAR_FILE                                  string("DOSCAR.pocc")
+#define         POCC_DOSCAR_FILE                                  XHOST.adefault.getattachedscheme("POCC_DOSCAR_FILE")
 
 // DEFAULT APL
 //// DEFAULT APL SUPERCELL
@@ -799,34 +805,16 @@
 #define AFLOWRC_MPI_BINARY_DIR_MPCDF_HYDRA                    string("~/bin/") // MPCDF_HYDRA_MPICH
 #define         MPI_BINARY_DIR_MPCDF_HYDRA                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MPCDF_HYDRA")
 
-#define AFLOWRC_MPI_OPTIONS_TERAGRID_RANGER                   string("") // TERAGRID_RANGER
-#define         MPI_OPTIONS_TERAGRID_RANGER                   XHOST.adefault.getattachedscheme("MPI_OPTIONS_TERAGRID_RANGER")
-#define AFLOWRC_MPI_COMMAND_TERAGRID_RANGER                   string("/share/sge6.2/default/pe_scripts/ibrun") // TERAGRID_RANGER
-#define         MPI_COMMAND_TERAGRID_RANGER                   XHOST.adefault.getattachedscheme("MPI_COMMAND_TERAGRID_RANGER")
-#define AFLOWRC_MPI_BINARY_DIR_TERAGRID_RANGER                string("~/bin/") // TERAGRID_RANGER
-#define         MPI_BINARY_DIR_TERAGRID_RANGER                XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_TERAGRID_RANGER")
-
-#define AFLOWRC_MPI_OPTIONS_TERAGRID_KRAKEN                   string("") // TERAGRID_KRAKEN
-#define         MPI_OPTIONS_TERAGRID_KRAKEN                   XHOST.adefault.getattachedscheme("MPI_OPTIONS_TERAGRID_KRAKEN")
-#define AFLOWRC_MPI_COMMAND_TERAGRID_KRAKEN                   string("aprun -n") // TERAGRID_KRAKEN
-#define         MPI_COMMAND_TERAGRID_KRAKEN                   XHOST.adefault.getattachedscheme("MPI_COMMAND_TERAGRID_KRAKEN")
-#define AFLOWRC_MPI_BINARY_DIR_TERAGRID_KRAKEN                string("/nics/a/proj/aflow/bin/") // TERAGRID_KRAKEN
-#define         MPI_BINARY_DIR_TERAGRID_KRAKEN                XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_TERAGRID_KRAKEN")
-
-#define AFLOWRC_MPI_OPTIONS_FULTON_MARYLOU                    string("export OMP_NUM_THREADS=1") // FULTON_MARYLOU
+//define AFLOWRC_MPI_OPTIONS_FULTON_MARYLOU                    string("module purge") // FULTON_MARYLOU
+#define AFLOWRC_MPI_OPTIONS_FULTON_MARYLOU                    string("export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE") // FULTON_MARYLOU
+//#define AFLOWRC_MPI_OPTIONS_FULTON_MARYLOU                    string("export OMP_NUM_THREADS=$SLURM_NTASKS") // FULTON_MARYLOU
 #define         MPI_OPTIONS_FULTON_MARYLOU                    XHOST.adefault.getattachedscheme("MPI_OPTIONS_FULTON_MARYLOU")
-#define AFLOWRC_MPI_COMMAND_FULTON_MARYLOU                    string("mpiexec") // FULTON_MARYLOU  
+#define AFLOWRC_MPI_COMMAND_FULTON_MARYLOU                    string("srun ") // FULTON_MARYLOU  
+//#define AFLOWRC_MPI_COMMAND_FULTON_MARYLOU                    string("mpiexec") // FULTON_MARYLOU  
 //#define AFLOWRC_MPI_COMMAND_FULTON_MARYLOU                    string("mpiexec -np") // FULTON_MARYLOU WITH NP
 #define         MPI_COMMAND_FULTON_MARYLOU                    XHOST.adefault.getattachedscheme("MPI_COMMAND_FULTON_MARYLOU")
 #define AFLOWRC_MPI_BINARY_DIR_FULTON_MARYLOU                 string("/fslgroup/fslg_datamining/bin/") // FULTON_MARYLOU
 #define         MPI_BINARY_DIR_FULTON_MARYLOU                 XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_FULTON_MARYLOU")
-
-#define AFLOWRC_MPI_OPTIONS_TRINITY_PARSONS                   string("") // TRINITY COLLEGE IRELAND
-#define         MPI_OPTIONS_TRINITY_PARSONS                   XHOST.adefault.getattachedscheme("MPI_OPTIONS_TRINITY_PARSONS")
-#define AFLOWRC_MPI_COMMAND_TRINITY_PARSONS                   string("mpirun -np") // TRINITY COLLEGE IRELAND
-#define         MPI_COMMAND_TRINITY_PARSONS                   XHOST.adefault.getattachedscheme("MPI_COMMAND_TRINITY_PARSONS")
-#define AFLOWRC_MPI_BINARY_DIR_TRINITY_PARSONS                string("/home/users/aflow/bin/") // TRINITY COLLEGE IRELAND
-#define         MPI_BINARY_DIR_TRINITY_PARSONS                XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_TRINITY_PARSONS")
 
 //DX - CMU EULER - START
 #define AFLOWRC_MPI_OPTIONS_CMU_EULER                         string("") // CMU EULER
@@ -967,7 +955,7 @@ namespace aflowrc {
 
     if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)) 
       if(!aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN"))
-	 cout << "WARNING aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
+	 cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
 	 
     aurostd::file2string(XHOST.aflowrc_filename,XHOST.aflowrc_content);
     // oss << "BEGIN" << endl << XHOST.aflowrc_content << "END" << endl;
@@ -1189,6 +1177,7 @@ namespace aflowrc {
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
 
     // DEFAULT POCC
+    aflowrc::load_default("DEFAULT_POCC_TEMPERATURE_STRING",AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);
     aflowrc::load_default("DEFAULT_POCC_SITE_TOL",AFLOWRC_DEFAULT_POCC_SITE_TOL);
     aflowrc::load_default("DEFAULT_POCC_STOICH_TOL",AFLOWRC_DEFAULT_POCC_STOICH_TOL);
     aflowrc::load_default("DEFAULT_UFF_BONDING_DISTANCE",AFLOWRC_DEFAULT_UFF_BONDING_DISTANCE);
@@ -1201,6 +1190,8 @@ namespace aflowrc {
     aflowrc::load_default("POCC_UNIQUE_SUPERCELLS_FILE",AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_ALL_HNF_MATRICES_FILE",AFLOWRC_POCC_ALL_HNF_MATRICES_FILE);
     aflowrc::load_default("POCC_ALL_SITE_CONFIGURATIONS_FILE",AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE);
+    aflowrc::load_default("POCC_OUT_FILE",AFLOWRC_POCC_OUT_FILE);
+    aflowrc::load_default("POCC_DOSCAR_FILE",AFLOWRC_POCC_DOSCAR_FILE);
 
     // DEFAULT APL
     //// DEFAULT APL SUPERCELL
@@ -1412,21 +1403,9 @@ namespace aflowrc {
     aflowrc::load_default("MPI_HYPERTHREADING_MPCDF_HYDRA",AFLOWRC_MPI_HYPERTHREADING_MPCDF_HYDRA); 
     aflowrc::load_default("MPI_BINARY_DIR_MPCDF_HYDRA",AFLOWRC_MPI_BINARY_DIR_MPCDF_HYDRA); 
 
-    aflowrc::load_default("MPI_OPTIONS_TERAGRID_RANGER",AFLOWRC_MPI_OPTIONS_TERAGRID_RANGER); 
-    aflowrc::load_default("MPI_COMMAND_TERAGRID_RANGER",AFLOWRC_MPI_COMMAND_TERAGRID_RANGER); 
-    aflowrc::load_default("MPI_BINARY_DIR_TERAGRID_RANGER",AFLOWRC_MPI_BINARY_DIR_TERAGRID_RANGER); 
-
-    aflowrc::load_default("MPI_OPTIONS_TERAGRID_KRAKEN",AFLOWRC_MPI_OPTIONS_TERAGRID_KRAKEN); 
-    aflowrc::load_default("MPI_COMMAND_TERAGRID_KRAKEN",AFLOWRC_MPI_COMMAND_TERAGRID_KRAKEN); 
-    aflowrc::load_default("MPI_BINARY_DIR_TERAGRID_KRAKEN",AFLOWRC_MPI_BINARY_DIR_TERAGRID_KRAKEN); 
-
     aflowrc::load_default("MPI_OPTIONS_FULTON_MARYLOU",AFLOWRC_MPI_OPTIONS_FULTON_MARYLOU); 
     aflowrc::load_default("MPI_COMMAND_FULTON_MARYLOU",AFLOWRC_MPI_COMMAND_FULTON_MARYLOU); 
     aflowrc::load_default("MPI_BINARY_DIR_FULTON_MARYLOU",AFLOWRC_MPI_BINARY_DIR_FULTON_MARYLOU); 
-
-    aflowrc::load_default("MPI_OPTIONS_TRINITY_PARSONS",AFLOWRC_MPI_OPTIONS_TRINITY_PARSONS); 
-    aflowrc::load_default("MPI_COMMAND_TRINITY_PARSONS",AFLOWRC_MPI_COMMAND_TRINITY_PARSONS); 
-    aflowrc::load_default("MPI_BINARY_DIR_TRINITY_PARSONS",AFLOWRC_MPI_BINARY_DIR_TRINITY_PARSONS); 
 
     aflowrc::load_default("MPI_OPTIONS_MACHINE1",AFLOWRC_MPI_OPTIONS_MACHINE1); 
     aflowrc::load_default("MPI_COMMAND_MACHINE1",AFLOWRC_MPI_COMMAND_MACHINE1); 
@@ -1696,6 +1675,7 @@ namespace aflowrc {
     
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POCC" << endl;
+    aflowrc << "DEFAULT_POCC_TEMPERATURE_STRING=\"" << AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     aflowrc << "DEFAULT_POCC_SITE_TOL=" << AFLOWRC_DEFAULT_POCC_SITE_TOL << endl;
     aflowrc << "DEFAULT_POCC_STOICH_TOL=" << AFLOWRC_DEFAULT_POCC_STOICH_TOL << endl;
     aflowrc << "DEFAULT_UFF_BONDING_DISTANCE=" << AFLOWRC_DEFAULT_UFF_BONDING_DISTANCE << endl;
@@ -1708,6 +1688,8 @@ namespace aflowrc {
     aflowrc << "POCC_UNIQUE_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_HNF_MATRICES_FILE=\"" << AFLOWRC_POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_SITE_CONFIGURATIONS_FILE=\"" << AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
+    aflowrc << "POCC_OUT_FILE=\"" << AFLOWRC_POCC_OUT_FILE << "\"" << endl;
+    aflowrc << "POCC_DOSCAR_FILE=\"" << AFLOWRC_POCC_DOSCAR_FILE << "\"" << endl;
     
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS APL" << endl;
@@ -1909,21 +1891,9 @@ namespace aflowrc {
     aflowrc << "MPI_HYPERTHREADING_MPCDF_HYDRA=\"" << AFLOWRC_MPI_HYPERTHREADING_MPCDF_HYDRA << "\"" << "  // MPCDF_HYDRA_MPI        // FALSE/OFF, IGNORE/NEGLECT, TRUE/ON " << endl;
     aflowrc << "MPI_BINARY_DIR_MPCDF_HYDRA=\"" << AFLOWRC_MPI_BINARY_DIR_MPCDF_HYDRA << "\"" << "  // MPCDF_HYDRA_MPI" << endl; 
 
-    aflowrc << "MPI_OPTIONS_TERAGRID_RANGER=\"" << AFLOWRC_MPI_OPTIONS_TERAGRID_RANGER << "\"" << "  // TERAGRID_RANGER" << endl;
-    aflowrc << "MPI_COMMAND_TERAGRID_RANGER=\"" << AFLOWRC_MPI_COMMAND_TERAGRID_RANGER << "\"" << "  // TERAGRID_RANGER" << endl;
-    aflowrc << "MPI_BINARY_DIR_TERAGRID_RANGER=\"" << AFLOWRC_MPI_BINARY_DIR_TERAGRID_RANGER << "\"" << "  // TERAGRID_RANGER" << endl; 
-
-    aflowrc << "MPI_OPTIONS_TERAGRID_KRAKEN=\"" << AFLOWRC_MPI_OPTIONS_TERAGRID_KRAKEN << "\"" << "  // TERAGRID_KRAKEN" << endl;
-    aflowrc << "MPI_COMMAND_TERAGRID_KRAKEN=\"" << AFLOWRC_MPI_COMMAND_TERAGRID_KRAKEN << "\"" << "  // TERAGRID_KRAKEN" << endl;
-    aflowrc << "MPI_BINARY_DIR_TERAGRID_KRAKEN=\"" << AFLOWRC_MPI_BINARY_DIR_TERAGRID_KRAKEN << "\"" << "  // TERAGRID_KRAKEN" << endl; 
-
     aflowrc << "MPI_OPTIONS_FULTON_MARYLOU=\"" << AFLOWRC_MPI_OPTIONS_FULTON_MARYLOU << "\"" << "  // FULTON_MARYLOU" << endl;
     aflowrc << "MPI_COMMAND_FULTON_MARYLOU=\"" << AFLOWRC_MPI_COMMAND_FULTON_MARYLOU << "\"" << "  // FULTON_MARYLOU" << endl;
     aflowrc << "MPI_BINARY_DIR_FULTON_MARYLOU=\"" << AFLOWRC_MPI_BINARY_DIR_FULTON_MARYLOU << "\"" << "  // FULTON_MARYLOU" << endl; 
-
-    aflowrc << "MPI_OPTIONS_TRINITY_PARSONS=\"" << AFLOWRC_MPI_OPTIONS_TRINITY_PARSONS << "\"" << "  // TRINITY_PARSONS" << endl;
-    aflowrc << "MPI_COMMAND_TRINITY_PARSONS=\"" << AFLOWRC_MPI_COMMAND_TRINITY_PARSONS << "\"" << "  // TRINITY_PARSONS" << endl;
-    aflowrc << "MPI_BINARY_DIR_TRINITY_PARSONS=\"" << AFLOWRC_MPI_BINARY_DIR_TRINITY_PARSONS << "\"" << "  // TRINITY_PARSONS" << endl; 
 
     aflowrc << "MPI_OPTIONS_MACHINE1=\"" << AFLOWRC_MPI_OPTIONS_MACHINE1 << "\"" << "  // MACHINE1" << endl;
     aflowrc << "MPI_COMMAND_MACHINE1=\"" << AFLOWRC_MPI_COMMAND_MACHINE1 << "\"" << "  // MACHINE1" << endl;
@@ -1938,8 +1908,10 @@ namespace aflowrc {
     aflowrc << "// ****************************************************************************************************" << endl;
   
     //   XHOST.DEBUG=TRUE;
-    cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
-    aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename);
+    //[CO190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
+    if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
+      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO190808 - issue this ONLY if it was written, should fix www-data}
+    }
     if(LDEBUG) oss << "aflowrc::write_default: END" << endl;
     //    exit(0);
     return TRUE;
@@ -2167,6 +2139,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
     
     if(LDEBUG) oss << "// DEFAULTS POCC" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_TEMPERATURE_STRING\")=\"" << DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_SITE_TOL\")=" << DEFAULT_POCC_SITE_TOL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_STOICH_TOL\")=" << DEFAULT_POCC_STOICH_TOL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_UFF_BONDING_DISTANCE\")=" << DEFAULT_UFF_BONDING_DISTANCE << endl;
@@ -2179,6 +2152,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_UNIQUE_SUPERCELLS_FILE\")=\"" << POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_HNF_MATRICES_FILE\")=\"" << POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SITE_CONFIGURATIONS_FILE\")=\"" << POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_OUT_FILE\")=\"" << POCC_OUT_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_DOSCAR_FILE\")=\"" << POCC_DOSCAR_FILE << "\"" << endl;
     
     if(LDEBUG) oss << "// DEFAULTS APL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PREC\")=\"" << DEFAULT_APL_PREC << "\"" << endl;
@@ -2374,21 +2349,9 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype(\"MPI_HYPERTHREADING_MPCDF_HYDRA\")=\"" << MPI_HYPERTHREADING_MPCDF_HYDRA << "\"" << "            // FALSE/OFF, IGNORE/NEGLECT, TRUE/ON " << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MPCDF_HYDRA\")=\"" << MPI_BINARY_DIR_MPCDF_HYDRA << "\"" << endl;
 
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_TERAGRID_RANGER\")=\"" << MPI_OPTIONS_TERAGRID_RANGER << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_TERAGRID_RANGER\")=\"" << MPI_COMMAND_TERAGRID_RANGER << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_TERAGRID_RANGER\")=\"" << MPI_BINARY_DIR_TERAGRID_RANGER << "\"" << endl;
-
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_TERAGRID_KRAKEN\")=\"" << MPI_OPTIONS_TERAGRID_KRAKEN << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_TERAGRID_KRAKEN\")=\"" << MPI_COMMAND_TERAGRID_KRAKEN << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_TERAGRID_KRAKEN\")=\"" << MPI_BINARY_DIR_TERAGRID_KRAKEN << "\"" << endl;
-
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_FULTON_MARYLOU\")=\"" << MPI_OPTIONS_FULTON_MARYLOU << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_FULTON_MARYLOU\")=\"" << MPI_COMMAND_FULTON_MARYLOU << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_FULTON_MARYLOU\")=\"" << MPI_BINARY_DIR_FULTON_MARYLOU << "\"" << endl;
-
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_TRINITY_PARSONS\")=\"" << MPI_OPTIONS_TRINITY_PARSONS << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_TRINITY_PARSONS\")=\"" << MPI_COMMAND_TRINITY_PARSONS << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_TRINITY_PARSONS\")=\"" << MPI_BINARY_DIR_TRINITY_PARSONS << "\"" << endl;
 
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE1\")=\"" << MPI_OPTIONS_MACHINE1 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE1\")=\"" << MPI_COMMAND_MACHINE1 << "\"" << endl;
