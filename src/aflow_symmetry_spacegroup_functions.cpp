@@ -258,7 +258,7 @@ namespace SYM {
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num) {
     split_atom_types = SYM::break_up_by_type(atomic_basis);
     if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::getAtomGCD():","split_atom_types.size()==0",_INPUT_ERROR_);}
-    gcd_num=1;
+    gcd_num=1;  //CO+DX191201
     if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
       gcd_num=(int)split_atom_types[0].size();  //CO+DX191201
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
@@ -4670,7 +4670,7 @@ namespace SYM {
     }
     bool consistent_ratio = true;
     if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::GCD_conventional_atomic_basis():","split_atom_types.size()==0",_INPUT_ERROR_);}
-    int GCD_num = 1;
+    int GCD_num = 1;  //CO+DX191201
     if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
       GCD_num=(int)split_atom_types[0].size();  //CO+DX191201
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
