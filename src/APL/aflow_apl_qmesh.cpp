@@ -441,7 +441,7 @@ void QMesh::writeQpoints(string filename, bool cartesian) {
     output << std::setw(10) << q;
     for (int i = 1; i < 4; i++) {
       output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-      output << std::setw(20) << std::setprecision(10) << std::scientific << (cartesian?_qpoints[q].cpos[i]:_qpoints[q].fpos);
+      output << std::setw(20) << std::setprecision(10) << std::scientific << (cartesian?_qpoints[q].cpos[i]:_qpoints[q].fpos[i]);
     }
     output << std::endl;
   }
