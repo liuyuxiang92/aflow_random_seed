@@ -76,7 +76,13 @@ void StructurePrototype::free(){
   number_compounds_matching_family.clear();
   family_comparison_logs.clear(); //DX 20190506
   misfits_duplicate.clear();
+  lattice_deviations_duplicate.clear(); //DX 20191210
+  coordinate_displacements_duplicate.clear(); //DX 20191210
+  failures_duplicate.clear(); //DX 20191210
   misfits_family.clear();
+  lattice_deviations_family.clear(); //DX 20191210
+  coordinate_displacements_family.clear(); //DX 20191210
+  failures_family.clear(); //DX 20191210
   property_names.clear();
   property_units.clear();
   properties_structure_representative.clear();
@@ -136,7 +142,13 @@ void StructurePrototype::copy(const StructurePrototype& b) {
     number_compounds_matching_family=b.number_compounds_matching_family;
     family_comparison_logs=b.family_comparison_logs; //DX 20190506
     misfits_duplicate=b.misfits_duplicate;
+    lattice_deviations_duplicate=b.lattice_deviations_duplicate; //DX 20191210
+    coordinate_displacements_duplicate=b.coordinate_displacements_duplicate; //DX 20191210
+    failures_duplicate=b.failures_duplicate; //DX 20191210
     misfits_family=b.misfits_family;
+    lattice_deviations_family=b.lattice_deviations_family; //DX 20191210
+    coordinate_displacements_family=b.coordinate_displacements_family; //DX 20191210
+    failures_family=b.failures_family; //DX 20191210
     property_names=b.property_names;
     property_units=b.property_units;
     properties_structure_representative=b.properties_structure_representative;
@@ -281,6 +293,18 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << "\"misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.misfits_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
+    // lattice_deviations_duplicate
+    sscontent_json << "\"lattice_deviations_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.lattice_deviations_duplicate,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // coordinate_displacements_duplicate
+    sscontent_json << "\"coordinate_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.coordinate_displacements_duplicate,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // failures_duplicate
+    sscontent_json << "\"failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.failures_duplicate,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
     // number_compounds_matching_duplicate
     sscontent_json << "\"number_compounds_matching_duplicate\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_duplicate,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
@@ -291,6 +315,18 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     
     // misfits_family
     sscontent_json << "\"misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.misfits_family,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // lattice_deviations_family
+    sscontent_json << "\"lattice_deviations_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.lattice_deviations_family,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // coordinate_displacements_family
+    sscontent_json << "\"coordinate_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.coordinate_displacements_family,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // failures_family
+    sscontent_json << "\"failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.failures_family,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // number_compounds_matching_family
@@ -443,6 +479,9 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
 
   // signifies comparison has not been performed yet
   misfits_duplicate.push_back(-1.0);
+  lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
+  coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
+  failures_duplicate.push_back(-1.0); //DX 20191210
 
   return true;
 }
@@ -461,6 +500,9 @@ void StructurePrototype::putDuplicateAsFamily(uint index, bool keep_generated){
   
   // add misfit
   misfits_family.push_back(misfits_duplicate[index]);
+  lattice_deviations_family.push_back(lattice_deviations_duplicate[index]); //DX 20191210
+  coordinate_displacements_family.push_back(coordinate_displacements_duplicate[index]); //DX 20191210
+  failures_family.push_back(failures_duplicate[index]); //DX 20191210
   if(duplicate_comparison_logs.size()!=0){
     family_comparison_logs.push_back(duplicate_comparison_logs[index]);
   }
@@ -582,11 +624,17 @@ bool StructurePrototype::copyDuplicate(StructurePrototype& b, uint& index, bool 
   }
 
   if(!copy_misfit){
-  // signifies comparison has not been performed yet
-  misfits_duplicate.push_back(-1.0);
+    // signifies comparison has not been performed yet
+    misfits_duplicate.push_back(-1.0);
+    lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
+    coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
+    failures_duplicate.push_back(-1.0); //DX 20191210
   }
   else{ //DX 20190730
     misfits_duplicate.push_back(b.misfits_duplicate[index]);
+    lattice_deviations_duplicate.push_back(b.lattice_deviations_duplicate[index]); //DX 20191210
+    coordinate_displacements_duplicate.push_back(b.coordinate_displacements_duplicate[index]); //DX 20191210
+    failures_duplicate.push_back(b.failures_duplicate[index]); //DX 20191210
   }
   
   // load property info
@@ -620,6 +668,9 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
 
   // remove misfit
   misfits_duplicate.erase(misfits_duplicate.begin()+index);
+  lattice_deviations_duplicate.erase(lattice_deviations_duplicate.begin()+index); //DX 20191210
+  coordinate_displacements_duplicate.erase(coordinate_displacements_duplicate.begin()+index); //DX 20191210
+  failures_duplicate.erase(failures_duplicate.begin()+index); //DX 20191210
 
   //DX 20190504 - START
   // remove comparison log
@@ -657,6 +708,9 @@ bool StructurePrototype::removeDuplicates(bool remove_duplicate_count){
 
   // remove misfit
   misfits_duplicate.clear();
+  lattice_deviations_duplicate.clear(); //DX 20191210
+  coordinate_displacements_duplicate.clear(); //DX 20191210
+  failures_duplicate.clear(); //DX 20191210
 
   // remove properties
   properties_structures_duplicate.clear();
@@ -1077,8 +1131,10 @@ namespace compare {
     if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
 
     for(uint i=start_index;i<end_index;i++){
-      structures[i].structure_representative_generated = generateStructure(structures[i].structure_representative_name, structures[i].structure_representative_from,
-          structures[i].structure_representative, oss);
+      if(!structures[i].structure_representative_generated){
+        structures[i].structure_representative_generated = generateStructure(structures[i].structure_representative_name, structures[i].structure_representative_from,
+            structures[i].structure_representative, oss);
+      }
     }
   }
 }
@@ -3721,6 +3777,9 @@ namespace compare{
             }
             prototype_schemes[j].addStructurePrototypeAsDuplicate(other_matches_schemes[i]);
             prototype_schemes[j].misfits_duplicate.back()=other_matches_schemes[i].misfits_duplicate[min_index];
+            prototype_schemes[j].lattice_deviations_duplicate.back()=other_matches_schemes[i].lattice_deviations_duplicate[min_index]; //DX 20191210
+            prototype_schemes[j].coordinate_displacements_duplicate.back()=other_matches_schemes[i].coordinate_displacements_duplicate[min_index]; //DX 20191210
+            prototype_schemes[j].failures_duplicate.back()=other_matches_schemes[i].failures_duplicate[min_index]; //DX 20191210
           }
           // remove from old representative
           if(clean_unmatched && prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[0]){
@@ -3824,9 +3883,9 @@ namespace compare{
         tmp.structure_representative.Clear(); //clear xstructure;
         tmp.structure_representative_generated=false;
         tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
-        tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.misfits_duplicate.clear(); tmp.properties_structures_duplicate.clear();
+        tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.misfits_duplicate.clear(); tmp.lattice_deviations_duplicate.clear(); tmp.coordinate_displacements_duplicate.clear(); tmp.failures_duplicate.clear(); tmp.properties_structures_duplicate.clear();
         tmp.structures_duplicate_generated.clear(); tmp.structures_duplicate_from.clear(); tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190814 - added Wyckoff positions
-        tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.misfits_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
+        tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.misfits_family.clear(); tmp.lattice_deviations_family.clear(); tmp.coordinate_displacements_family.clear(); tmp.failures_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
         tmp.structures_family_generated.clear(); tmp.structures_family_from.clear();
         tmp.elements.clear();
         duplicate_check_schemes.push_back(tmp);
@@ -3849,6 +3908,9 @@ namespace compare{
               duplicate_check_schemes[j].properties_structures_duplicate.clear();
             }
             duplicate_check_schemes[j].misfits_duplicate.push_back(-1.0);
+            duplicate_check_schemes[j].lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
+            duplicate_check_schemes[j].coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
+            duplicate_check_schemes[j].failures_duplicate.push_back(-1.0); //DX 20191210
             break;
           }
         }
@@ -3865,9 +3927,9 @@ namespace compare{
           tmp.structure_representative.Clear(); //clear xstructure;
           tmp.structure_representative_generated=false;
           tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
-          tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.misfits_duplicate.clear(); tmp.properties_structures_duplicate.clear();
+          tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.misfits_duplicate.clear();  tmp.lattice_deviations_duplicate.clear(); tmp.coordinate_displacements_duplicate.clear(); tmp.failures_duplicate.clear(); tmp.properties_structures_duplicate.clear();
           tmp.structures_duplicate_generated.clear(); tmp.structures_duplicate_from.clear(); tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190814 - added Wyckoff positions
-          tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.misfits_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
+          tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.misfits_family.clear(); tmp.lattice_deviations_family.clear(); tmp.coordinate_displacements_family.clear(); tmp.failures_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
           tmp.structures_family_generated.clear(); tmp.structures_family_from.clear();
           duplicate_check_schemes.push_back(tmp);
         }
@@ -3903,6 +3965,9 @@ namespace compare{
             final_prototypes[i].properties_structures_duplicate.erase(final_prototypes[i].properties_structures_duplicate.begin()+j);
           }
           final_prototypes[i].misfits_duplicate.erase(final_prototypes[i].misfits_duplicate.begin()+j);
+          final_prototypes[i].lattice_deviations_duplicate.erase(final_prototypes[i].lattice_deviations_duplicate.begin()+j); //DX 20191210
+          final_prototypes[i].coordinate_displacements_duplicate.erase(final_prototypes[i].coordinate_displacements_duplicate.begin()+j); //DX 20191210
+          final_prototypes[i].failures_duplicate.erase(final_prototypes[i].failures_duplicate.begin()+j); //DX 20191210
         }
       }
     }
@@ -4058,14 +4123,20 @@ namespace compare{
         // call the main comparison function
         ostringstream tmp_oss; tmp_oss.clear();
         double final_misfit=-1.0;
+        double final_lattice_dev=-1.0; //DX 20191210
+        double final_coordinate_dis=-1.0; //DX 20191210
+        double final_failure=-1.0; //DX 20191210
         if(LDEBUG) { cerr << function_name << ": Comparing " << comparison_schemes[i].structure_representative_name << " and " << comparison_schemes[i].structures_duplicate_names[j] <<  endl; }
         compare::aflowCompareStructure(1, structure_representative, //num_proc -> 1 for threads (not sure how it behaves otherwise)
                                        duplicate_structure,
-                                       same_species, scale_volume, optimize_match, final_misfit, tmp_oss);
+                                       same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, tmp_oss); //DX 20191210 - added lattice_dev, coordinate_dis, and failure
         
         // store the figure of misfit
         if(LDEBUG) { cerr << function_name << ": Comparison complete, misfit = " << final_misfit << "." << endl; }
         comparison_schemes[i].misfits_duplicate[j]=final_misfit;
+        comparison_schemes[i].lattice_deviations_duplicate[j]=final_lattice_dev; //DX 20191210
+        comparison_schemes[i].coordinate_displacements_duplicate[j]=final_coordinate_dis; //DX 20191210
+        comparison_schemes[i].failures_duplicate[j]=final_failure; //DX 20191210
         if(store_comparison_logs){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX 20190506
       }
     }
@@ -4161,6 +4232,9 @@ namespace compare{
         ostringstream tmp_oss;
         tmp_oss.clear();
         double final_misfit=-1.0;
+        double final_lattice_dev=-1.0; //DX 20191210
+        double final_coordinate_dis=-1.0; //DX 20191210
+        double final_failure=-1.0; //DX 20191210
         xstructure duplicate_structure;
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
           if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
@@ -4174,9 +4248,12 @@ namespace compare{
         // Call the main comparison function
         compare::aflowCompareStructure(num_proc, structure_representative,
             duplicate_structure,
-            same_species, scale_volume, optimize_match, final_misfit, tmp_oss); //DX 20191122 - move ostream to end
+            same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, tmp_oss); //DX 20191122 - move ostream to end //DX 20191210 - added lattice_dev, coordinate_dis, and failure
         // Store the figure of misfit
         comparison_schemes[i].misfits_duplicate[j]=final_misfit;
+        comparison_schemes[i].lattice_deviations_duplicate[j]=final_lattice_dev; //DX 20191210
+        comparison_schemes[i].coordinate_displacement_duplicate[j]=final_coordinate_dis; //DX 20191210
+        comparison_schemes[i].failure_duplicate[j]=final_failure; //DX 20191210
       }
     }
     //SINGLE THREAD - END
@@ -4398,6 +4475,9 @@ namespace compare{
             comparison_schemes[j].structures_duplicate_generated.push_back(true);
             comparison_schemes[j].structures_duplicate_from.push_back("input");
             comparison_schemes[j].misfits_duplicate.push_back(-1.0);
+            comparison_schemes[j].lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
+            comparison_schemes[j].coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
+            comparison_schemes[j].failures_duplicate.push_back(-1.0); //DX 20191210
             scheme_created=true;
             break;
           }
@@ -4638,6 +4718,9 @@ namespace compare{
       vector<double> store_misfits;
       int min_index=-1;
       double min_misfit=-1.0;
+      double min_lattice_dev=-1.0; //DX 20191210
+      double min_coordinate_dis=-1.0; //DX 20191210
+      double min_failure=-1.0; //DX 20191210
       for(uint j=i;j<final_prototypes.size();j++){
         ostringstream tmp_oss;
         tmp_oss.clear();
@@ -4655,13 +4738,19 @@ namespace compare{
             !matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group))
           ){
           double final_misfit=-1.0;
+          double final_lattice_dev=-1.0; //DX 20191210
+          double final_coordinate_dis=-1.0; //DX 20191210
+          double final_failure=-1.0; //DX 20191210
           bool scale_volume=true; //default is true
           bool optimize_match=false; //default is false
           aflowCompareStructure(num_proc, final_prototypes[i].structure_representative, 
 					 final_prototypes[j].structure_representative, same_species, 
-					 scale_volume, optimize_match, final_misfit, tmp_oss); //DX 20191122 - move ostream to end 
+					 scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, tmp_oss); //DX 20191122 - move ostream to end  //DX 20191210 - added lattice_dev, coordinate_dis, and failure
           if(final_misfit < min_misfit){
              min_misfit=final_misfit;
+             min_lattice_dev=final_lattice_dev; //DX 20191210
+             min_coordinate_dis=final_coordinate_dis; //DX 20191210
+             min_failure=final_failure; //DX 20191210
              min_index=j;
           }
         }
@@ -7027,6 +7116,21 @@ namespace compare{
     const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
     double& minMis, int type_match, bool optimize_match, ostream& oss){
 
+    double min_lattice_dev = AUROSTD_MAX_DOUBLE;
+    double min_coordinate_dis = AUROSTD_MAX_DOUBLE;
+    double min_failure = AUROSTD_MAX_DOUBLE;
+
+    latticeAndOriginSearch(xstr1, xstr2, num_proc, q1, vprotos, 
+        minMis, min_lattice_dev, min_coordinate_dis, min_failure, type_match, optimize_match, oss);
+  }
+}
+
+namespace compare{
+  void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, 
+    const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
+    double& minMis, double& min_lattice_dev, double& min_coordinate_dis, double& min_failure, 
+    int type_match, bool optimize_match, ostream& oss){
+
     // Performs lattice and origin search
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -7036,7 +7140,7 @@ namespace compare{
     //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX 20190318
 
     bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
-    double min_latt_dev=0.0; double min_coordinate_dis=0.0; double min_failure=0.0;
+    //OBSOLETE double min_latt_dev=0.0; double min_coordinate_dis=0.0; double min_failure=0.0;
     double min_magnetic_dis=0.0; double min_magnetic_failure=0.0;
     vector<uint> matching_indices_1, matching_indices_2;
     vector<double> minimum_distances;
@@ -7272,7 +7376,7 @@ namespace compare{
           for(uint p=0;p<possible_minMis.size();p++){
             if(p==0 && y==0 && x==0){ // DX 2/8/17 - need to add x==0 ortherwise matches can be overwritten
               minMis=possible_minMis[p];
-              min_latt_dev=possible_minLattDev[p];
+              min_lattice_dev=possible_minLattDev[p];
               min_coordinate_dis=possible_minCoordDis[p];
               min_failure=possible_minFail[p];
               min_magnetic_dis=possible_minMagneticDis[p];
@@ -7286,7 +7390,7 @@ namespace compare{
             else {
               if(possible_minMis[p]<=minMis){
                 minMis=possible_minMis[p];
-                min_latt_dev=possible_minLattDev[p];
+                min_lattice_dev=possible_minLattDev[p];
                 min_coordinate_dis=possible_minCoordDis[p];
                 min_failure=possible_minFail[p];
                 min_magnetic_dis=possible_minMagneticDis[p];
@@ -7304,7 +7408,7 @@ namespace compare{
           // quick return if found a match
           if(minMis<0.1 && !optimize_match){
             if(LDEBUG){cerr << function_name << ": Found match (misfit = " << minMis << ")! Terminating search early." << endl;}
-            printStructureMappingResults(oss,xstr1,vprotos[0],minMis,min_latt_dev,min_coordinate_dis,min_failure,min_magnetic_dis,min_magnetic_failure,
+            printStructureMappingResults(oss,xstr1,vprotos[0],minMis,min_lattice_dev,min_coordinate_dis,min_failure,min_magnetic_dis,min_magnetic_failure,
                 matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
             return;
           }
@@ -7321,7 +7425,7 @@ namespace compare{
       } 
     }  
     if(minMis!=1.0 && vprotos.size()>0){
-      printStructureMappingResults(oss,xstr1,vprotos[0],minMis,min_latt_dev,min_coordinate_dis,min_failure,min_magnetic_dis,min_magnetic_failure,
+      printStructureMappingResults(oss,xstr1,vprotos[0],minMis,min_lattice_dev,min_coordinate_dis,min_failure,min_magnetic_dis,min_magnetic_failure,
           matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
     }
   }

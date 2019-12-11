@@ -9624,7 +9624,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/POSCAR.orig",ss,false) : 
                 aurostd::file2stringstream(path + "/POSCAR.orig",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) { 
+              xstrAux.Clear(); //clear it if it is garbage
+              message << "POSCAR.orig: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax1")) {
@@ -9632,7 +9637,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/POSCAR.relax1",ss,false) :
                 aurostd::file2stringstream(path + "/POSCAR.relax1",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) {
+              xstrAux.Clear(); //clear it if it is garbage
+              message << "POSCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if (!xstrAux.atoms.size()) {
@@ -9656,7 +9666,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/POSCAR.relax2",ss,false) :
                 aurostd::file2stringstream(path + "/POSCAR.relax2",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) {
+              xstrAux.Clear(); //clear it if it is garbage
+              message << "POSCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax1")) {
@@ -9664,7 +9679,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/CONTCAR.relax1",ss,false) :
                 aurostd::file2stringstream(path + "/CONTCAR.relax1",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) {
+              xstrAux.Clear(); //clear it if it is garbage
+              message << "CONTCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if (!xstrAux.atoms.size()) {
@@ -9689,7 +9709,12 @@ namespace pflow {
         if ( (is_url_path ? 
               aurostd::url2stringstream(path + "/CONTCAR.relax",ss,false): 
               aurostd::file2stringstream(path + "/CONTCAR.relax",ss)) ) {
-          xstrAux = xstructure(ss, IOVASP_AUTO);
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+          catch(aurostd::xerror& excpt) {
+            xstrAux.Clear(); //clear it if it is garbage
+            message << "CONTCAR.relax: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
         }
       }
       if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax2")) {
@@ -9697,7 +9722,12 @@ namespace pflow {
         if ( (is_url_path ? 
               aurostd::url2stringstream(path + "/CONTCAR.relax2",ss,false) :
               aurostd::file2stringstream(path + "/CONTCAR.relax2",ss)) ) {
-          xstrAux = xstructure(ss, IOVASP_AUTO);
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+          catch(aurostd::xerror& excpt) {
+            xstrAux.Clear(); //clear it if it is garbage
+            message << "CONTCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
         }
       }
       if (!xstrAux.atoms.size()) {
