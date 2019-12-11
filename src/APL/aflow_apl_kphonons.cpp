@@ -53,8 +53,18 @@ bool relaxStructureAPL_VASP(int start_relax,
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   ostringstream aus;
   
+  // Store original settings
+  string prec = vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme;
+  bool prec_entry = vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry;
+
   bool Krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, fileMessage, aflags, kflags, vflags);
   Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
+
+  // Change to phonon settings
+  string prec_phonons = xvasp.aplopts.getattachedscheme("AFLOWIN_FLAG::APL_PREC");
+  vflags.KBIN_VASP_FORCE_OPTION_PREC.pop(prec);
+  vflags.KBIN_VASP_FORCE_OPTION_PREC.push(prec_phonons);
+  vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry = true;
 
   if (Krun) {
     int i;
@@ -103,6 +113,11 @@ bool relaxStructureAPL_VASP(int start_relax,
     xvasp.str.Standard_Lattice_conventional = false;
     VASP_Convert_Unit_Cell(xvasp, vflags, aflags, fileMessage, aus);
   }
+
+  // Restore original settings
+  vflags.KBIN_VASP_FORCE_OPTION_PREC.pop(prec_phonons);
+  vflags.KBIN_VASP_FORCE_OPTION_PREC.push(prec);
+  vflags.KBIN_VASP_FORCE_OPTION_KPOINTS.isentry = prec_entry;
 
   return Krun;
 }
