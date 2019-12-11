@@ -626,9 +626,9 @@ namespace SYM {
   double orthogonality_defect(xmatrix<double> xmat);
 
   //NUMBER THEORY FUNCTIONS
-  long long int gcd(long long int u, long long int v);                             //Euclid's
-  unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
-  //[CO191201 - OBSOLETE]int gcdD(int u, int v);
+  //DX 20191202 [OBSOLETE] long long int gcd(long long int u, long long int v);                             //Euclid's
+  //DX 20191202 [OBSOLETE] unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
+  //DX 20191202 [OBSOLETE] int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
   //DX 20190905 [OBSOLETE] double mod_one(double d);
@@ -711,7 +711,7 @@ namespace SYM {
   bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010
-  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD);
+  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num);
   void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX 20190805 - return to void
 
   //RHOMBOHEDRAL OBVERSE/REVERSE FUNCTIONS

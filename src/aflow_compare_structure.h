@@ -145,10 +145,10 @@ namespace compare{
       bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds, 
       bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, ostream& oss=cout); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss=cout); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match, ostream& oss=cout);  //DX 20191108 - remove const & from bools
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match, ostream& oss=cout); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
+      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match);  //DX 20191108 - remove const & from bools
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
 
   // permutaion comparisons
   vector<string> getUniquePermutations(xstructure& xstr);

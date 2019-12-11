@@ -2803,20 +2803,22 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc=1;
     double final_misfit=-1;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end
+    ostringstream comparison_log; //DX 20191202 
+    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, comparison_log); //DX 20191122 - move ostream to end
   }
 }
 
 namespace compare {
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc = 1;
     double final_misfit = -1;
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end and add default
+    ostringstream comparison_log; //DX 20191202 
+    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, comparison_log); //DX 20191122 - move ostream to end and add default
   }
 }
 
@@ -2825,12 +2827,13 @@ namespace compare {
 // compare::aflowCompareStructure - MAIN FUNCTION
 // ***************************************************************************
 namespace compare {
-  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, ostream& oss) { //DX 20191108 - remove const & from bools
+  double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
     uint num_proc=1;
     double final_misfit=-1;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
-    aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, oss); //DX 20191122 - move ostream to end
+    ostringstream comparison_log; //DX 20191202 
+    aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, comparison_log); //DX 20191122 - move ostream to end
     return final_misfit;
   }
 }
@@ -2841,15 +2844,15 @@ namespace compare {
 namespace compare {
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, 
-      double& final_misfit, ostream& oss) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
+      double& final_misfit, ostream& comparison_log) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
 
     // This is the main comparison function, which  compares two crystal structures
     // and determines their level of similarity based on the idea discussed 
     // in H. Burzlaff's paper (Acta Cryst., A53, 217-224 (1997)).
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    oss << "==================================================================================" << endl;
+    comparison_log << "==================================================================================" << endl;
 
     // ---------------------------------------------------------------------------
     // prepare structures (swap structure order if necessary, fix lattices, rescale, etc.)
@@ -2935,19 +2938,19 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // standardize structure (not used) 
     if(criteria_met == true){
-      oss << "=========================================================" << endl; 
+      comparison_log << "=========================================================" << endl; 
 
-      oss << "STRUCTURE 1: " << endl;  
-      oss << xstr_base << endl;
+      comparison_log << "STRUCTURE 1: " << endl;  
+      comparison_log << xstr_base << endl;
       //cerr << xstr_base << endl;
 
-      oss << "=========================================================" << endl;
+      comparison_log << "=========================================================" << endl;
 
-      oss << "STRUCTURE 2: " << endl;
-      oss << xstr_test << endl;	
+      comparison_log << "STRUCTURE 2: " << endl;
+      comparison_log << xstr_test << endl;	
       //cerr << xstr_test << endl;
 
-      oss << "=========================================================" << endl;
+      comparison_log << "=========================================================" << endl;
 
       // ---------------------------------------------------------------------------
       // comparison types
@@ -2974,7 +2977,7 @@ namespace compare {
       vector<string> PAIR1, PAIR2;
       double minMis=1;
 
-      oss<<"-------------------------------------------------------"<<endl;
+      comparison_log<<"-------------------------------------------------------"<<endl;
 
       // ---------------------------------------------------------------------------
       // normalize scaling factors 
@@ -2994,18 +2997,18 @@ namespace compare {
       }
 
       // OBSOLETE THIS PRINTS OUT XSTRUCTURES WITH ATOM ZERO SHIFTED TO ORIGIN...
-      // OBSOLETE oss<<"========================================================="<<endl;
-      // OBSOLETE oss << xstr_base << endl;
-      // OBSOLETE oss<<"========================================================="<<endl;
-      // OBSOLETE oss << xstr_test << endl;		
+      // OBSOLETE comparison_log<<"========================================================="<<endl;
+      // OBSOLETE comparison_log << xstr_base << endl;
+      // OBSOLETE comparison_log<<"========================================================="<<endl;
+      // OBSOLETE comparison_log << xstr_test << endl;		
 
       // ---------------------------------------------------------------------------
       // assign fake atom names 
-      printParameters(xstr_base,oss);
-      printParameters(xstr_test,oss);
+      printParameters(xstr_base,comparison_log);
+      printParameters(xstr_test,comparison_log);
 
-      oss << "========================================================="<<endl;    
-      oss << "QUADRUPLETS METHOD" << endl;
+      comparison_log << "========================================================="<<endl;    
+      comparison_log << "QUADRUPLETS METHOD" << endl;
 
       xmatrix<double> q_base=xstr_base.lattice;; 
       
@@ -3013,8 +3016,8 @@ namespace compare {
       // compare structures
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
-      //DX 20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,oss);
-      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,minMis,type_match,optimize_match,oss); //DX 20190530
+      //DX 20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
+      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,minMis,type_match,optimize_match,comparison_log); //DX 20190530
 
       if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
       final_misfit=minMis;
