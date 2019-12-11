@@ -1164,7 +1164,7 @@ namespace KBIN {
       aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LEPSILON - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);
-      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"LCALCEPS") && !aurostd::substring2bool(xvasp.INCAR,"#LCALCEPS")) {  /*************** INCAR **************/
