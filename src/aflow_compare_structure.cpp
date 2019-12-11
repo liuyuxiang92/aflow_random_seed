@@ -320,10 +320,13 @@ namespace pflow {
     // compare structures
     if(!multiple_comparisons){
       double final_misfit=-1.0; //DX 20190424
+      double final_lattice_dev=-1.0; //DX 20191210 
+      double final_coordinate_dis=-1.0; //DX 20191210 
+      double final_failure=-1.0; //DX 20191210 
       store_comparison_logs = true; //DX 20190822 - add log bool
       // call main comparison function
       // DX 20190424 [OBSOLETE] compare::aflowCompareStructure(num_proc,xstr1,xstr2,same_species, scale_volume, optimize_match, oss,final_misfit);
-      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, final_misfit, oss); //DX 2010424 //DX 20191122 - move ostream to end
+      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, oss); //DX 2010424 //DX 20191122 - move ostream to end //DX 20191210
       if(print==true){
         // return mapping details
         return oss.str();
@@ -2184,7 +2187,8 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // distribute threads via indices
     uint number_of_structures = auids.size();
-    uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+    //DX 20191210 [URL TIMEOUT] uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+    uint num_threads = 1; //DX 20191210 [URL TIMEOUT]
     //DX 20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
     //DX 20191107 [switching to getThreadDistribution] - compare::splitTaskIntoThreads(number_of_structures,num_threads,start_indices,end_indices);
     vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX 20191107 
@@ -2245,6 +2249,10 @@ namespace pflow {
       threads[t]->join();
       delete threads[t];
     }
+    // ---------------------------------------------------------------------------
+    // try to regenerate via one thread; sometimes multithreading does not load 
+    // all structures (timeout issue)
+    compare::generateStructures(all_structures);
     message << "Threads complete. " << all_structures.size() << " structures. Adding properties.";     
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
    
@@ -2844,7 +2852,23 @@ namespace compare {
 namespace compare {
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, 
-      double& final_misfit, ostream& comparison_log) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
+      double& final_misfit, ostream& comparison_log) {
+
+    double final_lattice_dev = AUROSTD_MAX_DOUBLE;
+    double final_coordinate_dis = AUROSTD_MAX_DOUBLE;
+    double final_failure = AUROSTD_MAX_DOUBLE;
+    
+    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, comparison_log); //DX 20191122 - move ostream to end
+  }
+}
+
+// ***************************************************************************
+// compare::aflowCompareStructure - MAIN FUNCTION
+// ***************************************************************************
+namespace compare {
+  bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
+      bool same_species, bool scale_volume, bool optimize_match, 
+      double& final_misfit, double& final_lattice_dev, double& final_coordinate_dis, double& final_failure, ostream& comparison_log) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
 
     // This is the main comparison function, which  compares two crystal structures
     // and determines their level of similarity based on the idea discussed 
@@ -2976,6 +3000,9 @@ namespace compare {
       vector<uint> im1, im2;
       vector<string> PAIR1, PAIR2;
       double minMis=1;
+      double min_lattice_dev = 1;
+      double min_coordinate_dis = 1;
+      double min_failure = 1;
 
       comparison_log<<"-------------------------------------------------------"<<endl;
 
@@ -3017,10 +3044,13 @@ namespace compare {
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
       //DX 20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
-      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,minMis,type_match,optimize_match,comparison_log); //DX 20190530
+      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,minMis,min_lattice_dev,min_coordinate_dis,min_failure,type_match,optimize_match,comparison_log); //DX 20190530
 
       if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
       final_misfit=minMis;
+      final_lattice_dev=min_lattice_dev;
+      final_coordinate_dis=min_coordinate_dis;
+      final_failure=min_failure;
 
       // ---------------------------------------------------------------------------
       // find matches
