@@ -4252,8 +4252,8 @@ namespace compare{
         // Store the figure of misfit
         comparison_schemes[i].misfits_duplicate[j]=final_misfit;
         comparison_schemes[i].lattice_deviations_duplicate[j]=final_lattice_dev; //DX 20191210
-        comparison_schemes[i].coordinate_displacement_duplicate[j]=final_coordinate_dis; //DX 20191210
-        comparison_schemes[i].failure_duplicate[j]=final_failure; //DX 20191210
+        comparison_schemes[i].coordinate_displacements_duplicate[j]=final_coordinate_dis; //DX 20191210
+        comparison_schemes[i].failures_duplicate[j]=final_failure; //DX 20191210
       }
     }
     //SINGLE THREAD - END
