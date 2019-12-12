@@ -49,6 +49,7 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
+#include <signal.h>  // ME191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO 170806 - need for POCC
 #include <netdb.h>  //CO 180321 - frisco needs for AFLUX

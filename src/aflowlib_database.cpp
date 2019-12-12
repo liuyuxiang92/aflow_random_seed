@@ -15,10 +15,22 @@
 // * Database analyzer
 // * User-level functions to interact with the database
 //
+// ---------------------------------- USAGE ----------------------------------
+//
+// To update the database, i.e. to rebuild the database only when new entries
+// are available, use: aflow --update_database
+//
+// To force a database rebuild, use: aflow --rebuild_database
+//
+// Database statistics will be collected in each case. To only perform the
+// analysis, use: aflow --analyze_database
+//
+// ----------------------------- REBUILD PROCESS -----------------------------
+//
 // The database rebuild process has the following steps:
 //   * Check if the database needs to be rebuild. This can be triggered either
-//     by the user, by new entries in the schema file, or by new/updated dat
-//     files. The dat files are collections of aflowlib.json files for a set of
+//     by the user, by new entries in the schema, or by new/updated dat files.
+//     The dat files are collections of aflowlib.json files for a set of
 //     AUIDs (i.e. aflow:00.dat, aflow:01.dat, etc.).
 //   * Create a temporary database file and populate with data from these JSONs.
 //     Rebuilding from scratch instead of incrementally adding into the existing
@@ -33,10 +45,7 @@
 //   * Analyze the database and output the database statistics.
 
 #include "aflowlib.h"
-#include "SQLITE/sqlite3.h"
-// signal and unistd are required to use kill when compiling with clang++
-#include <signal.h>
-#include <unistd.h>
+#include "SQLITE/aflow_sqlite.h"
 
 // Some parts are written within the C++0x support in GCC, especially std::thread,
 // which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
@@ -73,19 +82,17 @@ AflowDB::AflowDB(const string& db_file) {
 }
 
 // Open the database for write access
-AflowDB::AflowDB(const string& db_file, const string& dt_path,
-                 const string& schm_file, const string& lck_file) {
+AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   free();
   data_path = dt_path;
   database_file = db_file;
   lock_file = lck_file;
-  schema_file = schm_file;
+  schema.initialize();
   if (LDEBUG) {
     std::cerr << "AflowDB: Database file: " << database_file << std::endl;
     std::cerr << "AflowDB: Data path: " << data_path << std::endl;
     std::cerr << "AflowDB:: Lock file: " << lock_file << std::endl;
-    std::cerr << "AflowDB: Schema file: " << schema_file << std::endl;
   }
   open();
 }
@@ -99,7 +106,6 @@ void AflowDB::free() {
   data_path = "";
   database_file = "";
   lock_file = "";
-  schema_file = "";
   is_tmp = false;
 }
 
@@ -112,7 +118,7 @@ void AflowDB::open(int open_flags) {
     string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
     string message = "Could not open database file " + database_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 }
 
@@ -126,7 +132,7 @@ void AflowDB::close() {
     string function = _AFLOW_DB_ERR_PREFIX_ + "close()";
     string message = "Could not close database file " + database_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 }
 
@@ -155,7 +161,7 @@ void AflowDB::openTmpFile(int open_flags) {
     } else {
       message << "Process exited with errno " << errno << ".";
     }
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
   
   if (aurostd::FileExist(tmp_file)) {
@@ -193,7 +199,7 @@ void AflowDB::openTmpFile(int open_flags) {
           stringstream message;
           message << "Could not kill active process " << pid
                   << "(errno =  " << errno << ")." << std::endl;
-          throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
       }
       aurostd::RemoveFile(tmp_file);
@@ -202,7 +208,7 @@ void AflowDB::openTmpFile(int open_flags) {
       string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
       string message = "Could not create temporary database file."
                        " File already exists and rebuild process is active.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -213,7 +219,7 @@ void AflowDB::openTmpFile(int open_flags) {
     string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
     string message = "Could not close main database file " + database_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 
   sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, nullptr);
@@ -221,7 +227,7 @@ void AflowDB::openTmpFile(int open_flags) {
     string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
     string message = "Could not open tmp database file " + tmp_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
   is_tmp = true;
   aurostd::RemoveFile(lock_link);
@@ -238,18 +244,27 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
   string function = _AFLOW_DB_ERR_PREFIX_ + "openTmpFile()";
   if (LDEBUG) std::cerr << function << " Closing " << tmp_file << std::endl;
 
-  // If the tmp file is empty, the build was a failure and all other tests
-  // will fail.
-  bool file_empty = aurostd::FileEmpty(tmp_file);
+  bool nocopy = false;
+  // If the tmp file is empty, the build failed, so all other tests will fail as well.
+  if (aurostd::FileEmpty(tmp_file)) {
+    if (LDEBUG) std::cerr << "Temporary database file empty. Database will not be overwritten." << std::endl;
+    nocopy = true;
+  }
+  if (!nocopy) {
+    if ((int) getTables().size() != _N_AUID_TABLES_) {
+      std::cerr << "Temporary database file has the wrong number of tables."
+                << " Database file will not be copied." << std::endl;
+      nocopy = true;
+    }
+  }
 
   // If the user does not force a rebuild, test that the new database does not
   // result in less data than the old one. To build a database with less
   // properties, aflow needs to be run with the --rebuild_database option.
   uint nentries_tmp = 0, ncols_tmp = 0, nentries_old = 0, ncols_old = 0;
-  if (!force_copy && !file_empty) {
+  if (!force_copy && !nocopy) {
     vector<string> props, tables;
     tables = getTables();
-
     // Get number of properties
     props = getColumnNames(tables[0]);  // All tables have the same columns, so any table is good
     ncols_tmp = props.size();
@@ -263,30 +278,37 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
   if (sql_code != SQLITE_OK) {
     string message = "Could not close tmp database file " + tmp_file;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
   is_tmp = false;
 
   bool copied = false;
-  if (file_empty) {
-    if (LDEBUG) std::cerr << "Temporary database file empty. Database will not be overwritten." << std::endl;
+  if (nocopy) {
     copied = false;
   } else if (force_copy) {
     if (LDEBUG) std::cerr << "Force copy selected. Database will be overwritten." << std::endl;
     copied = aurostd::CopyFile(tmp_file, database_file);
   } else {
-    open();
-    vector<string> props, tables;
-    tables = getTables();
+    if (!aurostd::FileEmpty(database_file)) {
+      if (LDEBUG) std::cerr << "Old database file found. "
+                            << " Determining number of entries and " << std::endl;
+      open();
+      vector<string> props, tables;
+      tables = getTables();
 
-    // Get number of properties
-    props = getColumnNames(tables[0]);
-    ncols_old = props.size();
+      // Get number of properties
+      props = getColumnNames(tables[0]);
+      ncols_old = props.size();
 
-    // Get number of entries
-    props = getPropertyMultiTables("COUNT", tables, "*");
-    for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
-    close();
+      // Get number of entries
+      props = getPropertyMultiTables("COUNT", tables, "*");
+      for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
+      close();
+    } else {
+      if (LDEBUG) std::cerr << "No old datbase found." << std::endl;
+      ncols_old = 0;
+      nentries_old = 0;
+    }
 
     if (LDEBUG) {
       std::cerr << "Number of entries: " << nentries_tmp << " (current database: " << nentries_old << ")." << std::endl;
@@ -295,7 +317,7 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
 
     if (nentries_tmp < nentries_old) {
       std::cerr << "The rebuild process resulted in less entries"
-                << " than in the current database. To avoid accidental"
+                << " than in the current database. To prevent accidental"
                 << " data loss, the temporary database will not be copied."
                 << " Rerun as aflow --rebuild_database if the database should"
                 << " be updated regardless. The temporary database file will be"
@@ -304,7 +326,7 @@ bool AflowDB::closeTmpFile(bool force_copy, bool keep) {
       copied = false;
     } else if (ncols_tmp < ncols_old) {
       std::cerr << "The rebuild process resulted in less properties"
-                << " than in the current database. To avoid accidental"
+                << " than in the current database. To prevent accidental"
                 << " data loss, the temporary database will not be copied."
                 << " Rerun as aflow --rebuild_database if the database should"
                 << " be updated regardless. The temporary database file will be"
@@ -366,27 +388,22 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     if (LDEBUG && rebuild_db) std::cerr << function << ": Rebuilding database (file not found or empty)." << std::endl;
   }
 
-  // Rebuild when the schema file has new entries
+  // Rebuild when the schema has new entries
   if (!rebuild_db) {
-    vector<string> columns, keys;
+    vector<string> columns;
     string table = getTables()[0];  // All tables have the same columns, so any table is good
     columns = getColumnNames(table);
 
-    string schema = aurostd::file2string(schema_file);
-    // To prevent SQL syntax errors, single quotes/apostrophes must be escaped
-    // with an additional single quote.
-    aurostd::StringSubst(schema, "'", "''");
-    keys = getSchemaKeys(schema);
-
-    uint nkeys = keys.size();
+    uint nkeys = schema.getNKeys();
     if (nkeys > columns.size()) {
       rebuild_db = true;
     } else if (nkeys < columns.size()) {
-      string message = "The number of properties is smaller than in the current"
-                       " database. To avoid accidental data loss, AFLOW will abort"
-                       " the update process. Rerun as aflow --rebuild_database if"
-                       " the database should be updated regardless.";
-      throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+      stringstream message;
+      message << "The number of properties (" << nkeys << ") is smaller than in the"
+              << " current database (" << columns.size() << "). To prevent accidental"
+              << " data loss, AFLOW will abort the update process. Rerun as"
+              << " aflow --rebuild_database if the database should be updated regardless.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
     if (!rebuild_db) {
       vector<string> types_db = getColumnTypes(table);
@@ -394,13 +411,13 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       uint k = 0;
       string type = "";
       for (k = 0; k < nkeys; k++) {
-        type = extractJsonValue(schema, "AAPI_schema." + keys[k] + ".type");
-        if (type == "number") types_schema[k] = "REAL";
+        if (schema.getEntry(k).type == "number") types_schema[k] = "REAL";
         else types_schema[k] = "TEXT";
       }
+      int index = -1;
       for (k = 0; k < nkeys; k++) {
-        if (!aurostd::withinList(columns, keys[k])) break;
-        if (!aurostd::withinList(types_db, types_schema[k])) break;
+        if (!aurostd::withinList(columns, schema.getEntry(k).key, index)) break;
+        if (types_db[index] != types_schema[k]) break;
       }
       rebuild_db = (k != nkeys);
     }
@@ -416,7 +433,7 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
       json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".dat");
       if (!aurostd::EFileExist(json_files[i])) {
         string message = data_path + " is not a valid data path. Missing file for aflow:" + t.str() + ".";
-        throw aurostd::xerror(function, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
       }
     }
 
@@ -449,35 +466,27 @@ void AflowDB::rebuildDB() {
   // Do not constantly synchronize the database with file on disk.
   // Increases performance significantly.
   if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Starting rebuild." << std::endl;
-  SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
+  sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
-  // Get columns from schema
-  string schema = aurostd::file2string(schema_file);
-  aurostd::StringSubst(schema, "'", "''");
-  vector<string> columns = getSchemaKeys(schema);
-  vector<string> types = getDataTypes(schema, columns);
+  // Get columns and types from schema
+  vector<string> columns = schema.getKeys();
+  vector<string> types = getDataTypes();
 
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
-  // Put into a try statement so that exceptions thrown in a thread
-  // can be properly displayed.
-  try {
-    int ncpus = init::GetCPUCores();
-    int max_cpu = 16;
-    if (ncpus < 1) ncpus = 1;
-    if (ncpus > max_cpu) ncpus = max_cpu;
-    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&AflowDB::buildTables, this,
-                                        thread_dist[i][0], thread_dist[i][1],
-                                        std::ref(columns), std::ref(types)));
-    }
-    for (int i = 0; i < ncpus; i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
-  } catch (aurostd::xerror& excpt) {
-    throw aurostd::xerror(excpt.where(), excpt.what(), excpt.error_code);
+  int ncpus = init::GetCPUCores();
+  int max_cpu = 16;
+  if (ncpus < 1) ncpus = 1;
+  if (ncpus > max_cpu) ncpus = max_cpu;
+  vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
+  vector<std::thread*> threads;
+  for (int i = 0; i < ncpus; i++) {
+    threads.push_back(new std::thread(&AflowDB::buildTables, this,
+                                      thread_dist[i][0], thread_dist[i][1],
+                                      std::ref(columns), std::ref(types)));
+  }
+  for (int i = 0; i < ncpus; i++) {
+    threads[i]->join();
+    delete threads[i];
   }
 #else
   buildTables(0, _N_AUID_TABLES_, columns, types);
@@ -539,43 +548,20 @@ void AflowDB::populateTable(const string& table, const vector<string>& columns, 
   if (LDEBUG) std::cerr << "Finished building table " << table << std::endl;
 }
 
-// Schema --------------------------------------------------------------------
-
-//getSchemaKeys///////////////////////////////////////////////////////////////
-// Retrieves all properties that need to be included in the database.
-vector<string> AflowDB::getSchemaKeys(const string& schema) {
-  vector<string> keys_unfiltered = getJsonKeys(schema, "AAPI_schema");
-
-  vector<string> keys, exclude;
-  string excluded_functions = "app,image,link";
-  aurostd::string2tokens(excluded_functions, exclude, ",");
-
-  string function = "";
-  for (uint k = 0; k < keys_unfiltered.size(); k++) {
-    if ((keys_unfiltered[k] != "__schema^2__") && (keys_unfiltered[k] != "icsd_number")) {
-      function = extractJsonValue(schema, "AAPI_schema." + keys_unfiltered[k] + ".function");
-      if (!aurostd::withinList(exclude, function)) {
-        keys.push_back(keys_unfiltered[k]);
-      }
-    }
-  }
-  return keys;
-}
-
 // Data ----------------------------------------------------------------------
 
 //getDataTypes////////////////////////////////////////////////////////////////
 // Gets the data types of the schema keys and converts them into SQLite types.
 // Note that SQLite does not recognize arrays, so they will be stored as text.
-vector<string> AflowDB::getDataTypes(const string& schema, const vector<string>& cols) {
-  uint ncols = cols.size();
+vector<string> AflowDB::getDataTypes() {
+  uint ncols = schema.getNKeys();
   vector<string> types(ncols);
   for (uint i = 0; i < ncols; i++) {
-    types[i] = extractJsonValue(schema, "AAPI_schema." + cols[i] + ".type");
+    const _xschema& xschm = schema.getEntry(i);
     // AUID has to be unique
-    if (cols[i] == "auid") {
+    if (xschm.key == "auid") {
       types[i] = "TEXT UNIQUE NOT NULL";
-    } else if (types[i] == "number") {
+    } else if (xschm.type == "number") {
       types[i] = "REAL";
     } else {
       types[i] = "TEXT";
@@ -600,6 +586,32 @@ vector<string> AflowDB::getDataValues(const string& entry, const vector<string>&
   return values;
 }
 
+//extractJsonValueAflow///////////////////////////////////////////////////////
+// This function extracts values from an aflowlib.json file. It is much faster
+// than using SQLite's JSON extension, but has was designed to only work for
+// the aflowlib.json. It cannot handle nested JSONs!
+string AflowDB::extractJsonValueAflow(const string& json, string key) {
+  string value = "";
+  key = "\"" + key + "\":";
+  string::size_type start, end;
+  start = json.find(key);
+  if (start != string::npos) {
+    start += key.length();
+    end = json.find("\":", start);
+    if (end != string::npos) {
+      value = json.substr(start, end - start);
+      end = value.find_last_of(",\"") - 1;
+      value = value.substr(0, end);
+    } else {
+      end = json.find("}", start);
+      value = json.substr(start, end - start);
+    }
+  } else {
+    value = "";
+  }
+  return value;
+}
+
 } // namespace aflowlib
 
 /**************************** DATABASE ANALYSIS *****************************/
@@ -609,6 +621,12 @@ namespace aflowlib {
 //analyzeDatabase/////////////////////////////////////////////////////////////
 // Provides analytics for the database in JSON format.
 void AflowDB::analyzeDatabase(const string& outfile) {
+
+  if (aurostd::FileEmpty(database_file)) {
+    string function = _AFLOW_DB_ERR_PREFIX_ + "analyzeDatabase()";
+    string message = "Cannot analyze database. File empty.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+  }
 
   // Get properties and tables for which statistics need to be collected
   // Since all tables have the same columns, only one table needs to be searched
@@ -670,34 +688,28 @@ DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& ta
     vector<vector<int> > counts(_N_AUID_TABLES_, vector<int>(ncols));
     vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
-    // Put into a try statement so that exceptions thrown in a thread
-    // can be properly displayed.
-    try {
-      int ncpus = init::GetCPUCores();
-      if (ncpus < 1) ncpus = 1;
-      // The maximum number of CPUs are empirically found values that appear
-      // to result in the shortest run times. Further testing may be necessary.
-      int cpu_max = 32;
-      if (stats.nentries < 100000) cpu_max = 16;
-      if (stats.nentries < 50000) cpu_max = 8;
-      if (stats.nentries < 10000) cpu_max = 4;
-      if (ncpus > cpu_max) ncpus = cpu_max;
-      vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-      vector<std::thread*> threads;
-      for (int i = 0; i < ncpus; i++) {
-        threads.push_back(new std::thread(&AflowDB::getColStats, this,
-                                          thread_dist[i][0], thread_dist[i][1],
-                                          std::ref(catalog), std::ref(tables),
-                                          std::ref(cols), std::ref(loops),
-                                          std::ref(counts), std::ref(loop_counts),
-                                          std::ref(maxmin), std::ref(sets)));
-      }
-      for (int i = 0; i < ncpus; i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-    } catch (aurostd::xerror& excpt) {
-      throw aurostd::xerror(excpt.where(), excpt.what(), excpt.error_code);
+    int ncpus = init::GetCPUCores();
+    if (ncpus < 1) ncpus = 1;
+    // The maximum number of CPUs are empirically found values that appear
+    // to result in the shortest run times. Further testing may be necessary.
+    int cpu_max = 32;
+    if (stats.nentries < 100000) cpu_max = 16;
+    if (stats.nentries < 50000) cpu_max = 8;
+    if (stats.nentries < 10000) cpu_max = 4;
+    if (ncpus > cpu_max) ncpus = cpu_max;
+    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
+    vector<std::thread*> threads;
+    for (int i = 0; i < ncpus; i++) {
+      threads.push_back(new std::thread(&AflowDB::getColStats, this,
+                                        thread_dist[i][0], thread_dist[i][1],
+                                        std::ref(catalog), std::ref(tables),
+                                        std::ref(cols), std::ref(loops),
+                                        std::ref(counts), std::ref(loop_counts),
+                                        std::ref(maxmin), std::ref(sets)));
+    }
+    for (int i = 0; i < ncpus; i++) {
+      threads[i]->join();
+      delete threads[i];
     }
 #else
     getColStats(0, _N_AUID_TABLES_, catalog, tables, cols,
@@ -791,7 +803,7 @@ void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
   if (sql_code != SQLITE_OK) {
     string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
     string message = "Could not open cursor on database file " + database_file + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 
   uint ncols = cols.size();
@@ -816,7 +828,7 @@ void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
   if (sql_code != SQLITE_OK) {
     string function = _AFLOW_DB_ERR_PREFIX_ + "open()";
     string message = "Could not close cursor on database file " + database_file + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
   }
 }
 
@@ -953,21 +965,21 @@ namespace aflowlib {
 // Creates an index.
 void AflowDB::createIndex(const string& index, const string& table, const string& column) {
   string command = "CREATE INDEX " + index + " ON " + table + "(" + column +  ")";
-  SQLexecuteCommand(db, command);
+  sql::SQLexecuteCommand(db, command);
 }
 
 //dropIndex///////////////////////////////////////////////////////////////////
 // Removes an index.
 void AflowDB::dropIndex(const string& index) {
   string command = "DROP INDEX " + index;
-  SQLexecuteCommand(db, command);
+  sql::SQLexecuteCommand(db, command);
 }
 
 // TRANSACTION ---------------------------------------------------------------
 
 void AflowDB::transaction(bool begin) {
   string command = string(begin?"BEGIN":"END") + " TRANSACTION";
-  SQLexecuteCommand(db, command);
+  sql::SQLexecuteCommand(db, command);
 }
 
 // TABLE ---------------------------------------------------------------------
@@ -976,7 +988,7 @@ void AflowDB::transaction(bool begin) {
 // Deletes a table from the database.
 void AflowDB::dropTable(const string& table) {
   string command = "DROP TABLE IF EXISTS " + table;
-  SQLexecuteCommand(db, command);
+  sql::SQLexecuteCommand(db, command);
 }
 
 //getTables///////////////////////////////////////////////////////////////////
@@ -989,7 +1001,7 @@ vector<string> AflowDB::getTables(string where) {
 vector<string> AflowDB::getTables(sqlite3* cursor, string where) {
   string command = "SELECT name FROM sqlite_master WHERE type='table'";
   if (!where.empty()) command += " AND (" + where + ")";
-  return SQLexecuteCommandVECTOR(cursor, command);
+  return sql::SQLexecuteCommandVECTOR(cursor, command);
 }
 
 //createTable/////////////////////////////////////////////////////////////////
@@ -1006,7 +1018,7 @@ void AflowDB::createTable(const string& table, const vector<string>& cols, const
     string function = _AFLOW_DB_ERR_PREFIX_ + "createTable()";
     string message = "Could not create table. ";
     message += "Number of columns and number of types do not match.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else {
     string command = "CREATE TABLE IF NOT EXISTS " + table + " (";
     for (uint c = 0; c < ncols; c++) {
@@ -1014,7 +1026,7 @@ void AflowDB::createTable(const string& table, const vector<string>& cols, const
       if (c < ncols - 1) command += ", ";
     }
     command += ")";
-    SQLexecuteCommand(db, command);
+    sql::SQLexecuteCommand(db, command);
   }
 }
 
@@ -1037,12 +1049,12 @@ void AflowDB::insertValues(const string& table, const vector<string>& cols,
     string function = _AFLOW_DB_ERR_PREFIX_ + "insertValues()";
     string message = "Could not insert values. ";
     message += "Number of columns and number of values do not match.";
-    throw aurostd::xerror(function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   } else {
     string command = "INSERT INTO " + table;
     if (ncols > 0) command += " (" + aurostd::joinWDelimiter(cols, ", ") + ")";
     command += " VALUES(" + aurostd::joinWDelimiter(vals, ", ") + ")";
-    SQLexecuteCommand(db, command);
+    sql::SQLexecuteCommand(db, command);
   }
 }
 
@@ -1056,7 +1068,7 @@ vector<string> AflowDB::getColumnNames(const string& table) {
 
 vector<string> AflowDB::getColumnNames(sqlite3* cursor, const string& table) {
   string command = "PRAGMA table_info(" + table + ")";
-  vector<vector<string> > pragma_results = SQLexecuteCommand2DVECTOR(cursor, command);
+  vector<vector<string> > pragma_results = sql::SQLexecuteCommand2DVECTOR(cursor, command);
   uint nresults = pragma_results.size();
   vector<string> columns(nresults);
   for (uint r = 0; r < nresults; r++) {
@@ -1073,7 +1085,7 @@ vector<string> AflowDB::getColumnTypes(const string& table) {
 
 vector<string> AflowDB::getColumnTypes(sqlite3* cursor, const string& table) {
   string command = "PRAGMA table_info(" + table + ")";
-  vector<vector<string> > pragma_results = SQLexecuteCommand2DVECTOR(cursor, command);
+  vector<vector<string> > pragma_results = sql::SQLexecuteCommand2DVECTOR(cursor, command);
   uint nresults = pragma_results.size();
   vector<string> columns(nresults);
   for (uint r = 0; r < nresults; r++) {
@@ -1091,7 +1103,7 @@ string AflowDB::getValue(const string& table, const string& col, string where) {
 
 string AflowDB::getValue(sqlite3* cursor, const string& table, const string& col, string where) {
   string command = prepareSELECT(table, "", col, where, 0, "");
-  return SQLexecuteCommandSCALAR(cursor, command);
+  return sql::SQLexecuteCommandSCALAR(cursor, command);
 }
 
 //getProperty/////////////////////////////////////////////////////////////////
@@ -1103,7 +1115,7 @@ string AflowDB::getProperty(const string& property, const string& table,
 string AflowDB::getProperty(sqlite3* cursor, const string& property, const string& table,
                             const string& col, string where) {
   string command = prepareSELECT(table, property, col, where, 0, "");
-  return SQLexecuteCommandSCALAR(cursor, command);
+  return sql::SQLexecuteCommandSCALAR(cursor, command);
 }
 
 //getPropertyMultiTables//////////////////////////////////////////////////////
@@ -1118,7 +1130,7 @@ vector<string> AflowDB::getPropertyMultiTables(sqlite3* cursor, const string& pr
   uint ntables = tables.size();
   vector<string> commands(ntables);
   for (uint t = 0; t < ntables; t++) commands[t] = prepareSELECT(tables[t], property, col, where);
-  return SQLexecuteCommandVECTOR(cursor, aurostd::joinWDelimiter(commands, " UNION ALL "));
+  return sql::SQLexecuteCommandVECTOR(cursor, aurostd::joinWDelimiter(commands, " UNION ALL "));
 }
 
 //getSet//////////////////////////////////////////////////////////////////////
@@ -1132,7 +1144,7 @@ vector<string> AflowDB::getSet(sqlite3* cursor, const string& table, const strin
                                string where, int limit, string order_by) {
   string property = string((distinct?"DISTINCT":""));
   string command = prepareSELECT(table, property, col, where, limit, order_by);
-  return SQLexecuteCommandVECTOR(cursor, command);
+  return sql::SQLexecuteCommandVECTOR(cursor, command);
 }
 
 //getSetMulitTables///////////////////////////////////////////////////////////
@@ -1152,7 +1164,7 @@ vector<string> AflowDB::getSetMultiTables(sqlite3* cursor, const vector<string>&
   if (!distinct) union_string += "ALL ";
   string command = aurostd::joinWDelimiter(commands, union_string);
   if (limit > 0) command += " LIMIT " + aurostd::utype2string<int>(limit);
-  return SQLexecuteCommandVECTOR(cursor, command);
+  return sql::SQLexecuteCommandVECTOR(cursor, command);
 }
 
 //prepateSELECT///////////////////////////////////////////////////////////////

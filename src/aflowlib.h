@@ -12,7 +12,7 @@
 #define _AFLOWLIB_H_
 
 #include "aflow.h"
-#include "SQLITE/sqlite3.h"
+#include "SQLITE/aflow_sqlite.h"
 //[OBSOLETE] [KESONG] #include "aflow_contrib_kesong.h" //CO 180515
 
 using std::vector;
@@ -509,13 +509,13 @@ struct DBStats {
 class AflowDB {
   public:
     AflowDB(const string&);
-    AflowDB(const string&, const string&, const string&, const string&);
+    AflowDB(const string&, const string&, const string&);
     ~AflowDB();
 
     string data_path;
     string database_file;
     string lock_file;
-    string schema_file;
+    xSchema schema;
 
     bool isTMP();
 
@@ -560,8 +560,9 @@ class AflowDB {
     void buildTables(int, int, const vector<string>&, const vector<string>&);
     void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
-    vector<string> getDataTypes(const string&, const vector<string>&);
+    vector<string> getDataTypes();
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
+    string extractJsonValueAflow(const string&, string);
 
     DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&, const vector<string>&);
     void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
@@ -582,21 +583,6 @@ class AflowDB {
 };
 
 }  // namespace aflowlib
-
-namespace aflowlib {
-  vector<string> getJsonKeys(const string&, string="");
-  string extractJsonValue(const string&, const string&);
-  string extractJsonValueAflow(const string&, string);
-
-  void SQLexecuteCommand(sqlite3*, const string&);
-  string SQLexecuteCommandSCALAR(sqlite3*, const string&);
-  vector<string> SQLexecuteCommandVECTOR(sqlite3*, const string&);
-  vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3*, const string&);
-  int SQLcallback(void*, int, char**, char**);
-  int SQLcallbackSCALAR(void*, int, char**, char**);
-  int SQLcallbackVECTOR(void*, int, char**, char**);
-  int SQLcallback2DVECTOR(void*, int, char**, char**);
-}
 
 #endif //  _AFLOWLIB_H_
 

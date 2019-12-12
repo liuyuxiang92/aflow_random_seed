@@ -1780,6 +1780,36 @@ class xStream {
     void setOSS(ostream& oss);
 };
 
+// ME191125
+// AFLOW object for the AAPI schema
+struct _xschema {
+  string key;
+  string type;
+  string unit;
+};
+
+class xSchema {
+  public:
+    xSchema();
+    xSchema(const xSchema&);
+    const xSchema& operator=(const xSchema&);
+    ~xSchema();
+
+    void initialize();
+
+    uint getNKeys() const;
+    const vector<_xschema>& getSchemaEntries() const;
+    const _xschema& getEntry(const string&) const;
+    const _xschema& getEntry(int) const;
+    vector<string> getKeys() const;
+  private:
+    vector<_xschema> vxschema;
+    uint nkeys;
+
+    void free();
+    void copy(const xSchema&);
+};
+
 // for queue
 class _xqsub {
  public:

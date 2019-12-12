@@ -30,8 +30,6 @@
 #define         DEFAULT_AFLOW_DB_STATS_FILE             XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_STATS_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH              string("/common/AFLOW/LIBS/")
 #define         DEFAULT_AFLOW_DB_DATA_PATH              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_DATA_PATH")
-#define AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE            string("/www/search/aapi_schema.json")
-#define         DEFAULT_AFLOW_DB_SCHEMA_FILE            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_SCHEMA_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE              string("/mnt/ramd/ADB_Idle.lock")
 #define         DEFAULT_AFLOW_DB_LOCK_FILE              XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_DB_LOCK_FILE")
 #define AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD        3*3600
@@ -977,7 +975,6 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AFLOW_DB_FILE", AFLOWRC_DEFAULT_AFLOW_DB_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_STATS_FILE", AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_DATA_PATH", AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH);
-    aflowrc::load_default("DEFAULT_AFLOW_DB_SCHEMA_FILE", AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_LOCK_FILE", AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE);
     aflowrc::load_default("DEFAULT_AFLOW_DB_STALE_THRESHOLD", AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD);
     // ME191001 - END
@@ -1464,7 +1461,6 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_STATS_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
-    aflowrc << "DEFAULT_AFLOW_DB_SCHEMA_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_LOCK_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_STALE_THRESHOLD=" << AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD << endl;
     aflowrc << " " << endl;
@@ -1941,7 +1937,6 @@ namespace aflowrc {
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_STATS_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_STATS_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_DATA_PATH=\"" << AFLOWRC_DEFAULT_AFLOW_DB_DATA_PATH << "\"" << endl;
-    if(LDEBUG) oss << "DEFAULT_AFLOW_DB_SCHEMA_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_SCHEMA_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_LOCK_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_LOCK_FILE << "\"" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_STALE_THRESHOLD=" << AFLOWRC_DEFAULT_AFLOW_DB_STALE_THRESHOLD << endl;
     // ME191001 - STOP
