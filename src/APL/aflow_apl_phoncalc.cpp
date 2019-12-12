@@ -1235,7 +1235,8 @@ namespace apl {
 //    eigenvectors2 = trasp(eigenvectors2);
 //#endif
 
-// ME 180828; OBSOLETE ME190815 - use Jacobi algorithm in aurostd::xmatrix
+// ME 180828; OBSOLETE ME190815 - use Jacobi algorithm in aurostd::xmatrix, which
+// is much, much faster than aplEigensystems for large systems
 //    apl::aplEigensystems e;
 //    e.eigen_calculation(dynamicalMatrix, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
 
