@@ -825,7 +825,7 @@ APL/aflow_apl_pdisc.o: APL/aflow_apl_pdisc.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makef
 APL/aflow_aapl_tcond.o: APL/aflow_aapl_tcond.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
 #	${CPP} $(VERS) $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
-	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o-,cpp)"\" $(INCLUDE) -Wall -W -O3 -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) -Wall -W -O3 -std=gnu++0x APL/aflow_aapl_tcond.cpp -c
 	touch $@
 APL/aflow_qha_dm_pdos_save.o: APL/aflow_qha_dm_pdos_save.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 #	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS) ${LIBS} -o $@ $<
