@@ -475,7 +475,7 @@ void DOSCalculator::writePHDOSCAR(const string& directory) {
     string message = "Cannot open output file " + filename + ".";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
-  if (xdos.partial) {  // Write PHDOSCAR if there are projected DOS
+  if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
     filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
     xstructure xstr = _pc.getInputCellStructure();
     xstr.is_vasp5_poscar_format = true;
