@@ -56,7 +56,7 @@
 #include <mutex>
 std::mutex m;
 #else
-#warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
+#warning "The multithread parts of AflowDB will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 #define _AFLOW_DB_DEBUG_ true  // switched on for logging
