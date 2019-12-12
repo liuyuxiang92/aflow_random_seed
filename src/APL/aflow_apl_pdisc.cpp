@@ -107,7 +107,7 @@ void PhononDispersionCalculator::setPath(const string& USER_DC_OWNPATH) {
       if (tokens[0].find('|') != string::npos) {
         string function = "PhononDispersionCalculator::setPath()";
         string message = "Cannot have | in the first path coordinate";
-        throw aurostd::xerror(function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
       } else {
         path = tokens[0];
       }
@@ -347,7 +347,7 @@ void PhononDispersionCalculator::writePDIS() {
   if (!aurostd::FileExist(filename)) { //ME181226
     string function = "PhononDispersionCalculator::writePDIS()";
     string message = "Cannot open output file " + filename + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("Cannot open output PDIS file.");
   }
   //
@@ -361,7 +361,7 @@ void PhononDispersionCalculator::writePDIS() {
   if (!aurostd::FileExist(hskptsfile)) { //ME181226
     string function = "PhononDispersionCalculator::writePDIS()";
     string message = "Cannot open output file " + hskptsfile + "."; //ME181226
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
 //    throw apl::APLRuntimeError("Cannot open output aflow.apl_hskpoints.out file.");
   }
   //PINKU
@@ -408,7 +408,7 @@ void PhononDispersionCalculator::writePHEIGENVAL() {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHEIGENVAL()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 
   // Also write PHKPOINTS and PHPOSCAR file
@@ -422,7 +422,7 @@ void PhononDispersionCalculator::writePHEIGENVAL() {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHPOSCAR()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 
@@ -484,7 +484,7 @@ void PhononDispersionCalculator::writePHKPOINTS() {
   if (!aurostd::FileExist(filename)) {
     string function = "PhononDispersionCalculator::writePHKPOINTS()";
     string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(function, message, _FILE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
 }
 

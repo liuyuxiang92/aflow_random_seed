@@ -109,6 +109,11 @@ using std::vector;
 #endif
 
 //CO 171002 - USEFUL!
+#ifndef AUROSTD_MAX_ULLINT
+#define AUROSTD_MAX_ULLINT std::numeric_limits<unsigned long long int>::max()
+#endif
+
+//CO 171002 - USEFUL!
 #ifndef AUROSTD_MAX_DOUBLE
 #define AUROSTD_MAX_DOUBLE std::numeric_limits<double>::max()
 #endif
@@ -270,6 +275,7 @@ namespace aurostd {
   string tolower(const string& in)  __xprototype;
   char toupper(const char& in)  __xprototype;
   char tolower(const char& in)  __xprototype;
+  string getPWD();  //CO191112
   int GetNumFields(const string& s);
   string GetNextVal(const string& s,int& id);
   string PaddedNumString(const int num,const int ndigits);
@@ -363,6 +369,8 @@ namespace aurostd {
   long int FileSize(const string& FileName);  // ME191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
+  bool EFileEmpty(const string& FileName); //CO190808
+  bool EFileNotEmpty(const string& FileName); //CO190808
   long int FileModificationTime(const string&);  // ME181712
   unsigned int getFileCheckSum(const string&, const string&);  // ME190219
   unsigned int getFletcher32(unsigned short*, size_t);  // ME190219
@@ -504,7 +512,7 @@ namespace aurostd {
   uint gzfile2string(string FileNameIN,string& StringIN);
   uint xzfile2string(string FileNameIN,string& StringIN);
   uint zipfile2string(string _FileNameIN,string& StringIN); //CO
-  uint efile2string(string FileNameIN,string& StringIN);
+  uint efile2string(const string& FileNameIN,string& StringIN);  //CO191110
   // file2vectorstring  
   uint file2vectorstring(string FileNameIN,vector<string>& vlines);
   uint bz2file2vectorstring(string FileNameIN,vector<string>& vlines);
@@ -719,7 +727,7 @@ namespace aurostd {
   string string2latex(const string& str) __xprototype;
   string latex2html(const string& str) __xprototype;
   string latex2txt(const string& str) __xprototype;
-  string fixStringLatex(const string& input, bool double_back_slash,bool symmetry_string);  //CO190419
+  string fixStringLatex(const string& input, bool double_back_slash=false,bool symmetry_string=false);  //CO190419
   string dbl2frac(double a, bool sign_prefix=true); //DX 20190724
 }
 

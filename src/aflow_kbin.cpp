@@ -232,6 +232,18 @@ namespace KBIN {
   bool Legitimate_aflowin(string aflowindir) { ostringstream aus; return KBIN::Legitimate_aflowin(aflowindir,FALSE,aus);};
 }
 
+namespace KBIN {
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO191110
+    string soliloquy="getAflowInFromAFlags():";
+    AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
+    if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    aurostd::file2string(AflowIn_file,AflowIn);
+    AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+  }
+}
+
 // ***************************************************************************
 // KBIN::Main
 // ***************************************************************************
@@ -449,7 +461,8 @@ namespace KBIN {
       if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
     } else {
       if(!aflags.AFLOW_PERFORM_FILE)
-	vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
+	vruns.push_back(aurostd::getPWD()); //CO191112
+	//[CO191112 - OBSOLETE]vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
       // vruns.push_back(aurostd::execute2string(XHOST.command("pwd"))+" ./");
     }
     // if file found
@@ -1547,6 +1560,14 @@ namespace KBIN {
 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
 	  }
 	  if(kflags.KBIN_POCC_CALCULATION) {kflags.KBIN_POCC=TRUE;} // CO 180419
+    if(kflags.KBIN_POCC){ //CO191110
+	    kflags.KBIN_POCC_TEMPERATURE_STRING=aurostd::substring2string(AflowIn,"[AFLOW_POCC]TEMPERATURE=");  //CO191110
+      if(kflags.KBIN_POCC_TEMPERATURE_STRING.empty()){  //CO191110
+        kflags.KBIN_POCC_TEMPERATURE_STRING=DEFAULT_POCC_TEMPERATURE_STRING;  //CO191110
+      }
+	    aus << "00000  MESSAGE POCC_TEMPERATURE_STRING=" << kflags.KBIN_POCC_TEMPERATURE_STRING << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  //CO191110
+	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);  //CO191110
+    }
 	  // ---------------------------------------------------------
 	  // parameters for FROZSL
 	  kflags.KBIN_FROZSL=FALSE;

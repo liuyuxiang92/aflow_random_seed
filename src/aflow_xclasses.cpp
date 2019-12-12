@@ -9,6 +9,8 @@
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
 
+#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO191112 - this file is not compiled like the rest
+
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
@@ -284,7 +286,7 @@ std::string _XHOST::command(const string& command) {
   }
   //CO 180705 - STOP
   //[CO190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
-  throw aurostd::xerror(soliloquy,"command="+command+" not found",_INPUT_MISSING_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
@@ -507,6 +509,7 @@ _kflags::_kflags() {
   KBIN_NEIGHBOURS_DRADIUS                          = 0.0;
   KBIN_POCC                                        = FALSE;
   KBIN_POCC_CALCULATION                            = FALSE;
+  KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO191110
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -625,7 +628,8 @@ void _kflags::copy(const _kflags& b) {
   KBIN_NEIGHBOURS_RADIUS                           = b.KBIN_NEIGHBOURS_RADIUS;
   KBIN_NEIGHBOURS_DRADIUS                          = b.KBIN_NEIGHBOURS_DRADIUS;
   KBIN_POCC                                        = b.KBIN_POCC;
-  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION;
+  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO191110
+  KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO191110
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -2005,6 +2009,8 @@ void xStream::copy(const xStream& b){
   else {p_FileMESSAGE=b.p_FileMESSAGE;}
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
 }
+ostream* xStream::getOSS() const {return p_oss;} //CO191110
+ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 
@@ -2060,7 +2066,7 @@ const _xschema& xSchema::getEntry(const string& key) const {
   }
   string function = "xSchema::getEntry()";
   string message = "Could not find key " + key + ".";
-  throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
 }
 
 const _xschema& xSchema::getEntry(int i) const {
