@@ -206,6 +206,8 @@ void LTMethod::generateAllTetrahedra(const vector<vector<xvector<int> > >& tetra
 
 //makeIrreducible/////////////////////////////////////////////////////////////
 // Determines the irreducible tetrahedra.
+// ME191213 - Improved speed by storing the sorted irreducible tetrahedra
+// instead of sorting in place.
 void LTMethod::makeIrreducible() {
   // Only makes sense with a reduced q-mesh
   if (_qm.getnQPs() != _qm.getnIQPs()) {
@@ -213,7 +215,8 @@ void LTMethod::makeIrreducible() {
     _irredTetrahedra.clear();
     _nIrredTetra = 0;
     int it, m;
-    vector<int> compare, irred;
+    vector<int> compare; //, irred;  OBSOLETE - ME191213
+    vector<vector<int> > irred;
     _logger << "Determining irreducible tetrahedra." << apl::endl;
     _logger.initProgressBar("Irreducible Tetrahedra");
     for (int t = 0; t < _nTetra; t++) {
@@ -221,15 +224,17 @@ void LTMethod::makeIrreducible() {
       for (int i = 0; i < 4; i++) compare[i] = _qm.getIrredQPointIndex(compare[i]);
       std::sort(compare.begin(), compare.end());
       for (it = 0; it < _nIrredTetra; it++) {
-        irred = getIrredTetrahedron(it);
-        for (int i = 0; i < 4; i++) irred[i] = _qm.getIrredQPointIndex(irred[i]);
-        std::sort(irred.begin(), irred.end());
+        // OBSOLETE - ME191213
+        //irred = getIrredTetrahedron(it);
+        //for (int i = 0; i < 4; i++) irred[i] = _qm.getIrredQPointIndex(irred[i]);
+        //std::sort(irred.begin(), irred.end());
         for (m = 0; m < 4; m++) {
-          if (compare[m] != irred[m]) break;
+          if (compare[m] != irred[it][m]) break;
         }
         if (m == 4) break;
       }
       if (it == _nIrredTetra) {
+        irred.push_back(compare);  // ME191213
         _irredTetrahedra.push_back(t);
         _weights.push_back(1);
         _nIrredTetra++;

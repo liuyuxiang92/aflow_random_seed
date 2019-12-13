@@ -321,6 +321,7 @@ void DOSCalculator::calcDosLT() {
   uint natoms = xstr.atoms.size();
   vector<vector<vector<vector<double> > > > parts;
   if (nproj > 0) {
+    // Precompute eigenvector projections
     xcomplex<double> eig;
     parts.assign(_rg.getnQPs(), vector<vector<vector<double> > >(_pc.getNumberOfBranches(), vector<vector<double> >(nproj, vector<double>(natoms, 0))));
     for (int q = 0; q < _rg.getnQPs(); q++) {
