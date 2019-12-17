@@ -396,6 +396,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=aurostd::string2utype<int>("0");
     o+=aurostd::string2utype<long int>("0");
     o+=aurostd::string2utype<long long int>("0");
+    o+=aurostd::string2utype<unsigned long long int>("0"); //CO191216
     o+=aurostd::string2utype<float>("0");
     o+=aurostd::string2utype<double>("0");
     o+=aurostd::string2utype<long double>("0");

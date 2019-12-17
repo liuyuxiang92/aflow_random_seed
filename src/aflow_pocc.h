@@ -40,6 +40,7 @@ const string STD_ELEMENTS_LIST="Sc Ti V Cr Mn Fe Co Ni Cu Zn "
 
 namespace pocc {
   class POccCalculator; //forward declaration
+  struct POccSuperCellSet; //forward declaration
 
   string POCC_MINIMUM_CONFIGURATION(const aurostd::xoption& vpflow);
   string POCC_MINIMUM_CONFIGURATION(const string& directory="./");
@@ -48,7 +49,10 @@ namespace pocc {
 
   vector<double> getVTemperatures(const string& temp_string);
   
-  string getPOCCHashFromXStructureTitle(const string& title);
+  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash);
+  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& site_config_index_str);
+  unsigned long long int getDGFromXStructureTitle(const string& title);
+  void parsePropertyByTag(const string& line,const string& tag,double& prop);
   bool patchStructuresAllFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
   bool patchStructuresAllFile(stringstream& structures_file_ss);
   bool patchStructuresUniqueFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
@@ -81,6 +85,8 @@ namespace pocc {
   bool sortPOccSites(const POccUnit& p1,const POccUnit& p2);
   bool sortPOccGroups(const POccUnit& p1,const POccUnit& p2);
 
+  string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
+  string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
 } // namespace pocc
 
 namespace pocc {
@@ -115,10 +121,10 @@ namespace pocc {
       uint equivalent;                                  //from iatoms of non-pocc structure
 
       //general setters
-      void create(ostream& oss=cout);
-      void create(ofstream& FileMESSAGE,ostream& oss=cout);
-      void create(const _aflags& aflags,ostream& oss=cout);
-      void create(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(ostream& oss=cout);
+      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void setAFlags(const _aflags& aflags);
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
@@ -661,6 +667,58 @@ namespace pocc {
       bool getNextSiteConfiguration(vector<vector<int> >& v_site_config);
   };
 
+} // namespace pocc
+
+namespace pocc {
+  class POccStructuresFile : public xStream {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      POccStructuresFile(ostream& oss=cout);
+      POccStructuresFile(ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const _aflags& aflags,ostream& oss=cout);
+      POccStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,const _aflags& aflags,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+
+      POccStructuresFile(const POccStructuresFile& b);
+      //constructors - STOP
+      ~POccStructuresFile();
+      const POccStructuresFile& operator=(const POccStructuresFile& b);
+      void clear();
+
+      bool m_initialized;
+      string m_content;vector<string> m_vcontent;string m_filename;
+      _aflags m_aflags;
+      //vector<string> m_ARUN_directories;
+      std::list<POccSuperCellSet> l_supercell_sets;
+      aurostd::xoption m_fileoptions;
+      vector<vector<vector<uint> > > m_vPOSCAR_lines;  //contains start/stop indices for POSCARs in m_vcontent
+
+      void initialize(ostream& oss=cout);
+      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const string& fileIn,ostream& oss=cout);
+      void initialize(const string& fileIn,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const string& fileIn,const _aflags& aflags,ostream& oss=cout);
+      void initialize(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+
+      void setAFlags(const _aflags& aflags);
+      void readFile(const string& fileIn);
+      void processFile();
+      bool getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS=true);
+      bool loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS=true);
+
+      friend ostream& operator<<(ostream&, const POccStructuresFile&);
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const POccStructuresFile& b);
+      //NECESSARY END CLASS METHODS - END
+  };
 }
 
 #endif  // _AFLOW_POCC_H_
