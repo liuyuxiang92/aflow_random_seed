@@ -1,3 +1,6 @@
+3.1.229 - 20XX/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
+        -- patched BvolXXXX.dat increment issue (++atomCOUNT) (CO)
 3.1.228 - 2019/11/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- Fixed bug in xDOSCAR reader error detection. (ME)

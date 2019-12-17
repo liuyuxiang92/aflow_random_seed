@@ -805,7 +805,7 @@ bool BaderCalc(aurostd::xoption& vpflow,
           oss << soliloquy << "Please check." << endl;
           oss << endl;
         }
-        bader_file = "Bvol" + aurostd::PaddedNumString(atomCOUNT++, 4) + ".dat";
+        bader_file = "Bvol" + aurostd::PaddedNumString(++atomCOUNT, 4) + ".dat";
       }
       //B_wexxxx.dat
       //these have different file names than Bvolxxx.dat even though they are the same files (artifact of bader code?)
