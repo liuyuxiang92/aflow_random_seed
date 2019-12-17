@@ -6062,6 +6062,14 @@ namespace aflowlib {
         // ME1901004 - STOP
       }
 
+      // ME191217 - START
+      // additional web output
+      aflowlib_json << "," << "\"aflow_version\":\"" << AFLOW_VERSION << "\"";
+      aflowlib_out << "|" << "aflow_version=" << AFLOW_VERSION;
+      aflowlib_json << "," << "\"aflow_date\":\"" << TODAY << "\"";
+      aflowlib_out << "|" << "aflow_date=" << TODAY;
+      // ME191217 - STOP
+
       // XHOST.machine_type
       aflowlib_json << "," << "\"XHOST.machine_type\":" << "\"" << XHOST.machine_type << "\"";
       aflowlib_out << " | " << "XHOST.machine_type=" << XHOST.machine_type;
