@@ -1168,14 +1168,15 @@ namespace pocc {
     POccStructuresFile psf;
     psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags,*p_FileMESSAGE,*p_oss);
     if(!psf.loadDataIntoCalculator((*this),false)){  //do not try DirectoryLS() yet
+      //if we get here, then postprocessing file is TOO old, try rewriting after we read in ALL_STRUCTURES file
       psf.initialize(POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,m_aflags,*p_FileMESSAGE,*p_oss);
       if(!psf.loadDataIntoCalculator((*this),true)){  //try DirectoryLS() here
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot load data from structures files",_FILE_NOT_FOUND_);
       }
+      //move old file and write new one
     }
     //StructuresAllFile2SupercellSets();  //this also works, just slower
     //StructuresUniqueFile2SupercellSets();
-    //exit(0);
     if(!QMVASPsFound()){return;}
     setDFTEnergies();
     setEFA();
@@ -6586,21 +6587,21 @@ void POccStructuresFile::processFile() {
 
   //get structure_group_tag and m_fileoptions.flag("TYPE::XXXX")
   string structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
-  if(aurostd::substring2bool(m_content,structure_group_tag)){m_fileoptions.flag("TYPE::ALL_STRUCTURES",TRUE);}
+  if(aurostd::substring2bool(m_content,structure_group_tag)){m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);}
   else{structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";}
-  if(aurostd::substring2bool(m_content,structure_group_tag)){m_fileoptions.flag("TYPE::ALL_STRUCTURES",TRUE);}
+  if(aurostd::substring2bool(m_content,structure_group_tag)){m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);}
   else{
     structure_group_tag=poscar_start_tag;
-    m_fileoptions.flag("TYPE::UNIQUE_STRUCTURES",TRUE);
+    m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS",TRUE);
   }
 
   if(LDEBUG){
     cerr << soliloquy << " structure_group_tag=" << structure_group_tag << endl;
-    cerr << soliloquy << " m_fileoptions.flag(\"TYPE::ALL_STRUCTURES\")=" << m_fileoptions.flag("TYPE::ALL_STRUCTURES") << endl;
-    cerr << soliloquy << " m_fileoptions.flag(\"TYPE::UNIQUE_STRUCTURES\")=" << m_fileoptions.flag("TYPE::UNIQUE_STRUCTURES") << endl;
+    cerr << soliloquy << " m_fileoptions.flag(\"TYPE::ALL_SUPERCELLS\")=" << m_fileoptions.flag("TYPE::ALL_SUPERCELLS") << endl;
+    cerr << soliloquy << " m_fileoptions.flag(\"TYPE::UNIQUE_SUPERCELLS\")=" << m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS") << endl;
   }
 
-  if(!(m_fileoptions.flag("TYPE::ALL_STRUCTURES") || m_fileoptions.flag("TYPE::UNIQUE_STRUCTURES"))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown structures file type",_FILE_CORRUPT_);}
+  if(!(m_fileoptions.flag("TYPE::ALL_SUPERCELLS") || m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS"))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown structures file type",_FILE_CORRUPT_);}
 
   unsigned long long int iline=0;
   unsigned long long int ititle=0;
@@ -6751,11 +6752,11 @@ bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,boo
     aurostd::StringSubst(arun_directory,POSCAR_series_START_tag,"");
     aurostd::string2tokens(arun_directory,vtokens,"_");  //POCC_01_01_H0C0
     if(vtokens.size()==3){  //POCC_01_H0C0
-      if(m_fileoptions.flag("TYPE::ALL_STRUCTURES")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ALL_STRUCTURES setting but detected UNIQUE_STRUCTURES format",_FILE_WRONG_FORMAT_);}
+      if(m_fileoptions.flag("TYPE::ALL_SUPERCELLS")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ALL_STRUCTURES setting but detected UNIQUE_STRUCTURES format",_FILE_WRONG_FORMAT_);}
       if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure group index",_VALUE_ILLEGAL_);}
       arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[2];
     }else if(vtokens.size()==4){  //POCC_01_01_H0C0
-      if(m_fileoptions.flag("TYPE::UNIQUE_STRUCTURES")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"UNIQUE_STRUCTURES setting but detected ALL_STRUCTURES format",_FILE_WRONG_FORMAT_);}
+      if(m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"UNIQUE_STRUCTURES setting but detected ALL_STRUCTURES format",_FILE_WRONG_FORMAT_);}
       if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure group index",_VALUE_ILLEGAL_);}
       if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc structure index",_VALUE_ILLEGAL_);}
       arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[3];
@@ -6769,7 +6770,7 @@ bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,boo
   }
   if(missing_tag==false && ARUN_directories.size()==l_supercell_sets.size()){return true;}
 
-  if(m_fileoptions.flag("TYPE::ALL_STRUCTURES")){  //build titles, but we need vstructures_size, which requires TYPE::ALL_STRUCTURES
+  if(m_fileoptions.flag("TYPE::ALL_SUPERCELLS")){  //build titles, but we need vstructures_size, which requires TYPE::ALL_SUPERCELLS
     if(LDEBUG){cerr << soliloquy << " trying to build directories from information in ALL_STRUCTURES file" << endl;}
     unsigned long long int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){

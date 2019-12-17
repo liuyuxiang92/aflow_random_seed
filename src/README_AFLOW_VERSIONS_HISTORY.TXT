@@ -40,6 +40,7 @@
         -- added KBIN_POCC_TEMPERATURE_STRING (aflow.in) and --temperature (command line) for pocc post-processing (CO)
         -- avoiding NEGLECT_NOMIX for pocc, high-entropy offers increased solubility over binaries (CO)
         -- added option for printing ensemble average IDOS in pocc data files (aflow_pocc_old.cpp) (CO) 
+        -- added POccStructuresFile class to read post-processing files (CO)
         -- patch distinction between POTCAR_TYPE_DATE_PRINT_flag and POTCAR_TYPE_PRINT_flag in avasp (CO)
         -- patching xvasp.POTCAR_TYPE_PRINT_flag for LIB2/LIB3 (CO)
         -- added --potential_type for auto aflow.in generator (CO)
