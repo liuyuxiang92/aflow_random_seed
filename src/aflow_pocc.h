@@ -496,7 +496,8 @@ namespace pocc {
       //post-processing
       vector<string> m_ARUN_directories;
       double m_efa;
-      int m_zero_padding;
+      int m_zero_padding_temperature;
+      bool m_temperatures_int;
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;
@@ -593,6 +594,7 @@ namespace pocc {
       void setEFA();
       void calculateSTATICProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
+      string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
       void plotAvgDOSCAR(double temperature=300);
       void writeResults() const;
