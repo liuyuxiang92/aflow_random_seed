@@ -42,6 +42,7 @@
         -- added option for printing ensemble average IDOS in pocc data files (aflow_pocc_old.cpp) (CO) 
         -- added POccStructuresFile class to read post-processing files (CO)
         -- patched zero-padding for pocc output files (CO)
+        -- add first POCC unit test to Makefile (CO)
         -- patch distinction between POTCAR_TYPE_DATE_PRINT_flag and POTCAR_TYPE_PRINT_flag in avasp (CO)
         -- patching xvasp.POTCAR_TYPE_PRINT_flag for LIB2/LIB3 (CO)
         -- added --potential_type for auto aflow.in generator (CO)
