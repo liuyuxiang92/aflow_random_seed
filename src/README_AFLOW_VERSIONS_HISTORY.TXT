@@ -100,6 +100,7 @@
         -- added FileMESSAGE and logstream overloads for comparison functions (DX)
         -- added lattice deviation, coordinate displacement, and figure of failure (structure misfit) to the JSON output for structure comparison (DX)
         -- added try-catch for pflow::loadXstructure() in case URL times out or a bad structure file input (DX)
+        -- refined magnetic misfit criteria (DX)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)

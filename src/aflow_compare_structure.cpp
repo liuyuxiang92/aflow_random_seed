@@ -319,14 +319,12 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // compare structures
     if(!multiple_comparisons){
-      double final_misfit=-1.0; //DX 20190424
-      double final_lattice_dev=-1.0; //DX 20191210 
-      double final_coordinate_dis=-1.0; //DX 20191210 
-      double final_failure=-1.0; //DX 20191210 
+      double final_misfit=AUROSTD_MAX_DOUBLE; //DX 20191217
+      structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191217
       store_comparison_logs = true; //DX 20190822 - add log bool
       // call main comparison function
       // DX 20190424 [OBSOLETE] compare::aflowCompareStructure(num_proc,xstr1,xstr2,same_species, scale_volume, optimize_match, oss,final_misfit);
-      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, oss); //DX 2010424 //DX 20191122 - move ostream to end //DX 20191210
+      compare::aflowCompareStructure(num_proc,all_structures[0].structure_representative,all_structures[1].structure_representative,same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, oss); //DX 2010424 //DX 20191122 - move ostream to end //DX 20191210
       if(print==true){
         // return mapping details
         return oss.str();
@@ -335,15 +333,17 @@ namespace pflow {
         // return abbreviated results (i.e., misfit value along with match, same family, or no match text
         oss.str("");
         oss.clear();
-        oss << final_misfit << " : ";
         if(final_misfit <=0.1 && (final_misfit+1.0)> 1e-3){
-          oss << "MATCH" << endl;
+          oss << final_misfit << " : " << "MATCH" << endl;
         }
         else if(final_misfit > 0.1 && final_misfit <= 0.2){
-          oss << "SAME FAMILY" << endl;
+          oss << final_misfit << " : " << "SAME FAMILY" << endl;
         }
-        else if(final_misfit > 0.2 || (final_misfit+1.0) < 1e-3){ 
-          oss << "NOT A MATCH" << endl;
+        else if(final_misfit > 0.2 && final_misfit <=1.0){ 
+          oss << final_misfit << " : " << "NOT A MATCH" << endl;
+        }
+        else if(aurostd::isequal(final_misfit,AUROSTD_MAX_DOUBLE) || (final_misfit+1.0) < 1e-3){ 
+          oss << "UNMATCHABLE" << endl;
         }
       }
     }
@@ -885,19 +885,21 @@ namespace pflow {
     // if only two comparisons and text only, print mismatch information 
     if(file_list.size()==2){
       // return abbreviated results (i.e., misfit value along with match, same family, or no match text
-      double final_misfit = -1.0;
-      if(final_prototypes[0].misfits_duplicate.size()==1){
-        final_misfit =  final_prototypes[0].misfits_duplicate[0];
+      double final_misfit = AUROSTD_MAX_DOUBLE;
+      if(final_prototypes[0].structure_misfits_duplicate.size()==1){
+        final_misfit =  final_prototypes[0].structure_misfits_duplicate[0].misfit;
       }
-      message << final_misfit << " : ";
       if(final_misfit <=0.1 && (final_misfit+1.0)> 1e-3){
-        message << "MATCH" << endl;
+        message << final_misfit << " : " << "MATCH" << endl;
       }
       else if(final_misfit > 0.1 && final_misfit <= 0.2){
-        message << "SAME FAMILY" << endl;
+        message << final_misfit << " : " << "SAME FAMILY" << endl;
       }
-      else if(final_misfit > 0.2 || (final_misfit+1.0) < 1e-3){ 
-        message << "NOT A MATCH" << endl;
+      else if(final_misfit > 0.2 && final_misfit <= 1.0){ 
+        message << final_misfit << " : " << "NOT A MATCH" << endl;
+      }
+      else if(aurostd::isequal(final_misfit,AUROSTD_MAX_DOUBLE) || (final_misfit+1.0) < 1e-3){ 
+        message << "UNMATCHABLE" << endl;
       }
       if(XHOST.QUIET){
         oss << message.str();
@@ -906,7 +908,7 @@ namespace pflow {
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
       }
       if(print){
-        if(final_prototypes[0].misfits_duplicate.size()==1){
+        if(final_prototypes[0].structure_misfits_duplicate.size()==1){
           oss << final_prototypes[0].duplicate_comparison_logs[0];
         }
       }
@@ -2024,6 +2026,16 @@ namespace pflow {
     }
     
     // ---------------------------------------------------------------------------
+    // FLAG: consider magnetic structure in comparison //DX 20191212
+    bool magnetic_comparison=false;
+    vector<string> magmoms_for_systems;
+    if(vpflow.flag("COMPARE_DATABASE_ENTRIES::MAGNETIC")){
+      magnetic_comparison=true;
+      message << "OPTIONS: Including magnetic moment information in comparisons.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+    }
+    
+    // ---------------------------------------------------------------------------
     // FLAG: do not calculate unique permutations 
     bool calculate_unique_permutations=true;
     if(vpflow.flag("COMPARE_DATABSE_ENTRIES::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
@@ -2813,7 +2825,7 @@ namespace compare {
 namespace compare {
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc=1;
-    double final_misfit=-1;
+    double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
     ostringstream comparison_log; //DX 20191202 
@@ -2824,7 +2836,7 @@ namespace compare {
 namespace compare {
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optimize_match) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end
     uint num_proc = 1;
-    double final_misfit = -1;
+    double final_misfit = AUROSTD_MAX_DOUBLE;
     ostringstream comparison_log; //DX 20191202 
     return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, comparison_log); //DX 20191122 - move ostream to end and add default
   }
@@ -2837,7 +2849,7 @@ namespace compare {
 namespace compare {
   double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species) { //DX 20191108 - remove const & from bools
     uint num_proc=1;
-    double final_misfit=-1;
+    double final_misfit=AUROSTD_MAX_DOUBLE;
     bool scale_volume=true; //default is true
     bool optimize_match=false; //default is false
     ostringstream comparison_log; //DX 20191202 
@@ -2854,11 +2866,9 @@ namespace compare {
       bool same_species, bool scale_volume, bool optimize_match, 
       double& final_misfit, ostream& comparison_log) {
 
-    double final_lattice_dev = AUROSTD_MAX_DOUBLE;
-    double final_coordinate_dis = AUROSTD_MAX_DOUBLE;
-    double final_failure = AUROSTD_MAX_DOUBLE;
-    
-    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, comparison_log); //DX 20191122 - move ostream to end
+    structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+
+    return aflowCompareStructure(num_proc, xstr1, xstr2, same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, comparison_log); //DX 20191122 - move ostream to end
   }
 }
 
@@ -2868,7 +2878,7 @@ namespace compare {
 namespace compare {
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, 
-      double& final_misfit, double& final_lattice_dev, double& final_coordinate_dis, double& final_failure, ostream& comparison_log) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
+      double& final_misfit, structure_misfit& final_misfit_info, ostream& comparison_log) { //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
 
     // This is the main comparison function, which  compares two crystal structures
     // and determines their level of similarity based on the idea discussed 
@@ -2999,10 +3009,7 @@ namespace compare {
       vector<vector<double> > vmin_dists;
       vector<uint> im1, im2;
       vector<string> PAIR1, PAIR2;
-      double minMis=1;
-      double min_lattice_dev = 1;
-      double min_coordinate_dis = 1;
-      double min_failure = 1;
+      structure_misfit min_misfit_info = compare::initialize_misfit_struct();
 
       comparison_log<<"-------------------------------------------------------"<<endl;
 
@@ -3044,13 +3051,11 @@ namespace compare {
       if(LDEBUG) {cerr << "compare:: " << "WAIT... Computing quadruplets..."<<endl;} 
       // creates the threads for checking quadruplets (lattices)
       //DX 20190530 - OLD threadGeneration(num_proc,q_base,xstr_test,vprotos,xstr_base,type_match,optimize_match,minMis,comparison_log);
-      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,minMis,min_lattice_dev,min_coordinate_dis,min_failure,type_match,optimize_match,comparison_log); //DX 20190530
+      latticeAndOriginSearch(xstr_base,xstr_test,num_proc,q_base,vprotos,min_misfit_info,type_match,optimize_match,comparison_log); //DX 20190530
 
       if(LDEBUG) {cerr << "compare:: " << "Total # of possible matching representations: " << vprotos.size() << endl;}	
-      final_misfit=minMis;
-      final_lattice_dev=min_lattice_dev;
-      final_coordinate_dis=min_coordinate_dis;
-      final_failure=min_failure;
+      final_misfit=min_misfit_info.misfit;
+      final_misfit_info=min_misfit_info; //DX 20191218
 
       // ---------------------------------------------------------------------------
       // find matches

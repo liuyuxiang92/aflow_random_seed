@@ -3955,7 +3955,18 @@ namespace anrl {
     
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
-   
+  
+    //DX 20191217 - START
+    // ---------------------------------------------------------------------------
+    // print format 
+    string format = "text";
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+      format = "text";
+    }
+    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+      format = "json";
+    }
+
     //DX 20191030 - add force Wyckoff choice option - START
     // check if forcing certain Wyckoff convention 
     // Wyckoff positions must be provided (either in CIF, Wyccar, or in Wyckoff object)
@@ -4174,10 +4185,35 @@ namespace anrl {
     xstr.num_lattice_parameters = lattice_parameter_list.size();
 
     // print label/params/params values
-    oss << "AFLOW label   : " << aflow_label << endl;
-    oss << "params        : " << aurostd::joinWDelimiter(parameter_list,",") << endl;
-    oss << "params values : " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,6),",") << endl;
-    
+    string format="text";
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+      format="text";
+    }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+      format="json";
+    }
+
+    if(format=="json"){
+      string eendl="";
+      bool roff=true; //round off
+      stringstream sscontent_json;
+      vector<string> vcontent_json;
+      
+      sscontent_json << "\"aflow_label\":\"" << aflow_label << "\"" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"aflow_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(parameter_list,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"aflow_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
+    }
+    else{
+      oss << "AFLOW label   : " << aflow_label << endl;
+      oss << "params        : " << aurostd::joinWDelimiter(parameter_list,",") << endl;
+      oss << "params values : " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,6),",") << endl;
+    }
+
     return oss.str();
   }
 }
