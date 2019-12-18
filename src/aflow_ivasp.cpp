@@ -1160,23 +1160,28 @@ namespace KBIN {
 
     // INTERCEPT ERRORS AND WRAP UP after all the incar has been prepared
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"LEPSILON") && !aurostd::substring2bool(xvasp.INCAR,"#LEPSILON")) {  /*************** INCAR **************/
-      aus << "00000  MESSAGE REMOVE ENTRY NPAR because of LEPSILON - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      // ME191205 - also remove NCORE
+      aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LEPSILON - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"LCALCEPS") && !aurostd::substring2bool(xvasp.INCAR,"#LCALCEPS")) {  /*************** INCAR **************/
-      aus << "00000  MESSAGE REMOVE ENTRY NPAR because of LCALCEPS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      // ME191205 - also remove NCORE
+      aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LCALCEPS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","LCALCEPS",vflags.KBIN_VASP_INCAR_VERBOSE);
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","LCALCEPS",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     } // KEVIN
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"IBRION") && !aurostd::substring2bool(xvasp.INCAR,"#IBRION")) {  /*************** INCAR **************/
       uint IBRION=aurostd::substring2utype<uint>(xvasp.INCAR.str(),"IBRION=");
       if(IBRION==8) {
-        aus << "00000  MESSAGE REMOVE ENTRY NPAR because of IBRION=" << IBRION << "  - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of IBRION=" << IBRION << "  - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","IBRION=8",vflags.KBIN_VASP_INCAR_VERBOSE);
+        KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","IBRION=8",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
       }
     }

@@ -1,5 +1,8 @@
 3.1.228 - 2019/11/20
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- Added additional web output for entry page generation. (ME)
+        -- Fixed bug that put NCORE into INCARs of linear response calculations. (ME)
+        -- Fixed bug that caused phonon dispersion path builder to break for some lattices. (ME)
         -- Fixed bug in xDOSCAR reader error detection. (ME)
         -- Additional web output for entry page applets. (ME)
         -- Fixed bug that prevented LDA+U parameters from being passed into ARUN aflow.ins. (ME)
