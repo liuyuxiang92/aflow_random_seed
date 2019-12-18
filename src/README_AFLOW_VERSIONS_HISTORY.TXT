@@ -71,6 +71,7 @@
         -- converted bool inverse() to bool isNonInvertible() in xmatrix() (CO)
         -- added smith normal form calculator to xmatrix (CO)
         -- updated QR decomposition algorithm to avoid saving householder rotations to form Q at the end (CO)
+        -- added xDOSCAR.convertSpinOFF2ON() for easy manipulation between SPIN-OFF/SPIN-ON POCC ARUNS (CO)
         -- fixed tolerance "WARNING" in symmetry screw axis determination (DX)
         -- added missing partial occupation value when printing CIF (DX)
         -- added site occupation to Wyckoff object (DX)
