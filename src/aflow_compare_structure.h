@@ -32,6 +32,8 @@
 #endif
 
 #define JSON_MODE 0
+#define _CALCULATE_MAGNETIC_MISFIT_ false
+#define _SPIN_TOL_ 0.1
 
 //// ===== GroupedWyckoffPosition Class ===== //
 //class GroupedWyckoffPosition{
@@ -53,6 +55,21 @@
 
 // ===== AtomEnvironment Class ===== //
 //DX 20191120 [MOVED TO aflow.h]
+
+//DX 20191212 - added 
+struct structure_misfit {
+  bool is_magnetic_misfit;              // boolean indicating if a magnetic system and using magnetic as misfit
+  double misfit;                        // Burzlaff's structural misfit (=1-(1-lattice_deviation)(1-coordinate_displacement)(1-failure))
+  double lattice_deviation;             // Burzlaff's lattice deviation, captures differences between lattices
+  double coordinate_displacement;       // Burzlaff's coordinate displacement; captures differences between atom positions (relatively close together)
+  double failure;                       // Burzlaff's figure of failure; captures differences between atom positions (significantly far apart)
+  double magnetic_misfit;               // DX's magnetic misfit (inspired by Burzlaff's misfit; =1-(1-magnetic_displacement)(1-magnetic_failure))
+  double magnetic_displacement;         // DX's magnetic displacement; captures differences between magnetic moment magnitude (and angle for non-collinear)
+  double magnetic_failure;              // DX's magnetic failure; captures spin flip differences 
+};
+namespace compare{
+  structure_misfit initialize_misfit_struct(bool magnetic=false);
+}
 
 // ===== StructurePrototype Class ===== //
 class StructurePrototype{
@@ -101,14 +118,8 @@ class StructurePrototype{
     vector<vector<GroupedWyckoffPosition> > structures_family_grouped_Wyckoff_positions;    // Wyckoff positions grouped by site type
     vector<uint> number_compounds_matching_family;                                          // vector of number of compounds that match with the same family structures
     vector<string> family_comparison_logs; //DX 20190506                                    // vector of comparison logs for same family structures, CAREFUL: very long string //DX 20190506
-    vector<double> misfits_duplicate;                                                       // vector of misfit values when comparing the duplicate to the representative structure
-    vector<double> lattice_deviations_duplicate;                                            // vector of lattice deviation values when comparing the duplicate to the representative structure
-    vector<double> coordinate_displacements_duplicate;                                      // vector of coordinate_displacement values when comparing the duplicate to the representative structure
-    vector<double> failures_duplicate;                                                      // vector of failure values when comparing the duplicate to the representative structure
-    vector<double> misfits_family;                                                          // vector of misfit values when comparing the same family structure to the representative structure  
-    vector<double> lattice_deviations_family;                                               // vector of lattice deviation values when comparing the family structure to the representative structure
-    vector<double> coordinate_displacements_family;                                         // vector of coordinate_displacement values when comparing the family structure to the representative structure
-    vector<double> failures_family;                                                         // vector of failure values when comparing the family structure to the representative structure
+    vector<structure_misfit> structure_misfits_duplicate;                                   // vector of C++ structs containing broken-down structural misfit information between the duplicate and representative structures //DX 20191217
+    vector<structure_misfit> structure_misfits_family;                                      // vector of C++ structs containing broken-down structural misfit information between the family and representative structures //DX 20191217
     vector<string> property_names;                                                          // vector of property names (if using AFLUX)
     vector<string> property_units;                                                          // vector of property units (if using AFLUX)
     vector<string> properties_structure_representative;                                     // vector of property values for the representative structure (if using AFLUX)
@@ -153,7 +164,7 @@ namespace compare{
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
-      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, double& final_lattice_dev, double& final_coordinate_dis, double& final_failure, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default //DX 20191210 - added lattice_dev, coordinate_dis, and failure
+      bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_misfit& final_misfit_info, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default //DX 20191210 - added lattice_dev, coordinate_dis, and failure
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match);  //DX 20191108 - remove const & from bools
   double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
@@ -452,10 +463,10 @@ namespace compare{
   // [OBSOLETE - DX 20190717] void threadGeneration(const uint& num_proc,xmatrix<double>& q1, xstructure& xstr2, 
   // [OBSOLETE - DX 20190717]                       vector<xstructure> &vprotos, xstructure &xstr1, const int& type_match, 
   // [OBSOLETE - DX 20190717]                       const bool& optimize_match, double& minMis, ostream& oss);
+  //void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
+  //    double& minMis, int type_match, bool optimize_match, ostream& oss); //DX 20190530
   void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
-      double& minMis, int type_match, bool optimize_match, ostream& oss); //DX 20190530
-  void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
-      double& minMis, double& min_lattice_dev, double& min_coordinate_dis, double& min_failure, int type_match, bool optimize_match, ostream& oss); //DX 20190530 //DX 20191210 - added lattice_dev, coordinate_dis, and failure
+      structure_misfit& min_misfit_info, int type_match, bool optimize_match, ostream& oss); //DX 20190530 //DX 20191210 - added lattice_dev, coordinate_dis, and failure
   void quadrupletSearch(const xmatrix<double>& q1, const xstructure& xstr_LFA_supercell,
       const xstructure& xstr2,
       vector<xvector<double> >& lattice_vecs, vector<vector<uint> >& ij_index);
@@ -487,9 +498,10 @@ namespace compare{
       const vector<xmatrix<double> >& clattices, 
       const vector<double>& latt_devs, 
       const uint start_index, const uint end_index,
-      double& min_misfit, double& min_latt_dev, 
-      double& min_coordinate_dis, double& min_failure,
-      double& min_magnetic_dis, double& min_magnetic_failure,
+      structure_misfit& min_misfit_info,
+      //double& min_misfit, double& min_latt_dev, 
+      //double& min_coordinate_dis, double& min_failure,
+      //double& min_magnetic_dis, double& min_magnetic_failure,
       vector<uint>& index_match_1, vector<uint>& index_match_2,
       vector<double>& min_distances,
       vector<xstructure>& vprotos,

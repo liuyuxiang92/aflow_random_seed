@@ -75,14 +75,8 @@ void StructurePrototype::free(){
   structures_family_grouped_Wyckoff_positions.clear(); //DX 20190813
   number_compounds_matching_family.clear();
   family_comparison_logs.clear(); //DX 20190506
-  misfits_duplicate.clear();
-  lattice_deviations_duplicate.clear(); //DX 20191210
-  coordinate_displacements_duplicate.clear(); //DX 20191210
-  failures_duplicate.clear(); //DX 20191210
-  misfits_family.clear();
-  lattice_deviations_family.clear(); //DX 20191210
-  coordinate_displacements_family.clear(); //DX 20191210
-  failures_family.clear(); //DX 20191210
+  structure_misfits_duplicate.clear(); //DX 20191217
+  structure_misfits_family.clear(); //DX 20191217
   property_names.clear();
   property_units.clear();
   properties_structure_representative.clear();
@@ -141,14 +135,8 @@ void StructurePrototype::copy(const StructurePrototype& b) {
     structures_family_grouped_Wyckoff_positions=b.structures_family_grouped_Wyckoff_positions; //DX 20190813
     number_compounds_matching_family=b.number_compounds_matching_family;
     family_comparison_logs=b.family_comparison_logs; //DX 20190506
-    misfits_duplicate=b.misfits_duplicate;
-    lattice_deviations_duplicate=b.lattice_deviations_duplicate; //DX 20191210
-    coordinate_displacements_duplicate=b.coordinate_displacements_duplicate; //DX 20191210
-    failures_duplicate=b.failures_duplicate; //DX 20191210
-    misfits_family=b.misfits_family;
-    lattice_deviations_family=b.lattice_deviations_family; //DX 20191210
-    coordinate_displacements_family=b.coordinate_displacements_family; //DX 20191210
-    failures_family=b.failures_family; //DX 20191210
+    structure_misfits_duplicate=b.structure_misfits_duplicate; //DX 20191217
+    structure_misfits_family=b.structure_misfits_family; //DX 20191217
     property_names=b.property_names;
     property_units=b.property_units;
     properties_structure_representative=b.properties_structure_representative;
@@ -284,51 +272,118 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     }
     sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
+   
+    // split duplicate info
+    vector<double> misfits_duplicate, lattice_deviations_duplicate, coordinate_displacements_duplicate, failures_duplicate, magnetic_displacements_duplicate, magnetic_failures_duplicate;
+    stringstream ss_tmp;
+    bool magnetic_misfit_duplicate = false;
+    for(uint j=0;j<StructurePrototype.structures_duplicate_names.size();j++){
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].misfit;
+      misfits_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].lattice_deviation;
+      lattice_deviations_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].coordinate_displacement;
+      coordinate_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].failure;
+      failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_displacement;
+      magnetic_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_failure;
+      magnetic_failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      magnetic_misfit_duplicate=StructurePrototype.structure_misfits_duplicate[j].is_magnetic_misfit;
+    }
+
     // structures_duplicate
     sscontent_json << "\"structures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_duplicate_names,"\""),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
+  
     // misfits_duplicate
-    sscontent_json << "\"misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.misfits_duplicate,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // lattice_deviations_duplicate
-    sscontent_json << "\"lattice_deviations_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.lattice_deviations_duplicate,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"lattice_deviations_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // coordinate_displacements_duplicate
-    sscontent_json << "\"coordinate_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.coordinate_displacements_duplicate,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"coordinate_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // failures_duplicate
-    sscontent_json << "\"failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.failures_duplicate,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
+    if(magnetic_misfit_duplicate){
+      //// magnetic_misfits_duplicate
+      //sscontent_json << "\"magnetic_misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_duplicate,8,roff),",") << "]" << eendl;
+      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+   
+      // magnetic_displacements_duplicate
+      sscontent_json << "\"magnetic_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_duplicate,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+      // magnetic_failures_duplicate
+      sscontent_json << "\"magnetic_failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_duplicate,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+
     // number_compounds_matching_duplicate
     sscontent_json << "\"number_compounds_matching_duplicate\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_duplicate,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // split family info
+    vector<double> misfits_family, lattice_deviations_family, coordinate_displacements_family, failures_family, magnetic_displacements_family, magnetic_failures_family;
+    bool magnetic_misfit_family=false;
+    for(uint j=0;j<StructurePrototype.structures_family_names.size();j++){
+      ss_tmp << StructurePrototype.structure_misfits_family[j].misfit;
+      misfits_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].lattice_deviation;
+      lattice_deviations_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].coordinate_displacement;
+      coordinate_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].failure;
+      failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.clear();
+      ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_displacement;
+      magnetic_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_failure;
+      magnetic_failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      magnetic_misfit_family=StructurePrototype.structure_misfits_family[j].is_magnetic_misfit;
+    }
     
     // structures_family
     sscontent_json << "\"structures_family\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_family_names,"\""),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // misfits_family
-    sscontent_json << "\"misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.misfits_family,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_family,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // lattice_deviations_family
-    sscontent_json << "\"lattice_deviations_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.lattice_deviations_family,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"lattice_deviations_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_family,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // coordinate_displacements_family
-    sscontent_json << "\"coordinate_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.coordinate_displacements_family,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"coordinate_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_family,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // failures_family
-    sscontent_json << "\"failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.failures_family,8,roff),",") << "]" << eendl;
+    sscontent_json << "\"failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_family,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
+    if(magnetic_misfit_family){
+      //// magnetic_misfits_family
+      //sscontent_json << "\"magnetic_misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_family,8,roff),",") << "]" << eendl;
+      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      
+      // magnetic_displacements_family
+      sscontent_json << "\"magnetic_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_family,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      // magnetic_failures_family
+      sscontent_json << "\"magnetic_failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_family,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+
     // number_compounds_matching_family
     sscontent_json << "\"number_compounds_matching_family\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_family,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
@@ -385,8 +440,8 @@ uint StructurePrototype::numberOfDuplicates() const {
   // Count the number of duplicate structures
   
   uint number_of_duplicates = 0;
-  for(uint i=0;i<misfits_duplicate.size();i++){
-    if(misfits_duplicate[i]<=0.1 && (misfits_duplicate[i]+1.0)>1e-3 ){
+  for(uint i=0;i<structure_misfits_duplicate.size();i++){
+    if(structure_misfits_duplicate[i].misfit<=0.1 && (structure_misfits_duplicate[i].misfit+1.0)>1e-3 ){
       number_of_duplicates+=1;
     }
   }
@@ -478,10 +533,8 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
   }
 
   // signifies comparison has not been performed yet
-  misfits_duplicate.push_back(-1.0);
-  lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
-  coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
-  failures_duplicate.push_back(-1.0); //DX 20191210
+  structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); 
+  structure_misfits_duplicate.push_back(temp_misfit_info);
 
   return true;
 }
@@ -499,10 +552,8 @@ void StructurePrototype::putDuplicateAsFamily(uint index, bool keep_generated){
   structures_family_grouped_Wyckoff_positions.push_back(structures_duplicate_grouped_Wyckoff_positions[index]);
   
   // add misfit
-  misfits_family.push_back(misfits_duplicate[index]);
-  lattice_deviations_family.push_back(lattice_deviations_duplicate[index]); //DX 20191210
-  coordinate_displacements_family.push_back(coordinate_displacements_duplicate[index]); //DX 20191210
-  failures_family.push_back(failures_duplicate[index]); //DX 20191210
+  structure_misfits_family.push_back(structure_misfits_duplicate[index]); //DX 20191217
+
   if(duplicate_comparison_logs.size()!=0){
     family_comparison_logs.push_back(duplicate_comparison_logs[index]);
   }
@@ -625,16 +676,11 @@ bool StructurePrototype::copyDuplicate(StructurePrototype& b, uint& index, bool 
 
   if(!copy_misfit){
     // signifies comparison has not been performed yet
-    misfits_duplicate.push_back(-1.0);
-    lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
-    coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
-    failures_duplicate.push_back(-1.0); //DX 20191210
+    structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191217
+    structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191217
   }
   else{ //DX 20190730
-    misfits_duplicate.push_back(b.misfits_duplicate[index]);
-    lattice_deviations_duplicate.push_back(b.lattice_deviations_duplicate[index]); //DX 20191210
-    coordinate_displacements_duplicate.push_back(b.coordinate_displacements_duplicate[index]); //DX 20191210
-    failures_duplicate.push_back(b.failures_duplicate[index]); //DX 20191210
+    structure_misfits_duplicate.push_back(b.structure_misfits_duplicate[index]); //DX 20191217
   }
   
   // load property info
@@ -667,11 +713,8 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   structures_duplicate_grouped_Wyckoff_positions.erase(structures_duplicate_grouped_Wyckoff_positions.begin()+index); //DX 20190814
 
   // remove misfit
-  misfits_duplicate.erase(misfits_duplicate.begin()+index);
-  lattice_deviations_duplicate.erase(lattice_deviations_duplicate.begin()+index); //DX 20191210
-  coordinate_displacements_duplicate.erase(coordinate_displacements_duplicate.begin()+index); //DX 20191210
-  failures_duplicate.erase(failures_duplicate.begin()+index); //DX 20191210
-
+  structure_misfits_duplicate.erase(structure_misfits_duplicate.begin()+index); //DX 20191217
+  
   //DX 20190504 - START
   // remove comparison log
   if(duplicate_comparison_logs.size()!=0){
@@ -707,10 +750,7 @@ bool StructurePrototype::removeDuplicates(bool remove_duplicate_count){
   duplicate_comparison_logs.clear(); //DX 20190506
 
   // remove misfit
-  misfits_duplicate.clear();
-  lattice_deviations_duplicate.clear(); //DX 20191210
-  coordinate_displacements_duplicate.clear(); //DX 20191210
-  failures_duplicate.clear(); //DX 20191210
+  structure_misfits_duplicate.clear(); //DX 20191217
 
   // remove properties
   properties_structures_duplicate.clear();
@@ -829,6 +869,25 @@ bool GroupedWyckoffPosition::operator<(const GroupedWyckoffPosition& b) const{  
 // AtomEnvironment Class 
 // ***************************************************************************
 // MOVED CLASS TO aflow_xatom.cpp (DX 20191120)
+
+// ***************************************************************************
+// initialize_misfit_struct() //DX 20191218
+// ***************************************************************************
+namespace compare{
+  structure_misfit initialize_misfit_struct(bool magnetic){
+    structure_misfit misfit_info = { 
+      .is_magnetic_misfit=magnetic,
+      .misfit=AUROSTD_MAX_DOUBLE, 
+      .lattice_deviation=AUROSTD_MAX_DOUBLE, 
+      .coordinate_displacement=AUROSTD_MAX_DOUBLE, 
+      .failure=AUROSTD_MAX_DOUBLE, 
+      .magnetic_misfit=AUROSTD_MAX_DOUBLE,
+      .magnetic_displacement=AUROSTD_MAX_DOUBLE,
+      .magnetic_failure=AUROSTD_MAX_DOUBLE
+    };
+    return misfit_info;
+  }
+}
 
 
 // ***************************************************************************
@@ -1506,7 +1565,16 @@ namespace compare{
           }
           // minimal output
           else{ 
-            for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",")  << ")" << endl; } 
+            //DX 20191218 [ORIG] for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",")  << ")" << endl; } 
+            for(uint i=0;i<final_permutations.size();i++){ //DX 20191218 - new misfit struct version 
+              message << final_permutations[i].structure_representative_name << " = ";
+              vector<string> duplicate_info;
+              for(uint j=0;j<final_permutations[i].structures_duplicate_names.size();j++){
+                stringstream ss_tmp; ss_tmp << final_permutations[i].structures_duplicate_names[j] << " (misfit_duplicate=" << final_permutations[i].structure_misfits_duplicate[j].misfit << ")";
+                duplicate_info.push_back(ss_tmp.str());
+              }
+              message << aurostd::joinWDelimiter(duplicate_info,",") << endl; 
+            }
           }
           message << "Trying to check if duplicates match better with other representative structures ... " << endl;
           pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
@@ -1526,7 +1594,16 @@ namespace compare{
           }
           // minimal output
           else{ 
-            for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",") << ")" << endl; } 
+            //DX 20191218 [ORIG] for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",") << ")" << endl; } 
+            for(uint i=0;i<final_permutations.size();i++){ //DX 20191218 - new misfit struct version 
+              message << final_permutations[i].structure_representative_name << " = ";
+              vector<string> duplicate_info;
+              for(uint j=0;j<final_permutations[i].structures_duplicate_names.size();j++){
+                stringstream ss_tmp; ss_tmp << final_permutations[i].structures_duplicate_names[j] << " (misfit_duplicate=" << final_permutations[i].structure_misfits_duplicate[j].misfit << ")";
+                duplicate_info.push_back(ss_tmp.str());
+              }
+              message << aurostd::joinWDelimiter(duplicate_info,",") << endl; 
+            }
           }
           if(mode==1){  // exhausted checks
             message << "Please contact David Hicks (david.hicks@duke.edu) and provide the corresponding example." << endl;
@@ -3265,7 +3342,7 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry and pearson symbol and 
     // space group. A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
     // Overloaded: In case the properties of the material are not given.
     // OBSOLETE: Created a cleaner function which requires less input arguments,
     // i.e., groupStructurePrototypes()   
@@ -3301,7 +3378,7 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry and pearson symbol and 
     // space group. A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
     // OBSOLETE: Created a cleaner function which requires less input arguments,
     // i.e., groupStructurePrototypes()   
  
@@ -3402,7 +3479,8 @@ namespace compare{
               comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
               comparison_schemes[j].structures_duplicate_compounds.push_back(getCompoundName(vxstrs[i])); //DX 20190111 - added compound, e.g., Ag1Br2
             }
-            comparison_schemes[j].misfits_duplicate.push_back(-1.0);
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+            comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191218
             if(property_names.size()!=0){
               comparison_schemes[j].properties_structures_duplicate.push_back(property_values[i]); //DX 20181218 - added property_values
             }
@@ -3513,7 +3591,7 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry, space group, and Wyckoff positions. 
     // A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
     
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::groupStructurePrototypes()";
@@ -3710,8 +3788,8 @@ namespace compare{
   
     for(uint i=0;i<prototype_schemes.size();i++){
       for(uint j=0;j<prototype_schemes[i].structures_duplicate_names.size();j++){
-        if((check_for_better_matches && prototype_schemes[i].misfits_duplicate[j] > misfit_min && prototype_schemes[i].misfits_duplicate[j] < misfit_max) || // find better match
-           (!check_for_better_matches && (prototype_schemes[i].misfits_duplicate[j] > 0.1 || aurostd::isequal(prototype_schemes[i].misfits_duplicate[j],1.0,1e-6) || aurostd::isequal(prototype_schemes[i].misfits_duplicate[j],-1.0,1e-6)))){   // find a match
+        if((check_for_better_matches && prototype_schemes[i].structure_misfits_duplicate[j].misfit > misfit_min && prototype_schemes[i].structure_misfits_duplicate[j].misfit < misfit_max) || // find better match
+           (!check_for_better_matches && (prototype_schemes[i].structure_misfits_duplicate[j].misfit > 0.1 || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,1.0,1e-6) || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)))){   // find a match //DX 20191218
           StructurePrototype tmp;
           bool found_new_match=false;
           // ---------------------------------------------------------------------------
@@ -3734,7 +3812,6 @@ namespace compare{
                 tmp.putDuplicateAsRepresentative(prototype_schemes[i],j);
                 // store the current match so we can check fast if it matches to any other
                 tmp.addStructurePrototypeAsDuplicate(prototype_schemes[i]); // store the current match structure
-                //tmp.misfits_duplicate.push_back(prototype_schemes[i].misfits_duplicate[j]); // store the current match misfit 
                 found_new_match=true;
               }
               if(k!=j){
@@ -3757,11 +3834,11 @@ namespace compare{
     // check if there are any better matches and reorganize if necessary
     // the original match is stored in the first position
     for(uint i=0;i<other_matches_schemes.size();i++){
-      double min_misfit = aurostd::abs(other_matches_schemes[i].misfits_duplicate[0]); // put first as min //abs to turn -1 into 1 for comparison
+      double min_misfit = aurostd::abs(other_matches_schemes[i].structure_misfits_duplicate[0].misfit); // put first as min //abs to turn -1 into 1 for comparison //DX 20191218
       uint min_index = 0;
-      for(uint j=1;j<other_matches_schemes[i].misfits_duplicate.size();j++){
-        if(other_matches_schemes[i].misfits_duplicate[j]<min_misfit && aurostd::isdifferent(other_matches_schemes[i].misfits_duplicate[j],-1.0,1e-6)){
-          min_misfit=other_matches_schemes[i].misfits_duplicate[j];
+      for(uint j=1;j<other_matches_schemes[i].structure_misfits_duplicate.size();j++){ //DX 20191218
+        if(other_matches_schemes[i].structure_misfits_duplicate[j].misfit<min_misfit && aurostd::isdifferent(other_matches_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)){
+          min_misfit=other_matches_schemes[i].structure_misfits_duplicate[j].misfit;
           min_index=j;
         }
       }
@@ -3775,11 +3852,8 @@ namespace compare{
               message << other_matches_schemes[i].structure_representative_name << " matches better with " << prototype_schemes[j].structure_representative_name; 
               pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
             }
-            prototype_schemes[j].addStructurePrototypeAsDuplicate(other_matches_schemes[i]);
-            prototype_schemes[j].misfits_duplicate.back()=other_matches_schemes[i].misfits_duplicate[min_index];
-            prototype_schemes[j].lattice_deviations_duplicate.back()=other_matches_schemes[i].lattice_deviations_duplicate[min_index]; //DX 20191210
-            prototype_schemes[j].coordinate_displacements_duplicate.back()=other_matches_schemes[i].coordinate_displacements_duplicate[min_index]; //DX 20191210
-            prototype_schemes[j].failures_duplicate.back()=other_matches_schemes[i].failures_duplicate[min_index]; //DX 20191210
+            prototype_schemes[j].addStructurePrototypeAsDuplicate(other_matches_schemes[i]); //DX 20191218
+            prototype_schemes[j].structure_misfits_duplicate.back()=other_matches_schemes[i].structure_misfits_duplicate[min_index]; //DX 20191218
           }
           // remove from old representative
           if(clean_unmatched && prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[0]){
@@ -3883,9 +3957,9 @@ namespace compare{
         tmp.structure_representative.Clear(); //clear xstructure;
         tmp.structure_representative_generated=false;
         tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
-        tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.misfits_duplicate.clear(); tmp.lattice_deviations_duplicate.clear(); tmp.coordinate_displacements_duplicate.clear(); tmp.failures_duplicate.clear(); tmp.properties_structures_duplicate.clear();
+        tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.structure_misfits_duplicate.clear(); tmp.properties_structures_duplicate.clear();
         tmp.structures_duplicate_generated.clear(); tmp.structures_duplicate_from.clear(); tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190814 - added Wyckoff positions
-        tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.misfits_family.clear(); tmp.lattice_deviations_family.clear(); tmp.coordinate_displacements_family.clear(); tmp.failures_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
+        tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.structure_misfits_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
         tmp.structures_family_generated.clear(); tmp.structures_family_from.clear();
         tmp.elements.clear();
         duplicate_check_schemes.push_back(tmp);
@@ -3907,10 +3981,8 @@ namespace compare{
             else {
               duplicate_check_schemes[j].properties_structures_duplicate.clear();
             }
-            duplicate_check_schemes[j].misfits_duplicate.push_back(-1.0);
-            duplicate_check_schemes[j].lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
-            duplicate_check_schemes[j].coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
-            duplicate_check_schemes[j].failures_duplicate.push_back(-1.0); //DX 20191210
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+            duplicate_check_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191218
             break;
           }
         }
@@ -3927,9 +3999,9 @@ namespace compare{
           tmp.structure_representative.Clear(); //clear xstructure;
           tmp.structure_representative_generated=false;
           tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
-          tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.misfits_duplicate.clear();  tmp.lattice_deviations_duplicate.clear(); tmp.coordinate_displacements_duplicate.clear(); tmp.failures_duplicate.clear(); tmp.properties_structures_duplicate.clear();
+          tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.structure_misfits_duplicate.clear(); tmp.properties_structures_duplicate.clear();
           tmp.structures_duplicate_generated.clear(); tmp.structures_duplicate_from.clear(); tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190814 - added Wyckoff positions
-          tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.misfits_family.clear(); tmp.lattice_deviations_family.clear(); tmp.coordinate_displacements_family.clear(); tmp.failures_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
+          tmp.structures_family_names.clear(); tmp.structures_family.clear(); tmp.structure_misfits_family.clear(); tmp.properties_structures_family.clear(); //DX 20190425 - added properties
           tmp.structures_family_generated.clear(); tmp.structures_family_from.clear();
           duplicate_check_schemes.push_back(tmp);
         }
@@ -3964,10 +4036,7 @@ namespace compare{
           if(final_prototypes[i].property_names.size()!=0){
             final_prototypes[i].properties_structures_duplicate.erase(final_prototypes[i].properties_structures_duplicate.begin()+j);
           }
-          final_prototypes[i].misfits_duplicate.erase(final_prototypes[i].misfits_duplicate.begin()+j);
-          final_prototypes[i].lattice_deviations_duplicate.erase(final_prototypes[i].lattice_deviations_duplicate.begin()+j); //DX 20191210
-          final_prototypes[i].coordinate_displacements_duplicate.erase(final_prototypes[i].coordinate_displacements_duplicate.begin()+j); //DX 20191210
-          final_prototypes[i].failures_duplicate.erase(final_prototypes[i].failures_duplicate.begin()+j); //DX 20191210
+          final_prototypes[i].structure_misfits_duplicate.erase(final_prototypes[i].structure_misfits_duplicate.begin()+j); //DX 20191218
         }
       }
     }
@@ -4122,21 +4191,16 @@ namespace compare{
         
         // call the main comparison function
         ostringstream tmp_oss; tmp_oss.clear();
-        double final_misfit=-1.0;
-        double final_lattice_dev=-1.0; //DX 20191210
-        double final_coordinate_dis=-1.0; //DX 20191210
-        double final_failure=-1.0; //DX 20191210
+        double final_misfit=AUROSTD_MAX_DOUBLE;
+        structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
         if(LDEBUG) { cerr << function_name << ": Comparing " << comparison_schemes[i].structure_representative_name << " and " << comparison_schemes[i].structures_duplicate_names[j] <<  endl; }
         compare::aflowCompareStructure(1, structure_representative, //num_proc -> 1 for threads (not sure how it behaves otherwise)
                                        duplicate_structure,
-                                       same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, tmp_oss); //DX 20191210 - added lattice_dev, coordinate_dis, and failure
+                                       same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX 20191218 - added misfit_info
         
         // store the figure of misfit
-        if(LDEBUG) { cerr << function_name << ": Comparison complete, misfit = " << final_misfit << "." << endl; }
-        comparison_schemes[i].misfits_duplicate[j]=final_misfit;
-        comparison_schemes[i].lattice_deviations_duplicate[j]=final_lattice_dev; //DX 20191210
-        comparison_schemes[i].coordinate_displacements_duplicate[j]=final_coordinate_dis; //DX 20191210
-        comparison_schemes[i].failures_duplicate[j]=final_failure; //DX 20191210
+        if(LDEBUG) { cerr << function_name << ": Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
+        comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX 20191218
         if(store_comparison_logs){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX 20190506
       }
     }
@@ -4231,10 +4295,8 @@ namespace compare{
         }
         ostringstream tmp_oss;
         tmp_oss.clear();
-        double final_misfit=-1.0;
-        double final_lattice_dev=-1.0; //DX 20191210
-        double final_coordinate_dis=-1.0; //DX 20191210
-        double final_failure=-1.0; //DX 20191210
+        double final_misfit=AUROSTD_MAX_DOUBLE;
+        structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
         xstructure duplicate_structure;
         if(!comparison_schemes[i].structures_duplicate_generated[j]){
           if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
@@ -4248,12 +4310,9 @@ namespace compare{
         // Call the main comparison function
         compare::aflowCompareStructure(num_proc, structure_representative,
             duplicate_structure,
-            same_species, scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, tmp_oss); //DX 20191122 - move ostream to end //DX 20191210 - added lattice_dev, coordinate_dis, and failure
+            same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX 20191122 - move ostream to end //DX 20191218 - added misfit_info
         // Store the figure of misfit
-        comparison_schemes[i].misfits_duplicate[j]=final_misfit;
-        comparison_schemes[i].lattice_deviations_duplicate[j]=final_lattice_dev; //DX 20191210
-        comparison_schemes[i].coordinate_displacements_duplicate[j]=final_coordinate_dis; //DX 20191210
-        comparison_schemes[i].failures_duplicate[j]=final_failure; //DX 20191210
+        comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX 20191218
       }
     }
     //SINGLE THREAD - END
@@ -4433,7 +4492,7 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry and pearson symbol and 
     // space group. A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
 
     string function_name = "compare::createStructurePermutations()";
     stringstream message;
@@ -4474,10 +4533,8 @@ namespace compare{
             comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
             comparison_schemes[j].structures_duplicate_generated.push_back(true);
             comparison_schemes[j].structures_duplicate_from.push_back("input");
-            comparison_schemes[j].misfits_duplicate.push_back(-1.0);
-            comparison_schemes[j].lattice_deviations_duplicate.push_back(-1.0); //DX 20191210
-            comparison_schemes[j].coordinate_displacements_duplicate.push_back(-1.0); //DX 20191210
-            comparison_schemes[j].failures_duplicate.push_back(-1.0); //DX 20191210
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+            comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191218
             scheme_created=true;
             break;
           }
@@ -4580,8 +4637,8 @@ namespace compare{
 
     int num_mismatches=0;
     for(uint i=0; i<comparison_schemes.size(); i++){
-      for(uint j=0; j<comparison_schemes[i].misfits_duplicate.size(); j++){
-        if(comparison_schemes[i].misfits_duplicate[j] > 0.1 || aurostd::isequal(comparison_schemes[i].misfits_duplicate[j],-1.0,1e-6)){
+      for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > 0.1 || aurostd::isequal(comparison_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)){
           num_mismatches+=1;
         }
       }
@@ -4627,11 +4684,10 @@ namespace compare{
     vector<StructurePrototype> tmp_list;
     for(uint i=0; i<comparison_schemes.size(); i++){
       bool first_mismatch=true;
-      for(uint j=0; j<comparison_schemes[i].misfits_duplicate.size(); j++){
-        //DX TEST if(comparison_schemes[i].misfits_duplicate[j] > 0.1 || comparison_schemes[i].misfits_duplicate[j] == -1.0 ){
-        if(comparison_schemes[i].misfits_duplicate[j] > 0.1 || comparison_schemes[i].misfits_duplicate[j]+1.0 <_ZERO_TOL_){ //DX 20190301 - more robust
+      for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > 0.1){
           // First, store any family prototype information
-          if(comparison_schemes[i].misfits_duplicate[j] > 0.1 && comparison_schemes[i].misfits_duplicate[j] <= 0.2){
+          if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= 0.2){
             comparison_schemes[i].putDuplicateAsFamily(j); //DX 20190814 - consolidated below into single function
             //DX 20190814 [OBSOLETE] - comparison_schemes[i].structures_family_names.push_back(comparison_schemes[i].structures_duplicate_names[j]);
             //DX 20190814 [OBSOLETE] - comparison_schemes[i].misfits_family.push_back(comparison_schemes[i].misfits_duplicate[j]);
@@ -4658,7 +4714,7 @@ namespace compare{
           }
         }
         //DX 20181220 - if they are matched, then we should delete the xstructure, since we no longer need the structure (save memory)
-        else if(comparison_schemes[i].misfits_duplicate[j] <= 0.1 && !std::signbit(comparison_schemes[i].misfits_duplicate[j])){
+        else if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= 0.1 && !std::signbit(comparison_schemes[i].structure_misfits_duplicate[j].misfit)){
           //comparison_schemes[i].structures_duplicate.erase(comparison_schemes[i].structures_duplicate.begin()+j);
           // check if the structure is generated first
           if(comparison_schemes[i].structures_duplicate_generated[j]){comparison_schemes[i].structures_duplicate[j].Clear(); comparison_schemes[i].structures_duplicate_generated[j]=false; } //DX 20190303 - update generated flag
@@ -4683,7 +4739,7 @@ namespace compare{
                   << "-----------------------------------------------------------------------------------------------" << endl;
           for(uint d=0;d<comparison_schemes[i].structures_duplicate_names.size();d++){
             message << "   " << setw(80) << std::left << comparison_schemes[i].structures_duplicate_names[d]
-                    << setw(15) << std::left << comparison_schemes[i].misfits_duplicate[d] << endl;
+                    << setw(15) << std::left << comparison_schemes[i].structure_misfits_duplicate[d].misfit << endl;
           }
         }
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -4717,10 +4773,8 @@ namespace compare{
       vector<int> store_indices;
       vector<double> store_misfits;
       int min_index=-1;
-      double min_misfit=-1.0;
-      double min_lattice_dev=-1.0; //DX 20191210
-      double min_coordinate_dis=-1.0; //DX 20191210
-      double min_failure=-1.0; //DX 20191210
+      double min_misfit=AUROSTD_MAX_DOUBLE;
+      structure_misfit min_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
       for(uint j=i;j<final_prototypes.size();j++){
         ostringstream tmp_oss;
         tmp_oss.clear();
@@ -4737,26 +4791,22 @@ namespace compare{
             final_prototypes[i].Pearson==final_prototypes[j].Pearson && 
             !matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group))
           ){
-          double final_misfit=-1.0;
-          double final_lattice_dev=-1.0; //DX 20191210
-          double final_coordinate_dis=-1.0; //DX 20191210
-          double final_failure=-1.0; //DX 20191210
+          double final_misfit=AUROSTD_MAX_DOUBLE;
+          structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
           bool scale_volume=true; //default is true
           bool optimize_match=false; //default is false
           aflowCompareStructure(num_proc, final_prototypes[i].structure_representative, 
 					 final_prototypes[j].structure_representative, same_species, 
-					 scale_volume, optimize_match, final_misfit, final_lattice_dev, final_coordinate_dis, final_failure, tmp_oss); //DX 20191122 - move ostream to end  //DX 20191210 - added lattice_dev, coordinate_dis, and failure
+					 scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX 20191122 - move ostream to end  //DX 20191218 - added misfit_info
           if(final_misfit < min_misfit){
+             min_misfit_info=final_misfit_info; //DX 20191218
              min_misfit=final_misfit;
-             min_lattice_dev=final_lattice_dev; //DX 20191210
-             min_coordinate_dis=final_coordinate_dis; //DX 20191210
-             min_failure=final_failure; //DX 20191210
              min_index=j;
           }
         }
       }
       // If one prototype is similar to another, add to one with higher space group
-      if(min_misfit!=-1.0){
+      if(min_misfit!=AUROSTD_MAX_DOUBLE){
         int sg_ind=-1;
         uint other_ind=-1;
         if(final_prototypes[i].space_group > final_prototypes[min_index].space_group){
@@ -4959,7 +5009,7 @@ namespace compare{
         if(final_prototypes[j].structures_duplicate_names.size()>0){
           for(uint k=0;k<final_prototypes[j].structures_duplicate_names.size();k++){
             ss_out << "  " << setw(structure_spacing) << std::left << final_prototypes[j].structures_duplicate_names[k] 
-              << setw(misfit_spacing) << std::right << final_prototypes[j].misfits_duplicate[k];
+              << setw(misfit_spacing) << std::right << final_prototypes[j].structure_misfits_duplicate[k].misfit;
             if(final_prototypes[j].property_names.size()!=0){
               for(uint l=0;l<final_prototypes[j].properties_structures_duplicate[k].size();l++){
                 ss_out << setw(property_spacing) << std::right << final_prototypes[j].properties_structures_duplicate[k][l];
@@ -5852,6 +5902,9 @@ namespace compare{
     vector<double> vdiffs;                      //Difference btwn atoms coords
     vector<std::pair<xvector<double>,xvector<double> > > min_positions;                      //Store sets of Cartesian coords which minimize distance
     vector<vector<double> > all_vdiffs;         //For all the atoms
+    
+    bool is_non_collinear = xstr1_atoms[0].noncoll_spin_is_given; //DX 20191213
+    bool is_collinear = xstr1_atoms[0].spin_is_given; //DX 20191213
 
     vector<uint> im1_tmp;
     vector<uint> im2_tmp;
@@ -5972,6 +6025,30 @@ namespace compare{
           return false;
         }
       }
+      //DX 20191213 - START
+      if(!_CALCULATE_MAGNETIC_MISFIT_){
+        // Check non_collinear spin
+        if(is_non_collinear){
+          if(aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(1)-PROTO_atoms[i2_real].noncoll_spin(1))>_SPIN_TOL_ ||
+              aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(2)-PROTO_atoms[i2_real].noncoll_spin(2))>_SPIN_TOL_ ||
+              aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(3)-PROTO_atoms[i2_real].noncoll_spin(3))>_SPIN_TOL_){
+            if(VERBOSE){
+              cerr << function_name << ":WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
+            }
+            return false;
+          }
+        }
+        // Check collinear spin
+        if(is_collinear){
+          if(aurostd::abs(xstr1_atoms[i1_real].spin-PROTO_atoms[i2_real].spin)>_SPIN_TOL_){
+            if(VERBOSE){
+              cerr << function_name << ":WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
+            }
+            return false;
+          }
+        }
+      }
+      //DX 20191213 - END
       // Check for one-to-one mappings 
       for(uint i=0;i<im1_name.size();i++){
         // Check if i1 index has multiple mappings
@@ -6751,65 +6828,77 @@ namespace compare{
     double& magnetic_deviation, double& magnetic_fail) {
 
     // BETA functionality: Determine magnetic deviation between magnetic structures
+    double _NON_COLLINEAR_ANGLE_DEGREE_TOL_ = 10.0;
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::magneticDeviation()";
-    double projection_sum = 0.0;
-    double mag_fail = 0.0;
+    double magmom_num = 0.0;
+    double magmom_den = 0.0;
+    uint mag_fail_1 = 0, mag_fail_2 = 0;
     bool is_non_collinear = xstr1.atoms[0].noncoll_spin_is_given;
+        
+    if(LDEBUG){
+      cerr << function_name << " is_non_collinear = " << is_non_collinear << endl;
+    }
 
     for(uint j=0; j<indexMatch1.size(); j++){
       
-      double magnetic_projection_str1 = 0.0;
-      double magnetic_projection_str2 = 0.0;
-
       // ---------------------------------------------------------------------------
       // collinear 
       if(!is_non_collinear){
-        //if(aurostd::isequal(xstr1.atoms[indexMatch1[j]].spin,0.0,1e-6)){
-        //  projection_sum = projection_sum + (
-        //}
-        double dot_product = xstr1.atoms[indexMatch1[j]].spin*xstr2.atoms[indexMatch2[j]].spin;
-        double cos_theta = dot_product/(aurostd::abs(xstr1.atoms[indexMatch1[j]].spin)*aurostd::abs(xstr2.atoms[indexMatch2[j]].spin));
-        magnetic_projection_str1 = 1.0-(aurostd::abs(xstr2.atoms[indexMatch2[j]].spin)*cos_theta/aurostd::abs(xstr1.atoms[indexMatch1[j]].spin));        
-        magnetic_projection_str2 = 1.0-(aurostd::abs(xstr1.atoms[indexMatch1[j]].spin)*cos_theta/aurostd::abs(xstr2.atoms[indexMatch2[j]].spin));        
-        if(LDEBUG){
-          cerr << function_name << " matching xstr1 (" << indexMatch1[j] << ") mag=" << xstr1.atoms[indexMatch1[j]].spin << " to xstr2 (" << indexMatch2[j] << ") mag=" << xstr2.atoms[indexMatch2[j]].spin << endl;
-          cerr << function_name << " dot_product: " << xstr1.atoms[indexMatch1[j]].spin*xstr2.atoms[indexMatch2[j]].spin << endl; 
-          cerr << function_name << " cos_theta: " << cos_theta << endl; 
-          cerr << function_name << " magnetic_projection_str1: " << magnetic_projection_str1 << endl;
-          cerr << function_name << " magnetic_projection_str2: " << magnetic_projection_str2 << endl;
-        }
-        if(aurostd::isequal(cos_theta,-1.0,1e-6)){
-          mag_fail += 1.0; //str1
-          mag_fail += 1.0; //str2
-        }
-        else if(aurostd::isequal(dot_product,0.0,1e-6)){
-          projection_sum = projection_sum + 0.0;
+        double magmom_diff = aurostd::abs(xstr1.atoms[indexMatch1[j]].spin-xstr2.atoms[indexMatch2[j]].spin);
+        if(magmom_diff>1e-6){ //to account for -0.0 vs 0.0
+          if(std::signbit(xstr1.atoms[indexMatch1[j]].spin) == std::signbit(xstr2.atoms[indexMatch2[j]].spin)){
+            magmom_num += magmom_diff; 
+            magmom_den += aurostd::abs(xstr1.atoms[indexMatch1[j]].spin)+aurostd::abs(xstr2.atoms[indexMatch2[j]].spin);
+          }
+          else{
+            mag_fail_1++;
+            mag_fail_2++;
+          }
         }
         else{
-          projection_sum = projection_sum + (1.0-magnetic_projection_str1) + (1.0-magnetic_projection_str2);
+          magmom_num += magmom_diff; 
+          magmom_den += aurostd::abs(xstr1.atoms[indexMatch1[j]].spin)+aurostd::abs(xstr2.atoms[indexMatch2[j]].spin);
+        }
+        if(LDEBUG){
+          cerr << function_name << " matching xstr1 (" << indexMatch1[j] << ") mag=" << xstr1.atoms[indexMatch1[j]].spin << " to xstr2 (" << indexMatch2[j] << ") mag=" << xstr2.atoms[indexMatch2[j]].spin << endl;
+          cerr << function_name << " magmom_diff: " << magmom_diff << endl; 
+          cerr << function_name << " spin structure 1 (signbit): " << std::signbit(xstr1.atoms[indexMatch1[j]].spin) << endl;
+          cerr << function_name << " spin structure 2 (signbit): " << std::signbit(xstr2.atoms[indexMatch2[j]].spin) << endl;
         }
 
       }
+
       // ---------------------------------------------------------------------------
       // non-collinear 
       else if(is_non_collinear){
-        double projection = aurostd::abs(aurostd::scalar_product(xstr1.atoms[indexMatch1[j]].noncoll_spin,xstr2.atoms[indexMatch2[j]].noncoll_spin));
-        double mod_spin_1 = aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin);
-        double mod_spin_2 = aurostd::modulus(xstr2.atoms[indexMatch2[j]].noncoll_spin);
-        magnetic_projection_str1 = projection/(mod_spin_1*mod_spin_2);
-        magnetic_projection_str2 = projection/(mod_spin_1*mod_spin_2);
-        projection_sum = projection_sum + (1.0-magnetic_projection_str1) + (1.0-magnetic_projection_str2);
-      
-      }
-      if(LDEBUG){
-        cerr << "projection_sum: " << projection_sum << endl;
+        double magmom_diff = aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin-xstr2.atoms[indexMatch2[j]].noncoll_spin);
+        double angle_between_non_collinear_spins = rad2deg*aurostd::angle(xstr1.atoms[indexMatch1[j]].noncoll_spin,xstr2.atoms[indexMatch2[j]].noncoll_spin);
+        if(magmom_diff>1e-6){ //to account for -0.0 vs 0.0
+          if(angle_between_non_collinear_spins<=_NON_COLLINEAR_ANGLE_DEGREE_TOL_){
+            magmom_num += magmom_diff; 
+            magmom_den += aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin)+aurostd::modulus(xstr2.atoms[indexMatch2[j]].noncoll_spin);
+          }
+          else{
+            mag_fail_1++;
+            mag_fail_2++;
+          }
+        }
+        else{
+          magmom_num += magmom_diff; 
+          magmom_den += aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin)+aurostd::modulus(xstr2.atoms[indexMatch2[j]].noncoll_spin);
+        }
+        if(LDEBUG){
+          cerr << function_name << " matching xstr1 (" << indexMatch1[j] << ") mag=" << xstr1.atoms[indexMatch1[j]].noncoll_spin << " to xstr2 (" << indexMatch2[j] << ") mag=" << xstr2.atoms[indexMatch2[j]].noncoll_spin << endl;
+          cerr << function_name << " magmom_diff: " << magmom_diff << endl; 
+          cerr << function_name << " angle between two structures " << angle_between_non_collinear_spins << endl;
+        }
       }
     }
 
-    magnetic_deviation = (projection_sum/(xstr1.atoms.size()+xstr2.atoms.size()-mag_fail));
-    magnetic_fail = (mag_fail/(xstr1.atoms.size()+xstr2.atoms.size()));
+    magnetic_deviation = magmom_num/magmom_den;
+    magnetic_fail = (double)(mag_fail_1+mag_fail_2)/(double)(xstr1.atoms.size()+xstr2.atoms.size());
   }
 }
 
@@ -7114,21 +7203,7 @@ namespace compare{
 namespace compare{
   void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, 
     const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
-    double& minMis, int type_match, bool optimize_match, ostream& oss){
-
-    double min_lattice_dev = AUROSTD_MAX_DOUBLE;
-    double min_coordinate_dis = AUROSTD_MAX_DOUBLE;
-    double min_failure = AUROSTD_MAX_DOUBLE;
-
-    latticeAndOriginSearch(xstr1, xstr2, num_proc, q1, vprotos, 
-        minMis, min_lattice_dev, min_coordinate_dis, min_failure, type_match, optimize_match, oss);
-  }
-}
-
-namespace compare{
-  void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, 
-    const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
-    double& minMis, double& min_lattice_dev, double& min_coordinate_dis, double& min_failure, 
+    structure_misfit& min_misfit_info,
     int type_match, bool optimize_match, ostream& oss){
 
     // Performs lattice and origin search
@@ -7140,8 +7215,7 @@ namespace compare{
     //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX 20190318
 
     bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
-    //OBSOLETE double min_latt_dev=0.0; double min_coordinate_dis=0.0; double min_failure=0.0;
-    double min_magnetic_dis=0.0; double min_magnetic_failure=0.0;
+    min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX 20191218
     vector<uint> matching_indices_1, matching_indices_2;
     vector<double> minimum_distances;
 
@@ -7299,7 +7373,7 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // create vector of variables for each thread 
           vector<xstructure> xstr1_for_thread;
-          vector<double> possible_minMis, possible_minLattDev, possible_minCoordDis, possible_minFail, possible_minMagneticDis, possible_minMagneticFail;
+          vector<structure_misfit> possible_min_misfit_info; //DX 20191218
           vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
           vector<vector<double> > possible_minimum_distances;
           vector<vector<xstructure> > vvprotos;
@@ -7307,12 +7381,8 @@ namespace compare{
             vector<xstructure> vprotos_tmp;
             vvprotos.push_back(vprotos_tmp);
             xstr1_for_thread.push_back(xstr1_tmp);
-            possible_minMis.push_back(1.0);
-            possible_minLattDev.push_back(0.0);
-            possible_minCoordDis.push_back(0.0);
-            possible_minFail.push_back(0.0);
-            possible_minMagneticDis.push_back(0.0);
-            possible_minMagneticFail.push_back(0.0);
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX 20191218
+            possible_min_misfit_info.push_back(temp_misfit_info); //DX 20191218
             vector<uint> tmp_indices;
             possible_matching_indices_1.push_back(tmp_indices);
             possible_matching_indices_2.push_back(tmp_indices);
@@ -7335,9 +7405,7 @@ namespace compare{
                   std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
                   //DX 20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
                   thread_distribution[n][0], thread_distribution[n][1],
-                  std::ref(possible_minMis[n]),std::ref(possible_minLattDev[n]),
-                  std::ref(possible_minCoordDis[n]),std::ref(possible_minFail[n]),
-                  std::ref(possible_minMagneticDis[n]),std::ref(possible_minMagneticFail[n]),
+                  std::ref(possible_min_misfit_info[n]), //DX 20191218
                   std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
                   std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
                   optimize_match));
@@ -7363,9 +7431,7 @@ namespace compare{
               type_match,
               lattices,clattices,latt_devs,
               start_index, end_index,
-              possible_minMis[n],possible_minLattDev[n],
-              possible_minCoordDis[n],possible_minFail[n],
-              possible_minMagneticDis[n],possible_minMagneticFail[n],
+              possible_min_misfit_info[n], //DX 20191218
               possible_matching_indices_1[n],possible_matching_indices_2[n],
               possible_minimum_distances[n],vvprotos[n],
               optimize_match);
@@ -7373,14 +7439,9 @@ namespace compare{
       
           // ---------------------------------------------------------------------------
           // collect misfits and matching structure representations
-          for(uint p=0;p<possible_minMis.size();p++){
+          for(uint p=0;p<possible_min_misfit_info.size();p++){
             if(p==0 && y==0 && x==0){ // DX 2/8/17 - need to add x==0 ortherwise matches can be overwritten
-              minMis=possible_minMis[p];
-              min_lattice_dev=possible_minLattDev[p];
-              min_coordinate_dis=possible_minCoordDis[p];
-              min_failure=possible_minFail[p];
-              min_magnetic_dis=possible_minMagneticDis[p];
-              min_magnetic_failure=possible_minMagneticFail[p];
+              min_misfit_info=possible_min_misfit_info[p]; //DX 20191218
               matching_indices_1=possible_matching_indices_1[p];
               matching_indices_2=possible_matching_indices_2[p];
               minimum_distances=possible_minimum_distances[p];
@@ -7388,13 +7449,8 @@ namespace compare{
               vprotos=vvprotos[p];
             }
             else {
-              if(possible_minMis[p]<=minMis){
-                minMis=possible_minMis[p];
-                min_lattice_dev=possible_minLattDev[p];
-                min_coordinate_dis=possible_minCoordDis[p];
-                min_failure=possible_minFail[p];
-                min_magnetic_dis=possible_minMagneticDis[p];
-                min_magnetic_failure=possible_minMagneticFail[p];
+              if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
+                min_misfit_info=possible_min_misfit_info[p]; //DX 20191218
                 matching_indices_1=possible_matching_indices_1[p];
                 matching_indices_2=possible_matching_indices_2[p];
                 minimum_distances=possible_minimum_distances[p];
@@ -7406,9 +7462,9 @@ namespace compare{
 
           // ---------------------------------------------------------------------------
           // quick return if found a match
-          if(minMis<0.1 && !optimize_match){
-            if(LDEBUG){cerr << function_name << ": Found match (misfit = " << minMis << ")! Terminating search early." << endl;}
-            printStructureMappingResults(oss,xstr1,vprotos[0],minMis,min_lattice_dev,min_coordinate_dis,min_failure,min_magnetic_dis,min_magnetic_failure,
+          if(min_misfit_info.misfit<0.1 && !optimize_match){
+            if(LDEBUG){cerr << function_name << ": Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
+            printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
                 matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
             return;
           }
@@ -7416,7 +7472,7 @@ namespace compare{
           // ---------------------------------------------------------------------------
           // quick return if testing only one LFA set
           //DX 20190702 - can i do this: if(!optimize_match && minMis==1){ test_one_lfa_only=true;}
-          if(!optimize_match && minMis==1 && type_match==2){ test_one_lfa_only=true;} //DX 20190809 - need type match here; otherwise we may miss structure-type matches
+          if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && type_match==2){ test_one_lfa_only=true;} //DX 20190809 - need type match here; otherwise we may miss structure-type matches
           if(test_one_lfa_only){
             if(LDEBUG){cerr << function_name << ": No match found. Searched only one LFA set. Terminating search early." << endl;}
             return;
@@ -7424,8 +7480,8 @@ namespace compare{
         } 
       } 
     }  
-    if(minMis!=1.0 && vprotos.size()>0){
-      printStructureMappingResults(oss,xstr1,vprotos[0],minMis,min_lattice_dev,min_coordinate_dis,min_failure,min_magnetic_dis,min_magnetic_failure,
+    if(aurostd::isdifferent(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && vprotos.size()>0){
+      printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
           matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
     }
   }
@@ -7715,9 +7771,7 @@ namespace compare{
 			const vector<xmatrix<double> >& clattices, 
 			const vector<double>& latt_devs, 
       const uint start_index, const uint end_index,
-      double& min_misfit, double& min_latt_dev, 
-      double& min_coordinate_dis, double& min_failure,
-      double& min_magnetic_dis, double& min_magnetic_failure,
+      structure_misfit& min_misfit_info,
       vector<uint>& index_match_1, vector<uint>& index_match_2,
       vector<double>& min_distances,
 			vector<xstructure>& vprotos,
@@ -7726,11 +7780,10 @@ namespace compare{
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
 
-    double mis=1;  
-    double mag_dis=0.0; double mag_fail=0.0;
+    double mis=AUROSTD_MAX_DOUBLE;
+    double mag_dis=AUROSTD_MAX_DOUBLE; double mag_fail=AUROSTD_MAX_DOUBLE;
     xstructure proto;
     //xstructure xstr2_tmp = xstr2;
-   
 
     vector<string> species_str1=sortSpeciesByFrequency(xstr1);
     deque<_atom> xstr1_atoms;
@@ -7859,12 +7912,13 @@ namespace compare{
                 all_nn_calculated = true;
               }
               coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,im1,im2,min_dists,cd,f);
-              if((xstr1.atoms[0].spin_is_given && proto.atoms[0].spin_is_given) || 
-                 (xstr1.atoms[0].noncoll_spin_is_given && proto.atoms[0].noncoll_spin_is_given)){ 
+              if(_CALCULATE_MAGNETIC_MISFIT_&& 
+                  ((xstr1.atoms[0].spin_is_given && proto.atoms[0].spin_is_given) || 
+                   (xstr1.atoms[0].noncoll_spin_is_given && proto.atoms[0].noncoll_spin_is_given))){
                 magneticDeviation(xstr1,proto,im1,im2,mag_dis,mag_fail);
                 mis=computeMagneticMisfit(latt_devs[p],cd,f,mag_dis,mag_fail);
                 if(LDEBUG){
-                  cerr << "with spin: mis,latt_dev,cd,f,mag_dis: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f << ", " << mag_dis << ", " << mag_fail <<  endl;
+                  cerr << "with spin: mis,latt_dev,cd,f,mag_dis,mag_fail: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f << ", " << mag_dis << ", " << mag_fail <<  endl;
                   double tmp_mis=computeMisfit(latt_devs[p],cd,f);
                   cerr << "without spin: mis,latt_dev,cd,f: " << tmp_mis << ", " <<latt_devs[p] << ", " << cd << ", " << f <<  endl;
                 }
@@ -7875,16 +7929,17 @@ namespace compare{
                   cerr << "mis,latt_dev,cd,f: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f <<  endl;
                 }
               }
-              if(mis<min_misfit){
+              if(mis<min_misfit_info.misfit){
                 //cerr << "storing: " << proto << endl;
                 vprotos.clear();
                 vprotos.push_back(proto);
-                min_misfit=mis;
-                min_latt_dev=latt_devs[p];
-                min_coordinate_dis=cd;
-                min_failure=f;
-                min_magnetic_dis=mag_dis;
-                min_magnetic_failure=mag_fail;
+                min_misfit_info.misfit=mis;
+                min_misfit_info.lattice_deviation=latt_devs[p];
+                min_misfit_info.coordinate_displacement=cd;
+                min_misfit_info.failure=f;
+                min_misfit_info.magnetic_misfit=mis; //DX 20191218 - should we have this....
+                min_misfit_info.magnetic_displacement=mag_dis;
+                min_misfit_info.magnetic_failure=mag_fail;
                 index_match_1 = im1;
                 index_match_2 = im2;
                 min_distances = min_dists;
