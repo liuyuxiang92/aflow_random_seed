@@ -700,9 +700,13 @@ namespace aurostd {
   // Function getZeroPadding
   // ***************************************************************************
   // Corey Oses
-  int getZeroPadding(unsigned long long int num) {
-    return int(log10((double) num))+1;
-  }
+  int getZeroPadding(double d) {return int(log10(d))+1;}
+  int getZeroPadding(int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(uint num) {return getZeroPadding((double)num);}
+  int getZeroPadding(long int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(unsigned long int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(long long int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(unsigned long long int num) {return getZeroPadding((double)num);}
 
   // ***************************************************************************
   // Function PaddedPRE

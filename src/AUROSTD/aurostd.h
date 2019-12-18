@@ -283,7 +283,13 @@ namespace aurostd {
   int GetNumFields(const string& s);
   string GetNextVal(const string& s,int& id);
   string PaddedNumString(const int num,const int ndigits);
-  int getZeroPadding(unsigned long long int);  // ME190108
+  int getZeroPadding(double num);  //CO191217
+  int getZeroPadding(int num);  //CO191217
+  int getZeroPadding(uint num); //CO191217
+  int getZeroPadding(long int num); //CO191217
+  int getZeroPadding(unsigned long int num);  //CO191217
+  int getZeroPadding(long long int num);  //CO191217
+  int getZeroPadding(unsigned long long int num);  // ME190108
   template<class utype> string PaddedPRE(utype,int,string=" ");
   string PaddedPRE(string,int,string=" ");
   template<class utype> string PaddedPOST(utype,int,string=" ");

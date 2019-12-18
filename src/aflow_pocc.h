@@ -496,6 +496,7 @@ namespace pocc {
       //post-processing
       vector<string> m_ARUN_directories;
       double m_efa;
+      int m_zero_padding;
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       xDOSCAR m_xdoscar;

@@ -937,7 +937,9 @@ namespace pocc {
     message << "Egap_net=" << m_Egap_net;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     
     //XDOSCAR.OUT
-    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
+    stringstream t_ss;t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(TEMPERATURE_PRECISION);t_ss.width(m_zero_padding);t_ss.fill('0');t_ss << temperature;
+    //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
+    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+t_ss.str()+"K";
     message << "Writing out " << xdoscar_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_xdoscar_ss;
     pocc_xdoscar_ss << m_xdoscar;
@@ -1194,6 +1196,9 @@ namespace pocc {
     if(XHOST.vflag_control.flag("CALCULATION_TEMPERATURE")){v_temperatures.clear();v_temperatures=getVTemperatures(XHOST.vflag_control.getattachedscheme("CALCULATION_TEMPERATURE"));}  //command line input
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);}  //user aflow.rc
     if(v_temperatures.empty()){v_temperatures.clear();v_temperatures=getVTemperatures(AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);}  //internal aflow.rc, will always work
+
+    //get zero-padding, since negative cannot be negative, just get max
+    m_zero_padding=aurostd::getZeroPadding(max(v_temperatures));
 
     message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     
@@ -1599,6 +1604,7 @@ void POccCalculator::free() {
   l_supercell_sets.clear();
   m_ARUN_directories.clear();
   m_efa=AUROSTD_MAX_DOUBLE;
+  m_zero_padding=0;
   m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
   m_ARUN_directory_ground=AUROSTD_MAX_UINT;
   m_xdoscar.clear();
@@ -1633,6 +1639,7 @@ void POccCalculator::copy(const POccCalculator& b) { // copy PRIVATE
   //for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){(*it).clear();}
   l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=b.l_supercell_sets.begin();it!=b.l_supercell_sets.end();++it){l_supercell_sets.push_back(*it);}
   m_efa=b.m_efa;
+  m_zero_padding=b.m_zero_padding;
   m_energy_dft_ground=b.m_energy_dft_ground;
   m_ARUN_directory_ground=b.m_ARUN_directory_ground;
   m_ARUN_directories.clear();for(uint i=0;i<b.m_ARUN_directories.size();i++){m_ARUN_directories.push_back(b.m_ARUN_directories[i]);}
