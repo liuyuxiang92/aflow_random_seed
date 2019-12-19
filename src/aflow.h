@@ -2358,7 +2358,8 @@ bool DifferentAtom(const xstructure& str,const _atom& atom1,const _atom& atom2);
 xmatrix<double> GetDistMatrix(const xstructure& a); // CO 171025
 vector<double> GetNBONDXX(const xstructure& a);
 int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX 20191218
+int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX 20191218 [ORIG]
+int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX 20191218 [NEW]
 int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3);
 int GenerateGridAtoms(xstructure& str,int d);
 int GenerateGridAtoms(xstructure& str,const xvector<int>& dims);
