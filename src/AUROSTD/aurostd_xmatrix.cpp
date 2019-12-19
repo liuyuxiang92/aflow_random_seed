@@ -1718,21 +1718,28 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function inverse xmatrix<>
-    xmatrix<utype> inverseByMinors(const xmatrix<utype>& a) { //CO191201
+    void adjointInPlace(const xmatrix<utype>& a,xmatrix<utype>& b) { //CO191201
       //inspired by https://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html
-      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverseByMinors()","a must be square",_INPUT_ILLEGAL_);}
-      xmatrix<utype> mat_minors(a);
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverseByAdjoint()","a must be square",_INPUT_ILLEGAL_);}
+      b=a;
       xmatrix<utype> submat(a.urows-1,a.ucols-1,a.lrows,a.lcols);
       int i=0,j=0;
       for(i=a.lrows;i<=a.urows;i++){
         for(j=a.lcols;j<=a.ucols;j++){
           submatrixInPlace(a,submat,i,j);
-          mat_minors[i][j]=(utype)aurostd::powint(-1,i+j)*det(submat);
+          b[i][j]=(utype)aurostd::powint(-1,i+j)*det(submat);
         }
       }
-      traspInPlace(mat_minors);
-      return (utype)1.0/det(a) * mat_minors;
+      traspInPlace(b);
     }
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> adjoint(const xmatrix<utype>& a) { //CO191201
+      xmatrix<utype> b;
+      adjointInPlace(a,b);
+      return b;
+    }
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO191201
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverse(const xmatrix<utype>& a) {
       /* returns the inverse **/
@@ -1823,14 +1830,14 @@ namespace aurostd {  // namespace aurostd
         return b;
       }
       //CO191201 - GaussJordan() is INCREDIBLY unstable (division by small numbers over and over again)
-      //use inverseByMinors, which waits until the end to divide by a (hopefully) bigger number
+      //use inverseByAdjoint, which waits until the end to divide by a (hopefully) bigger number
       //[CO191201 - OBSOLETE]// if everything fails move to GaussJordan
       //[CO191201 - OBSOLETE]b=a;
       //[CO191201 - OBSOLETE]xmatrix<utype> B(a.rows,a.cols);
       //[CO191201 - OBSOLETE]GaussJordan(b,B);  
       //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;exit(0);}
       //[CO191201 - OBSOLETE]return b;
-      return inverseByMinors(a);
+      return inverseByAdjoint(a);
     }
 }
 

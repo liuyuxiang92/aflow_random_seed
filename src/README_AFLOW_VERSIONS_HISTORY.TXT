@@ -69,7 +69,7 @@
         -- added xmatrixint2double() and xmatrixdouble2int() (CO)
         -- added right matrix division, traspInPlace(), traspSquareInPlace(), submatrixInPlace(), and getdiag() to xmatrix (CO)
         -- added getmatInplace() and getvec() to xmatrix (CO)
-        -- patched inverse() for xmatrix, now uses matrix of minors approach which is more stable than GaussJordan (CO)
+        -- patched inverse() for xmatrix, now uses matrix of minors (adjoint) approach which is more stable than GaussJordan (CO)
         -- converted bool inverse() to bool isNonInvertible() in xmatrix() (CO)
         -- added smith normal form calculator to xmatrix (CO)
         -- updated QR decomposition algorithm to avoid saving householder rotations to form Q at the end (CO)

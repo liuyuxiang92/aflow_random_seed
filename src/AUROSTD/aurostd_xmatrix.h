@@ -324,8 +324,14 @@ namespace aurostd {
   template<class utype> utype
     minordeterminant(const xmatrix<utype>&,const int&,const int&) __xprototype;
   
+  template<class utype> void
+    adjointInPlace(const xmatrix<utype>&,xmatrix<utype>&) __xprototype;  //CO191201
+  
   template<class utype> xmatrix<utype>
-    inverseByMinors(const xmatrix<utype>&) __xprototype;  //CO191201
+    adjoint(const xmatrix<utype>&) __xprototype;  //CO191201
+  
+  template<class utype> xmatrix<utype>
+    inverseByAdjoint(const xmatrix<utype>&) __xprototype;  //CO191201
   
   template<class utype> xmatrix<utype>
     inverse(const xmatrix<utype>&) __xprototype;
