@@ -8228,12 +8228,16 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
           if(inside_relax){H_atom_relax=aurostd::string2utype<double>(tokens2[0]);}
           else if(inside_static){H_atom_static=aurostd::string2utype<double>(tokens2[0]);}
         }
-      } else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){  //CO191112 - forces for APL
+      // [OBSOLETE - ME191219] } else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){  //CO191112 - forces for APL
+      // ME191218 - substring2bool ignores comments and TOTAL-FORCE is in a comment line
+      } else if(vcontent[iline].find("TOTAL-FORCE") != string::npos){
         vforces.clear();
         iline++;  //skip first [AFLOW]
-        while(iline<vcontent.size() && aurostd::substring2bool(vcontent[iline],"[AFLOW]")==FALSE){
+        // ME191219 - ++iline needs to be in the while statement or the loop
+        // will never start
+        while(iline<vcontent.size() && aurostd::substring2bool(vcontent[++iline],"[AFLOW]")==FALSE){
           vforces.push_back(xvector<double>(3));
-          aurostd::string2tokens(vcontent[iline++],tokens," ");
+          aurostd::string2tokens(vcontent[iline],tokens," ");
           if(tokens.size()==6){
             for(int i=1;i<4;i++){
               if(aurostd::isfloat(tokens[i+2])){vforces.back()[i]=aurostd::string2utype<double>(tokens[i+2]);}
