@@ -170,8 +170,8 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "corigin" << atom.corigin(1) << " " << atom.corigin(2) << " " << atom.corigin(3) << endl;
       oss << "coord" << atom.coord(1) << " " << atom.coord(2) << " " << atom.coord(3) << endl;
 
-      oss << "fpos_equation" << atom.fpos_equation[0] << " " << atom.fpos_equation[1] << " " << atom.fpos_equation[2] << endl; //DX 20180607 - symbolic math for atom positions
-      oss << "cpos_equation" << atom.cpos_equation[0] << " " << atom.cpos_equation[1] << " " << atom.cpos_equation[3] << endl; //DX 20180607 - symbolic math for atom positions
+      oss << "fpos_equation" << aurostd::joinWDelimiter(atom.fpos_equation," ") << endl; //DX 20180607 - symbolic math for atom positions //DX 20191218 - join with delimiter in case empty
+      oss << "cpos_equation" << aurostd::joinWDelimiter(atom.cpos_equation," ") << endl; //DX 20180607 - symbolic math for atom positions //DX 20191218 - join with delimiter in case empty
       oss << "isincell=" << atom.isincell << endl;
       oss << "reference=" << atom.reference << endl;
       oss << "ireference=" << atom.ireference << endl;
@@ -14241,6 +14241,8 @@ int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k
             if(LDEBUG) { //CO190520
               cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
               cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX 20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; // DX 20191218
             } //CO190520
           }
         }
@@ -14299,8 +14301,8 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
   // resize vectors - DX 20191122
   uint num_grid_atoms = str.atoms.size()*l1.size()*l2.size()*l3.size();
   str.grid_atoms.resize(num_grid_atoms);
+  str.grid_atoms_pc2scMap.resize(str.atoms.size()); //DX 20191218 - should be the size of the the primitive cell, not grid
   str.grid_atoms_sc2pcMap.resize(num_grid_atoms);
-  str.grid_atoms_pc2scMap.resize(num_grid_atoms);
 
   uint grid_atom_count = 0; // keep track of index - DX 20191122
 
@@ -14309,7 +14311,7 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
     //str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
     //str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
     str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
-    str.grid_atoms_pc2scMap[grid_atom_count] = str.grid_atoms.size()-1; // CO 171025 
+    str.grid_atoms_pc2scMap[grid_atom_count] = iat; //DX 20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
     str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
     grid_atom_count++; //DX 20191122
   }
@@ -14365,6 +14367,8 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
               //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
               cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO190520
               cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX 20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; // DX 20191218
             } //CO190520
             grid_atom_count++; //DX 20191122
           }
