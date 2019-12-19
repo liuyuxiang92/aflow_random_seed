@@ -1168,7 +1168,8 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_tI2_139_a"){
-        vparameters.push_back("4.6002,1.07523585931");
+        //DX 20191218 [this is the a' parameter (fct) vs the a parameter (bct)] vparameters.push_back("4.6002,1.07523585931");
+        vparameters.push_back("3.25283,1.52061313499"); //DX 20191218 [CORRECT PARAMETERS]
         vparameters.push_back("3.932,0.823499491353");
       }
       // ---------------------------------------------------------------------------

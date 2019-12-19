@@ -14198,7 +14198,11 @@ int xstructure::GenerateGridAtoms(int d) {
   return GenerateGridAtoms(*this,-d,d,-d,d,-d,d);
 }
 
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) {
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218
+  return GenerateGridAtoms_20191218(str,i1,i2,j1,j2,k1,k2);
+}
+
+int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218 - added date [ORIG]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
   string soliloquy="GenerateGridAtoms():"; //CO190520
   if(LDEBUG) { //CO190520
@@ -14267,7 +14271,7 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   return str.grid_atoms.size();
 }
 
-int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) {
+int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218 - [NEW]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
   string soliloquy="GenerateGridAtoms():"; //CO190520
   if(LDEBUG) { //CO190520
@@ -14340,7 +14344,8 @@ int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k
     for(uint j=0;j<l2.size();j++) {
       ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
       for(uint k=0;k<l3.size();k++) {
-        if(i!=0 || j!=0 || k!=0) {
+        //DX 20191218 [WRONG INDICES] if(i!=0 || j!=0 || k!=0) {
+        if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) { //DX 20191218
           abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
           for(uint iat=0;iat<natoms;iat++) {       //DX 20191107 - replace str.atoms.size() with natoms
             atom=str.atoms[iat];                   //DX 20190709 - at to [] = speed increase
@@ -14398,7 +14403,7 @@ int GenerateGridAtoms(xstructure& str,const double& radius) {
 }
 
 int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3) {
-  return GenerateGridAtoms(str,-d1,d1,-d2,d2,-d3,d3);
+  return GenerateGridAtoms_20191218(str,-d1,d1,-d2,d2,-d3,d3);
 }
 
 int GenerateGridAtoms(xstructure& str,int d) {
@@ -14412,6 +14417,7 @@ int GenerateGridAtoms(xstructure& str,const xvector<int>& dims) {
 int GenerateGridAtoms(xstructure& str) {
   return GenerateGridAtoms(str,-1,1,-1,1,-1,1);
 }
+
 
 // **************************************************************************
 // GenerateLIJK table stuff
