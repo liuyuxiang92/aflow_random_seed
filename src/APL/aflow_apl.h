@@ -635,6 +635,8 @@ class Supercell {
   //CO - START
   void center_original(void);
   //corey
+  void getFullBasisAGROUP();  // ME191218
+  bool fullBasisCalculatedAGROUP();  // ME191218
   const vector<vector<_sym_op> >& getAGROUP(void) const;
   const vector<_sym_op>& getFGROUP(void) const;
   const vector<_sym_op>& getAGROUP(int) const;

@@ -1147,6 +1147,9 @@ int Supercell::atomGoesTo(const _sym_op& symOp, int atomID, int centerID, bool t
   }
 #endif
 
+  // ME191219 - use basis_atoms_map
+  if (symOp.basis_map_calculated) return symOp.basis_atoms_map[atomID];
+
   // Get the center atom center...
   if (translate && symOp.is_agroup) center(centerID);
 
@@ -1310,6 +1313,18 @@ int Supercell::atomComesFrom(const _sym_op& symOp, int atomID, int centerID, boo
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
   }
 #endif
+
+  // ME191219 - use basis_atoms_map
+  if (symOp.basis_map_calculated) {
+    int natoms = (int) _scStructure.atoms.size();
+    for (int at = 0; at < natoms; at++) {
+      if (symOp.basis_atoms_map[at] == atomID) return at;
+    }
+    // If the code makes it past the for-loop, the mapping failed
+    string function = "apl::Supercell::atomComesFrom()";
+    string message = "Mapping failed.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  }
 
   // Get the center atom center...
   if (translate && symOp.is_agroup) center(centerID);
@@ -1702,6 +1717,28 @@ const vector<_sym_op>& Supercell::getFGROUP(void) const {
 }
 
 // ///////////////////////////////////////////////////////////////////////////
+
+// ME191219
+void Supercell::getFullBasisAGROUP() {
+  _logger << "Calculating full bases for the site point groups of the supercell." << apl::endl;
+  if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
+    string function = "apl::Supercell::getFullBasisAGROUP()";
+    string message = "Could not calculate the bases of the site point groups.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  }
+}
+
+// ME191219
+bool Supercell::fullBasisCalculatedAGROUP() {
+  uint natoms = _scStructure.atoms.size();
+  for (uint at = 0; at < natoms; at++) {
+    const vector<_sym_op>& agroup = getAGROUP(at);
+    for (uint symop = 0; symop < agroup.size(); symop++) {
+      if (!agroup[symop].basis_map_calculated) return false;
+    }
+  }
+  return true;
+}
 
 // ME190715 - added const to use function with const Supercell &
 const vector<vector<_sym_op> >& Supercell::getAGROUP(void) const {

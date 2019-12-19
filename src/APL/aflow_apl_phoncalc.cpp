@@ -77,6 +77,11 @@ namespace apl {
     // Get all forces required for the construction of force-constant matrices
     calculateForceFields();  // ME191029 - modified
 
+    // ME191219 - atomGoesTo and atomComesFrom can now use basis_atoms_map.
+    // Calculating the full basis ahead of time is much faster than calculating all
+    // symmetry operations on-the-fly.
+    if (!_supercell.fullBasisCalculatedAGROUP()) _supercell.getFullBasisAGROUP();
+
     // For construction of the force-constant matrices we need three
     // independent distortions. Hence, calculate the remaining distortions and
     // forces by the symmetry (if necessary).
@@ -140,7 +145,7 @@ namespace apl {
         int atomID = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
         const vector<_sym_op>& agroup = _supercell.getAGROUP(atomID); //CO190218
         
-        _supercell.center(atomID);  //CO //CO190218
+        //_supercell.center(atomID);  //CO //CO190218 // OBSOLETE ME191218
 
 	// Generate next independent distortion by symmetry operations...
         uint currentSizeDistortions = _uniqueDistortions[i].size(); //CO190218
@@ -154,7 +159,9 @@ namespace apl {
 	    testForce.clear();
 	    for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
 	      try {
-                _AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, atomID, FALSE); //CO190218
+                // ME191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+                // the basis has not been calculated for some reason
+                _AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, atomID, true); //CO190218
 		testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
               // ME191031 - use xerror
 	      //} catch (APLLogicError& e) {
@@ -255,7 +262,7 @@ namespace apl {
 	  //_supercell.center_original(); //CO
 	  if (_uniqueDistortions[i].size() == 3) break;
 	}
-        _supercell.center_original();  //CO
+        //_supercell.center_original();  //CO  // OBSOLETE ME191218
 	allDistortionsOfAtom.clear();
 	for (uint ii = 0; ii < forcePool.size(); ii++) forcePool[ii].clear();
 	forcePool.clear();
@@ -537,7 +544,7 @@ namespace apl {
       }
 
       // Translate the center to this atom
-      _supercell.center(i);
+      //_supercell.center(i);  // OBSOLETE ME191219
 
       //
       for (int j = 0; j < _supercell.getNumberOfAtoms(); j++) {
@@ -552,7 +559,9 @@ namespace apl {
 
 	  try {
             //_AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, j, i, FALSE);  //CO NEW //CO190218
-            _AFLOW_APL_REGISTER_ int l = _supercell.atomGoesTo(symOp, j, i, FALSE); //JAHNATEK ORIGINAL //CO190218
+            // ME191219 - atomGoesTo now uses basis_atoms_map; keep translation option in case
+            // the basis has not been calculated for some reason
+            _AFLOW_APL_REGISTER_ int l = _supercell.atomGoesTo(symOp, j, i, true); //JAHNATEK ORIGINAL //CO190218
 	    //cout << "Mapping " << j << " <-> " << l << std::endl;
             m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO190218
             //m = m + (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc));  //CO NEW //CO190218
@@ -601,7 +610,7 @@ namespace apl {
       row.clear();
 
       // Translate the center back
-      _supercell.center_original();  //CO
+      //_supercell.center_original();  //CO  // OBSOLETE ME191219
     }
 
     // Translate the center back
