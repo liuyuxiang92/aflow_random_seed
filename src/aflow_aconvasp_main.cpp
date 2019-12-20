@@ -9629,7 +9629,7 @@ namespace pflow {
                 aurostd::file2stringstream(path + "/POSCAR.orig",ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
             catch(aurostd::xerror& excpt) { 
-              xstrAux.Clear(); //clear it if it is garbage
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
               message << "POSCAR.orig: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
             } //DX 20191210
@@ -9642,7 +9642,7 @@ namespace pflow {
                 aurostd::file2stringstream(path + "/POSCAR.relax1",ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
             catch(aurostd::xerror& excpt) {
-              xstrAux.Clear(); //clear it if it is garbage
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
               message << "POSCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
             } //DX 20191210
@@ -9653,7 +9653,7 @@ namespace pflow {
           return false;
         }
         entry.vstr.push_back(xstrAux);
-        xstrAux.Clear();
+        xstrAux.clear(); //DX 20191220 - uppercase to lowercase clear
         if(LDEBUG) {cerr << soliloquy << " loaded ORIGINAL structure" << endl;}
 
         //////////////////////////////////////////////////////////////////////////
@@ -9671,7 +9671,7 @@ namespace pflow {
                 aurostd::file2stringstream(path + "/POSCAR.relax2",ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
             catch(aurostd::xerror& excpt) {
-              xstrAux.Clear(); //clear it if it is garbage
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
               message << "POSCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
             } //DX 20191210
@@ -9684,7 +9684,7 @@ namespace pflow {
                 aurostd::file2stringstream(path + "/CONTCAR.relax1",ss)) ) {
             try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
             catch(aurostd::xerror& excpt) {
-              xstrAux.Clear(); //clear it if it is garbage
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
               message << "CONTCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
               pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
             } //DX 20191210
@@ -9695,7 +9695,7 @@ namespace pflow {
           return false;
         }
         entry.vstr.push_back(xstrAux);
-        xstrAux.Clear();
+        xstrAux.clear(); //DX 20191220 - uppercase to lowercase clear
         if(LDEBUG) {cerr << soliloquy << " loaded RELAX1 structure" << endl;}
 
         //////////////////////////////////////////////////////////////////////////
@@ -9714,7 +9714,7 @@ namespace pflow {
               aurostd::file2stringstream(path + "/CONTCAR.relax",ss)) ) {
           try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
           catch(aurostd::xerror& excpt) {
-            xstrAux.Clear(); //clear it if it is garbage
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
             message << "CONTCAR.relax: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
           } //DX 20191210
@@ -9727,7 +9727,7 @@ namespace pflow {
               aurostd::file2stringstream(path + "/CONTCAR.relax2",ss)) ) {
           try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
           catch(aurostd::xerror& excpt) {
-            xstrAux.Clear(); //clear it if it is garbage
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
             message << "CONTCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
             pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
           } //DX 20191210
@@ -9738,7 +9738,7 @@ namespace pflow {
         return false;
       }
       entry.vstr.push_back(xstrAux);
-      xstrAux.Clear();
+      xstrAux.clear(); //DX 20191220 - uppercase to lowercase clear
       if(LDEBUG) {cerr << soliloquy << " loaded FULLY-RELAXED structure" << endl;}
 
       ////////////////////////////////////////////////////////////////////////////

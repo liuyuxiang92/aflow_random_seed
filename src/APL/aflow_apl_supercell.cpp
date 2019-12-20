@@ -169,7 +169,7 @@ void Supercell::LightCopy(const xstructure& a, xstructure& b) {
   }
   b.agroup.clear();
 #else
-  b.Clear();
+  b.clear(); //DX 20191220 - uppercase to lowercase clear
   stringstream POSCAR;
   POSCAR.str("");
   if(0){cerr << a << std::endl;}

@@ -4326,10 +4326,10 @@ POccCalculatorTemplate::POccCalculatorTemplate() {} //{free();}
 POccCalculatorTemplate::~POccCalculatorTemplate() {free();}
 
 void POccCalculatorTemplate::free() {
-  xstr_pocc.Clear();
+  xstr_pocc.clear(); //DX 20191220 - uppercase to lowercase clear
   m_p_flags.clear();
   stoich_each_type.clear();
-  xstr_nopocc.Clear();
+  xstr_nopocc.clear(); //DX 20191220 - uppercase to lowercase clear
   types2pc_map.clear();
   m_species_redecoration.clear();
   //types2uffparams_map.clear();
@@ -4403,7 +4403,7 @@ void POccStructure::free() {
   m_initialized=false;
   m_aflags.clear();
   m_kflags.clear();
-  xstr_sym.Clear();
+  xstr_sym.clear(); //DX 20191220 - uppercase to lowercase clear
   n_hnf=0;
   for(uint site=0;site<m_pocc_sites.size();site++){m_pocc_sites[site].clear();} m_pocc_sites.clear();
   pocc_atoms_total=0;
@@ -4638,7 +4638,7 @@ void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
     unique_derivative_structures_ss << POSCAR_POCC_series_STOP_tag << getARUNString(i) << endl; // ." << ss_pocc_count.str() << endl;
     unique_derivative_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
   
-    xvasp.str.Clear();
+    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
     xvasp.str=getUniqueSuperCell(i);
     xvasp.Directory=m_aflags.Directory; //arun_directory;
     xvasp.AVASP_arun=true;
@@ -5797,10 +5797,10 @@ void POccUFFEnergyAnalyzer::free() {
   m_exploration_radius=AUROSTD_MAX_DOUBLE;
   distance_matrix.clear();
   v_dist_nn.clear();
-  xstr_ss.Clear();
+  xstr_ss.clear(); //DX 20191220 - uppercase to lowercase clear
   sc2pc_map.clear();
   pc2sc_map.clear();
-  xstr_cluster.Clear();
+  xstr_cluster.clear(); //DX 20191220 - uppercase to lowercase clear
   for(uint i=0;i<v_bonded_atom_indices.size();i++){v_bonded_atom_indices[i].clear();} v_bonded_atom_indices.clear();
   for(uint i=0;i<v_nonbonded_atom_indices.size();i++){v_nonbonded_atom_indices[i].clear();} v_nonbonded_atom_indices.clear();
   has_vacancies=false;

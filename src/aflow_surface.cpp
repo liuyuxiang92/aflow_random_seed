@@ -3804,7 +3804,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   }
   
   stringstream title;
-  xstr_slab_newbasis.Clear();
+  xstr_slab_newbasis.clear(); //DX 20191220 - uppercase to lowercase clear
   xstructure xstr_slab_origbasis;
   xstr_slab_newbasis.lattice=getSlabLattice(xstr_bulk,hkl_i,xstr_slab_origbasis.lattice,DEFAULT_V3_ANGLE_DEVIATION,v3len_max_strict);xstr_slab_newbasis.FixLattices();  //ang_dev==5.0 is standard (DEFAULT_V3_ANGLE_DEVIATION), the vlen_max_strict is very important here, as the test from Sun et al. takes a shortcut here
   rotation=trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_slab_origbasis.lattice));

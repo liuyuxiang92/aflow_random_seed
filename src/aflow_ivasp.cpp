@@ -1727,7 +1727,7 @@ namespace KBIN {
       xvasp.str.write_inequivalent_flag=FALSE;
       //corey, fix if write_inequivalent_flag is present
       xvasp.POSCAR << xvasp.str;
-      xvasp.str.Clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed
+      xvasp.str.clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed //DX 20191220 - uppercase to lowercase clear
       //corey add these flags to prevent recalculation and wasted effort
       xvasp.str.Standard_Lattice_calculated=TRUE;
       xvasp.str.Standard_Lattice_primitive=TRUE;
@@ -1761,7 +1761,7 @@ namespace KBIN {
       xvasp.str.write_inequivalent_flag=FALSE;
       //corey, fix if write_inequivalent_flag is present
       xvasp.POSCAR << xvasp.str;
-      xvasp.str.Clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change
+      xvasp.str.clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change //DX 20191220 - uppercase to lowercase clear
       //corey add these flags to prevent recalculation and wasted effort
       xvasp.str.Standard_Lattice_calculated=TRUE;
       xvasp.str.Standard_Lattice_conventional=TRUE;
@@ -1770,7 +1770,7 @@ namespace KBIN {
       xvasp.str.write_inequivalent_flag=write_inequivalent_flag;
       // CO - END
       xvasp.str.bravais_lattice_type=bravais_lattice_type;xvasp.str.bravais_lattice_variation_type=bravais_lattice_variation_type;xvasp.str.pearson_symbol=pearson_symbol;
-      // xvasp.str.Clear();xvasp.POSCAR >> xvasp.str;
+      // xvasp.str.clear();xvasp.POSCAR >> xvasp.str; //DX 20191220 - uppercase to lowercase clear
       // cout << xvasp.str << endl;
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed",TRUE);
