@@ -1083,7 +1083,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow){ 
-    bool LDEBUG=(true || XHOST.DEBUG);
+    bool LDEBUG=(false || XHOST.DEBUG);
     
     string function_name = "pflow::compare2prototypes()";
     ostringstream oss;
@@ -1188,13 +1188,12 @@ namespace pflow {
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
     input_structure.structure_representative_from = ss_input.str(); 
-    cerr << "input_structure: " << input_structure << endl;
     all_structures.push_back(input_structure);
 
-    cerr << "ITC space group: " << xstr.space_group_ITC << endl;
+    cerr << "xstr.space_group_ITC: " << xstr.space_group_ITC << endl;
     // ---------------------------------------------------------------------------
     // symmetry
-    if(!ignore_symmetry && (xstr.space_group_ITC<1 || xstr.space_group_ITC>230)){ //DX 20190829 - don't recalculate symmetry if already calcualted
+    if(!ignore_symmetry && (xstr.space_group_ITC<1 || xstr.space_group_ITC>230)){ //DX 20190829 - don't recalculate symmetry if already calculated //DX 20191220 - put range instead of ==0
       message << "Calculating the symmetry of the input structure.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       uint one_proc=1;
@@ -1202,7 +1201,7 @@ namespace pflow {
       message << "Symmetry calculated.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
-    else if(!ignore_symmetry && xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){
+    else if(!ignore_symmetry && xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){ //DX 20191220 - put range instead of !=0
       for(uint i=0;i<all_structures.size();i++){
         all_structures[i].space_group = all_structures[i].structure_representative.space_group_ITC;
         vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
@@ -2517,7 +2516,7 @@ namespace compare {
     bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
     
     string function_name = "compare::compareMultipleStructures()";
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(false || XHOST.DEBUG);
     ostream& logstream = cout;
     stringstream message;
     //DX 20190319 [OBSOLETE] ofstream FileMESSAGE;

@@ -466,7 +466,7 @@ bool StructurePrototype::isSymmetryCalculated(){
 
   // Check if the space group symmetry is calculated
 
-  //if(space_group==0){return false;}
+  //DX 20191220 [OBSOLETE] if(space_group==0){return false;}
   if(space_group<1 || space_group>230){return false;} //DX 20191220
 
   return true; 
@@ -1214,7 +1214,7 @@ namespace compare {
     // 2) AURL
     // 3) input (cin)
 
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::generateStructure()";
     ofstream FileMESSAGE;
     vector<string> tokens;
@@ -1474,8 +1474,8 @@ namespace compare{
 
   vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
 
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
-    bool VERBOSE=true;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
     string function_name = "compare::comparePermutations()";
     stringstream message;
     //DX 20191125 [OBSOLETE] ostream& logstream = cout;
@@ -1495,27 +1495,19 @@ namespace compare{
 
     vector<StructurePrototype> final_permutations;
 
-    cerr << "1 " << endl;
     // ---------------------------------------------------------------------------
     // get stoichiometry
     vector<uint> stoichiometry = compare::getStoichiometry(structure.structure_representative,true);
-    cerr << "2 " << endl;
 
     // ---------------------------------------------------------------------------
     // calculate symmetry (if not already calculated)
-    cerr << "structure.space_group: " << structure.space_group << endl;
-    cerr << "Wyckoff.size(): " << structure.grouped_Wyckoff_positions.size() << endl;
     if(structure.space_group ==0){
       structure.calculateSymmetry();
     }
-    cerr << "3 " << endl;
-    cerr << "structure.space_group: " << structure.space_group << endl;
-    cerr << "Wyckoff.size(): " << structure.grouped_Wyckoff_positions.size() << endl;
 
     // ---------------------------------------------------------------------------
     // generate all permuations structures
     vector<StructurePrototype> permutation_structures = compare::generatePermutationStructures(structure);
-    cerr << "4 " << endl;
 
     //cerr << "store naming" << endl;
     vector<vector<string> > name_order;
@@ -1527,7 +1519,6 @@ namespace compare{
       }
       name_order.push_back(vtmp_name);
     }
-    cerr << "5 " << endl;
 
     // ---------------------------------------------------------------------------
     // loop over grouping modes
@@ -1548,18 +1539,15 @@ namespace compare{
         }
       }
       final_permutations.clear();
-    cerr << "6 " << endl;
 
       // ---------------------------------------------------------------------------
       // group comparable permutations
       vector<StructurePrototype> permutation_comparisons;
       permutation_comparisons = compare::groupStructurePrototypes(permutation_structures, same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, false); //DX 20190731 - added ignore_environment //DX 20190829 - false for duplicates_removed
-    cerr << "7 " << endl;
 
       // ---------------------------------------------------------------------------
       // ensure the representative stucture is an even permutation
       compare::makeRepresentativeEvenPermutation(permutation_comparisons, name_order);
-    cerr << "8 " << endl;
 
       if(VERBOSE){ for(uint i=0;i<permutation_comparisons.size();i++){ cerr << "Initial permutation groupings: " << permutation_comparisons[i] << endl; } }
 
@@ -1641,12 +1629,11 @@ namespace compare{
   vector<StructurePrototype> generatePermutationStructures(StructurePrototype& structure){
    
     vector<StructurePrototype> permutation_structures;
-    cerr << "-1" << endl;
+ 
     vector<string> names = fakeElements(structure.stoichiometry.size());
     vector<uint> indices = structure.stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = structure.stoichiometry.size();
-    cerr << "-2" << endl;
     
     bool is_symmetry_calculated = structure.isSymmetryCalculated(); //DX 20190508 - check if Wyckoff positions determined
  
@@ -1655,49 +1642,27 @@ namespace compare{
     for(uint i=0;i<num_elements;i++){new_indices.push_back(0);}
  
     name_order.push_back(names); 
-    cerr << "-3" << endl;
   
     //DX 20190508 [OBSOLETE] vector<GroupedWyckoffPosition> grouped_Wyckoff_positions = structure.grouped_Wyckoff_positions;
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - START
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions; 
     vector<vector<GroupedWyckoffPosition> > permutation_grouped_Wyckoff_positions;
 
-    cerr << "structure: " << structure << endl;
-    cerr << "structure.space_group: " << structure.space_group << endl;
-    cerr << "Wyckoff.size(): " << structure.grouped_Wyckoff_positions.size() << endl;
-
     if(is_symmetry_calculated){
       grouped_Wyckoff_positions = structure.grouped_Wyckoff_positions;
-    stringstream sscontent_json; sscontent_json << "\"grouped_Wyckoff_positions\":[";
-    vector<string> tmp_vstring;
-    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
-      stringstream ss_tmp;
-      ss_tmp << grouped_Wyckoff_positions[i];
-      tmp_vstring.push_back(ss_tmp.str());
-    }
-    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << endl;
-    cerr << "sscontent_json: " << sscontent_json.str() << endl;
       for(uint i=0;i<grouped_Wyckoff_positions.size();i++){grouped_Wyckoff_positions[i].element=names[i];}
       //DX 20190508 [OBSOLETE] vector<vector<GroupedWyckoffPosition> > permutation_grouped_Wyckoff_positions;
       permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
-
     }
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - END
-    cerr << "-4" << endl;
 
-    cerr << "num_elements: " << num_elements << endl;
     uint i=0;
     while(i<num_elements){
-      cerr << "names: " << aurostd::joinWDelimiter(names,",") << endl;
-      cerr << "indices: " << aurostd::joinWDelimiter(indices,",") << endl;
-      cerr << "new_indices: " << aurostd::joinWDelimiter(new_indices,",") << endl;
-      cerr << "i: " << i << endl;
       if(new_indices[i] < i){
-        cerr << "orig: ";
-        for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
+        //LDEBUBcerr << "orig: ";
+        //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
         if(i%2==0){
-          cerr << "even" << endl;
-          cerr << "even: swapping " << indices[0] << " and " << indices[i] << endl;
+          //LDEBUBcerr << "even: swapping " << indices[0] << " and " << indices[i] << endl;
           int swap1 = indices[0];
           int swap2 = indices[i];
           indices[0]=swap2; indices[i]=swap1;
@@ -1711,59 +1676,22 @@ namespace compare{
         }
         }
         else {
-          cerr << "odd" << endl;
-          cerr << "odd: swapping " << indices[new_indices[i]] << " and " << indices[i] << endl;
+          //LDEBUBcerr << "odd: swapping " << indices[new_indices[i]] << " and " << indices[i] << endl;
           int swap1 = indices[new_indices[i]];
-          cerr << "a" << endl;
-          cerr << "swap1: " << swap1 << endl;
           int swap2 = indices[i];
-          cerr << "b" << endl;
-          cerr << "swap2: " << swap1 << endl;
           indices[new_indices[i]]=swap2; indices[i]=swap1;
-          cerr << "c" << endl;
-          cerr << "updated indices[new_indices[i]]: " << indices[new_indices[i]] << endl;
-          cerr << "updated indices[i]: " << indices[i] << endl;
           string swap_name1 = names[new_indices[i]];
-          cerr << "d" << endl;
-          cerr << "updated swap_name1: " << swap_name1 << endl;
           string swap_name2 = names[i];
-          cerr << "e" << endl;
-          cerr << "updated swap_name2: " << swap_name2 << endl;
           //GroupedWyckoffPosition swap_position1 = grouped_Wyckoff_positions[new_indices[i]]; swap_position1.element = names[i];
           //GroupedWyckoffPosition swap_position2 = grouped_Wyckoff_positions[i]; swap_position2.element = names[new_indices[i]];
           names[new_indices[i]]=swap_name2; names[i]=swap_name1;
-          cerr << "f" << endl;
-          cerr << "updated names[new_indices[i]]: " << names[new_indices[i]] << endl;
-          cerr << "updated names[i]: " << names[i] << endl;
           if(is_symmetry_calculated){ //DX 20190508
-            cerr << "sym calculated" << endl;
-    stringstream sscontent_json; sscontent_json << "\"grouped_Wyckoff_positions\":[";
-    vector<string> tmp_vstring;
-    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
-      stringstream ss_tmp;
-      ss_tmp << grouped_Wyckoff_positions[i];
-      tmp_vstring.push_back(ss_tmp.str());
-    }
-    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << endl;
-    cerr << "sscontent_json: " << sscontent_json.str() << endl;
-    sscontent_json.str("");
           grouped_Wyckoff_positions[new_indices[i]].element=swap_name2; grouped_Wyckoff_positions[i].element=swap_name1;
-            cerr << "Wyckoff regrouped" << endl;
-    sscontent_json << "\"grouped_Wyckoff_positions\":[";
-    tmp_vstring.clear();
-    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
-      stringstream ss_tmp;
-      ss_tmp << grouped_Wyckoff_positions[i];
-      tmp_vstring.push_back(ss_tmp.str());
-    }
-    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << endl;
-    cerr << "sscontent_json: " << sscontent_json.str() << endl;
         }
         }
-
-        cerr << "storing: ";
-        for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
-        cerr << endl;
+        //LDEBUBcerr << "storing: ";
+        //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
+        //cerr << endl;
         //permutations.push_back(indices);
         name_order.push_back(names);
         //DX 20190508 - check for Wyckoff - START
@@ -1788,7 +1716,6 @@ namespace compare{
 
     // create permuted structure    
     for(uint i=0;i<name_order.size();i++){
-    cerr << "-5" << "name order " << aurostd::joinWDelimiter(name_order[i]," ") << endl;
       xstructure xstr_tmp = structure.structure_representative;
       deque<string> species; 
       for(uint j=0;j<name_order[i].size();j++){species.push_back(name_order[i][j]);}
@@ -1820,7 +1747,6 @@ namespace compare{
       tmp.grouped_Wyckoff_positions = permutation_grouped_Wyckoff_positions[i];
       permutation_structures.push_back(tmp);
     }
-    cerr << "-6"  << endl;
    
     return permutation_structures;
   }
