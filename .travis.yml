@@ -54,6 +54,6 @@ before_install:
   - if [ -n "${MATRIX_EVAL}" ]; then eval "${MATRIX_EVAL}"; fi
 script:
   - cd src
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ];   then make CC=$CC CPP=$CXX -j 4 ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CXX" = "clang++" ]; then make CC=$CC CPP=$CXX mac  ; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make CC=$CC CPP=$CXX -j 4 ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ];   then make CC=$CC CPP=$CXX mac  ; fi
   - make check_full
