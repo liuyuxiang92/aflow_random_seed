@@ -1494,19 +1494,23 @@ namespace compare{
 
     vector<StructurePrototype> final_permutations;
 
+    cerr << "1 " << endl;
     // ---------------------------------------------------------------------------
     // get stoichiometry
     vector<uint> stoichiometry = compare::getStoichiometry(structure.structure_representative,true);
+    cerr << "2 " << endl;
 
     // ---------------------------------------------------------------------------
     // calculate symmetry (if not already calculated)
     if(structure.space_group ==0){
       structure.calculateSymmetry();
     }
+    cerr << "3 " << endl;
 
     // ---------------------------------------------------------------------------
     // generate all permuations structures
     vector<StructurePrototype> permutation_structures = compare::generatePermutationStructures(structure);
+    cerr << "4 " << endl;
 
     //cerr << "store naming" << endl;
     vector<vector<string> > name_order;
@@ -1518,6 +1522,7 @@ namespace compare{
       }
       name_order.push_back(vtmp_name);
     }
+    cerr << "5 " << endl;
 
     // ---------------------------------------------------------------------------
     // loop over grouping modes
@@ -1538,15 +1543,18 @@ namespace compare{
         }
       }
       final_permutations.clear();
+    cerr << "6 " << endl;
 
       // ---------------------------------------------------------------------------
       // group comparable permutations
       vector<StructurePrototype> permutation_comparisons;
       permutation_comparisons = compare::groupStructurePrototypes(permutation_structures, same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, false); //DX 20190731 - added ignore_environment //DX 20190829 - false for duplicates_removed
+    cerr << "7 " << endl;
 
       // ---------------------------------------------------------------------------
       // ensure the representative stucture is an even permutation
       compare::makeRepresentativeEvenPermutation(permutation_comparisons, name_order);
+    cerr << "8 " << endl;
 
       if(VERBOSE){ for(uint i=0;i<permutation_comparisons.size();i++){ cerr << "Initial permutation groupings: " << permutation_comparisons[i] << endl; } }
 
