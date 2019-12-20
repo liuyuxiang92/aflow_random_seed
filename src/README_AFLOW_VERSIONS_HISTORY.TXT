@@ -109,6 +109,7 @@
         -- added unit tests in makefile for aflowSG, aflowSYM, and aflow-xtal-match (DX)
         -- put xstructure initialization in free() and call free() at beginning of constructors (otherwise xstructure is not always initialize) (DX)
         -- changed xstructure::Clear() to xstructure::clear() (DX)
+        -- changed xstructure::Clean() to xstructure::clean() (DX)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)

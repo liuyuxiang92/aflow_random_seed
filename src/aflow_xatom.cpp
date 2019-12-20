@@ -2580,7 +2580,7 @@ void xstructure::clear() { //DX 20191220 - uppercase to lowercase clear
   (*this)=_tmp;
 }
 
-void xstructure::Clean() {
+void xstructure::clean() { //DX 20191220 - uppercase to lowercase clean
   stringstream ss_xstr;
   ss_xstr << (*this);
   (*this).clear(); //DX 20191220 - uppercase to lowercase clear
@@ -10335,7 +10335,7 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //vector<int> sc2pcMap, pc2scMap; //dummy
     if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
-    atomic_grid=a;atomic_grid.Clean();
+    atomic_grid=a;atomic_grid.clean(); //DX 20191220 - uppercase to lowercase clean
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
     ptr_atoms=&atomic_grid.grid_atoms;  //CO190808 - GenerateGridAtoms() populates grid_atoms, not atoms
