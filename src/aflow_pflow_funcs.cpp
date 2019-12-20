@@ -1037,7 +1037,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       //}
 
       //load in xstructure
-      xvasp.str.Clear();
+      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
       xvasp.str=xstr_shear;
 
       //create directory name
@@ -1304,7 +1304,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     xvasp.clear();
 
     //load in xstructure
-    xvasp.str.Clear();
+    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
     xvasp.str=xstr_bulk;
     if(convert_sprim){
       xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
@@ -1502,7 +1502,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     
     xvasp.clear();
     //load in xstructure
-    xvasp.str.Clear();
+    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
     xvasp.str=xstr_slab;
     xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
 

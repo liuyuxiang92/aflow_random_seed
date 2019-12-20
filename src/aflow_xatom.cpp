@@ -1997,13 +1997,9 @@ void minimumCoordinationShell(const xstructure& xstr,
 // STRUCTURE
 // look into aflow.h for the definitions
 
-void xstructure::free() {
-}
-
-// Constructors
-xstructure::xstructure(string structure_title) {
+void xstructure::free() { //DX 20191220 - moved all initializations from constuctor into free()
   iomode=IOAFLOW_AUTO;        // what else could we do right now...
-  title=structure_title;
+  title=""; //DX 20191210
   directory="";
   prototype="";
   info="";
@@ -2220,24 +2216,34 @@ xstructure::xstructure(string structure_title) {
   // -----------------------------------
 }
 
+// Constructors
+xstructure::xstructure(string structure_title) {
+  free(); //DX 20191220 - moved contents below into free()
+  title=structure_title;
+}
+
 // ifstream/istream
 xstructure::xstructure(istream& _input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   (*this).iomode=_iomode;
   _input >> (*this);
 }
 
 xstructure::xstructure(ifstream& _input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   (*this).iomode=_iomode;
   _input >> (*this);
 }
 
 xstructure::xstructure(stringstream& __input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   (*this).iomode=_iomode;
   stringstream _input(__input.str());
   _input >> (*this);
 }
 
 xstructure::xstructure(const string& _input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   stringstream strstream;
   aurostd::efile2stringstream(_input,strstream); // CO 171025
    (*this).iomode=_iomode;
@@ -2246,6 +2252,7 @@ xstructure::xstructure(const string& _input,int _iomode) {
 }
 
 xstructure::xstructure(const string& url,const string& file,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   stringstream strstream;
   aurostd::url2stringstream(url+"/"+file,strstream);
   (*this).iomode=_iomode;
@@ -2556,49 +2563,7 @@ xstructure::xstructure(const xstructure& b) {
 
 // destructor
 xstructure::~xstructure() {
-  atoms.clear();
-  qm_forces.clear();
-  qm_positions.clear();
-  pgroup.clear();
-  pgroup_xtal.clear();
-  pgroupk.clear();
-  pgroupk_xtal.clear(); // DX 12/5/17 - Added pgroupk_xtal
-  fgroup.clear();
-  sgroup.clear();
-  for(uint i=0;i<agroup.size();i++)
-    agroup.at(i).clear();
-  agroup.clear();
-  for(uint i=0;i<iatoms.size();i++)
-    iatoms.at(i).clear();
-  iatoms.clear();
-  grid_atoms_dimsL.clear(); // CO 171025
-  grid_atoms_dimsH.clear(); // CO 171025
-  grid_atoms.clear();
-  grid_atoms_sc2pcMap.clear(); // CO 171025
-  grid_atoms_pc2scMap.clear(); // CO 171025
-  lijk_table.clear();
-  lijk_cpos.clear();
-  lijk_fpos.clear();
-  for(uint i=0;i<neighbours_atoms_func_r_vs_nn.size();i++)
-    neighbours_atoms_func_r_vs_nn.at(i).clear();
-  neighbours_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<neighbours_atoms_func_num_vs_nn.size();i++)
-    neighbours_atoms_func_num_vs_nn.at(i).clear();
-  neighbours_atoms_func_num_vs_nn.clear();
-  neighbours_func_r_vs_nn.clear();
-  neighbours_func_num_vs_nn.clear();
- 
-  wyccar_ITC.clear();                   //(RHT)
-  wyckoff_sites_ITC.clear();            //(RHT)
-  wyckoff_symbols_ITC.clear();          //(RHT)
-  standard_basis_ITC.clear();           //(RHT)
-  standard_lattice_ITC.clear();         // RHT
-  origin_ITC.clear();                   // DX 8/30/17 - SGDATA
-  general_position_ITC.clear();         // DX 8/30/17 - SGDATA
-  symbolic_math_lattice.clear();                         // symbolic math representation of lattice 20180618
-  prototype_parameter_list.clear();                      // prototype parameter list ANRL 20180618
-  prototype_parameter_values.clear();                    // prototype parameters values ANRL 20180618
-  free();
+  free(); //DX 20191220 - added free and moved contents below into free
 }
 
 // copies xtructures: b=a
@@ -2610,7 +2575,7 @@ const xstructure& xstructure::operator=(const xstructure& b) {  // operator=
   return *this;
 }
 
-void xstructure::Clear() {
+void xstructure::clear() { //DX 20191220 - uppercase to lowercase clear
   xstructure _tmp;
   (*this)=_tmp;
 }
@@ -2618,7 +2583,7 @@ void xstructure::Clear() {
 void xstructure::Clean() {
   stringstream ss_xstr;
   ss_xstr << (*this);
-  (*this).Clear();
+  (*this).clear(); //DX 20191220 - uppercase to lowercase clear
   ss_xstr >> (*this);
   ss_xstr.str("");
 }

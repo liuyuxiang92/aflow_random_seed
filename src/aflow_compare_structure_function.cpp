@@ -40,7 +40,7 @@ void StructurePrototype::free(){
   iomode=JSON_MODE;
   structure_representative_name="";
   structure_representative_compound="";
-  structure_representative.Clear();
+  structure_representative.clear(); //DX 20191220 - uppercase to lowercase clear
   structure_representative_generated=false;
   structure_representative_from="";
   number_compounds_matching_representative=0;
@@ -3955,7 +3955,7 @@ namespace compare{
         else {
           tmp.properties_structure_representative.clear();
         }
-        tmp.structure_representative.Clear(); //clear xstructure;
+        tmp.structure_representative.clear(); //clear xstructure; //DX 20191220 - uppercase to lowercase clear
         tmp.structure_representative_generated=false;
         tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
         tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.structure_misfits_duplicate.clear(); tmp.properties_structures_duplicate.clear();
@@ -3997,7 +3997,7 @@ namespace compare{
           else {
             tmp.properties_structure_representative.clear();
           }
-          tmp.structure_representative.Clear(); //clear xstructure;
+          tmp.structure_representative.clear(); //clear xstructure; //DX 20191220 - uppercase to lowercase clear
           tmp.structure_representative_generated=false;
           tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
           tmp.structures_duplicate_names.clear(); tmp.structures_duplicate_compounds.clear(); tmp.structures_duplicate.clear(); tmp.structure_misfits_duplicate.clear(); tmp.properties_structures_duplicate.clear();
@@ -4085,7 +4085,7 @@ namespace compare{
                   comparison_schemes[i].structures_duplicate_generated[j] = old_representative_generated;
                 }
                 else {
-                  comparison_schemes[i].structure_representative.Clear();
+                  comparison_schemes[i].structure_representative.clear(); //DX 20191220 - uppercase to lowercase clear
                   comparison_schemes[i].structures_duplicate_generated[j]=false; //cannot guarantee the rest of the vector is generated; may populate wrong index
                  //DX 20190304 - should I also clear out vector<xvstructure>?
                 }
@@ -4718,11 +4718,11 @@ namespace compare{
         else if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= 0.1 && !std::signbit(comparison_schemes[i].structure_misfits_duplicate[j].misfit)){
           //comparison_schemes[i].structures_duplicate.erase(comparison_schemes[i].structures_duplicate.begin()+j);
           // check if the structure is generated first
-          if(comparison_schemes[i].structures_duplicate_generated[j]){comparison_schemes[i].structures_duplicate[j].Clear(); comparison_schemes[i].structures_duplicate_generated[j]=false; } //DX 20190303 - update generated flag
+          if(comparison_schemes[i].structures_duplicate_generated[j]){comparison_schemes[i].structures_duplicate[j].clear(); comparison_schemes[i].structures_duplicate_generated[j]=false; } //DX 20190303 - update generated flag //DX 20191220 - uppercase to lowercase clear
         }
       }
       //DX 20181220 - can clear representative structure since we will no longer compare it (save memory)
-      //DX 20190521 [BREAKS WITH AURL MODE IN PARALLEL] comparison_schemes[i].structure_representative.Clear();
+      //DX 20190521 [BREAKS WITH AURL MODE IN PARALLEL] comparison_schemes[i].structure_representative.clear(); //DX 20191220 - uppercase to lowercase clear
       //DX 20190521 [BREAKS WITH AURL MODE IN PARALLEL] comparison_schemes[i].structure_representative_generated=false;
 
       // if not quiet, print the comparison results to the screen 

@@ -1012,6 +1012,9 @@ patch_makefile2: Makefile
 	mv M Makefile
 check:
 	$(MAKE) proto_check
+	$(MAKE) slab_check
+	$(MAKE) aflowSG_check
+	$(MAKE) aflowSYM_check
 	$(MAKE) aflow_xtal_match_check
 check_full:
 	$(MAKE) proto_check
