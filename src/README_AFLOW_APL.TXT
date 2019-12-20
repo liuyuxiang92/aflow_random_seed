@@ -453,7 +453,7 @@ Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
         [AFLOW_APL]DOSPROJECTIONS_FRAC=-1,1,1;1,-1,1;1,1,-1
 
 Where DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC give the projection directions in Cartesian and
-fractional coordinates, respectively. It is not possible to choose both options. If neither options
+fractional coordinates, respectively. It is not possible to choose both options. If neither option
 is populated, projected DOS will not be calculated.
 
 Each projection vector triplet needs to be separated by a semicolon, and the coordinates inside the
