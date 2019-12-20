@@ -1083,7 +1083,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow){ 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(true || XHOST.DEBUG);
     
     string function_name = "pflow::compare2prototypes()";
     ostringstream oss;

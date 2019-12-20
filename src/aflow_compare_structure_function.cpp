@@ -1213,7 +1213,7 @@ namespace compare {
     // 2) AURL
     // 3) input (cin)
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     string function_name = "compare::generateStructure()";
     ofstream FileMESSAGE;
     vector<string> tokens;
@@ -1473,8 +1473,8 @@ namespace compare{
 
   vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
 
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    bool VERBOSE=false;
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool VERBOSE=true;
     string function_name = "compare::comparePermutations()";
     stringstream message;
     //DX 20191125 [OBSOLETE] ostream& logstream = cout;
