@@ -2515,7 +2515,7 @@ namespace compare {
     bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
     
     string function_name = "compare::compareMultipleStructures()";
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(TRUE || XHOST.DEBUG);
     ostream& logstream = cout;
     stringstream message;
     //DX 20190319 [OBSOLETE] ofstream FileMESSAGE;
