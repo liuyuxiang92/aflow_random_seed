@@ -12,6 +12,46 @@ matrix:
       compiler: clang
     - os: osx
       compiler: gcc
+  #https://docs.travis-ci.com/user/languages/cpp/
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+before_install:
+  - if [ -n "${MATRIX_EVAL}" ]; then eval "${MATRIX_EVAL}"; fi
 script:
   - cd src
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ];   then make CC=$CC CPP=$CXX -j 4 ; fi
