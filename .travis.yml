@@ -160,4 +160,4 @@ script:
   - cd src
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make realclean && make CC=$CC CPP=$CXX -j 4 && make check_full ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then make realclean && make CC=$CC CPP=$CXX -e ARCH=-D_MACOSX_ -j 4 && make check_full ; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CPP" = "clang" ] && [ "$CXX" = "clang++" ]; then make realclean && make mac && make check_full ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$CC" = "clang" ] && [ "$CXX" = "clang++" ]; then make realclean && make mac && make check_full ; fi
