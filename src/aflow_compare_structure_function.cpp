@@ -466,7 +466,8 @@ bool StructurePrototype::isSymmetryCalculated(){
 
   // Check if the space group symmetry is calculated
 
-  if(space_group==0){return false;}
+  //if(space_group==0){return false;}
+  if(space_group<1 || space_group>230){return false;} //DX 20191220
 
   return true; 
 }

@@ -1188,11 +1188,13 @@ namespace pflow {
     input_structure.structure_representative_generated = true;
     stringstream ss_input; ss_input << xstr;
     input_structure.structure_representative_from = ss_input.str(); 
+    cerr << "input_structure: " << input_structure << endl;
     all_structures.push_back(input_structure);
 
+    cerr << "ITC space group: " << xstr.space_group_ITC << endl;
     // ---------------------------------------------------------------------------
     // symmetry
-    if(!ignore_symmetry && xstr.space_group_ITC==0){ //DX 20190829 - don't recalculate symmetry if already calcualted
+    if(!ignore_symmetry && (xstr.space_group_ITC<1 || xstr.space_group_ITC>230)){ //DX 20190829 - don't recalculate symmetry if already calcualted
       message << "Calculating the symmetry of the input structure.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       uint one_proc=1;
@@ -1200,7 +1202,7 @@ namespace pflow {
       message << "Symmetry calculated.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
     }
-    else if(!ignore_symmetry && xstr.space_group_ITC!=0){
+    else if(!ignore_symmetry && xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){
       for(uint i=0;i<all_structures.size();i++){
         all_structures[i].space_group = all_structures[i].structure_representative.space_group_ITC;
         vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
