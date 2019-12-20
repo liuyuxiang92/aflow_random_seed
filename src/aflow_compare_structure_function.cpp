@@ -1502,10 +1502,14 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // calculate symmetry (if not already calculated)
+    cerr << "structure.space_group: " << structure.space_group << endl;
+    cerr << "Wyckoff.size(): " << structure.grouped_Wyckoff_positions.size() << endl;
     if(structure.space_group ==0){
       structure.calculateSymmetry();
     }
     cerr << "3 " << endl;
+    cerr << "structure.space_group: " << structure.space_group << endl;
+    cerr << "Wyckoff.size(): " << structure.grouped_Wyckoff_positions.size() << endl;
 
     // ---------------------------------------------------------------------------
     // generate all permuations structures
@@ -1656,6 +1660,10 @@ namespace compare{
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - START
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions; 
     vector<vector<GroupedWyckoffPosition> > permutation_grouped_Wyckoff_positions;
+
+    cerr << "structure: " << structure << endl;
+    cerr << "structure.space_group: " << structure.space_group << endl;
+    cerr << "Wyckoff.size(): " << structure.grouped_Wyckoff_positions.size() << endl;
 
     if(is_symmetry_calculated){
       grouped_Wyckoff_positions = structure.grouped_Wyckoff_positions;
