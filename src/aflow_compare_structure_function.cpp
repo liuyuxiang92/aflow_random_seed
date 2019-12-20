@@ -1659,9 +1659,19 @@ namespace compare{
 
     if(is_symmetry_calculated){
       grouped_Wyckoff_positions = structure.grouped_Wyckoff_positions;
+    stringstream sscontent_json; sscontent_json << "\"grouped_Wyckoff_positions\":[";
+    vector<string> tmp_vstring;
+    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
+      stringstream ss_tmp;
+      ss_tmp << grouped_Wyckoff_positions[i];
+      tmp_vstring.push_back(ss_tmp.str());
+    }
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << endl;
+    cerr << "sscontent_json: " << sscontent_json.str() << endl;
       for(uint i=0;i<grouped_Wyckoff_positions.size();i++){grouped_Wyckoff_positions[i].element=names[i];}
       //DX 20190508 [OBSOLETE] vector<vector<GroupedWyckoffPosition> > permutation_grouped_Wyckoff_positions;
       permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
+
     }
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - END
     cerr << "-4" << endl;
@@ -1718,8 +1728,27 @@ namespace compare{
           cerr << "updated names[i]: " << names[i] << endl;
           if(is_symmetry_calculated){ //DX 20190508
             cerr << "sym calculated" << endl;
+    stringstream sscontent_json; sscontent_json << "\"grouped_Wyckoff_positions\":[";
+    vector<string> tmp_vstring;
+    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
+      stringstream ss_tmp;
+      ss_tmp << grouped_Wyckoff_positions[i];
+      tmp_vstring.push_back(ss_tmp.str());
+    }
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << endl;
+    cerr << "sscontent_json: " << sscontent_json.str() << endl;
+    sscontent_json.str("");
           grouped_Wyckoff_positions[new_indices[i]].element=swap_name2; grouped_Wyckoff_positions[i].element=swap_name1;
             cerr << "Wyckoff regrouped" << endl;
+    sscontent_json << "\"grouped_Wyckoff_positions\":[";
+    tmp_vstring.clear();
+    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){
+      stringstream ss_tmp;
+      ss_tmp << grouped_Wyckoff_positions[i];
+      tmp_vstring.push_back(ss_tmp.str());
+    }
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << endl;
+    cerr << "sscontent_json: " << sscontent_json.str() << endl;
         }
         }
 
