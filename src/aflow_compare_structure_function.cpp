@@ -1636,11 +1636,12 @@ namespace compare{
   vector<StructurePrototype> generatePermutationStructures(StructurePrototype& structure){
    
     vector<StructurePrototype> permutation_structures;
- 
+    cerr << "-1" << endl;
     vector<string> names = fakeElements(structure.stoichiometry.size());
     vector<uint> indices = structure.stoichiometry;
     vector<vector<string> > name_order;  
     uint num_elements = structure.stoichiometry.size();
+    cerr << "-2" << endl;
     
     bool is_symmetry_calculated = structure.isSymmetryCalculated(); //DX 20190508 - check if Wyckoff positions determined
  
@@ -1649,6 +1650,7 @@ namespace compare{
     for(uint i=0;i<num_elements;i++){new_indices.push_back(0);}
  
     name_order.push_back(names); 
+    cerr << "-3" << endl;
   
     //DX 20190508 [OBSOLETE] vector<GroupedWyckoffPosition> grouped_Wyckoff_positions = structure.grouped_Wyckoff_positions;
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - START
@@ -1662,6 +1664,7 @@ namespace compare{
       permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
     }
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - END
+    cerr << "-4" << endl;
 
     uint i=0;
     while(i<num_elements){
@@ -1723,6 +1726,7 @@ namespace compare{
 
     // create permuted structure    
     for(uint i=0;i<name_order.size();i++){
+    cerr << "-5" << "name order " << aurostd::joinWDelimiter(name_order[i]," ") << endl;
       xstructure xstr_tmp = structure.structure_representative;
       deque<string> species; 
       for(uint j=0;j<name_order[i].size();j++){species.push_back(name_order[i][j]);}
@@ -1754,6 +1758,7 @@ namespace compare{
       tmp.grouped_Wyckoff_positions = permutation_grouped_Wyckoff_positions[i];
       permutation_structures.push_back(tmp);
     }
+    cerr << "-6"  << endl;
    
     return permutation_structures;
   }
