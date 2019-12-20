@@ -1695,21 +1695,37 @@ namespace compare{
           cerr << "odd" << endl;
           cerr << "odd: swapping " << indices[new_indices[i]] << " and " << indices[i] << endl;
           int swap1 = indices[new_indices[i]];
+          cerr << "a" << endl;
+          cerr << "swap1: " << swap1 << endl;
           int swap2 = indices[i];
+          cerr << "b" << endl;
+          cerr << "swap2: " << swap1 << endl;
           indices[new_indices[i]]=swap2; indices[i]=swap1;
+          cerr << "c" << endl;
+          cerr << "updated indices[new_indices[i]]: " << indices[new_indices[i]] << endl;
+          cerr << "updated indices[i]: " << indices[i] << endl;
           string swap_name1 = names[new_indices[i]];
+          cerr << "d" << endl;
+          cerr << "updated swap_name1: " << swap_name1 << endl;
           string swap_name2 = names[i];
+          cerr << "e" << endl;
+          cerr << "updated swap_name2: " << swap_name2 << endl;
           //GroupedWyckoffPosition swap_position1 = grouped_Wyckoff_positions[new_indices[i]]; swap_position1.element = names[i];
           //GroupedWyckoffPosition swap_position2 = grouped_Wyckoff_positions[i]; swap_position2.element = names[new_indices[i]];
           names[new_indices[i]]=swap_name2; names[i]=swap_name1;
+          cerr << "f" << endl;
+          cerr << "updated names[new_indices[i]]: " << names[new_indices[i]] << endl;
+          cerr << "updated names[i]: " << names[i] << endl;
           if(is_symmetry_calculated){ //DX 20190508
+            cerr << "sym calculated" << endl;
           grouped_Wyckoff_positions[new_indices[i]].element=swap_name2; grouped_Wyckoff_positions[i].element=swap_name1;
+            cerr << "Wyckoff regrouped" << endl;
         }
         }
 
-        //LDEBUBcerr << "storing: ";
-        //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
-        //cerr << endl;
+        cerr << "storing: ";
+        for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
+        cerr << endl;
         //permutations.push_back(indices);
         name_order.push_back(names);
         //DX 20190508 - check for Wyckoff - START
