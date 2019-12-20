@@ -1674,10 +1674,11 @@ namespace compare{
       cerr << "new_indices: " << aurostd::joinWDelimiter(new_indices,",") << endl;
       cerr << "i: " << i << endl;
       if(new_indices[i] < i){
-        //LDEBUBcerr << "orig: ";
-        //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
+        cerr << "orig: ";
+        for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
         if(i%2==0){
-          //LDEBUBcerr << "even: swapping " << indices[0] << " and " << indices[i] << endl;
+          cerr << "even" << endl;
+          cerr << "even: swapping " << indices[0] << " and " << indices[i] << endl;
           int swap1 = indices[0];
           int swap2 = indices[i];
           indices[0]=swap2; indices[i]=swap1;
@@ -1691,7 +1692,8 @@ namespace compare{
         }
         }
         else {
-          //LDEBUBcerr << "odd: swapping " << indices[new_indices[i]] << " and " << indices[i] << endl;
+          cerr << "odd" << endl;
+          cerr << "odd: swapping " << indices[new_indices[i]] << " and " << indices[i] << endl;
           int swap1 = indices[new_indices[i]];
           int swap2 = indices[i];
           indices[new_indices[i]]=swap2; indices[i]=swap1;
