@@ -1666,8 +1666,13 @@ namespace compare{
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - END
     cerr << "-4" << endl;
 
+    cerr << "num_elements: " << num_elements << endl;
     uint i=0;
     while(i<num_elements){
+      cerr << "names: " << aurostd::joinWDelimiter(names,",") << endl;
+      cerr << "indices: " << aurostd::joinWDelimiter(indices,",") << endl;
+      cerr << "new_indices: " << aurostd::joinWDelimiter(new_indices,",") << endl;
+      cerr << "i: " << i << endl;
       if(new_indices[i] < i){
         //LDEBUBcerr << "orig: ";
         //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
@@ -1699,6 +1704,7 @@ namespace compare{
           grouped_Wyckoff_positions[new_indices[i]].element=swap_name2; grouped_Wyckoff_positions[i].element=swap_name1;
         }
         }
+
         //LDEBUBcerr << "storing: ";
         //for(uint n=0;n<indices.size();n++){cerr << indices[n] << " ";}
         //cerr << endl;
