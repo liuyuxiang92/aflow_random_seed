@@ -1190,7 +1190,6 @@ namespace pflow {
     input_structure.structure_representative_from = ss_input.str(); 
     all_structures.push_back(input_structure);
 
-    cerr << "xstr.space_group_ITC: " << xstr.space_group_ITC << endl;
     // ---------------------------------------------------------------------------
     // symmetry
     if(!ignore_symmetry && (xstr.space_group_ITC<1 || xstr.space_group_ITC>230)){ //DX 20190829 - don't recalculate symmetry if already calculated //DX 20191220 - put range instead of ==0

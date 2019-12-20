@@ -4674,7 +4674,7 @@ void POccCalculator::cleanPOccStructure() {
   xstr_pocc.ReScale(1.0);
   xstr_pocc.ShifOriginToAtom(0);
   xstr_pocc.BringInCell();
-  xstr_pocc.Clean();
+  xstr_pocc.clean(); //DX 20191220 - uppercase to lowercase clean
 
   if(LDEBUG) {
     cerr << soliloquy << " cleaned PARTCAR" << endl;
@@ -5283,7 +5283,7 @@ xstructure createNonPOccStructure(const xstructure& xstr_pocc,const vector<POccU
 	*/
 
   xstr_nopocc.title="Parent structure";
-  xstr_nopocc.Clean();    //real true clean
+  xstr_nopocc.clean();    //real true clean //DX 20191220 - uppercase to lowercase clean
   if(LDEBUG) {
     cerr << soliloquy << " final non-pocc structure" << endl;
     cerr << xstr_nopocc << endl;

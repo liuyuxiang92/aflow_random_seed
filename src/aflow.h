@@ -1440,7 +1440,7 @@ class xstructure {
   void RemoveCartesianCopies(double=1.0e-3);                    // deleting atoms too close C
   void AddCorners(void);                                        // for picturing purpose
   void clear(void);                                             // clear everything //DX 20191220 - uppercase to lowercase clear
-  void Clean(void);                                             // performs stringstream clean
+  void clean(void);                                             // performs stringstream clean //DX 20191220 - uppercase to lowercase clean
   void ClearSpecies(void);                                      // Clear all the symmetry
   void ShifOriginToAtom(const int& iat);                        // Shift the origin to atom(iat)
   void IdenticalAtoms(void);                                    // Make identical atoms
