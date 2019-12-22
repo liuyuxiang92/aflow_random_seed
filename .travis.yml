@@ -22,9 +22,7 @@ matrix:
       #addons is NOT a good approach: need verbose and sometimes it fails with little output
       #addons homebrew update is NOT a good approach: need the output to prevent timeout
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools"
-          MATRIX_EVAL_BREW ="brew update && brew install xz"
-          MATRIX_EVAL      ="CC=gcc-4.9 && CXX=g++-4.9"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
     - os: osx
       osx_image: xcode8
       #patching verbose warnings (killing bundle) with CommandLineTools: https://stackoverflow.com/questions/39502921/warning-section-const-coal-is-deprecated-error-after-updating-xcode-to-la
@@ -32,9 +30,7 @@ matrix:
       #addons is NOT a good approach: need verbose and sometimes it fails with little output
       #addons homebrew update is NOT a good approach: need the output to prevent timeout
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools"
-          MATRIX_EVAL_BREW ="brew update && brew install xz && brew install --verbose gcc5"
-          MATRIX_EVAL      ="CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc5" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     - os: osx
       osx_image: xcode8
       #patching verbose warnings (killing bundle) with CommandLineTools: https://stackoverflow.com/questions/39502921/warning-section-const-coal-is-deprecated-error-after-updating-xcode-to-la
@@ -42,9 +38,7 @@ matrix:
       #addons is NOT a good approach: need verbose and sometimes it fails with little output
       #addons homebrew update is NOT a good approach: need the output to prevent timeout
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools"
-          MATRIX_EVAL_BREW ="brew update && brew install xz && brew install --verbose gcc6"
-          MATRIX_EVAL      ="CC=gcc-6 && CXX=g++-6"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc6" MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
     - os: osx
       osx_image: xcode8
       #patching verbose warnings (killing bundle) with CommandLineTools: https://stackoverflow.com/questions/39502921/warning-section-const-coal-is-deprecated-error-after-updating-xcode-to-la
@@ -52,9 +46,7 @@ matrix:
       #addons is NOT a good approach: need verbose and sometimes it fails with little output
       #addons homebrew update is NOT a good approach: need the output to prevent timeout
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools"
-          MATRIX_EVAL_BREW ="brew update && brew install xz && brew install --verbose gcc7"
-          MATRIX_EVAL      ="CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc7" MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 #    #STANDARD SETTINGS (vs. legacy)
 #    - os: linux
 #      compiler: gcc
