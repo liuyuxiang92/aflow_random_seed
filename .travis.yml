@@ -15,24 +15,24 @@ matrix:
   #https://docs.travis-ci.com/user/languages/cpp/
   include:
     #GCC on macOS
-    - os: osx
-      osx_image: xcode8
-      env:
-        - MATRIX_EVAL="brew update --verbose && brew install --verbose xz && sudo xcode-select -s /Library/Developer/CommandLineTools && CC=gcc-4.9 && CXX=g++-4.9"
-      #addons:
-      #  homebrew:
-      #    update: true
-      #[doesn't trigger anything]addons:
-      #[doesn't trigger anything]  homebrew:
-      #[doesn't trigger anything]    packages:
-      #[doesn't trigger anything]      - xz
 #    - os: osx
 #      osx_image: xcode8
 #      env:
-#        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
-#      addons:
-#        homebrew:
-#          update: true
+#        - MATRIX_EVAL="brew update --verbose && brew install --verbose xz && sudo xcode-select -s /Library/Developer/CommandLineTools && CC=gcc-4.9 && CXX=g++-4.9"
+#      #addons:
+#      #  homebrew:
+#      #    update: true
+#      #[doesn't trigger anything]addons:
+#      #[doesn't trigger anything]  homebrew:
+#      #[doesn't trigger anything]    packages:
+#      #[doesn't trigger anything]      - xz
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew update --verbose && brew install --verbose gcc5 && CC=gcc-5 && CXX=g++-5"
+      #addons:
+      #  homebrew:
+      #    update: true
 #    - os: osx
 #      osx_image: xcode8
 #      env:
