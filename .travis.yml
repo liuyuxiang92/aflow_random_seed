@@ -170,6 +170,7 @@ matrix:
 before_install:
   - if [ -n "${MATRIX_EVAL_XCODE}" ]; then echo "${MATRIX_EVAL_XCODE}"; eval "${MATRIX_EVAL_XCODE}"; fi
   - if [ -n "${MATRIX_EVAL_BREW}" ];  then echo "${MATRIX_EVAL_BREW}"; eval "${MATRIX_EVAL_BREW}";   fi
+  - if [ -n "${MATRIX_EVAL_GCC}" ];   then echo "${MATRIX_EVAL_GCC}"; eval "${MATRIX_EVAL_GCC}";     fi
   - if [ -n "${MATRIX_EVAL}" ];       then echo "${MATRIX_EVAL}"; eval "${MATRIX_EVAL}";             fi
 script:
   - cd src
