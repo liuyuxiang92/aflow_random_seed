@@ -1,4 +1,4 @@
-sudo: false
+#sudo: false
 language: cpp
 #os:
 #  - linux
@@ -18,7 +18,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="brew update --verbose && brew install --verbose xz && CC=gcc-4.9 && CXX=g++-4.9"
+        - MATRIX_EVAL="brew update --verbose && brew install --verbose xz && sudo xcode-select -s /Library/Developer/CommandLineTools && CC=gcc-4.9 && CXX=g++-4.9"
       #addons:
       #  homebrew:
       #    update: true
