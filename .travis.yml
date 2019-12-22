@@ -18,7 +18,10 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="brew install xz && CC=gcc-4.9 && CXX=g++-4.9"
+        - MATRIX_EVAL="brew update --verbose && brew upgrade --verbose && brew install --verbose xz && CC=gcc-4.9 && CXX=g++-4.9"
+      #addons:
+      #  homebrew:
+      #    update: true
       #[doesn't trigger anything]addons:
       #[doesn't trigger anything]  homebrew:
       #[doesn't trigger anything]    packages:
