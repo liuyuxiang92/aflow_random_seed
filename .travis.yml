@@ -24,23 +24,26 @@ matrix:
       osx_image: xcode8
       env:
         - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz"                                MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+    - os: osx
+      osx_image: xcode8
+      env:
         - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc5" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+    - os: osx
+      osx_image: xcode8
+      env:
         - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc6" MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+    - os: osx
+      osx_image: xcode8
+      env:
         - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc7" MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    - os: osx
+      osx_image: xcode8
+      env:
         - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc8" MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    - os: osx
+      osx_image: xcode8
+      env:
         - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz && brew install --verbose gcc9" MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
-    #- os: osx
-    #  osx_image: xcode8
-    #  env:
-    #- os: osx
-    #  osx_image: xcode8
-    #  env:
-    #- os: osx
-    #  osx_image: xcode8
-    #  env:
-    #- os: osx
-    #  osx_image: xcode8
-    #  env:
 #    #STANDARD SETTINGS (vs. legacy)
 #    - os: linux
 #      compiler: gcc
