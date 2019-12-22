@@ -11,7 +11,7 @@
 #include<iostream>
 #include "aflow_pflow.h"
 #include "aflow.h"
-#include "math.h"
+#include <math.h> //CO191217 - this is a STANDARD library
 #include<vector>
 #include<string>
 //#include <stdatomic.h> // Needed to communicate between threads

@@ -27,6 +27,7 @@
 #include "aflow.h"
 #include "aflow_pflow.h"
 // [OBSOLETE] #include "aflow_aqe.h"
+#include "aflow_makefile.h" //DELETE ME!
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -776,6 +777,12 @@ int main(int _argc,char **_argv) {
   if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO190601
   if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO190601
   if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
+
+
+    vector<string> files_already_explored,dfiles;
+    makefile::getDependencies("aflow.h",files_already_explored,dfiles);
+
+    exit(1);
 
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front("");
     deque<string> vcat; aurostd::string2tokens("cat,bzcat,xzcat,gzcat",vcat,",");

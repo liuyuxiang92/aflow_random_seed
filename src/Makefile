@@ -160,6 +160,7 @@ GFA_FUNCS_CPP = aflow_gfa.cpp
 #RF 190603
 CCE_CPP = aflow_cce.cpp
 #CO 170614
+MAKEFILE_CPP = aflow_makefile.cpp
 SQLITE_C = ./SQLITE/sqlite3.c
 #README_CPP= aflow_readme.cpp
 DATA_CPP=aflow_data_readme.cpp aflow_data_calculated.cpp aflow_data_htqc.cpp aflow_data_libraries.cpp aflow_data_stokes.cpp aflow_data_nist.cpp aflow_data_latex.cpp aflow_data_aflow_potcars.cpp aflow_data.cpp
@@ -188,9 +189,10 @@ GFA_OBJ                = $(GFA_FUNCS_CPP:.cpp=.o)
 #RF 190603
 CCE_OBJ                = $(CCE_CPP:.cpp=.o)
 #CO 170614
+MAKEFILE_OBJ           = $(MAKEFILE_CPP:.cpp=.o)
 SQLITE_OBJ             = $(SQLITE_C:.c=.o)
 
-AFLOW_OBJS = $(AFLOW_OBJ) $(AUROSTD_OBJ) $(AFLOW_CLASS_OBJ) $(AFLOW_FUNCS_OBJ) $(PFLOW_FUNCS_OBJ) $(ESTRUCTURE_FUNCS_OBJ) $(POCC_FUNCS_OLD_OBJ) $(POCC_OBJ) $(APENNSY_FUNCS_OBJ) $(LIBRARIES_FUNCS_OBJ) $(MIX_EXPERIMENTS_OBJ) $(CONTRIB_FUNCS_OBJ) $(AFLOWLIB_OBJ) $(AGL_OBJ) $(AEL_OBJ) $(APL_OBJ) $(ANRL_OBJ) $(COMPARE_FUNCS_DH_OBJ) $(CHULL_OBJ) $(GFA_OBJ) $(CCE_OBJ) $(SQLITE_OBJ)
+AFLOW_OBJS = $(AFLOW_OBJ) $(AUROSTD_OBJ) $(AFLOW_CLASS_OBJ) $(AFLOW_FUNCS_OBJ) $(PFLOW_FUNCS_OBJ) $(ESTRUCTURE_FUNCS_OBJ) $(POCC_FUNCS_OLD_OBJ) $(POCC_OBJ) $(APENNSY_FUNCS_OBJ) $(LIBRARIES_FUNCS_OBJ) $(MIX_EXPERIMENTS_OBJ) $(CONTRIB_FUNCS_OBJ) $(AFLOWLIB_OBJ) $(AGL_OBJ) $(AEL_OBJ) $(APL_OBJ) $(ANRL_OBJ) $(COMPARE_FUNCS_DH_OBJ) $(CHULL_OBJ) $(GFA_OBJ) $(CCE_OBJ) $(MAKEFILE_OBJ) $(SQLITE_OBJ)
 AFLOW_DEP = $(AFLOW_OBJS) $(AFLOWLIB_WEBAPP_CPP) $(CHULL_JUPYTER_CPP)
 
 all: aflow aflow_data 
@@ -294,6 +296,7 @@ $(AFLOW_OBJ): $(AFLOW_CPP) aflow_test.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
 
 $(AUROSTD_OBJ): $(AUROSTD_HPP) $(AUROSTD_CPP) Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) ./AUROSTD/aurostd.cpp -c -o $@
+	touch $@
 .cpp.o: .cpp Makefile $(AFLOW_HPP) $(AUROSTD_HPP) $(AUROSTD_CPP)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $< -c -o $@
 	touch $@
