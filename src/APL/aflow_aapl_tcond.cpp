@@ -89,14 +89,34 @@ TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm,
   nIQPs = _qm.getnIQPs();
 }
 
+//Copy Constructor////////////////////////////////////////////////////////////
+TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _logger(that._logger), aflags(that.aflags) {
+  copy(that);
+}
+
+void TCONDCalculator::copy(const TCONDCalculator& that) {
+  calc_options = that.calc_options;
+  eigenvectors = that.eigenvectors;
+  freq = that.freq;;
+  gvel = that.gvel;
+  intr_trans_probs = that.intr_trans_probs;
+  intr_trans_probs_iso = that.intr_trans_probs_iso;
+  nBranches = that.nBranches;
+  nIQPs = that.nIQPs;
+  nQPs = that.nQPs;
+  processes = that.processes;
+  processes_iso = that.processes_iso;
+  rates_boundary = that.rates_boundary;
+  rates_isotope = that.rates_isotope;
+  temperatures = that.temperatures;
+}
+
+//Destructor//////////////////////////////////////////////////////////////////
 TCONDCalculator::~TCONDCalculator() {
   free();
 }
 
-void TCONDCalculator::clear() {
-  free();
-}
-
+//free////////////////////////////////////////////////////////////////////////
 void TCONDCalculator::free() {
   calc_options.clear();
   eigenvectors.clear();
@@ -113,6 +133,12 @@ void TCONDCalculator::free() {
   rates_isotope.clear();
   temperatures.clear();
   thermal_conductivity.clear();
+}
+
+//clear///////////////////////////////////////////////////////////////////////
+void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
+  TCONDCalculator that(pc, qm, l, a);
+  copy(that);
 }
 
 }  // namespace apl
@@ -973,7 +999,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
     std::cout << std::setw(15) << "Iteration";
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-    std::cout << std::setw(25) << "Norm" << std::endl;
+    std::cout << std::setw(25) << "Rel. Change in Norm" << std::endl;
     do {
       tcond_prev = tcond;
       getMeanFreeDispFull(rates, small_groups, occ, mfd);

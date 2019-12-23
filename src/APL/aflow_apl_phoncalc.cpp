@@ -59,6 +59,7 @@ namespace apl {
 
     _bornEffectiveChargeTensor.clear();
     _stagebreak = false;  // ME191029
+    zerostate_dir = "";  // ME191030
   }
 
   // ///////////////////////////////////////////////////////////////////////////

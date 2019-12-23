@@ -229,12 +229,14 @@ class Supercell;  // Forward declaration
 class ClusterSet {
 // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
  public:
+    ClusterSet();
     ClusterSet(const Supercell&, const int&, double&, Logger&, _aflags&);  // Constructor
     ClusterSet(const string&, const Supercell&, const int&, double&, int, Logger&, _aflags&);  // From file
     ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
     ClusterSet(Logger&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
     ~ClusterSet();  // Destructor
     const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
+    void clear(Logger&, _aflags&);
 
     vector<_cluster> clusters;
     vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
@@ -262,7 +264,10 @@ class ClusterSet {
  private:
     Logger& _logger;  // The AFLOW logger
     _aflags& aflags;
+
     void free();
+    void copy(const ClusterSet&);
+
     double getMaxRad(const xstructure&, const int&);
     void buildShells();
     vector<_cluster> buildClusters();
@@ -324,12 +329,15 @@ class ClusterSet {
 class AnharmonicIFCs {
 // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
  public:
+    AnharmonicIFCs(ClusterSet&, Logger&, _aflags&);
     AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
                    const aurostd::xoption&, Logger&, _aflags&);  // ME190501
     AnharmonicIFCs(const string&, ClusterSet&, const double&,
                    const aurostd::xoption&, Logger&, _aflags&);  // ME190501
+    AnharmonicIFCs(const AnharmonicIFCs&);
     const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
     ~AnharmonicIFCs();
+    void clear(ClusterSet&, Logger&, _aflags&);
 
     ClusterSet& clst;  // Reference to the corresponding ClusterSet
     vector<vector<int> > cart_indices;  // A list of all Cartesian indices
@@ -346,7 +354,10 @@ class AnharmonicIFCs {
  private:
     Logger& _logger;  // The AFLOW logger
     _aflags& aflags;
+
     void free();
+    void copy(const AnharmonicIFCs&);
+
     vector<vector<int> > getCartesianIndices();
 
     vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
@@ -1338,6 +1349,7 @@ class LTMethod {
     LTMethod(const LTMethod&);
     LTMethod& operator=(const LTMethod&);
     ~LTMethod();
+    void clear(QMesh&, Logger&);
 
     void makeIrreducible();  // ME190625
 
@@ -1357,6 +1369,7 @@ class LTMethod {
     bool isReduced() const;
   private:
     void free();
+    void copy(const LTMethod&);
 
     QMesh& _qm;
     Logger& _logger;  // The APL logger
@@ -1554,8 +1567,10 @@ class TCONDCalculator {
 // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
  public:
     TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
+    TCONDCalculator(const TCONDCalculator&);
+
     ~TCONDCalculator();
-    void clear();
+    void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
 
     aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
     vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
@@ -1582,6 +1597,7 @@ class TCONDCalculator {
     _aflags& aflags;
 
     void free();
+    void copy(const TCONDCalculator&);
 
     vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
     double calculateAverageGrueneisen(double T, const vector<vector<double> >&);

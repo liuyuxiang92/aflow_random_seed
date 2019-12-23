@@ -2142,8 +2142,6 @@ void RunPhonons_APL_181216(_xinput& xinput,
       tcond.calc_options.push_attached("KZIP_BIN", kflags.KZIP_BIN);
 
       tcond.calculateThermalConductivity();
- 
-      tcond.clear();
     }
     /*************** End Thermal Conductivity Calculations ****************/
 

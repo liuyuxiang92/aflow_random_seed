@@ -45,6 +45,12 @@ namespace apl {
 
 //Constructors////////////////////////////////////////////////////////////////
 // Default constructor
+AnharmonicIFCs::AnharmonicIFCs(ClusterSet& _clst,
+                               Logger& l, _aflags& a) : clst(_clst), _logger(l), aflags(a) {
+  free();
+}
+
+// Constructor from a set of AAPL calculations
 AnharmonicIFCs::AnharmonicIFCs(vector<_xinput>& xInp,
                                ClusterSet& _clst,
                                const double& dist_mag, 
@@ -84,21 +90,28 @@ AnharmonicIFCs::AnharmonicIFCs(const string& filename,
   readIFCsFromFile(filename);
 }
 
-//Copy constructor
+//Copy constructors
+AnharmonicIFCs::AnharmonicIFCs(const AnharmonicIFCs& that) : clst(that.clst), _logger(that._logger), aflags(that.aflags) {
+  copy(that);
+}
+
 const AnharmonicIFCs& AnharmonicIFCs::operator=(const AnharmonicIFCs& that) {
-  if (this != &that) {
-    _logger = that._logger;
-    aflags = that.aflags;
-    cart_indices = that.cart_indices;
-    clst = that.clst;
-    distortion_magnitude = that.distortion_magnitude;
-    force_constants = that.force_constants;
-    max_iter = that.max_iter;
-    mixing_coefficient = that.mixing_coefficient;
-    order = that.order;
-    sumrule_threshold = that.sumrule_threshold;
-  }
+  if (this != &that) copy(that);
   return *this;
+}
+
+//copy////////////////////////////////////////////////////////////////////////
+void AnharmonicIFCs::copy(const AnharmonicIFCs& that) {
+  _logger = that._logger;
+  aflags = that.aflags;
+  cart_indices = that.cart_indices;
+  clst = that.clst;
+  distortion_magnitude = that.distortion_magnitude;
+  force_constants = that.force_constants;
+  max_iter = that.max_iter;
+  mixing_coefficient = that.mixing_coefficient;
+  order = that.order;
+  sumrule_threshold = that.sumrule_threshold;
 }
 
 //Destructor//////////////////////////////////////////////////////////////////
@@ -116,6 +129,12 @@ void AnharmonicIFCs::free() {
   mixing_coefficient = 0.0;
   order = 0;
   sumrule_threshold = 0.0;
+}
+
+//clear///////////////////////////////////////////////////////////////////////
+void AnharmonicIFCs::clear(ClusterSet& clst, Logger& l, _aflags& a) {
+  AnharmonicIFCs that(clst, l, a);
+  copy(that); 
 }
 
 }  // namespace apl
@@ -263,7 +282,6 @@ vector<vector<double> >
       cl = clst.ineq_clusters[ic][0];
       at = clst.getCluster(cl).atoms[order - 1];
       for (int cart = 0; cart < clst.nifcs; cart++) {
-        //ifcs[cl][cart] = calculateIFC(forces[f], at, cart_indices[cart], idist[f].atoms);
         ifcs[cl][cart] = finiteDifference(forces[f], at, cart_indices[cart], idist[f].atoms)/denom;
       }
     }
@@ -271,19 +289,12 @@ vector<vector<double> >
   return ifcs;
 }
 
-//calculateIFC////////////////////////////////////////////////////////////////
-// Calculates a specific IFC from the forces using the central difference
-// method. The numerator and denominator are calculated separately.
+//finiteDifference////////////////////////////////////////////////////////////
+// Calculates the numerator for a specific IFC from the forces using the
+// central difference method. The denominator is calculated separately.
 //
-// The numerator is a sum of the forces for the set of atoms distorted along
-// the Cartesian indices into positive and negative directions. The sign of
-// the force depends on the number of negative distortions in the set.
-//
-// The denominator is the product of the distortion lengths times two (the
-// factor of two comes from the central difference method). If the same atom
-// gets distorted into the same direction multiple times, the distortion
-// length needs to be adjusted so that the total length is the same as the
-// distortion magnitude chosen by the user.
+// See https://www.geometrictools.com/Documentation/FiniteDifferences.pdf for
+// formulas of higher order derivatives.
 double AnharmonicIFCs::finiteDifference(const vector<vector<xvector<double> > >& forces, int at,
                                         const vector<int>& cart_ind, const vector<int>& atoms) {
   vector<int> powers(order - 1, 1);

@@ -31,8 +31,8 @@ namespace apl {
 //Constructors////////////////////////////////////////////////////////////////
 ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
                        double& cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
-  _logger << "CLUSTER: Building coordination shells." << apl::endl;
   free();  // Clear old vectors
+  _logger << "CLUSTER: Building coordination shells." << apl::endl;
 
   scell = supercell.getSupercellStructure();
   pcell = supercell.getPrimitiveStructure();
@@ -57,8 +57,8 @@ ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
 ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
                        const int& cut_shell, double& cut_rad,
                        int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
-  _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
   free();  // Clear old vectors
+  _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
 
   order = _order;
   scell = supercell.getSupercellStructure();
@@ -82,39 +82,41 @@ ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
   nifcs = (int) std::pow(3, order);
 }
 
-// Just allocates. Used for non-AAPL calculations.
+// Default constructor
 ClusterSet::ClusterSet(Logger& l, _aflags& a) : _logger(l), aflags(a) {
   free();
 }
 
 //Copy Constructors///////////////////////////////////////////////////////////
 ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
-  *this = that;
+  copy(that);
 }
 
 const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
-  if (this != &that) {
-    _logger = that._logger;
-    aflags = that.aflags;
-    clusters = that.clusters;
-    coordination_shells = that.coordination_shells;
-    cutoff = that.cutoff;
-    distortion_vectors = that.distortion_vectors;
-    higher_order_ineq_distortions = that.higher_order_ineq_distortions;
-    ineq_clusters = that.ineq_clusters;
-    ineq_distortions = that.ineq_distortions;
-    linear_combinations = that.linear_combinations;
-    nifcs = that.nifcs;
-    order = that.order;
-    pcell = that.pcell;
-    pc2scMap = that.pc2scMap;
-    permutations = that.permutations;
-    scell = that.scell;
-    sc2pcMap = that.sc2pcMap;
-    sc_dim = that.sc_dim;
-    symmetry_map = that.symmetry_map;
-  }
+  if (this != &that) copy(that);
   return *this;
+}
+
+void ClusterSet::copy(const ClusterSet& that) {
+  _logger = that._logger;
+  aflags = that.aflags;
+  clusters = that.clusters;
+  coordination_shells = that.coordination_shells;
+  cutoff = that.cutoff;
+  distortion_vectors = that.distortion_vectors;
+  higher_order_ineq_distortions = that.higher_order_ineq_distortions;
+  ineq_clusters = that.ineq_clusters;
+  ineq_distortions = that.ineq_distortions;
+  linear_combinations = that.linear_combinations;
+  nifcs = that.nifcs;
+  order = that.order;
+  pcell = that.pcell;
+  pc2scMap = that.pc2scMap;
+  permutations = that.permutations;
+  scell = that.scell;
+  sc2pcMap = that.sc2pcMap;
+  sc_dim = that.sc_dim;
+  symmetry_map = that.symmetry_map;
 }
 
 //Destructor//////////////////////////////////////////////////////////////////
@@ -138,6 +140,14 @@ void ClusterSet::free() {
   sc_dim.clear();
   sc2pcMap.clear();
   symmetry_map.clear();
+}
+
+
+//clear////////////////////////////////////////////////////////////////////////
+// Creates an empty ClusterSet object.
+void ClusterSet::clear(Logger& l, _aflags& a) {
+  ClusterSet that(l, a);
+  copy(that);
 }
 
 }  // namespace apl
