@@ -1735,7 +1735,7 @@ vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const str
 
   // Calculate the LFA atomic environments
   // i.e., only environments comprised of the least frequent atom (LFA) type
-  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XTAL-MATCH)
+  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalMatch)
 
   vector<AtomEnvironment> environments_LFA;
 

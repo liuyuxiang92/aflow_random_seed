@@ -7,23 +7,23 @@
 LATEST VERSION OF THE FILE:    materials.duke.edu/AFLOW/README_AFLOW_COMPARE.TXT
 ********************************************************************************
 
-AFLOW-XTAL-MATCH (COMPARE STRUCTURE) README
+AFLOW-XtalMatch (COMPARE STRUCTURE) README
 
 README written by: David Hicks (david.hicks@duke.edu)
 
 Citation info: D. Hicks, C. Toher, D.C. Ford, F. Rose, 
                C. De Santo O. Levy, M.J. Mehl, and S. Curtarolo, 
-               AFLOW-XTAL-MATCH: Automated method for quantifying the 
+               AFLOW-XtalMatch: Automated method for quantifying the 
                structural similarity of materials and identifying unique 
                crystal prototypes, in preparation (2019).
 
 ********************************************************************************
 GENERAL OVERVIEW
 
-AFLOW-XTAL-MATCH compares crystal structures, regardless of their representation, and 
+AFLOW-XtalMatch compares crystal structures, regardless of their representation, and 
 quantifies their similarity based on criteria specified by H. Burzlaff (Acta Cryst., A53, 217-224 (1997)).
 
-The AFLOW-XTAL-MATCH similarity metrics and functionalities are briefly described below. 
+The AFLOW-XtalMatch similarity metrics and functionalities are briefly described below. 
 
 ----------------------------------------------------------------------
 MISFIT CRITERIA
@@ -44,7 +44,7 @@ The module offers four comparison modes:
 
 ----------------------------------------------------------------------
 MULTIPLE COMPARISONS
-AFLOW-XTAL-MATCH can automatically compare multiple compounds in a single command.  
+AFLOW-XtalMatch can automatically compare multiple compounds in a single command.  
 Structures are automatically grouped into comparison sets by stoichiometry, 
 species (if applicable), symmetry (space group number and Wyckoff positions), and atomic environment. 
 Compounds are compared until each structure is matched or all possible comparisons have been exhausted.
@@ -69,17 +69,17 @@ params values : 4.3814,0.901127,0.548523,105.81,0.6918,0.0942,0.1112,0.9123,0.13
 
 ----------------------------------------------------------------------
 MULTITHREADED CAPABILITIES
-Many of the AFLOW-XTAL-MATCH functions are parallelized: symmetry analysis, environment analysis, and comparisons.
+Many of the AFLOW-XtalMatch functions are parallelized: symmetry analysis, environment analysis, and comparisons.
 Use the --np=<number> flag to specify the number of threads for multithreaded comparisons.
 
 ****************************************************************************************************
-LIST OF AFLOW-XTAL-MATCH COMMANDS:
+LIST OF AFLOW-XtalMatch COMMANDS:
   
   aflow --compare2database        : Returns AFLOW database entries that match with the structure 
   aflow --compare2prototypes      : Returns AFLOW prototypes that match with the structure
   aflow --compare_materials       : Compares materials (mapping alike atomic species) and 
                                     returns their level of similarity
-  aflow --compare_structure       : Compares structures (ignore species in mapping) and returns their level 
+  aflow --compare_structures      : Compares structures (ignore species in mapping) and returns their level 
                                     of similarity
   aflow --prototype               : Returns ANRL label/parameters/parameter values of the structure
   aflow --unique_atom_decorations : Returns the unique atom decorations for the structure
@@ -166,7 +166,8 @@ General options - applicable to all commands - is listed at the bottom of this s
                                                              (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
             [--geometry_file=POSCAR.relax1]                : Compare geometries from a particular step in the DFT relaxation 
                                                              (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
-  
+
+
     aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
         Compares a structure (file) to the AFLOW crystallographic prototype structures, returning the similar 
         structures and quantifying their levels of similarity (misfit values).
@@ -182,9 +183,9 @@ General options - applicable to all commands - is listed at the bottom of this s
         This method identifies unique and duplicate materials.
         There are three input types:
             aflow --compare_materials=<f1>,<f2>,...  : append geometry files (<f1>,<f2>,...) to compare,
-            aflow --compare_materials -D <path>      : specify path to directory (<path) containing geometry files to compare, and
+            aflow --compare_materials -D <path>      : specify path to directory (<path>) containing geometry files to compare, and
             aflow --compare_materials -F=<filename>  : specify file (<filename>) containing compounds between delimiters 
-                                                       [VASP_POSCAR_MODE_EXPLICIT]START!and VASP_POSCAR_MODE_EXPLICIT]STOP.
+                                                       [VASP_POSCAR_MODE_EXPLICIT]START and VASP_POSCAR_MODE_EXPLICIT]STOP.
                                                        Additional delimiters will be included in later versions.
 
     
@@ -194,14 +195,14 @@ General options - applicable to all commands - is listed at the bottom of this s
         This method identifies unique and duplicate prototypes.
         There are three input types:
             aflow --compare_structures=<f1>,<f2>,...  : append geometry files (<f1>,<f2>,...) to compare,
-            aflow --compare_structures -D <path>      : specify path to directory (<path) containing geometry files to compare, and
+            aflow --compare_structures -D <path>      : specify path to directory (<path>) containing geometry files to compare, and
             aflow --compare_structures -F=<filename>  : specify file (<filename>) containing compounds between delimiters 
-                                                       [VASP_POSCAR_MODE_EXPLICIT]START!and VASP_POSCAR_MODE_EXPLICIT]STOP.
+                                                       [VASP_POSCAR_MODE_EXPLICIT]START and VASP_POSCAR_MODE_EXPLICIT]STOP.
                                                        Additional delimiters will be included in later versions.
 
 
     aflow --prototype [PROTOTYPE_OPTIONS] < file             
-        Converts a structure (file) into its corresponding standard \AFLOW\ prototype label. 
+        Converts a structure (file) into its corresponding standard AFLOW prototype label. 
         The parameter variables (degrees of freedom) and parameter values are also listed.
         Information about the label and parameters are described in the AFLOW Library of Crystallographic Prototypes:
         Part 1 (doi=10.1016/j.commatsci.2017.01.017), 
@@ -225,8 +226,8 @@ General options - applicable to all commands - is listed at the bottom of this s
   
     [GENERAL_COMPARISON_OPTIONS] : Generic options for all commands (unless indicated otherwise):
 
-        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.}
-        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, {\it{i.e.}}, minimizes misfit value.}
+        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
+        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
         [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
         [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
         [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
@@ -236,11 +237,11 @@ General options - applicable to all commands - is listed at the bottom of this s
           --unique_atom_decorations or --compare2prototypes (redundant).
         [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
           signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
-          AFLOW-XTAL-MATCH supports three input formats for the magnetic moment: 
+          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
               1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
               2) read from a VASP INCAR, or
               3) read from a VASP OUTCAR.
-            Additional magnetic moment readers for other ab initio codes will be available in future versions.}
+            Additional magnetic moment readers for other ab initio codes will be available in future versions.
         [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.  The option does not apply to commands 
           --unique_atom_decorations or --prototype! (redundant).
         [--remove_duplicate_compounds] : For structure-type comparisons, duplicate compounds are identified first 
@@ -249,7 +250,7 @@ General options - applicable to all commands - is listed at the bottom of this s
         [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
           and the transformed structures in the closest matching representation.
         [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
-          text or JSON, respectively.  By default, AFLOW-XTAL-MATCH writes the output in both formats.
+          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
         [--quiet|--q] : Suppresses the log information for the comparisons.
         [--screen_only] : Prints the comparison results to the screen and does not write to any files.
 
