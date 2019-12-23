@@ -27,7 +27,8 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install|gcc' && echo "CAT brew_gcc5.log" && cat brew_gcc5.log | tail -n 1000" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install|gcc' && which gcc-5 && locate 'gcc-*'" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+          #- MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install|gcc' && which gcc-5 &&  && echo "CAT brew_gcc5.log" && cat brew_gcc5.log | tail -n 1000" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     #- os: osx
     #  osx_image: xcode8
     #  env:
@@ -171,7 +172,7 @@ before_install:
   - if [ -n "${MATRIX_EVAL_XCODE}" ]; then echo "${MATRIX_EVAL_XCODE}"; eval "${MATRIX_EVAL_XCODE}"; fi
   - if [ -n "${MATRIX_EVAL_BREW}" ];  then echo "${MATRIX_EVAL_BREW}"; eval "${MATRIX_EVAL_BREW}";   fi
   - if [ -n "${MATRIX_EVAL_GCC}" ];   then echo "${MATRIX_EVAL_GCC}"; eval "${MATRIX_EVAL_GCC}";     fi
-  - if [ -n "${MATRIX_EVAL_GCC}" ];   then echo "${MATRIX_EVAL_GCC}"; eval "${MATRIX_EVAL_GCC}";     fi
+    #- if [ -n "${MATRIX_EVAL_GCC}" ];   then echo "${MATRIX_EVAL_GCC}"; eval "${MATRIX_EVAL_GCC}";     fi
   - if [ -n "${MATRIX_EVAL}" ];       then echo "${MATRIX_EVAL}"; eval "${MATRIX_EVAL}";             fi
 script:
   - cd src
