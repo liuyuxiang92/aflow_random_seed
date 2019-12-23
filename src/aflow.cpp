@@ -779,8 +779,9 @@ int main(int _argc,char **_argv) {
   if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
 
-    vector<string> files_already_explored,dfiles;
-    makefile::getDependencies("aflow.h",files_already_explored,dfiles);
+    //vector<string> files_already_explored,dfiles;
+    //makefile::getDependencies("aflow.h",files_already_explored,dfiles);
+    makefile::buildDependencies(".");
 
     exit(1);
 

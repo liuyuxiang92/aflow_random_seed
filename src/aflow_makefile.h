@@ -12,6 +12,7 @@
 
 namespace makefile {
   void getDependencies(const string& filename,vector<string>& files_already_explored,vector<string>& dfiles);
+  void buildDependencies(const string& directory=".");
 }
 
 #endif  // _AFLOW_MAKEFILE_CPP_

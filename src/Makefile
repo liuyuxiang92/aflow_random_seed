@@ -36,11 +36,13 @@ UNAME=$(shell uname)
 ifeq ($(UNAME),Darwin)
 CPP=clang++
 CC=clang
+ARCH=-e ARCH=-D_MACOSX_
 else
 CPP=g++
 #-O2 -frepo
 # for sqllite
 CC=gcc
+ARCH=
 endif
 
 #CPP=g++-fsf-7 

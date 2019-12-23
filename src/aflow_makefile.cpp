@@ -18,6 +18,7 @@ namespace makefile {
     if(filename.size()>1 && filename[0]=='.' && filename[1]=='/'){filename=filename.substr(2);} //removes ./ from beginning so j can start at 1 below
     if(filename.find("..")!=string::npos){ //might go up and down in tree structure
       filename=aurostd::CleanFileName(filename);  //get rid of /./
+      aurostd::CleanStringASCII_InPlace(filename);
       vector<string> vtokens;
       aurostd::string2tokens(filename,vtokens,"/");
 
@@ -29,10 +30,11 @@ namespace makefile {
     }
   }
   void getDependencies(const string& _filename,vector<string>& files_already_explored,vector<string>& dfiles){
-    bool LDEBUG=(TRUE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="makefile::getDependencies():";
     
     string filename=aurostd::CleanFileName(_filename);
+    aurostd::CleanStringASCII_InPlace(filename);
     trimPath(filename);
 
     if(LDEBUG){cerr << soliloquy << " fetching dependencies for " << filename << endl;};
@@ -61,7 +63,9 @@ namespace makefile {
       line = vlines[i];
       loc = line.find("//");
       line = line.substr(0, loc);
-      if(line.find("#include")!=string::npos && (line.find("<")==string::npos && line.find(">")==string::npos)){
+      line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(line);
+      if(line.find("#include")==0 && (line.find("<")==string::npos && line.find(">")==string::npos)){ //needs to be at the beginning of the line, files with <> are standard libraries
+        if(LDEBUG){cerr << soliloquy << " line with #include = \"" << line << "\"" << endl;}
         dfile=line;
         aurostd::StringSubst(dfile,"#include","");
         aurostd::StringSubst(dfile,"\"","");
@@ -76,7 +80,50 @@ namespace makefile {
     std::sort(dfiles.begin(),dfiles.end());dfiles.erase( std::unique( dfiles.begin(), dfiles.end() ), dfiles.end() );  //get unique set
     if(LDEBUG){cerr << soliloquy << " dfiles=" << aurostd::joinWDelimiter(dfiles,",") << endl;}
   }
-  void getDependencies(const string& directory,vector<string>& dfiles){
+  void fixDependencies(vector<string>& vdependencies){
+  }
+  void buildDependencies(const string& directory){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="makefile::buildDependencies():";
+
+    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+
+    if(!aurostd::FileExist(directory+"/aflow.h")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,directory+"/aflow.h not found",_VALUE_ILLEGAL_);}
+
+    vector<string> vsubdirectories;
+    vsubdirectories.push_back(directory);
+    vsubdirectories.push_back(directory+"/APL");
+    //[NOT NEEDED - only one command for AUROSTD cpp]vsubdirectories.push_back(directory+"/AUROSTD");
+    
+    uint i=0,j=0;
+    string dir="",file="";
+    vector<string> vfs,vfiles,files_already_explored;
+    vector<vector<string> > vdependencies;
+    std::sort(vsubdirectories.begin(),vsubdirectories.end());
+    for(i=0;i<vsubdirectories.size();i++){
+      dir=vsubdirectories[i];
+      trimPath(dir);
+      if(LDEBUG){cerr << soliloquy << " dir=" << dir << endl;}
+      if(!aurostd::IsDirectory(dir)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,dir+" directory not found",_VALUE_ILLEGAL_);}
+      aurostd::DirectoryLS(dir,vfs);
+      std::sort(vfs.begin(),vfs.end());
+      for(j=0;j<vfs.size();j++){
+        file=dir+"/"+vfs[j];
+        trimPath(file);
+        if(LDEBUG){cerr << soliloquy << " file=" << file << endl;}
+        if(file.find(".cpp")!=string::npos){
+          if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
+          vfiles.push_back(file);
+          vdependencies.push_back(vector<string>(0));files_already_explored.clear();
+          getDependencies(vfiles.back(),files_already_explored,vdependencies.back());
+          //get rid of any dependencies with AUROSTD and replace with $(AUROSTD_OBJ)
+        }
+      }
+    }
+    for(i=0;i<vfiles.size();i++){
+      cout << vfiles[i] << ": " << aurostd::joinWDelimiter(vdependencies[i]," ") << endl;
+      cout << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@" << endl;
+    }
   }
 }
 
