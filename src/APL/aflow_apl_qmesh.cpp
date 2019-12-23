@@ -25,49 +25,49 @@ namespace apl {
 //                                                                          //
 //////////////////////////////////////////////////////////////////////////////
 
+// Default Constructor
+QMesh::QMesh(Logger& l) : _logger(l) {
+  free();
+}
+
 QMesh::QMesh(const xvector<int>& grid, const xstructure& xs, Logger& l, bool gamma_centered) : _logger(l) {
   free();
-  setGrid(grid);
-  setupReciprocalCell(xs);
-  generateGridPoints(gamma_centered);
+  initialize(grid, xs, gamma_centered);
 }
 
 QMesh::QMesh(const vector<int>& vgrid, const xstructure& xs, Logger& l, bool gamma_centered) : _logger(l) {
   free();
-  xvector<int> grid = aurostd::vector2xvector(vgrid);
-  setGrid(grid);
-  setupReciprocalCell(xs);
-  generateGridPoints(gamma_centered);
+  initialize(aurostd::vector2xvector(vgrid), xs, gamma_centered);
 }
 
+// Copy constructors
 QMesh::QMesh(const QMesh& that) : _logger(that._logger) {
-  *this = that;
+  copy(that);
 }
 
-QMesh& QMesh::operator=(const QMesh& that) {
-  if (this != &that) {
-    _ibzqpts = that._ibzqpts;
-    _isGammaCentered = that._isGammaCentered;
-    _logger = that._logger;
-    _nIQPs = that._nIQPs;
-    _nQPs = that._nQPs;
-    _qptGrid = that._qptGrid;
-    _qptMap = that._qptMap;
-    _qpoints = that._qpoints;
-    _recCell = that._recCell;
-    _reduced = that._reduced;
-    _shifted = that._shifted;  // ME190813
-    _shift = that._shift;
-    _weights = that._weights;
-  }
+const QMesh& QMesh::operator=(const QMesh& that) {
+  if (this != &that) copy(that);
   return *this;
 }
 
-QMesh::~QMesh() {
-  free();
+void QMesh::copy(const QMesh& that) {
+  _ibzqpts = that._ibzqpts;
+  _isGammaCentered = that._isGammaCentered;
+  _logger = that._logger;
+  _nIQPs = that._nIQPs;
+  _nQPs = that._nQPs;
+  _qptGrid = that._qptGrid;
+  _qptMap = that._qptMap;
+  _qpoints = that._qpoints;
+  _recCell = that._recCell;
+  _reduced = that._reduced;
+  _shifted = that._shifted;  // ME190813
+  _shift = that._shift;
+  _weights = that._weights;
 }
 
-void QMesh::clear() {
+// Destructor
+QMesh::~QMesh() {
   free();
 }
 
@@ -94,11 +94,24 @@ void QMesh::free() {
   _weights.clear();
 }
 
+void QMesh::clear(Logger& l) {
+  QMesh that(l);
+  copy(that);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                          Q-POINT FUNCTIONS                               //
 //                                                                          //
 //////////////////////////////////////////////////////////////////////////////
+
+//initialize//////////////////////////////////////////////////////////////////
+// Initializes the q-point grid
+void QMesh::initialize(const xvector<int>& grid, const xstructure& xs, bool gamma_centered) {
+  setGrid(grid);
+  setupReciprocalCell(xs);
+  generateGridPoints(gamma_centered);
+}
 
 //setGrid/////////////////////////////////////////////////////////////////////
 // Sets up the grid size

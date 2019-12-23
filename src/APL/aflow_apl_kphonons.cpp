@@ -1644,7 +1644,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
         dosc.calc(USER_DOS_NPOINTS, USER_DOS_SMEAR);
         if (USER_DOS) dosc.writePDOS(_TMPDIR_, dirname);
         dosc.clear();
-          qmesh.clear();
+          qmesh.clear(logger);  // ME191223
           store.clear();
           phcalc->clear();
           return;
@@ -1716,7 +1716,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
               dosc.calc(USER_DOS_NPOINTS,USER_DOS_SMEAR);
               if(USER_DOS)dosc.writePDOS(_TMPDIR_, dirname);
               dosc.clear();
-              qmesh.clear();
+              qmesh.clear(logger);  // ME191223
       }
       store.clear();
       phcalc->clear();
@@ -2098,7 +2098,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       // Clear old stuff
       dosc.clear();  // ME190423
       //delete dosc; //auto_ptr will do
-      qmesh.clear();
+      qmesh.clear(logger);  // ME191223
     }
 
   /////////////////////////////////////////////////////////////////////////////

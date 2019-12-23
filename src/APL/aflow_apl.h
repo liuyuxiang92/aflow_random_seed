@@ -1268,12 +1268,14 @@ struct _kcell {
 
 class QMesh {
   public:
+    QMesh(Logger&);
     QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const vector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const QMesh&);
-    QMesh& operator=(const QMesh&);
+    const QMesh& operator=(const QMesh&);
     ~QMesh();
-    void clear();
+    void clear(Logger&);
+    void initialize(const xvector<int>&, const xstructure& xs, bool=true);
 
     void makeIrreducible();
     void writeQpoints(string, bool=true);
@@ -1309,6 +1311,7 @@ class QMesh {
 
   private:
     void free();
+    void copy(const QMesh&);
 
     Logger& _logger;  // The APL logger
 
@@ -1338,7 +1341,8 @@ class LTMethod {
   public:
     LTMethod(QMesh&, Logger&);
     LTMethod(const LTMethod&);
-    LTMethod& operator=(const LTMethod&);
+    const LTMethod& operator=(const LTMethod&);
+    void clear(QMesh&, Logger&);
     ~LTMethod();
 
     void makeIrreducible();  // ME190625
@@ -1359,6 +1363,7 @@ class LTMethod {
     bool isReduced() const;
   private:
     void free();
+    void copy(const LTMethod&);
 
     QMesh& _qm;
     Logger& _logger;  // The APL logger

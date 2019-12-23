@@ -37,25 +37,29 @@ LTMethod::LTMethod(QMesh& qm, Logger& l) : _qm(qm), _logger(l) {
   generateTetrahedra();
 }
 
+// Copy constructors
 LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm), _logger(that._logger) {
-  *this = that;
+  copy(that);
 }
 
-LTMethod& LTMethod::operator=(const LTMethod& that) {
-  if (this != &that) {
-    _tetrahedra = that._tetrahedra;
-    _irredTetrahedra = that._irredTetrahedra;
-    _logger = that._logger;
-    _nIrredTetra = that._nIrredTetra;
-    _nTetra = that._nTetra;
-    _qm = that._qm;
-    _reduced = that._reduced;
-    _volumePerTetrahedron = that._volumePerTetrahedron;
-    _weights = that._weights;
-  }
+const LTMethod& LTMethod::operator=(const LTMethod& that) {
+  if (this != &that) copy(that);
   return *this;
 }
 
+void LTMethod::copy(const LTMethod& that) {
+  _tetrahedra = that._tetrahedra;
+  _irredTetrahedra = that._irredTetrahedra;
+  _logger = that._logger;
+  _nIrredTetra = that._nIrredTetra;
+  _nTetra = that._nTetra;
+  _qm = that._qm;
+  _reduced = that._reduced;
+  _volumePerTetrahedron = that._volumePerTetrahedron;
+  _weights = that._weights;
+}
+
+// Destructor
 LTMethod::~LTMethod() {
   free();
 }
@@ -68,6 +72,11 @@ void LTMethod::free() {
   _reduced = false;
   _volumePerTetrahedron = 0.0;
   _weights.clear();
+}
+
+void LTMethod::clear(QMesh& qm, Logger& l) {
+  LTMethod that(qm, l);
+  copy(that);
 }
 
 //////////////////////////////////////////////////////////////////////////////
