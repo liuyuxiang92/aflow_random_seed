@@ -1254,19 +1254,39 @@ void RunPhonons_APL_181216(_xinput& xinput,
       }
     }
 
-    // ME 190107 - Relax after fixing the vasp bin to make version consistent.
-    // Run relaxations if necessary
-    if (USER_RELAX) {
-      bool Krun=true;
-      string function;
-      if (xinput.AFLOW_MODE_VASP) {
-        function = "KBIN::relaxStructureAPL_VASP";
-        Krun = relaxStructureAPL_VASP(START_RELAX, AflowIn, xinput.xvasp, aflags,
-                                      kflags, xflags.vflags, messageFile);
+    // ME191219 - The PHPOSCAR file now also serves as the canonical structure
+    // for the phonon calculations. This prevents any changes in symmetry codes,
+    // especially the structure conversion codes, from changing the structure
+    // between AFLOW versions.
+    string phposcar_file = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
+    if (aurostd::EFileExist(phposcar_file)) {
+      xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
+    } else {
+      // ME 190107 - Relax after fixing the vasp bin to make version consistent.
+      // Run relaxations if necessary
+      if (USER_RELAX) {
+        bool Krun=true;
+        string function;
+        if (xinput.AFLOW_MODE_VASP) {
+          function = "KBIN::relaxStructureAPL_VASP";
+          Krun = relaxStructureAPL_VASP(START_RELAX, AflowIn, xinput.xvasp, aflags,
+                                        kflags, xflags.vflags, messageFile);
+        }
+        if (!Krun) {
+          string message = "Relaxation calculations did not run successfully.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        }
       }
-      if (!Krun) {
-        string message = "Relaxation calculations did not run successfully.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      // Write structure into PHPOSCAR to save state
+      xstructure xstr = xinput.getXStr();
+      xstr.is_vasp5_poscar_format = true;
+      stringstream poscar;
+      poscar << xstr;
+      aurostd::stringstream2file(poscar, phposcar_file);
+      if (!aurostd::FileExist(phposcar_file)) {
+        string function = "KBIN::RunPhonons_APL()";
+        string message = "Cannot open output file " + phposcar_file + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       }
     }
 
@@ -1285,7 +1305,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
   try {
 
     apl::Supercell supercell(xinput.getXStr(),aflags,logger); //xvasp.str, logger);  //CO  //CO181226
-    apl::Supercell supercell_test = supercell;    //CO
+    //apl::Supercell supercell_test = supercell;    //CO  // OBSOLETE ME191223 - not used
 
     //   pflow::PrintDist(xinput.getXStr(),20.0,cerr);
     // ME 181026 - Added default case: if there are no supercell entries,

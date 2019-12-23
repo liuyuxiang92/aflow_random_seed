@@ -1107,7 +1107,7 @@ namespace apl {
     xcomplex<double> phase;
     double value;
     // ME 180828 - Prepare derivative calculation
-    xvector<xcomplex<double> > derivative;
+    xvector<xcomplex<double> > derivative(3);
     double nbCells = 1.0;  // for NAC derivative
     for (int i = 1; i < 4; i++) {
       nbCells *= _supercell.scell[i];

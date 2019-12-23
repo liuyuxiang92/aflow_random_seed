@@ -423,17 +423,18 @@ void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
 
   // Also write PHKPOINTS and PHPOSCAR file
   writePHKPOINTS(directory);
-  filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
-  xstructure xstr = _pc.getInputCellStructure();
-  xstr.is_vasp5_poscar_format = true;
-  stringstream poscar;
-  poscar << xstr;
-  aurostd::stringstream2file(poscar, filename);
-  if (!aurostd::FileExist(filename)) {
-    string function = "PhononDispersionCalculator::writePHPOSCAR()";
-    string message = "Cannot open output file " + filename + ".";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-  }
+  // OBSOLETE ME191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
+  //  filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
+  //  xstructure xstr = _pc.getInputCellStructure();
+  //  xstr.is_vasp5_poscar_format = true;
+  //  stringstream poscar;
+  //  poscar << xstr;
+  //  aurostd::stringstream2file(poscar, filename);
+  //  if (!aurostd::FileExist(filename)) {
+  //    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+  //    string message = "Cannot open output file " + filename + ".";
+  //    throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+  //  }
 }
 
 xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
