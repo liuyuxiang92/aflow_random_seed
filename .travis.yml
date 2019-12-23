@@ -27,7 +27,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install' && echo "CAT brew_gcc5.log" && cat brew_gcc5.log | tail -n 1000" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install|gcc' && echo "CAT brew_gcc5.log" && cat brew_gcc5.log | tail -n 1000" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     #- os: osx
     #  osx_image: xcode8
     #  env:
