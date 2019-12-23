@@ -79,11 +79,10 @@ LIST OF AFLOW-XTAL-MATCH COMMANDS:
   aflow --compare2prototypes      : Returns AFLOW prototypes that match with the structure
   aflow --compare_materials       : Compares materials (mapping alike atomic species) and 
                                     returns their level of similarity
-  aflow --compare_permutations    : Returns the unique permutations for the structure
   aflow --compare_structure       : Compares structures (ignore species in mapping) and returns their level 
                                     of similarity
   aflow --prototype               : Returns ANRL label/parameters/parameter values of the structure
- 
+  aflow --unique_atom_decorations : Returns the unique atom decorations for the structure
   
 For details on usage, see the "AFLOW COMMANDS USAGE" section below.
 
@@ -153,6 +152,29 @@ AFLOW COMMANDS USAGE:
 The AFLOW commands are listed below. Command-specific options are listed immediately below the command.
 General options - applicable to all commands - is listed at the bottom of this section.
 
+    aflow --compare2database [GENERAL_COMPARISON_OPTIONS] [COMPARE2DATABASE_OPTIONS] < file
+        Compares a structure (file) to entries in the AFLOW database, returning similar 
+        compounds and quantifying their levels of similarity (misfit values).
+        Material properties can be extracted from the database and printed (via AFLUX), highlighting structure-property relationships.
+        Performs material-type comparisons or structure-type comparisons (by adding the --structure_comparison option).
+        
+        [COMPARE2DATABASE_OPTIONS] : Options specific to this command:
+
+            [--properties=enthalpy_atom,natoms,...]        : Specify the properties via their API keyword to print the corresponding 
+                                                             values with the comparison results.
+            [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] : Restrict the entries to compare with to a specific catalog/library 
+                                                             (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
+            [--geometry_file=POSCAR.relax1]                : Compare geometries from a particular step in the DFT relaxation 
+                                                             (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
+  
+    aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
+        Compares a structure (file) to the AFLOW crystallographic prototype structures, returning the similar 
+        structures and quantifying their levels of similarity (misfit values).
+        
+        [COMPARE2PROTOTYPES_OPTIONS] : Options specific to this command:
+
+            [--catalog=anrl|htqc|all] : Restrict the entries to compare with to a specific catalog/library (e.g., `anrl' or `htqc').
+
 
     aflow --compare_materials=<f1>,<f2>,...| -D <path> | -F=<filename> [GENERAL_COMPARISON_OPTIONS]
         Compares compounds comprised of the same atomic species and with 
@@ -177,36 +199,7 @@ General options - applicable to all commands - is listed at the bottom of this s
                                                        [VASP_POSCAR_MODE_EXPLICIT]START!and VASP_POSCAR_MODE_EXPLICIT]STOP.
                                                        Additional delimiters will be included in later versions.
 
-  
-    aflow --compare2database [GENERAL_COMPARISON_OPTIONS] [COMPARE2DATABASE_OPTIONS] < file
-        Compares a structure (file) to entries in the AFLOW database, returning similar 
-        compounds and quantifying their levels of similarity (misfit values).
-        Material properties can be extracted from the database and printed (via AFLUX), highlighting structure-property relationships.
-        Performs material-type comparisons or structure-type comparisons (by adding the --structure_comparison option).
-        
-        [COMPARE2DATABASE_OPTIONS] : Options specific to this command:
 
-            [--properties=enthalpy_atom,natoms,...]        : Specify the properties via their API keyword to print the corresponding 
-                                                             values with the comparison results.
-            [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] : Restrict the entries to compare with to a specific catalog/library 
-                                                             (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
-            [--geometry_file=POSCAR.relax1]                : Compare geometries from a particular step in the DFT relaxation 
-                                                             (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
-  
-    aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
-        Compares a structure (file) to the AFLOW crystallographic prototype structures, returning the similar 
-        structures and quantifying their levels of similarity (misfit values).
-        
-        [COMPARE2PROTOTYPES_OPTIONS] : Options specific to this command:
-
-            [--catalog=anrl|htqc|all] : Restrict the entries to compare with to a specific catalog/library (e.g., `anrl' or `htqc').
-
-  
-    aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file!
-        Determines the unique and duplicate atom decorations for a given structure, grouping 
-        equivalent decorations (if applicable).
-
-  
     aflow --prototype [PROTOTYPE_OPTIONS] < file             
         Converts a structure (file) into its corresponding standard \AFLOW\ prototype label. 
         The parameter variables (degrees of freedom) and parameter values are also listed.
@@ -225,6 +218,11 @@ General options - applicable to all commands - is listed at the bottom of this s
               (default: anrl).
 
 
+    aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file!
+        Determines the unique and duplicate atom decorations for a given structure, grouping 
+        equivalent decorations (if applicable).
+
+  
     [GENERAL_COMPARISON_OPTIONS] : Generic options for all commands (unless indicated otherwise):
 
         [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.}
