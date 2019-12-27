@@ -14,6 +14,66 @@ matrix:
   #    compiler: gcc
   #https://docs.travis-ci.com/user/languages/cpp/
   include:
+    #STANDARD SETTINGS (vs. legacy)
+    - os: linux
+      compiler: gcc
+    - os: osx
+      compiler: clang
+    #GCC on Linux
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      env:
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+      env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
     #GCC on macOS
     #patching verbose warnings (killing bundle) with CommandLineTools, it must come first for brew install gccX: https://stackoverflow.com/questions/39502921/warning-section-const-coal-is-deprecated-error-after-updating-xcode-to-la
     #brew --verbose is needed because otherwise travis-ci timeouts, but use sparingly, it can print too much and kill the bundle
@@ -21,15 +81,15 @@ matrix:
     #addons homebrew update is NOT a good approach: need the output to prevent timeout
     #multiple env variables must be on the same line: https://docs.travis-ci.com/user/environment-variables/
     #do NOT run brew upgrade: takes longer than 2 hrs (times out)
-    #- os: osx
-    #  osx_image: xcode8
-    #  env:
-    #    - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz"                                                               MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | grep -E 'mak|Mak|install' && brew doctor && ls -alsthr /usr/local/bin" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-          #- MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install|gcc' && which gcc-5 &&  && echo "CAT brew_gcc5.log" && cat brew_gcc5.log | tail -n 1000" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz"                                                               MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+    #- os: osx
+    #  osx_image: xcode8
+    #  env:
+    #    - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | grep -E 'mak|Mak|install' && brew doctor && ls -alsthr /usr/local/bin" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+    #      #- MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc5 | tee brew_gcc5.log | grep -E 'mak|Mak|install|gcc' && which gcc-5 &&  && echo "CAT brew_gcc5.log" && cat brew_gcc5.log | tail -n 1000" MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
     #- os: osx
     #  osx_image: xcode8
     #  env:
@@ -46,66 +106,6 @@ matrix:
     #  osx_image: xcode8
     #  env:
     #    - MATRIX_EVAL_XCODE="sudo xcode-select -s /Library/Developer/CommandLineTools" MATRIX_EVAL_BREW="brew update && brew install xz" MATRIX_EVAL_GCC="brew install --verbose gcc9 | grep checking" MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
-#    #STANDARD SETTINGS (vs. legacy)
-#    - os: linux
-#      compiler: gcc
-#    - os: osx
-#      compiler: clang
-#    #GCC on Linux
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-4.9
-#      env:
-#         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-5
-#      env:
-#         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-6
-#      env:
-#        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-7
-#      env:
-#        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-8
-#      env:
-#        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-9
-#      env:
-#        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
 #    #Clang on Linux
 #    - os: linux
 #      addons:
@@ -164,11 +164,11 @@ matrix:
 #            - clang-5.0
 #      env:
 #        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
-#    #Clang on macOS
-#    - os: osx
-#      osx_image: xcode10.1
-#    - os: osx
-#      osx_image: xcode9.4
+    #Clang on macOS
+    - os: osx
+      osx_image: xcode10.1
+    - os: osx
+      osx_image: xcode9.4
 before_install:
   - if [ -n "${MATRIX_EVAL_XCODE}" ]; then echo "${MATRIX_EVAL_XCODE}"; eval "${MATRIX_EVAL_XCODE}"; fi
   - if [ -n "${MATRIX_EVAL_BREW}" ];  then echo "${MATRIX_EVAL_BREW}"; eval "${MATRIX_EVAL_BREW}";   fi
