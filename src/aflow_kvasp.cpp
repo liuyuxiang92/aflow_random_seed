@@ -2165,11 +2165,15 @@ namespace KBIN {
     
     // get CPUS from PBS/SLURM
     // string ausenv;
-    aus << "DDDDD  PBS_NUM_PPN=" << XHOST.PBS_NUM_PPN << "  PBS_NNODES=" << XHOST.PBS_NNODES << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  PBS_NUM_PPN=" << XHOST.PBS_NUM_PPN << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  PBS_NNODES=" << XHOST.PBS_NNODES << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << "DDDDD  SLURM_CPUS_ON_NODE=" << XHOST.SLURM_CPUS_ON_NODE << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << "DDDDD  SLURM_NNODES=" << XHOST.SLURM_NNODES << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << "DDDDD  SLURM_NTASKS=" << XHOST.SLURM_NTASKS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(XHOST.SLURM_NTASKS>1 && XHOST.CPU_Cores>XHOST.SLURM_NTASKS && kflags.KBIN_MPI_NCPUS>XHOST.SLURM_NTASKS) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // to avoid HT
     aus << "DDDDD  kflags.KBIN_MPI_NCPUS=" << kflags.KBIN_MPI_NCPUS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  XHOST.CPU_Cores=" << XHOST.CPU_Cores << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  aflags.AFLOW_GLOBAL_NCPUS=" << aflags.AFLOW_GLOBAL_NCPUS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) { 	//corey
     //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
@@ -2354,16 +2358,17 @@ namespace KBIN {
 		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_EOS" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_EOS=="FALSE" || MPI_HYPERTHREADING_MPCDF_EOS=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_EOS=="TRUE" || MPI_HYPERTHREADING_MPCDF_EOS=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE]	      if(MPI_HYPERTHREADING_MPCDF_EOS=="FALSE" || MPI_HYPERTHREADING_MPCDF_EOS=="OFF") {
+	      // [OBSOLETE]  local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE]	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE]	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_EOS=="TRUE" || MPI_HYPERTHREADING_MPCDF_EOS=="ON") {
+	      // [OBSOLETE]	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE]	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE]	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_EOS << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_EOS << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2383,16 +2388,17 @@ namespace KBIN {
 		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_DRACO" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_DRACO=="FALSE" || MPI_HYPERTHREADING_MPCDF_DRACO=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_DRACO=="TRUE" || MPI_HYPERTHREADING_MPCDF_DRACO=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_DRACO=="FALSE" || MPI_HYPERTHREADING_MPCDF_DRACO=="OFF") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_DRACO=="TRUE" || MPI_HYPERTHREADING_MPCDF_DRACO=="ON") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_DRACO << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_DRACO << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2412,16 +2418,17 @@ namespace KBIN {
 		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_COBRA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_COBRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_COBRA=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_COBRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_COBRA=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_COBRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_COBRA=="OFF") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_COBRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_COBRA=="ON") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_COBRA << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_COBRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2441,16 +2448,17 @@ namespace KBIN {
 		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_HYDRA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_HYDRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_HYDRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_HYDRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="OFF") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_HYDRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="ON") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      //	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_HYDRA << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_HYDRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  
 	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_HYDRA << " " << MPI_BINARY_DIR_MPCDF_HYDRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;   // poe not MPI run

@@ -223,7 +223,7 @@ namespace init {
     // XHOST.user=string(pw->pw_name);
     // NEW
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [9]" << endl;
-   // XHOST.user="boot";
+    // XHOST.user="boot";
     aurostd::StringSubst(XHOST.user,"\n","");
     // USER DONE
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("username = ",depth_short) << XHOST.user << endl;
@@ -287,7 +287,7 @@ namespace init {
       aurostd::string2tokens(XHOST.argv.at(0),tokens,"/");  //CO 180703 - note, string2tokens without consecutive keeps beginning / with first entry
       string aflow_data="";
       for(uint i=0;i<tokens.size()-1;i++) {aflow_data+=tokens.at(i)+"/";} aflow_data+=string("aflow_data");
-       if(aurostd::FileExist(aflow_data)) {
+      if(aurostd::FileExist(aflow_data)) {
 	XHOST.vcmd.push_back(aflow_data);
 	for(uint i=0;i<XHOST.vcmd.size();i++)
 	  if(aurostd::substring2bool(XHOST.vcmd.at(i),"aflow_data")) 
@@ -425,7 +425,7 @@ namespace init {
       oss << "MPI_NCPUS_MPCDF_HYDRA=" << MPI_NCPUS_MPCDF_HYDRA << "\"" << endl;
       oss << "MPI_HYPERTHREADING_MPCDF_HYDRA=" << MPI_HYPERTHREADING_MPCDF_HYDRA << "\"" << endl;
       oss << "MPI_BINARY_DIR_MPCDF_HYDRA=" << MPI_BINARY_DIR_MPCDF_HYDRA << "\"" << endl;
-     // CO - END
+      // CO - END
       //DX 20190509 - MACHINE001 - START
       oss << "MPI_OPTIONS_MACHINE001=" << MPI_OPTIONS_MACHINE001 << "\"" << endl;
       oss << "MPI_COMMAND_MACHINE001=" << MPI_COMMAND_MACHINE001 << "\"" << endl;
@@ -693,29 +693,29 @@ namespace init {
     XHOST.vflag_control.flag("README_XAFLOW",aurostd::args2flag(argv,cmds,"--readme=xaflow|--readme_xaflow"));
     XHOST.vflag_control.flag("README_AFLOWRC",aurostd::args2flag(argv,cmds,"--readme=aflowrc|--readme_aflowrc"));
     if(!(XHOST.vflag_control.flag("AFLOW_HELP") || 
-          XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") ||
-          XHOST.vflag_control.flag("README_AFLOW") ||
-          XHOST.vflag_control.flag("README_AFLOW_PFLOW") ||
-          XHOST.vflag_control.flag("README_FROZSL") ||
-          XHOST.vflag_control.flag("README_APL") ||
-          XHOST.vflag_control.flag("README_QHA") ||
-          XHOST.vflag_control.flag("README_AAPL") ||
-          XHOST.vflag_control.flag("README_AGL") ||
-          XHOST.vflag_control.flag("README_AEL") ||
-          XHOST.vflag_control.flag("README_ANRL") ||
-          XHOST.vflag_control.flag("README_COMPARE") ||
-          XHOST.vflag_control.flag("README_GFA") || //CO190401
-          XHOST.vflag_control.flag("README_SYMMETRY") ||
-          XHOST.vflag_control.flag("README_CCE") || //CO190620
-          XHOST.vflag_control.flag("README_CHULL") || //CO19620
-          XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
-          XHOST.vflag_control.flag("README_APENNSY") ||
-          XHOST.vflag_control.flag("README_SCRIPTING") ||
-          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME180531
-          XHOST.vflag_control.flag("README_HTRESOURCES") ||
-          XHOST.vflag_control.flag("README_XAFLOW") ||
-          XHOST.vflag_control.flag("README_AFLOWRC") ||
-          FALSE)){  // CO 180306 - need to catch --readme such that it doesn't interfere with --readme=
+	 XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") ||
+	 XHOST.vflag_control.flag("README_AFLOW") ||
+	 XHOST.vflag_control.flag("README_AFLOW_PFLOW") ||
+	 XHOST.vflag_control.flag("README_FROZSL") ||
+	 XHOST.vflag_control.flag("README_APL") ||
+	 XHOST.vflag_control.flag("README_QHA") ||
+	 XHOST.vflag_control.flag("README_AAPL") ||
+	 XHOST.vflag_control.flag("README_AGL") ||
+	 XHOST.vflag_control.flag("README_AEL") ||
+	 XHOST.vflag_control.flag("README_ANRL") ||
+	 XHOST.vflag_control.flag("README_COMPARE") ||
+	 XHOST.vflag_control.flag("README_GFA") || //CO190401
+	 XHOST.vflag_control.flag("README_SYMMETRY") ||
+	 XHOST.vflag_control.flag("README_CCE") || //CO190620
+	 XHOST.vflag_control.flag("README_CHULL") || //CO19620
+	 XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
+	 XHOST.vflag_control.flag("README_APENNSY") ||
+	 XHOST.vflag_control.flag("README_SCRIPTING") ||
+	 XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME180531
+	 XHOST.vflag_control.flag("README_HTRESOURCES") ||
+	 XHOST.vflag_control.flag("README_XAFLOW") ||
+	 XHOST.vflag_control.flag("README_AFLOWRC") ||
+	 FALSE)){  // CO 180306 - need to catch --readme such that it doesn't interfere with --readme=
       XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO 180306
     }
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AFLOW_HELP\")=" << XHOST.vflag_control.flag("AFLOW_HELP") << endl;
@@ -831,7 +831,7 @@ namespace init {
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=",""));
     if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME181113
       XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME181113
-//  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME 181113
+      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME 181113
     }
 
     // ME 181103 - set MPI when number of threads is larger than 1
@@ -898,14 +898,14 @@ namespace init {
     XHOST.vflag_control.flag("GRANTS",aurostd::args2flag(argv,cmds,"--grant|--grants"));
     if(XHOST.vflag_control.flag("GRANTS")) XHOST.vflag_control.push_attached("GRANTS",aurostd::args2attachedstring(argv,"--grant=|--grants=",""));
     if(LDEBUG) cout << "OUTREACH OPTIONS: xscheme=" << XHOST.vflag_control.xscheme << endl;
-//    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME 181102
+    //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME 181102
     if(LDEBUG) cout << "OUTREACH OPTIONS: vxsghost.size()=" << XHOST.vflag_control.vxsghost.size() << endl;
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
   
     // LOADING ANRL WEB
     XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--php|-www|-web|-php"));
 
-       // DEFAULT options
+    // DEFAULT options
     if(INIT_VERBOSE) oss << "--- DEFAULTSs --- " << endl;
     if(INIT_VERBOSE) aflowrc::print_aflowrc(oss,INIT_VERBOSE || XHOST.DEBUG);
     //if(INIT_VERBOSE) XHOST.DEBUG=TRUE;
@@ -919,7 +919,9 @@ namespace init {
     // CHECK CRC
     // aurostd::crc64_main();
     
-     
+    // NOW LOAD schema
+    init::InitSchema(INIT_VERBOSE);
+    
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
     
@@ -1441,6 +1443,7 @@ bool CheckMaterialServer(string message) {
   if(XHOST.hostname==XHOST.AFLOW_MATERIALS_SERVER) return TRUE;
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
+  if(XHOST.hostname=="aflowlib") return TRUE;
   cerr << "AFLOW ERROR: Your machine is \"" << XHOST.hostname << "\"." << endl;
   if(message.length()>0) cerr << "AFLOW ERROR: command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
   else cerr << "AFLOW ERROR: the procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
@@ -1614,10 +1617,1169 @@ namespace init {
   }
 }
 
+// ***************************************************************************
+// init::SchemaFixName
+// ***************************************************************************
+namespace init {
+  void SchemaFixName(string s1, string s2, string s3) {
+    string line1="// schema is CAPITAL, content is not necessarily";
+    string line2="XHOST.vschema.push_attached(\"SCHEMA::NAME:"+aurostd::toupper(s1)+"\",\""+s1+"\");";
+    string line3="XHOST.vschema.push_attached(\"SCHEMA::UNIT:"+aurostd::toupper(s1)+"\",\""+s2+"\");";
+    string line4="XHOST.vschema.push_attached(\"SCHEMA::TYPE:"+aurostd::toupper(s1)+"\",\""+s3+"\");";
+    string line5="nschema++;";
+    cout << line1 << endl;
+    cout << line2 << endl;
+    cout << line3 << endl;
+    cout << line4 << endl;
+    cout << line5 << endl;
+    cout << endl;
+    //  cout << aurostd::PaddedPOST(line2,105) << " // schema is CAPITAL" << endl;
+    //  cout << aurostd::PaddedPOST(line3,105) << " // schema is CAPITAL" << endl;
+    //  cout << aurostd::PaddedPOST(line4,105) << " // schema is CAPITAL" << endl;
+    //  cout << "nschema++" << endl << endl;
+  }
+}
+
+// ***************************************************************************
+// init::InitSchema
+// ***************************************************************************
+namespace init {
+  uint InitSchema(bool INIT_VERBOSE) {
+    // DECLARATIONS
+    bool LDEBUG=(FALSE || XHOST.DEBUG || INIT_VERBOSE);
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchema: [BEGIN]" << endl;
+   
+    uint nschema=0;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS","ael_bulk_modulus_reuss");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_BULK_MODULUS_VOIGT","ael_bulk_modulus_voigt");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_BULK_MODULUS_VOIGT","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_BULK_MODULUS_VOIGT","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_BULK_MODULUS_VRH","ael_bulk_modulus_vrh");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_BULK_MODULUS_VRH","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_BULK_MODULUS_VRH","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_COMPLIANCE_TENSOR","ael_compliance_tensor");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_COMPLIANCE_TENSOR","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_COMPLIANCE_TENSOR","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_ELASTIC_ANISOTROPY","ael_elastic_anisotropy");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_ELASTIC_ANISOTROPY","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_ELASTIC_ANISOTROPY","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_POISSON_RATIO","ael_poisson_ratio");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_POISSON_RATIO","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_POISSON_RATIO","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SHEAR_MODULUS_REUSS","ael_shear_modulus_reuss");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SHEAR_MODULUS_REUSS","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SHEAR_MODULUS_REUSS","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SHEAR_MODULUS_VOIGT","ael_shear_modulus_voigt");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SHEAR_MODULUS_VOIGT","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SHEAR_MODULUS_VOIGT","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_SHEAR_MODULUS_VRH","ael_shear_modulus_vrh");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_SHEAR_MODULUS_VRH","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_SHEAR_MODULUS_VRH","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AEL_STIFFNESS_TENSOR","ael_stiffness_tensor");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AEL_STIFFNESS_TENSOR","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AEL_STIFFNESS_TENSOR","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOW_VERSION","aflow_version");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOW_VERSION","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOW_VERSION","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOWLIB_DATE","aflowlib_date");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOWLIB_DATE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOWLIB_DATE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AFLOWLIB_VERSION","aflowlib_version");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AFLOWLIB_VERSION","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AFLOWLIB_VERSION","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_ACOUSTIC_DEBYE","agl_acoustic_debye");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_ACOUSTIC_DEBYE","K");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_ACOUSTIC_DEBYE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_BULK_MODULUS_ISOTHERMAL_300K","agl_bulk_modulus_isothermal_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_BULK_MODULUS_ISOTHERMAL_300K","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_BULK_MODULUS_ISOTHERMAL_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_BULK_MODULUS_STATIC_300K","agl_bulk_modulus_static_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_BULK_MODULUS_STATIC_300K","GPa");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_BULK_MODULUS_STATIC_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_DEBYE","agl_debye");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_DEBYE","K");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_DEBYE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_GRUNEISEN","agl_gruneisen");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_GRUNEISEN","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_GRUNEISEN","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_HEAT_CAPACITY_CP_300K","agl_heat_capacity_Cp_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_HEAT_CAPACITY_CP_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_HEAT_CAPACITY_CP_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_HEAT_CAPACITY_CV_300K","agl_heat_capacity_Cv_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_HEAT_CAPACITY_CV_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_HEAT_CAPACITY_CV_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_THERMAL_CONDUCTIVITY_300K","agl_thermal_conductivity_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_THERMAL_CONDUCTIVITY_300K","W/(m K)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_CONDUCTIVITY_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AGL_THERMAL_EXPANSION_300K","agl_thermal_expansion_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AGL_THERMAL_EXPANSION_300K","K^-1");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AGL_THERMAL_EXPANSION_300K","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AUID","auid");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AUID","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AUID","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:AURL","aurl");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:AURL","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:AURL","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BADER_ATOMIC_VOLUMES","bader_atomic_volumes");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BADER_ATOMIC_VOLUMES","A^3");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BADER_ATOMIC_VOLUMES","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BADER_NET_CHARGES","bader_net_charges");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BADER_NET_CHARGES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BADER_NET_CHARGES","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_LATTICE_SYSTEM","Bravais_lattice_lattice_system");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_LATTICE_SYSTEM","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_LATTICE_SYSTEM","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_LATTICE_SYSTEM_ORIG","Bravais_lattice_lattice_system_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_LATTICE_SYSTEM_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_LATTICE_SYSTEM_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_LATTICE_TYPE","Bravais_lattice_lattice_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_LATTICE_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_LATTICE_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_LATTICE_TYPE_ORIG","Bravais_lattice_lattice_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_LATTICE_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_LATTICE_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE","Bravais_lattice_lattice_variation_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE_ORIG","Bravais_lattice_lattice_variation_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_ORIG","Bravais_lattice_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_LATTICE_RELAX","Bravais_lattice_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_LATTICE_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_LATTICE_RELAX","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_SUPERLATTICE_LATTICE_SYSTEM","Bravais_superlattice_lattice_system");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_SUPERLATTICE_LATTICE_SYSTEM","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_SUPERLATTICE_LATTICE_SYSTEM","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_SUPERLATTICE_LATTICE_SYSTEM_ORIG","Bravais_superlattice_lattice_system_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_SUPERLATTICE_LATTICE_SYSTEM_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_SUPERLATTICE_LATTICE_SYSTEM_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_SUPERLATTICE_LATTICE_TYPE","Bravais_superlattice_lattice_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_SUPERLATTICE_LATTICE_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_SUPERLATTICE_LATTICE_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_SUPERLATTICE_LATTICE_TYPE_ORIG","Bravais_superlattice_lattice_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_SUPERLATTICE_LATTICE_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_SUPERLATTICE_LATTICE_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_SUPERLATTICE_LATTICE_VARIATION_TYPE","Bravais_superlattice_lattice_variation_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_SUPERLATTICE_LATTICE_VARIATION_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_SUPERLATTICE_LATTICE_VARIATION_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:BRAVAIS_SUPERLATTICE_LATTICE_VARIATION_TYPE_ORIG","Bravais_superlattice_lattice_variation_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:BRAVAIS_SUPERLATTICE_LATTICE_VARIATION_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:BRAVAIS_SUPERLATTICE_LATTICE_VARIATION_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CALCULATION_CORES","calculation_cores");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CALCULATION_CORES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CALCULATION_CORES","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CALCULATION_MEMORY","calculation_memory");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CALCULATION_MEMORY","MB");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CALCULATION_MEMORY","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CALCULATION_TIME","calculation_time");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CALCULATION_TIME","seconds");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CALCULATION_TIME","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CATALOG","catalog");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CATALOG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CATALOG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CODE","code");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CODE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CODE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:COMPOSITION","composition");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:COMPOSITION","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:COMPOSITION","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:COMPOUND","compound");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:COMPOUND","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:COMPOUND","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CRYSTAL_CLASS","crystal_class");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CRYSTAL_CLASS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CRYSTAL_CLASS","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CRYSTAL_CLASS_ORIG","crystal_class_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CRYSTAL_CLASS_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CRYSTAL_CLASS_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CRYSTAL_FAMILY","crystal_family");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CRYSTAL_FAMILY","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CRYSTAL_FAMILY","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CRYSTAL_FAMILY_ORIG","crystal_family_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CRYSTAL_FAMILY_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CRYSTAL_FAMILY_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CRYSTAL_SYSTEM","crystal_system");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CRYSTAL_SYSTEM","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CRYSTAL_SYSTEM","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:CRYSTAL_SYSTEM_ORIG","crystal_system_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:CRYSTAL_SYSTEM_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:CRYSTAL_SYSTEM_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DATA_API","data_api");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DATA_API","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DATA_API","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DATA_SOURCE","data_source");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DATA_SOURCE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DATA_SOURCE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DELTA_ELECTRONIC_ENERGY_CONVERGENCE","delta_electronic_energy_convergence");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DELTA_ELECTRONIC_ENERGY_CONVERGENCE","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DELTA_ELECTRONIC_ENERGY_CONVERGENCE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DELTA_ELECTRONIC_ENERGY_THRESHOLD","delta_electronic_energy_threshold");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DELTA_ELECTRONIC_ENERGY_THRESHOLD","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DELTA_ELECTRONIC_ENERGY_THRESHOLD","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DENSITY","density");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DENSITY","g/cm^3");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DENSITY","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:DFT_TYPE","dft_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:DFT_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:DFT_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_ATOM","eentropy_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:EENTROPY_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:EENTROPY_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:EENTROPY_CELL","eentropy_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:EENTROPY_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:EENTROPY_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:EGAP","Egap");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:EGAP","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:EGAP","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:EGAP_FIT","Egap_fit");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:EGAP_FIT","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:EGAP_FIT","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:EGAP_TYPE","Egap_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:EGAP_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:EGAP_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ATOM","energy_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_CELL","energy_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_CUTOFF","energy_cutoff");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_CUTOFF","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_CUTOFF","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_ATOM","enthalpy_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_CELL","enthalpy_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_ATOM","enthalpy_formation_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_FORMATION_CELL","enthalpy_formation_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_FORMATION_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTHALPY_FORMATION_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPIC_TEMPERATURE","entropic_temperature");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPIC_TEMPERATURE","K");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPIC_TEMPERATURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:FILES","files");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:FILES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:FILES","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:FORCES","forces");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:FORCES","eV/A");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:FORCES","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GEOMETRY","geometry");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GEOMETRY","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GEOMETRY","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:GEOMETRY_ORIG","geometry_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:GEOMETRY_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:GEOMETRY_ORIG","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:KPOINTS","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS_BANDS_NKPTS","kpoints_bands_nkpts");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS_BANDS_NKPTS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:KPOINTS_BANDS_NKPTS","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS_BANDS_PATH","kpoints_bands_path");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS_BANDS_PATH","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:KPOINTS_BANDS_PATH","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS_RELAX","kpoints_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:KPOINTS_RELAX","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS_STATIC","kpoints_static");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:KPOINTS_STATIC","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:KPOINTS_STATIC","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LATTICE_SYSTEM_ORIG","lattice_system_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LATTICE_SYSTEM_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LATTICE_SYSTEM_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LATTICE_SYSTEM_RELAX","lattice_system_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LATTICE_SYSTEM_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LATTICE_SYSTEM_RELAX","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LATTICE_VARIATION_ORIG","lattice_variation_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LATTICE_VARIATION_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LATTICE_VARIATION_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LATTICE_VARIATION_RELAX","lattice_variation_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LATTICE_VARIATION_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LATTICE_VARIATION_RELAX","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LDAU_J","ldau_j");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LDAU_J","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LDAU_J","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LDAU_L","ldau_l");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LDAU_L","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LDAU_L","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LDAU_TLUJ","ldau_TLUJ");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LDAU_TLUJ","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LDAU_TLUJ","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LDAU_TYPE","ldau_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LDAU_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LDAU_TYPE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LDAU_U","ldau_u");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LDAU_U","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LDAU_U","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:LOOP","loop");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:LOOP","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:LOOP","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NATOMS","natoms");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NATOMS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NATOMS","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NBONDXX","nbondxx");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NBONDXX","A");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NBONDXX","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NODE_CPU_CORES","node_CPU_Cores");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NODE_CPU_CORES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NODE_CPU_CORES","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NODE_CPU_MHZ","node_CPU_MHz");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NODE_CPU_MHZ","MHz");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NODE_CPU_MHZ","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NODE_CPU_MODEL","node_CPU_Model");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NODE_CPU_MODEL","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NODE_CPU_MODEL","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NODE_RAM_GB","node_RAM_GB");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NODE_RAM_GB","GB");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NODE_RAM_GB","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:NSPECIES","nspecies");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:NSPECIES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:NSPECIES","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PEARSON_SYMBOL_ORIG","Pearson_symbol_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PEARSON_SYMBOL_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PEARSON_SYMBOL_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PEARSON_SYMBOL_RELAX","Pearson_symbol_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PEARSON_SYMBOL_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PEARSON_SYMBOL_RELAX","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PEARSON_SYMBOL_SUPERLATTICE","Pearson_symbol_superlattice");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PEARSON_SYMBOL_SUPERLATTICE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PEARSON_SYMBOL_SUPERLATTICE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PEARSON_SYMBOL_SUPERLATTICE_ORIG","Pearson_symbol_superlattice_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PEARSON_SYMBOL_SUPERLATTICE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PEARSON_SYMBOL_SUPERLATTICE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_HERMANN_MAUGUIN","point_group_Hermann_Mauguin");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_HERMANN_MAUGUIN","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_HERMANN_MAUGUIN","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_HERMANN_MAUGUIN_ORIG","point_group_Hermann_Mauguin_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_HERMANN_MAUGUIN_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_HERMANN_MAUGUIN_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_ORBIFOLD","point_group_orbifold");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_ORBIFOLD","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_ORBIFOLD","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_ORBIFOLD_ORIG","point_group_orbifold_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_ORBIFOLD_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_ORBIFOLD_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_ORDER","point_group_order");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_ORDER","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_ORDER","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_ORDER_ORIG","point_group_order_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_ORDER_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_ORDER_ORIG","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_SCHOENFLIES","point_group_Schoenflies");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_SCHOENFLIES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_SCHOENFLIES","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_SCHOENFLIES_ORIG","point_group_Schoenflies_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_SCHOENFLIES_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_SCHOENFLIES_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_STRUCTURE","point_group_structure");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_STRUCTURE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_STRUCTURE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_STRUCTURE_ORIG","point_group_structure_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_STRUCTURE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_STRUCTURE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_TYPE","point_group_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POINT_GROUP_TYPE_ORIG","point_group_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POINT_GROUP_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POINT_GROUP_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POSITIONS_CARTESIAN","positions_cartesian");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POSITIONS_CARTESIAN","A");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POSITIONS_CARTESIAN","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:POSITIONS_FRACTIONAL","positions_fractional");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:POSITIONS_FRACTIONAL","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:POSITIONS_FRACTIONAL","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PRESSURE","pressure");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PRESSURE","kbar");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PRESSURE","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PRESSURE_FINAL","pressure_final");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PRESSURE_FINAL","kbar");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PRESSURE_FINAL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PRESSURE_RESIDUAL","pressure_residual");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PRESSURE_RESIDUAL","kbar");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PRESSURE_RESIDUAL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PULAY_STRESS","Pulay_stress");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PULAY_STRESS","kbar");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PULAY_STRESS","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PV_ATOM","PV_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PV_ATOM","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PV_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PV_CELL","PV_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PV_CELL","eV");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PV_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:PROTOTYPE","prototype");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:PROTOTYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:PROTOTYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_GEOMETRY","reciprocal_geometry");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_GEOMETRY","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_GEOMETRY","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_GEOMETRY_ORIG","reciprocal_geometry_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_GEOMETRY_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_GEOMETRY_ORIG","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_LATTICE_TYPE","reciprocal_lattice_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_LATTICE_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_LATTICE_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_LATTICE_TYPE_ORIG","reciprocal_lattice_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_LATTICE_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_LATTICE_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_LATTICE_VARIATION_TYPE","reciprocal_lattice_variation_type");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_LATTICE_VARIATION_TYPE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_LATTICE_VARIATION_TYPE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_LATTICE_VARIATION_TYPE_ORIG","reciprocal_lattice_variation_type_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_LATTICE_VARIATION_TYPE_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_LATTICE_VARIATION_TYPE_ORIG","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_VOLUME_CELL","reciprocal_volume_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_VOLUME_CELL","A^-3");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_VOLUME_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_VOLUME_CELL_ORIG","reciprocal_volume_cell_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_VOLUME_CELL_ORIG","A^-3/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_VOLUME_CELL_ORIG","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SCINTILLATION_ATTENUATION_LENGTH","scintillation_attenuation_length");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SCINTILLATION_ATTENUATION_LENGTH","cm");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SCINTILLATION_ATTENUATION_LENGTH","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SG","sg");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SG","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SG2","sg2");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SG2","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SG2","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPACEGROUP_ORIG","spacegroup_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPACEGROUP_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPACEGROUP_ORIG","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPACEGROUP_RELAX","spacegroup_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPACEGROUP_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPACEGROUP_RELAX","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES","species");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP","species_pp");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP_ZVAL","species_pp_ZVAL");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP_ZVAL","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP_ZVAL","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPECIES_PP_VERSION","species_pp_version");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPECIES_PP_VERSION","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPECIES_PP_VERSION","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPIND","spinD");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPIND","uB");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPIND","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPINF","spinF");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPINF","uB");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPINF","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPIN_ATOM","spin_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPIN_ATOM","uB/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPIN_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:SPIN_CELL","spin_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:SPIN_CELL","uB");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:SPIN_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:STOICHIOMETRY","stoichiometry");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:STOICHIOMETRY","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:STOICHIOMETRY","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:STRESS_TENSOR","stress_tensor");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:STRESS_TENSOR","kbar");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:STRESS_TENSOR","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:TITLE","title");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:TITLE","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:TITLE","string");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:VALENCE_CELL_IUPAC","valence_cell_iupac");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:VALENCE_CELL_IUPAC","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:VALENCE_CELL_IUPAC","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:VALENCE_CELL_STD","valence_cell_std");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:VALENCE_CELL_STD","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:VALENCE_CELL_STD","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:VOLUME_ATOM","volume_atom");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:VOLUME_ATOM","A^3/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:VOLUME_ATOM","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:VOLUME_CELL","volume_cell");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:VOLUME_CELL","A^3");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:VOLUME_CELL","number");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:WYCKOFF_LETTERS","Wyckoff_letters");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_LETTERS","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_LETTERS","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:WYCKOFF_LETTERS_ORIG","Wyckoff_letters_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_LETTERS_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_LETTERS_ORIG","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:WYCKOFF_MULTIPLICITIES","Wyckoff_multiplicities");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_MULTIPLICITIES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_MULTIPLICITIES","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:WYCKOFF_MULTIPLICITIES_ORIG","Wyckoff_multiplicities_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_MULTIPLICITIES_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_MULTIPLICITIES_ORIG","numbers");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:WYCKOFF_SITE_SYMMETRIES","Wyckoff_site_symmetries");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_SITE_SYMMETRIES","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_SITE_SYMMETRIES","strings");
+    nschema++;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:WYCKOFF_SITE_SYMMETRIES_ORIG","Wyckoff_site_symmetries_orig");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_SITE_SYMMETRIES_ORIG","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_SITE_SYMMETRIES_ORIG","strings");
+    nschema++;
+  
+    // read them as
+    LDEBUG=0; // david/corey put LDEBUG=1 so you seen how they answer
+    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl;  // content
+    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS") << endl;  // content
+    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS") << endl;  // content
+    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::TYPE:AEL_BULK_MODULUS_OSES\")=" << XHOST.vschema.isscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_OSES") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::TYPE:AEL_BULK_MODULUS_OSES\")=" << XHOST.vschema.getattachedscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_OSES") << endl;  // content
+
+    if(LDEBUG) cerr << "nschema=" << nschema << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchema: [END]" << endl;
+    if(LDEBUG) exit(0);
+    
+    return nschema;
+ 
+    /*
+    // since david gave me stuff in small letters, I used this to fix the text.. you can use it too if you have a bunch of them
+
+      SchemaFixName("ael_bulk_modulus_reuss","GPa","number");
+      SchemaFixName("ael_bulk_modulus_voigt","GPa","number");
+      SchemaFixName("ael_bulk_modulus_vrh","GPa","number");
+      SchemaFixName("ael_compliance_tensor","","numbers");
+      SchemaFixName("ael_elastic_anisotropy","","number");
+      SchemaFixName("ael_poisson_ratio","","number");
+      SchemaFixName("ael_shear_modulus_reuss","GPa","number");
+      SchemaFixName("ael_shear_modulus_voigt","GPa","number");
+      SchemaFixName("ael_shear_modulus_vrh","GPa","number");
+      SchemaFixName("ael_stiffness_tensor","","numbers");
+      SchemaFixName("aflow_version","","string");
+      SchemaFixName("aflowlib_date","","string");
+      SchemaFixName("aflowlib_version","","string");
+      SchemaFixName("agl_acoustic_debye","K","number");
+      SchemaFixName("agl_bulk_modulus_isothermal_300K","GPa","number");
+      SchemaFixName("agl_bulk_modulus_static_300K","GPa","number");
+      SchemaFixName("agl_debye","K","number");
+      SchemaFixName("agl_gruneisen","","number");
+      SchemaFixName("agl_heat_capacity_Cp_300K","kB/cell","number");
+      SchemaFixName("agl_heat_capacity_Cv_300K","kB/cell","number");
+      SchemaFixName("agl_thermal_conductivity_300K","W/(m K)","number");
+      SchemaFixName("agl_thermal_expansion_300K","K^-1","number");
+      SchemaFixName("auid","","string");
+      SchemaFixName("aurl","","string");
+      SchemaFixName("bader_atomic_volumes","A^3","numbers");
+      SchemaFixName("bader_net_charges","","numbers");
+      SchemaFixName("Bravais_lattice_lattice_system","","string");
+      SchemaFixName("Bravais_lattice_lattice_system_orig","","string");
+      SchemaFixName("Bravais_lattice_lattice_type","","string");
+      SchemaFixName("Bravais_lattice_lattice_type_orig","","string");
+      SchemaFixName("Bravais_lattice_lattice_variation_type","","string");
+      SchemaFixName("Bravais_lattice_lattice_variation_type_orig","","string");
+      SchemaFixName("Bravais_lattice_orig","","string");
+      SchemaFixName("Bravais_lattice_relax","","string");
+      SchemaFixName("Bravais_superlattice_lattice_system","","string");
+      SchemaFixName("Bravais_superlattice_lattice_system_orig","","string");
+      SchemaFixName("Bravais_superlattice_lattice_type","","string");
+      SchemaFixName("Bravais_superlattice_lattice_type_orig","","string");
+      SchemaFixName("Bravais_superlattice_lattice_variation_type","","string");
+      SchemaFixName("Bravais_superlattice_lattice_variation_type_orig","","string");
+      SchemaFixName("calculation_cores","","number");
+      SchemaFixName("calculation_memory","MB","number");
+      SchemaFixName("calculation_time","seconds","number");
+      SchemaFixName("catalog","","string");
+      SchemaFixName("code","","string");
+      SchemaFixName("composition","","numbers");
+      SchemaFixName("compound","","string");
+      SchemaFixName("crystal_class","","string");
+      SchemaFixName("crystal_class_orig","","string");
+      SchemaFixName("crystal_family","","string");
+      SchemaFixName("crystal_family_orig","","string");
+      SchemaFixName("crystal_system","","string");
+      SchemaFixName("crystal_system_orig","","string");
+      SchemaFixName("data_api","","string");
+      SchemaFixName("data_source","","string");
+      SchemaFixName("delta_electronic_energy_convergence","eV","number");
+      SchemaFixName("delta_electronic_energy_threshold","eV","number");
+      SchemaFixName("density","g/cm^3","number");
+      SchemaFixName("dft_type","","string");
+      SchemaFixName("eentropy_atom","eV/atom","number");
+      SchemaFixName("eentropy_cell","eV","number");
+      SchemaFixName("Egap","eV","number");
+      SchemaFixName("Egap_fit","eV","number");
+      SchemaFixName("Egap_type","","string");
+      SchemaFixName("energy_atom","eV/atom","number");
+      SchemaFixName("energy_cell","eV","number");
+      SchemaFixName("energy_cutoff","eV","number");
+      SchemaFixName("enthalpy_atom","eV/atom","number");
+      SchemaFixName("enthalpy_cell","eV","number");
+      SchemaFixName("enthalpy_formation_atom","eV/atom","number");
+      SchemaFixName("enthalpy_formation_cell","eV","number");
+      SchemaFixName("entropic_temperature","K","number");
+      SchemaFixName("files","","strings");
+      SchemaFixName("forces","eV/A","numbers");
+      SchemaFixName("geometry","","numbers");
+      SchemaFixName("geometry_orig","","numbers");
+      SchemaFixName("kpoints","","strings");
+      SchemaFixName("kpoints_bands_nkpts","","number");
+      SchemaFixName("kpoints_bands_path","","strings");
+      SchemaFixName("kpoints_relax","","numbers");
+      SchemaFixName("kpoints_static","","numbers");
+      SchemaFixName("lattice_system_orig","","string");
+      SchemaFixName("lattice_system_relax","","string");
+      SchemaFixName("lattice_variation_orig","","string");
+      SchemaFixName("lattice_variation_relax","","string");
+      SchemaFixName("ldau_j","eV","numbers");
+      SchemaFixName("ldau_l","","numbers");
+      SchemaFixName("ldau_TLUJ","","numbers");
+      SchemaFixName("ldau_type","","number");
+      SchemaFixName("ldau_u","eV","numbers");
+      SchemaFixName("loop","","strings");
+      SchemaFixName("natoms","","number");
+      SchemaFixName("nbondxx","A","numbers");
+      SchemaFixName("node_CPU_Cores","","number");
+      SchemaFixName("node_CPU_MHz","MHz","number");
+      SchemaFixName("node_CPU_Model","","string");
+      SchemaFixName("node_RAM_GB","GB","number");
+      SchemaFixName("nspecies","","number");
+      SchemaFixName("Pearson_symbol_orig","","string");
+      SchemaFixName("Pearson_symbol_relax","","string");
+      SchemaFixName("Pearson_symbol_superlattice","","string");
+      SchemaFixName("Pearson_symbol_superlattice_orig","","string");
+      SchemaFixName("point_group_Hermann_Mauguin","","string");
+      SchemaFixName("point_group_Hermann_Mauguin_orig","","string");
+      SchemaFixName("point_group_orbifold","","string");
+      SchemaFixName("point_group_orbifold_orig","","string");
+      SchemaFixName("point_group_order","","number");
+      SchemaFixName("point_group_order_orig","","number");
+      SchemaFixName("point_group_Schoenflies","","string");
+      SchemaFixName("point_group_Schoenflies_orig","","string");
+      SchemaFixName("point_group_structure","","string");
+      SchemaFixName("point_group_structure_orig","","string");
+      SchemaFixName("point_group_type","","string");
+      SchemaFixName("point_group_type_orig","","string");
+      SchemaFixName("positions_cartesian","A","numbers");
+      SchemaFixName("positions_fractional","","numbers");
+      SchemaFixName("pressure","kbar" ,"number");
+      SchemaFixName("pressure_final","kbar" ,"number");
+      SchemaFixName("pressure_residual","kbar" ,"number");
+      SchemaFixName("Pulay_stress","kbar","number");
+      SchemaFixName("PV_atom","eV/atom","number");
+      SchemaFixName("PV_cell","eV","number");
+      SchemaFixName("prototype","","string");
+      SchemaFixName("reciprocal_geometry","","numbers");
+      SchemaFixName("reciprocal_geometry_orig","","numbers");
+      SchemaFixName("reciprocal_lattice_type","","string");
+      SchemaFixName("reciprocal_lattice_type_orig","","string");
+      SchemaFixName("reciprocal_lattice_variation_type","","string");
+      SchemaFixName("reciprocal_lattice_variation_type_orig","","string");
+      SchemaFixName("reciprocal_volume_cell","A^-3","number");
+      SchemaFixName("reciprocal_volume_cell_orig","A^-3/atom","number");
+      SchemaFixName("scintillation_attenuation_length","cm","number");
+      SchemaFixName("sg","","strings");
+      SchemaFixName("sg2","","strings");
+      SchemaFixName("spacegroup_orig","","number");
+      SchemaFixName("spacegroup_relax","","number");
+      SchemaFixName("species","","strings");
+      SchemaFixName("species_pp","","strings");
+      SchemaFixName("species_pp_ZVAL","","numbers");
+      SchemaFixName("species_pp_version","","strings");
+      SchemaFixName("spinD","uB","numbers");
+      SchemaFixName("spinF","uB","number");
+      SchemaFixName("spin_atom","uB/atom","number");
+      SchemaFixName("spin_cell","uB","number");
+      SchemaFixName("stoichiometry","","numbers");
+      SchemaFixName("stress_tensor","kbar","numbers");
+      SchemaFixName("title","","string");
+      SchemaFixName("valence_cell_iupac","","number");
+      SchemaFixName("valence_cell_std","","number");
+      SchemaFixName("volume_atom","A^3/atom","number");
+      SchemaFixName("volume_cell","A^3","number");
+      SchemaFixName("Wyckoff_letters","","strings");
+      SchemaFixName("Wyckoff_letters_orig","","strings");
+      SchemaFixName("Wyckoff_multiplicities","","numbers");
+      SchemaFixName("Wyckoff_multiplicities_orig","","numbers");
+      SchemaFixName("Wyckoff_site_symmetries","","strings");
+      SchemaFixName("Wyckoff_site_symmetries_orig","","strings");
+    */
+  }
+}
+
+  // **************************************************************************
+
 #endif
 
-// **************************************************************************
-// *                                                                        *
-// *             STEFANO CURTAROLO - Duke University 2003-2019              *
-// *                                                                        *
-// **************************************************************************
+  // **************************************************************************
+  // *                                                                        *
+  // *             STEFANO CURTAROLO - Duke University 2003-2019              *
+  // *                                                                        *
+  // **************************************************************************

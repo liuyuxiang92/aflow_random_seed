@@ -360,6 +360,8 @@ class _XHOST {
   aurostd::xoption vflag_apennsy;  // argv/argc options following the xoption structure
   aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
   aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
+  aurostd::xoption vschema;        // keywords, names, units etc etc
+  
   // AFLOWRC
   string aflowrc_filename;
   string aflowrc_content;
@@ -1009,7 +1011,9 @@ namespace init {
   string AFLOW_Projects_Directories(string string2load);
   long GetRAM(void);
   uint GetTEMPs(void);
+  uint InitSchema(bool INIT_VERBOSE);
 } // namespace init
+
 uint AFLOW_getTEMP(vector<string> argv);
 uint AFLOW_monitor(vector<string> argv);
 double AFLOW_checkMEMORY(string="",double=102.0);
@@ -1070,6 +1074,7 @@ class _atom { // simple class.. nothing fancy
   // constructor destructor                              // constructor/destructor
   _atom();                                               // default, just allocate
   ~_atom();                                              // kill everything
+  _atom(const _atom& b);                                 // constructor copy
   const _atom& operator=(const _atom &b);                // copy
   void clear();
   // content                                             // content
@@ -1120,6 +1125,7 @@ class _atom { // simple class.. nothing fancy
   void ClearSymmetry(void);                              // clears symmetry //CO190219
  private:                                                //
   void free();                                           // free space
+  void copy(const _atom& b); //
 };
 
 class _atom_reference_cmp {                              // sorting through reference
@@ -2731,7 +2737,7 @@ namespace KBIN {
   bool VASP_SplitAlloyPseudoPotentials(string alloy, string &species_ppA, string &species_ppB, string &species_ppC);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB, vector<string> &species_ppsC);
-  void VASP_MPI_Autotune(_xvasp& xvasp,bool VERBOSE);
+  void VASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE);
   void XVASP_INCAR_System_Auto(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,_vflags& vflags,int number); // for steps

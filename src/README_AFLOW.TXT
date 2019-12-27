@@ -18,7 +18,7 @@ aflow
    --FILE[=| ]file | --F[=| ]file | --f[=| ]file   
                                     List of directories to run from file
                                     containing a list of aflow.in one per line.
-   --quiet | -quiet | -q            Quiet: remove all '00000 MESSAGES'
+   --quiet | -quiet | -q            Quiet: remove all 'MMMMM MESSAGES'
    -c | --clean         cleans everything except aflow.in
               (if .gz or .bz2 inputs are present, they are decompressed)
 
