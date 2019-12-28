@@ -1,7 +1,10 @@
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
-        -- added file2dequestring() (SC)
+        -- added file2dequestring(), string2dequestring() (SC)
+        -- optimized NCPUS/NPAR/NCORE settings (SC)
+        -- patched _atom() class: constructor()/copy()/free() (SC)
+        -- updated xoptions so content can be lowercase (CO)
         -- Added additional web output for entry page generation. (ME)
         -- Fixed bug that put NCORE into INCARs of linear response calculations. (ME)
         -- Fixed bug that caused phonon dispersion path builder to break for some lattices. (ME)
