@@ -1,4 +1,4 @@
-3.1.228 - 2019/11/20
+3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
         -- added file2dequestring() (SC)
