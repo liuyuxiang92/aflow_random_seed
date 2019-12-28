@@ -95,6 +95,10 @@ TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _
 }
 
 void TCONDCalculator::copy(const TCONDCalculator& that) {
+  _pc = that._pc;
+  _qm = that._qm;
+  _logger = that._logger;
+  aflags = that.aflags;
   calc_options = that.calc_options;
   eigenvectors = that.eigenvectors;
   freq = that.freq;;

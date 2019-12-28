@@ -775,6 +775,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
 
  private:
+  void copy(const PhononCalculator&);  // ME191228
   virtual void calculateForceFields() {}  // ME190412  // ME191029
   void completeForceFields();
   void projectToCartesianDirections();
@@ -800,6 +801,7 @@ class PhononCalculator : virtual public IPhononCalculator {
 
  public:
   PhononCalculator(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+  PhononCalculator& operator=(const PhononCalculator&);
   virtual ~PhononCalculator();
   void clear();
   void run();  // ME191029
