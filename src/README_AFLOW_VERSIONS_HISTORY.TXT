@@ -1,7 +1,15 @@
-3.1.228 - 2019/11/20
+3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- Added a handler for the AFLOW database. (ME)
         -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip). (ME)
+        -- added schema name/unit/type to XHOST (SC)
+        -- added file2dequestring(), string2dequestring() (SC)
+        -- optimized NCPUS/NPAR/NCORE settings (SC)
+        -- patched _atom() class: constructor()/copy()/free() (SC)
+        -- updated xoptions so content can be lowercase (CO)
+        -- Added additional web output for entry page generation. (ME)
+        -- Fixed bug that put NCORE into INCARs of linear response calculations. (ME)
+        -- Fixed bug that caused phonon dispersion path builder to break for some lattices. (ME)
         -- Fixed bug in xDOSCAR reader error detection. (ME)
         -- Additional web output for entry page applets. (ME)
         -- Fixed bug that prevented LDA+U parameters from being passed into ARUN aflow.ins. (ME)

@@ -90,6 +90,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vflag_apennsy.clear();
   vflag_outreach.clear();
   vflag_control.clear();
+  vschema.clear();
   XHOST_LIBRARY_LIB0=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB1=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
@@ -187,7 +188,8 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_apennsy=b.vflag_apennsy;
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
-  // AFLOWRC
+  vschema=b.vschema;
+    // AFLOWRC
   aflowrc_filename=b.aflowrc_filename;    // AFLOWRC
   aflowrc_content=b.aflowrc_content;    // AFLOWRC
   vaflowrc.clear();for(uint i=0;i<b.vaflowrc.size();i++) vaflowrc.push_back(b.vaflowrc.at(i));   // AFLOWRC
@@ -232,6 +234,7 @@ void _XHOST::free() { // free PRIVATE
   vflag_apennsy.clear();
   vflag_outreach.clear();
   vflag_control.clear();
+  vschema.clear();
   // AFLOWRC
   aflowrc_filename.clear();    // AFLOWRC
   aflowrc_content.clear();    // AFLOWRC
@@ -2013,228 +2016,6 @@ ostream* xStream::getOSS() const {return p_oss;} //CO191110
 ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
-
-// **************************************************************************
-// XSCHEMA - Marco Esters - 191125
-xSchema::xSchema() {
-  free();
-}
-
-xSchema::~xSchema() {
-  free();
-}
-
-xSchema::xSchema(const xSchema& that) {
-  copy(that);
-}
-
-const xSchema& xSchema::operator=(const xSchema& that) {
-  if (this != &that) {
-    free();
-    copy(that);
-  }
-  return *this;
-}
-
-void xSchema::copy(const xSchema& that) {
-  vxschema = that.vxschema;
-  nkeys = that.nkeys;
-}
-
-void xSchema::free() {
-  vxschema.clear();
-  nkeys = 0;
-}
-
-uint xSchema::getNKeys() const {
-  return nkeys;
-}
-
-const vector<_xschema>& xSchema::getSchemaEntries() const {
-  return vxschema;
-}
-
-vector<string> xSchema::getKeys() const {
-  vector<string> keys(nkeys);
-  for (uint i = 0; i < nkeys; i++) keys[i] = vxschema[i].key;
-  return keys;
-}
-
-const _xschema& xSchema::getEntry(const string& key) const {
-  for (uint i = 0; i < nkeys; i++) {
-    if (vxschema[i].key == key) return vxschema[i];
-  }
-  string function = "xSchema::getEntry()";
-  string message = "Could not find key " + key + ".";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
-}
-
-const _xschema& xSchema::getEntry(int i) const {
-  return vxschema[i];
-}
-
-void xSchema::initialize() {
-  free();
-  _xschema s;
-  s.key = "ael_bulk_modulus_reuss"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_bulk_modulus_voigt"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_bulk_modulus_vrh"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_compliance_tensor"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "ael_elastic_anisotropy"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_poisson_ratio"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_shear_modulus_reuss"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_shear_modulus_voigt"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_shear_modulus_vrh"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "ael_stiffness_tensor"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "aflow_version"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "aflowlib_date"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "aflowlib_version"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "agl_acoustic_debye"; s.unit = "K"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_bulk_modulus_isothermal_300K"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_bulk_modulus_static_300K"; s.unit = "GPa"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_debye"; s.unit = "K"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_gruneisen"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_heat_capacity_Cp_300K"; s.unit = "kB/cell"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_heat_capacity_Cv_300K"; s.unit = "kB/cell"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_thermal_conductivity_300K"; s.unit = "W/(m K)"; s.type = "number"; vxschema.push_back(s);
-  s.key = "agl_thermal_expansion_300K"; s.unit = "K^-1"; s.type = "number"; vxschema.push_back(s);
-  s.key = "auid"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "aurl"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "bader_atomic_volumes"; s.unit = "A^3"; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "bader_net_charges"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_lattice_system"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_lattice_system_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_lattice_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_lattice_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_lattice_variation_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_lattice_variation_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_lattice_relax"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_superlattice_lattice_system"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_superlattice_lattice_system_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_superlattice_lattice_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_superlattice_lattice_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_superlattice_lattice_variation_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Bravais_superlattice_lattice_variation_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "calculation_cores"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "calculation_memory"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "calculation_time"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "catalog"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "code"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "composition"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "compound"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "crystal_class"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "crystal_class_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "crystal_family"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "crystal_family_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "crystal_system"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "crystal_system_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "data_api"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "data_source"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "delta_electronic_energy_convergence"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "delta_electronic_energy_threshold"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "density"; s.unit = "g/cm^3"; s.type = "number"; vxschema.push_back(s);
-  s.key = "dft_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "eentropy_atom"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "eentropy_cell"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "Egap"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "Egap_fit"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "Egap_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "energy_atom"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "energy_cell"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "energy_cutoff"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "enthalpy_atom"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "enthalpy_cell"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "enthalpy_formation_atom"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "enthalpy_formation_cell"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "entropic_temperature"; s.unit = "K"; s.type = "number"; vxschema.push_back(s);
-  s.key = "files"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "forces"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "geometry"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "geometry_orig"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "kpoints"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "kpoints_bands_nkpts"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "kpoints_bands_path"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "kpoints_relax"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "kpoints_static"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "lattice_system_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "lattice_system_relax"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "lattice_variation_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "lattice_variation_relax"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "ldau_j"; s.unit = "eV"; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "ldau_l"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "ldau_TLUJ"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "ldau_type"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "ldau_u"; s.unit = "eV"; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "loop"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "natoms"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "nbondxx"; s.unit = "A"; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "node_CPU_Cores"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "node_CPU_MHz"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "node_CPU_Model"; s.unit = ""; s.type = ""; vxschema.push_back(s);
-  s.key = "node_RAM_GB"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "nspecies"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "Pearson_symbol_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Pearson_symbol_relax"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Pearson_symbol_superlattice"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "Pearson_symbol_superlattice_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_Hermann_Mauguin"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_Hermann_Mauguin_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_orbifold"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_orbifold_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_order"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "point_group_order_orig"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "point_group_Schoenflies"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_Schoenflies_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_structure"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_structure_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "point_group_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "positions_cartesian"; s.unit = "A"; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "positions_fractional"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "pressure"; s.unit = "kbar"; s.type = "number"; vxschema.push_back(s);
-  s.key = "pressure_final"; s.unit = "kbar"; s.type = "number"; vxschema.push_back(s);
-  s.key = "pressure_residual"; s.unit = "kbar"; s.type = "number"; vxschema.push_back(s);
-  s.key = "Pulay_stress"; s.unit = "kbar"; s.type = "number"; vxschema.push_back(s);
-  s.key = "PV_atom"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "PV_cell"; s.unit = "eV"; s.type = "number"; vxschema.push_back(s);
-  s.key = "prototype"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "reciprocal_geometry"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "reciprocal_geometry_orig"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "reciprocal_lattice_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "reciprocal_lattice_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "reciprocal_lattice_variation_type"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "reciprocal_lattice_variation_type_orig"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "reciprocal_volume_cell"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "reciprocal_volume_cell_orig"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "scintillation_attenuation_length"; s.unit = "cm"; s.type = "number"; vxschema.push_back(s);
-  s.key = "sg"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "sg2"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "spacegroup_orig"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "spacegroup_relax"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "species"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "species_pp"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "species_pp_ZVAL"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "species_pp_version"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "spinD"; s.unit = "uB"; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "spinF"; s.unit = "uB"; s.type = "number"; vxschema.push_back(s);
-  s.key = "spin_atom"; s.unit = "uB"; s.type = "number"; vxschema.push_back(s);
-  s.key = "spin_cell"; s.unit = "uB"; s.type = "number"; vxschema.push_back(s);
-  s.key = "stoichiometry"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "stress_tensor"; s.unit = ""; s.type = "numbers"; vxschema.push_back(s);
-  s.key = "title"; s.unit = ""; s.type = "string"; vxschema.push_back(s);
-  s.key = "valence_cell_iupac"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "valence_cell_std"; s.unit = ""; s.type = "number"; vxschema.push_back(s);
-  s.key = "volume_atom"; s.unit = "A^3"; s.type = "number"; vxschema.push_back(s);
-  s.key = "volume_cell"; s.unit = "A^3"; s.type = "number"; vxschema.push_back(s);
-  s.key = "Wyckoff_letters"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "Wyckoff_letters_orig"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "Wyckoff_multiplicities"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "Wyckoff_multiplicities_orig"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "Wyckoff_site_symmetries"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  s.key = "Wyckoff_site_symmetries_orig"; s.unit = ""; s.type = "strings"; vxschema.push_back(s);
-  nkeys = vxschema.size();
-}
 
 #endif  // _AFLOW_CLASSES_CPP
 

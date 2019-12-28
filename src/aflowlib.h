@@ -512,12 +512,14 @@ class AflowDB {
   public:
     AflowDB(const string&);
     AflowDB(const string&, const string&, const string&);
+    AflowDB(const AflowDB&);
+    AflowDB& operator=(const AflowDB&);
     ~AflowDB();
+    void clear();
 
     string data_path;
     string database_file;
     string lock_file;
-    xSchema schema;
 
     bool isTMP();
 
@@ -549,6 +551,7 @@ class AflowDB {
     void free();
     void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
     void close();
+    void copy(const AflowDB&);
 
     sqlite3* db;
     bool is_tmp;
@@ -556,13 +559,12 @@ class AflowDB {
     void openTmpFile(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
     bool closeTmpFile(bool=false, bool=false);
 
-    vector<string> getSchemaKeys(const string&);
-
     void rebuildDB();
     void buildTables(int, int, const vector<string>&, const vector<string>&);
     void populateTable(const string&, const vector<string>&, const vector<vector<string> >&);
 
-    vector<string> getDataTypes();
+    vector<string> getSchemaKeys();
+    vector<string> getDataTypes(const vector<string>&, bool);
     vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
     string extractJsonValueAflow(const string&, string);
 

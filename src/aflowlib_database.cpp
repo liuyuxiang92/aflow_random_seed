@@ -88,7 +88,6 @@ AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck
   data_path = dt_path;
   database_file = db_file;
   lock_file = lck_file;
-  schema.initialize();
   if (LDEBUG) {
     std::cerr << "AflowDB: Database file: " << database_file << std::endl;
     std::cerr << "AflowDB: Data path: " << data_path << std::endl;
@@ -97,6 +96,28 @@ AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck
   open();
 }
 
+// Copy constructors
+AflowDB::AflowDB(const AflowDB& that) {
+  copy(that);
+}
+
+AflowDB& AflowDB::operator=(const AflowDB& that) {
+  if (this != &that) copy(that);
+  return *this;
+}
+
+
+void AflowDB::copy(const AflowDB& that) {
+  data_path = that.data_path;
+  database_file = that.database_file;
+  lock_file = that.lock_file;
+  // Two databases should never operate on a temporary
+  // file or have write access at the same time.
+  is_tmp = false;
+  open(SQLITE_OPEN_READONLY);
+}
+
+// Destructor
 AflowDB::~AflowDB() {
   close();
   free();
@@ -107,6 +128,11 @@ void AflowDB::free() {
   database_file = "";
   lock_file = "";
   is_tmp = false;
+}
+
+void AflowDB::clear() {
+  close();
+  free();
 }
 
 // Opens the database file and creates the main cursor
@@ -157,7 +183,7 @@ void AflowDB::openTmpFile(int open_flags) {
     stringstream message;
     message << "Could not create symbolic link to lock file " + lock_file + ": ";
     if (errno == EEXIST) {
-      message << "Another process is created it already.";
+      message << "Another process has created it already.";
     } else {
       message << "Process exited with errno " << errno << ".";
     }
@@ -176,7 +202,7 @@ void AflowDB::openTmpFile(int open_flags) {
                 << " (current time: " << tm_curr << ")." << std::endl;
     }
     if (aurostd::FileExist(lock_file) && !aurostd::FileEmpty(lock_file)) {
-      int pid = aurostd::string2utype<int>(aurostd::file2string(lock_file));
+      pid = aurostd::string2utype<int>(aurostd::file2string(lock_file));
       if (kill(pid, 0)) pid = -1;
     }
     if (tm_curr - tm_tmp < DEFAULT_AFLOW_DB_STALE_THRESHOLD) {
@@ -394,7 +420,8 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     string table = getTables()[0];  // All tables have the same columns, so any table is good
     columns = getColumnNames(table);
 
-    uint nkeys = schema.getNKeys();
+    vector<string> keys_schema = getSchemaKeys();
+    uint nkeys = keys_schema.size();
     if (nkeys > columns.size()) {
       rebuild_db = true;
     } else if (nkeys < columns.size()) {
@@ -407,16 +434,13 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     }
     if (!rebuild_db) {
       vector<string> types_db = getColumnTypes(table);
-      vector<string> types_schema(nkeys);
-      uint k = 0;
-      string type = "";
-      for (k = 0; k < nkeys; k++) {
-        if (schema.getEntry(k).type == "number") types_schema[k] = "REAL";
-        else types_schema[k] = "TEXT";
-      }
+      vector<string> types_schema = getDataTypes(keys_schema, false);
       int index = -1;
+      string key = "";
+      uint k = 0;
       for (k = 0; k < nkeys; k++) {
-        if (!aurostd::withinList(columns, schema.getEntry(k).key, index)) break;
+        key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+        if (!aurostd::withinList(columns, key, index)) break;
         if (types_db[index] != types_schema[k]) break;
       }
       rebuild_db = (k != nkeys);
@@ -461,6 +485,8 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
 
 // Rebuild -------------------------------------------------------------------
 
+//rebuildDB///////////////////////////////////////////////////////////////////
+// Rebuilds the database from scratch.
 void AflowDB::rebuildDB() {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
   // Do not constantly synchronize the database with file on disk.
@@ -469,8 +495,11 @@ void AflowDB::rebuildDB() {
   sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
   // Get columns and types from schema
-  vector<string> columns = schema.getKeys();
-  vector<string> types = getDataTypes();
+  vector<string> keys = getSchemaKeys();
+  uint nkeys = keys.size();
+  vector<string> columns(nkeys);
+  for (uint k = 0; k < nkeys; k++) columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+  vector<string> types = getDataTypes(columns, true);
 
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
   int ncpus = init::GetCPUCores();
@@ -494,6 +523,8 @@ void AflowDB::rebuildDB() {
   if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Finished rebuild." << std::endl;
 }
 
+//buildTables/////////////////////////////////////////////////////////////////
+// Reads the .dat files and processes the JSONs for the database writer.
 void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
   for (int i = startIndex; i < endIndex; i++) {
     stringstream t;
@@ -513,6 +544,12 @@ void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& co
   }
 }
 
+//populateTable///////////////////////////////////////////////////////////////
+// Populates the database tables and creates indexes. This function uses a
+// mutex to make the writing thread-safe. While SQLITE does not allow
+// concurrent writing anyway, multiple threads may open a transaction, which
+// causes the build to fail (hence the mutex). The mutex is also the reason
+// why this function should never do any processing.
 void AflowDB::populateTable(const string& table, const vector<string>& columns, const vector<vector<string> >& values) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
@@ -548,23 +585,40 @@ void AflowDB::populateTable(const string& table, const vector<string>& columns, 
   if (LDEBUG) std::cerr << "Finished building table " << table << std::endl;
 }
 
+// Schema --------------------------------------------------------------------
+
+//getSchemaKeys///////////////////////////////////////////////////////////////
+// Returns the keys from the AFLOW schema.
+vector<string> AflowDB::getSchemaKeys() {
+  vector<string> keys;
+  string key = "";
+  for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
+    if(aurostd::substring2bool(XHOST.vschema.vxsghost[i], "::NAME:")) {
+      key = aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+      keys.push_back(key);
+    }
+  }
+  return keys;
+}
+
 // Data ----------------------------------------------------------------------
 
 //getDataTypes////////////////////////////////////////////////////////////////
 // Gets the data types of the schema keys and converts them into SQLite types.
 // Note that SQLite does not recognize arrays, so they will be stored as text.
-vector<string> AflowDB::getDataTypes() {
-  uint ncols = schema.getNKeys();
-  vector<string> types(ncols);
-  for (uint i = 0; i < ncols; i++) {
-    const _xschema& xschm = schema.getEntry(i);
+vector<string> AflowDB::getDataTypes(const vector<string>& keys, bool unique) {
+  uint nkeys = keys.size();
+  vector<string> types(nkeys);
+  string type = "";
+  for (uint k = 0; k < nkeys; k++) {
     // AUID has to be unique
-    if (xschm.key == "auid") {
-      types[i] = "TEXT UNIQUE NOT NULL";
-    } else if (xschm.type == "number") {
-      types[i] = "REAL";
+    type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + keys[k]);
+    if (unique && (keys[k] == "auid")) {
+      types[k] = "TEXT UNIQUE NOT NULL";
+    } else if (type == "number") {
+      types[k] = "REAL";
     } else {
-      types[i] = "TEXT";
+      types[k] = "TEXT";
     }
   }
   return types;
@@ -977,6 +1031,8 @@ void AflowDB::dropIndex(const string& index) {
 
 // TRANSACTION ---------------------------------------------------------------
 
+//transaction/////////////////////////////////////////////////////////////////
+// Begings (begin == true) or ends a database transaction.
 void AflowDB::transaction(bool begin) {
   string command = string(begin?"BEGIN":"END") + " TRANSACTION";
   sql::SQLexecuteCommand(db, command);
