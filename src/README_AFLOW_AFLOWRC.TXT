@@ -65,11 +65,6 @@ DEFAULT_AFLOW_DB_DATA_PATH
   type: string
   default: "/common/AFLOW/LIBS/"
 
-DEFAULT_AFLOW_DB_SCHEMA_FILE
-  description: The location of the AFLOW database schema file.
-  type: string
-  default: "/www/search/aapi_schema.json"
-
 DEFAULT_AFLOW_DB_LOCK_FILE
   description: The location of the AFLOW database lock file.
   type: string
