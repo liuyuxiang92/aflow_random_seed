@@ -91,7 +91,7 @@ LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(LIBS_STATIC)
 DEBUG=
 BACKUP=/common/AFLOW/SRC/
 
-#ME190823 - SQLite options
+# ME190823 - SQLite options
 # See https://www.sqlite.org/compile.html for compile-time options
 # The link recommends -DSQLITE-THREADSAFE=0, but that would disable
 # all threading capabilities

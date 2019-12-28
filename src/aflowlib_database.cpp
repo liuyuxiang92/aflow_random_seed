@@ -190,6 +190,8 @@ void AflowDB::openTmpFile(int open_flags) {
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
   
+  // If there is a temporary database file, a rebuild process is either in
+  // progress or failed.
   if (aurostd::FileExist(tmp_file)) {
     long int tm_tmp = aurostd::FileModificationTime(tmp_file);
     time_t t = std::time(nullptr);
@@ -201,6 +203,8 @@ void AflowDB::openTmpFile(int open_flags) {
                 << "Found temporary database file with time stamp " << tm_tmp
                 << " (current time: " << tm_curr << ")." << std::endl;
     }
+    // Check if the rebuild process that is saved in the lock file
+    // is still active.
     if (aurostd::FileExist(lock_file) && !aurostd::FileEmpty(lock_file)) {
       pid = aurostd::string2utype<int>(aurostd::file2string(lock_file));
       if (kill(pid, 0)) pid = -1;
@@ -414,12 +418,13 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
     if (LDEBUG && rebuild_db) std::cerr << function << ": Rebuilding database (file not found or empty)." << std::endl;
   }
 
-  // Rebuild when the schema has new entries
+  // Rebuild when the schema has been updated
   if (!rebuild_db) {
     vector<string> columns;
     string table = getTables()[0];  // All tables have the same columns, so any table is good
     columns = getColumnNames(table);
 
+    // Properties
     vector<string> keys_schema = getSchemaKeys();
     uint nkeys = keys_schema.size();
     if (nkeys > columns.size()) {
@@ -432,6 +437,8 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
               << " aflow --rebuild_database if the database should be updated regardless.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
+
+    // Data types
     if (!rebuild_db) {
       vector<string> types_db = getColumnTypes(table);
       vector<string> types_schema = getDataTypes(keys_schema, false);
@@ -489,8 +496,8 @@ bool AflowDB::rebuildDatabase(bool force_rebuild) {
 // Rebuilds the database from scratch.
 void AflowDB::rebuildDB() {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-  // Do not constantly synchronize the database with file on disk.
-  // Increases performance significantly.
+  // Do not constantly synchronize the database with file on disk (increases
+  // performance significantly).
   if (LDEBUG) std::cerr << _AFLOW_DB_ERR_PREFIX_ << "rebuildDB(): Starting rebuild." << std::endl;
   sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
@@ -501,6 +508,7 @@ void AflowDB::rebuildDB() {
   for (uint k = 0; k < nkeys; k++) columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
   vector<string> types = getDataTypes(columns, true);
 
+  // Rebuild
 #ifdef AFLOW_DB_MULTITHREADS_ENABLE
   int ncpus = init::GetCPUCores();
   int max_cpu = 16;
