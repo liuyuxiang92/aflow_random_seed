@@ -661,12 +661,26 @@ string AflowDB::extractJsonValueAflow(const string& json, string key) {
     start += key.length();
     end = json.find("\":", start);
     if (end != string::npos) {
-      value = json.substr(start, end - start);
-      end = value.find_last_of(",\"") - 1;
+      value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
+      // If we have a nested object, "value" should only be '{' + whitespace by now.
+      if (value[0] == '{') {
+        // In case there is any white space between key and value
+        string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
+        string message = "JSON parser cannot read nested objects.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      }
+      end = value.find_last_of(",");
       value = value.substr(0, end);
     } else {
       end = json.find("}", start);
-      value = json.substr(start, end - start);
+      // In case there is any white space between key and value
+      value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
+      // If we have a nested object, it should start with '{'
+      if (value[0] == '{') {
+        string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
+        string message = "JSON parser cannot read nested objects.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      }
     }
   } else {
     value = "";

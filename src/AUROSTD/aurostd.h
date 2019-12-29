@@ -212,7 +212,7 @@ typedef unsigned uint;
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
 #include "../aflow.h"
-#include "../SQLITE/sqlite3.h"
+//#include "../SQLITE/sqlite3.h"  // OBSOLETE ME191228 - not used
 
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
 template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<utype>&);// __xprototype;
@@ -366,7 +366,7 @@ namespace aurostd {
   // [OBSOLETE]  bool UnzipFile(const string& FileName);  bool ZipFile(const string& FileName);
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
-  long int FileSize(const string& FileName);  // ME191001
+  unsigned long long int FileSize(const string& FileName);  // ME191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO190808

@@ -1993,8 +1993,8 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo - jan 08
   // returns in bytes the size of a file
-  // ME191001 - Changed to long int to accommodate large files
-  long int FileSize(const string& _FileName) {
+  // ME191001 - Changed to unsigned long long int to accommodate large files
+  unsigned long long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     ifstream FileStream;
     long int sizeout = 0;

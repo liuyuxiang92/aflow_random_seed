@@ -73,7 +73,7 @@ DEFAULT_AFLOW_DB_LOCK_FILE
 DEFAULT_AFLOW_DB_STALE_THRESHOLD
   description: The time in seconds at which the AFLOW database rebuild process is considered stale.
   type: double
-  default: 10,800 (3 hours)
+  default: 10800 (3 hours)
 
 ####################################################################################################
 FILENAMES FOR AFLOW.ORG ANALYSIS
