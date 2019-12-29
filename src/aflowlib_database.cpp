@@ -662,7 +662,7 @@ string AflowDB::extractJsonValueAflow(const string& json, string key) {
     end = json.find("\":", start);
     if (end != string::npos) {
       value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-      // If we have a nested object, "value" should only be '{' + whitespace by now.
+      // If we have a nested object, "value" should only be '{' + white space by now.
       if (value[0] == '{') {
         // In case there is any white space between key and value
         string function = _AFLOW_DB_ERR_PREFIX_ + "extractJsonValueAflow()";
