@@ -371,6 +371,10 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         aflow --alpha_species=Zr15.6Ag2Mg14
         returns AgMgZr
 
+  aflow --analyze_database
+        Outputs the statistics of the AFLOW database file into a JSON file. The
+        locations of the files needs to be defined in the .aflow.rc file.
+
   aflow --angle=cutoff < POSCAR  
         Outputs to standard out the angles for each atom triplet
         made up of neighors within a distance cutoff of each other.  
@@ -2765,6 +2769,9 @@ LATTICES = (the ones with "")
         each type you can create supercell (see --supercell) to make this
         function usable.
 
+  aflow --rebuild_database
+        Fetches new entries and rebuilds the AFLOW database file.
+
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
         #  is the space group number
@@ -3135,6 +3142,9 @@ LATTICES = (the ones with "")
 
   aflow --uffenergy | --ue <  POSCAR
         Output the energy of the structure using the simplified Universal Force Filed (UFF) method [JACS, 114, 10024 (1992)].
+
+  aflow --update_database
+        Fetches new entries and rebuilds the AFLOW database file if new entries are available.
 
   aflow --vasp                                                                     
         Transforms the GEOMETRICAL (or whicever is the input file format) to a        
