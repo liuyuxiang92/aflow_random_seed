@@ -93,50 +93,57 @@ _atom::_atom() {
 // destructor
 _atom::~_atom() {free();}
 
-void _atom::free() {
+void _atom::free() { // PRIVATE
 }
 
-const _atom& _atom::operator=(const _atom& b) {       // operator=
-  if(this != &b) {
-    free();
-    fpos=b.fpos;
-    cpos=b.cpos;
-    corigin=b.corigin;
-    coord=b.coord;
-    fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
-    cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
-    spin=b.spin;
-    spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
-    noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-    noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-    mass=b.mass;
-    type=b.type;
-    name=b.name;
-    name_is_given=b.name_is_given;
-    cleanname=b.cleanname;
-    info=b.info;  // (RHT)
-    atomic_number=b.atomic_number;
-    number=b.number;
-    sd=b.sd;
-    ijk=b.ijk;
-    isincell=b.isincell;
-    basis=b.basis;
-    reference=b.reference;
-    ireference=b.ireference;
-    equivalent=b.equivalent;
-    is_inequivalent=b.is_inequivalent;
-    num_equivalents=b.num_equivalents;
-    index_iatoms=b.index_iatoms;
-    order_parameter_value=b.order_parameter_value;
-    order_parameter_atom=b.order_parameter_atom;
-    partial_occupation_value=b.partial_occupation_value;
-    partial_occupation_flag=b.partial_occupation_flag;
-    shell=b.shell;
-    verbose=b.verbose;
-    print_RHT=b.print_RHT;  // (RHT)
-    print_cartesian=b.print_cartesian;
-  }
+void _atom::copy(const _atom& b) { // copy PRIVATE
+  free();
+  fpos=b.fpos;
+  cpos=b.cpos;
+  corigin=b.corigin;
+  coord=b.coord;
+  fpos_equation=b.fpos_equation; //DX 20180607 - symbolic math for atom positions
+  cpos_equation=b.cpos_equation; //DX 20180607 - symbolic math for atom positions
+  spin=b.spin;
+  spin_is_given=b.spin_is_given; // DX 9/21/17 - magnetic sym
+  noncoll_spin=b.noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+  noncoll_spin_is_given=b.noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+  mass=b.mass;
+  type=b.type;
+  name=b.name;
+  name_is_given=b.name_is_given;
+  cleanname=b.cleanname;
+  info=b.info;  // (RHT)
+  atomic_number=b.atomic_number;
+  number=b.number;
+  sd=b.sd;
+  ijk=b.ijk;
+  isincell=b.isincell;
+  basis=b.basis;
+  reference=b.reference;
+  ireference=b.ireference;
+  equivalent=b.equivalent;
+  is_inequivalent=b.is_inequivalent;
+  num_equivalents=b.num_equivalents;
+  index_iatoms=b.index_iatoms;
+  order_parameter_value=b.order_parameter_value;
+  order_parameter_atom=b.order_parameter_atom;
+  partial_occupation_value=b.partial_occupation_value;
+  partial_occupation_flag=b.partial_occupation_flag;
+  shell=b.shell;
+  verbose=b.verbose;
+  print_RHT=b.print_RHT;  // (RHT)
+  print_cartesian=b.print_cartesian;
+}
+
+const _atom& _atom::operator=(const _atom& b) {  // operator= PUBLIC
+  if(this!=&b) {free();copy(b);}
   return *this;
+}
+
+_atom::_atom(const _atom& b) { // copy PUBLIC
+  //  free(); *this=b;
+  copy(b);
 }
 
 void _atom::clear(){_atom a; (*this)=a;}

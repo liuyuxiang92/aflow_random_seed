@@ -283,16 +283,34 @@ namespace aurostd {
     }
   }
 
-  bool xoption::isscheme(string check) const { //CO 180101
+  bool xoption::isscheme(string check) const {                     //CO 180101
+    // checks only scheme (vxscheme) it does not go through the attached schemes (vxghost).
     string a,b;
+    // check schemes list going through vxscheme 1 by 1
     for(uint i=0;i<vxscheme.size();i++) {
-      a=aurostd::toupper(vxscheme.at(i));b=aurostd::toupper(check);                                  // shortcuts
+      a=aurostd::toupper(vxscheme.at(i));                         // shortcuts
+      b=aurostd::toupper(check);                                  // shortcuts
+      // cerr << "xoption::isscheme for scheme i=" << i << " " << a << " " << b << endl;  
       aurostd::StringSubst(a,"GAMMA","G");aurostd::StringSubst(b,"GAMMA","G");                      // shortcuts
       aurostd::StringSubst(a,"MONKHORST_PACK","M");aurostd::StringSubst(b,"MONKHORST_PACK","M");    // shortcuts
       aurostd::StringSubst(a,"MP","M");aurostd::StringSubst(b,"MP","M");                            // shortcuts
       aurostd::StringSubst(a,"AUTO","A");aurostd::StringSubst(b,"AUTO","A");                        // shortcuts
-      if(a==b) return TRUE;
+      if(a==b) {
+	//	cerr << "xoption::isscheme BINGO FOUND SCHEME " << a << " " << b << endl;  
+	return TRUE;
+      }
     }
+    // check attached schemes list going through vxsghost 2 by 2  // SC 20191227
+    for(uint i=0;i<vxsghost.size();i+=2) {
+      //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;  
+      a=aurostd::toupper(vxsghost.at(i));                         // shortcuts
+      b=aurostd::toupper(check);                                  // shortcuts
+      if(a==b) {
+	//	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;  
+	return TRUE;
+      }
+    }
+    // nor in scheme nor in attached scheme... exit
     return FALSE;
   }
 
@@ -350,6 +368,7 @@ namespace aurostd {
   
   bool xoption::flag(void) const {  // same as ischeme
     if(vxscheme.size()>0) return TRUE;
+    if(vxsghost.size()>0) return TRUE;  // SC 20191227
     return FALSE;
   }
   
@@ -401,15 +420,13 @@ namespace aurostd {
   // [OBSOLETE]   return opattachedscheme(_xscheme,"",FALSE);
   // [OBSOLETE] }
     
- uint xoption::push_attached(string _xscheme,string attached) {
+  uint xoption::push_attached(string _xscheme,string attached) {
     return opattachedscheme(_xscheme,attached,TRUE);
   }
   
   uint xoption::pop_attached(string _xscheme) {
     return opattachedscheme(_xscheme,"",FALSE);
   }
-  
-
  
   bool xoption::args2addattachedscheme(vector<string> &argv,const string _xscheme,const string& _s_search,string string_default) {
     vector<string> cmds;
