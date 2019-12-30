@@ -27,11 +27,11 @@ namespace sql {
 
 void SQLexecuteCommand(sqlite3* cursor, const string& command) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-  if (LDEBUG) std::cerr << "aflowlib::SQLexecuteCommand(): command = " << command << std::endl;
+  if (LDEBUG) std::cerr << "sql::SQLexecuteCommand(): command = " << command << std::endl;
   char* sqlErrMsg = 0;
   int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback, 0, &sqlErrMsg);
   if (sql_code != SQLITE_OK) {
-    std::string function = "aflowlib::SQLexecuteCommand()";
+    std::string function = "sql::SQLexecuteCommand()";
     std::string message = string(sqlErrMsg) + " in command " + command;
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
   }
@@ -39,12 +39,12 @@ void SQLexecuteCommand(sqlite3* cursor, const string& command) {
 
 string SQLexecuteCommandSCALAR(sqlite3* cursor, const string& command) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-  if (LDEBUG) std::cerr << "aflowlib::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
+  if (LDEBUG) std::cerr << "sql::SQLexecuteCommandSCALAR(): command = " << command << std::endl;
   char* sqlErrMsg = 0;
   string returnstring = "";
   int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackSCALAR, &returnstring, &sqlErrMsg);
   if (sql_code != SQLITE_OK) {
-    string function = "aflowlib::SQLexecuteCommandSCALAR()";
+    string function = "sql::SQLexecuteCommandSCALAR()";
     string message = string(sqlErrMsg) + " in command " + command;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -55,12 +55,12 @@ string SQLexecuteCommandSCALAR(sqlite3* cursor, const string& command) {
 
 vector<string> SQLexecuteCommandVECTOR(sqlite3* cursor, const string& command) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG) && _SQL_COMMAND_DEBUG_);
-  if (LDEBUG) std::cerr << "aflowlib::SQLexecuteCommandVECTOR(): command = " << command << std::endl;
+  if (LDEBUG) std::cerr << "sql::SQLexecuteCommandVECTOR(): command = " << command << std::endl;
   char *sqlErrMsg = 0;
   vector<string> returnvector;
   int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallbackVECTOR, &returnvector, &sqlErrMsg);
   if (sql_code != SQLITE_OK) {
-    string function = "aflowlib::SQLexecuteCommandVECTOR()";
+    string function = "sql::SQLexecuteCommandVECTOR()";
     string message = string(sqlErrMsg) + " in command " + command;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -71,12 +71,12 @@ vector<string> SQLexecuteCommandVECTOR(sqlite3* cursor, const string& command) {
 
 vector<vector<string> > SQLexecuteCommand2DVECTOR(sqlite3* cursor, const string& command) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_COMMAND_DEBUG_);
-  if (LDEBUG) std::cerr << "aflowlib::SQLexecuteCommand2DVECTOR(): command = " << command << std::endl;
+  if (LDEBUG) std::cerr << "sql::SQLexecuteCommand2DVECTOR(): command = " << command << std::endl;
   char *sqlErrMsg = 0;
   vector<vector<string> > returnvector;
   int sql_code = sqlite3_exec(cursor, command.c_str(), SQLcallback2DVECTOR, &returnvector, &sqlErrMsg);
   if (sql_code != SQLITE_OK) {
-    string function = "aflowlib::SQLexecuteCommand2DVECTOR()";
+    string function = "sql::SQLexecuteCommand2DVECTOR()";
     string message = string(sqlErrMsg) + " in command " + command;
     message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_SQL_);
@@ -94,7 +94,7 @@ int SQLcallback(void* data, int argc, char** argv, char** col) {
   (void) data;  // To suppress compiler warnings
   if (LDEBUG) {
     for (int i = 0; i < argc; i++) {
-      std::cerr << "aflowlib::SQLcallback()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+      std::cerr << "sql::SQLcallback()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
     }
     std::cerr << std::endl;
   }
@@ -105,7 +105,7 @@ int SQLcallbackSCALAR(void* data, int argc, char** argv, char** col) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
   if (LDEBUG) {
     for (int i = 0; i < argc; i++) {
-      std::cerr << "aflowlib::SQLcallbackSCALAR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+      std::cerr << "sql::SQLcallbackSCALAR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
     }
     std::cerr << std::endl;
   }
@@ -126,7 +126,7 @@ int SQLcallbackVECTOR(void* data, int argc, char** argv, char** col) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
   if (LDEBUG) {
     for (int i = 0; i < argc; i++) {
-      std::cerr << "aflowlib::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+      std::cerr << "sql::SQLcallbackVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
     }
     std::cerr << std::endl;
   }
@@ -144,7 +144,7 @@ int SQLcallback2DVECTOR(void* data, int argc, char** argv, char** col) {
   bool LDEBUG = ((FALSE || XHOST.DEBUG || _AFLOW_SQL_DEBUG_) && _SQL_CALLBACK_DEBUG_);
   if (LDEBUG) {
     for (int i = 0; i < argc; i++) {
-      std::cerr << "aflowlib::SQLcallback2DVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
+      std::cerr << "sql::SQLcallback2DVECTOR()[" << i << "]: " << col[i] << " = " << (argv[i]?argv[i]:"NULL") << std::endl;
     }
     std::cerr << std::endl;
   }
@@ -158,7 +158,7 @@ int SQLcallback2DVECTOR(void* data, int argc, char** argv, char** col) {
   return 0;
 }
 
-}  // namespace aflowlib
+}  // namespace sql
 
 //****************************************************************************
 // *                                                                         *
