@@ -494,7 +494,9 @@ bool StructurePrototype::calculateSymmetry(){
   // The Pearson symbol calculation takes more time, so I do not calculate it
 
   Pearson = "";
-  space_group = structure_representative.SpaceGroup_ITC();
+  bool no_scan = false; //DX 20191230
+  double use_tol = SYM::defaultTolerance(structure_representative); //DX 20191230
+  space_group = structure_representative.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan); //DX 20191230
   vector<GroupedWyckoffPosition> tmp_grouped_Wyckoff_positions; 
   compare::groupWyckoffPositions(structure_representative, tmp_grouped_Wyckoff_positions);
   grouped_Wyckoff_positions = tmp_grouped_Wyckoff_positions;
@@ -2580,7 +2582,7 @@ namespace compare{
     vector<std::thread*> threads;
     for(uint n=0; n<num_proc; n++){
       //DX 20191107 [switching to getThreadDistribution] - threads.push_back(std::thread(SYM::calculateSpaceGroupsInSetRange,std::ref(vxstrs),std::ref(start_indices[n]),std::ref(end_indices[n])));
-      threads.push_back(new std::thread(&SYM::calculateSpaceGroupsInSetRange,std::ref(vxstrs),thread_distribution[n][0],thread_distribution[n][1]));
+      threads.push_back(new std::thread(&SYM::calculateSpaceGroups,std::ref(vxstrs),thread_distribution[n][0],thread_distribution[n][1],SG_SETTING_ANRL)); //DX 20191230 - use ANRL setting so we can cast into prototype designation later
     }
     // Join threads 
     for(uint t=0;t<num_proc;t++){
@@ -2686,15 +2688,20 @@ namespace compare{
 // calculateSpaceGroupsInSetRange
 // ***************************************************************************
 namespace compare {
-  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index, uint end_index){ //DX 20191108 - removed & from uint
+  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index, uint end_index, uint setting){ //DX 20191230 - added setting
    
     // Calculates the space group and Wyckoff positions for the representative 
     // structure in the StructurePrototype object
-    // Mirrors SYM::calculateSpaceGroupsInSetRange(), but is specific for 
+    // Mirrors SYM::calculateSpaceGroups(), but is specific for 
     // StructurePrototype objects, as opposed to xstructures
+    bool no_scan = false; //DX 20191230
+    
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute symmetry analysis for all StructurePrototypes
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
 
     for(uint i=start_index;i<end_index;i++){ //DX 20191107 - switching convention <= vs <
-      structures[i].space_group = structures[i].structure_representative.SpaceGroup_ITC();
+      double use_tol = SYM::defaultTolerance(structures[i].structure_representative); //DX 20191230
+      structures[i].space_group = structures[i].structure_representative.SpaceGroup_ITC(use_tol, -1, setting, no_scan); //DX 20191230 - added arguments
       vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
       groupWyckoffPositions(structures[i].structure_representative, grouped_Wyckoff_positions);
       structures[i].grouped_Wyckoff_positions=grouped_Wyckoff_positions;
@@ -2730,7 +2737,7 @@ namespace compare{
     vector<std::thread*> threads;
     for(uint n=0; n<num_threads; n++){
       //DX 20191107 [switching to getThreadDistribution] - threads.push_back(std::thread(compare::calculateSpaceGroupsInSetRange,std::ref(structures),std::ref(start_indices[n]),std::ref(end_indices[n])));
-      threads.push_back(new std::thread(&compare::calculateSpaceGroups,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107 [switching to getThreadDistribution] 
+      threads.push_back(new std::thread(&compare::calculateSpaceGroups,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1],SG_SETTING_ANRL)); //DX 20191107 [switching to getThreadDistribution] 
     }
     // Join threads
     for(uint t=0;t<num_threads;t++){
@@ -2829,7 +2836,9 @@ namespace compare{
     //xstr.GetLatticeType(); //slow; consider a different method -> (SpaceGroup_ITC) finds this
     //vpearsons.push_back(xstr.pearson_symbol);
     vpearsons.push_back("");
-    vsgroups.push_back(xstr.SpaceGroup_ITC());
+    bool no_scan = false; //DX 20191230
+    double use_tol = SYM::defaultTolerance(xstr); //DX 20191230
+    vsgroups.push_back(xstr.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan)); //DX 20191230
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions; 
     groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
     vgrouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);

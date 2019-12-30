@@ -205,7 +205,7 @@ namespace compare{
   //DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<uint>& start_indices, vector<uint>& end_indices); //DX 20190530 - renamed
   void calculateSymmetries(vector<xstructure>& vxstrs, vector<string>& vpearsons, vector<uint>& vsgroups, 
       vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions, uint& num_proc);
-  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index, uint end_index); //DX 20191107 - remove & from uint
+  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX 20191230 added setting
   void calculateLFAEnvironments(vector<StructurePrototype>& structures, uint num_proc);  //DX 20191105
   void calculateSymmetries(vector<StructurePrototype>& structures, uint& num_proc);  //DX 20190118
   void calculateSymmetry(xstructure& xstr, vector<string>& vpearsons, vector<uint>& vsgroups,

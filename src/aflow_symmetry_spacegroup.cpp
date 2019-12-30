@@ -3247,20 +3247,19 @@ namespace SYM {
 } //namespace SYM
 
 // ********************************************************************************************************************************
-// AFLOW2SG:: Prints space group in string format (Void Input)
+// calculateSpaceGroups()
 // ********************************************************************************************************************************
 namespace SYM {
-  void calculateSpaceGroups(vector<xstructure>& vxstrs){
-    for(uint i=0;i<vxstrs.size();i++){
-      vxstrs[i].SpaceGroup_ITC();
-    }
-  }
-}
+  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index, uint end_index, uint setting){ //DX 20191230 add setting option
 
-namespace SYM {
-  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint start_index, uint end_index){ //DX 20191108 removed & for uint
+    bool no_scan = false;
+
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute symmetry analysis for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=vxstrs.size(); }
+
     for(uint i=start_index;i<end_index;i++){ //DX 20191108 - [switching from compare::splitTaskIntoThreads to getThreadDistribution, end index conventions differ, <= vs <]
-      vxstrs[i].SpaceGroup_ITC();
+      double use_tol = SYM::defaultTolerance(vxstrs[i]);
+      vxstrs[i].SpaceGroup_ITC(use_tol, -1, setting, no_scan);
     }
   }
 }
