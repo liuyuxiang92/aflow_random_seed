@@ -1361,7 +1361,7 @@ namespace pflow {
 
     vector<string> tokens,sub_tokens;
     vector<string> matchbook; //aflux - filter/get properties
-    vector<string> schema; //aflux - get metadata (e.g., units)
+    vector<string> schema; //get metadata of properties (e.g., units)
     vector<string> property_units;
 
     bool same_species = true;
@@ -1614,33 +1614,41 @@ namespace pflow {
     //::print(compounds);
     
     // ---------------------------------------------------------------------------
-    // get AFLUX schema, i.e., metadata (for the units)
-    if(schema.size()>0){
-      schema.push_back(aflux_format);
-      schema.push_back(paging);
-
-      // call AFLUX to get schema
-      response = aflowlib::AFLUXCall(schema);
-      vector<vector<std::pair<string,string> > > schema_response = aflowlib::getPropertiesFromAFLUXResponse(response);
-
-			// extract units
-			for(uint i=0;i<schema_response.size();i++){
-				bool units_found = false;
-				for(uint j=0;j<schema_response[i].size();j++){
-					if(schema_response[i][j].first=="units"){
-						property_units.push_back(schema_response[i][j].second);
-						units_found=true;
-						break;
-					}
-				}
-				if(!units_found){
-					property_units.push_back("");
-				}
-			}
-      if(LDEBUG) {
-        for(uint i=0;i<property_units.size();i++){ cerr << function_name << ": units for " << property_list[i] << ": " << property_units[i] << endl; }
-      }
+    // get schema from xoptions, i.e., metadata (for the units)
+    string schema_unit = "";
+    for(uint p=0;p<property_list.size();p++){
+      schema_unit = "SCHEMA::UNIT:" + aurostd::toupper(property_list[p]);
+    	property_units.push_back(XHOST.vschema.getattachedscheme(schema_unit));
     }
+    
+    //DX 20191230 [OBSOLETE - FROM AFLUX]     // ---------------------------------------------------------------------------
+    //DX 20191230 [OBSOLETE - FROM AFLUX]     // get AFLUX schema, i.e., metadata (for the units)
+    //DX 20191230 [OBSOLETE - FROM AFLUX]     if(schema.size()>0){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       schema.push_back(aflux_format);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       schema.push_back(paging);
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       // call AFLUX to get schema
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       response = aflowlib::AFLUXCall(schema);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       vector<vector<std::pair<string,string> > > schema_response = aflowlib::getPropertiesFromAFLUXResponse(response);
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 			// extract units
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 			for(uint i=0;i<schema_response.size();i++){
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 				bool units_found = false;
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 				for(uint j=0;j<schema_response[i].size();j++){
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 					if(schema_response[i][j].first=="units"){
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 						property_units.push_back(schema_response[i][j].second);
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 						units_found=true;
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 						break;
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 					}
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 				}
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 				if(!units_found){
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 					property_units.push_back("");
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 				}
+    //DX 20191230 [OBSOLETE - FROM AFLUX] 			}
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       if(LDEBUG) {
+    //DX 20191230 [OBSOLETE - FROM AFLUX]         for(uint i=0;i<property_units.size();i++){ cerr << function_name << ": units for " << property_list[i] << ": " << property_units[i] << endl; }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]       }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]     }
 
     message << "Total number of candidate structures from database: " << auids.size();
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -1888,7 +1896,7 @@ namespace pflow {
 
     vector<string> tokens,sub_tokens;
     vector<string> matchbook; //aflux - filter/get properties
-    vector<string> schema; //aflux - get metadata (e.g., units)
+    vector<string> schema; //get metadata of properties (e.g., units)
     vector<string> property_units;
 
     bool same_species = true;
@@ -2160,33 +2168,41 @@ namespace pflow {
     //::print(compounds);
     
     // ---------------------------------------------------------------------------
-    // get AFLUX schema, i.e., metadata (for the units)
-    if(schema.size()>0){
-      schema.push_back(format);
-      schema.push_back(paging);
-
-      // call AFLUX to get schema
-      response = aflowlib::AFLUXCall(schema);
-      vector<vector<std::pair<string,string> > > schema_response = aflowlib::getPropertiesFromAFLUXResponse(response);
-
-      // extract units
-      for(uint i=0;i<schema_response.size();i++){
-        bool units_found = false;
-        for(uint j=0;j<schema_response[i].size();j++){
-          if(schema_response[i][j].first=="units"){
-            property_units.push_back(schema_response[i][j].second);
-            units_found=true;
-            break;
-          }
-        }
-        if(!units_found){
-          property_units.push_back("");
-        }
-      }
-      if(LDEBUG){
-        for(uint i=0;i<property_units.size();i++){ cerr << function_name << ": units for " << property_list[i] << ": " << property_units[i] << endl; }
-      }
+    // get schema from xoptions, i.e., metadata (for the units) (DX 20191230)
+    string schema_unit = "";
+    for(uint p=0;p<property_list.size();p++){
+      schema_unit = "SCHEMA::UNIT:" + aurostd::toupper(property_list[p]);
+    	property_units.push_back(XHOST.vschema.getattachedscheme(schema_unit));
     }
+
+    //DX 20191230 [OBSOLETE - FROM AFLUX]    // ---------------------------------------------------------------------------
+    //DX 20191230 [OBSOLETE - FROM AFLUX]    // get AFLUX schema, i.e., metadata (for the units)
+    //DX 20191230 [OBSOLETE - FROM AFLUX]    if(schema.size()>0){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      schema.push_back(format);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      schema.push_back(paging);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      // call AFLUX to get schema
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      response = aflowlib::AFLUXCall(schema);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      vector<vector<std::pair<string,string> > > schema_response = aflowlib::getPropertiesFromAFLUXResponse(response);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      // extract units
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      for(uint i=0;i<schema_response.size();i++){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]        bool units_found = false;
+    //DX 20191230 [OBSOLETE - FROM AFLUX]        for(uint j=0;j<schema_response[i].size();j++){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]          if(schema_response[i][j].first=="units"){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]            property_units.push_back(schema_response[i][j].second);
+    //DX 20191230 [OBSOLETE - FROM AFLUX]            units_found=true;
+    //DX 20191230 [OBSOLETE - FROM AFLUX]            break;
+    //DX 20191230 [OBSOLETE - FROM AFLUX]          }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]        }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]        if(!units_found){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]          property_units.push_back("");
+    //DX 20191230 [OBSOLETE - FROM AFLUX]        }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      if(LDEBUG){
+    //DX 20191230 [OBSOLETE - FROM AFLUX]        for(uint i=0;i<property_units.size();i++){ cerr << function_name << ": units for " << property_list[i] << ": " << property_units[i] << endl; }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]      }
+    //DX 20191230 [OBSOLETE - FROM AFLUX]    }
 
     message << "Total number of candidate structures from database: " << auids.size();
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
