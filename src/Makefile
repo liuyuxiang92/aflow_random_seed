@@ -23,8 +23,10 @@
 #
 # ***************************************************************************
 
+##########################################################################
+#VARIABLES START
+##########################################################################
 VERSNUMBER=3.1.227
-
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
 
@@ -33,16 +35,15 @@ UNAME=$(shell uname)
 
 # for aflow
 # https://stackoverflow.com/questions/714100/os-detecting-makefile
-ifeq ($(UNAME),Darwin)
-CPP=clang++
-CC=clang
-ARCH=-e ARCH=-D_MACOSX_
-else
 CPP=g++
 #-O2 -frepo
 # for sqllite
 CC=gcc
 ARCH=
+ifeq ($(UNAME),Darwin)
+CPP=clang++
+CC=clang
+ARCH=-e -D_MACOSX_
 endif
 
 #CPP=g++-fsf-7 
@@ -53,7 +54,7 @@ endif
 # -std=gnu++0x
 #CCFLAGS= -DCYGWIN -Wall -W -fno-inline
 CCFLAGS=-Wall -W -fno-inline
-CCFLAGS_MT=$(CCFLAGS) -O2
+#[CO191217 - put in OPTS_MT]CCFLAGS_MT=$(CCFLAGS) -O2
 #CCFLAGS_GSA=$(CCFLAGS) -O1	#CO OBSOLETE 170601
 INCLUDE = -I ./
 #INCLUDE = -I ./  -I /opt/intel/mkl100/include
@@ -63,6 +64,7 @@ OPTS=
 #-O1
 #-O3
 # -march=opteron
+OPTS_MT=-O2 -std=gnu++0x
 TODAY=-DTODAY=\"$(TIME)\"
 VERS=-DAFLOW_VERSION=\"$(VERSNUMBER)\" $(TODAY)
 
@@ -194,8 +196,11 @@ CCE_OBJ                = $(CCE_CPP:.cpp=.o)
 MAKEFILE_OBJ           = $(MAKEFILE_CPP:.cpp=.o)
 SQLITE_OBJ             = $(SQLITE_C:.c=.o)
 
-AFLOW_OBJS = $(AFLOW_OBJ) $(AUROSTD_OBJ) $(AFLOW_CLASS_OBJ) $(AFLOW_FUNCS_OBJ) $(PFLOW_FUNCS_OBJ) $(ESTRUCTURE_FUNCS_OBJ) $(POCC_FUNCS_OLD_OBJ) $(POCC_OBJ) $(APENNSY_FUNCS_OBJ) $(LIBRARIES_FUNCS_OBJ) $(MIX_EXPERIMENTS_OBJ) $(CONTRIB_FUNCS_OBJ) $(AFLOWLIB_OBJ) $(AGL_OBJ) $(AEL_OBJ) $(APL_OBJ) $(ANRL_OBJ) $(COMPARE_FUNCS_DH_OBJ) $(CHULL_OBJ) $(GFA_OBJ) $(CCE_OBJ) $(MAKEFILE_OBJ) $(SQLITE_OBJ)
+AFLOW_OBJS = $(AUROSTD_OBJ) $(AFLOW_OBJ) $(AFLOW_CLASS_OBJ) $(AFLOW_FUNCS_OBJ) $(PFLOW_FUNCS_OBJ) $(ESTRUCTURE_FUNCS_OBJ) $(POCC_FUNCS_OLD_OBJ) $(POCC_OBJ) $(APENNSY_FUNCS_OBJ) $(LIBRARIES_FUNCS_OBJ) $(MIX_EXPERIMENTS_OBJ) $(CONTRIB_FUNCS_OBJ) $(AFLOWLIB_OBJ) $(AGL_OBJ) $(AEL_OBJ) $(APL_OBJ) $(ANRL_OBJ) $(COMPARE_FUNCS_DH_OBJ) $(CHULL_OBJ) $(GFA_OBJ) $(CCE_OBJ) $(MAKEFILE_OBJ) $(SQLITE_OBJ)
 AFLOW_DEP = $(AFLOW_OBJS) $(AFLOWLIB_WEBAPP_CPP) $(CHULL_JUPYTER_CPP)
+##########################################################################
+#VARIABLES STOP
+##########################################################################
 
 all: aflow aflow_data 
 	$(MAKE) check
@@ -212,11 +217,11 @@ aflow: $(AFLOW_DEP) Makefile
 	ln -sf aflow apennsy
 
 $(SQLITE_OBJ): $(SQLITE_C)	#CO 1706147
-	#$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
-	#$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $^ $(LIBS)
-	#$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 	$(CC) -DSQLITE_ENABLE_JSON1 -c $^ -o $@
-	#cp sqlite3.o ./SQLITE/
+#	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
+#	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $^ $(LIBS)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
+#	#cp sqlite3.o ./SQLITE/
 
 .PHONY: extra extra_clean
 extra:	apl2agr subst findsym frozsl platon
@@ -259,22 +264,22 @@ extra_clean:
 
 .PHONY: mac
 mac:
+	$(MAKE) aflow_data
+	$(MAKE) -e -D_MACOSX_ -j 4
+	$(MAKE) check
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
 #	[CO191217 - fix above for the OS]$(MAKE) CC=clang CPP=clang++ aflow_data
 #	[CO191217 - fix above for the OS]$(MAKE) CC=clang CPP=clang++ -e ARCH=-D_MACOSX_ -j 4
-	$(MAKE) aflow_data
-	$(MAKE) -e ARCH=-D_MACOSX_ -j 4
 #	ln -sf aflow aflowd
 #	ln -sf aflow apennsy
-	$(MAKE) check
 #mac_static: mac
 #	tar Jcfvp aflow_$(VERSNUMBER)_maxOSX_10.X.X.tar.xz aflow aflow_data
 
 .PHONY: static_no_pdf
 static_no_pdf: aflow aflow_data
 	rm -rf $(SQLITE_OBJ)
-	#$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS_STATIC)
+#	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
 	cp sqlite3.o ./SQLITE/
 	rm -f aflow
 #	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW_STATIC)
@@ -767,7 +772,7 @@ aflow_data_extra.cpp: Makefile aflow_library_icsd.dat.xz
 	if [ -f $(NIST_LIB)/14-ary.icsd.xz ]; then echo "std::string icsd_14_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/14-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@; fi
 	if [ -f $(NIST_LIB)/15-ary.icsd.xz ]; then echo "std::string icsd_15_ary=\"\\" >> $@ && xzcat $(NIST_LIB)/15-ary.icsd.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@; fi
 #	echo "std::string Library_ICSD=\"\\" >> $@ && xzcat  ../AFLOW3_NONFREE/LIBS/aflow_library_icsd.dat.xz | grep -v "//" | perl -p -e 's/\"/\\"/g' | perl -p -e 's/\?/\? /g' | perl -p -e 's/\n/ \\n\\\n/g' >> $@ && echo "\";" >> $@
-#[CO191217 - OBSOLETE]	$(MAKE) aflow_data_libraries.cpp
+	$(MAKE) aflow_data_libraries.cpp
 #[CO191217 - OBSOLETE]	echo "std::string aflowlib_lib0=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib0.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp	
 #[CO191217 - OBSOLETE]	echo "std::string aflowlib_lib1=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib1.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp	
 #[CO191217 - OBSOLETE]	echo "std::string aflowlib_lib2=\"\\" >> aflow_data_libraries.cpp && xzcat ../AFLOW3_NONFREE/EXTRA/CALCULATED/aflowlib_lib2.dat.xz | grep -v "//" | perl -p -e 's/\n/ \\n\\\n/g' >> aflow_data_libraries.cpp && echo "\";" >> aflow_data_libraries.cpp	
