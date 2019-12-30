@@ -405,8 +405,7 @@ namespace SYM {
 // ******************************************************************************
 //MAIN FUNCITONS
 namespace SYM {
-  void calculateSpaceGroups(vector<xstructure>& vxstrs);
-  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint start_index, uint end_index); //DX 20191109 remove & for uint
+  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX 20191230 add setting option
   string OrthoDefect(istream& cin);
   xstructure SpaceGroup(istream& cin);
   void rgcd(vector<string> num);

@@ -4051,7 +4051,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry){  //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
     
@@ -4060,16 +4060,20 @@ namespace anrl {
     stringstream message;
     ofstream FileMESSAGE;
 
+    uint setting = input_setting; //DX 20191230 - if symmetry already calculated, we want to store true setting
+
     // Calculate symmetry
     uint space_group_number=0;
     if((xstr.space_group_ITC==0 && xstr.spacegroupnumber==0) || recalculate_symmetry){ //DX 20190829 - added if-statement; don't recalculate, it is faster
-      space_group_number = xstr.SpaceGroup_ITC(tolerance,setting);
+      space_group_number = xstr.SpaceGroup_ITC(tolerance,input_setting);
     }
     else if(xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){
       space_group_number = xstr.space_group_ITC;
+      setting=xstr.setting_ITC; //DX 20191230
     }
     else if(xstr.spacegroupnumber>=1 && xstr.spacegroupnumber<=230){
       space_group_number = xstr.spacegroupnumber;
+      setting=xstr.spacegroupnumberoption; //DX 20191230
     }
     
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;

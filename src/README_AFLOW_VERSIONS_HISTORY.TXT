@@ -135,6 +135,7 @@
         -- changed xstructure::Clean() to xstructure::clean() (DX)
         -- updated README_AFLOW_COMPARE.TXT (DX)
         -- use xoptions schema for property units in comparison code (DX)
+        -- use ANRL setting as default for symmetry analysis in comparisons for quick conversion to AFLOW prototype designation (DX)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)
