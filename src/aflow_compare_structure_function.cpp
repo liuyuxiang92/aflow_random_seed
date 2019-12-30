@@ -4,7 +4,7 @@
 // *           Aflow DAVID HICKS - Duke University 2014-2019                 *
 // *                                                                         *
 // ***************************************************************************
-// AFLOW-XTAL-MATCH (compare crystal structures)
+// AFLOW-XtalMatch (compare crystal structures)
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 
@@ -8429,7 +8429,7 @@ namespace compare{
   }
 }
 
-// AFLOW-XTAL-MATCH (compare crystal structures) - Functions
+// AFLOW-XtalMatch (compare crystal structures) - Functions
 // Written by David Hicks (david.hicks@duke.edu) 
 // Contributors: Carlo De Santo
 // ***************************************************************************

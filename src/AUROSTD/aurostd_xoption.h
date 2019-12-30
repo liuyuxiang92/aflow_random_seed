@@ -47,7 +47,7 @@ namespace aurostd {
     void options2entry(string,string,int=aurostd_xoptionONOFF,string="");
     void scheme2scheme(char,string);
     void scheme2scheme(string,string);
-    bool isscheme(string) const; // check if available //CO 180101
+    bool isscheme(string) const; // check if available //CO 180101 // SC 20191227
     // [OBSOLETE] uint addscheme(string);      // add scheme then returns vscheme.size()
     // [OBSOLETE] uint purgescheme(string);    // remove scheme then returns vscheme.size()
     uint opscheme(string,bool);  // add/remove scheme then returns vscheme.size()
@@ -55,8 +55,8 @@ namespace aurostd {
     uint pop(string);            // remove scheme then returns vscheme.size()
     // for plain flags
     bool flag(string,bool);      // if bool=TRUE/FALSE => add/remove "string" 
-    bool flag(string) const;     // interrogate=TRUE/FALSE, same as ischeme // CO 180101
-    bool flag(void) const;       // return if there is any scheme inside // CO 180101
+    bool flag(string) const;     // interrogate=TRUE/FALSE, same as ischeme // CO 180101  // SC 20191227
+    bool flag(void) const;       // return if there is any scheme inside // CO 180101 // SC 20191227
     // attached stuff..
     uint opattachedscheme(string,string,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size()
     uint addattachedscheme(string scheme,string attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()

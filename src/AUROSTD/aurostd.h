@@ -535,6 +535,12 @@ namespace aurostd {
   uint gzfile2dequestring(string FileNameIN,deque<string>& vlines);
   uint xzfile2dequestring(string FileNameIN,deque<string>& vlines);
   uint efile2dequestring(string FileNameIN,deque<string>& vlines);
+  // file2vectorstring overloading with deque
+  uint file2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint efile2vectorstring(string FileNameIN,deque<string>& vlines);  
   // file2stringstream
   bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
   bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);

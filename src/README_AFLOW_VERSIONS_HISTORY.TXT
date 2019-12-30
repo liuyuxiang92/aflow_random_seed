@@ -1,5 +1,10 @@
-3.1.228 - 2019/11/20
+3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- added schema name/unit/type to XHOST (SC)
+        -- added file2dequestring(), string2dequestring() (SC)
+        -- optimized NCPUS/NPAR/NCORE settings (SC)
+        -- patched _atom() class: constructor()/copy()/free() (SC)
+        -- updated xoptions so content can be lowercase (CO)
         -- Added additional web output for entry page generation. (ME)
         -- Fixed bug that put NCORE into INCARs of linear response calculations. (ME)
         -- Fixed bug that caused phonon dispersion path builder to break for some lattices. (ME)
@@ -128,6 +133,8 @@
         -- put xstructure initialization in free() and call free() at beginning of constructors (otherwise xstructure is not always initialize) (DX)
         -- changed xstructure::Clear() to xstructure::clear() (DX)
         -- changed xstructure::Clean() to xstructure::clean() (DX)
+        -- updated README_AFLOW_COMPARE.TXT (DX)
+        -- use xoptions schema for property units in comparison code (DX)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)

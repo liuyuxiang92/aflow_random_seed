@@ -3503,6 +3503,30 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring overloading for file2vector
+  // ***************************************************************************
+  // write file to deque string - Stefano Curtarolo
+  uint file2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint efile2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  // ***************************************************************************
   // Function file2stringstream bz2file2stringstream gzfile2stringstream xzfile2stringstream zipfile2stringstream efile2stringstream
   // ***************************************************************************
   // write file to stringstream - Stefano Curtarolo

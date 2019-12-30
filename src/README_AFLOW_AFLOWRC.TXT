@@ -1008,7 +1008,7 @@ DEFAULT_UFF_CLUSTER RADIUS
   default: 10 Angstroms
 
 DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON
-  description: Default option for performing robust structure comparison (AFLOW-XTAL-MATCH) IN ADDITION TO UFF energy analysis.
+  description: Default option for performing robust structure comparison (AFLOW-XtalMatch) IN ADDITION TO UFF energy analysis.
   type: bool
   default: 0
 
