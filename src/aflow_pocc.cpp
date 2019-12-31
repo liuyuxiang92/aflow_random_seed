@@ -295,9 +295,26 @@ namespace pocc {
     bool add_POSCAR_START_tag=false;  //SHACHAR OLD FORMAT
     bool add_l_supercell_sets_size=false; //SHACHAR OLD FORMAT
     string structures_file_str=structures_file_ss.str();
-    string structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
-    if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";}
-    if(!aurostd::substring2bool(structures_file_str,structure_group_tag)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find structure group tag",_FILE_CORRUPT_);}
+    bool found_tag_sg=false;
+    string structure_group_tag="";
+    //STRUCTURES_GROUP
+    if(found_tag_sg==false){
+      structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURES_GROUP";
+      if(aurostd::substring2bool(structures_file_str,structure_group_tag)){found_tag_sg=true;}
+    }
+    //STRUCTURE_GROUP
+    if(found_tag_sg==false){
+      structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
+      if(aurostd::substring2bool(structures_file_str,structure_group_tag)){found_tag_sg=true;}
+    }
+    //STRUCTURE GROUP
+    if(found_tag_sg==false){
+      structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";
+      if(aurostd::substring2bool(structures_file_str,structure_group_tag)){found_tag_sg=true;}
+    }
+    //not found
+    if(found_tag_sg==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find structure group tag",_FILE_CORRUPT_);}
+
     if(!aurostd::substring2bool(structures_file_str,POSCAR_series_START_tag)){
       if(!aurostd::substring2bool(structures_file_str,POSCAR_START_tag)){
         add_POSCAR_START_tag=true;
@@ -340,7 +357,8 @@ namespace pocc {
           i_l_supercell_sets_size++;
           i_pscs_psc_set=0;
           if(add_l_supercell_sets_size){
-            aurostd::StringSubst(vlines[iline],POCC_AFLOWIN_tag+"STRUCTURE GROUP",POCC_AFLOWIN_tag+"STRUCTURE_GROUP");
+            aurostd::StringSubst(vlines[iline],POCC_AFLOWIN_tag+"STRUCTURE_GROUP",POCC_AFLOWIN_tag+"STRUCTURES_GROUP");
+            aurostd::StringSubst(vlines[iline],POCC_AFLOWIN_tag+"STRUCTURE GROUP",POCC_AFLOWIN_tag+"STRUCTURES_GROUP");
             aurostd::StringSubst(vlines[iline],aurostd::RemoveWhiteSpacesFromTheBack(vlines[iline]),aurostd::RemoveWhiteSpacesFromTheBack(vlines[iline])+"/"+aurostd::utype2string(l_supercell_sets_size));
           }
         }
@@ -553,7 +571,7 @@ namespace pocc {
     xQMVASP qmvasp;
     m_ARUN_directories.clear();
     for(uint iline=0;iline<vlines.size();iline++){
-      if(aurostd::substring2bool(vlines[iline],POCC_AFLOWIN_tag+"STRUCTURE_GROUP")){
+      if(aurostd::substring2bool(vlines[iline],POCC_AFLOWIN_tag+"STRUCTURES_GROUP")){
         l_supercell_sets.push_back(POccSuperCellSet());
         continue;
       }
@@ -3559,13 +3577,16 @@ void POccCalculator::calculate(){
       const POccSuperCellSet& pscs=(*it);
       //all_supercells_ss << "---------------------------------------------------------------------------------------------" << endl;
       all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
-      all_supercells_ss << AFLOW_POCC_TAG << "STRUCTURE_GROUP " << isupercell+1 << "/" << l_supercell_sets.size() << endl;
+      all_supercells_ss << AFLOW_POCC_TAG << "STRUCTURES_GROUP " << isupercell+1 << "/" << l_supercell_sets.size() << endl;
       all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
       for(uint i=0;i<pscs.m_psc_set.size();i++){
         if(LDEBUG) {cerr << soliloquy << " i=" << i << endl;}
         psc=pscs.m_psc_set[i];
         psc.m_degeneracy=1;
         POSCAR_strtag=pocc::getARUNString(isupercell,l_supercell_sets.size(),i,pscs.m_psc_set.size(),pscs.m_psc_set[i].m_hnf_index,pscs.m_psc_set[i].m_site_config_index,true);
+        all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
+        all_supercells_ss << AFLOW_POCC_TAG << "STRUCTURE " << i+1 << "/" << pscs.m_psc_set.size() << endl;
+        all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
         //[OBSOLETE]POSCAR_strtag_ss.str("");
         //[OBSOLETE]POSCAR_strtag_ss << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets.size())) << isupercell+1 << "_"; //+1 so we start at 1, not 0 (count)
         //[OBSOLETE]POSCAR_strtag_ss << std::setfill('0') << std::setw(aurostd::getZeroPadding(pscs.m_psc_set.size())) << (i+1) << "_"; //+1 so we start at 1, not 0 (count)
@@ -3583,7 +3604,7 @@ void POccCalculator::calculate(){
         all_supercells_ss << POSCAR_POCC_series_STOP_tag << POSCAR_strtag << endl;
         all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
       }
-      all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
+      //all_supercells_ss << AFLOWIN_SEPARATION_LINE << endl;
     }
     aurostd::stringstream2file(all_supercells_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE);
   }
@@ -4627,23 +4648,32 @@ void POccCalculator::generateStructures(const _xvasp& in_xvasp) {
   stringstream unique_derivative_structures_ss;
   stringstream new_AflowIn_ss;
   bool original_quiet_flag=XHOST.QUIET;
+  unsigned long long int isupercell=0;
 
-  for(unsigned long long int i=0;i<getUniqueSuperCellsCount();i++) {
-    if(LDEBUG) {cerr << soliloquy << " starting structure[" << i << "]" << endl;}
+  //for(unsigned long long int i=0;i<getUniqueSuperCellsCount();i++) {
+  for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+    isupercell=std::distance(l_supercell_sets.begin(),it);
+    if(LDEBUG) {cerr << soliloquy << " starting structure[" << isupercell << "]" << endl;}
+
+    //do first so we only need to run getUniqueSuperCell() once
+    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+    xvasp.str=getUniqueSuperCell(isupercell);
 
     //populate POCC_UNIQUE_SUPERCELLS_FILE
     unique_derivative_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
-    unique_derivative_structures_ss << POSCAR_POCC_series_START_tag << getARUNString(i) << endl; // ." << ss_pocc_count.str() << endl;
-    unique_derivative_structures_ss << getUniqueSuperCell(i);
-    unique_derivative_structures_ss << POSCAR_POCC_series_STOP_tag << getARUNString(i) << endl; // ." << ss_pocc_count.str() << endl;
+    unique_derivative_structures_ss << AFLOW_POCC_TAG << "STRUCTURE " << isupercell+1 << "/" << l_supercell_sets.size() << endl;
+    unique_derivative_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
+    unique_derivative_structures_ss << AFLOW_POCC_TAG << "UFF_ENERGY=" << std::fixed << std::setprecision(15) << (*it).getUFFEnergy() << endl; unique_derivative_structures_ss.unsetf(std::ios_base::floatfield);
+    unique_derivative_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
+    unique_derivative_structures_ss << POSCAR_POCC_series_START_tag << getARUNString(isupercell) << endl; // ." << ss_pocc_count.str() << endl;
+    unique_derivative_structures_ss << xvasp.str; //getUniqueSuperCell(isupercell);
+    unique_derivative_structures_ss << POSCAR_POCC_series_STOP_tag << getARUNString(isupercell) << endl; // ." << ss_pocc_count.str() << endl;
     unique_derivative_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
   
-    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
-    xvasp.str=getUniqueSuperCell(i);
     xvasp.Directory=m_aflags.Directory; //arun_directory;
     xvasp.AVASP_arun=true;
     xvasp.AVASP_arun_mode = "POCC"; //CO181226
-    xvasp.AVASP_arun_runname = getARUNString(i);
+    xvasp.AVASP_arun_runname = getARUNString(isupercell);
     xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX",FALSE); //[CO191110]high-entropy offers increased solubility over binaries
     
     XHOST.QUIET=true;
@@ -6624,24 +6654,60 @@ void POccStructuresFile::processFile() {
     cerr << soliloquy << " poscar_start_tag=\"" << poscar_start_tag << "\"" << endl;
     cerr << soliloquy << " poscar_stop_tag=\"" << poscar_stop_tag << "\"" << endl;
   }
-
+  
   //get structure_group_tag and m_fileoptions.flag("TYPE::XXXX")
-  string structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
-  if(aurostd::substring2bool(m_content,structure_group_tag)){m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);}
-  else{structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";}
-  if(aurostd::substring2bool(m_content,structure_group_tag)){m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);}
-  else{
-    structure_group_tag=poscar_start_tag;
-    m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS",TRUE);
-  }
-
+  bool found_tag_sg=false;
+  string structure_group_tag="";
+  
   if(LDEBUG){
+    cerr << soliloquy << " PRE" << endl;
     cerr << soliloquy << " structure_group_tag=" << structure_group_tag << endl;
     cerr << soliloquy << " m_fileoptions.flag(\"TYPE::ALL_SUPERCELLS\")=" << m_fileoptions.flag("TYPE::ALL_SUPERCELLS") << endl;
     cerr << soliloquy << " m_fileoptions.flag(\"TYPE::UNIQUE_SUPERCELLS\")=" << m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS") << endl;
   }
 
-  if(!(m_fileoptions.flag("TYPE::ALL_SUPERCELLS") || m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS"))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown structures file type",_FILE_CORRUPT_);}
+  //STRUCTURES_GROUP
+  if(found_tag_sg==false){
+    structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURES_GROUP";
+    if(aurostd::substring2bool(m_content,structure_group_tag)){
+      m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);
+      found_tag_sg=true;
+      if(LDEBUG){cerr << soliloquy << " \"STRUCTURES_GROUP\" tag found" << endl;}
+    }
+  }
+  //STRUCTURE_GROUP
+  if(found_tag_sg==false){
+    structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE_GROUP";
+    if(aurostd::substring2bool(m_content,structure_group_tag)){
+      m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);
+      found_tag_sg=true;
+      if(LDEBUG){cerr << soliloquy << " \"STRUCTURE_GROUP\" tag found" << endl;}
+    }
+  }
+  //STRUCTURE GROUP
+  if(found_tag_sg==false){
+    structure_group_tag=POCC_AFLOWIN_tag+"STRUCTURE GROUP";
+    if(aurostd::substring2bool(m_content,structure_group_tag)){
+      m_fileoptions.flag("TYPE::ALL_SUPERCELLS",TRUE);
+      found_tag_sg=true;
+      if(LDEBUG){cerr << soliloquy << " \"STRUCTURE GROUP\" tag found" << endl;}
+    }
+  }
+  //TYPE::UNIQUE_SUPERCELLS
+  if(found_tag_sg==false){
+    structure_group_tag=poscar_start_tag;
+    m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS",TRUE);
+  }
+
+  if(LDEBUG){
+    cerr << soliloquy << " POST" << endl;
+    cerr << soliloquy << " structure_group_tag=" << structure_group_tag << endl;
+    cerr << soliloquy << " m_fileoptions.flag(\"TYPE::ALL_SUPERCELLS\")=" << m_fileoptions.flag("TYPE::ALL_SUPERCELLS") << endl;
+    cerr << soliloquy << " m_fileoptions.flag(\"TYPE::UNIQUE_SUPERCELLS\")=" << m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS") << endl;
+  }
+
+  if(!(m_fileoptions.flag("TYPE::ALL_SUPERCELLS") || m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS"))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown structures file type (none set)",_FILE_CORRUPT_);}
+  if(m_fileoptions.flag("TYPE::ALL_SUPERCELLS") && m_fileoptions.flag("TYPE::UNIQUE_SUPERCELLS")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown structures file type (all set)",_FILE_CORRUPT_);}
 
   unsigned long long int iline=0;
   unsigned long long int ititle=0;
@@ -6777,7 +6843,7 @@ bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,boo
 
   ARUN_directories.clear();
   uint i=0,iline;
-  bool missing_tag=false;
+  bool missing_tag=false; //very important, if we cannot find the tag for the structures_unique, we must read in structures_all to get total number of structures
   string arun_directory="",pocc_directory_abs="";
   vector<string> vtokens;
   for(i=0;i<m_vPOSCAR_lines.size()&&missing_tag==false;i++){
@@ -6854,6 +6920,7 @@ bool POccStructuresFile::loadDataIntoCalculator(POccCalculator& pcalc,bool tryDi
 
 ostream& operator<<(ostream& oss, const pocc::POccStructuresFile& psf) {
   if(!psf.m_initialized){}  //keep busy
+  //will do for the next round
   return oss;
 }
 

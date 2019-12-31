@@ -39,6 +39,7 @@
         -- patched FINAL volume of ordered supercells from pocc, should speed up VASP calculations (CO)
         -- added postprocessing workflow for pocc: performs postprocessing from input files, does NOT redo structure analysis (CO) 
         -- added self-patch for pocc: patches structures files (all and unique) so individual POSCARs can be read by aflow (CO) 
+        -- added reader for structures file (CO)
         -- pocc writes out PARTCAR (CO)
         -- pocc calculates/writes out EFA (CO)
         -- pocc writes out ensemble average DOSCAR (CO)  
