@@ -4089,7 +4089,7 @@ namespace KBIN {
 // ----------------------------------------------------------------------------
 // aflow_phonons.cpp
 namespace KBIN {
-  bool relaxStructureAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME 181107
+  bool relaxStructureAPL_VASP(int, const string&, aurostd::xoption, const aurostd::xvector<int>&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  // ME 181107
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general
   void RunPhonons_APL_181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE);  //now it's general //CO181216

@@ -21,6 +21,10 @@ namespace apl {
 
 //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
 Supercell::Supercell(const xstructure& _xstr, const _aflags& aflags, Logger& l) : _aflowFlags(aflags), _logger(l) {  //CO181226
+  initialize(_xstr);
+}
+
+void Supercell::initialize(const xstructure& _xstr) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="apl::Supercell::Supercell():";
 
@@ -278,9 +282,86 @@ void Supercell::reset() {
   _sc2pcMap.clear();
 
   _isConstructed = FALSE;
+  scell[1] = 1; scell[2] = 1; scell[3] = 1;  // ME191225
 }
 
 // ///////////////////////////////////////////////////////////////////////////
+
+// ME191225
+// Determine the supercell dimensions of the supercell for different methods
+xvector<int> Supercell::determineSupercellDimensions(const aurostd::xoption& opts) {
+  string function = "apl::Supercell::determineSupercellDimensions()";
+  string message;
+
+  xvector<int> dims(3);
+  string method = opts.getattachedscheme("SUPERCELL::METHOD");
+  if (method.empty()) {
+    message = "Supercell method empty.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+  }
+  string value = opts.getattachedscheme("SUPERCELL::VALUE");
+  if (value.empty()) {
+    message = "Supercell value empty.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+  }
+  if (method == "SUPERCELL") {
+    vector<int> tokens;
+    aurostd::string2tokens(value, tokens, " xX");
+    dims = aurostd::vector2xvector(tokens);
+  } else if (method == "MINATOMS") {
+    int minatoms = aurostd::string2utype<int>(value);
+    double radius = 0.0;
+    int natoms = (int) _inStructure.atoms.size();
+    for (radius = 0.01; natoms < minatoms; radius += 0.01) {
+      dims = LatticeDimensionSphere(_inStructure.lattice, radius);
+      natoms = dims[1] * dims[2] * dims[3] * (int) _inStructure.atoms.size();
+    }
+    if (opts.flag("SUPERCELL::VERBOSE")) {
+      _logger << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
+              << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
+              << " natoms=" << natoms << apl::endl;
+    }
+  } else if (method == "MINATOMS_RESTRICTED") {
+    int minatoms = aurostd::string2utype<int>(value);
+    int natoms = (int) _inStructure.atoms.size();
+    int Ni = 0;
+    for (Ni = 1; natoms < minatoms; Ni++) {
+      natoms = (int) std::pow(Ni, 3) * _inStructure.atoms.size();
+    }
+    dims[1] = Ni; dims[2] = Ni; dims[3] = Ni;
+    if (opts.flag("SUPERCELL::VERBOSE")) {
+      _logger << "Ni=" << Ni
+              << " supercell=" << Ni << "x" << Ni << "x" << Ni
+              << " natoms=" << natoms << apl::endl;
+    }
+  } else if (method == "SHELLS") {
+    int shells = aurostd::string2utype<int>(value);
+    // There is currently no option nor any documentation about
+    // using full shells or not, so this feature will be turned off
+    // for now.
+    bool full_shell = false;
+    if (opts.flag("SUPERCELL::VERBOSE")) {
+      _logger << "Searching for suitable cell to handle " << shells << " shells..." << apl::endl;
+    }
+    dims = buildSuitableForShell(shells, full_shell, opts.flag("SUPERCELL::VERBOSE"));
+  } else {
+    message = "Unknown supercell method " + method + ".";
+    aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+  }
+  return dims;
+}
+
+// ///////////////////////////////////////////////////////////////////////////
+
+void Supercell::build(aurostd::xoption& opts, bool VERBOSE) {
+  opts.flag("SUPERCELL::VERBOSE", VERBOSE);
+  xvector<int> dims = determineSupercellDimensions(opts);
+  build(dims);
+}
+
+void Supercell::build(const xvector<int>& dims, bool VERBOSE) {
+  build(dims[1], dims[2], dims[3], VERBOSE);
+}
 
 //[CO190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
 void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
@@ -733,7 +814,9 @@ void Supercell::trimStructure(int n, const xvector<double>& a,
 
 // ///////////////////////////////////////////////////////////////////////////
 
-int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
+//int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
+// ME200102 - do not build the supercell here, just retrieve dimensions.
+xvector<int> Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
   // What is the dimension of the supercell ? OK, user wants to have MAX_NN_SHELLS
   // shell occupied for each nonequvalent atom. Try to find it...
 
@@ -823,7 +906,7 @@ int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, 
   }
 
   // Build structure
-  build(i, j, k, VERBOSE);
+  //build(i, j, k, VERBOSE);  // OBSOLETE ME200102
 
   // Print info about shells
   for (uint i = 0; i < _inStructure.iatoms.size(); i++) {
@@ -832,7 +915,12 @@ int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, 
   }
   sh.clear();
 
-  return i * j * k * _inStructure.atoms.size();
+  // ME200102 - BEGIN
+  //[OBSOLETE] return i * j * k * _inStructure.atoms.size();
+  xvector<int> dims(3);
+  dims[1] = i; dims[2] = j; dims[3] = k;
+  return dims;
+  // ME200102 - END
 }
 
 // ///////////////////////////////////////////////////////////////////////////

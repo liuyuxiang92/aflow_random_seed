@@ -586,16 +586,20 @@ class Supercell {
   Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO181226
   Supercell(const Supercell&);
   ~Supercell();
+  void initialize(const xstructure&);  // ME191225
   void LightCopy(const xstructure& a, xstructure& b);
   void clear();
   Supercell& operator=(const Supercell&);
   bool isConstructed();
   void reset();
+  xvector<int> determineSupercellDimensions(const aurostd::xoption&);  // ME191225
+  void build(aurostd::xoption&, bool = true);  // ME191225
+  void build(const xvector<int>&, bool = true);  // ME191225
   void build(int, int, int, bool = TRUE);
   void trimStructure(int, const xvector<double>&,
                      const xvector<double>&, const xvector<double>&,
                      bool = true);
-  int buildSuitableForShell(int, bool, bool VERBOSE);
+  xvector<int> buildSuitableForShell(int, bool, bool VERBOSE);  // ME200102
   void setupShellRestrictions(int);
   // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
   bool isShellRestricted() const;
