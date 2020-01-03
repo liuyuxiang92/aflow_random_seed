@@ -1186,7 +1186,7 @@ namespace aflowlib {
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_RAW+"/*\"");
     }
     if(!aurostd::IsDirectory(directory_RAW)) {
-      cout << "aflowlib::LIB2RAW: directory is skip because cannot create directory_RAW: " << directory_RAW << endl;
+      cout << "aflowlib::LIB2RAW: directory is skipped because directory_RAW cannot be created: " << directory_RAW << endl;
       return FALSE;
     }
     if(flag_WEB) {
@@ -1200,7 +1200,7 @@ namespace aflowlib {
       aurostd::RemoveFile(directory_WEB+"/*");
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_WEB+"/*\"");
       if(!aurostd::IsDirectory(directory_WEB)) {
-	cout << "aflowlib::LIB2RAW: directory is skip because cannot create directory_WEB: " << directory_WEB << endl;
+	cout << "aflowlib::LIB2RAW: directory is skipped because directory_WEB cannot be created: " << directory_WEB << endl;
 	return FALSE;
       }
     }

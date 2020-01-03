@@ -1,5 +1,8 @@
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- Added a handler for the AFLOW database. (ME)
+        -- Added an AFLOW-SQLITE interface. (ME)
+        -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip). (ME)
         -- added schema name/unit/type to XHOST (SC)
         -- added file2dequestring(), string2dequestring() (SC)
         -- optimized NCPUS/NPAR/NCORE settings (SC)

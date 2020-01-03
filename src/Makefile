@@ -91,6 +91,12 @@ LIBS_AFLOW_STATIC=$(LIBS_AFLOW) $(LIBS_STATIC)
 DEBUG=
 BACKUP=/common/AFLOW/SRC/
 
+# ME190823 - SQLite options
+# See https://www.sqlite.org/compile.html for compile-time options
+# The link recommends -DSQLITE-THREADSAFE=0, but that would disable
+# all threading capabilities
+SQLITE_OPTS=-DSQLITE-THREADSAFE=1
+
 # Library MKL dynamic link
 #LIB_MKL= -L /opt/intel/mkl100/lib/32 -lmkl_lapack -lmkl_core -lmkl_intel -lmkl_sequential
 # Library MKL static link
@@ -102,6 +108,7 @@ AUROSTD_CPP = ./AUROSTD/aurostd.cpp ./AUROSTD/aurostd_main.cpp ./AUROSTD/aurostd
 AUROSTD_HPP = ./AUROSTD/aurostd.h ./AUROSTD/aurostd_argv.h ./AUROSTD/aurostd_xcomplex.h ./AUROSTD/aurostd_xmatrix.h ./AUROSTD/aurostd_xoption.h ./AUROSTD/aurostd_xrandom.h ./AUROSTD/aurostd_xscalar.h ./AUROSTD/aurostd_xtensor.h ./AUROSTD/aurostd_xvector.h ./AUROSTD/aurostd_xcombos.h AUROSTD/aurostd_xerror.h
 
 #CO 170614
+#ME191125 -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip)
 SQLITE_C = ./SQLITE/sqlite3.c
 
 #AUROSTD_CPP = aurostd.cpp
@@ -123,7 +130,7 @@ POCCUPATION_FUNCS_SRC = aflow_pocc_old.cpp
 APENNSY_FUNCS_SRC = aflow_apennsy_gndstate.cpp aflow_apennsy_structures.cpp aflow_apennsy.cpp aflow_apennsy_phases.cpp aflow_apennsy_main.cpp aflow_apennsy_vaspin.cpp
 LIBRARIES_FUNCS_SRC = aflowlib_libraries.cpp 
 CALCULATED_SRC = aflow_data_calculated.cpp
-AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp 
+AFLOWLIB_SRC = aflowlib_web_interface.cpp aflowlib_web_outreach.cpp aflowlib_database.cpp SQLITE/aflow_sqlite.cpp
 #DX and CO - START
 APL_SRC = APL/aflow_apl_kphonons.cpp APL/aflow_qha_operations.cpp APL/aflow_apl_function_fitting.cpp APL/aflow_apl_dirphoncalc.cpp APL/aflow_apl_qmesh.cpp APL/aflow_apl_ltet.cpp APL/aflow_apl_doscalc.cpp APL/aflow_apl_gsa.cpp APL/aflow_apl_logger.cpp APL/aflow_apl_lrphoncalc.cpp APL/aflow_apl_pathbuilder.cpp APL/aflow_apl_pdisc.cpp APL/aflow_apl_phoncalc.cpp APL/aflow_apl_shellhandle.cpp APL/aflow_apl_supercell.cpp APL/aflow_apl_thermalpc.cpp APL/aflow_aapl_cluster.cpp APL/aflow_aapl_ifcs.cpp APL/aflow_aapl_setup.cpp APL/aflow_aapl_tcond.cpp APL/aflow_qha_aflowin_creator.cpp APL/aflow_qha_dm_pdos_save.cpp APL/aflow_apl_hsqpoints.cpp APL/aflow_qha_gruneisen.cpp APL/aflow_apl_group_velocity.cpp APL/aflow_apl_atomic_disp.cpp APL/aflow_scqha_gruneisen.cpp APL/aflow_scqha_eos.cpp APL/aflow_qha_energies.cpp APL/aflow_qha3phonons_eos.cpp APL/aflow_qha_eos.cpp APL/aflow_scqha_T_freqs.cpp
 #DX and CO - END
@@ -206,7 +213,7 @@ aflow: $(OBJS_ALL) Makefile
 static_no_pdf: aflow aflow_data
 	rm -rf $(SQLITE_OBJ)
 	#$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS) $(LIBS_STATIC)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-	$(CC) -DSQLITE_ENABLE_JSON1 -c $(SQLITE_C) $(LIBS_STATIC)
+	$(CC) $(SQLITE_OPTS) -c $(SQLITE_C) $(LIBS_STATIC)
 	cp sqlite3.o ./SQLITE/
 	rm -f aflow
 #	$(CPP) $(LIBS_AFLOW_STATIC) -o aflow *.o $(LIB_MKL) $(LIBS_AFLOW_STATIC)
@@ -220,7 +227,7 @@ $(SQLITE_OBJ): $(SQLITE_C)	#CO 1706147
 	#$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $^ $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 	#$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $^ $(LIBS)
 	#$(CC) -DSQLITE_ENABLE_JSON1 -c $^ $(LIBS)	#CO190401 - $(LIBS) -lpthreads not needed, issues with clang++ (mac)
-	$(CC) -DSQLITE_ENABLE_JSON1 -c $^
+	$(CC) $(SQLITE_OPTS) -c $^
 	cp sqlite3.o ./SQLITE/
 extra:	findsym frozsl apl2agr platon subst
 apl2agr:
@@ -864,6 +871,11 @@ APL/aflow_scqha_T_freqs.o: APL/aflow_scqha_T_freqs.cpp $(AFLOW_HPP) $(AUROSTD_HP
 #	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_GSA) APL/aflow_apl_gsa.cpp -c
 #	touch $@
 
+################################################################################################
+# ME - Database
+aflowlib_database.o: aflowlib_database.cpp $(AFLOW_HPP) $(AUROSTD_HPP) Makefile
+	${CPP} $(VERS) -D_AFLOW_FILE_NAME_=\""$(@:.o=.cpp)"\" $(INCLUDE) $(CCFLAGS_MT) -std=gnu++0x aflowlib_database.cpp -c
+	touch $@
 ################################################################################################
 install: all
 	cp -f aflow $(BIN)/aflow.$(VERSNUMBER)
