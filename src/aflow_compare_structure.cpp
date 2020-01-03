@@ -1321,10 +1321,10 @@ namespace pflow {
         }        
         vector<StructurePrototype> final_permutations = compare::comparePermutations(final_prototypes[i],num_proc,optimize_match,oss,FileMESSAGE); //DX 20190319 - added FileMESSAGE
         for(uint j=0;j<final_permutations.size();j++){
-          vector<string> tmp; 
-          tmp.push_back(final_permutations[j].structure_representative_name); //push back representative permutation
-          for(uint d=0;d<final_permutations[j].structures_duplicate_names.size();d++){ tmp.push_back(final_permutations[j].structures_duplicate_names[d]); } //push back equivalent permutations
-          final_prototypes[i].atom_decorations_equivalent.push_back(tmp);
+          vector<string> tmp_permutations; 
+          tmp_permutations.push_back(final_permutations[j].structure_representative_name); //push back representative permutation
+          for(uint d=0;d<final_permutations[j].structures_duplicate_names.size();d++){ tmp_permutations.push_back(final_permutations[j].structures_duplicate_names[d]); } //push back equivalent permutations
+          final_prototypes[i].atom_decorations_equivalent.push_back(tmp_permutations);
         }
       }
       message << "Unique permutations found.";
@@ -1712,21 +1712,21 @@ namespace pflow {
         if(!loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
         if(entry.vstr.size()==1){
           // store entry from database
-          StructurePrototype tmp;
+          StructurePrototype str_proto_tmp;
           deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
           entry.vstr[0].SetSpecies(deque_species);
-          tmp.structure_representative = entry.vstr[0];
-          tmp.structure_representative.ReScale(1.0); //DX 20191105
-          tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
-          tmp.structure_representative.directory=tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
-          tmp.structure_representative_generated=true;
-          tmp.structure_representative_from="aurl";
-          tmp.stoichiometry=tmp_reduced_stoich;
-          tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]); //DX 20190430 - added
-          //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX 20190711
-          tmp.elements=species;
-          tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
-          tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
+          str_proto_tmp.structure_representative = entry.vstr[0];
+          str_proto_tmp.structure_representative.ReScale(1.0); //DX 20191105
+          str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
+          str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
+          str_proto_tmp.structure_representative_generated=true;
+          str_proto_tmp.structure_representative_from="aurl";
+          str_proto_tmp.stoichiometry=tmp_reduced_stoich;
+          str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]); //DX 20190430 - added
+          //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX 20190711
+          str_proto_tmp.elements=species;
+          str_proto_tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
+          str_proto_tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
           // store any properties 
           for(uint l=0;l<properties_response[i].size();l++){
             bool property_requested = false;
@@ -1734,13 +1734,13 @@ namespace pflow {
               if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
             }
             if(property_requested){
-              tmp.properties_structure_representative.push_back(properties_response[i][l].second);
+              str_proto_tmp.properties_structure_representative.push_back(properties_response[i][l].second);
             }
           }
           if(LDEBUG) {
-            cerr << "pflow::compareStructureDirectory() Found structure: " << tmp.structure_representative_name << endl;
+            cerr << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
           }
-          all_structures.push_back(tmp);
+          all_structures.push_back(str_proto_tmp);
         }
         else {
           message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
@@ -2227,7 +2227,7 @@ namespace pflow {
     // initialize vector of objects 
     vector<StructurePrototype> all_structures;
     for(uint i=0; i<auids.size(); i++){
-      StructurePrototype tmp;
+      StructurePrototype str_proto_tmp;
       // first, get stoichiometry from entry
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] vector<string> species; vector<double> natoms;
       //DX 20191106 [OBSOLETE - switch to stringElements2VectorElements] XATOM_SplitAlloySpecies(compounds[i], species, natoms);
@@ -2255,11 +2255,11 @@ namespace pflow {
 	      std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end());
         //DX 20191125 [OBSOLETE - REDUNDANT] }
       }
-      tmp.stoichiometry=tmp_reduced_stoich;
-      tmp.elements=species;
-      tmp.structure_representative_name=aurls[i];
-      tmp.structure_representative_from="aurl";
-      all_structures.push_back(tmp);
+      str_proto_tmp.stoichiometry=tmp_reduced_stoich;
+      str_proto_tmp.elements=species;
+      str_proto_tmp.structure_representative_name=aurls[i];
+      str_proto_tmp.structure_representative_from="aurl";
+      all_structures.push_back(str_proto_tmp);
     }
     message << "Finished initializing StructurePrototype object, now spawn threads.";     
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -2359,23 +2359,23 @@ namespace pflow {
       if(!loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (auid=" << entry.auid << ") ... skipping..." << endl; continue;}
       if(entry.vstr.size()==1){
         // store entry from database
-        StructurePrototype tmp;
+        StructurePrototype str_proto_tmp;
         deque<string> deque_species; for(uint j=0;j<species.size();j++){deque_species.push_back(species[j]);}
         entry.vstr[0].SetSpecies(deque_species);
-        tmp.structure_representative = entry.vstr[0];
-        tmp.structure_representative.ReScale(1.0); //DX 20191105
-        tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
-        tmp.structure_representative.directory=tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
-        tmp.structure_representative_generated=true;
-        tmp.structure_representative_from="aurl";
-        tmp.stoichiometry=tmp_reduced_stoich;
-        tmp.elements=species;
-        tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
-        tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
-        tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]);
-        //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX 20190711
-        tmp.property_names = property_list; //DX 20190326
-        tmp.property_units = property_units; //DX 20190326
+        str_proto_tmp.structure_representative = entry.vstr[0];
+        str_proto_tmp.structure_representative.ReScale(1.0); //DX 20191105
+        str_proto_tmp.structure_representative_name=entry.getPathAURL(FileMESSAGE,oss,false); //DX 20190321 - changed to false, i.e., do not load from common
+        str_proto_tmp.structure_representative.directory=str_proto_tmp.structure_representative_name; //DX 20190718 - update xstructure.directoryr
+        str_proto_tmp.structure_representative_generated=true;
+        str_proto_tmp.structure_representative_from="aurl";
+        str_proto_tmp.stoichiometry=tmp_reduced_stoich;
+        str_proto_tmp.elements=species;
+        str_proto_tmp.number_of_atoms = entry.vstr[0].atoms.size(); //DX 20191031
+        str_proto_tmp.number_of_types = entry.vstr[0].num_each_type.size(); //DX 20191031
+        str_proto_tmp.structure_representative_compound = compare::getCompoundName(entry.vstr[0]);
+        //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] str_proto_tmp.LFA_environments= compare::computeLFAEnvironment(tmp.structure_representative); //DX 20190711
+        str_proto_tmp.property_names = property_list; //DX 20190326
+        str_proto_tmp.property_units = property_units; //DX 20190326
         // store any properties 
         for(uint l=0;l<properties_response[i].size();l++){
           bool property_requested = false;
@@ -2383,13 +2383,13 @@ namespace pflow {
             if(properties_response[i][l].first == property_list[m]){ property_requested=true; break;}
           }
           if(property_requested){
-            tmp.properties_structure_representative.push_back(properties_response[i][l].second);
+            str_proto_tmp.properties_structure_representative.push_back(properties_response[i][l].second);
           }
         }
         if(LDEBUG){
-          cerr << "pflow::compareStructureDirectory() Found structure: " << tmp.structure_representative_name << endl;
+          cerr << "pflow::compareStructureDirectory() Found structure: " << str_proto_tmp.structure_representative_name << endl;
         }
-        all_structures.push_back(tmp);
+        all_structures.push_back(str_proto_tmp);
       }
       else{
         message << "More structures loaded than anticipated for auid=" << auids[i] << ".";     
@@ -2697,10 +2697,10 @@ namespace compare {
          
           // store permutation results in main StructurePrototype object
           for(uint j=0;j<final_permutations.size();j++){
-            vector<string> tmp; 
-            tmp.push_back(final_permutations[j].structure_representative_name); //push back representative permutation
-            for(uint d=0;d<final_permutations[j].structures_duplicate_names.size();d++){ tmp.push_back(final_permutations[j].structures_duplicate_names[d]); } //push back equivalent permutations
-            final_prototypes[i].atom_decorations_equivalent.push_back(tmp);
+            vector<string> permutations_tmp; 
+            permutations_tmp.push_back(final_permutations[j].structure_representative_name); //push back representative permutation
+            for(uint d=0;d<final_permutations[j].structures_duplicate_names.size();d++){ permutations_tmp.push_back(final_permutations[j].structures_duplicate_names[d]); } //push back equivalent permutations
+            final_prototypes[i].atom_decorations_equivalent.push_back(permutations_tmp);
           }
           final_permutations.clear(); //DX 20190624
         }
@@ -2708,8 +2708,8 @@ namespace compare {
           vector<string> unique_permutations; generatePermutationString(final_prototypes[i].stoichiometry, unique_permutations); //DX 20191125
           // store permutation results in main StructurePrototype object
           for(uint j=0;j<unique_permutations.size();j++){
-            vector<string> tmp; tmp.push_back(unique_permutations[j]);
-            final_prototypes[i].atom_decorations_equivalent.push_back(tmp);
+            vector<string> permutations_tmp; permutations_tmp.push_back(unique_permutations[j]);
+            final_prototypes[i].atom_decorations_equivalent.push_back(permutations_tmp);
           }
         }
       }

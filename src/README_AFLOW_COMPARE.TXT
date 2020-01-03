@@ -117,9 +117,11 @@ Steps:
        supercell and see if we can match it with structure1 
        using Burzlaff's criteria. (This part is parallel if more than one
        processor is specified.)
-    7) Once possible a lattice is found, check contents
-       of lattice (i.e. atoms). Check we can have a one-to-one 
-       mapping. Check that the lattice chosen preserves periodicity.
+    7) Once a commensurate lattice is found (i.e., similar lattice vector lengths 
+       and volume to structure1), remove atoms outside of the cell and 
+       check atom positions inside the new cell. 
+       Check we can have a one-to-one mapping. 
+       Check that the lattice chosen preserves periodicity.
     8) Of the best match (smallest misfit (mis)):
        If mis <= 0.1:
          Structures similar. Print out new representation of 
@@ -219,7 +221,7 @@ General options - applicable to all commands - is listed at the bottom of this s
               (default: anrl).
 
 
-    aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file!
+    aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file
         Determines the unique and duplicate atom decorations for a given structure, grouping 
         equivalent decorations (if applicable).
 

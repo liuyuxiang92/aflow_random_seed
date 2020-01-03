@@ -1772,7 +1772,7 @@ LATTICES = (the ones with "")
   aflow --latticehistogram < POSCAR
         Outputs the lattice calculated respect to tolerance of histogram of symmetry.
     
-  aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file!
+  aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file
       Determines the unique and duplicate atom decorations for a given structure, grouping 
       equivalent decorations (if applicable).
       
