@@ -148,24 +148,16 @@ class StructurePrototype{
 namespace compare{
 
   // ===== Main functions ===== //
-  vector<StructurePrototype> compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds,
-      bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190506 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
-  vector<StructurePrototype> compareStructuresFromDirectory(string& directory, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds, 
-      bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190506 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
-  vector<StructurePrototype> compareStructuresFromFile(string& filename, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds, 
-      bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190506 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
+  vector<StructurePrototype> compareStructuresFromStructureList(vector<string>& filenames, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions
+  vector<StructurePrototype> compareStructuresFromDirectory(string& directory, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions
+  vector<StructurePrototype> compareStructuresFromFile(string& filename, vector<string>& magmoms_for_systems, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory); //DX 20190319 - added FileMESSAGE
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool remove_duplicate_compounds, 
-      bool calculate_unique_permutations, bool add_matching_aflow_protos, bool get_aflow_prototype_designation, bool ICSD_comparison, bool store_comparison_logs); //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190724 - added add_matching_aflow_protos, get_aflow_prototype_designation, calculate_unique_permutations, ignore_environment //DX 20190822 - add log bool
+  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& all_structures, ostream& oss, ofstream& FileMESSAGE, uint& num_proc, bool same_species, string& directory, const aurostd::xoption& comparison_options); //DX 20200103 - condensed bools to xoptions 
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default
   bool aflowCompareStructure(const uint& num_proc, const xstructure& xstr1, const xstructure& xstr2, 
       bool same_species, bool scale_volume, bool optimize_match, double& final_misfit, structure_misfit& final_misfit_info, ostream& oss); //Main function //DX 20191108 - remove const & from bools //DX 20191122 - move ostream to end and add default //DX 20191210 - added lattice_dev, coordinate_dis, and failure
-  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overloaded, returns true (match), false (no match) //DX 20191108 - remove const & from bools
+  bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species); //Overco, returns true (match), false (no match) //DX 20191108 - remove const & from bools
   bool aflowCompareStructure(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool scale_volume, bool optmize_match);  //DX 20191108 - remove const & from bools
   double aflowCompareStructureMisfit(const xstructure& xstr1, const xstructure& xstr2, bool same_species, bool optimize_match); //Overloaded, returns misfit value //DX 20191108 - remove const & from bools
 
@@ -175,10 +167,10 @@ namespace compare{
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match); // add number of threads and optimize matches
   vector<string> getUniquePermutations(xstructure& xstr, uint& num_proc, bool& optimize_match, bool& print_misfit, ostream& oss, ofstream& FileMESSAGE); // full function //DX 20190319 - added FileMESSAGE
 
-
   //  string CompareStructures(aurostd::xoption& vpflow);
   //  string CompareStructureDirectory(aurostd::xoption& vpflow);
 
+  aurostd::xoption loadDefaultComparisonOptions(string mode=""); //DX 20200103
   // ===== Compare Directory Functions ===== //
   vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream=cout); //DX 20191122
   vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190424 //DX 20190801 - added vector<string>& magmoms_for_systems //DX 20191122 - added ostream and consts
@@ -286,12 +278,10 @@ namespace compare{
 
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
       ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, bool quiet=false, ostream& logstream=cout); //DX 20191125 
+      const aurostd::xoption& comparison_options, bool quiet=false, ostream& logstream=cout); //DX 20200103 - condensed bools to xoptions
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
       ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX 20191125
+      const aurostd::xoption& comparison_options, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX 20200103 - condensed bools to xoptions
   vector<StructurePrototype> compareDuplicateCompounds(vector<StructurePrototype>& prototype_schemes, uint& num_proc, 
       bool& ICSD_comparison, ostringstream& oss);
   vector<StructurePrototype> createComparisonSchemeForDuplicateCompounds(StructurePrototype& prototype_scheme); 
@@ -310,14 +300,12 @@ namespace compare{
       bool store_comparison_logs); //DX 20190822 - added comparison log bool
   //OLD vector<StructurePrototype> runComparisonScheme(uint& num_proc, vector<StructurePrototype>& comparison_schemes, const bool& same_species, 
   //OLD                                                const bool& scale_volume, const bool& optimize_match, const bool& single_comparison_round, const bool& structures_generated, const bool& ICSD_comparison, ostringstream& oss);
-  vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
-      bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
-      ostream& oss, bool quiet=false, ostream& logstream=cout); //DX 20191125
-  vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
-      bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
-      ostream& oss, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX 20191125
+  vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, uint num_proc, const aurostd::xoption& comparison_options,
+      ostream& oss, bool quiet=false, ostream& logstream=cout); //DX 20200103 - condensed bools to xoptions
+  vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, uint num_proc, const aurostd::xoption& comparison_options, 
+      ostream& oss, ofstream& FileMESSAGE, bool quiet=false, ostream& logstream=cout); //DX 20200103 - condensed bools to xoptions
   vector<std::pair<uint,uint> > calculateDivisors(const int& number);
   bool checkNumberOfGroupings(vector<StructurePrototype>& comparison_schemes, uint number);
   void createStructurePermutations(vector<StructurePrototype>& comparison_schemes, const vector<vector<string> >& name_order,
@@ -358,8 +346,8 @@ namespace compare{
   string findMinimumICSDEntry(vector<string>& ICSD_entries);
   bool groupSameRatios(vector<int>& stoich, vector<int>& unique_stoich, vector<vector<int> >& type_index);
   //vector<vector<int> > generatePermutations(uint& num_elements, vector<int>& indices);
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optmize_match, ostream& oss, ostream& logstream=cout); //DX 20191125 
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optmize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190319 - added FileMESSAGE //DX 20191125 - added ostream
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optmize_match, ostream& oss, ostream& logstream=cout); //DX 20191125 
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optmize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20190319 - added FileMESSAGE //DX 20191125 - added ostream
   vector<StructurePrototype> generatePermutationStructures(StructurePrototype& structure);
   void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX 20190508 //DX 20191125 - changed from vector to deque
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX 20190508

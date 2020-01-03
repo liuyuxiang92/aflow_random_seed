@@ -903,6 +903,52 @@ namespace compare{
 // loadStructuresFromDirectory() 
 // ***************************************************************************
 namespace compare {
+  aurostd::xoption loadDefaultComparisonOptions(string mode){ //DX 20200103
+    
+    aurostd::xoption comparison_options;
+    
+    if(mode=="permutation"){
+      comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",TRUE); // permutations are generated from the same structure, so they will have the same volume anyway
+      comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY",FALSE); // duplicate permutations should have the same symmetry
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF",FALSE); // duplicate permutations should have the same symmetry
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE); // duplicate permutations should have the same environment
+      comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",TRUE); // remove unmatched structures from object
+      comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPINGS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS",FALSE); // do not store comparison logs
+      comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",FALSE); // compare all permutations until matched or exhausted all comparisons
+      comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
+    }
+    else{
+      comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",TRUE);
+      comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",TRUE);
+      comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPINGS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    }
+
+    return comparison_options;
+  }
+}
+
+
+// ***************************************************************************
+// loadStructuresFromDirectory() 
+// ***************************************************************************
+namespace compare {
   vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream){ //DX 20191122
     ofstream FileMESSAGE;
     return loadStructuresFromDirectory(directory, magmoms_for_systems, same_species, FileMESSAGE, logstream);
@@ -1469,12 +1515,12 @@ namespace compare{
 // generatePermutations 
 // ***************************************************************************
 namespace compare{
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ostream& logstream){ //DX 20191125 - added overload
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optimize_match, ostream& oss, ostream& logstream){ //DX 20191125 - added overload
     ofstream FileMESSAGE;
     return comparePermutations(structure, num_proc, optimize_match, oss, FileMESSAGE, logstream);
   }
 
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optimize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool VERBOSE=false;
@@ -1483,17 +1529,11 @@ namespace compare{
     //DX 20191125 [OBSOLETE] ostream& logstream = cout;
 
     // ---------------------------------------------------------------------------
-    // fixed options for permutation comparisons 
+    // options for permutation comparisons 
     bool same_species = true; // permutation comparisons must compare the same species 
-    bool scale_volume = true; // permutations are generated from the same structure, so they will have the same volume anyway
-    bool ignore_symmetry = false; // duplicate permutations should have the same symmetry
-    bool ignore_Wyckoff = false; // duplicate permutations should have the same Wyckoff positions
-    bool ignore_environment = false; // duplicate permutations should have the same environment
-    bool single_comparison_round = false; // compare all permutations until matched or exhausted all comparisons
-    bool clean_unmatched = true; // remove unmatched structures from object //DX 20190504 
-    bool store_comparison_logs = false; // do not store comparison logs //DX 20190822
-    bool check_other_grouping = false; // DX 20190830
     bool quiet = true; //true 
+    aurostd::xoption permutation_options = compare::loadDefaultComparisonOptions("permutation");
+    permutation_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
 
     vector<StructurePrototype> final_permutations;
 
@@ -1534,7 +1574,8 @@ namespace compare{
         }
       }
       if(mode==1){ 
-        ignore_environment=true; 
+        //ignore_environment=true; 
+        permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",TRUE);
         if(!quiet || LDEBUG){
           message << "Could not find commensurate pemutations when grouping via environment. Ignoring environment analysis in grouping permutations (mode=1)." << endl;
           pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -1545,7 +1586,11 @@ namespace compare{
       // ---------------------------------------------------------------------------
       // group comparable permutations
       vector<StructurePrototype> permutation_comparisons;
-      permutation_comparisons = compare::groupStructurePrototypes(permutation_structures, same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, false); //DX 20190731 - added ignore_environment //DX 20190829 - false for duplicates_removed
+      permutation_comparisons = compare::groupStructurePrototypes(permutation_structures, same_species, 
+          permutation_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
+          permutation_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
+          permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
+          false); //DX 20200103 - condensed booleans to xoptions 
 
       // ---------------------------------------------------------------------------
       // ensure the representative stucture is an even permutation
@@ -1555,7 +1600,7 @@ namespace compare{
 
       // ---------------------------------------------------------------------------
       // compare permutations
-      final_permutations = compare::runComparisonScheme(num_proc, permutation_comparisons, same_species, check_other_grouping, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, clean_unmatched, false,store_comparison_logs,oss,FileMESSAGE,quiet); //DX 20190319 - added FileMESSAGE  //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool 
+      final_permutations = compare::runComparisonScheme(permutation_comparisons, same_species, num_proc, permutation_options, oss,FileMESSAGE,quiet); //DX 20200103 - condensed booleans to xoptions 
       
       // ---------------------------------------------------------------------------
       // check if matched permutations are physically possible
@@ -1585,7 +1630,7 @@ namespace compare{
 
         // ---------------------------------------------------------------------------
         // check if better matchings; perhaps matched structures would have smaller misfits if matched to different representatives
-        final_permutations = compare::checkForBetterMatches(final_permutations, oss, num_proc, true, same_species, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, clean_unmatched, false, FileMESSAGE, quiet, logstream); //DX 20191125 
+        final_permutations = compare::checkForBetterMatches(final_permutations, oss, num_proc, true, same_species, permutation_options, FileMESSAGE, quiet, logstream); //DX 20200103 - condensed booleans to xoptions
 
         // ---------------------------------------------------------------------------
         // check if NEW matched permutations are physically possible
@@ -3760,20 +3805,33 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
-      ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, bool quiet, ostream& logstream){ 
+      ostream& oss, uint& num_proc, 
+      bool check_for_better_matches, 
+      bool same_species,
+      const aurostd::xoption& comparison_options, 
+      bool quiet, 
+      ostream& logstream){ 
 
     ofstream FileMESSAGE;
-    return checkForBetterMatches(prototype_schemes, oss, num_proc, check_for_better_matches, same_species,
-        scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, 
-        ignore_environment, clean_unmatched, ICSD_comparison, FileMESSAGE, quiet, logstream);
+    return checkForBetterMatches(prototype_schemes, 
+        oss, 
+        num_proc, 
+        check_for_better_matches, 
+        same_species,
+        comparison_options, 
+        FileMESSAGE, 
+        quiet, 
+        logstream);
   }
 
   vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
-      ostream& oss, uint& num_proc, bool check_for_better_matches, bool same_species,
-      bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool clean_unmatched, bool ICSD_comparison, ofstream& FileMESSAGE, bool quiet, ostream& logstream){ 
+      ostream& oss, uint& num_proc, 
+      bool check_for_better_matches, 
+      bool same_species,
+      const aurostd::xoption& comparison_options, 
+      ofstream& FileMESSAGE, 
+      bool quiet, 
+      ostream& logstream){ 
 
     // this function checks if compounds/structures match better with another group 
 
@@ -3782,11 +3840,14 @@ namespace compare{
     stringstream message;
     //DX 20191125 [OBSOLETE] ostream& logstream = cout;
 
+    // ---------------------------------------------------------------------------
+    // create xoptions to contain all comparison options
+    aurostd::xoption check_better_matches_options = comparison_options; //DX 20200103
+    check_better_matches_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",TRUE); // always true for this function
+    check_better_matches_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",FALSE); //always false for this function 
+
     double misfit_min = 0.01; // used for check_for_better_matches : this is quite strict; if too expensive, make more loose
     double misfit_max = 0.1; // used for check_for_better_matches : otherwise we will compare same family structures which have already been moved (if using !clean_unmatched)
-    bool single_comparison_round = true; // always true for this function
-    bool store_comparison_logs = false; //DX 20190822 - add log bool
-    bool duplicates_removed = false; //DX 20190829 - should have no affect in this function
 
     // ---------------------------------------------------------------------------
     // check which structures could potentially match to others based on misfit
@@ -3804,7 +3865,13 @@ namespace compare{
           uint start_index = 0;
           if(check_for_better_matches){ start_index = i+1; }
           for(uint k=start_index;k<prototype_schemes.size();k++){
-            if(structuresCompatible(prototype_schemes[i], prototype_schemes[k], same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, duplicates_removed)){ // can check based on representatives; duplicate info matches its representative info //DX 20190829 - added duplicates_removed
+            if(structuresCompatible(prototype_schemes[i], 
+                  prototype_schemes[k], 
+                  same_species, 
+                  check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
+                  check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
+                  check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+                  false)){ // can check based on representatives; duplicate info matches its representative info //DX 20200103 - condensed booleans to xoptions
               if(!quiet || LDEBUG){
                 message << "Found potential match for " << prototype_schemes[i].structures_duplicate_names[j] << ": " << prototype_schemes[k].structure_representative_name; 
                 pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -3821,7 +3888,7 @@ namespace compare{
                 found_new_match=true;
               }
               if(k!=j){
-              str_proto_tmp.addStructurePrototypeAsDuplicate(prototype_schemes[k]);
+                str_proto_tmp.addStructurePrototypeAsDuplicate(prototype_schemes[k]);
               }
             }
           }
@@ -3834,7 +3901,7 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // compare structures 
-    vector<StructurePrototype> other_matches_schemes = compare::runComparisonScheme(num_proc, comparison_groups, same_species, duplicates_removed, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, false, ICSD_comparison, store_comparison_logs, oss, FileMESSAGE, quiet);  //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool
+    vector<StructurePrototype> other_matches_schemes = compare::runComparisonScheme(comparison_groups, same_species, num_proc, check_better_matches_options, oss, FileMESSAGE, quiet); //DX 20200103 - condensed booleans to xoptions
 
     // ---------------------------------------------------------------------------
     // check if there are any better matches and reorganize if necessary
@@ -3862,7 +3929,7 @@ namespace compare{
             prototype_schemes[j].structure_misfits_duplicate.back()=other_matches_schemes[i].structure_misfits_duplicate[min_index]; //DX 20191218
           }
           // remove from old representative
-          if(clean_unmatched && prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[0]){
+          if(check_better_matches_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED") && prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[0]){
             for(uint k=0;k<prototype_schemes[j].structures_duplicate_names.size();k++){
               if(prototype_schemes[j].structures_duplicate_names[k] == other_matches_schemes[i].structure_representative_name){
                 if(!quiet || LDEBUG){
@@ -3910,26 +3977,22 @@ namespace compare{
       }
     }
     
-    if(ICSD_comparison){
-      compare::representativePrototypeForICSDRuns(duplicate_check_schemes);
-    }
 
     // set options
     bool same_species=true;
-    bool scale_volume=false;
-    bool ignore_symmetry=false;
-    bool ignore_Wyckoff=false;
-    bool ignore_environment=false;
-    bool optimize_match=false;
-    bool single_comparison_round=false;
-    bool clean_unmatched=true; //DX 20190504
-    bool store_comparison_logs=false; //DX 20190822
-    bool check_other_groupings=false; //DX 20190830
-    //bool structures_generated=false;
+    
+    // ---------------------------------------------------------------------------
+    // create xoptions to contain all comparison options
+    aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+    comparison_options.flag("COMPARE_STRUCTURE::SCALE_VOLUME",FALSE);
+    if(ICSD_comparison){
+      comparison_options.flag("COMPARE_STRUCTURE::ICSD_COMPARISON",TRUE);
+      compare::representativePrototypeForICSDRuns(duplicate_check_schemes);
+    }
 
     message << "Running comparisons to remove duplicate compounds ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(num_proc, duplicate_check_schemes, same_species, check_other_groupings, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, ignore_environment, single_comparison_round, clean_unmatched, ICSD_comparison, store_comparison_logs, oss, FileMESSAGE); //DX 20190319 - added FileMESSAGE //DX 20190731 - //DX 20190731 - added ignore_symmetry/Wyckoff/environment //DX 20190822 - add log bool
+    vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(duplicate_check_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE); //DX 20200103 - condensed booleans to xoptions
 
     return final_prototypes_reduced;
 
@@ -4217,23 +4280,27 @@ namespace compare{
 // runComparisonScheme: Runs comparisons automatically 
 // ***************************************************************************
 namespace compare{
-  vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
-      bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
-      ostream& oss, bool quiet, ostream& logstream){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
+  vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, 
+      uint num_proc, 
+      const aurostd::xoption& comparison_options, 
+      ostream& oss, 
+      bool quiet, 
+      ostream& logstream){ //DX 20200103 - condensed booleans to xoptions
   
     ofstream FileMESSAGE;
   
-    return runComparisonScheme(num_proc, comparison_schemes, 
-      same_species, check_other_grouping, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, 
-      ignore_environment, single_comparison_round, clean_unmatched, ICSD_comparison, store_comparison_logs, 
-      oss, FileMESSAGE, quiet, logstream);
+    return runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE, quiet, logstream);
   }
 
-  vector<StructurePrototype> runComparisonScheme(uint num_proc, vector<StructurePrototype>& comparison_schemes, 
-      bool same_species, bool check_other_grouping, bool scale_volume, bool optimize_match, bool ignore_symmetry, bool ignore_Wyckoff, 
-      bool ignore_environment, bool single_comparison_round, bool clean_unmatched, bool ICSD_comparison, bool store_comparison_logs, 
-      ostream& oss, ofstream& FileMESSAGE, bool quiet, ostream& logstream){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched //DX 20190731 - removed const and &, added ignore_symmetry/Wyckoff/environment //DX 20190822 - added logs bool //DX 20190829 - added check_other_grouping
+  vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, 
+      uint num_proc, 
+      const aurostd::xoption& comparison_options, 
+      ostream& oss, 
+      ofstream& FileMESSAGE, 
+      bool quiet, 
+      ostream& logstream){ //DX 20200103 - condensed booleans to xoptions
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonScheme()";
@@ -4269,8 +4336,15 @@ namespace compare{
     // run threads (DX 20191108 - thread pointer)
     vector<std::thread*> threads;
     for(uint n=0; n<num_comparison_threads; n++){
-      threads.push_back(new std::thread(&compare::runComparisonThreads,std::ref(comparison_schemes),std::ref(start_indices[n]),std::ref(end_indices[n]),
-            std::ref(oss),same_species,scale_volume,optimize_match,store_comparison_logs));
+      threads.push_back(new std::thread(&compare::runComparisonThreads,
+            std::ref(comparison_schemes),
+            std::ref(start_indices[n]),
+            std::ref(end_indices[n]),
+            std::ref(oss),
+            same_species,
+            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
+            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
+            comparison_options.flag("COMPARE_STRUCTURE::STORE_COMPARISON_LOGS")));
     }        
 
     // join threads
@@ -4316,7 +4390,13 @@ namespace compare{
         // Call the main comparison function
         compare::aflowCompareStructure(num_proc, structure_representative,
             duplicate_structure,
-            same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX 20191122 - move ostream to end //DX 20191218 - added misfit_info
+            same_species, 
+            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"), 
+            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"), 
+            final_misfit, 
+            final_misfit_info, 
+            tmp_oss); //DX 20200103 - condensed booleans to xoptions
+
         // Store the figure of misfit
         comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX 20191218
       }
@@ -4330,12 +4410,12 @@ namespace compare{
     int num_mismatches=num_mismatches_orig;
 
     //DX 20190504 - added clean unmatched option - START
-    if(!clean_unmatched && single_comparison_round){
+    if(!comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED") && comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
       return comparison_schemes;
     }
     //DX 20190504 - added clean unmatched option - END
 
-    if(num_mismatches > 0 && !single_comparison_round && !quiet){
+    if(num_mismatches > 0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND") && !quiet){
       message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
@@ -4346,25 +4426,33 @@ namespace compare{
     // for this first iteration: LFA may have incorrectly grouped, so we need to check if the structures belong to other groups
     // OR after removing duplicate compounds these compounds remain separate, so for !same_species comparisons we need to check 
     // if they should match with other groups
-    if(!ignore_environment || check_other_grouping){
-      comparison_schemes = compare::checkForBetterMatches(comparison_schemes, oss, num_proc, false, same_species, scale_volume, optimize_match, ignore_symmetry, ignore_Wyckoff, true, clean_unmatched, false, FileMESSAGE, quiet, logstream); //DX 20191125
+    if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS") || comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPING")){
+      aurostd::xoption check_better_matches_options = comparison_options;
+      check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",TRUE);
+      comparison_schemes = compare::checkForBetterMatches(comparison_schemes, oss, num_proc, 
+          false, 
+          same_species, 
+          check_better_matches_options,
+          FileMESSAGE,
+          quiet, 
+          logstream); //DX 20200103 - condensed booleans to xoptions
     }
 
     // regroup comparisons based on misfit value
-    if(num_mismatches==0 && !single_comparison_round){
-      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, quiet); //DX 20190506 -- added clean_unmatched
+    if(num_mismatches==0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
+      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX 20200103
     }
 
     // Loop: continue comparison until all strucutures are matched or all comparisons schemes exhaused
     while(num_mismatches!=0){
       // regroup comparisons based on misfit value
-      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, quiet); //DX 20190506 -- added clean unmatched
+      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX 20200103
 
       // return if only one round of comparison is requested
-      if(single_comparison_round==true){return final_prototypes;}
+      if(comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){return final_prototypes;}
 
       // reorder structures so minimum ICSD is the representative structure
-      if(ICSD_comparison){ compare::representativePrototypeForICSDRuns(comparison_schemes); }
+      if(comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON")){ compare::representativePrototypeForICSDRuns(comparison_schemes); } //DX 20200103
 
       // split into threads
       number_of_comparisons=0;
@@ -4386,8 +4474,15 @@ namespace compare{
         threads.clear();
         // run threads
         for(uint n=0; n<num_comparison_threads; n++){
-          threads.push_back(new std::thread(&compare::runComparisonThreads,std::ref(comparison_schemes),std::ref(start_indices[n]),std::ref(end_indices[n]),
-                std::ref(oss),same_species,scale_volume,optimize_match,store_comparison_logs));
+          threads.push_back(new std::thread(&compare::runComparisonThreads,
+                std::ref(comparison_schemes),
+                std::ref(start_indices[n]),
+                std::ref(end_indices[n]),
+                std::ref(oss),
+                same_species,
+                comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
+                comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
+                comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS"))); //DX 20200103
         }        
         // join threads
         for(uint t=0;t<threads.size();t++){
@@ -4401,8 +4496,14 @@ namespace compare{
         start_indices.clear(); end_indices.clear();
         uint single_thread=1;
         splitComparisonIntoThreads(comparison_schemes, single_thread, start_indices, end_indices);
-        compare::runComparisonThreads(comparison_schemes,start_indices[0],end_indices[0],
-            oss,same_species,scale_volume,optimize_match,store_comparison_logs);
+        compare::runComparisonThreads(comparison_schemes,
+            start_indices[0],
+            end_indices[0],
+            oss,
+            same_species,
+            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
+            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
+            comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS")); //DX 20200103 - condensed booleans to xoptions
         //SINGLE THREAD - END
 #endif
       }
@@ -4427,7 +4528,7 @@ namespace compare{
     // end of while loop
 
     // append new prototype groupings
-    compare::appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, quiet); //DX 20190303 - added to properly clear xstructure and generated structure variable //DX 20190504 - added clean unmatched
+    compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX 20200103
     //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
     return final_prototypes;
   }
