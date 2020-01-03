@@ -213,7 +213,7 @@ namespace compare{
     // ---------------------------------------------------------------------------
     // quick check: check if any sites have the same number of atoms; if not, then no need to try comparing
     if(!print_misfit){
-      if(!arePermutationsComparableViaStoichiometry(xstr)){ //DX 20190624 - put into function
+      if(!arePermutationsComparableViaComposition(xstr)){ //DX 20190624 - put into function
         //DX 20191125 [OBSOLETE] vector<uint> reduced_stoichiometry = gcdStoich(xstr.num_each_type); //DX 20190508
         deque<int> reduced_stoichiometry; aurostd::reduceByGCD(xstr.num_each_type, reduced_stoichiometry); //DX 20191125
         deque<uint> reduced_stoichiometry_uint; for(uint i=0;i<reduced_stoichiometry.size(); i++){ reduced_stoichiometry_uint.push_back((uint)reduced_stoichiometry[i]); } //DX 20191125
@@ -317,14 +317,14 @@ namespace compare{
 // pflow::compareMultipleStructures()
 // ***************************************************************************
 namespace pflow {
-  string compareMultipleStructures(const aurostd::xoption& vpflow){ //DX 20190425 - changed name, more general
+  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream){ //DX 20190425 - changed name, more general
     
     // This function compares multiple structures (i.e., more than two).
 
     string function_name = "pflow::compareMultipleStructures()";
     bool LDEBUG=(false || XHOST.DEBUG);
     ostringstream oss;
-    ostream& logstream = cout;
+    //DX 20200103 ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
 
@@ -810,12 +810,12 @@ namespace pflow {
 // pflow::compare2prototypes - identifies corresponding protos 
 // ***************************************************************************
 namespace pflow {
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow){ 
+  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream){ 
     bool LDEBUG=(false || XHOST.DEBUG);
     
     string function_name = "pflow::compare2prototypes()";
     ostringstream oss;
-    ostream& logstream = cout;
+    //DX 20200103 ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
 
@@ -1073,13 +1073,13 @@ namespace pflow {
 // pflow::compare2database - compares database 
 // ***************************************************************************
 namespace pflow {
-  string compare2database(istream& input, const aurostd::xoption& vpflow){
+  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream){
     bool LDEBUG=(false || XHOST.DEBUG);
     
     string function_name = "pflow::compare2database()";
     string directory = "";
     ostringstream oss;
-    ostream& logstream = cout;
+    //DX 20200103 ostream& logstream = cout;
     stringstream message;
     ofstream FileMESSAGE;
 
@@ -2404,7 +2404,7 @@ namespace compare {
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       // find unique permutations of prototype
       for(uint i=0;i<final_prototypes.size();i++){
-        if(arePermutationsComparableViaStoichiometry(final_prototypes[i].stoichiometry) && 
+        if(arePermutationsComparableViaComposition(final_prototypes[i].stoichiometry) && 
            arePermutationsComparableViaSymmetry(final_prototypes[i].grouped_Wyckoff_positions)){
           // check if xstructure is generated; if not, make it
           if(!final_prototypes[i].structure_representative_generated){

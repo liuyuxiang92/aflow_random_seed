@@ -352,8 +352,8 @@ namespace compare{
   void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation); //DX 20190508 //DX 20191125 - changed from vector to deque
   void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation); //DX 20190508
   bool generatePermutations(uint& num_elements, vector<uint>& indices, vector<string>& names, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, vector<vector<uint> >& permutations, vector<vector<string> >&name_order, vector<vector<GroupedWyckoffPosition> >& permutation_grouped_Wyckoff_positions);
-  bool arePermutationsComparableViaStoichiometry(const xstructure& xstr); //DX 20190624 
-  bool arePermutationsComparableViaStoichiometry(vector<uint>& stoichiometry, bool reduce_stoichiometry=false); //DX 20190624
+  bool arePermutationsComparableViaComposition(const xstructure& xstr); //DX 20190624 
+  bool arePermutationsComparableViaComposition(vector<uint>& composition, bool reduce_composition=false); //DX 20190624
   bool arePermutationsComparableViaSymmetry(vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions); //DX 20190624
   bool makePermutations(StructurePrototype& structure, vector<vector<string> >& name_order, vector<StructurePrototype>& permutation_structures);
   bool makePermutations(xstructure& xstr, vector<vector<string> >& name_order, vector<xstructure>& xstr_permutations);
