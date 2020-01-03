@@ -2710,6 +2710,8 @@ namespace pflow {
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_PROTOTYPE;
     xvasp.AVASP_flag_PRECISION_scheme="H";
     xvasp.str=str;
+    if(xvasp.str.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POSCAR2AFLOWIN():","POSCAR has no atoms",_INPUT_ILLEGAL_);} //CO200102
+    if(xvasp.str.atoms[0].name_is_given==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POSCAR2AFLOWIN():","POSCAR is missing species information",_INPUT_ILLEGAL_);} //CO200102
     if (!module.empty()) xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", module);  // ME 181113
     KBIN::setModules(xvasp);  // ME 181110
     stringstream aflowin;
