@@ -171,8 +171,8 @@ bool relaxStructureAPL_VASP(int start_relax,
     message << "Supercell dimensions of input structure (" << aurostd::joinWDelimiter(scell_dims, "x") << ")"
             << " and relaxed structure (" << aurostd::joinWDelimiter(scell_dims_new, "x") << ")"
             << " do not agree. This is likely due to different symmetries in these structures. Use"
-            << " an input structure that is closer to the fully relaxed one, remove all CONTCAR.relax_apl*"
-            << " files, and run APL again.";
+            << " an input structure that is closer to the fully relaxed one, remove all"
+            << " CONTCAR." << _APL_RELAX_PREFIX_ << "* files, and run APL again.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
   xvector<int> kpts_sc_new(3);
@@ -184,8 +184,8 @@ bool relaxStructureAPL_VASP(int start_relax,
     message << "k-point grids  of the supercells of the input structure (" << aurostd::joinWDelimiter(kpts_sc, "x") << ")"
             << " and the relaxed structure (" << aurostd::joinWDelimiter(kpts_sc_new, "x") <<  ")"
             << " do not agree. This is likely due to different symmetries in these structures. Use"
-            << " an input structure that is closer to the fully relaxed one, remove all CONTCAR.relax_apl*"
-            << " files, and run APL again.";
+            << " an input structure that is closer to the fully relaxed one, remove all"
+            << " CONTCAR." << _APL_RELAX_PREFIX_ << "* files, and run APL again.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
@@ -409,7 +409,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
         // Check if the structure has already been relaxed
         for (int i = 1; i <= _NUM_RELAX_; i++) {
           string contcar = aflags.Directory + "/CONTCAR." + _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i);
-          if (aurostd::EFileExist(contcar)) {
+          if (aurostd::EFileExist(contcar) || aurostd::FileExist(contcar)) {  // ME200103 - also look for uncompressed files
             START_RELAX++;
           } else {
             break;
