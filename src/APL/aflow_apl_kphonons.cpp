@@ -1400,6 +1400,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
     }
     // Build after relaxations are done
     supercell.build(scell_dims);
+    if (USER_MAXSHELL > 0) supercell.setupShellRestrictions(USER_MAXSHELL);
     // ME200102 - END
 
     // ME190626 - Convert projection directions for DOS to Cartesian
