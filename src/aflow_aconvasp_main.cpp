@@ -13627,6 +13627,7 @@ namespace pflow {
   string SG(aurostd::xoption& vpflow,istream& input,string mode,string print) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string flag_name = "SG::"+mode; // DX 9/26/17
+    stringstream message; //DX 20200103
     if(print == "LABEL" || print == "NUMBER"){
       flag_name += "_" + print;
     }
@@ -13647,7 +13648,7 @@ namespace pflow {
               aurostd::utype2string(DEFAULT_PLATON_P_D2,5)+","+
               aurostd::utype2string(DEFAULT_PLATON_P_D3,5)+"",
               "aflow --findsymSG[_label,_number][=tolerance] < POSCAR   default:"+aurostd::utype2string(DEFAULT_FINDSYM_TOL,5)));
-        exit(0);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_MISSING_); //DX 20200103 - exit to xerror
       } 
     }
     // move on
@@ -13659,8 +13660,8 @@ namespace pflow {
     
     // [OBSOLETE] xstructure a(input,IOVASP_POSCAR);
     if(input.peek() == EOF) {
-      cerr << "File is empty. Check POSCAR." << endl;
-      exit(0);
+      message << "File is empty. Check POSCAR.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_MISSING_); //DX 20200103 - exit to xerror
     }
     xstructure a(input,IOAFLOW_AUTO);
     // DX 20180527 - use pwd - START
@@ -13714,8 +13715,8 @@ namespace pflow {
         tolerance = default_tolerance;
       }
       if(tolerance < 1e-10){
-        cerr << "pflow::SG::ERROR: Tolerance cannot be zero (i.e. less than 1e-10)." << endl;
-        return 0;
+        message << "pflow::SG::ERROR: Tolerance cannot be zero (i.e. less than 1e-10).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_VALUE_RANGE_); //DX 20200103 - return to xerror
       }
       // DX 9/26/17 - NO SCAN - START
       bool no_scan = false;

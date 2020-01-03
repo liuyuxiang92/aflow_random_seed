@@ -1579,22 +1579,19 @@ AtomEnvironment::AtomEnvironment(const AtomEnvironment& b){
 // ---------------------------------------------------------------------------
 // AtomEnvironment::copy
 void AtomEnvironment::copy(const AtomEnvironment& b) {
-  if(this != &b){
-    element_center=b.element_center;
-    type_center=b.type_center;
-    elements_neighbor=b.elements_neighbor;
-    types_neighbor=b.types_neighbor;
-    distances_neighbor=b.distances_neighbor;
-    coordinations_neighbor=b.coordinations_neighbor;
-    coordinates_neighbor=b.coordinates_neighbor;
-  }
+  element_center=b.element_center;
+  type_center=b.type_center;
+  elements_neighbor=b.elements_neighbor;
+  types_neighbor=b.types_neighbor;
+  distances_neighbor=b.distances_neighbor;
+  coordinations_neighbor=b.coordinations_neighbor;
+  coordinates_neighbor=b.coordinates_neighbor;
 }
 
 // ---------------------------------------------------------------------------
 // AtomEnvironment::operator=
 const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
   if(this!=&b){
-    free();
     copy(b);
   }
   return *this;
