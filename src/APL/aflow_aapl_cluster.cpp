@@ -1038,7 +1038,7 @@ vector<int> ClusterSet::getTransformationMap(const int& fg, const int& atom) {
 //getHigherOrderDistortions///////////////////////////////////////////////////
 vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
   vector<_ineq_distortions> ineq_dists;
-  if (order != 4) return ineq_dists;  // Not implemented for higher order and not necessary for lowe
+  if (order != 4) return ineq_dists;  // Not implemented for higher order and not necessary for lower
   ineq_dists.resize(pcell.iatoms.size());
   vector<vector<int> > dists(6, vector<int>(1));
   for (uint i = 0; i < 6; i++) dists[i][0] = i;

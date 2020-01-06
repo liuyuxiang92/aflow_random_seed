@@ -22,7 +22,6 @@
 #endif
 
 #define _DEBUG_AAPL_TCOND_ false
-#define ALAMODE
 
 // String constants for file output and exception handling
 static const string _AAPL_TCOND_ERR_PREFIX_ = "apl::TCONDCalculator::";
