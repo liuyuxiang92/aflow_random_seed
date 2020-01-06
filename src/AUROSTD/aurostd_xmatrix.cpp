@@ -3213,98 +3213,98 @@ namespace aurostd {
   // shifted by A. See Lecture notes in computer science, ISSN 0302-974, ANTS - VI : algorithmic
   // number theory, 2004, vol. 3076, pp. 338-357 ISBN 3-540-22156-5
   template<class utype> void
-  reduce_A_in_ABC(xvector<utype>& A, xvector<utype>& B, xvector<utype>& C,utype eps) {
-    string soliloquy="aurostd::reduce_A_in_ABC():";
-    xvector<utype> T(3);  // closest point to origin in B,C+A affine plane
-    xmatrix<utype> ABC(3,3),ABCinv(3,3),oldABC(3,3); // Matrices of ABC basis vectors and inverse
-    xvector<utype> dist(4); // the distances from T to enclosing lattice points of B,C (4 corners of the ppiped)
-    xvector<utype> i(3),i1(3),i2(3),i3(3),i4(3); // lattice coordinates of A, in the affine plane, using the B,C basis vectors
-    int idx; // index of the smallest distance from T to a lattice point in B,C
-    //[CO191201 - OBSOLETE]bool err;
-    //integer j
-    utype lambda;
-    //print *,"entering reduction routine..."
-    //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
-    for(int i=1;i<=3;i++) {
-      ABC(i,1)=A(i);
-      ABC(i,2)=B(i);
-      ABC(i,3)=C(i);
-    }
-    oldABC=ABC;
-    // Use Gaussian reduction to reduce the B,C 2D basis so that it is itself Minkowski reduced. If this
-    // is done then the closest lattice point (in B,C plane) to projection of A (into the B,C plane) is
-    // guaranteed to be one of the corners of the unit cell enclosing the projection of A
-    gaussian_reduce_two_vectors(B,C,eps);
-
-    //do j=1,3
-    //   write(*,'(3(f11.5,1x))') ABC(j,:)
-    //enddo
-    //
-    // First thing to do is find the (real, not lattice) point in the affine plane B,C + A that is
-    // nearest the origin. Call this T.
-    lambda=-scalar_product(A,vector_product(B,C))/(aurostd::modulus(vector_product(B,C))*aurostd::modulus(vector_product(B,C)));
-    T=A + lambda*vector_product(B,C);
-  
-    //print *,lambda
-    //write(*,'("T (vec in B,C affine plane): ",3(f10.3,1x))') T
-    
-    // Now find the four points of the B,C lattice, in the affine plane, that enclose the point T
-    for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
-      ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
-    }//GH
-    // [OBSOLETE]        aurostd::matrix_inverse(ABC,ABCinv,err);
-    //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
-    //[CO191201 - OBSOLETE]if(err) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  A,B,C vectors in reduce_A_in_ABC are co-planar" << endl;exit(0);}
-    if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
-    ABCinv=inverse(ABC);  //CO191201
-    i=aurostd::nint(ABCinv*T);
-    
-    // print *,"Lattice coordinates of origin enclosing T:", i
-    // Compute the distance from T to each of the four points and pick the one that is the closest.
-    i1(1)=i(1);i1(2)=i(2);i1(3)=i(3);dist(1)=aurostd::modulus(T-ABC*i1);
-    i2(1)=i(1);i2(2)=i(2)+1;i2(3)=i(3);dist(2)=aurostd::modulus(T-ABC*i2);
-    i3(1)=i(1);i3(2)=i(2);i3(3)=i(3)+1;dist(3)=aurostd::modulus(T-ABC*i3);
-    i4(1)=i(1);i4(2)=i(2)+1;i4(3)=i(3)+1;dist(4)=aurostd::modulus(T-ABC*i4);
-    idx=0;idx=aurostd::mini(dist);
-    //write(*,'("Dists: ",4(f10.5,1x))') dist
-    
-    //if(.not. equal(,origdist,eps)) then // Only change A if the new one really
-    
-    if(idx==1) A=A-ABC*i1;
-    if(idx==2) A=A-ABC*i2;
-    if(idx==3) A=A-ABC*i3;
-    if(idx==4) A=A-ABC*i4;
-    if(idx==0) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  Case failed in reduce_A_in_ABC" << endl;exit(0);}
-    //endif
-    //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
-    for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
-      ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
-    }//GH
-	  
-    // [OBSOLETE]  aurostd::matrix_inverse(ABC,ABCinv,err);
-    //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
-    //
-    if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
-    ABCinv=inverse(ABC);  //CO191201
-    ABC=ABCinv*oldABC-aurostd::nint(ABCinv*oldABC);
-
-    for(int i=1;i<=3;i++) {
-      for(int j=1;j<=3;j++) {
-	if(aurostd::abs(ABC(i,j))>eps) {
-	  cerr << "eps=" << endl << eps << endl;
-	  cerr << "ABC(i,j)=" << endl << ABC(i,j) << endl;
-	  cerr << "ABCinv=" << endl << ABCinv << endl;
-	  cerr << "oldABC=" << endl << oldABC << endl;
-	  cerr << "ABCinv*oldABC=" << endl << ABCinv*oldABC << endl;
-	  cerr << "ABCinv*oldABC-aurostd::nint(ABCinv*oldABC)=" << endl << ABCinv*oldABC-aurostd::nint(ABCinv*oldABC) << endl;
-	  cerr << "Lattice was not preserved  in reduce_A_in_ABC" << endl;
-	  exit(0);
-	}    
+    reduce_A_in_ABC(xvector<utype>& A, xvector<utype>& B, xvector<utype>& C,utype eps) {
+      string soliloquy="aurostd::reduce_A_in_ABC():";
+      xvector<utype> T(3);  // closest point to origin in B,C+A affine plane
+      xmatrix<utype> ABC(3,3),ABCinv(3,3),oldABC(3,3); // Matrices of ABC basis vectors and inverse
+      xvector<utype> dist(4); // the distances from T to enclosing lattice points of B,C (4 corners of the ppiped)
+      xvector<utype> i(3),i1(3),i2(3),i3(3),i4(3); // lattice coordinates of A, in the affine plane, using the B,C basis vectors
+      int idx; // index of the smallest distance from T to a lattice point in B,C
+      //[CO191201 - OBSOLETE]bool err;
+      //integer j
+      utype lambda;
+      //print *,"entering reduction routine..."
+      //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
+      for(int i=1;i<=3;i++) {
+        ABC(i,1)=A(i);
+        ABC(i,2)=B(i);
+        ABC(i,3)=C(i);
       }
+      oldABC=ABC;
+      // Use Gaussian reduction to reduce the B,C 2D basis so that it is itself Minkowski reduced. If this
+      // is done then the closest lattice point (in B,C plane) to projection of A (into the B,C plane) is
+      // guaranteed to be one of the corners of the unit cell enclosing the projection of A
+      gaussian_reduce_two_vectors(B,C,eps);
+
+      //do j=1,3
+      //   write(*,'(3(f11.5,1x))') ABC(j,:)
+      //enddo
+      //
+      // First thing to do is find the (real, not lattice) point in the affine plane B,C + A that is
+      // nearest the origin. Call this T.
+      lambda=-scalar_product(A,vector_product(B,C))/(aurostd::modulus(vector_product(B,C))*aurostd::modulus(vector_product(B,C)));
+      T=A + lambda*vector_product(B,C);
+
+      //print *,lambda
+      //write(*,'("T (vec in B,C affine plane): ",3(f10.3,1x))') T
+
+      // Now find the four points of the B,C lattice, in the affine plane, that enclose the point T
+      for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
+        ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
+      }//GH
+      // [OBSOLETE]        aurostd::matrix_inverse(ABC,ABCinv,err);
+      //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
+      //[CO191201 - OBSOLETE]if(err) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  A,B,C vectors in reduce_A_in_ABC are co-planar" << endl;exit(0);}
+      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
+      ABCinv=inverse(ABC);  //CO191201
+      i=aurostd::nint(ABCinv*T);
+
+      // print *,"Lattice coordinates of origin enclosing T:", i
+      // Compute the distance from T to each of the four points and pick the one that is the closest.
+      i1(1)=i(1);i1(2)=i(2);i1(3)=i(3);dist(1)=aurostd::modulus(T-ABC*i1);
+      i2(1)=i(1);i2(2)=i(2)+1;i2(3)=i(3);dist(2)=aurostd::modulus(T-ABC*i2);
+      i3(1)=i(1);i3(2)=i(2);i3(3)=i(3)+1;dist(3)=aurostd::modulus(T-ABC*i3);
+      i4(1)=i(1);i4(2)=i(2)+1;i4(3)=i(3)+1;dist(4)=aurostd::modulus(T-ABC*i4);
+      idx=0;idx=aurostd::mini(dist);
+      //write(*,'("Dists: ",4(f10.5,1x))') dist
+
+      //if(.not. equal(,origdist,eps)) then // Only change A if the new one really
+
+      if(idx==1) A=A-ABC*i1;
+      if(idx==2) A=A-ABC*i2;
+      if(idx==3) A=A-ABC*i3;
+      if(idx==4) A=A-ABC*i4;
+      if(idx==0) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  Case failed in reduce_A_in_ABC" << endl;exit(0);}
+      //endif
+      //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
+      for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
+        ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
+      }//GH
+
+      // [OBSOLETE]  aurostd::matrix_inverse(ABC,ABCinv,err);
+      //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
+      //
+      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
+      ABCinv=inverse(ABC);  //CO191201
+      ABC=ABCinv*oldABC-aurostd::nint(ABCinv*oldABC);
+
+      for(int i=1;i<=3;i++) {
+        for(int j=1;j<=3;j++) {
+          if(aurostd::abs(ABC(i,j))>eps) {
+            cerr << "eps=" << endl << eps << endl;
+            cerr << "ABC(i,j)=" << endl << ABC(i,j) << endl;
+            cerr << "ABCinv=" << endl << ABCinv << endl;
+            cerr << "oldABC=" << endl << oldABC << endl;
+            cerr << "ABCinv*oldABC=" << endl << ABCinv*oldABC << endl;
+            cerr << "ABCinv*oldABC-aurostd::nint(ABCinv*oldABC)=" << endl << ABCinv*oldABC-aurostd::nint(ABCinv*oldABC) << endl;
+            cerr << "Lattice was not preserved  in reduce_A_in_ABC" << endl;
+            exit(0);
+          }    
+        }
+      }
+      //read(*,*)
     }
-    //read(*,*)
-  }
-  
+
   // ***************************************************************************************************
   //  This routine takes a set of basis vectors (that form a lattice) and reduces them so that they form
   //  the shortest possible basis. See Lecture notes in computer science, ISSN 0302-974, ANTS - VI : algorithmic
