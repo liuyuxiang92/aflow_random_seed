@@ -2267,19 +2267,19 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-// ME 180904
+  // ME 180904
   template<class utype> xmatrix<utype>                             // conj xmatrix
-  conj(const xmatrix<utype>& a){
-    if (a.iscomplex) {
-      xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
-      for (int i = a.lrows; i <= a.urows; i++) {
-        for (int j = a.lcols; j <= a.ucols; j++) {
-          out[i][j] = conj(a[i][j]);
+    conj(const xmatrix<utype>& a){
+      if (a.iscomplex) {
+        xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
+        for (int i = a.lrows; i <= a.urows; i++) {
+          for (int j = a.lcols; j <= a.ucols; j++) {
+            out[i][j] = conj(a[i][j]);
+          }
         }
-      }
-      return out;
-    } else {return a;}
-  }
+        return out;
+      } else {return a;}
+    }
 }
 
 // ----------------------------------------------------------------------------
