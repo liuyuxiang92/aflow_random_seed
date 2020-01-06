@@ -379,7 +379,7 @@ vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<ve
           e = at1_pc * natoms + at2_pc;
           for (crt = 0; crt < ncart; crt++) {
             ifc_prod = ifcs[c][crt] * min_dist[at1_pc][at3_sc][cart_indices[crt][2] + 1];
-            // Perform multiplication expliclty in place instead of using xcomplex.
+            // Perform multiplication explicitly in place instead of using xcomplex.
             // This is three times faster because constructors and destructors are not called.
             g_mode.re += ifc_prod * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
             g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
