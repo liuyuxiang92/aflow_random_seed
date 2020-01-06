@@ -733,7 +733,7 @@ namespace aurostd {  // namespace aurostd
     }
 
     xmatrix<xcomplex<utype> > c(a.rows, b.cols);
-    int i, j, k, ii, jj, kk;
+    int i=0, j=0, k=0, ii=0, jj=0, kk=0;
     utype *ai, aik;
     xcomplex<utype> *bk, *ci;
     for (i = c.lrows, ii = a.lrows; i <= c.urows; i++, ii++) {
