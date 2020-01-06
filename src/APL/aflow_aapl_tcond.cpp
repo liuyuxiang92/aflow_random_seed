@@ -158,6 +158,13 @@ void TCONDCalculator::calculateThermalConductivity() {
   double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
   double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
   double tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
+
+  if (tstart > tend) {
+    string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalProperties()";
+    string message = "Tstart cannot be higher than Tend.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+  }
+
   for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
 
   // Frequencies and group velocities
