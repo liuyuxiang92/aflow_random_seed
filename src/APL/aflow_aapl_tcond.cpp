@@ -511,7 +511,7 @@ void TCONDCalculator::calculateTransitionProbabilities() {
     writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
   }
 
-  if (calc_options.flag("BOUNADRY")) {
+  if (calc_options.flag("BOUNDARY")) {
     rates_boundary = calculateTransitionProbabilitiesBoundary();
     string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
     writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
