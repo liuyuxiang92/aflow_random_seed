@@ -202,10 +202,10 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                             // operator =
-  xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& b) {  //CO191112
-    if(this!=&b) {copy(b);}
-    return *this;
-  }
+    xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& b) {  //CO191112
+      if(this!=&b) {copy(b);}
+      return *this;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
