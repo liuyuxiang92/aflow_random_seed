@@ -1406,7 +1406,7 @@ namespace aurostd {
     return GCD(va,vb,vgcd,vx,vy);
   }
   void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy){
-    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INPUT_NUMBER_);}
+    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INDEX_ILLEGAL_);}
     //va vs. vb
     if(va.lrows!=vb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.lrows!=vb.lrows",_INDEX_MISMATCH_);}
     if(va.urows!=vb.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.urows!=vb.urows",_INDEX_MISMATCH_);}
