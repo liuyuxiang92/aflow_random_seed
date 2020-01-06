@@ -2148,7 +2148,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
           vector<vector<int> > maps;
           while (true) {
             if (line_count == vsize) {
-              message = "incomplete distortios varray";
+              message = "incomplete distortions varray";
               throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
