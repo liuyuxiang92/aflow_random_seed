@@ -1396,7 +1396,7 @@ namespace aurostd {
         set=true;
       }
     }
-    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_VALUE_ILLEGAL_);}  //special case
     gcd=vab[counter];
     for(int i=counter+1;i<=vab.urows;i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
   }
