@@ -3576,7 +3576,7 @@ namespace aurostd {
 
       int i=0,k=0;
       xmatrix<utype> x,A; //since x and A changes size with each loop, let getmatInPlace() handle it internally
-      utype vModulus;
+      utype vModulus = (utype)0;
       std::vector<xmatrix<utype> > V; //we need to save v's, Q is calculated afterwards and needs all v's present
       for(k=R.lcols;k<=R.ucols;k++) {
         if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}

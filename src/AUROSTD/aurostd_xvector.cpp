@@ -1144,7 +1144,7 @@ namespace aurostd {                   // conversion from xvector<int> to xvector
 }
 
 //CO190516
-namespace aurostd {                   // conversion from xvector<int> to xvector<double>
+ namespace aurostd {                   // conversion from xvector<double> to xvector<int>
   xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
     xvector<int> b(a.urows,a.lrows);
     if(check_int){
