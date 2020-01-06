@@ -794,7 +794,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
                 eig.im = 0.0;
                 e = 3 * at;
                 for (int i = 1; i < 4; i++) {
-                  // Perform multiplication expliclty in place instead of using xcomplex.
+                  // Perform multiplication explicitly in place instead of using xcomplex.
                   // This is three times faster because constructors and destructors are not called.
                   eig.re += eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].re;
                   eig.re += eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].im;
