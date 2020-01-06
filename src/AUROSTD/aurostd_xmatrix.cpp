@@ -124,30 +124,30 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                     // default destructor
-  xmatrix<utype>::~xmatrix() {
-    // cerr << "problem destructor xmatrix [1]" << endl;
-    // free a xmatrix allocated with xmatrix()
+    xmatrix<utype>::~xmatrix() {
+      // cerr << "problem destructor xmatrix [1]" << endl;
+      // free a xmatrix allocated with xmatrix()
 #ifdef _XMATH_DEBUG_DESTRUCTORS
-    cerr << "M -> default destructor:"
-      << "  lrows=" << lrows << ", urows=" << urows
-      << ", lcols=" << lcols << ", ucols=" << ucols
-      << ", rows="  << rows  << ", cols="  << cols << endl;
+      cerr << "M -> default destructor:"
+        << "  lrows=" << lrows << ", urows=" << urows
+        << ", lcols=" << lcols << ", ucols=" << ucols
+        << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    free(); //CO190808
-  }
+      free(); //CO190808
+    }
 }
 // ----------------------------------------------------------------------------
 // -------------------------------------------------------- assigment operators
  
 namespace aurostd { // namespace aurostd
   template<class utype>
-  void xmatrix<utype>::free() { //CO190808
-    if(msize>0) {
-      delete [] (corpus[lrows]+lcols-XXEND);
-      delete [] (corpus+lrows-XXEND);
+    void xmatrix<utype>::free() { //CO190808
+      if(msize>0) {
+        delete [] (corpus[lrows]+lcols-XXEND);
+        delete [] (corpus+lrows-XXEND);
+      }
+      lrows=urows=lcols=ucols=0;refresh();
     }
-    lrows=urows=lcols=ucols=0;refresh();
-  }
 }
 
 namespace aurostd {  // namespace aurostd
