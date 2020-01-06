@@ -7344,7 +7344,7 @@ int MVops::apl_linalg_hermtd_unpack(const apl_matrix_complex<T> *A,
     // ME191031 - use xerror
     //throw APLRuntimeError("matrix A must be sqaure");
     string function = "MVops::apl_linalg_hermtd_unpack()";
-    string message = "matrix A must be sqeare";
+    string message = "matrix A must be square";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
   } else if (tau->size + 1 != A->size1) {
     // ME190726 - exit clean-up
