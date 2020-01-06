@@ -6761,70 +6761,68 @@ void POccStructuresFile::processFile() {
     //  ){index_str++;}
   }
   
-  /*
-  vector<string> vtokens,vtokens2;
-  string arun_directory="",pocc_directory_abs="",qmvasp_path="";
-  m_ARUN_directories.clear();
-  
-  for(uint iline=0;iline<m_vcontent.size();iline++){
-    if(aurostd::substring2bool(m_vcontent[iline],POCC_AFLOWIN_tag+"UFF_ENERGY=")){
-      aurostd::string2tokens(m_vcontent[iline],vtokens,"=");
-      if(vtokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown UFF_ENERGY line format",_FILE_CORRUPT_);}
-      if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"UFF_ENERGY is not a double",_VALUE_ERROR_);}
-      l_supercell_sets.back().m_psc_set.push_back(POccSuperCell()); //this comes before structure
-      l_supercell_sets.back().m_psc_set.back().m_energy_uff=aurostd::string2utype<double>(vtokens[1]);
-      continue;
-    }
-    if(aurostd::substring2bool(m_vcontent[iline],POSCAR_POCC_series_START_tag)){
-      //hnf_matrix
-      aurostd::string2tokens(m_vcontent[iline],vtokens,"H");
-      if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H1) line",_FILE_CORRUPT_);}
-      aurostd::string2tokens(vtokens.back(),vtokens2,"C");
-      if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H2) line",_FILE_CORRUPT_);}
-      if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
-      l_supercell_sets.back().m_psc_set.back().m_hnf_index=aurostd::string2utype<unsigned long long int>(vtokens2[0]);
-      //site_configuration
-      aurostd::string2tokens(m_vcontent[iline],vtokens,"C");
-      if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (C1) line",_FILE_CORRUPT_);}
-      if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"site_config_index is not an integer",_VALUE_ERROR_);}
-      l_supercell_sets.back().m_psc_set.back().m_site_config_index=aurostd::string2utype<unsigned long long int>(aurostd::RemoveWhiteSpaces(vtokens.back()));
-      //degeneracy
-      l_supercell_sets.back().m_psc_set.back().m_degeneracy=1;
-      if(iline+1>m_vcontent.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
-      if(!aurostd::substring2bool(m_vcontent[iline+1],"DG=")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DG= is not present in POSCAR title line",_FILE_CORRUPT_);}
-      aurostd::string2tokens(m_vcontent[iline+1],vtokens," ");
-      for(uint i=0;i<vtokens.size();i++){
-        if(aurostd::substring2bool(vtokens[i],"DG=")){
-          aurostd::string2tokens(vtokens[i],vtokens2,"=");
-          if(vtokens2.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_FILE_CORRUPT_);}
-          if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
-          l_supercell_sets.back().m_psc_set.back().m_degeneracy*=aurostd::string2utype<unsigned long long int>(vtokens2[1]); //backwards compatible with old pocc scheme, but this should be obsolete
-        }
-      }
-      //directory
-      pocc_directory_abs=m_vcontent[iline];
-      aurostd::StringSubst(pocc_directory_abs,POSCAR_series_START_tag,"");
-      aurostd::string2tokens(pocc_directory_abs,vtokens,"_");  //POCC_01_01_H0C0
-      if(vtokens.size()!=4){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown POcc hash format (_)",_FILE_CORRUPT_);}
-      if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc degeneracy index",_VALUE_ILLEGAL_);}
-      if(aurostd::string2utype<int>(vtokens[2])==1){
-        arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[3];
-        m_ARUN_directories.push_back(arun_directory);
-        pocc_directory_abs=m_aflags.Directory+"/"+arun_directory;
-        if(LDEBUG){cerr << soliloquy << " pocc_directory_abs=" << pocc_directory_abs << endl;}
-        if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_NOT_FOUND_);}
-        //m_ARUN_directories.push_back(pocc_directory_abs); //do not save full path
-      }
-      //debug
-      if(LDEBUG){
-        cerr << soliloquy << " found hnf_index=" << l_supercell_sets.back().m_psc_set.back().m_hnf_index;
-        cerr << " site_config_index=" << l_supercell_sets.back().m_psc_set.back().m_site_config_index;
-        cerr << " degeneracy=" << l_supercell_sets.back().m_psc_set.back().m_degeneracy;
-        cerr << endl;
-      }
-    }
-  }
-  */
+  //vector<string> vtokens,vtokens2;
+  //string arun_directory="",pocc_directory_abs="",qmvasp_path="";
+  //m_ARUN_directories.clear();
+  //
+  //for(uint iline=0;iline<m_vcontent.size();iline++){
+  //  if(aurostd::substring2bool(m_vcontent[iline],POCC_AFLOWIN_tag+"UFF_ENERGY=")){
+  //    aurostd::string2tokens(m_vcontent[iline],vtokens,"=");
+  //    if(vtokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown UFF_ENERGY line format",_FILE_CORRUPT_);}
+  //    if(!aurostd::isfloat(vtokens[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"UFF_ENERGY is not a double",_VALUE_ERROR_);}
+  //    l_supercell_sets.back().m_psc_set.push_back(POccSuperCell()); //this comes before structure
+  //    l_supercell_sets.back().m_psc_set.back().m_energy_uff=aurostd::string2utype<double>(vtokens[1]);
+  //    continue;
+  //  }
+  //  if(aurostd::substring2bool(m_vcontent[iline],POSCAR_POCC_series_START_tag)){
+  //    //hnf_matrix
+  //    aurostd::string2tokens(m_vcontent[iline],vtokens,"H");
+  //    if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H1) line",_FILE_CORRUPT_);}
+  //    aurostd::string2tokens(vtokens.back(),vtokens2,"C");
+  //    if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (H2) line",_FILE_CORRUPT_);}
+  //    if(!aurostd::isfloat(vtokens2[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hnf_index is not an integer",_VALUE_ILLEGAL_);}
+  //    l_supercell_sets.back().m_psc_set.back().m_hnf_index=aurostd::string2utype<unsigned long long int>(vtokens2[0]);
+  //    //site_configuration
+  //    aurostd::string2tokens(m_vcontent[iline],vtokens,"C");
+  //    if(vtokens.size()<=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown START.POCC_ (C1) line",_FILE_CORRUPT_);}
+  //    if(!aurostd::isfloat(aurostd::RemoveWhiteSpaces(vtokens.back()))){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"site_config_index is not an integer",_VALUE_ERROR_);}
+  //    l_supercell_sets.back().m_psc_set.back().m_site_config_index=aurostd::string2utype<unsigned long long int>(aurostd::RemoveWhiteSpaces(vtokens.back()));
+  //    //degeneracy
+  //    l_supercell_sets.back().m_psc_set.back().m_degeneracy=1;
+  //    if(iline+1>m_vcontent.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(iline),_FILE_CORRUPT_);} //see if title is accessible
+  //    if(!aurostd::substring2bool(m_vcontent[iline+1],"DG=")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DG= is not present in POSCAR title line",_FILE_CORRUPT_);}
+  //    aurostd::string2tokens(m_vcontent[iline+1],vtokens," ");
+  //    for(uint i=0;i<vtokens.size();i++){
+  //      if(aurostd::substring2bool(vtokens[i],"DG=")){
+  //        aurostd::string2tokens(vtokens[i],vtokens2,"=");
+  //        if(vtokens2.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot parse at DG= (vtokens2.size()=="+aurostd::utype2string(vtokens2.size())+")",_FILE_CORRUPT_);}
+  //        if(!aurostd::isfloat(vtokens2[1])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"degeneracy is not an integer",_VALUE_ILLEGAL_);}
+  //        l_supercell_sets.back().m_psc_set.back().m_degeneracy*=aurostd::string2utype<unsigned long long int>(vtokens2[1]); //backwards compatible with old pocc scheme, but this should be obsolete
+  //      }
+  //    }
+  //    //directory
+  //    pocc_directory_abs=m_vcontent[iline];
+  //    aurostd::StringSubst(pocc_directory_abs,POSCAR_series_START_tag,"");
+  //    aurostd::string2tokens(pocc_directory_abs,vtokens,"_");  //POCC_01_01_H0C0
+  //    if(vtokens.size()!=4){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown POcc hash format (_)",_FILE_CORRUPT_);}
+  //    if(!aurostd::isfloat(vtokens[2])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot determine POcc degeneracy index",_VALUE_ILLEGAL_);}
+  //    if(aurostd::string2utype<int>(vtokens[2])==1){
+  //      arun_directory="ARUN."+vtokens[0]+"_"+vtokens[1]+"_"+vtokens[3];
+  //      m_ARUN_directories.push_back(arun_directory);
+  //      pocc_directory_abs=m_aflags.Directory+"/"+arun_directory;
+  //      if(LDEBUG){cerr << soliloquy << " pocc_directory_abs=" << pocc_directory_abs << endl;}
+  //      if(!aurostd::IsDirectory(pocc_directory_abs)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POcc directory [dir="+pocc_directory_abs+"] not found",_FILE_NOT_FOUND_);}
+  //      //m_ARUN_directories.push_back(pocc_directory_abs); //do not save full path
+  //    }
+  //    //debug
+  //    if(LDEBUG){
+  //      cerr << soliloquy << " found hnf_index=" << l_supercell_sets.back().m_psc_set.back().m_hnf_index;
+  //      cerr << " site_config_index=" << l_supercell_sets.back().m_psc_set.back().m_site_config_index;
+  //      cerr << " degeneracy=" << l_supercell_sets.back().m_psc_set.back().m_degeneracy;
+  //      cerr << endl;
+  //    }
+  //  }
+  //}
 
   if(LDEBUG){
     cerr << soliloquy << " l_supercell_sets.size()=" << l_supercell_sets.size() << endl;
