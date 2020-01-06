@@ -1393,7 +1393,7 @@ namespace aurostd {                   // conversion from xmatrix<int> to xmatrix
       int i=0,j=0;
       for(i=a.lrows;i<=a.urows;i++){
         for(j=a.lcols;j<=a.ucols;j++){
-          b[i][j]=(double)a[i][j];  //nint is for safety
+          b[i][j]=(double)a[i][j];
         }
       }
       return b;
