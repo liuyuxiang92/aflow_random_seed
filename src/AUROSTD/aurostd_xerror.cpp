@@ -32,7 +32,7 @@ static const std::string errors[_AFLOW_NUM_ERR_TYPES_][9] =
      {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
      {"illegal value", "out of range", "", "", "", "", "", "", ""},
      {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
-     {"not initialized", "", "", "", "", "", "", "", ""},
+     {"not initialized", "SQL error", "", "", "", "", "", "", ""},
      {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
 //Constructors////////////////////////////////////////////////////////////////

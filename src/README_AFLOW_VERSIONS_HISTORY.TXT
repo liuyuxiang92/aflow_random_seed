@@ -1,5 +1,8 @@
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- Added a handler for the AFLOW database. (ME)
+        -- Added an AFLOW-SQLITE interface. (ME)
+        -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip). (ME)
         -- added schema name/unit/type to XHOST (SC)
         -- added file2dequestring(), string2dequestring() (SC)
         -- optimized NCPUS/NPAR/NCORE settings (SC)
@@ -138,6 +141,7 @@
         -- updated README_AFLOW_COMPARE.TXT (DX)
         -- use xoptions schema for property units in comparison code (DX)
         -- use ANRL setting as default for symmetry analysis in comparisons for quick conversion to AFLOW prototype designation (DX)
+        -- use of xoptions throughout comparison functions (DX)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)

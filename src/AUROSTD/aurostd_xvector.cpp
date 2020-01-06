@@ -1434,7 +1434,7 @@ namespace aurostd {
     return lcm;
   }
 }
-  
+ 
 namespace aurostd {
   template<class utype> void reduceByGCD(const xvector<utype>& in_V, xvector<utype>& out_V, utype tol){
   // DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,const utype& tol){
@@ -2920,4 +2920,3 @@ namespace aurostd {
 // *             STEFANO CURTAROLO - Duke University 2003-2019              *
 // *                                                                        *
 // **************************************************************************
-

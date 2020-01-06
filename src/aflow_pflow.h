@@ -102,12 +102,11 @@ namespace pflow {
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20191125
   string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20191125
   string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
-  string compareStructures(const aurostd::xoption& vpflow); //DAVID
   //DX 20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID
-  string compareMultipleStructures(const aurostd::xoption& vpflow); //DAVID //DX 20190425
-  string compare2database(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
+  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20190425
+  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20181004
   vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow); //DX 20181004 //DX 20190314 - changed return value
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 - overloaded 
+  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20190314 - overloaded 
   // DX 9/1/17 [OBSOLETE] void DATA(string smode,istream& input);
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); // DX 9/1/17 - SGDATA + JSON
   void DATA1(string options,istream& input);

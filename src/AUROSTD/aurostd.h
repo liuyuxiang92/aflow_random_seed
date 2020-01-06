@@ -49,6 +49,7 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
+#include <signal.h>  // ME191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO 170806 - need for POCC
 #include <netdb.h>  //CO 180321 - frisco needs for AFLUX
@@ -216,7 +217,7 @@ typedef unsigned uint;
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
 #include "../aflow.h"
-#include "../SQLITE/sqlite3.h"
+//#include "../SQLITE/sqlite3.h"  // OBSOLETE ME191228 - not used
 
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
 template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<utype>&);// __xprototype;
@@ -376,7 +377,7 @@ namespace aurostd {
   // [OBSOLETE]  bool UnzipFile(const string& FileName);  bool ZipFile(const string& FileName);
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
-  int  FileSize(const string& FileName);
+  unsigned long long int FileSize(const string& FileName);  // ME191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO190808
