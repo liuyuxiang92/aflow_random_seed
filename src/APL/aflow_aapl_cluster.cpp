@@ -191,7 +191,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
   FileDevNull.close();
 
   if (SYM::PointGroupsIdentical(scell.pgroup_xtal, pcell.pgroup_xtal, scell.sym_eps, false)) {
-    bool mapped;
+    bool mapped = false;
     // Minimum distance for pcell is the same for scell and cheaper to compute
     pcell.dist_nn_min = SYM::minimumDistance(pcell.atoms, pcell.lattice);
     double tol = _ZERO_TOL_;
