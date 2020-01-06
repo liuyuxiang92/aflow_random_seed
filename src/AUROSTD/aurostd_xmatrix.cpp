@@ -599,9 +599,8 @@ namespace aurostd {  // namespace aurostd
 // -------------------------------------------------- operator xmatrix /= utype
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>&                  
-  // removed inline
-  xmatrix<utype>::operator /=(utype r)
-  {  //CO191110
+    // removed inline
+    xmatrix<utype>::operator /=(utype r){  //CO191110
 #ifdef _XMATH_DEBUG_OPERATORS
       printf("M -> operator *=: ");
       printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
@@ -615,11 +614,10 @@ namespace aurostd {  // namespace aurostd
           corpus[i][j]/=r;
         }
       return *this;
-  }
+    }
   template<class utype> xmatrix<utype>&                  
-  // removed inline
-  xmatrix<utype>::operator /=(const xmatrix<utype>& a)
-  {  //CO191201 - right matrix division
+    // removed inline
+    xmatrix<utype>::operator /=(const xmatrix<utype>& a){  //CO191201 - right matrix division
 #ifdef _XMATH_DEBUG_OPERATORS
       printf("M -> operator *=: ");
       printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
@@ -630,27 +628,27 @@ namespace aurostd {  // namespace aurostd
 #endif
       *this=*this*inverse(a);
       return *this;
-  }
+    }
 }
 
 // ----------------------------------------------------------- operator +xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                          
-  xmatrix<utype> operator+(const xmatrix<utype>& a) {
-    return a;
-  }
+    xmatrix<utype> operator+(const xmatrix<utype>& a) {
+      return a;
+    }
 }
 
 // ----------------------------------------------------------- operator -xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                          
-  xmatrix<utype> operator-(const xmatrix<utype>& a) {
-    xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
-    for (int i=a.lrows;i<=a.urows;i++)
-      for (int j=a.lcols;j<=a.ucols;j++)
-	c[i][j]=-a[i][j];
-    return c;
-  }
+    xmatrix<utype> operator-(const xmatrix<utype>& a) {
+      xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
+      for (int i=a.lrows;i<=a.urows;i++)
+        for (int j=a.lcols;j<=a.ucols;j++)
+          c[i][j]=-a[i][j];
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -660,147 +658,147 @@ namespace aurostd {  // namespace aurostd
 // --------------------------------------------------- operator xmatrix + xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                          
-  xmatrix<utype> operator+(const xmatrix<utype>& a,const xmatrix<utype>& b) {
-    
+    xmatrix<utype> operator+(const xmatrix<utype>& a,const xmatrix<utype>& b) {
+
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+      printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
-    if(a.rows!=b.rows||a.cols!=b.cols)
+      if(a.rows!=b.rows||a.cols!=b.cols)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator+:"
-	    << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
-    xmatrix<utype> c(a.rows,a.cols);
-    int i,j;
-    utype *bi,*ci,*ai;
-    for(i=0;i<a.rows;i++) {
-      ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
-      for(j=0;j<a.cols;j++)
-	ci[j+c.lcols]=ai[j+a.lcols]+bi[j+b.lcols];}
-    return c;
-  }
+        << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
+      xmatrix<utype> c(a.rows,a.cols);
+      int i,j;
+      utype *bi,*ci,*ai;
+      for(i=0;i<a.rows;i++) {
+        ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
+        for(j=0;j<a.cols;j++)
+          ci[j+c.lcols]=ai[j+a.lcols]+bi[j+b.lcols];}
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 // --------------------------------------------------- operator xmatrix - xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  xmatrix<utype> operator-(const xmatrix<utype>& a,const xmatrix<utype>& b) {
-    
+    xmatrix<utype> operator-(const xmatrix<utype>& a,const xmatrix<utype>& b) {
+
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+      printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
-    if(a.rows!=b.rows||a.cols!=b.cols)
+      if(a.rows!=b.rows||a.cols!=b.cols)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator-:"
-	    << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
-    xmatrix<utype> c(a.rows,a.cols);
-    int i,j;
-    utype *bi,*ci,*ai;
-    for(i=0;i<a.rows;i++) {
-      ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
-      for(j=0;j<a.cols;j++)
-	ci[j+c.lcols]=ai[j+a.lcols]-bi[j+b.lcols];};
-    return c;
-  }
+        << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
+      xmatrix<utype> c(a.rows,a.cols);
+      int i,j;
+      utype *bi,*ci,*ai;
+      for(i=0;i<a.rows;i++) {
+        ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
+        for(j=0;j<a.cols;j++)
+          ci[j+c.lcols]=ai[j+a.lcols]-bi[j+b.lcols];};
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 // --------------------------------------------------- operator xmatrix * xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                  
-  xmatrix<utype> operator*(const xmatrix<utype>& a,const xmatrix<utype>& b) {    
+    xmatrix<utype> operator*(const xmatrix<utype>& a,const xmatrix<utype>& b) {    
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+      printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif    
-    if(a.cols!=b.rows)
+      if(a.cols!=b.rows)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator*: (a.cols!=b.rows)=FALSE" << endl;exit(0);}    
-    xmatrix<utype> c(a.rows,b.cols);
-    int i,j,k,ii,jj,kk;
-    // register
-    utype *bk,*ci,*ai,aik;    
-    for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++) {
-      ci=c[i];
-      ai=a[ii];
-      //for(k=a.lcols,kk=b.lcols;k<=a.ucols;k++,kk++) {
-      for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++) {
-	bk=b[kk];
-	aik=ai[k];
-	for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)
-	  ci[j]+=aik*bk[jj];
+      xmatrix<utype> c(a.rows,b.cols);
+      int i,j,k,ii,jj,kk;
+      // register
+      utype *bk,*ci,*ai,aik;    
+      for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++) {
+        ci=c[i];
+        ai=a[ii];
+        //for(k=a.lcols,kk=b.lcols;k<=a.ucols;k++,kk++) {
+        for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++) {
+          bk=b[kk];
+          aik=ai[k];
+          for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)
+            ci[j]+=aik*bk[jj];
+        }
+      }    
+      /*  
+          for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 48% slower than the
+          for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
+          for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
+          c[i][j]+=a[ii][k]*b[kk][jj];	
+          for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 66% slower than the
+          for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
+          for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
+          c(i,j)+=a(ii,k)*b(kk,jj);
+          */
+      return  c;
       }
-    }    
-    /*  
-	for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 48% slower than the
-	for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
-	for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
-	c[i][j]+=a[ii][k]*b[kk][jj];	
-	for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 66% slower than the
-	for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
-	for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
-	c(i,j)+=a(ii,k)*b(kk,jj);
-    */
-    return  c;
-  }
-}
+    }
 
-// ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // operator xmatrix * xvector
-  xvector<utype> operator*(const xmatrix<utype>& a,const xvector<utype>& b) {    
+    xvector<utype> operator*(const xmatrix<utype>& a,const xvector<utype>& b) {    
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator *: b.lrows=%i, b.urows=%i \n",b.lrows,b.urows);
+      printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator *: b.lrows=%i, b.urows=%i \n",b.lrows,b.urows);
 #endif    
-    if(a.cols!=b.rows)
+      if(a.cols!=b.rows)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator* xmatrix * xvector: (a.cols!=b.rows)=FALSE " << a.cols << " " << b.rows << endl;exit(0);}    
-    xvector<utype> c(a.lrows,a.urows);    
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-        //      c[i]+=a[i][j]*b[j-b.lrows+1];
-        c(i)+=a(i,j)*b(j-b.lrows+1);   // check... the 1 might be wrong
-    return  c;
-  }
+      xvector<utype> c(a.lrows,a.urows);    
+      for(int i=a.lrows;i<=a.urows;i++)
+        for(int j=a.lcols;j<=a.ucols;j++)
+          //      c[i]+=a[i][j]*b[j-b.lrows+1];
+          c(i)+=a(i,j)*b(j-b.lrows+1);   // check... the 1 might be wrong
+      return  c;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // operator xvector * xmatrix
-  xvector<utype> operator*(const xvector<utype>& a,const xmatrix<utype>& b) {    
+    xvector<utype> operator*(const xvector<utype>& a,const xmatrix<utype>& b) {    
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *: a.lrows=%i, a.urows=%i \n",a.lrows,a.urows);
-    printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator *: a.lrows=%i, a.urows=%i \n",a.lrows,a.urows);
+      printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
 #endif    
-    if(a.rows!=b.rows)
+      if(a.rows!=b.rows)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator* xvector * xmatrix: (a.rows!=b.rows)=FALSE " << a.rows << " " << b.rows << endl;exit(0);}  
-    xvector<utype> c(b.lcols,b.ucols);    
-    for(int i=b.lcols;i<=b.ucols;i++)
-      for(int j=a.lrows;j<=a.urows;j++)
-        //      c[i]+=a[j]*b[j-a.lrows+b.lrows][i];
-        c(i)+=a(j)*b(j-a.lrows+b.lrows,i);
-    return  c;
-  }
+      xvector<utype> c(b.lcols,b.ucols);    
+      for(int i=b.lcols;i<=b.ucols;i++)
+        for(int j=a.lrows;j<=a.urows;j++)
+          //      c[i]+=a[j]*b[j-a.lrows+b.lrows][i];
+          c(i)+=a(j)*b(j-a.lrows+b.lrows,i);
+      return  c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix * scalar
-  operator*(const utype s,const xmatrix<utype>& a) {
-    xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
-    for(int i=c.lrows;i<=c.urows;i++)
-      for(int j=c.lcols;j<=c.ucols;j++)
-	c[i][j]=(utype) a[i][j]*(utype) s;
-    return c;
-  }
+    operator*(const utype s,const xmatrix<utype>& a) {
+      xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
+      for(int i=c.lrows;i<=c.urows;i++)
+        for(int j=c.lcols;j<=c.ucols;j++)
+          c[i][j]=(utype) a[i][j]*(utype) s;
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                //  operator scalar * xmatrix
-  operator*(const xmatrix<utype>& a,const utype s) {
-    return s*a;
-  }
+    operator*(const xmatrix<utype>& a,const utype s) {
+      return s*a;
+    }
 }
 
 // ----------------------------------------------------------------------------
