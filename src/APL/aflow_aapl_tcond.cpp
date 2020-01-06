@@ -714,7 +714,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                 // The process information needs to be stored. For q-points, only
                 // one index is necessary since the last index follows from
                 // momentum conservation.
-                // The branches will be stored in a combinded index to save memory.
+                // The branches will be stored in a combined index to save memory.
                 // Instead of storing the sign as an integer, the q-point index
                 // will be signed to save memory. Adding 1 to the index is done
                 // to have a clear sign indication for q = 0. This will be reversed
