@@ -378,7 +378,7 @@ vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<ve
           e = at1_pc * natoms + at2_pc;
           for (crt = 0; crt < ncart; crt++) {
             ifc_prod = ifcs[c][crt] * min_dist[at1_pc][at3_sc][cart_indices[crt][2] + 1];
-            // Perform multiplication expliclty in place instead of using xcomplex.
+            // Perform multiplication explicitly in place instead of using xcomplex.
             // This is three times faster because constructors and destructors are not called.
             g_mode.re += ifc_prod * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
             g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
@@ -510,7 +510,7 @@ void TCONDCalculator::calculateTransitionProbabilities() {
     writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
   }
 
-  if (calc_options.flag("BOUNADRY")) {
+  if (calc_options.flag("BOUNDARY")) {
     rates_boundary = calculateTransitionProbabilitiesBoundary();
     string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
     writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
@@ -696,7 +696,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
             e = 0;
             for (j = 0; j < 3; j++) e += scell.sc2pcMap(atoms[j]) * atpowers[j];
             for (crt = 0; crt < ncart; crt++) {
-              // Perform multiplication expliclty in place instead of using xcomplex.
+              // Perform multiplication explicitly in place instead of using xcomplex.
               // This is three times faster because constructors and destructors are not called.
               matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
               matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
@@ -713,7 +713,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                 // The process information needs to be stored. For q-points, only
                 // one index is necessary since the last index follows from
                 // momentum conservation.
-                // The branches will be stored in a combinded index to save memory.
+                // The branches will be stored in a combined index to save memory.
                 // Instead of storing the sign as an integer, the q-point index
                 // will be signed to save memory. Adding 1 to the index is done
                 // to have a clear sign indication for q = 0. This will be reversed
@@ -767,7 +767,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
   const xstructure& pcell = _pc.getInputCellStructure();
   uint natoms = pcell.atoms.size();
   vector<double> pearson(natoms);
-  uint at;
+  uint at = 0;
   for (at = 0; at < natoms; at++) pearson[at] = GetPearsonCoefficient(pcell.atoms[at].atomic_number);
 
   vector<double> frequencies(nQPs), weights(nQPs);
@@ -793,7 +793,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
                 eig.im = 0.0;
                 e = 3 * at;
                 for (int i = 1; i < 4; i++) {
-                  // Perform multiplication expliclty in place instead of using xcomplex.
+                  // Perform multiplication explicitly in place instead of using xcomplex.
                   // This is three times faster because constructors and destructors are not called.
                   eig.re += eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].re;
                   eig.re += eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].im;

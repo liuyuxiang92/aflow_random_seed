@@ -191,7 +191,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
   FileDevNull.close();
 
   if (SYM::PointGroupsIdentical(scell.pgroup_xtal, pcell.pgroup_xtal, scell.sym_eps, false)) {
-    bool mapped;
+    bool mapped = false;
     // Minimum distance for pcell is the same for scell and cheaper to compute
     pcell.dist_nn_min = SYM::minimumDistance(pcell.atoms, pcell.lattice);
     double tol = _ZERO_TOL_;
@@ -1048,7 +1048,7 @@ vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
     ineq_dists[iat].atoms = atoms; 
     int cl = 0;
     for (cl = 0; cl < (int) clusters.size(); cl++) {
-      int a;
+      int a = 0;
       for (a = 0; a < order; a++) {
         if (clusters[cl].atoms[a] != at) break;
       }
@@ -2148,7 +2148,7 @@ _ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string
           vector<vector<int> > maps;
           while (true) {
             if (line_count == vsize) {
-              message = "incomplete distortios varray";
+              message = "incomplete distortions varray";
               throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
