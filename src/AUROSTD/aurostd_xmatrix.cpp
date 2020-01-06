@@ -1247,11 +1247,12 @@ namespace aurostd {  // namespace aurostd
     eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
       if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
       xmatrix<utype> a(nrh,nch,nrl,ncl);
-      for (int i=a.lrows;i<=a.urows;i++){
-        for (int j=a.lcols;j<=a.ucols;j++){
-          if(i==j){a[i][j]=(utype)1;}
-        }
-      }
+      for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++) a[i][j] = (utype)1; //ME200106
+      //[CO200106 - OBSOLETE]for (int i=a.lrows;i<=a.urows;i++){
+      //[CO200106 - OBSOLETE]  for (int j=a.lcols;j<=a.ucols;j++){
+      //[CO200106 - OBSOLETE]    if(i==j){a[i][j]=(utype)1;}
+      //[CO200106 - OBSOLETE]  }
+      //[CO200106 - OBSOLETE]}
       return a;
     }
 }
