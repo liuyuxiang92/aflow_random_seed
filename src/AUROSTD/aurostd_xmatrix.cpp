@@ -1247,12 +1247,13 @@ namespace aurostd {  // namespace aurostd
     eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
       if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
       xmatrix<utype> a(nrh,nch,nrl,ncl);
-      for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++) a[i][j] = (utype)1; //ME200106
-      //[CO200106 - OBSOLETE]for (int i=a.lrows;i<=a.urows;i++){
-      //[CO200106 - OBSOLETE]  for (int j=a.lcols;j<=a.ucols;j++){
-      //[CO200106 - OBSOLETE]    if(i==j){a[i][j]=(utype)1;}
-      //[CO200106 - OBSOLETE]  }
-      //[CO200106 - OBSOLETE]}
+      //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME200106
+      int i=0,j=0;
+      for (i=a.lrows;i<=a.urows;i++){
+        for (j=a.lcols;j<=a.ucols;j++){
+          if(i==j){a[i][j]=(utype)1;}
+        }
+      }
       return a;
     }
 }
@@ -1387,7 +1388,7 @@ namespace aurostd {                   // conversion to xvector
 //CO191201
 namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
   template<class utype> xmatrix<double> 
-    xmatrixint2double(const xmatrix<utype>& a){ //CO191201
+    xmatrixutype2double(const xmatrix<utype>& a){ //CO191201
       xmatrix<double> b(a.urows,a.ucols,a.lrows,a.lcols);
       int i=0,j=0;
       for(i=a.lrows;i<=a.urows;i++){
@@ -1402,13 +1403,13 @@ namespace aurostd {                   // conversion from xmatrix<int> to xmatrix
 //CO191201
 namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
   template<class utype> xmatrix<utype> 
-    xmatrixdouble2int(const xmatrix<double>& a,bool check_int){  //CO191201
+    xmatrixdouble2utype(const xmatrix<double>& a,bool check_int){  //CO191201
       xmatrix<utype> b(a.urows,a.ucols,a.lrows,a.lcols);
       int i=0,j=0;
       if(check_int){
         for(i=a.lrows;i<=a.urows;i++){
           for(j=a.lcols;j<=a.ucols;j++){
-            if(!isinteger(a[i][j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrixdouble2int():","non-integer found ["+aurostd::utype2string(a[i][j])+"]",_INPUT_ILLEGAL_);}
+            if(!isinteger(a[i][j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrixdouble2utype():","non-integer found ["+aurostd::utype2string(a[i][j])+"]",_INPUT_ILLEGAL_);}
           }
         }
       }
@@ -3686,7 +3687,7 @@ namespace aurostd {
 
       if(LDEBUG){cerr << soliloquy << " A=" << endl;cerr << A_in << endl;}
       
-      xmatrix<double> S=aurostd::xmatrixint2double(A_in);aurostd::shiftlrowscols(S,1,1); //algorithm depends on lrows==lcols==1
+      xmatrix<double> S=aurostd::xmatrixutype2double(A_in);aurostd::shiftlrowscols(S,1,1); //algorithm depends on lrows==lcols==1
 
       int m=S.rows,n=S.cols;
       int min_mn=std::min(m,n);
@@ -4072,9 +4073,9 @@ namespace aurostd {
       //inverse of an integer matrix is an integer matrix IFF det(M)= 1/-1 (true for V and U as above)
       //algorithm is MUCH more stable this way
       if(LDEBUG){cerr << soliloquy << " converting to xmatrix<int>" << endl;}
-      U_out=xmatrixdouble2int<utype>(U);
-      V_out=xmatrixdouble2int<utype>(V);
-      S_out=xmatrixdouble2int<utype>(S);
+      U_out=xmatrixdouble2utype<utype>(U);
+      V_out=xmatrixdouble2utype<utype>(V);
+      S_out=xmatrixdouble2utype<utype>(S);
       //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
       if(LDEBUG){
         cerr << soliloquy << " U=" <<endl;cerr << U_out << endl;

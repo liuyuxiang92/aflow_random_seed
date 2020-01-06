@@ -64,8 +64,8 @@ using aurostd::QRDecomposition_HouseHolder_MW; //CO191110
 using aurostd::QRDecomposition_HouseHolder_TB; //CO191110
 using aurostd::getEHermite; //CO191110
 using aurostd::getSmithNormalForm; //CO191110
-using aurostd::xmatrixint2double; //CO191201
-using aurostd::xmatrixdouble2int; //CO191201
+using aurostd::xmatrixutype2double; //CO191201
+using aurostd::xmatrixdouble2utype; //CO191201
 using aurostd::tqli;
 using aurostd::balanc;
 using aurostd::elmhes;
@@ -478,8 +478,8 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     int igcd=1;_GCD(igcd,igcd,igcd,igcd,igcd);_GCD(igcd,igcd,igcd);  //CO191201
     int aint=1;getEHermite(aint,aint,mxint); //CO191201
     getSmithNormalForm(mxint,mxint,mxint,mxint); //CO191201
-    mxdouble=xmatrixint2double(mxint);  //CO191201
-    mxint=xmatrixdouble2int<int>(mxdouble);   //CO191201
+    mxdouble=xmatrixutype2double(mxint);  //CO191201
+    mxint=xmatrixdouble2utype<int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
@@ -489,8 +489,8 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     aurostd::xmatrix<uint> mxuint; //CO190520
     uint auint=1;getEHermite(auint,auint,mxuint); //CO191201
     getSmithNormalForm(mxuint,mxuint,mxuint,mxuint); //CO191201
-    mxdouble=xmatrixint2double(mxuint);  //CO191201
-    mxuint=xmatrixdouble2int<uint>(mxdouble);   //CO191201
+    mxdouble=xmatrixutype2double(mxuint);  //CO191201
+    mxuint=xmatrixdouble2utype<uint>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
@@ -561,8 +561,8 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     aurostd::xmatrix<long int> mxlint; //CO190520
     long int alint=1;getEHermite(alint,alint,mxlint); //CO191201
     getSmithNormalForm(mxlint,mxlint,mxlint,mxlint); //CO191201
-    mxdouble=xmatrixint2double(mxlint);  //CO191201
-    mxlint=xmatrixdouble2int<long int>(mxdouble);   //CO191201
+    mxdouble=xmatrixutype2double(mxlint);  //CO191201
+    mxlint=xmatrixdouble2utype<long int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
@@ -574,8 +574,8 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     aurostd::xmatrix<unsigned long int> mxulint; //CO190520
     unsigned long int aulint=1;getEHermite(aulint,aulint,mxulint); //CO191201
     getSmithNormalForm(mxulint,mxulint,mxulint,mxulint); //CO191201
-    mxdouble=xmatrixint2double(mxulint);  //CO191201
-    mxulint=xmatrixdouble2int<unsigned long int>(mxdouble);   //CO191201
+    mxdouble=xmatrixutype2double(mxulint);  //CO191201
+    mxulint=xmatrixdouble2utype<unsigned long int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_LONG_LONG_INT
     o+=initialize_scalar((long long int)(1));
@@ -586,8 +586,8 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     aurostd::xmatrix<long long int> mxllint; //CO190520
     long long int allint=1;getEHermite(allint,allint,mxllint); //CO191201
     getSmithNormalForm(mxllint,mxllint,mxllint,mxllint); //CO191201
-    mxdouble=xmatrixint2double(mxllint);  //CO191201
-    mxllint=xmatrixdouble2int<long long int>(mxdouble);   //CO191201
+    mxdouble=xmatrixutype2double(mxllint);  //CO191201
+    mxllint=xmatrixdouble2utype<long long int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
@@ -599,8 +599,8 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     aurostd::xmatrix<unsigned long long int> mxullint; //CO190520
     unsigned long long int aullint=1;getEHermite(aullint,aullint,mxullint); //CO191201
     getSmithNormalForm(mxullint,mxullint,mxullint,mxullint); //CO191201
-    mxdouble=xmatrixint2double(mxullint);  //CO191201
-    mxullint=xmatrixdouble2int<unsigned long long int>(mxdouble);   //CO191201
+    mxdouble=xmatrixutype2double(mxullint);  //CO191201
+    mxullint=xmatrixdouble2utype<unsigned long long int>(mxdouble);   //CO191201
 #endif
   }
   return TRUE;
