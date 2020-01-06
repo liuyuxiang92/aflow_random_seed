@@ -499,7 +499,7 @@ void DirectMethodPC::calculateForceFields() {
 
   // Store forces //////////////////////////////////////////////////////////
 
-  bool generate_plus_minus;  // ME190129
+  bool generate_plus_minus = false;  // ME190129
 
   int idxRun = 0;
   for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
