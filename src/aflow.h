@@ -513,6 +513,13 @@ extern _XHOST XHOST; // this will be global
 #define SG_SETTING_ANRL 3
 //DX 20180131 - add symmetry definitions - END
 
+//DX 20191122 - START
+// atom environment modes
+#define ATOM_ENVIRONMENT_MODE_1    1 // minimum coordination shell
+#define ATOM_ENVIRONMENT_MODE_2    2 // [FUTURE] out to a given radius
+#define ATOM_ENVIRONMENT_MODE_3    3 // [FUTURE] largest gap in radial distribution function (GFA)
+//DX 20191122 - END
+
 // ----------------------------------------------------------------------------
 // aflow_aflowrc.cpp
 #define _AFLOW_AFLOWRC_H_
@@ -1331,7 +1338,8 @@ class wyckoffsite_ITC { //Also for wyckoff sites
   string letter;                                                //DX 20190128 - add Wyckoff letter
   string site_symmetry;                                         //DX 20190128 - add Wyckoff site symmetry
   uint multiplicity;                                            //DX 20190128 - add Wyckoff multiplicity
-  vector<vector<string> > equations;                             //DX 20190128 - add Wyckoff equations
+  double site_occupation;                                       //DX 20190128 - add Wyckoff site occupation
+  vector<vector<string> > equations;                            //DX 20190128 - add Wyckoff equations
  private:                                                       // ---------------------------------------
   void free();                                                  // to free everything
 };
@@ -1358,6 +1366,31 @@ class GroupedWyckoffPosition{
 };
 // --------------------------------------------------------------------------
 //DX 20181010 - grouped Wyckoff class - END
+
+// --------------------------------------------------------------------------
+// AtomEnvironment Class //DX 20191120 
+class AtomEnvironment{
+  public:
+    AtomEnvironment();                                                                      // constructor operator
+    ~AtomEnvironment();                                                                     // destructor operator
+    friend ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment);       // stringstream operator (printing)
+    const AtomEnvironment& operator=(const AtomEnvironment& b);                             // assignment operator
+    AtomEnvironment(const AtomEnvironment& b);                                              // copy constructor
+    string element_center;                                                                  // species/element at center of environment                                                                   
+    uint type_center;                                                                       // type (uint) at center of environment
+    vector<string> elements_neighbor;                                                       // species/element of atoms neighboring center atom
+    vector<uint> types_neighbor;                                                            // types (uint) of atoms neighboring center atom
+    vector<double> distances_neighbor;                                                      // distances to atoms neighboring atoms (typically put in a bin with small tolerance threshold)                                             
+    vector<uint> coordinations_neighbor;                                                    // coordination of neighboring distance                                              
+    vector<vector<xvector<double> > > coordinates_neighbor;                                 // coordinates of atoms neighboring atoms (center is assumed to be zero,i.e. coord=neighbor-origin)
+    //functions
+    void getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode=ATOM_ENVIRONMENT_MODE_1);                                          // get environment around atom index                                               
+    void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
+  private:
+    void free();                                                                            // free operator
+    void copy(const AtomEnvironment& b);                                                    // copy constructor
+};
+// --------------------------------------------------------------------------
 
 #define MAX_TITLE_SIZE 512
 
@@ -1412,8 +1445,8 @@ class xstructure {
   void RemoveFractionalCopies(double=1.0e-3);                   // deleting atoms too close F
   void RemoveCartesianCopies(double=1.0e-3);                    // deleting atoms too close C
   void AddCorners(void);                                        // for picturing purpose
-  void Clear(void);                                             // clear everything
-  void Clean(void);                                             // performs stringstream clean
+  void clear(void);                                             // clear everything //DX 20191220 - uppercase to lowercase clear
+  void clean(void);                                             // performs stringstream clean //DX 20191220 - uppercase to lowercase clean
   void ClearSpecies(void);                                      // Clear all the symmetry
   void ShifOriginToAtom(const int& iat);                        // Shift the origin to atom(iat)
   void IdenticalAtoms(void);                                    // Make identical atoms
@@ -2147,6 +2180,10 @@ xstructure GetIntpolStr(xstructure strA,xstructure strB,const double& f,const st
 double RadiusSphereLattice(const xmatrix<double>& lattice,double scale=1.0); // CO 180409
 xvector<int> LatticeDimensionSphere(const xmatrix<double>& lattice,double radius,double scale=1.0); // CO 180409
 xvector<int> LatticeDimensionSphere(const xstructure& str,double radius);
+void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
+    vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, vector<int>& a_index, 
+    vector<int>& b_index, vector<int>& c_index); //DX 20191122
 xvector<double> F2C(const double& scale,const xmatrix<double>& lattice,const xvector<double>& fpos);    // fpos are F components per COLUMS !
 xvector<double> F2C(const xmatrix<double>& lattice,const xvector<double>& fpos);                        // fpos are F components per COLUMS !
 xvector<double> C2F(const double& scale,const xmatrix<double>& lattice,const xvector<double>& cpos);    // cpos are C components per COLUMS !
@@ -2274,7 +2311,8 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms);
 bool alreadyInCell(_atom& atom, deque<_atom> atoms);
 //DX 20180726 - END
 // DX and CO - START
-bool inCell(xvector<double>& pos_vec); // DX
+bool atomInCell(const _atom& atom, double tolerance=_ZERO_TOL_); // DX 20191125
+bool inCell(const xvector<double>& pos_vec, double tolerance=_ZERO_TOL_); // DX 20191125 - added tolerance
 // DX and CO - END
 xstructure GetSuperCell(const xstructure& a,const xmatrix<double>& sc);
 xstructure GetSuperCell(const xstructure& a,const xvector<double>& sc);
@@ -2326,6 +2364,8 @@ bool DifferentAtom(const xstructure& str,const _atom& atom1,const _atom& atom2);
 xmatrix<double> GetDistMatrix(const xstructure& a); // CO 171025
 vector<double> GetNBONDXX(const xstructure& a);
 int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2);
+int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX 20191218 [ORIG]
+int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2); //DX 20191218 [NEW]
 int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3);
 int GenerateGridAtoms(xstructure& str,int d);
 int GenerateGridAtoms(xstructure& str,const xvector<int>& dims);
@@ -2346,6 +2386,24 @@ xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input);
+
+// ----------------------------------------------------------------------------
+// functions related to AtomEnvironment - DX 20191122
+vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode=ATOM_ENVIRONMENT_MODE_1);
+vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode=ATOM_ENVIRONMENT_MODE_1);
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191122
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius); //DX 20191122
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
+    vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
+    vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
+    double radius); //DX 20191122
+void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX 20191122
+void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+    double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX 20191122
 
 // ----------------------------------------------------------------------------
 // Structure Prototypes
@@ -2423,7 +2481,7 @@ namespace aflowlib {
   uint GetAllPrototypeLabels(vector<string>& prototype_labels, vector<string>& compositions, 
                              vector<uint>& space_group_numbers, vector<vector<vector<string> > >& Wyckoff_letter_strings, 
                              string library="all");
-  vector<string> GetPrototypesBySpeciesNumber(uint species_number, string library="all"); //DX 20181009
+  vector<string> GetPrototypesBySpeciesNumber(uint number_of_species, string library="all"); //DX 20181009
   vector<string> GetPrototypesByStoichiometry(vector<uint> stoichiometry, string library="all"); //DX 20181009
   vector<string> GetPrototypesByStoichiometry(vector<uint> stoichiometry, vector<string>& protototype_composition, vector<uint>& prototype_space_group_numbers, 
                              vector<vector<vector<string> > >& prototype_grouped_Wyckoff_letters, string library="all");
@@ -2488,13 +2546,15 @@ namespace anrl {
                                  uint proto_spacegroup, string proto_params, uint print_mode); //DX 20180710 - added print_mode
   string groupedWyckoffPosition2ANRLString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize);
   vector<string> getANRLLatticeParameterString(char& lattice_type);
-  vector<double> getANRLLatticeParameterValues(vector<string>& wyccar_ITC, char& lattice_type, char& lattice_centering, uint& setting);
-  uint getANRLSettingChoice(int& spacegroup);
+  vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting); //DX 20191031
+  vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting); //DX 20191031
+  vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting); //DX 20191031
+  uint getANRLSettingChoice(int spacegroup); //DX 20191031 - removed reference
   string structure2anrl(istream& input, aurostd::xoption& vpflow);           // xoption
-  string structure2anrl(xstructure& xstr);                                   // use default options
-  string structure2anrl(xstructure& xstr, double tolerance);                // specify symmetry tolerance //CO190520 - removed pointers for bools and doubles, added const where possible
-  string structure2anrl(xstructure& xstr, uint& setting);                    // specify setting
-  string structure2anrl(xstructure& xstr, double tolerance, uint& setting); // main function //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX 20191031 - added recalculate_symmetry
+  string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
   xstructure rhl2hex(xstructure& str, double& a, double& c); 
 }
 
@@ -3846,7 +3906,9 @@ namespace spacegroup{
 // lattice and brillouin zones
 namespace LATTICE {
   bool lattice_is_working(string lat);
+  string Lattice2TypeAndCentering(const string& lattice_type); //DX 20191031
   string SpaceGroup2Lattice(uint sg);
+  string SpaceGroup2LatticeTypeAndCentering(uint sg); //DX 20191031
   uint Lattice2SpaceGroup(string lattice,vector<uint>& vsg);
   string SpaceGroup2LatticeVariation(uint sg,const xstructure& str);
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c);

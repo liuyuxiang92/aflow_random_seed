@@ -286,18 +286,18 @@ namespace aflowlib {
 // ***************************************************************************
 // ***************************************************************************
 namespace aflowlib {
-  vector<string> GetPrototypesBySpeciesNumber(uint species_number, string library) {
+  vector<string> GetPrototypesBySpeciesNumber(uint number_of_species, string library) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<string> prototype_labels, compositions, filtered_prototype_labels, tokens;
     uint number_of_prototypes = GetAllPrototypeLabels(prototype_labels, compositions, library);
     for(uint i=0;i<number_of_prototypes;i++){ 
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
-      if(prototype_number_of_species == species_number){
+      if(prototype_number_of_species == number_of_species || number_of_species==0){ //DX 20191107 - if number_of_species is not specified
         filtered_prototype_labels.push_back(prototype_labels[i]);
       }
     }
     if(LDEBUG) {
-      cerr << "aflowlib::GetPrototypesBySpecies(): Prototype labels with " << species_number << " species: " << aurostd::joinWDelimiter(filtered_prototype_labels, ", ") << endl;
+      cerr << "aflowlib::GetPrototypesBySpecies(): Prototype labels with " << number_of_species << " species: " << aurostd::joinWDelimiter(filtered_prototype_labels, ", ") << endl;
     }
     return filtered_prototype_labels;
   }
@@ -318,17 +318,18 @@ namespace aflowlib {
   vector<string> GetPrototypesByStoichiometry(vector<uint> stoichiometry, vector<string>& compositions, vector<uint>& prototype_space_group_numbers, 
                              vector<vector<vector<string> > >& prototype_grouped_Wyckoff_letters, string library){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    uint species_number = stoichiometry.size();    
+    uint number_of_species = stoichiometry.size();    
     vector<uint> all_space_group_numbers;
     vector<vector<vector<string> > > all_grouped_Wyckoff_letters;
     vector<string> prototype_labels, filtered_prototype_labels, tokens;
     uint number_of_prototypes = GetAllPrototypeLabels(prototype_labels, compositions, all_space_group_numbers, all_grouped_Wyckoff_letters, library);
     for(uint i=0;i<number_of_prototypes;i++){
       uint prototype_number_of_species = aurostd::RemoveNumbers(compositions[i]).size();
-      if(prototype_number_of_species == species_number){
- 
-        vector<uint> prototype_stoichiometry = ::composition2stoichiometry(compositions[i]);
-        prototype_stoichiometry=compare::gcdStoich(prototype_stoichiometry);
+      if(prototype_number_of_species == number_of_species || number_of_species==0){ //DX 20191107 - add number_of_species==0 if stoich is not specified
+
+        vector<uint> unreduced_prototype_stoichiometry = composition2stoichiometry(compositions[i]); //DX 20191125
+        vector<uint> prototype_stoichiometry; aurostd::reduceByGCD(unreduced_prototype_stoichiometry, prototype_stoichiometry); //DX 20191125
+        //DX 20191125 [OBSOLETE] prototype_stoichiometry=compare::gcdStoich(prototype_stoichiometry);
 
 	      std::sort(prototype_stoichiometry.begin(),prototype_stoichiometry.end());
         bool stoichs_equal=true;
@@ -372,7 +373,7 @@ namespace aflowlib {
     vector<string> prototype_labels = GetPrototypesByStoichiometry(stoichiometry, prototype_compositions, prototype_space_group_numbers, prototype_grouped_Wyckoff_letters, library);
     vector<string> filtered_prototype_labels, tokens, database;
     for(uint i=0;i<prototype_labels.size();i++){
-      if(compare::matchableSpaceGroups(prototype_space_group_numbers[i],space_group_number)){
+      if(compare::matchableSpaceGroups(prototype_space_group_numbers[i],space_group_number) || space_group_number==0){ //DX 20191107 - include space_group_number==0 if not specified
         if(LDEBUG) {
           cerr << "aflowlib::GetPrototypesBySymmetry(): Prototype labels with matching space group number: " << prototype_labels[i] << endl;
         }

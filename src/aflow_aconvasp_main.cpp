@@ -373,6 +373,34 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   //DAVID
 
+  //DX 20190314 - START
+  vpflow.flag("COMPARE_DATABASE_ENTRIES",aurostd::args2attachedflag(argv,cmds,"--compare_database_entries"));
+  if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX 20190201 - changed from fast_match to optimize_match
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::NO_SCALE_VOLUME",aurostd::args2flag(argv,cmds,"--no_scale_volume"));
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ALLOY","--compare_alloy=|--alloy=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::ARITY","--arity=|--nspecies=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPECIES","--species=|--alloy=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::PROPERTY_LIST","--properties=|--property_list=|--property=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::GEOMETRY_FILE","--geometry_file=|--file=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::CATALOG","--catalog=|--library=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::STOICHIOMETRY","--stoichiometry=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::SPACE_GROUP","--space_group=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::STRUCTURE",aurostd::args2flag(argv,cmds,"--structure|--structure_comparison|--ignore_species"));
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX 20190424
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry")); //DX 20190424
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_Wyckoff")); //DX 20190424
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::REMOVE_DUPLICATE_COMPOUNDS",aurostd::args2flag(argv,cmds,"--remove_duplicates|--remove_duplicate_compounds")); //DX 20190201
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX 20190724
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation|--add_prototype|--add_prototype_information")); //DX 20190724
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX 20191212
+    vpflow.flag("COMPARE_DATABASE_ENTRIES::PRINT",aurostd::args2flag(argv,cmds,"--print"));
+  }
+  //DX 20190314 - END
+
   vpflow.flag("COMPARE_MATERIAL",aurostd::args2attachedflag(argv,cmds,"--compare_material|--compare_materials")); //DX 20190424 - added plural variant
   vpflow.flag("COMPARE_STRUCTURE",aurostd::args2attachedflag(argv,cmds,"--compare_structure|--compare_structures")); //DX 20190424 - added plural variant
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {
@@ -415,6 +443,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX 20190424 [OBSOLETE]   vpflow.flag(scheme_name,TRUE);
     //DX 20190424 [OBSOLETE] }
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::MAGNETIC","--mag=|--magnetic=|--magmom=","1"); // DX 8/3/17
     vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     vpflow.flag("COMPARE_STRUCTURE::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); // DX 8/3/17
     vpflow.flag("COMPARE_STRUCTURE::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX 20190201 - changed from fast_match to optimize_match
@@ -422,8 +451,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE_STRUCTURE::ICSD_COMPARISON",aurostd::args2flag(argv,cmds,"--ICSD")); //DX 20190201
     vpflow.flag("COMPARE_STRUCTURE::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry")); //DX 20190424
     vpflow.flag("COMPARE_STRUCTURE::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff")); //DX 20190424
+    vpflow.flag("COMPARE_STRUCTURE::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
     vpflow.flag("COMPARE_STRUCTURE::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX 20190424
     vpflow.flag("COMPARE_STRUCTURE::REMOVE_DUPLICATE_COMPOUNDS",aurostd::args2flag(argv,cmds,"--remove_duplicates|--remove_duplicate_compounds")); //DX 20190424
+    vpflow.flag("COMPARE_STRUCTURE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX 20190724
+    vpflow.flag("COMPARE_STRUCTURE::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation")); //DX 20190724
+    vpflow.flag("COMPARE_STRUCTURE::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX 20191212
     vpflow.flag("COMPARE_STRUCTURE::USAGE",aurostd::args2flag(argv,cmds,"--usage")); //DX 20190424
   }
   //DX 20190424 [OBSOLETE]vpflow.flag("COMPARE_MATERIAL_DIRECTORY",aurostd::args2flag(argv,cmds,"--compare_material_directory|--compare_material_dir"));
@@ -456,12 +489,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX 20190424 [OBSOLETE]}
 
   //DX 20181004 - add compare_permutations - START
-  vpflow.flag("COMPARE_PERMUTATION",aurostd::args2attachedflag(argv,cmds,"--compare_permutation|--compare_permutations|--unique_permutation|--unique_permutations"));
+  vpflow.flag("COMPARE_PERMUTATION",aurostd::args2attachedflag(argv,cmds,"--compare_atom_decoration|--compare_atom_decorations|--unique_atom_decoration|--unique_atom_decorations|--compare_permutation|--compare_permutations|--unique_permutation|--unique_permutations"));
   if(vpflow.flag("COMPARE_PERMUTATION")) {
     vector<string> vinput;
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_PERMUTATION::NP","--np=|--num_proc=","");
     vpflow.flag("COMPARE_PERMUTATION::PRINT",aurostd::args2flag(argv,cmds,"--print|--misfit|--print_misfit"));
     vpflow.flag("COMPARE_PERMUTATION::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("COMPARE_PERMUTATION::OPTIMIZE_MATCH",aurostd::args2flag(argv,cmds,"--optimize|--optimize_match")); //DX 20190201 - changed from fast_match to optimize_match
   }
   //DX 20181004 - add compare_permutations - END
   //DX 20181004 - add compare2database - START
@@ -478,7 +512,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE2DATABASE::NO_SCALE_VOLUME",aurostd::args2flag(argv,cmds,"--no_scale_volume"));
     vpflow.flag("COMPARE2DATABASE::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry"));
     vpflow.flag("COMPARE2DATABASE::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff"));
+    vpflow.flag("COMPARE2DATABASE::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
     vpflow.flag("COMPARE2DATABASE::KEEP_UNMATCHED",aurostd::args2flag(argv,cmds,"--keep_unmatched")); //DX 20190424
+    vpflow.flag("COMPARE2DATABASE::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX 20191212
   }
   //DX 20181004 - add compare2database - END
   //DAVID
@@ -1202,9 +1238,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX 20190128 - add structure2ANRL - START
   vpflow.flag("STRUCTURE2ANRL",aurostd::args2attachedflag(argv,cmds,"--prototype") && !vpflow.flag("LIST_PROTOTYPE_LABELS")); //DX 20190416 - changed from --anrl to --prototype //DX 20190509 - added check for prototype labels
   if(vpflow.flag("STRUCTURE2ANRL")){
-    if(aurostd::args2attachedflag(argv,"--setting=")){
-      vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::SETTING","--setting=","1");
-    }
+    vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::SETTING","--setting=","");
+    vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE","--tolerance=",""); //DX 20191028
+    vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF",aurostd::args2flag(argv,cmds,"--force_Wyckoff|--force_wyckoff|--force_Wyckoff_order|--force_wyckoff_order")); //DX 20191028
   }
   //DX 20190128 - add structure2ANRL - END
 
@@ -1215,6 +1251,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE2PROTOTYPES::CATALOG","--catalog=|--library=","");
     vpflow.flag("COMPARE2PROTOTYPES::IGNORE_SYMMETRY",aurostd::args2flag(argv,cmds,"--ignore_symmetry"));
     vpflow.flag("COMPARE2PROTOTYPES::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_wyckoff|--ignore_Wyckoff"));
+    vpflow.flag("COMPARE2PROTOTYPES::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX 20190807
     vpflow.flag("COMPARE2PROTOTYPES::PRINT",aurostd::args2flag(argv,cmds,"--print"));
     vpflow.flag("COMPARE2PROTOTYPES::SCREEN_ONLY",aurostd::args2flag(argv,cmds,"--screen_only")); // DX 8/3/17
   }
@@ -1456,6 +1493,7 @@ namespace pflow {
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_MATERIAL")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX 20190424 [OBSOLETE] if(vpflow.flag("COMPARE_STRUCTURE")) {cout << pflow::compareStructures(vpflow); _PROGRAMRUN=true;}
       //DX 20190425 - START
+      if(vpflow.flag("COMPARE_DATABASE_ENTRIES")) {cout << pflow::compareDatabaseEntries(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")){
         if(!vpflow.getattachedscheme("COMPARE_STRUCTURE::STRUCTURE_LIST").empty()) {
           //vector<string> vinput;
@@ -2606,6 +2644,61 @@ namespace pflow {
 }
 // DX 12/5/17 - add spin info to xstructure - START
 
+// DX 20190801 - consolidated to a function - START
+// ***************************************************************************
+// pflow::ProcessAndAddSpinToXstructure
+// ***************************************************************************
+namespace pflow {
+  void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info){
+    
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "pflow::ProcessAndAddSpinToXstructure()";
+    stringstream message;
+   
+    // ---------------------------------------------------------------------------
+    // check if spin information is empty
+    if(magmom_info.empty()){ 
+      if(LDEBUG){ cerr << function_name << " Spin information is empty; no spin information added to structure." << endl; }
+      return;
+    }
+
+    uint num_atoms=a.atoms.size(); //DX 20191107 - int to uint
+    bool is_noncoll=false; 
+    vector<xvector<double> > vmag_noncoll;                                                
+    bool is_coll=false; 
+    vector<double> vmag;
+
+    // ---------------------------------------------------------------------------
+    // check for non-collinear spin
+    if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){                   
+      if(LDEBUG) {cerr << function_name << " Non-collinear spin system detected." << endl;}
+      is_noncoll = true;
+      if(!AddSpinToXstructure(a,vmag_noncoll)){
+        message << "(non-collinear): Number of magnetic moments (" << vmag_noncoll.size() << ") does not match the number of atoms (" << a.atoms.size() << ")." << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+      } 
+    }                                                                               
+    // ---------------------------------------------------------------------------
+    // check for non-collinear spin
+    if(!is_noncoll){
+      if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
+        if(LDEBUG) {cerr << function_name << " Collinear spin system detected." << endl;} 
+        is_coll = true;
+        if(!AddSpinToXstructure(a,vmag)){
+          message << "(collinear): Number of magnetic moments (" << vmag.size() << ") does not match the number of atoms (" << a.atoms.size() << ")." << endl;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+        } 
+      } 
+    }
+    // ---------------------------------------------------------------------------
+    // could not detect; input error
+    if(!is_noncoll && !is_coll){
+      message << "Could not detect collinear or non-collinear spin(s). Check spin input.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);                                                                                                  // DX 12/5/17 - added non-collinear
+    }
+  } 
+}
+
 // ***************************************************************************
 // pflow::AFLOWIN
 // ***************************************************************************
@@ -2646,6 +2739,8 @@ namespace pflow {
 namespace pflow {
   bool SYMMETRY_GROUPS(_aflags &aflags,istream& input, aurostd::xoption& vpflow, ostream& oss){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::SYMMETRY_GROUPS()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     _kflags kflags;                                   // DX 8/15/17 - Add in consistency checks
     xstructure _a(input,IOAFLOW_AUTO);
     bool osswrite=TRUE;
@@ -2848,31 +2943,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("SYMMETRY::MAGNETIC") && (mode == _AGROUP_ || mode == _FGROUP_ || mode == _PGROUP_XTAL_ || mode == _PGROUPK_XTAL_ || mode == _SGROUP_)){
       string magmom_info = vpflow.getattachedscheme("SYMMETRY::MAGNETIC");
-      int num_atoms=a.atoms.size();
-      bool is_noncoll=false; 
-      vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
-      if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){       // DX 12/5/17 - added non-collinear
-	if(LDEBUG) {cerr << "pflow::SYMMETRY: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-	is_noncoll = true;
-	if(!AddSpinToXstructure(a,vmag_noncoll)){
-	  exit(0);
-	} 
-      }                                                                               // DX 12/5/17 - added non-collinear
-      bool is_coll=false; 
-      vector<double> vmag;
-      if(!is_noncoll){
-	if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-	  if(LDEBUG) {cerr << "pflow::SYMMETRY: Collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-	  is_coll = true;
-	  if(!AddSpinToXstructure(a,vmag)){
-	    exit(0);
-	  } 
-	} 
-      }
-      if(!is_noncoll && !is_coll){                                                                                // DX 12/5/17 - added non-collinear
-	cerr << "pflow::SYMMETRY: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl; // DX 12/5/17 - added non-collinear
-	exit(0);                                                                                                  // DX 12/5/17 - added non-collinear
-      }
+      ProcessAndAddSpinToXstructure(a, magmom_info); //DX 20191108 - condensed into a single function
     } 
     // DX 9/21/17 - MAGNETIC SYMMETRY - END
 
@@ -4975,7 +5046,7 @@ namespace pflow {
 namespace pflow {
   void CIF(istream& input, aurostd::xoption& vpflow) {
     if(vpflow.flag("CIF::USAGE")) {
-      init::ErrorOption(cout,"--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance| =tight| =loose] [--setting=1|2] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
+      init::ErrorOption(cout,"--usage","pflow::CIF",aurostd::liststring2string("aflow --cif[=tolerance| =tight| =loose] [--setting=1|2] [--no_symmetry] < POSCAR  default: tolerance=(minimum_interatomic_distance)/100.0, setting=1"));
       return;
     }
     xstructure a(input,IOAFLOW_AUTO);
@@ -5178,6 +5249,8 @@ namespace pflow {
   //void DATA(string smode,istream& input) {
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::DATA()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string aliases = "";
     string options = "";
     if(smode == "EDATA"){
@@ -5208,31 +5281,7 @@ namespace pflow {
     // DX 11/28/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("DATA::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("DATA::MAGNETIC");
-      int num_atoms=a.atoms.size();
-      bool is_noncoll=false; 
-      vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
-      if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
-        if(LDEBUG) {cerr << "pflow::DATA: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-        is_noncoll = true;
-        if(!AddSpinToXstructure(a,vmag_noncoll)){
-          return false;
-        } 
-      }                                                                               // DX 12/5/17 - added non-collinear
-      bool is_coll=false; 
-      vector<double> vmag;
-      if(!is_noncoll){
-        if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-          if(LDEBUG) {cerr << "pflow::DATA: Collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-          is_coll = true;
-          if(!AddSpinToXstructure(a,vmag)){
-            return false;
-          } 
-        } 
-      }
-      if(!is_noncoll && !is_coll){                                                                                 // DX 12/5/17 - added non-collinear
-        cerr << "pflow::DATA: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;// DX 12/5/17 - added non-collinear
-        return false;                                                                                              // DX 12/5/17 - added non-collinear
-      }
+      ProcessAndAddSpinToXstructure(a, magmom_info); //DX 20191108 - condensed into a single function
     }
     // DX 11/28/17 - MAGNETIC SYMMETRY - END
     double default_tolerance=SYM::defaultTolerance(a);
@@ -5632,31 +5681,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("SYMMETRY::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("SYMMETRY::MAGNETIC");
-      int num_atoms=a.atoms.size();
-      bool is_noncoll=false; 
-      vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
-      if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
-        if(LDEBUG) {cerr << "pflow::EQUIVALENT: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-        is_noncoll = true;
-        if(!AddSpinToXstructure(a,vmag_noncoll)){
-          exit(0);
-        } 
-      }                                                                               // DX 12/5/17 - added non-collinear
-      bool is_coll=false; 
-      vector<double> vmag;
-      if(!is_noncoll){
-        if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-          if(LDEBUG) {cerr << "pflow::EQUIVALENT: Collinear spin system detected." << endl;}   // DX 12/5/17 - added non-collinear
-          is_coll = true;
-          if(!AddSpinToXstructure(a,vmag)){
-            exit(0);
-          } 
-        } 
-      }
-      if(!is_noncoll && !is_coll){                                                                                 // DX 12/5/17 - added non-collinear
-        cerr << "pflow::EQUIVALENT: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;// DX 12/5/17 - added non-collinear
-        exit(0);                                                                                                   // DX 12/5/17 - added non-collinear
-      }
+      ProcessAndAddSpinToXstructure(a, magmom_info); //DX 20191108 - condensed into a single function
     } 
     // DX 9/21/17 - MAGNETIC SYMMETRY - END
     double default_tolerance=SYM::defaultTolerance(a);
@@ -6295,6 +6320,8 @@ namespace pflow {
   // COMMAND LINE SYMMETRY CALCULATION, calls main function PerformFullSymmetry()!!!!!!!!!!!
   bool CalculateFullSymmetry(_aflags &aflags, _kflags& kflags, xstructure& _a, aurostd::xoption& vpflow, bool osswrite,ostream& oss){ //main function
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::CalculateFullSymmetry()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string options = vpflow.getattachedscheme("FULLSYMMETRY");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -6311,31 +6338,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("FULLSYMMETRY::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("FULLSYMMETRY::MAGNETIC");
-      int num_atoms=a.atoms.size();
-      bool is_noncoll=false; 
-      vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
-      if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
-        if(LDEBUG) {cerr << "pflow::CalculateFullSymmetry: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-        is_noncoll = true;
-        if(!AddSpinToXstructure(a,vmag_noncoll)){
-          return false;
-        } 
-      }                                                                               // DX 12/5/17 - added non-collinear
-      bool is_coll=false; 
-      vector<double> vmag;
-      if(!is_noncoll){
-        if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-          if(LDEBUG) {cerr << "pflow::CalculateFullSymmetry: Collinear spin system detected." << endl;}   // DX 12/5/17 - added non-collinear
-          is_coll = true;
-          if(!AddSpinToXstructure(a,vmag)){
-            return false;
-          } 
-        } 
-      }
-      if(!is_noncoll && !is_coll){                                                                                 // DX 12/5/17 - added non-collinear
-        cerr << "pflow::CalculateFullSymmetry: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;// DX 12/5/17 - added non-collinear
-        return false;                                                                                              // DX 12/5/17 - added non-collinear
-      }
+      ProcessAndAddSpinToXstructure(a, magmom_info); //DX 20191108 - condensed into a single function
     } 
     // DX 9/21/17 - MAGNETIC SYMMETRY - END
 
@@ -7060,7 +7063,7 @@ namespace pflow {
 // pflow::GetCollinearMagneticInfo
 // ***************************************************************************
 namespace pflow {
-  bool GetCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<double>& vmag){
+  bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag){ //DX 20191107 - int to uint
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(aurostd::substring2bool(magmom_info,"OUTCAR")){
       if(aurostd::FileExist(magmom_info)) {
@@ -7097,14 +7100,14 @@ namespace pflow {
                 if(mag_tokens[m].find("*") != std::string::npos){
                   vector<string> tokens;
                   aurostd::string2tokens(mag_tokens[m],tokens,"*");
-                  uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+                  uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
                   for(uint n=0;n<num_magmoms;n++){
                     vmag.push_back(aurostd::string2utype<double>(tokens[1]));
                   }
                 }
                 else {
-		  vmag.push_back(aurostd::string2utype<double>(mag_tokens[m]));
-		}
+                  vmag.push_back(aurostd::string2utype<double>(mag_tokens[m]));
+                }
               }
               magmom_found=true;
             }
@@ -7117,7 +7120,7 @@ namespace pflow {
       }
       else {
         cerr << "pflow::GetCollinearMagneticInfo: ERROR: INCAR file does not exist." << endl;
-	return false;
+        return false;
       }
     }
     else {
@@ -7128,7 +7131,7 @@ namespace pflow {
         if(mag_tokens[m].find("*") != std::string::npos){
           vector<string> tokens;
           aurostd::string2tokens(mag_tokens[m],tokens,"*");
-          uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+          uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
           for(uint n=0;n<num_magmoms;n++){
             vmag.push_back(aurostd::string2utype<double>(tokens[1]));
           }
@@ -7138,7 +7141,7 @@ namespace pflow {
         }
       }
     }
-    if((int)vmag.size()!=num_atoms){
+    if(vmag.size()!=num_atoms){ //DX 20191107 - remove (int) type casting
       if(LDEBUG) {
         cerr << "pflow::GetCollinearMagneticInfo: WARNING: Number of magnetic moments is not equivalent to the number of atoms." << endl;
       }
@@ -7154,7 +7157,7 @@ namespace pflow {
 // pflow::GetNonCollinearMagneticInfo
 // ***************************************************************************
 namespace pflow {
-  bool GetNonCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll){
+  bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll){ //DX 20191107 - int to uint
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(aurostd::substring2bool(magmom_info,"OUTCAR")){
       if(aurostd::FileExist(magmom_info)) {
@@ -7192,7 +7195,7 @@ namespace pflow {
                 if(mag_tokens[m].find("*") != std::string::npos){
                   vector<string> tokens;
                   aurostd::string2tokens(mag_tokens[m],tokens,"*");
-                  uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+                  uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
                   for(uint n=0;n<num_magmoms;n++){
                     all_magmom_tokens.push_back(aurostd::string2utype<double>(tokens[1]));
                   }
@@ -7202,7 +7205,7 @@ namespace pflow {
                 }
               }
               // non-collinear check (should be divisible by 3)
-              if((int)all_magmom_tokens.size()!=3*num_atoms){
+              if(all_magmom_tokens.size()!=3*num_atoms){ //DX 20191107 - removed (int) type casting
                 if(LDEBUG) {
                   cerr << "pflow::GetNonCollinearMagneticInfo: WARNING: From INCAR. Number of magnetic moments not divisible by 3; not non-collinear system." << endl;
                 }
@@ -7241,7 +7244,7 @@ namespace pflow {
         if(mag_tokens[m].find("*") != std::string::npos){
           vector<string> tokens;
           aurostd::string2tokens(mag_tokens[m],tokens,"*");
-          uint num_magmoms = aurostd::string2utype<int>(tokens[0]);
+          uint num_magmoms = aurostd::string2utype<uint>(tokens[0]); //DX 20191107 - int to uint
           for(uint n=0;n<num_magmoms;n++){
             all_magmom_tokens.push_back(aurostd::string2utype<double>(tokens[1]));
           }
@@ -7251,7 +7254,7 @@ namespace pflow {
         }
       }
       // non-collinear check (should be divisible by 3)
-      if((int)all_magmom_tokens.size()!=3*num_atoms){
+      if(all_magmom_tokens.size()!=3*num_atoms){ //DX 20191107 - removed (int) type casting
         if(LDEBUG) {
           cerr << "pflow::GetNonCollinearMagneticInfo: WARNING: From manual input. Number of magnetic moments is not three times the number of atoms; not non-collinear system." << endl;
         }
@@ -8125,6 +8128,7 @@ namespace pflow {
   string listPrototypeLabels(aurostd::xoption& vpflow) {
     
     string function_name = "listPrototypeLabels()";
+    stringstream message;
     vector<string> tokens;
     
     // ----- mode -----//
@@ -8154,8 +8158,8 @@ namespace pflow {
       aurostd::string2tokens(vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::STOICHIOMETRY"),tokens,":");
       for(uint i=0;i<tokens.size();i++){ stoichiometry.push_back(aurostd::string2utype<uint>(tokens[i])); }
       if(arity!=0 && arity!=stoichiometry.size()){
-        cerr << "ERROR::" << function_name << ": arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match." << endl;
-        exit(1);
+        message << "arity=" << arity << " and stoichiometry=" << aurostd::joinWDelimiter(stoichiometry,":") << " do not match.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_); //DX 20191107 - exit() -> throw
       }
       std::sort(stoichiometry.begin(),stoichiometry.end()); // must sort to properly filter
     }
@@ -8174,8 +8178,8 @@ namespace pflow {
       mode = 4;
       Wyckoff_letters = vpflow.getattachedscheme("LIST_PROTOTYPE_LABELS::WYCKOFF_STRING");
       if(space_group_number == 0){
-        cerr << "ERROR::" << function_name << ": Space group must be given with Wyckoff letters; please specify." << endl;
-        exit(1);
+        message << "Space group must be given with Wyckoff letters; please specify." << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_); //DX 20191107 - exit() -> throw
       }
     }
 
@@ -8197,11 +8201,11 @@ namespace pflow {
     else if(mode==1){
       prototype_labels = aflowlib::GetPrototypesBySpeciesNumber(arity, library);
     }
-    // get n-nary prototype labels
+    // get prototype labels via stoichiometry
     else if(mode==2){
       prototype_labels = aflowlib::GetPrototypesByStoichiometry(stoichiometry, library);
     }
-    // get n-nary prototype labels
+    // get prototype labels via symmetry
     else if(mode==3){
       prototype_labels = aflowlib::GetPrototypesBySymmetry(
           stoichiometry, 
@@ -9640,7 +9644,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/POSCAR.orig",ss,false) : 
                 aurostd::file2stringstream(path + "/POSCAR.orig",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) { 
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+              message << "POSCAR.orig: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "POSCAR.relax1")) {
@@ -9648,7 +9657,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/POSCAR.relax1",ss,false) :
                 aurostd::file2stringstream(path + "/POSCAR.relax1",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) {
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+              message << "POSCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if (!xstrAux.atoms.size()) {
@@ -9656,7 +9670,7 @@ namespace pflow {
           return false;
         }
         entry.vstr.push_back(xstrAux);
-        xstrAux.Clear();
+        xstrAux.clear(); //DX 20191220 - uppercase to lowercase clear
         if(LDEBUG) {cerr << soliloquy << " loaded ORIGINAL structure" << endl;}
 
         //////////////////////////////////////////////////////////////////////////
@@ -9672,7 +9686,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/POSCAR.relax2",ss,false) :
                 aurostd::file2stringstream(path + "/POSCAR.relax2",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) {
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+              message << "POSCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax1")) {
@@ -9680,7 +9699,12 @@ namespace pflow {
           if ( (is_url_path ? 
                 aurostd::url2stringstream(path + "/CONTCAR.relax1",ss,false) :
                 aurostd::file2stringstream(path + "/CONTCAR.relax1",ss)) ) {
-            xstrAux = xstructure(ss, IOVASP_AUTO);
+            try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+            catch(aurostd::xerror& excpt) {
+              xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+              message << "CONTCAR.relax1: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+              pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+            } //DX 20191210
           }
         }
         if (!xstrAux.atoms.size()) {
@@ -9688,7 +9712,7 @@ namespace pflow {
           return false;
         }
         entry.vstr.push_back(xstrAux);
-        xstrAux.Clear();
+        xstrAux.clear(); //DX 20191220 - uppercase to lowercase clear
         if(LDEBUG) {cerr << soliloquy << " loaded RELAX1 structure" << endl;}
 
         //////////////////////////////////////////////////////////////////////////
@@ -9705,7 +9729,12 @@ namespace pflow {
         if ( (is_url_path ? 
               aurostd::url2stringstream(path + "/CONTCAR.relax",ss,false): 
               aurostd::file2stringstream(path + "/CONTCAR.relax",ss)) ) {
-          xstrAux = xstructure(ss, IOVASP_AUTO);
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+          catch(aurostd::xerror& excpt) {
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+            message << "CONTCAR.relax: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
         }
       }
       if(!xstrAux.atoms.size() && aurostd::substring2bool(files, "CONTCAR.relax2")) {
@@ -9713,7 +9742,12 @@ namespace pflow {
         if ( (is_url_path ? 
               aurostd::url2stringstream(path + "/CONTCAR.relax2",ss,false) :
               aurostd::file2stringstream(path + "/CONTCAR.relax2",ss)) ) {
-          xstrAux = xstructure(ss, IOVASP_AUTO);
+          try{ xstrAux = xstructure(ss, IOVASP_AUTO); } //DX 20191210 - added try-catch
+          catch(aurostd::xerror& excpt) {
+            xstrAux.clear(); //clear it if it is garbage //DX 20191220 - uppercase to lowercase clear
+            message << "CONTCAR.relax2: Path exists, but could not load structure (e.g., URL timeout or bad structure file)."; 
+            pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, _LOGGER_WARNING_); 
+          } //DX 20191210
         }
       }
       if (!xstrAux.atoms.size()) {
@@ -9721,7 +9755,7 @@ namespace pflow {
         return false;
       }
       entry.vstr.push_back(xstrAux);
-      xstrAux.Clear();
+      xstrAux.clear(); //DX 20191220 - uppercase to lowercase clear
       if(LDEBUG) {cerr << soliloquy << " loaded FULLY-RELAXED structure" << endl;}
 
       ////////////////////////////////////////////////////////////////////////////
@@ -13610,6 +13644,7 @@ namespace pflow {
   string SG(aurostd::xoption& vpflow,istream& input,string mode,string print) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string flag_name = "SG::"+mode; // DX 9/26/17
+    stringstream message; //DX 20200103
     if(print == "LABEL" || print == "NUMBER"){
       flag_name += "_" + print;
     }
@@ -13620,17 +13655,17 @@ namespace pflow {
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()==1) {
       if(tokens.at(0)=="usage" || tokens.at(0)=="USAGE") {
-	init::ErrorOption(cout,options,"pflow::SG",
-                          aurostd::liststring2string("aflow --aflowSG[=tolerance| =tight| =loose] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: (minimum_interatomic_distance)/100.0",
-						     "aflow --platonSG[_label,_number][=EQUAL| EXACT][,ang,d1,d2,d3] < POSCAR  default:"+
-						     string("EQUAL=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EQUAL)+","+
-						     string("EXACT=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EXACT)+","+
-						     aurostd::utype2string(DEFAULT_PLATON_P_ANG,5)+","+
-						     aurostd::utype2string(DEFAULT_PLATON_P_D1,5)+","+
-						     aurostd::utype2string(DEFAULT_PLATON_P_D2,5)+","+
-						     aurostd::utype2string(DEFAULT_PLATON_P_D3,5)+"",
-						     "aflow --findsymSG[_label,_number][=tolerance] < POSCAR   default:"+aurostd::utype2string(DEFAULT_FINDSYM_TOL,5)));
-	exit(0);
+        init::ErrorOption(cout,options,"pflow::SG",
+            aurostd::liststring2string("aflow --aflowSG[=tolerance| =tight| =loose] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR  default: (minimum_interatomic_distance)/100.0",
+              "aflow --platonSG[_label,_number][=EQUAL| EXACT][,ang,d1,d2,d3] < POSCAR  default:"+
+              string("EQUAL=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EQUAL)+","+
+              string("EXACT=")+aurostd::utype2string<int>(DEFAULT_PLATON_P_EXACT)+","+
+              aurostd::utype2string(DEFAULT_PLATON_P_ANG,5)+","+
+              aurostd::utype2string(DEFAULT_PLATON_P_D1,5)+","+
+              aurostd::utype2string(DEFAULT_PLATON_P_D2,5)+","+
+              aurostd::utype2string(DEFAULT_PLATON_P_D3,5)+"",
+              "aflow --findsymSG[_label,_number][=tolerance] < POSCAR   default:"+aurostd::utype2string(DEFAULT_FINDSYM_TOL,5)));
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_MISSING_); //DX 20200103 - exit to xerror
       } 
     }
     // move on
@@ -13642,8 +13677,8 @@ namespace pflow {
     
     // [OBSOLETE] xstructure a(input,IOVASP_POSCAR);
     if(input.peek() == EOF) {
-      cerr << "File is empty. Check POSCAR." << endl;
-      exit(0);
+      message << "File is empty. Check POSCAR.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_INPUT_MISSING_); //DX 20200103 - exit to xerror
     }
     xstructure a(input,IOAFLOW_AUTO);
     // DX 20180527 - use pwd - START
@@ -13660,35 +13695,8 @@ namespace pflow {
       a.ReScale(1.0);
       // DX 9/21/17 - MAGNETIC SYMMETRY - START
       if(vpflow.flag("SG::MAGNETIC")){
-	string magmom_info = vpflow.getattachedscheme("SG::MAGNETIC");
-        int num_atoms=a.atoms.size();
-        bool is_noncoll=false; 
-        vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
-        if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
-          if(LDEBUG) {cerr << "pflow::SG: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-          is_noncoll = true;
-          if(!AddSpinToXstructure(a,vmag_noncoll)){
-            exit(0);
-          } 
-        }                                                                               // DX 12/5/17 - added non-collinear
-        bool is_coll=false; 
-        vector<double> vmag;
-        if(!is_noncoll){
-          if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-            if(LDEBUG) {cerr << "pflow::SG: Collinear spin system detected." << endl;}   // DX 12/5/17 - added non-collinear
-            is_coll = true;
-            if(!AddSpinToXstructure(a,vmag)){
-	      exit(0);
-            } 
-          } 
-        }
-        if(!is_noncoll && !is_coll){                                                                                 // DX 12/5/17 - added non-collinear
-          cerr << "pflow::SG: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;// DX 12/5/17 - added non-collinear
-          exit(0);                                                                                                   // DX 12/5/17 - added non-collinear
-        }
-        // DX [OBSOLETE] 12/5/17 - if(!AddSpinToXstructure(a,vmag)){
-        // DX [OBSOLETE] 12/5/17 -   exit(0);
-        // DX [OBSOLETE] 12/5/17 - } 
+        string magmom_info = vpflow.getattachedscheme("SG::MAGNETIC");
+        ProcessAndAddSpinToXstructure(a, magmom_info); //DX 20191108 - condensed into a single function
       }
       // DX 9/21/17 - MAGNETIC SYMMETRY - END
       // DX [OBSOLETE] 9/21/17 - double default_tolerance=SYM::defaultTolerance(a);
@@ -13709,23 +13717,23 @@ namespace pflow {
       double default_tolerance=SYM::defaultTolerance(a);
       double tolerance = AUROSTD_NAN;
       if(vpflow.flag("SG::TOLERANCE")){
-	string tolerance_string = vpflow.getattachedscheme("SG::TOLERANCE");
-	if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
+        string tolerance_string = vpflow.getattachedscheme("SG::TOLERANCE");
+        if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
           tolerance=default_tolerance;
         }
-	else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
+        else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
           tolerance=default_tolerance*10.0;
         }
         else {
-	  tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SG::TOLERANCE"));
+          tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("SG::TOLERANCE"));
         }
       }
       else {
-	tolerance = default_tolerance;
+        tolerance = default_tolerance;
       }
       if(tolerance < 1e-10){
-	cerr << "pflow::SG::ERROR: Tolerance cannot be zero (i.e. less than 1e-10)." << endl;
-	return 0;
+        message << "pflow::SG::ERROR: Tolerance cannot be zero (i.e. less than 1e-10).";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,flag_name,message,_VALUE_RANGE_); //DX 20200103 - return to xerror
       }
       // DX 9/26/17 - NO SCAN - START
       bool no_scan = false;
@@ -13908,6 +13916,8 @@ namespace pflow {
 namespace pflow {
   bool SGDATA(istream& input, aurostd::xoption& vpflow, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::SGDATA()";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string options = vpflow.getattachedscheme("SGDATA");
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -13929,31 +13939,7 @@ namespace pflow {
     // DX 9/21/17 - MAGNETIC SYMMETRY - START
     if(vpflow.flag("SGDATA::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("SGDATA::MAGNETIC");
-      int num_atoms=a.atoms.size();
-      bool is_noncoll=false; 
-      vector<xvector<double> > vmag_noncoll;                                          // DX 12/5/17 - added non-collinear
-      if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){            // DX 12/5/17 - added non-collinear
-        if(LDEBUG) {cerr << "pflow::SG: Non-collinear spin system detected." << endl;} // DX 12/5/17 - added non-collinear
-        is_noncoll = true;
-        if(!AddSpinToXstructure(a,vmag_noncoll)){
-          return false;
-        } 
-      }                                                                               // DX 12/5/17 - added non-collinear
-      bool is_coll=false; 
-      vector<double> vmag;
-      if(!is_noncoll){
-        if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-          if(LDEBUG) {cerr << "pflow::SG: Collinear spin system detected." << endl;}   // DX 12/5/17 - added non-collinear
-          is_coll = true;
-          if(!AddSpinToXstructure(a,vmag)){
-            return false;
-          } 
-        } 
-      }
-      if(!is_noncoll && !is_coll){                                                                                 // DX 12/5/17 - added non-collinear
-        cerr << "pflow::SG: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;// DX 12/5/17 - added non-collinear
-        return false;                                                                                              // DX 12/5/17 - added non-collinear
-      } 
+      ProcessAndAddSpinToXstructure(a, magmom_info); //DX 20191108 - condensed into a single function
     } 
     // DX 9/21/17 - MAGNETIC SYMMETRY - END
 
@@ -14294,13 +14280,13 @@ namespace pflow {
     if(vpflow.flag("WYCCAR::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("WYCCAR::TOLERANCE");
       if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
-	tolerance=default_tolerance;
+        tolerance=default_tolerance;
       }
       else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
-	tolerance=default_tolerance*10.0;
+        tolerance=default_tolerance*10.0;
       }
       else {
-	tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("WYCCAR::TOLERANCE"));
+        tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("WYCCAR::TOLERANCE"));
       }
     }
     else {
@@ -14316,8 +14302,8 @@ namespace pflow {
     if(vpflow.flag("WYCCAR::SETTING")){
       int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("WYCCAR::SETTING"));
       if(user_setting!=1 && user_setting!=2){
-	cerr << "pflow::WYCCAR ERROR: Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)." << endl;
-	return 0;
+        cerr << "pflow::WYCCAR ERROR: Setting must be 1 or 2 (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c)." << endl;
+        return 0;
       }
       setting = user_setting;
     }
@@ -14325,31 +14311,7 @@ namespace pflow {
     // get magnetic moment
     if(vpflow.flag("WYCCAR::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("WYCCAR::MAGNETIC");
-      int num_atoms=str.atoms.size();
-      bool is_noncoll=false; 
-      vector<xvector<double> > vmag_noncoll;
-      if(GetNonCollinearMagneticInfo(num_atoms,magmom_info,vmag_noncoll)){
-	if(LDEBUG) {cerr << "pflow::WYCCAR: Non-collinear spin system detected." << endl;}
-	is_noncoll = true;
-	if(!AddSpinToXstructure(str,vmag_noncoll)){
-	  exit(0);
-	} 
-      }
-      bool is_coll=false; 
-      vector<double> vmag;
-      if(!is_noncoll){
-	if(GetCollinearMagneticInfo(num_atoms,magmom_info,vmag)){
-	  if(LDEBUG) {cerr << "pflow::WYCCAR: Collinear spin system detected." << endl;}
-	  is_coll = true;
-	  if(!AddSpinToXstructure(str,vmag)){
-	    exit(0);
-	  } 
-	} 
-      }
-      if(!is_noncoll && !is_coll){
-	cerr << "pflow::WYCCAR: ERROR: Could not detect collinear or non-collinear spin(s). Check spin input." << endl;
-	exit(0);
-      }
+      ProcessAndAddSpinToXstructure(str, magmom_info); //DX 20191108 - condensed into a single function
     }
 
     // tolerance scan 

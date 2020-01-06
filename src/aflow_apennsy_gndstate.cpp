@@ -344,19 +344,19 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 	    cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.orig/POSCAR.relax1" << endl;exit(0);}
 	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.orig")) {xstr=xstructure(aurl+"/POSCAR.orig",IOVASP_AUTO);}
 	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax1")) {xstr=xstructure(aurl+"/POSCAR.relax1",IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.Clear();
+	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 	  // MID
 	  if(!aurostd::FileExist(aurl+"/CONTCAR.relax1") && !aurostd::FileExist(aurl+"/POSCAR.relax2")) {
 	    cerr << "ERROR aurl=\"" << aurl << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
 	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/POSCAR.relax2")) {xstr=xstructure(aurl+"/POSCAR.relax2",IOVASP_AUTO);}
 	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax1")) {xstr=xstructure(aurl+"/CONTCAR.relax1",IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.Clear();
+	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 	  // POST
 	  if(!aurostd::FileExist(aurl+"/CONTCAR.relax") && !aurostd::FileExist(aurl+"/CONTCAR.relax2")) {
 	    cerr << "ERROR aurl=\"" << aurl << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
 	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax")) {xstr=xstructure(aurl+"/CONTCAR.relax",IOVASP_AUTO);}
 	  if(!xstr.atoms.size() && aurostd::FileExist(aurl+"/CONTCAR.relax2")) {xstr=xstructure(aurl+"/CONTCAR.relax2",IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.Clear();
+	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 	  //	plug.vstr.clear(); for(uint ii=0;ii<struct_proprts.vstr.size();ii++) plug.vstr.push_back(struct_proprts.vstr.at(ii));
 	  //	plug.nrelaxations=struct_proprts.nrelaxations;
 	  //	exit(0);
@@ -370,7 +370,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.orig"));xstr=xstructure(aus,IOVASP_AUTO);}
 	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax1")) {
 	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.Clear();
+	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
  	  // MID
 	  if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax1") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
 	    cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed POSCAR.relax2/CONTCAR.relax1" << endl;exit(0);}
@@ -378,7 +378,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax1"));xstr=xstructure(aus,IOVASP_AUTO);}
 	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"POSCAR.relax2")) {
 	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/POSCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.Clear();
+	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 	  // POST
 	  if(!aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax") && !aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
 	    cerr << "ERROR vaflowlibentry_url.at(i)=\"" << vaflowlibentry_url.at(i) << "\" needed CONTCAR.relax/CONTCAR.relax2" << endl;exit(0);}
@@ -386,7 +386,7 @@ bool APENNSY_Parameters::LoadLibrary(_aflags &aflags) {
 	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax"));xstr=xstructure(aus,IOVASP_AUTO);}
 	  if(!xstr.atoms.size() && aurostd::substring2bool(vaflowlib.at(i).vfiles,"CONTCAR.relax2")) {
 	    stringstream aus(aurostd::url2string(vaflowlibentry_url.at(i)+"/CONTCAR.relax2"));xstr=xstructure(aus,IOVASP_AUTO);}
-	  plug.vstr.push_back(xstr);xstr.Clear();
+	  plug.vstr.push_back(xstr);xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 
 	}
 

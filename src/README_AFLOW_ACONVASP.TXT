@@ -842,37 +842,142 @@ LATTICES = (the ones with "")
          cout << endl;
         Useful with y-ndata to compare % relaxations.
 
-  aflow --compare_material=POSCAR_1,POSCAR_2 [--np=xx] [--print]
-	Compares POSCAR_1 to POSCAR_2 if the ratios are commensurate
-	and types of atoms are the same (i.e. same material). 
-	POSCARs must be in the same directory you are running in.
-	[--np=xx] : Number of processors (default 8). Algorithm is thread-friendly.
-	[--print] : (For two at a time only.) Prints comparison data.
+  aflow --compare2database [GENERAL_COMPARISON_OPTIONS] [COMPARE2DATABASE_OPTIONS] < file
+      Compares a structure (file) to entries in the AFLOW database, returning similar 
+      compounds and quantifying their levels of similarity (misfit values).
+      Material properties can be extracted from the database and printed (via AFLUX), highlighting structure-property relationships.
+      
+      [COMPARE2DATABASE_OPTIONS] : Options specific to this command:
+          [--structure_comparison] : Performs structure-type comparisons.
+          [--properties=enthalpy_atom,natoms,...] : Specify the properties via their API keyword to print the corresponding 
+            values with the comparison results.
+          [--catalog=lib1|lib2|lib3|lib4|lib6|lib7|icsd] : Restrict the entries to compare with to a specific catalog/library 
+            (e.g., `lib1', `lib2', `lib3', `icsd', etc.).
+          [--geometry_file=POSCAR.relax1] : Compare geometries from a particular step in the DFT relaxation 
+            (e.g., `POSCAR.relax1', `POSCAR.relax2', `POSCAR.static', etc.).
+      [GENERAL_COMPARISON_OPTIONS] :
+        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
+        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
+        [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
+        [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
+        [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
+        [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
+        [--keep_unmatched!] : Retains misfit information of unmatched structures (i.e., misfit>0.1).
+        [--match_to_aflow_prototypes!] : Identifies matching AFLOW prototypes to the representative structure.
+        [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
+          signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
+          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+              1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
+              2) read from a VASP INCAR, or
+              3) read from a VASP OUTCAR.
+            Additional magnetic moment readers for other ab initio codes will be available in future versions.
+        [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.
+        [--remove_duplicate_compounds] : For structure-type comparisons, duplicate compounds are identified first 
+          (via a material-type comparison without volume scaling), then remaining unique compounds are compared, removing duplicate bias.
+        [--ICSD] : Only if ICSD structures: ensure the representative structure is the entry with the smallest ICSD number 
+        [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
+          and the transformed structures in the closest matching representation.
+        [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
+          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+        [--quiet|--q] : Suppresses the log information for the comparisons.
+        [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
-
-  aflow --compare_structure=POSCAR_1,POSCAR_2 [--np=xx] [--print]
-	Compares POSCAR_1 to POSCAR_2 (no requirement on type of atoms,
-	just stoichiometry ratios). POSCARs must be in the same 
-	directory you are running in.
-	[--np=xx] : Number of processors (default 8). Algorithm is thread-friendly.
-	[--print] : (For two at a time only.) Prints comparison data.
+    
+    
+  aflow --compare2prototypes [GENERAL_COMPARISON_OPTIONS] [COMPARE2PROTOTYPES_OPTIONS] < file
+      Compares a structure (file) to the AFLOW crystallographic prototype structures, returning the similar 
+      structures and quantifying their levels of similarity (misfit values).
+      
+      [COMPARE2PROTOTYPES_OPTIONS] : Options specific to this command:
+          [--catalog=anrl|htqc|all] : Restrict the entries to compare with to a specific catalog/library (e.g., `anrl' or `htqc').
+      [GENERAL_COMPARISON_OPTIONS] :
+        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
+        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
+        [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
+        [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
+        [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
+        [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
+        [--keep_unmatched!] : Retains misfit information of unmatched structures (i.e., misfit>0.1).
+        [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
+          signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
+          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+              1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
+              2) read from a VASP INCAR, or
+              3) read from a VASP OUTCAR.
+            Additional magnetic moment readers for other ab initio codes will be available in future versions.
+        [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.
+        [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
+          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+        [--quiet|--q] : Suppresses the log information for the comparisons.
+        [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
+    
 
-  aflow --compare_material_directory|--compare_material_dir [-D "PATH"] [--np=xx]
-	Determines the unique materials (same atomic species)
-	within a given directory. Returns a JSON and TXT file with the
-	results. Default Directory: "."
-	[-D "PATH"] : User can specify a specific directory to compare.
-		      Output will be placed there also.
-	[--np=xx]   : Number of processors (default 8). Algorithm is thread-friendly.
+  aflow --compare_materials=<f1>,<f2>,...| -D <path> | -F=<filename> [GENERAL_COMPARISON_OPTIONS]
+      Compares compounds comprised of the same atomic species and with 
+      commensurate stoichiometric ratios, i.e., material-type comparison, and returns their level of similarity (misfit value).
+      This method identifies unique and duplicate materials.
+      There are three input types:
+          aflow --compare_materials=<f1>,<f2>,...  : append geometry files (<f1>,<f2>,...) to compare,
+          aflow --compare_materials -D <path>      : specify path to directory (<path>) containing geometry files to compare, and
+          aflow --compare_materials -F=<filename>  : specify file (<filename>) containing compounds between delimiters 
+                                                     [VASP_POSCAR_MODE_EXPLICIT]START and VASP_POSCAR_MODE_EXPLICIT]STOP.
+                                                     Additional delimiters will be included in later versions.
+      [GENERAL_COMPARISON_OPTIONS] :
+        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
+        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
+        [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
+        [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
+        [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
+        [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
+        [--keep_unmatched!] : Retains misfit information of unmatched structures (i.e., misfit>0.1).
+        [--match_to_aflow_prototypes!] : Identifies matching AFLOW prototypes to the representative structure.
+        [--magmom=<m1,m2,...|INCAR|OUTCAR>:...] : Specifies the magnetic moment for each structure (collinear or non-collinear) delimited by colons, 
+          signaling a magnetic-type comparison. The option does not apply to --compare_structures since the atom type is neglected.
+          AFLOW-XtalMatch supports three input formats for the magnetic moment: 
+              1) explicit declaration via comma-separated string m_{1},m_{2},...m_{n} (m_{1,x},m_{1,y},m_{1,z},m_{2,x},...m_{n,z} for non-collinear) 
+              2) read from a VASP INCAR, or
+              3) read from a VASP OUTCAR.
+            Additional magnetic moment readers for other ab initio codes will be available in future versions.
+        [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.
+        [--ICSD] : Only if ICSD structures: ensure the representative structure is the entry with the smallest ICSD number 
+        [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
+          and the transformed structures in the closest matching representation.
+        [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
+          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+        [--quiet|--q] : Suppresses the log information for the comparisons.
+        [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
-
-  aflow --compare_structure_directory|--compare_structure_dir [-D "PATH"] [--np=xx]
-	Determines the unique structure prototypes within a given directory.
-	Returns a JSON and TXT file with the results. Default Directory: "."
-	[-D "PATH"] : User can specify a specific directory to compare.
-		      Output will be placed there also.
-	[--np=xx]   : Number of processors (default 8). Algorithm is thread-friendly.
+    
+  aflow --compare_structures=<f1>,<f2>,...| -D <path> | -F=<filename> [GENERAL_COMPARISON_OPTIONS]
+      Compares compounds with commensurate stoichiometric ratios and no 
+      requirement of the atomic species, i.e., structure-type comparison, and returns their level of similarity (misfit value).
+      This method identifies unique and duplicate prototypes.
+      There are three input types:
+          aflow --compare_structures=<f1>,<f2>,...  : append geometry files (<f1>,<f2>,...) to compare,
+          aflow --compare_structures -D <path>      : specify path to directory (<path>) containing geometry files to compare, and
+          aflow --compare_structures -F=<filename>  : specify file (<filename>) containing compounds between delimiters 
+                                                     [VASP_POSCAR_MODE_EXPLICIT]START and VASP_POSCAR_MODE_EXPLICIT]STOP.
+                                                     Additional delimiters will be included in later versions.
+      [GENERAL_COMPARISON_OPTIONS]:
+        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
+        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
+        [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
+        [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
+        [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
+        [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
+        [--keep_unmatched!] : Retains misfit information of unmatched structures (i.e., misfit>0.1).
+        [--match_to_aflow_prototypes!] : Identifies matching AFLOW prototypes to the representative structure.
+        [--add_aflow_prototype_designation] : Casts prototype structure into the AFLOW standard designation.
+        [--remove_duplicate_compounds] : For structure-type comparisons, duplicate compounds are identified first 
+          (via a material-type comparison without volume scaling), then remaining unique compounds are compared, removing duplicate bias.
+        [--ICSD] : Only if ICSD structures: ensure the representative structure is the entry with the smallest ICSD number 
+        [--print] : For comparing two structures, additional comparison information is printed, including atom mappings, distances between matched atoms, 
+          and the transformed structures in the closest matching representation.
+        [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
+          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+        [--quiet|--q] : Suppresses the log information for the comparisons.
+        [--screen_only] : Prints the comparison results to the screen and does not write to any files.
         Check aflow --readme=compare
 
   aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [chull_options] [--destination=[DIRECTORY]]
@@ -1670,6 +1775,23 @@ LATTICES = (the ones with "")
         Check aflow --readme=symmetry
   aflow --latticehistogram < POSCAR
         Outputs the lattice calculated respect to tolerance of histogram of symmetry.
+    
+  aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file
+      Determines the unique and duplicate atom decorations for a given structure, grouping 
+      equivalent decorations (if applicable).
+      
+      [GENERAL_COMPARISON_OPTIONS]:
+        [--np=16|--num_proc=16] : Allocate the number of processors/threads for the task.
+        [--optimize_match] : Explore all lattice and origin choices to find the best matching representation, i.e., minimizes misfit value.
+        [--no_scale_volume] : Suppresses volume rescaling during structure matching; identifies differences due to volume expansion or compression of a structure.
+        [--ignore_symmetry] : Neglects symmetry analysis (both space group and Wyckoff positions) for grouping comparisons.
+        [--ignore_Wyckoff] : Neglects Wyckoff symmetry (site symmetry) for filtering comparisons, but considers the space group number.
+        [--ignore_environment] : Neglects LFA environment analysis for filtering comparisons.
+        [--print=TEXT|JSON] : For comparing multiple structures, the results printed to the relevant files are formatted into human-readable 
+          text or JSON, respectively.  By default, AFLOW-XtalMatch writes the output in both formats.
+        [--quiet|--q] : Suppresses the log information for the comparisons.
+        [--screen_only] : Prints the comparison results to the screen and does not write to any files.
+        Check aflow --readme=compare
 
   aflow --use_LOCK=XXX
         Uses XXX instead of "LOCK" in freezing/searching/operating directories.
@@ -2522,7 +2644,25 @@ LATTICES = (the ones with "")
         Some rhombohedral cells can be generated in hexagonal configurations (see the article).
         The choice is performed with the flag --hex.
         Check aflow --readme=anrl 
+   
+
+  aflow --prototype [--setting=1|2|anrl] < file             
+      Converts a structure (file) into its corresponding standard AFLOW prototype label. 
+      The parameter variables (degrees of freedom) and parameter values are also listed.
+      Information about the label and parameters are described in the AFLOW Library of Crystallographic Prototypes:
+      Part 1 (doi=10.1016/j.commatsci.2017.01.017), 
+      Part 2 (doi=10.1016/j.commatsci.2018.10.043), 
+      or README_AFLOW_ANRL.TXT.
+      
+      Options:
+        [--setting=1|2|anrl] : Specify the space group setting for the conventional cell/Wyckoff positions.  
+          The `anrl' setting follows the choices of the AFLOW Library of Crystallographic Prototypes: 
+              - axis-b for monoclinic space groups, 
+              - rhombohedral setting for rhombohedral space groups, and 
+              - origin centered on the inversion for centrosymmetric space groups 
+          (default: anrl).
   
+
   aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>:<number>:...] [--space_group_number=|--space_group=|--sg=<number>] 
         Returns a list of the AFLOW prototype labels.
         The labels can be filtered by arity, stoichiometry, and space group.

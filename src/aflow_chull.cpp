@@ -1404,16 +1404,20 @@ xvector<double> ChullPoint::getTruncatedCCoords(const xvector<int>& elements_pre
   string soliloquy="ChullPoint::getTruncatedCCoords():";
   if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
   xvector<double> coords=getTruncatedCoords(c_coords,elements_present);
-  if(reduce){coords=aurostd::reduceByGCD(coords);}
-  if(LDEBUG) {cerr << soliloquy << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
-  return coords;
+  //DX 20191125 [OBSOLETE] if(reduce){coords=aurostd::reduceByGCD(coords);}
+  //DX 20191125 [OBSOLETE] if(LDEBUG) {cerr << soliloquy << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
+  //DX 20191125 [OBSOLETE] return coords;
+  xvector<double> final_coords=coords; //DX 20191125
+  if(reduce){ aurostd::reduceByGCD(coords, final_coords);} //DX 20191125 - new form of function
+  if(LDEBUG) {cerr << soliloquy << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << final_coords << " (elements_present=" << elements_present << ")" << endl;} //DX 20191125 - changed coords to final_coords
+  return final_coords; //DX 20191125 - changed coords to final_coords
 }
 
 xvector<double> ChullPoint::getReducedCCoords() const {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="ChullPoint::getReducedCCoords():";
   if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
-  xvector<double> coords=aurostd::reduceByGCD(c_coords,ZERO_TOL);
+  xvector<double> coords; aurostd::reduceByGCD(c_coords,coords,ZERO_TOL); //DX 20191125 - new form of function
   if(LDEBUG) {cerr << soliloquy << " reduced comp for " << c_coords << " is " << coords << endl;}
   return coords;
 }

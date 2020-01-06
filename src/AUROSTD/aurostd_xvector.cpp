@@ -1416,12 +1416,13 @@ namespace aurostd {
     return lcm;
   }
 }
-
+ 
 namespace aurostd {
-  template<class utype> xvector<utype> 
-    reduceByGCD(const xvector<utype>& in_V,const utype& tol){
-    xvector<utype> out_V=in_V;
-    if(!isinteger(out_V,tol)){return out_V;} //nothing to reduce
+  template<class utype> void reduceByGCD(const xvector<utype>& in_V, xvector<utype>& out_V, utype tol){
+  // DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,const utype& tol){
+    //DX 20191125 [OBSOLETE] xvector<utype> out_V=in_V;
+    out_V=in_V;
+    if(!isinteger(out_V,tol)){return;} //nothing to reduce //DX 20191125 - return type is void
 
     xvector<int> v1(in_V.lrows,in_V.urows); //cast to xvector of ints
     for(int i=in_V.lrows;i<=in_V.urows;i++){v1[i]=nint(in_V[i]);}
@@ -1429,7 +1430,7 @@ namespace aurostd {
     if(denom!=0){v1/=denom;}  //safety
     for(int i=v1.lrows;i<=v1.urows;i++){out_V[i]=(utype)v1[i];}  //cast back
     
-    return out_V;
+    //DX 20191125 [OBSOLETE] return out_V;
   }
   //xvector<int> reduceByGCD(const xvector<int>& in_V){
   //  xvector<int> out_V=in_V;
@@ -1437,6 +1438,120 @@ namespace aurostd {
   //  if(denom!=1){out_V/=denom;}
   //  return out_V;
   //}
+}
+
+// ----------------------------------------------------------------------------
+// GCD //DX 20191122
+// vector version (modeled after CO's xvector version)
+namespace aurostd {
+  int GCD(const vector<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    // REMOVE for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
+    for(uint i=0;i<in_V.size()&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 1;}  // always works
+    int gcd=in_V[counter];
+    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return gcd;
+  }
+  int LCM(const vector<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    for(uint i=0;i<in_V.size()&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 0;}  //special, trivial case: lcm must really be positive
+    int lcm=in_V[counter];
+    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){lcm=LCM(lcm,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return lcm;
+  }
+}
+
+namespace aurostd {
+  template<class utype> void reduceByGCD(const vector<utype>& in_V, vector<utype>& out_V, utype tol){
+    //DX 20191125 [OBSOLETE] vector<utype> out_V=in_V;
+    out_V=in_V;
+    for(uint i=0;i<out_V.size();i++){ 
+      if(!isinteger(out_V[i],tol)){return;}
+    }
+
+    vector<int> v1; v1.resize(in_V.size()); //cast to vector of ints
+    for(uint i=0;i<in_V.size();i++){v1[i]=nint(in_V[i]);}
+    int denom=GCD(v1);
+    if(denom!=0){
+      for(uint i=0;i<v1.size();i++){v1[i]/=denom;}
+    }
+    for(uint i=0;i<v1.size();i++){out_V[i]=(utype)v1[i];}  //cast back
+    
+    //DX 20191125 [OBSOLETE] return out_V;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// GCD //DX 20191122
+// deque version (modeled after CO's xvector version)
+namespace aurostd {
+  int GCD(const deque<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    // REMOVE for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
+    for(uint i=0;i<in_V.size()&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 1;}  // always works
+    int gcd=in_V[counter];
+    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return gcd;
+  }
+  int LCM(const deque<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    for(uint i=0;i<in_V.size()&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 0;}  //special, trivial case: lcm must really be positive
+    int lcm=in_V[counter];
+    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){lcm=LCM(lcm,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return lcm;
+  }
+}
+
+namespace aurostd {
+  template<class utype> void reduceByGCD(const deque<utype>& in_V, deque<utype>& out_V, utype tol){
+    //DX 20191125 [OBSOLETE] deque<utype> out_V=in_V;
+    out_V=in_V;
+    for(uint i=0;i<out_V.size();i++){ 
+      if(!isinteger(out_V[i],tol)){return;}
+    }
+
+    vector<int> v1; v1.resize(in_V.size()); //cast to vector of ints
+    for(uint i=0;i<in_V.size();i++){v1[i]=nint(in_V[i]);}
+    int denom=GCD(v1);
+    if(denom!=0){
+      for(uint i=0;i<v1.size();i++){v1[i]/=denom;}
+    }
+    for(uint i=0;i<v1.size();i++){out_V[i]=(utype)v1[i];}  //cast back
+    
+    //DX 20191125 [OBSOLETE] return out_V;
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -2788,4 +2903,3 @@ namespace aurostd {
 // *             STEFANO CURTAROLO - Duke University 2003-2019              *
 // *                                                                        *
 // **************************************************************************
-

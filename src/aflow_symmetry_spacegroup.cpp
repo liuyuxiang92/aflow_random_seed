@@ -824,18 +824,18 @@ uint xstructure::GetPrimitiveCell(void) {
 
   // Copy deque<_atoms> atoms (IN XSTRUCTURE) to atomic_basis_ to manipulate free of xstructure
   for (int i = 0; i < atom_count; i++) {
-    _atom tmp;
-    tmp.fpos = (*this).atoms[i].fpos;
-    tmp.cpos = (*this).atoms[i].cpos;
-    tmp.type = (*this).atoms[i].type;
-    tmp.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
-    tmp.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
-    tmp.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-    tmp.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+    _atom tmp_atom = (*this).atoms[i]; //DX 20191011 - initialized here instead of explicitly setting individual attributes below
+    //DX 20191011 [OBSOLETE] tmp_atom.fpos = (*this).atoms[i].fpos;
+    //DX 20191011 [OBSOLETE] tmp_atom.cpos = (*this).atoms[i].cpos;
+    //DX 20191011 [OBSOLETE] tmp_atom.type = (*this).atoms[i].type;
+    //DX 20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
+    //DX 20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
+    //DX 20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+    //DX 20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
     string tmpname = (*this).atoms[i].name;
     SYM::cleanupstring(tmpname);
-    tmp.name = tmpname;
-    atomic_basis_.push_back(tmp);
+    tmp_atom.name = tmpname;
+    atomic_basis_.push_back(tmp_atom);
   }
 
   // ===== Expand the lattice and atomic basis ===== //
@@ -883,15 +883,15 @@ uint xstructure::GetPrimitiveCell(void) {
   // ===== Find all possible translation vectors in crystal ===== //
   if(foundbasis == false) {
     for (uint i = 0; i < atomic_basis_.size(); i++) {
-      _atom tmp;
+      _atom tmp = atomic_basis_[i]; //DX 20191011 - initialized instead of setting individually below
       //DX 20190905 [OBSOLETE-no more mod_one_xvec] tmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos);
       tmp.fpos = ::BringInCell(atomic_basis_[i].fpos); //DX 20190905 - new BringInCell function and go outside xstructure scope
-      tmp.name = atomic_basis_[i].name;
-      tmp.type = atomic_basis_[i].type;
-      tmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
-      tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
-      tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-      tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+      //DX 20191011 [OBSOLETE] tmp.name = atomic_basis_[i].name;
+      //DX 20191011 [OBSOLETE] tmp.type = atomic_basis_[i].type;
+      //DX 20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
+      //DX 20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
+      //DX 20191011 [OBSOLETE] tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+      //DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
       full_basis.push_back(tmp);
     }
     vector<xvector<double> > diff_vectors;
@@ -916,16 +916,16 @@ uint xstructure::GetPrimitiveCell(void) {
       xvector<double> incell_dist = atoms_by_type[index_for_smallest_group][atom_pos[d]].cpos - atoms_by_type[index_for_smallest_group][0].cpos;
       uint count = 0;
       for (uint i = 0; i < atomic_basis_.size(); i++) {
-        _atom atmp;
+        _atom atmp = atomic_basis_[i]; //DX 20191011 - initialized instead of setting individually below
         //DX 20190905 [OBSOLETE-no more mod_one_xvec] atmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos + diff_vectors[d]);
         atmp.fpos = atomic_basis_[i].fpos + diff_vectors[d]; //DX 20190905 
         BringInCellInPlace(atmp.fpos); //DX 20190905
-        atmp.name = atomic_basis_[i].name;
-        atmp.type = atomic_basis_[i].type;
-        atmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
-        atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
-        atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-        atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] atmp.name = atomic_basis_[i].name;
+        //DX 20191011 [OBSOLETE] atmp.type = atomic_basis_[i].type;
+        //DX 20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
         if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, f2c, skew, (*this).sym_eps)) { //DX 20190215 - _SYM_TOL_ to (*this).sym_eps //DX 20190619 - lattice_basis_xmat and f2c as input
           count += 1;
         }
@@ -1067,23 +1067,23 @@ uint xstructure::GetPrimitiveCell(void) {
     }
     (*this).species.clear(); // DX
     for (uint i = 0; i < newbasis.size(); i++) {
-      _atom tmp;
-      tmp.fpos = newbasis[i].fpos;
-      tmp.cpos = newbasis[i].cpos;
-      tmp.name = newbasis[i].name;
-      tmp.type = newbasis[i].type;
-      tmp.name_is_given = true;
-      tmp.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
-      tmp.spin_is_given = false; // DX 9/21/17 - magnetic sym
-      if(aurostd::abs(tmp.spin)>_ZERO_TOL_){
-      tmp.spin_is_given = true; // DX 9/21/17 - magnetic sym
+      _atom tmp_atom = newbasis[i]; //DX 20191011 - initialized instead of setting individually below
+      //DX 20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
+      //DX 20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
+      //DX 20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
+      //DX 20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
+      //DX 20191011 [OBSOLETE] tmp_atom.name_is_given = true;
+      //DX 20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
+      tmp_atom.spin_is_given = false; // DX 9/21/17 - magnetic sym
+      if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
+        tmp_atom.spin_is_given = true; // DX 9/21/17 - magnetic sym
       }
-      tmp.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-      tmp.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
-      if(aurostd::abs(tmp.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(3))>_ZERO_TOL_){
-        tmp.spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
+      if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
+        tmp_atom.noncoll_spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear) //DX 20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
       }
-      (*this).AddAtom(tmp);
+      (*this).AddAtom(tmp_atom);
     }
   }
   (*this).num_each_type = numtypes;
@@ -1157,15 +1157,15 @@ namespace SYM {
       //cerr << "lattice point: " << expanded_lattice_points[i] << endl; //cartesian
       for (uint j = 0; j < xstr.atoms.size(); j++) {  // (OBSOLETE) go from 1 because
 	// the origin at 0 0 0 is taken care of by the expanded lattice
-	_atom tmp;
+	_atom tmp = xstr.atoms[j]; //DX 20191011 initialized instead of setting explictly (below)
 	//tmp.print_RHT = true; //CO190405 - get rid of this!
 	tmp.cpos = expanded_lattice_points[i] + F2C(L, xstr.atoms[j].fpos);
-	tmp.name = xstr.atoms[j].name;
-	tmp.type = xstr.atoms[j].type;
-	tmp.spin = xstr.atoms[j].spin; // DX 9/21/17 - magnetic sym
-	tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX 9/21/17 - magnetic sym
-	tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-	tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+	//DX 20191011 [OBSOLETE] tmp.name = xstr.atoms[j].name;
+	//DX 20191011 [OBSOLETE] tmp.type = xstr.atoms[j].type;
+	//DX 20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX 9/21/17 - magnetic sym
+	//DX 20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX 9/21/17 - magnetic sym
+	//DX 20191011 [OBSOLETE] tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+	//DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
 	out.push_back(tmp);
       }
     }
@@ -3247,20 +3247,19 @@ namespace SYM {
 } //namespace SYM
 
 // ********************************************************************************************************************************
-// AFLOW2SG:: Prints space group in string format (Void Input)
+// calculateSpaceGroups()
 // ********************************************************************************************************************************
 namespace SYM {
-  void calculateSpaceGroups(vector<xstructure>& vxstrs){
-    for(uint i=0;i<vxstrs.size();i++){
-      vxstrs[i].SpaceGroup_ITC();
-    }
-  }
-}
+  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index, uint end_index, uint setting){ //DX 20191230 add setting option
 
-namespace SYM {
-  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint& start_index, uint& end_index){
-    for(uint i=start_index;i<=end_index;i++){
-      vxstrs[i].SpaceGroup_ITC();
+    bool no_scan = false;
+
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute symmetry analysis for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=vxstrs.size(); }
+
+    for(uint i=start_index;i<end_index;i++){ //DX 20191108 - [switching from compare::splitTaskIntoThreads to getThreadDistribution, end index conventions differ, <= vs <]
+      double use_tol = SYM::defaultTolerance(vxstrs[i]);
+      vxstrs[i].SpaceGroup_ITC(use_tol, -1, setting, no_scan);
     }
   }
 }

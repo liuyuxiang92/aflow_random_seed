@@ -677,6 +677,10 @@ namespace anrl {
     //part2:0
     //part2:1
     //...
+    
+    string function_name = "anrl::getANRLParameters()";
+    stringstream message;
+
     vector<string> tokens;
     vector<string> vparameters;
     
@@ -1164,7 +1168,8 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_tI2_139_a"){
-        vparameters.push_back("4.6002,1.07523585931");
+        //DX 20191218 [this is the a' parameter (fct) vs the a parameter (bct)] vparameters.push_back("4.6002,1.07523585931");
+        vparameters.push_back("3.25283,1.52061313499"); //DX 20191218 [CORRECT PARAMETERS]
         vparameters.push_back("3.932,0.823499491353");
       }
       // ---------------------------------------------------------------------------
@@ -3072,17 +3077,17 @@ namespace anrl {
           vparameters=tmp;
         }
         else{
-          cerr << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices." << endl;
-          exit(1);
+          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
-        cerr << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
+        message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
         for(uint i=0;i<vparameters.size();i++){
-          cerr << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
+          message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
         }   
-        cerr << "Rerun command and specify the parameters or the preset suffix, e.g., ./aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1 << endl;
-        exit(1);
+        message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }
     }
     return vparameters;  
