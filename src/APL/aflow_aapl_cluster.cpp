@@ -1048,7 +1048,7 @@ vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
     ineq_dists[iat].atoms = atoms; 
     int cl = 0;
     for (cl = 0; cl < (int) clusters.size(); cl++) {
-      int a;
+      int a = 0;
       for (a = 0; a < order; a++) {
         if (clusters[cl].atoms[a] != at) break;
       }
