@@ -768,7 +768,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
   const xstructure& pcell = _pc.getInputCellStructure();
   uint natoms = pcell.atoms.size();
   vector<double> pearson(natoms);
-  uint at;
+  uint at = 0;
   for (at = 0; at < natoms; at++) pearson[at] = GetPearsonCoefficient(pcell.atoms[at].atomic_number);
 
   vector<double> frequencies(nQPs), weights(nQPs);
