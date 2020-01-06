@@ -697,7 +697,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
             e = 0;
             for (j = 0; j < 3; j++) e += scell.sc2pcMap(atoms[j]) * atpowers[j];
             for (crt = 0; crt < ncart; crt++) {
-              // Perform multiplication expliclty in place instead of using xcomplex.
+              // Perform multiplication explicitly in place instead of using xcomplex.
               // This is three times faster because constructors and destructors are not called.
               matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
               matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
