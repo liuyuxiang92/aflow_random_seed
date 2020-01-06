@@ -6842,7 +6842,7 @@ bool POccStructuresFile::getARUNDirectories(vector<string>& ARUN_directories,boo
   if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccStructuresFile not initialized",_RUNTIME_ERROR_);}
 
   ARUN_directories.clear();
-  uint i=0,iline;
+  uint i=0,iline=0;
   bool missing_tag=false; //very important, if we cannot find the tag for the structures_unique, we must read in structures_all to get total number of structures
   string arun_directory="",pocc_directory_abs="";
   vector<string> vtokens;
