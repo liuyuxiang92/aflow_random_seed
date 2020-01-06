@@ -1401,7 +1401,7 @@ namespace aurostd {
     for(int i=counter+1;i<=vab.urows;i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
   }
   void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd){
-    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INPUT_NUMBER_);}
+    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INDEX_ILLEGAL_);}
     xvector<int> vx(va.urows,va.lrows),vy(va.urows,va.lrows);
     return GCD(va,vb,vgcd,vx,vy);
   }
