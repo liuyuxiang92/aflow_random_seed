@@ -3310,71 +3310,71 @@ namespace aurostd {
   //  the shortest possible basis. See Lecture notes in computer science, ISSN 0302-974, ANTS - VI : algorithmic
   //  number theory, 2004, vol. 3076, pp. 338-357 ISBN 3-540-22156-5
   template<class utype> utype
-  reduce_to_shortest_basis(const xmatrix<utype>& IN,xmatrix<utype>& OUT,utype eps,bool VERBOSE) {
-    string soliloquy="aurostd::reduce_to_shortest_basis():";  //CO191201
-    xvector<utype> A(3),B(3),C(3);
-    xmatrix<utype> check(3,3);
-    //[CO191201 - OBSOLETE]bool err;
-    utype od,odnew;
-    int ii=0,iimax=10000;
-    // IN has colum-vectors
-    for(int i=1;i<=3;i++) {
-      A(i)=IN(i,1); // 1st vector
-      B(i)=IN(i,2); // 2nd vector
-      C(i)=IN(i,3); // 3rd vector
-    }
-    odnew=orthogonality_defect(IN);
-    if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: Before reduction, the orthogonality defect of the basis was " << odnew << endl;
-    bool goexit=FALSE;
-    while(goexit==FALSE) {
-      od=odnew;
-      reduce_A_in_ABC(A,B,C,eps);
-      reduce_A_in_ABC(B,C,A,eps);
-      reduce_A_in_ABC(C,A,B,eps);
+    reduce_to_shortest_basis(const xmatrix<utype>& IN,xmatrix<utype>& OUT,utype eps,bool VERBOSE) {
+      string soliloquy="aurostd::reduce_to_shortest_basis():";  //CO191201
+      xvector<utype> A(3),B(3),C(3);
+      xmatrix<utype> check(3,3);
+      //[CO191201 - OBSOLETE]bool err;
+      utype od,odnew;
+      int ii=0,iimax=10000;
+      // IN has colum-vectors
       for(int i=1;i<=3;i++) {
-	OUT(i,1)=A(i);OUT(i,2)=B(i);OUT(i,3)=C(i);
+        A(i)=IN(i,1); // 1st vector
+        B(i)=IN(i,2); // 2nd vector
+        C(i)=IN(i,3); // 3rd vector
       }
-      odnew=orthogonality_defect(OUT);
-      // write(*,'("OD: ",2(f7.3,1x))') odnew, od
-      //      cerr << od << " " << odnew << endl;
-      if(aurostd::abs(od-odnew)<eps) goexit=TRUE;
-      if(ii++>iimax) goexit=TRUE;
-      //     if(ii++>iimax) {OUT=IN;return orthogonality_defect(OUT);}
+      odnew=orthogonality_defect(IN);
+      if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: Before reduction, the orthogonality defect of the basis was " << odnew << endl;
+      bool goexit=FALSE;
+      while(goexit==FALSE) {
+        od=odnew;
+        reduce_A_in_ABC(A,B,C,eps);
+        reduce_A_in_ABC(B,C,A,eps);
+        reduce_A_in_ABC(C,A,B,eps);
+        for(int i=1;i<=3;i++) {
+          OUT(i,1)=A(i);OUT(i,2)=B(i);OUT(i,3)=C(i);
+        }
+        odnew=orthogonality_defect(OUT);
+        // write(*,'("OD: ",2(f7.3,1x))') odnew, od
+        //      cerr << od << " " << odnew << endl;
+        if(aurostd::abs(od-odnew)<eps) goexit=TRUE;
+        if(ii++>iimax) goexit=TRUE;
+        //     if(ii++>iimax) {OUT=IN;return orthogonality_defect(OUT);}
+      }
+      // [OBSOLETE]    matrix_inverse(OUT,check,err);
+      //[CO191201 - OBSOLETE]err=aurostd::inverse(OUT,check);
+      //[CO191201 - OBSOLETE]if(err==TRUE) { 
+      //[CO191201 - OBSOLETE]  cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: OUT matrix is singular in reduce_to_shortest_basis" << endl;
+      //[CO191201 - OBSOLETE]  exit(0);
+      //[CO191201 - OBSOLETE]}
+      if(aurostd::isNonInvertible(OUT)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"OUT matrix is singular in reduce_to_shortest_basis",_VALUE_RANGE_);} //CO191201
+      check=aurostd::inverse(OUT);
+      //  Check that the conversion from old to new lattice vectors is still an integer matrix
+      if(sum(abs(check*IN-nint(check*IN)))>eps) { 
+        cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: ERROR: Reduced lattice vectors in reduce_to_shortest_basis changed the original lattice" << endl;
+        exit(0);
+      }
+      if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: After reduction, the orthogonality defect of the basis is " << orthogonality_defect(OUT) << endl;
+      //GH if we have a left-handed basis, then exchange two vectors so that the basis is right-handed (I don't care but VASP does...Why?)
+      if(aurostd::det(OUT)<eps) {
+        utype temp;
+        for(int i=1;i<=3;i++) {temp=OUT(i,1);OUT(i,1)=OUT(i,2);OUT(i,2)=temp;} // swap 1st with 2nd vector
+      }
+      // OUT has colum-vectors
+      return orthogonality_defect(OUT);
     }
-    // [OBSOLETE]    matrix_inverse(OUT,check,err);
-    //[CO191201 - OBSOLETE]err=aurostd::inverse(OUT,check);
-    //[CO191201 - OBSOLETE]if(err==TRUE) { 
-    //[CO191201 - OBSOLETE]  cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: OUT matrix is singular in reduce_to_shortest_basis" << endl;
-    //[CO191201 - OBSOLETE]  exit(0);
-    //[CO191201 - OBSOLETE]}
-    if(aurostd::isNonInvertible(OUT)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"OUT matrix is singular in reduce_to_shortest_basis",_VALUE_RANGE_);} //CO191201
-    check=aurostd::inverse(OUT);
-    //  Check that the conversion from old to new lattice vectors is still an integer matrix
-    if(sum(abs(check*IN-nint(check*IN)))>eps) { 
-      cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: ERROR: Reduced lattice vectors in reduce_to_shortest_basis changed the original lattice" << endl;
-      exit(0);
-    }
-    if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: After reduction, the orthogonality defect of the basis is " << orthogonality_defect(OUT) << endl;
-    //GH if we have a left-handed basis, then exchange two vectors so that the basis is right-handed (I don't care but VASP does...Why?)
-    if(aurostd::det(OUT)<eps) {
-      utype temp;
-      for(int i=1;i<=3;i++) {temp=OUT(i,1);OUT(i,1)=OUT(i,2);OUT(i,2)=temp;} // swap 1st with 2nd vector
-    }
-    // OUT has colum-vectors
-    return orthogonality_defect(OUT);
-  }
 
   template<class utype> xmatrix<utype>
-  reduce_to_shortest_basis(const xmatrix<utype>& IN,utype eps,bool VERBOSE) {
-    xmatrix<utype> newbasis(3,3);
-    reduce_to_shortest_basis(IN,newbasis,eps,VERBOSE);
-    return newbasis;
-  }
-   
+    reduce_to_shortest_basis(const xmatrix<utype>& IN,utype eps,bool VERBOSE) {
+      xmatrix<utype> newbasis(3,3);
+      reduce_to_shortest_basis(IN,newbasis,eps,VERBOSE);
+      return newbasis;
+    }
+
   template<class utype> xmatrix<utype>
-  reduce_to_shortest_basis(const xmatrix<utype>& IN) {
-    return reduce_to_shortest_basis(IN,(utype)_DEFAULT_EPS_BASIS_REDUCE_,FALSE);
-  }
+    reduce_to_shortest_basis(const xmatrix<utype>& IN) {
+      return reduce_to_shortest_basis(IN,(utype)_DEFAULT_EPS_BASIS_REDUCE_,FALSE);
+    }
 }
 
 //*****************************************************************************
