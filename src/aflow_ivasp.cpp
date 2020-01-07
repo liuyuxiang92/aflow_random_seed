@@ -4222,6 +4222,7 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_ADJUST_ICHARG
 namespace KBIN {
+  // ME191028
   // When a CHGCAR file is specified in the aflow.in file, it is really only
   // useful in the first relxation calculations. For all other calculations,
   // it should not read from that CHGCAR file, so set ICHARG = 2 and comment
