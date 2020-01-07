@@ -2405,6 +2405,12 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
 void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX 20191122
 
+//makefile tests
+bool gcdTest(ostream& oss=cout);
+bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool smithTest(ostream& oss=cout);
+bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
+
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -3110,6 +3116,7 @@ class xDOSCAR {
   bool GetProperties(const string& stringIN,bool=TRUE);                   // get everything QUIET
   bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
   bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  void convertSpinOFF2ON(); //CO191217 - copies everything from spin channel 1 to spin channel 2
   bool checkDOS(string& ERROR_out) const;  //CO191010
   bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-3,double occ_tol=1e-4); //CO191110
   deque<deque<deque<deque<double> > > > GetVDOSSpecies(const xstructure& xstr) const; //vDOS.at(species).at(spin).at(energy_number)  //CO191110

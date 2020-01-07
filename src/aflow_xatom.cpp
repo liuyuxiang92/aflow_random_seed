@@ -12198,6 +12198,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
   stringstream message;
 
   if(LDEBUG) {cerr << soliloquy << " fixing volume" << endl;}
+  if(LDEBUG) {cerr << soliloquy << " volume_orig=" << GetVolume() << endl;}
   double volume=0; //,voli=0;
   bool use_AFLOW_defaults=use_AFLOW_defaults_in;
   //try and pull from species_volume first
@@ -12242,6 +12243,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
   }
   SetVolume(volume);
+  if(LDEBUG) {cerr << soliloquy << " volume_new=" << GetVolume() << endl;}
 }
 
 // ***************************************************************************

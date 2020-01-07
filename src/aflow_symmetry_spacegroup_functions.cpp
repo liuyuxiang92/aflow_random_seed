@@ -257,19 +257,13 @@ namespace SYM {
 namespace SYM {
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num) {
     split_atom_types = SYM::break_up_by_type(atomic_basis);
-    if(split_atom_types.size() > 1) {
+    if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::getAtomGCD():","split_atom_types.size()==0",_INPUT_ERROR_);}
+    gcd_num=1;  //CO+DX191201
+    if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
+      gcd_num=(int)split_atom_types[0].size();  //CO+DX191201
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
-        if(p == 0) {
-          //DX 20191202 [OBSOLETE] GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
-          gcd_num = aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size()); //DX 20191202 [OBSOLETE]
-        } else {
-          //DX 20191202 [OBSOLETE] GCD = gcdD(GCD, (int)split_atom_types[p + 1].size());
-          gcd_num = aurostd::GCD(gcd_num, (int)split_atom_types[p + 1].size()); //DX 20191202
-        }
+        aurostd::GCD(gcd_num, (int)split_atom_types[p + 1].size(),gcd_num);  //CO191201
       }
-    } else {
-      // If only one type of atom, set to 1
-      gcd_num = 1;
     }
     return true;
   }
@@ -4675,15 +4669,12 @@ namespace SYM {
       return false;
     }
     bool consistent_ratio = true;
-    int GCD_num = 0;
-    if(split_atom_types.size() > 1) {
+    if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::GCD_conventional_atomic_basis():","split_atom_types.size()==0",_INPUT_ERROR_);}
+    int GCD_num = 1;  //CO+DX191201
+    if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
+      GCD_num=(int)split_atom_types[0].size();  //CO+DX191201
       for (uint p = 0; p < split_atom_types.size() - 1; p++) {
-        if(p == 0) {
-          //DX 20191125 [OBSOLETE] GCD = gcdD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
-          GCD_num = aurostd::GCD((int)split_atom_types[p].size(), (int)split_atom_types[p + 1].size());
-        } else {
-          GCD_num = aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size());
-        }
+        aurostd::GCD(GCD_num, (int)split_atom_types[p + 1].size(),GCD_num); //CO191201
       }
       for (uint p = 0; p < prim_split_atom_types.size(); p++) {
         for (uint s = 0; s < split_atom_types.size(); s++) {

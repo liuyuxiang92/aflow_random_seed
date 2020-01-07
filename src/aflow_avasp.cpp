@@ -1803,6 +1803,8 @@ bool AVASP_MakeSingleAFLOWIN_181226(_xvasp& xvasp_in,stringstream &_aflowin,bool
     }
   }
 
+  if(system.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No system name information found",_INPUT_ILLEGAL_);}  //CO200102
+
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[11]" << endl;
 
   bool AFLOWIN_OLD=FALSE;
