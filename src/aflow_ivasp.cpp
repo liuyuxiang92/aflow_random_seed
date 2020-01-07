@@ -4252,7 +4252,10 @@ namespace KBIN {
         string line = "";
         for (int l = 1; l <= nlines; l++) {
           line = aurostd::GetLineString(filecontent, l);
-          if ((line[0] != '#') && (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line))) aflowin_fixed << "#";
+          if (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line)) {
+            string line_fixed = aurostd::RemoveWhiteSpacesFromTheFront(line);
+            if (line_fixed[0] != '#') line = "#" + line_fixed;
+          }
           aflowin_fixed << line << std::endl;
         }
         aurostd::stringstream2file(aflowin_fixed, filename);

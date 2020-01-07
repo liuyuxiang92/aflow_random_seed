@@ -27,12 +27,6 @@
 static const string _AAPL_TCOND_ERR_PREFIX_ = "apl::TCONDCalculator::";
 
 static const int max_iter = 250;  // Maximum number of iterations for the iterative BTE solution
-
-// Define constants and conversion factors. See AUROSTD/aurostd_xscalar.h for more.
-static const double au2THz = 9.648553873170e+02;  // eV/(A amu) -> nm * THz^2
-static const double hbar_J = E_ELECTRON * 1e12 * PLANCKSCONSTANTEV_hbar;  // hbar in J/THz;
-static const double hbar_amu = PLANCKSCONSTANTEV_hbar * au2THz * 1e13;  // hbar in amu A^2 THz
-static const double BEfactor = PLANCKSCONSTANTEV_hbar * 1e12/KBOLTZEV;  // hbar/kB in K/THz
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
 static const double TCOND_ITER_THRESHOLD = 1e-4;  // Convergence criterion for thermal conductivity
 
@@ -414,7 +408,7 @@ double TCONDCalculator::calculateAverageGrueneisen(double T,
   vector<vector<double> > occ = getOccupationNumbers(T);
   int iq = 0;
   double c, c_tot = 0, g_tot = 0;
-  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2));
+  double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2));
   for (int q = 0; q < nQPs; q++) {
     iq = _qm.getIbzqpt(q);
     for (int br = 0; br < nBranches; br++) {
@@ -593,7 +587,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   uint nbr = branches.size();
 
   // Units are chosen so that probabilities are in THz (1/ps)
-  const double probability_prefactor = std::pow(au2THz * 10.0, 2) * hbar_amu * PI/4.0;
+  const double probability_prefactor = std::pow(au2THz * 10.0, 2) * PLANCKSCONSTANTAMU_hbar_THz * PI/4.0;
   const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
 
   // Prepare precomputation of eigenvalue products
@@ -1043,7 +1037,7 @@ vector<vector<double> > TCONDCalculator::getOccupationNumbers(double T) {
   vector<vector<double> > occ(nQPs, vector<double>(nBranches, 0.0));
   for (int q = 0; q < nQPs; q++) {
     for (int br = 0; br < nBranches; br++) {
-      occ[q][br] = 1.0/(exp(BEfactor * freq[q][br]/T) - 1.0);
+      occ[q][br] = 1.0/(exp(BEfactor_hbar_THz * freq[q][br]/T) - 1.0);
     }
   }
   return occ;
@@ -1154,7 +1148,7 @@ xmatrix<double> TCONDCalculator::calcTCOND(double T, const vector<vector<double>
   xmatrix<double> tcond(3, 3);
   bool cumulative = calc_options.flag("CUMULATIVEK");
   double grain_size = aurostd::string2utype<double>(calc_options.getattachedscheme("GRAIN_SIZE"));
-  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc.getInputCellStructure()));
+  double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc.getInputCellStructure()));
   for (int q = 0; q < nQPs; q++) {
     for (int br = 0; br < nBranches; br++) {
       bool include = true;

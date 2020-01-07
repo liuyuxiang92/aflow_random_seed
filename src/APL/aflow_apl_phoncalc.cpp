@@ -1617,8 +1617,8 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononCalculator::writeDYNMAT() {
-    string filename = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE;  //ME181226
-    _logger << "Writing forces into file " << aurostd::CleanFileName(filename) << "." << apl::endl; //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
+    _logger << "Writing forces into file " << filename << "." << apl::endl; //ME181226
 
     //
     //CO - START
@@ -2019,7 +2019,7 @@ namespace apl {
     //CO, we already checked that it exists before, just open
 
     vector<string> vlines;                           //CO
-    string hibfile = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+    string hibfile = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
     // Decompress
     //bool isXMLCompressed = aurostd::FileExist(string("apl.xml.EXT")); //CO
