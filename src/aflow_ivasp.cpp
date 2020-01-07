@@ -4222,17 +4222,25 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_ADJUST_ICHARG
 namespace KBIN {
+  // When a CHGCAR file is specified in the aflow.in file, it is really only
+  // useful in the first relxation calculations. For all other calculations,
+  // it should not read from that CHGCAR file, so set ICHARG = 2 and comment
+  // out the original CHGCAR file. Exception: if a CHGCAR file is output
+  // after the relaxation, assume that the user wants to reuse it.
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, int step, ofstream& FileMESSAGE) {
     if ((step == 1) && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
-      ostringstream aus;
-      aus << "00000  MESSAGE ICHARG: ICHARG will be set to 2 - " << Message(aflags, "user,host,time") << std::endl;
-      aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
-      KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 2, 0.0, false);
-      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
-      xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
-      xvasp.INCAR_orig.str(std::string());
-      xvasp.INCAR_orig << xvasp.INCAR.str();
-      aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+      // Do not set ICHARG = 2 when a CHGCAR file is output
+      if (!vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
+        ostringstream aus;
+        aus << "00000  MESSAGE ICHARG: ICHARG will be set to 2 - " << Message(aflags, "user,host,time") << std::endl;
+        aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 2, 0.0, false);
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
+        xvasp.INCAR_orig.str(std::string());
+        xvasp.INCAR_orig << xvasp.INCAR.str();
+        aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+      }
 
       // Comment out CHGCAR file in aflow.in
       if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
