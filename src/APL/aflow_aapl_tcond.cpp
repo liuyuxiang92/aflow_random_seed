@@ -604,7 +604,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
   uint nateigen = at_eigen.size();
   vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
-  for (int j = 0; j < 2; j++) atpowers[j] = (int) std::pow(natoms, 2 - j);
+  for (int j = 0; j < 2; j++) atpowers[j] = aurostd::powint(natoms, 2 - j);
 
   // Precompute the indices of -q to use for inversion symmetry
   vector<int> q_minus(nQPs);
@@ -732,7 +732,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                   intr_trans_probs[i].push_back(transprob);
                   // Transposition symmetry
                   proc[0] = -(lq + 1);
-                  proc[1] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                  proc[1] = branches[br][0] * aurostd::powint(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
                 } else {  // +
@@ -742,7 +742,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                     proc[1] = br;
                   } else{
                     proc[0] = q_minus[lq] + 1;
-                    proc[1] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                    proc[1] = branches[br][0] * aurostd::powint(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
                   }
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
@@ -973,7 +973,7 @@ void TCONDCalculator::getProcess(const vector<int>& process, vector<int>& qpts,
   int br = process[1];
   int pw = 0;
   for (int i = 0; i < 2; i++) {
-    pw = (int) std::pow(nBranches, 2 - i);
+    pw = aurostd::powint(nBranches, 2 - i);
     branches[i] = br/pw;
     br = br % pw;
   }

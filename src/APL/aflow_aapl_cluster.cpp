@@ -79,7 +79,7 @@ ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
   // quick, they are not stored in the output file
   distortion_vectors = getCartesianDistortionVectors();
   permutations = getPermutations(order);
-  nifcs = (int) std::pow(3, order);
+  nifcs = aurostd::powint(3, order);
 }
 
 // Default constructor
