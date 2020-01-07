@@ -4245,7 +4245,9 @@ namespace KBIN {
       if (xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
         xvasp.INCAR_orig.str(std::string());
         xvasp.INCAR_orig << xvasp.INCAR.str();
-        aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+        if (step != xvasp.NRELAX) {  // Do not write when at the last step or there will be an extra INCAR
+          aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+        }
       }
 
       // Comment out CHGCAR file in aflow.in
@@ -4293,7 +4295,9 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
       xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-      aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      if (step != xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+        aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      }
       // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
     }
     if(fix_aflowlin) {
