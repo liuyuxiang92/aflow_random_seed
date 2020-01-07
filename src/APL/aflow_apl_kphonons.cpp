@@ -138,7 +138,12 @@ void RunPhonons_APL(_xinput& xinput,
                     _kflags& kflags,
                     _xflags& xflags, 
                     ofstream& messageFile) {
-  return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
+  // ME200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+  try {
+    return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
+  } catch (aurostd::xerror e) {
+    pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, std::cout, _LOGGER_ERROR_);
+  }
 }
 void RunPhonons_APL_181216(_xinput& xinput,
                     string AflowIn,
