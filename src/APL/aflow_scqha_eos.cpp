@@ -200,15 +200,15 @@ namespace apl
       threads.push_back( new std::thread(&SCQHAEOS::calculate_derivative,this,startIndex,endIndex) );
     }
 
-     //OBSOLETE ME180801
-     //for(int icpu = 0; icpu < ncpus; icpu++) {
-     //startIndex = icpu * qpointsPerCPU;
-     //endIndex = startIndex + qpointsPerCPU;
-     //if( ( (uint)endIndex > _freq0.size() ) ||
-     //( ( icpu == ncpus-1 ) && ( (uint)endIndex < _freq0.size() ) ) )
-     //endIndex = _freq0.size();
-     //threads.push_back( new std::thread(&SCQHAEOS::calculate_derivative,this,startIndex,endIndex) );
-     //}
+    //OBSOLETE ME180801
+    //for(int icpu = 0; icpu < ncpus; icpu++) {
+    //startIndex = icpu * qpointsPerCPU;
+    //endIndex = startIndex + qpointsPerCPU;
+    //if( ( (uint)endIndex > _freq0.size() ) ||
+    //( ( icpu == ncpus-1 ) && ( (uint)endIndex < _freq0.size() ) ) )
+    //endIndex = _freq0.size();
+    //threads.push_back( new std::thread(&SCQHAEOS::calculate_derivative,this,startIndex,endIndex) );
+    //}
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
