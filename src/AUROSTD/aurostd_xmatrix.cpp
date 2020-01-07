@@ -987,8 +987,7 @@ namespace aurostd {  // namespace aurostd
     } else if (_mode_ == 0) {  // absolute tolerance (faster) DEFAULT
       for (int i = a.lrows, ii = b.lrows; i <= a.urows; i++, ii++) {
         for (int j = a.lcols, jj = b.lcols; j <= a.ucols; j++, jj++) {
-          if (abs(a[i][j].re - b[ii][jj].re) >= _tol_) return false;
-          if (abs(a[i][j].im - b[ii][jj].im) >= _tol_) return false;
+          if (isdifferent(a, b, _tol_)) return false;
         }
       }
     } else {  // unknown mode

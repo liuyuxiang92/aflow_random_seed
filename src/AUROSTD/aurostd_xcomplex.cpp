@@ -55,6 +55,35 @@ namespace aurostd {
     return *this;
   }
   
+  // ME200107 - BEGIN
+  template<class utype>
+  bool identical(const xcomplex<utype>& a, const xcomplex<utype>&b, utype _tol_) {
+    if (abs(a.re - b.re) > _tol_) return false;
+    if (abs(a.im - b.im) > _tol_) return false;
+    return true;
+  }
+
+  template<class utype>
+  bool isdifferent(const xcomplex<utype>& a, const xcomplex<utype>&b, utype _tol_) {
+    return !identical(a, b, _tol_);
+  }
+
+  template<class utype>
+  bool isdifferent(const xcomplex<utype>& a, const xcomplex<utype>&b) {
+    return !identical(a, b, (utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+  }
+
+  template<class utype>
+  bool isequal(const xcomplex<utype>& a, const xcomplex<utype>&b, utype _tol_) {
+    return identical(a, b, _tol_);
+  }
+
+  template<class utype>
+  bool isequal(const xcomplex<utype>& a, const xcomplex<utype>&b) {
+    return identical(a, b, (utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+  }
+  // ME200107 - END
+
   // namespace aurostd
   //   template<class utype>                            // operator <<  xcomplex<>
   //   std::ostream& operator<< (std::ostream& buf,const xcomplex<utype>& x) {
