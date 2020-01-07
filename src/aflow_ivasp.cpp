@@ -3978,7 +3978,7 @@ namespace KBIN {
 	} else {
 	  if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
 	  if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
-	  if(aurostd::substring2bool(strline,"MAGMOM")) {cerr << strline << endl;}        //corey
+	  //if(aurostd::substring2bool(strline,"MAGMOM")) {cerr << strline << endl;}        //corey
 	  if(aurostd::substring2bool(strline,"MAGMOM") && !aurostd::substring2bool(strline,"#MAGMOM")) {MAGMOM_ALREADY_SPECIFIED=TRUE;}       //corey
 	}
       }
@@ -4177,9 +4177,12 @@ namespace KBIN {
           if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << std::endl;
         }
       }
-      if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] begin" << std::endl;
-      xvasp.INCAR << "ICHARG=" << ivalue << std::endl;
-      if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] end" << std::endl;
+      // Use negative values to just remove ICHARG
+      if (ivalue >= 0) {
+        if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] begin" << std::endl;
+        xvasp.INCAR << "ICHARG=" << ivalue << std::endl;
+        if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] end" << std::endl;
+      }
       DONE = true;
     }
 
@@ -4233,11 +4236,13 @@ namespace KBIN {
       // Do not set ICHARG = 2 when a CHGCAR file is output
       if (!vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
         ostringstream aus;
-        aus << "00000  MESSAGE ICHARG: ICHARG will be set to 2 - " << Message(aflags, "user,host,time") << std::endl;
+        aus << "00000  MESSAGE ICHARG: Removing ICHARG - " << Message(aflags, "user,host,time") << std::endl;
         aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
-        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 2, 0.0, false);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", -1, 0.0, false);
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
         xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
+      }
+      if (xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
         xvasp.INCAR_orig.str(std::string());
         xvasp.INCAR_orig << xvasp.INCAR.str();
         aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
