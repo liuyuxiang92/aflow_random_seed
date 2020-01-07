@@ -6,20 +6,19 @@
 // ***************************************************************************
 // Written by Pinku Nath
 // pn49@duke.edu
-/*
- This class creates aflow.in files for QHA, SCQHA, and QHA3P methods.
-*/
+
+// This class creates aflow.in files for QHA, SCQHA, and QHA3P methods.
 
 #include "aflow_apl.h"
 
 namespace apl {
   // ***************************************************************************************
   QHA_AFLOWIN_CREATOR::QHA_AFLOWIN_CREATOR(Supercell& sc, vector<ClusterSet>& clst,
-                                           _xinput& xinput, //_xvasp& xvasp,
-					   _aflags& aflags, _kflags& kflags,
-					   _xflags& xflags, //_vflags& vflags,
-					   string& AflowIn,
-					   Logger& l) : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) { //xvasp, aflags, kflags, vflags, l) {
+      _xinput& xinput, //_xvasp& xvasp,
+      _aflags& aflags, _kflags& kflags,
+      _xflags& xflags, //_vflags& vflags,
+      string& AflowIn,
+      Logger& l) : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) { //xvasp, aflags, kflags, vflags, l) { //[CO200106 - close bracket for indenting]}
     clear();
     _log.open(_logfile.c_str());
     if (!_log.is_open()) {
@@ -132,37 +131,37 @@ namespace apl {
       _is_eos_B=false; 
       _is_eos_C=true;
     }
- 
+
     //error check
     if(_scqha_vol_distortion==0) 
-      {
-	if(_is_sc_gp_on){
-          // ME191031 - use xerror
-	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp is on.");
-	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
-          string message = "scqha_distortion==0 but _is_sc_gp is on.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-	} else if(_is_sc_gp_A_on){
-          // ME191031 - use xerror
-	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_A is on.");
-	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
-          string message = "scqha_distortion==0 but _is_sc_gp_A is on.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-	} else if(_is_sc_gp_B_on){
-          // ME191031 - use xerror
-	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_B is on.");
-	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
-          string message = "scqha_distortion==0 but _is_sc_gp_B is on.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-	} else if(_is_sc_gp_C_on){
-          // ME191031 - use xerror
-	  //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_C is on.");
-	  string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
-          string message = "scqha_distortion==0 but _is_sc_gp_C is on.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-	}
+    {
+      if(_is_sc_gp_on){
+        // ME191031 - use xerror
+        //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp is on.");
+        string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+        string message = "scqha_distortion==0 but _is_sc_gp is on.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      } else if(_is_sc_gp_A_on){
+        // ME191031 - use xerror
+        //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_A is on.");
+        string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+        string message = "scqha_distortion==0 but _is_sc_gp_A is on.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      } else if(_is_sc_gp_B_on){
+        // ME191031 - use xerror
+        //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_B is on.");
+        string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+        string message = "scqha_distortion==0 but _is_sc_gp_B is on.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      } else if(_is_sc_gp_C_on){
+        // ME191031 - use xerror
+        //throw APLRuntimeError("apl::QHA_AFLOWIN_CREATOR::run_qha(): scqha_distortion==0 but _is_sc_gp_C is on.");
+        string function = "apl::QHA_AFLOWIN_CREATOR::run_qha()";
+        string message = "scqha_distortion==0 but _is_sc_gp_C is on.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
-   
+    }
+
     //set index for anisotropic distortion
     if(_is_gp_A_on || _is_sc_gp_A_on || _is_eos_A)_lattice_index=1;
     else if(_is_gp_B_on || _is_sc_gp_B_on || _is_eos_B)_lattice_index=2;
@@ -187,13 +186,13 @@ namespace apl {
 
     if(_is_eos){
       if(_is_gp_on || _is_gp_A_on || _is_gp_B_on || _is_gp_C_on){
-	create_aflowin_phonon(0, 2);
+        create_aflowin_phonon(0, 2);
       }
       create_aflowin_phonon(0, 3);
       _log<<"Equilibrium directory index "<< _zero_index << '\n';
     } else if(_is_eos_A || _is_eos_B || _is_eos_C){
       if(_is_gp_on || _is_gp_A_on || _is_gp_B_on || _is_gp_C_on){
-	create_aflowin_phonon_X(0, 6);
+        create_aflowin_phonon_X(0, 6);
       }
       create_aflowin_phonon_X(0, 7);
       _log<<"Equilibrium directory index "<< _zero_index << '\n';
@@ -242,7 +241,7 @@ namespace apl {
     if(phonon_option==3){
       vector<double> distortions;
       for(double i=Start; i<=End; i+=Inc){
-	distortions.push_back(std::abs(i));
+        distortions.push_back(std::abs(i));
       }
       smallest_distortion=*std::min_element(distortions.begin(), distortions.end());
     }
@@ -263,31 +262,31 @@ namespace apl {
       double volume=scale*scale*scale*det;
 
       if(_iszero(i)){
-	if(phonon_option==0){
-	  _gp_volumes.push_back(volume);
-	} else if(phonon_option==1){
-	  _scqha_volumes.push_back(volume);
-	}
+        if(phonon_option==0){
+          _gp_volumes.push_back(volume);
+        } else if(phonon_option==1){
+          _scqha_volumes.push_back(volume);
+        }
       }
 
       //include equilibrium configuration
       if(phonon_option==3){
-	if((std::abs(i)==smallest_distortion) && (!smallest_distortion_found)){
-	  create_aflowin_static_zero();
-	  smallest_distortion_found=true;
-	  _zero_index=idxRun;
-	}
+        if((std::abs(i)==smallest_distortion) && (!smallest_distortion_found)){
+          create_aflowin_static_zero();
+          smallest_distortion_found=true;
+          _zero_index=idxRun;
+        }
       }
- 
+
       if(_iszero(i))continue;
 
       string runname="";
       if(phonon_option==0 || phonon_option==1){
-	runname=get_phonon_runname(i, distortion);
+        runname=get_phonon_runname(i, distortion);
       } else if(phonon_option==2){
-	runname=get_phonon_runname(i);
+        runname=get_phonon_runname(i);
       } else if(phonon_option==3){
-	runname=get_static_runname(i);
+        runname=get_static_runname(i);
       }
 
       vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
@@ -301,17 +300,17 @@ namespace apl {
       double newvolume=newscale*newscale*newscale*det;
 
       if(phonon_option==0){
-	_gp_dir_names.push_back(runname);
-	_gp_volumes.push_back(newvolume);
+        _gp_dir_names.push_back(runname);
+        _gp_volumes.push_back(newvolume);
       } else if(phonon_option==1){
-	_scqha_volumes.push_back(newvolume);
-	_scqha_dir_names.push_back(runname);
+        _scqha_volumes.push_back(newvolume);
+        _scqha_dir_names.push_back(runname);
       } else if(phonon_option==2){
-	_ph_volumes.push_back(newvolume);
-	_ph_dir_names.push_back(runname);
+        _ph_volumes.push_back(newvolume);
+        _ph_dir_names.push_back(runname);
       } else if(phonon_option==3){
-	_eos_dir_names.push_back(runname);
-	_eos_volumes.push_back(newvolume);
+        _eos_dir_names.push_back(runname);
+        _eos_volumes.push_back(newvolume);
       }
 
       // new scale factor calulation end
@@ -320,19 +319,19 @@ namespace apl {
       vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
       m.clear();
       if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
-	  aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
+          aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
 
       if(phonon_option==2){
-	if (( (_is_sc_gp_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_A_on) && std::abs(i)==_scqha_vol_distortion) ||
-	    ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
+        if (( (_is_sc_gp_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_A_on) && std::abs(i)==_scqha_vol_distortion) ||
+            ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
       }
       _logger<<"Creating "<< runname <<apl::endl;
       if(phonon_option<3){ 
-	write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
+        write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
       } else if(phonon_option==3){ 
-	write_static_OUTPUT(vaspRuns[idxRun]);
+        write_static_OUTPUT(vaspRuns[idxRun]);
       }
-          
+
     }//for loop end
     vaspRuns.clear();
   }
@@ -344,35 +343,35 @@ namespace apl {
 
     if(phonon_option==4){
       if(_is_gp_A_on){ 
-	_logger<<"Creating distorted configurations to calculate Gruneisen-A Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate Gruneisen-A Parameter "<<apl::endl;
       } else if(_is_gp_B_on){ 
-	_logger<<"Creating distorted configurations to calculate Gruneisen-B Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate Gruneisen-B Parameter "<<apl::endl;
       } else if(_is_gp_C_on){ 
-	_logger<<"Creating distorted configurations to calculate Gruneisen-C Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate Gruneisen-C Parameter "<<apl::endl;
       }
     } else if(phonon_option==5){
       if(_is_sc_gp_A_on){ 
-	_logger<<"Creating distorted configurations to calculate SC-Gruneisen-A Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate SC-Gruneisen-A Parameter "<<apl::endl;
       } else if(_is_sc_gp_B_on){ 
-	_logger<<"Creating distorted configurations to calculate SC-Gruneisen-B Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate SC-Gruneisen-B Parameter "<<apl::endl;
       } else if(_is_sc_gp_C_on){ 
-	_logger<<"Creating distorted configurations to calculate SC-Gruneisen-C Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate SC-Gruneisen-C Parameter "<<apl::endl;
       }
     } else if(phonon_option==6){
       if(_is_eos_A){ 
-	_logger<<"Creating distorted configurations to calculate EOS-phonon-A Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate EOS-phonon-A Parameter "<<apl::endl;
       } else if(_is_eos_B){ 
-	_logger<<"Creating distorted configurations to calculate EOS-phonon-B Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate EOS-phonon-B Parameter "<<apl::endl;
       } else if(_is_eos_C){ 
-	_logger<<"Creating distorted configurations to calculate EOS-phonon-C Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate EOS-phonon-C Parameter "<<apl::endl;
       }
     } else if(phonon_option==7){
       if(_is_eos_A){ 
-	_logger<<"Creating distorted configurations to calculate EOS-static-A Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate EOS-static-A Parameter "<<apl::endl;
       } else if(_is_eos_B){ 
-	_logger<<"Creating distorted configurations to calculate EOS-static-B Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate EOS-static-B Parameter "<<apl::endl;
       } else if(_is_eos_C){ 
-	_logger<<"Creating distorted configurations to calculate EOS-static-C Parameter "<<apl::endl;
+        _logger<<"Creating distorted configurations to calculate EOS-static-C Parameter "<<apl::endl;
       }
     }
 
@@ -401,7 +400,7 @@ namespace apl {
     if(phonon_option==7){
       vector<double> distortions;
       for(double i=Start; i<=End; i+=Inc){
-	distortions.push_back(std::abs(i));
+        distortions.push_back(std::abs(i));
       }
       smallest_distortion=*std::min_element(distortions.begin(), distortions.end());
     }
@@ -411,89 +410,89 @@ namespace apl {
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=Start; i<=End; i+=Inc)
-      { 
-	vaspRuns.push_back(_xInput);
-	idxRun = vaspRuns.size()-1;
-	vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
-	xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
-	xvector<double> lattice_X(3,1);
-	for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
-	vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
-	double mod_X=aurostd::modulus(lattice_X);
+    { 
+      vaspRuns.push_back(_xInput);
+      idxRun = vaspRuns.size()-1;
+      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
+      xvector<double> lattice_X(3,1);
+      for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
+      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      double mod_X=aurostd::modulus(lattice_X);
 
 
-	if(_iszero(i)){
-	  if(phonon_option==4){
-	    _gp_volumes.push_back(mod_X);
-	  } else if(phonon_option==5){
-	    _scqha_volumes.push_back(mod_X);
-	  }
-	}
+      if(_iszero(i)){
+        if(phonon_option==4){
+          _gp_volumes.push_back(mod_X);
+        } else if(phonon_option==5){
+          _scqha_volumes.push_back(mod_X);
+        }
+      }
 
-	//include equilibrium configuration
-	if(phonon_option==7){
-	  if((std::abs(i)==smallest_distortion) && (!smallest_distortion_found)){
-	    create_aflowin_static_zero_X();
-	    smallest_distortion_found=true;
-	    _zero_index=idxRun;
-	  }
-	}
+      //include equilibrium configuration
+      if(phonon_option==7){
+        if((std::abs(i)==smallest_distortion) && (!smallest_distortion_found)){
+          create_aflowin_static_zero_X();
+          smallest_distortion_found=true;
+          _zero_index=idxRun;
+        }
+      }
 
-	if(_iszero(i))continue;
+      if(_iszero(i))continue;
 
-	string runname="";
-	if(phonon_option==4 || phonon_option==5){
-	  runname=get_phonon_runname(i, distortion);
-	} else if(phonon_option==6){
-	  runname=get_phonon_runname(i);
-	} else if(phonon_option==7){
-	  runname=get_static_runname(i);
-	}
+      string runname="";
+      if(phonon_option==4 || phonon_option==5){
+        runname=get_phonon_runname(i, distortion);
+      } else if(phonon_option==6){
+        runname=get_phonon_runname(i);
+      } else if(phonon_option==7){
+        runname=get_static_runname(i);
+      }
 
-	vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
+      vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
 
-	//new lattice vectors
-	xvector<double> lattice_X_new=lattice_X;
-	for(int j=1; j<=3; j++){
-	  lattice_X_new[j]= lattice_X[j]+(i*lattice_X[j])/100.00;
-	}
-	mod_X=aurostd::modulus(lattice_X_new);
+      //new lattice vectors
+      xvector<double> lattice_X_new=lattice_X;
+      for(int j=1; j<=3; j++){
+        lattice_X_new[j]= lattice_X[j]+(i*lattice_X[j])/100.00;
+      }
+      mod_X=aurostd::modulus(lattice_X_new);
 
-	for(int j=1; j<=3; j++){
-	  vaspRuns[idxRun].getXStr().lattice[_lattice_index][j]=lattice_X_new[j];
-	}
+      for(int j=1; j<=3; j++){
+        vaspRuns[idxRun].getXStr().lattice[_lattice_index][j]=lattice_X_new[j];
+      }
 
-	if(phonon_option==4){
-	  _gp_dir_names.push_back(runname);
-	  _gp_volumes.push_back(mod_X);
-	} else if(phonon_option==5){
-	  _scqha_volumes.push_back(mod_X);
-	  _scqha_dir_names.push_back(runname);
-	} else if(phonon_option==6){
-	  _ph_volumes.push_back(mod_X);
-	  _ph_dir_names.push_back(runname);
-	} else if(phonon_option==7){
-	  _eos_dir_names.push_back(runname);
-	  _eos_volumes.push_back(mod_X);
-	}
+      if(phonon_option==4){
+        _gp_dir_names.push_back(runname);
+        _gp_volumes.push_back(mod_X);
+      } else if(phonon_option==5){
+        _scqha_volumes.push_back(mod_X);
+        _scqha_dir_names.push_back(runname);
+      } else if(phonon_option==6){
+        _ph_volumes.push_back(mod_X);
+        _ph_dir_names.push_back(runname);
+      } else if(phonon_option==7){
+        _eos_dir_names.push_back(runname);
+        _eos_volumes.push_back(mod_X);
+      }
 
-	_log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
-	vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
-	m.clear();
+      _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
+      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      m.clear();
 
-	if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
-	    aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
-	if(phonon_option==6){
-	  if (( (_is_sc_gp_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_A_on) && std::abs(i)==_scqha_vol_distortion) ||
-	      ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
-	}
-	_logger<<"Creating "<< runname <<apl::endl;
-	if(phonon_option<7){
-	  write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
-	} else if(phonon_option==7){
-	  write_static_OUTPUT(vaspRuns[idxRun]);
-	}
-      }//for loop end
+      if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
+          aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
+      if(phonon_option==6){
+        if (( (_is_sc_gp_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_A_on) && std::abs(i)==_scqha_vol_distortion) ||
+            ((_is_sc_gp_B_on) && std::abs(i)==_scqha_vol_distortion) || ((_is_sc_gp_C_on) && std::abs(i)==_scqha_vol_distortion)) continue;
+      }
+      _logger<<"Creating "<< runname <<apl::endl;
+      if(phonon_option<7){
+        write_phonon_OUTPUT(vaspRuns[idxRun], phonon_option);
+      } else if(phonon_option==7){
+        write_static_OUTPUT(vaspRuns[idxRun]);
+      }
+    }//for loop end
     vaspRuns.clear();
   }
   // ***************************************************************************************
@@ -548,143 +547,143 @@ namespace apl {
     bool scqha_included=false;
 
     if (vlines.size())  
+    {
+      while (line_count < vlines.size())  
       {
-	while (line_count < vlines.size())  
-	  {
-	    line = vlines[line_count++]; 
-	    if(line=="")continue;
-	    if(line[0]=='#')continue;
-	    if(line.find("AFLOW_AAPL") != std::string::npos)continue;
-	    if(line.find("[VASP_POSCAR_MODE_EXPLICIT]START") != std::string::npos){ENTRY=true;}
-	    if(ENTRY){if(line.find("[VASP_POSCAR_MODE_EXPLICIT]STOP") != std::string::npos){ENTRY=false;}}
-	    //
-	    else if(line.find("[VASP_KPOINTS_FILE]KSCHEME=") != std::string::npos){_EOS_KSCHEME=line;outfile<<line<<std::endl;}
-	    else if(line.find("[VASP_KPOINTS_FILE]STATIC_KSCHEME=") != std::string::npos){_EOS_STATIC_KSCHEME=line;outfile<<line<<std::endl;}
-	    //exclude SPRIM from all the subdirectory runs
-	    else if( (line.find("[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM") != std::string::npos) ){}
-	    //phonon entry
-	    else if((line.find("[AFLOW_PHONONS]CALC") != std::string::npos) || (line.find("[AFLOW_APL]CALC") != std::string::npos)) {
-	      outfile<<line<<std::endl;
-            } else if(line.find("NEDOS=") != std::string::npos){
-            } else if(line.find("ENGINE=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("SUPERCELL=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("MINATOMS=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("DISMAG=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("ZEROSTATE=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("POLAR=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("DC=") != std::string::npos){
-	      if(phonon_option==0 || phonon_option==1 || phonon_option==4 || phonon_option==5){
-		outfile<<line<<std::endl;
-	      }
-	    } else if(line.find("DCINITSG=") != std::string::npos){
-	      outfile<<line<<std::endl;
-	    } else if(line.find("DCUSERPATH=") != std::string::npos){
-	      if(phonon_option==0 || phonon_option==1 || phonon_option==4 || phonon_option==5){
-		outfile<<line<<std::endl;
-	      }
-	    } else if(line.find("DOS=") != std::string::npos){
-	      if(phonon_option!=0 &&  phonon_option!=4){
-		outfile<<line<<std::endl;
-	      }
-	    } else if(line.find("GP_DISTORTION=") != std::string::npos){
-	      if(phonon_option==0 || phonon_option==4){
-                outfile << setprecision(2);
-		outfile<<"[AFLOW_APL]GP_DISTORTION="<<_gp_vol_distortion<<std::endl;
-                outfile << setprecision(Set_QHA_Precision);
-                gp_included=true;
-	      }
-	    } else if(line.find("SCQHA_DISTORTION=") != std::string::npos){
-	      if(phonon_option==1 || phonon_option==5){
-                outfile << setprecision(2);
-		outfile<<"[AFLOW_APL]SCQHA_DISTORTION="<<_scqha_vol_distortion<<std::endl;
-                outfile << setprecision(Set_QHA_Precision);
-                scqha_included=true;
-	      }
-	    } else if(line.find("EOS_DISTORTION_RANGE=") != std::string::npos){
-	      if(phonon_option==2 || phonon_option==6){
-                outfile << setprecision(2);
-		outfile<<"[AFLOW_APL]EOS_DISTORTION_RANGE="<<_EOS_VOL_START<<":"<<_EOS_VOL_END<<":"<<_EOS_VOL_INC<<std::endl;
-                outfile << setprecision(Set_QHA_Precision);
-                eos_included=true;
-	      }
-	    } else if((line.find("[AFLOW_PHONONS]") != std::string::npos) || 
-		     (line.find("[AFLOW_APL]") != std::string::npos) || 
-		     (line.find("[AFLOW_QHA]") != std::string::npos)){
-	      if(!include_qha_variables)
-		{
-		  if(phonon_option==0){
-		    outfile<<"[AFLOW_APL]GRUNEISEN_SD=y"<<std::endl;
-		  } else if(phonon_option==1){
-		    outfile<<"[AFLOW_APL]SCQHA_SD=y"<<std::endl;
-		  } else if(phonon_option==2){
-		    outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
-		  } else if(phonon_option==4){
-		    if(_is_gp_A_on){
-		      outfile<<"[AFLOW_APL]GRUNEISEN_A_SD=y"<<std::endl;
-		    } else if(_is_gp_B_on){
-		      outfile<<"[AFLOW_APL]GRUNEISEN_B_SD=y"<<std::endl;
-		    } else if(_is_gp_C_on){
-		      outfile<<"[AFLOW_APL]GRUNEISEN_C_SD=y"<<std::endl;
-		    }
-		  } else if(phonon_option==5){
-		    if(_is_sc_gp_A_on){
-		      outfile<<"[AFLOW_APL]SCQHA_A_SD=y"<<std::endl;
-		    } else if(_is_sc_gp_B_on){
-		      outfile<<"[AFLOW_APL]SCQHA_B_SD=y"<<std::endl;
-		    } else if(_is_sc_gp_C_on){
-		      outfile<<"[AFLOW_APL]SCQHA_C_SD=y"<<std::endl;
-		    }
-		  } else if(phonon_option==6){
-		    if(_is_sc_gp_A_on){
-		      outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
-		    } else if(_is_sc_gp_B_on){
-		      outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
-		    } else if(_is_sc_gp_C_on){
-		      outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
-		    }
-		  }
-		}
-	      include_qha_variables=true;
-	    } else { 
-	      outfile<<line<<std::endl;
-	    }
-	  }
-      } else {
+        line = vlines[line_count++]; 
+        if(line=="")continue;
+        if(line[0]=='#')continue;
+        if(line.find("AFLOW_AAPL") != std::string::npos)continue;
+        if(line.find("[VASP_POSCAR_MODE_EXPLICIT]START") != std::string::npos){ENTRY=true;}
+        if(ENTRY){if(line.find("[VASP_POSCAR_MODE_EXPLICIT]STOP") != std::string::npos){ENTRY=false;}}
+        //
+        else if(line.find("[VASP_KPOINTS_FILE]KSCHEME=") != std::string::npos){_EOS_KSCHEME=line;outfile<<line<<std::endl;}
+        else if(line.find("[VASP_KPOINTS_FILE]STATIC_KSCHEME=") != std::string::npos){_EOS_STATIC_KSCHEME=line;outfile<<line<<std::endl;}
+        //exclude SPRIM from all the subdirectory runs
+        else if( (line.find("[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM") != std::string::npos) ){}
+        //phonon entry
+        else if((line.find("[AFLOW_PHONONS]CALC") != std::string::npos) || (line.find("[AFLOW_APL]CALC") != std::string::npos)) {
+          outfile<<line<<std::endl;
+        } else if(line.find("NEDOS=") != std::string::npos){
+        } else if(line.find("ENGINE=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("SUPERCELL=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("MINATOMS=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("DISMAG=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("ZEROSTATE=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("POLAR=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("DC=") != std::string::npos){
+          if(phonon_option==0 || phonon_option==1 || phonon_option==4 || phonon_option==5){
+            outfile<<line<<std::endl;
+          }
+        } else if(line.find("DCINITSG=") != std::string::npos){
+          outfile<<line<<std::endl;
+        } else if(line.find("DCUSERPATH=") != std::string::npos){
+          if(phonon_option==0 || phonon_option==1 || phonon_option==4 || phonon_option==5){
+            outfile<<line<<std::endl;
+          }
+        } else if(line.find("DOS=") != std::string::npos){
+          if(phonon_option!=0 &&  phonon_option!=4){
+            outfile<<line<<std::endl;
+          }
+        } else if(line.find("GP_DISTORTION=") != std::string::npos){
+          if(phonon_option==0 || phonon_option==4){
+            outfile << setprecision(2);
+            outfile<<"[AFLOW_APL]GP_DISTORTION="<<_gp_vol_distortion<<std::endl;
+            outfile << setprecision(Set_QHA_Precision);
+            gp_included=true;
+          }
+        } else if(line.find("SCQHA_DISTORTION=") != std::string::npos){
+          if(phonon_option==1 || phonon_option==5){
+            outfile << setprecision(2);
+            outfile<<"[AFLOW_APL]SCQHA_DISTORTION="<<_scqha_vol_distortion<<std::endl;
+            outfile << setprecision(Set_QHA_Precision);
+            scqha_included=true;
+          }
+        } else if(line.find("EOS_DISTORTION_RANGE=") != std::string::npos){
+          if(phonon_option==2 || phonon_option==6){
+            outfile << setprecision(2);
+            outfile<<"[AFLOW_APL]EOS_DISTORTION_RANGE="<<_EOS_VOL_START<<":"<<_EOS_VOL_END<<":"<<_EOS_VOL_INC<<std::endl;
+            outfile << setprecision(Set_QHA_Precision);
+            eos_included=true;
+          }
+        } else if((line.find("[AFLOW_PHONONS]") != std::string::npos) || 
+            (line.find("[AFLOW_APL]") != std::string::npos) || 
+            (line.find("[AFLOW_QHA]") != std::string::npos)){
+          if(!include_qha_variables)
+          {
+            if(phonon_option==0){
+              outfile<<"[AFLOW_APL]GRUNEISEN_SD=y"<<std::endl;
+            } else if(phonon_option==1){
+              outfile<<"[AFLOW_APL]SCQHA_SD=y"<<std::endl;
+            } else if(phonon_option==2){
+              outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
+            } else if(phonon_option==4){
+              if(_is_gp_A_on){
+                outfile<<"[AFLOW_APL]GRUNEISEN_A_SD=y"<<std::endl;
+              } else if(_is_gp_B_on){
+                outfile<<"[AFLOW_APL]GRUNEISEN_B_SD=y"<<std::endl;
+              } else if(_is_gp_C_on){
+                outfile<<"[AFLOW_APL]GRUNEISEN_C_SD=y"<<std::endl;
+              }
+            } else if(phonon_option==5){
+              if(_is_sc_gp_A_on){
+                outfile<<"[AFLOW_APL]SCQHA_A_SD=y"<<std::endl;
+              } else if(_is_sc_gp_B_on){
+                outfile<<"[AFLOW_APL]SCQHA_B_SD=y"<<std::endl;
+              } else if(_is_sc_gp_C_on){
+                outfile<<"[AFLOW_APL]SCQHA_C_SD=y"<<std::endl;
+              }
+            } else if(phonon_option==6){
+              if(_is_sc_gp_A_on){
+                outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
+              } else if(_is_sc_gp_B_on){
+                outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
+              } else if(_is_sc_gp_C_on){
+                outfile<<"[AFLOW_APL]EOS_SD=y"<<std::endl;
+              }
+            }
+          }
+          include_qha_variables=true;
+        } else { 
+          outfile<<line<<std::endl;
+        }
+      }
+    } else {
       // ME191031 - use xerror
       //throw apl::APLRuntimeError("apl::PhononCalculator::createGPAFLOWIN(); Cannot open [aflow.in] file.");
-        string function = "apl::PhononCalculator::createGPAFLOWIN()";
-        string message = "Cannot open [" + _AFLOWIN_ + "] file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
-      }
+      string function = "apl::PhononCalculator::createGPAFLOWIN()";
+      string message = "Cannot open [" + _AFLOWIN_ + "] file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
 
-             if(!eos_included)
-            {
-	      if(phonon_option==2 || phonon_option==6){
-                outfile << setprecision(2);
-		outfile<<"[AFLOW_APL]EOS_DISTORTION_RANGE="<<_EOS_VOL_START<<":"<<_EOS_VOL_END<<":"<<_EOS_VOL_INC<<std::endl;
-                outfile << setprecision(Set_QHA_Precision);
-	      }
-             }
-              if(!gp_included)
-             {
-	      if(phonon_option==0 || phonon_option==4){
-                outfile << setprecision(2);
-		outfile<<"[AFLOW_APL]GP_DISTORTION="<<_gp_vol_distortion<<std::endl;
-                outfile << setprecision(Set_QHA_Precision);
-	      }
-             }
-              if(!scqha_included){
-	      if(phonon_option==1 || phonon_option==5){
-                outfile << setprecision(2);
-		outfile<<"[AFLOW_APL]SCQHA_DISTORTION="<<_scqha_vol_distortion<<std::endl;
-                outfile << setprecision(Set_QHA_Precision);
-	      }
+    if(!eos_included)
+    {
+      if(phonon_option==2 || phonon_option==6){
+        outfile << setprecision(2);
+        outfile<<"[AFLOW_APL]EOS_DISTORTION_RANGE="<<_EOS_VOL_START<<":"<<_EOS_VOL_END<<":"<<_EOS_VOL_INC<<std::endl;
+        outfile << setprecision(Set_QHA_Precision);
+      }
+    }
+    if(!gp_included)
+    {
+      if(phonon_option==0 || phonon_option==4){
+        outfile << setprecision(2);
+        outfile<<"[AFLOW_APL]GP_DISTORTION="<<_gp_vol_distortion<<std::endl;
+        outfile << setprecision(Set_QHA_Precision);
+      }
+    }
+    if(!scqha_included){
+      if(phonon_option==1 || phonon_option==5){
+        outfile << setprecision(2);
+        outfile<<"[AFLOW_APL]SCQHA_DISTORTION="<<_scqha_vol_distortion<<std::endl;
+        outfile << setprecision(Set_QHA_Precision);
+      }
     }
 
     outfile << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -713,30 +712,30 @@ namespace apl {
     bool found=false;
     vector<double> dis; dis.clear();
     for(double i=-min_value; i<=min_value; i+=_EOS_VOL_INC)
+    {
+      if(_isequal(std::abs(i), _scqha_vol_distortion))
       {
-	if(_isequal(std::abs(i), _scqha_vol_distortion))
-	  {
-	    found=true;
-	  }
-	double diff=std::abs((std::abs(i)-_scqha_vol_distortion));
-	if(!_iszero(i))
-	  {
-	    dis.push_back(diff);
-	  }
+        found=true;
       }
+      double diff=std::abs((std::abs(i)-_scqha_vol_distortion));
+      if(!_iszero(i))
+      {
+        dis.push_back(diff);
+      }
+    }
 
     if(!found)
+    {
+      min_value=dis[0];
+      for(uint i=0; i!=dis.size(); i++)
       {
-	min_value=dis[0];
-	for(uint i=0; i!=dis.size(); i++)
-	  {
-	    if(dis[i]<min_value)
-	      {
-		min_value=dis[i];
-	      }
-	  }
-	_scqha_vol_distortion+=min_value;
+        if(dis[i]<min_value)
+        {
+          min_value=dis[i];
+        }
       }
+      _scqha_vol_distortion+=min_value;
+    }
   }
   // ***************************************************************************************
   void QHA_AFLOWIN_CREATOR::setGP(bool b1, bool b2, bool b3, bool b4)
@@ -798,32 +797,32 @@ namespace apl {
     string APL_DIR=PhononCalculator::_xInput.getDirectory();
     vector<_xinput> vaspRuns; 
     for(double i=0; i<=0; i++)
-      {
-	vaspRuns.push_back(_xInput);
-	idxRun = vaspRuns.size()-1;
-	double scale=0.00;
-	vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
-	xmatrix<double> m(3,3,1,1);
-	scale=vaspRuns[idxRun].getXStr().scale;
-	m= vaspRuns[idxRun].getXStr().lattice;
-	double det=determinant(m);
-	double volume=scale*scale*scale*det;
+    {
+      vaspRuns.push_back(_xInput);
+      idxRun = vaspRuns.size()-1;
+      double scale=0.00;
+      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      xmatrix<double> m(3,3,1,1);
+      scale=vaspRuns[idxRun].getXStr().scale;
+      m= vaspRuns[idxRun].getXStr().lattice;
+      double det=determinant(m);
+      double volume=scale*scale*scale*det;
 
-	string runname=get_static_runname(i);
-	vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
-	_eos_dir_names.push_back(runname);
-	_eos_volumes.push_back(volume);
+      string runname=get_static_runname(i);
+      vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
+      _eos_dir_names.push_back(runname);
+      _eos_volumes.push_back(volume);
 
-	_log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<scale<<setw(15)<<volume<<'\n';
-	// new scale factor calulation end
+      _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<scale<<setw(15)<<volume<<'\n';
+      // new scale factor calulation end
 
-	vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
-	m.clear();
-	if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
-	    aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
-	_logger<<"Creating "<< runname <<apl::endl;
-	write_static_OUTPUT(vaspRuns[idxRun]);
-      }
+      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      m.clear();
+      if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
+          aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
+      _logger<<"Creating "<< runname <<apl::endl;
+      write_static_OUTPUT(vaspRuns[idxRun]);
+    }
     vaspRuns.clear();
   }
   // ***************************************************************************************
@@ -834,32 +833,32 @@ namespace apl {
     vector<_xinput> vaspRuns; vaspRuns.clear();
 
     for(double i=0; i<=0; i++)
-      { 
-	vaspRuns.push_back(_xInput);
-	idxRun = vaspRuns.size()-1;
-	vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
-	xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
-	xvector<double> lattice_X(3,1);
-	for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
-	vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
-	double mod_X=aurostd::modulus(lattice_X);
+    { 
+      vaspRuns.push_back(_xInput);
+      idxRun = vaspRuns.size()-1;
+      vaspRuns[idxRun].setXStr(PhononCalculator::_supercell.getPrimitiveStructure());
+      xmatrix<double> m=vaspRuns[idxRun].getXStr().lattice;
+      xvector<double> lattice_X(3,1);
+      for(int j=1; j<=3; j++)lattice_X[j]=m[_lattice_index][j];
+      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      double mod_X=aurostd::modulus(lattice_X);
 
-	string runname=get_static_runname(i);
-	vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
+      string runname=get_static_runname(i);
+      vaspRuns[idxRun].setDirectory(APL_DIR + "./" + runname);
 
-	_eos_dir_names.push_back(runname);
-	_eos_volumes.push_back(mod_X);
+      _eos_dir_names.push_back(runname);
+      _eos_volumes.push_back(mod_X);
 
-	_log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
-	vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
-	m.clear();
+      _log<<setw(25)<<vaspRuns[idxRun].getDirectory()<<setw(15)<<mod_X<<'\n';
+      vaspRuns[idxRun].getXStr().atoms = PhononCalculator::_supercell.getPrimitiveStructure().atoms;
+      m.clear();
 
-	if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
-	    aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
+      if( aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/")+string(_AFLOWLOCK_) ) ||
+          aurostd::FileExist( vaspRuns[idxRun].getDirectory() + string("/OUTCAR.static") ) ) continue;
 
-	_logger<<"Creating "<< runname <<apl::endl;
-	write_static_OUTPUT(vaspRuns[idxRun]);
-      }
+      _logger<<"Creating "<< runname <<apl::endl;
+      write_static_OUTPUT(vaspRuns[idxRun]);
+    }
     vaspRuns.clear();
   }
   // ***************************************************************************************
@@ -916,9 +915,9 @@ namespace apl {
       aflowin << AFLOWIN_SEPARATION_LINE << std::endl;
       aflowin << "[AFLOW_MODE_MPI]" << std::endl;
       if (_kbinFlags.KBIN_MPI_AUTOTUNE) {
-	aflowin << "[AFLOW_MODE_MPI_MODE]AUTOTUNE" << std::endl;
+        aflowin << "[AFLOW_MODE_MPI_MODE]AUTOTUNE" << std::endl;
       } else {
-	aflowin << "[AFLOW_MODE_MPI_MODE]NCPUS=MAX" << std::endl;
+        aflowin << "[AFLOW_MODE_MPI_MODE]NCPUS=MAX" << std::endl;
       }
       aflowin << "[AFLOW_MODE_MPI_MODE]BINARY=" << _kbinFlags.KBIN_MPI_BIN << std::endl;
     } else {
@@ -957,9 +956,9 @@ namespace apl {
     //SPIN
     if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.isentry) {
       if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.option)
-	aflowin << "[VASP_FORCE_OPTION]SPIN=ON" << std::endl;
+        aflowin << "[VASP_FORCE_OPTION]SPIN=ON" << std::endl;
       else
-	aflowin << "[VASP_FORCE_OPTION]SPIN=OFF" << std::endl;
+        aflowin << "[VASP_FORCE_OPTION]SPIN=OFF" << std::endl;
     }
 
     if (vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.isentry) aflowin << "[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=" << vflags.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.xscheme << std::endl;
@@ -968,9 +967,9 @@ namespace apl {
     if (vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry) aflowin << "[VASP_FORCE_OPTION]AUTO_MAGMOM=" << (vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option ? "ON" : "OFF") << std::endl;
     if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.isentry) {
       if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.option)
-	aflowin << "[VASP_FORCE_OPTION]SPIN=ON" << std::endl;
+        aflowin << "[VASP_FORCE_OPTION]SPIN=ON" << std::endl;
       else
-	aflowin << "[VASP_FORCE_OPTION]SPIN=OFF" << std::endl;
+        aflowin << "[VASP_FORCE_OPTION]SPIN=OFF" << std::endl;
     }
     //aflowin << "[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM"<<std::endl;
     // TYPE WRITING
@@ -1014,12 +1013,12 @@ namespace apl {
     aflowin << "[VASP_POTCAR_MODE_IMPLICIT] " << std::endl;
     for (uint i = 0; i < xvasp.str.species.size(); i++) {
       if (xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS") == FALSE) {
-	if (xvasp.str.species.at(i) != "" && xvasp.str.species.at(i) != "X") {  // need because some times we have the "" around
-	  aflowin << "[VASP_POTCAR_FILE]" << xvasp.AVASP_potential << "/" << xvasp.str.species_pp.at(i) << std::endl;
-	}
+        if (xvasp.str.species.at(i) != "" && xvasp.str.species.at(i) != "X") {  // need because some times we have the "" around
+          aflowin << "[VASP_POTCAR_FILE]" << xvasp.AVASP_potential << "/" << xvasp.str.species_pp.at(i) << std::endl;
+        }
       } else {
-	if (xvasp.str.species.at(i) != "" && xvasp.str.species.at(i) != "X")  // need because some times we have the "" around
-	  aflowin << "[VASP_POTCAR_FILE]" << KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(i)) << std::endl;
+        if (xvasp.str.species.at(i) != "" && xvasp.str.species.at(i) != "X")  // need because some times we have the "" around
+          aflowin << "[VASP_POTCAR_FILE]" << KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(i)) << std::endl;
       }
     }
     //New Kpoins
@@ -1071,15 +1070,15 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     while (line_count < vlines.size())  //CO
-      {
-	line = vlines[line_count++];  //CO
-	if (line == "") continue;
-	if (line[0] == '#') continue;
-	if ((line.find("PSTRESS") != std::string::npos)) {
-	  _PSTRESS = line;
-	  break;
-	}
+    {
+      line = vlines[line_count++];  //CO
+      if (line == "") continue;
+      if (line[0] == '#') continue;
+      if ((line.find("PSTRESS") != std::string::npos)) {
+        _PSTRESS = line;
+        break;
       }
+    }
   }
   // ***************************************************************************************
   vector<string> QHA_AFLOWIN_CREATOR::get_scqha_dir_names()
@@ -1138,21 +1137,21 @@ namespace apl {
   }
   // ***************************************************************************************
   template <typename T>
-  string QHA_AFLOWIN_CREATOR::NumToStr ( T Number )
-  {
-    ostringstream ss;
-    ss << Number;
-    return ss.str();
-  }
+    string QHA_AFLOWIN_CREATOR::NumToStr ( T Number )
+    {
+      ostringstream ss;
+      ss << Number;
+      return ss.str();
+    }
   // ***************************************************************************************
   string QHA_AFLOWIN_CREATOR::get_phonon_runname(const double i, const double distortion)
   {
     string runname="";
     string tag=NumToStr<double>(std::abs(i));
     if( _iszero(std::abs(i-distortion)) )
-      {
-	runname=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("P")+string(tag);
-      } else {
+    {
+      runname=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("P")+string(tag);
+    } else {
       runname=string(_AFLOW_QHA_PHONS_DIRECTORY_PREFIX_)+string("M")+string(tag);
     }
     return runname;
