@@ -67,7 +67,7 @@ void DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
       if (AUTO_GENERATE_PLUS_MINUS) {
         vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO190218
       } else {
-      vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
+        vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
       }
       if (vvgenerate_plus_minus[i][j]) {
         ncalcs += 2;
