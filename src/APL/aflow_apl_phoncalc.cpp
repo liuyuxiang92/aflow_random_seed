@@ -1997,7 +1997,7 @@ namespace apl {
     //   if (!aurostd::EFileExist("apl.xml"))
     //    throw apl::APLRuntimeError("PhononCalculator::hibernate(); Cannot open output apl.xml.");
     //} else {
-    string filename = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::stringstream2file(outfile, filename); //ME181226
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::hibernate()";
