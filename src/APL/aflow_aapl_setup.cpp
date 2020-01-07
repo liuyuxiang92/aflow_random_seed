@@ -197,7 +197,7 @@ void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
       if (abs(dist_cart(i)) < _ZERO_TOL_) {
         dist_cart(i) = 0.0;
       } else {
-        dist_cart(i) *= scale/std::abs(dist_cart(i));
+        dist_cart(i) *= (scale/std::abs(dist_cart(i)));
       }
     }
     dist_cart *= DISTORTION_MAGNITUDE;
