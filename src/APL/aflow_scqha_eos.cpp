@@ -18,11 +18,9 @@
 #warning "The multithread parts of APL will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
-/*
-  This is the SCQHA implementation [ Ref. Comp. Mat. Sci. 120 (2016) 84–93].
-  In this technique the thermodynamic properties are calculated by self-consistently
-  minimization of volume.
-*/
+//   This is the SCQHA implementation [ Ref. Comp. Mat. Sci. 120 (2016) 84–93].
+//   In this technique the thermodynamic properties are calculated by self-consistently
+//   minimization of volume.
 
 namespace apl
 {
@@ -79,40 +77,40 @@ namespace apl
   bool SCQHAEOS::check_size()
   {
     if(_scqha_volumes.size()!=3)
-      {
-	_logger << apl::error << "_scqha_volumes.size()!=3 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_scqha_volumes.size()!=3 "<< apl::endl;
+      return false;
+    }
     if(_eo.size()==0)
-      {
-	_logger << apl::error << "_eo.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_ele_vols.size()==0)
-      {
-	_logger << apl::error << "_ele_vols.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_ele_vols.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_freq0.size()==0)
-      {
-	_logger << apl::error << "_freq0.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_freq0.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_freqM.size()==0)
-      {
-	_logger << apl::error << "_freqM.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_freqM.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_freqP.size()==0)
-      {
-	_logger << apl::error << "_freqP.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_freqP.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_weights.size()==0)
-      {
-	_logger << apl::error << "_weights.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_weights.size()==0 "<< apl::endl;
+      return false;
+    }
     _nBranches=_freq0[0].rows;
     return true;
   }
@@ -126,10 +124,10 @@ namespace apl
     xvector<double> V(_eo.size(), 1);
 
     for(uint i=0; i!=_eo.size(); i++)
-      {
-	E[i+1]=_eo[i];
-	V[i+1]=_ele_vols[i];
-      }
+    {
+      E[i+1]=_eo[i];
+      V[i+1]=_ele_vols[i];
+    }
     md_lsquares_call(V,E);
   }
   // ***************************************************************************************
@@ -139,10 +137,10 @@ namespace apl
     md_lsquares mdfit;
     mdfit.clear();
     for(int i=1; i<=V.rows; i++)
-      {
-        mdfit.Xdata.push_back(V[i]);
-        mdfit.Ydata.push_back(E[i]);
-      }
+    {
+      mdfit.Xdata.push_back(V[i]);
+      mdfit.Ydata.push_back(E[i]);
+    }
     // it does both linear and nonlinear fit
     mdfit.cubic_polynomial_fit(); 
     _Veq = mdfit.nleqmV0;
@@ -161,7 +159,7 @@ namespace apl
   // ***************************************************************************************
   //doing more refinments after fitting 
   bool SCQHAEOS::more_refinement(const xvector<double> &E, const xvector<double> &V,
-				 xvector<double> &guess, xvector<double> &out)
+      xvector<double> &guess, xvector<double> &out)
   {
     apl::aflowFITTING fit;
 
@@ -185,7 +183,7 @@ namespace apl
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     // Get the number of CPUS
     int ncpus = sysconf(_SC_NPROCESSORS_ONLN);// AFLOW_MachineNCPUs;
-//    int qpointsPerCPU = _freq0.size() / ncpus;  OBSOLETE ME180801
+    //    int qpointsPerCPU = _freq0.size() / ncpus;  OBSOLETE ME180801
     // Show info 
     if( ncpus == 1 )
       _logger.initProgressBar("Calculating taylor coefficients for SCQHA");
@@ -202,16 +200,15 @@ namespace apl
       threads.push_back( new std::thread(&SCQHAEOS::calculate_derivative,this,startIndex,endIndex) );
     }
 
-/* OBSOLETE ME180801
-    for(int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = icpu * qpointsPerCPU;
-      endIndex = startIndex + qpointsPerCPU;
-      if( ( (uint)endIndex > _freq0.size() ) ||
-          ( ( icpu == ncpus-1 ) && ( (uint)endIndex < _freq0.size() ) ) )
-        endIndex = _freq0.size();
-      threads.push_back( new std::thread(&SCQHAEOS::calculate_derivative,this,startIndex,endIndex) );
-    }
-*/
+     //OBSOLETE ME180801
+     //for(int icpu = 0; icpu < ncpus; icpu++) {
+     //startIndex = icpu * qpointsPerCPU;
+     //endIndex = startIndex + qpointsPerCPU;
+     //if( ( (uint)endIndex > _freq0.size() ) ||
+     //( ( icpu == ncpus-1 ) && ( (uint)endIndex < _freq0.size() ) ) )
+     //endIndex = _freq0.size();
+     //threads.push_back( new std::thread(&SCQHAEOS::calculate_derivative,this,startIndex,endIndex) );
+     //}
 
     // Wait to finish all threads here!
     for(uint i = 0; i < threads.size(); i++) {
@@ -235,10 +232,10 @@ namespace apl
 
     for(int i=startIndex; i<endIndex; i++){
       for(uint j=1; j<=_nBranches; j++)
-	{
-	  _d1fdv1[i][j]= (_freqM[i][j] - _freqP[i][j])/dv;     
-	  _d2fdv2[i][j]= (_freqM[i][j] + _freqP[i][j] - 2.0* _freq0[i][j])/dv2;  
-	}
+      {
+        _d1fdv1[i][j]= (_freqM[i][j] - _freqP[i][j])/dv;     
+        _d2fdv2[i][j]= (_freqM[i][j] + _freqP[i][j] - 2.0* _freq0[i][j])/dv2;  
+      }
     }
   }
   // ***************************************************************************************
@@ -271,7 +268,7 @@ namespace apl
     _logger <<"Writng aflow.scqha.iter.out file"<<apl::endl; 
     _logger <<"Writng aflow.scqha.thermo.out file"<<apl::endl; 
     _logger <<"Writng aflow.scqha.pressure.out file"<<apl::endl;
- 
+
 
     scf_thermo_p<<std::setprecision(6)<<std::fixed;
     scf_err <<"[AFLOW] "<<STAR10<<"\n";
@@ -297,17 +294,17 @@ namespace apl
     scf_thermo <<"[AFLOW] "<<STAR150<<"\n";
     scf_thermo <<"[AFLOW_SCQHA_THERMO]START" <<"\n";
     scf_thermo<<"#"<<setw(15)<<"T[K]"
-	      <<setw(15)<<"Ee(meV/Cell)"
-	      <<setw(15)<<"Fvib(meV/Cell)"
-	      <<setw(15)<<"U(meV/Cell)"
-	      <<setw(15)<<"G(meV/Cell)"
-	      <<setw(15)<<"Svib(kB/Cell)"
-	      <<setw(15)<<"Cv(kB/Cell)"
-	      <<setw(15)<<"Cp(kB/Cell)"
-	      <<setw(15)<<"Ce(kB/Cell)"
-	      <<setw(15)<<"alpha_V(1/K)"
-	      <<setw(15)<<"V_T(A^3/Cell)"
-	      <<setw(15)<<"gamma";
+      <<setw(15)<<"Ee(meV/Cell)"
+      <<setw(15)<<"Fvib(meV/Cell)"
+      <<setw(15)<<"U(meV/Cell)"
+      <<setw(15)<<"G(meV/Cell)"
+      <<setw(15)<<"Svib(kB/Cell)"
+      <<setw(15)<<"Cv(kB/Cell)"
+      <<setw(15)<<"Cp(kB/Cell)"
+      <<setw(15)<<"Ce(kB/Cell)"
+      <<setw(15)<<"alpha_V(1/K)"
+      <<setw(15)<<"V_T(A^3/Cell)"
+      <<setw(15)<<"gamma";
     scf_thermo<<"\n";
     scf_thermo<<std::setprecision(6)<<std::fixed;
     scf_thermo_p <<"[AFLOW] "<<STAR150<<"\n";
@@ -321,12 +318,12 @@ namespace apl
     scf_thermo_p <<"[AFLOW] "<<STAR150<<"\n";
     scf_thermo_p <<"[AFLOW_SCQHA_PRESSURE]START" <<"\n";
     scf_thermo_p<<"#"<<setw(15)<<"T[K]"
-		<<setw(15)<<"B_T(GPa)"
-		<<setw(15)<<"B_e(GPa)"
-		<<setw(15)<<"B_gamma(GPa)"
-		<<setw(15)<<"B_Dgamma(GPa)"
-		<<setw(15)<<"P_e(GPa)"
-		<<setw(15)<<"P_gamma(GPa)";
+      <<setw(15)<<"B_T(GPa)"
+      <<setw(15)<<"B_e(GPa)"
+      <<setw(15)<<"B_gamma(GPa)"
+      <<setw(15)<<"B_Dgamma(GPa)"
+      <<setw(15)<<"P_e(GPa)"
+      <<setw(15)<<"P_gamma(GPa)";
     scf_thermo_p<<"\n";
 
     //calculating Taylor coefficients
@@ -352,7 +349,7 @@ namespace apl
     V_T[0] = (1.0+0.1)*_Veq;
 
 
-    
+
     uint ksize=_freq0.size();
     vector<xvector<double> > dvx;dvx.clear();
     //Gruneisen Parameter
@@ -380,72 +377,72 @@ namespace apl
 
     //self consistent cycle to minimize the volume
     for(uint i=0; i!=1000; i++)
+    {
+      vector<xvector<double> > U_ph; U_ph.clear();
+      U_ph.resize(ksize,dx);
+      for(uint j=0; j!=ksize; j++)
       {
-	vector<xvector<double> > U_ph; U_ph.clear();
-	U_ph.resize(ksize,dx);
-	for(uint j=0; j!=ksize; j++)
-	  {
-	    for(uint k=1; k<=_nBranches; k++)
-	      {
-		if(_freq0[j][k]<0.01) continue;
-		if( (abs(V_T[0]-ph_pressure)/V_T[0]) > 1.0e-3)
-		  {
-                    //initializing frequencies
-		    omega_T[0][j][k]= _freq0[j][k];
-		  } else {
-                  //updating frequencies
-		  omega_T[0][j][k]= _freq0[j][k]+ _d1fdv1[j][k]*(V_T[0]-_scqha_volumes[1]) + 0.5*_d2fdv2[j][k]*pow((V_T[0]-_scqha_volumes[1]), 2.0);
-		}
-		if(omega_T[0][j][k]<0.01) continue;
-                //updating Gruneisen parameter
-		gruneisen[0][j][k]= (-1.0*V_T[0])/omega_T[0][j][k]* (_d1fdv1[j][k] + _d2fdv2[j][k]*(V_T[0]-_scqha_volumes[1]));
-                //updating internal energies
-		U_ph[j][k]=internal_energy(omega_T[0][j][k],temperature);
-                //total phonon pressure updating
-		ph_pressure+=U_ph[j][k]*gruneisen[0][j][k]*_weights[j];
-	      }
-	  }
-        ph_pressure/=(double)(ksize);
-        //calculating electronic pressure
-        derivatives(V_T[0]);
-        //total pressure updating
-        ph_pressure=ph_pressure/(_dE_dV+_pext);
-
-        //checking self-consistent volume is converged or not
-	if(abs(V_T[0]-ph_pressure)/V_T[0] > 1e-5)
-	  {
-	    V_T[0]=V_T[0]+(ph_pressure-V_T[0])*0.001;
-	    ph_pressure=0.0;
-	    scf_err<<"V_T = "<<V_T[0]<<"\n";
-	  } else {
-          //Thermodynamic properties calculations
-	  B_e=V_T[0]*_d2E_dV2;
-	  P_e=-1.0*_dE_dV;
-	  B_gamma=0.0;
-	  B_2=0.0;
-	  P_gamma=0.0;
-
-          for(uint j=0; j!=ksize; j++){
-	    for(uint k=1; k<=_nBranches; k++){
-	      if(_freq0[j][k]<0.1) continue;
-	      Cv[0][j][k]=heat_capacity(omega_T[0][j][k],temperature);
-	      B_gamma+=(U_ph[j][k]-temperature*Cv[0][j][k])*gruneisen[0][j][k]*gruneisen[0][j][k]*_weights[j];
-	      B_2+=U_ph[j][k]*((1.0+gruneisen[0][j][k])*gruneisen[0][j][k]-V_T[0]*V_T[0]/omega_T[0][j][k]*_d2fdv2[j][k])*_weights[j];
-	      B_2_dw2+=U_ph[j][k]* V_T[0]*V_T[0]/omega_T[0][j][k]*_d2fdv2[j][k]*_weights[j];
-	      P_gamma+=U_ph[j][k]*gruneisen[0][j][k]*_weights[j];
-            }
+        for(uint k=1; k<=_nBranches; k++)
+        {
+          if(_freq0[j][k]<0.01) continue;
+          if( (abs(V_T[0]-ph_pressure)/V_T[0]) > 1.0e-3)
+          {
+            //initializing frequencies
+            omega_T[0][j][k]= _freq0[j][k];
+          } else {
+            //updating frequencies
+            omega_T[0][j][k]= _freq0[j][k]+ _d1fdv1[j][k]*(V_T[0]-_scqha_volumes[1]) + 0.5*_d2fdv2[j][k]*pow((V_T[0]-_scqha_volumes[1]), 2.0);
           }
-	  B_gamma=B_gamma/(double)(ksize)/V_T[0];
-	  B_2=-1.0*B_2/(double)(ksize)/V_T[0];
-	  B_2_dw2=B_2_dw2/(double)(ksize)/V_T[0];
-	  P_gamma=P_gamma/(double)(ksize)/V_T[0];
-           
-	  B_T[0]=B_e+B_gamma+B_2+P_gamma;
-	  scf_err<<"#Total iteration =  "<<i<<" Steps."<<"\n";
-	  break;
-	}
-      }//iteration loop
- 
+          if(omega_T[0][j][k]<0.01) continue;
+          //updating Gruneisen parameter
+          gruneisen[0][j][k]= (-1.0*V_T[0])/omega_T[0][j][k]* (_d1fdv1[j][k] + _d2fdv2[j][k]*(V_T[0]-_scqha_volumes[1]));
+          //updating internal energies
+          U_ph[j][k]=internal_energy(omega_T[0][j][k],temperature);
+          //total phonon pressure updating
+          ph_pressure+=U_ph[j][k]*gruneisen[0][j][k]*_weights[j];
+        }
+      }
+      ph_pressure/=(double)(ksize);
+      //calculating electronic pressure
+      derivatives(V_T[0]);
+      //total pressure updating
+      ph_pressure=ph_pressure/(_dE_dV+_pext);
+
+      //checking self-consistent volume is converged or not
+      if(abs(V_T[0]-ph_pressure)/V_T[0] > 1e-5)
+      {
+        V_T[0]=V_T[0]+(ph_pressure-V_T[0])*0.001;
+        ph_pressure=0.0;
+        scf_err<<"V_T = "<<V_T[0]<<"\n";
+      } else {
+        //Thermodynamic properties calculations
+        B_e=V_T[0]*_d2E_dV2;
+        P_e=-1.0*_dE_dV;
+        B_gamma=0.0;
+        B_2=0.0;
+        P_gamma=0.0;
+
+        for(uint j=0; j!=ksize; j++){
+          for(uint k=1; k<=_nBranches; k++){
+            if(_freq0[j][k]<0.1) continue;
+            Cv[0][j][k]=heat_capacity(omega_T[0][j][k],temperature);
+            B_gamma+=(U_ph[j][k]-temperature*Cv[0][j][k])*gruneisen[0][j][k]*gruneisen[0][j][k]*_weights[j];
+            B_2+=U_ph[j][k]*((1.0+gruneisen[0][j][k])*gruneisen[0][j][k]-V_T[0]*V_T[0]/omega_T[0][j][k]*_d2fdv2[j][k])*_weights[j];
+            B_2_dw2+=U_ph[j][k]* V_T[0]*V_T[0]/omega_T[0][j][k]*_d2fdv2[j][k]*_weights[j];
+            P_gamma+=U_ph[j][k]*gruneisen[0][j][k]*_weights[j];
+          }
+        }
+        B_gamma=B_gamma/(double)(ksize)/V_T[0];
+        B_2=-1.0*B_2/(double)(ksize)/V_T[0];
+        B_2_dw2=B_2_dw2/(double)(ksize)/V_T[0];
+        P_gamma=P_gamma/(double)(ksize)/V_T[0];
+
+        B_T[0]=B_e+B_gamma+B_2+P_gamma;
+        scf_err<<"#Total iteration =  "<<i<<" Steps."<<"\n";
+        break;
+      }
+    }//iteration loop
+
     //calculating thermodynamic properties
 
     //temperature independent electronic enegy
@@ -474,148 +471,148 @@ namespace apl
     B_2_dw2=0.0;
     _logger<<"Entering into Temperature loop "<<apl::endl;
     for(int uT=1; uT!=N_T; uT++)
+    {
+      double avg_gp=0.0;
+      uint i=1;
+      double    F_tot=0.0;
+      double temperature=Tmin+(double)(uT)*delta_T;
+
+      for(uint j=0; j!=ksize; j++){
+        for(uint k=1; k<=_nBranches; k++){
+          alpha_T[i]+=Cv[i-1][j][k]*gruneisen[i-1][j][k]*_weights[j];
+        }
+      }
+      //thermal expansion
+      alpha_T[i]=alpha_T[i]/(double)(ksize)/(B_T[i-1]*V_T[i-1]);
+
+      V_T[i]=(1.0+alpha_T[i]*delta_T)*V_T[i-1];
+
+      derivatives(V_T[i]);
+
+      B_e=V_T[i]*_d2E_dV2;
+      P_e=-1.0*_dE_dV;
+
+      for(uint j=0; j!=ksize; j++){
+        for(uint k=1; k<=_nBranches; k++){
+
+          if(_freq0[j][k]<0.01)continue;
+
+          //frequency updating
+          omega_T[i][j][k]=_freq0[j][k]+_d1fdv1[j][k]*(V_T[i]-_scqha_volumes[1])+0.5*_d2fdv2[j][k]*(V_T[i]-_scqha_volumes[1])*(V_T[i]-_scqha_volumes[1]);
+
+          if(omega_T[i][j][k]<0.01)continue;
+
+          //Gruneisen parameter updating
+          gruneisen[i][j][k]=-1.0*V_T[i]/omega_T[i][j][k]*(_d1fdv1[j][k]+
+              _d2fdv2[j][k]*(V_T[i]-_scqha_volumes[1]));
+
+          if(omega_T[i][j][k]<0.01){
+            // ME190726 - exit clean-up
+            //_logger<<apl::error<<"Frequency too small at "<<temperature<<" K "<<apl::endl;
+            //exit(0);
+            // ME191031 - use xerror
+            //throw APLRuntimeError("Frequency too small at " + aurostd::utype2string<double>(temperature) + " K");
+            string function = "SCQHAEOS::sccycle()";
+            string message = "Frequency too small at " + aurostd::utype2string<double>(temperature) + " K";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          }
+          double F_ph_i=free_energy(omega_T[i][j][k],temperature);
+          double U_ph_i=internal_energy(omega_T[i][j][k],temperature);
+          double S_ph_i=entropy(omega_T[i][j][k],temperature);
+          Cv[i][j][k]=heat_capacity(omega_T[i][j][k],temperature);
+
+          B_gamma+=(U_ph_i-temperature*Cv[i][j][k])*gruneisen[i][j][k]*gruneisen[i][j][k]*_weights[j];
+
+          B_2+=U_ph_i*((1.0+gruneisen[i][j][k])*gruneisen[i][j][k]-V_T[i]*V_T[i]/omega_T[i][j][k]*_d2fdv2[j][k])*_weights[j];
+
+          B_2_dw2+=U_ph_i*V_T[i]*V_T[i]/omega_T[i][j][k]*_d2fdv2[j][k]*_weights[j];
+
+          P_gamma+=U_ph_i*gruneisen[i][j][k]*_weights[j];
+
+          F_tot+=F_ph_i*_weights[j];
+          U_tot+=U_ph_i*_weights[j];
+          S_tot+=S_ph_i*_weights[j];
+          Cv_tot+=Cv[i][j][k]*_weights[j];
+          avg_gp+=gruneisen[i][j][k]*Cv[i][j][k]*_weights[j];
+        }
+      }
+
+      B_gamma=B_gamma/(double)(ksize)/V_T[i];
+      B_2=-1.0*B_2/(double)(ksize)/V_T[i];
+      B_2_dw2=B_2_dw2/(double)(ksize)/V_T[i];
+      P_gamma=P_gamma/(double)(ksize)/V_T[i];
+      avg_gp=avg_gp/Cv_tot;
+
+      B_T[i]=B_e+B_gamma+B_2+P_gamma;
+
+      F_tot=F_tot/double(ksize);
+      U_tot=U_tot/double(ksize);
+      H_tot=U_tot+_pext*V_T[i];
+      S_tot=S_tot/(double)(ksize);
+      Cv_tot=Cv_tot/(double)(ksize);
+      Cp_tot=Cv_tot+alpha_T[i]*alpha_T[i]*B_T[i]*V_T[i]*temperature;
+
+      Ee_tt=Ee_T;
+
+      Ee_T=E_V(V_T[i]);
+      //writing to files
+      scf_thermo<<std::setprecision(2)<<setw(15)<<temperature;
+      scf_thermo<<std::setprecision(6);
+      scf_thermo<<setw(15)<<Ee_T-E_min;
+      scf_thermo<<setw(15)<<F_tot;
+      scf_thermo<<setw(15)<<U_tot;
+      scf_thermo<<setw(15)<<H_tot;
+      //converting to kB/cell
+      scf_thermo<<setw(15)<<S_tot/(8.6173324*1e-2);
+      //converting to kB/cell
+      scf_thermo<<setw(15)<<Cv_tot/(8.6173324*1e-2);
+      //converting to kB/cell
+      scf_thermo<<setw(15)<<Cp_tot/(8.6173324*1e-2);
+      //converting to meV/cell
+      scf_thermo<<setw(15)<<((Ee_T-Ee_tt)/delta_T)/(8.6173324*1e-2);
+      //
+      scf_thermo<<setw(15)<<alpha_T[i]*1e6;
+      //
+      scf_thermo<<setw(15)<<V_T[i];
+      //
+      scf_thermo<<setw(15)<<avg_gp;
+      scf_thermo<<"\n";
+
+      scf_thermo_p<<std::setprecision(2)<<setw(15)<<temperature;
+      scf_thermo_p<<std::setprecision(6);
+      //cobvering to GPa
+      scf_thermo_p<<setw(15)<<0.16022*B_T[i];
+      scf_thermo_p<<setw(15)<<0.16022*B_e;
+      scf_thermo_p<<setw(15)<<0.16022*B_gamma;
+      scf_thermo_p<<setw(15)<<0.16022*B_2;
+      scf_thermo_p<<setw(15)<<0.16022*P_e;
+      scf_thermo_p<<setw(15)<<0.16022*P_gamma;
+      scf_thermo_p<<"\n";
+
+      //save current itaration 
+      alpha_T[0]=alpha_T[1];
+      Cv[0]=Cv[1];
+      gruneisen[0]=gruneisen[1];
+      B_T[0]=B_T[1];
+      V_T[0]=V_T[1];
+      vector<double> tmp(2, 0);
+      tmp[0]=temperature;
+      tmp[1]=Ee_T+F_tot;
+      _TF.push_back(tmp);
+      tmp.clear();
+      tmp.resize(2, 0);
+      //saving data to calculate temperature dependent PDIS
+      for (uint w=0; w<_inpiut_T.size(); w++)
       {
-        double avg_gp=0.0;
-        uint i=1;
-	double    F_tot=0.0;
-	double temperature=Tmin+(double)(uT)*delta_T;
-
-        for(uint j=0; j!=ksize; j++){
-          for(uint k=1; k<=_nBranches; k++){
-	    alpha_T[i]+=Cv[i-1][j][k]*gruneisen[i-1][j][k]*_weights[j];
-	  }
-	}
-        //thermal expansion
-        alpha_T[i]=alpha_T[i]/(double)(ksize)/(B_T[i-1]*V_T[i-1]);
-
-        V_T[i]=(1.0+alpha_T[i]*delta_T)*V_T[i-1];
-   
-        derivatives(V_T[i]);
-
-        B_e=V_T[i]*_d2E_dV2;
-        P_e=-1.0*_dE_dV;
-
-        for(uint j=0; j!=ksize; j++){
-          for(uint k=1; k<=_nBranches; k++){
-          
-	    if(_freq0[j][k]<0.01)continue;
-            
-            //frequency updating
-	    omega_T[i][j][k]=_freq0[j][k]+_d1fdv1[j][k]*(V_T[i]-_scqha_volumes[1])+0.5*_d2fdv2[j][k]*(V_T[i]-_scqha_volumes[1])*(V_T[i]-_scqha_volumes[1]);
-
-	    if(omega_T[i][j][k]<0.01)continue;
-
-            //Gruneisen parameter updating
-	    gruneisen[i][j][k]=-1.0*V_T[i]/omega_T[i][j][k]*(_d1fdv1[j][k]+
-							     _d2fdv2[j][k]*(V_T[i]-_scqha_volumes[1]));
-
-	    if(omega_T[i][j][k]<0.01){
-              // ME190726 - exit clean-up
-	      //_logger<<apl::error<<"Frequency too small at "<<temperature<<" K "<<apl::endl;
-	      //exit(0);
-              // ME191031 - use xerror
-              //throw APLRuntimeError("Frequency too small at " + aurostd::utype2string<double>(temperature) + " K");
-              string function = "SCQHAEOS::sccycle()";
-              string message = "Frequency too small at " + aurostd::utype2string<double>(temperature) + " K";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-	    }
-	    double F_ph_i=free_energy(omega_T[i][j][k],temperature);
-	    double U_ph_i=internal_energy(omega_T[i][j][k],temperature);
-	    double S_ph_i=entropy(omega_T[i][j][k],temperature);
-            Cv[i][j][k]=heat_capacity(omega_T[i][j][k],temperature);
-
-	    B_gamma+=(U_ph_i-temperature*Cv[i][j][k])*gruneisen[i][j][k]*gruneisen[i][j][k]*_weights[j];
-
-	    B_2+=U_ph_i*((1.0+gruneisen[i][j][k])*gruneisen[i][j][k]-V_T[i]*V_T[i]/omega_T[i][j][k]*_d2fdv2[j][k])*_weights[j];
-
-	    B_2_dw2+=U_ph_i*V_T[i]*V_T[i]/omega_T[i][j][k]*_d2fdv2[j][k]*_weights[j];
-
-	    P_gamma+=U_ph_i*gruneisen[i][j][k]*_weights[j];
-
-	    F_tot+=F_ph_i*_weights[j];
-	    U_tot+=U_ph_i*_weights[j];
-	    S_tot+=S_ph_i*_weights[j];
-	    Cv_tot+=Cv[i][j][k]*_weights[j];
-            avg_gp+=gruneisen[i][j][k]*Cv[i][j][k]*_weights[j];
-	  }
-	}
-
-        B_gamma=B_gamma/(double)(ksize)/V_T[i];
-        B_2=-1.0*B_2/(double)(ksize)/V_T[i];
-        B_2_dw2=B_2_dw2/(double)(ksize)/V_T[i];
-        P_gamma=P_gamma/(double)(ksize)/V_T[i];
-        avg_gp=avg_gp/Cv_tot;
-
-        B_T[i]=B_e+B_gamma+B_2+P_gamma;
-
-        F_tot=F_tot/double(ksize);
-        U_tot=U_tot/double(ksize);
-        H_tot=U_tot+_pext*V_T[i];
-        S_tot=S_tot/(double)(ksize);
-        Cv_tot=Cv_tot/(double)(ksize);
-        Cp_tot=Cv_tot+alpha_T[i]*alpha_T[i]*B_T[i]*V_T[i]*temperature;
-
-        Ee_tt=Ee_T;
-
-        Ee_T=E_V(V_T[i]);
-        //writing to files
-        scf_thermo<<std::setprecision(2)<<setw(15)<<temperature;
-        scf_thermo<<std::setprecision(6);
-        scf_thermo<<setw(15)<<Ee_T-E_min;
-        scf_thermo<<setw(15)<<F_tot;
-        scf_thermo<<setw(15)<<U_tot;
-        scf_thermo<<setw(15)<<H_tot;
-        //converting to kB/cell
-        scf_thermo<<setw(15)<<S_tot/(8.6173324*1e-2);
-        //converting to kB/cell
-        scf_thermo<<setw(15)<<Cv_tot/(8.6173324*1e-2);
-        //converting to kB/cell
-        scf_thermo<<setw(15)<<Cp_tot/(8.6173324*1e-2);
-        //converting to meV/cell
-        scf_thermo<<setw(15)<<((Ee_T-Ee_tt)/delta_T)/(8.6173324*1e-2);
-        //
-        scf_thermo<<setw(15)<<alpha_T[i]*1e6;
-        //
-        scf_thermo<<setw(15)<<V_T[i];
-        //
-        scf_thermo<<setw(15)<<avg_gp;
-        scf_thermo<<"\n";
-
-        scf_thermo_p<<std::setprecision(2)<<setw(15)<<temperature;
-        scf_thermo_p<<std::setprecision(6);
-        //cobvering to GPa
-        scf_thermo_p<<setw(15)<<0.16022*B_T[i];
-        scf_thermo_p<<setw(15)<<0.16022*B_e;
-        scf_thermo_p<<setw(15)<<0.16022*B_gamma;
-        scf_thermo_p<<setw(15)<<0.16022*B_2;
-        scf_thermo_p<<setw(15)<<0.16022*P_e;
-        scf_thermo_p<<setw(15)<<0.16022*P_gamma;
-        scf_thermo_p<<"\n";
-
-	//save current itaration 
-	alpha_T[0]=alpha_T[1];
-	Cv[0]=Cv[1];
-	gruneisen[0]=gruneisen[1];
-	B_T[0]=B_T[1];
-	V_T[0]=V_T[1];
-        vector<double> tmp(2, 0);
-        tmp[0]=temperature;
-        tmp[1]=Ee_T+F_tot;
-	_TF.push_back(tmp);
-	tmp.clear();
-	tmp.resize(2, 0);
-	//saving data to calculate temperature dependent PDIS
-	for (uint w=0; w<_inpiut_T.size(); w++)
-	  {
-	    if (abs(temperature-_inpiut_T[w])<0.001){
-	      tmp[0]=temperature;
-	      tmp[1]=V_T[i];
-	      _TV.push_back(tmp);
-	    }
-	  }  
+        if (abs(temperature-_inpiut_T[w])<0.001){
+          tmp[0]=temperature;
+          tmp[1]=V_T[i];
+          _TV.push_back(tmp);
+        }
+      }  
 
 
-      }//temperature loop ends
+    }//temperature loop ends
 
 
 
@@ -747,16 +744,16 @@ namespace apl
   double SCQHAEOS::free_energy(const double omeg, const double temp)
   {
     if(omeg<0.001)
-      {
-        // ME190726 - exit clean-up
-	//_logger<<apl::error<<"Frequency too small (<0.001 THz) for F_vib(T)"<<apl::endl;
-	//exit(0);
-        // ME191031 - use xerror
-        //throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
-        string function = "SCQHAEOS::free_energy()";
-        string message = "Frequency too small (<0.001 THz) for F_vib(T)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-      }
+    {
+      // ME190726 - exit clean-up
+      //_logger<<apl::error<<"Frequency too small (<0.001 THz) for F_vib(T)"<<apl::endl;
+      //exit(0);
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Frequency too small (<0.001 THz) for F_vib(T)");
+      string function = "SCQHAEOS::free_energy()";
+      string message = "Frequency too small (<0.001 THz) for F_vib(T)";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
 
     double betaa=47.9924*omeg/temp;
     double F=2.07065*omeg+0.0861733*temp*log(1.0-exp(-1.0*betaa));
@@ -785,16 +782,16 @@ namespace apl
   double SCQHAEOS::heat_capacity(const double omeg, const double temp)
   {
     if(omeg<0.001)
-      {
-        // ME190726 - exit clean-up
-	//_logger<<apl::error<<"Frequency too small (<0.001 THz) for Cv(T)" <<apl::endl;
-	//exit(0);
-        // ME191031 - use xerro
-        //throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
-        string function = "SCQHAEOS::heat_capacity()";
-        string message = "Frequency too small (<0.001 THz) for Cv(T)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-      }
+    {
+      // ME190726 - exit clean-up
+      //_logger<<apl::error<<"Frequency too small (<0.001 THz) for Cv(T)" <<apl::endl;
+      //exit(0);
+      // ME191031 - use xerro
+      //throw APLRuntimeError("Frequency too small (<0.001 THz) for Cv(T)");
+      string function = "SCQHAEOS::heat_capacity()";
+      string message = "Frequency too small (<0.001 THz) for Cv(T)";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
 
     double betaa=47.9924*omeg/temp;
     double dumm=(exp(betaa/2.0)-exp(-1.0*betaa/2.0));
@@ -837,7 +834,7 @@ namespace apl
     out<<"#"<<setw(15)<<"f"<<setw(15)<<"df/dv"<<setw(15)<<"d^2f/dv^2"<<setw(15)<<"branches"<<"\n";
     for(uint i=0; i!=_d1fdv1.size(); i++){
       for(int j=1; j<=_d1fdv1[i].rows; j++){
-	out<<setw(15)<<_freq0[i][j]<<setw(15)<<_d1fdv1[i][j]<<setw(15)<<_d2fdv2[i][j]<<setw(15)<<j<<'\n';
+        out<<setw(15)<<_freq0[i][j]<<setw(15)<<_d1fdv1[i][j]<<setw(15)<<_d2fdv2[i][j]<<setw(15)<<j<<'\n';
       }out<<"#\n";}
     out <<"[AFLOW_SCQHA_TAYLOR_COEFFICIENTS]END"<<"\n";
     out<<"[AFLOW]"<<STAR50<<'\n';
