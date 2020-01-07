@@ -1418,7 +1418,7 @@ namespace KBIN {
                         int l;
                         string line;
                         for (l = 1; l <= nlines; l++) {
-                          line = aurostd::GetLineString(extra_incar, l);
+                          line = aurostd::RemoveWhiteSpaces(aurostd::GetLineString(extra_incar, l));
                           if (aurostd::substring2bool(line, "ICHARG=1", true)) break;
                         }
                         if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
@@ -1491,7 +1491,7 @@ namespace KBIN {
                         int l;
                         string line;
                         for (l = 1; l <= nlines; l++) {
-                          line = aurostd::GetLineString(extra_incar, l);
+                          line = aurostd::RemoveWhiteSpaces(aurostd::GetLineString(extra_incar, l));
                           if (aurostd::substring2bool(line, "ICHARG=1", true)) break;
                         }
                         if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));

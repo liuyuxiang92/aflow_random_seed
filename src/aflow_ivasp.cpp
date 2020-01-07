@@ -4182,14 +4182,16 @@ namespace KBIN {
       // Comment out CHGCAR file in aflow.in
       if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
         stringstream aflowin_fixed;
-        string line, filecontent;
-        filecontent = aurostd::file2string(aurostd::CleanFileName(xvasp.Directory + "/" + _AFLOWIN_));
+        string filename = aurostd::CleanFileName(xvasp.Directory + "/" + _AFLOWIN_);
+        string filecontent = aurostd::file2string(aurostd::CleanFileName(filename));
         int nlines = aurostd::GetNLinesString(filecontent);
+        string line = "";
         for (int l = 1; l <= nlines; l++) {
           line = aurostd::GetLineString(filecontent, l);
           if ((line[0] != '#') && (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line))) aflowin_fixed << "#";
           aflowin_fixed << line << std::endl;
         }
+        aurostd::stringstream2file(aflowin_fixed, filename);
       }
     }
   }
