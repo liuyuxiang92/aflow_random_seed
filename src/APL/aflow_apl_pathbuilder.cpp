@@ -83,8 +83,9 @@ namespace apl {
 
     if( p.lrows != _pointsVectorStartingIndex ) {
       xvector<double> pp(_pointsVectorDimension+_pointsVectorStartingIndex,_pointsVectorStartingIndex);
-      for(int i = 0; i < _pointsVectorDimension; i++)
-	pp(_pointsVectorStartingIndex+i) = p(p.lrows+i);
+      for(int i = 0; i < _pointsVectorDimension; i++){
+        pp(_pointsVectorStartingIndex+i) = p(p.lrows+i);
+      }
       _points.push_back(pp);
     } else {
       _points.push_back(p);
@@ -130,16 +131,16 @@ namespace apl {
     // Create path in the SINGLE_POINT_MODE
     if( _mode == SINGLE_POINT_MODE ) {
       for(uint i = 1; i < _points.size(); i++) {
-	xvector<double> startPoint = _points[i-1];
-	_path.push_back(startPoint);
-	if( _nPointsPerSubPath != 0 ) {
-	  xvector<double> dPoint = ( _points[i] - _points[i-1] ) * ( 1.0 / (_nPointsPerSubPath) );
-	  for(int j = 1; j <= (int)_nPointsPerSubPath; j++)
-	    {
-	      xvector<double> p = startPoint + j*dPoint;
-	      _path.push_back(p);
-	    }
-	}
+        xvector<double> startPoint = _points[i-1];
+        _path.push_back(startPoint);
+        if( _nPointsPerSubPath != 0 ) {
+          xvector<double> dPoint = ( _points[i] - _points[i-1] ) * ( 1.0 / (_nPointsPerSubPath) );
+          for(int j = 1; j <= (int)_nPointsPerSubPath; j++)
+          {
+            xvector<double> p = startPoint + j*dPoint;
+            _path.push_back(p);
+          }
+        }
       }
       _path.push_back(_points[_points.size()-1]);
     }
@@ -149,8 +150,8 @@ namespace apl {
       // If the number of points is odd -> escape
       if( _points.size() % 2 != 0 ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::buildPath(); The number of points is odd.");
-	string function = "apl::PathBuilder::buildPath()";
+        //throw APLRuntimeError("apl::PathBuilder::buildPath(); The number of points is odd.");
+        string function = "apl::PathBuilder::buildPath()";
         string message = "The number of points is odd.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
@@ -158,19 +159,19 @@ namespace apl {
       xvector<double> startPoint(3), endPoint(3);
       endPoint = _points[0];
       for(uint i = 0; i < _points.size(); i+=2) {
-	startPoint = _points[i];
-	//if( aurostd::modulus( startPoint - endPoint ) > _AFLOW_APL_EPS_ )
-	//    _path.push_back(endPoint);
-	_path.push_back(startPoint);
-	endPoint = _points[i+1];
+        startPoint = _points[i];
+        //if( aurostd::modulus( startPoint - endPoint ) > _AFLOW_APL_EPS_ )
+        //    _path.push_back(endPoint);
+        _path.push_back(startPoint);
+        endPoint = _points[i+1];
 
-	if( _nPointsPerSubPath != 0 ) {
-	  xvector<double> dPoint = ( endPoint - startPoint ) * ( 1.0 / (_nPointsPerSubPath) );
-	  for(int j = 1; j <= (int)_nPointsPerSubPath; j++) {
-	      xvector<double> p = startPoint + j*dPoint;
-	      _path.push_back(p);
-	  }
-	}
+        if( _nPointsPerSubPath != 0 ) {
+          xvector<double> dPoint = ( endPoint - startPoint ) * ( 1.0 / (_nPointsPerSubPath) );
+          for(int j = 1; j <= (int)_nPointsPerSubPath; j++) {
+            xvector<double> p = startPoint + j*dPoint;
+            _path.push_back(p);
+          }
+        }
       }
       //_path.push_back(endPoint);
     }
@@ -249,46 +250,46 @@ namespace apl {
       // Quick solution 2...
       if( i > _points.size() ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
-	string function = "apl::PathBuilder::getPathLength()";
+        //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
+        string function = "apl::PathBuilder::getPathLength()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( _store == RECIPROCAL_LATTICE ) {
-	length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[i]) - F2C(trasp(reciprocalLattice),_points[i-1]) );
+        length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[i]) - F2C(trasp(reciprocalLattice),_points[i-1]) );
       }
       else
-        {
-	  length = aurostd::modulus( _points[i] - _points[i-1] );
-        }
+      {
+        length = aurostd::modulus( _points[i] - _points[i-1] );
+      }
       return length;
     }
     else if( _mode == COUPLE_POINT_MODE ) {
       // Quick solution 2...
       if( i > _points.size()/2 ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
-	string function = "apl::PathBuilder::getPathLength()";
+        //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
+        string function = "apl::PathBuilder::getPathLength()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( _store == RECIPROCAL_LATTICE ) {
-	length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[(i*2)-1]) - F2C(trasp(reciprocalLattice),_points[(i-1)*2]) );
+        length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[(i*2)-1]) - F2C(trasp(reciprocalLattice),_points[(i-1)*2]) );
       } else {
-	length = aurostd::modulus( _points[(i*2)-1] - _points[(i-1)*2] );
+        length = aurostd::modulus( _points[(i*2)-1] - _points[(i-1)*2] );
       }
       return length;
     }
-    
+
     // ME191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Unknown mode.");
     string function = "apl::PathBuilder::getPathLength()";
     string message = "Unknown mode.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
-  
+
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   xvector<double> PathBuilder::getPoint(uint i) {
     if( i <= 0 ) {
       // ME191031 - use xerror
@@ -300,8 +301,8 @@ namespace apl {
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _points.size() ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
-	string function = "apl::PathBuilder::getPoint()";
+        //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
+        string function = "apl::PathBuilder::getPoint()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
@@ -309,8 +310,8 @@ namespace apl {
     } else if( _mode == COUPLE_POINT_MODE ) {
       if( i > (_points.size()/2)+1 ) {
         // ME191031 - use xerro
-	//throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
-	string function = "apl::PathBuilder::getPoint()";
+        //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
+        string function = "apl::PathBuilder::getPoint()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
@@ -318,16 +319,16 @@ namespace apl {
       if( i == (_points.size()/2)+1 ) return _points[_points.size()-1];
       return _points[2*i-3];
     }
-    
+
     // ME191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPoint(); Unknown mode.");
     string function = "apl::PathBuilder::getPoint()";
     string message = "Unknown mode.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
-  
+
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   string PathBuilder::getPointLabel(uint i) {
     if( i <= 0 ) {
       // ME191031 - use xerror
@@ -336,12 +337,12 @@ namespace apl {
       string message = "Wrong index. The index has to start from 1.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
     }
-    
+
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _labels.size() ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
-	string function = "apl::PathBuilder::getPointLabel()";
+        //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
+        string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
@@ -349,32 +350,32 @@ namespace apl {
     } else if( _mode == COUPLE_POINT_MODE ) {
       if( i > (_labels.size()/2)+1 ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
-	string function = "apl::PathBuilder::getPointLabel()";
+        //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
+        string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
       }
       if( i == 1 ) return _labels[0];
       if( i == (_labels.size()/2)+1 ) return _labels[_labels.size()-1];
-      
+
       int h = 2*i-2;
       int l = 2*i-3;
-      
+
       if( _labels[l] == _labels[h] )
-	return _labels[l];
+        return _labels[l];
       else
-	return(_labels[l]+"|"+_labels[h]);
+        return(_labels[l]+"|"+_labels[h]);
     }
-    
+
     // ME191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Unknown mode.");
     string function = "apl::PathBuilder::getPointLabel()";
     string message = "Unknown mode.";
     throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
   }
-  
+
   // ///////////////////////////////////////////////////////////////////////////
-  
+
   vector< aurostd::xvector<double> > PathBuilder::getPath(ModeEnumType mode, const string& userPath) {
     vector< xvector<double> > new_points;
     vector<string> new_labels;
@@ -385,17 +386,17 @@ namespace apl {
     for(uint i = 0; i < tokens.size(); i++) {
       uint j = 0;
       for( ; j < _labels.size(); j++) {
-	// This works fine, but notorious changes of the Gammma point label
-	// in aflow_kpoints.cpp lead me to do it like: G, Gamma, of \Gamma or
-	// or anything like GAMMA \G or GaMmA or I do not know what else is
-	// still a gamma point labeled as G!
-	//if( _labels[j] == tokens.at(i) ) break;
-	if( _labels[j].find(tokens.at(i)) != string::npos ) break;
+        // This works fine, but notorious changes of the Gammma point label
+        // in aflow_kpoints.cpp lead me to do it like: G, Gamma, of \Gamma or
+        // or anything like GAMMA \G or GaMmA or I do not know what else is
+        // still a gamma point labeled as G!
+        //if( _labels[j] == tokens.at(i) ) break;
+        if( _labels[j].find(tokens.at(i)) != string::npos ) break;
       }
       if( j == _labels.size() ) {
         // ME191031 - use xerror
-	//throw APLRuntimeError("apl::PathBuilder::getPath(); Undefined label of the point.");
-	string function = "apl::PathBuilder::getPath()";
+        //throw APLRuntimeError("apl::PathBuilder::getPath(); Undefined label of the point.");
+        string function = "apl::PathBuilder::getPath()";
         string message = "Undefined label of the point.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
@@ -453,20 +454,20 @@ namespace apl {
   //void PathBuilder::tokenize(const string& str,vector<string>& tokens, string del) {
   //  string delimiters = del;
 
-    // Skip delimiters at beginning.
+  // Skip delimiters at beginning.
   //  string::size_type lastPos = str.find_first_not_of(delimiters, 0);
 
-    // Find first "non-delimiter".
+  // Find first "non-delimiter".
   //  string::size_type pos = str.find_first_of(delimiters, lastPos);
 
   //  while (string::npos != pos || string::npos != lastPos) {
-      // Found a token, add it to the vector.
+  // Found a token, add it to the vector.
   //    tokens.push_back(str.substr(lastPos, pos - lastPos));
 
-      // Skip delimiters. Note the "not_of"
+  // Skip delimiters. Note the "not_of"
   //    lastPos = str.find_first_not_of(delimiters, pos);
 
-      // Find next "non-delimiter"
+  // Find next "non-delimiter"
   //    pos = str.find_first_of(delimiters, lastPos);
   //  }
   //}
@@ -484,24 +485,22 @@ namespace apl {
   }
 
   // ///////////////////////////////////////////////////////////////////////////
-  
-  /*
-    void PathBuilder::transformPointsFor(const xstructure& supercellStructure, StoreEnumType store) {
-        if( store == CARTESIAN_LATTICE ) {
-      if( _store == RECIPROCAL_LATTICE )
-      transform( trasp(ReciprocalLattice(supercellStructure.lattice)) );
-      else
-      }
-      else if( store == RECIPROCAL_LATTICE ) {
-      transform( inverse(trasp(ReciprocalLattice(supercellStructure.lattice))) );
-      }
 
-      _store = store;
-      cartesianLattice = supercellStructure.lattice;
-      reciprocalLattice = ReciprocalLattice(supercellStructure.lattice);
-  
-   }
-  */
+  //void PathBuilder::transformPointsFor(const xstructure& supercellStructure, StoreEnumType store) {
+  //  if( store == CARTESIAN_LATTICE ) {
+  //    if( _store == RECIPROCAL_LATTICE )
+  //      transform( trasp(ReciprocalLattice(supercellStructure.lattice)) );
+  //    else
+  //  }
+  //  else if( store == RECIPROCAL_LATTICE ) {
+  //    transform( inverse(trasp(ReciprocalLattice(supercellStructure.lattice))) );
+  //  }
+
+  //  _store = store;
+  //  cartesianLattice = supercellStructure.lattice;
+  //  reciprocalLattice = ReciprocalLattice(supercellStructure.lattice);
+
+  //}
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -535,7 +534,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()<2){
-       // ME191031 - use xerro
+      // ME191031 - use xerro
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Path size should include at least two points");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Path size should include at least two points";
@@ -556,7 +555,7 @@ namespace apl {
     }
 
     if(!CARTESIAN_COORDS){transform( trasp(ReciprocalLattice(sc.getPrimitiveStructure().lattice)) );} //must be reciprocal
-    
+
     //set lattices
     cartesianLattice = sc.getSupercellStructure().lattice;
     reciprocalLattice = ReciprocalLattice(sc.getSupercellStructure().lattice);
@@ -566,8 +565,8 @@ namespace apl {
   }
 
   void PathBuilder::takeAflowElectronicPath(const string& latticeName,const Supercell& sc){ //CO 180409
-					    //const xstructure& inStructure,
-					    //const xstructure& scStructure) {
+    //const xstructure& inStructure,
+    //const xstructure& scStructure) {
     // Get path from electronic structure...
     stringstream fileKPOINTS;
     // input is not the reciprocal lattice!
