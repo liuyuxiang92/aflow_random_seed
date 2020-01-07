@@ -241,7 +241,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   }
   
   bool convert_sconv=true;
-  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.Clean();}  //best to work with standard conventional unitcell
+  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
@@ -255,7 +255,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   xstr_bulk.ReScale(1.0);
   xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
   xstr_bulk.BringInCell();
-  xstr_bulk.Clean();  //clear origin!
+  xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
   if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
   //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
   
@@ -415,7 +415,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
   //[CO190408 - do rotation last!]  xstr_slab_newbasis.FixLattices();
   //[CO190408 - do rotation last!]  const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
   //[CO190408 - do rotation last!]  for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
-  //[CO190408 - do rotation last!]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.Clean();
+  //[CO190408 - do rotation last!]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
   //[CO190408 - do rotation last!]}
   //[CO190408 - do rotation last!]if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis=" << endl;cerr << xstr_slab_newbasis << endl;}
   //[CO190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
@@ -1037,7 +1037,7 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       //}
 
       //load in xstructure
-      xvasp.str.Clear();
+      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
       xvasp.str=xstr_shear;
 
       //create directory name
@@ -1162,7 +1162,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   }
   
   bool convert_sconv=true;
-  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.Clean();}  //best to work with standard conventional unitcell
+  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
   if(check_min_dist){ //sanity check as we rotate structure/atoms
     min_dist=xstr_bulk.MinDist();
     if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
@@ -1176,7 +1176,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
   xstr_bulk.ReScale(1.0);
   xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
   xstr_bulk.BringInCell();
-  xstr_bulk.Clean();  //clear origin!
+  xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
   if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
   //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
   
@@ -1304,14 +1304,14 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     xvasp.clear();
 
     //load in xstructure
-    xvasp.str.Clear();
+    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
     xvasp.str=xstr_bulk;
     if(convert_sprim){
       xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
       xvasp.str.ReScale(1.0);
       xvasp.str.ShifOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
       xvasp.str.BringInCell();
-      xvasp.str.Clean();  //clear origin!
+      xvasp.str.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
     }
     xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
 
@@ -1502,7 +1502,7 @@ void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& 
     
     xvasp.clear();
     //load in xstructure
-    xvasp.str.Clear();
+    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
     xvasp.str=xstr_slab;
     xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
 
@@ -7359,17 +7359,19 @@ string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>&
     return output.str();
   }
   xvector<double> comp=vcomposition;
-  if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+  xvector<double> final_comp=comp; //DX 20191125
+  //DX 20191125 [OBSOLETE] if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+  if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX 20191125 - new function form
+  else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
   else if(vred==no_vrt){;}
-  else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(std::abs(aurostd::sum(comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
+  else {throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+  if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
     output << vspecies[i];
-    if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
+    if(!(exclude1 && aurostd::identical(final_comp[i+final_comp.lrows],1.0,ZERO_TOL))) {
       if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
       } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
-      output << comp[i+comp.lrows];
+      output << final_comp[i+final_comp.lrows];
       if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
       else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
     }

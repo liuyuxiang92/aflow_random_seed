@@ -48,126 +48,75 @@
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // constructor
-  xmatrix<utype>::xmatrix(int nrh,int nch,int nrl,int ncl) {
-    int i,j;
-    lrows=std::min(nrl,nrh); //if(!nrh||!nch) lrows=0; this messes up convasp
-    urows=std::max(nrl,nrh); //if(!nrh||!nch) urows=0; this messes up convasp
-    lcols=std::min(ncl,nch); //if(!nrh||!nch) lcols=0; this messes up convasp
-    ucols=std::max(ncl,nch); //if(!nrh||!nch) ucols=0; this messes up convasp
-    rows=urows-lrows+1;      //if(!nrh||!nch) rows=0; this messes up convasp
-    cols=ucols-lcols+1;      //if(!nrh||!nch) cols=0; this messes up convasp
-    issquare=bool(rows == cols);
-    isfloat=_isfloat((utype) 0);
-    iscomplex=_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    msize=(long int) size*rows*cols;
+    xmatrix<utype>::xmatrix(int nrh,int nch,int nrl,int ncl) : msize(0) {
+      lrows=std::min(nrl,nrh); //if(!nrh||!nch) lrows=0; this messes up convasp
+      urows=std::max(nrl,nrh); //if(!nrh||!nch) urows=0; this messes up convasp
+      lcols=std::min(ncl,nch); //if(!nrh||!nch) lcols=0; this messes up convasp
+      ucols=std::max(ncl,nch); //if(!nrh||!nch) ucols=0; this messes up convasp
+      refresh();  //CO191112
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "M -> constructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
+      cerr << "M -> constructor:"
+        << "  lrows=" << lrows << ", urows=" << urows
+        << ", lcols=" << lcols << ", ucols=" << ucols
+        << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    if(msize>0) {
-      //Pass **passes = new ( Pass (*[ 10 ]) );
-      //Pass** passes = new Pass*[10];
-      corpus=new utype *[rows+XXEND]; // TRY
-      if(!corpus)
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in constructor (int,int,int,int)" << endl;exit(0);}
-      corpus+= -lrows+ XXEND;
-      corpus[lrows]= new utype[rows*cols+XXEND];
-      if(!corpus[lrows])
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in constructor (int,int,int,int)" << endl;exit(0);}
-      corpus[lrows] += -lcols +XXEND;
-      for(i=lrows+1;i<=urows;i++)
-	corpus[i]=corpus[i-1]+cols;
-      for(i=lrows;i<=urows;i++)                      // clear
-	for(j=lcols;j<=ucols;j++)                    // clear
-	  corpus[i][j]=(utype) 0.0;                    // clear
+      if(msize>0) {
+        corpus=new utype *[rows+XXEND];
+        if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,int,int)",_ALLOC_ERROR_);}
+        corpus+= -lrows+ XXEND;
+        corpus[lrows]= new utype[rows*cols+XXEND];
+        if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,int,int)",_ALLOC_ERROR_);}
+        corpus[lrows]+= -lcols+XXEND;
+        for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
+        clear();
+      }
+#ifdef _XMATH_DEBUG_CONSTRUCTORS
+      cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
+        << ", sizeof=" << size << ", msize=" << msize << endl;
+#endif
     }
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	 << ", sizeof=" << size << ", msize=" << msize << endl;
-#endif
-  }
-}
-  
-namespace aurostd {  // namespace aurostd
-  template<class utype>                                       // copy constructor
-  xmatrix<utype>::xmatrix(const xmatrix<utype>& a) {
-    int i,j;
-    lrows=a.lrows;urows=a.urows;rows=urows-lrows+1;
-    lcols=a.lcols;ucols=a.ucols;cols=ucols-lcols+1;
-    issquare=bool(rows == cols);
-    isfloat=_isfloat((utype) 0);  
-    iscomplex=_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    msize=(long int) size*rows*cols;
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "M -> copy constructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
-#endif
-    if(msize>0) {
-      corpus=new utype *[rows+XXEND];
-      if(!corpus)
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in constructor (xmatrix)" << endl;exit(0);}
-      corpus+= -lrows + XXEND;
-      corpus[lrows]= new utype[rows*cols+XXEND];
-      if(!corpus[lrows])
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in constructor (xmatrix)" << endl;exit(0);}
-      corpus[lrows] += -lcols +XXEND;
-      for(i=lrows+1;i<=urows;i++)
-	corpus[i]=corpus[i-1]+cols;
-      for(i=lrows;i<=urows;i++)          
-	for(j=lcols;j<=ucols;j++)        
-	  corpus[i][j]=(utype) a.corpus[i][j];
-    }
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	 << ", sizeof=" << size << ", msize=" << msize << endl;
-#endif
-  }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-  xmatrix<utype>::xmatrix(int vrows,int vcols, utype* a) {  // a starts from 0..
-    int i,j;
-    lrows=1;urows=vrows;rows=urows-lrows+1;
-    lcols=1;ucols=vcols;cols=ucols-lcols+1;
-    issquare=bool(rows == cols);
-    isfloat=_isfloat((utype) 0);  
-    iscomplex=_iscomplex((utype) 0);
-    size=(char) (sizeof(utype));
-    msize=(long int) size*rows*cols;
+    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) : msize(0) {copy(b);}  //CO191112
+  template<class utype>                                       // copy constructor
+    xmatrix<utype>::xmatrix(const xvector<utype>& b) : msize(0) {copy(b);}  //CO191112
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                       // copy constructor
+    xmatrix<utype>::xmatrix(int vrows,int vcols, utype* a) : msize(0) {  // a starts from 0..
+      lrows=1;urows=vrows;
+      lcols=1;ucols=vcols;
+      refresh();  //CO191112
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "M -> copy constructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
+      cerr << "M -> copy constructor:"
+        << "  lrows=" << lrows << ", urows=" << urows
+        << ", lcols=" << lcols << ", ucols=" << ucols
+        << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    if(msize>0) {
-      corpus=new utype *[rows+XXEND];
-      if(!corpus)
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in constructor (xmatrix)" << endl;exit(0);}
-      corpus+= -lrows + XXEND;
-      corpus[lrows]= new utype[rows*cols+XXEND];
-      if(!corpus[lrows])
-	{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in constructor (xmatrix)" << endl;exit(0);}
-      corpus[lrows] += -lcols +XXEND;
-      for(i=lrows+1;i<=urows;i++)
-	corpus[i]=corpus[i-1]+cols;
-      for(i=lrows;i<=urows;i++)          
-	for(j=lcols;j<=ucols;j++)        
-	  corpus[i][j]=(utype) a[(i-1)*ucols+(j-1)]; // a.corpus[i][j];  // LIKE FORTRAN
-      //      delete [] a;
+      if(msize>0) {
+        corpus=new utype *[rows+XXEND];
+        if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,utype*)",_ALLOC_ERROR_);}
+        corpus+= -lrows+ XXEND;
+        corpus[lrows]= new utype[rows*cols+XXEND];
+        if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,utype*)",_ALLOC_ERROR_);}
+        corpus[lrows]+= -lcols+XXEND;
+        int i=0,j=0;
+        for(i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
+        for(i=lrows;i<=urows;i++){
+          for(j=lcols;j<=ucols;j++){
+            corpus[i][j]=(utype) a[(i-1)*ucols+(j-1)]; // a.corpus[i][j];  // LIKE FORTRAN
+          }
+        }
+        //      delete [] a;
+      }
+#ifdef _XMATH_DEBUG_CONSTRUCTORS
+      cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
+        << ", sizeof=" << size << ", msize=" << msize << endl;
+#endif
     }
-#ifdef _XMATH_DEBUG_CONSTRUCTORS
-    cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	 << ", sizeof=" << size << ", msize=" << msize << endl;
-#endif
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -175,75 +124,106 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                     // default destructor
-  xmatrix<utype>::~xmatrix() {
-    // cerr << "problem destructor xmatrix [1]" << endl;
-    // free a xmatrix allocated with xmatrix()
+    xmatrix<utype>::~xmatrix() {
+      // cerr << "problem destructor xmatrix [1]" << endl;
+      // free a xmatrix allocated with xmatrix()
 #ifdef _XMATH_DEBUG_DESTRUCTORS
-    cerr << "M -> default destructor:"
-	 << "  lrows=" << lrows << ", urows=" << urows
-	 << ", lcols=" << lcols << ", ucols=" << ucols
-	 << ", rows="  << rows  << ", cols="  << cols << endl;
+      cerr << "M -> default destructor:"
+        << "  lrows=" << lrows << ", urows=" << urows
+        << ", lcols=" << lcols << ", ucols=" << ucols
+        << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-    if(msize>0) {
-      delete [] (corpus[lrows]+lcols-XXEND);
-      delete [] (corpus+lrows-XXEND);
+      free(); //CO190808
     }
-    // cerr << "problem destructor xmatrix [2]" << endl;
-  }
 }
 // ----------------------------------------------------------------------------
 // -------------------------------------------------------- assigment operators
-  
+ 
+namespace aurostd { // namespace aurostd
+  template<class utype>
+    void xmatrix<utype>::free() { //CO190808
+      if(msize>0) {
+        delete [] (corpus[lrows]+lcols-XXEND);
+        delete [] (corpus+lrows-XXEND);
+      }
+      lrows=urows=lcols=ucols=0;refresh();
+    }
+}
+
 namespace aurostd {  // namespace aurostd
-  template<class utype>                                             // operator =
-  xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& a) {
-    int i,j;
-    if(corpus!=a.corpus||rows!=a.rows||cols!=a.cols||lrows!=a.lrows||urows!=a.urows||lcols!=a.lcols||ucols!=a.ucols) {                // check  for a=a
-      //CO 170803 - ODD CORNER CASE, same corpus and rows, but different lrows and urows
-      //if(rows!=a.rows||cols!=a.cols) {
-      if(rows!=a.rows||cols!=a.cols||lrows!=a.lrows||urows!=a.urows||lcols!=a.lcols||ucols!=a.ucols) {
-	// if dims(this)!=dims(a) => build a new xmatrix !!!
-	if(msize>0) {
-	  delete [] (corpus[lrows]+lcols-XXEND);
-	  delete [] (corpus+lrows-XXEND);
-	}
-	lrows=a.lrows;urows=a.urows;rows=a.rows;
-	lcols=a.lcols;ucols=a.ucols;cols=a.cols;
-	issquare=bool(rows == cols);
-	isfloat=_isfloat((utype) 0);
-	iscomplex=_iscomplex((utype) 0);
-	size=(char) sizeof(utype);
-	msize=(long int) size*rows*cols;
+  template<class utype>
+    void xmatrix<utype>::copy(const xmatrix<utype>& b) { //CO190808
+      if(lrows!=b.lrows||urows!=b.urows||lcols!=b.lrows||ucols!=b.ucols||msize!=b.msize) {    // if dims(this)!=dims(a) => build a new xmatrix !!!  //CO190808 - VERY IMPORTANT that we not only check lrows/urows/lcols/ucols, but msize, as xmatrix could just have been initialized (msize==0)
+        free();
+        lrows=b.lrows;urows=b.urows;rows=b.rows;
+        lcols=b.lcols;ucols=b.ucols;cols=b.cols;
+        //[simply copy instead]refresh();
+        issquare=bool(rows == cols);
+        isfloat=_isfloat((utype) 0);
+        iscomplex=_iscomplex((utype) 0);
+        size=(char) sizeof(utype);
+        msize=(long int) size*rows*cols;
 #ifdef _XMATH_DEBUG_OPERATORS
-	cerr << "M -> operator =::"
-	     << "  lrows=" << lrows << ", urows=" << urows
-	     << ", lcols=" << lcols << ", ucols=" << ucols
-	     << ", rows="  << rows  << ", cols="  << cols << endl;
+        cerr << "M -> operator =::"
+          << "  lrows=" << lrows << ", urows=" << urows
+          << ", lcols=" << lcols << ", ucols=" << ucols
+          << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
-	if(msize>0) {
-	  corpus=new utype *[rows+XXEND];
-	  if(!corpus)
-	    {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 1 in assignment" << endl;exit(0);}
-	  corpus+= -lrows+ XXEND;
-	  corpus[lrows]= new utype[rows*cols+XXEND];
-	  if(!corpus[lrows])
-	    {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: allocation failure 2 in assignment" << endl;exit(0);}
-	  corpus[lrows]+= -lcols+XXEND;
-	  for(i=lrows+1;i<=urows;i++)
-	    corpus[i]=corpus[i-1]+cols;
-	}
+        if(msize>0) {
+          corpus=new utype *[rows+XXEND];
+          if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 1 in COPY",_ALLOC_ERROR_);}
+          corpus+= -lrows+ XXEND;
+          corpus[lrows]= new utype[rows*cols+XXEND];
+          if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 2 in COPY",_ALLOC_ERROR_);}
+          corpus[lrows]+= -lcols+XXEND;
+          for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
+        }
 #ifdef _XMATH_DEBUG_CONSTRUCTORS
-	cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
-	     << ", sizeof=" << size << ", msize=" << msize << endl;
+        cerr << "issquare=" << issquare << ", isfloat=" << isfloat << ", iscomplex=" << iscomplex
+          << ", sizeof=" << size << ", msize=" << msize << endl;
 #endif
       }
-      for(j=0;j<cols;j++)
-	for(i=0;i<rows;i++)
-	  this->corpus[i+lrows][j+lcols] =
-	    a.corpus[i+a.lrows][j+a.lcols];
+      if(corpus!=b.corpus){
+        int i=0,j=0;
+        for(i=0;i<rows;i++){
+          for(j=0;j<cols;j++){
+            corpus[i+lrows][j+lcols] = b.corpus[i+b.lrows][j+b.lcols];
+          }
+        }
+      } //CO190808 - we definitely have corpus now
     }
-    return *this;
-  }
+  template<class utype>
+    void xmatrix<utype>::copy(const xvector<utype>& b) { //CO190808
+      xmatrix<utype> a(b.urows,1,b.lrows,1);
+      for(int i=b.lrows;i<=b.urows;i++){a[i][1]=b[i];}
+      copy(a);
+    }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                             // operator =
+    xmatrix<utype>& xmatrix<utype>::operator=(const xmatrix<utype>& b) {  //CO191112
+      if(this!=&b) {copy(b);}
+      return *this;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    void xmatrix<utype>::refresh(void) { //CO190808
+      rows=urows-lrows+1;      //if(!nrh||!nch) rows=0; this messes up convasp
+      cols=ucols-lcols+1;      //if(!nrh||!nch) cols=0; this messes up convasp
+      if(rows==0||cols==0) {
+        cerr << "XMATRIX constructor: creating EMPTY xmatrix<utype>" << endl;
+        lrows=0;urows=0;rows=0;
+        lcols=0;ucols=0;cols=0;
+      };
+      issquare=bool(rows == cols);
+      isfloat=_isfloat((utype) 0);
+      iscomplex=_iscomplex((utype) 0);
+      size=(char) (sizeof(utype));
+      msize=(long int) size*rows*cols;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -317,35 +297,69 @@ namespace aurostd {  // namespace aurostd
   }
 }
 
-//CO190808
 namespace aurostd {  // namespace aurostd
   template<class utype>
+    xvector<utype> xmatrix<utype>::getdiag(int k,int _lrows) const { //CO191210
+      //first get length
+      int _rows=0,i=0,j=0;
+      for(i=lrows;i<=urows;i++){
+        j=i+k;
+        if(j>ucols){break;}
+        _rows++;
+      }
+      xvector<utype> diag(_rows,_lrows);
+      int index=_lrows;
+      for(i=lrows;i<=urows;i++){
+        j=i+k;
+        if(j>ucols){break;}
+        diag[index++]=corpus[i][j];
+      }
+      return diag;
+    }
+}
+
+//CO190808
+namespace aurostd {  // namespace aurostd
   //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
   //lrows_out,lcols_out specifies lrows,lcols of mat_out
   //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
-  void xmatrix<utype>::getmat(xmatrix<utype>& mat_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
-    string soliloquy="aurostd::getmat():";
-    if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
-    if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
-    if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
-    if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
-    int rows_out=(urow-lrow)+1;
-    int cols_out=(ucol-lcol)+1;
-    if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
-      xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
-      mat_out=mat;
+  template<class utype> void
+    xmatrix<utype>::getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
+      string soliloquy="aurostd::getmatInPlace():";
+      if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
+      if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
+      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
+      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
+      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
+      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+      int rows_out=(urow-lrow)+1;
+      int cols_out=(ucol-lcol)+1;
+      if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
+        xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
+        mat_out=mat;
+      }
+      for(int i=lrow;i<=urow;i++){
+        for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j];}
+      }
     }
-    for(int i=lrow;i<=urow;i++){
-      for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j];}
+  template<class utype> void
+    xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO191110
+      xmatrix<utype> xmat;
+      (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
     }
-  }
-  template<class utype>
-  void xmatrix<utype>::getmat(xvector<utype>& xv_out,int urow,int ucol,int lrow,int lcol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO191110
-    string soliloquy="aurostd::getmat():";
-    xmatrix<utype> xmat;
-    (*this).getmat(xmat,urow,ucol,lrow,lcol,lrows_out,lcols_out);
-    xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
-  }
+  template<class utype> xmatrix<utype>
+    xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
+      xmatrix<utype> xmat;
+      (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      return xmat;
+    }
+  template<class utype> xvector<utype>
+    xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO191110
+      xvector<utype> xvec;
+      (*this).getmatInPlace(xvec,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      return xvec;
+    }
 }
 
 //CO190808
@@ -585,9 +599,8 @@ namespace aurostd {  // namespace aurostd
 // -------------------------------------------------- operator xmatrix /= utype
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>&                  
-  // removed inline
-  xmatrix<utype>::operator /=(utype r)
-  {  //CO191110
+    // removed inline
+    xmatrix<utype>::operator /=(utype r){  //CO191110
 #ifdef _XMATH_DEBUG_OPERATORS
       printf("M -> operator *=: ");
       printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
@@ -601,27 +614,41 @@ namespace aurostd {  // namespace aurostd
           corpus[i][j]/=r;
         }
       return *this;
-  }
+    }
+  template<class utype> xmatrix<utype>&                  
+    // removed inline
+    xmatrix<utype>::operator /=(const xmatrix<utype>& a){  //CO191201 - right matrix division
+#ifdef _XMATH_DEBUG_OPERATORS
+      printf("M -> operator *=: ");
+      printf("this->lrows=%i, this->urows=%i, ",this->lrows,this->urows);
+      printf("this->lcols=%i, this->ucols=%i\n",this->lcols,this->ucols);
+      printf("                 ");
+      printf("b.lrows=%i, b.urows=%i, ",b.lrows,b.urows);
+      printf("b.lcols=%i, b.ucols=%i\n",b.lcols,b.ucols);
+#endif
+      *this=*this*inverse(a);
+      return *this;
+    }
 }
 
 // ----------------------------------------------------------- operator +xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                          
-  xmatrix<utype> operator+(const xmatrix<utype>& a) {
-    return a;
-  }
+    xmatrix<utype> operator+(const xmatrix<utype>& a) {
+      return a;
+    }
 }
 
 // ----------------------------------------------------------- operator -xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                          
-  xmatrix<utype> operator-(const xmatrix<utype>& a) {
-    xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
-    for (int i=a.lrows;i<=a.urows;i++)
-      for (int j=a.lcols;j<=a.ucols;j++)
-	c[i][j]=-a[i][j];
-    return c;
-  }
+    xmatrix<utype> operator-(const xmatrix<utype>& a) {
+      xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
+      for (int i=a.lrows;i<=a.urows;i++)
+        for (int j=a.lcols;j<=a.ucols;j++)
+          c[i][j]=-a[i][j];
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -631,58 +658,58 @@ namespace aurostd {  // namespace aurostd
 // --------------------------------------------------- operator xmatrix + xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                          
-  xmatrix<utype> operator+(const xmatrix<utype>& a,const xmatrix<utype>& b) {
-    
+    xmatrix<utype> operator+(const xmatrix<utype>& a,const xmatrix<utype>& b) {
+
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+      printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
-    if(a.rows!=b.rows||a.cols!=b.cols)
+      if(a.rows!=b.rows||a.cols!=b.cols)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator+:"
-	    << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
-    xmatrix<utype> c(a.rows,a.cols);
-    int i,j;
-    utype *bi,*ci,*ai;
-    for(i=0;i<a.rows;i++) {
-      ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
-      for(j=0;j<a.cols;j++)
-	ci[j+c.lcols]=ai[j+a.lcols]+bi[j+b.lcols];}
-    return c;
-  }
+        << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
+      xmatrix<utype> c(a.rows,a.cols);
+      int i,j;
+      utype *bi,*ci,*ai;
+      for(i=0;i<a.rows;i++) {
+        ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
+        for(j=0;j<a.cols;j++)
+          ci[j+c.lcols]=ai[j+a.lcols]+bi[j+b.lcols];}
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 // --------------------------------------------------- operator xmatrix - xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  xmatrix<utype> operator-(const xmatrix<utype>& a,const xmatrix<utype>& b) {
-    
+    xmatrix<utype> operator-(const xmatrix<utype>& a,const xmatrix<utype>& b) {
+
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+      printf("M -> operator +: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
-    if(a.rows!=b.rows||a.cols!=b.cols)
+      if(a.rows!=b.rows||a.cols!=b.cols)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator-:"
-	    << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
-    xmatrix<utype> c(a.rows,a.cols);
-    int i,j;
-    utype *bi,*ci,*ai;
-    for(i=0;i<a.rows;i++) {
-      ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
-      for(j=0;j<a.cols;j++)
-	ci[j+c.lcols]=ai[j+a.lcols]-bi[j+b.lcols];};
-    return c;
-  }
+        << " (a.rows!=b.rows||a.cols!=b.cols)=FALSE" << endl;exit(0);}
+      xmatrix<utype> c(a.rows,a.cols);
+      int i,j;
+      utype *bi,*ci,*ai;
+      for(i=0;i<a.rows;i++) {
+        ai=a[i+a.lrows];bi=b[i+b.lrows];ci=c[i+c.lrows];
+        for(j=0;j<a.cols;j++)
+          ci[j+c.lcols]=ai[j+a.lcols]-bi[j+b.lcols];};
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 // --------------------------------------------------- operator xmatrix * xmatrix
 namespace aurostd {  // namespace aurostd
   template<class utype>                  
-  xmatrix<utype> operator*(const xmatrix<utype>& a,const xmatrix<utype>& b) {    
+    xmatrix<utype> operator*(const xmatrix<utype>& a,const xmatrix<utype>& b) {    
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
+      printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif    
     if(a.cols!=b.rows) {
       // ME190814 - eliminate exit
@@ -756,66 +783,70 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // operator xmatrix * xvector
-  xvector<utype> operator*(const xmatrix<utype>& a,const xvector<utype>& b) {    
+    xvector<utype> operator*(const xmatrix<utype>& a,const xvector<utype>& b) {    
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
-    printf("M -> operator *: b.lrows=%i, b.urows=%i \n",b.lrows,b.urows);
+      printf("M -> operator *: a.lrows=%i, a.urows=%i, a.lcols=%i, a.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator *: b.lrows=%i, b.urows=%i \n",b.lrows,b.urows);
 #endif    
-    if(a.cols!=b.rows)
+      if(a.cols!=b.rows)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator* xmatrix * xvector: (a.cols!=b.rows)=FALSE " << a.cols << " " << b.rows << endl;exit(0);}    
-    xvector<utype> c(a.lrows,a.urows);    
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-        //      c[i]+=a[i][j]*b[j-b.lrows+1];
-        c(i)+=a(i,j)*b(j-b.lrows+1);   // check... the 1 might be wrong
-    return  c;
-  }
+      xvector<utype> c(a.lrows,a.urows);    
+      for(int i=a.lrows;i<=a.urows;i++)
+        for(int j=a.lcols;j<=a.ucols;j++)
+          //      c[i]+=a[i][j]*b[j-b.lrows+1];
+          c(i)+=a(i,j)*b(j-b.lrows+1);   // check... the 1 might be wrong
+      return  c;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // operator xvector * xmatrix
-  xvector<utype> operator*(const xvector<utype>& a,const xmatrix<utype>& b) {    
+    xvector<utype> operator*(const xvector<utype>& a,const xmatrix<utype>& b) {    
 #ifdef _XMATH_DEBUG_OPERATORS
-    printf("M -> operator *: a.lrows=%i, a.urows=%i \n",a.lrows,a.urows);
-    printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
+      printf("M -> operator *: a.lrows=%i, a.urows=%i \n",a.lrows,a.urows);
+      printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
 #endif    
-    if(a.rows!=b.rows)
+      if(a.rows!=b.rows)
       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>: failure in operator* xvector * xmatrix: (a.rows!=b.rows)=FALSE " << a.rows << " " << b.rows << endl;exit(0);}  
-    xvector<utype> c(b.lcols,b.ucols);    
-    for(int i=b.lcols;i<=b.ucols;i++)
-      for(int j=a.lrows;j<=a.urows;j++)
-        //      c[i]+=a[j]*b[j-a.lrows+b.lrows][i];
-        c(i)+=a(j)*b(j-a.lrows+b.lrows,i);
-    return  c;
-  }
+      xvector<utype> c(b.lcols,b.ucols);    
+      for(int i=b.lcols;i<=b.ucols;i++)
+        for(int j=a.lrows;j<=a.urows;j++)
+          //      c[i]+=a[j]*b[j-a.lrows+b.lrows][i];
+          c(i)+=a(j)*b(j-a.lrows+b.lrows,i);
+      return  c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix * scalar
-  operator*(const utype s,const xmatrix<utype>& a) {
-    xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
-    for(int i=c.lrows;i<=c.urows;i++)
-      for(int j=c.lcols;j<=c.ucols;j++)
-	c[i][j]=(utype) a[i][j]*(utype) s;
-    return c;
-  }
+    operator*(const utype s,const xmatrix<utype>& a) {
+      xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
+      for(int i=c.lrows;i<=c.urows;i++)
+        for(int j=c.lcols;j<=c.ucols;j++)
+          c[i][j]=(utype) a[i][j]*(utype) s;
+      return c;
+    }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                //  operator scalar * xmatrix
-  operator*(const xmatrix<utype>& a,const utype s) {
-    return s*a;
-  }
+    operator*(const xmatrix<utype>& a,const utype s) {
+      return s*a;
+    }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
-  operator/(const xmatrix<utype>& a,const utype s) {
-    return (utype) ((utype)1/s)*a;                     // DX 1/15/17 - add utype to 1/s to account for xcomplex
+    operator/(const xmatrix<utype>& a,const utype s) {
+      return (utype) ((utype)1/s)*a;                     // DX 1/15/17 - add utype to 1/s to account for xcomplex
+    }
+  template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
+    operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO191201
+      return a*inverse(b);
   }
 }
 
@@ -1341,29 +1372,32 @@ namespace aurostd {  // namespace aurostd
   //171008 - CO
   //doesn't have to be square like identity
   template<class utype> xmatrix<utype>
-  eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
-    xmatrix<utype> a(nrh,nch,nrl,ncl);
-    for (int i=a.lrows;i<=a.urows;i++){
-      for (int j=a.lcols;j<=a.ucols;j++){
-        if(i==j){a[i][j]=(utype)1;}
+    eye(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
+      if(nch==AUROSTD_MAX_INT){nch=nrh;}  //eye(3)==eye(3,3)
+      xmatrix<utype> a(nrh,nch,nrl,ncl);
+      //[CO200106 - doesn't work for lrows!=lcols]for (int i=a.lrows;i<=a.urows && i<=a.ucols;i++){a[i][i] = (utype)1;} //ME200106
+      int i=0,j=0;
+      for (i=a.lrows;i<=a.urows;i++){
+        for (j=a.lcols;j<=a.ucols;j++){
+          if(i==j){a[i][j]=(utype)1;}
+        }
       }
+      return a;
     }
-    return a;
-  }
 }
 
 namespace aurostd {  // namespace aurostd
   //171008 - CO
   template<class utype> xmatrix<utype>
-  ones_xm(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
-    xmatrix<utype> a(nrh,nch,nrl,ncl);
-    for (int i=a.lrows;i<=a.urows;i++){
-      for (int j=a.lcols;j<=a.ucols;j++){
-        a[i][j]=(utype)1;
+    ones_xm(int nrh,int nch,int nrl,int ncl) __xprototype { //CO190520
+      xmatrix<utype> a(nrh,nch,nrl,ncl);
+      for (int i=a.lrows;i<=a.urows;i++){
+        for (int j=a.lcols;j<=a.ucols;j++){
+          a[i][j]=(utype)1;
+        }
       }
+      return a;
     }
-    return a;
-  }
 }
 
 // ****************************************************************************
@@ -1479,52 +1513,85 @@ namespace aurostd {                   // conversion to xvector
   }
 }
 
+//CO191201
+namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
+  template<class utype> xmatrix<double> 
+    xmatrixutype2double(const xmatrix<utype>& a){ //CO191201
+      xmatrix<double> b(a.urows,a.ucols,a.lrows,a.lcols);
+      int i=0,j=0;
+      for(i=a.lrows;i<=a.urows;i++){
+        for(j=a.lcols;j<=a.ucols;j++){
+          b[i][j]=(double)a[i][j];
+        }
+      }
+      return b;
+    }
+}
+
+//CO191201
+namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
+  template<class utype> xmatrix<utype> 
+    xmatrixdouble2utype(const xmatrix<double>& a,bool check_int){  //CO191201
+      xmatrix<utype> b(a.urows,a.ucols,a.lrows,a.lcols);
+      int i=0,j=0;
+      if(check_int){
+        for(i=a.lrows;i<=a.urows;i++){
+          for(j=a.lcols;j<=a.ucols;j++){
+            if(!isinteger(a[i][j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrixdouble2utype():","non-integer found ["+aurostd::utype2string(a[i][j])+"]",_INPUT_ILLEGAL_);}
+          }
+        }
+      }
+      for(i=a.lrows;i<=a.urows;i++){
+        for(j=a.lcols;j<=a.ucols;j++){
+          b[i][j]=(utype)nint(a[i][j]);  //nint is for safety
+        }
+      }
+      return b;
+    }
+}
+
 // ****************************************************************************
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // function reset xmatrix<>
-  void xmatrix<utype>::reset(void) {
+    void xmatrix<utype>::reset(void) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function reset: "
-	<<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
+      cout<<"M -> function reset: "
+        <<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
 #endif
-    for(int i=lrows;i<=urows;i++)
-      for(int j=lcols;j<=ucols;j++)
-	corpus[i][j]=(utype) 0.0;
-  }
+      for(int i=lrows;i<=urows;i++)
+        for(int j=lcols;j<=ucols;j++)
+          corpus[i][j]=(utype) 0.0;
+    }
   template<class utype>                               // function reset xmatrix<>
-  void reset(xmatrix<utype>& a) {
+    void reset(xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function reset: "
-	<<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
+      cout<<"M -> function reset: "
+        <<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
 #endif
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-	a[i][j]=(utype) 0.0;
-  }
+      for(int i=a.lrows;i<=a.urows;i++)
+        for(int j=a.lcols;j<=a.ucols;j++)
+          a[i][j]=(utype) 0.0;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                               // function clear xmatrix<>
-  void xmatrix<utype>::clear(void) {
+    void xmatrix<utype>::clear(void) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function clear: "
-	<<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
+      cout<<"M -> function clear: "
+        <<" lrows="<<lrows<<" urows="<<urows<<" lcols="<<lcols<<" ucols="<<ucols<<endl;
 #endif
-    for(int i=lrows;i<=urows;i++)
-      for(int j=lcols;j<=ucols;j++)
-	corpus[i][j]=(utype) 0.0;
-  }
+      reset();
+    }
   template<class utype>                               // function clear xmatrix<>
-  void clear(xmatrix<utype>& a) {
+    void clear(xmatrix<utype>& a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    cout<<"M -> function clear: "
-	<<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
+      cout<<"M -> function clear: "
+        <<" a.lrows="<<a.lrows<<" a.urows="<<a.urows<<" a.lcols="<<a.lcols<<" a.ucols="<<a.ucols<<endl;
 #endif
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-	a[i][j]=(utype) 0.0;
-  }
+      reset(a);
+    }
 }
 
 namespace aurostd {  // namespace aurostd
@@ -1566,52 +1633,54 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function det xmatrix<>
-  utype det(const xmatrix<utype>& a) {
-    /* returns the determinant **/
-    if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.rows = a.cols" << endl;exit(0);}
-    if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lrows = 1" << endl;exit(0);}
-    if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lcols = 1" << endl;exit(0);}
-    int size=a.rows;
-    //  cerr << "DET CALL size="<<size<< endl;
-    if(size==1) { return (utype) a[1][1]; }
-    if(size==2) { return (utype) a[1][1]*a[2][2]-a[1][2]*a[2][1]; }
-    if(size==3) { 
-      return (utype) (a[1][1]*a[2][2]*a[3][3]+
-		      a[1][2]*a[2][3]*a[3][1]+
-		      a[1][3]*a[2][1]*a[3][2]-
-		      a[1][3]*a[2][2]*a[3][1]-
-		      a[1][2]*a[2][1]*a[3][3]-
-		      a[1][1]*a[2][3]*a[3][2]); }
-    if(size==4) { 
-      return (utype) (a[1][4]*a[2][3]*a[3][2]*a[4][1]-a[1][3]*a[2][4]*a[3][2]*a[4][1]-a[1][4]*a[2][2]*a[3][3]*a[4][1]+a[1][2]*a[2][4]*a[3][3]*a[4][1]+
-		      a[1][3]*a[2][2]*a[3][4]*a[4][1]-a[1][2]*a[2][3]*a[3][4]*a[4][1]-a[1][4]*a[2][3]*a[3][1]*a[4][2]+a[1][3]*a[2][4]*a[3][1]*a[4][2]+
-		      a[1][4]*a[2][1]*a[3][3]*a[4][2]-a[1][1]*a[2][4]*a[3][3]*a[4][2]-a[1][3]*a[2][1]*a[3][4]*a[4][2]+a[1][1]*a[2][3]*a[3][4]*a[4][2]+
-		      a[1][4]*a[2][2]*a[3][1]*a[4][3]-a[1][2]*a[2][4]*a[3][1]*a[4][3]-a[1][4]*a[2][1]*a[3][2]*a[4][3]+a[1][1]*a[2][4]*a[3][2]*a[4][3]+
-		      a[1][2]*a[2][1]*a[3][4]*a[4][3]-a[1][1]*a[2][2]*a[3][4]*a[4][3]-a[1][3]*a[2][2]*a[3][1]*a[4][4]+a[1][2]*a[2][3]*a[3][1]*a[4][4]+
-		      a[1][3]*a[2][1]*a[3][2]*a[4][4]-a[1][1]*a[2][3]*a[3][2]*a[4][4]-a[1][2]*a[2][1]*a[3][3]*a[4][4]+a[1][1]*a[2][2]*a[3][3]*a[4][4]);  }
-    utype out=(utype) 0;
-    if(size>=5) {
-      xmatrix<utype> b(size-1,size-1);
-      for(int j=1;j<=size;j++) {
-	for(int ib=1;ib<=size-1;ib++)                                         // make sub
-	  for(int jb=1;jb<=size-1;jb++)                                       // make sub
-	    if(jb<j) { b[ib][jb]=a[ib+1][jb]; } else { b[ib][jb]=a[ib+1][jb+1]; }  // make sub --- FASTER
-	if(_isodd(j)) { out+=a[1][j]*det(b); } else { out-=a[1][j]*det(b); }         // get part --- FASTER
-	//if(jb<j)  { b(ib,jb)=a(ib+1,jb); } else {  b(ib,jb)=a(ib+1,jb+1); }        // make sub --- SLOWER
-	//if(_isodd(j)) { out+=a(1,j)*det(b); } else { out-=a(1,j)*det(b); }         // get part --- SLOWER
+    utype det(const xmatrix<utype>& a) {
+      /* returns the determinant **/
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::det()","a must be square",_INPUT_ILLEGAL_);}
+      if(a.lrows!=1 || a.lcols!=1){xmatrix<utype> b=a;shiftlrowscols(b,1,1);return det(b);}
+      //[CO191201 - OBSOLETE]if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.rows = a.cols" << endl;exit(0);}
+      //[CO191201 - OBSOLETE]if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lrows = 1" << endl;exit(0);}
+      //[CO191201 - OBSOLETE]if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::determinant: must have a.lcols = 1" << endl;exit(0);}
+      int size=a.rows;
+      //  cerr << "DET CALL size="<<size<< endl;
+      if(size==1) { return (utype) a[1][1]; }
+      if(size==2) { return (utype) a[1][1]*a[2][2]-a[1][2]*a[2][1]; }
+      if(size==3) { 
+        return (utype) (a[1][1]*a[2][2]*a[3][3]+
+            a[1][2]*a[2][3]*a[3][1]+
+            a[1][3]*a[2][1]*a[3][2]-
+            a[1][3]*a[2][2]*a[3][1]-
+            a[1][2]*a[2][1]*a[3][3]-
+            a[1][1]*a[2][3]*a[3][2]); }
+      if(size==4) { 
+        return (utype) (a[1][4]*a[2][3]*a[3][2]*a[4][1]-a[1][3]*a[2][4]*a[3][2]*a[4][1]-a[1][4]*a[2][2]*a[3][3]*a[4][1]+a[1][2]*a[2][4]*a[3][3]*a[4][1]+
+            a[1][3]*a[2][2]*a[3][4]*a[4][1]-a[1][2]*a[2][3]*a[3][4]*a[4][1]-a[1][4]*a[2][3]*a[3][1]*a[4][2]+a[1][3]*a[2][4]*a[3][1]*a[4][2]+
+            a[1][4]*a[2][1]*a[3][3]*a[4][2]-a[1][1]*a[2][4]*a[3][3]*a[4][2]-a[1][3]*a[2][1]*a[3][4]*a[4][2]+a[1][1]*a[2][3]*a[3][4]*a[4][2]+
+            a[1][4]*a[2][2]*a[3][1]*a[4][3]-a[1][2]*a[2][4]*a[3][1]*a[4][3]-a[1][4]*a[2][1]*a[3][2]*a[4][3]+a[1][1]*a[2][4]*a[3][2]*a[4][3]+
+            a[1][2]*a[2][1]*a[3][4]*a[4][3]-a[1][1]*a[2][2]*a[3][4]*a[4][3]-a[1][3]*a[2][2]*a[3][1]*a[4][4]+a[1][2]*a[2][3]*a[3][1]*a[4][4]+
+            a[1][3]*a[2][1]*a[3][2]*a[4][4]-a[1][1]*a[2][3]*a[3][2]*a[4][4]-a[1][2]*a[2][1]*a[3][3]*a[4][4]+a[1][1]*a[2][2]*a[3][3]*a[4][4]);  }
+      utype out=(utype) 0;
+      if(size>=5) {
+        xmatrix<utype> b(size-1,size-1);
+        for(int j=1;j<=size;j++) {
+          for(int ib=1;ib<=size-1;ib++)                                         // make sub
+            for(int jb=1;jb<=size-1;jb++)                                       // make sub
+              if(jb<j) { b[ib][jb]=a[ib+1][jb]; } else { b[ib][jb]=a[ib+1][jb+1]; }  // make sub --- FASTER
+          if(_isodd(j)) { out+=a[1][j]*det(b); } else { out-=a[1][j]*det(b); }         // get part --- FASTER
+          //if(jb<j)  { b(ib,jb)=a(ib+1,jb); } else {  b(ib,jb)=a(ib+1,jb+1); }        // make sub --- SLOWER
+          //if(_isodd(j)) { out+=a(1,j)*det(b); } else { out-=a(1,j)*det(b); }         // get part --- SLOWER
+        }
+        return (utype) out;
       }
       return (utype) out;
     }
-    return (utype) out;
-  }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                       // function determinant xmatrix<>
-  utype determinant(const xmatrix<utype>& a) {
-    return (utype) det(a);
-  }
+    utype determinant(const xmatrix<utype>& a) {
+      return (utype) det(a);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1685,46 +1754,81 @@ namespace aurostd { // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  template<class utype> xmatrix<utype>                       // minor submatrix
-  submatrix(const xmatrix<utype>& a,const int& irow,const int& jcol) {
-    //     if(irow<a.lrows || irow>a.urows || jcol<a.lcols || jcol>a.ucols) {
-    //       cerr << _AUROSTD_XLIBS_ERROR_ << "submatrix, error in irows,icols: ";
-    //       cerr << " a.urows= " << a.urows << " a.lrows= " << a.lrows;
-    //       cerr << " a.ucols= " << a.ucols << " a.lcols= " << a.lcols;
-    //       cerr << " irow=" << irow << " jcol=" << jcol << endl;
-    //       exit(0);
-    //     }
-    if(irow>=a.lrows && irow<=a.urows && jcol>=a.lcols && jcol<=a.ucols) {
-      xmatrix<utype> b(a.urows-1,a.ucols-1,a.lrows,a.lcols);
-      for(int i=a.lrows;i<=a.urows;i++)
-	for(int j=a.lcols;j<=a.ucols;j++) {
-	  if(i<irow && j<jcol) b[i][j]=a[i][j];
-	  if(i>irow && j<jcol) b[i-1][j]=a[i][j];
-	  if(i<irow && j>jcol) b[i][j-1]=a[i][j];
-	  if(i>irow && j>jcol) b[i-1][j-1]=a[i][j];
-	}
-      return b;
+  template<class utype> void                       // minor submatrix - IN PLACE (faster for big routines)
+    submatrixInPlace(const xmatrix<utype>& a,xmatrix<utype>& b,int irow,int jcol) {
+      //     if(irow<a.lrows || irow>a.urows || jcol<a.lcols || jcol>a.ucols) {
+      //       cerr << _AUROSTD_XLIBS_ERROR_ << "submatrix, error in irows,icols: ";
+      //       cerr << " a.urows= " << a.urows << " a.lrows= " << a.lrows;
+      //       cerr << " a.ucols= " << a.ucols << " a.lcols= " << a.lcols;
+      //       cerr << " irow=" << irow << " jcol=" << jcol << endl;
+      //       exit(0);
+      //     }
+      if(irow>=a.lrows && irow<=a.urows && jcol>=a.lcols && jcol<=a.ucols) {
+        //[CO191201 - OBSOLETE]xmatrix<utype> b(a.urows-1,a.ucols-1,a.lrows,a.lcols);
+        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows-1 || b.ucols!=b.ucols-1){ //CO191201
+          xmatrix<utype> c(a.urows-1,a.ucols-1,a.lrows,a.lcols);
+          b=c;
+        }
+        for(int i=a.lrows;i<=a.urows;i++)
+          for(int j=a.lcols;j<=a.ucols;j++) {
+            if(i<irow && j<jcol) b[i][j]=a[i][j];
+            if(i>irow && j<jcol) b[i-1][j]=a[i][j];
+            if(i<irow && j>jcol) b[i][j-1]=a[i][j];
+            if(i>irow && j>jcol) b[i-1][j-1]=a[i][j];
+          }
+        //[CO191201 - OBSOLETE]return b;
+        return;
+      }
+      if((irow<a.lrows || irow>a.urows) && jcol>=a.lcols && jcol<=a.ucols) {
+        //[CO191201 - OBSOLETE]xmatrix<utype> b(a.urows,a.ucols-1,a.lrows,a.lcols);
+        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows || b.ucols!=b.ucols-1){ //CO191201
+          xmatrix<utype> c(a.urows,a.ucols-1,a.lrows,a.lcols);
+          b=c;
+        }
+        for(int i=a.lrows;i<=a.urows;i++)
+          for(int j=a.lcols;j<=a.ucols;j++) {
+            if(j<jcol) b[i][j]=a[i][j];
+            if(j>jcol) b[i][j-1]=a[i][j];
+          }
+        //[CO191201 - OBSOLETE]return b;
+        return;
+      }
+      if(irow>=a.lrows && irow<=a.urows && (jcol<a.lcols || jcol>a.ucols)) {
+        //[CO191201 - OBSOLETE]xmatrix<utype> b(a.urows-1,a.ucols,a.lrows,a.lcols);
+        if(b.lrows!=a.lrows || b.lcols!=a.lcols || b.urows!=a.urows-1 || b.ucols!=b.ucols){ //CO191201
+          xmatrix<utype> c(a.urows-1,a.ucols,a.lrows,a.lcols);
+          b=c;
+        }
+        for(int i=a.lrows;i<=a.urows;i++)
+          for(int j=a.lcols;j<=a.ucols;j++) {
+            if(i<irow) b[i][j]=a[i][j];
+            if(i>irow) b[i-1][j]=a[i][j];
+          }
+        //[CO191201 - OBSOLETE]return b;
+        return;
+      }
+      //[CO191201 - OBSOLETE]return a;
+      b=a;  //CO191201
     }
-    if((irow<a.lrows || irow>a.urows) && jcol>=a.lcols && jcol<=a.ucols) {
-      xmatrix<utype> b(a.urows,a.ucols-1,a.lrows,a.lcols);
-      for(int i=a.lrows;i<=a.urows;i++)
-	for(int j=a.lcols;j<=a.ucols;j++) {
-	  if(j<jcol) b[i][j]=a[i][j];
-	  if(j>jcol) b[i][j-1]=a[i][j];
-	}
-      return b;
+  template<class utype> xmatrix<utype>                       // minor submatrix - IN PLACE
+    submatrix(const xmatrix<utype>& a,int irow,int jcol) {
+      if(irow>=a.lrows && irow<=a.urows && jcol>=a.lcols && jcol<=a.ucols) {
+        xmatrix<utype> b(a.urows-1,a.ucols-1,a.lrows,a.lcols);
+        submatrixInPlace(a,b,irow,jcol);
+        return b;
+      }
+      if((irow<a.lrows || irow>a.urows) && jcol>=a.lcols && jcol<=a.ucols) {
+        xmatrix<utype> b(a.urows,a.ucols-1,a.lrows,a.lcols);
+        submatrixInPlace(a,b,irow,jcol);
+        return b;
+      }
+      if(irow>=a.lrows && irow<=a.urows && (jcol<a.lcols || jcol>a.ucols)) {
+        xmatrix<utype> b(a.urows-1,a.ucols,a.lrows,a.lcols);
+        submatrixInPlace(a,b,irow,jcol);
+        return b;
+      }
+      return a;
     }
-    if(irow>=a.lrows && irow<=a.urows && (jcol<a.lcols || jcol>a.ucols)) {
-      xmatrix<utype> b(a.urows-1,a.ucols,a.lrows,a.lcols);
-      for(int i=a.lrows;i<=a.urows;i++)
-	for(int j=a.lcols;j<=a.ucols;j++) {
-	  if(i<irow) b[i][j]=a[i][j];
-	  if(i>irow) b[i-1][j]=a[i][j];
-	}
-      return b;
-    }
-    return a;
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -1742,103 +1846,137 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function inverse xmatrix<>
-  xmatrix<utype> inverse(const xmatrix<utype>& a) {
-    /* returns the inverse **/
-    if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.rows = a.cols" << endl;exit(0);}
-    if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lrows = 1" << endl;exit(0);}
-    if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lcols = 1" << endl;exit(0);}
-    int size=a.rows;
-    xmatrix<utype> b(a.rows,a.cols);
-    //  cerr << "DET CALL size="<<size<< endl;
-    utype adet=det(a);
-    if(adet==(utype) 0)  {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: singular matrix" << endl;exit(0);}
-    if(size==1) {b[1][1]=1/a[1][1]; return b;}
-    if(size==2) {{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: 2x2 not written yet" << endl;exit(0);} return b;}
-    if(size==3) {
-      adet=det(a);
-      /*
-	b[1][1]=(+a[2][2]*a[3][3]-a[2][3]*a[3][2])/adet;   // with fast index []
-	b[1][2]=(-a[1][2]*a[3][3]+a[1][3]*a[3][2])/adet;   // with fast index []
-	b[1][3]=(+a[1][2]*a[2][3]-a[1][3]*a[2][2])/adet;   // with fast index []
-	b[2][1]=(-a[2][1]*a[3][3]+a[2][3]*a[3][1])/adet;   // with fast index []
-	b[2][2]=(+a[1][1]*a[3][3]-a[1][3]*a[3][1])/adet;   // with fast index []
-	b[2][3]=(-a[1][1]*a[2][3]+a[1][3]*a[2][1])/adet;   // with fast index []
-	b[3][1]=(+a[2][1]*a[3][2]-a[2][2]*a[3][1])/adet;   // with fast index []
-	b[3][2]=(-a[1][1]*a[3][2]+a[1][2]*a[3][1])/adet;   // with fast index []
-	b[3][3]=(+a[1][1]*a[2][2]-a[1][2]*a[2][1])/adet;   // with fast index []
-      */
-      b(1,1)=(+a(2,2)*a(3,3)-a(2,3)*a(3,2))/adet;   // with slow index ()
-      b(1,2)=(-a(1,2)*a(3,3)+a(1,3)*a(3,2))/adet;   // with slow index ()
-      b(1,3)=(+a(1,2)*a(2,3)-a(1,3)*a(2,2))/adet;   // with slow index ()
-      b(2,1)=(-a(2,1)*a(3,3)+a(2,3)*a(3,1))/adet;   // with slow index ()
-      b(2,2)=(+a(1,1)*a(3,3)-a(1,3)*a(3,1))/adet;   // with slow index ()
-      b(2,3)=(-a(1,1)*a(2,3)+a(1,3)*a(2,1))/adet;   // with slow index ()
-      b(3,1)=(+a(2,1)*a(3,2)-a(2,2)*a(3,1))/adet;   // with slow index ()
-      b(3,2)=(-a(1,1)*a(3,2)+a(1,2)*a(3,1))/adet;   // with slow index ()
-      b(3,3)=(+a(1,1)*a(2,2)-a(1,2)*a(2,1))/adet;   // with slow index ()
+    void adjointInPlace(const xmatrix<utype>& a,xmatrix<utype>& b) { //CO191201
+      //inspired by https://www.mathsisfun.com/algebra/matrix-inverse-minors-cofactors-adjugate.html
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverseByAdjoint()","a must be square",_INPUT_ILLEGAL_);}
+      b=a;
+      xmatrix<utype> submat(a.urows-1,a.ucols-1,a.lrows,a.lcols);
+      int i=0,j=0;
+      for(i=a.lrows;i<=a.urows;i++){
+        for(j=a.lcols;j<=a.ucols;j++){
+          submatrixInPlace(a,submat,i,j);
+          b[i][j]=(utype)aurostd::powint(-1,i+j)*det(submat);
+        }
+      }
+      traspInPlace(b);
+    }
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> adjoint(const xmatrix<utype>& a) { //CO191201
+      xmatrix<utype> b;
+      adjointInPlace(a,b);
       return b;
     }
-    if(size==4) {
-      adet=det(a);
-      /*
-	b[1][1]=(+a[2][2]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])-a[2][3]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])+a[2][4]*(a[3][2]*a[4][3]-a[3][3]*a[4][2]))/adet;   // with fast index []
-	b[2][1]=(-a[2][1]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])+a[2][3]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])-a[2][4]*(a[3][1]*a[4][3]-a[3][3]*a[4][1]))/adet;   // with fast index []
-	b[3][1]=(+a[2][1]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])-a[2][2]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])+a[2][4]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
-	b[4][1]=(-a[2][1]*(a[3][2]*a[4][3]-a[3][3]*a[4][2])+a[2][2]*(a[3][1]*a[4][3]-a[3][3]*a[4][1])-a[2][3]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
-	b[1][2]=(-a[1][2]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])+a[1][3]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])-a[1][4]*(a[3][2]*a[4][3]-a[3][3]*a[4][2]))/adet;   // with fast index []
-	b[2][2]=(+a[1][1]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])-a[1][3]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])+a[1][4]*(a[3][1]*a[4][3]-a[3][3]*a[4][1]))/adet;   // with fast index []
-	b[3][2]=(-a[1][1]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])+a[1][2]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])-a[1][4]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
-	b[4][2]=(+a[1][1]*(a[3][2]*a[4][3]-a[3][3]*a[4][2])-a[1][2]*(a[3][1]*a[4][3]-a[3][3]*a[4][1])+a[1][3]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
-	b[1][3]=(+a[1][2]*(a[2][3]*a[4][4]-a[2][4]*a[4][3])-a[1][3]*(a[2][2]*a[4][4]-a[2][4]*a[4][2])+a[1][4]*(a[2][2]*a[4][3]-a[2][3]*a[4][2]))/adet;   // with fast index []
-	b[2][3]=(-a[1][1]*(a[2][3]*a[4][4]-a[2][4]*a[4][3])+a[1][3]*(a[2][1]*a[4][4]-a[2][4]*a[4][1])-a[1][4]*(a[2][1]*a[4][3]-a[2][3]*a[4][1]))/adet;   // with fast index []
-	b[3][3]=(+a[1][1]*(a[2][2]*a[4][4]-a[2][4]*a[4][2])-a[1][2]*(a[2][1]*a[4][4]-a[2][4]*a[4][1])+a[1][4]*(a[2][1]*a[4][2]-a[2][2]*a[4][1]))/adet;   // with fast index []
-	b[4][3]=(-a[1][1]*(a[2][2]*a[4][3]-a[2][3]*a[4][2])+a[1][2]*(a[2][1]*a[4][3]-a[2][3]*a[4][1])-a[1][3]*(a[2][1]*a[4][2]-a[2][2]*a[4][1]))/adet;   // with fast index []
-	b[1][4]=(-a[1][2]*(a[2][3]*a[3][4]-a[2][4]*a[3][3])+a[1][3]*(a[2][2]*a[3][4]-a[2][4]*a[3][2])-a[1][4]*(a[2][2]*a[3][3]-a[2][3]*a[3][2]))/adet;   // with fast index []
-	b[2][4]=(+a[1][1]*(a[2][3]*a[3][4]-a[2][4]*a[3][3])-a[1][3]*(a[2][1]*a[3][4]-a[2][4]*a[3][1])+a[1][4]*(a[2][1]*a[3][3]-a[2][3]*a[3][1]))/adet;   // with fast index []
-	b[3][4]=(-a[1][1]*(a[2][2]*a[3][4]-a[2][4]*a[3][2])+a[1][2]*(a[2][1]*a[3][4]-a[2][4]*a[3][1])-a[1][4]*(a[2][1]*a[3][2]-a[2][2]*a[3][1]))/adet;   // with fast index []
-	b[4][4]=(+a[1][1]*(a[2][2]*a[3][3]-a[2][3]*a[3][2])-a[1][2]*(a[2][1]*a[3][3]-a[2][3]*a[3][1])+a[1][3]*(a[2][1]*a[3][2]-a[2][2]*a[3][1]))/adet;   // with fast index []
-      */  
-      b(1,1)=(+a(2,2)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))-a(2,3)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))+a(2,4)*(a(3,2)*a(4,3)-a(3,3)*a(4,2)))/adet;   // with slow index ()
-      b(2,1)=(-a(2,1)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))+a(2,3)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))-a(2,4)*(a(3,1)*a(4,3)-a(3,3)*a(4,1)))/adet;   // with slow index ()
-      b(3,1)=(+a(2,1)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))-a(2,2)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))+a(2,4)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
-      b(4,1)=(-a(2,1)*(a(3,2)*a(4,3)-a(3,3)*a(4,2))+a(2,2)*(a(3,1)*a(4,3)-a(3,3)*a(4,1))-a(2,3)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
-      b(1,2)=(-a(1,2)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))+a(1,3)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))-a(1,4)*(a(3,2)*a(4,3)-a(3,3)*a(4,2)))/adet;   // with slow index ()
-      b(2,2)=(+a(1,1)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))-a(1,3)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))+a(1,4)*(a(3,1)*a(4,3)-a(3,3)*a(4,1)))/adet;   // with slow index ()
-      b(3,2)=(-a(1,1)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))+a(1,2)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))-a(1,4)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
-      b(4,2)=(+a(1,1)*(a(3,2)*a(4,3)-a(3,3)*a(4,2))-a(1,2)*(a(3,1)*a(4,3)-a(3,3)*a(4,1))+a(1,3)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
-      b(1,3)=(+a(1,2)*(a(2,3)*a(4,4)-a(2,4)*a(4,3))-a(1,3)*(a(2,2)*a(4,4)-a(2,4)*a(4,2))+a(1,4)*(a(2,2)*a(4,3)-a(2,3)*a(4,2)))/adet;   // with slow index ()
-      b(2,3)=(-a(1,1)*(a(2,3)*a(4,4)-a(2,4)*a(4,3))+a(1,3)*(a(2,1)*a(4,4)-a(2,4)*a(4,1))-a(1,4)*(a(2,1)*a(4,3)-a(2,3)*a(4,1)))/adet;   // with slow index ()
-      b(3,3)=(+a(1,1)*(a(2,2)*a(4,4)-a(2,4)*a(4,2))-a(1,2)*(a(2,1)*a(4,4)-a(2,4)*a(4,1))+a(1,4)*(a(2,1)*a(4,2)-a(2,2)*a(4,1)))/adet;   // with slow index ()
-      b(4,3)=(-a(1,1)*(a(2,2)*a(4,3)-a(2,3)*a(4,2))+a(1,2)*(a(2,1)*a(4,3)-a(2,3)*a(4,1))-a(1,3)*(a(2,1)*a(4,2)-a(2,2)*a(4,1)))/adet;   // with slow index ()
-      b(1,4)=(-a(1,2)*(a(2,3)*a(3,4)-a(2,4)*a(3,3))+a(1,3)*(a(2,2)*a(3,4)-a(2,4)*a(3,2))-a(1,4)*(a(2,2)*a(3,3)-a(2,3)*a(3,2)))/adet;   // with slow index ()
-      b(2,4)=(+a(1,1)*(a(2,3)*a(3,4)-a(2,4)*a(3,3))-a(1,3)*(a(2,1)*a(3,4)-a(2,4)*a(3,1))+a(1,4)*(a(2,1)*a(3,3)-a(2,3)*a(3,1)))/adet;   // with slow index ()
-      b(3,4)=(-a(1,1)*(a(2,2)*a(3,4)-a(2,4)*a(3,2))+a(1,2)*(a(2,1)*a(3,4)-a(2,4)*a(3,1))-a(1,4)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))/adet;   // with slow index ()
-      b(4,4)=(+a(1,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))+a(1,3)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))/adet;   // with slow index ()
-      return b;
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO191201
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> inverse(const xmatrix<utype>& a) {
+      /* returns the inverse **/
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverse()","a must be square",_INPUT_ILLEGAL_);}
+      if(a.lrows!=1 || a.lcols!=1){
+        xmatrix<utype> b(a);
+        shiftlrowscols(b,1,1);
+        b=inverse(b);
+        shiftlrowscols(b,a.lrows,a.lcols);
+        return b;
+      }
+      //[CO191201 - OBSOLETE]if(a.rows != a.cols) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.rows = a.cols" << endl;exit(0);}
+      //[CO191201 - OBSOLETE]if(a.lrows!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lrows = 1" << endl;exit(0);}
+      //[CO191201 - OBSOLETE]if(a.lcols!=1)       {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: must have a.lcols = 1" << endl;exit(0);}
+      int size=a.rows;
+      xmatrix<utype> b(a.rows,a.cols);
+      //  cerr << "DET CALL size="<<size<< endl;
+      utype adet=det(a);
+      //[CO191201 - OBSOLETE]if(adet==(utype) 0)  {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: singular matrix" << endl;exit(0);}
+      if(adet==(utype) 0)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverse()","singular matrix",_INPUT_ILLEGAL_);}
+      if(size==1) {b[1][1]=(utype)1/a[1][1]; return b;}
+      if(size==2) { //CO191201
+        //[CO191201 - OBSOLETE]{cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: 2x2 not written yet" << endl;exit(0);} return b;
+        b[1][1]=a[2][2]/adet;b[1][2]=-a[1][2]/adet;
+        b[2][1]=-a[2][1]/adet;b[2][2]=a[1][1]/adet;
+        return b;
+      }
+      if(size==3) {
+        //[CO191201 - already calculated above]adet=det(a);
+        /*
+           b[1][1]=(+a[2][2]*a[3][3]-a[2][3]*a[3][2])/adet;   // with fast index []
+           b[1][2]=(-a[1][2]*a[3][3]+a[1][3]*a[3][2])/adet;   // with fast index []
+           b[1][3]=(+a[1][2]*a[2][3]-a[1][3]*a[2][2])/adet;   // with fast index []
+           b[2][1]=(-a[2][1]*a[3][3]+a[2][3]*a[3][1])/adet;   // with fast index []
+           b[2][2]=(+a[1][1]*a[3][3]-a[1][3]*a[3][1])/adet;   // with fast index []
+           b[2][3]=(-a[1][1]*a[2][3]+a[1][3]*a[2][1])/adet;   // with fast index []
+           b[3][1]=(+a[2][1]*a[3][2]-a[2][2]*a[3][1])/adet;   // with fast index []
+           b[3][2]=(-a[1][1]*a[3][2]+a[1][2]*a[3][1])/adet;   // with fast index []
+           b[3][3]=(+a[1][1]*a[2][2]-a[1][2]*a[2][1])/adet;   // with fast index []
+           */
+        b(1,1)=(+a(2,2)*a(3,3)-a(2,3)*a(3,2))/adet;   // with slow index ()
+        b(1,2)=(-a(1,2)*a(3,3)+a(1,3)*a(3,2))/adet;   // with slow index ()
+        b(1,3)=(+a(1,2)*a(2,3)-a(1,3)*a(2,2))/adet;   // with slow index ()
+        b(2,1)=(-a(2,1)*a(3,3)+a(2,3)*a(3,1))/adet;   // with slow index ()
+        b(2,2)=(+a(1,1)*a(3,3)-a(1,3)*a(3,1))/adet;   // with slow index ()
+        b(2,3)=(-a(1,1)*a(2,3)+a(1,3)*a(2,1))/adet;   // with slow index ()
+        b(3,1)=(+a(2,1)*a(3,2)-a(2,2)*a(3,1))/adet;   // with slow index ()
+        b(3,2)=(-a(1,1)*a(3,2)+a(1,2)*a(3,1))/adet;   // with slow index ()
+        b(3,3)=(+a(1,1)*a(2,2)-a(1,2)*a(2,1))/adet;   // with slow index ()
+        return b;
+      }
+      if(size==4) {
+        //[CO191201 - already calculated above]adet=det(a);
+        /*
+           b[1][1]=(+a[2][2]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])-a[2][3]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])+a[2][4]*(a[3][2]*a[4][3]-a[3][3]*a[4][2]))/adet;   // with fast index []
+           b[2][1]=(-a[2][1]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])+a[2][3]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])-a[2][4]*(a[3][1]*a[4][3]-a[3][3]*a[4][1]))/adet;   // with fast index []
+           b[3][1]=(+a[2][1]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])-a[2][2]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])+a[2][4]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
+           b[4][1]=(-a[2][1]*(a[3][2]*a[4][3]-a[3][3]*a[4][2])+a[2][2]*(a[3][1]*a[4][3]-a[3][3]*a[4][1])-a[2][3]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
+           b[1][2]=(-a[1][2]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])+a[1][3]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])-a[1][4]*(a[3][2]*a[4][3]-a[3][3]*a[4][2]))/adet;   // with fast index []
+           b[2][2]=(+a[1][1]*(a[3][3]*a[4][4]-a[3][4]*a[4][3])-a[1][3]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])+a[1][4]*(a[3][1]*a[4][3]-a[3][3]*a[4][1]))/adet;   // with fast index []
+           b[3][2]=(-a[1][1]*(a[3][2]*a[4][4]-a[3][4]*a[4][2])+a[1][2]*(a[3][1]*a[4][4]-a[3][4]*a[4][1])-a[1][4]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
+           b[4][2]=(+a[1][1]*(a[3][2]*a[4][3]-a[3][3]*a[4][2])-a[1][2]*(a[3][1]*a[4][3]-a[3][3]*a[4][1])+a[1][3]*(a[3][1]*a[4][2]-a[3][2]*a[4][1]))/adet;   // with fast index []
+           b[1][3]=(+a[1][2]*(a[2][3]*a[4][4]-a[2][4]*a[4][3])-a[1][3]*(a[2][2]*a[4][4]-a[2][4]*a[4][2])+a[1][4]*(a[2][2]*a[4][3]-a[2][3]*a[4][2]))/adet;   // with fast index []
+           b[2][3]=(-a[1][1]*(a[2][3]*a[4][4]-a[2][4]*a[4][3])+a[1][3]*(a[2][1]*a[4][4]-a[2][4]*a[4][1])-a[1][4]*(a[2][1]*a[4][3]-a[2][3]*a[4][1]))/adet;   // with fast index []
+           b[3][3]=(+a[1][1]*(a[2][2]*a[4][4]-a[2][4]*a[4][2])-a[1][2]*(a[2][1]*a[4][4]-a[2][4]*a[4][1])+a[1][4]*(a[2][1]*a[4][2]-a[2][2]*a[4][1]))/adet;   // with fast index []
+           b[4][3]=(-a[1][1]*(a[2][2]*a[4][3]-a[2][3]*a[4][2])+a[1][2]*(a[2][1]*a[4][3]-a[2][3]*a[4][1])-a[1][3]*(a[2][1]*a[4][2]-a[2][2]*a[4][1]))/adet;   // with fast index []
+           b[1][4]=(-a[1][2]*(a[2][3]*a[3][4]-a[2][4]*a[3][3])+a[1][3]*(a[2][2]*a[3][4]-a[2][4]*a[3][2])-a[1][4]*(a[2][2]*a[3][3]-a[2][3]*a[3][2]))/adet;   // with fast index []
+           b[2][4]=(+a[1][1]*(a[2][3]*a[3][4]-a[2][4]*a[3][3])-a[1][3]*(a[2][1]*a[3][4]-a[2][4]*a[3][1])+a[1][4]*(a[2][1]*a[3][3]-a[2][3]*a[3][1]))/adet;   // with fast index []
+           b[3][4]=(-a[1][1]*(a[2][2]*a[3][4]-a[2][4]*a[3][2])+a[1][2]*(a[2][1]*a[3][4]-a[2][4]*a[3][1])-a[1][4]*(a[2][1]*a[3][2]-a[2][2]*a[3][1]))/adet;   // with fast index []
+           b[4][4]=(+a[1][1]*(a[2][2]*a[3][3]-a[2][3]*a[3][2])-a[1][2]*(a[2][1]*a[3][3]-a[2][3]*a[3][1])+a[1][3]*(a[2][1]*a[3][2]-a[2][2]*a[3][1]))/adet;   // with fast index []
+           */  
+        b(1,1)=(+a(2,2)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))-a(2,3)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))+a(2,4)*(a(3,2)*a(4,3)-a(3,3)*a(4,2)))/adet;   // with slow index ()
+        b(2,1)=(-a(2,1)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))+a(2,3)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))-a(2,4)*(a(3,1)*a(4,3)-a(3,3)*a(4,1)))/adet;   // with slow index ()
+        b(3,1)=(+a(2,1)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))-a(2,2)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))+a(2,4)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
+        b(4,1)=(-a(2,1)*(a(3,2)*a(4,3)-a(3,3)*a(4,2))+a(2,2)*(a(3,1)*a(4,3)-a(3,3)*a(4,1))-a(2,3)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
+        b(1,2)=(-a(1,2)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))+a(1,3)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))-a(1,4)*(a(3,2)*a(4,3)-a(3,3)*a(4,2)))/adet;   // with slow index ()
+        b(2,2)=(+a(1,1)*(a(3,3)*a(4,4)-a(3,4)*a(4,3))-a(1,3)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))+a(1,4)*(a(3,1)*a(4,3)-a(3,3)*a(4,1)))/adet;   // with slow index ()
+        b(3,2)=(-a(1,1)*(a(3,2)*a(4,4)-a(3,4)*a(4,2))+a(1,2)*(a(3,1)*a(4,4)-a(3,4)*a(4,1))-a(1,4)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
+        b(4,2)=(+a(1,1)*(a(3,2)*a(4,3)-a(3,3)*a(4,2))-a(1,2)*(a(3,1)*a(4,3)-a(3,3)*a(4,1))+a(1,3)*(a(3,1)*a(4,2)-a(3,2)*a(4,1)))/adet;   // with slow index ()
+        b(1,3)=(+a(1,2)*(a(2,3)*a(4,4)-a(2,4)*a(4,3))-a(1,3)*(a(2,2)*a(4,4)-a(2,4)*a(4,2))+a(1,4)*(a(2,2)*a(4,3)-a(2,3)*a(4,2)))/adet;   // with slow index ()
+        b(2,3)=(-a(1,1)*(a(2,3)*a(4,4)-a(2,4)*a(4,3))+a(1,3)*(a(2,1)*a(4,4)-a(2,4)*a(4,1))-a(1,4)*(a(2,1)*a(4,3)-a(2,3)*a(4,1)))/adet;   // with slow index ()
+        b(3,3)=(+a(1,1)*(a(2,2)*a(4,4)-a(2,4)*a(4,2))-a(1,2)*(a(2,1)*a(4,4)-a(2,4)*a(4,1))+a(1,4)*(a(2,1)*a(4,2)-a(2,2)*a(4,1)))/adet;   // with slow index ()
+        b(4,3)=(-a(1,1)*(a(2,2)*a(4,3)-a(2,3)*a(4,2))+a(1,2)*(a(2,1)*a(4,3)-a(2,3)*a(4,1))-a(1,3)*(a(2,1)*a(4,2)-a(2,2)*a(4,1)))/adet;   // with slow index ()
+        b(1,4)=(-a(1,2)*(a(2,3)*a(3,4)-a(2,4)*a(3,3))+a(1,3)*(a(2,2)*a(3,4)-a(2,4)*a(3,2))-a(1,4)*(a(2,2)*a(3,3)-a(2,3)*a(3,2)))/adet;   // with slow index ()
+        b(2,4)=(+a(1,1)*(a(2,3)*a(3,4)-a(2,4)*a(3,3))-a(1,3)*(a(2,1)*a(3,4)-a(2,4)*a(3,1))+a(1,4)*(a(2,1)*a(3,3)-a(2,3)*a(3,1)))/adet;   // with slow index ()
+        b(3,4)=(-a(1,1)*(a(2,2)*a(3,4)-a(2,4)*a(3,2))+a(1,2)*(a(2,1)*a(3,4)-a(2,4)*a(3,1))-a(1,4)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))/adet;   // with slow index ()
+        b(4,4)=(+a(1,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))-a(1,2)*(a(2,1)*a(3,3)-a(2,3)*a(3,1))+a(1,3)*(a(2,1)*a(3,2)-a(2,2)*a(3,1)))/adet;   // with slow index ()
+        return b;
+      }
+      //CO191201 - GaussJordan() is INCREDIBLY unstable (division by small numbers over and over again)
+      //use inverseByAdjoint, which waits until the end to divide by a (hopefully) bigger number
+      //[CO191201 - OBSOLETE]// if everything fails move to GaussJordan
+      //[CO191201 - OBSOLETE]b=a;
+      //[CO191201 - OBSOLETE]xmatrix<utype> B(a.rows,a.cols);
+      //[CO191201 - OBSOLETE]GaussJordan(b,B);  
+      //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;exit(0);}
+      //[CO191201 - OBSOLETE]return b;
+      return inverseByAdjoint(a);
     }
-    // if everything fails move to GaussJordan
-    b=a;
-    xmatrix<utype> B(a.rows,a.cols);
-    GaussJordan(b,B);  
-    //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;exit(0);}
-    return b;
-  }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  bool inverse(const xmatrix<utype>& a,xmatrix<utype>& b) {  // RETURN ERROR if non invertible
-    utype c=aurostd::det(a);
-    if(abs(c)<10e-14) {
-      b.clear();
-      return TRUE;
-    } else {
-      b=aurostd::inverse(a);
+    bool isNonInvertible(const xmatrix<utype>& a) {  // RETURN ERROR if non invertible  //CO191201
+      utype c=aurostd::det(a);
+      if(abs(c)<10e-14) {return TRUE;}
       return FALSE;
     }
-    return FALSE;
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -2257,65 +2395,117 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-// ME 180904
+  // ME 180904
   template<class utype> xmatrix<utype>                             // conj xmatrix
-  conj(const xmatrix<utype>& a)
-  {
-    if (a.iscomplex) {
-      xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
-      for (int i = a.lrows; i <= a.urows; i++) {
-        for (int j = a.lcols; j <= a.ucols; j++) {
-          out[i][j] = conj(a[i][j]);
+    conj(const xmatrix<utype>& a){
+      if (a.iscomplex) {
+        xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
+        for (int i = a.lrows; i <= a.urows; i++) {
+          for (int j = a.lcols; j <= a.ucols; j++) {
+            out[i][j] = conj(a[i][j]);
+          }
         }
-      }
-      return out;
-    } else {
-      return a;
+        return out;
+      } else {return a;}
     }
-  }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
-  template<class utype> xmatrix<utype>                             // trasp xmatrix
-  trasp(const xmatrix<utype>& a, bool conjugate)  // ME190813 - conjugate complex now an option
-  {
-#ifdef _XMATH_DEBUG_FUNCTIONS
-    printf("M -> function traspose xmatrix: ");
-    printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
-    printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
-#endif
-    xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
-    for(int i=a.lrows;i<=a.urows;i++)
-      for(int j=a.lcols;j<=a.ucols;j++)
-        if (a.iscomplex && conjugate) {
-          out[j][i] = conj(a[i][j]);
-        } else {
-          out[j][i]=a[i][j];
+  template<class utype> void
+    traspSquareInPlace(xmatrix<utype>& a,bool conjugate){ //CO191201 - only designed for square matrices
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::traspSquareInPlace():","this function is designed only for square matrices",_VALUE_ILLEGAL_);}
+      int i=0,j=0;
+      utype aij=(utype)0;
+      if(a.iscomplex&&conjugate){ //CO191201
+        for(i=a.lrows;i<=a.urows;i++){
+          for(j=i+1;j<=a.urows;j++){
+            aij=a[i][j];
+            a[i][j]=conj(a[j][i]);
+            a[j][i]=conj(aij);
+          }
         }
-    return out;
-  }
+        return;
+      }else{
+        for(i=a.lrows;i<=a.urows;i++){
+          for(j=i+1;j<=a.urows;j++){
+            aij=a[i][j];
+            a[i][j]=a[j][i];
+            a[j][i]=aij;
+          }
+        }
+        return;
+      }
+    }
+  template<class utype> void
+    traspInPlace(const xmatrix<utype>& a,xmatrix<utype>& b,bool conjugate){ //CO191201
+      //always works, just not most efficient for square matrices
+      if(b.lrows!=a.lcols || b.lcols!=a.lrows || b.urows!=a.ucols || b.ucols!=a.urows){
+        xmatrix<utype> c(a.ucols,a.urows,a.lcols,a.lrows);
+        b=c;
+      }
+      int i=0,j=0;
+      if(a.iscomplex&&conjugate){ //CO191201
+        for(i=a.lrows;i<=a.urows;i++){
+          for(j=a.lcols;j<=a.ucols;j++){b[j][i]=conj(a[i][j]);}  //cannot do j=i+1 since b is unpopulated
+        }
+        return;
+      }else{
+        for(i=a.lrows;i<=a.urows;i++){
+          for(j=a.lcols;j<=a.ucols;j++){b[j][i]=a[i][j];}  //cannot do j=i+1 since b is unpopulated
+        }
+        return;
+      }
+    }
+  template<class utype> void                             // trasp xmatrix
+    traspInPlace(xmatrix<utype>& a,bool conjugate){  // ME190813 - conjugate complex now an option //CO191201 - in place
+#ifdef _XMATH_DEBUG_FUNCTIONS
+      printf("M -> function traspose xmatrix: ");
+      printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
+      printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
+#endif
+      if(a.issquare){traspSquareInPlace(a,conjugate);return;} //this works because we modify a[i][j] and a[j][i] at once
+      else{  //cannot trasp in place
+        xmatrix<utype> b(a.ucols,a.urows,a.lcols,a.lrows);
+        traspInPlace(a,b,conjugate);
+        a=b;
+        return;
+      }
+      //[CO191201 - OBSOLETE]xmatrix<utype> out(a.ucols,a.urows,a.lcols,a.lrows);
+      //[CO191201 - OBSOLETE]for(int i=a.lrows;i<=a.urows;i++)
+      //[CO191201 - OBSOLETE]  for(int j=a.lcols;j<=a.ucols;j++)
+      //[CO191201 - OBSOLETE]    if (a.iscomplex && conjugate) {
+      //[CO191201 - OBSOLETE]      out[j][i] = conj(a[i][j]);
+      //[CO191201 - OBSOLETE]    } else {
+      //[CO191201 - OBSOLETE]      out[j][i]=a[i][j];
+      //[CO191201 - OBSOLETE]    }
+      //[CO191201 - OBSOLETE]return out;
+    }
+  template<class utype> xmatrix<utype>              // trasp xmatrix
+    trasp(const xmatrix<utype>& a,bool conjugate){  //CO191201
+      xmatrix<utype> b(a.ucols,a.urows,a.lcols,a.lrows);
+      traspInPlace(a,b,conjugate);
+      return b;
+    }
 }
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                             // trasp xvector
-  trasp(const xvector<utype>& a, bool conjugate)  // ME190813 - conjugate complex now an option
-  {
+    trasp(const xvector<utype>& a, bool conjugate){  // ME190813 - conjugate complex now an option
 #ifdef _XMATH_DEBUG_FUNCTIONS
-    printf("M -> function traspose xvector: ");
-    printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
+      printf("M -> function traspose xvector: ");
+      printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
 #endif
-    xmatrix<utype> out(a.urows,1,a.lrows,1);
-    for(int i=a.lrows;i<=a.urows;i++) {
-      if (a.iscomplex && conjugate) {
-        out[i][1] = conj(a[i]);
-      } else {
-        out[i][1]=a[i];
+      xmatrix<utype> b(a.urows,1,a.lrows,1);
+      int i=0;
+      if(a.iscomplex&&conjugate){ //CO191201
+        for(i=a.lrows;i<=a.urows;i++){b[i][1]=conj(a[i]);}
+      }else{
+        for(i=a.lrows;i<=a.urows;i++){b[i][1]=a[i];}
       }
+      return b;
     }
-    return out;
-  }
 }
 
 // ****************************************************************************
@@ -2417,6 +2607,50 @@ namespace aurostd {  // namespace aurostd
     }
   }
 }
+
+// ****************************************************************************
+// ----------------------------------------------------------------------------
+namespace aurostd { // namespace aurostd
+  
+  template<class utype> void  // function shift lrows so first index is i
+    shiftlrows(xmatrix<utype>& a,int i){ //CO191201
+      if(a.lrows==i){return;}
+      xmatrix<utype> b(a.rows+i-1,a.ucols,i,a.lcols);
+      int k=i;
+      for(int ii=a.lrows;ii<=a.urows;ii++){
+        for(int jj=a.lcols;jj<=a.ucols;jj++){
+          b[k++][jj]=a[ii][jj];
+        }
+      }
+      a=b;
+    }
+  
+  template<class utype> void  // function shift lcols so first index is i
+    shiftlcols(xmatrix<utype>& a,int i){ //CO191201
+      if(a.lcols==i){return;}
+      xmatrix<utype> b(a.urows,a.cols+i-1,a.lrows,i);
+      int k=i;
+      for(int ii=a.lrows;ii<=a.urows;ii++){
+        for(int jj=a.lcols;jj<=a.ucols;jj++){
+          b[ii][k++]=a[ii][jj];
+        }
+      }
+      a=b;
+    }
+  
+  template<class utype> void  // function shift lrows and lcols so first index is i, j
+    shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO191201
+      if(a.lrows==i && a.lcols==j){return;}
+      xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
+      int k=i,l=j;
+      for(int ii=a.lrows;ii<=a.urows;ii++){
+        for(int jj=a.lcols;jj<=a.ucols;jj++){
+          b[k++][l++]=a[ii][jj];
+        }
+      }
+      a=b;
+    }
+} // namespace aurostd
 
 // ****************************************************************************
 // ----------------------------------------------------------------------------
@@ -2870,6 +3104,33 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
   }
 }
 
+namespace aurostd {  // namespace aurostd
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd){ //CO191201
+    if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
+    xmatrix<int> mx(ma.urows,ma.ucols,ma.lrows,ma.lcols),my(ma.urows,ma.ucols,ma.lrows,ma.lcols);
+    return GCD(ma,mb,mgcd,mx,my);
+  }
+  void GCD(const xmatrix<int>& ma,const xmatrix<int>& mb,xmatrix<int>& mgcd,xmatrix<int>& mx,xmatrix<int>& my){ //CO191291
+    if(ma.rows==0 || ma.cols==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.rows==0 || ma.cols==0",_INPUT_NUMBER_);}
+    //ma vs. mb
+    if(ma.lrows!=mb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lrows!=mb.lrows",_INDEX_MISMATCH_);}
+    if(ma.urows!=mb.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.urows!=mb.urows",_INDEX_MISMATCH_);}
+    if(ma.lcols!=mb.lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.lcols!=mb.lcols",_INDEX_MISMATCH_);}
+    if(ma.ucols!=mb.ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","ma.ucols!=mb.ucols",_INDEX_MISMATCH_);}
+    //ma vs. mgcd
+    if(ma.lrows!=mgcd.lrows || ma.urows!=mgcd.urows || ma.lcols!=mgcd.lcols || ma.ucols!=mgcd.ucols){xmatrix<int> mgcd_tmp(ma);mgcd=mgcd_tmp;}
+    //ma vs. mx
+    if(ma.lrows!=mx.lrows || ma.urows!=mx.urows || ma.lcols!=mx.lcols || ma.ucols!=mx.ucols){xmatrix<int> mx_tmp(ma);mx=mx_tmp;}
+    //ma vs. my
+    if(ma.lrows!=my.lrows || ma.urows!=my.urows || ma.lcols!=my.lcols || ma.ucols!=my.ucols){xmatrix<int> my_tmp(ma);my=my_tmp;}
+    for(int i=ma.lrows;i<=ma.urows;i++){
+      for(int j=ma.lcols;j<=ma.ucols;j++){
+        GCD(ma[i][j],mb[i][j],mgcd[i][j],mx[i][j],my[i][j]);
+      }
+    }
+  }
+} // namespace aurostd
+
 // ----------------------------------------------------------------------------
 
 namespace aurostd {  // namespace aurostd
@@ -3080,160 +3341,168 @@ namespace aurostd {
   // shifted by A. See Lecture notes in computer science, ISSN 0302-974, ANTS - VI : algorithmic
   // number theory, 2004, vol. 3076, pp. 338-357 ISBN 3-540-22156-5
   template<class utype> void
-  reduce_A_in_ABC(xvector<utype>& A, xvector<utype>& B, xvector<utype>& C,utype eps) {
-    xvector<utype> T(3);  // closest point to origin in B,C+A affine plane
-    xmatrix<utype> ABC(3,3),ABCinv(3,3),oldABC(3,3); // Matrices of ABC basis vectors and inverse
-    xvector<utype> dist(4); // the distances from T to enclosing lattice points of B,C (4 corners of the ppiped)
-    xvector<utype> i(3),i1(3),i2(3),i3(3),i4(3); // lattice coordinates of A, in the affine plane, using the B,C basis vectors
-    int idx; // index of the smallest distance from T to a lattice point in B,C
-    bool err;
-    //integer j
-    utype lambda;
-    //print *,"entering reduction routine..."
-    //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
-    for(int i=1;i<=3;i++) {
-      ABC(i,1)=A(i);
-      ABC(i,2)=B(i);
-      ABC(i,3)=C(i);
-    }
-    oldABC=ABC;
-    // Use Gaussian reduction to reduce the B,C 2D basis so that it is itself Minkowski reduced. If this
-    // is done then the closest lattice point (in B,C plane) to projection of A (into the B,C plane) is
-    // guaranteed to be one of the corners of the unit cell enclosing the projection of A
-    gaussian_reduce_two_vectors(B,C,eps);
-
-    //do j=1,3
-    //   write(*,'(3(f11.5,1x))') ABC(j,:)
-    //enddo
-    //
-    // First thing to do is find the (real, not lattice) point in the affine plane B,C + A that is
-    // nearest the origin. Call this T.
-    lambda=-scalar_product(A,vector_product(B,C))/(aurostd::modulus(vector_product(B,C))*aurostd::modulus(vector_product(B,C)));
-    T=A + lambda*vector_product(B,C);
-  
-    //print *,lambda
-    //write(*,'("T (vec in B,C affine plane): ",3(f10.3,1x))') T
-    
-    // Now find the four points of the B,C lattice, in the affine plane, that enclose the point T
-    for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
-      ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
-    }//GH
-    // [OBSOLETE]        aurostd::matrix_inverse(ABC,ABCinv,err);
-    err=aurostd::inverse(ABC,ABCinv);
-    
-    if(err) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  A,B,C vectors in reduce_A_in_ABC are co-planar" << endl;exit(0);}
-    i=aurostd::nint(ABCinv*T);
-    
-    // print *,"Lattice coordinates of origin enclosing T:", i
-    // Compute the distance from T to each of the four points and pick the one that is the closest.
-    i1(1)=i(1);i1(2)=i(2);i1(3)=i(3);dist(1)=aurostd::modulus(T-ABC*i1);
-    i2(1)=i(1);i2(2)=i(2)+1;i2(3)=i(3);dist(2)=aurostd::modulus(T-ABC*i2);
-    i3(1)=i(1);i3(2)=i(2);i3(3)=i(3)+1;dist(3)=aurostd::modulus(T-ABC*i3);
-    i4(1)=i(1);i4(2)=i(2)+1;i4(3)=i(3)+1;dist(4)=aurostd::modulus(T-ABC*i4);
-    idx=0;idx=aurostd::mini(dist);
-    //write(*,'("Dists: ",4(f10.5,1x))') dist
-    
-    //if(.not. equal(,origdist,eps)) then // Only change A if the new one really
-    
-    if(idx==1) A=A-ABC*i1;
-    if(idx==2) A=A-ABC*i2;
-    if(idx==3) A=A-ABC*i3;
-    if(idx==4) A=A-ABC*i4;
-    if(idx==0) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  Case failed in reduce_A_in_ABC" << endl;exit(0);}
-    //endif
-    //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
-    for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
-      ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
-    }//GH
-	  
-    // [OBSOLETE]  aurostd::matrix_inverse(ABC,ABCinv,err);
-    err=aurostd::inverse(ABC,ABCinv);
-    //
-    ABC=ABCinv*oldABC-aurostd::nint(ABCinv*oldABC);
-    for(int i=1;i<=3;i++) {
-      for(int j=1;j<=3;j++) {
-	if(aurostd::abs(ABC(i,j))>eps) {
-	  cerr << "eps=" << endl << eps << endl;
-	  cerr << "ABC(i,j)=" << endl << ABC(i,j) << endl;
-	  cerr << "ABCinv=" << endl << ABCinv << endl;
-	  cerr << "oldABC=" << endl << oldABC << endl;
-	  cerr << "ABCinv*oldABC=" << endl << ABCinv*oldABC << endl;
-	  cerr << "ABCinv*oldABC-aurostd::nint(ABCinv*oldABC)=" << endl << ABCinv*oldABC-aurostd::nint(ABCinv*oldABC) << endl;
-	  cerr << "Lattice was not preserved  in reduce_A_in_ABC" << endl;
-	  exit(0);
-	}    
+    reduce_A_in_ABC(xvector<utype>& A, xvector<utype>& B, xvector<utype>& C,utype eps) {
+      string soliloquy="aurostd::reduce_A_in_ABC():";
+      xvector<utype> T(3);  // closest point to origin in B,C+A affine plane
+      xmatrix<utype> ABC(3,3),ABCinv(3,3),oldABC(3,3); // Matrices of ABC basis vectors and inverse
+      xvector<utype> dist(4); // the distances from T to enclosing lattice points of B,C (4 corners of the ppiped)
+      xvector<utype> i(3),i1(3),i2(3),i3(3),i4(3); // lattice coordinates of A, in the affine plane, using the B,C basis vectors
+      int idx; // index of the smallest distance from T to a lattice point in B,C
+      //[CO191201 - OBSOLETE]bool err;
+      //integer j
+      utype lambda;
+      //print *,"entering reduction routine..."
+      //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
+      for(int i=1;i<=3;i++) {
+        ABC(i,1)=A(i);
+        ABC(i,2)=B(i);
+        ABC(i,3)=C(i);
       }
+      oldABC=ABC;
+      // Use Gaussian reduction to reduce the B,C 2D basis so that it is itself Minkowski reduced. If this
+      // is done then the closest lattice point (in B,C plane) to projection of A (into the B,C plane) is
+      // guaranteed to be one of the corners of the unit cell enclosing the projection of A
+      gaussian_reduce_two_vectors(B,C,eps);
+
+      //do j=1,3
+      //   write(*,'(3(f11.5,1x))') ABC(j,:)
+      //enddo
+      //
+      // First thing to do is find the (real, not lattice) point in the affine plane B,C + A that is
+      // nearest the origin. Call this T.
+      lambda=-scalar_product(A,vector_product(B,C))/(aurostd::modulus(vector_product(B,C))*aurostd::modulus(vector_product(B,C)));
+      T=A + lambda*vector_product(B,C);
+
+      //print *,lambda
+      //write(*,'("T (vec in B,C affine plane): ",3(f10.3,1x))') T
+
+      // Now find the four points of the B,C lattice, in the affine plane, that enclose the point T
+      for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
+        ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
+      }//GH
+      // [OBSOLETE]        aurostd::matrix_inverse(ABC,ABCinv,err);
+      //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
+      //[CO191201 - OBSOLETE]if(err) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  A,B,C vectors in reduce_A_in_ABC are co-planar" << endl;exit(0);}
+      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
+      ABCinv=inverse(ABC);  //CO191201
+      i=aurostd::nint(ABCinv*T);
+
+      // print *,"Lattice coordinates of origin enclosing T:", i
+      // Compute the distance from T to each of the four points and pick the one that is the closest.
+      i1(1)=i(1);i1(2)=i(2);i1(3)=i(3);dist(1)=aurostd::modulus(T-ABC*i1);
+      i2(1)=i(1);i2(2)=i(2)+1;i2(3)=i(3);dist(2)=aurostd::modulus(T-ABC*i2);
+      i3(1)=i(1);i3(2)=i(2);i3(3)=i(3)+1;dist(3)=aurostd::modulus(T-ABC*i3);
+      i4(1)=i(1);i4(2)=i(2)+1;i4(3)=i(3)+1;dist(4)=aurostd::modulus(T-ABC*i4);
+      idx=0;idx=aurostd::mini(dist);
+      //write(*,'("Dists: ",4(f10.5,1x))') dist
+
+      //if(.not. equal(,origdist,eps)) then // Only change A if the new one really
+
+      if(idx==1) A=A-ABC*i1;
+      if(idx==2) A=A-ABC*i2;
+      if(idx==3) A=A-ABC*i3;
+      if(idx==4) A=A-ABC*i4;
+      if(idx==0) {cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_A_in_ABC:  Case failed in reduce_A_in_ABC" << endl;exit(0);}
+      //endif
+      //write(*,'("aurostd::modulus(A): ",f7.3,5x," A ",3(f7.3,1x)A)') aurostd::modulus(A), A
+      for(int i=1;i<=3;i++) {//GH We need these 3 lines to load matrix ABC again with the vectors A,B,C
+        ABC(i,1)=A(i);ABC(i,2)=B(i);ABC(i,3)=C(i);//GH
+      }//GH
+
+      // [OBSOLETE]  aurostd::matrix_inverse(ABC,ABCinv,err);
+      //[CO191201 - OBSOLETE]err=aurostd::inverse(ABC,ABCinv);
+      //
+      if(aurostd::isNonInvertible(ABC)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"A,B,C vectors in reduce_A_in_ABC are co-planar",_VALUE_RANGE_);} //CO191201
+      ABCinv=inverse(ABC);  //CO191201
+      ABC=ABCinv*oldABC-aurostd::nint(ABCinv*oldABC);
+
+      for(int i=1;i<=3;i++) {
+        for(int j=1;j<=3;j++) {
+          if(aurostd::abs(ABC(i,j))>eps) {
+            cerr << "eps=" << endl << eps << endl;
+            cerr << "ABC(i,j)=" << endl << ABC(i,j) << endl;
+            cerr << "ABCinv=" << endl << ABCinv << endl;
+            cerr << "oldABC=" << endl << oldABC << endl;
+            cerr << "ABCinv*oldABC=" << endl << ABCinv*oldABC << endl;
+            cerr << "ABCinv*oldABC-aurostd::nint(ABCinv*oldABC)=" << endl << ABCinv*oldABC-aurostd::nint(ABCinv*oldABC) << endl;
+            cerr << "Lattice was not preserved  in reduce_A_in_ABC" << endl;
+            exit(0);
+          }    
+        }
+      }
+      //read(*,*)
     }
-    //read(*,*)
-  }
-  
+
   // ***************************************************************************************************
   //  This routine takes a set of basis vectors (that form a lattice) and reduces them so that they form
   //  the shortest possible basis. See Lecture notes in computer science, ISSN 0302-974, ANTS - VI : algorithmic
   //  number theory, 2004, vol. 3076, pp. 338-357 ISBN 3-540-22156-5
   template<class utype> utype
-  reduce_to_shortest_basis(const xmatrix<utype>& IN,xmatrix<utype>& OUT,utype eps,bool VERBOSE) {
-    xvector<utype> A(3),B(3),C(3);
-    xmatrix<utype> check(3,3);
-    bool err;
-    utype od,odnew;
-    int ii=0,iimax=10000;
-    // IN has colum-vectors
-    for(int i=1;i<=3;i++) {
-      A(i)=IN(i,1); // 1st vector
-      B(i)=IN(i,2); // 2nd vector
-      C(i)=IN(i,3); // 3rd vector
-    }
-    odnew=orthogonality_defect(IN);
-    if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: Before reduction, the orthogonality defect of the basis was " << odnew << endl;
-    bool goexit=FALSE;
-    while(goexit==FALSE) {
-      od=odnew;
-      reduce_A_in_ABC(A,B,C,eps);
-      reduce_A_in_ABC(B,C,A,eps);
-      reduce_A_in_ABC(C,A,B,eps);
+    reduce_to_shortest_basis(const xmatrix<utype>& IN,xmatrix<utype>& OUT,utype eps,bool VERBOSE) {
+      string soliloquy="aurostd::reduce_to_shortest_basis():";  //CO191201
+      xvector<utype> A(3),B(3),C(3);
+      xmatrix<utype> check(3,3);
+      //[CO191201 - OBSOLETE]bool err;
+      utype od,odnew;
+      int ii=0,iimax=10000;
+      // IN has colum-vectors
       for(int i=1;i<=3;i++) {
-	OUT(i,1)=A(i);OUT(i,2)=B(i);OUT(i,3)=C(i);
+        A(i)=IN(i,1); // 1st vector
+        B(i)=IN(i,2); // 2nd vector
+        C(i)=IN(i,3); // 3rd vector
       }
-      odnew=orthogonality_defect(OUT);
-      // write(*,'("OD: ",2(f7.3,1x))') odnew, od
-      //      cerr << od << " " << odnew << endl;
-      if(aurostd::abs(od-odnew)<eps) goexit=TRUE;
-      if(ii++>iimax) goexit=TRUE;
-      //     if(ii++>iimax) {OUT=IN;return orthogonality_defect(OUT);}
+      odnew=orthogonality_defect(IN);
+      if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: Before reduction, the orthogonality defect of the basis was " << odnew << endl;
+      bool goexit=FALSE;
+      while(goexit==FALSE) {
+        od=odnew;
+        reduce_A_in_ABC(A,B,C,eps);
+        reduce_A_in_ABC(B,C,A,eps);
+        reduce_A_in_ABC(C,A,B,eps);
+        for(int i=1;i<=3;i++) {
+          OUT(i,1)=A(i);OUT(i,2)=B(i);OUT(i,3)=C(i);
+        }
+        odnew=orthogonality_defect(OUT);
+        // write(*,'("OD: ",2(f7.3,1x))') odnew, od
+        //      cerr << od << " " << odnew << endl;
+        if(aurostd::abs(od-odnew)<eps) goexit=TRUE;
+        if(ii++>iimax) goexit=TRUE;
+        //     if(ii++>iimax) {OUT=IN;return orthogonality_defect(OUT);}
+      }
+      // [OBSOLETE]    matrix_inverse(OUT,check,err);
+      //[CO191201 - OBSOLETE]err=aurostd::inverse(OUT,check);
+      //[CO191201 - OBSOLETE]if(err==TRUE) { 
+      //[CO191201 - OBSOLETE]  cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: OUT matrix is singular in reduce_to_shortest_basis" << endl;
+      //[CO191201 - OBSOLETE]  exit(0);
+      //[CO191201 - OBSOLETE]}
+      if(aurostd::isNonInvertible(OUT)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"OUT matrix is singular in reduce_to_shortest_basis",_VALUE_RANGE_);} //CO191201
+      check=aurostd::inverse(OUT);
+      //  Check that the conversion from old to new lattice vectors is still an integer matrix
+      if(sum(abs(check*IN-nint(check*IN)))>eps) { 
+        cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: ERROR: Reduced lattice vectors in reduce_to_shortest_basis changed the original lattice" << endl;
+        exit(0);
+      }
+      if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: After reduction, the orthogonality defect of the basis is " << orthogonality_defect(OUT) << endl;
+      //GH if we have a left-handed basis, then exchange two vectors so that the basis is right-handed (I don't care but VASP does...Why?)
+      if(aurostd::det(OUT)<eps) {
+        utype temp;
+        for(int i=1;i<=3;i++) {temp=OUT(i,1);OUT(i,1)=OUT(i,2);OUT(i,2)=temp;} // swap 1st with 2nd vector
+      }
+      // OUT has colum-vectors
+      return orthogonality_defect(OUT);
     }
-    // [OBSOLETE]    matrix_inverse(OUT,check,err);
-    err=aurostd::inverse(OUT,check);
-    if(err==TRUE) { 
-      cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: OUT matrix is singular in reduce_to_shortest_basis" << endl;
-      exit(0);
-    }
-    //  Check that the conversion from old to new lattice vectors is still an integer matrix
-    if(sum(abs(check*IN-nint(check*IN)))>eps) { 
-      cerr << _AUROSTD_XLIBS_ERROR_ << "aurostd::reduce_to_shortest_basis: ERROR: Reduced lattice vectors in reduce_to_shortest_basis changed the original lattice" << endl;
-      exit(0);
-    }
-    if(VERBOSE) cout << "aurostd::reduce_to_shortest_basis: After reduction, the orthogonality defect of the basis is " << orthogonality_defect(OUT) << endl;
-    //GH if we have a left-handed basis, then exchange two vectors so that the basis is right-handed (I don't care but VASP does...Why?)
-    if(aurostd::det(OUT)<eps) {
-      utype temp;
-      for(int i=1;i<=3;i++) {temp=OUT(i,1);OUT(i,1)=OUT(i,2);OUT(i,2)=temp;} // swap 1st with 2nd vector
-    }
-    // OUT has colum-vectors
-    return orthogonality_defect(OUT);
-  }
 
   template<class utype> xmatrix<utype>
-  reduce_to_shortest_basis(const xmatrix<utype>& IN,utype eps,bool VERBOSE) {
-    xmatrix<utype> newbasis(3,3);
-    reduce_to_shortest_basis(IN,newbasis,eps,VERBOSE);
-    return newbasis;
-  }
-   
+    reduce_to_shortest_basis(const xmatrix<utype>& IN,utype eps,bool VERBOSE) {
+      xmatrix<utype> newbasis(3,3);
+      reduce_to_shortest_basis(IN,newbasis,eps,VERBOSE);
+      return newbasis;
+    }
+
   template<class utype> xmatrix<utype>
-  reduce_to_shortest_basis(const xmatrix<utype>& IN) {
-    return reduce_to_shortest_basis(IN,(utype)_DEFAULT_EPS_BASIS_REDUCE_,FALSE);
-  }
+    reduce_to_shortest_basis(const xmatrix<utype>& IN) {
+      return reduce_to_shortest_basis(IN,(utype)_DEFAULT_EPS_BASIS_REDUCE_,FALSE);
+    }
 }
 
 //*****************************************************************************
@@ -3536,82 +3805,611 @@ namespace aurostd {
 // CO 171129
 namespace aurostd {
   template<class utype>
-  void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
-    // mat is mxn, m>=n
-    // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
+    void QRDecomposition_HouseHolder(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
+      return QRDecomposition_HouseHolder_MW(mat_orig,Q,R,tol);
+      //_MW() and _TB() show to have about the same run time, but _MW() can be slightly faster
+      //could be because of extra LDEBUG bool checks
+      //_MW() might introduce more error into R as x spans full column everytime, but the error falls below 1e-15
+      //_TB() uses more memory storing all v's
+      //_MW() is shorter and easier to follow
+    }
+  template<class utype>
+    void QRDecomposition_HouseHolder_MW(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
+      // mat is mxn, m>=n
+      // inspired by https://www.mathworks.com/matlabcentral/answers/169648-qr-factorization-using-householder-transformations
+      string soliloquy="aurostd::QRDecomposition_HouseHolder():";
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+      if(LDEBUG){cerr << soliloquy << " mat_orig=" << endl;cerr << mat_orig << endl;}
+      if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
 
-    string soliloquy="aurostd::QRDecomposition_HouseHolder():";
-    if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
+      R=mat_orig; //reset
 
-    R=mat_orig; //reset
-
-    //utype xModulus; //vModulus
-    utype vModulus;
-    std::vector<xmatrix<utype> > V;
-
-    for (int i = R.lcols; i <= R.ucols; i++) {
-      // create x, faster than getmat() because we need trasp (col->row)
-      xmatrix<utype> x(R.urows - i + R.lrows, 1);
-      for (int j = i; j <= R.urows; j++) {
-        x(j - i + R.lrows, 1) = R(j, i);
+      utype vModulus;
+      Q=eye<utype>(R.urows,R.urows,R.lrows,R.lrows); //reset
+      for(int k=R.lcols;k<=R.ucols;k++) {
+        if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}
+        xmatrix<utype> x(R.urows,R.lcols,R.lrows,R.lcols);
+        x.setmat(R.getmat(k,R.urows,k,k),k,R.lcols);  //x(k:m,1)=R(k:m,k);
+        if(LDEBUG){cerr << soliloquy << " x=" << endl;cerr << x << endl;}
+        xmatrix<utype> v(x);  //+x first
+        v[k][v.lcols]=x[k][x.lcols]+aurostd::modulus(x);
+        if(LDEBUG){cerr << soliloquy << " v(unnormalized)=" << endl;cerr << v << endl;}
+        vModulus=aurostd::modulus(v);
+        if(LDEBUG){cerr << soliloquy << " ||v||=" << vModulus << endl;}
+        if(!iszero(vModulus,tol)){  //prevents division by 0
+          v/=vModulus;
+          if(LDEBUG){cerr << soliloquy << " v(  normalized)=" << endl;cerr << v << endl;}
+          xmatrix<utype> u=(utype)2.0*trasp(R)*v;
+          if(LDEBUG){cerr << soliloquy << " u=" << endl;cerr << u << endl;}
+          if(LDEBUG){cerr << soliloquy << " R( pre)=" << endl;cerr << R << endl;}
+          R-=v*trasp(u);  //product HR
+          if(LDEBUG){cerr << soliloquy << " R(post)=" << endl;cerr << R << endl;}
+          if(LDEBUG){cerr << soliloquy << " Q( pre)=" << endl;cerr << Q << endl;}
+          Q-=(utype)2.0*Q*v*trasp(v); //product QR
+          if(LDEBUG){cerr << soliloquy << " Q(post)=" << endl;cerr << Q << endl;}
+        }
       }
-      // create identity vector
-      //[SLOW]xmatrix<utype> e1(x.rows, 1);  // automatically sets all to 0
-      //[SLOW]e1(e1.lrows, e1.lcols) = (utype)1.0;
-      //[SLOW]xModulus=aurostd::modulus(x); //sqrt(sum(trasp(x) * x));
-      //[SLOW]xmatrix<utype> v(x.rows, 1);
-      xmatrix<utype> v=x;
-      v(v.lrows,v.lcols)+=aurostd::sign(x(x.lrows,x.lcols))*aurostd::modulus(x);
-      vModulus=aurostd::modulus(v);
-      if(vModulus>=tol){  //prevents division by 0
-      //[SLOW]if(xModulus >= tol) { //prevents division by 0
-        //[SLOW]  v = xModulus * e1;
-        //[SLOW]  if(std::signbit(x(x.lrows, x.lcols))) {v*=(utype)-1.0;}// negate
-        //[SLOW]  v += x;
-        //[SLOW]  v/=aurostd::modulus(v); //normalize
-        v/=vModulus;
-        //[OBSOLETE]// modulus of v
-        //[OBSOLETE]vModulus = sqrt(sum(trasp(v) * v));
-        //[OBSOLETE]v /= vModulus;
-        xmatrix<utype> A(R.urows - i + R.lrows, R.ucols - i + R.lcols); //faster than getmat() because we need trasp
-        for (int j = i; j <= R.urows; j++) {
-          for (int k = i; k <= R.ucols; k++) {
-            A(j - i + R.lrows, k - i + R.lcols) = R(j, k);
+
+      if(LDEBUG){
+        cerr << soliloquy << " mat_orig=" << endl;cerr << mat_orig << endl;
+        cerr << soliloquy << " Q=" << endl;cerr << Q << endl;
+        cerr << soliloquy << " R=" << endl;cerr << R << endl;
+      }
+
+      if(!aurostd::isequal(mat_orig,Q*R,tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (A!=Q*R)",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(trasp(Q)*Q,eye<utype>(Q.urows,Q.ucols,Q.lrows,Q.lcols),tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (Q not orthonormal)",_RUNTIME_ERROR_);}
+      if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    }
+  template<class utype>
+    void QRDecomposition_HouseHolder_TB(const xmatrix<utype>& mat_orig,xmatrix<utype>& Q,xmatrix<utype>& R,utype tol) {  //CO191110
+      // mat is mxn, m>=n
+      // See Numerical Linear Algebra, Trefethen and Bau, pg. 73
+      // this function stores household rotations (v) to create Q at the end
+      string soliloquy="aurostd::QRDecomposition_HouseHolder():";
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+      if(LDEBUG){cerr << soliloquy << " mat_orig=" << endl;cerr << mat_orig << endl;}
+      if(mat_orig.rows<mat_orig.cols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m<n, please flip the matrix",_VALUE_ERROR_);}
+
+      R=mat_orig; //reset
+
+      int i=0,k=0;
+      xmatrix<utype> x,A; //since x and A changes size with each loop, let getmatInPlace() handle it internally
+      utype vModulus = (utype)0;
+      std::vector<xmatrix<utype> > V; //we need to save v's, Q is calculated afterwards and needs all v's present
+      for(k=R.lcols;k<=R.ucols;k++) {
+        if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}
+        R.getmatInPlace(x,k,R.urows,k,k);  //build R([k:m],l)
+        if(LDEBUG){cerr << soliloquy << " x=" << endl;cerr << x << endl;}
+        //v_k=sign(x1)||x||e1+x
+        xmatrix<utype> v(x);  //+x first
+        v[v.lrows][v.lcols]+=aurostd::sign(x[x.lrows][x.lcols])*aurostd::modulus(x);  //only applies to first entry of v (e1)
+        if(LDEBUG){cerr << soliloquy << " v(unnormalized)=" << endl;cerr << v << endl;}
+        vModulus=aurostd::modulus(v);
+        if(LDEBUG){cerr << soliloquy << " ||v||=" << vModulus << endl;}
+        if(!iszero(vModulus,tol)){  //prevents division by 0
+          v/=vModulus;
+          if(LDEBUG){cerr << soliloquy << " v(  normalized)=" << endl;cerr << v << endl;}
+          if(LDEBUG){cerr << soliloquy << " R( pre)=" << endl;cerr << R << endl;}
+          R.getmatInPlace(A,k,R.urows,k,R.ucols);  //build R([k:m],[k:m])
+          if(LDEBUG){cerr << soliloquy << " A( pre)=" << endl;cerr << A << endl;}
+          A-=(utype)2.0*v*trasp(v)*A;
+          if(LDEBUG){cerr << soliloquy << " A(post)=" << endl;cerr << A << endl;}
+          R.setmat(A,k,k);  //store A back into R
+          if(LDEBUG){cerr << soliloquy << " R(post)=" << endl;cerr << R << endl;}
+        }
+        V.push_back(v);
+      }
+
+      Q=xmatrix<utype>(R.urows,R.urows,R.lrows,R.lrows); //reset
+      xmatrix<utype> ek(R.urows,R.lcols,R.lrows,R.lcols); //create identity matrix column vector
+      for(k=R.lcols;k<=R.urows;k++){  //calculate Q*e1,Q*e2...
+        if(LDEBUG){cerr << soliloquy << " Q( pre)=" << endl;cerr << Q << endl;}
+        for(i=R.lrows;i<=R.urows;i++){ek[i][ek.lcols]=(i==k) ? (utype)1 : (utype)0;}
+        if(LDEBUG){cerr << soliloquy << " ek( pre)=" << endl;cerr << ek << endl;}
+        for(i=R.ucols;i>=R.lcols;i--){
+          ek.getmatInPlace(x,i,R.urows,R.lcols,R.lcols);
+          if(LDEBUG){cerr << soliloquy << " x( pre)=" << endl;cerr << x << endl;}
+          x-=(utype)2.0*V[i-R.lcols]*trasp(V[i-R.lcols])*x;
+          if(LDEBUG){cerr << soliloquy << " x(post)=" << endl;cerr << x << endl;}
+          ek.setmat(x,i,R.lcols);
+        }
+        if(LDEBUG){cerr << soliloquy << " ek(post)=" << endl;cerr << ek << endl;}
+        Q.setmat(ek,R.lrows,k);
+        if(LDEBUG){cerr << soliloquy << " Q(post)=" << endl;cerr << Q << endl;}
+      }
+
+      if(LDEBUG){
+        cerr << soliloquy << " mat_orig=" << endl;cerr << mat_orig << endl;
+        cerr << soliloquy << " Q=" << endl;cerr << Q << endl;
+        cerr << soliloquy << " R=" << endl;cerr << R << endl;
+      }
+
+      if(!aurostd::isequal(mat_orig,Q*R,tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (A!=Q*R)",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(trasp(Q)*Q,eye<utype>(Q.urows,Q.ucols,Q.lrows,Q.lcols),tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (Q not orthonormal)",_RUNTIME_ERROR_);}
+      if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    }
+  template<class utype>
+    void getEHermite(utype a,utype b,xmatrix<utype>& ehermite){ //CO+YL191201
+      //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
+      //original license: GNU-GPL Style.
+      //Elementary Hermite transformation.
+      //For integers a and b, E = ehermite(a,b) returns
+      //an integer matrix with determinant 1 such that E * [a;b] = [g;0],
+      //where g is the gcd of a and b.
+      //E = ehermite(a,b)
+      //This function is in some ways analogous to GIVENS.
+    
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      string soliloquy="aurostd::getEHermite():";
+      if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+      utype gcd=0,x=0,y=0;
+      GCD(a,b,gcd,x,y);
+      if(LDEBUG){cerr << soliloquy << " gcd(" << a << "," << b << ")=" << gcd << ", x=" << x << ", y=" << y << endl;}
+      //ehermite is 2x2
+      if(ehermite.rows!=2 || ehermite.cols!=2){xmatrix<utype> ehermite_tmp(2,2);ehermite=ehermite_tmp;}
+      if(gcd){
+        ehermite[ehermite.lrows][ehermite.lcols]=x;
+        ehermite[ehermite.lrows][ehermite.ucols]=y;       //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.lcols]=-b/gcd;  //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.ucols]=a/gcd;   //urows=lrows+1, ucols=lcols+1
+      }else{
+        ehermite[ehermite.lrows][ehermite.lcols]=(utype)1;
+        ehermite[ehermite.lrows][ehermite.ucols]=(utype)0;       //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.lcols]=(utype)0;       //urows=lrows+1, ucols=lcols+1
+        ehermite[ehermite.urows][ehermite.ucols]=(utype)1;       //urows=lrows+1, ucols=lcols+1
+      }
+      
+      if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    }
+  template<class utype>
+    void getSmithNormalForm(const xmatrix<utype>& A_in,xmatrix<utype>& U_out,xmatrix<utype>& V_out,xmatrix<utype>& S_out,double tol){  //CO+YL191201
+      //implementation is inspired by that found here: http://pydoc.net/GBpy/0.1.1/GBpy.tools/
+      //original license: GNU-GPL Style.
+      //Smith normal form of an integer matrix.
+      //[U,S,V] = smith(A) returns integer matrices U, S, and V such that
+      //S = U*A*V (rotated from A=U*S*V')
+      //S is diagonal and nonnegative, S(i,i) divides S(i+1,i+1) for all i,
+      //det U =+-1, and det V =+-1.
+      //This function is in some ways analogous to SVD.
+      //This looks much like an SVD algorithm that first bidiagonalizes
+      //A by Givens rotations and then chases zeros, except for
+      //the construction of the 2 by 2 elementary transformation.
+      //we work with doubles inside, return int matrices later
+      
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      string soliloquy="aurostd::getSmithNormalForm():";
+      if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+      if(LDEBUG){cerr << soliloquy << " A=" << endl;cerr << A_in << endl;}
+      
+      xmatrix<double> S=aurostd::xmatrixutype2double(A_in);aurostd::shiftlrowscols(S,1,1); //algorithm depends on lrows==lcols==1
+
+      int m=S.rows,n=S.cols;
+      int min_mn=std::min(m,n);
+      xmatrix<double> U=eye<double>(m),V=eye<double>(n);
+
+      if(LDEBUG){cerr << soliloquy << " bidiagonalizing S with elementary Hermite transforms" << endl;}
+      
+      xmatrix<double> E(2,2);
+      xmatrix<double> mXtwo_in(m,2),mXtwo_out(m,2),nXtwo_in(n,2),nXtwo_out(n,2),twoXn_in(2,n),twoXn_out(2,n);
+      int j=0,i=0,jj=0;
+      for(j=S.lcols;j<=min_mn;j++){
+        //Zero column j below the diagonal.
+        for(i=j+1;i<=m;i++){
+          if(!iszero(S[i][j],tol)){
+            //Construct an elementary Hermite transformation E
+            //to zero S(i,j) by combining rows i and j.
+            getEHermite(S[j][j],S[i][j],E);
+            if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j=" << j << "]="<< S[j][j] <<",S[i=" << i << "][j=" << j << "]=" << S[i][j] << ")=" << endl;cerr << E << endl;}
+            
+            //Apply the transform to S
+            if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+            //build S([j i],:)
+            for(jj=twoXn_in.lcols;jj<=twoXn_in.ucols;jj++){
+              twoXn_in[twoXn_in.lrows][jj]=S[j][jj];
+              twoXn_in[twoXn_in.urows][jj]=S[i][jj];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S([j=" << j << " i=" << i << "],:)=" << endl;cerr << twoXn_in << endl;}
+            twoXn_out=E*twoXn_in; //2x2 x 2x3 = 2x3
+            //store twoXn_out into S([j i],:)
+            for(jj=twoXn_out.lcols;jj<=twoXn_out.ucols;jj++){
+              S[j][jj]=twoXn_out[twoXn_in.lrows][jj];
+              S[i][jj]=twoXn_out[twoXn_in.urows][jj];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+            
+            //Apply the transform to U
+            if(LDEBUG){cerr << soliloquy << " U(pre)=" << endl;cerr << U << endl;}
+            //build U(:,[j i])
+            for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+              mXtwo_in[jj][mXtwo_in.lcols]=U[jj][j];
+              mXtwo_in[jj][mXtwo_in.ucols]=U[jj][i];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " U(:,[j=" << j << " i=" << i << "])=" << endl;cerr << mXtwo_in << endl;}
+            mXtwo_out=mXtwo_in/E;
+            //store mXtwo_out into U(:,[j i])
+            for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+              U[jj][j]=mXtwo_out[jj][mXtwo_out.lcols];
+              U[jj][i]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " U(post)=" << endl;cerr << U << endl;}
           }
         }
-        A -= (utype)2.0 * v * trasp(v) * A;
-        for (int j = i; j <= R.urows; j++) {
-          for (int k = i; k <= R.ucols; k++) {
-            R(j, k) = A(j - i + R.lrows, k - i + R.lcols);
+        //Zero row j after the superdiagonal.
+        for(i=j+2;i<=n;i++){
+          if(!iszero(S[j][i],tol)){
+            //Construct an elementary Hermite transformation E
+            //to zero S(j,i) by combining columns j+1 and i.
+            getEHermite(S[j][j+1],S[j][i],E);
+            if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j+1=" << j+1 << "]="<< S[j][j+1] <<",S[j=" << j << "][i=" << i << "]=" << S[j][i] << ")=" << endl;cerr << E << endl;}
+            
+            //Apply the transform to S
+            if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+            //build S(:,[j+1 i])
+            for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+              mXtwo_in[jj][mXtwo_in.lcols]=S[jj][j+1];
+              mXtwo_in[jj][mXtwo_in.ucols]=S[jj][i];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S(:,[j+1=" << j+1 << " i=" << i << "])=" << endl;cerr << mXtwo_in << endl;}
+            mXtwo_out=mXtwo_in*trasp(E);
+            //store mXtwo_out into S(:,[j+1 i])
+            for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+              S[jj][j+1]=mXtwo_out[jj][mXtwo_out.lcols];
+              S[jj][i]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+            
+            //Apply the transform to V
+            if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+            //build V(:,[j+1 i])
+            for(jj=nXtwo_in.lrows;jj<=nXtwo_in.urows;jj++){
+              nXtwo_in[jj][nXtwo_in.lcols]=V[jj][j+1];
+              nXtwo_in[jj][nXtwo_in.ucols]=V[jj][i];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " V(:,[j+1=" << j+1 << " i=" << i << "])=" << endl;cerr << nXtwo_in << endl;}
+            nXtwo_out=nXtwo_in/E;
+            //store nXtwo_out into V(:,[j+1 i])
+            for(jj=nXtwo_out.lrows;jj<=nXtwo_out.urows;jj++){
+              V[jj][j+1]=nXtwo_out[jj][nXtwo_out.lcols];
+              V[jj][i]=nXtwo_out[jj][nXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+            }
+            if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
           }
         }
       }
-      V.push_back(v);
-    }
 
-    Q=xmatrix<utype>(R.rows, R.rows); //reset
-    xmatrix<utype> ek(R.rows, 1); // create identity vector
-    for (int k = R.lcols; k <= R.urows; k++) {
-      for (int i = R.lrows; i <= R.urows; i++) {
-        ek(i,ek.lcols)=(i==k) ? (utype)1 : (utype)0;
-        //[OBSOLETE]if(i == k) {ek(i, 1) = (utype)1;} 
-        //[OBSOLETE]else {ek(i, 1) = (utype)0;}
+      //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+      if(LDEBUG){
+        cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+        cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+        cerr << soliloquy << " S=" <<endl;cerr << S << endl;
       }
-      for (int i = R.ucols; i > 0; i--) {
-        xmatrix<utype> x(R.urows - i + R.lrows, 1);
-        for (int j = i; j <= R.urows; j++) {
-          x(j - i + R.lrows, x.lcols) = ek(j, ek.lcols);
-        }
-        x = x - (utype)2.0 * V[i - R.lcols] * trasp(V[i - R.lcols]) * x;
-        for (int j = i; j <= R.urows; j++) {
-          ek(j, ek.lcols) = x(j - i + R.lrows, x.lcols);
-        }
-      }
-      for (int i = R.lrows; i <= R.urows; i++) {Q(i, k) = ek(i, ek.lcols);}
-    }
 
-    if(!aurostd::isequal(mat_orig,Q*R)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed",_RUNTIME_ERROR_);}
-  }
+      if(LDEBUG){cerr << soliloquy << " S is now upper bidiagonal, eliminating superdiagonal non-zeros" << endl;}
+      
+      xvector<double> D=S.getdiag(1);
+      if(LDEBUG){cerr << soliloquy << " D=" << D << endl;}
+
+      int k=0;
+      double q=0.0;
+      while(!iszero(D,tol)){
+        //Start chasing bulge at first nonzero superdiagonal element.
+        k=-1;
+        for(i=D.lrows;i<=D.urows;i++){
+          if(!iszero(D[i],tol)){k=i;break;}
+        }
+        //be careful, k refers to index of D, not S
+        
+        //To guarantee reduction in S(k,k), first make S(k,k) positive
+        //and make S(k,k+1) nonnegative and less than S(k,k).
+        if(std::signbit(S[k][k])){
+          for(i=S.lcols;i<=S.ucols;i++){S[k][i]=-S[k][i];}
+          for(i=U.lrows;i<=U.urows;i++){U[i][k]=-U[i][k];}
+        }
+        q=std::floor(S[k][k+1]/S[k][k]);
+        E[1][1]=1;E[1][2]=0;
+        E[2][1]=-q;E[2][2]=1;
+
+        //Apply the transform to S
+        if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+        //build S(:,[k k+1])
+        for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+          mXtwo_in[jj][mXtwo_in.lcols]=S[jj][k];
+          mXtwo_in[jj][mXtwo_in.ucols]=S[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " S(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << mXtwo_in << endl;}
+        mXtwo_out=mXtwo_in*trasp(E);
+        //store mXtwo_out into S(:,[k k+1])
+        for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+          S[jj][k]=mXtwo_out[jj][mXtwo_out.lcols];
+          S[jj][k+1]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+
+        //Apply the transform to V
+        if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+        //build V(:,[k k+1])
+        for(jj=nXtwo_in.lrows;jj<=nXtwo_in.urows;jj++){
+          nXtwo_in[jj][nXtwo_in.lcols]=V[jj][k];
+          nXtwo_in[jj][nXtwo_in.ucols]=V[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " V(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << nXtwo_in << endl;}
+        nXtwo_out=nXtwo_in/E;
+        //store nXtwo_out into V(:,[k k+1])
+        for(jj=nXtwo_out.lrows;jj<=nXtwo_out.urows;jj++){
+          V[jj][k]=nXtwo_out[jj][nXtwo_out.lcols];
+          V[jj][k+1]=nXtwo_out[jj][nXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+        }
+        if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+
+        if(!iszero(S[k][k+1],tol)){
+          //Zero the first nonzero superdiagonal element
+          //using columns k and k+1, to start the bulge at S(k+1,k).
+          getEHermite(S[k][k],S[k][k+1],E);
+          if(LDEBUG){cerr << soliloquy << " getEHermite(S[k=" << k <<"][k=" << k << "]="<< S[k][k] <<",S[k=" << k << "][k+1=" << k+1 << "]=" << S[k][k+1] << ")=" << endl;cerr << E << endl;}
+
+          //Apply the transform to S
+          if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+          //build S(:,[k k+1])
+          for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+            mXtwo_in[jj][mXtwo_in.lcols]=S[jj][k];
+            mXtwo_in[jj][mXtwo_in.ucols]=S[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " S(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << mXtwo_in << endl;}
+          mXtwo_out=mXtwo_in*trasp(E);
+          //store mXtwo_out into S(:,[k k+1])
+          for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+            S[jj][k]=mXtwo_out[jj][mXtwo_out.lcols];
+            S[jj][k+1]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+
+          //Apply the transform to V
+          if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+          //build V(:,[k k+1])
+          for(jj=nXtwo_in.lrows;jj<=nXtwo_in.urows;jj++){
+            nXtwo_in[jj][nXtwo_in.lcols]=V[jj][k];
+            nXtwo_in[jj][nXtwo_in.ucols]=V[jj][k+1];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " V(:,[k=" << k << " k+1=" << k+1 << "])=" << endl;cerr << nXtwo_in << endl;}
+          nXtwo_out=nXtwo_in/E;
+          //store nXtwo_out into V(:,[k k+1])
+          for(jj=nXtwo_out.lrows;jj<=nXtwo_out.urows;jj++){
+            V[jj][k]=nXtwo_out[jj][nXtwo_out.lcols];
+            V[jj][k+1]=nXtwo_out[jj][nXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+
+          for(j=S.lcols;j<=min_mn;j++){
+            if(j+1<=m){
+              //Zero S(j+1,j) using rows j and j+1.
+              getEHermite(S[j][j],S[j+1][j],E);
+              if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j=" << j << "]="<< S[j][j] <<",S[j+1=" << j+1 << "][j=" << j << "]=" << S[j+1][j] << ")=" << endl;cerr << E << endl;}
+            
+              //Apply the transform to S
+              if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+              //build S([j j+1],:)
+              for(jj=twoXn_in.lcols;jj<=twoXn_in.ucols;jj++){
+                twoXn_in[twoXn_in.lrows][jj]=S[j][jj];
+                twoXn_in[twoXn_in.urows][jj]=S[j+1][jj];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " S([j=" << j << " j+1=" << j+1 << "],:)=" << endl;cerr << twoXn_in << endl;}
+              twoXn_out=E*twoXn_in; //2x2 x 2x3 = 2x3
+              //store twoXn_out into S([j j+1],:)
+              for(jj=twoXn_out.lcols;jj<=twoXn_out.ucols;jj++){
+                S[j][jj]=twoXn_out[twoXn_in.lrows][jj];
+                S[j+1][jj]=twoXn_out[twoXn_in.urows][jj];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+              
+              //Apply the transform to U
+              if(LDEBUG){cerr << soliloquy << " U(pre)=" << endl;cerr << U << endl;}
+              //build U(:,[j j+1])
+              for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+                mXtwo_in[jj][mXtwo_in.lcols]=U[jj][j];
+                mXtwo_in[jj][mXtwo_in.ucols]=U[jj][j+1];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " U(:,[j=" << j << " j+1=" << j+1 << "])=" << endl;cerr << mXtwo_in << endl;}
+              mXtwo_out=mXtwo_in/E;
+              //store mXtwo_out into U(:,[j j+1])
+              for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+                U[jj][j]=mXtwo_out[jj][mXtwo_out.lcols];
+                U[jj][j+1]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " U(post)=" << endl;cerr << U << endl;}
+            }
+            if(j+2<=n){
+              //Zero S(j,j+2) using columns j+1 and j+2.
+              getEHermite(S[j][j+1],S[j][j+2],E);
+              if(LDEBUG){cerr << soliloquy << " getEHermite(S[j=" << j <<"][j+1=" << j+1 << "]="<< S[j][j+1] <<",S[j=" << j << "][j+2=" << j+2 << "]=" << S[j][j+2] << ")=" << endl;cerr << E << endl;}
+              
+              //Apply the transform to S
+              if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+              //build S(:,[j+1 j+2])
+              for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+                mXtwo_in[jj][mXtwo_in.lcols]=S[jj][j+1];
+                mXtwo_in[jj][mXtwo_in.ucols]=S[jj][j+2];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " S(:,[j+1=" << j+1 << " j+2=" << j+2 << "])=" << endl;cerr << mXtwo_in << endl;}
+              mXtwo_out=mXtwo_in*trasp(E);
+              //store mXtwo_out into S(:,[j+1 j+2])
+              for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+                S[jj][j+1]=mXtwo_out[jj][mXtwo_out.lcols];
+                S[jj][j+2]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+              
+              //Apply the transform to V
+              if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+              //build V(:,[j+1 j+2])
+              for(jj=nXtwo_in.lrows;jj<=nXtwo_in.urows;jj++){
+                nXtwo_in[jj][nXtwo_in.lcols]=V[jj][j+1];
+                nXtwo_in[jj][nXtwo_in.ucols]=V[jj][j+2];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " V(:,[j+1=" << j+1 << " j+2=" << j+2 << "])=" << endl;cerr << nXtwo_in << endl;}
+              nXtwo_out=nXtwo_in/E;
+              //store nXtwo_out into V(:,[j+1 j+2])
+              for(jj=nXtwo_out.lrows;jj<=nXtwo_out.urows;jj++){
+                V[jj][j+1]=nXtwo_out[jj][nXtwo_out.lcols];
+                V[jj][j+2]=nXtwo_out[jj][nXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+              }
+              if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+            }
+          }
+        }
+        D=S.getdiag(1);
+      }
+
+      //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+      if(LDEBUG){
+        cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+        cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+        cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+      }
+
+      if(LDEBUG){cerr << soliloquy << " S is now diagonal, make it non-negative" << endl;}
+
+      for(j=S.lcols;j<=min_mn;j++){
+        if(std::signbit(S[j][j])){
+          for(i=S.lcols;i<=S.ucols;i++){S[j][i]=-S[j][i];}
+          for(i=U.lrows;i<=U.urows;i++){U[i][j]=-U[i][j];}
+        }
+      }
+      
+      if(LDEBUG){
+        cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+        cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+        cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+      }
+
+      if(LDEBUG){cerr << soliloquy << " squeezing factors to lower right to enforce divisibility condition" << endl;}
+      
+      double a=0.0,b=0.0,gcd=0.0,x=0.0,y=0.0;
+      xmatrix<double> F(E),twoXtwo_in(2,2),twoXtwo_out(2,2);
+      for(i=S.lcols;i<=min_mn;i++){
+        for(j=i+1;j<=min_mn;j++){
+          //Replace S(i,i), S(j,j) by their gcd and lcm respectively.
+          a=S[i][i];
+          b=S[j][j];
+          GCD(a,b,gcd,x,y);
+          
+          if(LDEBUG){
+            cerr << soliloquy << " a=" << a << endl;
+            cerr << soliloquy << " b=" << b << endl;
+            cerr << soliloquy << " gcd=" << gcd << endl;
+            cerr << soliloquy << " x=" << x << endl;
+            cerr << soliloquy << " y=" << y << endl;
+          }
+          
+          E[1][1]=1.0;E[1][2]=y;
+          E[2][1]=-b/gcd;E[2][2]=a*x/gcd;
+          
+          F[1][1]=x;F[1][2]=1.0;
+          F[2][1]=-b*y/gcd;F[2][2]=a/gcd;
+
+          if(LDEBUG){
+            cerr << soliloquy << " E=" << endl;cerr << E << endl;
+            cerr << soliloquy << " F=" << endl;cerr << F << endl;
+          }
+
+          //Apply the transform to S
+          if(LDEBUG){cerr << soliloquy << " S(pre)=" << endl;cerr << S << endl;}
+          //build S([i j],[i j])
+          twoXtwo_in[twoXtwo_in.lrows][twoXtwo_in.lcols]=S[i][i];twoXtwo_in[twoXtwo_in.lrows][twoXtwo_in.ucols]=S[i][j];  //urows=lrows+1, ucols=lcols+1
+          twoXtwo_in[twoXtwo_in.urows][twoXtwo_in.lcols]=S[j][i];twoXtwo_in[twoXtwo_in.urows][twoXtwo_in.ucols]=S[j][j];  //urows=lrows+1, ucols=lcols+1
+          if(LDEBUG){cerr << soliloquy << " S([i=" << i << " j=" << j << "],[i=" << i << " j=" << j << "])=" << endl;cerr << twoXtwo_in << endl;}
+          twoXtwo_out=E*twoXtwo_in*trasp(F);
+          //store twoXtwo_out into S([i j],[i j])
+          S[i][i]=twoXtwo_out[twoXtwo_out.lrows][twoXtwo_out.lcols];S[i][j]=twoXtwo_out[twoXtwo_out.lrows][twoXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          S[j][i]=twoXtwo_out[twoXtwo_out.urows][twoXtwo_out.lcols];S[j][j]=twoXtwo_out[twoXtwo_out.urows][twoXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          if(LDEBUG){cerr << soliloquy << " S(post)=" << endl;cerr << S << endl;}
+
+          //Apply the transform to U
+          if(LDEBUG){cerr << soliloquy << " U(pre)=" << endl;cerr << U << endl;}
+          //build U(:,[i j])
+          for(jj=mXtwo_in.lrows;jj<=mXtwo_in.urows;jj++){
+            mXtwo_in[jj][mXtwo_in.lcols]=U[jj][i];
+            mXtwo_in[jj][mXtwo_in.ucols]=U[jj][j];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " U(:,[i=" << i << " j=" << j << "])=" << endl;cerr << mXtwo_in << endl;}
+          mXtwo_out=mXtwo_in/E;
+          //store mXtwo_out into U(:,[i j])
+          for(jj=mXtwo_out.lrows;jj<=mXtwo_out.urows;jj++){
+            U[jj][i]=mXtwo_out[jj][mXtwo_out.lcols];
+            U[jj][j]=mXtwo_out[jj][mXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " U(post)=" << endl;cerr << U << endl;}
+
+          //Apply the transform to V
+          if(LDEBUG){cerr << soliloquy << " V(pre)=" << endl;cerr << V << endl;}
+          //build V(:,[i j])
+          for(jj=nXtwo_in.lrows;jj<=nXtwo_in.urows;jj++){
+            nXtwo_in[jj][nXtwo_in.lcols]=V[jj][i];
+            nXtwo_in[jj][nXtwo_in.ucols]=V[jj][j];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " V(:,[i=" << i << " j=" << j << "])=" << endl;cerr << nXtwo_in << endl;}
+          nXtwo_out=nXtwo_in/F;
+          //store nXtwo_out into V(:,[i j])
+          for(jj=nXtwo_in.lrows;jj<=nXtwo_in.urows;jj++){
+            V[jj][i]=nXtwo_out[jj][nXtwo_out.lcols];
+            V[jj][j]=nXtwo_out[jj][nXtwo_out.ucols];  //urows=lrows+1, ucols=lcols+1
+          }
+          if(LDEBUG){cerr << soliloquy << " V(post)=" << endl;cerr << V << endl;}
+        }
+      }
+      
+      if(LDEBUG){
+        cerr << soliloquy << " U=" <<endl;cerr << U << endl;
+        cerr << soliloquy << " V=" <<endl;cerr << V << endl;
+        cerr << soliloquy << " S=" <<endl;cerr << S << endl;
+      }
+
+      //CONVERT TO INTEGERS FIRST!
+      //inverse of an integer matrix is an integer matrix IFF det(M)= 1/-1 (true for V and U as above)
+      //algorithm is MUCH more stable this way
+      if(LDEBUG){cerr << soliloquy << " converting to xmatrix<int>" << endl;}
+      U_out=xmatrixdouble2utype<utype>(U);
+      V_out=xmatrixdouble2utype<utype>(V);
+      S_out=xmatrixdouble2utype<utype>(S);
+      //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+      if(LDEBUG){
+        cerr << soliloquy << " U=" <<endl;cerr << U_out << endl;
+        cerr << soliloquy << " V=" <<endl;cerr << V_out << endl;
+        cerr << soliloquy << " S=" <<endl;cerr << S_out << endl;
+      }
+      
+      //the routine should give SNF such that A=U*S*V'
+      //we will rotate after this if the Matlab output is desired
+      if(!aurostd::isequal(A_in,U_out*S_out*trasp(V_out),(utype)tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"SNF decomposition failed",_RUNTIME_ERROR_);}
+      
+      //operations below here for Matlab-like output
+
+      if(LDEBUG){cerr << soliloquy << " transposing V to match Matlab" << endl;}
+      traspInPlace(V_out);  //such that A=U*S*V  and not A=U*S*V'
+      if(LDEBUG){cerr << soliloquy << " V=" <<endl;cerr << V_out << endl;}
+
+      if(LDEBUG){cerr << soliloquy << " inverting V and U to match Matlab" << endl;}
+      V_out=inverse(V_out);U_out=inverse(U_out);  //to be identical to matlab's smithForm we need V -> inv(V) U-> inv(U)
+      //if results differ slightly from matlab, check _GCD() and enable matlab implementation for gcd(1,1)
+      if(LDEBUG){
+        cerr << soliloquy << " U=" <<endl;cerr << U_out << endl;
+        cerr << soliloquy << " V=" <<endl;cerr << V_out << endl;
+        cerr << soliloquy << " S=" <<endl;cerr << S_out << endl;
+      }
+      
+      //shift everything to match A_in
+      aurostd::shiftlrowscols(U_out,A_in.lrows,A_in.lcols);
+      aurostd::shiftlrowscols(V_out,A_in.lrows,A_in.lcols);
+      aurostd::shiftlrowscols(S_out,A_in.lrows,A_in.lcols);
+      
+      //Matlab gives SNF such that S=U*A*V
+      if(!aurostd::isequal(S_out,U_out*A_in*V_out,(utype)tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"SNF decomposition failed AFTER Matlab transformations",_RUNTIME_ERROR_);}
+
+      if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    }
 }
 
 // ****************************************************

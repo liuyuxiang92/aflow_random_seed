@@ -700,9 +700,13 @@ namespace aurostd {
   // Function getZeroPadding
   // ***************************************************************************
   // Corey Oses
-  int getZeroPadding(unsigned long long int num) {
-    return int(log10((double) num))+1;
-  }
+  int getZeroPadding(double d) {return int(log10(d))+1;}
+  int getZeroPadding(int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(uint num) {return getZeroPadding((double)num);}
+  int getZeroPadding(long int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(unsigned long int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(long long int num) {return getZeroPadding((double)num);}
+  int getZeroPadding(unsigned long long int num) {return getZeroPadding((double)num);}
 
   // ***************************************************************************
   // Function PaddedPRE
@@ -1993,10 +1997,11 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo - jan 08
   // returns in bytes the size of a file
-  int FileSize(const string& _FileName) {
+  // ME191001 - Changed to unsigned long long int to accommodate large files
+  unsigned long long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     ifstream FileStream;
-    int sizeout;
+    long int sizeout = 0;
     FileStream.open(FileName.c_str(),std::ios::in);
     if(!FileStream.good()) {
       sizeout=0;
@@ -3495,6 +3500,30 @@ namespace aurostd {
   }
 
   uint efile2dequestring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  // ***************************************************************************
+  // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring overloading for file2vector
+  // ***************************************************************************
+  // write file to deque string - Stefano Curtarolo
+  uint file2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines) {
+    return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vlines);
+  }
+
+  uint efile2vectorstring(string FileNameIN,deque<string>& vlines) {
     return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vlines);
   }
 
