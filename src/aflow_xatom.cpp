@@ -8391,8 +8391,11 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
   out=out*1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
   out=out*1.05;     // Mon Apr 23 13:40:02 EST 2018 // HELPS SCAN
   // cerr << "GetNBANDS=" << out << endl;
-  //out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
-  out= out * std::pow((double) nions,(double) 0.06);  // ME191028 - prior scaling factor not sufficient
+  if (nions < 100) {
+    out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
+  } else {
+    out= out * std::pow((double) nions,(double) 0.06);  // ME191028 - prior scaling factor not sufficient for supercells
+  }
   //  cerr << "GetNBANDS=" << out << endl;
   // exit(0);
   return (int) ceil(out);
