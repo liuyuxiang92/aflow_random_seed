@@ -4240,9 +4240,9 @@ namespace KBIN {
         aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
         KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", -1, 0.0, false);
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
-        xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
       }
       if (xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
         xvasp.INCAR_orig.str(std::string());
         xvasp.INCAR_orig << xvasp.INCAR.str();
         if (step != xvasp.NRELAX) {  // Do not write when at the last step or there will be an extra INCAR
