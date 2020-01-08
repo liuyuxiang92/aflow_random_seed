@@ -1826,11 +1826,12 @@ void convertEnergies(xDOSCAR& xdos, const string& unit) {
 //getEnergyConversionFactor///////////////////////////////////////////////////
 // Returns the factor to convert eV into the desired energy/frequency unit.
 // Supported units are meV, THz, Hz, and reciprocal cm (CM-1/RCM).
+// ME200108 - replaced with xscalar constants
 double getEnergyConversionFactor(const string& unit) {
   if (unit == "MEV") return 1000.0;
-  if (unit == "THZ") return 241.7990504024;
-  if (unit == "HZ") return 2.417990504024E14;
-  if ((unit == "CM-1") || (unit == "RCM")) return 8065.548153549;
+  if (unit == "THZ") return (eV2Hz * Hz2THz);
+  if (unit == "HZ") return eV2Hz;
+  if ((unit == "CM-1") || (unit == "RCM")) return eV2rcm;
   return 1.0;
 }
 

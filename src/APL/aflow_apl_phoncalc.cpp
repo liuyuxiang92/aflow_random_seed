@@ -1346,6 +1346,7 @@ namespace apl {
 
   // ///////////////////////////////////////////////////////////////////////////
 
+  // ME200108 - replaced with constants in xscalar
   double PhononCalculator::getFrequencyConversionFactor(IPCFreqFlags inFlags, IPCFreqFlags outFlags) {
     double conversionFactor = 1.0;
 
@@ -1356,16 +1357,16 @@ namespace apl {
 	conversionFactor = 1.0;
       } else if (outFlags & apl::HERTZ) {
 	// Transform to s-1; sqrt(EV_TO_JOULE / (ANGSTROM_TO_METER*ANGSTROM_TO_METER) / AMU_TO_KG);
-	conversionFactor = 0.98226977255434387350E14;
+	conversionFactor = au2Hz;
       } else if (outFlags & apl::THZ) {
 	// Transform to THz; (in Hertz) / 1E12;
-	conversionFactor = 98.226977255434387350;
+	conversionFactor = au2Hz * Hz2THz;
       } else if (outFlags & apl::RECIPROCAL_CM) {
 	// Transform to cm-1; 1/lambda(m) = freq.(s-1) / light_speed(m/s);
-	conversionFactor = 1E-2 * 0.98226977255434387350E14 / 2.99792458E8;
+	conversionFactor = au2rcm;
       } else if (outFlags & apl::MEV) {
 	// Transform to meV; E(eV) = h(eV.s) * freq(s-1); h[(from J.s) -> (eV.s)] = 4.1356673310E-15
-	conversionFactor = 0.98226977255434387350E14 * 4.1356673310E-15 / 1E-3;
+	conversionFactor = 1000 * au2eV;
       } else {
         // ME191031 - use xerror
 	//throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
@@ -1379,11 +1380,11 @@ namespace apl {
     else if (inFlags & apl::THZ) {
       if (outFlags & apl::RAW) {
 	// Transform to eV/A/A/atomic_mass_unit
-	conversionFactor = 1.0 / 98.226977255434387350;
+	conversionFactor = 1.0 / (au2Hz * Hz2THz);
       } else if (outFlags & apl::THZ) {
 	conversionFactor = 1.0;
       } else if (outFlags & apl::MEV) {
-	conversionFactor = 4.1356673310;
+	conversionFactor = 1000 * PLANCKSCONSTANTEV_h * THz2Hz;
       } else {
         // ME191031 - use xerror
 	//throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
