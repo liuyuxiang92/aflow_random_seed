@@ -534,7 +534,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()<2){
-      // ME191031 - use xerro
+      // ME191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Path size should include at least two points");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Path size should include at least two points";
