@@ -26,7 +26,51 @@ namespace apl {
     } else {
       _system = _supercell.getInputStructure().title;
     }
+    _stagebreak = false;  // ME191029
+    zerostate_dir = "";  // ME191030
   }
+
+  // ME191228 - BEGIN
+  // Copy constructors
+  PhononCalculator& PhononCalculator::operator=(const PhononCalculator& that) {
+    if (this != &that) copy(that);
+    return *this;
+  }
+
+  void PhononCalculator::copy(const PhononCalculator& that) {
+    DISTORTION_MAGNITUDE = that.DISTORTION_MAGNITUDE;
+    DISTORTION_INEQUIVONLY = that.DISTORTION_INEQUIVONLY;
+    TCOND = that.TCOND;
+    anharmonic_IFC_options = that.anharmonic_IFC_options;
+    _xInput = that._xInput;
+    _aflowFlags = that._aflowFlags;
+    _xFlags = that._xFlags;
+    _AflowIn = that._AflowIn;
+    _system = that._system;
+    _logger = that._logger;
+    _supercell = that._supercell;
+    xInputsAAPL = that.xInputsAAPL;
+    xInputs = that.xInputs;
+    _uniqueDistortions = that._uniqueDistortions;
+    _uniqueForces = that._uniqueForces;
+    _forceConstantMatrices = that._forceConstantMatrices;
+    _calculateZeroStateForces = that._calculateZeroStateForces;
+    ATOMIC_MASSES_AMU = that.ATOMIC_MASSES_AMU;
+    _check_LDAU2_ON = that._check_LDAU2_ON;
+    _LDAU_PARAMETERS = that._LDAU_PARAMETERS;
+    _PSTRESS = that._PSTRESS;
+    _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
+    _dielectricTensor = that._dielectricTensor;
+    _inverseDielectricTensor = that._inverseDielectricTensor;
+    _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
+    _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
+    _gammaEwaldCorr = that._gammaEwaldCorr;
+    _clusters = that._clusters;
+    _anharmonicIFCs = that._anharmonicIFCs;
+    _stagebreak = that._stagebreak;
+    zerostate_dir = that.zerostate_dir;
+  }
+  // ME191228 - END
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -56,24 +100,25 @@ namespace apl {
     _gammaEwaldCorr.clear();
 
     _bornEffectiveChargeTensor.clear();
+    _stagebreak = false;  // ME191029
+    zerostate_dir = "";  // ME191030
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void PhononCalculator::run(bool aapl_stagebreak) {
+  void PhononCalculator::run() {
     // Check if supercell is already built
-    if (!_supercell.isConstructed())
-      throw APLRuntimeError("apl::PhononCalculator::run(); The supercell structure has not been initialized yet.");
+    if (!_supercell.isConstructed()) {
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator::run(); The supercell structure has not been initialized yet.");
+      string function = "apl::PhononCalculator::run()";
+      string message = "The supercell structure has not been initialized yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+    }
 
-    _xInput.xvasp.AVASP_arun_mode = "APL"; //ME181226
+    //_xInput.xvasp.AVASP_arun_mode = "APL"; //OBSOLETE ME191029 - moved to runVASPCalculations
     // Get all forces required for the construction of force-constant matrices
-    calculateForceFields(aapl_stagebreak);  // ME190412
-
-    // If AAPL calculations haven't run yet, stop here after
-    // APL calculations have been set up
-    if (aapl_stagebreak) {
-      throw APLStageBreak();
-	}
+    calculateForceFields();  // ME191029 - modified
 
     // For construction of the force-constant matrices we need three
     // independent distortions. Hence, calculate the remaining distortions and
@@ -116,7 +161,11 @@ namespace apl {
     //CO - START
     // Test of stupidity...
     if (_supercell.getEPS() == AUROSTD_NAN) {
-      throw APLRuntimeError("apl::PhononCalculator::completeForceFields(); Need to define symmetry tolerance.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator::completeForceFields(); Need to define symmetry tolerance.");
+      string function = "apl::PhononCalculator::completeForceFields()";
+      string message = "Need to define symmetry tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
     //CO - END
     // Show info
@@ -150,7 +199,9 @@ namespace apl {
 	      try {
                 _AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, atomID, FALSE); //CO190218
 		testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
-	      } catch (APLLogicError& e) {
+              // ME191031 - use xerror
+	      //} catch (APLLogicError& e) {
+	      } catch (aurostd::xerror& e) {
 		//corey
 		//TEMPORARY CODE below by Jahnatek
 		//no comments - hard to interpret what's going on
@@ -161,7 +212,11 @@ namespace apl {
                 //ignoring temporary code, I have no idea what is going on.
                 //[CO181226 - OBSOLETE]if (!_supercell.isDerivativeStructure()) {
 		  _logger << error << "Mapping problem ? <-> " << k << "." << apl::endl;
-		  throw APLLogicError("apl::PhononCalculator::completeForceFields(); Mapping failed.");
+                  // ME191031 - use xerror
+		  //throw APLLogicError("apl::PhononCalculator::completeForceFields(); Mapping failed.");
+                  string function = "apl::PhononCalculator::completeForceFields()";
+                  string message = "Mapping failed.";
+                  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
                 //[CO181226 - OBSOLETE]}
 		            //[CO181226 - OBSOLETE]// TEMPORARY CODE =================================================================
                 //[CO181226 - OBSOLETE]#if ERROR_VERBOSE
@@ -251,7 +306,11 @@ namespace apl {
 
       // I hope this will never happen...
       if (_uniqueDistortions[i].size() != 3) {
-	throw APLRuntimeError("apl::PhononCalculator::completeForceFields(); Can not complete force fields by symmetry.");
+        // ME191031 - use xerror
+	//throw APLRuntimeError("apl::PhononCalculator::completeForceFields(); Can not complete force fields by symmetry.");
+	string function = "apl::PhononCalculator::completeForceFields()";
+        string message = "Cannot complete force fields by symmetry.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
     }
     //[CO181226 - not necessary]_supercell.center_original();  //CO
@@ -341,11 +400,19 @@ namespace apl {
     string soliloquy="apl::PhononCalculator::buildForceConstantMatrices():"; //CO190218
     // Test of stupidity...
     if (DISTORTION_INEQUIVONLY && !_supercell.getSupercellStructure().fgroup_calculated) { //CO190218
-      throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); The factor group has not been calculated yet.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); The factor group has not been calculated yet.");
+      string function = "apl::PhononCalculator::buildForceConstantMatrices()";
+      string message = "The factor group has not been calculated yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     //CO - START
     if (DISTORTION_INEQUIVONLY && _supercell.getEPS() == AUROSTD_NAN) { //CO190218
-      throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); Need to define symmetry tolerance.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); Need to define symmetry tolerance.");
+      string function = "apl::PhononCalculator::buildForceConstantMatrices()";
+      string message = "Need to define symmetry tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
     //CO - END
 
@@ -416,10 +483,16 @@ namespace apl {
             //cout << basedAtomID << " -> " << _supercell.getUniqueAtomID(i,j) << " " << symOp.str_type << " shift:"; printXVector(symOp.ftau);
             //printXVector(_supercell.getSupercellStructure().atoms[basedAtomID].fpos);
 	  //printXVector(_supercell.getSupercellStructure().atoms[_supercell.getUniqueAtomID(i,j)].fpos);
-	} catch (APLLogicError& e)  //CO
+        // ME191031 - use xerror
+	//} catch (APLLogicError& e)  //CO
+	} catch (aurostd::xerror& e)  //CO
 	  {
             _logger << error << "Mapping problem " << _supercell.getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?" << apl::endl; //CO190218
-	    throw APLLogicError("apl::PhononCalculator::buildForceConstantMatrices(); Mapping failed.");
+            // ME191031 - use xerror
+	    //throw APLLogicError("apl::PhononCalculator::buildForceConstantMatrices(); Mapping failed.");
+	    string function = "apl::PhononCalculator::buildForceConstantMatrices()";
+            string message = "Mapping failed.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
 	  }
 
 	for (_AFLOW_APL_REGISTER_ int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
@@ -437,9 +510,11 @@ namespace apl {
                 cerr << soliloquy << " adding m to forceConstantMatrices[" << _supercell.getUniqueAtomID(i, j) << "][" << k << "]=" << std::endl;
                 cerr << m << std::endl;
               }
-	  } catch (APLLogicError& e) {  //CO
+          // ME191031 - use xerror
+	  //} catch (APLLogicError& e) {  //CO
+	  } catch (aurostd::xerror& e) {  //CO
 	    _logger << error << "Mapping problem " << k << " <-> ?." << apl::endl;
-	    throw APLLogicError("apl::PhononCalculator::buildForceConstantMatrices(); Mapping failed.");
+	    throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::PhononCalculator::buildForceConstantMatrices()", "Mapping failed.");
 	  }
 	}
           //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO190218
@@ -451,7 +526,11 @@ namespace apl {
 
     // Test of correctness
     if ((int)_forceConstantMatrices.size() != _supercell.getNumberOfAtoms()) {
-      throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); Some problem with the application of factor group operations.");
+      // ME191031 - use xerror
+      // throw APLRuntimeError("apl::PhononCalculator::buildForceConstantMatrices(); Some problem with the application of factor group operations.");
+      string function = "apl::PhononCalculator::buildForceConstantMatrices()";
+      string message = "Some problem with the application of factor group operations.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -462,11 +541,19 @@ namespace apl {
     string soliloquy="apl::PhononCalculator::symmetrizeForceConstantMatrices()"; //CO190218
     // Test of stupidity...
     if (!_supercell.getSupercellStructure().agroup_calculated) {
-      throw APLRuntimeError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); The site groups have not been calculated yet.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); The site groups have not been calculated yet.");
+      string function = "apl::PhononCalculator::symmetrizeForceConstantMatrices()";
+      string message = "The site groups have not been calculated yet.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
     }
     //CO - START
     if (_supercell.getEPS() == AUROSTD_NAN) {
-      throw APLRuntimeError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Need to define symmetry tolerance.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Need to define symmetry tolerance.");
+      string function = "apl::PhononCalculator::symmetrizeForceConstantMatrices()";
+      string message = "Need to define symmetry tolerance.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ERROR_);
     }
     //CO - END
 
@@ -484,8 +571,13 @@ namespace apl {
     //[CO181226 - OBSOLETE]uint agroup_size;  //CO
     for (int i = 0; i < _supercell.getNumberOfAtoms(); i++) {
       const vector<_sym_op>& agroup = _supercell.getAGROUP(i);  //CO //CO190218
-      if (agroup.size() == 0)
-	throw APLRuntimeError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Site point group operations are missing.");
+      if (agroup.size() == 0) {
+        // ME191031 - use xerror
+	//throw APLRuntimeError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Site point group operations are missing.");
+	string function = "apl::PhononCalculator::symmetrizeForceConstantMatrices()";
+        string message = "Site point group operations are missing.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      }
 
       // Translate the center to this atom
       _supercell.center(i);
@@ -518,14 +610,20 @@ namespace apl {
               cerr << (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc)) << std::endl;
             }
 	    //CO - START
-	  } catch (APLLogicError& e) {
+          // ME191031 - use xerror
+	  //} catch (APLLogicError& e) {
+	  } catch (aurostd::xerror& e) {
 	    //_logger << error << "Mapping problem " << j << " <-> ?. Skipping." << apl::endl;
 	    //derivative structures are expected to lose symmetry, don't bother exiting
             //CO181226 - forget about this junk
             //if it's a derivative structure, we recalculate the symmetry for the supercell, it's necessary
             //[CO181226 - OBSOLETE]if (!_supercell.isDerivativeStructure()) {
 	      _logger << error << "Mapping problem " << j << " <-> ?." << apl::endl;
-	      throw APLLogicError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Mapping failed.");
+              // ME191031 - use xerror
+	      //throw APLLogicError("apl::PhononCalculator::symmetrizeForceConstantMatrices(); Mapping failed.");
+	      string function = "apl::PhononCalculator::symmetrizeForceConstantMatrices()";
+              string message = "Mapping failed.";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
             //[CO181226 - OBSOLETE]}
             //[CO181226 - OBSOLETE]agroup_size -= 1;  //CO, reduce agroup size
 	    //CO - END
@@ -1164,29 +1262,29 @@ namespace apl {
                                                    xmatrix<xcomplex<double> >& eigenvectors,
                                                    vector<xmatrix<xcomplex<double> > >& dDynMat,
                                                    bool calc_derivative) {
-    // Get dynamic matrix
+    // Get dynamical matrix
     xmatrix<xcomplex<double> > dynamicalMatrix = getDynamicalMatrix(kpoint, dDynMat, calc_derivative);
 
     // Diagonalize
     xvector<double> eigenvalues(dynamicalMatrix.rows, 1);
 //    xmatrix<xcomplex<double> > unitaryMatrix;  OBSOLETE ME 180827
 
+// OBSOLETE ME190815 - moved to aurostd::xmatrix
+//#ifdef USE_MKL
+//    zheevMKL(dynamicalMatrix, eigenvalues, eigenvectors);
+//#else
+//    //tred2(dynamicalMatrix);
+//    zheevByJacobiRotation(dynamicalMatrix2, eigenvalues2, eigenvectors2);
+//    eigenvectors2 = trasp(eigenvectors2);
+//#endif
 
-/*
-//OBSOLETE ME 180828 - zheevByJacobiRotation may not yield the correct eigenvectors.
-#ifdef USE_MKL
-    zheevMKL(dynamicalMatrix, eigenvalues, eigenvectors);
-#else
-    //tred2(dynamicalMatrix);
-    zheevByJacobiRotation(dynamicalMatrix, eigenvalues, eigenvectors);
-#endif
-*/
+// ME 180828; OBSOLETE ME190815 - use Jacobi algorithm in aurostd::xmatrix, which
+// is much, much faster than aplEigensystems for large systems
+//    apl::aplEigensystems e;
+//    e.eigen_calculation(dynamicalMatrix, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
 
-// ME 180828 
-    apl::aplEigensystems e;
-    e.eigen_calculation(dynamicalMatrix, eigenvalues, eigenvectors, APL_MV_EIGEN_SORT_VAL_ASC);
+    eigenvalues = jacobiHermitian(dynamicalMatrix, eigenvectors);  // ME190815
 
-    //
     return eigenvalues;
   }
 
@@ -1260,7 +1358,11 @@ namespace apl {
 	// Transform to meV; E(eV) = h(eV.s) * freq(s-1); h[(from J.s) -> (eV.s)] = 4.1356673310E-15
 	conversionFactor = 0.98226977255434387350E14 * 4.1356673310E-15 / 1E-3;
       } else {
-	throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
+        // ME191031 - use xerror
+	//throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
+	string function = "apl::PhononCalculator:convertFrequencyUnit()";
+        string message = "Not implemented conversion.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
     }
 
@@ -1274,13 +1376,22 @@ namespace apl {
       } else if (outFlags & apl::MEV) {
 	conversionFactor = 4.1356673310;
       } else {
-	throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
+        // ME191031 - use xerror
+	//throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
+	string function = "apl::PhononCalculator:convertFrequencyUnit()";
+        string message = "Not implemented conversion.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
       }
     }
 
     // Nothing suits?
-    else
-      throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
+    else {
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator:convertFrequencyUnit(); Not implemented conversion.");
+      string function = "apl::PhononCalculator:convertFrequencyUnit()";
+      string message = "Not implemented conversion.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
 
     //
     if ((outFlags & OMEGA) && !(inFlags & OMEGA))
@@ -1296,7 +1407,11 @@ namespace apl {
 
   void PhononCalculator::writeOUTPUT(_xinput& xinput) { //CO 180409
     if(!( xinput.AFLOW_MODE_VASP || xinput.AFLOW_MODE_AIMS )) { 
-      throw APLRuntimeError("apl::PhononCalculator:writeOUTPUT(); Input -> aflow.in conversion unknown.");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator:writeOUTPUT(); Input -> aflow.in conversion unknown.");
+      string function = "apl::PhononCalculator:writeOUTPUT()";
+      string message = "Input -> aflow.in conversion unknown.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
     //copying from createAFLOWIN
@@ -1306,7 +1421,13 @@ namespace apl {
     _aimsflags aimsflags(_xFlags.aimsflags);
 
     string directory=xinput.getDirectory();
-    if(directory.empty()){throw APLRuntimeError("apl::PhononCalculator:writeOUTPUT(); no output directory found");}
+    if(directory.empty()){
+      // ME191031 - use xerror
+      //throw APLRuntimeError("apl::PhononCalculator:writeOUTPUT(); no output directory found");
+      string function = "apl::PhononCalculator:writeOUTPUT()";
+      string message =  "no output directory found";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
 
     if(!aurostd::FileExist(directory)){aurostd::DirectoryMake(directory);}  // Create directory if it is not created
     aurostd::DirectoryChmod("777", directory);                              // CHMOD Directory 777
@@ -1469,7 +1590,11 @@ namespace apl {
 	string geom_filename = xaims.Directory + "/" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM;
 	aurostd::stringstream2file(xaims.GEOM, geom_filename);
 	if(!aurostd::FileExist(geom_filename)){
-	  throw apl::APLRuntimeError("apl::PhononCalculator::createAIMSOUTPUT(); Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.");
+          // ME191031 - use xerror
+	  //throw apl::APLRuntimeError("apl::PhononCalculator::createAIMSOUTPUT(); Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.");
+	  string function = "apl::PhononCalculator::createAIMSOUTPUT()";
+          string message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
 	}
 	aurostd::ChmodFile("a+rw", geom_filename);
       }
@@ -1478,7 +1603,13 @@ namespace apl {
     //CO - START
     string filename = directory + string("/") + _AFLOWIN_;
     aurostd::stringstream2file(outfile, filename);
-    if (!aurostd::FileExist(filename)){throw apl::APLRuntimeError("apl::PhononCalculator::createAFLOWIN(); Cannot create [" + _AFLOWIN_ + "] file.");}
+    if (!aurostd::FileExist(filename)){
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("apl::PhononCalculator::createAFLOWIN(); Cannot create [" + _AFLOWIN_ + "] file.");
+      string function = "apl::PhononCalculator::createAFLOWIN()";
+      string message = "Cannot create [" + _AFLOWIN_ + "] file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
     aurostd::ChmodFile("a+rw", filename); // CHMOD a+rw _AFLOWIN_
     //CO - END
   }
@@ -1486,7 +1617,7 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononCalculator::writeDYNMAT() {
-    string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE;  //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
     _logger << "Writing forces into file " << filename << "." << apl::endl; //ME181226
 
     //
@@ -1613,7 +1744,11 @@ namespace apl {
 	    //[OBSOLETE] printXVector(ix.atoms[k].fpos);
 	    //[OBSOLETE] printXVector(ix.atoms[k].cpos);
             // ME 190218 - END
-	    throw APLLogicError("apl::PhononCalculator::writeFORCES(); Mapping error.");
+            // ME191031 - use xerror
+	    //throw APLLogicError("apl::PhononCalculator::writeFORCES(); Mapping error.");
+	    string function = "apl::PhononCalculator::writeFORCES()";
+            string message = "Mapping error.";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
 	  }
 
 	  outfile << setw(15) << _uniqueForces[i][j][l](1) << " "
@@ -1626,8 +1761,13 @@ namespace apl {
     //CO - START
     filename = "FORCES";
     aurostd::stringstream2file(outfile, filename);
-    if (!aurostd::FileExist(filename))
-      throw apl::APLRuntimeError("PhononCalculator::writeFORCES(); Cannot open output file.");
+    if (!aurostd::FileExist(filename)) {
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("PhononCalculator::writeFORCES(); Cannot open output file.");
+      string function = "PhononCalculator::writeFORCES()";
+      string message = "Cannot open output file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+    }
 
     //
     //outfile.clear();
@@ -1684,7 +1824,11 @@ namespace apl {
 	string filename = "FORCES_A" + stringify(_supercell.getUniqueAtomID(i)) + "D" + stringify(j) + ".xsf";
 	aurostd::stringstream2file(outfile, filename);
 	if (!aurostd::FileExist(filename)) {
-	  throw apl::APLRuntimeError("apl::PhononCalculator::writeXCrysDenForces(); Cannot create " + filename + " file.");
+          // ME191031 - use xerror
+	  //throw apl::APLRuntimeError("apl::PhononCalculator::writeXCrysDenForces(); Cannot create " + filename + " file.");
+	  string function = "apl::PhononCalculator::writeXCrysDenForces()";
+          string message = "Cannot create " + filename + " file.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
 	}
 
 	//outfile.clear();
@@ -1720,7 +1864,7 @@ namespace apl {
     if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
     outfile << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
     outfile << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_ << "\" type=\"" << APL_CHECKSUM_ALGO << "\">"
-	    << std::hex << aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME190219
+	    << std::hex << aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO) << "</i>" << std::endl;  // ME190219
     outfile.unsetf(std::ios::hex); //CO190116 - undo hex immediately
     outfile << tab << "</generator>" << std::endl;
 
@@ -1853,7 +1997,7 @@ namespace apl {
     //   if (!aurostd::EFileExist("apl.xml"))
     //    throw apl::APLRuntimeError("PhononCalculator::hibernate(); Cannot open output apl.xml.");
     //} else {
-    string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::stringstream2file(outfile, filename); //ME181226
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::hibernate()";
@@ -1875,7 +2019,7 @@ namespace apl {
     //CO, we already checked that it exists before, just open
 
     vector<string> vlines;                           //CO
-    string hibfile = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+    string hibfile = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
     // Decompress
     //bool isXMLCompressed = aurostd::FileExist(string("apl.xml.EXT")); //CO
@@ -1887,6 +2031,7 @@ namespace apl {
     //ifstream infile("apl.xml", ios_base::in);
     //if (!infile.is_open())
     if (!vlines.size()) {
+      // ME191031 - use xerror
       string function = "PhononCalculator::awake()";
       string message = "Cannot open output file " + hibfile + "."; //ME181226
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
@@ -1900,8 +2045,13 @@ namespace apl {
     // Test of xml...
     line = vlines[line_count++];
     //getline(infile, line);
-    if (line.find("xml") == string::npos)
-      throw APLLogicError("apl::PhononCalculator::awake(); Wrong xml file.");
+    if (line.find("xml") == string::npos) {
+      // ME191031 - use xerror
+      //throw APLLogicError("apl::PhononCalculator::awake(); Wrong xml file.");
+      string function = "apl::PhononCalculator::awake()";
+      string message = "Not an xml file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
+    }
     //CO - END
 
     // Get _AFLOWIN_ checksum and compare it to current
@@ -1909,23 +2059,35 @@ namespace apl {
       //getline(infile, line); //CO
       //if (infile.eof()) //CO
       if (line_count == vlines.size())  //CO
-	throw APLLogicError("apl::PhononCalculator::awake(); Can not find <i name=\"checksum\" ...> tag.");
+        // ME191031 - use xerror
+	//throw APLLogicError("apl::PhononCalculator::awake(); Can not find <i name=\"checksum\" ...> tag.");
+	throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::PhononCalculator::awake()", "Can not find <i name=\"checksum\" ...> tag.", _FILE_CORRUPT_);
       line = vlines[line_count++];  //CO
       if (line.find("checksum") != string::npos)
 	break;
     }
     int t = line.find_first_of(">") + 1;
     tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO))  // ME190219
-      throw APLLogicError("apl::PhononCalculator::awake(); The " + _AFLOWIN_ + " file has been changed from the hibernated state.");
+    if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(_aflowFlags.Directory + "/" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
+      // ME191031 - use xerror
+      //throw APLLogicError("apl::PhononCalculator::awake(); The " + _AFLOWIN_ + " file has been changed from the hibernated state.");
+      string function = "apl::PhononCalculator::awake()";
+      string message = "The " + _AFLOWIN_ + " file has been changed from the hibernated state.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    }
     tokens.clear();
 
     // Get force constant matrices
     while (true) {
       //getline(infile, line); //CO
       //if (infile.eof()) //CO
-      if (line_count == vlines.size())  //CO
-	throw APLLogicError("apl::PhononCalculator::awake(); Can not find <fcms> tag.");
+      if (line_count == vlines.size()) { //CO
+        // ME191031 - use xerror
+	//throw APLLogicError("apl::PhononCalculator::awake(); Can not find <fcms> tag.");
+        string function = "apl::PhononCalculator::awake()";
+        string message = "Cannot find <fcms> tag.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      }
       line = vlines[line_count++];  //CO
       if (line.find("fcms") != string::npos)
 	break;
@@ -1941,8 +2103,13 @@ namespace apl {
     while (true) {
       //getline(infile, line); //CO
       //if (infile.eof()) //CO
-      if (line_count == vlines.size())  //CO
-	throw APLLogicError("apl::PhononCalculator::awake(); Incomplete <fcms> tag.");
+      if (line_count == vlines.size()) { //CO
+        // ME191031 - use xerror
+	//throw APLLogicError("apl::PhononCalculator::awake(); Incomplete <fcms> tag.");
+	string function = "apl::PhononCalculator::awake()";
+        string message = "Incomplete <fcms> tag.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      }
       line = vlines[line_count++];  //CO
       if (line.find("</varray>") != string::npos) {
 	_forceConstantMatrices.push_back(row);
@@ -1979,7 +2146,11 @@ namespace apl {
 	//if (infile.eof()) { //CO
 	if (line_count == vlines.size()) {  //CO
 	  _isPolarMaterial = false;
-	  throw APLLogicError("apl::PhononCalculator::awake(); Can not find <born> tag.");
+          // ME191031 - use xerror
+	  //throw APLLogicError("apl::PhononCalculator::awake(); Can not find <born> tag.");
+	  string function = "apl::PhononCalculator::awake()";
+          string message = "Cannot find <born> tag.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
 	}
 	line = vlines[line_count++];  //CO
 	if (line.find("born") != string::npos)
@@ -1990,8 +2161,13 @@ namespace apl {
       while (true) {
 	//getline(infile, line); //CO
 	//if (infile.eof()) //CO
-	if (line_count == vlines.size())  //CO
-	  throw APLLogicError("apl::PhononCalculator::awake(); Incomplete <born> tag.");
+	if (line_count == vlines.size()) { //CO
+          // ME191031 - use xerror
+	  //throw APLLogicError("apl::PhononCalculator::awake(); Incomplete <born> tag.");
+	  string function = "apl::PhononCalculator::awake()";
+          string message = "Incomplete <born> tag.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
 	line = vlines[line_count++];  //CO
 	if (line.find("</varray>") != string::npos)
 	  break;
@@ -2016,7 +2192,11 @@ namespace apl {
 	//if (infile.eof()) { //CO
 	if (line_count == vlines.size()) {  //CO
 	  _isPolarMaterial = false;
-	  throw APLLogicError("apl::PhononCalculator::awake(); Can not find <epsilon> tag.");
+          // ME191031 - use xerror
+	  //throw APLLogicError("apl::PhononCalculator::awake(); Can not find <epsilon> tag.");
+	  string function = "apl::PhononCalculator::awake()";
+          string message = "Can not find <epsilon> tag.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
 	}
 	line = vlines[line_count++];  //CO
 	if (line.find("epsilon") != string::npos)
@@ -2036,7 +2216,9 @@ namespace apl {
       }
       _inverseDielectricTensor = inverse(_dielectricTensor);
       _recsqrtDielectricTensorDeterminant = 1.0 / sqrt(determinant(_dielectricTensor));
-    } catch (APLLogicError& e) {  //CO
+    // ME191031 - use xerror
+    //} catch (APLLogicError& e) {  //CO
+    } catch (aurostd::xerror& e) {  //CO
       //_logger << apl::warning << e.what() << apl::endl;
     }
 
@@ -2106,7 +2288,11 @@ namespace apl {
     //CO - START
     //if (!myfile.is_open()) {
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
+      string function = "apl::PhononCalculator::get_special_inputs()";
+      string message = "Cannot read ["+_AFLOWIN_+"] file.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     //while (getline(myfile, line)) {
     while (line_count < vlines.size()) {
@@ -2253,7 +2439,7 @@ namespace apl {
       if(_kbinFlags.AFLOW_MODE_VASP) {
 	if(aurostd::EFileExist(dir + string("/vasprun.xml.static")) || 
 	   aurostd::EFileExist(dir + string("/vasprun.xml")) || 
-           aurostd::EFileExist(dir + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME190607
+           aurostd::EFileExist(dir + "/" + DEFAULT_AFLOW_QMVASP_OUT)) {  // ME190607
 	  return true;
 	}
       }
@@ -2267,10 +2453,12 @@ namespace apl {
   }
 
   //outfileFoundEverywherePhonons///////////////////////////////////////////////
-  void PhononCalculator::outfileFoundEverywherePhonons(vector<_xinput>& xinps) {
+  void PhononCalculator::outfileFoundEverywherePhonons(vector<_xinput>& xinps, bool contains_born) {
     _logger << "Reading force files." << apl::endl; //CO190116  // ME190607
-    for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {
-      _logger << "Reading force file " << idxRun+1 << "/" << (uint)xinps.size() << "." << apl::endl; //CO190116  // ME190607
+    uint ninps = xinps.size();
+    if (contains_born) ninps--;
+    for (uint idxRun = 0; idxRun < ninps; idxRun++) {
+      _logger << "Reading force file " << idxRun+1 << "/" << ninps << "." << apl::endl; //CO190116  // ME190607
       // string tarfilename = xinps[idxRun].getDirectory() + ".tar";  OBSOLETE ME 190607
       xinps[idxRun].getXStr().qm_forces.clear();
       // Load data....
@@ -2286,7 +2474,11 @@ namespace apl {
             vasprunxml_file=xinps[idxRun].getDirectory() + string("/vasprun.xml");
             if(!aurostd::EFileExist(vasprunxml_file)) {
               _logger << apl::warning << "The vasprun.xml file in " << xinps[idxRun].getDirectory() << " directory is missing." << apl::endl;
-              throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
+              // ME191031 - use xerror
+              //throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
+              string function = "apl::DirectMethodPC::calculateForceFields()";
+              string message = "Missing data from one job.";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
             }
           }
           //xVASPRUNXML vasprunxml(vasprunxml_file); OBSOLETE ME 190204 - far too slow
@@ -2299,7 +2491,11 @@ namespace apl {
       if(_kbinFlags.AFLOW_MODE_AIMS){
 	if(!aurostd::EFileExist(xinps[idxRun].getDirectory() + string("/aims.out"))) {
 	  _logger << apl::warning << "The aims.out file in " << xinps[idxRun].getDirectory() << " directory is missing." << apl::endl;
-	  throw APLRuntimeError("apl::DirectMethodPC::runAIMSCalculations(); Missing data from one job.");
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::DirectMethodPC::runAIMSCalculations(); Missing data from one job.");
+          string function = "apl::DirectMethodPC::calculateForceFields()";
+          string message = "Missing data from one job.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
 	}
 	xAIMSOUT xaimsout(xinps[idxRun].getDirectory() + "/aims.out");
 	for (uint i = 0; i < xaimsout.vforces.size(); i++) xinps[idxRun].getXStr().qm_forces.push_back(xaimsout.vforces.at(i));
@@ -2309,12 +2505,20 @@ namespace apl {
       // Was it all right?
       if (!xinps[idxRun].getXStr().qm_calculated) {
 	if(_kbinFlags.AFLOW_MODE_VASP){
-	  _logger << apl::warning << "The vasprun.xml file in " << xinps[idxRun].getDirectory() << " is wrong." << apl::endl;
-	  throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
+	  _logger << apl::warning << "The force file in " << xinps[idxRun].getDirectory() << " is wrong." << apl::endl;
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::DirectMethodPC::runVASPCalculations(); Missing data from one job.");
+          string function = "apl::DirectMethodPC::calculateForceFields()";
+          string message = "Missing data from one job.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
 	}
 	if(_kbinFlags.AFLOW_MODE_AIMS){
 	  _logger << apl::warning << "The aims.out file in " << xinps[idxRun].getDirectory() << " is wrong." << apl::endl;
-	  throw APLRuntimeError("apl::DirectMethodPC::runAIMSCalculations(); Missing data from one job.");
+          // ME191031 - use xerror
+	  //throw APLRuntimeError("apl::DirectMethodPC::runAIMSCalculations(); Missing data from one job.");
+          string function = "apl::DirectMethodPC::calculateForceFields()";
+          string message = "Missing data from one job.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
 	}
       }
 
@@ -2332,11 +2536,14 @@ namespace apl {
   }
   
   void PhononCalculator::subtractZeroStateForces(vector<_xinput>& xinps) {
-    for (uint idxRun = 0; idxRun < xInputs.size() - 1; idxRun++) {
+    // ME191029 - Born run is now part of xinps
+    uint ninps = xinps.size() - 1;
+    if (_isPolarMaterial) ninps--;
+    for (uint idxRun = 0; idxRun < ninps; idxRun++) {
       for (int k = 0; k < _supercell.getNumberOfAtoms(); k++) {
-	xinps[idxRun].getXStr().qm_forces[k](1) = xinps[idxRun].getXStr().qm_forces[k](1) - xinps.back().getXStr().qm_forces[k](1);
-	xinps[idxRun].getXStr().qm_forces[k](2) = xinps[idxRun].getXStr().qm_forces[k](2) - xinps.back().getXStr().qm_forces[k](2);
-	xinps[idxRun].getXStr().qm_forces[k](3) = xinps[idxRun].getXStr().qm_forces[k](3) - xinps.back().getXStr().qm_forces[k](3);
+	xinps[idxRun].getXStr().qm_forces[k](1) = xinps[idxRun].getXStr().qm_forces[k](1) - xinps[ninps].getXStr().qm_forces[k](1);
+	xinps[idxRun].getXStr().qm_forces[k](2) = xinps[idxRun].getXStr().qm_forces[k](2) - xinps[ninps].getXStr().qm_forces[k](2);
+	xinps[idxRun].getXStr().qm_forces[k](3) = xinps[idxRun].getXStr().qm_forces[k](3) - xinps[ninps].getXStr().qm_forces[k](3);
       }
     }
   }

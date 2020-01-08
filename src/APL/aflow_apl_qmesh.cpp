@@ -89,6 +89,7 @@ void QMesh::free() {
   _recCell.f2c = zeroMatrix;
   _recCell.skewed = false;
   _recCell.pgroup.clear();
+  _shifted = false;  // ME190701
   _shift = zerodbl;
   _weights.clear();
 }
@@ -127,7 +128,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
 
   // Calculate the point group of the reciprocal cell. This requires some dummy
   // ofstream objects to parse into the function. These objects will be removed
-  // when CalculatePointGroupKCrystal is redesigned to work without ofstreams.
+  // when CalculatePointGroupKlattice is redesigned to work without ofstreams.
   if (!xs.pgroupk_calculated) {  // ME190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
     ofstream FileDevNull("/dev/null");
     if (!FileDevNull.is_open()) {
@@ -163,7 +164,7 @@ void QMesh::generateGridPoints(bool force_gamma) {
 
   // Use Monkhorst-Pack formula to generate a mesh - do not center yet. Cartesian
   // coordinates will be calculated after all shifts have been performed.
-  double q1, q2, q3;
+  double q1 = 0.0, q2 = 0.0, q3 = 0.0;
   _qpoint qpt;
   int q = 0;
   for (int s = 1; s <= _qptGrid[3]; s++) {
@@ -239,7 +240,6 @@ void QMesh::makeIrreducible() {
   _ibzqpts.clear();
   _weights.clear();
   _nIQPs = 0;
-  xvector<double> qpt(3);
   int nsym = (int) _recCell.pgroup.size();
   vector<vector<int> > irred_trans;
   vector<int> trans(nsym, -1);
@@ -441,7 +441,7 @@ void QMesh::writeQpoints(string filename, bool cartesian) {
     output << std::setw(10) << q;
     for (int i = 1; i < 4; i++) {
       output << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-      output << std::setw(20) << std::setprecision(10) << std::scientific << (cartesian?_qpoints[q].cpos[i]:_qpoints[q].fpos);
+      output << std::setw(20) << std::setprecision(10) << std::scientific << (cartesian?_qpoints[q].cpos[i]:_qpoints[q].fpos[i]);
     }
     output << std::endl;
   }

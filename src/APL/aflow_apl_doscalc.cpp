@@ -421,7 +421,7 @@ void DOSCalculator::calcDosLT() {
 
 // ME190423 - END
 
-void DOSCalculator::writePDOS() {
+void DOSCalculator::writePDOS(const string& directory) {
   // Write PHDOS file
   //CO - START
   //ofstream outfile("PDOS",ios_base::out);
@@ -431,13 +431,13 @@ void DOSCalculator::writePDOS() {
   //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
   //}
   //CO - END
-  string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE; //ME181226
 
+  string filename = directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDOS_FILE;
   double factorTHz2Raw = _pc.getFrequencyConversionFactor(apl::THZ, apl::RAW);
   double factorRaw2rcm = _pc.getFrequencyConversionFactor(apl::RAW, apl::RECIPROCAL_CM);
   double factorRaw2meV = _pc.getFrequencyConversionFactor(apl::RAW, apl::MEV);
 
-  _logger << "Writing phonon density of states into file " << filename << "." << apl::endl; //ME181226
+  _logger << "Writing phonon density of states into file " << aurostd::CleanFileName(filename) << "." << apl::endl; //ME181226
   //outfile << "############### ############### ############### ###############" << std::endl;
   outfile << "#    f(THz)      1/lambda(cm-1)      E(meV)          pDOS      " << std::endl;
   outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
@@ -463,20 +463,20 @@ void DOSCalculator::writePDOS() {
 }
 
 // ME190614 - writes phonon DOS in DOSCAR format
-void DOSCalculator::writePHDOSCAR() {
-  string filename = DEFAULT_APL_PHDOSCAR_FILE;
+void DOSCalculator::writePHDOSCAR(const string& directory) {
+  string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
   _logger << "Writing phonon density of states into file " << filename << "." << apl::endl;
   stringstream doscar;
   xDOSCAR xdos = createDOSCAR();
   doscar << xdos;
   aurostd::stringstream2file(doscar, filename);
   if (!aurostd::FileExist(filename)) {
-    string function = "PhononDispersionCalculator::writePHPOSCAR()";
+    string function = "PhononDispersionCalculator::writePHDOSCAR()";
     string message = "Cannot open output file " + filename + ".";
     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
   }
-  if (xdos.partial) {  // Write PHDOSCAR if there are projected DOS
-    filename = DEFAULT_APL_PHPOSCAR_FILE;
+  if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
+    filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
     xstructure xstr = _pc.getInputCellStructure();
     xstr.is_vasp5_poscar_format = true;
     stringstream poscar;

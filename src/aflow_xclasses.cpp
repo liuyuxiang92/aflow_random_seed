@@ -787,6 +787,7 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_WAVECAR.option                          = DEFAULT_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.clear();                         // CHGCAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.option                           = DEFAULT_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.clear();                    // ME191028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.clear();                     // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.option                       = DEFAULT_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
   
@@ -966,6 +967,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_SYM                                     = b.KBIN_VASP_FORCE_OPTION_SYM; // SYM
   KBIN_VASP_FORCE_OPTION_WAVECAR                                 = b.KBIN_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR                                  = b.KBIN_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE                             = b.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;  // ME1901028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING                              = b.KBIN_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LDAU0                                   = b.KBIN_VASP_FORCE_OPTION_LDAU0;  // LDAU0
   KBIN_VASP_FORCE_OPTION_LDAU1                                   = b.KBIN_VASP_FORCE_OPTION_LDAU1;  // LDAU1

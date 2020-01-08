@@ -857,6 +857,7 @@ class _vflags {
   xoption KBIN_VASP_FORCE_OPTION_SYM;           // SYM
   xoption KBIN_VASP_FORCE_OPTION_WAVECAR;       // WAVECAR
   xoption KBIN_VASP_FORCE_OPTION_CHGCAR;        // CHGCAR
+  xoption KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;   // ME191028
   xoption KBIN_VASP_FORCE_OPTION_LSCOUPLING;    // LSCOUPLING
   xoption KBIN_VASP_FORCE_OPTION_LDAU0;         // LDAU0
   xoption KBIN_VASP_FORCE_OPTION_LDAU1;         // LDAU1
@@ -2831,6 +2832,7 @@ namespace KBIN {
   bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
   //  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
   // ALGO, ENMAX_MULTIPLY, IMIX, IALGO, TYPE, PAW_CORRECTIONS, NBANDS, PSTRESS, EDIFFG, POTIM, SPIN, LS_COUPLING, AUTO_MAGMOM, NWS, SYM, WAVECAR, CHGCAR
+  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  // ME191028
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
   void XVASP_INCAR_LDAU_OFF(_xvasp& xvasp,bool VERBOSE);

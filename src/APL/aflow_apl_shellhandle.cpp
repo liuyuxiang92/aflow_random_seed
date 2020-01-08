@@ -284,11 +284,16 @@ void ShellHandle::splitBySymmetry() {
               try {
                 int shellID = getShell(aurostd::modulus(atom.cpos));
                 addAtomToShell(shellID, atom, false);
-              } catch (APLLogicError& e) {
+              // ME191031 - use xerror
+              //} catch (APLLogicError& e) {
+              } catch (aurostd::xerror& e) {
                 cout << "Atom cpos: " << atom.cpos;  // ME190218
                 // [OBSOLETE ME190218] printXVector(atom.cpos, false);
                 cout << ";r = " << aurostd::modulus(atom.cpos) << std::endl;
-                throw APLLogicError("apl::ShellHandle::splitBySymmetry(); No shell for this atom.");
+                //throw APLLogicError("apl::ShellHandle::splitBySymmetry(); No shell for this atom.");
+                string function = "apl::ShellHandle::splitBySymmetry()";
+                string message = "No shell for this atom.";
+                throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
               }
             }
       }
@@ -494,8 +499,13 @@ void ShellHandle::removeSplitBySymmetry() {
 // ///////////////////////////////////////////////////////////////////////////
 
 double ShellHandle::getShellRadius(int nn) {
-  if (nn >= (int)_shells.size())
-    throw APLRuntimeError("ShellHandle::getShellRadius(); Index out of range.");
+  if (nn >= (int)_shells.size()) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("ShellHandle::getShellRadius(); Index out of range.");
+    string function = "ShellHandle::getShellRadius()";
+    string message = "Index " + aurostd::utype2string<int>(nn) + " out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
   return (_shells[nn].radius);
 }
 
@@ -527,8 +537,13 @@ int ShellHandle::getShell(double r) {
     if (found) break;
   }
 
-  if (j == _shells.size())
-    throw APLLogicError("apl::ShellHandle::getShell(); Problem to find shell for this radius.");
+  if (j == _shells.size()) {
+    // ME191031 - use xerror
+    //throw APLLogicError("apl::ShellHandle::getShell(); Problem to find shell for this radius.");
+    string function = "apl::ShellHandle::getShell()";
+    string message = "Problem to find shell for this radius.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  }
 
   return ((int)j);
 }
@@ -593,8 +608,13 @@ int ShellHandle::getLastFullShell() {
 // ///////////////////////////////////////////////////////////////////////////
 
 void ShellHandle::addAtomToShell(int nn, const _atom& atom, bool useSplittedShells) {
-  if (nn >= (int)_shells.size())
-    throw APLRuntimeError("apl::ShellHandle::addAtomToShell(); Index out of range.");
+  if (nn >= (int)_shells.size()) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::ShellHandle::addAtomToShell(); Index out of range.");
+    string function = "ShellHandle::getShellRadius()";
+    string message = "Index " + aurostd::utype2string<int>(nn) + " out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
 
   // If there is more shells of the same radius try to add atom with the
   // help of reference atoms
@@ -608,10 +628,15 @@ void ShellHandle::addAtomToShell(int nn, const _atom& atom, bool useSplittedShel
       if (j != _shells[nn].ratoms[i].size()) break;
     }
     if (i != _shells[nn].ratoms.size()) {
-      if (_shells[nn].ratoms.size() != _shells[nn].atoms.size())
-        throw APLLogicError("apl::ShellHandle::addAtomToShell(); Problem to add atom into symmetry splitted shell list. Arrays differ.");
-      else
+      if (_shells[nn].ratoms.size() != _shells[nn].atoms.size()) {
+        // ME191031 - use xerror
+        //throw APLLogicError("apl::ShellHandle::addAtomToShell(); Problem to add atom into symmetry splitted shell list. Arrays differ.");
+        string function = "apl::ShellHandle::addAtomToShell()";
+        string message = "Problem to add atom into symmetry split shell list. Arrays differ.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      } else {
         _shells[nn].atoms[i].push_back(atom);
+      }
     } else {
       cout << "SHELL: " << nn << std::endl;
       cout << "add: " << atom.cpos;  // ME190218
@@ -622,7 +647,11 @@ void ShellHandle::addAtomToShell(int nn, const _atom& atom, bool useSplittedShel
           // pOBSOLETE ME190218] printXVector(_shells[nn].ratoms[i][j].cpos);
         }
       }
-      throw APLLogicError("apl::ShellHandle::addAtomToShell(); None reference atom found.");
+      // ME191031 - use xerror
+      //throw APLLogicError("apl::ShellHandle::addAtomToShell(); None reference atom found.");
+      string function = "apl::ShellHandle::addAtomToShell()";
+      string message = "No reference atom found.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
   } else {
     _shells[nn].atoms.back().push_back(atom);
@@ -674,11 +703,13 @@ void ShellHandle::mapStructure(const xstructure& xstr, int centralAtomID, bool u
       atom.fpos = xmin;
       atom.cpos = cpos;
       addAtomToShell(shellID, atom, useSplittedShells);
-    } catch (APLLogicError& e) {
+    // ME191031 - use xerror
+    //} catch (APLLogicError& e) {
+    } catch (aurostd::xerror& e) {
       cout << "Atom cpos: " << cpos;  // ME190218
       // [OBSOLETE ME 190218] printXVector(cpos, false);
       cout << "; r = " << aurostd::modulus(cpos) << std::endl;
-      throw APLLogicError("apl::ShellHandle::mapStructure(); There is an atom which does not correspond to any shell.");
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::ShellHandle::mapStructure()", "There is an atom which does not correspond to any shell.", _RUNTIME_ERROR_);
     }
   }
   //cout << "--map-end--"<<std::endl;
@@ -693,18 +724,33 @@ int ShellHandle::getNumberOfShells() {
 // ///////////////////////////////////////////////////////////////////////////
 
 int ShellHandle::getNumberOfSubshells(int ishell) {
-  if (ishell > (int)_shells.size() - 1)
-    throw APLRuntimeError("apl::ShellHandle::getNumberOfSubshells; The shell index is out of range.");
+  if (ishell > (int)_shells.size() - 1) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::ShellHandle::getNumberOfSubshells; The shell index is out of range.");
+    string function = "apl::ShellHandle::getNumberOfSubshells";
+    string message = "The shell index " + aurostd::utype2string<int>(ishell) + "is out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
   return ((int)_shells[ishell].ratoms.size());
 }
 
 // ///////////////////////////////////////////////////////////////////////////
 
 std::deque<_atom> ShellHandle::getAtomsAtSameShell(int ishell, int isubshell) {
-  if (ishell > (int)_shells.size() - 1)
-    throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The shell index is out of range.");
-  if (isubshell > (int)_shells[ishell].atoms.size() - 1)
-    throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The subshell index is out of range.");
+  if (ishell > (int)_shells.size() - 1) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The shell index is out of range.");
+    string function = "apl::ShellHandle::getAtomsAtSameShell()";
+    string message = "The shell index " + aurostd::utype2string<int>(ishell) + "is out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
+  if (isubshell > (int)_shells[ishell].atoms.size() - 1) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The subshell index is out of range.");
+    string function = "apl::ShellHandle::getAtomsAtSameShell()";
+    string message = "The subshell index " + aurostd::utype2string<int>(isubshell) + "is out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
 
   return (_shells[ishell].atoms[isubshell]);
 }
@@ -712,10 +758,20 @@ std::deque<_atom> ShellHandle::getAtomsAtSameShell(int ishell, int isubshell) {
 // ///////////////////////////////////////////////////////////////////////////
 
 const std::deque<_atom>& ShellHandle::getReferenceAtomsAtSameShell(int ishell, int isubshell) {
-  if (ishell > (int)_shells.size() - 1)
-    throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The shell index is out of range.");
-  if (isubshell > (int)_shells[ishell].ratoms.size() - 1)
-    throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The subshell index is out of range.");
+  if (ishell > (int)_shells.size() - 1) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The shell index is out of range.");
+    string function = "apl::ShellHandle::getReferenceAtomsAtSameShell()";
+    string message = "The shell index " + aurostd::utype2string<int>(ishell) + "is out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
+  if (isubshell > (int)_shells[ishell].ratoms.size() - 1) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::ShellHandle::getAtomsAtSameShell(); The subshell index is out of range.");
+    string function = "apl::ShellHandle::getReferenceAtomsAtSameShell()";
+    string message = "The subshell index " + aurostd::utype2string<int>(isubshell) + "is out of range.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+  }
 
   return (_shells[ishell].ratoms[isubshell]);
 }

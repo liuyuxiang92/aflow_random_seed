@@ -1054,6 +1054,12 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   aflow/aflowd re-adapts INCAR to exclude CHGCAR. (LCHARG = .FALSE.)
   If you have good INCARs, you do not need to play with these options.
 
+ CHGCAR_FILE=XXXX (XXXX = path to file)
+   Uses the CHGCAR file this option is set to to start the VASP calculation.
+   ICHARG is set to 1 when this option is set. If the run type is a relaxation
+   calculation, the CHGCAR file will only be used for the first one. ICHARG
+   is then set to 2 for the subsequent relaxations.
+
  RWIGS_STATIC
   When running a STATIC calculation (STATIC, RELAX_STATIC, RELAX_BAND_STATIC)
   it extracts RWIGS from the POTCAR (and forces LORBIT=0)

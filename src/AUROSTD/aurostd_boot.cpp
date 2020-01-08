@@ -135,6 +135,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x*x;x*r;r*x;x*=y;x*=r; // multiplication	//CO190329 - clang doesn't like x=x, changing to x=y
   x/x;x/r;r/x;x/=y;x/=r; // division		//CO190329 - clang doesn't like x=x, changing to x=y
   x=y;x=r;               // equal		//CO190329 - clang doesn't like x=x, changing to x=y
+  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME200107
   x=abs(x)+arg(x)+polar(r,r)+conj(x)+norm(x)+cos(x)+cosh(x)+exp(x)+log(x)+pow(x,x)+pow(x,int(1))+pow(x,r)+pow(r,x)+sin(x)+sinh(x)+sqrt(x); // functions
   r = magsqr(x);  // ME180907
 
@@ -166,6 +167,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
+  m=mx*m;m==n;m!=n;jacobiHermitian(m);vx=m(1); // ME190814
 
   //  jacobi(m,vx,m);
  
@@ -289,6 +291,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO191201
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
+  // ME190718 - norms
+  aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
 
   //[ME 180627 START]

@@ -1,5 +1,15 @@
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- AFLOW DFT calculations can now read in CHGCAR files. (ME)
+        -- Improved runtimes and memory requirements for AAPL. (ME)
+        -- Switched the thermal conductivity integration method to the tetrahedron method. (ME)
+        -- Added Grueneisen parameter and phase space calculation to thermal conductvity calculations. (ME)
+        -- APL and AAPL can now use the CHGCAR file from the ZEROSTATE calculation to speed up calculations. (ME)
+        -- Replaced APLLogicError and APLRuntimeError with aurostd::xerror. (ME)
+        -- Fixed bug in APL and AAPL that did not properly process -D option. (ME)
+        -- Removed unused source files. (ME)
+        -- Added matrix norms to aurostd::xmatrix. (ME)
+        -- Fixed KPPRA for APL relaxations to use the standard density. (ME)
         -- Added a handler for the AFLOW database. (ME)
         -- Added an AFLOW-SQLITE interface. (ME)
         -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip). (ME)
@@ -148,7 +158,7 @@
         -- Verbosity fixes (Message("")) (SC)
 3.1.226 - 2019/10/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.226.tar.xz
-        -- Modification on the allocation of web entries, through web cash of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
+        -- Modification on the allocation of web entries, through web cache of AUID. Speed up of 20-200 times in serving aflowlib entry pages (SC)
         -- Bug fixes in producing html/json for icsd# entries (SC)
         -- Modified aflow.in generation in AEL and AGL to use common routines in aflow_avasp.cpp and aflow_modules.cpp (CT)  
         -- Write AGL enthalpy as a function of pressure in an AFLOW readable format for future phase diagram application (CT)

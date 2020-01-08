@@ -30,9 +30,9 @@ namespace apl {
 
 //Constructors////////////////////////////////////////////////////////////////
 ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
-                       double& cut_rad, Logger& l) : _logger(l) {
-  _logger << "CLUSTER: Building coordination shells." << apl::endl;
+                       double& cut_rad, Logger& l, _aflags& a) : _logger(l), aflags(a) {
   free();  // Clear old vectors
+  _logger << "CLUSTER: Building coordination shells." << apl::endl;
 
   scell = supercell.getSupercellStructure();
   pcell = supercell.getPrimitiveStructure();
@@ -56,9 +56,9 @@ ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
 //From file
 ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
                        const int& cut_shell, double& cut_rad,
-                       int _order, Logger& l) : _logger(l) {
-  _logger << "Reading ClusterSet from file " << filename << apl::endl;
+                       int _order, Logger& l, _aflags& a) : _logger(l), aflags(a) {
   free();  // Clear old vectors
+  _logger << "Reading ClusterSet from file " << aurostd::CleanFileName(filename) << apl::endl;
 
   order = _order;
   scell = supercell.getSupercellStructure();
@@ -79,42 +79,44 @@ ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
   // quick, they are not stored in the output file
   distortion_vectors = getCartesianDistortionVectors();
   permutations = getPermutations(order);
-  nifcs = 1;
-  for (int i = 0; i < order; i++) {
-    nifcs *= 3;  // Naive method for powers since C++ has no integer power function
-  }
+  nifcs = aurostd::powint(3, order);
 }
 
-// Just allocates. Used for non-AAPL calculations.
-ClusterSet::ClusterSet(Logger& l) : _logger(l) {
+// Default constructor
+ClusterSet::ClusterSet(Logger& l, _aflags& a) : _logger(l), aflags(a) {
   free();
 }
 
 //Copy Constructors///////////////////////////////////////////////////////////
-ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger) {
-  *this = that;
+ClusterSet::ClusterSet(const ClusterSet& that) : _logger(that._logger), aflags(that.aflags) {
+  copy(that);
 }
 
 const ClusterSet& ClusterSet::operator=(const ClusterSet& that) {
-  if (this != &that) {
-    _logger = that._logger;
-    coordination_shells = that.coordination_shells;
-    cutoff = that.cutoff;
-    distortion_vectors = that.distortion_vectors;
-    ineq_clusters = that.ineq_clusters;
-    ineq_distortions = that.ineq_distortions;
-    linear_combinations = that.linear_combinations;
-    nifcs = that.nifcs;
-    order = that.order;
-    pcell = that.pcell;
-    pc2scMap = that.pc2scMap;
-    permutations = that.permutations;
-    scell = that.scell;
-    sc2pcMap = that.sc2pcMap;
-    sc_dim = that.sc_dim;
-    symmetry_map = that.symmetry_map;
-  }
+  if (this != &that) copy(that);
   return *this;
+}
+
+void ClusterSet::copy(const ClusterSet& that) {
+  _logger = that._logger;
+  aflags = that.aflags;
+  clusters = that.clusters;
+  coordination_shells = that.coordination_shells;
+  cutoff = that.cutoff;
+  distortion_vectors = that.distortion_vectors;
+  higher_order_ineq_distortions = that.higher_order_ineq_distortions;
+  ineq_clusters = that.ineq_clusters;
+  ineq_distortions = that.ineq_distortions;
+  linear_combinations = that.linear_combinations;
+  nifcs = that.nifcs;
+  order = that.order;
+  pcell = that.pcell;
+  pc2scMap = that.pc2scMap;
+  permutations = that.permutations;
+  scell = that.scell;
+  sc2pcMap = that.sc2pcMap;
+  sc_dim = that.sc_dim;
+  symmetry_map = that.symmetry_map;
 }
 
 //Destructor//////////////////////////////////////////////////////////////////
@@ -128,6 +130,7 @@ void ClusterSet::free() {
   coordination_shells.clear();
   cutoff = 0.0;
   distortion_vectors.clear();
+  higher_order_ineq_distortions.clear();
   ineq_clusters.clear();
   ineq_distortions.clear();
   nifcs = 0;
@@ -137,6 +140,14 @@ void ClusterSet::free() {
   sc_dim.clear();
   sc2pcMap.clear();
   symmetry_map.clear();
+}
+
+
+//clear////////////////////////////////////////////////////////////////////////
+// Creates an empty ClusterSet object.
+void ClusterSet::clear(Logger& l, _aflags& a) {
+  ClusterSet that(l, a);
+  copy(that);
 }
 
 }  // namespace apl
@@ -168,9 +179,9 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
       throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
-  if (!pcell.pgroup_calculated) {
-    if (!SYM::CalculatePointGroup(FileDevNull, pcell, aflags,
-                                  false, false, dummy_os, pcell.sym_eps)) {
+  if (!pcell.pgroup_xtal_calculated) {
+    if (!SYM::CalculatePointGroupCrystal(FileDevNull, pcell, aflags,
+                                         false, false, dummy_os, pcell.sym_eps)) {
       string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
       string message = "Could not calculate the point group of the primitive cell.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
@@ -179,8 +190,8 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
   FileDevNull.clear();
   FileDevNull.close();
 
-  if (SYM::PointGroupsIdentical(scell.pgroup, pcell.pgroup, scell.sym_eps, false)) {
-    bool mapped;
+  if (SYM::PointGroupsIdentical(scell.pgroup_xtal, pcell.pgroup_xtal, scell.sym_eps, false)) {
+    bool mapped = false;
     // Minimum distance for pcell is the same for scell and cheaper to compute
     pcell.dist_nn_min = SYM::minimumDistance(pcell.atoms, pcell.lattice);
     double tol = _ZERO_TOL_;
@@ -209,11 +220,11 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
         if (!mapped) {
           string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
           string message = "At least one atom of the supercell could not be mapped.";
-          throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
           if (LDEBUG) {
             std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc;
             std::cerr << "using symmetry fgroup number " << fg << std::endl;
           }
+          throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }
       }
     }
@@ -236,8 +247,8 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
 double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
   bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_) || _DEBUG_AAPL_CLUSTERS_;
   if (cut_shell > 0) {
-    int countshell;
-    double shell_rad;
+    int countshell = 0;
+    double shell_rad = 0.0;
     double max_rad = 0.0;
     const double _DIST_TOL_ = 0.1;
     uint natoms = cell.atoms.size();
@@ -280,7 +291,7 @@ double ClusterSet::getMaxRad(const xstructure& cell, const int& cut_shell){
 // Creates coordination shells around the atoms of the primitive cell.
 void ClusterSet::buildShells() {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
-  int at1sc;
+  int at1sc = 0;
   vector<int> shell;
   coordination_shells.clear();
   uint natoms_pcell = pcell.atoms.size();
@@ -321,6 +332,12 @@ void ClusterSet::buildShells() {
 
 namespace apl {
 
+//getCluster//////////////////////////////////////////////////////////////////
+// Returns a cluster from the list of clusters
+const _cluster& ClusterSet::getCluster(const int& i) const {
+  return clusters[i];
+}
+
 //build///////////////////////////////////////////////////////////////////////
 // Builds the inequivalent clusters.
 void ClusterSet::build(int _order) {
@@ -334,13 +351,10 @@ void ClusterSet::build(int _order) {
     throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
   }
   _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
-  nifcs = 1;
-  for (int i = 0; i < order; i++){
-    nifcs *= 3; // Naive method for powers since C++ has no integer power function
-  }
+  nifcs = aurostd::powint(3, order);
 
   permutations = getPermutations(order);
-  vector<_cluster> clusters = buildClusters();
+  clusters = buildClusters();
   getInequivalentClusters(clusters, ineq_clusters);
 
   if (LDEBUG) {
@@ -348,8 +362,8 @@ void ClusterSet::build(int _order) {
     for (uint i = 0; i < ineq_clusters.size(); i++) {
       std::cerr << "Inequivalent cluster " << i << std::endl;
       for (uint j = 0; j < ineq_clusters[i].size(); j++) {
-        for (uint k = 0; k < ineq_clusters[i][j].atoms.size(); k++) {
-          std::cerr << ineq_clusters[i][j].atoms[k] << " ";
+        for (uint k = 0; k < getCluster(ineq_clusters[i][j]).atoms.size(); k++) {
+          std::cerr << getCluster(ineq_clusters[i][j]).atoms[k] << " ";
         }
         std::cerr << std::endl;
       }
@@ -383,7 +397,7 @@ vector<_cluster> ClusterSet::buildClusters() {
   bool repeat = true;
   for (uint s = 0; s < coordination_shells.size(); s++) {
     atoms_in_cluster[0] = coordination_shells[s][0];
-    xcombos clst_combos(coordination_shells[s].size() - 1, order - 1, 'C', repeat);
+    xcombos clst_combos(coordination_shells[s].size() - 1, order - 1, 'E', repeat);
     while (clst_combos.increment()) {
       bool append = true;
       clst = clst_combos.getCombo();
@@ -432,9 +446,9 @@ vector<_cluster> ClusterSet::buildClusters() {
 // While it is possible to determine this in one step, the two-step procedure
 // is significantly faster, especially with many coordination shells.
 void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
-                                         vector<vector<_cluster> > & ineq_clst) {
+                                         vector<vector<int> > & ineq_clst) {
   _logger << "CLUSTER: Determining inequivalent clusters." << apl::endl;
-  int equivalent_clst;
+  int equivalent_clst = -1;
   vector<int> unique_atoms;
   vector<vector<int> > compositions;
   uint nspecies = scell.species.size();
@@ -445,14 +459,14 @@ void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
                                          compositions, ineq_clst);
     if (equivalent_clst > -1 ) {
        // Equivalent - determine transformation
-      getSymOp(clusters[c], ineq_clusters[equivalent_clst][0].atoms);
-      ineq_clst[equivalent_clst].push_back(clusters[c]);
+      getSymOp(clusters[c], getCluster(ineq_clusters[equivalent_clst][0]).atoms);
+      ineq_clst[equivalent_clst].push_back(c);
     } else {
       // Not equivalent - create new inequivalent cluster
       clusters[c].fgroup = -1;
       clusters[c].permutation = -1;
-      vector<_cluster> ineq_init;
-      ineq_init.push_back(clusters[c]);
+      vector<int> ineq_init;
+      ineq_init.push_back(c);
       ineq_clst.push_back(ineq_init);
       int unique = getNumUniqueAtoms(clusters[c].atoms);
       unique_atoms.push_back(unique);
@@ -493,7 +507,7 @@ int ClusterSet::getNumUniqueAtoms(const vector<int>& atoms) {
 // each other.
 vector<int> ClusterSet::getComposition(const vector<int>& atoms) {
   vector<int> composition(scell.species.size());
-  int type;
+  int type = -1;
   for (int at = 0; at < order; at++) {
     type = scell.atoms[atoms[at]].type;
     composition[type]++;
@@ -521,7 +535,7 @@ bool ClusterSet::sameComposition(const vector<int>& comp1,
 int ClusterSet::equivalenceCluster(const vector<int>& atoms,
                                    const vector<int>& unique_atoms,
                                    const vector<vector<int> >& compositions,
-                                   const vector<vector<_cluster> >& ineq_clst) {
+                                   const vector<vector<int> >& ineq_clst) {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
   if (LDEBUG) {
     std::cerr << "ClusterSet::equivalenceCluster: Determining equivalent cluster for:";
@@ -553,7 +567,7 @@ int ClusterSet::equivalenceCluster(const vector<int>& atoms,
             same_composition = true;
           }
           if ((unique == unique_atoms[ineq]) && (same_composition)) {  
-            perm_index = comparePermutations(ineq_clst[ineq][0].atoms, cluster_transl);
+            perm_index = comparePermutations(getCluster(ineq_clst[ineq][0]).atoms, cluster_transl);
             if (perm_index != -1) {
               return ineq;
             }
@@ -601,12 +615,10 @@ vector<int> ClusterSet::translateToPcell(const vector<int>& atoms, int at) {
 // in lexicographical order, which is done by xcombos.
 int ClusterSet::comparePermutations(const vector<int>& cluster_ineq,
                                     const vector<int>& cluster_compare) {
-  int index, iper;
-  uint depth, jump, jump_size, n;
-  index = iper = 0;
-  depth = jump = 0;
-  n = cluster_ineq.size();
-  jump_size = permutations.size()/n;
+  int index = 0, iper = 0;
+  uint depth = 0, jump = 0;
+  uint n = cluster_ineq.size();
+  uint jump_size = permutations.size()/n;
   while ((jump < n - depth) && (depth < n)) {
     if (atomsMatch(permutations[iper], cluster_compare, cluster_ineq, depth)) {
       index += jump_size * jump;
@@ -642,7 +654,7 @@ bool ClusterSet::atomsMatch(const vector<int>& permutation, const vector<int>& c
 // the inequivalent cluster into the equivalent cluster.
 void ClusterSet::getSymOp(_cluster& cluster, const vector<int>& atoms_orig) {
   vector<int> cluster_transformed(order), cluster_transl(order);
-  int perm_index;
+  int perm_index = -1;
   for (uint fg = 0; fg < pcell.fgroup.size(); fg++) {
     for (int at = 0; at < order; at++) {
       cluster_transformed[at] = symmetry_map[fg][atoms_orig[at]];
@@ -678,6 +690,9 @@ void ClusterSet::buildDistortions() {
   for (uint i = 0; i < ineq_distortions.size(); i++) {
     test_distortions = getTestDistortions(ineq_distortions[i].clusters);
     getInequivalentDistortions(test_distortions, ineq_distortions[i]);
+  }
+  if (order > 3) {
+    higher_order_ineq_distortions = getHigherOrderDistortions();
   }
 }
 
@@ -719,14 +734,14 @@ vector<xvector<double> > ClusterSet::getCartesianDistortionVectors() {
 vector<_ineq_distortions> ClusterSet::initializeIneqDists() {
   vector<_ineq_distortions> ineq_dists;
   for (uint ineq = 0; ineq < ineq_clusters.size(); ineq++) {
-    int same = sameDistortions(ineq_clusters[ineq][0], ineq_dists);
+    int same = sameDistortions(getCluster(ineq_clusters[ineq][0]), ineq_dists);
     if (same == -1) {
       _ineq_distortions dists;
       dists.clusters.clear();
       dists.clusters.push_back(ineq);
       dists.atoms.resize(order - 1);
       for (int at = 0; at < order - 1; at++) {
-        dists.atoms[at] = ineq_clusters[ineq][0].atoms[at];
+        dists.atoms[at] = getCluster(ineq_clusters[ineq][0]).atoms[at];
       }
       ineq_dists.push_back(dists);
     } else {
@@ -765,14 +780,6 @@ int ClusterSet::sameDistortions(const _cluster& clst,
 // Gets the test distortions from the linear dependences of the interatomic
 // force constants. Only the distortions that belong to linearly independent
 // force constants are kept.
-bool sortcol(const vector<int>& v1, const vector<int>& v2) {
-  if (v1[0] == v2[0]) {
-    return v1[1] < v2[1];
-  } else {
-    return v1[0] < v2[0];
-  }
-}
-
 vector<vector<int> > ClusterSet::getTestDistortions(const vector<int>& clusters) {
   vector<int> dists;
   uint max_dists = (uint) nifcs/3;
@@ -819,7 +826,6 @@ vector<vector<int> > ClusterSet::getTestDistortions(const vector<int>& clusters)
       test_distortions.push_back(distortions);
     }
   }
-//  std::sort(test_distortions.begin(), test_distortions.end(), sortcol);
   return test_distortions;
 }
 
@@ -889,7 +895,7 @@ void ClusterSet::appendDistortion(_ineq_distortions& ineq_dists, vector<int> dis
     ineq_dists.rotations.push_back(init_trans);
     ineq_dists.transformation_maps.push_back(init_map);
   } else {
-    // Equivalent distortion found - create new inequivalent distortion
+    // Equivalent distortion found - append to inequivalent distortion
     ineq_dists.distortions[eq].push_back(dist);
     ineq_dists.rotations[eq].push_back(fg);
     transformation_map = getTransformationMap(fg, ineq_dists.atoms[0]);
@@ -904,7 +910,7 @@ void ClusterSet::appendDistortion(_ineq_distortions& ineq_dists, vector<int> dis
 // lexicographical order, which is true when the clusters were created using
 // xcombos.
 bool ClusterSet::allZeroDistortions(const vector<int>& atoms, const vector<int>& dist) {
-  int atom, at_count;
+  int atom = 0, at_count = 0;
   uint natoms = atoms.size();
   for (uint at = 0; at < natoms; at++) {
     atom = atoms[at];
@@ -968,7 +974,7 @@ int ClusterSet::equivalenceDistortions(const xmatrix<double>& Uc,
       vec_dist = trans_dist[at];
       int v = ineq_dists[ineq][0][at];
       vec_comp = distortion_vectors[v];
-      while ((atoms[at] == atoms[at+at_count]) && (at + at_count < natoms)) {
+      while ((at + at_count < natoms) && (atoms[at] == atoms[at+at_count])) {
         vec_dist += trans_dist[at+at_count];
         int v = ineq_dists[ineq][0][at+at_count];
         vec_comp += distortion_vectors[v];
@@ -1029,6 +1035,42 @@ vector<int> ClusterSet::getTransformationMap(const int& fg, const int& atom) {
 }
 // END Inequivalent distortions functions
 
+//getHigherOrderDistortions///////////////////////////////////////////////////
+vector<_ineq_distortions> ClusterSet::getHigherOrderDistortions() {
+  vector<_ineq_distortions> ineq_dists;
+  if (order != 4) return ineq_dists;  // Not implemented for higher order and not necessary for lower
+  ineq_dists.resize(pcell.iatoms.size());
+  vector<vector<int> > dists(6, vector<int>(1));
+  for (uint i = 0; i < 6; i++) dists[i][0] = i;
+  for (uint iat = 0; iat < pcell.iatoms.size(); iat++) {
+    int at = pc2scMap[pcell.iatoms[iat][0]];
+    vector<int> atoms(1, at);
+    ineq_dists[iat].atoms = atoms; 
+    int cl = 0;
+    for (cl = 0; cl < (int) clusters.size(); cl++) {
+      int a = 0;
+      for (a = 0; a < order; a++) {
+        if (clusters[cl].atoms[a] != at) break;
+      }
+      if (a == order) break;
+    }
+    vector<int> clusters(1, cl);
+    ineq_dists[iat].clusters = clusters;
+    for (uint td = 0; td < dists.size(); td++) {
+      int eq = -1;
+      for (uint fg = 0; fg < pcell.fgroup.size(); fg++) {
+        eq = equivalenceDistortions(pcell.fgroup[fg].Uc, dists[td], ineq_dists[iat].distortions, atoms);
+        if (eq > -1) {
+          appendDistortion(ineq_dists[iat], dists[td], eq, fg);
+          fg = pcell.fgroup.size();
+        }
+      }
+      if (eq == -1) appendDistortion(ineq_dists[iat], dists[td]);
+    }
+  }
+  return ineq_dists;
+}
+
 }  // namespace apl
 
 
@@ -1044,7 +1086,7 @@ vector<_linearCombinations> ClusterSet::getLinearCombinations() {
   for (uint ineq = 0; ineq < ineq_clusters.size(); ineq++) {
     _linearCombinations lcomb;
     // Build coefficient matrix
-    vector<vector<int> > symops = getInvariantSymOps(ineq_clusters[ineq][0]);
+    vector<vector<int> > symops = getInvariantSymOps(getCluster(ineq_clusters[ineq][0]));
     vector<vector<double> > coeff_mat = buildCoefficientMatrix(symops);
     if (coeff_mat.size() > 0) {
       // Determine the reduced row echelon form of the coefficiebt
@@ -1153,8 +1195,8 @@ vector<vector<int> > ClusterSet::getInvariantSymOps(const _cluster& ineq_clst) {
 vector<vector<double> > ClusterSet::buildCoefficientMatrix(const vector<vector<int> >& symops) {
   vector<vector<double> > coeff_mat;
   vector<double> row;
-  bool append;
-  int rw, cl, perm, fg, p;
+  bool append = true;
+  int rw = 0, cl = 0, perm = 0, fg = 0, p = 0;
   // Build Cartesian indices - faster and easier to read than running
   // an xcombo within an xcombo
   vector<vector<int> > cart_indices;
@@ -1202,8 +1244,8 @@ vector<vector<double> > ClusterSet::buildCoefficientMatrix(const vector<vector<i
 // Obtains the reduced row echelon form (RREF) of the coefficient matrix
 // using Gaussian elimination.
 vector<vector<double> > ClusterSet::getRREF(vector<vector<double> > mat) {
-  uint currentrow, nrows, ncols;
-  double swap;
+  uint currentrow = 0, nrows = 0, ncols = 0;
+  double swap = 0.0;
   nrows = mat.size();
   ncols = mat[0].size();
   currentrow = 0;
@@ -1260,8 +1302,10 @@ void ClusterSet::writeClusterSetToFile(const string& filename) {
   output << "<cluster_set>" << std::endl;
 
   output << writeParameters();
+  output << writeClusters(clusters);
   output << writeInequivalentClusters();
   output << writeInequivalentDistortions();
+  if (order == 4) output << writeHigherOrderDistortions();
   output << "</cluster_set>" << std::endl;
   aurostd::stringstream2file(output, filename);
   if (!aurostd::FileExist(filename)) {
@@ -1284,7 +1328,7 @@ string ClusterSet::writeParameters() {
   if (time[time.size() - 1] == '\n') time.erase(time.size() - 1);
   parameters << tab << tab << "<i name=\"date\" type=\"string\">" << time << "</i>" << std::endl;
   parameters << tab << tab << "<i name=\"checksum\" file=\"" << _AFLOWIN_;
-  parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO);  // ME190219
+  parameters << "\" type=\"" << APL_CHECKSUM_ALGO << "\">" << std::hex << aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO);
   parameters.unsetf(std::ios::hex);  // ME190125 - Remove hexadecimal formatting
   parameters  << "</i>" << std::endl;
   parameters << tab << "</generator>" << std::endl;
@@ -1329,6 +1373,29 @@ string ClusterSet::writeParameters() {
   return parameters.str();
 }
 
+//writeClusters///////////////////////////////////////////////////////////////
+// Writes the _cluster objects inside a set of clusters.
+string ClusterSet::writeClusters(const vector<_cluster>& clusters) {
+  string tab = " ";
+  stringstream clst;
+  clst << "<clusters>" << std::endl;
+  for (uint c = 0; c < clusters.size(); c++) {
+    clst << tab << "<cluster>" << std::endl;
+    clst << tab << tab << "<atoms>";
+    for (int at = 0; at < order; at++) {
+      clst << " " << clusters[c].atoms[at];
+    }
+    clst << " </atoms>" << std::endl;
+    clst << tab << tab << "<fgroup>";
+    clst << clusters[c].fgroup << "</fgroup>" << std::endl;
+    clst << tab << tab << "<permutation>";
+    clst << clusters[c].permutation << "</permutation>" << std::endl;
+    clst << tab << "</cluster>" << std::endl;
+  }
+  clst << "</clusters>" << std::endl;
+  return clst.str();
+}
+
 //writeInequivalentClusters///////////////////////////////////////////////////
 // Writes the inequivalent clusters and the linear combinations.
 string ClusterSet::writeInequivalentClusters() {
@@ -1337,36 +1404,14 @@ string ClusterSet::writeInequivalentClusters() {
   clusters << tab << "<inequivalent_clusters>" << std::endl;
   for (uint i = 0; i < ineq_clusters.size(); i++) {
     clusters << tab << tab << "<ineq_cluster ID=\"" << i << "\">" << std::endl;
-    clusters << writeClusters(ineq_clusters[i]);
+    clusters << tab << tab << tab << "<varray name=\"clusters\">"
+             << aurostd::joinWDelimiter(ineq_clusters[i], " ")
+             << "</varray>" << std::endl;
     clusters << writeLinearCombinations(linear_combinations[i]);
     clusters << tab << tab << "</ineq_cluster>" << std::endl;
   }
   clusters << tab << "</inequivalent_clusters>" << std::endl;
   return clusters.str();
-}
-
-//writeClusters///////////////////////////////////////////////////////////////
-// Writes the _cluster objects inside a set of clusters.
-string ClusterSet::writeClusters(const vector<_cluster>& clusters) {
-  string tab = " ";
-  string basetab = tab + tab + tab;
-  stringstream clst;
-  clst << basetab << "<clusters>" << std::endl;
-  for (uint c = 0; c < clusters.size(); c++) {
-    clst << basetab << tab << "<cluster>" << std::endl;
-    clst << basetab << tab << tab << "<atoms>";
-    for (int at = 0; at < order; at++) {
-      clst << " " << clusters[c].atoms[at];
-    }
-    clst << " </atoms>" << std::endl;
-    clst << basetab << tab << tab << "<fgroup>";
-    clst << clusters[c].fgroup << "</fgroup>" << std::endl;
-    clst << basetab << tab << tab << "<permutation>";
-    clst << clusters[c].permutation << "</permutation>" << std::endl;
-    clst << basetab << tab << "</cluster>" << std::endl;
-  }
-  clst << basetab << "</clusters>" << std::endl;
-  return clst.str();
 }
 
 //writeLinearCombinations/////////////////////////////////////////////////////
@@ -1462,7 +1507,7 @@ string ClusterSet::writeIneqDist(const _ineq_distortions& ineq_dist) {
     idist << basetab << tab << "<varray ID=\"" << d << "\">" << std::endl;
     for (uint i = 0; i < ineq_dist.distortions[d].size(); i++) {
       idist << basetab << tab << tab << "<v>";
-      for (int j = 0; j < order - 1; j++) {
+      for (uint j = 0; j < ineq_dist.distortions[d][i].size(); j++) {
         idist << " " << ineq_dist.distortions[d][i][j];
       }
       idist << " </v>" << std::endl;
@@ -1500,6 +1545,19 @@ string ClusterSet::writeIneqDist(const _ineq_distortions& ineq_dist) {
   return idist.str();
 }
 
+string ClusterSet::writeHigherOrderDistortions() {
+  string tab = " ";
+  stringstream distortions;
+  distortions << tab << "<higher_order_distortions>" << std::endl;
+  for (uint i = 0; i < higher_order_ineq_distortions.size(); i++) {
+    distortions << tab << tab << "<ineq_dist ID=\"" << i << "\">" << std::endl;
+    distortions << writeIneqDist(higher_order_ineq_distortions[i]);
+    distortions << tab << tab << "</ineq_dist>" << std::endl;
+  }
+  distortions << tab << "</higher_order_distortions>" << std::endl;
+  return distortions.str();
+}
+
 // END Write files
 
 // BEGIN Read files
@@ -1529,16 +1587,18 @@ void ClusterSet::readClusterSetFromFile(const string& filename) {
   // Check that this is a valid xml file
   if (line.find("xml") == string::npos) {
     message << "File is not a valid xml file.";
-    throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+    throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
   }
 
   //Check if xml file can be used to read the ClusterSet object
   if (checkCompatibility(line_count, vlines)) {
+    clusters = readClusters(line_count, vlines);
     readInequivalentClusters(line_count, vlines);
     readInequivalentDistortions(line_count, vlines);
+    if (order == 4) readHigherOrderDistortions(line_count, vlines);
   } else {
     message << "The settings in the hibernate file and the aflow.in file are incompatible.";
-    throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 }
 
@@ -1551,10 +1611,10 @@ void ClusterSet::readClusterSetFromFile(const string& filename) {
 // post-processing parameters are changed.
 bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlines) {
   string function = _AAPL_CLUSTER_ERR_PREFIX_ + "checkCompatibility";
-  string line;
+  string line = "";
   std::stringstream message;
   bool compatible = true;
-  int t;
+  int t = 0;
   vector<string> tokens;
   uint vsize = vlines.size();
 
@@ -1572,7 +1632,7 @@ bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlin
 
   t = line.find_first_of(">") + 1;
   tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-  if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum("./" + _AFLOWIN_ + "", APL_CHECKSUM_ALGO)) {  // ME190219
+  if (strtoul(tokens[0].c_str(), NULL, 16) != aurostd::getFileCheckSum(aflags.Directory + "/" + _AFLOWIN_, APL_CHECKSUM_ALGO)) {  // ME190219
     message << "The " << _AFLOWIN_ << " file has been changed from the hibernated state. ";
 
     tokens.clear();
@@ -1775,7 +1835,9 @@ bool ClusterSet::checkCompatibility(uint& line_count, const vector<string>& vlin
 void ClusterSet::readInequivalentClusters(uint& line_count,
                                           const vector<string>& vlines) {
   string function = _AAPL_CLUSTER_ERR_PREFIX_ + "readInequivalentClusters";
-  string line, message;
+  string line = "", message = "";
+  vector<string> tokens;
+  int t = 0;
   uint vsize = vlines.size();
 
   // Find inequivalent_clusters tag
@@ -1804,8 +1866,10 @@ void ClusterSet::readInequivalentClusters(uint& line_count,
           throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
-        if (line.find("clusters") != string::npos) {
-          vector<_cluster> clst = readClusters(line_count, vlines);
+        if (line.find("varray name=\"clusters\"") != string::npos) {
+          vector<int> clst;
+          t = line.find_first_of(">") + 1;
+          aurostd::string2tokens(line.substr(t, line.find_last_of("<") - t), clst, string(" "));
           ineq_clusters.push_back(clst);
         } else if (line.find("linear_combinations") != string::npos) {
           _linearCombinations lcomb = readLinearCombinations(line_count, vlines);
@@ -1821,10 +1885,10 @@ void ClusterSet::readInequivalentClusters(uint& line_count,
 vector<_cluster> ClusterSet::readClusters(uint& line_count,
                                           const vector<string>& vlines) {
   string function = "readClusters";
-  string message, line;
+  string message = "", line = "";
   vector<_cluster> clusters;
   vector<string> tokens;
-  int t;
+  int t = 0;
   uint vsize = vlines.size();
 
   while (line.find("/clusters") == string::npos) {
@@ -1872,10 +1936,10 @@ vector<_cluster> ClusterSet::readClusters(uint& line_count,
 _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
                                                        const vector<string>& vlines) {
   string function = "readLinearCombinations";
-  string message, line;
+  string message = "", line = "";
   _linearCombinations lcombs;
   vector<string> tokens;
-  int t;
+  int t = 0;
   uint vsize = vlines.size();
 
   while (line.find("/linear_combinations") == string::npos) {
@@ -1969,10 +2033,8 @@ _linearCombinations ClusterSet::readLinearCombinations(uint& line_count,
 void ClusterSet::readInequivalentDistortions(uint& line_count,
                                              const vector<string>& vlines) {
   string function = "readInequivalentDistortions";
-  string line, message;
+  string line = "", message = "";
   uint vsize = vlines.size();
-  vector<string> tokens;
-  int t;
 
   while (line.find("/inequivalent_distortions") == string::npos) {
     if (line_count == vsize) {
@@ -1981,124 +2043,155 @@ void ClusterSet::readInequivalentDistortions(uint& line_count,
     }
     line = vlines[line_count++];
     if (line.find("ineq_dist") != string::npos) {
-      _ineq_distortions idist;
-      while (line.find("/ineq_dist") == string::npos) {
+      _ineq_distortions idist = readIneqDist(line_count, vlines);
+      ineq_distortions.push_back(idist);
+    }
+  }
+}
+
+_ineq_distortions ClusterSet::readIneqDist(uint& line_count, const vector<string>& vlines) {
+  string function = "readIneqDist";
+  string line = "", message = "";
+  uint vsize = vlines.size();
+  vector<string> tokens;
+  int t = 0;
+
+  _ineq_distortions idist;
+  while (line.find("/ineq_dist") == string::npos) {
+    if (line_count == vsize) {
+      message = "ineq_dist tag incomplete";
+      throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+    line = vlines[line_count++];
+    if (line.find("atoms") != string::npos) {
+      tokens.clear();
+      t = line.find_first_of(">") + 1;
+      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+      for (uint i = 0; i < tokens.size(); i++) {
+        idist.atoms.push_back(aurostd::string2utype<int>(tokens[i]));
+      }
+    } else if (line.find("clusters") != string::npos) {
+      tokens.clear();
+      t = line.find_first_of(">") + 1;
+      tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+      for (uint i = 0; i < tokens.size(); i++) {
+        idist.clusters.push_back(aurostd::string2utype<int>(tokens[i]));
+      }
+    } else if (line.find("distortions") != string::npos) {
+      while (line.find("/distortions") == string::npos) {
         if (line_count == vsize) {
           message = "ineq_dist tag incomplete";
           throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
         }
         line = vlines[line_count++];
-        if (line.find("atoms") != string::npos) {
-          tokens.clear();
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          for (uint i = 0; i < tokens.size(); i++) {
-            idist.atoms.push_back(aurostd::string2utype<int>(tokens[i]));
-          }
-        } else if (line.find("clusters") != string::npos) {
-          tokens.clear();
-          t = line.find_first_of(">") + 1;
-          tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-          for (uint i = 0; i < tokens.size(); i++) {
-            idist.clusters.push_back(aurostd::string2utype<int>(tokens[i]));
-          }
-        } else if (line.find("distortions") != string::npos) {
-          while (line.find("/distortions") == string::npos) {
+        if (line.find("varray") != string::npos) {
+          vector<vector<int> > distortions;
+          while (true) {
             if (line_count == vsize) {
-              message = "distortions tag incomplete";
-              throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+              message = "incomplete distortions varray";
+              throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
-            if (line.find("varray") != string::npos) {
-              vector<vector<int> > distortions;
-              while (true) {
-                if (line_count == vsize) {
-                  message = "incomplete distortions varray";
-                  throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-                }
-                line = vlines[line_count++];
-                if (line.find("/varray") != string::npos) {
-                  break;
-                } else {
-                  vector<int> dist;
-                  tokens.clear();
-                  t = line.find_first_of(">") + 1;
-                  tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-                  for (uint i = 0; i < tokens.size(); i++) {
-                    dist.push_back(aurostd::string2utype<int>(tokens[i]));
-                  }
-                  distortions.push_back(dist);
-                }
+            if (line.find("/varray") != string::npos) {
+              break;
+            } else {
+              vector<int> dist;
+              tokens.clear();
+              t = line.find_first_of(">") + 1;
+              tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+              for (uint i = 0; i < tokens.size(); i++) {
+                dist.push_back(aurostd::string2utype<int>(tokens[i]));
               }
-              idist.distortions.push_back(distortions);
+              distortions.push_back(dist);
             }
           }
-        } else if (line.find("rotations") != string::npos) {
-          while (line.find("/rotations") == string::npos) {
+          idist.distortions.push_back(distortions);
+        }
+      }
+    } else if (line.find("rotations") != string::npos) {
+      while (line.find("/rotations") == string::npos) {
+        if (line_count == vsize) {
+          message = "rotations tag incomplete";
+          throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        line = vlines[line_count++];
+        if (line.find("varray") != string::npos) {
+          while (true) {
             if (line_count == vsize) {
-              message = "rotations tag incomplete";
-              throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+              message = "incomplete rotations varray";
+              throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
             }
             line = vlines[line_count++];
-            if (line.find("varray") != string::npos) {
-              while (true) {
-                if (line_count == vsize) {
-                  message = "incomplete rotations varray";
-                  throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-                }
-                line = vlines[line_count++];
-                if (line.find("/varray") != string::npos) {
-                  break;
-                } else {
-                  vector<int> rot;
-                  tokens.clear();
-                  t = line.find_first_of(">") + 1;
-                  tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-                  for (uint i = 0; i < tokens.size(); i++) {
-                    rot.push_back(aurostd::string2utype<int>(tokens[i]));
-                  }
-                  idist.rotations.push_back(rot);
-                }
+            if (line.find("/varray") != string::npos) {
+              break;
+            } else {
+              vector<int> rot;
+              tokens.clear();
+              t = line.find_first_of(">") + 1;
+              tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+              for (uint i = 0; i < tokens.size(); i++) {
+                rot.push_back(aurostd::string2utype<int>(tokens[i]));
               }
-            }
-          }
-        } else if (line.find("transformation_maps") != string::npos) {
-          while (line.find("/transformation_maps") == string::npos) {
-            if (line_count == vsize) {
-              message = "transformation_maps tag incomplete";
-              throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-            }
-            line = vlines[line_count++];
-            if (line.find("varray") != string::npos) {
-              vector<vector<int> > maps;
-              while (true) {
-                if (line_count == vsize) {
-                  message = "incomplete distortios varray";
-                  throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
-                }
-                line = vlines[line_count++];
-                if (line.find("/varray") != string::npos) {
-                  break;
-                } else {
-                  vector<int> map;
-                  tokens.clear();
-                  t = line.find_first_of(">") + 1;
-                  tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
-                  for (uint i = 0; i < tokens.size(); i++) {
-                    map.push_back(aurostd::string2utype<int>(tokens[i]));
-                  }
-                  maps.push_back(map);
-                }
-              }
-              idist.transformation_maps.push_back(maps);
+              idist.rotations.push_back(rot);
             }
           }
         }
       }
-      ineq_distortions.push_back(idist);
+    } else if (line.find("transformation_maps") != string::npos) {
+      while (line.find("/transformation_maps") == string::npos) {
+        if (line_count == vsize) {
+          message = "transformation_maps tag incomplete";
+          throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        }
+        line = vlines[line_count++];
+        if (line.find("varray") != string::npos) {
+          vector<vector<int> > maps;
+          while (true) {
+            if (line_count == vsize) {
+              message = "incomplete distortions varray";
+              throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+            }
+            line = vlines[line_count++];
+            if (line.find("/varray") != string::npos) {
+              break;
+            } else {
+              vector<int> map;
+              tokens.clear();
+              t = line.find_first_of(">") + 1;
+              tokenize(line.substr(t, line.find_last_of("<") - t), tokens, string(" "));
+              for (uint i = 0; i < tokens.size(); i++) {
+                map.push_back(aurostd::string2utype<int>(tokens[i]));
+              }
+              maps.push_back(map);
+            }
+          }
+          idist.transformation_maps.push_back(maps);
+        }
+      }
+    }
+  }
+  return idist;
+}
+
+void ClusterSet::readHigherOrderDistortions(uint& line_count,
+                                            const vector<string>& vlines) {
+  string function = "readHigherOrderDistortions";
+  string line = "", message = "";
+  uint vsize = vlines.size();
+
+  while (line.find("/higher_order_distortions") == string::npos) {
+    if (line_count == vsize) {
+      message = "higher_order_distortions tag incomplete";
+      throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+    }
+    line = vlines[line_count++];
+    if (line.find("ineq_dist") != string::npos) {
+      _ineq_distortions idist = readIneqDist(line_count, vlines);
+      higher_order_ineq_distortions.push_back(idist);
     }
   }
 }
+
 // END Read files
 
 }  // namespace apl

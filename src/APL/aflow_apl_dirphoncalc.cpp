@@ -33,42 +33,192 @@ void DirectMethodPC::clear() {
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// ME 190412 - Added aapl_stagebreak
-void DirectMethodPC::calculateForceFields(bool aapl_stagebreak) {
+
+void DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
+  string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
+
   // Check if supercell is already built
   if (!_supercell.isConstructed()) {
-    throw APLRuntimeError("apl::DirectMethodPC::calculateForceFields(); The supercell structure has not been initialized yet.");
+    // ME191029 - use xerror
+    //throw APLRuntimeError("apl::DirectMethodPC::calculateForceFields(); The supercell structure has not been initialized yet.");
+    string message = "The supercell structure has not been initialized yet.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
   }
+  _xInput.xvasp.AVASP_arun_mode = "APL";
 
   // Determine the distortion vectors
   estimateUniqueDistortions(_supercell.getSupercellStructure(), _uniqueDistortions);
 
-  // Print some information
-  int dof = 0;
-  for (uint i = 0; i < _uniqueDistortions.size(); i++)
-    dof += _uniqueDistortions[i].size();
-  _logger << "Found " << dof << " degree(s) of freedom." << apl::endl;
-  for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
-    int id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
+  //CO - START
+  vvgenerate_plus_minus.clear();  //CO //CO181226  // ME191029
+  bool generate_plus_minus;           //CO
+  //bool         check_minus_needed = ( AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS && !_supercell.isDerivativeStructure() );
+  //bool check_minus_needed = (AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS);  OBSOLETE ME 181028 - this overrides DPM=OFF
+  //[CO181212]bool check_minus_needed = AUTO_GENERATE_PLUS_MINUS;  // ME 181028
+  int ncalcs = 0;  // ME 190107 - total number of calculations for padding
+  if (_calculateZeroStateForces) ncalcs++;  // ME190112
+  if (_isPolarMaterial) ncalcs++;  // ME190112
+
+  for (uint i = 0; i < _uniqueDistortions.size(); i++) {
+    vvgenerate_plus_minus.push_back(vector<bool>(0)); //CO181226
     for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-      _logger << "Atom [" << sf("%03d") << id << "] (" << sf("%f")
-              << sw(2) << _supercell.getSupercellStructure().atoms[id].cleanname
-              << ") will be distorted in direction ["
-              << sf("%5.3f") << _uniqueDistortions[i][j](1) << ","
-              << sf("%5.3f") << _uniqueDistortions[i][j](2) << ","
-              << sf("%5.3f") << _uniqueDistortions[i][j](3) << "]." << apl::endl;
+//      vvgenerate_plus_minus.push_back(true);  //assume we need plus/minus OBSOLETE ME 181028 - this overrides DPM=OFF
+      // ME 190107 - Calculate "need minus" here
+      if (AUTO_GENERATE_PLUS_MINUS) {
+        vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO190218
+      } else {
+      vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
+      }
+      if (vvgenerate_plus_minus[i][j]) {
+        ncalcs += 2;
+      } else {
+        ncalcs += 1;
+      }
+    }
+  }
+  //CO - END
+  // ME 181022 - START
+  // Generate calculation directories
+  string chgcar_file = "";
+  if (zerostate_chgcar) {  // ME191029 - for ZEROSTATE CHGCAR
+    zerostate_dir = "ARUN.APL_";
+    int index = ncalcs;
+    if (_isPolarMaterial) index--;
+    zerostate_dir += aurostd::PaddedNumString(index, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE";
+    chgcar_file = "../" + zerostate_dir + "/CHGCAR.static";
+    if (_kbinFlags.KZIP_COMPRESS) chgcar_file += "." + _kbinFlags.KZIP_BIN;
+  }
+
+  for (uint i = 0; i < _uniqueDistortions.size(); i++) {
+    for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+      //CO - START
+      //[CO181212]if (check_minus_needed) {
+      //[ME190107] if(AUTO_GENERATE_PLUS_MINUS) {  //CHECK -
+      //[ME190107]  vvgenerate_plus_minus[i][j] = needMinus(i, j);
+      //[ME190107]  if (!vvgenerate_plus_minus[i][j]) {_logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;}
+      //[ME190107]}
+      generate_plus_minus = vvgenerate_plus_minus[i][j];
+      if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
+        _logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;
+      }
+      for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
+        //CO - END
+        // Copy settings from common case
+        xInputs.push_back(_xInput);
+        int idxRun = xInputs.size() - 1;
+        int idAtom = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
+
+        // Create run ID
+        // ME190107 - added padding
+        string runname = aurostd::PaddedNumString(idxRun + 1, aurostd::getZeroPadding(ncalcs)) + "_";  // ME190112
+        runname += "A" + stringify(idAtom) + "D" + stringify(j); //CO190218
+
+        if (generate_plus_minus) {  //CO
+          runname = runname + ((k == 0) ? "P" : "M");
+        }
+        xInputs[idxRun].xvasp.AVASP_arun_runname = runname;
+        // Apply the unique distortion to one inequvalent atom
+        // This distortion vector is stored in Cartesian form, hence use C2F before applying
+        xInputs[idxRun].setXStr(_supercell.getSupercellStructureLight()); //CO faster, only what's necessary here
+        xstructure& xstr = xInputs[idxRun].getXStr(); // ME190109 - Declare to make code more legible
+        //CO190114 - it is very silly to try to add in fpos
+        //add to cpos, then convert to fpos
+        xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
+        xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
+        //[CO190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].fpos = xInputs[idxRun].getXStr().atoms[idAtom].fpos + C2F(xInputs[idxRun].getXStr().lattice, ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
+        //[CO190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].cpos = F2C(xInputs[idxRun].getXStr().lattice,
+        //[CO190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
+
+        //clean title //CO181226
+        //[CO190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); // ME190109 - Declare to make code more legible
+        xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title); //CO181226, ME 190109
+        if(xstr.title.empty()){xstr.buildGenericTitle(true,false);} //CO181226, ME 190109
+        xstr.title += " APL supercell=" + aurostd::joinWDelimiter(_supercell.scell, 'x'); //ME190109
+        xstr.title += " atom=" + stringify(idAtom); //ME190109
+        //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(DISTORTION_MAGNITUDE*_uniqueDistortions[i][j])) + "]"; //ME190109 - OBSOLETE ME190112
+        std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
+        xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  // ME190112
+        distortion << " distortion=["
+                   << std::setprecision(3) << dist_cart[1] << ","
+                   << std::setprecision(3) << dist_cart[2] << ","
+                   << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
+        xstr.title += distortion.str();
+
+        // For VASP, use the standardized aflow.in creator
+        if (_kbinFlags.AFLOW_MODE_VASP){
+          // ME191029
+          xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
+          if (zerostate_chgcar) {
+            xInputs[idxRun].xvasp.aopts.push_attached("APL_FLAG::CHGCAR_FILE", chgcar_file);
+          }
+
+          _kbinFlags.KBIN_MPI_AUTOTUNE = true;
+          // Change format of POSCAR
+          // ME 190228 - OBSOLETE for two reasons:
+          // 1. This method is not robust
+          // 2. This will be taken care of when the actual POSCAR is generated
+          // [OBSOLETE - 190228] if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
+          // [OBSOLETE - 190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
+          // [OBSOLETE - 190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
+          // [OBSOLETE - 190228] }
+          _stagebreak = (createAflowInPhonons(xInputs[idxRun]) || _stagebreak);
+        }
+        // For AIMS, use the old method until we have AVASP_populateXAIMS
+        if (_kbinFlags.AFLOW_MODE_AIMS) {
+          string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "A" + stringify(_supercell.getUniqueAtomID(i)) + "D" + stringify(j);
+          xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
+          if (!filesExistPhonons(xInputs[idxRun])) {
+            _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
+            createAflowInPhonons(xInputs[idxRun], runname);
+          }
+        }
+      }
     }
   }
 
-  // Call VASP to calculate forces
-  runVASPCalculations(aapl_stagebreak);  // ME190412
+  // Add zero state if requested
+  if (_calculateZeroStateForces) {
+    // Copy settings from common case
+    xInputs.push_back(_xInput);
+    int idxRun = xInputs.size() - 1;
+    // Create run ID //ME181226
+    xInputs[idxRun].xvasp.AVASP_arun_runname = aurostd::PaddedNumString(idxRun+1, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE"; //ME181226, ME190112
 
-  // Optional
-  //if( _isPolarMaterial )
-  //    removeFakeForcesOfElectrostaticField();
+    // Get structure
+    xInputs[idxRun].setXStr(_supercell.getSupercellStructureLight()); //CO
+
+    // ME 190108 - Set title
+    xInputs[idxRun].getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInputs[idxRun].getXStr().title); //CO181226
+    if(xInputs[idxRun].getXStr().title.empty()){xInputs[idxRun].getXStr().buildGenericTitle(true,false);} //CO181226
+    xInputs[idxRun].getXStr().title += " APL supercell=" + aurostd::joinWDelimiter(_supercell.scell, 'x'); //ME190112
+    xInputs[idxRun].getXStr().title += " undistorted";
+    xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  // ME191029
+    // For VASP, use the standardized aflow.in creator
+    if(_kbinFlags.AFLOW_MODE_VASP){
+      xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::ZEROSTATE_CHGCAR", zerostate_chgcar);
+      _stagebreak = (createAflowInPhonons(xInputs[idxRun]) || _stagebreak); //ME181226
+    }
+    // For AIMS, use the old method until we have AVASP_populateXAIMS //ME181226
+    if(_kbinFlags.AFLOW_MODE_AIMS){
+      string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "ZEROSTATE";
+      xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
+      if (!filesExistPhonons(xInputs[idxRun])) {
+        _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
+        createAflowInPhonons(xInputs[idxRun], runname);
+      }
+    }
+  }
+
+  // BEGIN STEFANO
+  // Do an additional calculation for polar materials
+  if (_isPolarMaterial) {
+    // Calc. Born effective charge tensors and dielectric constant matrix
+    _xinput xinpBE(_xInput);  // ME190113
+    runVASPCalculationsBE(xinpBE, xInputs.size());  // ME190113
+    xInputs.push_back(xinpBE);
+  }
+  // END STEFANO
 }
-
-//////////////////////////////////////////////////////////////////////////////
 
 void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
                                                vector<vector<xvector<double> > >& uniqueDistortions) {
@@ -91,7 +241,11 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
 
   // Is there a list of inequivalent atoms?
   if (DISTORTION_INEQUIVONLY && !xstr.iatoms_calculated) { //CO190218
-    throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the inequivalent atoms is missing.");
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the inequivalent atoms is missing.");
+    string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
+    string message = "The list of the inequivalent atoms is missing.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
   }
 
   // Clear old stuff
@@ -177,7 +331,11 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
       int atomID = (DISTORTION_INEQUIVONLY ? xstr.iatoms[i][0] : i); //CO190218
       //cout << "atomID = " << atomID << std::endl; //CO190218
       if (xstr.agroup[atomID].size() == 0) { //CO190218
-        throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); Site point group operations are missing.");
+        // ME191031 - use xerror
+        //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); Site point group operations are missing.");
+        string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
+        string message = "Site point group operations are missing.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 
       // Loop over test directions vectors - we count the number of unique
@@ -227,7 +385,28 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
     // Free useless stuff
     testDistortions.clear();
   } else {
-    throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the site point group operations is missing.");
+    // ME191031
+    //throw APLRuntimeError("apl::DirectMethodPC::estimateUniqueDistortions(); The list of the site point group operations is missing.");
+    string function = "apl::DirectMethodPC::estimateUniqueDistortions()";
+    string message = "The list of the site point group operations is missing.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  }
+
+  // Print some information
+  int dof = 0;
+  for (uint i = 0; i < _uniqueDistortions.size(); i++)
+    dof += _uniqueDistortions[i].size();
+  _logger << "Found " << dof << " degree(s) of freedom." << apl::endl;
+  for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
+    int id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
+    for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
+      _logger << "Atom [" << sf("%03d") << id << "] (" << sf("%f")
+              << sw(2) << _supercell.getSupercellStructure().atoms[id].cleanname
+              << ") will be distorted in direction ["
+              << sf("%5.3f") << _uniqueDistortions[i][j](1) << ","
+              << sf("%5.3f") << _uniqueDistortions[i][j](2) << ","
+              << sf("%5.3f") << _uniqueDistortions[i][j](3) << "]." << apl::endl;
+    }
   }
 }
 
@@ -301,230 +480,26 @@ bool DirectMethodPC::needMinus(uint atom_index, uint distortion_index, bool ineq
 //CO - END
 
 //////////////////////////////////////////////////////////////////////////////
-// ME 190412 - Added aapl_stagebreak
-void DirectMethodPC::runVASPCalculations(bool aapl_stagebreak) {
+
+void DirectMethodPC::calculateForceFields() {
   bool LDEBUG=(FALSE || _DEBUG_APL_DIRPHONCALC_ || XHOST.DEBUG);
   string soliloquy="apl::DirectMethodPC::runVASPCalculations():"; //CO190218
-  //CO - START
-  vector<vector<bool> > vvgenerate_plus_minus;  //CO //CO181226
-  bool generate_plus_minus;           //CO
-  //bool         check_minus_needed = ( AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS && !_supercell.isDerivativeStructure() );
-  //bool check_minus_needed = (AUTO_GENERATE_PLUS_MINUS && !USER_GENERATE_PLUS_MINUS);  OBSOLETE ME 181028 - this overrides DPM=OFF
-  //[CO181212]bool check_minus_needed = AUTO_GENERATE_PLUS_MINUS;  // ME 181028
-  int ncalcs = 0;  // ME 190107 - total number of calculations for padding
-  if (_calculateZeroStateForces) ncalcs++;  // ME190112
-  if (_isPolarMaterial) ncalcs++;  // ME190112
-
-  for (uint i = 0; i < _uniqueDistortions.size(); i++) {
-    vvgenerate_plus_minus.push_back(vector<bool>(0)); //CO181226
-    for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-//      vvgenerate_plus_minus.push_back(true);  //assume we need plus/minus OBSOLETE ME 181028 - this overrides DPM=OFF
-      // ME 190107 - Calculate "need minus" here
-      if (AUTO_GENERATE_PLUS_MINUS) {
-        vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO190218
-      } else {
-      vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
-      }
-      if (vvgenerate_plus_minus[i][j]) {
-        ncalcs += 2;
-      } else {
-        ncalcs += 1;
-      }
-    }
-  }
-  //CO - END
-  // ME 181022 - START
-  // Generate calculation directories
-  for (uint i = 0; i < _uniqueDistortions.size(); i++) {
-    for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
-      //CO - START
-      //[CO181212]if (check_minus_needed) {
-      //[ME190107] if(AUTO_GENERATE_PLUS_MINUS) {  //CHECK -
-      //[ME190107]  vvgenerate_plus_minus[i][j] = needMinus(i, j);
-      //[ME190107]  if (!vvgenerate_plus_minus[i][j]) {_logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;}
-      //[ME190107]}
-      generate_plus_minus = vvgenerate_plus_minus[i][j];
-      if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
-        _logger << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "]." << apl::endl;
-        }
-      for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
-        //CO - END
-        // Copy settings from common case
-        xInputs.push_back(_xInput);
-        int idxRun = xInputs.size() - 1;
-        int idAtom = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
-
-        // Create run ID
-        // ME190107 - added padding
-        string runname = aurostd::PaddedNumString(idxRun + 1, aurostd::getZeroPadding(ncalcs)) + "_";  // ME190112
-        runname += "A" + stringify(idAtom) + "D" + stringify(j); //CO190218
-
-        if (generate_plus_minus) {  //CO
-          runname = runname + ((k == 0) ? "P" : "M");
-        }
-        xInputs[idxRun].xvasp.AVASP_arun_runname = runname;
-
-        // Apply the unique distortion to one inequvalent atom
-        // This distortion vector is stored in Cartesian form, hence use C2F before applying
-        xInputs[idxRun].setXStr(_supercell.getSupercellStructureLight()); //CO faster, only what's necessary here
-        xstructure& xstr = xInputs[idxRun].getXStr(); // ME190109 - Declare to make code more legible
-        //CO190114 - it is very silly to try to add in fpos
-        //add to cpos, then convert to fpos
-        xstr.atoms[idAtom].cpos += ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];
-        xstr.atoms[idAtom].fpos = C2F(xstr.lattice, xstr.atoms[idAtom].cpos);
-        //[CO190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].fpos = xInputs[idxRun].getXStr().atoms[idAtom].fpos + C2F(xInputs[idxRun].getXStr().lattice, ((k == 0) ? 1.0 : -1.0) * DISTORTION_MAGNITUDE * _uniqueDistortions[i][j]);
-        //[CO190114 - OBSOLETE]xInputs[idxRun].getXStr().atoms[idAtom].cpos = F2C(xInputs[idxRun].getXStr().lattice,
-        //[CO190114 - OBSOLETE]                                                 xInputs[idxRun].getXStr().atoms[idAtom].fpos);
-
-        //clean title //CO181226
-        //[CO190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); // ME190109 - Declare to make code more legible
-        xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title); //CO181226, ME 190109
-        if(xstr.title.empty()){xstr.buildGenericTitle(true,false);} //CO181226, ME 190109
-        xstr.title += " APL supercell=" + aurostd::joinWDelimiter(_supercell.scell, 'x'); //ME190109
-        xstr.title += " atom=" + stringify(idAtom); //ME190109
-        //xstr.title += " distortion=[" + aurostd::RemoveWhiteSpacesFromTheFrontAndBack(stringify(DISTORTION_MAGNITUDE*_uniqueDistortions[i][j])) + "]"; //ME190109 - OBSOLETE ME190112
-        std::stringstream distortion; // ME190112 - need stringstream for nicer formatting
-        xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  // ME190112
-        distortion << " distortion=["
-                   << std::setprecision(3) << dist_cart[1] << ","
-                   << std::setprecision(3) << dist_cart[2] << ","
-                   << std::setprecision(3) << dist_cart[3] << "]"; // ME190112
-        xstr.title += distortion.str();
-
-        // For VASP, use the standardized aflow.in creator
-        if (_kbinFlags.AFLOW_MODE_VASP){
-          _kbinFlags.KBIN_MPI_AUTOTUNE = true;
-          // Change format of POSCAR
-          // ME 190228 - OBSOLETE for two reasons:
-          // 1. This method is not robust
-          // 2. This will be taken care of when the actual POSCAR is generated
-          // [OBSOLETE - 190228] if ((!_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_BIN.find("46") != string::npos)) ||
-          // [OBSOLETE - 190228]    (_kbinFlags.KBIN_MPI && (_kbinFlags.KBIN_MPI_BIN.find("46") != string::npos))) {
-          // [OBSOLETE - 190228]  xInputs[idxRun].getXStr().is_vasp5_poscar_format = false;
-          // [OBSOLETE - 190228] }
-          createAflowInPhonons(xInputs[idxRun]);
-        }
-        // For AIMS, use the old method until we have AVASP_populateXAIMS
-        if (_kbinFlags.AFLOW_MODE_AIMS) {
-          string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "A" + stringify(_supercell.getUniqueAtomID(i)) + "D" + stringify(j);
-          xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
-          if (!filesExistPhonons(xInputs[idxRun])) {
-        _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
-        createAflowInPhonons(xInputs[idxRun], runname);
-          }
-        }
-      }
-    }
-  }
-
-  // Add zero state if requested
-  if (_calculateZeroStateForces) {
-    // Copy settings from common case
-    xInputs.push_back(_xInput);
-    int idxRun = xInputs.size() - 1;
-    // Create run ID //ME181226
-    xInputs[idxRun].xvasp.AVASP_arun_runname = aurostd::PaddedNumString(idxRun+1, aurostd::getZeroPadding(ncalcs)) + "_ZEROSTATE"; //ME181226, ME190112
-
-    // Get structure
-    xInputs[idxRun].setXStr(_supercell.getSupercellStructureLight()); //CO
-
-    // ME 190108 - Set title
-    xInputs[idxRun].getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInputs[idxRun].getXStr().title); //CO181226
-    if(xInputs[idxRun].getXStr().title.empty()){xInputs[idxRun].getXStr().buildGenericTitle(true,false);} //CO181226
-    xInputs[idxRun].getXStr().title += " APL supercell=" + aurostd::joinWDelimiter(_supercell.scell, 'x'); //ME190112
-    xInputs[idxRun].getXStr().title+=" undistorted";
-    // For VASP, use the standardized aflow.in creator
-    if(_kbinFlags.AFLOW_MODE_VASP){
-      createAflowInPhonons(xInputs[idxRun]); //ME181226
-    }
-    // For AIMS, use the old method until we have AVASP_populateXAIMS //ME181226
-    if(_kbinFlags.AFLOW_MODE_AIMS){
-      string runname = ARUN_DIRECTORY_PREFIX + "APL_" + stringify(idxRun) + "ZEROSTATE";
-      xInputs[idxRun].setDirectory(_xInput.getDirectory() + "/" + runname);
-      if (!filesExistPhonons(xInputs[idxRun])) {
-        _logger << "Creating " << xInputs[idxRun].getDirectory() << apl::endl;
-      createAflowInPhonons(xInputs[idxRun], runname);
-      }
-    }
-  }
-
-  // BEGIN STEFANO
-  // Do an additional calculation for polar materials
-  if (_isPolarMaterial) {
-    try {
-      // if tarred and compressed directory exists...
-
-      // COREY CHECK THIS
-      deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");vext.push_front(""); // cheat for void string
-      string tarfilename =string(_AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_) + ".tar";
-      for(uint iext=0;iext<vext.size();iext++) {
-	if (aurostd::FileExist(tarfilename+vext.at(iext))) {
-	  if(_kbinFlags.AFLOW_MODE_VASP)
-	    aurostd::execute(string("tar -xf ") + tarfilename + vext.at(iext)+ " --wildcards " + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ + "/OUTCAR*");
-	  if(_kbinFlags.AFLOW_MODE_AIMS)
-	    aurostd::execute(string("tar -xf ") + tarfilename + vext.at(iext)+ " --wildcards " + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ + "/aims.out");
-	}
-      }
-
-      // Calc. Born effective charge tensors and dielectric constant matrix
-      _xinput xinpBE(_xInput);  // ME190113
-      runVASPCalculationsBE(xinpBE, xInputs.size());  // ME190113
-      // Parse it from OUTCAR
-      if (!aapl_stagebreak) { // ME190412 - skip if AAPL calculations till need to be run
-      if(_kbinFlags.AFLOW_MODE_VASP){readBornEffectiveChargesFromOUTCAR(xinpBE);}  // ME190113
-      if(_kbinFlags.AFLOW_MODE_AIMS){readBornEffectiveChargesFromAIMSOUT();}
-      // Enforce ASR (Acustic sum rules)
-      symmetrizeBornEffectiveChargeTensors();
-      // Parser epsilon from OUTCAR
-      readDielectricTensorFromOUTCAR(xinpBE);  // ME190113
-      //
-      _logger << "Dielectric tensor: ";
-      for (int a = 1; a <= 3; a++)
-        for (int b = 1; b <= 3; b++)
-          _logger << sf("%5.3f") << _dielectricTensor(a, b) << " ";
-      _logger << apl::endl;
-
-      // precompute
-      _inverseDielectricTensor = inverse(_dielectricTensor);
-      _recsqrtDielectricTensorDeterminant = 1.0 / sqrt(determinant(_dielectricTensor));
-      }
-
-//  OBSOLETE - ME181024
-//      // Pack the whole directory...
-//      if (DOtar) {
-//	// COREY CHECK THIS
-//        if (!aurostd::FileExist(tarfilename)) {
-//	  aurostd::execute(string("tar -cf ") + tarfilename + " " + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ + "/");
-//	  aurostd::CompressFile(tarfilename,_kbinFlags.KZIP_BIN);
-//	}
-// 	if (aurostd::FileExist(tarfilename)) aurostd::execute(string("rm -rf ") + _AFLOW_APL_BORN_EPSILON_DIRECTORY_NAME_ + "/");
-//      }
-    } catch (APLLogicError& e) {
-      _logger << apl::error << e.what() << apl::endl;
-      _logger << warning << "Switching the dipole-dipole correction off." << apl::endl;
-      _isPolarMaterial = false;
-    }
-    //      cerr << "GENERATING FOR POLAR  STOP" << std::endl;exit(0);
-  }
-  // END STEFANO
-
-  // Extract all forces from vasprun.xml.static ////////////////////////////////////////
+  // Extract all forces ////////////////////////////////////////////////////
 
   //first pass, just find if outfile is found ANYWHERE
-  // ME190412 - Do not read forces when an AAPL calculations need to be run
-  if(aapl_stagebreak || !outfileFoundAnywherePhonons(xInputs)){throw APLStageBreak();}
+  if(!outfileFoundAnywherePhonons(xInputs)){throw APLStageBreak();}
 
   //second pass, make sure it's everywhere!
-  outfileFoundEverywherePhonons(xInputs);
-    //CO - END
+  outfileFoundEverywherePhonons(xInputs, _isPolarMaterial);
 
-  // Remove zero state forces if possible //////////////////////////////////
-
+  // Remove zero state forces if necessary
   if (_calculateZeroStateForces) {
     subtractZeroStateForces(xInputs);
   }
 
   // Store forces //////////////////////////////////////////////////////////
+
+  bool generate_plus_minus = false;  // ME190129
 
   int idxRun = 0;
   for (int i = 0; i < _supercell.getNumberOfUniqueAtoms(); i++) {
@@ -574,6 +549,8 @@ void DirectMethodPC::runVASPCalculations(bool aapl_stagebreak) {
     _uniqueForces.push_back(forcesForOneAtomAndAllDistortions);
     forcesForOneAtomAndAllDistortions.clear();
   }
+
+  if (_isPolarMaterial) calculateDielectricTensor(xInputs.back());
 
   //******** BEGIN JJPR: Clean later to use ZERO STATE FORCES with TENSOR  *******
   // Clear useless stuff

@@ -232,7 +232,7 @@ void xcombos::initialize() {
   m_initialized=TRUE;
 }
 
-std::vector<int> xcombos::getCombo() const {return m_current;}
+const std::vector<int>& xcombos::getCombo() const {return m_current;} // ME190703 - use const & (faster)
 int xcombos::getN() const {return n_choices;}
 int xcombos::getM() const {return m_choose;}
 
@@ -307,7 +307,7 @@ void xcombos::incrementCombinations() {
   setCombinationsIncrementParameters();
   m_current[m_x]=1;
   m_current[m_y]=0;
-  }
+}
 
 void xcombos::incrementEnumerations() {
   if (m_exhausted) {return;}

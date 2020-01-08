@@ -438,6 +438,8 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.options2entry(AflowIn,_STROPT_+"WAVECAR=",DEFAULT_VASP_FORCE_OPTION_WAVECAR);
     // CHGCAR AND PRIORITIES
     vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.options2entry(AflowIn,_STROPT_+"CHGCAR=",DEFAULT_VASP_FORCE_OPTION_CHGCAR);
+    // ME191028 - specify CHGCAR file to use
+    vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.options2entry(AflowIn,_STROPT_+"CHGCAR_FILE=",0,"");
 
     // LDAU2 AND PRIORITIES
     vflags.KBIN_VASP_LDAU_SPECIES="";
@@ -1409,7 +1411,18 @@ namespace KBIN {
                       // ME 190301 - BEGIN
                       // CHGCAR/WAVECAR needs to be recycled if CHGCAR/WAVECAR=ON or VASP
                       // won't be able to read the files. Bug found by Rico Friedrich
-                      if(vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                      if(vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
+                        // ME191031 - Only recycle when ICHARG was found
+                        string extra_incar = xvasp.AVASP_EXTRA_INCAR.str();
+                        int nlines = aurostd::GetNLinesString(extra_incar);
+                        int l;
+                        string line;
+                        for (l = 1; l <= nlines; l++) {
+                          line = aurostd::RemoveWhiteSpaces(aurostd::GetLineString(extra_incar, l));
+                          if (aurostd::substring2bool(line, "ICHARG=1", true)) break;
+                        }
+                        if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                      }
                       //[WAVECAR NOT SUPPORTED]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                       // ME 190301 - END
 		    }
@@ -1418,6 +1431,7 @@ namespace KBIN {
 		      if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAXATION=]");return Krun;}
 		      KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE);  // ME190610 - or else SPIN_REMOVE_RELAX_2 won't work
 		    }
+                    KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, FileMESSAGE);  // ME191028
 		  }
 		  xvasp.NRELAXING=xvasp.NRELAX;
 		  xvasp.NRELAXING++;
@@ -1470,7 +1484,18 @@ namespace KBIN {
                       // ME 190301 - BEGIN
                       // CHGCAR/WAVECAR needs to be recycled if CHGCAR/WAVECAR=ON or VASP
                       // won't be able to read the files. Bug found by Rico Friedrich
-                      if(vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                      if(vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
+                        // ME191031 - Only recycle when ICHARG was found
+                        string extra_incar = xvasp.AVASP_EXTRA_INCAR.str();
+                        int nlines = aurostd::GetNLinesString(extra_incar);
+                        int l;
+                        string line;
+                        for (l = 1; l <= nlines; l++) {
+                          line = aurostd::RemoveWhiteSpaces(aurostd::GetLineString(extra_incar, l));
+                          if (aurostd::substring2bool(line, "ICHARG=1", true)) break;
+                        }
+                        if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                      }
                       //[WAVECAR NOT SUPPORTED]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                       // ME 190301 - END
 		    }
@@ -1478,6 +1503,7 @@ namespace KBIN {
 		      Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax"+aurostd::utype2string(xvasp.NRELAXING),TRUE,FileMESSAGE);
 		      if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS RELAXATION=]");return Krun;}
 		    }
+                    KBIN::XVASP_INCAR_ADJUST_ICHARG(xvasp, vflags, aflags, xvasp.NRELAXING, FileMESSAGE);  // ME191028
 		    xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
 		    aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

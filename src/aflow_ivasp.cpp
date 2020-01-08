@@ -935,6 +935,28 @@ namespace KBIN {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
 
+    // ME1901028
+    if (Krun && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
+      string chgcar = vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string;
+      if (chgcar[0] != '/') chgcar = aurostd::CleanFileName(aflags.Directory + "/" + chgcar);  // relative path
+      if (aurostd::FileExist(chgcar)) {
+        if (aurostd::IsCompressed(chgcar)) {
+          string ext = aurostd::GetCompressionExtension(chgcar);
+          aurostd::CopyFile(chgcar, aflags.Directory + "/CHGCAR" + ext);  // relative path
+          aurostd::UncompressFile(aflags.Directory + "/CHGCAR" + ext);
+        } else {
+          aurostd::CopyFile(chgcar, aflags.Directory + "/CHGCAR");
+        }
+        aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 1, 0.0, true);
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
+      } else {
+        string function = "KBIN::VASP_Modify_INCAR()";
+        string message = "Cannot use CHGCAR file " + chgcar + ". File not found.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+      }
+    }
+
     // LDAU0
     if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LDAU0.isentry) {          /*************** INCAR **************/
       aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]LDAU=OFF - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -3956,7 +3978,7 @@ namespace KBIN {
 	} else {
 	  if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
 	  if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
-	  if(aurostd::substring2bool(strline,"MAGMOM")) {cerr << strline << endl;}        //corey
+	  //if(aurostd::substring2bool(strline,"MAGMOM")) {cerr << strline << endl;}        //corey
 	  if(aurostd::substring2bool(strline,"MAGMOM") && !aurostd::substring2bool(strline,"#MAGMOM")) {MAGMOM_ALREADY_SPECIFIED=TRUE;}       //corey
 	}
       }
@@ -4142,6 +4164,28 @@ namespace KBIN {
       DONE=TRUE;
     }
 
+    // ME191028
+    // ICHARG ICHARG ICHARG ICHARG ICHARG ICHARG
+    if (command == "ICHARG") {
+      const string& chgcar = vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.content_string;
+      for (int i = 1; i <= imax; i++) {
+        strline = aurostd::GetLineString(FileContent, i);
+        if (aurostd::substring2bool(strline, "ICHARG", TRUE) || aurostd::substring2bool(strline, "#ICHARG", TRUE)) {
+          if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_PREPARE_GENERIC)" << std::endl;
+        } else {
+          if (!vflags.KBIN_VASP_INCAR_VERBOSE && !strline.empty()) xvasp.INCAR << strline << std::endl;
+          if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << std::endl;
+        }
+      }
+      // Use negative values to just remove ICHARG
+      if (ivalue >= 0) {
+        if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] begin" << std::endl;
+        xvasp.INCAR << "ICHARG=" << ivalue << std::endl;
+        if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] end" << std::endl;
+      }
+      DONE = true;
+    }
+
     // ***************************************************************************
     // GENERIC GENERIC GENERIC GENERIC GENERIC GENERIC
     if(command=="GENERIC") {
@@ -4179,6 +4223,55 @@ namespace KBIN {
 } 
 
 // ***************************************************************************
+// KBIN::XVASP_INCAR_ADJUST_ICHARG
+namespace KBIN {
+  // ME191028
+  // When a CHGCAR file is specified in the aflow.in file, it is really only
+  // useful in the first relxation calculations. For all other calculations,
+  // it should not read from that CHGCAR file, so set ICHARG = 2 (default, but do not write) and comment
+  // out the original CHGCAR file. Exception: if a CHGCAR file is output
+  // after the relaxation, assume that the user wants to reuse it.
+  void XVASP_INCAR_ADJUST_ICHARG(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, int step, ofstream& FileMESSAGE) {
+    if ((step == 1) && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
+      // Do not set ICHARG when a CHGCAR file is output
+      if (!vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
+        ostringstream aus;
+        aus << "00000  MESSAGE ICHARG: Removing ICHARG - " << Message(aflags, "user,host,time") << std::endl;
+        aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", -1, 0.0, false); //remove any ICHARG from INCAR, leaving default ==2
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
+      }
+      if (xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
+        xvasp.INCAR_orig.str(std::string());
+        xvasp.INCAR_orig << xvasp.INCAR.str();
+        if (step < xvasp.NRELAX) {  // Do not write when at the last step or there will be an extra INCAR
+          aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+        }
+      }
+
+      // Comment out CHGCAR file in aflow.in
+      if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
+        stringstream aflowin_fixed;
+        string filename = aurostd::CleanFileName(xvasp.Directory + "/" + _AFLOWIN_);
+        string filecontent = aurostd::file2string(aurostd::CleanFileName(filename));
+        int nlines = aurostd::GetNLinesString(filecontent);
+        string line = "";
+        for (int l = 1; l <= nlines; l++) {
+          line = aurostd::GetLineString(filecontent, l);
+          if (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line)) {
+            string line_fixed = aurostd::RemoveWhiteSpacesFromTheFront(line);
+            if (line_fixed[0] != '#') line = "#" + line_fixed;
+          }
+          aflowin_fixed << line << std::endl;
+        }
+        aurostd::stringstream2file(aflowin_fixed, filename);
+      }
+    }
+  }
+}  // namespace KBIN
+
+// ***************************************************************************
 // KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX
 namespace KBIN {
   void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
@@ -4202,7 +4295,9 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
       xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-      aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+        aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      }
       // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
     }
     if(fix_aflowlin) {
@@ -4240,7 +4335,9 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_generated",TRUE);
       xvasp.KPOINTS_orig.str(std::string()); xvasp.KPOINTS_orig << xvasp.KPOINTS.str();
-      aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+        aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      }
       // xvasp.KPOINTS << aurostd::file2string(xvasp.Directory+"/KPOINTS"); // DID REREAD
     }
   }

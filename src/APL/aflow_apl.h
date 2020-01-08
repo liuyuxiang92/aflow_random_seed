@@ -44,15 +44,15 @@ extern bool _WITHIN_DUKE_;  //will define it immediately in kphonons
 #include <stdexcept>
 namespace apl {
 //
-class APLRuntimeError : public std::runtime_error {
- public:
-  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
-};
-//
-class APLLogicError : public std::logic_error {
- public:
-  APLLogicError(const std::string& s) : std::logic_error(s) {}
-};
+// OBSOLETE ME191031 - use xerror
+//class APLRuntimeError : public std::runtime_error {
+// public:
+//  APLRuntimeError(const std::string& s) : std::runtime_error(s) {}
+//};
+//class APLLogicError : public std::logic_error {
+// public:
+//  APLLogicError(const std::string& s) : std::logic_error(s) {}
+//};
 //
 class APLStageBreak : public std::exception {
  public:
@@ -164,7 +164,9 @@ template <typename T>
 inline std::string stringify(const T& x) {
   std::ostringstream o;
   if (!(o << x)) {
-    throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
+    // ME191031 - use xerror
+    //throw APLRuntimeError(std::string("stringify(") + typeid(x).name() + ")");
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::stringify()", std::string("stringify(") + typeid(x).name() + ")");
   }
   return o.str();
 }
@@ -227,17 +229,21 @@ class Supercell;  // Forward declaration
 class ClusterSet {
 // See aflow_aapl_cluster.cpp for detailed descriptions of the functions
  public:
-    ClusterSet(const Supercell&, const int&, double&, Logger&);  // Constructor
-    ClusterSet(const string&, const Supercell&, const int&, double&, int, Logger&);  // From file
+    ClusterSet();
+    ClusterSet(const Supercell&, const int&, double&, Logger&, _aflags&);  // Constructor
+    ClusterSet(const string&, const Supercell&, const int&, double&, int, Logger&, _aflags&);  // From file
     ClusterSet(const ClusterSet&);  // Constructor from another ClusterSet instance
-    ClusterSet(Logger&);  // Does nothing - used as a placeholder for non-AAPL calculations
+    ClusterSet(Logger&, _aflags&);  // Does nothing - used as a placeholder for non-AAPL calculations
     ~ClusterSet();  // Destructor
     const ClusterSet& operator=(const ClusterSet&);  // Copy constructor
+    void clear(Logger&, _aflags&);
 
+    vector<_cluster> clusters;
     vector<vector<int> > coordination_shells;  // Contains all coordinate shells. Central atoms is index 0.
     double cutoff;  // Cutoff radius in Angstroms
     vector<xvector<double> > distortion_vectors;  // List of distortion vectors
-    vector<vector<_cluster> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.
+    vector<_ineq_distortions> higher_order_ineq_distortions;  // ME190531 - for 3rd derivatives of higher order processes
+    vector<vector<int> > ineq_clusters;  // Clusters rearranged into sets of equivalent clusters.  // ME190520
     vector<_ineq_distortions> ineq_distortions; // List of inequivalent distortions
     vector<_linearCombinations> linear_combinations;  // List of linear combinations of the IFCs
     int nifcs;  // Number of force constants for each set of atoms.
@@ -250,13 +256,18 @@ class ClusterSet {
     xvector<int> sc_dim;  // Dimensions of the supercell.
     vector<vector<int> > symmetry_map;  // Symmetry atom map for the atoms in the clusters
 
+    const _cluster& getCluster(const int& i) const;  // ME190520
     void build(int);
     void buildDistortions();
     void writeClusterSetToFile(const string&);
 
  private:
     Logger& _logger;  // The AFLOW logger
+    _aflags& aflags;
+
     void free();
+    void copy(const ClusterSet&);
+
     double getMaxRad(const xstructure&, const int&);
     void buildShells();
     vector<_cluster> buildClusters();
@@ -264,12 +275,12 @@ class ClusterSet {
     vector<vector<int> > getPermutations(const int&);
 
     // Clusters
-    void getInequivalentClusters(vector<_cluster>&, vector<vector<_cluster> >&);
+    void getInequivalentClusters(vector<_cluster>&, vector<vector<int> >&);
     int getNumUniqueAtoms(const vector<int>&);
     vector<int> getComposition(const vector<int>&);
     bool sameComposition(const vector<int>&, const vector<int>&);
     int equivalenceCluster(const vector<int>&, const vector<int>&,
-                           const vector<vector<int> >&, const vector<vector<_cluster> >&);
+                           const vector<vector<int> >&, const vector<vector<int> >&);
     vector<int> translateToPcell(const vector<int>&, int);
     int comparePermutations(const vector<int>&, const vector<int>&);
     bool atomsMatch(const vector<int>&, const vector<int>&, const vector<int>&, const int&);
@@ -288,6 +299,7 @@ class ClusterSet {
     int equivalenceDistortions(const xmatrix<double>&, const vector<int>&,
                                const vector<vector<vector<int> > >&, const vector<int>&);
     vector<int> getTransformationMap(const int&, const int&);
+    vector<_ineq_distortions> getHigherOrderDistortions();
 
     // Linear Combinations
     vector<_linearCombinations> getLinearCombinations();
@@ -302,6 +314,7 @@ class ClusterSet {
     string writeLinearCombinations(const _linearCombinations&);
     string writeInequivalentDistortions();
     string writeIneqDist(const _ineq_distortions&);
+    string writeHigherOrderDistortions();
 
     void readClusterSetFromFile(const string&);
     bool checkCompatibility(uint&, const vector<string>&);
@@ -309,22 +322,27 @@ class ClusterSet {
     vector<_cluster> readClusters(uint&, const vector<string>&);
     _linearCombinations readLinearCombinations(uint&, const vector<string>&);
     void readInequivalentDistortions(uint&, const vector<string>&);
+    _ineq_distortions readIneqDist(uint&, const vector<string>&);
+    void readHigherOrderDistortions(uint&, const vector<string>&);
 };
 
 class AnharmonicIFCs {
 // See aflow_aapl_ifcs.cpp for detailed descriptions of the functions
  public:
-    AnharmonicIFCs(const vector<_xinput>&, ClusterSet&, const double&,
-                   const aurostd::xoption&, Logger&);  // ME190501
+    AnharmonicIFCs(ClusterSet&, Logger&, _aflags&);
+    AnharmonicIFCs(vector<_xinput>&, ClusterSet&, const double&,  // ME190529
+                   const aurostd::xoption&, Logger&, _aflags&);  // ME190501
     AnharmonicIFCs(const string&, ClusterSet&, const double&,
-                   const aurostd::xoption&, Logger&);  // ME190501
+                   const aurostd::xoption&, Logger&, _aflags&);  // ME190501
+    AnharmonicIFCs(const AnharmonicIFCs&);
     const AnharmonicIFCs& operator=(const AnharmonicIFCs&);
     ~AnharmonicIFCs();
+    void clear(ClusterSet&, Logger&, _aflags&);
 
     ClusterSet& clst;  // Reference to the corresponding ClusterSet
     vector<vector<int> > cart_indices;  // A list of all Cartesian indices
     double distortion_magnitude;  // The magnitude of the distortions in Angstroms
-    aurostd::xtensor<double> force_constants;  // Symmetrized IFCs
+    vector<vector<double> > force_constants;  // Symmetrized IFCs - ME190520
     int max_iter;  // Number of iterations for the sum rules
     double mixing_coefficient;  // The mixing coefficient for the SCF procedure
     int order;  // The order of the IFCs
@@ -335,44 +353,48 @@ class AnharmonicIFCs {
 
  private:
     Logger& _logger;  // The AFLOW logger
+    _aflags& aflags;
+
     void free();
+    void copy(const AnharmonicIFCs&);
+
     vector<vector<int> > getCartesianIndices();
 
-    vector<aurostd::xtensor<double> > storeForces(const vector<_xinput>&);
-    aurostd::xtensor<double> getForces(int, int&, vector<_xinput>);
+    vector<vector<vector<xvector<double> > > > storeForces(vector<_xinput>&);
+    vector<vector<xvector<double> > > getForces(int, int&, vector<_xinput>&);
     int getTransformedAtom(const vector<int>&, const int&);
-    aurostd::xtensor<double> calculateUnsymmetrizedIFCs(const _ineq_distortions&, 
-                                                        const aurostd::xtensor<double>&);
-    double calculateIFC(const aurostd::xtensor<double>&, int,
-                        const vector<int>&, const vector<int>&);
+    void addHigherOrderForces(vector<vector<vector<xvector<double> > > >&, int&, vector<_xinput>&);
+    vector<vector<double> > calculateUnsymmetrizedIFCs(const vector<_ineq_distortions>&,
+                                                       const vector<vector<vector<xvector<double> > > >&);
+    double finiteDifference(const vector<vector<xvector<double> > >&, int,
+                            const vector<int>&, const vector<int>&);
 
     // Symmetrization Functions
-    aurostd::xtensor<double> symmetrizeIFCs(const vector<aurostd::xtensor<double> >&);
-    typedef vector<std::pair<vector<vector<int> >, vector<double> > > tform;
-    typedef vector<vector<vector<vector<vector<int> > > > > v5int;
-    void getTensorTransformations(v5int&, vector<vector<tform> >&);
-    aurostd::xtensor<double> initializeIFCTensor(const vector<aurostd::xtensor<double> >&);
-    aurostd::xtensor<double> initializeDeviationsFromZero();
+    vector<vector<double> > symmetrizeIFCs(vector<vector<double> >);
+    typedef vector<std::pair<vector<int>, vector<double> > > tform;
+    typedef vector<vector<vector<vector<int> > > > v4int;
+    void getTensorTransformations(v4int&, vector<vector<tform> >&);
     vector<vector<int> > getReducedClusters();
-    vector<vector<vector<int> > > getAllClusters(v5int&);
-    void applyLinCombs(aurostd::xtensor<double>&);
-    void transformIFCs(const vector<vector<tform> >&, aurostd::xtensor<double>&);
-    void applyPermutations(vector<int>, aurostd::xtensor<double>&);
-    void calcSums(const vector<vector<int> >&, const aurostd::xtensor<double>&,
-                  aurostd::xtensor<double>&, aurostd::xtensor<double>&);
-    void correctIFCs(aurostd::xtensor<double>&, const aurostd::xtensor<double>&,
-                     const aurostd::xtensor<double>&,
-                     const vector<vector<vector<int> > >, const v5int&);
-    aurostd::xtensor<double> getCorrectionTerms(vector<int>,
-                                                const aurostd::xtensor<double>&,
-                                                const aurostd::xtensor<double>&,
-                                                const aurostd::xtensor<double>&);
+    void applyLinCombs(vector<vector<double> >&);
+    void transformIFCs(const vector<vector<tform> >&, vector<vector<double> >&);
+    void applyPermutations(vector<int>, vector<vector<double> >&);
+    void calcSums(const vector<vector<int> >&, const vector<vector<double> >&,
+                  vector<vector<double> >&, vector<vector<double> >&);
+    void correctIFCs(vector<vector<double> >&, const vector<vector<double> >&,
+                     const vector<vector<double> >&,
+                     const vector<vector<int> >&, const v4int&);
+    vector<double> getCorrectionTerms(const int&,
+                                      const vector<vector<int> >&,
+                                      const vector<vector<double> >&,
+                                      const vector<vector<double> >&,
+                                      const vector<vector<double> >&);
+    uint findReducedCluster(const vector<vector<int> >&, const vector<int>&);
 
     // File I/O
     string writeParameters();
     string writeIFCs();
     bool checkCompatibility(uint&, const vector<string>&);
-    aurostd::xtensor<double> readIFCs(uint&, const vector<string>&);
+    vector<vector<double> > readIFCs(uint&, const vector<string>&);
 };
 
 }  //namespace apl
@@ -586,18 +608,20 @@ class Supercell {
                      bool = true);
   int buildSuitableForShell(int, bool, bool VERBOSE);
   void setupShellRestrictions(int);
-  bool isShellRestricted();
-  int getMaxShellID();
-  int getNumberOfAtoms();
-  int getNumberOfUniqueAtoms();
-  int getNumberOfEquivalentAtomsOfType(int); //CO190218
-  int getUniqueAtomID(int);
-  int getUniqueAtomID(int, int);
-  const _atom& getUniqueAtom(int);
-  string getUniqueAtomSymbol(int);
-  double getUniqueAtomMass(int);
-  double getAtomMass(int);
-  int getAtomNumber(int);
+  // ME190715 BEGIN - added const to getter functions so they can be used with const Supercell &
+  bool isShellRestricted() const;
+  int getMaxShellID() const;
+  int getNumberOfAtoms() const;
+  int getNumberOfUniqueAtoms() const;
+  int getNumberOfEquivalentAtomsOfType(int) const; //CO190218
+  int getUniqueAtomID(int) const;
+  int getUniqueAtomID(int, int) const;
+  const _atom& getUniqueAtom(int) const;
+  string getUniqueAtomSymbol(int) const;
+  double getUniqueAtomMass(int) const;
+  double getAtomMass(int) const;
+  int getAtomNumber(int) const;
+  // ME190715 END
   const xstructure& getSupercellStructure() const;
   const xstructure& getSupercellStructureLight() const;
   const xstructure& getPrimitiveStructure() const;
@@ -616,17 +640,18 @@ class Supercell {
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
                             int&, xvector<xcomplex<double> >&, bool);  // ME 180828
-  int pc2scMap(int);
-  int sc2pcMap(int);
+  int pc2scMap(int) const;
+  int sc2pcMap(int) const;
   void center(int);
   //CO - START
   void center_original(void);
   //corey
-  const vector<vector<_sym_op> >& getAGROUP(void);
-  const vector<_sym_op>& getFGROUP(void);
-  const vector<_sym_op>& getAGROUP(int);
-  bool isDerivativeStructure();
-  double getEPS(void);
+  const vector<vector<_sym_op> >& getAGROUP(void) const;
+  const vector<_sym_op>& getFGROUP(void) const;
+  const vector<_sym_op>& getAGROUP(int) const;
+  bool isDerivativeStructure() const;
+  double getEPS(void) const;
+  // ME190715 - END
   // CO - END
   // **** BEGIN JJPR *****
   xvector<int> scell;
@@ -750,7 +775,8 @@ class PhononCalculator : virtual public IPhononCalculator {
   vector<xmatrix<xcomplex<double> > > _gammaEwaldCorr;
 
  private:
-  virtual void calculateForceFields(bool) {}  // ME190412
+  void copy(const PhononCalculator&);  // ME191228
+  virtual void calculateForceFields() {}  // ME190412  // ME191029
   void completeForceFields();
   void projectToCartesianDirections();
   void buildForceConstantMatrices();
@@ -775,9 +801,10 @@ class PhononCalculator : virtual public IPhononCalculator {
 
  public:
   PhononCalculator(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
+  PhononCalculator& operator=(const PhononCalculator&);
   virtual ~PhononCalculator();
   void clear();
-  void run(bool);
+  void run();  // ME191029
   xvector<double> getEigenvalues(const xvector<double>&);
   xvector<double> getEigenvalues(const xvector<double>&, xmatrix<xcomplex<double> >&,
                                  vector<xmatrix<xcomplex<double> > >&, bool=true);  // ME 180827
@@ -795,15 +822,16 @@ class PhononCalculator : virtual public IPhononCalculator {
   vector<ClusterSet>& _clusters;
   vector<AnharmonicIFCs> _anharmonicIFCs;
   void setAnharmonicOptions(int, double, double);
-  bool buildVaspAAPL(const ClusterSet&);
+  bool buildVaspAAPL(const ClusterSet&, bool);
   string buildRunNameAAPL(const vector<int>&, const vector<int>&,
                              const int&, const int&, const int&);// ME190108
   void applyDistortionsAAPL(_xinput&, const vector<aurostd::xvector<double> >&,
-                            const vector<int>&, const vector<int>&);
+                            const vector<int>&, const vector<int>&, double scale=1.0);
   void calculateAnharmonicIFCs(ClusterSet&);
   void readAnharmonicIFCs(const string&, ClusterSet&);
   void subtractZeroStateForcesAAPL(vector<_xinput>&, _xinput&);  // ME190114
   //******* END ME ************
+  bool _stagebreak;  // ME191029
   // Interface
   xvector<double> getFrequency(const xvector<double>&, const IPCFreqFlags&);  // ME180827
   xvector<double> getFrequency(const xvector<double>&, IPCFreqFlags, xmatrix<xcomplex<double> >&);  // ME190624
@@ -822,6 +850,7 @@ class PhononCalculator : virtual public IPhononCalculator {
   /* friend void readDielectricTensorFromOUTCAR(apl::PhononCalculator *pcalculator); */
   void runVASPCalculationsBE(_xinput&, uint=0); // ME190113
   void runVASPCalculationsLRBE(_xinput&, bool, uint=0);  // ME181024 // ME190113
+  void calculateDielectricTensor(const _xinput&);  // ME191029
   void readBornEffectiveChargesFromAIMSOUT(void);
   void readBornEffectiveChargesFromOUTCAR(const _xinput&);  // ME190113
   void symmetrizeBornEffectiveChargeTensors(void);
@@ -835,10 +864,12 @@ class PhononCalculator : virtual public IPhononCalculator {
   bool createAflowInPhonons(_xinput&); // ME190108
   void createAflowInPhonons(_xinput&, const string&);
   bool outfileFoundAnywherePhonons(vector<_xinput>&);
-  void outfileFoundEverywherePhonons(vector<_xinput>&);
+  void outfileFoundEverywherePhonons(vector<_xinput>&, bool=false);  // ME191029
   void subtractZeroStateForces(vector<_xinput>&);
   // END ME 180518
   vector<xvector<double> > readForcesFromQmvasp(const string&); // ME190607
+  virtual void runVASPCalculations(bool) {}  // ME191029
+  string zerostate_dir;  // ME191030
 };
 }  // namespace apl
 
@@ -874,7 +905,7 @@ class DirectMethodPC : public PhononCalculator {
   DirectMethodPC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
   ~DirectMethodPC();
   void clear();
-  void calculateForceFields(bool);  // ME190412
+  void calculateForceFields();  // ME190412  // ME191029
   // Easy access to global parameters
   //void setGeneratePlusMinus(bool b) { GENERATE_PLUS_MINUS = b; } //JAHNATEK ORIGINAL
   void setGeneratePlusMinus(bool _auto_, bool _user_) {
@@ -883,6 +914,9 @@ class DirectMethodPC : public PhononCalculator {
   }  //CO
   void setGenerateOnlyXYZ(bool b) { GENERATE_ONLY_XYZ = b; }
   void setDistortionSYMMETRIZE(bool b) { DISTORTION_SYMMETRIZE = b; } //CO190108
+
+  private:
+    vector<vector<bool> > vvgenerate_plus_minus;  // ME191029
 };
 }  // namespace apl
 
@@ -1020,7 +1054,8 @@ class LinearResponsePC : public PhononCalculator {
   LinearResponsePC(Supercell&, vector<ClusterSet>&, _xinput&, _aflags&, _kflags&, _xflags&, string&, Logger&);
   ~LinearResponsePC();
   void clear();
-  void calculateForceFields(bool);  // ME190412
+  void runVASPCalculations(bool);  // ME191029
+  void calculateForceFields();  // ME190412  // ME191029
 };
 }  // namespace apl
 
@@ -1133,13 +1168,13 @@ class PhononDispersionCalculator {
   void initPathLattice(const string&, int);
   void setPath(const string&);
   void calc(const IPCFreqFlags);
-  void writePDIS();
+  void writePDIS(const string&);
   bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
   std::vector<xvector<double> > get_qpoints() { return _qpoints; }  //[PINKU]
   // ME190614 - START
   xEIGENVAL createEIGENVAL();
-  void writePHEIGENVAL();
-  void writePHKPOINTS();
+  void writePHEIGENVAL(const string&);
+  void writePHKPOINTS(const string&);
   string _system;
   // ME19614 - STOP
   //[OBSOLETE PN180705]std::vector<double> get_path() { return path; }                   //[PINKU]
@@ -1163,7 +1198,7 @@ namespace apl { //PN180705
     PhononHSQpoints(Logger&);
     ~PhononHSQpoints();
     void clear();
-    void read_qpointfile();
+    void read_qpointfile(const string&);
     //interface functions
     vector<xvector<double> > get_qpoints();
     vector<xvector<double> > get_hs_kpoints();
@@ -1230,7 +1265,6 @@ struct _qpoint {
   xvector<double> fpos;  // Fractional coordinates of the q-point
   int irredQpt;  // The irreducible q-point this q-point belongs to
   int ibzqpt;  // The index of the irreducible q-point in the _ibzqpt vector
-  xvector<int> indices;
   int symop;  // Symmetry operation to transform the irreducible q-point into this q-point
 };
 
@@ -1317,6 +1351,7 @@ class LTMethod {
     LTMethod(const LTMethod&);
     LTMethod& operator=(const LTMethod&);
     ~LTMethod();
+    void clear(QMesh&, Logger&);
 
     void makeIrreducible();  // ME190625
 
@@ -1336,6 +1371,7 @@ class LTMethod {
     bool isReduced() const;
   private:
     void free();
+    void copy(const LTMethod&);
 
     QMesh& _qm;
     Logger& _logger;  // The APL logger
@@ -1424,10 +1460,10 @@ class DOSCalculator {  // ME190424
   void calc(int);
   void calc(int, double);
   void clear();
-  void writePDOS();
+  void writePDOS(const string&);
   void writePDOS(string, string);  //[PINKU]
   xDOSCAR createDOSCAR();  // ME190614
-  void writePHDOSCAR();  // ME190614
+  void writePHDOSCAR(const string&);  // ME190614
   // Interface IDOSCalculator
   std::vector<double> getBins();
   std::vector<double> getDOS();
@@ -1499,7 +1535,7 @@ class ThermalPropertiesCalculator {
   ThermalPropertiesCalculator(DOSCalculator&, Logger&);  // ME190423
   ~ThermalPropertiesCalculator();
   void clear();
-  void writeTHERMO(double, double, double);
+  void writeTHERMO(double, double, double, const string&);
   double getZeroPointVibrationEnergy(ThermalPropertiesUnits);
   double getInternalEnergy(double, ThermalPropertiesUnits);
   double getVibrationalFreeEnergy(double, ThermalPropertiesUnits);
@@ -1514,18 +1550,6 @@ class ThermalPropertiesCalculator {
 // ***************************************************************************
 
 namespace apl {
-
-struct _TCONDOptions {
-  bool rta_only;  // Use RTA only
-  bool calc_isotopes;  // Use isotope correction
-  bool calc_cumulative;  // Calculate cumulative thermal conductivity
-  bool calc_boundary;  // Use grain boundary correction
-  bool fourth_order;  // Include fourth order corrections
-  double grain_size;  // Grain size in the boundary correction
-  double temp_start;  // Starting temperature
-  double temp_end;  // Final temperature
-  double temp_step;  // Temperature step size
-};
 
 //[ME190520 - MOVED UP]struct _qpoint {
 //[ME190520 - MOVED UP]  xvector<double> cpos;  // Cartesian position of the q-point
@@ -1544,89 +1568,78 @@ struct _TCONDOptions {
 class TCONDCalculator {
 // See aflow_aapl_tcond.cpp for detailed descriptions of the functions
  public:
-    TCONDCalculator(PhononCalculator&, Supercell&, Logger&);
-    ~TCONDCalculator();
-    void clear();
+    TCONDCalculator(PhononCalculator&, QMesh&, Logger&, _aflags&);
+    TCONDCalculator(const TCONDCalculator&);
 
-    _TCONDOptions calc_options;  // Options for the the thermal conductivity calculation
+    ~TCONDCalculator();
+    void clear(PhononCalculator&, QMesh&, Logger&, _aflags&);
+
+    aurostd::xoption calc_options; // Options for the the thermal conductivity calculation
     vector<xmatrix<xcomplex<double> > > eigenvectors;  // The eigenvectors at each q-point
     vector<vector<double> > freq;  // The frequencies at each q-point
     vector<vector<xvector<double> > > gvel;  // The group velocities
-    vector<vector<int> > irred_qpoints;  // Irreducible q-points with their equivalent points
-    vector<vector<int> > irred_qpts_symops;  // List of invariant operations for the irreducible q-points
-    _kcell kcell;  // The reciprocal cell
     int nBranches;  // The number of branches in the phonon spectrum
     int nIQPs;  // The total number of irreducible q-points in the grid
     int nQPs;  // The total number of q-points in the grid
-    xstructure pcell;  // The real space primitive cell
-    vector<vector<vector<int> > > processes;  // The q-point and branch indices of the scattering processes
+    vector<vector<vector<int> > > processes;  // The sign, q-point and branch indices of the scattering processes
     vector<vector<double> > intr_trans_probs;  // The intrinsic transition probabilities
-    vector<_qpoint> qpoints;  // The q-points
-    xvector<int> qptgrid;  // The number of q-points in each dimension
-    vector<vector<vector<int> > > qptmap;  // Map assigning grid points to a q-point
-    vector<double> temperatures;  // The temperatures for the thermal conductivity calculations
+    vector<vector<vector<int> > > processes_iso;  // The q-point and branch indices of the isotope scattering processes
+    vector<vector<double> > intr_trans_probs_iso;  // The intrinsic transition probabilities for isotope processes
+    vector<vector<double> > rates_boundary;
+    vector<vector<double> > rates_isotope;
+    vector<double> temperatures;  // The mperatures for the thermal conductivity calculations
     vector<xmatrix<double> > thermal_conductivity;  // The thermal conductivity values
 
-    void setCalculationOptions(string, bool, bool, bool, bool,
-                               double, double, double, double);
-    void buildQpoints(const xvector<int>&);
-    void calculateFrequenciesGroupVelocities();
-    void calculateTransitionProbabilities(int);
     void calculateThermalConductivity();
 
   private:
     PhononCalculator& _pc;  // Reference to the phonon calculator
-    Supercell& _sc;  // Reference to the supercell
-    Logger& _logger;  // The AFLOW logger
+    QMesh& _qm;  // Reference to the q-point mesh
+    Logger& _logger;  // The APL logger
+    _aflags& aflags;
 
     void free();
+    void copy(const TCONDCalculator&);
 
-    _kcell setupReciprocalCell();
-    vector<_qpoint> getQpointsFromGrid();
-    void getIrreducibleQpoints(int, int, vector<vector<int> >&);
-    vector<vector<int> > meldIrredQpoints(const vector<vector<vector<int> > >&);
+    vector<vector<double> > calculateModeGrueneisen(const vector<vector<vector<xcomplex<double> > > >& phases);
+    double calculateAverageGrueneisen(double T, const vector<vector<double> >&);
 
+    vector<vector<int> > calculateSmallGroups();
+    void calculateFrequenciesGroupVelocities();
     void calculateFreqGvel(int, int);
-    void calculateScattering(int, int, int, vector<vector<vector<double> > >&,
-                             vector<vector<vector<vector<int> > > >&);
-    double getSigma(const vector<int>&, int);
-    void getPhaseVectors(vector<xvector<int> >&, int, vector<vector<xvector<double> > >&);
-    void calculateScatteringMatrix(int, int, int,
-                                   vector<xcomplex<double> >&,
-                                   const vector<xvector<int> >&,
-                                   const vector<vector<xvector<double> > >&);
-    void calculateIntrTransProbs(int, int, int, const vector<double>&,
-                                 const vector<xcomplex<double> >&);
-    double getProbabilityPrefactor(int);
-    double gaussian(int, double, const vector<int>&);
-
-    vector<vector<double> > getIsotopeRates(vector<vector<int> >&, vector<double>&);
-//ME190107    vector<vector<double> > getIsotopeRates(vector<vector<int> >&, const vector<vector<double> >&, vector<double>&);
-    vector<vector<double> > getSigmaIsotope();
-    vector<vector<double> > getBoundaryRates();
-    vector<vector<double> > getAnharmonicRates(int, const vector<vector<double> >&);
+    void getWeightsLT(const LTMethod&, double, const vector<double>&, vector<double>&);
+    void calculateTransitionProbabilities();
+    vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
+    void calculateTransitionProbabilitiesPhonon(int, int, const LTMethod&,
+                                                vector<vector<vector<vector<double> > > >&,
+                                                const vector<vector<vector<xcomplex<double> > > >&);
+    void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
+    vector<vector<double> > calculateTransitionProbabilitiesBoundary();
+    void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
+    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&,
+                                                       vector<vector<vector<double> > >&,
+                                                       vector<vector<vector<double> > >&);
     vector<vector<double> > getOccupationNumbers(double);
-    double getOccupationTerm(int, const vector<int>&, const vector<vector<double> >&);
+    vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
+    vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<vector<double> > >&);
+    double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
+    void calcAnharmRates(int, int, const vector<vector<double> >&, vector<vector<double> >&);
     vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
-    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<double> >&,
-                             const vector<vector<int> >&, const vector<double>&,
-                             vector<vector<xvector<double> > >&);
-    xvector<double> getMFDCorrection(int, const vector<int>&,
-                                     const vector<vector<xvector<double> > >&,
-                                     const vector<vector<double> >&);
     xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
                               const vector<vector<xvector<double> > >&);
-    void iterateMeanFreePath(vector<vector<xvector<double> > >&);
-
-    void writeQpoints();
-    void writeIrredQpoints();
-    void writeFrequencies();
-    void writeGroupVelocities();
-    void writeTempIndepRatesFile(string, string, const vector<vector<double> >&);
-    string tempDepRatesString(string, double, const vector<vector<double> >&);
-    void writeTempDepRatesFile(string, const string&);
-    void writeThermalConductivity();
-    // void writeThermalConductivityPlot(); OBSOLETE ME190614
+    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<int> >&,
+                             const vector<vector<double> >&, vector<vector<xvector<double> > >&);
+    void calculateDelta(int, int, const vector<vector<int> >&, const vector<vector<double> >&,
+                        const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+    void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+    
+    void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);
+    void writeTempDepOutput(const string&, string, const string&, const vector<double>&, const vector<vector<vector<double> > >&);
+    void writeDataBlock(stringstream&, const vector<vector<double> >&);
+    void writeGroupVelocities(const string&);
+    void writePhaseSpace(const string&, const vector<vector<vector<vector<double> > > >&);
+    void writeGrueneisen(const string&, const vector<double>&, const vector<vector<double> >&);
+    void writeThermalConductivity(const string&);
 };
 
 }  // namespace apl
@@ -2674,16 +2687,14 @@ xvector<utype> getVectorConvolution(const xvector<utype>& a, const xvector<utype
 }
 
 
-/*
-OBSOLETE - ME180828
+//OBSOLETE - ME190815 - moved to aurostd::xmatrix
 namespace apl {
-void tred2(xmatrix<xcomplex<double> >&);
+//void tred2(xmatrix<xcomplex<double> >&);
 void zheevByJacobiRotation(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
 #ifdef USE_MKL
 void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<double> >&);
 #endif
 }
-*/
 
 // ***************************************************************************
 // cursor.h
@@ -2720,133 +2731,134 @@ void zheevMKL(xmatrix<xcomplex<double> >&, xvector<double>&, xmatrix<xcomplex<do
 #define cursor_attr_blink() printf("\033[5m")     /*Supposed to make text blink, usually bolds it instead*/
 #define cursor_attr_reverse() printf("\033[7m")   /*Swap background and foreground colors*/
 
+// OBSOLETE ME191031 - not used
 // ***************************************************************************
 // xtensor.hpp
-
-namespace apl {
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-class xtensor {
-  T* _data;
-  int _lindex;
-  int _hindex;
-  unsigned int _indexSize;
-  unsigned long long _arraySize;
-  std::vector<unsigned long long> _precomputedOffsets;
-
- private:
-  unsigned long long getOffset(const std::vector<unsigned int>&);
-
- public:
-  xtensor(int, int);
-  ~xtensor();
-  void zero();
-  void fill(const T&);
-  T& operator()(int, ...);
-};
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-xtensor<T, TENSOR_ORDER>::xtensor(int index1, int index2) {
-  _hindex = index1 > index2 ? index1 : index2;
-  _lindex = index1 < index2 ? index1 : index2;
-
-  _indexSize = _hindex - _lindex + 1;
-
-  // Allocate data
-  unsigned long long arraySizeBefore;
-  _arraySize = 1ULL;
-  _precomputedOffsets.push_back(_arraySize);
-  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER; i++) {
-    arraySizeBefore = _arraySize;
-    _arraySize *= _indexSize;
-    // Detect overflow
-    if (arraySizeBefore > _arraySize)
-      throw APLRuntimeError("apl::xtensor<T>::xtensor(); The setting is producing an array which can not by handled by this implementation.");
-    _precomputedOffsets.push_back(_arraySize);
-  }
-
-  try {
-    // FIX: Problem; new(std::size_t), where size_t is hardware/platform specific,
-    // for 32 bit systems it is uint = 2^32, if our array is bigger than this,
-    // there is a overflow -> use more pages of the same block _data[PAGE][2^32]???,
-    // or go to the 64 bits systems -> 2^64 (unsigned long long)
-    if (_arraySize > (1ULL << (8 * sizeof(std::size_t) - 1)))  // dont go overboard  STEFANO (-1)
-      throw APLRuntimeError("apl::xtensor<T>::xtensor(); Problem to allocate a required array. Hardware specific problem.");
-    _data = new T[(std::size_t)_arraySize];
-  } catch (std::bad_alloc& e) {
-    throw APLRuntimeError("apl::xtensor<T>::xtensor(); Bad allocation.");
-  }
-
-  // Reverse precomputed for better manipulation and shift by 1
-  std::vector<unsigned long long> temp(_precomputedOffsets.rbegin() + 1, _precomputedOffsets.rend());
-  _precomputedOffsets = temp;
-  temp.clear();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-xtensor<T, TENSOR_ORDER>::~xtensor() {
-  _precomputedOffsets.clear();
-  delete[] _data;
-  _data = NULL;
-  _arraySize = 0ULL;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-void xtensor<T, TENSOR_ORDER>::zero() {
-  // Take care! The last argument is of std::size_t, hence platform specific
-  memset(_data, 0, _arraySize * sizeof(T));
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-void xtensor<T, TENSOR_ORDER>::fill(const T& val) {
-  for (unsigned long long i = 0ULL; i < _arraySize; i++)
-    _data[i] = val;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-unsigned long long xtensor<T, TENSOR_ORDER>::getOffset(const std::vector<unsigned int>& idxs) {
-  unsigned long long offset = idxs.back();
-  for (_AFLOW_APL_REGISTER_ int i = idxs.size() - 2; i >= 0; i--)
-    offset += (unsigned long long)(idxs[i] * _precomputedOffsets[i]);
-  return offset;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-template <typename T, unsigned int TENSOR_ORDER>
-T& xtensor<T, TENSOR_ORDER>::operator()(int idx1, ...) {
-  // Get indices and transform to form 0...max
-  va_list arguments;
-  std::vector<unsigned int> idxs;
-
-  // The 1st index
-  idxs.push_back((unsigned int)(idx1 - _lindex));
-  //    if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-  if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-
-  // The rest of indices
-  va_start(arguments, idx1);
-  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER - 1; i++) {
-    idxs.push_back((unsigned int)(va_arg(arguments, int) - _lindex));
-    //   if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
-    if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
-  }
-  va_end(arguments);
-
-  // Calculate offset
-  unsigned long long offset = getOffset(idxs);
-  idxs.clear();
-
-  // Return value
-  return _data[offset];
-}
-//////////////////////////////////////////////////////////////////////////////
-}
+//
+//namespace apl {
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//class xtensor {
+//  T* _data;
+//  int _lindex;
+//  int _hindex;
+//  unsigned int _indexSize;
+//  unsigned long long _arraySize;
+//  std::vector<unsigned long long> _precomputedOffsets;
+//
+// private:
+//  unsigned long long getOffset(const std::vector<unsigned int>&);
+//
+// public:
+//  xtensor(int, int);
+//  ~xtensor();
+//  void zero();
+//  void fill(const T&);
+//  T& operator()(int, ...);
+//};
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//xtensor<T, TENSOR_ORDER>::xtensor(int index1, int index2) {
+//  _hindex = index1 > index2 ? index1 : index2;
+//  _lindex = index1 < index2 ? index1 : index2;
+//
+//  _indexSize = _hindex - _lindex + 1;
+//
+//  // Allocate data
+//  unsigned long long arraySizeBefore;
+//  _arraySize = 1ULL;
+//  _precomputedOffsets.push_back(_arraySize);
+//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER; i++) {
+//    arraySizeBefore = _arraySize;
+//    _arraySize *= _indexSize;
+//    // Detect overflow
+//    if (arraySizeBefore > _arraySize)
+//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); The setting is producing an array which can not by handled by this implementation.");
+//    _precomputedOffsets.push_back(_arraySize);
+//  }
+//
+//  try {
+//    // FIX: Problem; new(std::size_t), where size_t is hardware/platform specific,
+//    // for 32 bit systems it is uint = 2^32, if our array is bigger than this,
+//    // there is a overflow -> use more pages of the same block _data[PAGE][2^32]???,
+//    // or go to the 64 bits systems -> 2^64 (unsigned long long)
+//    if (_arraySize > (1ULL << (8 * sizeof(std::size_t) - 1)))  // dont go overboard  STEFANO (-1)
+//      throw APLRuntimeError("apl::xtensor<T>::xtensor(); Problem to allocate a required array. Hardware specific problem.");
+//    _data = new T[(std::size_t)_arraySize];
+//  } catch (std::bad_alloc& e) {
+//    throw APLRuntimeError("apl::xtensor<T>::xtensor(); Bad allocation.");
+//  }
+//
+//  // Reverse precomputed for better manipulation and shift by 1
+//  std::vector<unsigned long long> temp(_precomputedOffsets.rbegin() + 1, _precomputedOffsets.rend());
+//  _precomputedOffsets = temp;
+//  temp.clear();
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//xtensor<T, TENSOR_ORDER>::~xtensor() {
+//  _precomputedOffsets.clear();
+//  delete[] _data;
+//  _data = NULL;
+//  _arraySize = 0ULL;
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//void xtensor<T, TENSOR_ORDER>::zero() {
+//  // Take care! The last argument is of std::size_t, hence platform specific
+//  memset(_data, 0, _arraySize * sizeof(T));
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//void xtensor<T, TENSOR_ORDER>::fill(const T& val) {
+//  for (unsigned long long i = 0ULL; i < _arraySize; i++)
+//    _data[i] = val;
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//unsigned long long xtensor<T, TENSOR_ORDER>::getOffset(const std::vector<unsigned int>& idxs) {
+//  unsigned long long offset = idxs.back();
+//  for (_AFLOW_APL_REGISTER_ int i = idxs.size() - 2; i >= 0; i--)
+//    offset += (unsigned long long)(idxs[i] * _precomputedOffsets[i]);
+//  return offset;
+//}
+//
+////////////////////////////////////////////////////////////////////////////////
+//template <typename T, unsigned int TENSOR_ORDER>
+//T& xtensor<T, TENSOR_ORDER>::operator()(int idx1, ...) {
+//  // Get indices and transform to form 0...max
+//  va_list arguments;
+//  std::vector<unsigned int> idxs;
+//
+//  // The 1st index
+//  idxs.push_back((unsigned int)(idx1 - _lindex));
+//  //    if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
+//  if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
+//
+//  // The rest of indices
+//  va_start(arguments, idx1);
+//  for (_AFLOW_APL_REGISTER_ unsigned int i = 0; i < TENSOR_ORDER - 1; i++) {
+//    idxs.push_back((unsigned int)(va_arg(arguments, int) - _lindex));
+//    //   if( idxs.back() < 0 || idxs.back() > _indexSize ) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");
+//    if (idxs.back() > _indexSize) throw APLRuntimeError("apl::xtensor<T>::operator(); Index out of range.");  // unsigned long long cant be negative
+//  }
+//  va_end(arguments);
+//
+//  // Calculate offset
+//  unsigned long long offset = getOffset(idxs);
+//  idxs.clear();
+//
+//  // Return value
+//  return _data[offset];
+//}
+////////////////////////////////////////////////////////////////////////////////
+//}
 // ***************************************************************************
 
 #endif  // _AFLOW_APL_H_

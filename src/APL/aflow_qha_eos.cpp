@@ -327,7 +327,11 @@ namespace apl
 	  }
 	} else {
 	  osfit<<"error in data reading"<<"\n"; 
-	  apl::APLRuntimeError("problem with volume and energy data");
+          // ME191031 - use xerror
+	  //apl::APLRuntimeError("problem with volume and energy data");
+          string function = "QHAEOS::calc_qheos()";
+          string message = "problem with volume and energy data";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
 	}
        vector<double> tmp(2, 0);
        tmp[0]=K;
@@ -343,19 +347,31 @@ namespace apl
     if(!_include_ele){
       string FVTfile =  "aflow.qha.FVT.out";
       if(!aurostd::stringstream2file(osfvt, FVTfile, "WRITE")) {
-	throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+        // ME191031 - use xerror
+	//throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+        string function = "QHAEOS::calc_qheos()";
+        string message = "Cannot write " + FVTfile;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::StringstreamClean(osfvt);
     }
     string fit_out =  "aflow.qha.err_fit.out";
     if(!aurostd::stringstream2file(osfit, fit_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.err_fit.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.err_fit.out");
+      string function = "QHAEOS::calc_qheos()";
+      string message = "Cannot write " + fit_out;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(osfit);
 
     string eos_out =  "aflow.qha.thermo.out";
     if(!aurostd::stringstream2file(oseos, eos_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.thermo.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.thermo.out");
+      string function = "QHAEOS::calc_qheos()";
+      string message = "Cannot write " + eos_out;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(oseos);
 
@@ -684,7 +700,11 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.qha.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      string function = "QHAEOS::total_enthalpy()";
+      string message = "Cannot write " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();
@@ -745,7 +765,11 @@ namespace apl
 
     string FVTfile =  "aflow.qha.FVT.out";
     if(!aurostd::stringstream2file(osfvt, FVTfile, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+      string function = "QHAEOS::enhtalpy_including_ele()";
+      string message = "Cannot write " + FVTfile;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(osfvt);
 
@@ -780,7 +804,11 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.qha.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      string function = "QHAEOS::enhtalpy_including_ele()";
+      string message = "Cannot write " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();

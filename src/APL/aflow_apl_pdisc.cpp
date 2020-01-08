@@ -43,7 +43,13 @@ void PhononDispersionCalculator::initPathCoords(  //CO 180406
     const string& USER_DC_INITLABELS,
     int USER_DC_NPOINTS, 
     bool CARTESIAN_COORDS) {
-  if(USER_DC_INITCOORDS.empty() || USER_DC_INITLABELS.empty()){throw APLRuntimeError("apl::PhononDispersionCalculator::initPathCoords; Inputs are empty.");}
+  if(USER_DC_INITCOORDS.empty() || USER_DC_INITLABELS.empty()) {
+    // ME191031 - use xerror
+    //throw APLRuntimeError("apl::PhononDispersionCalculator::initPathCoords; Inputs are empty.");
+    string function = "apl::PhononDispersionCalculator::initPathCoords";
+    string message = "Inputs are empty.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
+  }
   _pb.defineCustomPoints(USER_DC_INITCOORDS,USER_DC_INITLABELS,_pc.getSupercell(),CARTESIAN_COORDS);
   _pb.setDensity(USER_DC_NPOINTS);
   //_qpoints = _pb.getPath(); // Get points // OBSOLETE ME190429 - this function should just define points; there is no path to set or get
@@ -144,8 +150,12 @@ void PhononDispersionCalculator::calc(const IPCFreqFlags frequencyFormat) {
   _frequencyFormat = frequencyFormat;
 
   // Maybe there was some error and the list of q-points is empty, hence bye-bye...
-  if (_qpoints.empty())
-    throw apl::APLRuntimeError("There are no points for calculation.");
+  if (_qpoints.empty()) {
+    //throw apl::APLRuntimeError("There are no points for calculation.");
+    string function = "PhononDispersionCalculator::calc()";
+    string message = "There are no points for the calculation.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  }
 
 // Compute frequencies for each q-point
 
@@ -214,8 +224,8 @@ void PhononDispersionCalculator::calc(const IPCFreqFlags frequencyFormat) {
 
 //////////////////////////////////////////////////////////////////////////////
 
-void PhononDispersionCalculator::writePDIS() {
-  string filename = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE; //ME181226
+void PhononDispersionCalculator::writePDIS(const string& directory) {
+  string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME181226
   _logger << "Writing dispersion curves into file " << filename << "." << apl::endl; //ME181226
 
   //CO - START
@@ -356,7 +366,7 @@ void PhononDispersionCalculator::writePDIS() {
   //CO - END
 
   //PINKU //PN180705
-  string hskptsfile = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HSKPTS_FILE; //ME181226
+  string hskptsfile = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HSKPTS_FILE); //ME181226
   aurostd::stringstream2file(ouths, hskptsfile); //ME181226
   if (!aurostd::FileExist(hskptsfile)) { //ME181226
     string function = "PhononDispersionCalculator::writePDIS()";
@@ -399,8 +409,8 @@ bool PhononDispersionCalculator::isExactQPoint(const xvector<double>& qpoint,
 
 // ME190614 - START
 // Write the eigenvalues into a VASP EIGENVAL-formatted file
-void PhononDispersionCalculator::writePHEIGENVAL() {
-  string filename = DEFAULT_APL_PHEIGENVAL_FILE;
+void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
+  string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
   _logger << "Writing phonon eigenvalues into file " << filename << "." << apl::endl;
   stringstream eigenval;
   eigenval << createEIGENVAL();
@@ -412,8 +422,8 @@ void PhononDispersionCalculator::writePHEIGENVAL() {
   }
 
   // Also write PHKPOINTS and PHPOSCAR file
-  writePHKPOINTS();
-  filename = DEFAULT_APL_PHPOSCAR_FILE;
+  writePHKPOINTS(directory);
+  filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
   xstructure xstr = _pc.getInputCellStructure();
   xstr.is_vasp5_poscar_format = true;
   stringstream poscar;
@@ -476,8 +486,8 @@ xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
 // ///////////////////////////////////////////////////////////////////////////
 
 // Write the k-point path into a VASP KPOINTS-formatted file
-void PhononDispersionCalculator::writePHKPOINTS() {
-  string filename = DEFAULT_APL_PHKPOINTS_FILE;
+void PhononDispersionCalculator::writePHKPOINTS(const string& directory) {
+  string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHKPOINTS_FILE);
   stringstream kpoints;
   kpoints << _pb.createKPOINTS(_pc.getSupercell());
   aurostd::stringstream2file(kpoints, filename);

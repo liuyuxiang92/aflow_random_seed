@@ -45,6 +45,7 @@ namespace aurostd {
       void initializeCombinationsP();
       void setCombinationsIncrementParameters();
       void getNextEnumeration(); // ME 180529
+      void getNextEnumerationEqual();
       void initialize();
     public:
       //NECESSARY PUBLIC CLASS METHODS - START
@@ -63,7 +64,7 @@ namespace aurostd {
       void reset(vector<int> vec,bool sort=TRUE, char mode='P'); //reset with permutations
       void reset(int choice_count,int choose_count, char mode='C', bool rpt=FALSE); //reset with combinations
       void reset(vector<int> vec, char mode); // reset with enumerations
-      vector<int> getCombo() const; //grab current possibility
+      const vector<int>& getCombo() const; //grab current possibility - ME190703 use const & (faster)
       int getN() const; //grab n (total count)
       int getM() const; //grab m (choose)
       vector<int> getIndices() const; //get which indicies are 1

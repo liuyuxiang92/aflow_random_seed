@@ -64,6 +64,14 @@
 #define atom2mol                6.0221408E23                    //CO 180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO 180329
 
+//ME200107 - (A)APL conversion factors
+#define THz2Hz                      1E12
+#define Hz2THz                      1/THz2Hz
+#define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_hbar_THz    PLANCKSCONSTANT_hbar*THz2Hz // J/THz
+#define PLANCKSCONSTANTAMU_hbar_THz PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2THz)  // amu A^2 THz
+#define BEfactor_hbar_THz           PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
 
