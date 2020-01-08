@@ -383,7 +383,7 @@ namespace apl {
     for(uint i = 0; i < tokens.size(); i++) {
       uint j = 0;
       for( ; j < _labels.size(); j++) {
-        // This works fine, but notorious changes of the Gammma point label
+        // This works fine, but notorious changes of the Gamma point label
         // in aflow_kpoints.cpp lead me to do it like: G, Gamma, of \Gamma or
         // or anything like GAMMA \G or GaMmA or I do not know what else is
         // still a gamma point labeled as G!
@@ -531,7 +531,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
     }
     if(vcoords.size()<2){
-      // ME191031 - use xerro
+      // ME191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Path size should include at least two points");
       string function = "apl::PathBuilder::defineCustomPoints()";
       string message = "Path size should include at least two points";
