@@ -386,7 +386,7 @@ namespace apl {
     for(uint i = 0; i < tokens.size(); i++) {
       uint j = 0;
       for( ; j < _labels.size(); j++) {
-        // This works fine, but notorious changes of the Gammma point label
+        // This works fine, but notorious changes of the Gamma point label
         // in aflow_kpoints.cpp lead me to do it like: G, Gamma, of \Gamma or
         // or anything like GAMMA \G or GaMmA or I do not know what else is
         // still a gamma point labeled as G!
