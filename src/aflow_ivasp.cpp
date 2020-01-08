@@ -4233,7 +4233,7 @@ namespace KBIN {
   // after the relaxation, assume that the user wants to reuse it.
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, int step, ofstream& FileMESSAGE) {
     if ((step == 1) && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
-      // Do not set ICHARG = 2 when a CHGCAR file is output
+      // Do not set ICHARG when a CHGCAR file is output
       if (!vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
         ostringstream aus;
         aus << "00000  MESSAGE ICHARG: Removing ICHARG - " << Message(aflags, "user,host,time") << std::endl;
