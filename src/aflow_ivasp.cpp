@@ -4228,7 +4228,7 @@ namespace KBIN {
   // ME191028
   // When a CHGCAR file is specified in the aflow.in file, it is really only
   // useful in the first relxation calculations. For all other calculations,
-  // it should not read from that CHGCAR file, so set ICHARG = 2 and comment
+  // it should not read from that CHGCAR file, so set ICHARG = 2 (default, but do not write) and comment
   // out the original CHGCAR file. Exception: if a CHGCAR file is output
   // after the relaxation, assume that the user wants to reuse it.
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, int step, ofstream& FileMESSAGE) {
