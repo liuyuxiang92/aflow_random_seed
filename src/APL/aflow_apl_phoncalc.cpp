@@ -199,8 +199,10 @@ namespace apl {
                 _AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, atomID, FALSE); //CO190218
                 testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
                 // ME191031 - use xerror
-                //[CO200106 - close bracket for indenting]{//} catch (APLLogicError& e) {  //[CO200106 - close bracket for indenting]}
-              } catch (aurostd::xerror& e) {
+              }  //CO200106 - patching for auto-indenting
+              //catch (APLLogicError& e)
+              catch (aurostd::xerror& e) 
+              {  //CO200106 - patching for auto-indenting
                 //corey
                 //TEMPORARY CODE below by Jahnatek
                 //no comments - hard to interpret what's going on
@@ -483,8 +485,9 @@ namespace apl {
             //printXVector(_supercell.getSupercellStructure().atoms[basedAtomID].fpos);
             //printXVector(_supercell.getSupercellStructure().atoms[_supercell.getUniqueAtomID(i,j)].fpos);
             // ME191031 - use xerror
-            //[CO200106 - close bracket for indenting]{//} catch (APLLogicError& e)  //CO
-          } catch (aurostd::xerror& e)  //CO
+          }  //CO200106 - patching for auto-indenting
+          //catch (APLLogicError& e)  //CO
+          catch (aurostd::xerror& e)  //CO
           {
             _logger << error << "Mapping problem " << _supercell.getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?" << apl::endl; //CO190218
             // ME191031 - use xerror
@@ -510,8 +513,10 @@ namespace apl {
                 cerr << m << std::endl;
               }
               // ME191031 - use xerror
-              //[CO200106 - close bracket for indenting]{//} catch (APLLogicError& e) {  //CO //[CO200106 - close bracket for indenting]}
-            } catch (aurostd::xerror& e) {  //CO
+            }  //CO200106 - patching for auto-indenting
+            //catch (APLLogicError& e)  //CO
+            catch (aurostd::xerror& e)  //CO
+            {  //CO200106 - patching for auto-indenting
               _logger << error << "Mapping problem " << k << " <-> ?." << apl::endl;
               throw aurostd::xerror(_AFLOW_FILE_NAME_, "apl::PhononCalculator::buildForceConstantMatrices()", "Mapping failed.");
             }
@@ -1542,7 +1547,8 @@ namespace apl {
       outfile << "[VASP_RUN]STATIC" << std::endl;
       outfile << AFLOWIN_SEPARATION_LINE << std::endl;
 
-      if (xvasp.aopts.flag("AFLOWIN_FLAG::QE")) { //(AFLOWIN_QE_FLAG) { //[CO200106 - close bracket for indenting]}
+      if (xvasp.aopts.flag("AFLOWIN_FLAG::QE")) //(AFLOWIN_QE_FLAG)
+      {  //CO200106 - patching for auto-indenting
         outfile << AFLOWIN_SEPARATION_LINE << std::endl;
         outfile << "[QE_GEOM_MODE_EXPLICIT]START " << std::endl;
         xstructure qestr(xvasp.str);
@@ -1689,16 +1695,16 @@ namespace apl {
     xstructure ix;
     //CO - START
     string filename = "SPOSCAR";
-    //if (infile.is_open()) { //[CO200106 - close bracket for indenting]}
-    if (!aurostd::FileEmpty(filename)) {
+    //if (infile.is_open())
+    if (!aurostd::FileEmpty(filename)) 
+    {  //CO200106 - patching for auto-indenting
       _logger << "Reading " << filename << apl::endl;
       stringstream SPOSCAR;
       aurostd::efile2stringstream(filename, SPOSCAR);
       SPOSCAR >> ix;
       //infile >> ix;
       //infile.close();
-    } else
-      ix = _supercell.getSupercellStructure();
+    } else {ix = _supercell.getSupercellStructure();}  //CO200106 - patching for auto-indenting
 
     //
     //ofstream outfile("FORCES", ios_base::out);
@@ -2140,8 +2146,9 @@ namespace apl {
       // Get born effective charge tensors
       while (true) {
         //getline(infile, line); //CO
-        //if (infile.eof()) { //CO  //[CO200106 - close bracket for indenting]}
-        if (line_count == vlines.size()) {  //CO
+        //if (infile.eof()) //CO
+        if (line_count == vlines.size())  //CO
+        {  //CO200106 - patching for auto-indenting
           _isPolarMaterial = false;
           // ME191031 - use xerror
           //throw APLLogicError("apl::PhononCalculator::awake(); Can not find <born> tag.");
@@ -2186,8 +2193,9 @@ namespace apl {
       // Get dielectric constant tensor
       while (true) {
         //getline(infile, line); //CO
-        //if (infile.eof()) { //CO
-        if (line_count == vlines.size()) {  //CO
+        //if (infile.eof()) //CO
+        if (line_count == vlines.size())  //CO
+        {  //CO200106 - patching for auto-indenting
           _isPolarMaterial = false;
           // ME191031 - use xerror
           //throw APLLogicError("apl::PhononCalculator::awake(); Can not find <epsilon> tag.");
@@ -2214,8 +2222,10 @@ namespace apl {
       _inverseDielectricTensor = inverse(_dielectricTensor);
       _recsqrtDielectricTensorDeterminant = 1.0 / sqrt(determinant(_dielectricTensor));
       // ME191031 - use xerror
-      //} catch (APLLogicError& e) {  //CO  //[CO200106 - close bracket for indenting]}
-    } catch (aurostd::xerror& e) {  //CO
+    }  //CO200106 - patching for auto-indenting
+    //catch (APLLogicError& e)  //CO
+    catch (aurostd::xerror& e)  //CO
+    {  //CO200106 - patching for auto-indenting
       //_logger << apl::warning << e.what() << apl::endl;
     }
 
@@ -2283,8 +2293,9 @@ namespace apl {
     //ifstream myfile(_AFLOWIN_.c_str());
 
     //CO - START
-    //if (!myfile.is_open()) {  //[CO200106 - close bracket for indenting]}
-    if (!vlines.size()) {
+    //if (!myfile.is_open())
+    if (!vlines.size()) 
+    {  //CO200106 - patching for auto-indenting
       // ME191031 - use xerror
       //throw apl::APLRuntimeError("apl::PhononCalculator::get_special_inputs(); Cannot read ["+_AFLOWIN_+"] file.");
       string function = "apl::PhononCalculator::get_special_inputs()";

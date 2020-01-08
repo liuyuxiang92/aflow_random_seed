@@ -18,7 +18,8 @@ namespace apl {
       _aflags& aflags, _kflags& kflags,
       _xflags& xflags, //_vflags& vflags,
       string& AflowIn,
-      Logger& l) : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) { //xvasp, aflags, kflags, vflags, l) { //[CO200106 - close bracket for indenting]}
+      Logger& l) : PhononCalculator(sc, clst, xinput, aflags, kflags, xflags, AflowIn, l) //xvasp, aflags, kflags, vflags, l)
+  {  //CO200106 - patching for auto-indenting
     clear();
     _log.open(_logfile.c_str());
     if (!_log.is_open()) {

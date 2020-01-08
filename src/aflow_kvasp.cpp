@@ -1980,7 +1980,7 @@ namespace KBIN {
                 //aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading KPOINTS (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
                 //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
                 //KBIN::VASP_Reread_KPOINTS(xvasp,FileMESSAGE,aflags); // REREAD IT
-                
+
                 KBIN::VASP_RecycleExtraFile(xvasp,"POSCAR","static");  // bring back the stuff
                 KBIN::VASP_RecycleExtraFile(xvasp,"KPOINTS","static");  // bring back the stuff
 
@@ -3109,7 +3109,8 @@ namespace KBIN {
         // ********* CHECK EFIELD_PEAD PROBLEMS ******************
         if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK EFIELD_PEAD PROBLEMS]" << endl;
         if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EFIELD_PEAD") && !xfixed.flag("ALL")) { // check EFIELD_PEAD
-          if(xwarning.flag("EFIELD_PEAD")) { // can be applied many times && !xfixed.flag("EFIELD_PEAD")) { // Apply only ONCE  //[CO200106 - close bracket for indenting]}
+          if(xwarning.flag("EFIELD_PEAD")) // can be applied many times && !xfixed.flag("EFIELD_PEAD")) // Apply only ONCE
+          {  //CO200106 - patching for auto-indenting
             KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  EFIELD_PEAD problems ");
             aus << "WWWWW  FIX EFIELD_PEAD - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
