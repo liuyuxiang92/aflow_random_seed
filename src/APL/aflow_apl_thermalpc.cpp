@@ -296,7 +296,7 @@ double ThermalPropertiesCalculator::getIsochoricSpecificHeat(double T,
 double ThermalPropertiesCalculator::getStepDOS(const vector<double>& freq) {
   double stepDOS = 0.0;
   if (freq.size() > 2) {
-    stepDOS = freq[1] - freq[1];
+    stepDOS = freq[1] - freq[0];
   } else {
     string function = _APL_THERMO_ERR_PREFIX_ + "getStepDOS()";
     string message = "Not enough DOS points (need at least two).";
