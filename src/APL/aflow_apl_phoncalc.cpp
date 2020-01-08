@@ -199,62 +199,62 @@ namespace apl {
                 _AFLOW_APL_REGISTER_ int l = _supercell.atomComesFrom(symOp, k, atomID, FALSE); //CO190218
                 testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
                 // ME191031 - use xerror
-                //} catch (APLLogicError& e) {
-            } catch (aurostd::xerror& e) {
-              //corey
-              //TEMPORARY CODE below by Jahnatek
-              //no comments - hard to interpret what's going on
-              //WILL INQUIRE SOON, exit if appropriate
-              //should not happen if not a derivative structure, exit appropriately
-              //CO181226 - forget about this junk
-              //if it's a derivative structure, we recalculate the symmetry for the supercell, it's necessary
-              //ignoring temporary code, I have no idea what is going on.
-              //[CO181226 - OBSOLETE]if (!_supercell.isDerivativeStructure()) {
-              _logger << error << "Mapping problem ? <-> " << k << "." << apl::endl;
-              // ME191031 - use xerror
-              //throw APLLogicError("apl::PhononCalculator::completeForceFields(); Mapping failed.");
-              string function = "apl::PhononCalculator::completeForceFields()";
-              string message = "Mapping failed.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-              //[CO181226 - OBSOLETE]}
-              //[CO181226 - OBSOLETE]// TEMPORARY CODE =================================================================
-              //[CO181226 - OBSOLETE]#if ERROR_VERBOSE
-              //[CO181226 - OBSOLETE]cout << "-> PROBLEM: Distortion: " << idistor << "; AtomID " << k << "; CenterAtomID: " << atomID //CO190218
-              //[CO181226 - OBSOLETE]  << "; SymOp: " << symOpID << " ( " << symOp.str_type << ") Angle:" << symOp.angle << "; Axis: ";
-              //[CO181226 - OBSOLETE]printXVector(symOp.axis);
-              //[CO181226 - OBSOLETE]#endif
-              //[CO181226 - OBSOLETE]// printXVector(_supercell.getSupercellStructure().atoms[k].cpos);
-              //[CO181226 - OBSOLETE]// xvector<double> zero(3);
-              //[CO181226 - OBSOLETE]// testForce.push_back( zero);
-              //[CO181226 - OBSOLETE]testForce.push_back(_uniqueForces[i][idistor][k]);
-              //[CO181226 - OBSOLETE]int l = 0;
-              //[CO181226 - OBSOLETE]xvector<double> rotpos;  //CO
-              //[CO181226 - OBSOLETE]for (; l < (int)_supercell.getNumberOfAtoms(); l++) {
-              //[CO181226 - OBSOLETE]  uint symOpID2 = 0;
-              //[CO181226 - OBSOLETE]  for (; symOpID2 < agroup.size(); symOpID2++) {
-              //[CO181226 - OBSOLETE]    const _sym_op& symOp2 = agroup[symOpID2];
-              //[CO181226 - OBSOLETE]    rotpos = symOp.Uc * inverse(symOp2.Uc) * _supercell.getSupercellStructure().atoms[l].cpos;
-              //[CO181226 - OBSOLETE]
-              //[CO181226 - OBSOLETE]    //if( aurostd::modulus( rotpos - _supercell.getSupercellStructure().atoms[k].cpos ) < _AFLOW_APL_EPS_ ) //JAHNATEK ORIGINAL
-              //[CO181226 - OBSOLETE]    if (aurostd::modulus(rotpos - _supercell.getSupercellStructure().atoms[k].cpos) < _supercell.getEPS())  //CO
-              //[CO181226 - OBSOLETE]    {
-              //[CO181226 - OBSOLETE]      break;
-              //[CO181226 - OBSOLETE]    }
-              //[CO181226 - OBSOLETE]  }
-              //[CO181226 - OBSOLETE]  if (symOpID2 != agroup.size()) {
-              //[CO181226 - OBSOLETE]    #if ERROR_VERBOSE
-              //[CO181226 - OBSOLETE]    cout << l << " " << k << std::endl;
-              //[CO181226 - OBSOLETE]    //printXMatrix(symOp.Uc * _supercell.getSupercellStructure().agroup[symOpID2].Uc);
-              //[CO181226 - OBSOLETE]    #endif
-              //[CO181226 - OBSOLETE]    testForce.push_back(symOp.Uc * inverse(agroup[symOpID2].Uc) * _uniqueForces[i][idistor][l]);
-              //[CO181226 - OBSOLETE]    break;
-              //[CO181226 - OBSOLETE]  }
-              //[CO181226 - OBSOLETE]}
-              //[CO181226 - OBSOLETE]if (l == (int)_supercell.getNumberOfAtoms()) {
-              //[CO181226 - OBSOLETE]  throw APLLogicError("Mapping failed.2");
-              //[CO181226 - OBSOLETE]}
-              //[CO181226 - OBSOLETE]// TEMPORARY CODE =================================================================
-            }
+                //[CO200106 - close bracket for indenting]{//} catch (APLLogicError& e) {  //[CO200106 - close bracket for indenting]}
+              } catch (aurostd::xerror& e) {
+                //corey
+                //TEMPORARY CODE below by Jahnatek
+                //no comments - hard to interpret what's going on
+                //WILL INQUIRE SOON, exit if appropriate
+                //should not happen if not a derivative structure, exit appropriately
+                //CO181226 - forget about this junk
+                //if it's a derivative structure, we recalculate the symmetry for the supercell, it's necessary
+                //ignoring temporary code, I have no idea what is going on.
+                //[CO181226 - OBSOLETE]if (!_supercell.isDerivativeStructure()) {
+                _logger << error << "Mapping problem ? <-> " << k << "." << apl::endl;
+                // ME191031 - use xerror
+                //throw APLLogicError("apl::PhononCalculator::completeForceFields(); Mapping failed.");
+                string function = "apl::PhononCalculator::completeForceFields()";
+                string message = "Mapping failed.";
+                throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+                //[CO181226 - OBSOLETE]}
+                //[CO181226 - OBSOLETE]// TEMPORARY CODE =================================================================
+                //[CO181226 - OBSOLETE]#if ERROR_VERBOSE
+                //[CO181226 - OBSOLETE]cout << "-> PROBLEM: Distortion: " << idistor << "; AtomID " << k << "; CenterAtomID: " << atomID //CO190218
+                //[CO181226 - OBSOLETE]  << "; SymOp: " << symOpID << " ( " << symOp.str_type << ") Angle:" << symOp.angle << "; Axis: ";
+                //[CO181226 - OBSOLETE]printXVector(symOp.axis);
+                //[CO181226 - OBSOLETE]#endif
+                //[CO181226 - OBSOLETE]// printXVector(_supercell.getSupercellStructure().atoms[k].cpos);
+                //[CO181226 - OBSOLETE]// xvector<double> zero(3);
+                //[CO181226 - OBSOLETE]// testForce.push_back( zero);
+                //[CO181226 - OBSOLETE]testForce.push_back(_uniqueForces[i][idistor][k]);
+                //[CO181226 - OBSOLETE]int l = 0;
+                //[CO181226 - OBSOLETE]xvector<double> rotpos;  //CO
+                //[CO181226 - OBSOLETE]for (; l < (int)_supercell.getNumberOfAtoms(); l++) {
+                //[CO181226 - OBSOLETE]  uint symOpID2 = 0;
+                //[CO181226 - OBSOLETE]  for (; symOpID2 < agroup.size(); symOpID2++) {
+                //[CO181226 - OBSOLETE]    const _sym_op& symOp2 = agroup[symOpID2];
+                //[CO181226 - OBSOLETE]    rotpos = symOp.Uc * inverse(symOp2.Uc) * _supercell.getSupercellStructure().atoms[l].cpos;
+                //[CO181226 - OBSOLETE]
+                //[CO181226 - OBSOLETE]    //if( aurostd::modulus( rotpos - _supercell.getSupercellStructure().atoms[k].cpos ) < _AFLOW_APL_EPS_ ) //JAHNATEK ORIGINAL
+                //[CO181226 - OBSOLETE]    if (aurostd::modulus(rotpos - _supercell.getSupercellStructure().atoms[k].cpos) < _supercell.getEPS())  //CO
+                //[CO181226 - OBSOLETE]    {
+                //[CO181226 - OBSOLETE]      break;
+                //[CO181226 - OBSOLETE]    }
+                //[CO181226 - OBSOLETE]  }
+                //[CO181226 - OBSOLETE]  if (symOpID2 != agroup.size()) {
+                //[CO181226 - OBSOLETE]    #if ERROR_VERBOSE
+                //[CO181226 - OBSOLETE]    cout << l << " " << k << std::endl;
+                //[CO181226 - OBSOLETE]    //printXMatrix(symOp.Uc * _supercell.getSupercellStructure().agroup[symOpID2].Uc);
+                //[CO181226 - OBSOLETE]    #endif
+                //[CO181226 - OBSOLETE]    testForce.push_back(symOp.Uc * inverse(agroup[symOpID2].Uc) * _uniqueForces[i][idistor][l]);
+                //[CO181226 - OBSOLETE]    break;
+                //[CO181226 - OBSOLETE]  }
+                //[CO181226 - OBSOLETE]}
+                //[CO181226 - OBSOLETE]if (l == (int)_supercell.getNumberOfAtoms()) {
+                //[CO181226 - OBSOLETE]  throw APLLogicError("Mapping failed.2");
+                //[CO181226 - OBSOLETE]}
+                //[CO181226 - OBSOLETE]// TEMPORARY CODE =================================================================
+              }
             }
             //_supercell.center(0);  //JAHNATEK ORIGINAL
             //_supercell.center_original();  //CO
