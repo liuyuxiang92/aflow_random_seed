@@ -18,6 +18,8 @@
         -- optimized NCPUS/NPAR/NCORE settings (SC)
         -- patched _atom() class: constructor()/copy()/free() (SC)
         -- added warnings/errors if species information missing in POSCAR for --poscar2aflowin (CO)
+        -- tab aligning all files (CO)
+        -- patched clang warnings for aurostd_boot.cpp (CO)
         -- updated xoptions so content can be lowercase (CO)
         -- Added additional web output for entry page generation. (ME)
         -- Fixed bug that put NCORE into INCARs of linear response calculations. (ME)
