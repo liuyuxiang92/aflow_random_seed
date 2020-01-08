@@ -719,7 +719,7 @@ namespace aurostd {  // namespace aurostd
       throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
     }
     xmatrix<utype> c(a.rows,b.cols);
-    int i,j,k,ii,jj,kk;
+    int i=0,j=0,k=0,ii=0,jj=0,kk=0;
     // register
     utype *bk,*ci,*ai,aik;    
     for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++) {
@@ -733,16 +733,14 @@ namespace aurostd {  // namespace aurostd
 	  ci[j]+=aik*bk[jj];
       }
     }    
-    /*  
-	for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 48% slower than the
-	for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
-	for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
-	c[i][j]+=a[ii][k]*b[kk][jj];	
-	for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 66% slower than the
-	for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
-	for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
-	c(i,j)+=a(ii,k)*b(kk,jj);
-    */
+    //for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 48% slower than the
+    //for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
+    //for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
+    //c[i][j]+=a[ii][k]*b[kk][jj];	
+    //for(i=c.lrows,ii=a.lrows;i<=c.urows;i++,ii++)          // 66% slower than the
+    //for(k=a.lcols,kk=b.lrows;k<=a.ucols;k++,kk++)        // previous optimized
+    //for(j=c.lcols,jj=b.lcols;j<=c.ucols;j++,jj++)      // routine
+    //c(i,j)+=a(ii,k)*b(kk,jj);
     return  c;
   }
 

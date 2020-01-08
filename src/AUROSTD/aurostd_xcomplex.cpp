@@ -58,9 +58,7 @@ namespace aurostd {
   // ME200107 - BEGIN
   template<class utype>
   bool identical(const xcomplex<utype>& a, const xcomplex<utype>&b, utype _tol_) {
-    if (abs(a.re - b.re) > _tol_) return false;
-    if (abs(a.im - b.im) > _tol_) return false;
-    return true;
+    return (identical(a.re, b.re, _tol_) && identical(a.im, b.im, _tol_));
   }
 
   template<class utype>
