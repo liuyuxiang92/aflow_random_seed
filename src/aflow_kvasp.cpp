@@ -1972,15 +1972,15 @@ namespace KBIN {
                   KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,FileMESSAGE,OFF);
                 aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
 
-                /* 		//Reread POSCAR
-                      aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading POSCAR (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-                      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-                      KBIN::VASP_Reread_POSCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
-                //Reread KPOINTS
-                aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading KPOINTS (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-                aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-                KBIN::VASP_Reread_KPOINTS(xvasp,FileMESSAGE,aflags); // REREAD IT
-                */
+                ////Reread POSCAR
+                //aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading POSCAR (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+                //KBIN::VASP_Reread_POSCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
+                ////Reread KPOINTS
+                //aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading KPOINTS (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+                //KBIN::VASP_Reread_KPOINTS(xvasp,FileMESSAGE,aflags); // REREAD IT
+                
                 KBIN::VASP_RecycleExtraFile(xvasp,"POSCAR","static");  // bring back the stuff
                 KBIN::VASP_RecycleExtraFile(xvasp,"KPOINTS","static");  // bring back the stuff
 

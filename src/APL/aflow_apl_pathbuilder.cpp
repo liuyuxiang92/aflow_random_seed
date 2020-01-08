@@ -258,10 +258,7 @@ namespace apl {
       if( _store == RECIPROCAL_LATTICE ) {
         length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[i]) - F2C(trasp(reciprocalLattice),_points[i-1]) );
       }
-      else
-      {
-        length = aurostd::modulus( _points[i] - _points[i-1] );
-      }
+      else{length = aurostd::modulus( _points[i] - _points[i-1] );}
       return length;
     }
     else if( _mode == COUPLE_POINT_MODE ) {
