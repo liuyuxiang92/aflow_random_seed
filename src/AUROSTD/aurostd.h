@@ -49,6 +49,7 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
+#include <signal.h>  // ME191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO 170806 - need for POCC
 #include <netdb.h>  //CO 180321 - frisco needs for AFLUX
@@ -100,6 +101,11 @@ using std::vector;
 //(aurostd default is less conservative to match read/write roundoff error)
 #ifndef AUROSTD_IDENTITY_TOL
 #define AUROSTD_IDENTITY_TOL 1e-6
+#endif
+
+//CO 171002 - USEFUL!
+#ifndef AUROSTD_MAX_INT
+#define AUROSTD_MAX_INT std::numeric_limits<int>::max()
 #endif
 
 //CO 171002 - USEFUL!
@@ -211,7 +217,7 @@ typedef unsigned uint;
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
 #include "../aflow.h"
-#include "../SQLITE/sqlite3.h"
+//#include "../SQLITE/sqlite3.h"  // OBSOLETE ME191228 - not used
 
 template<class utype> std::ostream& operator<<(std::ostream&,const std::vector<utype>&);// __xprototype;
 template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<utype>&);// __xprototype;
@@ -278,7 +284,13 @@ namespace aurostd {
   int GetNumFields(const string& s);
   string GetNextVal(const string& s,int& id);
   string PaddedNumString(const int num,const int ndigits);
-  int getZeroPadding(unsigned long long int);  // ME190108
+  int getZeroPadding(double num);  //CO191217
+  int getZeroPadding(int num);  //CO191217
+  int getZeroPadding(uint num); //CO191217
+  int getZeroPadding(long int num); //CO191217
+  int getZeroPadding(unsigned long int num);  //CO191217
+  int getZeroPadding(long long int num);  //CO191217
+  int getZeroPadding(unsigned long long int num);  // ME190108
   template<class utype> string PaddedPRE(utype,int,string=" ");
   string PaddedPRE(string,int,string=" ");
   template<class utype> string PaddedPOST(utype,int,string=" ");
@@ -365,7 +377,7 @@ namespace aurostd {
   // [OBSOLETE]  bool UnzipFile(const string& FileName);  bool ZipFile(const string& FileName);
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
-  int  FileSize(const string& FileName);
+  unsigned long long int FileSize(const string& FileName);  // ME191001
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO190808
@@ -524,6 +536,12 @@ namespace aurostd {
   uint gzfile2dequestring(string FileNameIN,deque<string>& vlines);
   uint xzfile2dequestring(string FileNameIN,deque<string>& vlines);
   uint efile2dequestring(string FileNameIN,deque<string>& vlines);
+  // file2vectorstring overloading with deque
+  uint file2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint bz2file2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint gzfile2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint xzfile2vectorstring(string FileNameIN,deque<string>& vlines);
+  uint efile2vectorstring(string FileNameIN,deque<string>& vlines);  
   // file2stringstream
   bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
   bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);

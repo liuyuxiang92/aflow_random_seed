@@ -748,7 +748,7 @@ str_num_data double2str_num_data(double a) {
 namespace pocc {
   void POSCAR2GULP(istream& input) {
     xstructure xstr; 
-    xstr.Clear();
+    xstr.clear(); //DX 20191220 - uppercase to lowercase clear
     xstr=xstructure(input, IOVASP_POSCAR);
     xstr.ReScale(1.0);
     string GulpInput;
@@ -2686,7 +2686,7 @@ namespace pocc {
   void POSCAR2ENUM(istream& input) {
 
     xstructure xstr_in; //, xstr_out;
-    xstr_in.Clear();
+    xstr_in.clear(); //DX 20191220 - uppercase to lowercase clear
     xstr_in=xstructure(input, IOVASP_POSCAR);
     xstr_in.ReScale(1.00000);
 
@@ -3110,7 +3110,7 @@ namespace pocc {
 namespace pocc {
   bool MultienumPrintSortedXstr(istream& input) {
     xstructure xstr; 
-    xstr.Clear();
+    xstr.clear(); //DX 20191220 - uppercase to lowercase clear
     xstr=xstructure(input, IOVASP_POSCAR);
 
     vector<string> AtomSpecies;
@@ -4245,7 +4245,7 @@ namespace pocc {
 namespace pocc {
   void UFFENERGY(istream& input) {
     xstructure xstr; 
-    xstr.Clear();
+    xstr.clear(); //DX 20191220 - uppercase to lowercase clear
     xstr=xstructure(input, IOVASP_POSCAR);
     cout << "total energy: " <<  pocc::CalculateUFFEnergy(xstr) << endl;
   }

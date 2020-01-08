@@ -22,18 +22,11 @@
 #endif
 
 #define _DEBUG_AAPL_TCOND_ false
-#define ALAMODE
 
 // String constants for file output and exception handling
 static const string _AAPL_TCOND_ERR_PREFIX_ = "apl::TCONDCalculator::";
 
 static const int max_iter = 250;  // Maximum number of iterations for the iterative BTE solution
-
-// Define constants and conversion factors. See AUROSTD/aurostd_xscalar.h for more.
-static const double au2THz = 9.648553873170e+02;  // eV/(A amu) -> nm * THz^2
-static const double hbar_J = E_ELECTRON * 1e12 * PLANCKSCONSTANTEV_hbar;  // hbar in J/THz;
-static const double hbar_amu = PLANCKSCONSTANTEV_hbar * au2THz * 1e13;  // hbar in amu A^2 THz
-static const double BEfactor = PLANCKSCONSTANTEV_hbar * 1e12/KBOLTZEV;  // hbar/kB in K/THz
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
 static const double TCOND_ITER_THRESHOLD = 1e-4;  // Convergence criterion for thermal conductivity
 
@@ -89,14 +82,38 @@ TCONDCalculator::TCONDCalculator(PhononCalculator& pc, QMesh& qm,
   nIQPs = _qm.getnIQPs();
 }
 
+//Copy Constructor////////////////////////////////////////////////////////////
+TCONDCalculator::TCONDCalculator(const TCONDCalculator& that) : _pc(that._pc), _qm(that._qm), _logger(that._logger), aflags(that.aflags) {
+  copy(that);
+}
+
+void TCONDCalculator::copy(const TCONDCalculator& that) {
+  _pc = that._pc;
+  _qm = that._qm;
+  _logger = that._logger;
+  aflags = that.aflags;
+  calc_options = that.calc_options;
+  eigenvectors = that.eigenvectors;
+  freq = that.freq;;
+  gvel = that.gvel;
+  intr_trans_probs = that.intr_trans_probs;
+  intr_trans_probs_iso = that.intr_trans_probs_iso;
+  nBranches = that.nBranches;
+  nIQPs = that.nIQPs;
+  nQPs = that.nQPs;
+  processes = that.processes;
+  processes_iso = that.processes_iso;
+  rates_boundary = that.rates_boundary;
+  rates_isotope = that.rates_isotope;
+  temperatures = that.temperatures;
+}
+
+//Destructor//////////////////////////////////////////////////////////////////
 TCONDCalculator::~TCONDCalculator() {
   free();
 }
 
-void TCONDCalculator::clear() {
-  free();
-}
-
+//free////////////////////////////////////////////////////////////////////////
 void TCONDCalculator::free() {
   calc_options.clear();
   eigenvectors.clear();
@@ -115,6 +132,12 @@ void TCONDCalculator::free() {
   thermal_conductivity.clear();
 }
 
+//clear///////////////////////////////////////////////////////////////////////
+void TCONDCalculator::clear(PhononCalculator& pc, QMesh& qm, Logger& l, _aflags& a) {
+  TCONDCalculator that(pc, qm, l, a);
+  copy(that);
+}
+
 }  // namespace apl
 
 /******************************* MAIN FUNCTION ******************************/
@@ -129,6 +152,13 @@ void TCONDCalculator::calculateThermalConductivity() {
   double tstart = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTART"));
   double tend = aurostd::string2utype<double>(calc_options.getattachedscheme("TEND"));
   double tstep = aurostd::string2utype<double>(calc_options.getattachedscheme("TSTEP"));
+
+  if (tstart > tend) {
+    string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalProperties()";
+    string message = "Tstart cannot be higher than Tend.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+  }
+
   for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
 
   // Frequencies and group velocities
@@ -349,7 +379,7 @@ vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<ve
           e = at1_pc * natoms + at2_pc;
           for (crt = 0; crt < ncart; crt++) {
             ifc_prod = ifcs[c][crt] * min_dist[at1_pc][at3_sc][cart_indices[crt][2] + 1];
-            // Perform multiplication expliclty in place instead of using xcomplex.
+            // Perform multiplication explicitly in place instead of using xcomplex.
             // This is three times faster because constructors and destructors are not called.
             g_mode.re += ifc_prod * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
             g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
@@ -378,7 +408,7 @@ double TCONDCalculator::calculateAverageGrueneisen(double T,
   vector<vector<double> > occ = getOccupationNumbers(T);
   int iq = 0;
   double c, c_tot = 0, g_tot = 0;
-  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2));
+  double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2));
   for (int q = 0; q < nQPs; q++) {
     iq = _qm.getIbzqpt(q);
     for (int br = 0; br < nBranches; br++) {
@@ -481,7 +511,7 @@ void TCONDCalculator::calculateTransitionProbabilities() {
     writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_isotope);
   }
 
-  if (calc_options.flag("BOUNADRY")) {
+  if (calc_options.flag("BOUNDARY")) {
     rates_boundary = calculateTransitionProbabilitiesBoundary();
     string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_BOUNDARY_FILE);
     writeTempIndepOutput(filename, "SCATTERING_RATES_ISOTOPE", "1/ps", rates_boundary);
@@ -557,7 +587,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   uint nbr = branches.size();
 
   // Units are chosen so that probabilities are in THz (1/ps)
-  const double probability_prefactor = std::pow(au2THz * 10.0, 2) * hbar_amu * PI/4.0;
+  const double probability_prefactor = std::pow(au2THz * 10.0, 2) * PLANCKSCONSTANTAMU_hbar_THz * PI/4.0;
   const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
 
   // Prepare precomputation of eigenvalue products
@@ -568,7 +598,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   while (at_combos.increment()) at_eigen.push_back(at_combos.getCombo());
   uint nateigen = at_eigen.size();
   vector<vector<xcomplex<double> > > eigenprods(nateigen, vector<xcomplex<double> >(ncart));
-  for (int j = 0; j < 2; j++) atpowers[j] = (int) std::pow(natoms, 2 - j);
+  for (int j = 0; j < 2; j++) atpowers[j] = aurostd::powint(natoms, 2 - j);
 
   // Precompute the indices of -q to use for inversion symmetry
   vector<int> q_minus(nQPs);
@@ -667,7 +697,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
             e = 0;
             for (j = 0; j < 3; j++) e += scell.sc2pcMap(atoms[j]) * atpowers[j];
             for (crt = 0; crt < ncart; crt++) {
-              // Perform multiplication expliclty in place instead of using xcomplex.
+              // Perform multiplication explicitly in place instead of using xcomplex.
               // This is three times faster because constructors and destructors are not called.
               matrix.re += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].re - prefactor.im * eigenprods[e][crt].im);
               matrix.im += ifcs[c][crt] * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
@@ -684,7 +714,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                 // The process information needs to be stored. For q-points, only
                 // one index is necessary since the last index follows from
                 // momentum conservation.
-                // The branches will be stored in a combinded index to save memory.
+                // The branches will be stored in a combined index to save memory.
                 // Instead of storing the sign as an integer, the q-point index
                 // will be signed to save memory. Adding 1 to the index is done
                 // to have a clear sign indication for q = 0. This will be reversed
@@ -696,7 +726,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                   intr_trans_probs[i].push_back(transprob);
                   // Transposition symmetry
                   proc[0] = -(lq + 1);
-                  proc[1] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                  proc[1] = branches[br][0] * aurostd::powint(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
                 } else {  // +
@@ -706,7 +736,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
                     proc[1] = br;
                   } else{
                     proc[0] = q_minus[lq] + 1;
-                    proc[1] = branches[br][0] * std::pow(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
+                    proc[1] = branches[br][0] * aurostd::powint(nBranches, 2) + branches[br][2] * nBranches + branches[br][1];
                   }
                   processes[i].push_back(proc);
                   intr_trans_probs[i].push_back(transprob);
@@ -738,7 +768,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
   const xstructure& pcell = _pc.getInputCellStructure();
   uint natoms = pcell.atoms.size();
   vector<double> pearson(natoms);
-  uint at;
+  uint at = 0;
   for (at = 0; at < natoms; at++) pearson[at] = GetPearsonCoefficient(pcell.atoms[at].atomic_number);
 
   vector<double> frequencies(nQPs), weights(nQPs);
@@ -764,7 +794,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int startIndex, in
                 eig.im = 0.0;
                 e = 3 * at;
                 for (int i = 1; i < 4; i++) {
-                  // Perform multiplication expliclty in place instead of using xcomplex.
+                  // Perform multiplication explicitly in place instead of using xcomplex.
                   // This is three times faster because constructors and destructors are not called.
                   eig.re += eigenvectors[q1][e + i][br1 + 1].re * eigenvectors[q2][e + i][br2 + 1].re;
                   eig.re += eigenvectors[q1][e + i][br1 + 1].im * eigenvectors[q2][e + i][br2 + 1].im;
@@ -937,7 +967,7 @@ void TCONDCalculator::getProcess(const vector<int>& process, vector<int>& qpts,
   int br = process[1];
   int pw = 0;
   for (int i = 0; i < 2; i++) {
-    pw = (int) std::pow(nBranches, 2 - i);
+    pw = aurostd::powint(nBranches, 2 - i);
     branches[i] = br/pw;
     br = br % pw;
   }
@@ -973,7 +1003,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
     std::cout << std::setw(15) << "Iteration";
     std::cout << std::setiosflags(std::ios::fixed | std::ios::right);
-    std::cout << std::setw(25) << "Norm" << std::endl;
+    std::cout << std::setw(25) << "Rel. Change in Norm" << std::endl;
     do {
       tcond_prev = tcond;
       getMeanFreeDispFull(rates, small_groups, occ, mfd);
@@ -1007,7 +1037,7 @@ vector<vector<double> > TCONDCalculator::getOccupationNumbers(double T) {
   vector<vector<double> > occ(nQPs, vector<double>(nBranches, 0.0));
   for (int q = 0; q < nQPs; q++) {
     for (int br = 0; br < nBranches; br++) {
-      occ[q][br] = 1.0/(exp(BEfactor * freq[q][br]/T) - 1.0);
+      occ[q][br] = 1.0/(exp(BEfactor_hbar_THz * freq[q][br]/T) - 1.0);
     }
   }
   return occ;
@@ -1118,7 +1148,7 @@ xmatrix<double> TCONDCalculator::calcTCOND(double T, const vector<vector<double>
   xmatrix<double> tcond(3, 3);
   bool cumulative = calc_options.flag("CUMULATIVEK");
   double grain_size = aurostd::string2utype<double>(calc_options.getattachedscheme("GRAIN_SIZE"));
-  double prefactor = 1E24 * std::pow(hbar_J, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc.getInputCellStructure()));
+  double prefactor = 1E24 * std::pow(PLANCKSCONSTANT_hbar_THz, 2)/(KBOLTZ * std::pow(T, 2) * nQPs * Volume(_pc.getInputCellStructure()));
   for (int q = 0; q < nQPs; q++) {
     for (int br = 0; br < nBranches; br++) {
       bool include = true;

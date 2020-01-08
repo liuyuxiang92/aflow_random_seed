@@ -37,6 +37,33 @@ namespace LATTICE {
     return FALSE;
   }
 }
+   
+//DX 20191031 - START
+namespace LATTICE {
+  string Lattice2TypeAndCentering(const string& lattice_type) {
+
+    if(lattice_type=="TRI"){ return "aP"; }
+    if(lattice_type=="MCL"){ return "mP"; }
+    if(lattice_type=="MCLC"){ return "mC"; }
+    if(lattice_type=="ORC"){ return "oP"; }
+    if(lattice_type=="ORCF"){ return "oF"; }
+    if(lattice_type=="ORCI"){ return "oI"; }
+    if(lattice_type=="ORCC"){ return "oC"; }
+    if(lattice_type=="TET"){ return "tP"; }
+    if(lattice_type=="BCT"){ return "tI"; }
+    if(lattice_type=="HEX"){ return "hP"; }
+    if(lattice_type=="RHL"){ return "hR"; }
+    if(lattice_type=="CUB"){ return "cP"; }
+    if(lattice_type=="FCC"){ return "cF"; }
+    if(lattice_type=="BCC"){ return "cI"; }
+
+    string function_name = "LATTICE::lattice2typeAndCentering()";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
+
+    return "";
+  }
+}
+//DX 20191031 - END
 
 // ***************************************************************************
 namespace LATTICE {
@@ -105,6 +132,16 @@ namespace LATTICE {
     return lattice_type;
   }
 }
+
+//DX 20191031 - START
+namespace LATTICE {
+  string SpaceGroup2LatticeTypeAndCentering(uint sg) {
+    string lattice_type,lattice_system, type_and_centering;
+    LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
+    return LATTICE::Lattice2TypeAndCentering(lattice_type);
+  }
+}
+//DX 20191031 - END
 
 namespace LATTICE {
   string Lattice_System_SpaceGroup(uint sg) {

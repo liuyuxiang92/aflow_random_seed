@@ -30,6 +30,48 @@ namespace apl {
     zerostate_dir = "";  // ME191030
   }
 
+  // ME191228 - BEGIN
+  // Copy constructors
+  PhononCalculator& PhononCalculator::operator=(const PhononCalculator& that) {
+    if (this != &that) copy(that);
+    return *this;
+  }
+
+  void PhononCalculator::copy(const PhononCalculator& that) {
+    DISTORTION_MAGNITUDE = that.DISTORTION_MAGNITUDE;
+    DISTORTION_INEQUIVONLY = that.DISTORTION_INEQUIVONLY;
+    TCOND = that.TCOND;
+    anharmonic_IFC_options = that.anharmonic_IFC_options;
+    _xInput = that._xInput;
+    _aflowFlags = that._aflowFlags;
+    _xFlags = that._xFlags;
+    _AflowIn = that._AflowIn;
+    _system = that._system;
+    _logger = that._logger;
+    _supercell = that._supercell;
+    xInputsAAPL = that.xInputsAAPL;
+    xInputs = that.xInputs;
+    _uniqueDistortions = that._uniqueDistortions;
+    _uniqueForces = that._uniqueForces;
+    _forceConstantMatrices = that._forceConstantMatrices;
+    _calculateZeroStateForces = that._calculateZeroStateForces;
+    ATOMIC_MASSES_AMU = that.ATOMIC_MASSES_AMU;
+    _check_LDAU2_ON = that._check_LDAU2_ON;
+    _LDAU_PARAMETERS = that._LDAU_PARAMETERS;
+    _PSTRESS = that._PSTRESS;
+    _bornEffectiveChargeTensor = that._bornEffectiveChargeTensor;
+    _dielectricTensor = that._dielectricTensor;
+    _inverseDielectricTensor = that._inverseDielectricTensor;
+    _recsqrtDielectricTensorDeterminant = that._recsqrtDielectricTensorDeterminant;
+    _isGammaEwaldPrecomputed = that._isGammaEwaldPrecomputed;
+    _gammaEwaldCorr = that._gammaEwaldCorr;
+    _clusters = that._clusters;
+    _anharmonicIFCs = that._anharmonicIFCs;
+    _stagebreak = that._stagebreak;
+    zerostate_dir = that.zerostate_dir;
+  }
+  // ME191228 - END
+
   // ///////////////////////////////////////////////////////////////////////////
 
   PhononCalculator::~PhononCalculator() {
@@ -59,6 +101,7 @@ namespace apl {
 
     _bornEffectiveChargeTensor.clear();
     _stagebreak = false;  // ME191029
+    zerostate_dir = "";  // ME191030
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -1583,8 +1626,8 @@ namespace apl {
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononCalculator::writeDYNMAT() {
-    string filename = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE;  //ME181226
-    _logger << "Writing forces into file " << aurostd::CleanFileName(filename) << "." << apl::endl; //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
+    _logger << "Writing forces into file " << filename << "." << apl::endl; //ME181226
 
     //
     //CO - START
@@ -1963,7 +2006,7 @@ namespace apl {
     //   if (!aurostd::EFileExist("apl.xml"))
     //    throw apl::APLRuntimeError("PhononCalculator::hibernate(); Cannot open output apl.xml.");
     //} else {
-    string filename = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+    string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::stringstream2file(outfile, filename); //ME181226
     if (!aurostd::FileExist(filename)) { //ME181226
       string function = "PhononCalculator::hibernate()";
@@ -1985,7 +2028,7 @@ namespace apl {
     //CO, we already checked that it exists before, just open
 
     vector<string> vlines;                           //CO
-    string hibfile = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+    string hibfile = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
     aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
     // Decompress
     //bool isXMLCompressed = aurostd::FileExist(string("apl.xml.EXT")); //CO

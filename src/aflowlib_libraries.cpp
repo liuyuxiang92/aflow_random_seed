@@ -1186,7 +1186,7 @@ namespace aflowlib {
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_RAW+"/*\"");
     }
     if(!aurostd::IsDirectory(directory_RAW)) {
-      cout << "aflowlib::LIB2RAW: directory is skip because cannot create directory_RAW: " << directory_RAW << endl;
+      cout << "aflowlib::LIB2RAW: directory is skipped because directory_RAW cannot be created: " << directory_RAW << endl;
       return FALSE;
     }
     if(flag_WEB) {
@@ -1200,7 +1200,7 @@ namespace aflowlib {
       aurostd::RemoveFile(directory_WEB+"/*");
       // [OBSOLETE] aurostd::execute("rm -f \""+directory_WEB+"/*\"");
       if(!aurostd::IsDirectory(directory_WEB)) {
-	cout << "aflowlib::LIB2RAW: directory is skip because cannot create directory_WEB: " << directory_WEB << endl;
+	cout << "aflowlib::LIB2RAW: directory is skipped because directory_WEB cannot be created: " << directory_WEB << endl;
 	return FALSE;
       }
     }
@@ -2116,7 +2116,7 @@ namespace aflowlib {
 //     if(flag_EDATA_ORIG_) { // ORIG
 //       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
 // 	cout << MESSAGE << " EDATA doing orig (POSCAR.orig): " << directory_RAW << endl;
-// 	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+// 	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 // 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 // 	pflow::PrintData(str,str_sp,str_sc,sss,"EDATA"); // 1=EDATA
 // 	aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT);
@@ -2126,7 +2126,7 @@ namespace aflowlib {
 //     if(flag_EDATA_RELAX_) { // RELAX
 //       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT) && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
 // 	cout << MESSAGE << " EDATA doing relax (CONTCAR.relax): " << directory_RAW << endl;
-// 	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+// 	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 // 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 // 	pflow::PrintData(str,str_sp,str_sc,sss,"EDATA"); // EDATA
 // 	aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT);
@@ -2138,7 +2138,7 @@ namespace aflowlib {
 //     { // BANDS IF AVAILABLE DO IT
 //       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.bands")) {
 // 	cout << MESSAGE << " EDATA doing bands (POSCAR.bands): " << directory_RAW << endl;
-// 	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+// 	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 // 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 // 	pflow::PrintData(str,str_sp,str_sc,sss,"EDATA"); // EDATA
 // 	aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_OUT);
@@ -2151,7 +2151,7 @@ namespace aflowlib {
 //     if(flag_DATA_ORIG_) { // ORIG
 //       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
 // 	cout << MESSAGE << " DATA doing orig (POSCAR.orig): " << directory_RAW << endl;
-// 	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+// 	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 // 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 // 	pflow::PrintData(str,str_sp,str_sc,sss,"DATA"); // DATA
 // 	aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_OUT);
@@ -2160,7 +2160,7 @@ namespace aflowlib {
 //     if(flag_DATA_RELAX_) { // RELAX
 //       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_OUT) && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
 // 	cout << MESSAGE << " DATA doing relax (CONTCAR.relax): " << directory_RAW << endl;
-// 	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+// 	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 // 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 // 	pflow::PrintData(str,str_sp,str_sc,sss,"DATA"); // DATA
 // 	aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_OUT);
@@ -2169,7 +2169,7 @@ namespace aflowlib {
 //     if(flag_DATA_BANDS_) { // BANDS
 //       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.bands")) {
 // 	cout << MESSAGE << " DATA doing bands (POSCAR.bands): " << directory_RAW << endl;
-// 	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+// 	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 // 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 // 	pflow::PrintData(str,str_sp,str_sc,sss,"DATA"); // DATA
 // 	aurostd::stringstream2file(sss,directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_OUT);
@@ -3463,7 +3463,7 @@ namespace aflowlib {
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_ORIG_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
 	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing orig (POSCAR.orig) text format: " << directory_RAW << endl;
 	// [OBSOLETE] aurostd::execute("cd \""+directory_RAW+"\" && cat POSCAR.orig | aflow --edata > "+DEFAULT_FILE_EDATA_ORIG_OUT);
-	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 	// DX - START
 	//DX 20180526 [OBSOLETE] str.directory = str_sp.directory = str_sc.directory = aflags.Directory;
 	// DX - END
@@ -3695,7 +3695,7 @@ namespace aflowlib {
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_RELAX_OUT) && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
 	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing relax (CONTCAR.relax) text format: " << directory_RAW << endl;
 	// [OBSOLETE] aurostd::execute("cd \""+directory_RAW+"\" && cat CONTCAR.relax | aflow --edata > "+DEFAULT_FILE_EDATA_RELAX_OUT);
-	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 	xstructure str_sym=str; // CO171027 // DX 2/26/18 - set equal str
         aurostd::xoption vpflow_edata_relax; //DX 20180823 - added xoption
@@ -3928,7 +3928,7 @@ namespace aflowlib {
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_EDATA_BANDS_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.bands")) {
 	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " EDATA doing bands (POSCAR.bands) text format: " << directory_RAW << endl;
 	// [OBSOLETE] aurostd::execute("cd \""+directory_RAW+"\" && cat POSCAR.bands | aflow --edata > "+DEFAULT_FILE_EDATA_BANDS_OUT);
-	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 	xstructure str_sym=str; // CO171027 // DX 2/26/18 - set equal str
         aurostd::xoption vpflow_edata_bands; //DX 20180823 - added xoption
@@ -4162,7 +4162,7 @@ namespace aflowlib {
     if(flag_DATA_ORIG_) { // ORIG
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_DATA_ORIG_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
 	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing orig (POSCAR.orig) text format: " << directory_RAW << endl;
-	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+	str=xstructure(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 	xstructure str_sym=str; // CO171027 // DX 2/26/18 - set equal str
 	pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA // CO 171025 // CO171027
@@ -4177,7 +4177,7 @@ namespace aflowlib {
     if(flag_DATA_RELAX_) { // RELAX
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_DATA_RELAX_OUT) && aurostd::FileExist(directory_RAW+"/CONTCAR.relax")) {
 	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing relax (CONTCAR.relax) text format: " << directory_RAW << endl;
-	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+	str=xstructure(directory_RAW+"/CONTCAR.relax",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 	xstructure str_sym=str; // CO171027 // DX 2/26/18 - set equal str
 	pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA // CO 171025 // CO171027
@@ -4192,7 +4192,7 @@ namespace aflowlib {
     if(flag_DATA_BANDS_) { // BANDS
       if(!aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_DATA_BANDS_OUT) && aurostd::FileExist(directory_RAW+"/POSCAR.bands")) {
 	if(AFLOWLIB_VERBOSE) cout << MESSAGE << " DATA doing relax (POSCAR.bands) text format: " << directory_RAW << endl;
-	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.Clear();str_sc.Clear();
+	str=xstructure(directory_RAW+"/POSCAR.bands",IOAFLOW_AUTO);str_sp.clear();str_sc.clear(); //DX 20191220 - uppercase to lowercase clear
 	stringstream sss; sss << aflow::Banner("BANNER_TINY") << endl;
 	xstructure str_sym=str; // CO171027 // DX 2/26/18 - set equal str
 	pflow::PrintData(str,str_sym,str_sp,str_sc,sss,"DATA","txt",false); // DATA // CO 171025 // CO171027
@@ -5128,6 +5128,21 @@ namespace aflowlib {
     obb<<endl;
     if(print==TRUE) oss << obb.str();
     oss.flush();
+
+    // DX and CO 20191030 - check for identical subdirectories - START
+    // check if directory has an identical subdirectory
+    vector<string> dir_tokens;
+    aurostd::string2tokens(dir,dir_tokens,"/");
+    string run_directory = dir_tokens[dir_tokens.size()-1];
+    string sub_directory = dir+"/"+run_directory;
+    if(aurostd::FileExist(sub_directory)) {
+      obb << "This directory contains an identical subdirectory (subdir=" << sub_directory << "). Removing subdirectory." << endl;
+      oss << obb.str();
+      oss.flush();
+      aurostd::RemoveDirectory(sub_directory);
+    }
+    // DX and CO 20191030 - check for identical subdirectories - END
+
     return ok;
   }
 }

@@ -88,10 +88,8 @@ namespace aurostd {  // namespace aurostd
       //if(rows!=b.rows) {    // if dims(this)!=dims(a) => build a new xvector !!!
       if(lrows!=b.lrows||urows!=b.urows||vsize!=b.vsize) {    // if dims(this)!=dims(a) => build a new xvector !!!  //CO190808 - VERY IMPORTANT that we not only check lrows and urows, but vsize, as xvector could just have been initialized (vsize==0)
         free();
-        lrows=b.lrows;
-        urows=b.urows;
+        lrows=b.lrows;urows=b.urows;rows=b.rows;
         //[simply copy instead]refresh();
-        rows=b.rows;
         isfloat=b.isfloat;
         iscomplex=b.iscomplex;
         size=b.size;
@@ -112,10 +110,10 @@ namespace aurostd {  // namespace aurostd
         //[CO190808 OBSOLETE]  this->corpus[i+lrows] =
         //[CO190808 OBSOLETE]    (utype) b.corpus[i+b.lrows];
     }
-      if(corpus!=b.corpus){
-        for(int i=lrows;i<=urows;i++){this->corpus[i]=b.corpus[i];}
-      } //CO190808 - we definitely have corpus now
-    }
+    if(corpus!=b.corpus){
+      for(int i=lrows;i<=urows;i++){this->corpus[i]=b.corpus[i];}
+    } //CO190808 - we definitely have corpus now
+  }
   template<class utype>
     void xvector<utype>::copy(const xmatrix<utype>& b) { //CO190808
       if(b.rows==1){return copy(b(b.lrows));}
@@ -794,32 +792,30 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype> bool
-  isinteger(const xvector<utype>& a,const utype& tol) { //CO 180409
-    for(int i=a.lrows;i<=a.urows;i++)
-      if(isinteger(a[i],tol)==FALSE) return FALSE; //CO 180409
-    return TRUE;
-  }
-  bool _aurostd_initialize_isinteger(const xvector<int>& a) { return isinteger(a);}
-  bool _aurostd_initialize_isinteger(const xvector<uint>& a) { return isinteger(a);} //CO 180409
-  bool _aurostd_initialize_isinteger(const xvector<float>& a) { return isinteger(a);}
-  bool _aurostd_initialize_isinteger(const xvector<double>& a) { return isinteger(a);}
+    isinteger(const xvector<utype>& a,const utype& tol) { //CO 180409
+      for(int i=a.lrows;i<=a.urows;i++)
+        if(isinteger(a[i],tol)==FALSE) return FALSE; //CO 180409
+      return TRUE;
+    }
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<int>& a) { return isinteger(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<uint>& a) { return isinteger(a);} //CO 180409
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<float>& a) { return isinteger(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_isinteger(const xvector<double>& a) { return isinteger(a);}
 }
 
 // ME 180702 - Tests if vector is the zero vector
 namespace aurostd {
   template<class utype> bool
-  iszero(const xvector<utype>& a, const double& tol) {
-    for (int i = a.lrows; i <= a.urows; i++) {
-      if (abs(a(i)) > tol) {
-        return false;
+    iszero(const xvector<utype>& a,double tol) {
+      for(int i=a.lrows;i<=a.urows;i++){
+        if(!iszero(a[i],tol)){return false;}
       }
+      return true; 
     }
-    return true; 
-  }
-  bool _aurostd_initialize_iszero(const xvector<int>& a) { return iszero(a);}
-  bool _aurostd_initialize_iszero(const xvector<uint>& a) { return iszero(a);}
-  bool _aurostd_initialize_iszero(const xvector<float>& a) { return iszero(a);}
-  bool _aurostd_initialize_iszero(const xvector<double>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<int>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<uint>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<float>& a) { return iszero(a);}
+  //[CO191201 - OBSOLETE]bool _aurostd_initialize_iszero(const xvector<double>& a) { return iszero(a);}
 }
 
 // ------------------------------------------------------------ std::cout operations
@@ -1148,9 +1144,14 @@ namespace aurostd {                   // conversion from xvector<int> to xvector
 }
 
 //CO190516
-namespace aurostd {                   // conversion from xvector<int> to xvector<double>
-  xvector<int> xvectordouble2int(const xvector<double>& a){
+ namespace aurostd {                   // conversion from xvector<double> to xvector<int>
+  xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
     xvector<int> b(a.urows,a.lrows);
+    if(check_int){
+      for(int i=a.lrows;i<=a.urows;i++){
+        if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvectordouble2int():","non-integer found",_INPUT_ILLEGAL_);}
+      }
+    }
     for(int i=a.lrows;i<=a.urows;i++){b[i]=(int)nint(a[i]);}  //nint is for safety
     return b;
   }
@@ -1161,37 +1162,37 @@ namespace aurostd {                   // conversion from xvector<int> to xvector
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  void xvector<utype>::reset(void) {
-    for(int i=lrows;i<=urows;i++) corpus[i]=(utype) 0.0;
-  }
+    void xvector<utype>::reset(void) {
+      for(int i=lrows;i<=urows;i++) corpus[i]=(utype) 0.0;
+    }
   template<class utype>                              // function reset xvector<>
-  void reset(xvector<utype>& a) {
-    for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) 0.0;
-  }
+    void reset(xvector<utype>& a) {
+      for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) 0.0;
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  void xvector<utype>::clear(void) {
-    //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;copy(a);
-    reset(); //CO191110
-  }
+    void xvector<utype>::clear(void) {
+      //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;copy(a);
+      reset(); //CO191110
+    }
   template<class utype>                              // function clear xvector<>
-  void clear(xvector<utype>& b) {
-    //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;b=a;
-    b.reset(); //CO191110
-  }
+    void clear(xvector<utype>& b) {
+      //[CO190808 - this is ideal behavior of clear, but to avoid seg faults with size changes, simply reset() instead]xvector<utype> a;b=a;
+      b.reset(); //CO191110
+    }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-  void xvector<utype>::set(const utype& s) {
-    for(int i=lrows;i<=urows;i++) corpus[i]=(utype) s;
-  }
+    void xvector<utype>::set(const utype& s) {
+      for(int i=lrows;i<=urows;i++) corpus[i]=(utype) s;
+    }
   template<class utype>                                // function set xvector<>
-  void set(xvector<utype>& a, const utype& s) {
-    for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) s;
-  }
+    void set(xvector<utype>& a, const utype& s) {
+      for(int i=a.lrows;i<=a.urows;i++) a[i]=(utype) s;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1385,20 +1386,37 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 // GCD //CO 180409
 namespace aurostd {
-  int GCD(const xvector<int>& in_V){
+  void GCD(const xvector<int>& vab,int& gcd){
     // find first nonzero entry
-    int counter;
+    int counter=0;
     bool set=false;
-    for(int i=in_V.lrows;i<=in_V.urows&&!set;i++) {
-      if(in_V[i]) {
+    for(int i=vab.lrows;i<=vab.urows&&!set;i++) { //find first non-zero entry
+      if(vab[i]) {
         counter=i;
         set=true;
       }
     }
-    if(!set) {return 1;}  // always works
-    int gcd=in_V[counter];
-    for(int i=counter+1;i<=in_V.urows;i++){if(in_V[i]){gcd=GCD(gcd,in_V[i]);}}// if we use chullpoint, there will be 0's!
-    return gcd;
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_VALUE_ILLEGAL_);}  //special case
+    gcd=vab[counter];
+    for(int i=counter+1;i<=vab.urows;i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
+  }
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd){
+    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INDEX_ILLEGAL_);}
+    xvector<int> vx(va.urows,va.lrows),vy(va.urows,va.lrows);
+    return GCD(va,vb,vgcd,vx,vy);
+  }
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy){
+    if(va.rows==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.rows==0",_INDEX_ILLEGAL_);}
+    //va vs. vb
+    if(va.lrows!=vb.lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.lrows!=vb.lrows",_INDEX_MISMATCH_);}
+    if(va.urows!=vb.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","va.urows!=vb.urows",_INDEX_MISMATCH_);}
+    //va vs. vgcd
+    if(va.lrows!=vgcd.lrows || va.urows!=vgcd.urows){xvector<int> vgcd_tmp(va);vgcd=vgcd_tmp;}
+    //va vs. vx
+    if(va.lrows!=vx.lrows || va.urows!=vx.urows){xvector<int> vx_tmp(va);vx=vx_tmp;}
+    //va vs. vy
+    if(va.lrows!=vy.lrows || va.urows!=vy.urows){xvector<int> vy_tmp(va);vy=vy_tmp;}
+    for(int i=va.lrows;i<=va.urows;i++){GCD(va[i],vb[i],vgcd[i],vx[i],vy[i]);}
   }
   int LCM(const xvector<int>& in_V){
     // find first nonzero entry
@@ -1416,20 +1434,21 @@ namespace aurostd {
     return lcm;
   }
 }
-
+ 
 namespace aurostd {
-  template<class utype> xvector<utype> 
-    reduceByGCD(const xvector<utype>& in_V,const utype& tol){
-    xvector<utype> out_V=in_V;
-    if(!isinteger(out_V,tol)){return out_V;} //nothing to reduce
+  template<class utype> void reduceByGCD(const xvector<utype>& in_V, xvector<utype>& out_V, utype tol){
+  // DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,const utype& tol){
+    //DX 20191125 [OBSOLETE] xvector<utype> out_V=in_V;
+    out_V=in_V;
+    if(!isinteger(out_V,tol)){return;} //nothing to reduce //DX 20191125 - return type is void
 
     xvector<int> v1(in_V.lrows,in_V.urows); //cast to xvector of ints
     for(int i=in_V.lrows;i<=in_V.urows;i++){v1[i]=nint(in_V[i]);}
-    int denom=GCD(v1);
+    int denom=0;
+    GCD(v1,denom);
     if(denom!=0){v1/=denom;}  //safety
     for(int i=v1.lrows;i<=v1.urows;i++){out_V[i]=(utype)v1[i];}  //cast back
-    
-    return out_V;
+    //DX 20191125 [OBSOLETE] return out_V;
   }
   //xvector<int> reduceByGCD(const xvector<int>& in_V){
   //  xvector<int> out_V=in_V;
@@ -1437,6 +1456,114 @@ namespace aurostd {
   //  if(denom!=1){out_V/=denom;}
   //  return out_V;
   //}
+}
+
+// ----------------------------------------------------------------------------
+// GCD //DX 20191122
+// vector version (modeled after CO's xvector version)
+namespace aurostd {
+  void GCD(const vector<int>& vab,int& gcd){
+    // find first nonzero entry
+    int counter=0;
+    bool set=false;
+    // REMOVE for(int i=vab.lrows;i<=vab.urows&&!set;i++) {
+    for(uint i=0;i<vab.size()&&!set;i++) {
+      if(vab[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_VALUE_ILLEGAL_);}  //special case
+    gcd=vab[counter];
+    for(uint i=counter+1;i<vab.size();i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
+  }
+  int LCM(const vector<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    for(uint i=0;i<in_V.size()&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 0;}  //special, trivial case: lcm must really be positive
+    int lcm=in_V[counter];
+    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){lcm=LCM(lcm,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return lcm;
+  }
+}
+
+namespace aurostd {
+  template<class utype> void reduceByGCD(const vector<utype>& in_V, vector<utype>& out_V, utype tol){
+    //DX 20191125 [OBSOLETE] vector<utype> out_V=in_V;
+    out_V=in_V;
+    for(uint i=0;i<out_V.size();i++){ 
+      if(!isinteger(out_V[i],tol)){return;}
+    }
+
+    vector<int> v1; v1.resize(in_V.size()); //cast to vector of ints
+    for(uint i=0;i<in_V.size();i++){v1[i]=nint(in_V[i]);}
+    int denom=0;
+    GCD(v1,denom);
+    if(denom!=0){for(uint i=0;i<v1.size();i++){v1[i]/=denom;}}
+    for(uint i=0;i<v1.size();i++){out_V[i]=(utype)v1[i];}  //cast back
+    //DX 20191125 [OBSOLETE] return out_V;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// GCD //DX 20191122
+// deque version (modeled after CO's xvector version)
+namespace aurostd {
+  void GCD(const deque<int>& vab,int& gcd){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    // REMOVE for(int i=vab.lrows;i<=vab.urows&&!set;i++) {
+    for(uint i=0;i<vab.size()&&!set;i++) {
+      if(vab[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_VALUE_ILLEGAL_);}  //special case
+    gcd=vab[counter];
+    for(uint i=counter+1;i<vab.size();i++){if(vab[i]){GCD(gcd,vab[i],gcd);}}// if we use chullpoint, there will be 0's!
+  }
+  int LCM(const deque<int>& in_V){
+    // find first nonzero entry
+    int counter;
+    bool set=false;
+    for(uint i=0;i<in_V.size()&&!set;i++) {
+      if(in_V[i]) {
+        counter=i;
+        set=true;
+      }
+    }
+    if(!set) {return 0;}  //special, trivial case: lcm must really be positive
+    int lcm=in_V[counter];
+    for(uint i=counter+1;i<in_V.size();i++){if(in_V[i]){lcm=LCM(lcm,in_V[i]);}}// if we use chullpoint, there will be 0's!
+    return lcm;
+  }
+}
+
+namespace aurostd {
+  template<class utype> void reduceByGCD(const deque<utype>& in_V, deque<utype>& out_V, utype tol){
+    //DX 20191125 [OBSOLETE] deque<utype> out_V=in_V;
+    out_V=in_V;
+    for(uint i=0;i<out_V.size();i++){ 
+      if(!isinteger(out_V[i],tol)){return;}
+    }
+
+    vector<int> v1; v1.resize(in_V.size()); //cast to vector of ints
+    for(uint i=0;i<in_V.size();i++){v1[i]=nint(in_V[i]);}
+    int denom=0;
+    GCD(v1,denom);
+    if(denom!=0){for(uint i=0;i<v1.size();i++){v1[i]/=denom;}}
+    for(uint i=0;i<v1.size();i++){out_V[i]=(utype)v1[i];}  //cast back
+    //DX 20191125 [OBSOLETE] return out_V;
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -1949,7 +2076,7 @@ namespace aurostd {
       //https://ef.gy/linear-algebra:normal-vectors-in-higher-dimensional-spaces
       //"it can be defined in a coordinate independent way as the Hodge dual of the wedge product of the arguments"
       xvector<utype> normal(dim-1,0);
-      xmatrix<utype> mat(dim,dim-1,1,1); //must start at 1 to work with det(), minordet()
+      xmatrix<utype> mat(dim,dim-1,1,1),submat(dim-1,dim-1,1,1); //must start at 1 to work with det(), minordet()
       for(int i=0;i<dim;i++){
         for(int j=0;j<dim-1;j++){
           mat(i+1,j+1)=directive_vectors[j][i];
@@ -1967,7 +2094,12 @@ namespace aurostd {
       //is useless, they are the same for even/odd n, I checked.
       //so we keep as implemented
       //this is also verified in http://www.jstor.org/stable/2323537
-      for(int i=0;i<dim;i++){normal[i]=std::pow(-1,i)*minordet(mat,i+1,0);}
+      //get "cofactor" vector
+      //[CO191201 - OBSOLETE SLOW]for(int i=0;i<dim;i++){normal[i]=std::pow(-1,i)*minordet(mat,i+1,0);}
+      for(int i=0;i<dim;i++){ //CO191201 - faster
+        submatrixInPlace(mat,submat,i+1,0);
+        normal[i]=(double)aurostd::powint(-1,i)*det(submat);
+      }
       normal/=modulus(normal);    //normalize
 
       aurostd::shiftlrows(normal,lrows); //shift back to original!
@@ -2788,4 +2920,3 @@ namespace aurostd {
 // *             STEFANO CURTAROLO - Duke University 2003-2019              *
 // *                                                                        *
 // **************************************************************************
-

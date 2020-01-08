@@ -736,7 +736,7 @@ namespace KBIN {
         aus << "00000  MESSAGE INCAR-MPI: found AUTOTUNE option " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         aus << "00000  MESSAGE INCAR-MPI: input files WILL be auto-tuned for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        KBIN::VASP_MPI_Autotune(xvasp,vflags.KBIN_VASP_INCAR_VERBOSE);
+        KBIN::VASP_MPI_Autotune(xvasp,aflags,vflags.KBIN_VASP_INCAR_VERBOSE);
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
       } else {
         aus << "00000  MESSAGE INCAR-MPI: AUTOTUNE option NOT found! (aflow_ivasp.cpp) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -1182,23 +1182,28 @@ namespace KBIN {
 
     // INTERCEPT ERRORS AND WRAP UP after all the incar has been prepared
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"LEPSILON") && !aurostd::substring2bool(xvasp.INCAR,"#LEPSILON")) {  /*************** INCAR **************/
-      aus << "00000  MESSAGE REMOVE ENTRY NPAR because of LEPSILON - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      // ME191205 - also remove NCORE
+      aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LEPSILON - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","LEPSILON",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"LCALCEPS") && !aurostd::substring2bool(xvasp.INCAR,"#LCALCEPS")) {  /*************** INCAR **************/
-      aus << "00000  MESSAGE REMOVE ENTRY NPAR because of LCALCEPS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      // ME191205 - also remove NCORE
+      aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of LCALCEPS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","LCALCEPS",vflags.KBIN_VASP_INCAR_VERBOSE);
+      KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","LCALCEPS",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     } // KEVIN
     if(Krun && aurostd::substring2bool(xvasp.INCAR,"IBRION") && !aurostd::substring2bool(xvasp.INCAR,"#IBRION")) {  /*************** INCAR **************/
       uint IBRION=aurostd::substring2utype<uint>(xvasp.INCAR.str(),"IBRION=");
       if(IBRION==8) {
-        aus << "00000  MESSAGE REMOVE ENTRY NPAR because of IBRION=" << IBRION << "  - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE REMOVE ENTRIES NPAR and NCORE because of IBRION=" << IBRION << "  - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  // ME191205
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NPAR","IBRION=8",vflags.KBIN_VASP_INCAR_VERBOSE);
+        KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"NCORE","IBRION=8",vflags.KBIN_VASP_INCAR_VERBOSE);  // ME191205
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
       }
     }
@@ -1744,7 +1749,7 @@ namespace KBIN {
       xvasp.str.write_inequivalent_flag=FALSE;
       //corey, fix if write_inequivalent_flag is present
       xvasp.POSCAR << xvasp.str;
-      xvasp.str.Clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed
+      xvasp.str.clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has changed //DX 20191220 - uppercase to lowercase clear
       //corey add these flags to prevent recalculation and wasted effort
       xvasp.str.Standard_Lattice_calculated=TRUE;
       xvasp.str.Standard_Lattice_primitive=TRUE;
@@ -1778,7 +1783,7 @@ namespace KBIN {
       xvasp.str.write_inequivalent_flag=FALSE;
       //corey, fix if write_inequivalent_flag is present
       xvasp.POSCAR << xvasp.str;
-      xvasp.str.Clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change
+      xvasp.str.clear();xvasp.POSCAR >> xvasp.str;  //corey, this is important, clear all symmetry stuff as the whole lattice has change //DX 20191220 - uppercase to lowercase clear
       //corey add these flags to prevent recalculation and wasted effort
       xvasp.str.Standard_Lattice_calculated=TRUE;
       xvasp.str.Standard_Lattice_conventional=TRUE;
@@ -1787,7 +1792,7 @@ namespace KBIN {
       xvasp.str.write_inequivalent_flag=write_inequivalent_flag;
       // CO - END
       xvasp.str.bravais_lattice_type=bravais_lattice_type;xvasp.str.bravais_lattice_variation_type=bravais_lattice_variation_type;xvasp.str.pearson_symbol=pearson_symbol;
-      // xvasp.str.Clear();xvasp.POSCAR >> xvasp.str;
+      // xvasp.str.clear();xvasp.POSCAR >> xvasp.str; //DX 20191220 - uppercase to lowercase clear
       // cout << xvasp.str << endl;
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
       xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed",TRUE);
@@ -2801,7 +2806,7 @@ namespace KBIN {
 // KBIN::XVASP_MPI_Autotune
 // ***************************************************************************
 namespace KBIN {
-  void VASP_MPI_Autotune(_xvasp& xvasp,bool VERBOSE) {
+  void VASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE) {
     string FileContent,strline;
     int imax;
 
@@ -2844,72 +2849,122 @@ namespace KBIN {
     if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for david gaffney, koehr, and mustang
     if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for david onyx
 
-
     // marylou fulton super computer center
     if(xvasp.NCPUS==4)  { // best 4 times
-      //  ./NCPUS04/NPAR01_NCORE04/OUTCAR.xz: 18576.588 20.6407
-      //  ./NCPUS04/NPAR01_NCORE03/OUTCAR.xz: 18289.541 20.3217
-      //  ./NCPUS04/NPAR01_NCORE01/OUTCAR.xz: 18223.492 20.2483
-      //  ./NCPUS04/NPAR01_NCORE02/OUTCAR.xz: 18176.841 20.1965
+      //  NCPUS04 NPAR01 NCORE04 18576.588 20.6407
+      //  NCPUS04 NPAR01 NCORE03 18289.541 20.3217
+      //  NCPUS04 NPAR01 NCORE01 18223.492 20.2483
+      //  NCPUS04 NPAR01 NCORE02 18176.841 20.1965
       NPAR=1;NCORE=4;  // trying to make NPAR*NCORE=NCPUS 
     }
     if(xvasp.NCPUS==6)  { // best 4 times
-      //  ./NCPUS06/NPAR03_NCORE02/OUTCAR.xz: 12758.774 21.2646
-      //  ./NCPUS06/NPAR03_NCORE04/OUTCAR.xz: 12724.680 21.2078
-      //  ./NCPUS06/NPAR03_NCORE05/OUTCAR.xz: 12678.754 21.1313
-      //  ./NCPUS06/NPAR03_NCORE01/OUTCAR.xz: 12669.103 21.1152
+      //  NCPUS06 NPAR03 NCORE02 12758.774 21.2646
+      //  NCPUS06 NPAR03 NCORE04 12724.680 21.2078
+      //  NCPUS06 NPAR03 NCORE05 12678.754 21.1313
+      //  NCPUS06 NPAR03 NCORE01 12669.103 21.1152
       NPAR=3;NCORE=2;  // trying to make NPAR*NCORE=NCPUS 
     }
     if(xvasp.NCPUS==8)  { // best 4 times   
-      // ./NCPUS08/NPAR02_NCORE06/OUTCAR.xz: 10757.264 23.905
-      // ./NCPUS08/NPAR02_NCORE04/OUTCAR.xz: 10731.053 23.8468
-      // ./NCPUS08/NPAR02_NCORE07/OUTCAR.xz: 10728.917 23.842
-      // ./NCPUS08/NPAR02_NCORE01/OUTCAR.xz: 10707.747 23.795
+      //  NCPUS08 NPAR02 NCORE06 10757.264 23.905
+      //  NCPUS08 NPAR02 NCORE04 10731.053 23.8468
+      //  NCPUS08 NPAR02 NCORE07 10728.917 23.842
+      //  NCPUS08 NPAR02 NCORE01 10707.747 23.795
       NPAR=2;NCORE=4;  // trying to make NPAR*NCORE=NCPUS if possible
     }
     if(xvasp.NCPUS==12)  { // best times
-      // ./NCPUS12/NPAR03_NCORE07/OUTCAR.xz: 7256.892 24.1896
-      // ./NCPUS12/NPAR03_NCORE11/OUTCAR.xz: 7253.081 24.1769
-      // ./NCPUS12/NPAR03_NCORE04/OUTCAR.xz: 7251.042 24.1701
-      // ./NCPUS12/NPAR03_NCORE09/OUTCAR.xz: 7248.894 24.163
-      // ./NCPUS12/NPAR03_NCORE05/OUTCAR.xz: 7245.983 24.1533
-      // ./NCPUS12/NPAR03_NCORE06/OUTCAR.xz: 7242.303 24.141
-      // ./NCPUS12/NPAR03_NCORE02/OUTCAR.xz: 7239.272 24.1309
-      // ./NCPUS12/NPAR03_NCORE12/OUTCAR.xz: 7239.034 24.1301
-      // ./NCPUS12/NPAR03_NCORE03/OUTCAR.xz: 7234.666 24.1156
-      // ./NCPUS12/NPAR03_NCORE10/OUTCAR.xz: 7230.139 24.1005
-      // ./NCPUS12/NPAR03_NCORE08/OUTCAR.xz: 7175.204 23.9173
-      // ./NCPUS12/NPAR03_NCORE01/OUTCAR.xz: 7169.198 23.8973
+      //  NCPUS12 NPAR03 NCORE07 7256.892 24.1896
+      //  NCPUS12 NPAR03 NCORE11 7253.081 24.1769
+      //  NCPUS12 NPAR03 NCORE04 7251.042 24.1701
+      //  NCPUS12 NPAR03 NCORE09 7248.894 24.163
+      //  NCPUS12 NPAR03 NCORE05 7245.983 24.1533
+      //  NCPUS12 NPAR03 NCORE06 7242.303 24.141
+      //  NCPUS12 NPAR03 NCORE02 7239.272 24.1309
+      //  NCPUS12 NPAR03 NCORE12 7239.034 24.1301
+      //  NCPUS12 NPAR03 NCORE03 7234.666 24.1156
+      //  NCPUS12 NPAR03 NCORE10 7230.139 24.1005
+      //  NCPUS12 NPAR03 NCORE08 7175.204 23.9173
+      //  NCPUS12 NPAR03 NCORE01 7169.198 23.8973
       NPAR=3;NCORE=2; // trying to make NPAR*NCORE=NCPUS if possible
     }
-    if(xvasp.NCPUS==16)  { // best times
-      // ./NCPUS16/NPAR04_NCORE04/OUTCAR.xz: 6423.776 28.5501
-      // ./NCPUS16/NPAR04_NCORE02/OUTCAR.xz: 6418.438 28.5264
-      // ./NCPUS16/NPAR04_NCORE13/OUTCAR.xz: 6416.928 28.5197
-      // ./NCPUS16/NPAR04_NCORE05/OUTCAR.xz: 6416.292 28.5169
-      // ./NCPUS16/NPAR04_NCORE14/OUTCAR.xz: 6415.565 28.5136
-      // ./NCPUS16/NPAR04_NCORE10/OUTCAR.xz: 6407.344 28.4771
-      // ./NCPUS16/NPAR04_NCORE01/OUTCAR.xz: 6405.943 28.4709
-      // ./NCPUS16/NPAR04_NCORE16/OUTCAR.xz: 6403.422 28.4597
-      // ./NCPUS16/NPAR04_NCORE06/OUTCAR.xz: 6323.368 28.1039
-      // ./NCPUS16/NPAR04_NCORE08/OUTCAR.xz: 6323.029 28.1024
+    if(xvasp.NCPUS==14)  { // best times
+      // NCPUS14 NPAR02 NCORE13 6647.652 25.852
+      // NCPUS14 NPAR02 NCORE04 6625.906 25.7674
+      // NCPUS14 NPAR02 NCORE01 6622.861 25.7556
+      // NCPUS14 NPAR02 NCORE12 6606.536 25.6921
+      // NCPUS14 NPAR02 NCORE14 6605.233 25.687
+      // NCPUS14 NPAR02 NCORE06 6602.645 25.677
+      // NCPUS14 NPAR02 NCORE02 6583.709 25.6033
+      // NCPUS14 NPAR02 NCORE08 6581.525 25.5948
+      // NCPUS14 NPAR02 NCORE05 6577.889 25.5807
+      // NCPUS14 NPAR02 NCORE03 6573.488 25.5636
+      // NCPUS14 NPAR02 NCORE07 6562.956 25.5226
+      // NCPUS14 NPAR02 NCORE10 6536.529 25.4198
+      // NCPUS14 NPAR02 NCORE11 6518.928 25.3514
+      NPAR=2;NCORE=7; // trying to make NPAR*NCORE=NCPUS if possible
+    }
+   if(xvasp.NCPUS==16)  { // best times
+      //  NCPUS16 NPAR04 NCORE04 6423.776 28.5501
+      //  NCPUS16 NPAR04 NCORE02 6418.438 28.5264
+      //  NCPUS16 NPAR04 NCORE13 6416.928 28.5197
+      //  NCPUS16 NPAR04 NCORE05 6416.292 28.5169
+      //  NCPUS16 NPAR04 NCORE14 6415.565 28.5136
+      //  NCPUS16 NPAR04 NCORE10 6407.344 28.4771
+      //  NCPUS16 NPAR04 NCORE01 6405.943 28.4709
+      //  NCPUS16 NPAR04 NCORE16 6403.422 28.4597
+      //  NCPUS16 NPAR04 NCORE06 6323.368 28.1039
+      //  NCPUS16 NPAR04 NCORE08 6323.029 28.1024
       NPAR=4;NCORE=8; // trying to make NPAR*NCORE=NCPUS if possible
     }
     if(xvasp.NCPUS==24)  { // best times
-      // ./NCPUS24/NPAR03_NCORE02/OUTCAR.xz: 5293.432 35.2895
-      // ./NCPUS24/NPAR03_NCORE05/OUTCAR.xz: 5286.059 35.2404
-      // ./NCPUS24/NPAR03_NCORE12/OUTCAR.xz: 5277.060 35.1804
-      // ./NCPUS24/NPAR03_NCORE09/OUTCAR.xz: 5274.808 35.1654
-      // ./NCPUS24/NPAR03_NCORE17/OUTCAR.xz: 5267.672 35.1178
-      // ./NCPUS24/NPAR03_NCORE15/OUTCAR.xz: 5265.254 35.1017
-      // ./NCPUS24/NPAR03_NCORE01/OUTCAR.xz: 5262.930 35.0862
-      // ./NCPUS24/NPAR03_NCORE23/OUTCAR.xz: 5254.012 35.0267
-      // ./NCPUS24/NPAR03_NCORE06/OUTCAR.xz: 5247.212 34.9814
-      // ./NCPUS24/NPAR03_NCORE24/OUTCAR.xz: 5219.655 34.7977
-      // ./NCPUS24/NPAR03_NCORE07/OUTCAR.xz: 5185.569 34.5705
+      //  NCPUS24 NPAR03 NCORE02 5293.432 35.2895
+      //  NCPUS24 NPAR03 NCORE05 5286.059 35.2404
+      //  NCPUS24 NPAR03 NCORE12 5277.060 35.1804
+      //  NCPUS24 NPAR03 NCORE09 5274.808 35.1654
+      //  NCPUS24 NPAR03 NCORE17 5267.672 35.1178
+      //  NCPUS24 NPAR03 NCORE15 5265.254 35.1017
+      //  NCPUS24 NPAR03 NCORE01 5262.930 35.0862
+      //  NCPUS24 NPAR03 NCORE23 5254.012 35.0267
+      //  NCPUS24 NPAR03 NCORE06 5247.212 34.9814
+      //  NCPUS24 NPAR03 NCORE24 5219.655 34.7977
+      //  NCPUS24 NPAR03 NCORE07 5185.569 34.5705
       NPAR=3;NCORE=12;  // trying to make NPAR*NCORE=NCPUS if possible
     }
    
+    if(xvasp.NCPUS==28)  { // best times  (delay %)
+      //  NCPUS28 NPAR04 NCORE12 4817.701 37.471  1.97962
+      //  NCPUS28 NPAR04 NCORE07 4809.654 37.4084 1.80929
+      //  NCPUS28 NPAR04 NCORE13 4799.799 37.3318 1.60068
+      //  NCPUS28 NPAR04 NCORE05 4799.391 37.3286 1.59204
+      //  NCPUS28 NPAR04 NCORE20 4797.978 37.3176 1.56213
+      //  NCPUS28 NPAR04 NCORE22 4794.220 37.2884 1.48259
+      //  NCPUS28 NPAR04 NCORE01 4785.839 37.2232 1.30518
+      //  NCPUS28 NPAR04 NCORE18 4769.633 37.0971 0.962135
+      //  NCPUS28 NPAR04 NCORE23 4767.426 37.08   0.915418
+      //  NCPUS28 NPAR04 NCORE06 4724.180 36.7436
+      NPAR=4;NCORE=6;  // trying to make NPAR*NCORE=NCPUS if possible
+    }
+   
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_EOS and xvasp.NCPUS==32",_incarpad_) << endl; 
+      NPAR=4;NCORE=32;
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_DRACO and xvasp.NCPUS==32",_incarpad_) << endl; 
+      NPAR=4;NCORE=32;
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_COBRA and xvasp.NCPUS==32",_incarpad_) << endl; 
+      NPAR=4;NCORE=32;
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA") && xvasp.NCPUS==40)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_COBRA and xvasp.NCPUS==40",_incarpad_) << endl; 
+      NPAR=4;NCORE=40;
+    }
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA") && xvasp.NCPUS==32)  {
+      xvasp.INCAR << aurostd::PaddedPOST("# Override for MACHINE::MPCDF_HYDRA and xvasp.NCPUS==32",_incarpad_) << endl; 
+      NPAR=4;NCORE=32;
+    }
+
     //  cerr << "xvasp.NCPUS=" << xvasp.NCPUS << endl;;
     // cerr << "NPAR=" << NPAR << endl;
     // exit(0);
@@ -3923,7 +3978,7 @@ namespace KBIN {
 	} else {
 	  if(!vflags.KBIN_VASP_INCAR_VERBOSE && strline.length()) xvasp.INCAR << strline << endl;
 	  if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << endl;
-	  if(aurostd::substring2bool(strline,"MAGMOM")) {cerr << strline << endl;}        //corey
+	  //if(aurostd::substring2bool(strline,"MAGMOM")) {cerr << strline << endl;}        //corey
 	  if(aurostd::substring2bool(strline,"MAGMOM") && !aurostd::substring2bool(strline,"#MAGMOM")) {MAGMOM_ALREADY_SPECIFIED=TRUE;}       //corey
 	}
       }
@@ -4122,9 +4177,12 @@ namespace KBIN {
           if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << strline << std::endl;
         }
       }
-      if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] begin" << std::endl;
-      xvasp.INCAR << "ICHARG=" << ivalue << std::endl;
-      if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] end" << std::endl;
+      // Use negative values to just remove ICHARG
+      if (ivalue >= 0) {
+        if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] begin" << std::endl;
+        xvasp.INCAR << "ICHARG=" << ivalue << std::endl;
+        if (vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing CHGCAR_FILE=" << chgcar << " [AFLOW] end" << std::endl;
+      }
       DONE = true;
     }
 
@@ -4167,29 +4225,47 @@ namespace KBIN {
 // ***************************************************************************
 // KBIN::XVASP_INCAR_ADJUST_ICHARG
 namespace KBIN {
+  // ME191028
+  // When a CHGCAR file is specified in the aflow.in file, it is really only
+  // useful in the first relxation calculations. For all other calculations,
+  // it should not read from that CHGCAR file, so set ICHARG = 2 (default, but do not write) and comment
+  // out the original CHGCAR file. Exception: if a CHGCAR file is output
+  // after the relaxation, assume that the user wants to reuse it.
   void XVASP_INCAR_ADJUST_ICHARG(_xvasp& xvasp, _vflags& vflags, _aflags& aflags, int step, ofstream& FileMESSAGE) {
     if ((step == 1) && vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
-      ostringstream aus;
-      aus << "00000  MESSAGE ICHARG: ICHARG will be set to 2 - " << Message(aflags, "user,host,time") << std::endl;
-      aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
-      KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", 2, 0.0, false);
-      xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
-      xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
-      xvasp.INCAR_orig.str(std::string());
-      xvasp.INCAR_orig << xvasp.INCAR.str();
-      aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+      // Do not set ICHARG when a CHGCAR file is output
+      if (!vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option) {
+        ostringstream aus;
+        aus << "00000  MESSAGE ICHARG: Removing ICHARG - " << Message(aflags, "user,host,time") << std::endl;
+        aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", -1, 0.0, false); //remove any ICHARG from INCAR, leaving default ==2
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
+      }
+      if (xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
+        xvasp.aopts.flag("FLAG::XVASP_INCAR_generated", true);
+        xvasp.INCAR_orig.str(std::string());
+        xvasp.INCAR_orig << xvasp.INCAR.str();
+        if (step < xvasp.NRELAX) {  // Do not write when at the last step or there will be an extra INCAR
+          aurostd::stringstream2file(xvasp.INCAR, string(xvasp.Directory+"/INCAR"));
+        }
+      }
 
       // Comment out CHGCAR file in aflow.in
       if (vflags.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.isentry) {
         stringstream aflowin_fixed;
-        string line, filecontent;
-        filecontent = aurostd::file2string(aurostd::CleanFileName(xvasp.Directory + "/" + _AFLOWIN_));
+        string filename = aurostd::CleanFileName(xvasp.Directory + "/" + _AFLOWIN_);
+        string filecontent = aurostd::file2string(aurostd::CleanFileName(filename));
         int nlines = aurostd::GetNLinesString(filecontent);
+        string line = "";
         for (int l = 1; l <= nlines; l++) {
           line = aurostd::GetLineString(filecontent, l);
-          if ((line[0] != '#') && (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line))) aflowin_fixed << "#";
+          if (aurostd::substring2bool("[VASP_FORCE_OPTION]CHGCAR_FILE=", line)) {
+            string line_fixed = aurostd::RemoveWhiteSpacesFromTheFront(line);
+            if (line_fixed[0] != '#') line = "#" + line_fixed;
+          }
           aflowin_fixed << line << std::endl;
         }
+        aurostd::stringstream2file(aflowin_fixed, filename);
       }
     }
   }
@@ -4219,7 +4295,9 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_INCAR_generated",TRUE);
       xvasp.INCAR_orig.str(std::string()); xvasp.INCAR_orig << xvasp.INCAR.str();
-      aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+        aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
+      }
       // xvasp.INCAR << aurostd::file2string(xvasp.Directory+"/INCAR"); // DID REREAD
     }
     if(fix_aflowlin) {
@@ -4257,7 +4335,9 @@ namespace KBIN {
     if(xvasp.aopts.flag("FLAG::XVASP_KPOINTS_changed")) {
       xvasp.aopts.flag("FLAG::XVASP_KPOINTS_generated",TRUE);
       xvasp.KPOINTS_orig.str(std::string()); xvasp.KPOINTS_orig << xvasp.KPOINTS.str();
-      aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      if (step < xvasp.NRELAX) {  // ME200107 - do not write when at the last step or there will be an extra INCAR
+        aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
+      }
       // xvasp.KPOINTS << aurostd::file2string(xvasp.Directory+"/KPOINTS"); // DID REREAD
     }
   }

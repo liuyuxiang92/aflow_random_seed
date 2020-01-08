@@ -217,7 +217,12 @@ void RunPhonons_APL(_xinput& xinput,
                     _kflags& kflags,
                     _xflags& xflags, 
                     ofstream& messageFile) {
-  return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
+  // ME200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+  try {
+    return RunPhonons_APL_181216(xinput,AflowIn,aflags,kflags,xflags,messageFile);
+  } catch (aurostd::xerror e) {
+    pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, std::cout, _LOGGER_ERROR_);
+  }
 }
 void RunPhonons_APL_181216(_xinput& xinput,
                     string AflowIn,
@@ -495,7 +500,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
     if (USER_DC) {
       if (USER_DC_METHOD == "LATTICE") {
-        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_type;
+        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // ME191202 - must be variation_type to get e.g. MCLC3
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
         tokens.clear();
@@ -1520,8 +1525,8 @@ void RunPhonons_APL_181216(_xinput& xinput,
             clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
                                    USER_CUTOFF_DISTANCE[o-3], o, logger, aflags);
           } catch (aurostd::xerror excpt) {
-            logger << apl::warning << excpt.where() << " " << excpt.error_message
-                   << " Skipping awakening of anharmonic IFCs." << apl::endl;
+            logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
+            logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
             awakeClusterSet = false;
           }
         }
@@ -2245,7 +2250,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
           try {
             phcalc->readAnharmonicIFCs(ifcs_hib_file, phcalc->_clusters[i]);
           } catch (aurostd::xerror excpt) {
-            logger << apl::warning << excpt.where() << " " << excpt.error_message << std::endl;
+            logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
             logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
             awakeAnharmIFCs = false;
           }
@@ -2283,8 +2288,6 @@ void RunPhonons_APL_181216(_xinput& xinput,
       tcond.calc_options.push_attached("KZIP_BIN", kflags.KZIP_BIN);
 
       tcond.calculateThermalConductivity();
- 
-      tcond.clear();
     }
     /*************** End Thermal Conductivity Calculations ****************/
 
@@ -3456,7 +3459,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
             clst = apl::ClusterSet(clust_hib_file, supercell, USER_CUTOFF_SHELL[o-3],
                                    USER_CUTOFF_DISTANCE[o-3], o, logger);
           } catch (aurostd::xerror excpt) {
-            logger << apl::warning << excpt.where() << " " << excpt.error_message << std::endl;
+            logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
             logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
             awakeClusterSet = false;
           }
@@ -4076,7 +4079,7 @@ void RunPhonons_APL_180101(_xinput& xinput,
           try {
             phcalc->readAnharmonicIFCs(ifcs_hib_file, phcalc->_clusters[i]);
           } catch (aurostd::xerror excpt) {
-            logger << apl::warning << excpt.where() << " " << excpt.error_message << std::endl;
+            logger << apl::warning << excpt.whereFunction() << " " << excpt.error_message << std::endl; //CO191201 - marco, patch so whereFileName() is included through logger()
             logger << apl::warning << "Skipping awakening of anharmonic IFCs." << apl::endl;
             awakeAnharmIFCs = false;
           }

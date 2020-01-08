@@ -1,7 +1,13 @@
 // ***************************************************************************
-// 			AFLOW Compare Structure - Functions
-//		David Hicks (d.hicks@duke.edu) and Carlo de Santo
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *                                                                         *
 // ***************************************************************************
+// AFLOW-XtalMatch (compare crystal structures)
+// Written by David Hicks (david.hicks@duke.edu) 
+// Contributors: Carlo De Santo
+
 #include<fstream>
 #include<iostream>
 #include<vector>
@@ -25,81 +31,61 @@
 // Prototype Class 
 // ***************************************************************************
 // ===== Constructor ===== //
-StructurePrototype::StructurePrototype(){ 
+StructurePrototype::StructurePrototype(){
+  free();
+}
+
+// ===== Free  ===== //
+void StructurePrototype::free(){
   iomode=JSON_MODE;
-  representative_structure_name="";
-  representative_structure_compound="";
-  representative_structure.Clear();
-  representative_structure_generated=false;
-  representative_structure_from="";
+  structure_representative_name="";
+  structure_representative_compound="";
+  structure_representative.clear(); //DX 20191220 - uppercase to lowercase clear
+  structure_representative_generated=false;
+  structure_representative_from="";
   number_compounds_matching_representative=0;
-  number_types=0;
+  number_of_types=0;
   elements.clear();
   stoichiometry.clear();
   number_of_atoms=0;
-  unique_permutations.clear();
+  atom_decorations_equivalent.clear();
   Pearson="";
   space_group=0;
   grouped_Wyckoff_positions.clear();
   wyckoff_site_symmetry.clear();
   wyckoff_multiplicity.clear();
   wyckoff_letter.clear();
-  duplicate_structures_names.clear();
-  duplicate_structures_compounds.clear();
-  duplicate_structures.clear();
-  duplicate_structures_generated.clear();
-  duplicate_structures_from.clear();
+  aflow_label=""; //DX 20190724
+  aflow_parameter_list.clear(); //DX 20190724
+  aflow_parameter_values.clear(); //DX 20190724
+  matching_aflow_prototypes.clear(); //DX 20190724
+  environments_LFA.clear(); //DX 20190711
+  structures_duplicate_names.clear();
+  structures_duplicate_compounds.clear();
+  structures_duplicate.clear();
+  structures_duplicate_generated.clear();
+  structures_duplicate_from.clear();
+  structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190813
   number_compounds_matching_duplicate.clear();
   duplicate_comparison_logs.clear(); //DX 20190506
-  family_structures_names.clear();
-  family_structures.clear();
-  family_structures_generated.clear();
-  family_structures_from.clear();
+  structures_family_names.clear();
+  structures_family.clear();
+  structures_family_generated.clear();
+  structures_family_from.clear();
+  structures_family_grouped_Wyckoff_positions.clear(); //DX 20190813
   number_compounds_matching_family.clear();
   family_comparison_logs.clear(); //DX 20190506
-  misfits.clear();
-  family_misfits.clear();
+  structure_misfits_duplicate.clear(); //DX 20191217
+  structure_misfits_family.clear(); //DX 20191217
   property_names.clear();
   property_units.clear();
-  representative_structure_properties.clear();
-  duplicate_structures_properties.clear();
-  family_structures_properties.clear(); //DX 20190425
-}
-
-// ===== Free  ===== //
-void StructurePrototype::free(){
+  properties_structure_representative.clear();
+  properties_structures_duplicate.clear();
+  properties_structures_family.clear(); //DX 20190425
 }
 
 // ===== Destructor ===== //
 StructurePrototype::~StructurePrototype(){ 
-  representative_structure.Clear();
-  elements.clear();
-  stoichiometry.clear();
-  unique_permutations.clear();
-  grouped_Wyckoff_positions.clear();
-  wyckoff_site_symmetry.clear();
-  wyckoff_multiplicity.clear();
-  wyckoff_letter.clear();
-  duplicate_structures_names.clear();
-  duplicate_structures_compounds.clear();
-  duplicate_structures.clear();
-  duplicate_structures_generated.clear();
-  duplicate_structures_from.clear();
-  number_compounds_matching_duplicate.clear();
-  duplicate_comparison_logs.clear(); //DX 20190506
-  family_structures_names.clear();
-  family_structures.clear();
-  family_structures_generated.clear();
-  family_structures_from.clear();
-  number_compounds_matching_family.clear();
-  family_comparison_logs.clear(); //DX 20190506
-  misfits.clear();
-  family_misfits.clear();
-  property_names.clear();
-  property_units.clear();
-  representative_structure_properties.clear();
-  duplicate_structures_properties.clear();
-  family_structures_properties.clear(); //DX 20190425
   free();
 }
 
@@ -110,46 +96,51 @@ StructurePrototype::StructurePrototype(const StructurePrototype& b){
 
 // ===== Copy Constructor Function ===== //
 void StructurePrototype::copy(const StructurePrototype& b) {
-  if(this != &b){
-    iomode=b.iomode;
-    representative_structure_name=b.representative_structure_name; 
-    representative_structure_compound=b.representative_structure_compound; 
-    representative_structure=b.representative_structure; 
-    representative_structure_generated=b.representative_structure_generated; 
-    representative_structure_from=b.representative_structure_from; 
-    number_compounds_matching_representative=b.number_compounds_matching_representative;
-    number_types=b.number_types;
-    elements=b.elements;
-    stoichiometry=b.stoichiometry;
-    number_of_atoms=b.number_of_atoms;
-    unique_permutations=b.unique_permutations;
-    Pearson=b.Pearson;
-    space_group=b.space_group;
-    grouped_Wyckoff_positions=b.grouped_Wyckoff_positions;
-    wyckoff_site_symmetry=b.wyckoff_site_symmetry;
-    wyckoff_multiplicity=b.wyckoff_multiplicity;
-    wyckoff_letter=b.wyckoff_letter;
-    duplicate_structures_names=b.duplicate_structures_names;
-    duplicate_structures_compounds=b.duplicate_structures_compounds;
-    duplicate_structures=b.duplicate_structures;
-    duplicate_structures_generated=b.duplicate_structures_generated;
-    duplicate_structures_from=b.duplicate_structures_from;
-    number_compounds_matching_duplicate=b.number_compounds_matching_duplicate;
-    duplicate_comparison_logs=b.duplicate_comparison_logs; //DX 20190506
-    family_structures_names=b.family_structures_names;
-    family_structures=b.family_structures;
-    family_structures_generated=b.family_structures_generated;
-    family_structures_from=b.family_structures_from;
-    number_compounds_matching_family=b.number_compounds_matching_family;
-    family_comparison_logs=b.family_comparison_logs; //DX 20190506
-    misfits=b.misfits;
-    family_misfits=b.family_misfits;
-    property_names=b.property_names;
-    property_units=b.property_units;
-    representative_structure_properties=b.representative_structure_properties;
-    duplicate_structures_properties=b.duplicate_structures_properties;
-    family_structures_properties=b.family_structures_properties; //DX 20190425
-  }
+  iomode=b.iomode;
+  structure_representative_name=b.structure_representative_name; 
+  structure_representative_compound=b.structure_representative_compound; 
+  structure_representative=b.structure_representative; 
+  structure_representative_generated=b.structure_representative_generated; 
+  structure_representative_from=b.structure_representative_from; 
+  number_compounds_matching_representative=b.number_compounds_matching_representative;
+  number_of_types=b.number_of_types;
+  elements=b.elements;
+  stoichiometry=b.stoichiometry;
+  number_of_atoms=b.number_of_atoms;
+  atom_decorations_equivalent=b.atom_decorations_equivalent;
+  Pearson=b.Pearson;
+  space_group=b.space_group;
+  grouped_Wyckoff_positions=b.grouped_Wyckoff_positions;
+  wyckoff_site_symmetry=b.wyckoff_site_symmetry;
+  wyckoff_multiplicity=b.wyckoff_multiplicity;
+  wyckoff_letter=b.wyckoff_letter;
+  aflow_label=b.aflow_label; //DX 20190724
+  aflow_parameter_list=b.aflow_parameter_list; //DX 20190724
+  aflow_parameter_values=b.aflow_parameter_values; //DX 20190724
+  matching_aflow_prototypes=b.matching_aflow_prototypes; //DX 20190724
+  environments_LFA=b.environments_LFA; //DX 20190711
+  structures_duplicate_names=b.structures_duplicate_names;
+  structures_duplicate_compounds=b.structures_duplicate_compounds;
+  structures_duplicate=b.structures_duplicate;
+  structures_duplicate_generated=b.structures_duplicate_generated;
+  structures_duplicate_from=b.structures_duplicate_from;
+  structures_duplicate_grouped_Wyckoff_positions=b.structures_duplicate_grouped_Wyckoff_positions; //DX 20190813
+  number_compounds_matching_duplicate=b.number_compounds_matching_duplicate;
+  duplicate_comparison_logs=b.duplicate_comparison_logs; //DX 20190506
+  structures_family_names=b.structures_family_names;
+  structures_family=b.structures_family;
+  structures_family_generated=b.structures_family_generated;
+  structures_family_from=b.structures_family_from;
+  structures_family_grouped_Wyckoff_positions=b.structures_family_grouped_Wyckoff_positions; //DX 20190813
+  number_compounds_matching_family=b.number_compounds_matching_family;
+  family_comparison_logs=b.family_comparison_logs; //DX 20190506
+  structure_misfits_duplicate=b.structure_misfits_duplicate; //DX 20191217
+  structure_misfits_family=b.structure_misfits_family; //DX 20191217
+  property_names=b.property_names;
+  property_units=b.property_units;
+  properties_structure_representative=b.properties_structure_representative;
+  properties_structures_duplicate=b.properties_structures_duplicate;
+  properties_structures_family=b.properties_structures_family; //DX 20190425
 }
 
 // ===== Assignment Operator (operator=) ===== //
@@ -158,7 +149,6 @@ void StructurePrototype::copy(const StructurePrototype& b) {
 // ***************************************************************************
 const StructurePrototype& StructurePrototype::operator=(const StructurePrototype& b){
   if(this!=&b){
-    free();
     copy(b);
   }
   return *this;
@@ -180,18 +170,18 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     string eendl="";
     bool roff=true; //round off
     stringstream sscontent_json;
-    vector<string> vcontent_json, tmp;
+    vector<string> vcontent_json, tmp_vstring;
     
-    // representative_structure 
-    sscontent_json << "\"representative_structure\":\"" << StructurePrototype.representative_structure_name << "\"" << eendl;
+    // structure_representative 
+    sscontent_json << "\"structure_representative\":\"" << StructurePrototype.structure_representative_name << "\"" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     // number_compounds_matching_representative 
     sscontent_json << "\"number_compounds_matching_representative\":" << StructurePrototype.number_compounds_matching_representative << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // number_types 
-    sscontent_json << "\"number_types\":" << StructurePrototype.number_types << eendl;
+    // number_of_types 
+    sscontent_json << "\"number_of_types\":" << StructurePrototype.number_of_types << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     // elements 
@@ -206,10 +196,16 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     sscontent_json << "\"number_of_atoms\":" << StructurePrototype.number_of_atoms << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // unique_permutations
-    if(StructurePrototype.unique_permutations.size()!=0){ //DX 20190425 - only print if calculated
-    sscontent_json << "\"unique_permutations\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.unique_permutations,"\""),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    // atom_decorations_equivalent
+    if(StructurePrototype.atom_decorations_equivalent.size()!=0){ //DX 20190425 - only print if calculated
+      //DX 20191111 [OBSOLETE] sscontent_json << "\"atom_decorations_equivalent\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent,"\""),",") << "]" << eendl;
+      sscontent_json << "\"atom_decorations_equivalent\":[";
+      tmp_vstring.clear();
+      for(uint i=0;i<StructurePrototype.atom_decorations_equivalent.size();i++){
+        tmp_vstring.push_back("["+aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.atom_decorations_equivalent[i],"\""),",")+"]");
+      }
+      sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     } //DX 20190425
     
     //DX 20190425 [OBSOLETE] // Pearson
@@ -222,13 +218,13 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     
     // grouped_Wyckoff_positions
     sscontent_json << "\"grouped_Wyckoff_positions\":[";
-    tmp.clear();
+    tmp_vstring.clear();
     for(uint i=0;i<StructurePrototype.grouped_Wyckoff_positions.size();i++){
       stringstream ss_tmp;
       ss_tmp << StructurePrototype.grouped_Wyckoff_positions[i];
-      tmp.push_back(ss_tmp.str());
+      tmp_vstring.push_back(ss_tmp.str());
     }
-    sscontent_json << aurostd::joinWDelimiter(tmp,",") << "]" << eendl;
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
     //DX 20190425 [OBSOLETE] // Wyckoff_multiplicities
@@ -243,67 +239,189 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     //DX 20190425 [OBSOLETE] sscontent_json << "\"Wyckoff_letters\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.wyckoff_site_symmetry,"\""),",") << "]" << eendl;
     //DX 20190425 [OBSOLETE] vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // duplicate_structures
-    sscontent_json << "\"duplicate_structures\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.duplicate_structures_names,"\""),",") << "]" << eendl;
+    if(StructurePrototype.aflow_label.size()!=0){
+      // aflow_label 
+      sscontent_json << "\"aflow_label\":\"" << StructurePrototype.aflow_label << "\"" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      // aflow_parameter_list
+      sscontent_json << "\"aflow_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.aflow_parameter_list,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      // aflow_parameter_values
+      sscontent_json << "\"aflow_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.aflow_parameter_values,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+
+    // matching_aflow_prototypes
+    if(StructurePrototype.matching_aflow_prototypes.size()!=0){
+      sscontent_json << "\"matching_aflow_prototypes\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.matching_aflow_prototypes,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+
+    // environments_LFA
+    sscontent_json << "\"environments_LFA\":[";
+    tmp_vstring.clear();
+    for(uint i=0;i<StructurePrototype.environments_LFA.size();i++){
+      stringstream ss_tmp;
+      ss_tmp << StructurePrototype.environments_LFA[i];
+      tmp_vstring.push_back(ss_tmp.str());
+    }
+    sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+   
+    // split duplicate info
+    vector<double> misfits_duplicate, lattice_deviations_duplicate, coordinate_displacements_duplicate, failures_duplicate, magnetic_displacements_duplicate, magnetic_failures_duplicate;
+    stringstream ss_tmp;
+    bool magnetic_misfit_duplicate = false;
+    for(uint j=0;j<StructurePrototype.structures_duplicate_names.size();j++){
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].misfit;
+      misfits_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].lattice_deviation;
+      lattice_deviations_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].coordinate_displacement;
+      coordinate_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].failure;
+      failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_displacement;
+      magnetic_displacements_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_duplicate[j].magnetic_failure;
+      magnetic_failures_duplicate.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      magnetic_misfit_duplicate=StructurePrototype.structure_misfits_duplicate[j].is_magnetic_misfit;
+    }
+
+    // structures_duplicate
+    sscontent_json << "\"structures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_duplicate_names,"\""),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+  
+    // misfits_duplicate
+    sscontent_json << "\"misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // misfits
-    sscontent_json << "\"misfits\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.misfits,8,roff),",") << "]" << eendl;
+    // lattice_deviations_duplicate
+    sscontent_json << "\"lattice_deviations_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_duplicate,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
+    // coordinate_displacements_duplicate
+    sscontent_json << "\"coordinate_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_duplicate,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // failures_duplicate
+    sscontent_json << "\"failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_duplicate,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    if(magnetic_misfit_duplicate){
+      //// magnetic_misfits_duplicate
+      //sscontent_json << "\"magnetic_misfits_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_duplicate,8,roff),",") << "]" << eendl;
+      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+   
+      // magnetic_displacements_duplicate
+      sscontent_json << "\"magnetic_displacements_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_duplicate,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+      // magnetic_failures_duplicate
+      sscontent_json << "\"magnetic_failures_duplicate\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_duplicate,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+
     // number_compounds_matching_duplicate
     sscontent_json << "\"number_compounds_matching_duplicate\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_duplicate,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // family_structures
-    sscontent_json << "\"family_structures\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.family_structures_names,"\""),",") << "]" << eendl;
+    // split family info
+    vector<double> misfits_family, lattice_deviations_family, coordinate_displacements_family, failures_family, magnetic_displacements_family, magnetic_failures_family;
+    bool magnetic_misfit_family=false;
+    for(uint j=0;j<StructurePrototype.structures_family_names.size();j++){
+      ss_tmp << StructurePrototype.structure_misfits_family[j].misfit;
+      misfits_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].lattice_deviation;
+      lattice_deviations_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].coordinate_displacement;
+      coordinate_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].failure;
+      failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.clear();
+      ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_displacement;
+      magnetic_displacements_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      ss_tmp << StructurePrototype.structure_misfits_family[j].magnetic_failure;
+      magnetic_failures_family.push_back(aurostd::string2utype<double>(ss_tmp.str())); ss_tmp.str("");
+      magnetic_misfit_family=StructurePrototype.structure_misfits_family[j].is_magnetic_misfit;
+    }
+    
+    // structures_family
+    sscontent_json << "\"structures_family\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.structures_family_names,"\""),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // family_misfits
-    sscontent_json << "\"family_misfits\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(StructurePrototype.family_misfits,8,roff),",") << "]" << eendl;
+    // misfits_family
+    sscontent_json << "\"misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(misfits_family,8,roff),",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
+    // lattice_deviations_family
+    sscontent_json << "\"lattice_deviations_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(lattice_deviations_family,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // coordinate_displacements_family
+    sscontent_json << "\"coordinate_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(coordinate_displacements_family,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    // failures_family
+    sscontent_json << "\"failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(failures_family,8,roff),",") << "]" << eendl;
+    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    
+    if(magnetic_misfit_family){
+      //// magnetic_misfits_family
+      //sscontent_json << "\"magnetic_misfits_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_misfits_family,8,roff),",") << "]" << eendl;
+      //vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      
+      // magnetic_displacements_family
+      sscontent_json << "\"magnetic_displacements_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_displacements_family,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      // magnetic_failures_family
+      sscontent_json << "\"magnetic_failures_family\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(magnetic_failures_family,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    }
+
     // number_compounds_matching_family
     sscontent_json << "\"number_compounds_matching_family\":[" << aurostd::joinWDelimiter(StructurePrototype.number_compounds_matching_family,",") << "]" << eendl;
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
     if(StructurePrototype.property_names.size()!=0){ //DX 20190425 - only print if requested
-    // property_names
-    sscontent_json << "\"property_names\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.property_names,"\""),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      // property_names
+      sscontent_json << "\"property_names\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.property_names,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
     
-    // property_units
-    sscontent_json << "\"property_units\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.property_units,"\""),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
-    // representative_structure_properties
-    sscontent_json << "\"representative_structure_properties\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.representative_structure_properties,"\""),",") << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
-    // duplicate_structure_properties
-      sscontent_json << "\"duplicate_structures_properties\":[";
-    tmp.clear();
-    //DX 20190326 - should be duplicate for(uint i=0;i<StructurePrototype.representative_structure_properties.size();i++){
-    for(uint i=0;i<StructurePrototype.duplicate_structures_properties.size();i++){ // DX 20190326 - correctly changed to duplicate_sturctures_properties
-      tmp.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.duplicate_structures_properties[i],"\""),","));
-    }
-    sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp,"[","]"),",");
-    sscontent_json << "]" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
+      // property_units
+      sscontent_json << "\"property_units\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.property_units,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      // properties_structure_representative
+      sscontent_json << "\"properties_structure_representative\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structure_representative,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      // duplicate_structure_properties
+      sscontent_json << "\"properties_structures_duplicate\":[";
+      tmp_vstring.clear();
+      //DX 20190326 - should be duplicate for(uint i=0;i<StructurePrototype.properties_structure_representative.size();i++){
+      for(uint i=0;i<StructurePrototype.properties_structures_duplicate.size();i++){ // DX 20190326 - correctly changed to duplicate_sturctures_properties
+        tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_duplicate[i],"\""),","));
+      }
+      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
+      sscontent_json << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
       //DX 20190425 - START
       // family_structure_properties
-      sscontent_json << "\"family_structures_properties\":[";
-      tmp.clear();
-      for(uint i=0;i<StructurePrototype.family_structures_properties.size();i++){
-        tmp.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.family_structures_properties[i],"\""),","));
+      sscontent_json << "\"properties_structures_family\":[";
+      tmp_vstring.clear();
+      for(uint i=0;i<StructurePrototype.properties_structures_family.size();i++){
+        tmp_vstring.push_back(aurostd::joinWDelimiter(aurostd::wrapVecEntries(StructurePrototype.properties_structures_family[i],"\""),","));
       }
-      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp,"[","]"),",");
+      sscontent_json << aurostd::joinWDelimiter(aurostd::wrapVecEntries(tmp_vstring,"[","]"),",");
       sscontent_json << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       //DX 20190425 - END
     } //DX 20190425
-    
+
     // Put into json StructurePrototype object
     oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
     vcontent_json.clear();
@@ -319,8 +437,8 @@ uint StructurePrototype::numberOfDuplicates() const {
   // Count the number of duplicate structures
   
   uint number_of_duplicates = 0;
-  for(uint i=0;i<misfits.size();i++){
-    if(misfits[i]<=0.1 && (misfits[i]+1.0)>1e-3 ){
+  for(uint i=0;i<structure_misfits_duplicate.size();i++){
+    if(structure_misfits_duplicate[i].misfit<=0.1 && (structure_misfits_duplicate[i].misfit+1.0)>1e-3 ){
       number_of_duplicates+=1;
     }
   }
@@ -335,7 +453,7 @@ uint StructurePrototype::numberOfComparisons(){
 
   // Count the number of comparisons
 
-  return duplicate_structures_names.size(); 
+  return structures_duplicate_names.size(); 
 }
 
 // ***************************************************************************
@@ -345,7 +463,20 @@ bool StructurePrototype::isSymmetryCalculated(){
 
   // Check if the space group symmetry is calculated
 
-  if(space_group==0){return false;}
+  //DX 20191220 [OBSOLETE] if(space_group==0){return false;}
+  if(space_group<1 || space_group>230){return false;} //DX 20191220
+
+  return true; 
+}
+
+// ***************************************************************************
+// StructurePrototype::isLFAEnvironmentCalculated() 
+// ***************************************************************************
+bool StructurePrototype::isLFAEnvironmentCalculated(){
+
+  // Check if the LFA environment is calculated
+
+  if(environments_LFA.size()==0){return false;}
 
   return true; 
 }
@@ -360,9 +491,11 @@ bool StructurePrototype::calculateSymmetry(){
   // The Pearson symbol calculation takes more time, so I do not calculate it
 
   Pearson = "";
-  space_group = representative_structure.SpaceGroup_ITC();
+  bool no_scan = false; //DX 20191230
+  double use_tol = SYM::defaultTolerance(structure_representative); //DX 20191230
+  space_group = structure_representative.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan); //DX 20191230
   vector<GroupedWyckoffPosition> tmp_grouped_Wyckoff_positions; 
-  compare::groupWyckoffPositions(representative_structure, tmp_grouped_Wyckoff_positions);
+  compare::groupWyckoffPositions(structure_representative, tmp_grouped_Wyckoff_positions);
   grouped_Wyckoff_positions = tmp_grouped_Wyckoff_positions;
   return true;
 }
@@ -375,32 +508,72 @@ bool StructurePrototype::addStructurePrototypeAsDuplicate(StructurePrototype& b)
   // Add representative structure as a duplicate structure in this object
   
   // add structure info
-  duplicate_structures_names.push_back(b.representative_structure_name);
-  duplicate_structures_generated.push_back(b.representative_structure_generated);
+  structures_duplicate_names.push_back(b.structure_representative_name);
+  structures_duplicate_generated.push_back(b.structure_representative_generated);
  
   // only add xstructure if it has been generated
-  if(b.representative_structure_generated){
-    duplicate_structures.push_back(b.representative_structure);
-    duplicate_structures_compounds.push_back(compare::getCompoundName(b.representative_structure)); //DX 20190111 - added compound, e.g., Ag1Br2
+  if(b.structure_representative_generated){
+    structures_duplicate.push_back(b.structure_representative);
+    structures_duplicate_compounds.push_back(compare::getCompoundName(b.structure_representative)); //DX 20190111 - added compound, e.g., Ag1Br2
   }
-  else if(!b.representative_structure_compound.empty()){
-    duplicate_structures_compounds.push_back(b.representative_structure_compound); //DX 20190111 - added compound, e.g., Ag1Br2
+  else if(!b.structure_representative_compound.empty()){
+    structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX 20190111 - added compound, e.g., Ag1Br2
   }
   else {
-    duplicate_structures_compounds.push_back(""); //DX 20190111 - added compound, e.g., Ag1Br2
+    structures_duplicate_compounds.push_back(""); //DX 20190111 - added compound, e.g., Ag1Br2
   }
-  duplicate_structures_from.push_back(b.representative_structure_from);
+  structures_duplicate_from.push_back(b.structure_representative_from);
+  // add Wyckoff positions
+  structures_duplicate_grouped_Wyckoff_positions.push_back(b.grouped_Wyckoff_positions); //DX 20190814 - added Wyckoff information for duplicates
   number_compounds_matching_duplicate.push_back(b.number_compounds_matching_representative); //DX 20190228 - added duplicate compound count
 
   // add structure properties
-  if(b.representative_structure_properties.size()!=0){
-    duplicate_structures_properties.push_back(b.representative_structure_properties); //DX 20181218 - added property_values
+  if(b.properties_structure_representative.size()!=0){
+    properties_structures_duplicate.push_back(b.properties_structure_representative); //DX 20181218 - added property_values
   }
 
   // signifies comparison has not been performed yet
-  misfits.push_back(-1.0);
+  structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); 
+  structure_misfits_duplicate.push_back(temp_misfit_info);
 
   return true;
+}
+
+// ***************************************************************************
+// StructurePrototype::addStructurePrototypeAsFamilyStructure() 
+// ***************************************************************************
+void StructurePrototype::putDuplicateAsFamily(uint index, bool keep_generated){
+
+  // Move duplicate structure information to the same family attributes in this 
+  // StructurePrototype object
+            
+  // add structure info
+  structures_family_names.push_back(structures_duplicate_names[index]);
+  structures_family_grouped_Wyckoff_positions.push_back(structures_duplicate_grouped_Wyckoff_positions[index]);
+  
+  // add misfit
+  structure_misfits_family.push_back(structure_misfits_duplicate[index]); //DX 20191217
+
+  if(duplicate_comparison_logs.size()!=0){
+    family_comparison_logs.push_back(duplicate_comparison_logs[index]);
+  }
+
+  // generated structure info
+  structures_family_from.push_back(structures_duplicate_from[index]);
+  if(keep_generated && structures_duplicate_generated[index]){
+    structures_family.push_back(structures_duplicate[index]);
+    structures_family_generated.push_back(structures_duplicate_generated[index]);
+  }
+  else{ //default
+    structures_family_generated.push_back(false);
+  }
+
+  // store properties of family structures
+  if(property_names.size()!=0){
+    properties_structures_family.push_back(properties_structures_duplicate[index]);
+  }
+  
+  return;
 }
 
 // ***************************************************************************
@@ -414,10 +587,11 @@ bool StructurePrototype::copyPrototypeInformation(StructurePrototype& b){
 
   //elements=comparison_schemes[i].elements;
   stoichiometry=b.stoichiometry;
-  number_types=b.stoichiometry.size();
+  number_of_types=b.stoichiometry.size();
   Pearson=b.Pearson;
   space_group=b.space_group;
   grouped_Wyckoff_positions=b.grouped_Wyckoff_positions;
+  environments_LFA=b.environments_LFA; //DX 20190711
   return true;
 }
 
@@ -430,50 +604,86 @@ bool StructurePrototype::putDuplicateAsRepresentative(StructurePrototype& b, uin
   // if structure (b.duplicate_structure[index]) does not match with the 
   // original representative structure (i.e., misfit>1.0),
   // make a new object with this structure as the representative 
+  // NOTE: what about elements???: No, don't want to propogate elements which do not apply to 
+  // new prototype system
   
   // load structure info
-  representative_structure_name=b.duplicate_structures_names[index];
-  // number_types=b.duplicate_structures[index].num_each_type.size();
-  // elements??? don't want to propogate elements which do not apply
-  representative_structure_compound=b.duplicate_structures_compounds[index]; //DX 20190111 - added compound, e.g., Ag1Br2
-  representative_structure_generated=b.duplicate_structures_generated[index];
-  representative_structure_from=b.duplicate_structures_from[index];
+  structure_representative_name=b.structures_duplicate_names[index];
+  // number_of_types=b.structures_duplicate[index].num_each_type.size();
+  structure_representative_compound=b.structures_duplicate_compounds[index]; //DX 20190111 - added compound, e.g., Ag1Br2
+  elements = pflow::getElements(structure_representative_compound); //DX 20191003 - add elements of this compound only!
+  structure_representative_generated=b.structures_duplicate_generated[index];
+  structure_representative_from=b.structures_duplicate_from[index];
+  grouped_Wyckoff_positions=b.structures_duplicate_grouped_Wyckoff_positions[index]; //DX 20190814
   number_compounds_matching_representative=b.number_compounds_matching_duplicate[index]; //DX 20190228 - added duplicate compound count
-  if(b.duplicate_structures_generated[index]){
-    number_of_atoms=b.duplicate_structures[index].atoms.size();
-    representative_structure=b.duplicate_structures[index];
+  if(b.structures_duplicate_generated[index]){
+    number_of_atoms=b.structures_duplicate[index].atoms.size();
+    structure_representative=b.structures_duplicate[index];
   }
   
   // load property info
   if(b.property_names.size()!=0){
     property_names=b.property_names;
     property_units=b.property_units;
-    representative_structure_properties=b.duplicate_structures_properties[index];
+    properties_structure_representative=b.properties_structures_duplicate[index];
   }
   return true;
 }
 
+//DX [OBSOLETE]// ***************************************************************************
+//DX [OBSOLETE]// StructurePrototype::putRepresentativeAsDuplicate() 
+//DX [OBSOLETE]// ***************************************************************************
+//DX [OBSOLETE]bool StructurePrototype::putRepresentativeAsDuplicate(StructurePrototype& b){
+//DX [OBSOLETE]
+//DX [OBSOLETE]  // Make structure in representative the new duplicate structure
+//DX [OBSOLETE]  
+//DX [OBSOLETE]  // load structure info
+//DX [OBSOLETE]  structures_duplicate_names.push_back(b.structure_representative_name);
+//DX [OBSOLETE]  structures_duplicate_compounds.push_back(b.structure_representative_compound); //DX 20190111 - added compound, e.g., Ag1Br2
+//DX [OBSOLETE]  structures_duplicate_generated.push_back(b.structure_representative_generated);
+//DX [OBSOLETE]  structures_duplicate_from.push_back(b.structure_representative_from);
+//DX [OBSOLETE]  number_compounds_matching_duplicate.push_back(b.number_compounds_matching_representative); //DX 20190228 - added duplicate compound count
+//DX [OBSOLETE]  if(b.structure_representative_generated){
+//DX [OBSOLETE]    structures_duplicate.push_back(b.structure_representative);
+//DX [OBSOLETE]  }
+//DX [OBSOLETE]  
+//DX [OBSOLETE]  // load property info
+//DX [OBSOLETE]  if(b.property_names.size()!=0){
+//DX [OBSOLETE]    properties_structures_duplicate.push_back(b.properties_structure_representative);
+//DX [OBSOLETE]  }
+//DX [OBSOLETE]
+//DX [OBSOLETE]  return true;
+//DX [OBSOLETE]}
+
 // ***************************************************************************
 // StructurePrototype::copyDuplicate() 
 // ***************************************************************************
-bool StructurePrototype::copyDuplicate(StructurePrototype& b, uint& index){
+bool StructurePrototype::copyDuplicate(StructurePrototype& b, uint& index, bool copy_misfit){ //DX 20190730 - added copy_misfit option
 
   // Copy structure at index as a potential duplicate in this object 
 
-  duplicate_structures_names.push_back(b.duplicate_structures_names[index]);
-  duplicate_structures_compounds.push_back(b.duplicate_structures_compounds[index]);
-  duplicate_structures_generated.push_back(b.duplicate_structures_generated[index]);
-  duplicate_structures_from.push_back(b.duplicate_structures_from[index]);
+  structures_duplicate_names.push_back(b.structures_duplicate_names[index]);
+  structures_duplicate_compounds.push_back(b.structures_duplicate_compounds[index]);
+  structures_duplicate_generated.push_back(b.structures_duplicate_generated[index]);
+  structures_duplicate_from.push_back(b.structures_duplicate_from[index]);
+  structures_duplicate_grouped_Wyckoff_positions.push_back(b.structures_duplicate_grouped_Wyckoff_positions[index]);
   number_compounds_matching_duplicate.push_back(b.number_compounds_matching_duplicate[index]); //DX 20190228 - added duplicate compound count
-  if(b.duplicate_structures_generated[index]){
-    duplicate_structures.push_back(b.duplicate_structures[index]);
+  if(b.structures_duplicate_generated[index]){
+    structures_duplicate.push_back(b.structures_duplicate[index]);
   }
-  // signifies comparison has not been performed yet
-  misfits.push_back(-1.0);
+
+  if(!copy_misfit){
+    // signifies comparison has not been performed yet
+    structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191217
+    structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191217
+  }
+  else{ //DX 20190730
+    structure_misfits_duplicate.push_back(b.structure_misfits_duplicate[index]); //DX 20191217
+  }
   
   // load property info
   if(property_names.size()!=0){
-    duplicate_structures_properties.push_back(b.duplicate_structures_properties[index]);
+    properties_structures_duplicate.push_back(b.properties_structures_duplicate[index]);
   }
 
   return true;
@@ -489,19 +699,20 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
   // remove from scheme
 
   // remove structure information
-  duplicate_structures_names.erase(duplicate_structures_names.begin()+index);
-  duplicate_structures_compounds.erase(duplicate_structures_compounds.begin()+index); //DX 20190111 - added compound, e.g., Ag1Br2
+  structures_duplicate_names.erase(structures_duplicate_names.begin()+index);
+  structures_duplicate_compounds.erase(structures_duplicate_compounds.begin()+index); //DX 20190111 - added compound, e.g., Ag1Br2
   // DX - may need to be careful here.  If we have a mix of generated and non-generated, we may have difficulties
-  if(duplicate_structures_generated[index]){
-    duplicate_structures.erase(duplicate_structures.begin()+index);
+  if(structures_duplicate_generated[index]){
+    structures_duplicate.erase(structures_duplicate.begin()+index);
   }
-  duplicate_structures_generated.erase(duplicate_structures_generated.begin()+index);
-  duplicate_structures_from.erase(duplicate_structures_from.begin()+index);
+  structures_duplicate_generated.erase(structures_duplicate_generated.begin()+index);
+  structures_duplicate_from.erase(structures_duplicate_from.begin()+index);
   number_compounds_matching_duplicate.erase(number_compounds_matching_duplicate.begin()+index);
+  structures_duplicate_grouped_Wyckoff_positions.erase(structures_duplicate_grouped_Wyckoff_positions.begin()+index); //DX 20190814
 
   // remove misfit
-  misfits.erase(misfits.begin()+index);
-
+  structure_misfits_duplicate.erase(structure_misfits_duplicate.begin()+index); //DX 20191217
+  
   //DX 20190504 - START
   // remove comparison log
   if(duplicate_comparison_logs.size()!=0){
@@ -511,7 +722,7 @@ bool StructurePrototype::removeNonDuplicate(uint& index){
 
   // remove properties
   if(property_names.size()!=0){
-    duplicate_structures_properties.erase(duplicate_structures_properties.begin()+index);
+    properties_structures_duplicate.erase(properties_structures_duplicate.begin()+index);
   }
   return true;
 } 
@@ -524,11 +735,11 @@ bool StructurePrototype::removeDuplicates(bool remove_duplicate_count){
   // Remove duplicate structure information from object
   
   // remove structure information
-  duplicate_structures_names.clear();
-  duplicate_structures_compounds.clear(); //DX 20190111 - added compound, e.g., Ag1Br2
-  duplicate_structures.clear();
-  duplicate_structures_generated.clear();
-  duplicate_structures_from.clear();
+  structures_duplicate_names.clear();
+  structures_duplicate_compounds.clear(); //DX 20190111 - added compound, e.g., Ag1Br2
+  structures_duplicate.clear();
+  structures_duplicate_generated.clear();
+  structures_duplicate_from.clear();
 
   // may want to keep this information
   if(remove_duplicate_count){number_compounds_matching_duplicate.clear();}
@@ -537,10 +748,10 @@ bool StructurePrototype::removeDuplicates(bool remove_duplicate_count){
   duplicate_comparison_logs.clear(); //DX 20190506
 
   // remove misfit
-  misfits.clear();
+  structure_misfits_duplicate.clear(); //DX 20191217
 
   // remove properties
-  duplicate_structures_properties.clear();
+  properties_structures_duplicate.clear();
 
   return true;
 }
@@ -653,6 +864,28 @@ bool GroupedWyckoffPosition::operator<(const GroupedWyckoffPosition& b) const{  
 // ***************************************************************************
 
 // ***************************************************************************
+// AtomEnvironment Class 
+// ***************************************************************************
+// MOVED CLASS TO aflow_xatom.cpp (DX 20191120)
+
+// ***************************************************************************
+// initialize_misfit_struct() //DX 20191218
+// ***************************************************************************
+namespace compare{
+  structure_misfit initialize_misfit_struct(bool magnetic){
+    structure_misfit misfit_info = { 
+      .is_magnetic_misfit=magnetic,
+      .misfit=AUROSTD_MAX_DOUBLE, 
+      .lattice_deviation=AUROSTD_MAX_DOUBLE, 
+      .coordinate_displacement=AUROSTD_MAX_DOUBLE, 
+      .failure=AUROSTD_MAX_DOUBLE, 
+      .magnetic_misfit=AUROSTD_MAX_DOUBLE,
+      .magnetic_displacement=AUROSTD_MAX_DOUBLE,
+      .magnetic_failure=AUROSTD_MAX_DOUBLE
+    };
+    return misfit_info;
+  }
+}
 
 
 // ***************************************************************************
@@ -665,16 +898,68 @@ bool GroupedWyckoffPosition::operator<(const GroupedWyckoffPosition& b) const{  
 // loadStructuresFromDirectory() 
 // ***************************************************************************
 namespace compare {
-  vector<StructurePrototype> loadStructuresFromDirectory(string& directory, bool& same_species, ofstream& FileMESSAGE){ //DX 20190319 - added FileMESSAGE
+  aurostd::xoption loadDefaultComparisonOptions(string mode){ //DX 20200103
+    
+    aurostd::xoption comparison_options;
+    
+    if(mode=="permutation"){
+      comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",TRUE); // permutations are generated from the same structure, so they will have the same volume anyway
+      comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY",FALSE); // duplicate permutations should have the same symmetry
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF",FALSE); // duplicate permutations should have the same symmetry
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE); // duplicate permutations should have the same environment
+      comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",TRUE); // remove unmatched structures from object
+      comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPINGS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS",FALSE); // do not store comparison logs
+      comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",FALSE); // compare all permutations until matched or exhausted all comparisons
+      comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
+    }
+    else{
+      comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",TRUE);
+      comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",TRUE);
+      comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPINGS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",FALSE);
+      comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",TRUE);
+    }
+
+    return comparison_options;
+  }
+}
+
+
+// ***************************************************************************
+// loadStructuresFromDirectory() 
+// ***************************************************************************
+namespace compare {
+  vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream){ //DX 20191122
+    ofstream FileMESSAGE;
+    return loadStructuresFromDirectory(directory, magmoms_for_systems, same_species, FileMESSAGE, logstream);
+  }
+}
+
+namespace compare {
+  vector<StructurePrototype> loadStructuresFromDirectory(const string& directory, const vector<string>& magmoms_for_systems, 
+  bool same_species, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
 
     // load all structures from a directory into a vector of StructurePrototype 
     // objects
     string function_name = "compare:loadStructuresFromDirectory()";
     
-    bool LDEBUG=(false || XHOST.DEBUG);
-    ostream& logstream = cout;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
-    //DX 20190319 [OBSOLETE] ofstream FileMESSAGE;
     
     vector<StructurePrototype> all_structures;
     vector<string> vfiles;
@@ -692,6 +977,8 @@ namespace compare {
          vfiles[i].find("duplicate_compounds_output.json") != std::string::npos || 
          vfiles[i].find("duplicate_compounds_output.out") != std::string::npos || 
          vfiles[i].find("nohup.out") != std::string::npos){
+        message << "Ignoring file=" << vfiles[i] << endl;
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
         vfiles.erase(vfiles.begin()+i);
         i--;
       }
@@ -699,28 +986,42 @@ namespace compare {
         StructurePrototype structure_tmp;
         stringstream sss1;
         aurostd::efile2stringstream(directory+"/"+vfiles[i],sss1);
-        xstructure xstr1(sss1);
-        structure_tmp.representative_structure = xstr1;
-        structure_tmp.representative_structure_name = directory+"/"+vfiles[i];
+        xstructure xstr1; //DX 20190718
+        try { xstr1 = sss1; } //DX 20190718
+        catch(aurostd::xerror& excpt) { message << "Could not load structure " << vfiles[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX 20190718
+        xstr1.directory = directory+"/"+vfiles[i]; //DX 20190718 - need to pass in since passing structure as a string
+        if(magmoms_for_systems.size()==vfiles.size()){
+          try { pflow::ProcessAndAddSpinToXstructure(xstr1, magmoms_for_systems[i]); } //DX 20190801
+          catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX 20190801
+        }
+        structure_tmp.structure_representative = xstr1;
+        structure_tmp.structure_representative.ReScale(1.0); //DX 20190715
+        structure_tmp.structure_representative_name = directory+"/"+vfiles[i];
         structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
         structure_tmp.elements = compare::getElements(xstr1);
         structure_tmp.number_of_atoms = xstr1.atoms.size(); //DX 20190425
-        structure_tmp.number_types = xstr1.num_each_type.size(); //DX 20190425
-	structure_tmp.representative_structure_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr1
+        structure_tmp.number_of_types = xstr1.num_each_type.size(); //DX 20190425
+        structure_tmp.structure_representative_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr1
         // update xstructure species
-        if(structure_tmp.representative_structure.species.size()==0){
+        if(structure_tmp.structure_representative.species.size()==0){
           deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
-          structure_tmp.representative_structure.SetSpecies(deque_species);
-          structure_tmp.representative_structure.SpeciesPutAlphabetic();
+          structure_tmp.structure_representative.SetSpecies(deque_species);
+          structure_tmp.structure_representative.SpeciesPutAlphabetic();
+        }
+        // clean species
+        else{
+          for(uint s=0;s<structure_tmp.structure_representative.species.size();s++){structure_tmp.structure_representative.species[s]=KBIN::VASP_PseudoPotential_CleanName(structure_tmp.structure_representative.species[s]); } //DX 20190711
+          structure_tmp.structure_representative.SetSpecies(structure_tmp.structure_representative.species);
         }
         // check if fake names for same species comparison
-        if(structure_tmp.representative_structure.species[0]=="A" && same_species){
-          message << "Atomic species are missing for " << structure_tmp.representative_structure_name << " cannot perform material comparison; skipping structure.";     
+        if(structure_tmp.structure_representative.species[0]=="A" && same_species){
+          message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping structure.";     
           pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
           continue;
         }
-        structure_tmp.representative_structure_generated = true; 
-        structure_tmp.representative_structure_from = "file"; 
+        //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA= compare::computeLFAEnvironment(xstr1); //DX 20190711
+        structure_tmp.structure_representative_generated = true; 
+        structure_tmp.structure_representative_from = "file"; 
         if(LDEBUG) {
           cerr << "compare::loadStructureFromDirectory() Found structure: " << directory+"/"+vfiles[i] << endl;
         }
@@ -735,15 +1036,23 @@ namespace compare {
 // loadStructuresFromFile() 
 // ***************************************************************************
 namespace compare {
-  vector<StructurePrototype> loadStructuresFromFile(string& filename, bool& same_species, ofstream& FileMESSAGE){ //DX 20190319 - added FileMESSAGE
+  vector<StructurePrototype> loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream){ //DX 20191122
+    ofstream FileMESSAGE;
+    return loadStructuresFromFile(filename, magmoms_for_systems, same_species, FileMESSAGE, logstream);
+  }
+}
+
+namespace compare {
+  vector<StructurePrototype> loadStructuresFromFile(const string& filename, const vector<string>& magmoms_for_systems, 
+  bool same_species, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
 
     // load all structures from a file into a vector of StructurePrototype object
     // useful for reading in aflow.in relaxation steps or pocc structures
 
     string function_name = "compare:loadStructuresFromFile()";
     
-    bool LDEBUG=(false || XHOST.DEBUG);
-    ostream& logstream = cout;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //DX 20191122 [OBSOLETE] ostream& logstream = cout;
     stringstream message;
     //DX [OBSOLETE] ofstream FileMESSAGE;
     
@@ -788,29 +1097,43 @@ namespace compare {
         structure_lines = false; 
         if(LDEBUG) {cerr << "compare:: loading " << structure_count << "/" << start_string.size() << endl;}
         StructurePrototype structure_tmp;
-        xstructure xstr1(geometry);
-        structure_tmp.representative_structure = xstr1;
+        xstructure xstr1; //DX 20190718
+        try { xstr1 = geometry; } //DX 20190718
+        catch(aurostd::xerror& excpt) { message << "Could not load structure " << structure_count << "/" << start_string.size() << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);  continue; } //DX 20190718
         stringstream designation; designation << "file structure # " << structure_count << "/" << start_string.size();
-        structure_tmp.representative_structure_name = designation.str();
+        xstr1.directory = designation.str(); //DX 20190718 - need to pass in since passing structure as a string
+        if(magmoms_for_systems.size()==lines.size()){
+          try { pflow::ProcessAndAddSpinToXstructure(xstr1, magmoms_for_systems[i]); } //DX 20190801
+          catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure"; pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); continue; } //DX 20190801
+        }
+        structure_tmp.structure_representative = xstr1;
+        structure_tmp.structure_representative.ReScale(1.0); //DX 20190715
+        structure_tmp.structure_representative_name = designation.str();
         structure_tmp.stoichiometry = compare::getStoichiometry(xstr1,same_species);
         structure_tmp.elements = compare::getElements(xstr1);
         structure_tmp.number_of_atoms = xstr1.atoms.size(); //DX 20190425
-        structure_tmp.number_types = xstr1.num_each_type.size(); //DX 20190425
-	structure_tmp.representative_structure_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr
+        structure_tmp.number_of_types = xstr1.num_each_type.size(); //DX 20190425
+        structure_tmp.structure_representative_compound = compare::getCompoundName(xstr1); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr
         // update xstructure species
-        if(structure_tmp.representative_structure.species.size()==0){
+        if(structure_tmp.structure_representative.species.size()==0){
           deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
-          structure_tmp.representative_structure.SetSpecies(deque_species);
-          structure_tmp.representative_structure.SpeciesPutAlphabetic();
+          structure_tmp.structure_representative.SetSpecies(deque_species);
+          structure_tmp.structure_representative.SpeciesPutAlphabetic();
+        }
+        // clean species
+        else{
+          for(uint s=0;s<structure_tmp.structure_representative.species.size();s++){structure_tmp.structure_representative.species[s]=KBIN::VASP_PseudoPotential_CleanName(structure_tmp.structure_representative.species[s]); } //DX 20190711
+          structure_tmp.structure_representative.SetSpecies(structure_tmp.structure_representative.species);
         }
         // check if fake names for same species comparison
-        if(structure_tmp.representative_structure.species[0]=="A" && same_species){
-          message << "Atomic species are missing for " << structure_tmp.representative_structure_name << " cannot perform material comparison; skipping strucutre.";     
+        if(structure_tmp.structure_representative.species[0]=="A" && same_species){
+          message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping strucutre.";     
           pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
           continue;
         }
-        structure_tmp.representative_structure_generated = true; 
-        structure_tmp.representative_structure_from = input_file.str(); 
+        //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX 20190711
+        structure_tmp.structure_representative_generated = true; 
+        structure_tmp.structure_representative_from = input_file.str(); 
         if(LDEBUG) {
           cerr << "compare::loadStructureFromFile(): loaded structure " << i << endl;
         }
@@ -826,15 +1149,22 @@ namespace compare {
 // loadStructuresFromStructureList() 
 // ***************************************************************************
 namespace compare {
-  vector<StructurePrototype> loadStructuresFromStructureList(vector<string>& filenames, bool& same_species, ofstream& FileMESSAGE){
+  vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, bool same_species, ostream& logstream){ //DX 20191122
+    ofstream FileMESSAGE;
+    return loadStructuresFromStructureList(filenames, magmoms_for_systems, same_species, FileMESSAGE, logstream);
+  }
+}
+
+namespace compare {
+  vector<StructurePrototype> loadStructuresFromStructureList(const vector<string>& filenames, const vector<string>& magmoms_for_systems, 
+  bool same_species, ofstream& FileMESSAGE, ostream& logstream){
 
     // load all structures from a vector of filenames into a vector of StructurePrototype object
 
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare:loadStructuresFromStructureList()";
-    
-    bool LDEBUG=(false || XHOST.DEBUG);
-    ostream& logstream = cout;
     stringstream message;
+    //DX 20191122 [OBSOLETE] ostream& logstream = cout;
     //DX [OBSOLETE] ofstream FileMESSAGE;
     
     vector<StructurePrototype> all_structures;
@@ -844,33 +1174,45 @@ namespace compare {
     for(uint i=0;i<filenames.size();i++){
       StructurePrototype structure_tmp;
       if(!aurostd::FileExist(filenames[i])){
-        cerr << function_name << ": ERROR " << filenames[i] << " file not found" << endl;
-        exit(1);
+        message << filenames[i] << " file not found.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_FILE_NOT_FOUND_);
       }
       stringstream sss;
       aurostd::efile2stringstream(filenames[i],sss);
       xstructure xstr(sss);  
-      structure_tmp.representative_structure = xstr;
-      structure_tmp.representative_structure_name = filenames[i];
+      xstr.directory = filenames[i]; //DX 20190718 - need to pass in since passing structure as a string
+      if(magmoms_for_systems.size()==filenames.size()){
+        try { pflow::ProcessAndAddSpinToXstructure(xstr, magmoms_for_systems[i]); } //DX 20190801
+        catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); } //DX 20190801
+      }
+      structure_tmp.structure_representative = xstr;
+      structure_tmp.structure_representative.ReScale(1.0); //DX 20190715
+      structure_tmp.structure_representative_name = filenames[i];
       structure_tmp.stoichiometry = compare::getStoichiometry(xstr,same_species);
       structure_tmp.elements = compare::getElements(xstr);
       structure_tmp.number_of_atoms = xstr.atoms.size(); //DX 20190425
-      structure_tmp.number_types = xstr.num_each_type.size(); //DX 20190425
-	    structure_tmp.representative_structure_compound = compare::getCompoundName(xstr); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr
+      structure_tmp.number_of_types = xstr.num_each_type.size(); //DX 20190425
+	    structure_tmp.structure_representative_compound = compare::getCompoundName(xstr); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr
       // update xstructure species
-      if(structure_tmp.representative_structure.species.size()==0){
+      if(structure_tmp.structure_representative.species.size()==0){
         deque<string> deque_species; for(uint j=0;j<structure_tmp.elements.size();j++){deque_species.push_back(structure_tmp.elements[j]);}
-        structure_tmp.representative_structure.SetSpecies(deque_species);
-        structure_tmp.representative_structure.SpeciesPutAlphabetic();
+        structure_tmp.structure_representative.SetSpecies(deque_species);
+        structure_tmp.structure_representative.SpeciesPutAlphabetic();
+      }
+      // clean species
+      else{
+        for(uint s=0;s<structure_tmp.structure_representative.species.size();s++){structure_tmp.structure_representative.species[s]=KBIN::VASP_PseudoPotential_CleanName(structure_tmp.structure_representative.species[s]); } //DX 20190711
+        structure_tmp.structure_representative.SetSpecies(structure_tmp.structure_representative.species);
       }
       // check if fake names for same species comparison
-      if(structure_tmp.representative_structure.species[0]=="A" && same_species){
-        message << "Atomic species are missing for " << structure_tmp.representative_structure_name << " cannot perform material comparison; skipping strucutre.";     
+      if(structure_tmp.structure_representative.species[0]=="A" && same_species){
+        message << "Atomic species are missing for " << structure_tmp.structure_representative_name << " cannot perform material comparison; skipping strucutre.";     
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
         continue;
       }
-      structure_tmp.representative_structure_generated = true; 
-      structure_tmp.representative_structure_from = "file"; 
+      //DX 20191105 [MOVED LATER - SAME AS SYMMETRY] structure_tmp.environments_LFA=compare::computeLFAEnvironment(structure_tmp.structure_representative); //DX 20190711
+      structure_tmp.structure_representative_generated = true; 
+      structure_tmp.structure_representative_from = "file"; 
       if(LDEBUG) {
         cerr << function_name << ": loaded structure " << i << endl;
       }
@@ -880,6 +1222,26 @@ namespace compare {
   }
 }
 //DX 20190424 - END
+
+//DX 20191105 - load multiple structures (useful for multithreaded structure loading) - START
+// ***************************************************************************
+// generateStructures()
+// ***************************************************************************
+namespace compare {
+  void generateStructures(vector<StructurePrototype>& structures, ostream& oss, uint start_index, uint end_index){
+ 
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then generate over entire range
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+    for(uint i=start_index;i<end_index;i++){
+      if(!structures[i].structure_representative_generated){
+        structures[i].structure_representative_generated = generateStructure(structures[i].structure_representative_name, structures[i].structure_representative_from,
+            structures[i].structure_representative, oss);
+      }
+    }
+  }
+}
+//DX 20191105 - load multiple structures (useful for multithreaded structure loading) - END 
 
 // ***************************************************************************
 // generateStructure 
@@ -895,18 +1257,28 @@ namespace compare {
     // 2) AURL
     // 3) input (cin)
 
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::generateStructure()";
     ofstream FileMESSAGE;
     vector<string> tokens;
 
+    if(LDEBUG){
+      cerr << function_name << ": generating structure: " << structure_name << " from " << structure_from << endl;
+    }
+
+    // ---------------------------------------------------------------------------
+    // load from AFLOW prototypes
     if(structure_from=="aflow_prototypes"){
       // htqc or anrl
-      structure = aflowlib::PrototypeLibraries(cout,structure_name,"",2); 
+      structure = aflowlib::PrototypeLibraries(oss,structure_name,"",2); //DX 20200103 - cout to oss
     }
+    // ---------------------------------------------------------------------------
+    // load from AURL
     else if(structure_from=="aurl"){
       aflowlib::_aflowlib_entry entry; entry.aurl = structure_name; 
       //DX 20190326 - need to put url path, i.e., structure name, [OBSOLETE] if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;}
-      if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX 20190326
+      //DX ORIG B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << function_name << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX 20190326
+      if(!pflow::loadXstructures(entry,FileMESSAGE,oss)){ cerr << "WARNING::Could not load structure (aurl=" << entry.aurl << ") ... skipping..." << endl; return false;} //DX 20191105
       if(entry.vstr.size()==1){
         structure = entry.vstr[0];
       }
@@ -915,12 +1287,16 @@ namespace compare {
         return false;
       }
     }
+    // ---------------------------------------------------------------------------
+    // load from file
     else if(structure_from=="file"){
       stringstream sss;
       aurostd::efile2stringstream(structure_name,sss);
       xstructure xstr(sss);
       structure = xstr;
     }
+    // ---------------------------------------------------------------------------
+    // load from file containing list of structures (like aflow.in or pocc)
     else if(aurostd::substring2bool(structure_name,"file structure ")){
       aurostd::string2tokens(structure_name,tokens,"#");
       string structure_designation = aurostd::RemoveWhiteSpaces(tokens[1]);
@@ -959,38 +1335,80 @@ namespace compare {
         }
       }
     }
+    // ---------------------------------------------------------------------------
+    // load from input (istream, e.g., from 'cat' or redirect '<') 
     else if(structure_name=="input geometry"){
       stringstream sss; sss << structure_from;
       xstructure xstr(sss);
       structure = xstr;
     }
+    // ---------------------------------------------------------------------------
+    // load permutation 
+    else if(aurostd::substring2bool(structure_from, "permutation of: ")){
+      //cerr << "permutation generator: " << structure_from << endl;
+      //cerr << "permutation of: " << structure_name << endl;
+      string tmp_from = structure_from;
+      stringstream sss; sss << aurostd::StringSubst(tmp_from, "permutation of: ", "");
+      xstructure xstr(sss);
+      deque<string> species; 
+      for(uint j=0;j<structure_name.size();j++){stringstream ss_site; ss_site << structure_name[j]; species.push_back(ss_site.str());}
+      xstr.SetSpecies(species);
+      xstr.SpeciesPutAlphabetic();
+      deque<int> sizes = SYM::arrange_atoms(xstr.atoms);
+      xstr = pflow::SetNumEachType(xstr, sizes);
+      structure = xstr;
+    }
+    // ---------------------------------------------------------------------------
+    // load-type not accounted for 
     else {
-      cerr << function_name << "::WARNING: Structure location (from=" << structure_from << ") is not specified correctly for " << structure_name << " (i.e., input, aflow_prototype, aurl, etc.)." << endl;
+      stringstream message;
+      message << "Structure location (from=" << structure_from << ") is not specified correctly for " << structure_name << " (i.e., input, aflow_prototype, aurl, etc.).";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, _LOGGER_WARNING_); //DX 20200103 - cerr to logger
       return false;
     }
+
     return true;
   }
 }
   
-/*
+//DX 20191105 - remove non-generated structures - START
 // ***************************************************************************
-// SVD Decomposition 
+// removeNonGeneratedStructures 
 // ***************************************************************************
-namespace compare{
-  bool SVD(xmatrix<double> A){
-    xmatrix<double> ATA = aurostd::trasp(A)*A;
-    //to bidiagonal
-    xmatrix<double> test = ATA;
-    xmatrix<double> Q; 
-    pflow::QRDecomposition_HouseHolder(ATA,Q,test); //CO190808
-    //cerr << "A: " << A << endl;
-    //cerr << "ATA: " << ATA << endl;
-    //cerr << "Q: " << Q << endl;
-    //cerr << "R: " << test << endl;
-    return true;
-  }
+namespace compare {
+	void removeNonGeneratedStructures(vector<StructurePrototype>& structures){
+
+		// remove structures that have not been generated
+		// typically used if there is an error in loading a structure
+
+		for(uint i=0;i<structures.size();i++){
+			if(!structures[i].structure_representative_generated){
+				structures.erase(structures.begin()+i);
+				i--;
+			}
+		}
+	}
 }
-*/
+//DX 20191105 - remove non-generated structures - END
+  
+//DX 20191108 [OBOSLETE] // ***************************************************************************
+//DX 20191108 [OBOSLETE] // SVD Decomposition 
+//DX 20191108 [OBOSLETE] // ***************************************************************************
+//DX 20191108 [OBOSLETE] namespace compare{
+//DX 20191108 [OBOSLETE]   bool SVD(xmatrix<double> A){
+//DX 20191108 [OBOSLETE]     xmatrix<double> ATA = aurostd::trasp(A)*A;
+//DX 20191108 [OBOSLETE]     //to bidiagonal
+//DX 20191108 [OBOSLETE]     xmatrix<double> test = ATA;
+//DX 20191108 [OBOSLETE]     xmatrix<double> Q = pflow::generalHouseHolderQRDecomposition(test);
+//DX 20191108 [OBOSLETE]     xmatrix<double> Q; 
+//DX 20191108 [OBOSLETE]     pflow::QRDecomposition_HouseHolder(ATA,Q,test); //CO190808
+//DX 20191108 [OBOSLETE]     //cerr << "A: " << A << endl;
+//DX 20191108 [OBOSLETE]     //cerr << "ATA: " << ATA << endl;
+//DX 20191108 [OBOSLETE]     //cerr << "Q: " << Q << endl;
+//DX 20191108 [OBOSLETE]     //cerr << "R: " << test << endl;
+//DX 20191108 [OBOSLETE]     return true;
+//DX 20191108 [OBOSLETE]   }
+//DX 20191108 [OBOSLETE] }
 
 // ***************************************************************************
 // Find ICSD name - Find ICSD name 
@@ -1001,6 +1419,8 @@ namespace compare{
     // Find ICSD substring within path name
     // In order for this to work, the following ICSD name format must be 
     // present in the string (e.g., Ag1_ICSD_#####)
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     string ICSD_substring = "";
     bool ICSD_substring_found = false;
@@ -1015,15 +1435,16 @@ namespace compare{
       }
     }
     else {
-      cerr << aurostd::substring2bool(name,"_ICSD_") << endl;
       if(aurostd::substring2bool(name,"_ICSD_")){ 
         ICSD_substring = name;
         ICSD_substring_found = true;
       }
     }
     if(!ICSD_substring_found){
-      cerr << "compare::findICSDName: WARNING: Could not find ICSD substring in name.  representative prototype will not necessarily be the minimum ICSD number." << endl; 
-      cerr << "string: " << name << endl;
+      if(LDEBUG){
+        cerr << "compare::findICSDName: WARNING: Could not find ICSD substring in name.  representative prototype will not necessarily be the minimum ICSD number." << endl; 
+        cerr << "string: " << name << endl;
+      }
     }
     return ICSD_substring;
   }
@@ -1041,6 +1462,7 @@ namespace compare{
     string min_ICSD = "";
     int min_num = 1e9;
     for(uint i=0;i<ICSD_entries.size();i++){
+      if(ICSD_entries[i].empty()){ continue; } //DX 20191108 - if not an ICSD, skip
       vector<string> tokens;
       aurostd::string2tokens(ICSD_entries[i],tokens,"_"); 
       string num_string = tokens[tokens.size()-1];
@@ -1090,60 +1512,156 @@ namespace compare{
 // generatePermutations 
 // ***************************************************************************
 namespace compare{
-  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool& optimize_match, ostream& oss, ofstream& FileMESSAGE){ //DX 20190319 - added FileMESSAGE
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optimize_match, ostream& oss, ostream& logstream){ //DX 20191125 - added overload
+    ofstream FileMESSAGE;
+    return comparePermutations(structure, num_proc, optimize_match, oss, FileMESSAGE, logstream);
+  }
 
+  vector<StructurePrototype> comparePermutations(StructurePrototype& structure, uint& num_proc, bool optimize_match, ostream& oss, ofstream& FileMESSAGE, ostream& logstream){ //DX 20190319 - added FileMESSAGE
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
+    string function_name = "compare::comparePermutations()";
+    stringstream message;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
+
+    // ---------------------------------------------------------------------------
+    // options for permutation comparisons 
     bool same_species = true; // permutation comparisons must compare the same species 
-    bool scale_volume = true; // permutations are generated from the same structure, so they will have the same volume anyway
-    //bool optimize_match = false;
-    bool ignore_symmetry = false; // duplicate permutations should have the same symmetry
-    bool ignore_Wyckoff = false; // duplicate permutations should have the same Wyckoff positions
-    bool single_comparison_round = false; // compare all permutations until matched or exhausted all comparisons
-    bool clean_unmatched = true; // remove unmatched structures from object //DX 20190504 
     bool quiet = true; //true 
+    aurostd::xoption permutation_options = compare::loadDefaultComparisonOptions("permutation");
+    permutation_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",optimize_match);
 
-    // ===== Call main permutation comparison function ===== //
-    vector<StructurePrototype> permutation_comparisons;
+    vector<StructurePrototype> final_permutations;
 
-    vector<uint> stoichiometry = compare::getStoichiometry(structure.representative_structure,true);
+    // ---------------------------------------------------------------------------
+    // get stoichiometry
+    vector<uint> stoichiometry = compare::getStoichiometry(structure.structure_representative,true);
 
-    // Calculate symmetry
+    // ---------------------------------------------------------------------------
+    // calculate symmetry (if not already calculated)
     if(structure.space_group ==0){
       structure.calculateSymmetry();
     }
 
-    //cerr << "generating all permutations" << endl;
+    // ---------------------------------------------------------------------------
     // generate all permuations structures
     vector<StructurePrototype> permutation_structures = compare::generatePermutationStructures(structure);
 
     //cerr << "store naming" << endl;
     vector<vector<string> > name_order;
     for(uint i=0;i<permutation_structures.size();i++){
-      vector<string> vtmp; 
-      for(uint j=0;j<permutation_structures[i].representative_structure_name.size();j++){
-        stringstream ss_tmp; ss_tmp << permutation_structures[i].representative_structure_name[j];
-        vtmp.push_back(ss_tmp.str());
+      vector<string> vtmp_name; 
+      for(uint j=0;j<permutation_structures[i].structure_representative_name.size();j++){
+        stringstream ss_tmp; ss_tmp << permutation_structures[i].structure_representative_name[j];
+        vtmp_name.push_back(ss_tmp.str());
       }
-      name_order.push_back(vtmp);
+      name_order.push_back(vtmp_name);
     }
 
-    // group comparable permutations
-    permutation_comparisons = compare::groupStructurePrototypes(permutation_structures, same_species, ignore_symmetry, ignore_Wyckoff);
-    
-    // ensure the representative stucture is an even permutation
-    compare::makeRepresentativeEvenPermutation(permutation_comparisons, name_order);
+    // ---------------------------------------------------------------------------
+    // loop over grouping modes
+    // mode=0: use LFA environment to filter
+    // mode=1: if incommensurate groupings, then ignore LFA environment in grouping
+    for(uint mode=0;mode<2;mode++){
+      if(mode==0){
+        if(!quiet || LDEBUG){
+          message << "Considering environment analysis in grouping permutations (mode=0)." << endl;
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        }
+      }
+      if(mode==1){ 
+        //ignore_environment=true; 
+        permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",TRUE);
+        if(!quiet || LDEBUG){
+          message << "Could not find commensurate pemutations when grouping via environment. Ignoring environment analysis in grouping permutations (mode=1)." << endl;
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        }
+      }
+      final_permutations.clear();
 
-    // compare permutations
-    vector<StructurePrototype> final_permutations = compare::runComparisonScheme(num_proc, permutation_comparisons, same_species, scale_volume, optimize_match, single_comparison_round, clean_unmatched, false,oss,FileMESSAGE,quiet); //DX 20190319 - added FileMESSAGE 
-    if(!compare::checkNumberOfGroupings(final_permutations, name_order.size())){
-      cerr << "compare::comparePermutations():: ERROR: Compared groupings of permutations do not follow number theory. Contact David Hicks (d.hicks@duke.edu). Exiting." << endl;
-      exit(1);
+      // ---------------------------------------------------------------------------
+      // group comparable permutations
+      vector<StructurePrototype> permutation_comparisons;
+      permutation_comparisons = compare::groupStructurePrototypes(permutation_structures, same_species, 
+          permutation_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
+          permutation_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"),
+          permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"),
+          false); //DX 20200103 - condensed booleans to xoptions 
+
+      // ---------------------------------------------------------------------------
+      // ensure the representative stucture is an even permutation
+      compare::makeRepresentativeEvenPermutation(permutation_comparisons, name_order);
+
+      if(VERBOSE){ for(uint i=0;i<permutation_comparisons.size();i++){ cerr << "Initial permutation groupings: " << permutation_comparisons[i] << endl; } }
+
+      // ---------------------------------------------------------------------------
+      // compare permutations
+      final_permutations = compare::runComparisonScheme(permutation_comparisons, same_species, num_proc, permutation_options, oss,FileMESSAGE,quiet); //DX 20200103 - condensed booleans to xoptions 
+      
+      // ---------------------------------------------------------------------------
+      // check if matched permutations are physically possible
+      if(!compare::checkNumberOfGroupings(final_permutations, name_order.size())){
+        if(!quiet || LDEBUG){
+          message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << name_order.size() << ")" << endl;
+          // comprehensive output
+          if(LDEBUG){ 
+            for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i] << endl; } 
+          }
+          // minimal output
+          else{ 
+            //DX 20191218 [ORIG] for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",")  << ")" << endl; } 
+            for(uint i=0;i<final_permutations.size();i++){ //DX 20191218 - new misfit struct version 
+              message << final_permutations[i].structure_representative_name << " = ";
+              vector<string> duplicate_info;
+              for(uint j=0;j<final_permutations[i].structures_duplicate_names.size();j++){
+                stringstream ss_tmp; ss_tmp << final_permutations[i].structures_duplicate_names[j] << " (misfit_duplicate=" << final_permutations[i].structure_misfits_duplicate[j].misfit << ")";
+                duplicate_info.push_back(ss_tmp.str());
+              }
+              message << aurostd::joinWDelimiter(duplicate_info,",") << endl; 
+            }
+          }
+          message << "Trying to check if duplicates match better with other representative structures ... " << endl;
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_WARNING_);
+        }
+
+        // ---------------------------------------------------------------------------
+        // check if better matchings; perhaps matched structures would have smaller misfits if matched to different representatives
+        final_permutations = compare::checkForBetterMatches(final_permutations, oss, num_proc, true, same_species, permutation_options, FileMESSAGE, quiet, logstream); //DX 20200103 - condensed booleans to xoptions
+
+        // ---------------------------------------------------------------------------
+        // check if NEW matched permutations are physically possible
+        if(!compare::checkNumberOfGroupings(final_permutations, name_order.size())){
+          message << "Compared groupings of permutations do not follow number theory (# unique=" << final_permutations.size() << " vs # total=" << name_order.size() << ")" << endl;
+          // comprehensive output
+          if(LDEBUG){ 
+            for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i] << endl; } 
+          }
+          // minimal output
+          else{ 
+            //DX 20191218 [ORIG] for(uint i=0;i<final_permutations.size();i++){ message << final_permutations[i].structure_representative_name << " = " << aurostd::joinWDelimiter(final_permutations[i].structures_duplicate_names,",") << " (misfits_duplicate=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_permutations[i].misfits_duplicate,8,true),",") << ")" << endl; } 
+            for(uint i=0;i<final_permutations.size();i++){ //DX 20191218 - new misfit struct version 
+              message << final_permutations[i].structure_representative_name << " = ";
+              vector<string> duplicate_info;
+              for(uint j=0;j<final_permutations[i].structures_duplicate_names.size();j++){
+                stringstream ss_tmp; ss_tmp << final_permutations[i].structures_duplicate_names[j] << " (misfit_duplicate=" << final_permutations[i].structure_misfits_duplicate[j].misfit << ")";
+                duplicate_info.push_back(ss_tmp.str());
+              }
+              message << aurostd::joinWDelimiter(duplicate_info,",") << endl; 
+            }
+          }
+          if(mode==1){  // exhausted checks
+            message << "Please email aflow@groups.io and provide the corresponding example." << endl;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+          }
+        }
+        else{ break; }
+      }
+      else{ break; }
     }
 
-    //DEBUG cerr << "final_permuations:" << final_permutations.size() << endl;
-    //DEBUG for(uint j=0;j<final_permutations.size();j++){
-    //DEBUG   cerr << "j: " << j << endl;
-    //DEBUG   cerr << final_permutations[j] << endl;
-    //DEBUG }
+    if(VERBOSE){ for(uint i=0;i<final_permutations.size();i++){ cerr << "Final permutation groupings: " << final_permutations[i] << endl; } }
+
     return final_permutations;
   }
 }
@@ -1176,9 +1694,9 @@ namespace compare{
 
     if(is_symmetry_calculated){
       grouped_Wyckoff_positions = structure.grouped_Wyckoff_positions;
-    for(uint i=0;i<grouped_Wyckoff_positions.size();i++){grouped_Wyckoff_positions[i].element=names[i];}
-    //DX 20190508 [OBSOLETE] vector<vector<GroupedWyckoffPosition> > permutation_grouped_Wyckoff_positions;
-    permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
+      for(uint i=0;i<grouped_Wyckoff_positions.size();i++){grouped_Wyckoff_positions[i].element=names[i];}
+      //DX 20190508 [OBSOLETE] vector<vector<GroupedWyckoffPosition> > permutation_grouped_Wyckoff_positions;
+      permutation_grouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
     }
     //DX 20190508 - add option to generate permutation and ignore Wyckoff - END
 
@@ -1242,26 +1760,36 @@ namespace compare{
 
     // create permuted structure    
     for(uint i=0;i<name_order.size();i++){
-      xstructure xstr_tmp = structure.representative_structure;
+      xstructure xstr_tmp = structure.structure_representative;
       deque<string> species; 
       for(uint j=0;j<name_order[i].size();j++){species.push_back(name_order[i][j]);}
       xstr_tmp.SetSpecies(species);
+      //DX TEST xstr_tmp.species_pp = species; //for vasp5 20190731
+      xstr_tmp.species = species; //DX 20190813
       xstr_tmp.SpeciesPutAlphabetic();
+      xstr_tmp.species_pp = xstr_tmp.species; //for vasp5 20190731, after ordered
       deque<int> sizes = SYM::arrange_atoms(xstr_tmp.atoms);
       //LDEBUGfor(uint j=0;j<sizes.size();j++){cerr << "sizes[j]: " << sizes[j] << endl;}
       xstr_tmp = pflow::SetNumEachType(xstr_tmp, sizes);
       //if (xstr_out.num_each_type.size() != names.size()){
       //  xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
       //}
-
-      StructurePrototype tmp;
-      tmp.representative_structure = xstr_tmp;
-      tmp.representative_structure_name = aurostd::joinWDelimiter(species,"");
-      tmp.representative_structure_generated = true;
-      tmp.representative_structure_from = "permutation";
-      tmp.copyPrototypeInformation(structure);
-      tmp.grouped_Wyckoff_positions = permutation_grouped_Wyckoff_positions[i];
-      permutation_structures.push_back(tmp);
+      StructurePrototype str_proto_tmp;
+      str_proto_tmp.structure_representative = xstr_tmp;
+      str_proto_tmp.structure_representative.ReScale(1.0); //DX 20190715
+      str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
+      str_proto_tmp.structure_representative_generated = true;
+      //DX 20190730 - ORIG - str_proto_tmp.structure_representative_from = "permutation";
+      stringstream ss_str; ss_str << "permutation of: " << structure.structure_representative; //DX 20190730
+      str_proto_tmp.structure_representative_from = ss_str.str(); //DX 20190730
+      str_proto_tmp.copyPrototypeInformation(structure);
+      str_proto_tmp.stoichiometry = compare::getStoichiometry(str_proto_tmp.structure_representative, true); //DX 20190529 - need updated stoich
+      // compound name is always alphabetic; order swapping is dictated by stoichiometry
+      //tmp.structure_representative_compound = compare::getCompoundName(name_order[0],tmp.stoichiometry,false); //remove ones is true //DX 20190529 - need compound name to group later;
+      str_proto_tmp.structure_representative_compound = compare::getCompoundName(str_proto_tmp.structure_representative); //remove ones is true  //DX 20190311 //DX 20190313 - use xstr1
+      str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX 20190711
+      str_proto_tmp.grouped_Wyckoff_positions = permutation_grouped_Wyckoff_positions[i];
+      permutation_structures.push_back(str_proto_tmp);
     }
    
     return permutation_structures;
@@ -1273,7 +1801,14 @@ namespace compare{
 // generatePermutationString
 // ***************************************************************************
 namespace compare{
-  vector<string> generatePermutationString(vector<uint>& stoichiometry){
+  //deque input
+  void generatePermutationString(const deque<uint>& stoichiometry, vector<string>& permutation){
+    vector<uint> stoichiometry_vstring = aurostd::deque2vector(stoichiometry);
+    generatePermutationString(stoichiometry_vstring, permutation);
+  }
+
+  //vector input
+  void generatePermutationString(const vector<uint>& stoichiometry, vector<string>& permutation){
    
     vector<StructurePrototype> permutation_structures;
  
@@ -1317,10 +1852,9 @@ namespace compare{
       }   
     }
 
-    vector<string> permuted_string;
-    for(uint i=0;i<name_order.size();i++){ permuted_string.push_back(aurostd::joinWDelimiter(name_order[i],"")); }
+    for(uint i=0;i<name_order.size();i++){ permutation.push_back(aurostd::joinWDelimiter(name_order[i],"")); }
 
-    return permuted_string; 
+    return; 
   }
 }
 //DX 20190508 - added permutation string function - END
@@ -1392,6 +1926,89 @@ namespace compare{
 //ABOVE FUNCTION MAY NEED A DOUBLE CHECK
 
 // ***************************************************************************
+// arePermutationsComparableViaComposition() 
+// ***************************************************************************
+namespace compare{
+  bool arePermutationsComparableViaComposition(const xstructure& xstr){ 
+    
+    // check if permutations of a structure are possible via stoichiometry
+    // i.e., check if stoichiometric ratio value occurs more than once
+    // xstructure version
+
+    bool matchable_sites=false;
+    for(uint i=0;i<xstr.num_each_type.size();i++){
+      for(uint j=i+1;j<xstr.num_each_type.size();j++){
+        if(xstr.num_each_type[i]==xstr.num_each_type[j]){ matchable_sites=true; break; }
+      }
+      if(matchable_sites){ break; }
+    }
+    return matchable_sites;
+  }
+}
+
+// ***************************************************************************
+// arePermutationsComparableViaComposition() 
+// ***************************************************************************
+namespace compare{
+  bool arePermutationsComparableViaComposition(vector<uint>& composition, bool reduce_composition){ 
+    
+    // check if permutations of a structure are possible via composition
+    // i.e., check if stoichiometric ratio value occurs more than once
+    // vector<uint> stoichiometry version
+
+    // ---------------------------------------------------------------------------
+    // reduce stoichiometry first if necessary 
+    vector<uint> tmp_composition=composition;
+    //DX 20191125 [OBSOLETE] if(reduce_stoichiometry){ tmp_composition = compare::gcdStoich(composition); }
+    if(reduce_composition){ aurostd::reduceByGCD(composition, tmp_composition); } //DX 20191125
+    else{ tmp_composition = composition; } // assuming it is already reduced
+
+    // ---------------------------------------------------------------------------
+    // check if stoichiometries occur more than once
+    bool matchable_sites=false;
+    for(uint i=0;i<tmp_composition.size();i++){
+      for(uint j=i+1;j<tmp_composition.size();j++){
+        if(tmp_composition[i]==tmp_composition[j]){ matchable_sites=true; break; }
+      }
+      if(matchable_sites){ break; }
+    }
+    return matchable_sites;
+  }
+}
+
+// ***************************************************************************
+// arePermutationsComparableViaSymmetry() 
+// ***************************************************************************
+namespace compare{
+  bool arePermutationsComparableViaSymmetry(vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions){
+    
+    // check if permutations of a structure are possible via symmetry (Wyckoff positions)
+    // i.e., check if there are matchable Wyckoff positions in a given structure
+    
+    // ---------------------------------------------------------------------------
+    // re-write site symmetries to account for cell choice differences 
+    // note: the resulting site symmetries may NOT be physical (this is just a 
+    // speed up; fast way to compare)
+    vector<GroupedWyckoffPosition> sorted_temp_grouped_Wyckoffs = compare::sortSiteSymmetryOfGroupedWyckoffPositions(grouped_Wyckoff_positions);
+
+    // ---------------------------------------------------------------------------
+    // check if Wyckoff site symmetries and multiplicites occur more than once
+    for(uint i=0;i<sorted_temp_grouped_Wyckoffs.size();i++){
+      string set_1_site_symmetry = aurostd::joinWDelimiter(sorted_temp_grouped_Wyckoffs[i].site_symmetries,",");
+      string set_1_multiplicity = aurostd::joinWDelimiter(sorted_temp_grouped_Wyckoffs[i].multiplicities,",");
+      for(uint j=i+1;j<sorted_temp_grouped_Wyckoffs.size();j++){
+        string set_2_site_symmetry = aurostd::joinWDelimiter(sorted_temp_grouped_Wyckoffs[j].site_symmetries,",");
+        string set_2_multiplicity = aurostd::joinWDelimiter(sorted_temp_grouped_Wyckoffs[j].multiplicities,",");
+        if(set_1_site_symmetry == set_2_site_symmetry && set_1_multiplicity == set_2_multiplicity){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+}
+  
+// ***************************************************************************
 // makePermutations 
 // ***************************************************************************
 namespace compare{
@@ -1404,7 +2021,7 @@ namespace compare{
     //groupSameRatios(stoich,unique_stoich,type_index);
 
     for(uint i=0;i<name_order.size();i++){
-      xstructure xstr_tmp = structure.representative_structure;
+      xstructure xstr_tmp = structure.structure_representative;
       deque<string> species; 
       for(uint j=0;j<name_order[i].size();j++){cerr << name_order[i][j] << endl; species.push_back(name_order[i][j]);}
       xstr_tmp.SetSpecies(species);
@@ -1416,13 +2033,15 @@ namespace compare{
       //  xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
       //}
 
-      StructurePrototype tmp;
-      tmp.representative_structure = xstr_tmp;
-      tmp.representative_structure_name = aurostd::joinWDelimiter(species,"");
-      tmp.representative_structure_generated = true;
-      tmp.representative_structure_from = "permutation";
-      tmp.copyPrototypeInformation(structure);
-      permutation_structures.push_back(tmp);
+      StructurePrototype str_proto_tmp;
+      str_proto_tmp.structure_representative = xstr_tmp;
+      str_proto_tmp.structure_representative.ReScale(1.0); //DX 20190715
+      str_proto_tmp.structure_representative_name = aurostd::joinWDelimiter(species,"");
+      str_proto_tmp.environments_LFA=compare::computeLFAEnvironment(str_proto_tmp.structure_representative); //DX 20190711
+      str_proto_tmp.structure_representative_generated = true;
+      str_proto_tmp.structure_representative_from = "permutation";
+      str_proto_tmp.copyPrototypeInformation(structure);
+      permutation_structures.push_back(str_proto_tmp);
     }
    
     return true;
@@ -1502,7 +2121,9 @@ namespace compare{
         tmp.str("");
       }
       //::print(stoichiometry);
-      stoich=gcdStoich(stoichiometry);
+      //DX 20191125 [OBSOLETE] stoich=gcdStoich(stoichiometry);
+      stoich = stoichiometry;
+      aurostd::reduceByGCD(stoichiometry, stoich); //DX 20191125
     }
     // If a structure prototype comparison (not material type), ensure 
     // stoichiometries are in numerical order for comparison.  Else, 
@@ -1525,8 +2146,8 @@ namespace compare{
     // Add the AFLOW prototypes to the vector of StructurePrototype objects
     // Note: The AFLOW labels should already be filtered to the relevant
     // strutures for comparison
-    
-    bool LDEBUG=(false || XHOST.DEBUG);
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "addAFLOWPrototypes2StructurePrototypeVector()";
 
     for(uint i=0;i<vlabel.size();i++){
@@ -1537,43 +2158,43 @@ namespace compare{
       if(aurostd::string2tokens(vlabel[i],tokens,"_")>=4) {
         vector<string> vparameter_values = anrl::getANRLParameters(vlabel[i],"all");
         for(uint j=0;j<vparameter_values.size();j++){
-					StructurePrototype structure_tmp;
-					//if one degree of freedom, then no number scheme required
-					if(aurostd::string2tokens(vparameter_values[j],tokens,",")==1){
-						structure_tmp.representative_structure_name = vlabel[i];
-					}
-					//if multiple degrees of freedom, then number scheme is required
-					else {
-						stringstream tmp; tmp << vlabel[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
-						structure_tmp.representative_structure_name = tmp.str();
-    			}
-					structure_tmp.stoichiometry = all_structures[0].stoichiometry;
-					//structure_tmp.space_group = prototype_space_groups[i]; 
-					structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
-					structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
-					structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
-				  structure_tmp.representative_structure_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
-					structure_tmp.representative_structure_generated = false; 
-					structure_tmp.representative_structure_from = "aflow_prototypes"; 
-					all_structures.push_back(structure_tmp);
-			  }
-			}
+          StructurePrototype structure_tmp;
+          //if one degree of freedom, then no number scheme required
+          if(aurostd::string2tokens(vparameter_values[j],tokens,",")==1){
+            structure_tmp.structure_representative_name = vlabel[i];
+          }
+          //if multiple degrees of freedom, then number scheme is required
+          else {
+            stringstream tmp; tmp << vlabel[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
+            structure_tmp.structure_representative_name = tmp.str();
+          }
+          structure_tmp.stoichiometry = all_structures[0].stoichiometry;
+          //structure_tmp.space_group = prototype_space_groups[i]; 
+          structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
+          structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
+          structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
+          structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
+          structure_tmp.structure_representative_generated = false; 
+          structure_tmp.structure_representative_from = "aflow_prototypes"; 
+          all_structures.push_back(structure_tmp);
+        }
+      }
 
-			// htqc prototypes
-			else {
-				StructurePrototype structure_tmp;
-				structure_tmp.representative_structure_name = vlabel[i];
-				structure_tmp.stoichiometry = all_structures[0].stoichiometry;
-				//structure_tmp.space_group = prototype_space_groups[i];
-				structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
-				structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
-				vector<string> elements;
-			  structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
-				structure_tmp.representative_structure_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
-				structure_tmp.representative_structure_generated = false; 
-				structure_tmp.representative_structure_from = "aflow_prototypes"; 
-				all_structures.push_back(structure_tmp);
-			}
+      // htqc prototypes
+      else {
+        StructurePrototype structure_tmp;
+        structure_tmp.structure_representative_name = vlabel[i];
+        structure_tmp.stoichiometry = all_structures[0].stoichiometry;
+        //structure_tmp.space_group = prototype_space_groups[i];
+        structure_tmp.space_group = all_structures[0].space_group; // same as representative structure (either will be the same, or we are forcing it to be for the ignore_symmetry/ignore_Wyckoff run)
+        structure_tmp.grouped_Wyckoff_positions = all_structures[0].grouped_Wyckoff_positions;
+        vector<string> elements;
+        structure_tmp.elements = compare::fakeElements(all_structures[0].stoichiometry.size());
+        structure_tmp.structure_representative_compound = compare::getCompoundName(structure_tmp.elements,structure_tmp.stoichiometry,true); //remove ones is true 
+        structure_tmp.structure_representative_generated = false; 
+        structure_tmp.structure_representative_from = "aflow_prototypes"; 
+        all_structures.push_back(structure_tmp);
+      }
     }
     return true;
   }
@@ -1630,22 +2251,28 @@ namespace compare{
     
     // Obtains the least common multiple representation of the stoichiometry.
 
-    vector<uint> stoich;
+    deque<int> stoich;
     if(xstr.species.size()==1){
-       stoich.push_back(1);
+      stoich.push_back(1);
     }
     else {
-      stoich=gcdStoich(xstr.num_each_type);
+      //DX 20191125 stoich=gcdStoich(xstr.num_each_type);
+      stoich = xstr.num_each_type;
+      aurostd::reduceByGCD(xstr.num_each_type, stoich); //DX 20191125
     }
     // If a structure prototype comparison (not material type), ensure 
     // stoichiometries are in numerical order for comparison.  Else, 
     // leave in position indicating atomic species count.
     if(same_species==false){
-      for(uint i=0; i<stoich.size(); i++){
-	      std::sort(stoich.begin(),stoich.end());
-      }
+      //DX 20191125 for(uint i=0; i<stoich.size(); i++){
+      std::sort(stoich.begin(),stoich.end());
+      //DX 20191125 }
     }
-    return stoich;
+    
+    // convert to vector<uint>
+    vector<uint> stoich_uint;
+    for(uint i=0;i<stoich.size();i++){ stoich_uint.push_back((uint)stoich[i]); }
+    return stoich_uint;
   }
 }
 
@@ -1657,7 +2284,7 @@ namespace compare{
     
     // Obtains the elements in the xstructure.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<string> velements;
     // If atoms in poscar not labeled in either POSCAR; assign fake names
     if (xstr.atoms[0].name == ""){
@@ -1676,241 +2303,187 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-// gcdStoich - Euler's Greatest Common Divisor Algorithm
-// ***************************************************************************
-namespace compare{
-  vector<uint> gcdStoich(const vector<uint>& numbers){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] // ***************************************************************************
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] // gcdStoich - Euler's Greatest Common Divisor Algorithm
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] // ***************************************************************************
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] namespace compare{
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   vector<uint> gcdStoich(const vector<uint>& numbers){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // the least common multiple representation for the stoichiometry.
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // vector version
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     deque<int> number_deque; 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0;i<numbers.size();i++){number_deque.push_back((int)numbers[i]);}
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     return gcdStoich(number_deque);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] namespace compare{
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   vector<uint> gcdStoich(const deque<int>& numbers){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // the least common multiple representation for the stoichiometry.
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // deque version
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     string function_name = "compare::gcdStoich():";
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     stringstream message;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] 
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     int global_GCD = 0; //DX 5/14/18 - added initialization
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     int GCD = 0; //DX 5/14/18 - added initialization
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     vector<uint> reduced_numbers;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     // Find min number first
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     int min=0;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(i==0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         min=numbers[i];
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       else {
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         if(numbers[i]<min){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           min=numbers[i];
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     bool found_GCD=true;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(numbers[i]%min != 0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         found_GCD=false;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         break;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     if(found_GCD==true){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       global_GCD=min;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     else if(found_GCD==false){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       int remainder=1000;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       int divisor=min;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         int num=numbers[i];
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         while(remainder != 0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           remainder=(num%divisor);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           if(remainder==0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]             GCD=divisor;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           else {
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]             num=divisor;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]             divisor=remainder;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         divisor=GCD;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         if(i==0){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           global_GCD=GCD;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         else if(GCD < global_GCD){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]           global_GCD=GCD;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         remainder=100;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     for(uint i=0; i<numbers.size(); i++){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       reduced_numbers.push_back((uint)(numbers[i]/global_GCD));
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       if(numbers[i]%global_GCD){
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         message << "Error in GCD procedure. Email aflow@groups.io";
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]       }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]     return reduced_numbers;
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION]   }
+//DX 20191125 [OBSOLETE - USING AUROSTD VERSION] }
 
-    // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
-    // the least common multiple representation for the stoichiometry.
-    // vector version
-
-    deque<int> number_deque; 
-    for(uint i=0;i<numbers.size();i++){number_deque.push_back((int)numbers[i]);}
-    return gcdStoich(number_deque);
-  }
-}
-
-namespace compare{
-  vector<uint> gcdStoich(const deque<int>& numbers){
-
-    // This is Euler's Greates Common Divisor Algorithm.  It is used to determine 
-    // the least common multiple representation for the stoichiometry.
-    // deque version
-
-    int global_GCD = 0; //DX 5/14/18 - added initialization
-    int GCD = 0; //DX 5/14/18 - added initialization
-    vector<uint> reduced_numbers;
-    // Find min number first
-    int min=0;
-    for(uint i=0; i<numbers.size(); i++){
-      if(i==0){
-	min=numbers[i];
-      }
-      else {
-	if(numbers[i]<min){
-	   min=numbers[i];
-	}
-      }
-    }
-    bool found_GCD=true;
-    for(uint i=0; i<numbers.size(); i++){
-      if(numbers[i]%min != 0){
-	found_GCD=false;
-	break;
-      }
-    }
-    if(found_GCD==true){
-      global_GCD=min;
-    }
-    else if(found_GCD==false){
-      int remainder=1000;
-      int divisor=min;
-      for(uint i=0; i<numbers.size(); i++){
-	int num=numbers[i];
-	while(remainder != 0){
-	  remainder=(num%divisor);
-	  if(remainder==0){
-	    GCD=divisor;
-	  }
-	  else {
-	    num=divisor;
-	    divisor=remainder;
-	  }
-	}
-	divisor=GCD;
-	if(i==0){
-	  global_GCD=GCD;
-	}
-	else if(GCD < global_GCD){
-	   global_GCD=GCD;
-	}
-	remainder=100;
-      }
-    }
-    for(uint i=0; i<numbers.size(); i++){
-       reduced_numbers.push_back((uint)(numbers[i]/global_GCD));
-       if(numbers[i]%global_GCD){
-	  cerr << "compare::ERROR - Error in GCD procedure. Exiting. (David Hicks: d.hicks@duke.edu)" << endl;
-	  exit(1);
-       }
-    }
-    return reduced_numbers;
-  }
-}
-
-// ***************************************************************************
-// prepareSymmetryThreads - 
-// ***************************************************************************
-namespace compare{
-  vector<vector<xstructure> > prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc){
-
-    // Split xstructures into a vector, i.e., to be used in different threads for 
-    // calculating the symmetry (space group and Wyckoff positions)
-    // More efficient method is to split into indices; see other funtion with the same name (below)
-
-	  vector<vector<xstructure> > vxstrs_split;
-	  uint num_per_thread = vxstrs.size()/num_proc;
-	  uint residual = vxstrs.size()%num_proc;
-	  bool accounted_for_residual=false;
-	  if(residual!=0){num_per_thread+=1;}
-    
-    uint count = 0;
-    uint thread_count = 0;
-    vector<xstructure> tmp;
-    for(uint l=0; l<vxstrs.size(); l++){
-      tmp.push_back(vxstrs[l]);
-      count+=1;
-      if(count == num_per_thread && thread_count<num_proc-1){
-        thread_count+=1;
-        vxstrs_split.push_back(tmp);
-        tmp.clear();
-        count = 0;
-      }
-      else if(thread_count==num_proc-1 && l==vxstrs.size()-1){
-        thread_count+=1;
-        vxstrs_split.push_back(tmp);
-        tmp.clear();
-        count = 0;
-      }
-      if(!accounted_for_residual && residual!=0 && thread_count==residual){
-        accounted_for_residual=true;
-        num_per_thread=num_per_thread-1;
-      }
-    }
-
-    uint recovered=0;
-    //Need the following safety in case the number of threads is greater than the number of xstructures to test
-    uint num_of_threads=0;
-    if(vxstrs_split.size()>=num_proc){
-      num_of_threads=num_proc;
-    }
-    else if(vxstrs_split.size()<num_proc){
-      num_of_threads=vxstrs_split.size();
-    }
-    for(uint n=0; n<num_of_threads; n++){
-      for(uint h=0;h<vxstrs_split[n].size();h++){
-        recovered+=1;
-      }
-    } 
-    if(recovered != vxstrs.size()){
-      cerr << "compare::prepareSymmetryThreads(): The splitting of jobs failed...not all were accounted for: " << recovered << " != " << vxstrs.size() << endl;
-      exit(1);
-    }
-    //DEBUG for(uint i=0;i<vxstrs_split.size();i++){
-    //DEBUG   cerr << "num of xstrs for thread: " << i << " = " << vxstrs_split[i].size() << endl;
-    //DEBUG }
-    return vxstrs_split;
-  }
-}
-
-// ***************************************************************************
-// prepareSymmetryThreads - 
-// ***************************************************************************
-namespace compare{
-  bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
-                              vector<uint>& start_indices, vector<uint>& end_indices){
-
-    // Split xstructures via indices, i.e., to be used in different threads for 
-    // calculating the symmetry (space group and Wyckoff positions)
-
-	  vector<vector<xstructure> > vxstrs_split;
-	  uint num_per_thread = vxstrs.size()/num_proc;
-	  uint residual = vxstrs.size()%num_proc;
-	  bool accounted_for_residual=false;
-	  if(residual!=0){num_per_thread+=1;}
-    
-    uint count = 0;
-    uint thread_count = 0;
-    vector<xstructure> tmp;
-    uint tmp_start_index=0;
-    for(uint l=0; l<vxstrs.size(); l++){
-      count+=1;
-      if(count == num_per_thread && thread_count<num_proc-1){
-        thread_count+=1;
-        start_indices.push_back(tmp_start_index);
-        end_indices.push_back(l);
-        tmp_start_index=l+1;
-        count = 0;
-      }
-      else if(thread_count==num_proc-1 && l==vxstrs.size()-1){
-        thread_count+=1;
-        start_indices.push_back(tmp_start_index);
-        end_indices.push_back(l);
-        tmp_start_index=l+1;
-        count = 0;
-      }
-      if(!accounted_for_residual && residual!=0 && thread_count==residual){
-        accounted_for_residual=true;
-        num_per_thread=num_per_thread-1;
-      }
-    }
-
-    //Need the following safety in case the number of threads is greater than the number of structures to test
-    uint recovered=0;
-    uint num_of_threads=0;
-    if(start_indices.size()>=num_proc){
-      num_of_threads=num_proc;
-    }
-    else if(start_indices.size()<num_proc){
-      num_of_threads=start_indices.size();
-    }
-    for(uint n=0; n<num_of_threads; n++){
-      for(uint i=start_indices[n];i<=end_indices[n];i++){
-        recovered+=1;
-      }
-    } 
-    if(recovered != vxstrs.size()){
-      cerr << "compare::prepareSymmetryThreads(): The splitting of jobs failed...not all were accounted for: " << recovered << " != " << vxstrs.size() << endl;
-      exit(1);
-    }
-    //DEBUG for(uint i=0;i<vxstrs_split.size();i++){
-    //DEBUG   cerr << "num of xstrs for thread: " << i << " = " << vxstrs_split[i].size() << endl;
-    //DEBUG }
-    return true;
-  }
-}
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] // ***************************************************************************
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] // prepareSymmetryThreads - 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] // ***************************************************************************
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] namespace compare{
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]   bool prepareSymmetryThreads(vector<xstructure>& vxstrs, uint& num_proc,
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       vector<uint>& start_indices, vector<uint>& end_indices){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // Split xstructures via indices, i.e., to be used in different threads for 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // calculating the symmetry (space group and Wyckoff positions)
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = "compare::prepareSymmetryThreads()";
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     stringstream message;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<vector<xstructure> > vxstrs_split;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint num_per_thread = vxstrs.size()/num_proc;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint residual = vxstrs.size()%num_proc;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     bool accounted_for_residual=false;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     if(residual!=0){num_per_thread+=1;}
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint thread_count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     vector<xstructure> tmp;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint tmp_start_index=0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     for(uint l=0; l<vxstrs.size(); l++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       count+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(count == num_per_thread && thread_count<num_proc-1){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         thread_count+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         start_indices.push_back(tmp_start_index);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         end_indices.push_back(l);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         tmp_start_index=l+1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       else if(thread_count==num_proc-1 && l==vxstrs.size()-1){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         thread_count+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         start_indices.push_back(tmp_start_index);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         end_indices.push_back(l);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         tmp_start_index=l+1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(!accounted_for_residual && residual!=0 && thread_count==residual){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         accounted_for_residual=true;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         num_per_thread=num_per_thread-1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     //Need the following safety in case the number of threads is greater than the number of structures to test
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint recovered=0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint num_of_threads=0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     if(start_indices.size()>=num_proc){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       num_of_threads=num_proc;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     else if(start_indices.size()<num_proc){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       num_of_threads=start_indices.size();
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     for(uint n=0; n<num_of_threads; n++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       for(uint i=start_indices[n];i<=end_indices[n];i++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         recovered+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     } 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     if(recovered != vxstrs.size()){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << vxstrs.size();
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_); //DX 20190717 - exit to xerror
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG for(uint i=0;i<vxstrs_split.size();i++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG   cerr << "num of xstrs for thread: " << i << " = " << vxstrs_split[i].size() << endl;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     //DEBUG }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     return true;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]   }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] }
 
 
 // ***************************************************************************
-// prepareComparisonThreads - 
+// splitComparisonIntoThreads()
 // ***************************************************************************
 namespace compare{
   bool splitComparisonIntoThreads(vector<StructurePrototype>& comparison_schemes, uint& num_proc,
                               vector<std::pair<uint,uint> >& start_indices,
                               vector<std::pair<uint,uint> >& end_indices){
 
-    // split comparisons into threads by indicating comparison indices
+    // ---------------------------------------------------------------------------
+    // split comparisons into threads via indices
+    string function_name = "compare::splitComparisonIntoThreads()";
+    stringstream message;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool safety_check=false; // safety check if split incorrectly
+
     uint number_of_comparisons = 0;
     for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
     //DEBUG cerr << "# of comparisons: " << number_of_comparisons << endl;
 
     if(number_of_comparisons==0){
       if(LDEBUG) {
-        cerr << "Number of comparisons is zero, no need to split into threads." << endl;
+        cerr << function_name << ": Number of comparisons is zero, no need to split into threads." << endl;
       } 
       return true;
     }   
@@ -1921,7 +2494,7 @@ namespace compare{
 	  if(residual!=0){num_per_thread+=1;}
    
     if(LDEBUG) {
-      cerr << "Number of comparisons per thread: " << num_per_thread << endl;
+      cerr << function_name << ": Number of comparisons per thread: " << num_per_thread << endl;
     }
 
     uint tmp =0;
@@ -1932,7 +2505,7 @@ namespace compare{
     std::pair<uint,uint> indices;
     for(uint i=0;i<comparison_schemes.size();i++){
       //DEBUG cerr << "splitting comparison indices: i: " << i << "/" << comparison_schemes.size() << endl;
-      for(uint j=0;j<comparison_schemes[i].duplicate_structures_names.size();j++){
+      for(uint j=0;j<comparison_schemes[i].structures_duplicate_names.size();j++){
         indices.first=i, indices.second=j;
         count+=1;
         tmp+=1;
@@ -1940,7 +2513,7 @@ namespace compare{
           thread_count+=1;
           start_indices.push_back(tmp_start);
           //update tmp_start
-          if(j+1>=comparison_schemes[i].duplicate_structures_names.size()-1 && i+1<comparison_schemes.size()-1){
+          if(j+1>=comparison_schemes[i].structures_duplicate_names.size()-1 && i+1<comparison_schemes.size()-1){
             tmp_start.first=i+1; tmp_start.second=0; 
             tmp_end.first=i+1; tmp_end.second=0;
           }
@@ -1951,11 +2524,11 @@ namespace compare{
           end_indices.push_back(tmp_end);
           count = 0;
         }
-        else if(thread_count==num_proc-1 && i==comparison_schemes.size()-1 && j==comparison_schemes[i].duplicate_structures_names.size()-1){
+        else if(thread_count==num_proc-1 && i==comparison_schemes.size()-1 && j==comparison_schemes[i].structures_duplicate_names.size()-1){
           thread_count+=1;
           start_indices.push_back(tmp_start);
           //update tmp_start
-          if(j+1>=comparison_schemes[i].duplicate_structures_names.size()-1 && i+1<comparison_schemes.size()-1){
+          if(j+1>=comparison_schemes[i].structures_duplicate_names.size()-1 && i+1<comparison_schemes.size()-1){
             tmp_start.first=i+1; tmp_start.second=0; 
             tmp_end.first=i+1; tmp_end.second=0;
           }
@@ -1976,46 +2549,48 @@ namespace compare{
     if(count){
       start_indices.push_back(tmp_start);
       //tmp_end.first=indices.first; tmp_end.second=indices.second; //+1 
-      tmp_end.first=comparison_schemes.size()-1; tmp_end.second=comparison_schemes[tmp_end.first].duplicate_structures_names.size();
+      tmp_end.first=comparison_schemes.size()-1; tmp_end.second=comparison_schemes[tmp_end.first].structures_duplicate_names.size();
       end_indices.push_back(tmp_end);
     }
 
-    //cerr << "number of indices indicators: " << start_indices.size() << endl;
-    //cerr << "number gone through: " << tmp << endl;
-    uint recovered=0;
-    //Need the following safety in case the number of threads is greater than the number of xstructures to test
-    uint num_of_threads=0;
-    if(start_indices.size()>=num_proc){
-      num_of_threads=num_proc;
-    }
-    else if(start_indices.size()<num_proc){
-      num_of_threads=start_indices.size();
-    }
+    // ---------------------------------------------------------------------------
+    // check if split correctly
+    // in case the number of threads is greater than the number of xstructures to test
+    // put inside an if-statement (on 20190715) to save time; the function has been well-tested
+    if(safety_check){
+      uint recovered=0;
+      uint num_of_threads=0;
+      if(start_indices.size()>=num_proc){
+        num_of_threads=num_proc;
+      }
+      else if(start_indices.size()<num_proc){
+        num_of_threads=start_indices.size();
+      }
 
-    for(uint n=0; n<num_of_threads; n++){
-      //cerr << start_indices[n].first << "," << start_indices[n].second << " - " << end_indices[n].first << "," << end_indices[n].second << endl;
-      uint i_min=start_indices[n].first; uint i_max=end_indices[n].first;
-      uint j_min=0; uint j_max=0;
-      for(uint i=0;i<comparison_schemes.size();i++){
-        // to loop properly
-        if(i==i_min){
-          j_min=start_indices[n].second;
-          if(i==i_max){j_max=end_indices[n].second;}
-          else {j_max=comparison_schemes[i].duplicate_structures_names.size();} //-1 since in loop: j<=j_max
-        }
-        else if(i==i_max){j_min=0; j_max=end_indices[n].second;}
-        else {j_min=0; j_max=comparison_schemes[i].duplicate_structures_names.size();} //-1 since in loop: j<=j_max
-        for(uint j=0;j<comparison_schemes[i].duplicate_structures_names.size();j++){
-          if(i>=i_min && j>=j_min &&
-             i<=i_max && j<j_max){
-            recovered+=1;
+      for(uint n=0; n<num_of_threads; n++){
+        uint i_min=start_indices[n].first; uint i_max=end_indices[n].first;
+        uint j_min=0; uint j_max=0;
+        for(uint i=0;i<comparison_schemes.size();i++){
+          // to loop properly
+          if(i==i_min){
+            j_min=start_indices[n].second;
+            if(i==i_max){j_max=end_indices[n].second;}
+            else {j_max=comparison_schemes[i].structures_duplicate_names.size();} //-1 since in loop: j<=j_max
+          }
+          else if(i==i_max){j_min=0; j_max=end_indices[n].second;}
+          else {j_min=0; j_max=comparison_schemes[i].structures_duplicate_names.size();} //-1 since in loop: j<=j_max
+          for(uint j=0;j<comparison_schemes[i].structures_duplicate_names.size();j++){
+            if(i>=i_min && j>=j_min &&
+                i<=i_max && j<j_max){
+              recovered+=1;
+            }
           }
         }
+      } 
+      if(recovered != number_of_comparisons){
+        message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_comparisons;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_); //DX 20190717 - exit to xerror
       }
-    } 
-    if(recovered != number_of_comparisons){
-      cerr << "compare::splitComparisonsIntoThreads(): The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_comparisons << endl;
-      exit(1);
     }
     return true;
   }
@@ -2032,7 +2607,7 @@ namespace compare{
     // and stores it in the relevant vector
     // Same as the StructurePrototype version, just not as concise
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name="compare::calculateSymmetries()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
@@ -2040,18 +2615,22 @@ namespace compare{
     // THREADED VERSION - START
     
     // Distribute threads via indices
-    vector<uint> start_indices, end_indices;
-    prepareSymmetryThreads(vxstrs,num_proc,start_indices,end_indices);
+    //DX 20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
+    //DX 20191107 [switching to getThreadDistribution] - prepareSymmetryThreads(vxstrs,num_proc,start_indices,end_indices);
+    uint number_of_structures = vxstrs.size(); //DX 20191107
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_proc); //DX 20191107 
 
     // Run threads 
-    vector<std::thread> threads;
+    vector<std::thread*> threads;
     for(uint n=0; n<num_proc; n++){
-	    threads.push_back(std::thread(SYM::calculateSpaceGroupsInSetRange,std::ref(vxstrs),std::ref(start_indices[n]),std::ref(end_indices[n])));
+      //DX 20191107 [switching to getThreadDistribution] - threads.push_back(std::thread(SYM::calculateSpaceGroupsInSetRange,std::ref(vxstrs),std::ref(start_indices[n]),std::ref(end_indices[n])));
+      threads.push_back(new std::thread(&SYM::calculateSpaceGroups,std::ref(vxstrs),thread_distribution[n][0],thread_distribution[n][1],SG_SETTING_ANRL)); //DX 20191230 - use ANRL setting so we can cast into prototype designation later
     }
     // Join threads 
-	  for(uint t=0;t<num_proc;t++){
-      threads[t].join();
-	  }
+    for(uint t=0;t<num_proc;t++){
+      threads[t]->join();
+      delete threads[t];
+    }
     // THREADED VERSION - END
 
 #else
@@ -2074,84 +2653,99 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-// prepareSymmetryThreads - 
-// ***************************************************************************
-namespace compare{
-  bool prepareSymmetryThreads(uint& number_of_structures, uint& num_proc,
-                              vector<uint>& start_indices, vector<uint>& end_indices){
-
-    // Split number of structures via indices, i.e., to be used in different threads for 
-    // calculating the symmetry (space group and Wyckoff positions)
-    // Could be generalized for any type of job splitting
-
-	  uint num_per_thread = number_of_structures/num_proc;
-	  uint residual = number_of_structures%num_proc;
-	  bool accounted_for_residual=false;
-	  if(residual!=0){num_per_thread+=1;}
-    
-    uint count = 0;
-    uint thread_count = 0;
-    uint tmp_start_index=0;
-    for(uint l=0; l<number_of_structures; l++){
-      count+=1;
-      if(count == num_per_thread && thread_count<num_proc-1){
-        thread_count+=1;
-        start_indices.push_back(tmp_start_index);
-        end_indices.push_back(l);
-        tmp_start_index=l+1;
-        count = 0;
-      }
-      else if(thread_count==num_proc-1 && l==number_of_structures-1){
-        thread_count+=1;
-        start_indices.push_back(tmp_start_index);
-        end_indices.push_back(l);
-        tmp_start_index=l+1;
-        count = 0;
-      }
-      if(!accounted_for_residual && residual!=0 && thread_count==residual){
-        accounted_for_residual=true;
-        num_per_thread=num_per_thread-1;
-      }
-    }
-
-    //Need the following safety in case the number of threads is greater than the number of structures to test
-    uint recovered=0;
-    uint num_of_threads=0;
-    if(start_indices.size()>=num_proc){
-      num_of_threads=num_proc;
-    }
-    else if(start_indices.size()<num_proc){
-      num_of_threads=start_indices.size();
-    }
-    for(uint n=0; n<num_of_threads; n++){
-      for(uint i=start_indices[n];i<=end_indices[n];i++){
-        recovered+=1;
-      }
-    } 
-    if(recovered != number_of_structures){
-      cerr << "compare::prepareSymmetryThreads(): The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_structures << endl;
-      exit(1);
-    }
-    return true;
-  }
-}
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] // ***************************************************************************
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] // splitTaskIntoThreads - 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] // ***************************************************************************
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] namespace compare{
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]   bool splitTaskIntoThreads(uint& number_of_tasks, uint& num_proc,
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       vector<uint>& start_indices, vector<uint>& end_indices){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // Split number of tasks via indices, e.g., to be used in different threads for 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // calculating the symmetry (space group and Wyckoff positions)
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // It is generalized for any type of job splitting
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // ---------------------------------------------------------------------------
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // split comparisons into threads via indices
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     string function_name = "compare::splitTaskIntoThread()";
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     stringstream message;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     bool safety_check=false; // safety check if split incorrectly
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint num_per_thread = number_of_tasks/num_proc;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint residual = number_of_tasks%num_proc;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     bool accounted_for_residual=false;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     if(residual!=0){num_per_thread+=1;}
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint thread_count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     uint tmp_start_index=0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     for(uint l=0; l<number_of_tasks; l++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       count+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(count == num_per_thread && thread_count<num_proc-1){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         thread_count+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         start_indices.push_back(tmp_start_index);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         end_indices.push_back(l);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         tmp_start_index=l+1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       else if(thread_count==num_proc-1 && l==number_of_tasks-1){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         thread_count+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         start_indices.push_back(tmp_start_index);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         end_indices.push_back(l);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         tmp_start_index=l+1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         count = 0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(!accounted_for_residual && residual!=0 && thread_count==residual){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         accounted_for_residual=true;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         num_per_thread=num_per_thread-1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // ---------------------------------------------------------------------------
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // check if split correctly
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     // put inside an if-statement (on 20190715) to save time; the function has been well-tested
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     if(safety_check){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       uint recovered=0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       uint num_of_threads=0;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(start_indices.size()>=num_proc){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         num_of_threads=num_proc;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       else if(start_indices.size()<num_proc){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         num_of_threads=start_indices.size();
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       for(uint n=0; n<num_of_threads; n++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         for(uint i=start_indices[n];i<=end_indices[n];i++){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]           recovered+=1;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       } 
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       if(recovered != number_of_tasks){
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_tasks;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]       }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]     return true;
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution]   }
+//DX 20191108 [OBSOLETE - switching to getThreadDistribution] }
 
 // ***************************************************************************
 // calculateSpaceGroupsInSetRange
 // ***************************************************************************
 namespace compare {
-  void calculateSpaceGroupsInSetRange(vector<StructurePrototype>& structures, uint& start_index, uint& end_index){
+  void calculateSpaceGroups(vector<StructurePrototype>& structures, uint start_index, uint end_index, uint setting){ //DX 20191230 - added setting
    
     // Calculates the space group and Wyckoff positions for the representative 
     // structure in the StructurePrototype object
-    // Mirrors SYM::calculateSpaceGroupsInSetRange(), but is specific for 
+    // Mirrors SYM::calculateSpaceGroups(), but is specific for 
     // StructurePrototype objects, as opposed to xstructures
+    bool no_scan = false; //DX 20191230
+    
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute symmetry analysis for all StructurePrototypes
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
 
-    for(uint i=start_index;i<=end_index;i++){
-      structures[i].space_group = structures[i].representative_structure.SpaceGroup_ITC();
+    for(uint i=start_index;i<end_index;i++){ //DX 20191107 - switching convention <= vs <
+      double use_tol = SYM::defaultTolerance(structures[i].structure_representative); //DX 20191230
+      structures[i].space_group = structures[i].structure_representative.SpaceGroup_ITC(use_tol, -1, setting, no_scan); //DX 20191230 - added arguments
       vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
-      groupWyckoffPositions(structures[i].representative_structure, grouped_Wyckoff_positions);
+      groupWyckoffPositions(structures[i].structure_representative, grouped_Wyckoff_positions);
       structures[i].grouped_Wyckoff_positions=grouped_Wyckoff_positions;
     }
   }
@@ -2167,7 +2761,7 @@ namespace compare{
     // and stores it in the StructurePrototype object
     // Same as the vector<xstructure> version, just more concise
     
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name="compare::calculateSymmetries()";
     if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
 
@@ -2177,18 +2771,21 @@ namespace compare{
     // Distribute threads via indices
     uint number_of_structures = structures.size();
     uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-    vector<uint> start_indices, end_indices;
-    prepareSymmetryThreads(number_of_structures,num_threads,start_indices,end_indices);
+    //DX 20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
+    //DX 20191107 [switching to getThreadDistribution] - splitTaskIntoThreads(number_of_structures,num_threads,start_indices,end_indices); //DX 20190530 - renamed
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX 20191107 
 
-    // Run threads 
-    vector<std::thread> threads;
+    // Run threads (DX 20191108 thread pointer)
+    vector<std::thread*> threads;
     for(uint n=0; n<num_threads; n++){
-	    threads.push_back(std::thread(compare::calculateSpaceGroupsInSetRange,std::ref(structures),std::ref(start_indices[n]),std::ref(end_indices[n])));
+      //DX 20191107 [switching to getThreadDistribution] - threads.push_back(std::thread(compare::calculateSpaceGroupsInSetRange,std::ref(structures),std::ref(start_indices[n]),std::ref(end_indices[n])));
+      threads.push_back(new std::thread(&compare::calculateSpaceGroups,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1],SG_SETTING_ANRL)); //DX 20191107 [switching to getThreadDistribution] 
     }
     // Join threads
-	  for(uint t=0;t<num_threads;t++){
-      threads[t].join();
-	  }
+    for(uint t=0;t<num_threads;t++){
+      threads[t]->join();
+      delete threads[t];
+    }
     // THREADED VERISON - END
 
 #else
@@ -2196,6 +2793,70 @@ namespace compare{
     for(uint i=0; i<structures.size(); i++){
       structures[i].calculateSymmetry();
     }   
+    // NON-THREADED VERSION - END
+
+#endif
+
+  }
+}
+
+// ***************************************************************************
+// calculateLFAEnvironmentsInSetRange
+// ***************************************************************************
+namespace compare {
+  void computeLFAEnvironments(vector<StructurePrototype>& structures, uint start_index, uint end_index){
+   
+    // Calculates the LFA environments for a structure and
+    // stores it in the StructurePrototype object
+    
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute LFA environment analysis for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=structures.size(); }
+
+    for(uint i=start_index;i<end_index;i++){ //DX 20191107 switching end index convention <= vs <
+      structures[i].environments_LFA = compare::computeLFAEnvironment(structures[i].structure_representative);
+    }
+  }
+}
+
+// ***************************************************************************
+// calculateLFAEnvironments - Calculate LFA environments
+// ***************************************************************************
+namespace compare{
+  void calculateLFAEnvironments(vector<StructurePrototype>& structures, uint num_proc){
+
+    // Calculates the LFA environments for a structure and
+    // stores it in the StructurePrototype object
+    
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name="compare::calculateLFAEnvironments()";
+    if(LDEBUG) {cerr << function_name << ": Number of threads=" << num_proc << endl;}
+
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+    // THREADED VERISON - START
+    
+    // Distribute threads via indices
+    uint number_of_structures = structures.size();
+    uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
+    //DX 20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
+    //DX 20191107 [switching to getThreadDistribution] - splitTaskIntoThreads(number_of_structures,num_threads,start_indices,end_indices); //DX 20190530 - renamed
+    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX 20191107 
+
+    // Run threads 
+    vector<std::thread*> threads;
+    for(uint n=0; n<num_threads; n++){
+      //DX 20191107 [switching to getThreadDistribution] - threads.push_back(std::thread(compare::calculateLFAEnvironmentsInSetRange,std::ref(structures),start_indices[n],end_indices[n]));
+      threads.push_back(new std::thread(&compare::computeLFAEnvironments,std::ref(structures),thread_distribution[n][0],thread_distribution[n][1])); //DX 20191107 [switching to getThreadDistribution] -
+    }
+    // Join threads
+    for(uint t=0;t<num_threads;t++){
+      threads[t]->join();
+      delete threads[t];
+    }
+    // THREADED VERISON - END
+
+#else
+    // NON-THREADED VERSION - START
+    computeLFAEnvironments(structures); //DX 20191122 - for all structures
     // NON-THREADED VERSION - END
 
 #endif
@@ -2217,7 +2878,9 @@ namespace compare{
     //xstr.GetLatticeType(); //slow; consider a different method -> (SpaceGroup_ITC) finds this
     //vpearsons.push_back(xstr.pearson_symbol);
     vpearsons.push_back("");
-    vsgroups.push_back(xstr.SpaceGroup_ITC());
+    bool no_scan = false; //DX 20191230
+    double use_tol = SYM::defaultTolerance(xstr); //DX 20191230
+    vsgroups.push_back(xstr.SpaceGroup_ITC(use_tol,-1,SG_SETTING_ANRL,no_scan)); //DX 20191230
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions; 
     groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
     vgrouped_Wyckoff_positions.push_back(grouped_Wyckoff_positions);
@@ -2241,11 +2904,14 @@ namespace compare{
     uint type_count = 0; //DX 20190425 - add type indicator
 
     for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
-      vector<string> tokens;
-      aurostd::string2tokens(xstr.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");  
-      uint multiplicity = aurostd::string2utype<uint>(tokens[0]);     
-      string letter = aurostd::string2utype<string>(tokens[1]);     
-      string site_symmetry = aurostd::string2utype<string>(tokens[2]);     
+      //DX 20191030 [OBOSLETE] vector<string> tokens;
+      //DX 20191030 [OBOSLETE] aurostd::string2tokens(xstr.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");  
+      //DX 20191030 [OBOSLETE] uint multiplicity = aurostd::string2utype<uint>(tokens[0]);     
+      //DX 20191030 [OBOSLETE] string letter = aurostd::string2utype<string>(tokens[1]);     
+      //DX 20191030 [OBOSLETE] string site_symmetry = aurostd::string2utype<string>(tokens[2]);     
+      uint multiplicity = xstr.wyckoff_sites_ITC[i].multiplicity; //DX 20191031 
+      string letter = xstr.wyckoff_sites_ITC[i].letter; //DX 20191031
+      string site_symmetry = xstr.wyckoff_sites_ITC[i].site_symmetry; //DX 20191031
 
       bool element_found = false;
       uint element_index = 0;
@@ -2346,7 +3012,7 @@ namespace compare{
 // sortSiteSymmetryOfGroupedWyckoffPositions
 // ***************************************************************************
 namespace compare{
-  vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(vector<GroupedWyckoffPosition>& grouped_Wyckoffs){
+  vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(const vector<GroupedWyckoffPosition>& grouped_Wyckoffs){
 
     // Sort they Wyckoff site symmetry for each Wyckoff position.
     // It is possible to match Wyckoff positions with different ordering of the 
@@ -2377,15 +3043,15 @@ namespace compare{
 // matchableWyckoffPositions
 // ***************************************************************************
 namespace compare{
-  bool matchableWyckoffPositions(vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
-                                 vector<GroupedWyckoffPosition>& representative_grouped_Wyckoffs, 
-                                 const bool& same_species){
+  bool matchableWyckoffPositions(const vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
+                                 const vector<GroupedWyckoffPosition>& representative_grouped_Wyckoffs, 
+                                 bool same_species){
 
     // Determines if two sets of grouped Wyckoff positions are commensurate 
     // with one another, i.e., checks if the Wyckoff multiplicities and site 
     // symmetries are the same.  Comparing the same species is optional.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     // quick check: are the number of Wyckoff positions the same; cannot match otherwise
     if(temp_grouped_Wyckoffs.size() != representative_grouped_Wyckoffs.size()){
       if(LDEBUG) {
@@ -2536,7 +3202,7 @@ namespace compare{
 namespace compare{
   bool matchableWyckoffPositionSet(vector<vector<vector<string> > > grouped_possible_Wyckoff_letters,
                                    vector<vector<string> > grouped_Wyckoff_letters){
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool all_Wyckoffs_matched = false;
     //quick check
     if(grouped_possible_Wyckoff_letters.size() != grouped_Wyckoff_letters.size()){
@@ -2728,7 +3394,7 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry and pearson symbol and 
     // space group. A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
     // Overloaded: In case the properties of the material are not given.
     // OBSOLETE: Created a cleaner function which requires less input arguments,
     // i.e., groupStructurePrototypes()   
@@ -2764,55 +3430,53 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry and pearson symbol and 
     // space group. A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
     // OBSOLETE: Created a cleaner function which requires less input arguments,
     // i.e., groupStructurePrototypes()   
  
     //cerr << "vstoichs: " << vstoichs.size() << endl;
     //cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
     //cerr << "vstructures_from: " << vstructures_from.size() << endl;
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
 
     // First, separate by stoichiometry
     for(uint i=0;i<vstoichs.size(); i++){
       bool scheme_created=false;
       if(i==0){
-        StructurePrototype tmp;
+        StructurePrototype str_proto_tmp;
         if(directory==""){
-          tmp.representative_structure_name = vfiles[i];
+          str_proto_tmp.structure_representative_name = vfiles[i];
         }
         else {
-          tmp.representative_structure_name = directory+"/"+vfiles[i];  aurostd::StringSubst(tmp.representative_structure_name,"//","/"); //DX 20181003
+          str_proto_tmp.structure_representative_name = directory+"/"+vfiles[i];  aurostd::StringSubst(str_proto_tmp.structure_representative_name,"//","/"); //DX 20181003
         }
-        tmp.representative_structure_generated=vstructures_generated[i];
-        tmp.representative_structure_from=vstructures_from[i];
-        //tmp.number_types=vxstrs[i].num_each_type.size();
-        tmp.elements=vvelements[i];
-        tmp.stoichiometry=vstoichs[i];
-        //tmp.number_of_atoms=vxstrs[i].atoms.size();
-        tmp.Pearson=vpearsons[i];
-        tmp.space_group=vsgroups[i];
-        tmp.grouped_Wyckoff_positions=vgrouped_Wyckoff_positions[i];
+        str_proto_tmp.structure_representative_generated=vstructures_generated[i];
+        str_proto_tmp.structure_representative_from=vstructures_from[i];
+        //str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+        str_proto_tmp.elements=vvelements[i];
+        str_proto_tmp.stoichiometry=vstoichs[i];
+        //str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+        str_proto_tmp.Pearson=vpearsons[i];
+        str_proto_tmp.space_group=vsgroups[i];
+        str_proto_tmp.grouped_Wyckoff_positions=vgrouped_Wyckoff_positions[i];
         if(property_names.size()!=0){
-          tmp.property_names=property_names; //DX 20181218 - added property_names
-          tmp.property_units=property_units; //DX 20181218 - added property_units
-          tmp.representative_structure_properties=property_values[i]; //DX 20181218 - added property_values
+          str_proto_tmp.property_names=property_names; //DX 20181218 - added property_names
+          str_proto_tmp.property_units=property_units; //DX 20181218 - added property_units
+          str_proto_tmp.properties_structure_representative=property_values[i]; //DX 20181218 - added property_values
         }
         if(vstructures_generated[i]){
-          tmp.representative_structure=vxstrs[i];
-          tmp.number_types=vxstrs[i].num_each_type.size();
-          tmp.number_of_atoms=vxstrs[i].atoms.size();
-          tmp.representative_structure_compound=getCompoundName(vxstrs[i]); //DX 20190111 - added compound, e.g., Ag1Br2
+          str_proto_tmp.structure_representative=vxstrs[i];
+          str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+          str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+          str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX 20190111 - added compound, e.g., Ag1Br2
         }
-        comparison_schemes.push_back(tmp);
+        comparison_schemes.push_back(str_proto_tmp);
       }
       else {
         for(uint j=0; j<comparison_schemes.size(); j++){
           bool same_material_stoich=false;
-          ostringstream tmp;
-          tmp.clear();
           if(same_species==true && 
-             matchableSpecies(vxstrs[i],comparison_schemes[j].representative_structure,same_species)==true){
+             matchableSpecies(vxstrs[i],comparison_schemes[j].structure_representative,same_species)==true){
             same_material_stoich=true;
           }
           else if(same_species==false){
@@ -2855,54 +3519,55 @@ namespace compare{
             else {
               duplicate_name = directory+"/"+vfiles[i];  aurostd::StringSubst(duplicate_name,"//","/"); //DX 20181003
             }
-            comparison_schemes[j].duplicate_structures_names.push_back(duplicate_name);
-            comparison_schemes[j].duplicate_structures_generated.push_back(vstructures_generated[i]);
-            comparison_schemes[j].duplicate_structures_from.push_back(vstructures_from[i]);
-            //cerr << "adding to " << j << " (name): " << comparison_schemes[j].duplicate_structures_names.size() << endl;
-            //cerr << "adding to " << j << " (gen): " << comparison_schemes[j].duplicate_structures_generated.size() << endl;
-            //cerr << "adding to " << j << " (from): " << comparison_schemes[j].duplicate_structures_from.size() << endl;
+            comparison_schemes[j].structures_duplicate_names.push_back(duplicate_name);
+            comparison_schemes[j].structures_duplicate_generated.push_back(vstructures_generated[i]);
+            comparison_schemes[j].structures_duplicate_from.push_back(vstructures_from[i]);
+            //cerr << "adding to " << j << " (name): " << comparison_schemes[j].structures_duplicate_names.size() << endl;
+            //cerr << "adding to " << j << " (gen): " << comparison_schemes[j].structures_duplicate_generated.size() << endl;
+            //cerr << "adding to " << j << " (from): " << comparison_schemes[j].structures_duplicate_from.size() << endl;
             if(vstructures_generated[i]){
-              comparison_schemes[j].duplicate_structures.push_back(vxstrs[i]);
-              comparison_schemes[j].duplicate_structures_compounds.push_back(getCompoundName(vxstrs[i])); //DX 20190111 - added compound, e.g., Ag1Br2
+              comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
+              comparison_schemes[j].structures_duplicate_compounds.push_back(getCompoundName(vxstrs[i])); //DX 20190111 - added compound, e.g., Ag1Br2
             }
-            comparison_schemes[j].misfits.push_back(-1.0);
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+            comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191218
             if(property_names.size()!=0){
-              comparison_schemes[j].duplicate_structures_properties.push_back(property_values[i]); //DX 20181218 - added property_values
+              comparison_schemes[j].properties_structures_duplicate.push_back(property_values[i]); //DX 20181218 - added property_values
             }
             scheme_created=true;
             break;
           }
-          //cerr << "!!!!!!!!!!!!!!!!!!!!UNMATCHABLE: " << comparison_schemes[j].representative_structure_name << " and " << directory+"/"+vfiles[i] <<  endl;
+          //cerr << "!!!!!!!!!!!!!!!!!!!!UNMATCHABLE: " << comparison_schemes[j].structure_representative_name << " and " << directory+"/"+vfiles[i] <<  endl;
         }
         if(scheme_created==false){
-          StructurePrototype tmp;
+          StructurePrototype str_proto_tmp;
           if(directory==""){
-            tmp.representative_structure_name = vfiles[i];
+            str_proto_tmp.structure_representative_name = vfiles[i];
           }
           else {
-            tmp.representative_structure_name = directory+"/"+vfiles[i];  aurostd::StringSubst(tmp.representative_structure_name,"//","/"); //DX 20181003
+            str_proto_tmp.structure_representative_name = directory+"/"+vfiles[i];  aurostd::StringSubst(str_proto_tmp.structure_representative_name,"//","/"); //DX 20181003
           }
-          tmp.representative_structure_generated=vstructures_generated[i];
-          tmp.representative_structure_from=vstructures_from[i];
-          //tmp.number_types=vxstrs[i].num_each_type.size();
-          tmp.elements=vvelements[i];
-          tmp.stoichiometry=vstoichs[i];
-          //tmp.number_of_atoms=vxstrs[i].atoms.size();
-          tmp.Pearson=vpearsons[i];
-          tmp.space_group=vsgroups[i];
-          tmp.grouped_Wyckoff_positions=vgrouped_Wyckoff_positions[i];
+          str_proto_tmp.structure_representative_generated=vstructures_generated[i];
+          str_proto_tmp.structure_representative_from=vstructures_from[i];
+          //str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+          str_proto_tmp.elements=vvelements[i];
+          str_proto_tmp.stoichiometry=vstoichs[i];
+          //str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+          str_proto_tmp.Pearson=vpearsons[i];
+          str_proto_tmp.space_group=vsgroups[i];
+          str_proto_tmp.grouped_Wyckoff_positions=vgrouped_Wyckoff_positions[i];
           if(property_names.size()!=0){
-            tmp.property_names=property_names; //DX 20181218 - added property_names
-            tmp.property_units=property_units; //DX 20181218 - added property_units
-            tmp.representative_structure_properties=property_values[i]; //DX 20181218 - added property_values
+            str_proto_tmp.property_names=property_names; //DX 20181218 - added property_names
+            str_proto_tmp.property_units=property_units; //DX 20181218 - added property_units
+            str_proto_tmp.properties_structure_representative=property_values[i]; //DX 20181218 - added property_values
           }
           if(vstructures_generated[i]){
-            tmp.representative_structure=vxstrs[i];
-            tmp.number_types=vxstrs[i].num_each_type.size();
-            tmp.number_of_atoms=vxstrs[i].atoms.size();
-            tmp.representative_structure_compound=getCompoundName(vxstrs[i]); //DX 20190111 - added compound, e.g., Ag1Br2
+            str_proto_tmp.structure_representative=vxstrs[i];
+            str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+            str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+            str_proto_tmp.structure_representative_compound=getCompoundName(vxstrs[i]); //DX 20190111 - added compound, e.g., Ag1Br2
           }
-          comparison_schemes.push_back(tmp);
+          comparison_schemes.push_back(str_proto_tmp);
         }
       }
     }
@@ -2913,10 +3578,55 @@ namespace compare{
       cerr << ss_test.str() << endl;
     }
     //for(uint i=0;i<comparison_schemes.size();i++){
-    //      cerr << i << "duplicate_structures.size(): " << comparison_schemes[i].duplicate_structures.size() << endl;
-    //      cerr << i << "duplicate_structures_generated.size(): " << comparison_schemes[i].duplicate_structures_generated.size() << endl;
-    //      cerr << i << "duplicate_structures_from.size(): " << comparison_schemes[i].duplicate_structures_from.size() << endl;
+    //      cerr << i << "structures_duplicate.size(): " << comparison_schemes[i].structures_duplicate.size() << endl;
+    //      cerr << i << "structures_duplicate_generated.size(): " << comparison_schemes[i].structures_duplicate_generated.size() << endl;
+    //      cerr << i << "structures_duplicate_from.size(): " << comparison_schemes[i].structures_duplicate_from.size() << endl;
     //}
+  }
+}
+        
+// ***************************************************************************
+// structuresCompatible - check compatiblity of structures 
+// ***************************************************************************
+namespace compare{
+  bool structuresCompatible(const StructurePrototype& structure1,
+    const StructurePrototype& structure2, bool same_species,  
+    bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment,
+    bool duplicates_removed){ //DX 20190829 - added duplicates_removed
+
+    // ---------------------------------------------------------------------------
+    // check if species/stoichiometries are compatible
+    //DX 20190430 - this may take longer, use compound if(same_species==true && matchableSpecies(structures[i].structure_representative,comparison_schemes[j].structure_representative,same_species)==true){
+    if(same_species==true && structure1.structure_representative_compound!=structure2.structure_representative_compound){ //DX 20190430 - quicker //DX 20190702 - changed to "!=" and "false" for speed increase
+      return false;
+    }
+    else if(same_species==false && structure1.stoichiometry!=structure2.stoichiometry){ //DX 20190702 - changed to "!=" and "false" for speed increase
+      return false;
+    }
+    // if already removed duplicate compounds, then structures were already compared, so don't compare again
+    else if(same_species==false && duplicates_removed && structure1.structure_representative_compound==structure2.structure_representative_compound){
+      return false;
+    }
+    // ---------------------------------------------------------------------------
+    // check if LFA environments are compatible - DX 20190711
+    if(!ignore_environment && !compatibleEnvironmentSets(structure1.environments_LFA,structure2.environments_LFA,same_species,false)){
+      return false;
+    }
+    // ---------------------------------------------------------------------------
+    // check symmetry (if applicable) 
+    //DX 20190702 - checking stoich is redundant for compound checking - if(same_material_stoich==true && structures[i].stoichiometry==comparison_schemes[j].stoichiometry && 
+    //DX 20190702 [OBSOLETE] if(same_material_stoich==true &&  //DX 20190702 - moved stoichiometry up
+    if(((ignore_symmetry && ignore_Wyckoff) ||    
+        (!ignore_symmetry && ignore_Wyckoff &&
+         structure1.Pearson == structure2.Pearson && 
+         matchableSpaceGroups(structure1.space_group,structure2.space_group)) || 
+        (!ignore_symmetry && !ignore_Wyckoff &&
+         structure1.Pearson == structure2.Pearson && 
+         matchableSpaceGroups(structure1.space_group,structure2.space_group) &&
+         matchableWyckoffPositions(structure1.grouped_Wyckoff_positions,structure2.grouped_Wyckoff_positions,same_species)))){
+       return true;
+    }
+    return false;
   }
 }
 
@@ -2925,16 +3635,16 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   vector<StructurePrototype> groupStructurePrototypes(vector<StructurePrototype>& structures, 
-				 const bool& same_species, 
-         const bool& ignore_symmetry, const bool& ignore_Wyckoff){
+				 bool same_species, bool ignore_symmetry, bool ignore_Wyckoff, bool ignore_environment,
+         bool duplicates_removed){ //DX 20190829 - added duplicates_removed
 
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry, space group, and Wyckoff positions. 
     // A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
     
-    bool LDEBUG=(false || XHOST.DEBUG);
-    string function_name = "groupStructurePrototypes()";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::groupStructurePrototypes()";
    
     // variable to store structure sets to compare 
     vector<StructurePrototype> comparison_schemes;
@@ -2949,29 +3659,14 @@ namespace compare{
     //                     structures with different space groups)
     //   ignore_Wyckoff : ignores Wyckoff positions when grouping (i.e., can group 
     //                     structures with the same space group number, but different Wyckoff positions)
+    //   ignore_environment : ignores LFA environment analysis 
 
     for(uint i=0;i<structures.size(); i++){
       bool scheme_created=false;
       for(uint j=0; j<comparison_schemes.size(); j++){
-        bool same_material_stoich=false;
-        ostringstream tmp;
-        tmp.clear();
-        //DX 20190430 - this may take longer, use compound if(same_species==true && matchableSpecies(structures[i].representative_structure,comparison_schemes[j].representative_structure,same_species)==true){
-        if(same_species==true && structures[i].representative_structure_compound==comparison_schemes[j].representative_structure_compound){ //DX 20190430 - quicker
-          same_material_stoich=true;
-        }
-        else if(same_species==false){
-          same_material_stoich=true;
-        }
-        if(same_material_stoich==true && structures[i].stoichiometry==comparison_schemes[j].stoichiometry && 
-           ((ignore_symmetry && ignore_Wyckoff) ||    
-            (!ignore_symmetry && ignore_Wyckoff &&
-             structures[i].Pearson == comparison_schemes[j].Pearson && 
-             matchableSpaceGroups(structures[i].space_group,comparison_schemes[j].space_group)) || 
-            (!ignore_symmetry && !ignore_Wyckoff &&
-           structures[i].Pearson == comparison_schemes[j].Pearson && 
-           matchableSpaceGroups(structures[i].space_group,comparison_schemes[j].space_group) &&
-             matchableWyckoffPositions(structures[i].grouped_Wyckoff_positions, comparison_schemes[j].grouped_Wyckoff_positions,same_species)))){
+        //bool same_material_stoich=false;
+
+        if(structuresCompatible(structures[i], comparison_schemes[j], same_species, ignore_symmetry, ignore_Wyckoff, ignore_environment, duplicates_removed)){ //DX 20190829 - added duplicates_removed
           if(same_species==false){
             for(uint e=0;e<structures[i].elements.size();e++){
               bool already_in=false;
@@ -2992,118 +3687,274 @@ namespace compare{
         }
       }
       if(scheme_created==false){
-        StructurePrototype tmp = structures[i];
-        comparison_schemes.push_back(tmp);
+        StructurePrototype str_proto_tmp = structures[i];
+        comparison_schemes.push_back(str_proto_tmp);
       }
     }
     if(LDEBUG) {
-      cerr << "Prepared comparison sets: " << endl;
+      cerr << function_name << ": Prepared comparison sets: " << endl;
       stringstream ss_test;
       compare::printResults(ss_test, same_species, comparison_schemes);
       cerr << ss_test.str() << endl;
     }
     // DEBUG for(uint i=0;i<comparison_schemes.size();i++){
-    // DEBUG  cerr << i << "duplicate_structures.size(): " << comparison_schemes[i].duplicate_structures.size() << endl;
-    // DEBUG  cerr << i << "duplicate_structures_names.size(): " << comparison_schemes[i].duplicate_structures_names.size() << endl;
-    // DEBUG  cerr << i << "duplicate_structures_generated.size(): " << comparison_schemes[i].duplicate_structures_generated.size() << endl;
-    // DEBUG  cerr << i << "duplicate_structures_from.size(): " << comparison_schemes[i].duplicate_structures_from.size() << endl;
+    // DEBUG  cerr << i << "structures_duplicate.size(): " << comparison_schemes[i].structures_duplicate.size() << endl;
+    // DEBUG  cerr << i << "structures_duplicate_names.size(): " << comparison_schemes[i].structures_duplicate_names.size() << endl;
+    // DEBUG  cerr << i << "structures_duplicate_generated.size(): " << comparison_schemes[i].structures_duplicate_generated.size() << endl;
+    // DEBUG  cerr << i << "structures_duplicate_from.size(): " << comparison_schemes[i].structures_duplicate_from.size() << endl;
     // DEBUG }
     return comparison_schemes;
   }
 }
 
-/*
-// ***************************************************************************
-// removeDuplicateCompounds 
-// ***************************************************************************
-namespace compare{
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& comparison_schemes, 
-				 vector<xstructure>& vxstrs, const bool& same_species, 
-				 const vector< vector<string> >& vvelements,
-				 vector< vector<uint> >& vstoichs, vector<string>& vpearsons, 
-				 vector<uint>& vsgroups, 
-         vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions,
-         const string& directory, const vector<string>& vfiles, 
-         vector<bool>& vstructures_generated,
-         vector<string>& vstructures_from,
-         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
-         const bool& structures_generated){
-    vector<string> property_names, property_units;
-    vector<vector<string> > property_values;
-    return compareMultipleStructures(comparison_schemes, vxstrs, same_species, 
-                                     vvelements, vstoichs, vpearsons, vsgroups, 
-                                     vgrouped_Wyckoff_positions, property_names, property_units, property_values, 
-                                     directory, vfiles,
-                                     vstructures_generated, vstructures_from,
-                                     ignore_symmetry, ignore_Wyckoff, structures_generated);
-  }
-}
+//DX [OBSOLETE]// ***************************************************************************
+//DX [OBSOLETE]// removeDuplicateCompounds 
+//DX [OBSOLETE]// ***************************************************************************
+//DX [OBSOLETE]namespace compare{
+//DX [OBSOLETE]  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& comparison_schemes, 
+//DX [OBSOLETE]				 vector<xstructure>& vxstrs, const bool& same_species, 
+//DX [OBSOLETE]				 const vector< vector<string> >& vvelements,
+//DX [OBSOLETE]				 vector< vector<uint> >& vstoichs, vector<string>& vpearsons, 
+//DX [OBSOLETE]				 vector<uint>& vsgroups, 
+//DX [OBSOLETE]         vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions,
+//DX [OBSOLETE]         const string& directory, const vector<string>& vfiles, 
+//DX [OBSOLETE]         vector<bool>& vstructures_generated,
+//DX [OBSOLETE]         vector<string>& vstructures_from,
+//DX [OBSOLETE]         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
+//DX [OBSOLETE]         const bool& structures_generated){
+//DX [OBSOLETE]    vector<string> property_names, property_units;
+//DX [OBSOLETE]    vector<vector<string> > property_values;
+//DX [OBSOLETE]    return compareMultipleStructures(comparison_schemes, vxstrs, same_species, 
+//DX [OBSOLETE]                                     vvelements, vstoichs, vpearsons, vsgroups, 
+//DX [OBSOLETE]                                     vgrouped_Wyckoff_positions, property_names, property_units, property_values, 
+//DX [OBSOLETE]                                     directory, vfiles,
+//DX [OBSOLETE]                                     vstructures_generated, vstructures_from,
+//DX [OBSOLETE]                                     ignore_symmetry, ignore_Wyckoff, structures_generated);
+//DX [OBSOLETE]  }
+//DX [OBSOLETE]}
+//DX [OBSOLETE]
+//DX [OBSOLETE]// ***************************************************************************
+//DX [OBSOLETE]// 
+//DX [OBSOLETE]// ***************************************************************************
+//DX [OBSOLETE]namespace compare{
+//DX [OBSOLETE]  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& comparison_schemes, 
+//DX [OBSOLETE]				 vector<xstructure>& vxstrs, const bool& same_species, 
+//DX [OBSOLETE]				 const vector< vector<string> >& vvelements,
+//DX [OBSOLETE]				 vector< vector<uint> >& vstoichs, vector<string>& vpearsons, 
+//DX [OBSOLETE]				 vector<uint>& vsgroups, 
+//DX [OBSOLETE]         vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions,
+//DX [OBSOLETE]         vector<string>& property_names,
+//DX [OBSOLETE]         vector<string>& property_units,
+//DX [OBSOLETE]         vector<vector<string> >& property_values,
+//DX [OBSOLETE]         const string& directory, const vector<string>& vfiles,
+//DX [OBSOLETE]         vector<bool>& vstructures_generated,
+//DX [OBSOLETE]         vector<string>& vstructures_from,
+//DX [OBSOLETE]         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
+//DX [OBSOLETE]         const bool& structures_generated){
+//DX [OBSOLETE]
+//DX [OBSOLETE]    string function_name = "compare::compareMultipleStructures()";
+//DX [OBSOLETE]    ostream& logstream = cout;
+//DX [OBSOLETE]    stringstream message;
+//DX [OBSOLETE]    ofstream FileMESSAGE;
+//DX [OBSOLETE]
+//DX [OBSOLETE]    message << "Grouping sets of comparisons.";
+//DX [OBSOLETE]    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+//DX [OBSOLETE]    // === Organize into objects based on stoichiometry and symmetry (Pearson and space group)
+//DX [OBSOLETE]
+//DX [OBSOLETE]    cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
+//DX [OBSOLETE]    cerr << "vstructures_from: " << vstructures_from.size() << endl;
+//DX [OBSOLETE]    compare::createStructurePrototypes(comparison_schemes, vxstrs, same_species, 
+//DX [OBSOLETE]                                       vvelements, vstoichs, vpearsons, vsgroups, 
+//DX [OBSOLETE]                                       vgrouped_Wyckoff_positions, directory, vfiles,
+//DX [OBSOLETE]                                       vstructures_generated, vstructures_from,
+//DX [OBSOLETE]                                       ignore_symmetry, ignore_Wyckoff, structures_generated);
+//DX [OBSOLETE]   
+//DX [OBSOLETE]    // === If an ICSD comparison, make minimum ICSD number as the representative prototype === // 
+//DX [OBSOLETE]    if(ICSD_comparison){
+//DX [OBSOLETE]      compare::representativePrototypeForICSDRuns(comparison_schemes);
+//DX [OBSOLETE]    }
+//DX [OBSOLETE]
+//DX [OBSOLETE]    message << "Running comparisons ...";
+//DX [OBSOLETE]    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+//DX [OBSOLETE]    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(num_proc, comparison_schemes, same_species, scale_volume, optimize_match, single_comparison_round, structures_generated, ICSD_comparison, oss); 
+//DX [OBSOLETE]    
+//DX [OBSOLETE]    if(final_prototypes.size()==0){
+//DX [OBSOLETE]      return oss.str();
+//DX [OBSOLETE]    }
+//DX [OBSOLETE]    comparison_schemes.clear();
+//DX [OBSOLETE] 
+//DX [OBSOLETE]    // ========== Check final_prototypes ========== //
+//DX [OBSOLETE]    // It is possible that two prototypes are the same regardless 
+//DX [OBSOLETE]    // of having different space groups.
+//DX [OBSOLETE]    //DX - BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
+//DX [OBSOLETE] 
+//DX [OBSOLETE]    message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << vxstrs.size() << " structures).";
+//DX [OBSOLETE]    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
+//DX [OBSOLETE]   
+//DX [OBSOLETE]    return final_prototypes; 
+//DX [OBSOLETE]  }
+//DX [OBSOLETE]}
 
 // ***************************************************************************
-// 
+// checkForBetterMatches 
 // ***************************************************************************
 namespace compare{
-  vector<StructurePrototype> compareMultipleStructures(vector<StructurePrototype>& comparison_schemes, 
-				 vector<xstructure>& vxstrs, const bool& same_species, 
-				 const vector< vector<string> >& vvelements,
-				 vector< vector<uint> >& vstoichs, vector<string>& vpearsons, 
-				 vector<uint>& vsgroups, 
-         vector<vector<GroupedWyckoffPosition> >& vgrouped_Wyckoff_positions,
-         vector<string>& property_names,
-         vector<string>& property_units,
-         vector<vector<string> >& property_values,
-         const string& directory, const vector<string>& vfiles,
-         vector<bool>& vstructures_generated,
-         vector<string>& vstructures_from,
-         const bool& ignore_symmetry, const bool& ignore_Wyckoff,
-         const bool& structures_generated){
+  vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
+      ostream& oss, uint& num_proc, 
+      bool check_for_better_matches, 
+      bool same_species,
+      const aurostd::xoption& comparison_options, 
+      bool quiet, 
+      ostream& logstream){ 
 
-    string function_name = "compare::compareMultipleStructures()";
-    ostream& logstream = cout;
-    stringstream message;
     ofstream FileMESSAGE;
+    return checkForBetterMatches(prototype_schemes, 
+        oss, 
+        num_proc, 
+        check_for_better_matches, 
+        same_species,
+        comparison_options, 
+        FileMESSAGE, 
+        quiet, 
+        logstream);
+  }
 
-    message << "Grouping sets of comparisons.";
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    // === Organize into objects based on stoichiometry and symmetry (Pearson and space group)
+  vector<StructurePrototype> checkForBetterMatches(vector<StructurePrototype>& prototype_schemes, 
+      ostream& oss, uint& num_proc, 
+      bool check_for_better_matches, 
+      bool same_species,
+      const aurostd::xoption& comparison_options, 
+      ofstream& FileMESSAGE, 
+      bool quiet, 
+      ostream& logstream){ 
 
-    cerr << "vstructures_generated: " << vstructures_generated.size() << endl;
-    cerr << "vstructures_from: " << vstructures_from.size() << endl;
-    compare::createStructurePrototypes(comparison_schemes, vxstrs, same_species, 
-                                       vvelements, vstoichs, vpearsons, vsgroups, 
-                                       vgrouped_Wyckoff_positions, directory, vfiles,
-                                       vstructures_generated, vstructures_from,
-                                       ignore_symmetry, ignore_Wyckoff, structures_generated);
-   
-    // === If an ICSD comparison, make minimum ICSD number as the representative prototype === // 
-    if(ICSD_comparison){
-      compare::representativePrototypeForICSDRuns(comparison_schemes);
+    // this function checks if compounds/structures match better with another group 
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::checkForBetterMatches()";
+    stringstream message;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
+
+    // ---------------------------------------------------------------------------
+    // create xoptions to contain all comparison options
+    aurostd::xoption check_better_matches_options = comparison_options; //DX 20200103
+    check_better_matches_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND",TRUE); // always true for this function
+    check_better_matches_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",FALSE); //always false for this function 
+
+    double misfit_min = 0.01; // used for check_for_better_matches : this is quite strict; if too expensive, make more loose
+    double misfit_max = 0.1; // used for check_for_better_matches : otherwise we will compare same family structures which have already been moved (if using !clean_unmatched)
+
+    // ---------------------------------------------------------------------------
+    // check which structures could potentially match to others based on misfit
+    vector<StructurePrototype> comparison_groups;
+  
+    for(uint i=0;i<prototype_schemes.size();i++){
+      for(uint j=0;j<prototype_schemes[i].structures_duplicate_names.size();j++){
+        if((check_for_better_matches && prototype_schemes[i].structure_misfits_duplicate[j].misfit > misfit_min && prototype_schemes[i].structure_misfits_duplicate[j].misfit < misfit_max) || // find better match
+           (!check_for_better_matches && (prototype_schemes[i].structure_misfits_duplicate[j].misfit > 0.1 || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,1.0,1e-6) || aurostd::isequal(prototype_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)))){   // find a match //DX 20191218
+          StructurePrototype str_proto_tmp;
+          bool found_new_match=false;
+          // ---------------------------------------------------------------------------
+          // check for other compatible representative structures 
+          // start_index=i+1 : (only need to search forward for better matches, due to appendStructurePrototypes() scheme)
+          uint start_index = 0;
+          if(check_for_better_matches){ start_index = i+1; }
+          for(uint k=start_index;k<prototype_schemes.size();k++){
+            if(structuresCompatible(prototype_schemes[i], 
+                  prototype_schemes[k], 
+                  same_species, 
+                  check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY"), 
+                  check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF"), 
+                  check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS"), 
+                  false)){ // can check based on representatives; duplicate info matches its representative info //DX 20200103 - condensed booleans to xoptions
+              if(!quiet || LDEBUG){
+                message << "Found potential match for " << prototype_schemes[i].structures_duplicate_names[j] << ": " << prototype_schemes[k].structure_representative_name; 
+                pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+              }
+
+              // ---------------------------------------------------------------------------
+              // reverse the convention, single structurePrototype object to find best match
+              // i.e., duplicate -> representative and representatives -> duplicates 
+              if(!found_new_match){
+                str_proto_tmp.copyPrototypeInformation(prototype_schemes[i]);
+                str_proto_tmp.putDuplicateAsRepresentative(prototype_schemes[i],j);
+                // store the current match so we can check fast if it matches to any other
+                str_proto_tmp.addStructurePrototypeAsDuplicate(prototype_schemes[i]); // store the current match structure
+                found_new_match=true;
+              }
+              if(k!=j){
+                str_proto_tmp.addStructurePrototypeAsDuplicate(prototype_schemes[k]);
+              }
+            }
+          }
+          if(found_new_match){
+            comparison_groups.push_back(str_proto_tmp);
+          }
+        }
+      }
     }
 
-    message << "Running comparisons ...";
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes = compare::runComparisonScheme(num_proc, comparison_schemes, same_species, scale_volume, optimize_match, single_comparison_round, structures_generated, ICSD_comparison, oss); 
+    // ---------------------------------------------------------------------------
+    // compare structures 
+    vector<StructurePrototype> other_matches_schemes = compare::runComparisonScheme(comparison_groups, same_species, num_proc, check_better_matches_options, oss, FileMESSAGE, quiet); //DX 20200103 - condensed booleans to xoptions
+
+    // ---------------------------------------------------------------------------
+    // check if there are any better matches and reorganize if necessary
+    // the original match is stored in the first position
+    for(uint i=0;i<other_matches_schemes.size();i++){
+      double min_misfit = aurostd::abs(other_matches_schemes[i].structure_misfits_duplicate[0].misfit); // put first as min //abs to turn -1 into 1 for comparison //DX 20191218
+      uint min_index = 0;
+      for(uint j=1;j<other_matches_schemes[i].structure_misfits_duplicate.size();j++){ //DX 20191218
+        if(other_matches_schemes[i].structure_misfits_duplicate[j].misfit<min_misfit && aurostd::isdifferent(other_matches_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)){
+          min_misfit=other_matches_schemes[i].structure_misfits_duplicate[j].misfit;
+          min_index=j;
+        }
+      }
+      // ---------------------------------------------------------------------------
+      // move if found better match
+      if(min_index!=0){
+        for(uint j=0;j<prototype_schemes.size();j++){
+          // add structure to its better matching representative
+          if(prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[min_index]){
+            if(!quiet || LDEBUG){
+              message << other_matches_schemes[i].structure_representative_name << " matches better with " << prototype_schemes[j].structure_representative_name; 
+              pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+            }
+            prototype_schemes[j].addStructurePrototypeAsDuplicate(other_matches_schemes[i]); //DX 20191218
+            prototype_schemes[j].structure_misfits_duplicate.back()=other_matches_schemes[i].structure_misfits_duplicate[min_index]; //DX 20191218
+          }
+          // remove from old representative
+          if(check_better_matches_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED") && prototype_schemes[j].structure_representative_name == other_matches_schemes[i].structures_duplicate_names[0]){
+            for(uint k=0;k<prototype_schemes[j].structures_duplicate_names.size();k++){
+              if(prototype_schemes[j].structures_duplicate_names[k] == other_matches_schemes[i].structure_representative_name){
+                if(!quiet || LDEBUG){
+                  message << "removing " << other_matches_schemes[i].structure_representative_name << " from " << prototype_schemes[j].structure_representative_name << " set"; 
+                  pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+                }
+                prototype_schemes[j].removeNonDuplicate(k);
+                break;
+              }
+            }
+          }
+        }
+      }
+      else{
+        if(!quiet){
+          message << other_matches_schemes[i].structure_representative_name << " matches better with original set " << other_matches_schemes[i].structures_duplicate_names[0];
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        }
+      }
+    }
     
-    if(final_prototypes.size()==0){
-      return oss.str();
+    if(LDEBUG){
+      for(uint i=0;i<prototype_schemes.size();i++){ cerr << function_name << " prototype_schemes[i]: " << prototype_schemes[i] << endl; }
     }
-    comparison_schemes.clear();
- 
-    // ========== Check final_prototypes ========== //
-    // It is possible that two prototypes are the same regardless 
-    // of having different space groups.
-    //DX - BETA TESTING - compare::checkPrototypes(num_proc,same_species,final_prototypes);
- 
-    message << "Number of unique prototypes: " << final_prototypes.size() << " (out of " << vxstrs.size() << " structures).";
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_COMPLETE_);
-   
-    return final_prototypes; 
+    return prototype_schemes;
   }
 }
-*/
 
 // ***************************************************************************
-// removeDuplicateCompounds 
+// compareDuplicateCompounds()
 // ***************************************************************************
 namespace compare{
   vector<StructurePrototype> compareDuplicateCompounds(vector<StructurePrototype>& prototype_schemes, uint& num_proc, 
@@ -3115,27 +3966,28 @@ namespace compare{
 
     vector<StructurePrototype> duplicate_check_schemes;
     for(uint i=0;i<prototype_schemes.size();i++){
-      if(prototype_schemes[i].duplicate_structures_names.size()>0){ //if 0, none to check; 
-        vector<StructurePrototype> tmp = compare::createComparisonSchemeForDuplicateCompounds(prototype_schemes[i]);
-        duplicate_check_schemes.insert(duplicate_check_schemes.end(), tmp.begin(), tmp.end());
+      if(prototype_schemes[i].structures_duplicate_names.size()>0){ //if 0, none to check; 
+        vector<StructurePrototype> vstr_proto_tmp = compare::createComparisonSchemeForDuplicateCompounds(prototype_schemes[i]);
+        duplicate_check_schemes.insert(duplicate_check_schemes.end(), vstr_proto_tmp.begin(), vstr_proto_tmp.end());
       }
     }
     
-    if(ICSD_comparison){
-      compare::representativePrototypeForICSDRuns(duplicate_check_schemes);
-    }
 
     // set options
     bool same_species=true;
-    bool scale_volume=false;
-    bool optimize_match=false;
-    bool single_comparison_round=false;
-    bool clean_unmatched=true; //DX 20190504
-    //bool structures_generated=false;
+    
+    // ---------------------------------------------------------------------------
+    // create xoptions to contain all comparison options
+    aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+    comparison_options.flag("COMPARE_STRUCTURE::SCALE_VOLUME",FALSE);
+    if(ICSD_comparison){
+      comparison_options.flag("COMPARE_STRUCTURE::ICSD_COMPARISON",TRUE);
+      compare::representativePrototypeForICSDRuns(duplicate_check_schemes);
+    }
 
     message << "Running comparisons to remove duplicate compounds ...";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-    vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(num_proc, duplicate_check_schemes, same_species, scale_volume, optimize_match, single_comparison_round, clean_unmatched, ICSD_comparison, oss, FileMESSAGE); //DX 20190319 - added FileMESSAGE 
+    vector<StructurePrototype> final_prototypes_reduced = compare::runComparisonScheme(duplicate_check_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE); //DX 20200103 - condensed booleans to xoptions
 
     return final_prototypes_reduced;
 
@@ -3153,67 +4005,69 @@ namespace compare{
     // so there is not need to check.
 
     vector<StructurePrototype> duplicate_check_schemes;
-    for(uint i=0;i<prototype_scheme.duplicate_structures_names.size();i++){
+    for(uint i=0;i<prototype_scheme.structures_duplicate_names.size();i++){
       bool scheme_created=false;
       //cerr << i << endl;
       if(i==0){
-        StructurePrototype tmp = prototype_scheme;
-        tmp.representative_structure_name = prototype_scheme.duplicate_structures_names[i];
-        tmp.representative_structure_compound = prototype_scheme.duplicate_structures_compounds[i];
-        if(prototype_scheme.duplicate_structures_properties.size()>0){
-          tmp.representative_structure_properties = prototype_scheme.duplicate_structures_properties[i];
+        StructurePrototype str_proto_tmp = prototype_scheme;
+        str_proto_tmp.structure_representative_name = prototype_scheme.structures_duplicate_names[i];
+        str_proto_tmp.structure_representative_compound = prototype_scheme.structures_duplicate_compounds[i];
+        if(prototype_scheme.properties_structures_duplicate.size()>0){
+          str_proto_tmp.properties_structure_representative = prototype_scheme.properties_structures_duplicate[i];
         }
         else {
-          tmp.representative_structure_properties.clear();
+          str_proto_tmp.properties_structure_representative.clear();
         }
-        tmp.representative_structure.Clear(); //clear xstructure;
-        tmp.representative_structure_generated=false;
-        tmp.representative_structure_from=prototype_scheme.duplicate_structures_from[i];
-        tmp.duplicate_structures_names.clear(); tmp.duplicate_structures_compounds.clear(); tmp.duplicate_structures.clear(); tmp.misfits.clear(); tmp.duplicate_structures_properties.clear();
-        tmp.duplicate_structures_generated.clear(); tmp.duplicate_structures_from.clear();
-        tmp.family_structures_names.clear(); tmp.family_structures.clear(); tmp.family_misfits.clear(); tmp.family_structures_properties.clear(); //DX 20190425 - added properties
-        tmp.family_structures_generated.clear(); tmp.family_structures_from.clear();
-        tmp.elements.clear();
-        duplicate_check_schemes.push_back(tmp);
+        str_proto_tmp.structure_representative.clear(); //clear xstructure; //DX 20191220 - uppercase to lowercase clear
+        str_proto_tmp.structure_representative_generated=false;
+        str_proto_tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
+        str_proto_tmp.structures_duplicate_names.clear(); str_proto_tmp.structures_duplicate_compounds.clear(); str_proto_tmp.structures_duplicate.clear(); str_proto_tmp.structure_misfits_duplicate.clear(); str_proto_tmp.properties_structures_duplicate.clear();
+        str_proto_tmp.structures_duplicate_generated.clear(); str_proto_tmp.structures_duplicate_from.clear(); str_proto_tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190814 - added Wyckoff positions
+        str_proto_tmp.structures_family_names.clear(); str_proto_tmp.structures_family.clear(); str_proto_tmp.structure_misfits_family.clear(); str_proto_tmp.properties_structures_family.clear(); //DX 20190425 - added properties
+        str_proto_tmp.structures_family_generated.clear(); str_proto_tmp.structures_family_from.clear();
+        str_proto_tmp.elements.clear();
+        duplicate_check_schemes.push_back(str_proto_tmp);
       }
       else {
         for(uint j=0; j<duplicate_check_schemes.size(); j++){
-          if(prototype_scheme.duplicate_structures_compounds[i] == duplicate_check_schemes[j].representative_structure_compound){
+          if(prototype_scheme.structures_duplicate_compounds[i] == duplicate_check_schemes[j].structure_representative_compound){
             scheme_created=true;
-            duplicate_check_schemes[j].duplicate_structures_names.push_back(prototype_scheme.duplicate_structures_names[i]);
-            duplicate_check_schemes[j].duplicate_structures_compounds.push_back(prototype_scheme.duplicate_structures_compounds[i]);
+            duplicate_check_schemes[j].structures_duplicate_names.push_back(prototype_scheme.structures_duplicate_names[i]);
+            duplicate_check_schemes[j].structures_duplicate_compounds.push_back(prototype_scheme.structures_duplicate_compounds[i]);
             xstructure tmp_xstr;
-            duplicate_check_schemes[j].duplicate_structures.push_back(tmp_xstr);
-            duplicate_check_schemes[j].duplicate_structures_generated.push_back(false);
-            duplicate_check_schemes[j].duplicate_structures_from.push_back(prototype_scheme.duplicate_structures_from[i]);
-            if(prototype_scheme.duplicate_structures_properties.size()>0){
-              duplicate_check_schemes[j].duplicate_structures_properties.push_back(prototype_scheme.duplicate_structures_properties[i]);
+            duplicate_check_schemes[j].structures_duplicate.push_back(tmp_xstr);
+            duplicate_check_schemes[j].structures_duplicate_generated.push_back(false);
+            duplicate_check_schemes[j].structures_duplicate_from.push_back(prototype_scheme.structures_duplicate_from[i]);
+            duplicate_check_schemes[j].structures_duplicate_grouped_Wyckoff_positions.push_back(prototype_scheme.structures_duplicate_grouped_Wyckoff_positions[i]);
+            if(prototype_scheme.properties_structures_duplicate.size()>0){
+              duplicate_check_schemes[j].properties_structures_duplicate.push_back(prototype_scheme.properties_structures_duplicate[i]);
             }
             else {
-              duplicate_check_schemes[j].duplicate_structures_properties.clear();
+              duplicate_check_schemes[j].properties_structures_duplicate.clear();
             }
-            duplicate_check_schemes[j].misfits.push_back(-1.0);
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+            duplicate_check_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191218
             break;
           }
         }
         if(!scheme_created){
-          StructurePrototype tmp = prototype_scheme;
-          tmp.representative_structure_name = prototype_scheme.duplicate_structures_names[i];
-          tmp.representative_structure_compound = prototype_scheme.duplicate_structures_compounds[i];
-          if(prototype_scheme.duplicate_structures_properties.size()>0){
-            tmp.representative_structure_properties = prototype_scheme.duplicate_structures_properties[i];
+          StructurePrototype str_proto_tmp = prototype_scheme;
+          str_proto_tmp.structure_representative_name = prototype_scheme.structures_duplicate_names[i];
+          str_proto_tmp.structure_representative_compound = prototype_scheme.structures_duplicate_compounds[i];
+          if(prototype_scheme.properties_structures_duplicate.size()>0){
+            str_proto_tmp.properties_structure_representative = prototype_scheme.properties_structures_duplicate[i];
           }
           else {
-            tmp.representative_structure_properties.clear();
+            str_proto_tmp.properties_structure_representative.clear();
           }
-          tmp.representative_structure.Clear(); //clear xstructure;
-          tmp.representative_structure_generated=false;
-          tmp.representative_structure_from=prototype_scheme.duplicate_structures_from[i];
-          tmp.duplicate_structures_names.clear(); tmp.duplicate_structures_compounds.clear(); tmp.duplicate_structures.clear(); tmp.misfits.clear(); tmp.duplicate_structures_properties.clear();
-          tmp.duplicate_structures_generated.clear(); tmp.duplicate_structures_from.clear();
-          tmp.family_structures_names.clear(); tmp.family_structures.clear(); tmp.family_misfits.clear(); tmp.family_structures_properties.clear(); //DX 20190425 - added properties
-          tmp.family_structures_generated.clear(); tmp.family_structures_from.clear();
-          duplicate_check_schemes.push_back(tmp);
+          str_proto_tmp.structure_representative.clear(); //clear xstructure; //DX 20191220 - uppercase to lowercase clear
+          str_proto_tmp.structure_representative_generated=false;
+          str_proto_tmp.structure_representative_from=prototype_scheme.structures_duplicate_from[i];
+          str_proto_tmp.structures_duplicate_names.clear(); str_proto_tmp.structures_duplicate_compounds.clear(); str_proto_tmp.structures_duplicate.clear(); str_proto_tmp.structure_misfits_duplicate.clear(); str_proto_tmp.properties_structures_duplicate.clear();
+          str_proto_tmp.structures_duplicate_generated.clear(); str_proto_tmp.structures_duplicate_from.clear(); str_proto_tmp.structures_duplicate_grouped_Wyckoff_positions.clear(); //DX 20190814 - added Wyckoff positions
+          str_proto_tmp.structures_family_names.clear(); str_proto_tmp.structures_family.clear(); str_proto_tmp.structure_misfits_family.clear(); str_proto_tmp.properties_structures_family.clear(); //DX 20190425 - added properties
+          str_proto_tmp.structures_family_generated.clear(); str_proto_tmp.structures_family_from.clear();
+          duplicate_check_schemes.push_back(str_proto_tmp);
         }
       }
     }
@@ -3230,23 +4084,23 @@ namespace compare{
     // Remove the duplicate compounds from the final prototype list
 
     for(uint i=0;i<final_prototypes.size();i++){
-      for(uint j=0;j<final_prototypes[i].duplicate_structures_names.size();j++){
+      for(uint j=0;j<final_prototypes[i].structures_duplicate_names.size();j++){
         bool remove_structure = true;
         for(uint k=0;k<duplicate_compound_comparisons.size();k++){
-          if(final_prototypes[i].duplicate_structures_names[j] == duplicate_compound_comparisons[k].representative_structure_name){
+          if(final_prototypes[i].structures_duplicate_names[j] == duplicate_compound_comparisons[k].structure_representative_name){
             remove_structure = false;
             break;
           }
         }
         if(remove_structure){
-          final_prototypes[i].duplicate_structures_names.erase(final_prototypes[i].duplicate_structures_names.begin()+j);
-          final_prototypes[i].duplicate_structures_compounds.erase(final_prototypes[i].duplicate_structures_compounds.begin()+j);
-          final_prototypes[i].duplicate_structures_generated.erase(final_prototypes[i].duplicate_structures_generated.begin()+j);
-          final_prototypes[i].duplicate_structures_from.erase(final_prototypes[i].duplicate_structures_from.begin()+j);
+          final_prototypes[i].structures_duplicate_names.erase(final_prototypes[i].structures_duplicate_names.begin()+j);
+          final_prototypes[i].structures_duplicate_compounds.erase(final_prototypes[i].structures_duplicate_compounds.begin()+j);
+          final_prototypes[i].structures_duplicate_generated.erase(final_prototypes[i].structures_duplicate_generated.begin()+j);
+          final_prototypes[i].structures_duplicate_from.erase(final_prototypes[i].structures_duplicate_from.begin()+j);
           if(final_prototypes[i].property_names.size()!=0){
-            final_prototypes[i].duplicate_structures_properties.erase(final_prototypes[i].duplicate_structures_properties.begin()+j);
+            final_prototypes[i].properties_structures_duplicate.erase(final_prototypes[i].properties_structures_duplicate.begin()+j);
           }
-          final_prototypes[i].misfits.erase(final_prototypes[i].misfits.begin()+j);
+          final_prototypes[i].structure_misfits_duplicate.erase(final_prototypes[i].structure_misfits_duplicate.begin()+j); //DX 20191218
         }
       }
     }
@@ -3263,60 +4117,63 @@ namespace compare{
     // representative structure (normally the oldest).
 
     for(uint i=0;i<comparison_schemes.size();i++){
-      if(comparison_schemes[i].duplicate_structures_names.size()){
+      if(comparison_schemes[i].structures_duplicate_names.size()){
         vector<string> ICSD_entries;
-        ICSD_entries.push_back(findICSDName(comparison_schemes[i].representative_structure_name));
-        for(uint j=0;j<comparison_schemes[i].duplicate_structures_names.size();j++){
-          ICSD_entries.push_back(findICSDName(comparison_schemes[i].duplicate_structures_names[j]));
+        ICSD_entries.push_back(findICSDName(comparison_schemes[i].structure_representative_name));
+        for(uint j=0;j<comparison_schemes[i].structures_duplicate_names.size();j++){
+          ICSD_entries.push_back(findICSDName(comparison_schemes[i].structures_duplicate_names[j]));
         }
         string min_ICSD_entry = findMinimumICSDEntry(ICSD_entries);
-        if(!aurostd::substring2bool(comparison_schemes[i].representative_structure_name,min_ICSD_entry)){
-          for(uint j=0;j<comparison_schemes[i].duplicate_structures_names.size();j++){
-            if(aurostd::substring2bool(comparison_schemes[i].duplicate_structures_names[j],min_ICSD_entry)){
-              string old_representative_ID = comparison_schemes[i].representative_structure_name;
-              string old_representative_compound = comparison_schemes[i].representative_structure_compound;
-              bool old_representative_generated = comparison_schemes[i].representative_structure_generated;
-              string old_representative_from = comparison_schemes[i].representative_structure_from;
+        if(!aurostd::substring2bool(comparison_schemes[i].structure_representative_name,min_ICSD_entry) && !min_ICSD_entry.empty()){ //DX 20191108 - add not empty case
+          for(uint j=0;j<comparison_schemes[i].structures_duplicate_names.size();j++){
+            if(aurostd::substring2bool(comparison_schemes[i].structures_duplicate_names[j],min_ICSD_entry)){
+              string old_representative_ID = comparison_schemes[i].structure_representative_name;
+              string old_representative_compound = comparison_schemes[i].structure_representative_compound;
+              bool old_representative_generated = comparison_schemes[i].structure_representative_generated;
+              string old_representative_from = comparison_schemes[i].structure_representative_from;
+              vector<GroupedWyckoffPosition> old_Wyckoff_positions = comparison_schemes[i].grouped_Wyckoff_positions; //DX 20190813 - need to update; otherwise, the compound name and Wyckoff positions may not match; especially for structure-type comparisons
               uint old_representative_duplicate_count = comparison_schemes[i].number_compounds_matching_representative;
-              vector<string> old_representative_properties = comparison_schemes[i].representative_structure_properties;
-              comparison_schemes[i].representative_structure_name = comparison_schemes[i].duplicate_structures_names[j];  
-              comparison_schemes[i].representative_structure_compound = comparison_schemes[i].duplicate_structures_compounds[j];  
-              comparison_schemes[i].representative_structure_generated = comparison_schemes[i].duplicate_structures_generated[j];  
-              comparison_schemes[i].representative_structure_from = comparison_schemes[i].duplicate_structures_from[j]; 
+              vector<string> old_representative_properties = comparison_schemes[i].properties_structure_representative;
+              comparison_schemes[i].structure_representative_name = comparison_schemes[i].structures_duplicate_names[j];  
+              comparison_schemes[i].structure_representative_compound = comparison_schemes[i].structures_duplicate_compounds[j];  
+              comparison_schemes[i].structure_representative_generated = comparison_schemes[i].structures_duplicate_generated[j];  
+              comparison_schemes[i].structure_representative_from = comparison_schemes[i].structures_duplicate_from[j]; 
+              comparison_schemes[i].grouped_Wyckoff_positions = comparison_schemes[i].structures_duplicate_grouped_Wyckoff_positions[j]; //DX 20190813 - need to update; otherwise, the compound name and Wyckoff positions may not match; especially for structure-type comparisons
               comparison_schemes[i].number_compounds_matching_representative = comparison_schemes[i].number_compounds_matching_duplicate[j]; 
               if(old_representative_generated){
-                xstructure old_representative_xstr = comparison_schemes[i].representative_structure;
-                if(comparison_schemes[i].duplicate_structures_generated[j]){
-                  comparison_schemes[i].representative_structure = comparison_schemes[i].duplicate_structures[j]; 
-                  comparison_schemes[i].duplicate_structures[j] = old_representative_xstr;
-                  comparison_schemes[i].duplicate_structures_generated[j] = old_representative_generated;
+                xstructure old_representative_xstr = comparison_schemes[i].structure_representative;
+                if(comparison_schemes[i].structures_duplicate_generated[j]){
+                  comparison_schemes[i].structure_representative = comparison_schemes[i].structures_duplicate[j]; 
+                  comparison_schemes[i].structures_duplicate[j] = old_representative_xstr;
+                  comparison_schemes[i].structures_duplicate_generated[j] = old_representative_generated;
                 }
                 else {
-                  comparison_schemes[i].representative_structure.Clear();
-                  comparison_schemes[i].duplicate_structures_generated[j]=false; //cannot guarantee the rest of the vector is generated; may populate wrong index
+                  comparison_schemes[i].structure_representative.clear(); //DX 20191220 - uppercase to lowercase clear
+                  comparison_schemes[i].structures_duplicate_generated[j]=false; //cannot guarantee the rest of the vector is generated; may populate wrong index
                  //DX 20190304 - should I also clear out vector<xvstructure>?
                 }
               }
               else {
-                comparison_schemes[i].duplicate_structures_generated[j] = old_representative_generated;
+                comparison_schemes[i].structures_duplicate_generated[j] = old_representative_generated;
               }
-              if(comparison_schemes[i].duplicate_structures_properties.size()>0){
-                comparison_schemes[i].representative_structure_properties = comparison_schemes[i].duplicate_structures_properties[j];
+              if(comparison_schemes[i].properties_structures_duplicate.size()>0){
+                comparison_schemes[i].properties_structure_representative = comparison_schemes[i].properties_structures_duplicate[j];
               }
               else {
-                comparison_schemes[i].representative_structure_properties.clear();
+                comparison_schemes[i].properties_structure_representative.clear();
               }
-              comparison_schemes[i].duplicate_structures_names[j] = old_representative_ID;
-              //DX 20190304 - moved into if statment up above - comparison_schemes[i].duplicate_structures[j] = old_representative_xstr;
-              comparison_schemes[i].duplicate_structures_compounds[j] = old_representative_compound;
-              //DX 20190304 - moved into if statment up above - comparison_schemes[i].duplicate_structures_generated[j] = old_representative_generated;
-              comparison_schemes[i].duplicate_structures_from[j] = old_representative_from;
+              comparison_schemes[i].structures_duplicate_names[j] = old_representative_ID;
+              //DX 20190304 - moved into if statment up above - comparison_schemes[i].structures_duplicate[j] = old_representative_xstr;
+              comparison_schemes[i].structures_duplicate_compounds[j] = old_representative_compound;
+              //DX 20190304 - moved into if statment up above - comparison_schemes[i].structures_duplicate_generated[j] = old_representative_generated;
+              comparison_schemes[i].structures_duplicate_from[j] = old_representative_from;
+              comparison_schemes[i].structures_duplicate_grouped_Wyckoff_positions[j] = old_Wyckoff_positions; //DX 20190813
               comparison_schemes[i].number_compounds_matching_duplicate[j] = old_representative_duplicate_count;
-              if(comparison_schemes[i].duplicate_structures_properties.size()>0){
-                comparison_schemes[i].duplicate_structures_properties[j] = old_representative_properties;
+              if(comparison_schemes[i].properties_structures_duplicate.size()>0){
+                comparison_schemes[i].properties_structures_duplicate[j] = old_representative_properties;
               }
               else {
-                comparison_schemes[i].duplicate_structures_properties.clear();
+                comparison_schemes[i].properties_structures_duplicate.clear();
               }
               break;
             }  
@@ -3335,71 +4192,80 @@ namespace compare{
   void runComparisonThreads(vector<StructurePrototype>& comparison_schemes, 
       std::pair<uint,uint>& start_indices,
       std::pair<uint,uint>& end_indices,
-      const bool& same_species, 
-      const bool& scale_volume, const bool& optimize_match, 
-      ostream& oss){
+      ostream& oss,
+      bool same_species, 
+      bool scale_volume, bool optimize_match, 
+      bool store_comparison_logs){ 
  
     // Run comparison thread
     // If the xstructure is not generated, it will generate a local copy for 
     // the single comparison only (prevents overwriting in the comparisons) 
  
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonThreads()";
+    stringstream message;
+    //bool store_comparison_logs = false; //DX 20190624
+   
+    //// check if only one comparison, then we store the comparison logs //DX 20190802
+    //uint number_of_comparisons = 0;
+    //for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
+    //if(number_of_comparisons==1){store_comparison_logs=true;}
 
     uint i_min=start_indices.first; uint i_max=end_indices.first;
     uint j_min=0; uint j_max=0;
 
     for(uint i=i_min; i<=i_max; i++){
-      xstructure representative_structure;
+      xstructure structure_representative;
 
       // to loop properly
       if(i==i_min){
         j_min=start_indices.second;
         if(i==i_max){j_max=end_indices.second;}
-        else {j_max=comparison_schemes[i].duplicate_structures_names.size();} //-1 since in loop: j<=j_max
+        else {j_max=comparison_schemes[i].structures_duplicate_names.size();} //-1 since in loop: j<=j_max
       }
       else if(i==i_max){j_min=0; j_max=end_indices.second;}
-      else {j_min=0; j_max=comparison_schemes[i].duplicate_structures_names.size();} //-1 since in loop: j<=j_max
+      else {j_min=0; j_max=comparison_schemes[i].structures_duplicate_names.size();} //-1 since in loop: j<=j_max
      
       for(uint j=j_min; j<j_max; j++){
 
         // get representative structure 
-        if(!comparison_schemes[i].representative_structure_generated){
-          if(!generateStructure(comparison_schemes[i].representative_structure_name,comparison_schemes[i].representative_structure_from,representative_structure,oss)){
-            cerr << function_name << "ERROR: Could not generate structure (" << comparison_schemes[i].representative_structure_name << ")." << endl;
-            exit(1);
+        if(!comparison_schemes[i].structure_representative_generated){
+          if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_from,structure_representative,oss)){
+            message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
           }
         }
         else {
-          representative_structure = comparison_schemes[i].representative_structure;
+          structure_representative = comparison_schemes[i].structure_representative;
         }
-        //if(LDEBUG) { cerr << function_name << ": Loaded representative structure = " << comparison_schemes[i].representative_structure_name << endl; }
+        //if(LDEBUG) { cerr << function_name << ": Loaded representative structure = " << comparison_schemes[i].structure_representative_name << endl; }
       
         // get prototype structure 
         xstructure duplicate_structure;
-        if(!comparison_schemes[i].duplicate_structures_generated[j]){
-          if(!generateStructure(comparison_schemes[i].duplicate_structures_names[j],comparison_schemes[i].duplicate_structures_from[j],duplicate_structure,oss)){
-            cerr << function_name << "ERROR: Could not generate structure (" << comparison_schemes[i].duplicate_structures_names[j] << ")." << endl;
-            exit(1);
+        if(!comparison_schemes[i].structures_duplicate_generated[j]){
+          if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
+            message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
           }
         }
         else {
-          duplicate_structure = comparison_schemes[i].duplicate_structures[j];
+          duplicate_structure = comparison_schemes[i].structures_duplicate[j];
         }
-        if(LDEBUG) { cerr << function_name << ": Loaded duplicate structure = " << comparison_schemes[i].duplicate_structures_names[j] << endl; }
+        if(LDEBUG) { cerr << function_name << ": Loaded duplicate structure = " << comparison_schemes[i].structures_duplicate_names[j] << endl; }
         
         // call the main comparison function
         ostringstream tmp_oss; tmp_oss.clear();
-        double final_misfit=-1.0;
-        if(LDEBUG) { cerr << function_name << ": Comparing " << comparison_schemes[i].representative_structure_name << " and " << comparison_schemes[i].duplicate_structures_names[j] <<  endl; }
-        compare::aflowCompareStructure(1, representative_structure, //num_proc -> 1 for threads (not sure how it behaves otherwise)
+        double final_misfit=AUROSTD_MAX_DOUBLE;
+        structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+        if(LDEBUG) { cerr << function_name << ": Comparing " << comparison_schemes[i].structure_representative_name << " and " << comparison_schemes[i].structures_duplicate_names[j] <<  endl; }
+        compare::aflowCompareStructure(1, structure_representative, //num_proc -> 1 for threads (not sure how it behaves otherwise)
                                        duplicate_structure,
-                                       same_species, scale_volume, optimize_match, tmp_oss, final_misfit);
+                                       same_species, scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX 20191218 - added misfit_info
         
         // store the figure of misfit
-        if(LDEBUG) { cerr << function_name << ": Comparison complete, misfit = " << final_misfit << "." << endl; }
-        comparison_schemes[i].misfits[j]=final_misfit;
-        comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str()); //DX 20190506
+        if(LDEBUG) { cerr << function_name << ": Comparison complete, misfit = " << final_misfit_info.misfit << "." << endl; }
+        comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX 20191218
+        if(store_comparison_logs){comparison_schemes[i].duplicate_comparison_logs.push_back(tmp_oss.str());} //DX 20190506
       }
     }
   }
@@ -3409,13 +4275,33 @@ namespace compare{
 // runComparisonScheme: Runs comparisons automatically 
 // ***************************************************************************
 namespace compare{
-  vector<StructurePrototype> runComparisonScheme(uint& num_proc, vector<StructurePrototype>& comparison_schemes, const bool& same_species, const bool& scale_volume, const bool& optimize_match, const bool& single_comparison_round, const bool& clean_unmatched, const bool& ICSD_comparison, ostream& oss, ofstream& FileMESSAGE, bool quiet){ //DX 20190319 - added FileMESSAGE //DX 20190504 - added clean unmatched
-    
-    bool LDEBUG=(false || XHOST.DEBUG);
+  vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, 
+      uint num_proc, 
+      const aurostd::xoption& comparison_options, 
+      ostream& oss, 
+      bool quiet, 
+      ostream& logstream){ //DX 20200103 - condensed booleans to xoptions
+  
+    ofstream FileMESSAGE;
+  
+    return runComparisonScheme(comparison_schemes, same_species, num_proc, comparison_options, oss, FileMESSAGE, quiet, logstream);
+  }
+
+  vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+      bool same_species, 
+      uint num_proc, 
+      const aurostd::xoption& comparison_options, 
+      ostream& oss, 
+      ofstream& FileMESSAGE, 
+      bool quiet, 
+      ostream& logstream){ //DX 20200103 - condensed booleans to xoptions
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = "compare::runComparisonScheme()";
 
-    ostream& logstream = cout;
     stringstream message;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
     //DX 20190319 [OBSOLETE] ofstream FileMESSAGE;
 
     // print initial grouped sets of comparisons
@@ -3429,7 +4315,7 @@ namespace compare{
 
     uint number_of_comparisons = 0;
     vector<std::pair<uint,uint> > start_indices, end_indices;
-    
+
     uint num_comparison_threads = 1;
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
     // THREADED VERSION - START
@@ -3438,66 +4324,80 @@ namespace compare{
     // split into threads
     number_of_comparisons = 0;
     for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
-  
+
     num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
     splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
 
-    // run threads
-    vector<std::thread> threads;
+    // run threads (DX 20191108 - thread pointer)
+    vector<std::thread*> threads;
     for(uint n=0; n<num_comparison_threads; n++){
-	    threads.push_back(std::thread(compare::runComparisonThreads,std::ref(comparison_schemes),std::ref(start_indices[n]),std::ref(end_indices[n]),
-                                    std::ref(same_species),std::ref(scale_volume),std::ref(optimize_match),
-                                    std::ref(oss)));
+      threads.push_back(new std::thread(&compare::runComparisonThreads,
+            std::ref(comparison_schemes),
+            std::ref(start_indices[n]),
+            std::ref(end_indices[n]),
+            std::ref(oss),
+            same_species,
+            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
+            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
+            comparison_options.flag("COMPARE_STRUCTURE::STORE_COMPARISON_LOGS")));
     }        
 
     // join threads
     for(uint t=0;t<threads.size();t++){
-	    threads[t].join();
+      threads[t]->join();
+      delete threads[t];
     }
 
     // THREADED VERSION - END
 
 #else
-   // NON-THREADED VERISON - START
+    // NON-THREADED VERISON - START
     if(LDEBUG) { cerr << function_name << ": Non-threaded version." << endl; } 
 
     for(uint i=0; i<comparison_schemes.size(); i++){
-      xstructure representative_structure;
-      for(uint j=0; j<comparison_schemes[i].duplicate_structures_names.size(); j++){
+      xstructure structure_representative;
+      for(uint j=0; j<comparison_schemes[i].structures_duplicate_names.size(); j++){
         if(j==0){
-          if(!comparison_schemes[i].representative_structure_generated){
-            if(!generateStructure(comparison_schemes[i].representative_structure_name,comparison_schemes[i].representative_structure_from,representative_structure,oss)){
-              cerr << function_name << "ERROR: Could not generate structure (" << comparison_schemes[i].representative_structure_name << ")." << endl;
-              exit(1);
+          if(!comparison_schemes[i].structure_representative_generated){
+            if(!generateStructure(comparison_schemes[i].structure_representative_name,comparison_schemes[i].structure_representative_from,structure_representative,oss)){
+              message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative_name << ").";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
             }
           }
           else {
-            representative_structure = comparison_schemes[i].representative_structure;
+            structure_representative = comparison_schemes[i].structure_representative;
           }
         }
         ostringstream tmp_oss;
         tmp_oss.clear();
-        double final_misfit=-1.0;
+        double final_misfit=AUROSTD_MAX_DOUBLE;
+        structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
         xstructure duplicate_structure;
-        if(!comparison_schemes[i].duplicate_structures_generated[j]){
-          if(!generateStructure(comparison_schemes[i].duplicate_structures_names[j],comparison_schemes[i].duplicate_structures_from[j],duplicate_structure,oss)){
-            cerr << function_name << "ERROR: Could not generate structure (" << comparison_schemes[i].duplicate_structures_names[j] << ")." << endl;
-            exit(1);
+        if(!comparison_schemes[i].structures_duplicate_generated[j]){
+          if(!generateStructure(comparison_schemes[i].structures_duplicate_names[j],comparison_schemes[i].structures_duplicate_from[j],duplicate_structure,oss)){
+            message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate_names[j] << ").";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_); //DX 20190717 - exit to xerror
           }
         }
         else {
-          duplicate_structure = comparison_schemes[i].duplicate_structures[j];
+          duplicate_structure = comparison_schemes[i].structures_duplicate[j];
         }
         // Call the main comparison function
-        compare::aflowCompareStructure(num_proc, representative_structure,
-                                       duplicate_structure,
-                                       same_species, scale_volume, optimize_match, tmp_oss, final_misfit);
+        compare::aflowCompareStructure(num_proc, structure_representative,
+            duplicate_structure,
+            same_species, 
+            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"), 
+            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"), 
+            final_misfit, 
+            final_misfit_info, 
+            tmp_oss); //DX 20200103 - condensed booleans to xoptions
+
         // Store the figure of misfit
-        comparison_schemes[i].misfits[j]=final_misfit;
+        comparison_schemes[i].structure_misfits_duplicate[j]=final_misfit_info; //DX 20191218
       }
     }
-   //SINGLE THREAD - END
-   
+    //SINGLE THREAD - END
+
 #endif
 
     // count the number of mismatches (i.e. mis > 0.1)
@@ -3505,12 +4405,12 @@ namespace compare{
     int num_mismatches=num_mismatches_orig;
 
     //DX 20190504 - added clean unmatched option - START
-    if(!clean_unmatched && single_comparison_round){
+    if(!comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED") && comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
       return comparison_schemes;
     }
     //DX 20190504 - added clean unmatched option - END
 
-    if(num_mismatches > 0 && !single_comparison_round && !quiet){
+    if(num_mismatches > 0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND") && !quiet){
       message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
@@ -3518,21 +4418,36 @@ namespace compare{
     // create new object for comparisons
     vector<StructurePrototype> final_prototypes;
 
-    // regroup comparisons based on misfit value
-    if(num_mismatches==0 && !single_comparison_round){
-      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, quiet); //DX 20190506 -- added clean_unmatched
+    // for this first iteration: LFA may have incorrectly grouped, so we need to check if the structures belong to other groups
+    // OR after removing duplicate compounds these compounds remain separate, so for !same_species comparisons we need to check 
+    // if they should match with other groups
+    if(!comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS") || comparison_options.flag("COMPARISON_OPTIONS::CHECK_OTHER_GROUPING")){
+      aurostd::xoption check_better_matches_options = comparison_options;
+      check_better_matches_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",TRUE);
+      comparison_schemes = compare::checkForBetterMatches(comparison_schemes, oss, num_proc, 
+          false, 
+          same_species, 
+          check_better_matches_options,
+          FileMESSAGE,
+          quiet, 
+          logstream); //DX 20200103 - condensed booleans to xoptions
     }
-    
+
+    // regroup comparisons based on misfit value
+    if(num_mismatches==0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){
+      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX 20200103
+    }
+
     // Loop: continue comparison until all strucutures are matched or all comparisons schemes exhaused
     while(num_mismatches!=0){
       // regroup comparisons based on misfit value
-      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, quiet); //DX 20190506 -- added clean unmatched
+      compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED"), quiet); //DX 20200103
 
-      // exit if only one round of comparison is requested
-      if(single_comparison_round==true){return final_prototypes;}
+      // return if only one round of comparison is requested
+      if(comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND")){return final_prototypes;}
 
       // reorder structures so minimum ICSD is the representative structure
-      if(ICSD_comparison){ compare::representativePrototypeForICSDRuns(comparison_schemes); }
+      if(comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON")){ compare::representativePrototypeForICSDRuns(comparison_schemes); } //DX 20200103
 
       // split into threads
       number_of_comparisons=0;
@@ -3540,34 +4455,51 @@ namespace compare{
       num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
 
       if(number_of_comparisons>0){
+        if(!quiet){
+          message << "Continuing comparisons to match " << num_mismatches << " structures ...";
+          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
+        }
         if(LDEBUG) { cerr << function_name << ": Number of comparisons is not zero... " << number_of_comparisons << endl; }
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
-				// THREADED VERISON - START
+        // THREADED VERISON - START
 
         // split into threads
-				start_indices.clear(); end_indices.clear();
-				splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
-				threads.clear();
+        start_indices.clear(); end_indices.clear();
+        splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
+        threads.clear();
         // run threads
-				for(uint n=0; n<num_comparison_threads; n++){
-					threads.push_back(std::thread(compare::runComparisonThreads,std::ref(comparison_schemes),std::ref(start_indices[n]),std::ref(end_indices[n]),
-																			std::ref(same_species),std::ref(scale_volume),std::ref(optimize_match),
-																			std::ref(oss)));
-				}        
+        for(uint n=0; n<num_comparison_threads; n++){
+          threads.push_back(new std::thread(&compare::runComparisonThreads,
+                std::ref(comparison_schemes),
+                std::ref(start_indices[n]),
+                std::ref(end_indices[n]),
+                std::ref(oss),
+                same_species,
+                comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
+                comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
+                comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS"))); //DX 20200103
+        }        
         // join threads
-				for(uint t=0;t<threads.size();t++){
-					threads[t].join();
-				}
-				// THREADED VERISON - END
+        for(uint t=0;t<threads.size();t++){
+          threads[t]->join();
+          delete threads[t];
+        }
+        // THREADED VERISON - END
 #else
-      //SINGLE THREAD - START
+        //SINGLE THREAD - START
 
-			start_indices.clear(); end_indices.clear();
-      uint single_thread=1;
-      splitComparisonIntoThreads(comparison_schemes, single_thread, start_indices, end_indices);
-			compare::runComparisonThreads(comparison_schemes,start_indices[0],end_indices[0],
-																		same_species,scale_volume,optimize_match,oss);
-      //SINGLE THREAD - END
+        start_indices.clear(); end_indices.clear();
+        uint single_thread=1;
+        splitComparisonIntoThreads(comparison_schemes, single_thread, start_indices, end_indices);
+        compare::runComparisonThreads(comparison_schemes,
+            start_indices[0],
+            end_indices[0],
+            oss,
+            same_species,
+            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
+            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
+            comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS")); //DX 20200103 - condensed booleans to xoptions
+        //SINGLE THREAD - END
 #endif
       }
 
@@ -3582,16 +4514,16 @@ namespace compare{
 
       // ensure while loop is not uncontrolled
       if(num_mismatches>=num_mismatches_orig){
-         oss << "compare::ERROR - Number of mismatches is increasing ... impossible (bug in comparision framework). "
-              << "Contact David Hicks (d.hicks@duke.edu)." << endl;
-         final_prototypes.clear();
-         return final_prototypes;
+        oss << "compare::ERROR - Number of mismatches is increasing ... impossible (bug in comparision framework). "
+          << "Email aflow@groups.io." << endl;
+        final_prototypes.clear();
+        return final_prototypes;
       }
     }
     // end of while loop
 
     // append new prototype groupings
-    compare::appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, quiet); //DX 20190303 - added to properly clear xstructure and generated structure variable //DX 20190504 - added clean unmatched
+    compare::appendStructurePrototypes(comparison_schemes, final_prototypes, comparison_options.flag("COMPARE_STRUCTURE::CLEAN_UNMATCHED"), quiet); //DX 20200103
     //DX ORIG 20190303 - final_prototypes.insert(final_prototypes.end(),comparison_schemes.begin(),comparison_schemes.end());
     return final_prototypes;
   }
@@ -3640,7 +4572,7 @@ namespace compare{
     }
     uint num_consistent = 0;
     for(uint j=0; j<comparison_schemes.size(); j++){
-      if(comparison_schemes[j].duplicate_structures_names.size()+1 == divisor_pairs[divisor_index].second){ //+1 to include representative
+      if(comparison_schemes[j].structures_duplicate_names.size()+1 == divisor_pairs[divisor_index].second){ //+1 to include representative
         num_consistent++;
       }
     }
@@ -3662,33 +4594,34 @@ namespace compare{
     // Populates the structure information into the StructurePrototype object.
     // It groups structure based on their stoichiometry and pearson symbol and 
     // space group. A "representative" structure is chosen and will be compared to the 
-    // possible "duplicates". The misfit values are set to -1.0 until compared.
+    // possible "duplicates". The misfit values are set to AUROSTD_MAX_DOUBLE until compared.
 
+    string function_name = "compare::createStructurePermutations()";
+    stringstream message;
+
+    // ---------------------------------------------------------------------------
     // First, separate by stoichiometry
-    //LDEBUG cerr << "name_order.size(): " << name_order.size() << endl;
     for(uint i=0;i<name_order.size(); i++){
       bool scheme_created=false;
       string name = "";
       for(uint j=0;j<name_order[i].size();j++){name+=name_order[i][j];}
       if(i==0){
-        StructurePrototype tmp;
-        tmp.representative_structure_name=name;
-        tmp.representative_structure=vxstrs[i];
-        tmp.representative_structure_generated=true;
-        tmp.representative_structure_from="input";
-        tmp.number_types=vxstrs[i].num_each_type.size();
-        tmp.number_of_atoms=vxstrs[i].atoms.size();
-        tmp.grouped_Wyckoff_positions=permutation_grouped_Wyckoff_positions[i];
+        StructurePrototype str_proto_tmp;
+        str_proto_tmp.structure_representative_name=name;
+        str_proto_tmp.structure_representative=vxstrs[i];
+        str_proto_tmp.structure_representative_generated=true;
+        str_proto_tmp.structure_representative_from="input";
+        str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+        str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+        str_proto_tmp.grouped_Wyckoff_positions=permutation_grouped_Wyckoff_positions[i];
         //cerr << "tmp: " << tmp << endl;
-        comparison_schemes.push_back(tmp);
+        comparison_schemes.push_back(str_proto_tmp);
       }
       else {
         //cerr << comparison_schemes.size() << endl;
         for(uint j=0; j<comparison_schemes.size(); j++){
           bool same_material_stoich=false;
-          ostringstream tmp;
-          tmp.clear();
-          if(same_species==true && matchableSpecies(vxstrs[i],comparison_schemes[j].representative_structure,same_species)==true){
+          if(same_species==true && matchableSpecies(vxstrs[i],comparison_schemes[j].structure_representative,same_species)==true){
             same_material_stoich=true;
           }
           else if(same_species==false){
@@ -3696,33 +4629,39 @@ namespace compare{
           }
           if(same_material_stoich==true &&
              matchableWyckoffPositions(permutation_grouped_Wyckoff_positions[i], comparison_schemes[j].grouped_Wyckoff_positions,same_species)){
-            comparison_schemes[j].duplicate_structures_names.push_back(name);
-            comparison_schemes[j].duplicate_structures.push_back(vxstrs[i]);
-            comparison_schemes[j].duplicate_structures_generated.push_back(true);
-            comparison_schemes[j].duplicate_structures_from.push_back("input");
-            comparison_schemes[j].misfits.push_back(-1.0);
+            comparison_schemes[j].structures_duplicate_names.push_back(name);
+            comparison_schemes[j].structures_duplicate.push_back(vxstrs[i]);
+            comparison_schemes[j].structures_duplicate_generated.push_back(true);
+            comparison_schemes[j].structures_duplicate_from.push_back("input");
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
+            comparison_schemes[j].structure_misfits_duplicate.push_back(temp_misfit_info); //DX 20191218
             scheme_created=true;
             break;
           }
         }
         if(scheme_created==false){
-          StructurePrototype tmp;
-          tmp.representative_structure_name=name;
-          tmp.representative_structure_generated=true;
-          tmp.representative_structure_from="input";
-          tmp.representative_structure=vxstrs[i];
-          tmp.number_types=vxstrs[i].num_each_type.size();
-          tmp.number_of_atoms=vxstrs[i].atoms.size();
-          tmp.grouped_Wyckoff_positions=permutation_grouped_Wyckoff_positions[i];
-          comparison_schemes.push_back(tmp);
+          StructurePrototype str_proto_tmp;
+          str_proto_tmp.structure_representative_name=name;
+          str_proto_tmp.structure_representative_generated=true;
+          str_proto_tmp.structure_representative_from="input";
+          str_proto_tmp.structure_representative=vxstrs[i];
+          str_proto_tmp.number_of_types=vxstrs[i].num_each_type.size();
+          str_proto_tmp.number_of_atoms=vxstrs[i].atoms.size();
+          str_proto_tmp.grouped_Wyckoff_positions=permutation_grouped_Wyckoff_positions[i];
+          comparison_schemes.push_back(str_proto_tmp);
         }
       }
     }
-    // Check number of sets and elements in set are consistent with number theory
+    // ---------------------------------------------------------------------------
+    // check number of sets and elements in set are consistent with number theory
     // (Groupings/sets must be a divisor of the total number of permutations)
     if(!checkNumberOfGroupings(comparison_schemes,name_order.size())){
-      cerr << "ERROR: Initial groupings of permutations do not follow number theory. Contact David Hicks (d.hicks@duke.edu). Exiting." << endl;
-      exit(1);
+      message << "Initial groupings of permutations do not follow number theory." << endl; 
+      for(uint i=0;i<comparison_schemes.size();i++){ //DX 20190601 - added more info
+        message << comparison_schemes[i] << endl;
+      }
+      message << "Please email aflow@groups.io and provide the corresponding example." << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
   }
 }
@@ -3742,7 +4681,7 @@ namespace compare{
       for(uint j=0; j<name_order.size(); j++){			
         string name="";
         for(uint k=0;k<name_order[j].size();k++){name+=name_order[j][k];}
-        if(comparison_schemes[i].representative_structure_name == name){
+        if(comparison_schemes[i].structure_representative_name == name){
           representative_permutation_num = j;
           break;
         }
@@ -3751,11 +4690,11 @@ namespace compare{
       uint min_even_duplicate_permutation_num = 1e9;
       uint duplicate_permutation_num = 0;
       uint min_duplicate_index = 0;
-      for(uint p=0; p<comparison_schemes[i].duplicate_structures_names.size(); p++){
+      for(uint p=0; p<comparison_schemes[i].structures_duplicate_names.size(); p++){
         for(uint j=0; j<name_order.size(); j++){			
           string name="";
           for(uint k=0;k<name_order[j].size();k++){name+=name_order[j][k];}
-          if(comparison_schemes[i].duplicate_structures_names[p] == name){
+          if(comparison_schemes[i].structures_duplicate_names[p] == name){
             duplicate_permutation_num = j;
             // Check if proto is minimum/even permutation
             if(duplicate_permutation_num < min_even_duplicate_permutation_num && duplicate_permutation_num%2 == 0){ 
@@ -3769,18 +4708,18 @@ namespace compare{
       // Else replace automatically if proto permutation is not 1e9
       if((representative_permutation_num%2 == 0 && min_even_duplicate_permutation_num < representative_permutation_num) ||
          (representative_permutation_num%2 != 0 && min_even_duplicate_permutation_num != 1e9)){
-        comparison_schemes[i].duplicate_structures_names.push_back(comparison_schemes[i].representative_structure_name);  
-        comparison_schemes[i].duplicate_structures.push_back(comparison_schemes[i].representative_structure);  
-        comparison_schemes[i].duplicate_structures_generated.push_back(comparison_schemes[i].representative_structure_generated);  
-        comparison_schemes[i].duplicate_structures_from.push_back(comparison_schemes[i].representative_structure_from);  
-        comparison_schemes[i].representative_structure_name = comparison_schemes[i].duplicate_structures_names[min_duplicate_index];  
-        comparison_schemes[i].representative_structure = comparison_schemes[i].duplicate_structures[min_duplicate_index];  
-        comparison_schemes[i].representative_structure_generated = comparison_schemes[i].duplicate_structures_generated[min_duplicate_index];  
-        comparison_schemes[i].representative_structure_from = comparison_schemes[i].duplicate_structures_from[min_duplicate_index];  
-        comparison_schemes[i].duplicate_structures_names.erase(comparison_schemes[i].duplicate_structures_names.begin()+min_duplicate_index);
-        comparison_schemes[i].duplicate_structures.erase(comparison_schemes[i].duplicate_structures.begin()+min_duplicate_index);
-        comparison_schemes[i].duplicate_structures_generated.erase(comparison_schemes[i].duplicate_structures_generated.begin()+min_duplicate_index);
-        comparison_schemes[i].duplicate_structures_from.erase(comparison_schemes[i].duplicate_structures_from.begin()+min_duplicate_index);
+        comparison_schemes[i].structures_duplicate_names.push_back(comparison_schemes[i].structure_representative_name);  
+        comparison_schemes[i].structures_duplicate.push_back(comparison_schemes[i].structure_representative);  
+        comparison_schemes[i].structures_duplicate_generated.push_back(comparison_schemes[i].structure_representative_generated);  
+        comparison_schemes[i].structures_duplicate_from.push_back(comparison_schemes[i].structure_representative_from);  
+        comparison_schemes[i].structure_representative_name = comparison_schemes[i].structures_duplicate_names[min_duplicate_index];  
+        comparison_schemes[i].structure_representative = comparison_schemes[i].structures_duplicate[min_duplicate_index];  
+        comparison_schemes[i].structure_representative_generated = comparison_schemes[i].structures_duplicate_generated[min_duplicate_index];  
+        comparison_schemes[i].structure_representative_from = comparison_schemes[i].structures_duplicate_from[min_duplicate_index];  
+        comparison_schemes[i].structures_duplicate_names.erase(comparison_schemes[i].structures_duplicate_names.begin()+min_duplicate_index);
+        comparison_schemes[i].structures_duplicate.erase(comparison_schemes[i].structures_duplicate.begin()+min_duplicate_index);
+        comparison_schemes[i].structures_duplicate_generated.erase(comparison_schemes[i].structures_duplicate_generated.begin()+min_duplicate_index);
+        comparison_schemes[i].structures_duplicate_from.erase(comparison_schemes[i].structures_duplicate_from.begin()+min_duplicate_index);
       }
     }
     return true;
@@ -3798,8 +4737,8 @@ namespace compare{
 
     int num_mismatches=0;
     for(uint i=0; i<comparison_schemes.size(); i++){
-      for(uint j=0; j<comparison_schemes[i].misfits.size(); j++){
-        if(comparison_schemes[i].misfits[j] > 0.1 || comparison_schemes[i].misfits[j] == -1.0 ){
+      for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > 0.1 || aurostd::isequal(comparison_schemes[i].structure_misfits_duplicate[j].misfit,AUROSTD_MAX_DOUBLE,1e-6)){
           num_mismatches+=1;
         }
       }
@@ -3813,9 +4752,20 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   void appendStructurePrototypes(vector<StructurePrototype>& comparison_schemes, 
-				 vector<StructurePrototype>& final_prototypes,
-         bool clean_unmatched, //DX 20190506
-         bool quiet){
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX 20190506
+      bool quiet,
+      ostream& logstream){
+    ofstream FileMESSAGE;
+    appendStructurePrototypes(comparison_schemes, final_prototypes, clean_unmatched, FileMESSAGE, quiet, logstream);
+  }
+
+  void appendStructurePrototypes(vector<StructurePrototype>& comparison_schemes, 
+      vector<StructurePrototype>& final_prototypes,
+      bool clean_unmatched, //DX 20190506
+      ofstream& FileMESSAGE,
+      bool quiet,
+      ostream& logstream){
 
     // This cleans the StrucuturePrototype objects by removing all the mismatches.
     // Then, it takes the mismatches and makes them into new StructurePrototype objects
@@ -3826,33 +4776,34 @@ namespace compare{
     //LDEBUG cerr << ss_test.str() << endl;
 
     ostringstream oss;
-    ostream& logstream = cout;
+    //DX 20191125 [OBSOLETE] ostream& logstream = cout;
     stringstream message;
-    ofstream FileMESSAGE;
+    //DX 20191125 [OBSOLETE] ofstream FileMESSAGE;
     string function_name = "compare::appendStructurePrototypes()";
 
     vector<StructurePrototype> tmp_list;
     for(uint i=0; i<comparison_schemes.size(); i++){
       bool first_mismatch=true;
-      for(uint j=0; j<comparison_schemes[i].misfits.size(); j++){
-        //DX TEST if(comparison_schemes[i].misfits[j] > 0.1 || comparison_schemes[i].misfits[j] == -1.0 ){
-        if(comparison_schemes[i].misfits[j] > 0.1 || comparison_schemes[i].misfits[j]+1.0 <_ZERO_TOL_){ //DX 20190301 - more robust
+      for(uint j=0; j<comparison_schemes[i].structure_misfits_duplicate.size(); j++){
+        if(comparison_schemes[i].structure_misfits_duplicate[j].misfit > 0.1){
           // First, store any family prototype information
-          if(comparison_schemes[i].misfits[j] > 0.1 && comparison_schemes[i].misfits[j] <= 0.2){
-            comparison_schemes[i].family_structures_names.push_back(comparison_schemes[i].duplicate_structures_names[j]);
-            comparison_schemes[i].family_misfits.push_back(comparison_schemes[i].misfits[j]);
-            //DX 20190424 - store properties of family structures - START
-            if(comparison_schemes[i].property_names.size()!=0){
-              comparison_schemes[i].family_structures_properties.push_back(comparison_schemes[i].duplicate_structures_properties[j]);
-            }
+          if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= 0.2){
+            comparison_schemes[i].putDuplicateAsFamily(j); //DX 20190814 - consolidated below into single function
+            //DX 20190814 [OBSOLETE] - comparison_schemes[i].structures_family_names.push_back(comparison_schemes[i].structures_duplicate_names[j]);
+            //DX 20190814 [OBSOLETE] - comparison_schemes[i].misfits_family.push_back(comparison_schemes[i].misfits_duplicate[j]);
+            //DX 20190814 [OBSOLETE] - comparison_schemes[i].structures_family_grouped_Wyckoff_positions.push_back(comparison_schemes[i].structures_duplicate_grouped_Wyckoff_positions[j]); //DX 20190814 
+            //DX 20190814 [OBSOLETE] - //DX 20190424 - store properties of family structures - START
+            //DX 20190814 [OBSOLETE] - if(comparison_schemes[i].property_names.size()!=0){
+            //DX 20190814 [OBSOLETE] -   comparison_schemes[i].properties_structures_family.push_back(comparison_schemes[i].properties_structures_duplicate[j]);
+            //DX 20190814 [OBSOLETE] - }
             //DX 20190424 - store properties of family structures - END
           }
           // Take first mismatch and make as the representative structure in the new object
           if(first_mismatch==true){
-            StructurePrototype tmp;
-            tmp.copyPrototypeInformation(comparison_schemes[i]);
-            tmp.putDuplicateAsRepresentative(comparison_schemes[i],j);
-            tmp_list.push_back(tmp);
+            StructurePrototype str_proto_tmp;
+            str_proto_tmp.copyPrototypeInformation(comparison_schemes[i]);
+            str_proto_tmp.putDuplicateAsRepresentative(comparison_schemes[i],j);
+            tmp_list.push_back(str_proto_tmp);
             if(clean_unmatched){ comparison_schemes[i].removeNonDuplicate(j); j--; } //DX 20190504 - put in if-statement
             first_mismatch=false;
           }
@@ -3863,22 +4814,22 @@ namespace compare{
           }
         }
         //DX 20181220 - if they are matched, then we should delete the xstructure, since we no longer need the structure (save memory)
-        else if(comparison_schemes[i].misfits[j] <= 0.1 && !std::signbit(comparison_schemes[i].misfits[j])){
-          //comparison_schemes[i].duplicate_structures.erase(comparison_schemes[i].duplicate_structures.begin()+j);
+        else if(comparison_schemes[i].structure_misfits_duplicate[j].misfit <= 0.1 && !std::signbit(comparison_schemes[i].structure_misfits_duplicate[j].misfit)){
+          //comparison_schemes[i].structures_duplicate.erase(comparison_schemes[i].structures_duplicate.begin()+j);
           // check if the structure is generated first
-          if(comparison_schemes[i].duplicate_structures_generated[j]){comparison_schemes[i].duplicate_structures[j].Clear(); comparison_schemes[i].duplicate_structures_generated[j]=false; } //DX 20190303 - update generated flag
+          if(comparison_schemes[i].structures_duplicate_generated[j]){comparison_schemes[i].structures_duplicate[j].clear(); comparison_schemes[i].structures_duplicate_generated[j]=false; } //DX 20190303 - update generated flag //DX 20191220 - uppercase to lowercase clear
         }
       }
       //DX 20181220 - can clear representative structure since we will no longer compare it (save memory)
-      comparison_schemes[i].representative_structure.Clear();
-      comparison_schemes[i].representative_structure_generated=false;
+      //DX 20190521 [BREAKS WITH AURL MODE IN PARALLEL] comparison_schemes[i].structure_representative.clear(); //DX 20191220 - uppercase to lowercase clear
+      //DX 20190521 [BREAKS WITH AURL MODE IN PARALLEL] comparison_schemes[i].structure_representative_generated=false;
 
       // if not quiet, print the comparison results to the screen 
       // (useful for long comparison times or if the program terminates early)
       if(!quiet){
         message << "Identified unique prototype: " << endl;
-        message << "   prototype=" << comparison_schemes[i].representative_structure_name << endl;
-        if(comparison_schemes[i].duplicate_structures_names.size()==0){
+        message << "   prototype=" << comparison_schemes[i].structure_representative_name << endl;
+        if(comparison_schemes[i].structures_duplicate_names.size()==0){
           message << "   No duplicates. " << endl;
         }
         else {
@@ -3886,9 +4837,9 @@ namespace compare{
                   << setw(15) << std::left << "misfit value" << endl;
           message << "   " << setw(80) << std::left 
                   << "-----------------------------------------------------------------------------------------------" << endl;
-          for(uint d=0;d<comparison_schemes[i].duplicate_structures_names.size();d++){
-            message << "   " << setw(80) << std::left << comparison_schemes[i].duplicate_structures_names[d]
-                    << setw(15) << std::left << comparison_schemes[i].misfits[d] << endl;
+          for(uint d=0;d<comparison_schemes[i].structures_duplicate_names.size();d++){
+            message << "   " << setw(80) << std::left << comparison_schemes[i].structures_duplicate_names[d]
+                    << setw(15) << std::left << comparison_schemes[i].structure_misfits_duplicate[d].misfit << endl;
           }
         }
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
@@ -3922,39 +4873,40 @@ namespace compare{
       vector<int> store_indices;
       vector<double> store_misfits;
       int min_index=-1;
-      double min_misfit=-1.0;
+      double min_misfit=AUROSTD_MAX_DOUBLE;
+      structure_misfit min_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
       for(uint j=i;j<final_prototypes.size();j++){
         ostringstream tmp_oss;
         tmp_oss.clear();
         if(
            // If same_species==true
            (same_species==true && 
-            matchableSpecies(final_prototypes[i].representative_structure,final_prototypes[j].representative_structure,same_species)==true &&
+            matchableSpecies(final_prototypes[i].structure_representative,final_prototypes[j].structure_representative,same_species)==true &&
             final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry && 
             final_prototypes[i].Pearson==final_prototypes[j].Pearson &&
-            //final_prototypes[i].space_group!=final_prototypes[j].space_group) ||
             !matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group)) ||
            // If same_species==false
            (same_species==false && 
             final_prototypes[i].stoichiometry==final_prototypes[j].stoichiometry &&
             final_prototypes[i].Pearson==final_prototypes[j].Pearson && 
-            //final_prototypes[i].space_group!=final_prototypes[j].space_group)
             !matchableSpaceGroups(final_prototypes[i].space_group,final_prototypes[j].space_group))
           ){
-          double final_misfit=-1.0;
+          double final_misfit=AUROSTD_MAX_DOUBLE;
+          structure_misfit final_misfit_info = compare::initialize_misfit_struct(); //DX 20191218
           bool scale_volume=true; //default is true
           bool optimize_match=false; //default is false
-          aflowCompareStructure(num_proc, final_prototypes[i].representative_structure, 
-					 final_prototypes[j].representative_structure, same_species, 
-					 scale_volume, optimize_match, tmp_oss, final_misfit);
+          aflowCompareStructure(num_proc, final_prototypes[i].structure_representative, 
+					 final_prototypes[j].structure_representative, same_species, 
+					 scale_volume, optimize_match, final_misfit, final_misfit_info, tmp_oss); //DX 20191122 - move ostream to end  //DX 20191218 - added misfit_info
           if(final_misfit < min_misfit){
+             min_misfit_info=final_misfit_info; //DX 20191218
              min_misfit=final_misfit;
              min_index=j;
           }
         }
       }
       // If one prototype is similar to another, add to one with higher space group
-      if(min_misfit!=-1.0){
+      if(min_misfit!=AUROSTD_MAX_DOUBLE){
         int sg_ind=-1;
         uint other_ind=-1;
         if(final_prototypes[i].space_group > final_prototypes[min_index].space_group){
@@ -3966,26 +4918,26 @@ namespace compare{
           other_ind=i;
         }
         // Transfer info to prototype with higher space group
-        final_prototypes[sg_ind].duplicate_structures_names.push_back(final_prototypes[other_ind].representative_structure_name);
-        final_prototypes[sg_ind].duplicate_structures_names.insert(final_prototypes[sg_ind].duplicate_structures_names.end(),
-				final_prototypes[other_ind].duplicate_structures_names.begin(),
-				final_prototypes[other_ind].duplicate_structures_names.end());
-        final_prototypes[sg_ind].duplicate_structures.push_back(final_prototypes[other_ind].representative_structure);
-        final_prototypes[sg_ind].duplicate_structures.insert(final_prototypes[sg_ind].duplicate_structures.end(),
-				final_prototypes[other_ind].duplicate_structures.begin(),
-				final_prototypes[other_ind].duplicate_structures.end());
-        final_prototypes[sg_ind].duplicate_structures_compounds.push_back(final_prototypes[other_ind].representative_structure_compound);
-        final_prototypes[sg_ind].duplicate_structures_compounds.insert(final_prototypes[sg_ind].duplicate_structures_compounds.end(),
-				final_prototypes[other_ind].duplicate_structures_compounds.begin(),
-				final_prototypes[other_ind].duplicate_structures_compounds.end());
-        final_prototypes[sg_ind].duplicate_structures_generated.push_back(final_prototypes[other_ind].representative_structure_generated);
-        final_prototypes[sg_ind].duplicate_structures_generated.insert(final_prototypes[sg_ind].duplicate_structures_generated.end(),
-				final_prototypes[other_ind].duplicate_structures_generated.begin(),
-				final_prototypes[other_ind].duplicate_structures_generated.end());
-        final_prototypes[sg_ind].duplicate_structures_from.push_back(final_prototypes[other_ind].representative_structure_from);
-        final_prototypes[sg_ind].duplicate_structures_from.insert(final_prototypes[sg_ind].duplicate_structures_from.end(),
-				final_prototypes[other_ind].duplicate_structures_from.begin(),
-				final_prototypes[other_ind].duplicate_structures_from.end());
+        final_prototypes[sg_ind].structures_duplicate_names.push_back(final_prototypes[other_ind].structure_representative_name);
+        final_prototypes[sg_ind].structures_duplicate_names.insert(final_prototypes[sg_ind].structures_duplicate_names.end(),
+            final_prototypes[other_ind].structures_duplicate_names.begin(),
+            final_prototypes[other_ind].structures_duplicate_names.end());
+        final_prototypes[sg_ind].structures_duplicate.push_back(final_prototypes[other_ind].structure_representative);
+        final_prototypes[sg_ind].structures_duplicate.insert(final_prototypes[sg_ind].structures_duplicate.end(),
+            final_prototypes[other_ind].structures_duplicate.begin(),
+            final_prototypes[other_ind].structures_duplicate.end());
+        final_prototypes[sg_ind].structures_duplicate_compounds.push_back(final_prototypes[other_ind].structure_representative_compound);
+        final_prototypes[sg_ind].structures_duplicate_compounds.insert(final_prototypes[sg_ind].structures_duplicate_compounds.end(),
+            final_prototypes[other_ind].structures_duplicate_compounds.begin(),
+            final_prototypes[other_ind].structures_duplicate_compounds.end());
+        final_prototypes[sg_ind].structures_duplicate_generated.push_back(final_prototypes[other_ind].structure_representative_generated);
+        final_prototypes[sg_ind].structures_duplicate_generated.insert(final_prototypes[sg_ind].structures_duplicate_generated.end(),
+            final_prototypes[other_ind].structures_duplicate_generated.begin(),
+            final_prototypes[other_ind].structures_duplicate_generated.end());
+        final_prototypes[sg_ind].structures_duplicate_from.push_back(final_prototypes[other_ind].structure_representative_from);
+        final_prototypes[sg_ind].structures_duplicate_from.insert(final_prototypes[sg_ind].structures_duplicate_from.end(),
+            final_prototypes[other_ind].structures_duplicate_from.begin(),
+            final_prototypes[other_ind].structures_duplicate_from.end());
         // Delete the prototype with the lower space group
         final_prototypes.erase(final_prototypes.begin()+other_ind);
         // If the index deleted was less than the initial loop (i), then need to reduce iterator
@@ -4009,6 +4961,8 @@ namespace compare{
     // In general, the structure along with the misfit value is printed
     // If material properties are provided, then the properties will be displayed 
     // next to the misfit value
+
+    bool roff=true; //round off
 
     // JSON MODE
     if(aurostd::tolower(mode)=="json"){ //case insensitive
@@ -4043,38 +4997,46 @@ namespace compare{
           //DX 2019090311 [OBSOLETE] for(uint k=0;k<final_prototypes[j].elements.size();k++){
           //DX 2019090311 [OBSOLETE]   ss_out << final_prototypes[j].elements[k] << final_prototypes[j].stoichiometry[k];
           //DX 2019090311 [OBSOLETE] }
-          //LDEBUG cerr << j << " compound: " << final_prototypes[j].representative_structure_compound; //DX 20190311
-          ss_out << final_prototypes[j].representative_structure_compound; //DX 20190311
+          //LDEBUG cerr << j << " compound: " << final_prototypes[j].structure_representative_compound; //DX 20190311
+          ss_out << final_prototypes[j].structure_representative_compound; //DX 20190311
           ss_out << "  SG=#" << final_prototypes[j].space_group;
           // ORIG ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true) << endl;
           ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true); //DX 20190228 - remove count
           uint number_of_duplicates = final_prototypes[j].numberOfDuplicates(); //DX 20190506 - made function
           ss_out << "  duplicate_compounds=" << number_of_duplicates << endl; //DX 20190228 - add count
-        if(final_prototypes[j].representative_structure_properties.size()!=0){
-          ss_out << "  " << setw(structure_spacing) << std::left << "structure";
-          ss_out << setw(misfit_spacing) << std::right << "misfit";
-          for(uint l=0;l<final_prototypes[j].property_names.size();l++){
-            if(final_prototypes[j].property_units[l].size()!=0){
-              ss_out << setw(property_spacing) << std::right 
-                << final_prototypes[j].property_names[l]+"("+final_prototypes[j].property_units[l]+")";
+          if(final_prototypes[j].aflow_label.size()!=0){
+            ss_out << "  aflow_label=" << final_prototypes[j].aflow_label << endl; 
+            ss_out << "  aflow_parameter_list=" << aurostd::joinWDelimiter(final_prototypes[j].aflow_parameter_list,",") << endl; 
+            ss_out << "  aflow_parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_prototypes[j].aflow_parameter_values,8,roff),",") << endl;
+          } 
+          if(final_prototypes[j].matching_aflow_prototypes.size()!=0){
+            ss_out << "  matching_aflow_prototypes=" << aurostd::joinWDelimiter(final_prototypes[j].matching_aflow_prototypes,",") << endl; 
+          } 
+          if(final_prototypes[j].properties_structure_representative.size()!=0){
+            ss_out << "  " << setw(structure_spacing) << std::left << "structure";
+            ss_out << setw(misfit_spacing) << std::right << "misfit";
+            for(uint l=0;l<final_prototypes[j].property_names.size();l++){
+              if(final_prototypes[j].property_units[l].size()!=0){
+                ss_out << setw(property_spacing) << std::right 
+                  << final_prototypes[j].property_names[l]+"("+final_prototypes[j].property_units[l]+")";
+              }
+              else {ss_out << setw(property_spacing) << std::right << final_prototypes[j].property_names[l];}
             }
-            else {ss_out << setw(property_spacing) << std::right << final_prototypes[j].property_names[l];}
+            ss_out << endl;
           }
-          ss_out << endl;
-        }
-        if(final_prototypes[j].representative_structure_properties.size()!=0){
-        ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '-');
-        if(final_prototypes[j].property_names.size()!=0){
-          ss_out << std::string(final_prototypes[j].representative_structure_properties.size()*property_spacing, '-');
-          ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '-');
-        }
-        ss_out << endl;
-        }
-          ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].representative_structure_name;
-          if(final_prototypes[j].representative_structure_properties.size()!=0){
+          if(final_prototypes[j].properties_structure_representative.size()!=0){
+            ss_out << std::string(indent_spacing+structure_spacing+misfit_spacing, '-');
+            if(final_prototypes[j].property_names.size()!=0){
+              ss_out << std::string(final_prototypes[j].properties_structure_representative.size()*property_spacing, '-');
+              ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '-');
+            }
+            ss_out << endl;
+          }
+          ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_name;
+          if(final_prototypes[j].properties_structure_representative.size()!=0){
             ss_out << setw(misfit_spacing) << std::right << "-";
-            for(uint l=0;l<final_prototypes[j].representative_structure_properties.size();l++){
-              ss_out << setw(property_spacing) << std::right << final_prototypes[j].representative_structure_properties[l];
+            for(uint l=0;l<final_prototypes[j].properties_structure_representative.size();l++){
+              ss_out << setw(property_spacing) << std::right << final_prototypes[j].properties_structure_representative[l];
             }
           }
           //ss_out << endl;
@@ -4089,9 +5051,9 @@ namespace compare{
             }
           }
           ss_out << "  SG=#" << final_prototypes[j].space_group;
-          ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true);;
+          ss_out << "  Wyckoffs=" << compare::printWyckoffString(final_prototypes[j].grouped_Wyckoff_positions,true);
           uint number_of_duplicates = final_prototypes[j].numberOfDuplicates(); //DX 20190506 - made function
-          ss_out << "  duplicate_structures=" << number_of_duplicates; //DX 20190228 - add count
+          ss_out << "  structures_duplicate=" << number_of_duplicates; //DX 20190228 - add count
           uint number_duplicate_compounds = 0;
           for(uint k=0;k<final_prototypes[j].number_compounds_matching_duplicate.size();k++){
             number_duplicate_compounds+=final_prototypes[j].number_compounds_matching_duplicate[k];
@@ -4101,10 +5063,21 @@ namespace compare{
             ss_out << "  duplicate_compounds=" << number_duplicate_compounds; //DX 20190228 - add count
           }
           ss_out << endl;
-          ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].representative_structure_name;
+          if(final_prototypes[j].aflow_label.size()!=0){
+            ss_out << "  aflow_label=" << final_prototypes[j].aflow_label << endl; 
+            ss_out << "  aflow_parameter_list=" << aurostd::joinWDelimiter(final_prototypes[j].aflow_parameter_list,",") << endl; 
+            ss_out << "  aflow_parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(final_prototypes[j].aflow_parameter_values,8,roff),",") << endl;
+          }
+          if(final_prototypes[j].matching_aflow_prototypes.size()!=0){
+            ss_out << "  matching_aflow_prototypes=" << aurostd::joinWDelimiter(final_prototypes[j].matching_aflow_prototypes,",") << endl; 
+          } 
+          ss_out << "  " << setw(structure_spacing) << std::left << "prototype="+final_prototypes[j].structure_representative_name;
           // perhaps add which permutations are duplicates
-          if(final_prototypes[j].unique_permutations.size()!=0){
-            ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique permutations="+aurostd::joinWDelimiter(final_prototypes[j].unique_permutations,",");
+          if(final_prototypes[j].atom_decorations_equivalent.size()!=0){
+            //ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(final_prototypes[j].atom_decorations_equivalent,",");
+            vector<string> unique_decorations;
+            for(uint d=0;d<final_prototypes[j].atom_decorations_equivalent.size();d++){ unique_decorations.push_back(final_prototypes[j].atom_decorations_equivalent[d][0]); }
+            ss_out << endl << "  " << setw(structure_spacing) << std::left << "unique atom decorations="+aurostd::joinWDelimiter(unique_decorations,",");
           }
         }
         ss_out << endl;
@@ -4113,14 +5086,14 @@ namespace compare{
           ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '-');
         }
         ss_out << endl;
-        if(final_prototypes[j].duplicate_structures_names.size()!=0 && final_prototypes[j].representative_structure_properties.size()==0){
+        if(final_prototypes[j].structures_duplicate_names.size()!=0 && final_prototypes[j].properties_structure_representative.size()==0){
           ss_out << "  " << setw(structure_spacing) << std::left << "list of duplicates";
           ss_out << setw(misfit_spacing) << std::right << "misfit";
         }
-        else if(final_prototypes[j].duplicate_structures_names.size()==0){
+        else if(final_prototypes[j].structures_duplicate_names.size()==0){
           ss_out << "  " << setw(structure_spacing) << std::left << "no duplicates";
         }
-        if(final_prototypes[j].representative_structure_properties.size()==0){
+        if(final_prototypes[j].properties_structure_representative.size()==0){
           for(uint l=0;l<final_prototypes[j].property_names.size();l++){
             if(final_prototypes[j].property_units[l].size()!=0){
               ss_out << setw(property_spacing) << std::right 
@@ -4133,17 +5106,17 @@ namespace compare{
           ss_out << std::string(final_prototypes[j].property_names.size()*property_spacing, '-');
           ss_out << endl;
         }
-        if(final_prototypes[j].duplicate_structures_names.size()>0){
-        for(uint k=0;k<final_prototypes[j].duplicate_structures_names.size();k++){
-           ss_out << "  " << setw(structure_spacing) << std::left << final_prototypes[j].duplicate_structures_names[k] 
-                  << setw(misfit_spacing) << std::right << final_prototypes[j].misfits[k];
-           if(final_prototypes[j].property_names.size()!=0){
-             for(uint l=0;l<final_prototypes[j].duplicate_structures_properties[k].size();l++){
-               ss_out << setw(property_spacing) << std::right << final_prototypes[j].duplicate_structures_properties[k][l];
-             }   
-           }     
-           ss_out << endl;
-        }
+        if(final_prototypes[j].structures_duplicate_names.size()>0){
+          for(uint k=0;k<final_prototypes[j].structures_duplicate_names.size();k++){
+            ss_out << "  " << setw(structure_spacing) << std::left << final_prototypes[j].structures_duplicate_names[k] 
+              << setw(misfit_spacing) << std::right << final_prototypes[j].structure_misfits_duplicate[k].misfit;
+            if(final_prototypes[j].property_names.size()!=0){
+              for(uint l=0;l<final_prototypes[j].properties_structures_duplicate[k].size();l++){
+                ss_out << setw(property_spacing) << std::right << final_prototypes[j].properties_structures_duplicate[k][l];
+              }   
+            }     
+            ss_out << endl;
+          }
         }
         else {
           ss_out << endl;
@@ -4152,6 +5125,57 @@ namespace compare{
     }
   }
 }
+
+// ***************************************************************************
+// printStructureMappingResults - Displays comprehensive mapping information
+// ***************************************************************************
+namespace compare{
+  void printStructureMappingResults(ostream& oss, 
+    const xstructure& xstr_reference,
+    const xstructure& xstr_transformed,
+    const double misfit,
+    const double lattice_deviation,
+    const double coordinate_displacement,
+    const double failure,
+    const double magnetic_displacement,
+    const double magnetic_failure,
+    const vector<uint>& matching_indices_1, 
+    const vector<uint>& matching_indices_2,
+    const vector<double>& minimum_distances,
+    bool magnetic_analysis,
+    string mode){
+
+    if(aurostd::toupper(mode) == "TEXT" || aurostd::toupper(mode) == "TXT"){
+      oss << endl <<"**************************** RESULTS ****************************"<<endl;
+      if(misfit<=0.1){
+        oss << endl <<"MISFIT:			" << misfit << "  STRUCTURES ARE COMPATIBLE" << endl;
+      }
+      else if(misfit<=0.2){
+        oss << endl <<"MISFIT:      " << misfit <<"  STRUCTURES ARE IN THE SAME FAMILY" << endl;
+      }
+      else {
+        oss << endl <<"MISFIT:			" << misfit <<"  STRUCTURES ARE INCOMPATIBLE (No match found)" << endl;
+      }
+      oss <<"----------------------------------------------------"<<endl;
+      oss << "Figure of Deviation:	" << lattice_deviation << endl;
+      oss << "Figure of Displacement:	" << coordinate_displacement << endl;
+      oss << "Figure of Failure:	" << failure << endl;
+      if(magnetic_analysis){
+        oss << "Figure of Magnetic Displacement:	" << magnetic_displacement << endl;
+        oss << "Figure of Magnetic Failure:	" << magnetic_failure << endl;
+      }
+      oss <<"----------------------------------------------------"<<endl;
+      printMatch(matching_indices_1,matching_indices_2,minimum_distances,xstr_transformed,xstr_reference,oss);
+      oss <<"----------------------------------------------------"<<endl;
+      oss << "FINAL - REFERENCE STRUCTURE: " << endl;	
+      oss << xstr_reference << endl;
+      oss <<"----------------------------------------------------"<<endl;
+      oss << "FINAL - MAPPED STRUCTURE: " << endl;
+      oss << xstr_transformed;
+      oss << endl << "*********************  THE END - FINE  **********************" << endl << endl;
+    }
+  }
+} 
 
 // ***************************************************************************
 // sameStoichiometry
@@ -4184,17 +5208,19 @@ namespace compare{
     // Determine if it is possible to match up species based on the number of atoms
     // (i.e, reduced stoichiometries are equal)
 
-    bool LDEBUG=(false || XHOST.DEBUG);
-    vector<uint> stoich1;
-    vector<uint> stoich2;
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    deque<int> stoich1; //DX 20191125
+    deque<int> stoich2; //DX 20191125
     bool matchable=true;
     if(xstr1.species.size()==xstr2.species.size()){
       if(xstr1.species.size()==1){
      	  stoich1.push_back(1); stoich2.push_back(1);
       }
       else {
-        stoich1=gcdStoich(xstr1.num_each_type);
-        stoich2=gcdStoich(xstr2.num_each_type);
+        //DX 20191125 [OBSOLETE] stoich1=gcdStoich(xstr1.num_each_type);
+        //DX 20191125 [OBSOLETE] stoich2=gcdStoich(xstr2.num_each_type);
+        aurostd::reduceByGCD(xstr1.num_each_type, stoich1); //DX 20191125
+        aurostd::reduceByGCD(xstr2.num_each_type, stoich2); //DX 20191125
       }
       uint matches=0;
       // Check if we can match to same species (atoms and stoichs)
@@ -4208,12 +5234,12 @@ namespace compare{
               commensurate=true;
               break;
             }
-	  }
+          }
           if(commensurate==false){
             matchable=false;
             break;
           }
-	      }
+        }
       }
       // Check if we can match stoichs only
       else {
@@ -4256,46 +5282,62 @@ namespace compare{
 
     // Determine if the structures have the same types and counts of species
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::sameSpecies()";
 
+    bool VERBOSE = (display && LDEBUG); //DX 20191125
+
+    // ---------------------------------------------------------------------------
     // Check number of types
     if(xstr1.num_each_type.size() != xstr2.num_each_type.size()){
       // Display counts
-      if(display==true){
-        if(LDEBUG) {
-          cerr << "compare::NUMBER OF TYPES OF ATOMIC SPECIES:   xstr1:  " << xstr1.num_each_type.size() 
-               << " 		xstr2:  " << xstr2.num_each_type.size() << endl;
-          cerr << "compare::NUMBER OF TYPES OF ATOMIC SPECIES IS NOT THE SAME..." << endl;
-        }
-        return false;
+      if(VERBOSE) { //DX 20190702 - condense if-statements
+        cerr << function_name << ": Number of element types are not the same." 
+          << " xstr 1: " << xstr1.num_each_type.size() 
+          << " and xstr2: " << xstr2.num_each_type.size() << endl;
       }
+      return false; //DX 20190702 - bug fix, should not be in if-statement
     }
 
+    // ---------------------------------------------------------------------------
     // Check counts and species
-    for(uint i=0;i<xstr1.num_each_type.size();i++){
-      bool matched = false;
-      for(uint j=0;j<xstr2.num_each_type.size();j++){
-        // DX IS SPECIES CHECK TOO STRICT? if(xstr1.num_each_type[i] == xstr2.num_each_type[j] &&
-        // DX IS SPECIES CHECK TOO STRICT?   xstr1.species[i] == xstr2.species[j]){
-        if(xstr1.num_each_type[i] == xstr2.num_each_type[j]){
-          matched = true;
-          break;
-        }
-      }
-      if(matched == false){
-        if(display==true){ 
-          if(LDEBUG) {
-            cerr << "compare::WARNING:: TYPE OF ATOMIC SPECIES OR NUMBER PER TYPE ARE NOT THE SAME..." << endl;  
-          }
-        }
-        return false;
-      }
+    // sort, then check (to check if matchable) = fast
+    deque<int> xstr1_num_each_type = xstr1.num_each_type;
+    deque<int> xstr2_num_each_type = xstr2.num_each_type;
+
+    std::sort(xstr1_num_each_type.begin(), xstr1_num_each_type.end());
+    std::sort(xstr2_num_each_type.begin(), xstr2_num_each_type.end());
+
+    if(xstr1_num_each_type!=xstr2_num_each_type){
+      if(VERBOSE) { cerr << function_name << ": Number of each type of element are incompatible." << endl; }
+      return false;
     }
-    if(display==true){
-      if(LDEBUG) {
-	      cerr << "compare::NUMBER AND TYPE OF ATOMIC SPECIES ARE THE SAME...PROCEEDING..." << endl;
-      }
-    }
+    if(VERBOSE) { cerr << function_name << ": Number of each type of element are compatible; proceeding." << endl; }
+
+    //DX 20190702 [OBSOLETE - not robust and slow] for(uint i=0;i<xstr1.num_each_type.size();i++){
+    //DX 20190702 [OBSOLETE - not robust and slow]   bool matched = false;
+    //DX 20190702 [OBSOLETE - not robust and slow]   for(uint j=0;j<xstr2.num_each_type.size();j++){
+    //DX 20190702 [OBSOLETE - not robust and slow]     // DX IS SPECIES CHECK TOO STRICT? if(xstr1.num_each_type[i] == xstr2.num_each_type[j] &&
+    //DX 20190702 [OBSOLETE - not robust and slow]     // DX IS SPECIES CHECK TOO STRICT?   xstr1.species[i] == xstr2.species[j]){
+    //DX 20190702 [OBSOLETE - not robust and slow]     if(xstr1.num_each_type[i] == xstr2.num_each_type[j]){
+    //DX 20190702 [OBSOLETE - not robust and slow]       matched = true;
+    //DX 20190702 [OBSOLETE - not robust and slow]       break;
+    //DX 20190702 [OBSOLETE - not robust and slow]     }
+    //DX 20190702 [OBSOLETE - not robust and slow]   }
+    //DX 20190702 [OBSOLETE - not robust and slow]   if(matched == false){
+    //DX 20190702 [OBSOLETE - not robust and slow]     if(display==true){ 
+    //DX 20190702 [OBSOLETE - not robust and slow]       if(LDEBUG) {
+    //DX 20190702 [OBSOLETE - not robust and slow]         cerr << "compare::WARNING:: TYPE OF ATOMIC SPECIES OR NUMBER PER TYPE ARE NOT THE SAME..." << endl;  
+    //DX 20190702 [OBSOLETE - not robust and slow]       }
+    //DX 20190702 [OBSOLETE - not robust and slow]     }
+    //DX 20190702 [OBSOLETE - not robust and slow]     return false;
+    //DX 20190702 [OBSOLETE - not robust and slow]   }
+    //DX 20190702 [OBSOLETE - not robust and slow] }
+    //DX 20190702 [OBSOLETE - not robust and slow] if(display==true){
+    //DX 20190702 [OBSOLETE - not robust and slow]   if(LDEBUG) {
+	  //DX 20190702 [OBSOLETE - not robust and slow]     cerr << "compare::NUMBER AND TYPE OF ATOMIC SPECIES ARE THE SAME...PROCEEDING..." << endl;
+    //DX 20190702 [OBSOLETE - not robust and slow]   }
+    //DX 20190702 [OBSOLETE - not robust and slow] }
     return true;
   }
 }
@@ -4375,7 +5417,7 @@ namespace compare{
       xstr.species[i]=letters[i];
       for(int j=0; j<xstr.num_each_type[i]; j++){
         xstr.atoms[iat].name=letters[i];
-	iat++;
+        iat++;
       }
     }
   }
@@ -4440,10 +5482,10 @@ namespace compare{
 }
 
 // ***************************************************************************
-// Least Frequent Atom 2
+// getLeastFreqentAtomSpecies
 // ***************************************************************************
 namespace compare{
-  vector<string> leastFrequentAtom2(const xstructure& xstr) {
+  vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr) {
 
     // This least frequent atom function finds all possible least frequent atoms 
     // for an xstructure and stores them in a vector. All of these LFAs are used 
@@ -4482,6 +5524,38 @@ namespace compare{
 }
 
 // ***************************************************************************
+// sortBySecondPair 
+// ***************************************************************************
+namespace compare{
+  bool sortBySecondPair(const std::pair<string,uint>& a, const std::pair<string,uint>& b) {
+    return (a.second<b.second);
+  }
+}
+
+// ***************************************************************************
+// sortSpeciesByFrequency
+// ***************************************************************************
+namespace compare{
+  vector<string> sortSpeciesByFrequency(const xstructure& xstr) {
+
+    vector<std::pair<string,uint> > species_and_counts;
+
+    for(uint i=0;i<xstr.num_each_type.size();i++){
+      std::pair<string,uint> tmp_pair;
+      tmp_pair.first=xstr.species[i]; tmp_pair.second=xstr.num_each_type[i];
+      species_and_counts.push_back(tmp_pair);
+    }
+
+    std::stable_sort(species_and_counts.begin(),species_and_counts.end(),compare::sortBySecondPair);
+
+    vector<string> reordered_species;
+    for(uint i=0;i<species_and_counts.size();i++){ reordered_species.push_back(species_and_counts[i].first); }
+    
+    return reordered_species;
+  }
+}
+
+// ***************************************************************************
 // Check Tolerances
 // ***************************************************************************
 namespace compare{
@@ -4491,19 +5565,45 @@ namespace compare{
     // the length of the 3 vectors and the angles between them are within
     // a given tolerance (in this case 30% of the reference value has been set).
 
-    double tol_length=0.3, tol_angle=0.3;
+    // ---------------------------------------------------------------------------
+    // switch between relative and absolute tolerance
+    bool relative = false;
 
-    if( abs(d1(1)-d2(1)) < tol_length*abs(d1(1)) &&
-        abs(d1(2)-d2(2)) < tol_length*abs(d1(2)) &&
-        abs(d1(3)-d2(3)) < tol_length*abs(d1(3)) &&
-        abs(d1(4)-d2(4)) < tol_angle*abs(d1(4)) &&
-        abs(d1(5)-d2(5)) < tol_angle*abs(d1(5)) &&
-        abs(d1(6)-d2(6)) < tol_angle*abs(d1(6))
-      ){
-      return false;
+    // ---------------------------------------------------------------------------
+    // relative
+    if(relative){
+      double tol_length=0.3, tol_angle=0.3;
+
+      if( abs(d1(1)-d2(1)) < tol_length*abs(d1(1)) &&
+          abs(d1(2)-d2(2)) < tol_length*abs(d1(2)) &&
+          abs(d1(3)-d2(3)) < tol_length*abs(d1(3)) &&
+          abs(d1(4)-d2(4)) < tol_angle*abs(d1(4)) &&
+          abs(d1(5)-d2(5)) < tol_angle*abs(d1(5)) &&
+          abs(d1(6)-d2(6)) < tol_angle*abs(d1(6))
+        ){
+        return false;
+      }
+      else {	
+        return true;
+      }
     }
-    else {	
-      return true;
+    // ---------------------------------------------------------------------------
+    // absolute
+    else{
+      double tol_length=1.0, tol_angle=5; // 1 Angstrom; 5 degrees
+
+      if( abs(d1(1)-d2(1)) < tol_length &&
+          abs(d1(2)-d2(2)) < tol_length &&
+          abs(d1(3)-d2(3)) < tol_length &&
+          abs(d1(4)-d2(4)) < tol_angle &&
+          abs(d1(5)-d2(5)) < tol_angle &&
+          abs(d1(6)-d2(6)) < tol_angle
+        ){
+        return false;
+      }
+      else {	
+        return true;
+      }
     }
   }
 }
@@ -4521,18 +5621,18 @@ namespace compare{
 
     for(uint i=1;i<4;i++){
       for(uint j=1;j<4;j++){
-	if(j!=i){
-	  for(uint k=1;k<4;k++){
-	    if(k!=i && k!=j){
-	      if(abs(d1(i)-d2(1)) < tol_length*abs(d1(i)) &&
-		 abs(d1(j)-d2(2)) < tol_length*abs(d1(j)) &&
-		 abs(d1(k)-d2(3)) < tol_length*abs(d1(k))
-		){
-		return false;
-	      }
-	    }
-	  }
-	}
+        if(j!=i){
+          for(uint k=1;k<4;k++){
+            if(k!=i && k!=j){
+              if(abs(d1(i)-d2(1)) < tol_length*abs(d1(i)) &&
+                  abs(d1(j)-d2(2)) < tol_length*abs(d1(j)) &&
+                  abs(d1(k)-d2(3)) < tol_length*abs(d1(k))
+                ){
+                return false;
+              }
+            }
+          }
+        }
       }
     }
     return true;
@@ -4552,23 +5652,253 @@ namespace compare{
 
     for(uint i=4;i<7;i++){
       for(uint j=4;j<7;j++){
-	if(j!=i){
-	  for(uint k=4;k<7;k++){
-	    if(k!=i && k!=j){	
-	      if(abs(d1(i)-d2(4)) < tol_angle*abs(d1(4)) &&
-		 abs(d1(j)-d2(5)) < tol_angle*abs(d1(5)) &&
-		 abs(d1(k)-d2(6)) < tol_angle*abs(d1(6))
-		){
-		return false;
-	      }
-	    }
-	  }
-	}
+        if(j!=i){
+          for(uint k=4;k<7;k++){
+            if(k!=i && k!=j){	
+              if(abs(d1(i)-d2(4)) < tol_angle*abs(d1(4)) &&
+                  abs(d1(j)-d2(5)) < tol_angle*abs(d1(5)) &&
+                  abs(d1(k)-d2(6)) < tol_angle*abs(d1(6))
+                ){
+                return false;
+              }
+            }
+          }
+        }
       }
     }
     return true;
   }
 }
+
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // Reset dims for RadiusSphereLattice() 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   void resetLatticeDimensions(const xmatrix<double>& lattice, double radius, xvector<int>& dims,
+// DX 20191122 [MOVED TO XATOM]       vector<xvector<double> >& l1, vector<xvector<double> >& l2, 
+// DX 20191122 [MOVED TO XATOM]       vector<xvector<double> >& l3, vector<int>& a_index, 
+// DX 20191122 [MOVED TO XATOM]       vector<int>& b_index, vector<int>& c_index){
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // resets the lattice dimensions (dims) based on radius
+// DX 20191122 [MOVED TO XATOM]     // generates lattice vectors (l1,l2,l3) right away = speed increase
+// DX 20191122 [MOVED TO XATOM]     // stores dimension indices (a_index,b_index,c_index)
+// DX 20191122 [MOVED TO XATOM]     // new dims explore order : zeroth cell to max dims = speed increase 
+// DX 20191122 [MOVED TO XATOM]     // (can break early if match is found)
+// DX 20191122 [MOVED TO XATOM]     // DX create function date: 20190705
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // get new dimensions based on radius
+// DX 20191122 [MOVED TO XATOM]     if(radius<=_ZERO_TOL_){ dims[1]=1; dims[2]=1; dims[3]=1; }
+// DX 20191122 [MOVED TO XATOM]     else{ dims=LatticeDimensionSphere(lattice,radius); }
+// DX 20191122 [MOVED TO XATOM]     //cerr << "using dims: " << dims << endl; 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // clear old 
+// DX 20191122 [MOVED TO XATOM]     l1.clear(); l2.clear(); l3.clear();
+// DX 20191122 [MOVED TO XATOM]     a_index.clear(); b_index.clear(); c_index.clear();
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // [NEW] - go from zeroth cell out
+// DX 20191122 [MOVED TO XATOM]     // more likely to find match close to origin, why start so far away
+// DX 20191122 [MOVED TO XATOM]     
+// DX 20191122 [MOVED TO XATOM]     // push back zeroth cell : dims[1]=dims[2]=dims[3]=0
+// DX 20191122 [MOVED TO XATOM]     l1.push_back(0*lattice(1));a_index.push_back(0);
+// DX 20191122 [MOVED TO XATOM]     l2.push_back(0*lattice(2));b_index.push_back(0);
+// DX 20191122 [MOVED TO XATOM]     l3.push_back(0*lattice(3));c_index.push_back(0);
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // push back 1,-1,2,-2,...dims,-dims
+// DX 20191122 [MOVED TO XATOM]     for(int a=1;a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a); l1.push_back(-a*lattice(1));a_index.push_back(-a);}
+// DX 20191122 [MOVED TO XATOM]     for(int b=1;b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b); l2.push_back(-b*lattice(2));b_index.push_back(-b);}
+// DX 20191122 [MOVED TO XATOM]     for(int c=1;c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c); l3.push_back(-c*lattice(3));c_index.push_back(-c);}
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+// DX 20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates){
+// DX 20191122 [MOVED TO XATOM]     
+// DX 20191122 [MOVED TO XATOM]     // determine the minimum coordination shell of the lattice
+// DX 20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
+// DX 20191122 [MOVED TO XATOM]     // (overload: uses lattice radius) 
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // determine necessary search radius
+// DX 20191122 [MOVED TO XATOM]     double radius=RadiusSphereLattice(lattice);
+// DX 20191122 [MOVED TO XATOM]   
+// DX 20191122 [MOVED TO XATOM]     minimumCoordinationShellLatticeOnly(lattice, min_dist, frequency, coordinates, radius);
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+// DX 20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, double radius){
+// DX 20191122 [MOVED TO XATOM]     
+// DX 20191122 [MOVED TO XATOM]     // determine the minimum coordination shell of the lattice
+// DX 20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
+// DX 20191122 [MOVED TO XATOM]     // (overload: instantiates lattice dimension information) 
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // instantiate lattice vectors 
+// DX 20191122 [MOVED TO XATOM]     vector<xvector<double> > l1, l2, l3; 
+// DX 20191122 [MOVED TO XATOM]     vector<int> a_index, b_index, c_index;
+// DX 20191122 [MOVED TO XATOM]     xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+// DX 20191122 [MOVED TO XATOM]     resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+// DX 20191122 [MOVED TO XATOM]   
+// DX 20191122 [MOVED TO XATOM]     minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
+// DX 20191122 [MOVED TO XATOM]         a_index, b_index, c_index, 
+// DX 20191122 [MOVED TO XATOM]         min_dist, frequency, coordinates, radius);
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // minimumCoordinationShellLatticeOnly() 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, xvector<int>& dims,
+// DX 20191122 [MOVED TO XATOM]       vector<xvector<double> >& l1, vector<xvector<double> >& l2, vector<xvector<double> >& l3, 
+// DX 20191122 [MOVED TO XATOM]       vector<int>& a_index, vector<int>& b_index, vector<int>& c_index, 
+// DX 20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates,
+// DX 20191122 [MOVED TO XATOM]       double radius){
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // determine the minimum coordination shell environment of the lattice
+// DX 20191122 [MOVED TO XATOM]     // i.e., find the set of closest neighbors to the origin
+// DX 20191122 [MOVED TO XATOM]     // stores l1, l2, l3, a_index, b_index, and c_index for external use
+// DX 20191122 [MOVED TO XATOM]     // optional "radius" as enables more control over search space 
+// DX 20191122 [MOVED TO XATOM]     // (and potential speed up, may not need to search as far as the lattice radius)
+// DX 20191122 [MOVED TO XATOM]     
+// DX 20191122 [MOVED TO XATOM]     xvector<double> tmp;
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // reset lattice dimensions 
+// DX 20191122 [MOVED TO XATOM]     resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // loop through lattice vectors (stored before-hand in l1,l2,l3)
+// DX 20191122 [MOVED TO XATOM]     for(uint m=0;m<l1.size();m++){
+// DX 20191122 [MOVED TO XATOM]       xvector<double> a_component = l1[m];                  // DX : coord1-coord2+a*lattice(1)
+// DX 20191122 [MOVED TO XATOM]       for(uint n=0;n<l2.size();n++){
+// DX 20191122 [MOVED TO XATOM]         xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+// DX 20191122 [MOVED TO XATOM]         for(uint p=0;p<l3.size();p++){
+// DX 20191122 [MOVED TO XATOM]           if(!(m==0 && n==0 && p==0)){
+// DX 20191122 [MOVED TO XATOM]             tmp = ab_component + l3[p];                     // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+// DX 20191122 [MOVED TO XATOM]             double tmp_mod = aurostd::modulus(tmp);
+// DX 20191122 [MOVED TO XATOM]             // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]             // if found a new minimum distance and update coordination/frequency and coordinate 
+// DX 20191122 [MOVED TO XATOM]             if(tmp_mod<min_dist){
+// DX 20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]               // if new distance is close to the original it is the same coordination shell (add to coordination)
+// DX 20191122 [MOVED TO XATOM]               // otherwise, reset coordination shell
+// DX 20191122 [MOVED TO XATOM]               // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX 20191122 [MOVED TO XATOM]               if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+// DX 20191122 [MOVED TO XATOM]               else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+// DX 20191122 [MOVED TO XATOM]               min_dist=tmp_mod;
+// DX 20191122 [MOVED TO XATOM]               // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]               // diminishing dims: if minimum distance changed, then we may not need to search as far
+// DX 20191122 [MOVED TO XATOM]               // reset loop and search again based on new minimum distance
+// DX 20191122 [MOVED TO XATOM]               if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+// DX 20191122 [MOVED TO XATOM]                 resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+// DX 20191122 [MOVED TO XATOM]                 m=n=p=0;
+// DX 20191122 [MOVED TO XATOM]                 frequency=0; //reset
+// DX 20191122 [MOVED TO XATOM]               }
+// DX 20191122 [MOVED TO XATOM]             }
+// DX 20191122 [MOVED TO XATOM]             // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX 20191122 [MOVED TO XATOM]             else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
+// DX 20191122 [MOVED TO XATOM]           }
+// DX 20191122 [MOVED TO XATOM]         }
+// DX 20191122 [MOVED TO XATOM]       }
+// DX 20191122 [MOVED TO XATOM]     }
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // minimumCoordinationShell() 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+// DX 20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates){
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     string type = "";
+// DX 20191122 [MOVED TO XATOM]   
+// DX 20191122 [MOVED TO XATOM]     minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, type);
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // minimumCoordinationShell() 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   void minimumCoordinationShell(const xstructure& xstr, uint center_index, 
+// DX 20191122 [MOVED TO XATOM]       double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type){
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // determine the minimum coordination shell environment
+// DX 20191122 [MOVED TO XATOM]     // "type" enables the search of environments by certain elements/types only
+// DX 20191122 [MOVED TO XATOM]     // (e.g., find the neighborhood of oxygen atoms surrounding a magnesium center)
+// DX 20191122 [MOVED TO XATOM]     
+// DX 20191122 [MOVED TO XATOM]     xvector<double> tmp;
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // instantiate lattice vectors 
+// DX 20191122 [MOVED TO XATOM]     vector<xvector<double> > l1, l2, l3; 
+// DX 20191122 [MOVED TO XATOM]     vector<int> a_index, b_index, c_index;
+// DX 20191122 [MOVED TO XATOM]     xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+// DX 20191122 [MOVED TO XATOM]     //resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     for(uint ii=0; ii<xstr.atoms.size(); ii++){
+// DX 20191122 [MOVED TO XATOM]       // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]       // if atom ii is not environment center, find minimum distance between center atom ii's images 
+// DX 20191122 [MOVED TO XATOM]       if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type=="" 
+// DX 20191122 [MOVED TO XATOM]         xvector<double> incell_dist = xstr.atoms[center_index].cpos-xstr.atoms[ii].cpos;
+// DX 20191122 [MOVED TO XATOM]         double incell_mod = aurostd::modulus(incell_dist);
+// DX 20191122 [MOVED TO XATOM]         if(!(dims[1]==1 && dims[2]==1 && dims[3]==1) && incell_mod!=1e9){
+// DX 20191122 [MOVED TO XATOM]           resetLatticeDimensions(xstr.lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+// DX 20191122 [MOVED TO XATOM]         }
+// DX 20191122 [MOVED TO XATOM]         //DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+// DX 20191122 [MOVED TO XATOM]         for(uint m=0;m<l1.size();m++){
+// DX 20191122 [MOVED TO XATOM]           xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+// DX 20191122 [MOVED TO XATOM]           for(uint n=0;n<l2.size();n++){
+// DX 20191122 [MOVED TO XATOM]             xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+// DX 20191122 [MOVED TO XATOM]             for(uint p=0;p<l3.size();p++){
+// DX 20191122 [MOVED TO XATOM]               tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+// DX 20191122 [MOVED TO XATOM]               double tmp_mod = aurostd::modulus(tmp);
+// DX 20191122 [MOVED TO XATOM]               if(tmp_mod<min_dist){
+// DX 20191122 [MOVED TO XATOM]                 //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX 20191122 [MOVED TO XATOM]                 if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+// DX 20191122 [MOVED TO XATOM]                 else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+// DX 20191122 [MOVED TO XATOM]                 min_dist=tmp_mod;
+// DX 20191122 [MOVED TO XATOM]               }
+// DX 20191122 [MOVED TO XATOM]               //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+// DX 20191122 [MOVED TO XATOM]               else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+// DX 20191122 [MOVED TO XATOM]             }
+// DX 20191122 [MOVED TO XATOM]           }
+// DX 20191122 [MOVED TO XATOM]         }
+// DX 20191122 [MOVED TO XATOM]       }
+// DX 20191122 [MOVED TO XATOM]       // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]       // if atom is environment center check its images, but only need to search as 
+// DX 20191122 [MOVED TO XATOM]       // far as min_dist or lattice_radius (whichever is smaller)
+// DX 20191122 [MOVED TO XATOM]       else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type==""
+// DX 20191122 [MOVED TO XATOM]         double lattice_radius=RadiusSphereLattice(xstr.lattice);
+// DX 20191122 [MOVED TO XATOM]         double search_radius=min(lattice_radius,min_dist);
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]         // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]         // use variant that stores the lattice dimension information so it can be 
+// DX 20191122 [MOVED TO XATOM]         // updated for the "minimumCoordinationShell" function
+// DX 20191122 [MOVED TO XATOM]         minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
+// DX 20191122 [MOVED TO XATOM]             a_index, b_index, c_index, 
+// DX 20191122 [MOVED TO XATOM]             min_dist, frequency, coordinates, search_radius);
+// DX 20191122 [MOVED TO XATOM]       }
+// DX 20191122 [MOVED TO XATOM]     }
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
 
 // ***************************************************************************
 // Find centroid for system with periodic boundary conditions
@@ -4628,10 +5958,10 @@ namespace compare{
       double theta_avg =0.0;
       for(uint j=0;j<coordinates.size();j++){
         double theta = coordinates[j][i]*(2.0*Pi_r)/(aurostd::modulus(lattice(i)));
-	double zi = std::cos(theta)*weights[j];
-	double zeta = std::sin(theta)*weights[j];
-	zi_avg += zi/coordinates.size();
-	zeta_avg += zeta/coordinates.size();
+        double zi = std::cos(theta)*weights[j];
+        double zeta = std::sin(theta)*weights[j];
+        zi_avg += zi/coordinates.size();
+        zeta_avg += zeta/coordinates.size();
       }
       theta_avg = std::atan2(-zeta_avg,-zi_avg);
       centroid(i) = theta_avg*(aurostd::modulus(lattice(i))/(2.0*Pi_r));
@@ -4645,7 +5975,8 @@ namespace compare{
 // Find Matches
 // ***************************************************************************
 namespace compare{
-  bool findMatch(const xstructure& xstr1, const xstructure& PROTO, 
+  bool findMatch(const deque<_atom>& xstr1_atoms, const deque<_atom>& PROTO_atoms,
+        const xmatrix<double>& PROTO_lattice,
 		    vector<uint>& im1, vector<uint>& im2, vector<double>& min_dists, 
                     const int& type_match) {
 
@@ -4660,12 +5991,20 @@ namespace compare{
     // C |      C1, C2     with A,B,C,D 
     // D |      D1, D2    
 
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
+
+    string function_name = "compare::findMatch()";
+
     uint j=0,k=0;
     int i1=0,i2=0;                                  //Indices corresponding atoms
 
     vector<double> vdiffs;                      //Difference btwn atoms coords
     vector<std::pair<xvector<double>,xvector<double> > > min_positions;                      //Store sets of Cartesian coords which minimize distance
     vector<vector<double> > all_vdiffs;         //For all the atoms
+    
+    bool is_non_collinear = xstr1_atoms[0].noncoll_spin_is_given; //DX 20191213
+    bool is_collinear = xstr1_atoms[0].spin_is_given; //DX 20191213
 
     vector<uint> im1_tmp;
     vector<uint> im2_tmp;
@@ -4676,7 +6015,8 @@ namespace compare{
     vdiffs.clear();
     all_vdiffs.clear();
 
-    xmatrix<double> lattice=PROTO.lattice;
+    //xmatrix<double> lattice=PROTO.lattice;
+    xmatrix<double> lattice=PROTO_lattice;
 
     double tmp = 1e9;
     uint i1_real=0;
@@ -4689,54 +6029,69 @@ namespace compare{
     
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
-    for(int a=-2;a<=2;a++){l1.push_back(a*lattice(1));a_index.push_back(a);} //DX calc once and store
-    for(int b=-2;b<=2;b++){l2.push_back(b*lattice(2));b_index.push_back(b);} //DX calc once and store
-    for(int c=-2;c<=2;c++){l3.push_back(c*lattice(3));c_index.push_back(c);} //DX calc once and store
+    //double radius=RadiusSphereLattice(lattice); //DX 20190701 - use robust method
+    xvector<int> dims(3); //DX 20190701 - use robust method
+    //resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
 
-    for(j=0;j<xstr1.atoms.size();j++){
+    for(j=0;j<xstr1_atoms.size();j++){
+      //cerr << "xstr1.atoms[j]: " << xstr1.atoms[j] << endl;
       std::pair<xvector<double>,xvector<double> > tmp_pair;
-      xvector<double> tmp_xvec = xstr1.atoms[j].cpos;
+      xvector<double> tmp_xvec = xstr1_atoms[j].cpos;
       tmp_pair.first = tmp_xvec;
       vdiffs.clear();
       double match_dist=1e9;
-      for(k=0;k<PROTO.atoms.size();k++){
-        // speed increase, if same species map, don't try to map atoms of different types
-        if(type_match==2 && xstr1.atoms[j].name!=PROTO.atoms[k].name){
-          continue;
+      double prev_match_dist=0; //to avoid recalculating dims if nothing has changed
+      dims[1]=dims[2]=dims[3]=0; //reset
+      for(k=0;k<PROTO_atoms.size();k++){
+        //cerr << "PROTO.atoms[k]: " << PROTO.atoms[k] << endl;
+        //cerr << "[orig] dims: " << dims << endl;
+        //DX 20190701 - use diminishing dims - START
+        if(match_dist<prev_match_dist){
+          if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+            resetLatticeDimensions(lattice,match_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+            prev_match_dist=match_dist;
+          }
         }
         double dist=1e9;
         xvector<double> min_xvec;
-        xvector<int> abc;
-        xvector<double> incell_dist = xstr1.atoms[j].cpos-PROTO.atoms[k].cpos;
+        xvector<double> incell_dist = xstr1_atoms[j].cpos-PROTO_atoms[k].cpos;
+        double incell_mod = aurostd::modulus(incell_dist);
+        //DX 20190701 - use diminishing dims - START
+        if(incell_mod < match_dist){
+          if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+            resetLatticeDimensions(lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+            prev_match_dist=incell_mod;
+          }
+        }
         // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
         //DX - running vector in each loop saves computations; fewer duplicate operations
-        for(uint m=0;m<l1.size();m++){
-          xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
-          for(uint n=0;n<l2.size();n++){
-            xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
-            for(uint p=0;p<l3.size();p++){
-              tmp_xvec = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-              tmp=aurostd::modulus(tmp_xvec);
-        //DX 20190226 [OBSOLETE -SLOWER] for(int a=-2;a<=2;a++){
-        //DX 20190226 [OBSOLETE -SLOWER]  for(int b=-2;b<=2;b++){
-        //DX 20190226 [OBSOLETE -SLOWER]    for(int c=-2;c<=2;c++){
-        //DX 20190226 [OBSOLETE -SLOWER]      tmp_xvec = PROTO.atoms[k].cpos+a*lattice(1)+b*lattice(2)+c*lattice(3);
-        //DX 20190226 [OBSOLETE -SLOWER]      tmp = aurostd::modulus(xstr1.atoms[j].cpos-tmp_xvec); 
-              if(tmp < dist){
-                //DX 20190226 [OBSOLETE -SLOWER]abc(1)=a;
-                //DX 20190226 [OBSOLETE -SLOWER]abc(2)=b;
-                //DX 20190226 [OBSOLETE -SLOWER]abc(3)=c;
-                abc(1)=a_index[m];
-                abc(2)=b_index[n];
-                abc(3)=c_index[p];
-                i1 = j;
-                i2 = k;
-                //cerr << tmp << " vs " << dist << " - " << j << ", " << k << endl;
-                dist = tmp;
-                min_xvec = tmp_xvec;
+        if(incell_mod>0.25){
+          for(uint m=0;m<l1.size();m++){
+            xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+            for(uint n=0;n<l2.size();n++){
+              xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+              for(uint p=0;p<l3.size();p++){
+                tmp_xvec = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+                tmp=aurostd::modulus(tmp_xvec);
+                if(tmp < dist){
+                  i1 = j;
+                  i2 = k;
+                  dist = tmp;
+                  min_xvec = tmp_xvec;
+                }
+                if(dist<0.25){ break; }
               }
-              // DXdist=aurostd::min(dist,aurostd::modulus(PROTO.atoms[j].cpos-xstr1.atoms[k].cpos+a*klattice(1)+b*klattice(2)+c*klattice(3)));
+              if(dist<0.25){ break; }
             }
+            if(dist<0.25){ break; }
+          }
+        }
+        else{
+          if(incell_mod < dist){
+            i1 = j;
+            i2 = k;
+            dist = incell_mod;
+            min_xvec = incell_dist;
           }
         }
         //cerr << "match_dist: " << match_dist << endl;
@@ -4744,41 +6099,86 @@ namespace compare{
           i1_real=i1;
           i2_real=i2;
           match_dist = dist;
-          i1_name = xstr1.atoms[i1_real].name;
-          i2_name = PROTO.atoms[i2_real].name;
+          i1_name = xstr1_atoms[i1_real].name;
+          i2_name = PROTO_atoms[i2_real].name;
           tmp_pair.second = min_xvec;
         }
         vdiffs.push_back(dist);
+        //DX 20190701 - speed increase, not possible to match to anything else if less than quarter of an Angstrom
+        // note this will truncate vdiffs, so if we need it, then do not use the break below
+        if(dist<0.25){
+          break;
+        }
+      }
+      if(VERBOSE){
+        cerr << function_name << ": set of distances for original structure's " << j << "th atom: " << endl; 
+        for(uint d=0;d<vdiffs.size();d++){
+          cerr << d << ": " << vdiffs[d] << endl;
+        }
       }
       // Check if same species match
       if(type_match == 2){ // same species
         if(i1_name != i2_name){
-          //cerr << "WARNING: Matching species are not the same type, throwing out match (same species comparison)" << endl;
+          if(VERBOSE){
+            cerr << function_name << ":WARNING: Matching species are not the same type, throwing out match (same species comparison)" << endl;
+          }
           return false;
         }
       }
+      //DX 20191213 - START
+      if(!_CALCULATE_MAGNETIC_MISFIT_){
+        // Check non_collinear spin
+        if(is_non_collinear){
+          if(aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(1)-PROTO_atoms[i2_real].noncoll_spin(1))>_SPIN_TOL_ ||
+              aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(2)-PROTO_atoms[i2_real].noncoll_spin(2))>_SPIN_TOL_ ||
+              aurostd::abs(xstr1_atoms[i1_real].noncoll_spin(3)-PROTO_atoms[i2_real].noncoll_spin(3))>_SPIN_TOL_){
+            if(VERBOSE){
+              cerr << function_name << ":WARNING: Matching atoms do not have the same non-collinear spin, throwing out match" << endl;
+            }
+            return false;
+          }
+        }
+        // Check collinear spin
+        if(is_collinear){
+          if(aurostd::abs(xstr1_atoms[i1_real].spin-PROTO_atoms[i2_real].spin)>_SPIN_TOL_){
+            if(VERBOSE){
+              cerr << function_name << ":WARNING: Matching atoms do not have the same collinear spin, throwing out match" << endl;
+            }
+            return false;
+          }
+        }
+      }
+      //DX 20191213 - END
       // Check for one-to-one mappings 
       for(uint i=0;i<im1_name.size();i++){
         // Check if i1 index has multiple mappings
         if(i1_real == im1[i]){
-          //cerr << "WARNING: Used the same index for matching in i1! (" << i1_real << " == " << im1[i] << ")"<< endl;
-          //cerr << match_dist << " vs " << min_dists[i] << endl;
+          if(LDEBUG){
+            cerr << "WARNING: Used the same index for matching in i1! (" << i1_real << " == " << im1[i] << ")"<< endl;
+            cerr << "                                             i2! (" << i2_real << " == " << im2[i] << ")"<< endl;
+            cerr << match_dist << " vs " << min_dists[i] << endl;
+          }
           return false;
         }
         // Check if i2 index has multiple mappings
         if(i2_real == im2[i]){
-          //cerr << "WARNING: Used the same index for matching in i2! (" << i2_real << " == " << im2[i] << ")"<< endl;
-          //cerr << match_dist << " vs " << min_dists[i] << endl;
+          if(LDEBUG){
+            cerr << "WARNING: Used the same index for matching in i2! (" << i2_real << " == " << im2[i] << ")"<< endl;
+            cerr << "                                             i1! (" << i1_real << " == " << im1[i] << ")"<< endl;
+            cerr << match_dist << " vs " << min_dists[i] << endl;
+          }
           return false;
         }
         // Check if types are not consistently mapped to a single type
         if(i1_name == im1_name[i]){
           if(i2_name != im2_name[i]){
-            //cerr << "WARNING: Matching one type of atom to more than one type! (" << i1_name << " == " << i2_name << " | " << im1_name[i] << " == " << im2_name[i] << ")" <<  endl;
-            //for(uint j=0;j<im1_name.size();j++){
+            if(LDEBUG){
+              cerr << "WARNING: Matching one type of atom to more than one type! (" << i1_name << " == " << i2_name << " | " << im1_name[i] << " == " << im2_name[i] << ")" <<  endl;
+              for(uint j=0;j<im1_name.size();j++){
             //  cerr << im1[j] << " == " << im2[j] << " | " << xstr1.atoms[im1[j]].cpos << " == " << PROTO.atoms[im2[j]].cpos << " (" << min_dists[i] << ") | " << im1_name[j] << " == " << im2_name[j] << endl;
-            //}
+              }
             //cerr << i1_real << " == " << i2_real << " | " << xstr1.atoms[i1_real].cpos << " == " << PROTO.atoms[i2_real].cpos << " (" << match_dist << ") | " << i1_name << " == " << i2_name << endl;            
+            }
             return false;
           }
         }
@@ -4817,29 +6217,29 @@ namespace compare{
     for(i=0; i<im1.size(); i++){
       i1.clear();
       if(i==0){
-	TYPE1.push_back(xstr1.atoms[im1[i]].name);
-	QTA1.push_back(1);
-	i1.push_back(im1[i]);
-	I1.push_back(i1);
+        TYPE1.push_back(xstr1.atoms[im1[i]].name);
+        QTA1.push_back(1);
+        i1.push_back(im1[i]);
+        I1.push_back(i1);
       }
       else {
-	flag=0;
-	for(j=0; j<TYPE1.size(); j++){
-	  if(xstr1.atoms[im1[i]].name==TYPE1[j]){
-	    QTA1[j]++;
-	    i1=I1[j];
-	    i1.push_back(im1[i]);
-	    I1[j]=i1;
-	    flag=1;
-	    break;
-	  }
-	}
-	if(flag==0){
-	  TYPE1.push_back(xstr1.atoms[im1[i]].name);
-	  QTA1.push_back(1);
-	  i1.push_back(im1[i]);
-	  I1.push_back(i1);
-	}
+        flag=0;
+        for(j=0; j<TYPE1.size(); j++){
+          if(xstr1.atoms[im1[i]].name==TYPE1[j]){
+            QTA1[j]++;
+            i1=I1[j];
+            i1.push_back(im1[i]);
+            I1[j]=i1;
+            flag=1;
+            break;
+          }
+        }
+        if(flag==0){
+          TYPE1.push_back(xstr1.atoms[im1[i]].name);
+          QTA1.push_back(1);
+          i1.push_back(im1[i]);
+          I1.push_back(i1);
+        }
       }
     }
   }
@@ -4859,7 +6259,7 @@ namespace compare{
     vector<uint> QTA1,QTA2;
     vector<vector<uint> > I1,I2;
 
-    vector<int> flag,checkType;
+    vector<int> vflags,checkType;
 
     clusterize(xstr1,im1,TYPE1,QTA1,I1);
     clusterize(xstr2,im2,TYPE2,QTA2,I2);
@@ -4868,27 +6268,27 @@ namespace compare{
 
     for(i=0; i<TYPE1.size(); i++){
       for(j=0; j<TYPE2.size(); j++){
-	if(QTA1[i]==QTA2[j]){	
-	  flag.clear();
-	  for(w=0; w<I1[i].size(); w++){
-	    for(z=0; z<I2[j].size(); z++){
-	      for(k=0; k<im1.size(); k++){
-		//Means we want the same atomic species to be matched up.
-		if(type_match==2){           
-		  if(I1[i][w]==im1[k] && I2[j][z]==im2[k] && 
-		     xstr1.atoms[im1[k]].name == xstr2.atoms[im2[k]].name
-		    ) 
-		    flag.push_back(1);
-		}
-		else {
-		  if(I1[i][w]==im1[k] && I2[j][z]==im2[k]) flag.push_back(1);
-		}
-	      }
-	    }
-	  }
-	  if(flag.size()==QTA1[i])
-	    checkType.push_back(1);	
-	}
+        if(QTA1[i]==QTA2[j]){	
+          vflags.clear();
+          for(w=0; w<I1[i].size(); w++){
+            for(z=0; z<I2[j].size(); z++){
+              for(k=0; k<im1.size(); k++){
+                //Means we want the same atomic species to be matched up.
+                if(type_match==2){           
+                  if(I1[i][w]==im1[k] && I2[j][z]==im2[k] && 
+                      xstr1.atoms[im1[k]].name == xstr2.atoms[im2[k]].name
+                    ) 
+                    vflags.push_back(1);
+                }
+                else {
+                  if(I1[i][w]==im1[k] && I2[j][z]==im2[k]) vflags.push_back(1);
+                }
+              }
+            }
+          }
+          if(vflags.size()==QTA1[i])
+            checkType.push_back(1);	
+        }
       }
     }
     if(checkType.size()==TYPE1.size()) return true;
@@ -4910,9 +6310,9 @@ namespace compare{
 
     for(i=0; i<im1.size(); i++){
       for(j=0; j<im1.size(); j++){
-	if(i!=j){
-	  if(im1[i]==im1[j]){
-	    return true;
+        if(i!=j){
+          if(im1[i]==im1[j]){
+            return true;
           }
         }
       }	
@@ -4969,7 +6369,8 @@ namespace compare{
     vector<double> dev;
 
     for(i=0; i<3; i++) 
-      dev.push_back((abs(diag_sum1[i]-diag_sum2[i])+abs(diag_diff1[i]-diag_diff2[i]))/(diag_sum2[i]+diag_diff2[i]));
+      //DX 20191112 [ORIG] dev.push_back((abs(diag_sum1[i]-diag_sum2[i])+abs(diag_diff1[i]-diag_diff2[i]))/(diag_sum2[i]+diag_diff2[i]));
+      dev.push_back((abs(diag_sum2[i]-diag_sum1[i])+abs(diag_diff2[i]-diag_diff1[i]))/(diag_sum1[i]+diag_diff1[i])); //DX 20191112 - should be compared to the reference, (1) not (2)?
 
     d=1;
     for(i=0;i<dev.size();i++) 
@@ -4979,6 +6380,391 @@ namespace compare{
     return d;
   }
 }
+
+// ***************************************************************************
+// compute LFA environment 
+// ***************************************************************************
+namespace compare{
+  vector<AtomEnvironment> computeLFAEnvironment(const xstructure& xstr, bool unique_only){
+    
+    // computes an abridged atomic environment around all LFA atom centers
+    // only determines the closest distance fore each atom type (i.e., one for each species)
+    // this is a quick way to look at the atom environment before trying to compare
+    // atom environment is invariant of unit cell representation/origin choice
+
+    // ---------------------------------------------------------------------------
+    // determine all LFA atoms in the structure (could be more than one) 
+    vector<string> LFAs=getLeastFrequentAtomSpecies(xstr);
+
+    // ---------------------------------------------------------------------------
+    // compute all LFA environments, looping through each LFA type 
+    vector<AtomEnvironment> all_environments_LFA;
+
+    for(uint i=0;i<LFAs.size();i++){
+      //DX 20191122 [OBSOLETE, moved functionality to XATOM] vector<AtomEnvironment> environments_LFA = getUniqueTypesAtomEnvironmentForLFA(xstr, LFAs[i], LFAs);
+      vector<AtomEnvironment> environments_LFA = getLFAAtomEnvironments(xstr, LFAs[i], LFAs, ATOM_ENVIRONMENT_MODE_1); //DX 20191122
+      // ---------------------------------------------------------------------------
+      // may have non-primitive cell, but we only want unique/smallest set of information (fast)
+      if(unique_only){
+        for(uint j=0;j<environments_LFA.size();j++){
+          bool duplicate = false;
+          for(uint k=0;k<all_environments_LFA.size();k++){
+            if(compatibleEnvironments(environments_LFA[j],all_environments_LFA[k],true,true,true)){
+              duplicate = true;
+              break;
+            }
+          }
+          if(!duplicate){
+            all_environments_LFA.push_back(environments_LFA[j]);
+          }
+        }
+      }
+      // ---------------------------------------------------------------------------
+      // primitivized cell, push back all 
+      else{
+        all_environments_LFA.insert(all_environments_LFA.end(),environments_LFA.begin(),environments_LFA.end());
+      }
+    }
+
+    return all_environments_LFA;
+  }
+}
+
+// ***************************************************************************
+// compute LFA environment 
+// ***************************************************************************
+namespace compare{
+  bool compatibleEnvironmentSets(const vector<AtomEnvironment>& env_set1, 
+      const vector<AtomEnvironment>& env_set2, bool same_species, bool exact_match){
+ 
+    // determines if set of LFA environments are similar
+    // same_species : requires the same atom decorations/types
+    // exact_match  : signals if an exact match (remove duplicates) or conversely 
+    //                if it possible to match later via structure comparison
+    // if this used elsewhere, it may need to be modified since it only considers
+    // the special case of comparing LFA environments
+
+    // ---------------------------------------------------------------------------
+    // if one is not calculated then we need to assume they may be compatible 
+    if(env_set1.size()==0 || env_set2.size()==0){
+      return true;
+    }
+
+    // ---------------------------------------------------------------------------
+    // check if atom environment set has only one atom 
+    // (signal more comprehensive environment comparison)
+    bool only_single_LFA_atoms = true;
+    string first_lfa_element = env_set1[0].element_center; //safe to acess element since I checked earlier
+    for(uint i=1;i<env_set1.size();i++){ // start after first 1
+      if(first_lfa_element ==env_set1[i].element_center){
+        only_single_LFA_atoms = false;
+        break;
+      }
+    }
+    bool compare_frequency = only_single_LFA_atoms;
+    // ---------------------------------------------------------------------------
+    // if same species
+    if(same_species){
+      for(uint i=0;i<env_set1.size();i++){
+        bool matched_set = false;
+        vector<vector<string> > matched_species;
+        for(uint j=0;j<env_set2.size();j++){
+          matched_set = compatibleEnvironments(env_set1[i],env_set2[j],matched_species,same_species,compare_frequency,exact_match);
+          if(matched_set) { break; }
+        }
+        if(!matched_set){ return false; }
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // any species
+    else{
+      // this is a bit more complicated
+      // need to think about this; come back later
+      // for now return true so we do a robust match
+      return true; 
+    }
+    return true;
+  }
+}
+
+// ***************************************************************************
+// compute LFA environment 
+// ***************************************************************************
+namespace compare{
+  bool compatibleEnvironments(const AtomEnvironment& env_1, 
+      const AtomEnvironment& env_2, bool same_species, bool compare_frequency, 
+      bool exact_match){
+
+    vector<vector<string> > matched_species;
+
+    return compatibleEnvironments(env_1,env_2,matched_species,same_species,compare_frequency,exact_match);
+  }
+}
+
+// ***************************************************************************
+// compute LFA environment 
+// ***************************************************************************
+namespace compare{
+  bool compatibleEnvironments(const AtomEnvironment& env_1, 
+      const AtomEnvironment& env_2, vector<vector<string> > & matched_species, 
+      bool same_species, bool compare_frequency, bool exact_match){
+
+    // determines if set of LFA environments are similar
+    // same_species     : requires the same atom decorations/types
+    // exact_match      : signals if an exact match (remove duplicates) or conversely 
+    //                    if it possible to match later via structure comparison
+   
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
+    string function_name = "compare::compatibleEnvironments()";
+
+    double _TOL_EXACT_MATCH_ = 0.01; // hundredth of an Angstrom, perhaps put in header?
+    double _TOL_RELATIVE_MATCH_ = 0.10; // ten percent, perhaps put in header? //DX 20190724 - changed from 0.25 to 0.1
+    double _TOL_LOOSE_MATCH_ = aurostd::min(env_1.distances_neighbor)/2.0; // ten percent, perhaps put in header? //DX 20190724 - changed from 0.25 to 0.1
+
+    // ---------------------------------------------------------------------------
+    // check for element for center first (fast)
+    if(same_species){
+      if(env_1.element_center!=env_2.element_center){ return false; }
+    }
+
+    // ---------------------------------------------------------------------------
+    // check neighboring sites
+    for(uint i=0;i<env_1.elements_neighbor.size();i++){
+      bool match_found = false;
+      vector<string> species;
+      for(uint j=0;j<env_2.elements_neighbor.size();j++){
+        // ---------------------------------------------------------------------------
+        // check same species, if applicable
+        if(same_species && env_1.elements_neighbor[i]!=env_2.elements_neighbor[j]){ continue; }
+        
+        // ---------------------------------------------------------------------------
+        // check frequency of distance
+        // this is sensitive to tolerance of cutoff; use with caution
+        // DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
+        
+        // ---------------------------------------------------------------------------
+        // exact match 
+        if(exact_match && aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])<_TOL_EXACT_MATCH_){
+           match_found = true; species.push_back(env_2.elements_neighbor[j]);
+        }
+
+        // ---------------------------------------------------------------------------
+        // relative match 
+        else if(!exact_match && 
+                //aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])/(env_1.distances_neighbor[i]+env_2.distances_neighbor[j])<_TOL_RELATIVE_MATCH_){ //DX 20190730 - too strict
+                aurostd::abs(env_1.distances_neighbor[i]-env_2.distances_neighbor[j])<_TOL_LOOSE_MATCH_){ //DX 20190730
+            match_found = true; species.push_back(env_2.elements_neighbor[j]);
+        }
+        
+      }
+      if(!match_found){ return false; }
+      matched_species.push_back(species);
+    }
+
+    // ---------------------------------------------------------------------------
+    // check relationship between LFA environments
+    // only check for on one atom center (cheaper)
+    // check this if all checks have passed thus far
+    // this is sensitive to tolerance of cutoff; use with caution
+    if(compare_frequency && same_species){ //same species for now
+      vector<vector<double> > angles_sets_1 = getAnglesBetweenMixedSpeciesEnvironments(env_1.coordinates_neighbor);
+      vector<vector<double> > angles_sets_2 = getAnglesBetweenMixedSpeciesEnvironments(env_2.coordinates_neighbor);
+  
+      for(uint i=0;i<angles_sets_1.size();i++){
+        // ---------------------------------------------------------------------------
+        // use soft-cutoff; if number of coordinates is not equal, then check that 
+        // the smallest set matches; a better alternative then the hard-cutoff freqency match
+        // case 1) if set 1 < set 2 
+        if(angles_sets_1[i].size()<=angles_sets_2[i].size()){
+          for(uint j=0;j<angles_sets_1[i].size();j++){
+            bool matched=false;
+            for(uint k=0;k<angles_sets_2[i].size();k++){
+              //if(aurostd::isequal(angles_sets_1[i][j],angles_sets_2[i][k],10.0)){ //equal within 10 degrees
+              if(aurostd::isequal(angles_sets_1[i][j],angles_sets_2[i][k],20.0)){ //equal within 10 degrees
+                matched=true;
+                break;
+              }
+              if(VERBOSE){cerr << function_name << " angles dont match: " << angles_sets_1[i][j] << " vs " << angles_sets_2[i][k] << " | diff=" << angles_sets_1[i][j]-angles_sets_2[i][k] << endl;}
+            }
+            if(!matched){ matched_species.clear(); return false; }
+          }
+        }
+        // ---------------------------------------------------------------------------
+        // case 2) if set 1 > set 2 
+        else if(angles_sets_1[i].size()>angles_sets_2[i].size()){
+          for(uint j=0;j<angles_sets_2[i].size();j++){
+            bool matched=false;
+            for(uint k=0;k<angles_sets_1[i].size();k++){
+              if(aurostd::isequal(angles_sets_2[i][j],angles_sets_1[i][k],10.0)){ //equal within 10 degrees
+                matched=true;
+                break;
+              }
+            }
+            if(!matched){ matched_species.clear(); return false; }
+          }
+        }
+      }
+    }
+  
+    if(LDEBUG){ cerr << function_name << " environments are compatible." << endl; }
+
+    return true;
+  }
+}
+
+// ***************************************************************************
+//  
+// ***************************************************************************
+namespace compare{
+  vector<vector<double> > getAnglesBetweenMixedSpeciesEnvironments(const vector<vector<xvector<double> > >& coordinates_neighbor){
+      
+    vector<vector<double> > angles_sets;
+    for(uint j=1;j<coordinates_neighbor.size();j++){
+      vector<double> angles;
+      for(uint i=0;i<coordinates_neighbor[0].size();i++){
+        for(uint k=0;k<coordinates_neighbor[j].size();k++){
+          angles.push_back(aurostd::angle(coordinates_neighbor[0][i],coordinates_neighbor[j][k])*rad2deg);
+        }
+      }
+      angles_sets.push_back(angles);
+    }
+    return angles_sets;
+  }
+}
+
+// ***************************************************************************
+// compatible nearest neighbor environments
+// ***************************************************************************
+namespace compare{
+  bool compatibleNearestNeighborTypesEnvironments(const vector<vector<double> >& nn_lfa_with_types_1,
+      const vector<vector<double> >& nn_lfa_with_types_2,
+      int type_match){
+
+    // Determine if LFA nearest neighbor distances are compatible
+    // i.e., quick filter for determining if we can match atoms
+    // hinges on alphabetic, perhaps make more robust
+
+    bool VERBOSE=false;
+
+    if(VERBOSE){
+      for(uint i=0;i<nn_lfa_with_types_1.size();i++){
+        cerr <<"1 " << i << ": " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nn_lfa_with_types_1[i]),",") << endl;
+      } 
+      for(uint i=0;i<nn_lfa_with_types_2.size();i++){
+        cerr <<"2 " << i << ": " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(nn_lfa_with_types_2[i]),",") << endl;
+      } 
+    }
+
+    // ---------------------------------------------------------------------------
+    // if same species comparison
+    if(type_match==2){
+      if(nn_lfa_with_types_1.size()==nn_lfa_with_types_2.size()){
+        for(uint i=0;i<nn_lfa_with_types_1.size();i++){
+          bool matched_set=false;
+          for(uint j=0;j<nn_lfa_with_types_2.size();j++){
+            bool matched = true;
+            for(uint ii=0;ii<nn_lfa_with_types_1[i].size();ii++){
+              if(aurostd::abs(nn_lfa_with_types_1[i][ii]-nn_lfa_with_types_2[j][ii])/(nn_lfa_with_types_1[i][ii]+nn_lfa_with_types_2[j][ii])>0.1){ // less than 10% relative error
+                matched=false;
+                break;
+              }
+            }
+            if(matched){
+              matched_set=true;
+            }
+          }
+          if(!matched_set){
+            return false;
+          }
+        }
+      }
+      else{
+        // come back here to deal with comparing supercells
+        // for now, putting true and forcing comparison
+        return true;
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // if not same species
+    else{
+      // come back here later (this is a bit more complicated)
+      return true;
+    }
+
+    return true;
+  }
+}
+
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // get nearest neighbors 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   vector<AtomEnvironment> getUniqueTypesAtomEnvironmentForLFA(const xstructure& xstr, const string lfa, 
+// DX 20191122 [MOVED TO XATOM]       const vector<string>& LFAs){
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // Calculates the nearest neighbor distance to a particular atom
+// DX 20191122 [MOVED TO XATOM]     // hinges on alphabetic, perhaps make more robust
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     vector<AtomEnvironment> environments_LFA;
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     for(uint i=0;i<xstr.atoms.size();i++){
+// DX 20191122 [MOVED TO XATOM]       if(xstr.atoms[i].name == lfa){
+// DX 20191122 [MOVED TO XATOM]         AtomEnvironment LFA_env; 
+// DX 20191122 [MOVED TO XATOM]         LFA_env.element_center = xstr.atoms[i].name;
+// DX 20191122 [MOVED TO XATOM]         LFA_env.type_center = xstr.atoms[i].type;
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]         for(uint j=0;j<LFAs.size();j++){
+// DX 20191122 [MOVED TO XATOM]         //DX ORIG for(uint j=0;j<xstr.species.size();j++){
+// DX 20191122 [MOVED TO XATOM]           //if(xstr.species[j]!=lfa){
+// DX 20191122 [MOVED TO XATOM]             uint frequency = 0;
+// DX 20191122 [MOVED TO XATOM]             vector<xvector<double> > coordinates;
+// DX 20191122 [MOVED TO XATOM]             //DX ORIG LFA_env.elements_neighbor.push_back(xstr.species[j]);
+// DX 20191122 [MOVED TO XATOM]             LFA_env.elements_neighbor.push_back(LFAs[j]); //TEST 
+// DX 20191122 [MOVED TO XATOM]             LFA_env.types_neighbor.push_back(j);
+// DX 20191122 [MOVED TO XATOM]             //DX ORIG LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,xstr.species[j]));
+// DX 20191122 [MOVED TO XATOM]             LFA_env.distances_neighbor.push_back(shortestDistanceRestrictType(xstr,i,frequency,coordinates,LFAs[j])); //TEST
+// DX 20191122 [MOVED TO XATOM]             LFA_env.coordinations_neighbor.push_back(frequency);
+// DX 20191122 [MOVED TO XATOM]             LFA_env.coordinates_neighbor.push_back(coordinates);
+// DX 20191122 [MOVED TO XATOM]           //}
+// DX 20191122 [MOVED TO XATOM]         }
+// DX 20191122 [MOVED TO XATOM]         environments_LFA.push_back(LFA_env);
+// DX 20191122 [MOVED TO XATOM]       }
+// DX 20191122 [MOVED TO XATOM]     }
+// DX 20191122 [MOVED TO XATOM]     return environments_LFA;
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] // Shortest Distance from one atom
+// DX 20191122 [MOVED TO XATOM] // ***************************************************************************
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   double shortestDistanceRestrictType(const xstructure& xstr, const uint& k, string type) {
+// DX 20191122 [MOVED TO XATOM]     // Find the minimum interatomic distance from a central atom to 
+// DX 20191122 [MOVED TO XATOM]     // a particular element/type 
+// DX 20191122 [MOVED TO XATOM]     // (overload)
+// DX 20191122 [MOVED TO XATOM]     
+// DX 20191122 [MOVED TO XATOM]     uint frequency = 0;
+// DX 20191122 [MOVED TO XATOM]     vector<xvector<double> > coordinates;
+// DX 20191122 [MOVED TO XATOM]     return shortestDistanceRestrictType(xstr,k,frequency,coordinates,type);
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM] namespace compare{
+// DX 20191122 [MOVED TO XATOM]   double shortestDistanceRestrictType(const xstructure& xstr, const uint& k, 
+// DX 20191122 [MOVED TO XATOM]       uint& frequency, vector<xvector<double> >& coordinates, string type) {
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // Find the minimum interatomic distance from a central atom to 
+// DX 20191122 [MOVED TO XATOM]     // a particular element/type and store frequency/coordination and coordinates
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     // ---------------------------------------------------------------------------
+// DX 20191122 [MOVED TO XATOM]     // instantiate variables
+// DX 20191122 [MOVED TO XATOM]     double min_dist=1e9;
+// DX 20191122 [MOVED TO XATOM]     minimumCoordinationShell(xstr, k, min_dist, frequency, coordinates, type);
+// DX 20191122 [MOVED TO XATOM] 
+// DX 20191122 [MOVED TO XATOM]     return min_dist;
+// DX 20191122 [MOVED TO XATOM]   }
+// DX 20191122 [MOVED TO XATOM] }
 
 // ***************************************************************************
 // Compute nearest neighbors 
@@ -5005,52 +6791,51 @@ namespace compare{
 namespace compare{
   double shortestDistance(const xstructure& xstr, const uint& k) {
 
-    // Find the minimum interatomic distance in the structure 
+    // Find the minimum interatomic distance in the structure to atom k
+    // (perhaps integrate with SYM::minimumDistance())
 
-    //double min;
     double min_dist=1e9;
+    double prev_min_dist=0; //DX 20190716
     xmatrix<double> lattice = xstr.lattice; //NEW
 
     //DX speed increase
     //perhaps can speed up even more, since the lattice doesn't change for the xstr...
     vector<xvector<double> > l1, l2, l3;
     vector<int> a_index, b_index, c_index;
-    l1.clear(); l2.clear(); l3.clear();
-    a_index.clear(); b_index.clear(); c_index.clear();
-    for(int a=-2;a<=2;a++){l1.push_back(a*lattice(1));a_index.push_back(a);} //DX calc once and store, faster
-    for(int b=-2;b<=2;b++){l2.push_back(b*lattice(2));b_index.push_back(b);} //DX calc once and store, faster
-    for(int c=-2;c<=2;c++){l3.push_back(c*lattice(3));c_index.push_back(c);} //DX calc once and store, faster
+    xvector<int> dims(3); //DX 20190710 - use robust method
+    dims[1]=dims[2]=dims[3]=0; //reset
     
-    xvector<double> tmp;
+    xvector<double> tmp_coord;
 
     for(uint ii=0; ii<xstr.atoms.size(); ii++){
       if(ii!=k){
+        if(min_dist<prev_min_dist){
+          if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+            resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+            prev_min_dist=min_dist;
+          }
+        }
         xvector<double> incell_dist = xstr.atoms[k].cpos-xstr.atoms[ii].cpos;
+        double incell_mod = aurostd::modulus(incell_dist);
+        if(incell_mod<min_dist){
+          if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+            resetLatticeDimensions(lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+          }
+          prev_min_dist=incell_mod;
+        }
         //DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
         for(uint m=0;m<l1.size();m++){
           xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
           for(uint n=0;n<l2.size();n++){
             xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
             for(uint p=0;p<l3.size();p++){
-              tmp = ab_component + l3[p];                       // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
-              min_dist=aurostd::min(min_dist,aurostd::modulus(tmp));
+              tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+              min_dist=aurostd::min(min_dist,aurostd::modulus(tmp_coord));
             }
           }
         }
       }
     }
-    //DX 20190226 [OBSOLETE - SLOWER] for(uint ii=0; ii<xstr.atoms.size(); ii++){
-    //DX 20190226 [OBSOLETE - SLOWER]   if(ii!=k){
-	  //DX 20190226 [OBSOLETE - SLOWER]     for(int a=-2;a<=2;a++){
-	  //DX 20190226 [OBSOLETE - SLOWER]       for(int b=-2;b<=2;b++){
-	  //DX 20190226 [OBSOLETE - SLOWER]         for(int c=-2;c<=2;c++){
-    //DX 20190226 [OBSOLETE - SLOWER]           double tmp = aurostd::modulus(xstr.atoms[k].cpos-xstr.atoms[ii].cpos+a*lattice(1)+b*lattice(2)+c*lattice(3));
-	  //DX 20190226 [OBSOLETE - SLOWER]           min_dist=aurostd::min(min_dist,tmp);
-	  //DX 20190226 [OBSOLETE - SLOWER]         }
-	  //DX 20190226 [OBSOLETE - SLOWER]       }
-	  //DX 20190226 [OBSOLETE - SLOWER]     }      
-    //DX 20190226 [OBSOLETE - SLOWER]   }
-    //DX 20190226 [OBSOLETE - SLOWER] }
 
     return min_dist;
   }
@@ -5079,15 +6864,6 @@ namespace compare{
       nn1 = all_nn1[indexMatch1[j]];
       nn2 = all_nn_proto[indexMatch2[j]];
       dd = min_dists[j];
-//      dd=1e9;
-//      // Need to find the min distance; thus check distance between neighboring cells to find true minimum.
-//      for(int a=-2;a<=2;a++){
-//	for(int b=-2;b<=2;b++){
-//	  for(int c=-2;c<=2;c++){
-//	    dd=aurostd::min(dd,modulus(xstr1.atoms.at(indexMatch1[j]).cpos-xstr2.atoms.at(indexMatch2[j]).cpos+a*klattice(1)+b*klattice(2)+c*klattice(3)));
-//	  }
-//	}
-//      }
 
       //DX [OBSOLETE] if(dd<=0.5*nn1) fail1=0;
       //DX [OBSOLETE] if(dd>0.5*nn1) fail1=1;
@@ -5100,12 +6876,12 @@ namespace compare{
       else { fail2=1; }
 
       if(fail1==0){
-	num=num+dd;
-	den=den+nn1;
+        num=num+dd;
+        den=den+nn1;
       }   
       if(fail2==0){
-	num=num+dd;
-	den=den+nn2;
+        num=num+dd;
+        den=den+nn2;
       }   
       if(fail1==1) nfail++;
       if(fail2==1) nfail++;
@@ -5119,28 +6895,111 @@ namespace compare{
     for(uint i=0; i<xstr1.atoms.size();i++){
       flag=0;
       for(uint k=0; k<indexMatch1.size();k++){
-	if(i==indexMatch1[k]){
-	  flag=1;
-	}
+        if(i==indexMatch1[k]){
+          flag=1;
+        }
       }
       if(flag==0){	//Meaning this atom does not have a match; increase the figure of failure
-	nfail++;
+        nfail++;
       }
     }
     for(uint i=0; i<xstr2.atoms.size();i++){
       flag=0;
       for(uint k=0; k<indexMatch2.size();k++){
-	if(i==indexMatch2[k]){
-	  flag=1;
-	}
+        if(i==indexMatch2[k]){
+          flag=1;
+        }
       }
       if(flag==0){        //Meaning this atom does not have a match; increase the figure of failure
-	nfail++;
+        nfail++;
       }
     }
     
     fail_figure=(nfail/(xstr1.atoms.size()+xstr2.atoms.size()));
   }   
+}
+
+// ***************************************************************************
+// Magnetic Deviation (beta)
+// ***************************************************************************
+namespace compare{
+  void magneticDeviation(const xstructure& xstr1, const xstructure& xstr2, 
+		const vector<uint>& indexMatch1, const vector<uint>& indexMatch2,
+    double& magnetic_deviation, double& magnetic_fail) {
+
+    // BETA functionality: Determine magnetic deviation between magnetic structures
+    double _NON_COLLINEAR_ANGLE_DEGREE_TOL_ = 10.0;
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::magneticDeviation()";
+    double magmom_num = 0.0;
+    double magmom_den = 0.0;
+    uint mag_fail_1 = 0, mag_fail_2 = 0;
+    bool is_non_collinear = xstr1.atoms[0].noncoll_spin_is_given;
+        
+    if(LDEBUG){
+      cerr << function_name << " is_non_collinear = " << is_non_collinear << endl;
+    }
+
+    for(uint j=0; j<indexMatch1.size(); j++){
+      
+      // ---------------------------------------------------------------------------
+      // collinear 
+      if(!is_non_collinear){
+        double magmom_diff = aurostd::abs(xstr1.atoms[indexMatch1[j]].spin-xstr2.atoms[indexMatch2[j]].spin);
+        if(magmom_diff>1e-6){ //to account for -0.0 vs 0.0
+          if(std::signbit(xstr1.atoms[indexMatch1[j]].spin) == std::signbit(xstr2.atoms[indexMatch2[j]].spin)){
+            magmom_num += magmom_diff; 
+            magmom_den += aurostd::abs(xstr1.atoms[indexMatch1[j]].spin)+aurostd::abs(xstr2.atoms[indexMatch2[j]].spin);
+          }
+          else{
+            mag_fail_1++;
+            mag_fail_2++;
+          }
+        }
+        else{
+          magmom_num += magmom_diff; 
+          magmom_den += aurostd::abs(xstr1.atoms[indexMatch1[j]].spin)+aurostd::abs(xstr2.atoms[indexMatch2[j]].spin);
+        }
+        if(LDEBUG){
+          cerr << function_name << " matching xstr1 (" << indexMatch1[j] << ") mag=" << xstr1.atoms[indexMatch1[j]].spin << " to xstr2 (" << indexMatch2[j] << ") mag=" << xstr2.atoms[indexMatch2[j]].spin << endl;
+          cerr << function_name << " magmom_diff: " << magmom_diff << endl; 
+          cerr << function_name << " spin structure 1 (signbit): " << std::signbit(xstr1.atoms[indexMatch1[j]].spin) << endl;
+          cerr << function_name << " spin structure 2 (signbit): " << std::signbit(xstr2.atoms[indexMatch2[j]].spin) << endl;
+        }
+
+      }
+
+      // ---------------------------------------------------------------------------
+      // non-collinear 
+      else if(is_non_collinear){
+        double magmom_diff = aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin-xstr2.atoms[indexMatch2[j]].noncoll_spin);
+        double angle_between_non_collinear_spins = rad2deg*aurostd::angle(xstr1.atoms[indexMatch1[j]].noncoll_spin,xstr2.atoms[indexMatch2[j]].noncoll_spin);
+        if(magmom_diff>1e-6){ //to account for -0.0 vs 0.0
+          if(angle_between_non_collinear_spins<=_NON_COLLINEAR_ANGLE_DEGREE_TOL_){
+            magmom_num += magmom_diff; 
+            magmom_den += aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin)+aurostd::modulus(xstr2.atoms[indexMatch2[j]].noncoll_spin);
+          }
+          else{
+            mag_fail_1++;
+            mag_fail_2++;
+          }
+        }
+        else{
+          magmom_num += magmom_diff; 
+          magmom_den += aurostd::modulus(xstr1.atoms[indexMatch1[j]].noncoll_spin)+aurostd::modulus(xstr2.atoms[indexMatch2[j]].noncoll_spin);
+        }
+        if(LDEBUG){
+          cerr << function_name << " matching xstr1 (" << indexMatch1[j] << ") mag=" << xstr1.atoms[indexMatch1[j]].noncoll_spin << " to xstr2 (" << indexMatch2[j] << ") mag=" << xstr2.atoms[indexMatch2[j]].noncoll_spin << endl;
+          cerr << function_name << " magmom_diff: " << magmom_diff << endl; 
+          cerr << function_name << " angle between two structures " << angle_between_non_collinear_spins << endl;
+        }
+      }
+    }
+
+    magnetic_deviation = magmom_num/magmom_den;
+    magnetic_fail = (double)(mag_fail_1+mag_fail_2)/(double)(xstr1.atoms.size()+xstr2.atoms.size());
+  }
 }
 
 // ***************************************************************************
@@ -5160,11 +7019,31 @@ namespace compare{
 }
 
 // ***************************************************************************
+// Compute Magnetic Misfit (beta)
+// ***************************************************************************
+namespace compare{
+  double computeMagneticMisfit(const double dev, const double dis, const double fail, const double mag_dis, const double mag_fail) {
+
+    // Combines differences between all aspects of crystal structure into a 
+    // figure of misfit. (See Burzlaff)
+    // It also adds in a new magnetic contribution (created by us), in the 
+    // same spirit as the Burzlaff criteria
+    // BETA FUNCTIONALITY
+
+    double mis;
+
+    mis=1-((1-dev)*(1-dis)*(1-fail)*(1-mag_dis)*(1-mag_fail));
+    return mis;
+  }   
+}
+
+// ***************************************************************************
 // Print Matching Between Atoms
 // ***************************************************************************
 namespace compare{
   void printMatch(const vector<uint>& indexMatch1, const vector<uint>& indexMatch2, 
-		  const xstructure& PROTO, const xstructure& xstr1, ostream& oss) {
+      const vector<double>& distances,
+      const xstructure& PROTO, const xstructure& xstr1, ostream& oss) { //DX 20190802 - added distances
 
     // With this function we print the atoms matched in the previous function
     // whose indices are stored in the indexMatch vector.
@@ -5173,12 +7052,14 @@ namespace compare{
 
     uint i,j;
 
-    oss << "              Reference                               Mapped"<<endl;
+    oss << "              Reference                               Mapped                               Distances"<<endl;
     for(j=0; j< indexMatch1.size(); j++){
       oss << indexMatch1[j]<<"-"<<indexMatch2[j]<<"    ";
       oss << xstr1.atoms[indexMatch1[j]].cpos << " " << xstr1.atoms[indexMatch1[j]].name;
       oss << "       ";
-      oss << PROTO.atoms[indexMatch2[j]].cpos << " " << PROTO.atoms[indexMatch2[j]].name << endl;
+      oss << PROTO.atoms[indexMatch2[j]].cpos << " " << PROTO.atoms[indexMatch2[j]].name;
+      oss << "       ";
+      oss << distances[j] << endl; //DX 20190802
     }
 
     int flag=0;
@@ -5188,11 +7069,11 @@ namespace compare{
     for(j=0; j<xstr1.atoms.size(); j++){
       flag=0;
       for(i=0; i<indexMatch1.size(); i++){
-	if(j==indexMatch1[i])
-	  flag=1;
+        if(j==indexMatch1[i])
+          flag=1;
       }
       if(flag==0){
-	oss << "# "<< j << "   " << xstr1.atoms[j].cpos << "   " << xstr1.atoms[j].name << endl;
+        oss << "# "<< j << "   " << xstr1.atoms[j].cpos << "   " << xstr1.atoms[j].name << endl;
       }
     }
 
@@ -5200,7 +7081,7 @@ namespace compare{
     for(j=0; j<PROTO.atoms.size(); j++){
       flag=0;
       for(i=0; i<indexMatch2.size(); i++){
-	if(indexMatch2[i]==j) flag=1;
+        if(indexMatch2[i]==j) flag=1;
       }
       if(flag==0) oss << "# "<< j << "   " << PROTO.atoms[j].cpos << "   " << PROTO.atoms[j].name << endl;
     }
@@ -5219,15 +7100,36 @@ namespace compare{
     double tol=1e-6;
     for(uint i=1;i<4;i++){
       if(coord(i)<-tol){
-	coord(i)+=1.0;
+        coord(i)+=1.0;
       }
       else if(coord(i)>=1.0-tol){
-	coord(i)-=1.0;
+        coord(i)-=1.0;
       }
     }
     return coord;
   }
 }
+
+// ***************************************************************************
+// atomInCell() 
+// ***************************************************************************
+//DX 20191125 [OBSOLETE - MOVED TO XATOM] namespace compare{
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]   bool atomInCell(const _atom& atom){ 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM] 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // check if the atom is in the unit cell based on fractional coordinates
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // this alone is not robust; this should be used in tandem with 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // SYM::MapAtom() to account for periodic boundary conditions
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // filtering with this first with soft cutoffs is much faster, 
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     // especially if there are many atoms to check (e.g., 20,000)
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     for(uint f=1;f<4;f++){
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]       if(atom.fpos[f] > 1.05 || atom.fpos[f] < -0.05){ //soft cutoff, use hard cutoff later
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]         return false;
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]       }
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     }
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]     return true;
+//DX 20191125 [OBSOLETE - MOVED TO XATOM]   }
+//DX 20191125 [OBSOLETE - MOVED TO XATOM] }
 
 // ***************************************************************************
 // Determine if vector is Periodic
@@ -5247,25 +7149,26 @@ namespace compare{
     deque<_atom> atoms = lfa_supercell.atoms;
     xmatrix<double> lattice = lfa_supercell.lattice;
     xmatrix<double> f2c = trasp(lattice);
-    //DX 20190619 [OBSOLETE] xmatrix<double> c2f = inverse(trasp(lattice));
+    //DX 20190619 xmatrix<double> c2f = inverse(trasp(lattice));
     bool skew = false;
 
-    vector<int> ind(2); ind[0]=i, ind[1]=j;
-    xvector<double> tmp;
+    //vector<int> ind(2); ind[0]=i, ind[1]=j;
+    //xvector<double> tmp;
 
     uint count=0;
-    deque<_atom> transformed;
-    deque<uint> index_to_check;
+    //deque<_atom> transformed;
+    //deque<uint> index_to_check;
 
     // ===== Check if applying the symmetry element along with internal translation maps to another atom ===== //
     for(uint d=0;d<atoms.size();d++){
-      _atom tmp;
-      tmp.type = atoms[d].type;
-      tmp.cpos = atoms[d].cpos+vec;
-      tmp.fpos = C2F(lattice,tmp.cpos);
-      if(SYM::MapAtom(atoms,tmp,true,lattice,f2c,skew,tolerance)){ //DX 20190619 - lattice and f2c as input
-        transformed.push_back(tmp);
-        index_to_check.push_back(d);
+      //DX 20190702 - no name information: _atom tmp;
+      //DX 20190702 - use assignment op to get type - tmp.type = atoms[d].type;
+      _atom tmp_atom = atoms[d]; //copy names, types, etc. //DX 20190702
+      tmp_atom.cpos = atoms[d].cpos+vec;
+      tmp_atom.fpos = C2F(lattice,tmp_atom.cpos);
+      if(SYM::MapAtom(atoms,tmp_atom,true,lattice,f2c,skew,tolerance)){ //DX 20190619 - removed c2f
+        //transformed.push_back(tmp);
+        //index_to_check.push_back(d);
         count++;
       }
       else {
@@ -5296,37 +7199,37 @@ namespace compare{
     vector<int> ind(4); ind[0]=i, ind[1]=j; ind[2]=k; ind[3]=w;
     vector<xvector<double> > latt_vecs(3); 
     latt_vecs[0]=quad(1); latt_vecs[1]=quad(2); latt_vecs[2]=quad(3);
-    xvector<double> tmp;
+    xvector<double> tmp_coord;
 
     for(uint b=0; b<ind.size();b++){
       for(uint c=0;c<latt_vecs.size();c++){
-	tmp=lfa_supercell.atoms.at(ind[b]).cpos+latt_vecs[c];
-	bool match_found=false;
-	for(uint d=0;d<lfa_supercell.atoms.size();d++){
-	  if(abs(lfa_supercell.atoms.at(d).cpos(1)-tmp(1))<0.01 && 
-	     abs(lfa_supercell.atoms.at(d).cpos(2)-tmp(2))<0.01 && 
-	     abs(lfa_supercell.atoms.at(d).cpos(3)-tmp(3))<0.01){ // Less than hundredth of Angstrom?
-	    match_found=true;
-	    break;
-	  }
-	}
-	if(match_found==false){
-	  xvector<double> tmp_frac=C2F(lfa_supercell.lattice,tmp);
-	  tmp_frac=bringCoordinateInCell(tmp_frac);
-	  xstructure lfa_supercell_tmp = lfa_supercell;
-	  for(uint f=0;f<lfa_supercell_tmp.atoms.size();f++){
-	    lfa_supercell_tmp.atoms.at(f).fpos=C2F(lfa_supercell_tmp.lattice,lfa_supercell_tmp.atoms.at(f).cpos);
-	    if(abs(lfa_supercell_tmp.atoms.at(f).fpos(1)-tmp_frac(1))<0.01 && 
-	       abs(lfa_supercell_tmp.atoms.at(f).fpos(2)-tmp_frac(2))<0.01 && 
-	       abs(lfa_supercell_tmp.atoms.at(f).fpos(3)-tmp_frac(3))<0.01){
-	      match_found=true;
-	      break;
-	    }
-	  }
-	  if(match_found==false){
-	    return false;
-	  }
-	}
+        tmp_coord=lfa_supercell.atoms.at(ind[b]).cpos+latt_vecs[c];
+        bool match_found=false;
+        for(uint d=0;d<lfa_supercell.atoms.size();d++){
+          if(abs(lfa_supercell.atoms.at(d).cpos(1)-tmp_coord(1))<0.01 && 
+              abs(lfa_supercell.atoms.at(d).cpos(2)-tmp_coord(2))<0.01 && 
+              abs(lfa_supercell.atoms.at(d).cpos(3)-tmp_coord(3))<0.01){ // Less than hundredth of Angstrom?
+            match_found=true;
+            break;
+          }
+        }
+        if(match_found==false){
+          xvector<double> tmp_coord_frac=C2F(lfa_supercell.lattice,tmp_coord);
+          tmp_coord_frac=bringCoordinateInCell(tmp_coord_frac);
+          xstructure lfa_supercell_tmp = lfa_supercell;
+          for(uint f=0;f<lfa_supercell_tmp.atoms.size();f++){
+            lfa_supercell_tmp.atoms.at(f).fpos=C2F(lfa_supercell_tmp.lattice,lfa_supercell_tmp.atoms.at(f).cpos);
+            if(abs(lfa_supercell_tmp.atoms.at(f).fpos(1)-tmp_coord_frac(1))<0.01 && 
+                abs(lfa_supercell_tmp.atoms.at(f).fpos(2)-tmp_coord_frac(2))<0.01 && 
+                abs(lfa_supercell_tmp.atoms.at(f).fpos(3)-tmp_coord_frac(3))<0.01){
+              match_found=true;
+              break;
+            }
+          }
+          if(match_found==false){
+            return false;
+          }
+        }
       }
     }
     return true;
@@ -5334,271 +7237,824 @@ namespace compare{
 }
 
 // ***************************************************************************
-// Thread Generation (For parallel processing of quadruplets)
+// GetLFASupercell
 // ***************************************************************************
 namespace compare{
-  void threadGeneration(const uint& num_proc,xmatrix<double>& q1, xstructure& xstr2, 
-			vector<xstructure> &vprotos, xstructure &xstr1, const int& type_match, 
-			const bool& optimize_match, double& minMis, ostream& oss){ 
+  xstructure GetLFASupercell(const xstructure& xstr, const xvector<int>& dims, const string& lfa_name){
 
-    // This function creates the supercell of the second structure and begins 
-    // the quadruplets search within a supercell. Due to the costly nature of 
-    // this algorithm, the quadruplet search is parallelized. The splitting 
-    // of computation of done here
+    // build a supercell comprised only of LFA atoms
+    // to speed up translation vector search
 
-    bool LDEBUG=(false || XHOST.DEBUG);
-    bool test_one_lfa_only = false; //DX 20190318
-    if(type_match==2){ test_one_lfa_only=true;} //DX 20190318
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::GetLFASupercell()";
 
+    // ---------------------------------------------------------------------------
+    // remove all atoms that are not of the LFA type 
+    xstructure xstr_LFA_only=xstr;
+    xstr_LFA_only.ClearSymmetry(); //DX 20181022
+    uint num_atoms=xstr_LFA_only.atoms.size();
+    for(uint i=0;i<num_atoms;i++){
+	    if(xstr_LFA_only.atoms[i].name!=lfa_name){
+	      xstr_LFA_only.RemoveAtom(i);
+	      num_atoms--;
+	      i--;
+	    }
+    }
 
-    xstructure xstr1_tmp = xstr1;
-
-    //cerr << "LFA" << endl;
-    vector<string> LFA_str1=leastFrequentAtom2(xstr1);
-    vector<string> LFA_str2=leastFrequentAtom2(xstr2);
-    string lfa, lfa_str1;
-
-    //cerr << "SUPERCELL" << endl;
-    //DX 20190319 - START
-    vector<int> sc2pcMap, pc2scMap;
-    bool get_symmetry=false;
-    bool get_full_basis=false;
-    bool force_supercell_matrix=true;
-    xstructure xstr=GetSuperCell(xstr2,3,0,0,0,3,0,0,0,3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix); //DX 20190319 - use supercell matrix in expansion
-
-    uint y=0;
-    uint x=0;
-
-    // DX TEST
-    // Consider all LFAs
-    for(y=0;y<LFA_str2.size();y++){
-    for(x=0;x<LFA_str1.size();x++){
-    // DX TEST
-      lfa_str1=LFA_str1[x];
-      lfa=LFA_str2[y];
-      if(type_match == 2 && lfa_str1 != lfa){
-        continue;
+    // ---------------------------------------------------------------------------
+    // shift an LFA atom to origin
+    for(uint a=0;a<xstr_LFA_only.atoms.size();a++){
+      if(xstr_LFA_only.atoms[a].name == lfa_name){
+        xstr_LFA_only.ShifOriginToAtom(a);
+        break;
       }
-      oss << "===> LFA: "<<lfa<<endl;
+    }
 
-      if(LDEBUG) {
-        cerr << "===> LFA_1: " << lfa_str1 <<endl;
-        cerr << "===> LFA: "<<lfa<<endl;
-      }
+    // ---------------------------------------------------------------------------
+    // create supercell (fast) 
+    //DX [OBSOLETE] vector<int> sc2pcMap, pc2scMap;
+    //DX [OBSOLETE] bool get_symmetry=false;
+    //DX [OBSOLETE] bool get_full_basis=false;
+    //DX [OBSOLETE] bool force_supercell_matrix=true;
+    //DX [OBSOLETE] xstructure xstr_LFA_supercell=GetSuperCell(xstr_LFA_only,3,0,0,0,3,0,0,0,3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix); //DX 20190319 - use supercell matrix in expansion
+
+    // ---------------------------------------------------------------------------
+    // create supercell (fast/robust)
+    xstructure xstr_LFA_supercell=xstr_LFA_only;
+    GenerateGridAtoms(xstr_LFA_supercell,dims(1),dims(2),dims(3));
+
+    // ---------------------------------------------------------------------------
+    // update atoms
+    xstr_LFA_supercell.atoms = xstr_LFA_supercell.grid_atoms;
+    xstr_LFA_supercell.grid_atoms.clear();
+	  //xstr_LFA_supercell = pflow::SetNumEachType(xstr_LFA_supercell, sizes);
+
+	  if(LDEBUG){cerr << function_name << ": Number of LFAs in supercell: " << xstr_LFA_supercell.atoms.size() << endl;}
       
-      // DX NEW so we don't need to do this in an inner loop
-      for(uint a=0;a<xstr.atoms.size();a++){
-        if(xstr.atoms[a].name == lfa){
-          xstr.ShifOriginToAtom(a);
-          break;
-        }
-      }
-      // DX NEW
+    return xstr_LFA_supercell;
+  }
+}
 
-      //cerr << "xstr1 centroid: " << endl;
+// ***************************************************************************
+// latticeAndOriginSearch
+// ***************************************************************************
+namespace compare{
+  void latticeAndOriginSearch(xstructure& xstr1, xstructure& xstr2, 
+    const uint& num_proc,xmatrix<double>& q1, vector<xstructure> &vprotos, 
+    structure_misfit& min_misfit_info,
+    int type_match, bool optimize_match, ostream& oss){
 
-      //cerr << "SHIFT" << endl;
-      // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
-      for(uint i=0;i<xstr1_tmp.atoms.size();i++){
-        if(xstr1_tmp.atoms[i].name==lfa_str1){
-          xstr1_tmp.ShifOriginToAtom(i);
-          xstr1_tmp.BringInCell(1e-10);
-          break;
-        }
-      }
+    // Performs lattice and origin search
 
-      // NEED TO SHIFT origin of xstr2 to one of the LFA
-      for(uint i=0;i<xstr2.atoms.size();i++){
-        if(xstr2.atoms[i].name==lfa){
-          xstr2.ShifOriginToAtom(i);
-          xstr2.BringInCell(1e-10);
-          break;
-        }
-      }
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::latticeAndOriginSearch()";
 
-      // When checking the quadruplets/lattice, we only need to generate a 
-      // LFA supercell (i.e. take out the other atoms).  This greatly reduces 
-      // the time of computation (don't need to scan through unnecessary atoms) 
-      xstructure xstr_LFA_only=xstr2;
-      xstr_LFA_only.ClearSymmetry(); //DX 20181022
-      uint num_atoms=xstr_LFA_only.atoms.size();
-      for(uint i=0;i<num_atoms;i++){
-	if(xstr_LFA_only.atoms[i].name!=lfa){
-	  xstr_LFA_only.RemoveAtom(i);
-	  num_atoms--;
-	  i--;
-	}
-      }
-      //cerr << "LFA SUPERELL" << endl;
-      xstructure xstr_LFA_supercell=GetSuperCell(xstr_LFA_only,3,0,0,0,3,0,0,0,3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix); //DX 20190319 - use supercell matrix in expansion
-      //cerr << "created LFA supercell" << endl;
-      // Determines the number of LFAs in the supercell.
-      int num_LFAs=-1; //-1 as default value 
-      for(uint q=0; q<xstr.num_each_type.size();q++){
-	if(xstr.species[q] == lfa){ 
-	  num_LFAs= xstr.num_each_type[q];
-	  if(LDEBUG) {cerr << "compare:: " << "Number of LFAs in supercell: " << xstr.species[q] << "= " << num_LFAs << endl;}
-	}
-      }
+    bool test_one_lfa_only = false; //DX 20190318
+    //DX - SPEED UP BUT NOT ROBUST - if(type_match==2){ test_one_lfa_only=true;} //DX 20190318
 
-      // === THREAD PREPARATION FOR PARALLEL PROCESSING OF QUADRUPLET SEARCH === //
+    bool magnetic_analysis = (xstr1.atoms[0].spin_is_given || xstr1.atoms[0].noncoll_spin_is_given);
+    min_misfit_info.is_magnetic_misfit=(magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_); //DX 20191218
+    vector<uint> matching_indices_1, matching_indices_2;
+    vector<double> minimum_distances;
 
-      // DECLARATION OF ATOMIC BOOL SECTION: Allows the threads to communicate. 
-      // This is useful for stopping the threads if the misfit falls below
-      // the compatible misfit criterion (mis<0.1) in any of the threads. 
-      // [OBSOLETE] std::atomic_bool misfit_in_threshold_found (false);
+    // ---------------------------------------------------------------------------
+    // determine least-frequently occuring atom type (LFA) for each structure
+    // (there may be more than one)
+    vector<string> LFA_str1=getLeastFrequentAtomSpecies(xstr1);
+    vector<string> LFA_str2=getLeastFrequentAtomSpecies(xstr2);
+    string lfa_str1=LFA_str1[0]; //initialize
+    string lfa_str2=LFA_str2[0]; //initialize
 
-      //[NONTHREADS]bool misfit_in_threshold_found=false;
+    double abs_det_q1=abs(det(q1)); // volume
+    xvector<double> abc_angles_q1=Getabc_angles(q1,DEGREES); // lattice parameters
    
-      vector<xstructure> xstr1_for_thread;
-      vector<double> possible_minMis;
-      vector<vector<xstructure> > vvprotos;
-      //vector<std::thread> threads;
-      //DX NEW - used to be done in one of the inner loops in structureSearch 
+    // ---------------------------------------------------------------------------
+    // determine supercell size via search radius/dims
+    double search_radius = aurostd::max(abc_angles_q1(1),abc_angles_q1(2),abc_angles_q1(3));
+    xvector<int> dims = LatticeDimensionSphere(xstr2.lattice,search_radius);
 
-      // compute xstr1 information once only (perhaps we can use this in the directory scheme!!!!!!!! 
-      // and really only calculate once; but not that expensive, may be more expensive to store --memory!)
+    if(LDEBUG){cerr << function_name << ": lattice search radius: " << search_radius << endl;}
+    if(LDEBUG){cerr << function_name << ": lattice dims : " << dims << endl;}
+
+    // ---------------------------------------------------------------------------
+    // peform supercell expansion on LFA atoms in structure2 
+    xstructure xstr_LFA_supercell = compare::GetLFASupercell(xstr2, dims, lfa_str2);
+   
+    // ---------------------------------------------------------------------------
+    // find possible translation vectors 
+    vector<xvector<double> > translation_vectors;
+    vector<vector<uint> > ij_index;
+	  quadrupletSearch(q1,xstr_LFA_supercell,xstr2,translation_vectors,ij_index); //DX 20190701 - added xstr2
+
+    // ---------------------------------------------------------------------------
+    // build possible lattices
+    vector<xmatrix<double> > lattices;
+    vector<xmatrix<double> > clattices;
+    vector<double> latt_devs;
+    buildSimilarLattices(translation_vectors, q1, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match);
+    if(LDEBUG){cerr << function_name << ": Number of lattices to compare: " << lattices.size() << endl;}
+      
+    if(lattices.size()>0){
+    
+      xstructure xstr1_tmp = xstr1;
+      // ---------------------------------------------------------------------------
+      // calculate attributes of structure 1 (volume, lattice parameters, nearest neighbor distances, etc.)
       vector<double> D1,F1;
-      cellDiagonal(xstr1_tmp,D1,F1,1);
+      cellDiagonal(xstr1_tmp,D1,F1,1); // cell diagonals
+      // convert to clattice representation
       xstr1_tmp.lattice=GetClat(xstr1_tmp.a,xstr1_tmp.b,xstr1_tmp.c,xstr1_tmp.alpha,xstr1_tmp.beta,xstr1_tmp.gamma);
       for(uint iat=0; iat<xstr1_tmp.atoms.size(); iat++){
         xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos);
       }
-      vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp);
-      // DX NEW
-      //for(uint n=0; n<num_proc; n++){
-	    //  vector<xstructure> vprotos_tmp;
-	    //  vvprotos.push_back(vprotos_tmp);
-	    //  xstr1_for_thread.push_back(xstr1_tmp);
-	    //  possible_minMis.push_back(1.0);
-      //}
+      vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp); // nearest neighbor distances (invariant of origin shifts) 
       
-      vector<xmatrix<double> > lattices;
-      vector<xmatrix<double> > clattices;
-      vector<vector<uint> > ij_index;
-      vector<double> latt_devs;
+      // ---------------------------------------------------------------------------
+      // peform expansion on structure2
+      // wait until we confirm there are similar lattices, otherwise we build it for nothing (i.e. unnecessary cost)
+      xstructure xstr_supercell=xstr2;
+      GenerateGridAtoms(xstr_supercell,dims(1),dims(2),dims(3));
 
-      //vector<std::thread> threads0;
-      vector<xvector<double> > translation_vectors;
-	    quadrupletSearch(q1,xstr_LFA_supercell,translation_vectors,ij_index);
-      //cerr << "FINDING TRANSLATION VECTORS: " << endl;
-      double abs_det_q1=abs(det(q1));
-      xvector<double> abc_angles_q1=Getabc_angles(q1,DEGREES);
+      // ---------------------------------------------------------------------------
+      // update atoms
+      xstr_supercell.atoms = xstr_supercell.grid_atoms;
+      xstr_supercell.grid_atoms.clear();
 
-      buildSimilarLattices(translation_vectors, q1, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match);
-      if(LDEBUG) {cerr << "pflow::threadGeneration: Number of lattices to compare: " << lattices.size() << endl;}
-
-      if(lattices.size()>0){
-  for(uint n=0; n<num_proc; n++){
-	  vector<xstructure> vprotos_tmp;
-	  vvprotos.push_back(vprotos_tmp);
-	  xstr1_for_thread.push_back(xstr1_tmp);
-	  possible_minMis.push_back(1.0);
-  }
 #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
-	vector<std::thread> threads1;
-	vector<vector<xmatrix<double> > > lattices_split;
-	vector<vector<xmatrix<double> > > clattices_split;
-	vector<vector<double> > latt_devs_split;
-	uint num_per_thread = lattices.size()/num_proc;
-	uint residual = lattices.size()%num_proc;
-	bool accounted_for_residual=false;
-	if(residual!=0){
-	  num_per_thread+=1;
-	}
-	uint count = 0;
-	uint thread_count = 0;
-	vector<xmatrix<double> > latt_tmp, clatt_tmp;
-	vector<double> tmp_dev;
-	for(uint l=0; l<lattices.size(); l++){
-	  latt_tmp.push_back(lattices[l]); clatt_tmp.push_back(clattices[l]); tmp_dev.push_back(latt_devs[l]);
-	  count+=1;
-	  if(count == num_per_thread && thread_count<num_proc-1){
-	    thread_count+=1;
-	    lattices_split.push_back(latt_tmp);
-	    clattices_split.push_back(clatt_tmp);
-	    latt_devs_split.push_back(tmp_dev);
-	    latt_tmp.clear(); clatt_tmp.clear(); tmp_dev.clear();
-	    count = 0;
-	  }
-	  else if(thread_count==num_proc-1 && l==lattices.size()-1){
-	    thread_count+=1;
-	    lattices_split.push_back(latt_tmp);
-	    clattices_split.push_back(clatt_tmp);
-	    latt_devs_split.push_back(tmp_dev);
-	    latt_tmp.clear(); clatt_tmp.clear(); tmp_dev.clear();
-	    count = 0;
-	  }
-	  if(!accounted_for_residual && residual!=0 && thread_count==residual){
-	    accounted_for_residual=true;
-	    num_per_thread=num_per_thread-1;
-	  }
-	}
-	uint recovered=0;
-	//Need the following safety in case the number of threads is greater than the number of lattices to test
-	uint num_of_threads=0;
-	if(lattices_split.size()>=num_proc){
-	  num_of_threads=num_proc;
-	}
-	else if(lattices_split.size()<num_proc){
-	  num_of_threads=lattices_split.size();
-	}
-	for(uint n=0; n<num_of_threads; n++){
-	  for(uint h=0;h<lattices_split[n].size();h++){
-	    recovered+=1;
-	    //cerr << "recovered: " << recovered << " - " << lattices_split[n][h] << endl;
-	  }
-	} 
-	if(recovered != lattices.size()){
-	  cerr << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << lattices.size() << endl;
-	  exit(1);
-	}
-  if(LDEBUG) {cerr << "pflow::threadGeneration: Performing structure search on " << lattices.size() << " lattices ..." << endl;}
-	for(uint n=0; n<num_of_threads; n++){
-	  threads1.push_back(std::thread(structureSearch,lfa,all_nn1,xstr,
-			    std::ref(vvprotos[n]),std::ref(xstr1_for_thread[n]),xstr2,type_match,std::ref(possible_minMis[n]),
-			    std::ref(lattices_split[n]),std::ref(clattices_split[n]),std::ref(latt_devs_split[n]),
-                            optimize_match));
-	}         
-	for(uint t=0;t<threads1.size();t++){
-	  threads1[t].join();
-	}
-#else
-  uint n=0;
-	structureSearch(lfa,all_nn1,xstr,vvprotos[n],xstr1_for_thread[n],xstr2,type_match,possible_minMis[n],
-	   	        lattices,clattices,latt_devs,optimize_match);
+      // ---------------------------------------------------------------------------
+      // split task into threads 
+      uint number_of_lattices = lattices.size();
+      uint number_of_threads = aurostd::min(num_proc,number_of_lattices); // cannot have more threads than lattices
+      //DX 20191107 [switching to getThreadDistribution] - vector<uint> start_indices, end_indices;
+      //DX 20191107 [switching to getThreadDistribution] - splitTaskIntoThreads(number_of_lattices, number_of_threads, start_indices, end_indices);
+      vector<vector<int> > thread_distribution = getThreadDistribution(number_of_lattices, number_of_threads); //DX 20191107 
 #endif
-      }
-      //cerr << "========== possible_minMis.size(): " << possible_minMis.size() << endl;
-      for(uint p=0;p<possible_minMis.size();p++){
-	if(p==0 && y==0 && x==0){ // DX 2/8/17 - need to add x==0 ortherwise matches can be overwritten
-	  minMis=possible_minMis[p];
-	  xstr1=xstr1_for_thread[p];
-	  vprotos=vvprotos[p];
-	}
-	else {
-	  if(possible_minMis[p]<=minMis){
-	    minMis=possible_minMis[p];
-	    xstr1=xstr1_for_thread[p];
-	    vprotos=vvprotos[p];
-	  }
-	}
-        //cerr << "minMis: " << minMis << endl;
-      }
-      //break if(minMis<=0.1) break;
 
-    // //DX 20190226 - fast return, no need to check other LFAs if a match is found - START
-    if(minMis<0.1 && !optimize_match){
-      return;
+      // ---------------------------------------------------------------------------
+      // identify rotation between original and new structure
+      // [ODD BEHAVIOR - REVISIT]
+      //DX [REVISIT] for(uint p=0;p<lattices.size();p++){
+      //DX [REVISIT]   cerr << "lattice:" << lattices[p] << endl;
+      //DX [REVISIT]   cerr << "clattice:" << clattices[p] << endl;
+      //DX [REVISIT]   xmatrix<double> lattice_metric_tensor = MetricTensor(lattices[p]);
+      //DX [REVISIT]   xmatrix<double> clattice_metric_tensor = MetricTensor(clattices[p]);
+      //DX [REVISIT]   cerr << "lattice metric tensor: " << lattice_metric_tensor << endl;
+      //DX [REVISIT]   cerr << "clattice metric tensor: " << clattice_metric_tensor << endl;
+      //DX [REVISIT]   //xmatrix<double> rotation = lattices[p]*aurostd::inverse(clattices[p]);
+      //DX [REVISIT]   xmatrix<double> rotation1 = aurostd::inverse(lattices[p])*clattices[p];
+      //DX [REVISIT]   cerr << "rotation1: " << rotation1 << endl; 
+      //DX [REVISIT]   xstructure xstr_rot1 = xstr2;
+      //DX [REVISIT]   xstr_rot1 = Rotate(xstr2,trasp(rotation1));
+      //DX [REVISIT]   xmatrix<double> rotation2 = trasp(clattices[p])*trasp(aurostd::inverse(lattices[p]));
+      //DX [REVISIT]   cerr << "rotation2: " << rotation2 << endl; 
+      //DX [REVISIT]   xstructure xstr_rot2 = xstr2;
+      //DX [REVISIT]   xstr_rot2 = Rotate(xstr2,rotation2);
+      //DX [REVISIT]   xmatrix<double> rotation3 = trasp(clattices[p])*trasp(aurostd::inverse(lattices[p]));
+      //DX [REVISIT]   cerr << "rotation3: " << rotation3 << endl; 
+      //DX [REVISIT]   xstructure xstr_rot3 = xstr2;
+      //DX [REVISIT]   xstr_rot3 = GetLTCell(rotation3,xstr2);
+      //DX [REVISIT]   xmatrix<double> rotation4 = trasp(rotation1); 
+      //DX [REVISIT]   cerr << "rotation4: " << rotation4 << endl; 
+      //DX [REVISIT]   xstructure xstr_rot4 = xstr2;
+      //DX [REVISIT]   xstr_rot4 = Rotate(xstr2,rotation4);
+
+      //DX [REVISIT]   cerr << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << endl;
+      //DX [REVISIT]   cerr << "orig xstr2: " << xstr2 << endl;
+      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
+      //DX [REVISIT]   cerr << "rotated xstr2 - 1: " << xstr_rot1 << endl;
+      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
+      //DX [REVISIT]   cerr << "rotated xstr2 - 2: " << xstr_rot2 << endl;
+      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
+      //DX [REVISIT]   cerr << "rotated xstr2 - 3: " << xstr_rot3 << endl;
+      //DX [REVISIT]   cerr << "-----------------------------------------------------------------" << endl;
+      //DX [REVISIT]   cerr << "rotated xstr2 - 4: " << xstr_rot4 << endl;
+      //DX [REVISIT] }
+
+      // ---------------------------------------------------------------------------
+      // test origin shifts 
+      for(uint y=0;y<LFA_str2.size();y++){
+        for(uint x=0;x<LFA_str1.size();x++){
+          lfa_str1=LFA_str1[x];
+          lfa_str2=LFA_str2[y];
+          if(type_match == 2 && lfa_str1 != lfa_str2){ continue;}
+
+          oss << "===> LFA (structure 1): " << lfa_str1 << endl;
+          oss << "===> LFA (structure 2): " << lfa_str2 << endl;
+
+          if(LDEBUG){
+            cerr << function_name << ": LFA (structure 1): " << lfa_str1 << endl;
+            cerr << function_name << ": LFA (structure 2): " << lfa_str2 << endl;
+          }
+        
+          // ---------------------------------------------------------------------------
+          // shift supercell to LFA
+          // cerr << "xstr_supercell.atoms.size(): " << xstr_supercell.atoms.size() << endl;
+          // for(uint a=0;a<xstr_supercell.atoms.size();a++){
+          //   if(xstr_supercell.atoms[a].name == lfa_str2){
+          //     xstr_supercell.ShifOriginToAtom(a);
+          //     break;
+          //   }
+          // }
+
+          // ---------------------------------------------------------------------------
+          // shift representative structure to LFA
+          // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
+          for(uint i=0;i<xstr1_tmp.atoms.size();i++){
+            if(xstr1_tmp.atoms[i].name==lfa_str1){
+              xstr1_tmp.ShifOriginToAtom(i);
+              xstr1_tmp.BringInCell(1e-10);
+              break;
+            }
+          }
+
+          // ---------------------------------------------------------------------------
+          // create vector of variables for each thread 
+          vector<xstructure> xstr1_for_thread;
+          vector<structure_misfit> possible_min_misfit_info; //DX 20191218
+          vector<vector<uint> > possible_matching_indices_1, possible_matching_indices_2;
+          vector<vector<double> > possible_minimum_distances;
+          vector<vector<xstructure> > vvprotos;
+          for(uint n=0; n<num_proc; n++){
+            vector<xstructure> vprotos_tmp;
+            vvprotos.push_back(vprotos_tmp);
+            xstr1_for_thread.push_back(xstr1_tmp);
+            structure_misfit temp_misfit_info = compare::initialize_misfit_struct((magnetic_analysis && _CALCULATE_MAGNETIC_MISFIT_)); //DX 20191218
+            possible_min_misfit_info.push_back(temp_misfit_info); //DX 20191218
+            vector<uint> tmp_indices;
+            possible_matching_indices_1.push_back(tmp_indices);
+            possible_matching_indices_2.push_back(tmp_indices);
+            vector<double> tmp_distances;
+            possible_minimum_distances.push_back(tmp_distances);
+          }
+ 
+#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+          // ---------------------------------------------------------------------------
+          // threaded (DX 20191107 thread pointer) 
+          vector<std::thread*> threads;
+          if(LDEBUG){cerr << function_name << ": Searching for possible matching structures [THREADED VERSION]" << endl;}
+          for(uint n=0; n<number_of_threads; n++){
+            threads.push_back(new std::thread(structureSearch,
+                  std::ref(xstr1_for_thread[n]),
+                  std::ref(xstr_supercell),
+                  std::ref(all_nn1),
+                  std::ref(lfa_str2),
+                  type_match,
+                  std::ref(lattices),std::ref(clattices),std::ref(latt_devs),
+                  //DX 20191107 [switching to getThreadDistribution] - start_indices[n], end_indices[n],
+                  thread_distribution[n][0], thread_distribution[n][1],
+                  std::ref(possible_min_misfit_info[n]), //DX 20191218
+                  std::ref(possible_matching_indices_1[n]),std::ref(possible_matching_indices_2[n]),
+                  std::ref(possible_minimum_distances[n]),std::ref(vvprotos[n]),
+                  optimize_match));
+          }         
+          for(uint t=0;t<threads.size();t++){
+            threads[t]->join();
+            delete threads[t];
+          }
+#else
+          // ---------------------------------------------------------------------------
+          // non-threaded 
+          uint n=0;
+          uint start_index=0;
+          uint end_index=lattices.size();  //DX 20191107 switching end point convention
+          if(LDEBUG){cerr << function_name << ": Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
+          //structureSearch(lfa_str2,all_nn1,xstr_supercell,vvprotos[n],xstr1_for_thread[n],type_match,possible_minMis[n],
+          //                lattices,clattices,latt_devs,optimize_match,start_index,end_index);
+          structureSearch(
+              xstr1_for_thread[n],
+              xstr_supercell,
+              all_nn1,
+              lfa_str2,
+              type_match,
+              lattices,clattices,latt_devs,
+              start_index, end_index,
+              possible_min_misfit_info[n], //DX 20191218
+              possible_matching_indices_1[n],possible_matching_indices_2[n],
+              possible_minimum_distances[n],vvprotos[n],
+              optimize_match);
+#endif
+      
+          // ---------------------------------------------------------------------------
+          // collect misfits and matching structure representations
+          for(uint p=0;p<possible_min_misfit_info.size();p++){
+            if(p==0 && y==0 && x==0){ // DX 2/8/17 - need to add x==0 ortherwise matches can be overwritten
+              min_misfit_info=possible_min_misfit_info[p]; //DX 20191218
+              matching_indices_1=possible_matching_indices_1[p];
+              matching_indices_2=possible_matching_indices_2[p];
+              minimum_distances=possible_minimum_distances[p];
+              xstr1=xstr1_for_thread[p];
+              vprotos=vvprotos[p];
+            }
+            else {
+              if(possible_min_misfit_info[p].misfit<=min_misfit_info.misfit){
+                min_misfit_info=possible_min_misfit_info[p]; //DX 20191218
+                matching_indices_1=possible_matching_indices_1[p];
+                matching_indices_2=possible_matching_indices_2[p];
+                minimum_distances=possible_minimum_distances[p];
+                xstr1=xstr1_for_thread[p];
+                vprotos=vvprotos[p];
+              }
+            }
+          }
+
+          // ---------------------------------------------------------------------------
+          // quick return if found a match
+          if(min_misfit_info.misfit<0.1 && !optimize_match){
+            if(LDEBUG){cerr << function_name << ": Found match (misfit = " << min_misfit_info.misfit << ")! Terminating search early." << endl;}
+            printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+                matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
+            return;
+          }
+
+          // ---------------------------------------------------------------------------
+          // quick return if testing only one LFA set
+          //DX 20190702 - can i do this: if(!optimize_match && minMis==1){ test_one_lfa_only=true;}
+          if(!optimize_match && aurostd::isequal(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && type_match==2){ test_one_lfa_only=true;} //DX 20190809 - need type match here; otherwise we may miss structure-type matches
+          if(test_one_lfa_only){
+            if(LDEBUG){cerr << function_name << ": No match found. Searched only one LFA set. Terminating search early." << endl;}
+            return;
+          }
+        } 
+      } 
+    }  
+    if(aurostd::isdifferent(min_misfit_info.misfit,AUROSTD_MAX_DOUBLE) && vprotos.size()>0){
+      printStructureMappingResults(oss,xstr1,vprotos[0],min_misfit_info.misfit,min_misfit_info.lattice_deviation,min_misfit_info.coordinate_displacement,min_misfit_info.failure,min_misfit_info.magnetic_displacement,min_misfit_info.magnetic_failure,
+          matching_indices_1,matching_indices_2,minimum_distances,magnetic_analysis);
     }
-    // //DX 20190226 - fast return, no need to check other LFAs if a match is found - END
-    // DX 20190318 - START
-    if(test_one_lfa_only){
-        return;
+  }
+}
+
+// [OBSOLETE - DX 20190717] // ***************************************************************************
+// [OBSOLETE - DX 20190717] // Thread Generation (For parallel processing of quadruplets)
+// [OBSOLETE - DX 20190717] // ***************************************************************************
+// [OBSOLETE - DX 20190717] namespace compare{
+// [OBSOLETE - DX 20190717]   void threadGeneration(const uint& num_proc,xmatrix<double>& q1, xstructure& xstr2, 
+// [OBSOLETE - DX 20190717] 			vector<xstructure> &vprotos, xstructure &xstr1, const int& type_match, 
+// [OBSOLETE - DX 20190717] 			const bool& optimize_match, double& minMis, ostream& oss){ 
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     // This function creates the supercell of the second structure and begins 
+// [OBSOLETE - DX 20190717]     // the quadruplets search within a supercell. Due to the costly nature of 
+// [OBSOLETE - DX 20190717]     // this algorithm, the quadruplet search is parallelized. The splitting 
+// [OBSOLETE - DX 20190717]     // of computation of done here
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     bool LDEBUG=(false || XHOST.DEBUG);
+// [OBSOLETE - DX 20190717]     bool test_one_lfa_only = false; //DX 20190318
+// [OBSOLETE - DX 20190717]     //DX if(type_match==2){ test_one_lfa_only=true;} //DX 20190318 - need to comment out for permutation matching
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     xstructure xstr1_tmp = xstr1;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     //cerr << "LFA" << endl;
+// [OBSOLETE - DX 20190717]     vector<string> LFA_str1=getLeastFrequentAtomSpecies(xstr1);
+// [OBSOLETE - DX 20190717]     vector<string> LFA_str2=getLeastFrequentAtomSpecies(xstr2);
+// [OBSOLETE - DX 20190717]     string lfa, lfa_str1;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     //cerr << "SUPERCELL" << endl;
+// [OBSOLETE - DX 20190717]     //DX 20190319 - START
+// [OBSOLETE - DX 20190717]     vector<int> sc2pcMap, pc2scMap;
+// [OBSOLETE - DX 20190717]     bool get_symmetry=false;
+// [OBSOLETE - DX 20190717]     bool get_full_basis=false;
+// [OBSOLETE - DX 20190717]     bool force_supercell_matrix=true;
+// [OBSOLETE - DX 20190717]     xstructure xstr=GetSuperCell(xstr2,3,0,0,0,3,0,0,0,3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix); //DX 20190319 - use supercell matrix in expansion
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     uint y=0;
+// [OBSOLETE - DX 20190717]     uint x=0;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     // DX TEST
+// [OBSOLETE - DX 20190717]     // Consider all LFAs
+// [OBSOLETE - DX 20190717]     for(y=0;y<LFA_str2.size();y++){
+// [OBSOLETE - DX 20190717]       for(x=0;x<LFA_str1.size();x++){
+// [OBSOLETE - DX 20190717]         // DX TEST
+// [OBSOLETE - DX 20190717]         lfa_str1=LFA_str1[x];
+// [OBSOLETE - DX 20190717]         lfa=LFA_str2[y];
+// [OBSOLETE - DX 20190717]         if(type_match == 2 && lfa_str1 != lfa){
+// [OBSOLETE - DX 20190717]           continue;
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         oss << "===> LFA: "<<lfa<<endl;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         if(LDEBUG) {
+// [OBSOLETE - DX 20190717]           cerr << "===> LFA_1: " << lfa_str1 <<endl;
+// [OBSOLETE - DX 20190717]           cerr << "===> LFA: "<<lfa<<endl;
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // DX NEW so we don't need to do this in an inner loop
+// [OBSOLETE - DX 20190717]         for(uint a=0;a<xstr.atoms.size();a++){
+// [OBSOLETE - DX 20190717]           if(xstr.atoms[a].name == lfa){
+// [OBSOLETE - DX 20190717]             xstr.ShifOriginToAtom(a);
+// [OBSOLETE - DX 20190717]             break;
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         // DX NEW
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         //cerr << "xstr1 centroid: " << endl;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         //cerr << "SHIFT" << endl;
+// [OBSOLETE - DX 20190717]         // NEED TO SHIFT origin of xstr1_tmp to one of the LFA (this was missing before and caused ICSD_102428.BCA, and CBA to not match, but they should
+// [OBSOLETE - DX 20190717]         for(uint i=0;i<xstr1_tmp.atoms.size();i++){
+// [OBSOLETE - DX 20190717]           if(xstr1_tmp.atoms[i].name==lfa_str1){
+// [OBSOLETE - DX 20190717]             xstr1_tmp.ShifOriginToAtom(i);
+// [OBSOLETE - DX 20190717]             xstr1_tmp.BringInCell(1e-10);
+// [OBSOLETE - DX 20190717]             break;
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // NEED TO SHIFT origin of xstr2 to one of the LFA
+// [OBSOLETE - DX 20190717]         for(uint i=0;i<xstr2.atoms.size();i++){
+// [OBSOLETE - DX 20190717]           if(xstr2.atoms[i].name==lfa){
+// [OBSOLETE - DX 20190717]             xstr2.ShifOriginToAtom(i);
+// [OBSOLETE - DX 20190717]             xstr2.BringInCell(1e-10);
+// [OBSOLETE - DX 20190717]             break;
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // When checking the quadruplets/lattice, we only need to generate a 
+// [OBSOLETE - DX 20190717]         // LFA supercell (i.e. take out the other atoms).  This greatly reduces 
+// [OBSOLETE - DX 20190717]         // the time of computation (don't need to scan through unnecessary atoms) 
+// [OBSOLETE - DX 20190717]         xstructure xstr_LFA_only=xstr2;
+// [OBSOLETE - DX 20190717]         xstr_LFA_only.ClearSymmetry(); //DX 20181022
+// [OBSOLETE - DX 20190717]         uint num_atoms=xstr_LFA_only.atoms.size();
+// [OBSOLETE - DX 20190717]         for(uint i=0;i<num_atoms;i++){
+// [OBSOLETE - DX 20190717]           if(xstr_LFA_only.atoms[i].name!=lfa){
+// [OBSOLETE - DX 20190717]             xstr_LFA_only.RemoveAtom(i);
+// [OBSOLETE - DX 20190717]             num_atoms--;
+// [OBSOLETE - DX 20190717]             i--;
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         //cerr << "LFA SUPERELL" << endl;
+// [OBSOLETE - DX 20190717]         xstructure xstr_LFA_supercell=GetSuperCell(xstr_LFA_only,3,0,0,0,3,0,0,0,3,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix); //DX 20190319 - use supercell matrix in expansion
+// [OBSOLETE - DX 20190717]         //cerr << "created LFA supercell" << endl;
+// [OBSOLETE - DX 20190717]         // Determines the number of LFAs in the supercell.
+// [OBSOLETE - DX 20190717]         int num_LFAs=-1; //-1 as default value 
+// [OBSOLETE - DX 20190717]         for(uint q=0; q<xstr.num_each_type.size();q++){
+// [OBSOLETE - DX 20190717]           if(xstr.species[q] == lfa){ 
+// [OBSOLETE - DX 20190717]             num_LFAs= xstr.num_each_type[q];
+// [OBSOLETE - DX 20190717]             if(LDEBUG) {cerr << "compare:: " << "Number of LFAs in supercell: " << xstr.species[q] << "= " << num_LFAs << endl;}
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // === THREAD PREPARATION FOR PARALLEL PROCESSING OF QUADRUPLET SEARCH === //
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // DECLARATION OF ATOMIC BOOL SECTION: Allows the threads to communicate. 
+// [OBSOLETE - DX 20190717]         // This is useful for stopping the threads if the misfit falls below
+// [OBSOLETE - DX 20190717]         // the compatible misfit criterion (mis<0.1) in any of the threads. 
+// [OBSOLETE - DX 20190717]         // [OBSOLETE] std::atomic_bool misfit_in_threshold_found (false);
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         //[NONTHREADS]bool misfit_in_threshold_found=false;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         vector<xstructure> xstr1_for_thread;
+// [OBSOLETE - DX 20190717]         vector<double> possible_minMis;
+// [OBSOLETE - DX 20190717]         vector<vector<xstructure> > vvprotos;
+// [OBSOLETE - DX 20190717]         //vector<std::thread> threads;
+// [OBSOLETE - DX 20190717]         //DX NEW - used to be done in one of the inner loops in structureSearch 
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // compute xstr1 information once only (perhaps we can use this in the directory scheme!!!!!!!! 
+// [OBSOLETE - DX 20190717]         // and really only calculate once; but not that expensive, may be more expensive to store --memory!)
+// [OBSOLETE - DX 20190717]         vector<double> D1,F1;
+// [OBSOLETE - DX 20190717]         cellDiagonal(xstr1_tmp,D1,F1,1);
+// [OBSOLETE - DX 20190717]         xstr1_tmp.lattice=GetClat(xstr1_tmp.a,xstr1_tmp.b,xstr1_tmp.c,xstr1_tmp.alpha,xstr1_tmp.beta,xstr1_tmp.gamma);
+// [OBSOLETE - DX 20190717]         for(uint iat=0; iat<xstr1_tmp.atoms.size(); iat++){
+// [OBSOLETE - DX 20190717]           xstr1_tmp.atoms[iat].cpos=F2C(xstr1_tmp.lattice,xstr1_tmp.atoms[iat].fpos);
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         vector<double> all_nn1 = computeNearestNeighbors(xstr1_tmp);
+// [OBSOLETE - DX 20190717]         // DX NEW
+// [OBSOLETE - DX 20190717]         //for(uint n=0; n<num_proc; n++){
+// [OBSOLETE - DX 20190717]         //  vector<xstructure> vprotos_tmp;
+// [OBSOLETE - DX 20190717]         //  vvprotos.push_back(vprotos_tmp);
+// [OBSOLETE - DX 20190717]         //  xstr1_for_thread.push_back(xstr1_tmp);
+// [OBSOLETE - DX 20190717]         //  possible_minMis.push_back(1.0);
+// [OBSOLETE - DX 20190717]         //}
+// [OBSOLETE - DX 20190717]       
+// [OBSOLETE - DX 20190717]         vector<xmatrix<double> > lattices;
+// [OBSOLETE - DX 20190717]         vector<xmatrix<double> > clattices;
+// [OBSOLETE - DX 20190717]         vector<vector<uint> > ij_index;
+// [OBSOLETE - DX 20190717]         vector<double> latt_devs;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         //vector<std::thread> threads0;
+// [OBSOLETE - DX 20190717]         vector<xvector<double> > translation_vectors;
+// [OBSOLETE - DX 20190717]         quadrupletSearch(q1,xstr_LFA_supercell,xstr2,translation_vectors,ij_index); //DX 20190701 - added xstr2
+// [OBSOLETE - DX 20190717]         //cerr << "FINDING TRANSLATION VECTORS: " << endl;
+// [OBSOLETE - DX 20190717]         double abs_det_q1=abs(det(q1));
+// [OBSOLETE - DX 20190717]         xvector<double> abc_angles_q1=Getabc_angles(q1,DEGREES);
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         buildSimilarLattices(translation_vectors, q1, abs_det_q1, abs_det_q1, abc_angles_q1, lattices, clattices, latt_devs, optimize_match);
+// [OBSOLETE - DX 20190717]         if(LDEBUG) {cerr << "pflow::threadGeneration: Number of lattices to compare: " << lattices.size() << endl;}
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         if(lattices.size()>0){
+// [OBSOLETE - DX 20190717]           for(uint n=0; n<num_proc; n++){
+// [OBSOLETE - DX 20190717]             vector<xstructure> vprotos_tmp;
+// [OBSOLETE - DX 20190717]             vvprotos.push_back(vprotos_tmp);
+// [OBSOLETE - DX 20190717]             xstr1_for_thread.push_back(xstr1_tmp);
+// [OBSOLETE - DX 20190717]             possible_minMis.push_back(1.0);
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717] #ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+// [OBSOLETE - DX 20190717]           vector<std::thread> threads1;
+// [OBSOLETE - DX 20190717]           vector<vector<xmatrix<double> > > lattices_split;
+// [OBSOLETE - DX 20190717]           vector<vector<xmatrix<double> > > clattices_split;
+// [OBSOLETE - DX 20190717]           vector<vector<double> > latt_devs_split;
+// [OBSOLETE - DX 20190717]           uint num_per_thread = lattices.size()/num_proc;
+// [OBSOLETE - DX 20190717]           uint residual = lattices.size()%num_proc;
+// [OBSOLETE - DX 20190717]           bool accounted_for_residual=false;
+// [OBSOLETE - DX 20190717]           if(residual!=0){
+// [OBSOLETE - DX 20190717]             num_per_thread+=1;
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           uint count = 0;
+// [OBSOLETE - DX 20190717]           uint thread_count = 0;
+// [OBSOLETE - DX 20190717]           vector<xmatrix<double> > latt_tmp, clatt_tmp;
+// [OBSOLETE - DX 20190717]           vector<double> tmp_dev;
+// [OBSOLETE - DX 20190717]           for(uint l=0; l<lattices.size(); l++){
+// [OBSOLETE - DX 20190717]             latt_tmp.push_back(lattices[l]); clatt_tmp.push_back(clattices[l]); tmp_dev.push_back(latt_devs[l]);
+// [OBSOLETE - DX 20190717]             count+=1;
+// [OBSOLETE - DX 20190717]             if(count == num_per_thread && thread_count<num_proc-1){
+// [OBSOLETE - DX 20190717]               thread_count+=1;
+// [OBSOLETE - DX 20190717]               lattices_split.push_back(latt_tmp);
+// [OBSOLETE - DX 20190717]               clattices_split.push_back(clatt_tmp);
+// [OBSOLETE - DX 20190717]               latt_devs_split.push_back(tmp_dev);
+// [OBSOLETE - DX 20190717]               latt_tmp.clear(); clatt_tmp.clear(); tmp_dev.clear();
+// [OBSOLETE - DX 20190717]               count = 0;
+// [OBSOLETE - DX 20190717]             }
+// [OBSOLETE - DX 20190717]             else if(thread_count==num_proc-1 && l==lattices.size()-1){
+// [OBSOLETE - DX 20190717]               thread_count+=1;
+// [OBSOLETE - DX 20190717]               lattices_split.push_back(latt_tmp);
+// [OBSOLETE - DX 20190717]               clattices_split.push_back(clatt_tmp);
+// [OBSOLETE - DX 20190717]               latt_devs_split.push_back(tmp_dev);
+// [OBSOLETE - DX 20190717]               latt_tmp.clear(); clatt_tmp.clear(); tmp_dev.clear();
+// [OBSOLETE - DX 20190717]               count = 0;
+// [OBSOLETE - DX 20190717]             }
+// [OBSOLETE - DX 20190717]             if(!accounted_for_residual && residual!=0 && thread_count==residual){
+// [OBSOLETE - DX 20190717]               accounted_for_residual=true;
+// [OBSOLETE - DX 20190717]               num_per_thread=num_per_thread-1;
+// [OBSOLETE - DX 20190717]             }
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           uint recovered=0;
+// [OBSOLETE - DX 20190717]           //Need the following safety in case the number of threads is greater than the number of lattices to test
+// [OBSOLETE - DX 20190717]           uint num_of_threads=0;
+// [OBSOLETE - DX 20190717]           if(lattices_split.size()>=num_proc){
+// [OBSOLETE - DX 20190717]             num_of_threads=num_proc;
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           else if(lattices_split.size()<num_proc){
+// [OBSOLETE - DX 20190717]             num_of_threads=lattices_split.size();
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           for(uint n=0; n<num_of_threads; n++){
+// [OBSOLETE - DX 20190717]             for(uint h=0;h<lattices_split[n].size();h++){
+// [OBSOLETE - DX 20190717]               recovered+=1;
+// [OBSOLETE - DX 20190717]               //cerr << "recovered: " << recovered << " - " << lattices_split[n][h] << endl;
+// [OBSOLETE - DX 20190717]             }
+// [OBSOLETE - DX 20190717]           } 
+// [OBSOLETE - DX 20190717]           if(recovered != lattices.size()){
+// [OBSOLETE - DX 20190717]             cerr << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << lattices.size() << endl;
+// [OBSOLETE - DX 20190717]             exit(1);
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           if(LDEBUG) {cerr << "pflow::threadGeneration: Performing structure search on " << lattices.size() << " lattices ..." << endl;}
+// [OBSOLETE - DX 20190717]           
+// [OBSOLETE - DX 20190717]              //for(uint n=0; n<num_of_threads; n++){
+// [OBSOLETE - DX 20190717]              //threads1.push_back(std::thread(structureSearch,lfa,all_nn1,xstr,
+// [OBSOLETE - DX 20190717]              //std::ref(vvprotos[n]),std::ref(xstr1_for_thread[n]),xstr2,type_match,std::ref(possible_minMis[n]),
+// [OBSOLETE - DX 20190717]              //std::ref(lattices_split[n]),std::ref(clattices_split[n]),std::ref(latt_devs_split[n]),
+// [OBSOLETE - DX 20190717]              //optimize_match));
+// [OBSOLETE - DX 20190717]              //}         
+// [OBSOLETE - DX 20190717]              //for(uint t=0;t<threads1.size();t++){
+// [OBSOLETE - DX 20190717]              //threads1[t].join();
+// [OBSOLETE - DX 20190717]              //}
+// [OBSOLETE - DX 20190717] #else
+// [OBSOLETE - DX 20190717]           uint n=0;
+// [OBSOLETE - DX 20190717]           structureSearch(lfa,all_nn1,xstr,vvprotos[n],xstr1_for_thread[n],xstr2,type_match,possible_minMis[n],
+// [OBSOLETE - DX 20190717]               lattices,clattices,latt_devs,optimize_match);
+// [OBSOLETE - DX 20190717] #endif
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         //cerr << "========== possible_minMis.size(): " << possible_minMis.size() << endl;
+// [OBSOLETE - DX 20190717]         for(uint p=0;p<possible_minMis.size();p++){
+// [OBSOLETE - DX 20190717]           if(p==0 && y==0 && x==0){ // DX 2/8/17 - need to add x==0 ortherwise matches can be overwritten
+// [OBSOLETE - DX 20190717]             minMis=possible_minMis[p];
+// [OBSOLETE - DX 20190717]             xstr1=xstr1_for_thread[p];
+// [OBSOLETE - DX 20190717]             vprotos=vvprotos[p];
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           else {
+// [OBSOLETE - DX 20190717]             if(possible_minMis[p]<=minMis){
+// [OBSOLETE - DX 20190717]               minMis=possible_minMis[p];
+// [OBSOLETE - DX 20190717]               xstr1=xstr1_for_thread[p];
+// [OBSOLETE - DX 20190717]               vprotos=vvprotos[p];
+// [OBSOLETE - DX 20190717]             }
+// [OBSOLETE - DX 20190717]           }
+// [OBSOLETE - DX 20190717]           //cerr << "minMis: " << minMis << endl;
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         //break if(minMis<=0.1) break;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]         // //DX 20190226 - fast return, no need to check other LFAs if a match is found - START
+// [OBSOLETE - DX 20190717]         if(minMis<0.1 && !optimize_match){
+// [OBSOLETE - DX 20190717]           return;
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         // //DX 20190226 - fast return, no need to check other LFAs if a match is found - END
+// [OBSOLETE - DX 20190717]         // DX 20190318 - START
+// [OBSOLETE - DX 20190717]         if(test_one_lfa_only){
+// [OBSOLETE - DX 20190717]           return;
+// [OBSOLETE - DX 20190717]         }
+// [OBSOLETE - DX 20190717]         // DX 20190318 - START
+// [OBSOLETE - DX 20190717]       } 
+// [OBSOLETE - DX 20190717]     } 
+// [OBSOLETE - DX 20190717]   }  
+// [OBSOLETE - DX 20190717] }
+
+// ***************************************************************************
+// structureSearch
+// ***************************************************************************
+namespace compare{
+  bool structureSearch(
+			const xstructure& xstr1, 
+			const xstructure& xstr_supercell, //DX 20190530 - added "_supercell"; more descriptive 
+      const vector<double>& all_nn1, 
+      const string& lfa, 
+      const int type_match, 
+			const vector<xmatrix<double> >& lattices,
+			const vector<xmatrix<double> >& clattices, 
+			const vector<double>& latt_devs, 
+      const uint start_index, const uint end_index,
+      structure_misfit& min_misfit_info,
+      vector<uint>& index_match_1, vector<uint>& index_match_2,
+      vector<double>& min_distances,
+			vector<xstructure>& vprotos,
+      bool optimize_match){ 
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
+
+    double mis=AUROSTD_MAX_DOUBLE;
+    double mag_dis=AUROSTD_MAX_DOUBLE; double mag_fail=AUROSTD_MAX_DOUBLE;
+    xstructure proto;
+    //xstructure xstr2_tmp = xstr2;
+
+    vector<string> species_str1=sortSpeciesByFrequency(xstr1);
+    deque<_atom> xstr1_atoms;
+    for(uint i=0;i<species_str1.size();i++){
+      for(uint j=0;j<xstr1.atoms.size();j++){
+        if(species_str1[i]==xstr1.atoms[j].name){
+          xstr1_atoms.push_back(xstr1.atoms[j]);
+        }
+      }
     }
-    // DX 20190318 - START
-    } 
-    } 
+
+    for(uint p=start_index;p<end_index;p++){ //DX 20191107 switching end index convention <= vs <
+      if(LDEBUG){
+        cerr << "compare::structureSearch: Trying lattice " << p << endl;
+        cerr << "lattice=" << lattices[p] << endl;
+      }
+
+      // ---------------------------------------------------------------------------
+      // lattice rotation (beta) 
+      xmatrix<double> lattice_rotation = aurostd::inverse(lattices[p])*clattices[p];
+      if(LDEBUG){
+        cerr << "rotation between lattice " << lattices[p] << endl;
+        cerr << "and clattice: " << clattices[p] << endl;
+        cerr << "is " << lattice_rotation << endl;
+        cerr << "validate (lattice * rotation =? clattice) : " << lattices[p]*lattice_rotation << endl;
+      }
+
+      // ---------------------------------------------------------------------------
+      // make smaller lattice the new lattice in the supercell structure 
+      // note: lattices[p] are oriented wrt to supercell (it has to be), otherwise could break periodicity
+      proto=xstr_supercell; //DX 20190530 - added "_supercell"; more descriptive
+      proto.lattice=lattices[p];
+
+      // ---------------------------------------------------------------------------
+      // C2F - (i.e., will provide fractional coordinates wrt to new lattice) 
+      // AND remove all atoms outside unit cell based on fractional coordinates
+      // speed increase: ensure this is in cell before computing F2C 
+      // (don't calculate unnecessary matrix-vector multiplication)
+      // Note: C2F (done later) changes lattice to one that is aligned with Cartesian directions (a along +X, etc.) 
+      //       this is like rotating the global coordinates, therefore, fpos does not change
+      deque<_atom> new_basis_2;
+      for(uint iat=0;iat<proto.atoms.size();iat++){
+	      proto.atoms[iat].fpos=C2F(proto.lattice,proto.atoms[iat].cpos);
+        if(atomInCell(proto.atoms[iat],0.05)){ //DX 20191125 - soft cutoff, using robust MapAtom later on resulting subset 
+          new_basis_2.push_back(proto.atoms[iat]);
+        }
+      }
+      
+      xstructure proto_new;
+      proto_new.title=proto.title;
+      proto_new.lattice=clattices[p];
+      
+      // DX NEW - START =======================
+      xmatrix<double> f2c = trasp(proto_new.lattice); //DX 20190717
+      xmatrix<double> c2f = aurostd::inverse(trasp(proto_new.lattice)); //DX 20190717
+      //DX 20190717 [OBSOLETE] xmatrix<double> f2c = trasp(proto.lattice);
+      //DX 20190717 [OBSOLETE] xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
+      bool skew = false;
+      double tol=0.01;
+      
+      deque<_atom> new_basis;
+      for(uint j=0;j<new_basis_2.size();j++){
+        bool duplicate_lattice_point=false;
+        for(uint a=0; a<new_basis.size(); a++){
+          xvector<double> tmp = BringInCell(new_basis_2[j].fpos,1e-10);
+          if(SYM::MapAtom(new_basis[a].fpos,tmp,proto_new.lattice,f2c,skew,tol)){
+            duplicate_lattice_point=true;
+            break;
+          }
+        }
+        if(duplicate_lattice_point==false){
+          new_basis_2[j].fpos = BringInCell(new_basis_2[j].fpos,1e-10);
+          new_basis_2[j].cpos = f2c*new_basis_2[j].fpos;
+          new_basis.push_back(new_basis_2[j]);
+        }
+      }
+      std::stable_sort(new_basis.begin(),new_basis.end(),sortAtomsNames); //DX 20190709 - need to sort now
+      proto_new.atoms = new_basis;
+      proto_new.BringInCell(1e-10); 
+      proto_new.FixLattices();
+      proto_new.SpeciesPutAlphabetic();
+      deque<int> sizes = SYM::arrange_atoms(new_basis);
+      proto_new = pflow::SetNumEachType(proto_new, sizes);
+      proto_new.species = proto.species; //DX 20190718
+      proto = proto_new;
+      
+      if(sameSpecies(proto,xstr1,false)){
+        vector<string> species_str2=sortSpeciesByFrequency(proto);
+        vector<double> all_nn_proto;
+        bool all_nn_calculated = false;
+        for(uint iat=0; iat<proto.atoms.size();iat++){
+          if(proto.atoms[iat].name==lfa){
+            proto.ShifOriginToAtom(iat);
+            proto.BringInCell(1e-10);
+            if(VERBOSE){
+              cerr << "compare::structureSearch: orig structure " << xstr1 << endl;
+              cerr << "compare::structureSearch: structure " << proto << endl;
+            }
+            deque<_atom> proto_atoms;
+            for(uint i=0;i<species_str2.size();i++){
+              for(uint j=0;j<proto.atoms.size();j++){
+                if(species_str2[i]==proto.atoms[j].name){
+                  proto_atoms.push_back(proto.atoms[j]);
+                }
+              }
+            }
+            vector<uint> im1, im2;
+            vector<double> min_dists;
+            if(findMatch(xstr1_atoms,proto_atoms,proto.lattice,im1,im2,min_dists,type_match)){;
+              if(VERBOSE){
+                for(uint m=0;m<im1.size();m++){
+                  cerr << "compare::structureSearch: " << im1[m] << " == " << im2[m] << " : dist=" << min_dists[m] << endl;
+                }
+              }
+              double cd, f;
+              // Only calculate the NN for the proto if we found suitable matches.  
+              // Only calculate once, nothing changes between shifts to origin (affine)
+              if(!all_nn_calculated){
+                all_nn_proto = computeNearestNeighbors(proto);
+                if(VERBOSE){
+                  cerr << "compare::structureSearch: Nearest neighbors:" << endl;
+                  for(uint a=0;a<all_nn_proto.size();a++){
+                    cerr << "compare::structureSearch: Nearest neighbor distance from " << a << " atom: " << all_nn_proto[a] << endl;
+                  }
+                }
+                all_nn_calculated = true;
+              }
+              coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,im1,im2,min_dists,cd,f);
+              if(_CALCULATE_MAGNETIC_MISFIT_&& 
+                  ((xstr1.atoms[0].spin_is_given && proto.atoms[0].spin_is_given) || 
+                   (xstr1.atoms[0].noncoll_spin_is_given && proto.atoms[0].noncoll_spin_is_given))){
+                magneticDeviation(xstr1,proto,im1,im2,mag_dis,mag_fail);
+                mis=computeMagneticMisfit(latt_devs[p],cd,f,mag_dis,mag_fail);
+                if(LDEBUG){
+                  cerr << "with spin: mis,latt_dev,cd,f,mag_dis,mag_fail: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f << ", " << mag_dis << ", " << mag_fail <<  endl;
+                  double tmp_mis=computeMisfit(latt_devs[p],cd,f);
+                  cerr << "without spin: mis,latt_dev,cd,f: " << tmp_mis << ", " <<latt_devs[p] << ", " << cd << ", " << f <<  endl;
+                }
+              }
+              else{
+                mis=computeMisfit(latt_devs[p],cd,f);
+                if(LDEBUG){
+                  cerr << "mis,latt_dev,cd,f: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f <<  endl;
+                }
+              }
+              if(mis<min_misfit_info.misfit){
+                //cerr << "storing: " << proto << endl;
+                vprotos.clear();
+                vprotos.push_back(proto);
+                min_misfit_info.misfit=mis;
+                min_misfit_info.lattice_deviation=latt_devs[p];
+                min_misfit_info.coordinate_displacement=cd;
+                min_misfit_info.failure=f;
+                min_misfit_info.magnetic_misfit=mis; //DX 20191218 - should we have this....
+                min_misfit_info.magnetic_displacement=mag_dis;
+                min_misfit_info.magnetic_failure=mag_fail;
+                index_match_1 = im1;
+                index_match_2 = im2;
+                min_distances = min_dists;
+              }
+              // If we want to simply find a match and not find the best match, we can exit early
+	            if(mis<0.1 && !optimize_match) {
+                return true;
+              }
+            }
+          }
+        }
+      }// end of if protos.size()...
+      else{
+        if(LDEBUG){
+          cerr << "compare::structureSearch: Atom counts do not match: orig=" << aurostd::joinWDelimiter(xstr1.num_each_type,",") << " vs test=" << aurostd::joinWDelimiter(proto.num_each_type,",") << endl;
+        }
+      }
+    }
+    return true;
   }  
 }
 
@@ -5607,26 +8063,43 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   void quadrupletSearch(const xmatrix<double>& q1, const xstructure& xstr_LFA_supercell, 
-			vector<xvector<double> >& lattice_vecs, vector<vector<uint> >& ij_index){
+      const xstructure& xstr,
+      vector<xvector<double> >& lattice_vecs, vector<vector<uint> >& ij_index){
 
     // This function scans through the possible quadruplets (sets of 4 LFA atoms) i
     // to find a lattice which is commensurate with the reference structure (xstr1). 
     // This function is parallelized since it is the time-limiting function.
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = "compare::quadrupletSearch()";
+    bool relative_tolerance=true;
 
-    double min_q1_a = aurostd::modulus(q1(1))-aurostd::modulus(q1(1))*0.1;
-    double max_q1_a = aurostd::modulus(q1(1))+aurostd::modulus(q1(1))*0.1;
-    double min_q1_b = aurostd::modulus(q1(2))-aurostd::modulus(q1(2))*0.1;
-    double max_q1_b = aurostd::modulus(q1(2))+aurostd::modulus(q1(2))*0.1;
-    double min_q1_c = aurostd::modulus(q1(3))-aurostd::modulus(q1(3))*0.1;
-    double max_q1_c = aurostd::modulus(q1(3))+aurostd::modulus(q1(3))*0.1;
+    double min_q1_a = 0.0; double max_q1_a = 0.0;
+    double min_q1_b = 0.0; double max_q1_b = 0.0;
+    double min_q1_c = 0.0; double max_q1_c = 0.0;
+
+    if(relative_tolerance){
+      min_q1_a = aurostd::modulus(q1(1))-aurostd::modulus(q1(1))*0.1;
+      max_q1_a = aurostd::modulus(q1(1))+aurostd::modulus(q1(1))*0.1;
+      min_q1_b = aurostd::modulus(q1(2))-aurostd::modulus(q1(2))*0.1;
+      max_q1_b = aurostd::modulus(q1(2))+aurostd::modulus(q1(2))*0.1;
+      min_q1_c = aurostd::modulus(q1(3))-aurostd::modulus(q1(3))*0.1;
+      max_q1_c = aurostd::modulus(q1(3))+aurostd::modulus(q1(3))*0.1;
+    }
+    else{
+      min_q1_a = aurostd::modulus(q1(1))-1.0;
+      max_q1_a = aurostd::modulus(q1(1))+1.0;
+      min_q1_b = aurostd::modulus(q1(2))-1.0;
+      max_q1_b = aurostd::modulus(q1(2))+1.0;
+      min_q1_c = aurostd::modulus(q1(3))-1.0;
+      max_q1_c = aurostd::modulus(q1(3))+1.0;
+    }
 
     if(LDEBUG) {
-      cerr << "compare::quadrupletSearch: Lattice parameters: " << aurostd::modulus(q1(1)) << ", " << aurostd::modulus(q1(2)) << ", " << aurostd::modulus(q1(3)) << endl;
-      cerr << "compare::quadrupletSearch: Modulus search range for lattice vector a: " << min_q1_a << " - " << max_q1_a << endl;
-      cerr << "compare::quadrupletSearch: Modulus search range for lattice vector b: " << min_q1_b << " - " << max_q1_b << endl;
-      cerr << "compare::quadrupletSearch: Modulus search range for lattice vector c: " << min_q1_c << " - " << max_q1_c << endl;
+      cerr << function_name << ": Lattice parameters: " << aurostd::modulus(q1(1)) << ", " << aurostd::modulus(q1(2)) << ", " << aurostd::modulus(q1(3)) << endl;
+      cerr << function_name << ": Modulus search range for lattice vector a: " << min_q1_a << " - " << max_q1_a << endl;
+      cerr << function_name << ": Modulus search range for lattice vector b: " << min_q1_b << " - " << max_q1_b << endl;
+      cerr << function_name << ": Modulus search range for lattice vector c: " << min_q1_c << " - " << max_q1_c << endl;
     }
 
     xvector<double> tmp_vec;
@@ -5634,67 +8107,77 @@ namespace compare{
     
     // Search all possible vectors with modulus comparable to one of the lattice vectors 
     for(uint i=0; i<xstr_LFA_supercell.atoms.size(); i++){
-      for(uint j=i+1; j<xstr_LFA_supercell.atoms.size(); j++){ //upper triangular
-	tmp_vec = xstr_LFA_supercell.atoms[j].cpos-xstr_LFA_supercell.atoms[i].cpos;
-        tmp_mod = aurostd::modulus(tmp_vec);
-        if((tmp_mod <= max_q1_a && tmp_mod >= min_q1_a) || 
-           (tmp_mod <= max_q1_b && tmp_mod >= min_q1_b) || 
-           (tmp_mod <= max_q1_c && tmp_mod >= min_q1_c)){ 
-          bool vec_stored = false;
-          for(uint p=0;p<lattice_vecs.size();p++){
-            if(identical(lattice_vecs[p],tmp_vec,1e-3)){ //DX 20190318 - changed from -10 to -3
-              vec_stored = true;
-              break;
-            }
-          }       
-          if(vec_stored == false){
-            lattice_vecs.push_back(tmp_vec);
-            // Store indices of atoms comprising the vector
-            vector<uint> ij;
-            ij.push_back(i); ij.push_back(j);
-            ij_index.push_back(ij); 
-            // Store negative (may not be needed)
-            //lattice_vecs.push_back(-tmp_vec);
-            //vector<uint> ji;
-            //ji.push_back(j); ji.push_back(i);
-            //ij_index.push_back(ji); 
+      //DX TEST for(uint j=i+1; j<xstr_LFA_supercell.atoms.size(); j++){ //upper triangular
+      //DX TEST   tmp_vec = xstr_LFA_supercell.atoms[j].cpos-xstr_LFA_supercell.atoms[i].cpos;
+      uint j=0;
+      tmp_vec = xstr_LFA_supercell.atoms[i].cpos;
+      tmp_mod = aurostd::modulus(tmp_vec);
+      if((tmp_mod <= max_q1_a && tmp_mod >= min_q1_a) || 
+          (tmp_mod <= max_q1_b && tmp_mod >= min_q1_b) || 
+          (tmp_mod <= max_q1_c && tmp_mod >= min_q1_c)){ 
+        bool vec_stored = false;
+        for(uint p=0;p<lattice_vecs.size();p++){
+          if(identical(lattice_vecs[p],tmp_vec,1e-3)){ //DX 20190318 - changed from -10 to -3
+            vec_stored = true;
+            break;
           }
+        }       
+        if(vec_stored == false){
+          lattice_vecs.push_back(tmp_vec);
+          // Store indices of atoms comprising the vector
+          vector<uint> ij;
+          ij.push_back(i); ij.push_back(j);
+          ij_index.push_back(ij); 
+          // Store negative (may not be needed)
+          //lattice_vecs.push_back(-tmp_vec);
+          //vector<uint> ji;
+          //ji.push_back(j); ji.push_back(i);
+          //ij_index.push_back(ji); 
         }
       }
+      //DX TEST }
     }
 
     if(LDEBUG) {
-      cerr << "compare::quadrupletSearch: Number of potential lattice vectors: " << lattice_vecs.size() << endl;
+      cerr << function_name << ": Number of potential lattice vectors: " << lattice_vecs.size() << endl;
     } 
-    // Removing non-periodic lattice vectors
-    vector<xvector<double> > lattice_vecs_periodic;
-    for(uint i=0;i<lattice_vecs.size();i++){
-      if(vectorPeriodic(lattice_vecs[i],xstr_LFA_supercell,ij_index[i][0],ij_index[i][1])){
-        lattice_vecs_periodic.push_back(lattice_vecs[i]);
-        //DX 20190318 [OBSOLETE] lattice_vecs_periodic.push_back(-lattice_vecs[i]);
-      }
-    }
-    vector<xvector<double> > final_lattice_vecs = lattice_vecs_periodic; //DX 20190320
-    //DX 20190318 - only store negative if not a duplicate - START
-    for(uint i=0;i<lattice_vecs_periodic.size();i++){ //DX 20190320
-      xvector<double> tmp = -lattice_vecs_periodic[i];
-      bool vec_stored = false;
-      for(uint p=0;p<final_lattice_vecs.size();p++){
-        if(identical(final_lattice_vecs[p],tmp,1e-3)){
-          vec_stored = true;
-          break;
-        }
-      }       
-      if(!vec_stored){
-        final_lattice_vecs.push_back(tmp);
-      }
-    }
-    //DX 20190318 - only store negative if not a duplicate - END
-    lattice_vecs = final_lattice_vecs; //DX 20190320
-    if(LDEBUG) {
-      cerr << "compare::quadrupletSearch: Number of lattice vectors (preserves periodicity): " << lattice_vecs.size() << endl;
+
+    // ---------------------------------------------------------------------------
+    // check if vectors preserve crystal periodicity
+    // if only one LFA atom in unit cell -> lattice point -> vectors=lattice vectors (by definition)
+    if(aurostd::min(xstr.num_each_type)!=1){
+      // Removing non-periodic lattice vectors
+      vector<xvector<double> > lattice_vecs_periodic;
       for(uint i=0;i<lattice_vecs.size();i++){
-        cerr << "compare::quadrupletSearch: lattice vector " << i << ": " << lattice_vecs[i] << " (" << aurostd::modulus(lattice_vecs[i]) << ")" << endl; 
+        if(vectorPeriodic(lattice_vecs[i],xstr,ij_index[i][0],ij_index[i][1])){ //DX 20190701 - xstr_LFA_supercell to xstr
+          lattice_vecs_periodic.push_back(lattice_vecs[i]);
+          //DX 20190318 [OBSOLETE] lattice_vecs_periodic.push_back(-lattice_vecs[i]);
+        }
+      }
+      //vector<xvector<double> > final_lattice_vecs = lattice_vecs_periodic; //DX 20190320
+      //DX NOT NEEDED ANYMORE, ALREADY ACCOUNTED FOR - START
+      //DX 20190318 - only store negative if not a duplicate - START
+      //DX [OBSOLETE]   for(uint i=0;i<lattice_vecs_periodic.size();i++){ //DX 20190320
+      //DX [OBSOLETE]    xvector<double> tmp = -lattice_vecs_periodic[i];
+      //DX [OBSOLETE]    bool vec_stored = false;
+      //DX [OBSOLETE]    for(uint p=0;p<final_lattice_vecs.size();p++){
+      //DX [OBSOLETE]    if(identical(final_lattice_vecs[p],tmp,1e-3)){
+      //DX [OBSOLETE]    vec_stored = true;
+      //DX [OBSOLETE]    break;
+      //DX [OBSOLETE]    }
+      //DX [OBSOLETE]    }       
+      //DX [OBSOLETE]    if(!vec_stored){
+      //DX [OBSOLETE]    final_lattice_vecs.push_back(tmp);
+      //DX [OBSOLETE]    }
+      //DX [OBSOLETE]    }
+      //DX 20190318 - only store negative if not a duplicate - END
+      //DX NOT NEEDED ANYMORE, ALREADY ACCOUNTED FOR - END
+      lattice_vecs = lattice_vecs_periodic; //DX 20190320
+    }
+    if(LDEBUG) {
+      cerr << function_name << ": Number of lattice vectors (preserves periodicity): " << lattice_vecs.size() << endl;
+      for(uint i=0;i<lattice_vecs.size();i++){
+        cerr << function_name << ": lattice vector " << i << ": " << lattice_vecs[i] << " (" << aurostd::modulus(lattice_vecs[i]) << ")" << endl; 
       }
     } 
   }
@@ -5708,7 +8191,14 @@ namespace compare{
                             xvector<double>& abc_angles_q1, vector<xmatrix<double> >& lattices, vector<xmatrix<double> >& clattices, 
                             vector<double>& latt_devs, const bool& optimize_match){
 
-    bool LDEBUG=(false || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool VERBOSE=false;
+    string function_name = "compare::buildSimilarLattices():";
+
+    // ---------------------------------------------------------------------------
+    // sort via smallest misfit for speed up
+    bool sort_via_lattice_deviation = true; //DX 20190626 - speed increase
+    bool relative_tolerance = false; //DX 20190703
 
     vector<double> D1,F1;
     cellDiagonal(q1,D1,F1,1);
@@ -5716,111 +8206,142 @@ namespace compare{
     double tol_vol=0.1;
     double det_tol=tol_vol*abs_det_q1;
 
-    double tol_a=abc_angles_q1[1]*0.3;
-    double tol_b=abc_angles_q1[2]*0.3;
-    double tol_c=abc_angles_q1[3]*0.3;
+    // ---------------------------------------------------------------------------
+    // tolerance for lattice vectors: relative or absolute 
+    double tol_a=1e9; double tol_b=1e9; double tol_c=1e9;
+    if(relative_tolerance){
+      tol_a=abc_angles_q1[1]*0.3;
+      tol_b=abc_angles_q1[2]*0.3;
+      tol_c=abc_angles_q1[3]*0.3;
+    }
+    else{
+      tol_a=1.0; tol_b=1.0; tol_c=1.0; // 1 Angstrom
+    }
 
+    // ---------------------------------------------------------------------------
+    // LDEBUG: print lattice tolerances 
     if(LDEBUG) {
-      cerr << "compare::buildSimilarLattices: Tolerance for a (Angstroms): " << tol_a << endl;
-      cerr << "compare::buildSimilarLattices: Tolerance for b (Angstroms): " << tol_b << endl;
-      cerr << "compare::buildSimilarLattices: Tolerance for c (Angstroms): " << tol_c << endl;
-      cerr << "compare::buildSimilarLattices: Tolerance for alpha (degrees): " << abc_angles_q1[4]*0.3 << endl;
-      cerr << "compare::buildSimilarLattices: Tolerance for beta (degrees): " << abc_angles_q1[5]*0.3 << endl;
-      cerr << "compare::buildSimilarLattices: Tolerance for gamma (degrees): " << abc_angles_q1[6]*0.3 << endl;
+      if(relative_tolerance){
+        cerr << function_name << " Tolerance for a (Angstroms): " << tol_a << endl;
+        cerr << function_name << " Tolerance for b (Angstroms): " << tol_b << endl;
+        cerr << function_name << " Tolerance for c (Angstroms): " << tol_c << endl;
+        cerr << function_name << " Tolerance for alpha (degrees): " << abc_angles_q1[4]*0.3 << endl;
+        cerr << function_name << " Tolerance for beta (degrees): " << abc_angles_q1[5]*0.3 << endl;
+        cerr << function_name << " Tolerance for gamma (degrees): " << abc_angles_q1[6]*0.3 << endl;
+      }
+      else{
+        cerr << function_name << " Tolerance for a (Angstroms): " << tol_a << endl;
+        cerr << function_name << " Tolerance for b (Angstroms): " << tol_b << endl;
+        cerr << function_name << " Tolerance for c (Angstroms): " << tol_c << endl;
+        cerr << function_name << " Tolerance for alpha (degrees): " << 5 << endl;
+        cerr << function_name << " Tolerance for beta (degrees): " << 5 << endl;
+        cerr << function_name << " Tolerance for gamma (degrees): " << 5 << endl;
+      }
     }
 
     xmatrix<double> tmp_lattice(3,3);
     xmatrix<double> tmp_clatt(3,3);
 
+    // ---------------------------------------------------------------------------
+    // compute lenths of possible lattices before-hand (faster than on-the-fly)
     int store=0;
     vector<double> translations_mod;
     for(uint i=0;i<translation_vectors.size();i++){
       translations_mod.push_back(aurostd::modulus(translation_vectors[i]));
     }
-    if(LDEBUG) {
-      cerr << "buildSimilarLattices:: Number of lattice vectors: " << translation_vectors.size() << endl;
-    }
+    if(LDEBUG) { cerr << function_name << " Number of lattice vectors: " << translation_vectors.size() << endl; }
 
-    // Build all possible unit cells with combinations of lattice vectors (order matters, hence not upper triangular)
+    // ---------------------------------------------------------------------------
+    // build all possible unit cells with combinations of lattice vectors 
+    // (order matters, hence not upper triangular)
     for(uint i=0;i<translation_vectors.size();i++){
+      // ---------------------------------------------------------------------------
+      // check lattice vector length: a
       if(abs(translations_mod[i]-abc_angles_q1[1])<tol_a){ //check a
-	for(uint j=0;j<translation_vectors.size();j++){
-	  if(j!=i){
-	    if(abs(translations_mod[j]-abc_angles_q1[2])<tol_b){ // check b
-	      for(uint k=0;k<translation_vectors.size();k++){
-		if(k!=i && k!=j){
-		  if(abs(translations_mod[k]-abc_angles_q1[3])<tol_c){ //check c
-		    tmp_lattice = SYM::xvec2xmat(translation_vectors[i],translation_vectors[j],translation_vectors[k]);         
-		    if(abs(abs_det_q1-abs(det(tmp_lattice))) < det_tol){ //check determinant/volume
-		      xvector<double> abc_angles_q2=Getabc_angles(tmp_lattice,DEGREES);
-		      if(checkTolerance(abc_angles_q1,abc_angles_q2)==false){
-// DX 20190318 only calc if lattice dev is small - START
-//			    tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-//			    bool unique = true;
-//			    for(uint t=0;t<lattices.size();t++){
-//			      if(identical(tmp_lattice,lattices[t],1e-10)){
-//			    // DX TEST - CANNOT DO: Eliminates potential matches for(uint t=0;t<clattices.size();t++){
-//			    // DX TEST - CANNOT DO: Eliminates potential matches if(identical(tmp_clatt,clattices[t],1e-10)){
-//			    unique=false;
-//			    break;
-//			  }
-//			}
-// DX 20190318 only calc if lattice dev is small - END
-			double tmp_latt_dev = checkLatticeDeviation(xstr1_vol,tmp_lattice,D1,F1);
-                        // Time-saver, keep lattices that have a deviation smaller than Burzlaff's same-family requirement
+        for(uint j=0;j<translation_vectors.size();j++){
+          if(j!=i){
+            // ---------------------------------------------------------------------------
+            // check lattice vector length: b
+            if(abs(translations_mod[j]-abc_angles_q1[2])<tol_b){ // check b
+              for(uint k=0;k<translation_vectors.size();k++){
+                if(k!=i && k!=j){
+                  // ---------------------------------------------------------------------------
+                  // check lattice vector length: c
+                  if(abs(translations_mod[k]-abc_angles_q1[3])<tol_c){ //check c
+                    tmp_lattice = SYM::xvec2xmat(translation_vectors[i],translation_vectors[j],translation_vectors[k]);         
+                    // ---------------------------------------------------------------------------
+                    // check determinant 
+                    if(abs(abs_det_q1-abs(det(tmp_lattice))) < det_tol){ //check determinant/volume
+                      xvector<double> abc_angles_q2=Getabc_angles(tmp_lattice,DEGREES);
+                      // ---------------------------------------------------------------------------
+                      // check angles
+                      if(checkTolerance(abc_angles_q1,abc_angles_q2)==false){
+                        double tmp_latt_dev = checkLatticeDeviation(xstr1_vol,tmp_lattice,D1,F1);
+                        // ---------------------------------------------------------------------------
+                        // check lattice deviation (time-saver) 
+                        // case 1: NOT optimize match: keep lattices with deviation smaller than Burzlaff's matching requirement)
+                        //         otherwise, there is no possible way that it could match with anything 
+                        // case 2: optimize match: keep lattices with deviation smaller than Burzlaff's same-family requirement)
                         // otherwise, there is no possible way that it could match with anything or be in the same-family
-			// DX 20190318 [OBSOLETE] if(unique && !optimize_match && tmp_latt_dev <= 0.1){ //fast match doesn't care about finding same family information
-			if(!optimize_match && tmp_latt_dev <= 0.1){ //fast match doesn't care about finding same family information //DX 20190318 - removed unique since it doesn't exist yet
-			bool unique = true;
-			for(uint t=0;t<lattices.size();t++){
-			  if(identical(tmp_lattice,lattices[t],1e-10)){
-			    // DX TEST - CANNOT DO: Eliminates potential matches for(uint t=0;t<clattices.size();t++){
-			    // DX TEST - CANNOT DO: Eliminates potential matches if(identical(tmp_clatt,clattices[t],1e-10)){
-			    unique=false;
-			    break;
-			  }
-			}
-                        //DX 20190318 - now store calc and store clattice - START
-                          if(unique){
-			  lattices.push_back(tmp_lattice); // stores original original orientation
-			  tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-			  clattices.push_back(tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
-			  latt_devs.push_back(tmp_latt_dev);
-			  store++;
-                        }
-                        }
-                        //DX 20190318 - now store calc and store clattice - END
-			// DX 20190318 [OBSOLETE] else if(unique && optimize_match && tmp_latt_dev <= 0.2){
-			else if(optimize_match && tmp_latt_dev <= 0.2){ //DX 20190318 - removed unique since it doesn't exist yet
-			            bool unique = true;
-			            for(uint t=0;t<lattices.size();t++){
-			              if(identical(tmp_lattice,lattices[t],1e-10)){
-			    // DX TEST - CANNOT DO: Eliminates potential matches for(uint t=0;t<clattices.size();t++){
-			    // DX TEST - CANNOT DO: Eliminates potential matches if(identical(tmp_clatt,clattices[t],1e-10)){
-			    unique=false;
-			    break;
-			  }
-			}
-                        //DX 20190318 - now store calc and store clattice - START
-                          if(unique){
-			  lattices.push_back(tmp_lattice); // stores original original orientation
-			  tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
-			  clattices.push_back(tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
-			  latt_devs.push_back(tmp_latt_dev);
-			  store++;
+                        if((!optimize_match && tmp_latt_dev <= 0.1) || (optimize_match && tmp_latt_dev <= 0.2)) { //fast match doesn't care about finding same family information //DX 20190318 - removed unique since it doesn't exist yet
+                          // ---------------------------------------------------------------------------
+                          // now check uniqueness (this is more expensive than checking lattice deviation, hence why it is further in nesting) 
+                          bool unique = true;
+                          uint placement_index = lattices.size(); //DX 20190626 //default to the end
+                          for(uint t=0;t<lattices.size();t++){
+                            if(identical(tmp_lattice,lattices[t],1e-10)){
+                              unique=false;
+                              break;
+                            }
+                            // store placement/index based on lattice deviation 
+                            if(sort_via_lattice_deviation && tmp_latt_dev < latt_devs[t] && placement_index == lattices.size()){ // third condition necessary; otherwise it could move down in order
+                              placement_index = t;
+                            }
                           }
-                        //DX 20190318 - now store calc and store clattice - END
-			}
-		      }
-		    }
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+                          if(unique){
+                            // ---------------------------------------------------------------------------
+                            // order/re-order by minimum lattice deviation (speed increase: more likely to find matches faster) 
+                            // append to the end 
+                            if(placement_index==lattices.size()){ // push_back: either it is the first or it goes to the end
+                              lattices.push_back(tmp_lattice); // stores original original orientation
+                              tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
+                              clattices.push_back(tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
+                              latt_devs.push_back(tmp_latt_dev);
+                            }
+                            // insert to certain location via index 
+                            else{
+                              lattices.insert(lattices.begin()+placement_index, tmp_lattice); // stores original original orientation
+                              tmp_clatt=GetClat(abc_angles_q2[1],abc_angles_q2[2],abc_angles_q2[3],abc_angles_q2[4],abc_angles_q2[5],abc_angles_q2[6]);
+                              clattices.insert(clattices.begin()+placement_index, tmp_clatt); // store Cartesian lattice, alignes with XYZ coordinates
+                              latt_devs.insert(latt_devs.begin()+placement_index, tmp_latt_dev);
+                            }
+                            store++;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
+
+    // ---------------------------------------------------------------------------
+    // print lattices and corresponding lattice deviation 
+    if(VERBOSE){
+      cerr << "q1: " << q1 << endl;
+      cerr << "det(q1): " << det(q1) << endl;
+      cerr << "abc angles q1: " << abc_angles_q1 << endl;
+      for(uint i=0;i<lattices.size();i++){
+        cerr << function_name << endl << " lattice: " << endl << lattices[i] << endl << " clattice: " << clattices[i] << endl << " volume: " << det(lattices[i]) << endl << " lattice deviation: " << endl << latt_devs[i] << endl;
+        xvector<double> abc_angles_q2=Getabc_angles(lattices[i],DEGREES);
+        cerr << "abc angles: " << abc_angles_q2 << endl;
+      }
+    }
+
     return true;
   }
 }
@@ -5839,149 +8360,174 @@ namespace compare{
   }
 }
 
-// ***************************************************************************
-// Internal structure
-// ***************************************************************************
-namespace compare{
-  bool structureSearch(const string& lfa, 
-                        const vector<double>& all_nn1, 
-			const xstructure& xstr, 
-			vector<xstructure>& vprotos, xstructure& xstr1, const xstructure& xstr2, 
-			const int& type_match, double& possible_minMis,
-			vector<xmatrix<double> >& lattices,
-			vector<xmatrix<double> >& clattices, 
-			vector<double>& latt_devs, 
-			const bool& optimize_match){ 
-
-
-    bool LDEBUG=(false || XHOST.DEBUG);
-
-    double mis=1;  
-    xstructure proto;
-    int flag=0;
-    xstructure xstr2_tmp = xstr2;
-
-    for(uint p=0;p<lattices.size();p++){
-      if(LDEBUG) {
-        cerr << "compare::structureSearch: Trying lattice " << p << endl;
-      }
-      proto=xstr;
-      proto.lattice=lattices[p];
-
-      // Transform
-      for(uint iat=0;iat<proto.atoms.size();iat++){
-	proto.atoms[iat].fpos=C2F(proto.lattice,proto.atoms[iat].cpos);
-      }
-      proto.lattice=clattices[p];
-	for(uint iat=0;iat<proto.atoms.size();iat++){
-	proto.atoms[iat].cpos=F2C(proto.lattice,proto.atoms[iat].fpos);
-      }
-      xstructure proto_new;
-      proto_new.title=proto.title;
-      proto_new.lattice=clattices[p];
-
-      // DX NEW - START =======================
-      xmatrix<double> f2c = trasp(proto.lattice);
-      xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
-      bool skew = false;
-      double tol=0.01;
-      deque<_atom> new_basis;
-      for(uint j=0;j<proto.atoms.size();j++){
-	if(new_basis.size()==0){
-	  proto.atoms[j].fpos = BringInCell(proto.atoms[j].fpos,1e-10);
-	  proto.atoms[j].cpos = f2c*proto.atoms[j].fpos;
-	  new_basis.push_back(proto.atoms[j]);
-	  //proto_new.AddAtom(proto.atoms[j]);
-	}
-	else {
-	  bool duplicate_lattice_point=false;
-	  for(uint a=0; a<new_basis.size(); a++){
-	    xvector<double> tmp = BringInCell(proto.atoms[j].fpos,1e-10);
-	    if(SYM::MapAtom(new_basis[a].fpos,tmp,proto.lattice,proto.f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input
-	      duplicate_lattice_point=true;
-	      break;
-	    }
-	  }
-	  if(duplicate_lattice_point==false){
-	    proto.atoms[j].fpos = BringInCell(proto.atoms[j].fpos,1e-10);
-	    proto.atoms[j].cpos = f2c*proto.atoms[j].fpos;
-	    new_basis.push_back(proto.atoms[j]);
-	    //proto_new.AddAtom(proto.atoms[j]);
-	  }
-	}
-      }
-      proto_new.atoms = new_basis;
-      proto_new.BringInCell(1e-10); 
-      proto_new.FixLattices();
-      proto_new.SpeciesPutAlphabetic();
-      deque<int> sizes = SYM::arrange_atoms(new_basis);
-      proto_new = pflow::SetNumEachType(proto_new, sizes);
-      proto = proto_new;
-      if(sameSpecies(proto,xstr1,false)){
-	vector<double> all_nn_proto;
-	bool all_nn_calculated = false;
-	for(uint iat=0; iat<proto.atoms.size();iat++){
-	  if(proto.atoms[iat].name==lfa){
-	    proto.ShifOriginToAtom(iat);
-	    proto.BringInCell(1e-10);
-	    vector<uint> im1, im2;
-	    vector<double> min_dists;
-	    if(findMatch(xstr1,proto,im1,im2,min_dists,type_match)){;
-	      double cd, f;
-	      // Only calculate the NN for the proto if we found suitable matches.  
-	      // Only calculate once, nothing changes between shifts to origin (affine)
-	      if(!all_nn_calculated){
-                all_nn_proto = computeNearestNeighbors(proto);
-		if(LDEBUG) {
-		  cerr << "compare::structureSearch: Nearest neighbors:" << endl;
-		  for(uint a=0;a<all_nn_proto.size();a++){
-		    cerr << "compare::structureSearch: Nearest neighbor distance from " << a << " atom: " << all_nn_proto[a] << endl;
-		  }
-		}
-		all_nn_calculated = true;
-              }
-	      coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,im1,im2,min_dists,cd,f);
-	      mis=computeMisfit(latt_devs[p],cd,f);
-	      //if(LDEBUG) {
-	      //  cerr << "mis,latt_dev,cd,f: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f <<  endl;
-	      //}
-	      if(flag==0){
-	        flag=1;
-		//cerr << "storing: " << proto << endl;
-		vprotos.push_back(proto);
-		possible_minMis=mis;
-	      }
-	      else {
-	        if(mis<possible_minMis){
-		  vprotos.clear();
-		  possible_minMis=mis;
-		  //cerr << "storing: " << proto << endl;
-		  vprotos.push_back(proto); //to here
-		}
-	      }
-              // If we want to simply find a match and not find the best match, we can exit early
-	      if(mis<0.1 && !optimize_match) {
-                return true;
-	        //DEBUGGING
-		//cerr <<"Winning combo: "<<i<<","<<j<<","<<k<<","<<w<<endl;
-		//cerr << "proto.lattice: " << proto.lattice << endl;
-		//cerr << "lattice(1): " << modulus(proto.lattice(1)) << endl;
-		//cerr << "lattice(2): " << modulus(proto.lattice(2)) << endl;
-		//cerr << "lattice(3): " << modulus(proto.lattice(3)) << endl;
-	      }
-	    }
-	  }
-	}
-      }// end of if protos.size()...
-    }
-    return true;
-  }
-}
-
+// [OBSOLETE - DX 20190717] // ***************************************************************************
+// [OBSOLETE - DX 20190717] // Internal structure
+// [OBSOLETE - DX 20190717] // ***************************************************************************
+// [OBSOLETE - DX 20190717] namespace compare{
+// [OBSOLETE - DX 20190717]   bool structureSearch(const string& lfa, 
+// [OBSOLETE - DX 20190717]                         const vector<double>& all_nn1, 
+// [OBSOLETE - DX 20190717] 			const xstructure& xstr_supercell, //DX 20190530 - added "_supercell"; more descriptive 
+// [OBSOLETE - DX 20190717] 			vector<xstructure>& vprotos, xstructure& xstr1, const xstructure& xstr2, 
+// [OBSOLETE - DX 20190717] 			const int& type_match, double& possible_minMis,
+// [OBSOLETE - DX 20190717] 			vector<xmatrix<double> >& lattices,
+// [OBSOLETE - DX 20190717] 			vector<xmatrix<double> >& clattices, 
+// [OBSOLETE - DX 20190717] 			vector<double>& latt_devs, 
+// [OBSOLETE - DX 20190717] 			const bool& optimize_match){ 
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     bool LDEBUG=(false || XHOST.DEBUG);
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     double mis=1;  
+// [OBSOLETE - DX 20190717]     xstructure proto;
+// [OBSOLETE - DX 20190717]     int flag=0;
+// [OBSOLETE - DX 20190717]     xstructure xstr2_tmp = xstr2;
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]     for(uint p=0;p<lattices.size();p++){
+// [OBSOLETE - DX 20190717]       if(LDEBUG) {
+// [OBSOLETE - DX 20190717]         cerr << "compare::structureSearch: Trying lattice " << p << endl;
+// [OBSOLETE - DX 20190717]       }
+// [OBSOLETE - DX 20190717]       proto=xstr_supercell; //DX 20190530 - added "_supercell"; more descriptive
+// [OBSOLETE - DX 20190717]       proto.lattice=lattices[p];
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]       // Transform
+// [OBSOLETE - DX 20190717]       for(uint iat=0;iat<proto.atoms.size();iat++){
+// [OBSOLETE - DX 20190717] 	proto.atoms[iat].fpos=C2F(proto.lattice,proto.atoms[iat].cpos);
+// [OBSOLETE - DX 20190717]       }
+// [OBSOLETE - DX 20190717]       proto.lattice=clattices[p];
+// [OBSOLETE - DX 20190717] 	for(uint iat=0;iat<proto.atoms.size();iat++){
+// [OBSOLETE - DX 20190717] 	proto.atoms[iat].cpos=F2C(proto.lattice,proto.atoms[iat].fpos);
+// [OBSOLETE - DX 20190717]       }
+// [OBSOLETE - DX 20190717]       xstructure proto_new;
+// [OBSOLETE - DX 20190717]       proto_new.title=proto.title;
+// [OBSOLETE - DX 20190717]       proto_new.lattice=clattices[p];
+// [OBSOLETE - DX 20190717] 
+// [OBSOLETE - DX 20190717]       // DX NEW - START =======================
+// [OBSOLETE - DX 20190717]       xmatrix<double> f2c = trasp(proto.lattice);
+// [OBSOLETE - DX 20190717]       xmatrix<double> c2f = aurostd::inverse(trasp(proto.lattice));
+// [OBSOLETE - DX 20190717]       bool skew = false;
+// [OBSOLETE - DX 20190717]       double tol=0.01;
+// [OBSOLETE - DX 20190717]       deque<_atom> new_basis;
+// [OBSOLETE - DX 20190717]       for(uint j=0;j<proto.atoms.size();j++){
+// [OBSOLETE - DX 20190717] 	if(new_basis.size()==0){
+// [OBSOLETE - DX 20190717] 	  proto.atoms[j].fpos = BringInCell(proto.atoms[j].fpos,1e-10);
+// [OBSOLETE - DX 20190717] 	  proto.atoms[j].cpos = f2c*proto.atoms[j].fpos;
+// [OBSOLETE - DX 20190717] 	  new_basis.push_back(proto.atoms[j]);
+// [OBSOLETE - DX 20190717] 	  //proto_new.AddAtom(proto.atoms[j]);
+// [OBSOLETE - DX 20190717] 	}
+// [OBSOLETE - DX 20190717] 	else {
+// [OBSOLETE - DX 20190717] 	  bool duplicate_lattice_point=false;
+// [OBSOLETE - DX 20190717] 	  for(uint a=0; a<new_basis.size(); a++){
+// [OBSOLETE - DX 20190717] 	    xvector<double> tmp = BringInCell(proto.atoms[j].fpos,1e-10);
+// [OBSOLETE - DX 20190717] 	    if(SYM::MapAtom(new_basis[a].fpos,tmp,c2f,f2c,skew,tol)){
+// [OBSOLETE - DX 20190717] 	      duplicate_lattice_point=true;
+// [OBSOLETE - DX 20190717] 	      break;
+// [OBSOLETE - DX 20190717] 	    }
+// [OBSOLETE - DX 20190717] 	  }
+// [OBSOLETE - DX 20190717] 	  if(duplicate_lattice_point==false){
+// [OBSOLETE - DX 20190717] 	    proto.atoms[j].fpos = BringInCell(proto.atoms[j].fpos,1e-10);
+// [OBSOLETE - DX 20190717] 	    proto.atoms[j].cpos = f2c*proto.atoms[j].fpos;
+// [OBSOLETE - DX 20190717] 	    new_basis.push_back(proto.atoms[j]);
+// [OBSOLETE - DX 20190717] 	    //proto_new.AddAtom(proto.atoms[j]);
+// [OBSOLETE - DX 20190717] 	  }
+// [OBSOLETE - DX 20190717] 	}
+// [OBSOLETE - DX 20190717]       }
+// [OBSOLETE - DX 20190717]       proto_new.atoms = new_basis;
+// [OBSOLETE - DX 20190717]       proto_new.BringInCell(1e-10); 
+// [OBSOLETE - DX 20190717]       proto_new.FixLattices();
+// [OBSOLETE - DX 20190717]       proto_new.SpeciesPutAlphabetic();
+// [OBSOLETE - DX 20190717]       deque<int> sizes = SYM::arrange_atoms(new_basis);
+// [OBSOLETE - DX 20190717]       proto_new = pflow::SetNumEachType(proto_new, sizes);
+// [OBSOLETE - DX 20190717]       proto = proto_new;
+// [OBSOLETE - DX 20190717]       if(sameSpecies(proto,xstr1,false)){
+// [OBSOLETE - DX 20190717] 	vector<double> all_nn_proto;
+// [OBSOLETE - DX 20190717] 	bool all_nn_calculated = false;
+// [OBSOLETE - DX 20190717] 	for(uint iat=0; iat<proto.atoms.size();iat++){
+// [OBSOLETE - DX 20190717] 	  if(proto.atoms[iat].name==lfa){
+// [OBSOLETE - DX 20190717] 	    proto.ShifOriginToAtom(iat);
+// [OBSOLETE - DX 20190717] 	    proto.BringInCell(1e-10);
+// [OBSOLETE - DX 20190717]             if(LDEBUG){
+// [OBSOLETE - DX 20190717]               cerr << "compare::structureSearch: orig structure " << xstr1 << endl;
+// [OBSOLETE - DX 20190717]               cerr << "compare::structureSearch: structure " << proto << endl;
+// [OBSOLETE - DX 20190717]             }
+// [OBSOLETE - DX 20190717] 	    vector<uint> im1, im2;
+// [OBSOLETE - DX 20190717] 	    vector<double> min_dists;
+// [OBSOLETE - DX 20190717] 	    if(findMatch(xstr1,proto,im1,im2,min_dists,type_match)){;
+// [OBSOLETE - DX 20190717]               for(uint m=0;m<im1.size();m++){
+// [OBSOLETE - DX 20190717]                 cerr << im1[m] << " == " << im2[m] << " : dist=" << min_dists[m] << endl;
+// [OBSOLETE - DX 20190717]               }
+// [OBSOLETE - DX 20190717] 	      double cd, f;
+// [OBSOLETE - DX 20190717] 	      // Only calculate the NN for the proto if we found suitable matches.  
+// [OBSOLETE - DX 20190717] 	      // Only calculate once, nothing changes between shifts to origin (affine)
+// [OBSOLETE - DX 20190717] 	      if(!all_nn_calculated){
+// [OBSOLETE - DX 20190717]                 all_nn_proto = computeNearestNeighbors(proto);
+// [OBSOLETE - DX 20190717] 		if(LDEBUG) {
+// [OBSOLETE - DX 20190717] 		  cerr << "compare::structureSearch: Nearest neighbors:" << endl;
+// [OBSOLETE - DX 20190717] 		  for(uint a=0;a<all_nn_proto.size();a++){
+// [OBSOLETE - DX 20190717] 		    cerr << "compare::structureSearch: Nearest neighbor distance from " << a << " atom: " << all_nn_proto[a] << endl;
+// [OBSOLETE - DX 20190717] 		  }
+// [OBSOLETE - DX 20190717] 		}
+// [OBSOLETE - DX 20190717] 		all_nn_calculated = true;
+// [OBSOLETE - DX 20190717]               }
+// [OBSOLETE - DX 20190717] 	      coordinateDeviation(xstr1,proto,all_nn1,all_nn_proto,im1,im2,min_dists,cd,f);
+// [OBSOLETE - DX 20190717] 	      mis=computeMisfit(latt_devs[p],cd,f);
+// [OBSOLETE - DX 20190717] 	      //if(LDEBUG) {
+// [OBSOLETE - DX 20190717] 	      //  cerr << "mis,latt_dev,cd,f: " << mis << ", " <<latt_devs[p] << ", " << cd << ", " << f <<  endl;
+// [OBSOLETE - DX 20190717] 	      //}
+// [OBSOLETE - DX 20190717] 	      if(flag==0){
+// [OBSOLETE - DX 20190717] 	        flag=1;
+// [OBSOLETE - DX 20190717] 		//cerr << "storing: " << proto << endl;
+// [OBSOLETE - DX 20190717] 		vprotos.push_back(proto);
+// [OBSOLETE - DX 20190717] 		possible_minMis=mis;
+// [OBSOLETE - DX 20190717] 	      }
+// [OBSOLETE - DX 20190717] 	      else {
+// [OBSOLETE - DX 20190717] 	        if(mis<possible_minMis){
+// [OBSOLETE - DX 20190717] 		  vprotos.clear();
+// [OBSOLETE - DX 20190717] 		  possible_minMis=mis;
+// [OBSOLETE - DX 20190717] 		  //cerr << "storing: " << proto << endl;
+// [OBSOLETE - DX 20190717] 		  vprotos.push_back(proto); //to here
+// [OBSOLETE - DX 20190717] 		}
+// [OBSOLETE - DX 20190717] 	      }
+// [OBSOLETE - DX 20190717]               // If we want to simply find a match and not find the best match, we can exit early
+// [OBSOLETE - DX 20190717] 	      if(mis<0.1 && !optimize_match) {
+// [OBSOLETE - DX 20190717]                 return true;
+// [OBSOLETE - DX 20190717] 	        //DEBUGGING
+// [OBSOLETE - DX 20190717] 		//cerr <<"Winning combo: "<<i<<","<<j<<","<<k<<","<<w<<endl;
+// [OBSOLETE - DX 20190717] 		//cerr << "proto.lattice: " << proto.lattice << endl;
+// [OBSOLETE - DX 20190717] 		//cerr << "lattice(1): " << modulus(proto.lattice(1)) << endl;
+// [OBSOLETE - DX 20190717] 		//cerr << "lattice(2): " << modulus(proto.lattice(2)) << endl;
+// [OBSOLETE - DX 20190717] 		//cerr << "lattice(3): " << modulus(proto.lattice(3)) << endl;
+// [OBSOLETE - DX 20190717] 	      }
+// [OBSOLETE - DX 20190717] 	    }
+// [OBSOLETE - DX 20190717] 	  }
+// [OBSOLETE - DX 20190717] 	}
+// [OBSOLETE - DX 20190717]       }// end of if protos.size()...
+// [OBSOLETE - DX 20190717]     }
+// [OBSOLETE - DX 20190717]     return true;
+// [OBSOLETE - DX 20190717]   }
+// [OBSOLETE - DX 20190717] }
 //---------------------------------------------------------------
 
 // ***************************************************************************
-//                                 END - FINE
-// 			AFLOW Compare Structure - Functions
-//		David Hicks (d.hicks@duke.edu) and Carlo de Santo
+// get prototype designations 
+// ***************************************************************************
+namespace compare{
+  void getPrototypeDesignations(vector<StructurePrototype>& prototypes, uint start_index, uint end_index){
+    
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then generate over entire range
+    if(end_index == AUROSTD_MAX_UINT){ end_index=prototypes.size(); }
+
+    for(uint i=start_index;i<end_index;i++){ //DX 20191107 switching end index convention <= vs <
+      anrl::structure2anrl(prototypes[i].structure_representative,false); //DX 20190829 - false for do not recalulate symmetry, save time
+    }
+  }
+}
+
+// AFLOW-XtalMatch (compare crystal structures) - Functions
+// Written by David Hicks (david.hicks@duke.edu) 
+// Contributors: Carlo De Santo
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *           Aflow DAVID HICKS - Duke University 2014-2019                 *
+// *                                                                         *
 // ***************************************************************************

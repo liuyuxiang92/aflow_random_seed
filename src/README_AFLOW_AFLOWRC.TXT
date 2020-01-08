@@ -48,6 +48,34 @@ DEFAULT_KZIP_EXT
   default: ".xz"
 
 ####################################################################################################
+DEFAULTS FOR THE AFLOW DATABASE
+
+DEFAULT_AFLOW_DB_FILE
+  description: The location of the AFLOW database file.
+  type: string
+  default: "/mnt/ramd/aflowlib.db"
+
+DEFAULT_AFLOW_DB_STATS_FILE
+  description: The location of the AFLOW database statistics file.
+  type: string
+  default: "/mnt/ramd/aflowlib.json"
+
+DEFAULT_AFLOW_DB_DATA_PATH
+  description: The location of the AFLOW database JSON files.
+  type: string
+  default: "/common/AFLOW/LIBS/"
+
+DEFAULT_AFLOW_DB_LOCK_FILE
+  description: The location of the AFLOW database lock file.
+  type: string
+  default: "/mnt/ramd/ADB_Idle.lock"
+
+DEFAULT_AFLOW_DB_STALE_THRESHOLD
+  description: The time in seconds at which the AFLOW database rebuild process is considered stale.
+  type: double
+  default: 10800 (3 hours)
+
+####################################################################################################
 FILENAMES FOR AFLOW.ORG ANALYSIS
 
 DEFAULT_FILE_AFLOWLIB_ENTRY_OUT
@@ -1008,7 +1036,7 @@ DEFAULT_UFF_CLUSTER RADIUS
   default: 10 Angstroms
 
 DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON
-  description: Default option for performing robust structure comparison (AFLOW-XTAL-MATCH) IN ADDITION TO UFF energy analysis.
+  description: Default option for performing robust structure comparison (AFLOW-XtalMatch) IN ADDITION TO UFF energy analysis.
   type: bool
   default: 0
 

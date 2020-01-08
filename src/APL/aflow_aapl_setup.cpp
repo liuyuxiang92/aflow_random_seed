@@ -176,7 +176,9 @@ string PhononCalculator::buildRunNameAAPL(const vector<int>& distortions,
 }
 
 //applyDistortionsAAPL////////////////////////////////////////////////////////
-// Applies the inequivalent distortions to the supercell structures.
+// Applies the inequivalent distortions to the supercell structures. scale is
+// a scaling factor for the distortion magnitude (necessary for higher order
+// derivatives).
 void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
                                             const vector<xvector<double> >& distortion_vectors,
                                             const vector<int>& distortions,
@@ -197,7 +199,7 @@ void PhononCalculator::applyDistortionsAAPL(_xinput& xinp,
       if (abs(dist_cart(i)) < _ZERO_TOL_) {
         dist_cart(i) = 0.0;
       } else {
-        dist_cart(i) *= scale/std::abs(dist_cart(i));
+        dist_cart(i) *= (scale/std::abs(dist_cart(i)));
       }
     }
     dist_cart *= DISTORTION_MAGNITUDE;

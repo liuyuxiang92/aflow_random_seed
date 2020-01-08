@@ -464,7 +464,7 @@ string formatDefaultTitlePOCC_191004(const xoption& plotoptions) {  //CO version
       break;
     }
     catch(aurostd::xerror& excpt){
-      xstr.Clear();
+      xstr.clear(); //DX 20191220 - uppercase to lowercase clear
       t=elements_prototype_str.find('.',t+1);
       continue;
     }
