@@ -288,7 +288,13 @@ namespace SYM{
     xvector<double> dir_vec = point_2 - point_1;
     //cerr << "dir vec: " << dir_vec << endl;
     double n = aurostd::modulus(dir_vec);
-    if(aurostd::abs(n) < 1e-8) { cerr << "SYM::Screw::get_A(): PROBLEM WITH DIR VEC ( Screw::get_A() ) " << endl; }
+    //DX 20191028 [OBSOLETE] if(aurostd::abs(n) < 1e-8) { cerr << "SYM::Screw::get_A(): PROBLEM WITH DIR VEC ( Screw::get_A() ) " << endl; }
+    //DX 20191028 - if modulus is zero, then do no rotate - START
+    if(aurostd::abs(n) < _ZERO_TOL_) {
+      A = aurostd::eye<double>(4,4);
+      return;
+    }
+    //DX 20191028 - if modulus is zero, then do no rotate - END
     dir_vec = 1 / n * dir_vec;
     one_point = point_2;  //a point on the line to pass around
     //double u = dir_vec[1];
@@ -327,7 +333,13 @@ namespace SYM{
     xvector<double> dir_vec = axis_dir;
     double n = aurostd::modulus(dir_vec);
     angle = 2 * Pi_r / order;
-    if(aurostd::abs(n) < 1e-8) { cerr << "SYM::get_screw_direct: PROBLEM WITH DIR VEC ( Screw::get_screw_direct() )" << endl; }
+    //DX 20191028 [OBSOLETE] if(aurostd::abs(n) < 1e-8) { cerr << "SYM::get_screw_direct: PROBLEM WITH DIR VEC ( Screw::get_screw_direct() )" << endl; }
+    //DX 20191028 - if modulus is zero, then do no rotate - START
+    if(aurostd::abs(n) < _ZERO_TOL_) {
+      A = aurostd::eye<double>(4,4);
+      return;
+    }
+    //DX 20191028 - if modulus is zero, then do no rotate - END
     dir_vec = 1 / n * dir_vec;
     direction_vector = dir_vec;
     one_point = point;  //a point on the line to pass around

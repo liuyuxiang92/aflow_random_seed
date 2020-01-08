@@ -42,6 +42,14 @@ namespace aurostd {
     //    utype re,im;
   };
 
+  // ME200107
+  // ---------------------------------------------- identical
+  template<class utype> bool identical(const xcomplex<utype>&, const xcomplex<utype>&, utype);
+  template<class utype> bool isdifferent(const xcomplex<utype>&, const xcomplex<utype>&, utype);
+  template<class utype> bool isdifferent(const xcomplex<utype>&, const xcomplex<utype>&);
+  template<class utype> bool isequal(const xcomplex<utype>&, const xcomplex<utype>&, utype);
+  template<class utype> bool isequal(const xcomplex<utype>&, const xcomplex<utype>&);
+
   // ---------------------------------------------- operator ostream << xcomplex
   //  template <class utype> ostream& operator <<(ostream&,const xcomplex<utype>&);
   template<class utype> std::ostream& operator <<(std::ostream& os,const xcomplex<utype>& x) __xprototype;

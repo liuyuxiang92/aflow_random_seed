@@ -208,7 +208,7 @@ namespace aurostd {
     isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO 180409
   
   template<class utype> bool
-    iszero(const xvector<utype>&, const double& tol=1e-7) __xprototype;  // ME180702
+    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  // ME180702 //CO191201 - 1e-7 seems arbitrary
   // CONSTRUCTIONS OF VECTORS FROM SCALARS
   
   template<class utype> xvector<utype>
@@ -280,7 +280,7 @@ namespace aurostd {
     vector2xvector(const vector<utype>&,int lrows=1) __xprototype; //CO 180409
 
   xvector<double> xvectorint2double(const xvector<int>&); //CO 180515
-  xvector<int> xvectordouble2int(const xvector<double>&); //CO 180515
+  xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO 180515
 
   // OPERATIONS ON XVECTORS
 
@@ -338,12 +338,35 @@ namespace aurostd {
   template<class utype> xvector<utype>                  // clear values too small
     roundoff(const xvector<utype>&,utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; // claar values too small //CO 180409
 
-  int GCD(const xvector<int>&);                         // get GCD of vector //CO 180409
-  int LCM(const xvector<int>&);                         // get LCM of vector //CO 180520
+  void GCD(const xvector<int>&,int&);                         // get GCD of xvector //CO 180409 //CO191201
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd); //CO191201
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy); //CO191201
+  int LCM(const xvector<int>&);                         // get LCM of xvector //CO 180520
 
-  template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO 180409
-    reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO 180409
-        const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409
+  //DX 20191125 [OBSOLETE] template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO 180409
+  //DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO 180409
+  //DX 20191125 [OBSOLETE]       const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409
+  
+  template<class utype> 
+    void reduceByGCD(const xvector<utype>& in_V,                    // simply divide by GCD (useful for compounds) //CO 180409
+      xvector<utype>& out_V,                                        // simply divide by GCD (useful for compounds) //CO 180409
+      utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409 //CO191201
+  
+  void GCD(const vector<int>&,int&);                          // get GCD of vector //DX 20191125 (modeled after CO's xvector version) //CO191201
+  int LCM(const vector<int>&);                          // get LCM of vector //DX 20191125 (modeled after CO's xvector version)
+  
+  template<class utype> 
+    void reduceByGCD(const vector<utype>& in_V,                     // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+      vector<utype>& out_V,                                         // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+      utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)  //CO191201
+  
+  void GCD(const deque<int>&,int& gcd);                           // get GCD of deque //DX 20191125 (modeled after CO's xvector version)  //CO191201
+  int LCM(const deque<int>&);                           // get LCM of deque //DX 20191125 (modeled after CO's xvector version)
+  
+  template<class utype> 
+    void reduceByGCD(const deque<utype>& in_V,                      // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+      deque<utype>& out_V,                                          // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+      utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)  //CO191201
 
   template<class utype> xvector<utype> 
     normalizeSumToOne(const xvector<utype>& in_V,

@@ -1,4 +1,3 @@
-
 #include "aflow_apl.h"
 
 #define _DEBUG_APL_PHONCALC_ false  //CO190116
@@ -1615,8 +1614,8 @@ void PhononCalculator::writeOUTPUT(_xinput& xinput) { //CO 180409
 //////////////////////////////////////////////////////////////////////////////
 
 void PhononCalculator::writeDYNMAT() {
-  string filename = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE;  //ME181226
-  _logger << "Writing forces into file " << aurostd::CleanFileName(filename) << "." << apl::endl; //ME181226
+  string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_DYNMAT_FILE);  //ME181226
+  _logger << "Writing forces into file " << filename << "." << apl::endl; //ME181226
 
   //
   //CO - START
@@ -1995,7 +1994,7 @@ void PhononCalculator::hibernate() {
   //   if (!aurostd::EFileExist("apl.xml"))
   //    throw apl::APLRuntimeError("PhononCalculator::hibernate(); Cannot open output apl.xml.");
   //} else {
-  string filename = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+  string filename = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
   aurostd::stringstream2file(outfile, filename); //ME181226
   if (!aurostd::FileExist(filename)) { //ME181226
     string function = "PhononCalculator::hibernate()";
@@ -2017,7 +2016,7 @@ void PhononCalculator::awake() {
   //CO, we already checked that it exists before, just open
 
   vector<string> vlines;                           //CO
-  string hibfile = _aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE; //ME181226
+  string hibfile = aurostd::CleanFileName(_aflowFlags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE); //ME181226
   aurostd::efile2vectorstring(hibfile, vlines);  //CO //ME181226
   // Decompress
   //bool isXMLCompressed = aurostd::FileExist(string("apl.xml.EXT")); //CO

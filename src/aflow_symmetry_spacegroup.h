@@ -405,8 +405,7 @@ namespace SYM {
 // ******************************************************************************
 //MAIN FUNCITONS
 namespace SYM {
-  void calculateSpaceGroups(vector<xstructure>& vxstrs);
-  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint& start_index, uint& end_index);
+  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index=0, uint end_index=AUROSTD_MAX_UINT, uint setting=0); //DX 20191230 add setting option
   string OrthoDefect(istream& cin);
   xstructure SpaceGroup(istream& cin);
   void rgcd(vector<string> num);
@@ -456,6 +455,8 @@ namespace SYM {
   int enumerate_wyckoff_letter(string& wyckoff_letter);
   vector<int> enumerate_wyckoff_letters(vector<string>& wyckoff_letters); //DX 20180927
   void get_all_wyckoff_for_site_symmetry(string spaceg, int mult, string site_symmetry, vector<vector<string> >& all_positions);
+  void get_Wyckoff_from_letter(uint space_group_number, string& space_group_setting,
+      string& Wyckoff_letter, uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions); //DX 20191029
   void get_Wyckoff_from_letter(string& spaceg, string& Wyckoff_letter, 
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<string>& positions);
   xvector<double> Wyckoff_position_string2xvector(string& string_position);
@@ -463,6 +464,8 @@ namespace SYM {
   void get_certain_wyckoff_pos(string spaceg, int mult, string site_symmetry, vector<string>& site_symmetries, vector<string>& letters, vector<string>& positions);
   void getGeneralWyckoffMultiplicityAndPosition(uint space_group_number, string& space_group_setting, int& general_wyckoff_multiplicity, vector<string>& general_wyckoff_position);
   vector<string> findGeneralWyckoffPosition(string& spacegroupstring, int& general_wyckoff_multiplicity);
+  vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting,
+      string& Wyckoff_letter, uint Wyckoff_multiplicity); //DX 20191029
   vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity); //DX 20190128 
   string formatWyckoffPosition(const vector<sdouble>& sd_coordinate); //DX 20190723
   string reorderWyckoffPosition(const string& orig_position); //DX 20190708
@@ -474,20 +477,31 @@ namespace SYM {
 			    deque<_atom>& wyckoffPositionsVector, vector<string>& wyckoffSymbols, ostringstream& woss,
 			    bool& obverse_force_transformed);
 
+  vector<vector<string> > getWyckoffEquations(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
+  vector<vector<string> > getWyckoffEquations(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
+  uint getWyckoffMultiplicity(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
+  uint getWyckoffMultiplicity(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
+  string getWyckoffSiteSymmetry(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter); //DX 20191030
+  string getWyckoffSiteSymmetry(const string& Wyckoff_string, const string& Wyckoff_letter); //DX 20191030
+  void getWyckoffInformation(const uint space_group_number, const string& space_group_setting, const string& Wyckoff_letter,
+      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions); //DX 20191030
+  void getWyckoffInformation(const string& Wyckoff_string, const string& Wyckoff_letter,
+      uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions); //DX 20191030
+
   vector<vector<vector<string> > > GetSameSymmetryWyckoffLetters(uint space_group_number, vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint setting);
   void print_wyckoff_pos(vector<vector<vector<string> > > wyckoff_positions);
   vector<vector<vector<vector<sdouble> > > > convert_wyckoff_pos_sd(vector<vector<vector<string> > > wyckoff_positions);
   void convert_wyckoff_pos(vector<vector<vector<string> > > wyckoff_positions);
   vector<vector<string> > get_centering(string spaceg);
 
-  vector<double> ExtractLatticeParametersFromWyccar(vector<string>& wyccar_ITC);
-  string ExtractWyckoffAttributesString(vector<string>& wyccar_ITC, uint attribute_index); //DX 201780823 
-  string ExtractWyckoffLettersString(vector<string>& wyccar_ITC); //DX 201780823
-  string ExtractWyckoffMultiplicitiesString(vector<string>& wyccar_ITC); //DX 201780823
-  string ExtractWyckoffSiteSymmetriesString(vector<string>& wyccar_ITC); //DX 201780823
+  vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC); //DX 20191030 - added const
+  string ExtractWyckoffAttributesString(const vector<string>& wyccar_ITC, uint attribute_index); //DX 201780823 //DX 20191030 - added const 
+  string ExtractWyckoffLettersString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
+  string ExtractWyckoffMultiplicitiesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
+  string ExtractWyckoffSiteSymmetriesString(const vector<string>& wyccar_ITC); //DX 201780823 //DX 20191030 - added const
   vector<vector<vector<string> > > getWyckoffLettersWithSameMultiplcityAndSiteSymmetry(uint& space_group_number, 
                                    vector<GroupedWyckoffPosition>& grouped_Wyckoff_positions, uint& cell_choice); //DX 20190201  
-  vector<string> splitSiteSymmetry(string& site_symmetry); //DX 20190219
+  vector<string> splitSiteSymmetry(const string& site_symmetry); //DX 20190219 //DX 20190730 - added const
 
   //TOPOLOGY FUNCTIONS
   vector<xvector<double> > find_vectors_inplane(const vector<xvector<double> >& big_expanded, const xvector<double>& perp_to_vec, double& tol); //DX 20190215
@@ -611,9 +625,9 @@ namespace SYM {
   double orthogonality_defect(xmatrix<double> xmat);
 
   //NUMBER THEORY FUNCTIONS
-  long long int gcd(long long int u, long long int v);                             //Euclid's
-  unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
-  int gcdD(int u, int v);
+  //DX 20191202 [OBSOLETE] long long int gcd(long long int u, long long int v);                             //Euclid's
+  //DX 20191202 [OBSOLETE] unsigned long long int gcd(unsigned long long int u, unsigned long long int v);  //Dijkstra's GCD Algorithm
+  //DX 20191202 [OBSOLETE] int gcdD(int u, int v);
   //[OBSOLETE]long long int cast2int(double d, long long int prec);
   //modulo reduce
   //DX 20190905 [OBSOLETE] double mod_one(double d);
@@ -696,7 +710,7 @@ namespace SYM {
   bool determineLatticeCentering(vector<xvector<double> >& bravais_basis, int& bravais_count, xmatrix<double>& c2f, xmatrix<double>& f2c, bool& skew, vector<xvector<double> >& big_expanded, string& crystalsystem, vector<char>& candidate_lattice_chars, double& tol); //DX 20190215 - added tol
   string getPearsonSymbol(char& centering, char& lattice_char, deque<_atom> atoms);
   uint getEnantiomorphSpaceGroupNumber(uint space_group_number); //DX 20181010
-  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& GCD);
+  bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num);
   void updateAtomPositions(deque<_atom>& atoms, Screw& S, xmatrix<double>& lattice); //DX 20190805 - return to void
 
   //RHOMBOHEDRAL OBVERSE/REVERSE FUNCTIONS

@@ -79,7 +79,7 @@ ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
   // quick, they are not stored in the output file
   distortion_vectors = getCartesianDistortionVectors();
   permutations = getPermutations(order);
-  nifcs = (int) std::pow(3, order);
+  nifcs = aurostd::powint(3, order);
 }
 
 // Default constructor
@@ -351,7 +351,7 @@ void ClusterSet::build(int _order) {
     throw xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_RANGE_);
   }
   _logger << "CLUSTER: Building clusters of order " << order << "." << apl::endl;
-  nifcs = (int) std::pow(3, order);
+  nifcs = aurostd::powint(3, order);
 
   permutations = getPermutations(order);
   clusters = buildClusters();

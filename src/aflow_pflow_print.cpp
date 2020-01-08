@@ -515,7 +515,8 @@ namespace pflow {
         aurostd::string2tokens(str.wyckoff_sites_ITC[i].wyckoffSymbol,tokens," ");
         string wyckoff_multiplicity = tokens[0];
         string wyckoff_letter = tokens[1];
-        oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
+        //DX 20191010 [OBOSLETE] oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
+        oss << str.wyckoff_sites_ITC[i].type << i+1 << " " << str.wyckoff_sites_ITC[i].site_occupation << " " //DX 20191010
               << setw(12) << str.wyckoff_sites_ITC[i].coord(1) <<" "
               << setw(12) << str.wyckoff_sites_ITC[i].coord(2) <<" "
               << setw(12) << str.wyckoff_sites_ITC[i].coord(3) <<" "
@@ -558,7 +559,8 @@ namespace pflow {
 
     oss.precision(10);
     for(uint i=0;i<str.atoms.size();i++) {
-      oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
+      //DX 20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
+      oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX 20191010
           << setw(12) << str.atoms.at(i).fpos(1) <<" "
           << setw(12) << str.atoms.at(i).fpos(2) <<" "
           << setw(12) << str.atoms.at(i).fpos(3) <<" "

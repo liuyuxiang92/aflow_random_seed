@@ -64,6 +64,14 @@
 #define atom2mol                6.0221408E23                    //CO 180329
 #define meVatom2kJmol           (E_ELECTRON*atom2mol/1.0e6)     //CO 180329
 
+//ME200107 - (A)APL conversion factors
+#define THz2Hz                      1E12
+#define Hz2THz                      1/THz2Hz
+#define au2THz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_hbar_THz    PLANCKSCONSTANT_hbar*THz2Hz // J/THz
+#define PLANCKSCONSTANTAMU_hbar_THz PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2THz)  // amu A^2 THz
+#define BEfactor_hbar_THz           PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------------------ constants
 
@@ -116,21 +124,53 @@ namespace aurostd {
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
-  int GCD(int a,int b); //CO180409
+  template<class utype> void _GCD(int a,int b, int& gcd, int& x, int& y); //CO180409  //CO191112 - extended GCD, get Bezout coefficients
+  template<class utype> void _GCD(int a,int b, int& gcd); //CO180409
+  void GCD(int a,int b,int& gcd,int& x,int& y); //CO191201
+  void GCD(int a,int b,int& gcd); //CO191201
+  void GCD(uint a,uint b,uint& gcd,uint& x,uint& y);  //CO191201
+  void GCD(uint a,uint b,uint& gcd);  //CO191201
+  void GCD(long int a,long int b,long int& gcd,long int& x,long int& y);  //CO191201
+  void GCD(long int a,long int b,long int& gcd);  //CO191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd,unsigned long int& x,unsigned long int& y); //CO191201
+  void GCD(unsigned long int a,unsigned long int b,unsigned long int& gcd); //CO191201
+  void GCD(long long int a,long long int b,long long int& gcd,long long int& x,long long int& y); //CO191201
+  void GCD(long long int a,long long int b,long long int& gcd); //CO191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd,unsigned long long int& x,unsigned long long int& y);  //CO191201
+  void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd);  //CO191201
+  void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance=0.01);  //CO191201
+  void GCD(float a,float b,float& gcd,float tolerance=0.01);  //CO191201
+  void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance=0.01);  //CO191201
+  void GCD(double a,double b,double& gcd,double tolerance=0.01);  //CO191201
+  void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO191201
+  void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO191201
   int LCM(int a,int b); //CO190520
-  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;
+  
+  template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO191201
+  //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO191201
+  //bool isinteger(char x,char tolerance=(char)0.01); //CO191201
+  bool isinteger(uint x,uint tolerance=(uint)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(int x,int tolerance=(int)0.01);  //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(long int x,long int tolerance=(long)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(unsigned long int x,unsigned long int tolerance=(unsigned long)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);  //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01); //CO191201  //CO191201 - obvious but define for boot
+  bool isinteger(float x,float tolerance=(float)0.01);  //CO191201
+  bool isinteger(double x,double tolerance=(double)0.01); //CO191201
+  bool isinteger(long double x,long double tolerance=(long double)0.01);  //CO191201
 
-  //bool isinteger(bool x,bool tolerance=(bool)0.01);
-  //bool isinteger(char x,char tolerance=(char)0.01);
-  bool isinteger(int x,int tolerance=(int)0.01);
-  bool isinteger(long x,long tolerance=(long)0.01);
-  bool isinteger(uint x,uint tolerance=(uint)0.01);
-  bool isinteger(float x,float tolerance=(float)0.01);
-  bool isinteger(double x,double tolerance=(double)0.01);
-  //bool isinteger(long int x,long int tolerance=(long int)0.01);
-  bool isinteger(long long int x,long long int tolerance=(long long int)0.01);
-  bool isinteger(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)0.01);
-  bool isinteger(long double x,long double tolerance=(long double)0.01);
+  template<class utype> bool _iszero(utype a,utype tol=(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);  //CO191201
+  //bool iszero(bool x,bool tolerance); //CO191201
+  //bool iszero(char x,char tolerance); //CO191201
+  bool iszero(uint x,uint tolerance=(uint)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(int x,int tolerance=(int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(long int x,long int tolerance=(long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(unsigned long int x,unsigned long int tolerance=(unsigned long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(long long int x,long long int tolerance=(long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(unsigned long long int x,unsigned long long int tolerance=(unsigned long long int)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
+  bool iszero(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO191201
 
   template<class utype> utype fact(utype) __xprototype;
   template<class utype> utype factorial(utype) __xprototype;
@@ -166,13 +206,14 @@ namespace aurostd {
   // namespace aurostd
   bool _isfloat(bool) __xprototype;
   bool _isfloat(char) __xprototype;
-  bool _isfloat(int) __xprototype;
   bool _isfloat(uint) __xprototype;
-  bool _isfloat(float) __xprototype;
-  bool _isfloat(double) __xprototype;
+  bool _isfloat(int) __xprototype;
   bool _isfloat(long int) __xprototype;
+  bool _isfloat(unsigned long int) __xprototype;
   bool _isfloat(long long int) __xprototype;
   bool _isfloat(unsigned long long int) __xprototype;
+  bool _isfloat(float) __xprototype;
+  bool _isfloat(double) __xprototype;
   bool _isfloat(long double) __xprototype;
 #ifdef _AUROSTD_XCOMPLEX_
   bool _isfloat(xcomplex<float>) __xprototype;
@@ -188,13 +229,14 @@ namespace aurostd {
   // namespace aurostd
   bool _iscomplex(bool) __xprototype;
   bool _iscomplex(char) __xprototype;
-  bool _iscomplex(int) __xprototype;
   bool _iscomplex(uint) __xprototype;
-  bool _iscomplex(float) __xprototype;
-  bool _iscomplex(double) __xprototype;
+  bool _iscomplex(int) __xprototype;
   bool _iscomplex(long int) __xprototype;
+  bool _iscomplex(unsigned long int) __xprototype;  //CO191201
   bool _iscomplex(long long int) __xprototype;
   bool _iscomplex(unsigned long long int) __xprototype;
+  bool _iscomplex(float) __xprototype;
+  bool _iscomplex(double) __xprototype;
   bool _iscomplex(long double) __xprototype;
 #ifdef _AUROSTD_XCOMPLEX_
   bool _iscomplex(xcomplex<float>) __xprototype;
@@ -209,13 +251,36 @@ namespace aurostd {
   // namespace aurostd
   bool _isreal(bool) __xprototype;
   bool _isreal(char) __xprototype;
-  bool _isreal(int) __xprototype;
   bool _isreal(uint) __xprototype;
-  bool _isreal(float) __xprototype;
-  bool _isreal(double) __xprototype;
+  bool _isreal(int) __xprototype;
   bool _isreal(long int) __xprototype;
+  bool _isreal(unsigned long int) __xprototype; //CO191201
   bool _isreal(long long int) __xprototype;
   bool _isreal(unsigned long long int) __xprototype;
+  bool _isreal(float) __xprototype;
+  bool _isreal(double) __xprototype;
+  bool _isreal(long double) __xprototype;
+#ifdef _AUROSTD_XCOMPLEX_
+  bool _isreal(xcomplex<float>) __xprototype;
+  bool _isreal(xcomplex<double>) __xprototype;
+  bool _isreal(xcomplex<long double>) __xprototype;
+#endif
+}
+
+// ----------------------------------------------------------------------------
+// _isreal  _isreal  _isreal  _isreal  _isreal
+namespace aurostd {
+  // namespace aurostd
+  bool _isreal(bool) __xprototype;
+  bool _isreal(char) __xprototype;
+  bool _isreal(uint) __xprototype;
+  bool _isreal(int) __xprototype;
+  bool _isreal(long int) __xprototype;
+  bool _isreal(unsigned long int) __xprototype; //CO191201
+  bool _isreal(long long int) __xprototype;
+  bool _isreal(unsigned long long int) __xprototype;
+  bool _isreal(float) __xprototype;
+  bool _isreal(double) __xprototype;
   bool _isreal(long double) __xprototype;
 #ifdef _AUROSTD_XCOMPLEX_
   bool _isreal(xcomplex<float>) __xprototype;
@@ -272,13 +337,14 @@ namespace aurostd {
   // namespace aurostd
   bool _real(bool) __xprototype;
   char _real(char) __xprototype;
-  int _real(int) __xprototype;
   uint _real(uint) __xprototype;
-  float _real(float) __xprototype;
-  double _real(double) __xprototype;
+  int _real(int) __xprototype;
   long int _real(long int) __xprototype;
+  unsigned long int _real(unsigned long int) __xprototype;  //CO191201
   long long int _real(long long int) __xprototype;
   unsigned long long int _real(unsigned long long int) __xprototype;
+  float _real(float) __xprototype;
+  double _real(double) __xprototype;
   long double _real(long double) __xprototype;
 #ifdef _AUROSTD_XCOMPLEX_
   float _real(xcomplex<float>) __xprototype;
@@ -455,6 +521,15 @@ namespace aurostd {
 
 namespace aurostd {
   int boundary_conditions_periodic(int lrows,int urows,int i);  //CO190419 - taken from xvector BOUNDARY_CONDITIONS_PERIODIC
+}
+
+namespace aurostd {
+  uint powint(uint x,uint exp); //CO191201
+  int powint(int x,uint exp); //CO191201
+  long int powint(long int x,uint exp); //CO191201
+  unsigned long int powint(unsigned long int x,uint exp); //CO191201
+  long long int powint(long long int x,uint exp); //CO191201
+  unsigned long long int powint(unsigned long long int x,uint exp); //CO191201
 }
 
 // ----------------------------------------------------------------------------

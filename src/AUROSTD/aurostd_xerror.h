@@ -32,6 +32,7 @@ namespace aurostd {
 #define _INDEX_MISMATCH_      43
 #define _RUNTIME_ERROR_       50
 #define _RUNTIME_INIT_        51
+#define _RUNTIME_SQL_         52
 #define _ALLOC_ERROR_         60
 #define _ALLOC_ALLOCATE_      61
 #define _ALLOC_INSUFFICIENT_  62
@@ -47,7 +48,8 @@ class xerror {
     ~xerror() throw() {};
     int error_code;
     std::string what();
-    std::string where();
+    std::string whereFunction();  //CO191201
+    std::string whereFileName();  //CO191201
     std::string error_message;
   private:
     int error_type, error_number;

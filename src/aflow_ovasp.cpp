@@ -102,7 +102,7 @@ xOUTCAR::xOUTCAR() {
   mass_hole_conduction.clear(); // for aflowlib_libraries.cpp 
   //------------------------------------------------------------------------------
   // GetBandGap
-  xstr.Clear();
+  xstr.clear(); //DX 20191220 - uppercase to lowercase clear
   conduction_band_min.clear();  // for aflowlib_libraries.cpp 
   valence_band_max.clear();     // for aflowlib_libraries.cpp 
   Egap_type.clear();            // for aflowlib_libraries.cpp 
@@ -164,7 +164,7 @@ void xOUTCAR::free() {
   mass_hole_conduction.clear();        // for aflowlib_libraries.cpp
   //------------------------------------------------------------------------------
   // GetBandGap
-  xstr.Clear();
+  xstr.clear(); //DX 20191220 - uppercase to lowercase clear
   conduction_band_min.clear();         // for aflowlib_libraries.cpp
   valence_band_max.clear();            // for aflowlib_libraries.cpp
   Egap_type.clear();                   // for aflowlib_libraries.cpp
@@ -1381,7 +1381,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //-------------------------------------------------------------------------------------------------
 bool xOUTCAR::GetXStructure() {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  xstr.Clear();
+  xstr.clear(); //DX 20191220 - uppercase to lowercase clear
 
   if(LDEBUG) {cerr << "xOUTCAR::GetXStructure: Trying to build the xstructure from the OUTCAR" << endl;}
 
@@ -4012,6 +4012,41 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(ERROR_flag && !QUIET) cerr << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
   if(ERROR_flag) return FALSE;
   return TRUE;
+}
+
+//CO191217 - copies everything from spin channel 1 to spin channel 2
+void xDOSCAR::convertSpinOFF2ON() { //CO191217
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy="xDOSCAR::convertSpinOFF2ON():";
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  //check that it is truly SPIN-OFF
+  if(viDOS.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"viDOS.size()!=1",_INPUT_ERROR_);}; //no conversion needed
+  for(uint iatom=0;iatom<vDOS.size();iatom++){
+    for(uint iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+      if(vDOS[iatom][iorbital].size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS[iatom][iorbital].size()!=1",_INPUT_ERROR_);}; //no conversion needed
+    }
+  }
+  if(conduction_band_min.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"conduction_band_min.size()!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(valence_band_max.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"valence_band_max.size()!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(Egap.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Egap!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(Egap_fit.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Egap_fit!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(Egap_type.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Egap_type!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(spin!=0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"spin!=0",_INPUT_ERROR_);}; //no conversion needed
+  
+  //copy everything over
+  viDOS.push_back(viDOS.back());
+  for(uint iatom=0;iatom<vDOS.size();iatom++){
+    for(uint iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+      vDOS[iatom][iorbital].push_back(vDOS[iatom][iorbital].back());
+    }
+  }
+  conduction_band_min.push_back(conduction_band_min.back());
+  valence_band_max.push_back(valence_band_max.back());
+  Egap.push_back(Egap.back());
+  Egap_fit.push_back(Egap_fit.back());
+  Egap_type.push_back(Egap_type.back());
+  spin=1;
 }
 
 bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO191110
@@ -8193,12 +8228,16 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
           if(inside_relax){H_atom_relax=aurostd::string2utype<double>(tokens2[0]);}
           else if(inside_static){H_atom_static=aurostd::string2utype<double>(tokens2[0]);}
         }
-      } else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){  //CO191112 - forces for APL
+      // [OBSOLETE - ME191219] } else if(aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){  //CO191112 - forces for APL
+      // ME191218 - substring2bool ignores comments and TOTAL-FORCE is in a comment line
+      } else if(vcontent[iline].find("TOTAL-FORCE") != string::npos){
         vforces.clear();
         iline++;  //skip first [AFLOW]
-        while(iline<vcontent.size() && aurostd::substring2bool(vcontent[iline],"[AFLOW]")==FALSE){
+        // ME191219 - ++iline needs to be in the while statement or the loop
+        // will never start
+        while(iline<vcontent.size() && aurostd::substring2bool(vcontent[++iline],"[AFLOW]")==FALSE){
           vforces.push_back(xvector<double>(3));
-          aurostd::string2tokens(vcontent[iline++],tokens," ");
+          aurostd::string2tokens(vcontent[iline],tokens," ");
           if(tokens.size()==6){
             for(int i=1;i<4;i++){
               if(aurostd::isfloat(tokens[i+2])){vforces.back()[i]=aurostd::string2utype<double>(tokens[i+2]);}

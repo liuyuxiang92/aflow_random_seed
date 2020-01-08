@@ -296,8 +296,8 @@ If activated, APL will generate a calculation of the undistorted supercell and t
 will be subtracted from all other strained calculations. The default is ZEROSTATE=OFF.
 WARNING: This method is not well tested yet and should be used with caution.
 
-The ZEROSTATE calculation can also be used to accelerate by using its charge density as the basis
-for the distorted calculation. To do this, the following keyword needs to be activated:
+The ZEROSTATE calculation can also be used to accelerate the DFT calculations of the distorted
+cells by using its charge density. To do this, the following keyword needs to be activated:
 
     [AFLOW_APL]ZEROSTATE_CHGCAR=ON
 
@@ -460,7 +460,7 @@ Projected DOS can also be calculted using the keyword DOSPROJECTIONS:
         [AFLOW_APL]DOSPROJECTIONS_FRAC=-1,1,1;1,-1,1;1,1,-1
 
 Where DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC give the projection directions in Cartesian and
-fractional coordinates, respectively. It is not possible to choose both options. If neither options
+fractional coordinates, respectively. It is not possible to choose both options. If neither option
 is populated, projected DOS will not be calculated.
 
 Each projection vector triplet needs to be separated by a semicolon, and the coordinates inside the

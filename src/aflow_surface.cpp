@@ -3139,7 +3139,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ReScale(1.0);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.BringInCell();
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.Clean();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //tests of stupidity
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> alat_pre=xstr_bulk.lattice(1);xvector<double> blat_pre=xstr_bulk.lattice(2);xvector<double> clat_pre=xstr_bulk.lattice(3);
@@ -3162,7 +3162,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]xstr_slab_newbasis.FixLattices();
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO190423 - already done in Rotate()]for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.Clean();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis(rotation_only)=" << endl;cerr << xstr_slab_newbasis << endl;}
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -3211,7 +3211,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ReScale(1.0);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.BringInCell();
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.Clean();
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(check_min_dist){ //sanity check as we rotate structure/atoms
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      min_dist=xstr_slab_newbasis.MinDist();
@@ -3269,7 +3269,7 @@ bool distanceBetweenImages_Tracing(const xstructure& xstr_in,const xvector<doubl
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ReScale(1.0);
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab.BringInCell();
-//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab.Clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate()
+//[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX 20191220 - uppercase to lowercase clean
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //set title
 //[CO190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  stringstream title;
@@ -3804,7 +3804,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   }
   
   stringstream title;
-  xstr_slab_newbasis.Clear();
+  xstr_slab_newbasis.clear(); //DX 20191220 - uppercase to lowercase clear
   xstructure xstr_slab_origbasis;
   xstr_slab_newbasis.lattice=getSlabLattice(xstr_bulk,hkl_i,xstr_slab_origbasis.lattice,DEFAULT_V3_ANGLE_DEVIATION,v3len_max_strict);xstr_slab_newbasis.FixLattices();  //ang_dev==5.0 is standard (DEFAULT_V3_ANGLE_DEVIATION), the vlen_max_strict is very important here, as the test from Sun et al. takes a shortcut here
   rotation=trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_slab_origbasis.lattice));
@@ -3842,7 +3842,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   xstr_slab_origbasis.ReScale(1.0);
   xstr_slab_origbasis.ShifOriginToAtom(0);xstr_slab_origbasis.origin=0.0; //reset origin
   xstr_slab_origbasis.BringInCell();
-  xstr_slab_origbasis.Clean();
+  xstr_slab_origbasis.clean(); //DX 20191220 - uppercase to lowercase clean
   
   //set title
   title.str("");
@@ -3862,7 +3862,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   xstr_slab_newbasis.ReScale(1.0);
   xstr_slab_newbasis.ShifOriginToAtom(0);xstr_slab_newbasis.origin=0.0; //reset origin
   xstr_slab_newbasis.BringInCell();
-  xstr_slab_newbasis.Clean();
+  xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
 
   //set title
   title.str("");
@@ -3929,7 +3929,7 @@ xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int
   xstr_slab.ReScale(1.0);
   xstr_slab.ShifOriginToAtom(0);xstr_slab.origin=0.0; //reset origin
   xstr_slab.BringInCell();
-  //xstr_slab.Clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate()
+  //xstr_slab.clean();  //clear origin! //do not clear ijk! origin is okay here, only a problem for Rotate() //DX 20191220 - uppercase to lowercase clean
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // STOP - create supercell

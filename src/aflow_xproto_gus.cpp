@@ -232,8 +232,10 @@ namespace aflowlib {
     xmatrix<double> aBas(3,nAt*nD);
     xvector<double> ausv(3),aussLVinvXdvec(3);
     int z1, z2, z3, ic,iD;
-    aurostd::inverse(HNF,Sinv); //**
-    aurostd::inverse(sLV,sLVinv);
+    //[CO191201 - OBSOLETE]aurostd::inverse(HNF,Sinv); //**
+    //[CO191201 - OBSOLETE]aurostd::inverse(sLV,sLVinv);
+    Sinv=aurostd::inverse(HNF); //**  //CO191201
+    sLVinv=aurostd::inverse(sLV);  //CO191201
     sLVinvXdvec=sLVinv*dvec; //**
     ic = 0;
     for(iD=1;iD<=(int) nD;iD++) {//**

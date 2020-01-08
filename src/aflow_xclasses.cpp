@@ -90,6 +90,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vflag_apennsy.clear();
   vflag_outreach.clear();
   vflag_control.clear();
+  vschema.clear();
   XHOST_LIBRARY_LIB0=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB1=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
@@ -187,7 +188,8 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_apennsy=b.vflag_apennsy;
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
-  // AFLOWRC
+  vschema=b.vschema;
+    // AFLOWRC
   aflowrc_filename=b.aflowrc_filename;    // AFLOWRC
   aflowrc_content=b.aflowrc_content;    // AFLOWRC
   vaflowrc.clear();for(uint i=0;i<b.vaflowrc.size();i++) vaflowrc.push_back(b.vaflowrc.at(i));   // AFLOWRC
@@ -232,6 +234,7 @@ void _XHOST::free() { // free PRIVATE
   vflag_apennsy.clear();
   vflag_outreach.clear();
   vflag_control.clear();
+  vschema.clear();
   // AFLOWRC
   aflowrc_filename.clear();    // AFLOWRC
   aflowrc_content.clear();    // AFLOWRC
@@ -1480,7 +1483,7 @@ _aimsflags::~_aimsflags() {
 
 void _aimsflags::free() {
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear();
-  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].Clear();}
+  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].clear();} //DX 20191220 - uppercase to lowercase clear
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear();
 }
 
@@ -1543,7 +1546,7 @@ _xaims::~_xaims() {
 }
 
 void _xaims::free() {
-  str.Clear();
+  str.clear(); //DX 20191220 - uppercase to lowercase clear
   xqsub.clear();
 }
 
