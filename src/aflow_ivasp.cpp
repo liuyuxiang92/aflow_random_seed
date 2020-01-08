@@ -4238,7 +4238,7 @@ namespace KBIN {
         ostringstream aus;
         aus << "00000  MESSAGE ICHARG: Removing ICHARG - " << Message(aflags, "user,host,time") << std::endl;
         aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET);
-        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", -1, 0.0, false);
+        KBIN::XVASP_INCAR_PREPARE_GENERIC("ICHARG", xvasp, vflags, "", -1, 0.0, false); //remove any ICHARG from INCAR, leaving default ==2
         xvasp.aopts.flag("FLAG::XVASP_INCAR_changed", true);
       }
       if (xvasp.aopts.flag("FLAG::XVASP_INCAR_changed")) {
