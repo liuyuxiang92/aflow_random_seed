@@ -546,15 +546,16 @@ xDOSCAR DOSCalculator::createDOSCAR() {
 
 // ///////////////////////////////////////////////////////////////////////////
 
-vector<double> DOSCalculator::getBins() {
+// ME200108 - added const
+vector<double> DOSCalculator::getBins() const {
   return _bins;
 }
 
-vector<double> DOSCalculator::getDOS() {
+vector<double> DOSCalculator::getDOS() const {
   return _dos;
 }
 
-bool DOSCalculator::hasNegativeFrequencies() {
+bool DOSCalculator::hasNegativeFrequencies() const {
   return (_minFreq < MIN_FREQ_TRESHOLD ? true : false);
 }
 

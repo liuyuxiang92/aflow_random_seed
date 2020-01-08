@@ -1361,7 +1361,6 @@ class LTMethod {
     const LTMethod& operator=(const LTMethod&);
     void clear(QMesh&, Logger&);
     ~LTMethod();
-    void clear(QMesh&, Logger&);
 
     void makeIrreducible();  // ME190625
 
@@ -1475,9 +1474,9 @@ class DOSCalculator {  // ME190424
   xDOSCAR createDOSCAR();  // ME190614
   void writePHDOSCAR(const string&);  // ME190614
   // Interface IDOSCalculator
-  std::vector<double> getBins();
-  std::vector<double> getDOS();
-  bool hasNegativeFrequencies();
+  std::vector<double> getBins() const;  // ME200108 - added const
+  std::vector<double> getDOS() const;   // ME200108 - added const
+  bool hasNegativeFrequencies() const;  // ME200108 - added const
   string _system;  // ME190614
 };
 }  // namespace apl
@@ -1528,29 +1527,50 @@ enum ThermalPropertiesUnits { eV,
 
 class ThermalPropertiesCalculator {
  private:
-  //IDOSCalculator& _dosc;  //CO  OBSOLETE ME190423
-  DOSCalculator& _dosc;  // ME190423
   Logger& _logger;
-  std::vector<double> _bins;
-  std::vector<double> _dos;
-  double _stepDOS;
-  double _zeroPointVibrationEnergy_meV;
-  bool _isCalcZeroPointVibrationEnergy_meV;
+  std::vector<double> _freqs_0K;
+  std::vector<double> _dos_0K;
+  string system;
 
- private:
-  double getScalingFactor(ThermalPropertiesUnits units);
+  void free();
+  void copy(const ThermalPropertiesCalculator&);
+
+  double getStepDOS(const vector<double>&);
+  double getScalingFactor(const ThermalPropertiesUnits&);
 
  public:
-  //ThermalPropertiesCalculator(IDOSCalculator&, Logger&);  OBSOLETE ME190423
-  ThermalPropertiesCalculator(DOSCalculator&, Logger&);  // ME190423
+  ThermalPropertiesCalculator(Logger&);
+  ThermalPropertiesCalculator(const DOSCalculator&, Logger&);
+  ThermalPropertiesCalculator(const xDOSCAR&, Logger&);
+  ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
+  ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
   ~ThermalPropertiesCalculator();
-  void clear();
-  void writeTHERMO(double, double, double, const string&);
-  double getZeroPointVibrationEnergy(ThermalPropertiesUnits);
-  double getInternalEnergy(double, ThermalPropertiesUnits);
-  double getVibrationalFreeEnergy(double, ThermalPropertiesUnits);
-  double getVibrationalEntropy(double, ThermalPropertiesUnits);
-  double getIsochoricSpecificHeat(double, ThermalPropertiesUnits);
+  void clear(Logger&);
+
+  vector<double> temperatures;
+  vector<double> Cv;
+  vector<double> Fvib;
+  vector<double> Svib;
+  vector<double> U;
+  double U0;
+
+  void initialize(const vector<double>&, const vector<double>&, string="");
+  void calculateThermalProperties(double, double, double);
+  void addPoint(double, const xDOSCAR&);
+  void addPoint(double, const vector<double>&, const vector<double>&);
+
+  double getZeroPointEnergy();
+  double getInternalEnergy(double, ThermalPropertiesUnits=apl::meV);
+  double getInternalEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
+  double getVibrationalFreeEnergy(double, ThermalPropertiesUnits=apl::meV);
+  double getVibrationalFreeEnergy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::meV);
+  double getVibrationalEntropy(double, ThermalPropertiesUnits=apl::meV);
+  double getVibrationalEntropy(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
+  double getVibrationalEntropy(double, double, double, ThermalPropertiesUnits=apl::kB);
+  double getIsochoricSpecificHeat(double, ThermalPropertiesUnits=apl::kB);
+  double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
+
+  void writePropertiesToFile(string);
 };
 
 }  // namespace apl

@@ -2002,7 +2002,9 @@ void RunPhonons_APL_181216(_xinput& xinput,
       if (USER_TP) {
         if (!dosc.hasNegativeFrequencies()) {  // ME190423
           apl::ThermalPropertiesCalculator tpc(dosc, logger);  // ME190423
-          tpc.writeTHERMO(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP, aflags.Directory);
+          // ME200108 - new ThermalPropertiesCalculator format
+          tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
+          tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
 	    //QHA/SCQHA/QHA3P START //PN180705
           //calculate Gruneisen
           // ME 190428 - START
@@ -2215,7 +2217,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
             if(ptr_hsq.get()) ptr_hsq->clear();  // ME190423
             // umesh.clear();  OBSOLETE ME190428
 	    //QHA/SCQHA/QHA3P END
-          tpc.clear();
+          tpc.clear(logger);  // ME200108
         } else {
           logger << apl::warning << "There are negative frequencies in DOS. The calculation of thermal properties has been skipped." << apl::endl;
         }

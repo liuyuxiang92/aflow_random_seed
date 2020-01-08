@@ -282,7 +282,7 @@ void TCONDCalculator::calculateFreqGvel(int startIndex, int endIndex) {
         xvector<xcomplex<double> > eigenvec_conj = conj(eigenvec);
         for (int i = 1; i < 4; i++) {
           xcomplex<double> integral = eigenvec_conj * (dDynMat[i-1] * eigenvec);
-          gvel[q][br][i] = au2THz * integral.re/(2.0 * freq[q][br]);
+          gvel[q][br][i] = au2nmTHz * integral.re/(2.0 * freq[q][br]);
         }
       } else {
         for (int i = 1; i < 4; i++) {
@@ -385,7 +385,7 @@ vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<ve
             g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
           }
         }
-        g_mode *= -10.0*au2THz/(6.0 * std::pow(freq[q][br], 2));
+        g_mode *= -10.0*au2nmTHz/(6.0 * std::pow(freq[q][br], 2));
         if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
           _logger << apl::warning << " Grueneisen parameter at mode "
                                   << iq << ", " << br << " is not real ("
@@ -587,7 +587,7 @@ void TCONDCalculator::calculateTransitionProbabilitiesPhonon(int startIndex, int
   uint nbr = branches.size();
 
   // Units are chosen so that probabilities are in THz (1/ps)
-  const double probability_prefactor = std::pow(au2THz * 10.0, 2) * PLANCKSCONSTANTAMU_hbar_THz * PI/4.0;
+  const double probability_prefactor = std::pow(au2nmTHz * 10.0, 2) * PLANCKSCONSTANTAMU_hbar_THz * PI/4.0;
   const double ps_prefactor = 2.0/(3.0 * std::pow(nBranches, 3) * nQPs);
 
   // Prepare precomputation of eigenvalue products
