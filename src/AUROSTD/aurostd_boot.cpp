@@ -148,9 +148,9 @@ template<class utype> bool initialize_xcomplex(utype d) {
   cout << vx << endl; // DX 1/15/18 - ostream was missing
   conj(vx);  // ME180904
 
-  aurostd::xmatrix<utype> mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
-  mx+mx;mx+=my;mx-mx;mx-=my;mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y
-  sin(mx);sinh(mx);cos(mx);cosh(mx);exp(mx);
+  aurostd::xmatrix<utype > mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
+  mx=mx+mx;mx+=my;mx=mx-mx;mx-=my;mx=mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y  //CO200106 - set the result or clang complains
+  mx=sin(mx);mx=sinh(mx);mx=cos(mx);mx=cosh(mx);mx=exp(mx); //CO200106 - set the result or clang complains
   aurostd::ones_xv<utype>();aurostd::ones_xv<utype>(3);aurostd::ones_xv<utype>(3,3); //CO190520
   aurostd::ones_xm<utype>();aurostd::ones_xm<utype>(3);aurostd::ones_xm<utype>(3,3);aurostd::ones_xm<utype>(1,2,3,4); //CO190520
   aurostd::eye<utype>();aurostd::eye<utype>(3);aurostd::eye<utype>(3,3);aurostd::eye<utype>(1,2,3,4); //CO190520
@@ -167,7 +167,9 @@ template<class utype> bool initialize_xcomplex(utype d) {
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
-  m=mx*m;m==n;m!=n;jacobiHermitian(m);vx=m(1); // ME190814
+  bool tf=false;  //CO200106 - set the result or clang complains
+  m=mx*m;tf=bool(m==n);tf=bool(m!=n);jacobiHermitian(m);vx=m(1); // ME190814  //CO200106 - set the result or clang complains
+  if(tf){;} //CO200106 - keep tf busy
 
   //  jacobi(m,vx,m);
  

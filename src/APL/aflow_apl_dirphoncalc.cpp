@@ -67,7 +67,7 @@ void DirectMethodPC::runVASPCalculations(bool zerostate_chgcar) {
       if (AUTO_GENERATE_PLUS_MINUS) {
         vvgenerate_plus_minus.back().push_back(needMinus(i, j, DISTORTION_INEQUIVONLY)); //CO190218
       } else {
-      vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
+        vvgenerate_plus_minus.back().push_back(USER_GENERATE_PLUS_MINUS);  // ME 181028
       }
       if (vvgenerate_plus_minus[i][j]) {
         ncalcs += 2;
@@ -394,8 +394,9 @@ void DirectMethodPC::estimateUniqueDistortions(const xstructure& xstr,
 
   // Print some information
   int dof = 0;
-  for (uint i = 0; i < _uniqueDistortions.size(); i++)
+  for (uint i = 0; i < _uniqueDistortions.size(); i++){ //CO200106 - wrapping with guard
     dof += _uniqueDistortions[i].size();
+  }
   _logger << "Found " << dof << " degree(s) of freedom." << apl::endl;
   for (int i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell.getNumberOfUniqueAtoms() : _supercell.getNumberOfAtoms()); i++) { //CO190218
     int id = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218

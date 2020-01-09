@@ -1808,7 +1808,7 @@ const vector<_sym_op>& Supercell::getFGROUP(void) const {
 
 // ME191219
 void Supercell::getFullBasisAGROUP() {
-  _logger << "Calculating full bases for the site point groups of the supercell." << apl::endl;
+  _logger << "Calculating full basis for the site point groups of the supercell." << apl::endl;
   if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
     string function = "apl::Supercell::getFullBasisAGROUP()";
     string message = "Could not calculate the bases of the site point groups.";

@@ -22,74 +22,74 @@ int Sign(const double& x) {return (int) aurostd::sign(x);}
 // ***************************************************************************
 namespace pflow {
   // constructor
-  
+
   //   template<class utype>
   //   matrix<utype>::matrix(void) { // default
   //   }
-  
+
   template<class utype>
-  matrix<utype>::matrix(const int m) { // specifying rows
-    vector<utype> v;
-    mat=vector<vector<utype> > (m,v);
-  }
-  
+    matrix<utype>::matrix(const int m) { // specifying rows
+      vector<utype> v;
+      mat=vector<vector<utype> > (m,v);
+    }
+
   template<class utype>
-  matrix<utype>::matrix(const int m, const int n) { // specifying rows and columns
-    vector<utype> v(n);
-    mat=vector<vector<utype> > (m,v);
-  }
-  
+    matrix<utype>::matrix(const int m, const int n) { // specifying rows and columns
+      vector<utype> v(n);
+      mat=vector<vector<utype> > (m,v);
+    }
+
   template<class utype>
-  matrix<utype>::matrix(const int m, const vector<utype>& inutypevec) { // specifying rows as vectors.
-    mat=vector<vector<utype> > (m,inutypevec);
-  }
-  
+    matrix<utype>::matrix(const int m, const vector<utype>& inutypevec) { // specifying rows as vectors.
+      mat=vector<vector<utype> > (m,inutypevec);
+    }
+
   template<class utype>
-  matrix<utype>::matrix(const int m, const int n, const utype& inutype) { // specifying rows and columns and initial values
-    vector<utype> v(n);
-    mat=vector<vector<utype> > (m,v);
-    for(uint i=0;i<mat.size();i++) {
-      for(uint j=0;j<mat[i].size();j++) {
-	mat[i][j]=inutype;
+    matrix<utype>::matrix(const int m, const int n, const utype& inutype) { // specifying rows and columns and initial values
+      vector<utype> v(n);
+      mat=vector<vector<utype> > (m,v);
+      for(uint i=0;i<mat.size();i++) {
+        for(uint j=0;j<mat[i].size();j++) {
+          mat[i][j]=inutype;
+        }
       }
     }
-  }
-  
+
   // accessors
   template<class utype>
-  void matrix<utype>::print(void) {
-    cout.setf(std::ios::fixed,std::ios::floatfield);
-    cout.precision(4);
-    for(uint i=0;i<mat.size();i++) {
-      cout << "  ";
-      for(uint j=0;j<mat[i].size();j++) {
-	cout << " " << mat[i][j];
+    void matrix<utype>::print(void) {
+      cout.setf(std::ios::fixed,std::ios::floatfield);
+      cout.precision(4);
+      for(uint i=0;i<mat.size();i++) {
+        cout << "  ";
+        for(uint j=0;j<mat[i].size();j++) {
+          cout << " " << mat[i][j];
+        }
+        cout << endl;
       }
-      cout << endl;
     }
-  }
-  
+
   //   template<class utype>
   //   inline int matrix<utype>::size(void) const{
   //     return (int) mat.size();
   //   }
-  
+
 
   template<class utype>
-  matrix<utype> matrix<utype>::transpose() const{
-    matrix<utype> tmat;
-    uint m=mat.size();
-    if(m==0) return tmat;
-    uint n=mat[0].size();
-    tmat = matrix<utype> (n,m);
-    for(uint i=0;i<m;i++) {
-      for(uint j=0;j<n;j++) {
-	tmat[j][i]=mat[i][j];
+    matrix<utype> matrix<utype>::transpose() const{
+      matrix<utype> tmat;
+      uint m=mat.size();
+      if(m==0) return tmat;
+      uint n=mat[0].size();
+      tmat = matrix<utype> (n,m);
+      for(uint i=0;i<m;i++) {
+        for(uint j=0;j<n;j++) {
+          tmat[j][i]=mat[i][j];
+        }
       }
+      return tmat;
     }
-    return tmat;
-  }
-  
+
   // template<class utype>
   // vector<vector<utype> >::iterator matrix<utype>::begin() {
   // return mat.begin();
@@ -99,7 +99,7 @@ namespace pflow {
   // vector<vector<utype> >::iterator matrix<utype>::end() {
   // return mat.end();
   // }
-  
+
   // operator
   //   template<class utype>
   //   vector<utype>& matrix<utype>::operator[] (const int index) {
@@ -110,25 +110,25 @@ namespace pflow {
   //   const vector<utype>& matrix<utype>::operator[] (const int index) const {
   //     assert(index>=0 && index<=mat.size());
   //     return mat[index];
-  
+
   //   }
-  
+
   template<class utype>
-  const matrix<utype>& matrix<utype>::operator=(const matrix<utype> &b) {
-    if(this != &b) {
-      uint m=b.mat.size();
-      uint n=0;
-      mat=vector<vector<utype> > (m);
-      for(uint i=0;i<m;i++) {
-	n=b.mat[i].size();
-	mat[i]=vector<utype> (n);
-	for(uint j=0;j<n;j++) {
-	  mat[i][j]=b.mat[i][j];
-	}
+    const matrix<utype>& matrix<utype>::operator=(const matrix<utype> &b) {
+      if(this != &b) {
+        uint m=b.mat.size();
+        uint n=0;
+        mat=vector<vector<utype> > (m);
+        for(uint i=0;i<m;i++) {
+          n=b.mat[i].size();
+          mat[i]=vector<utype> (n);
+          for(uint j=0;j<n;j++) {
+            mat[i][j]=b.mat[i][j];
+          }
+        }
       }
+      return *this;
     }
-    return *this;
-  }
 
   // mutators
   //  template<class utype>
@@ -142,15 +142,15 @@ namespace pflow {
   //  }
 
   template<class utype>
-  void matrix<utype>::vecvec2mat(const vector<vector<utype> >& inVV) {
-    mat=vector<vector<utype> > (inVV.size());
-    for(uint i=0;i<mat.size();i++) {
-      mat[i]=vector<utype> (inVV[i].size());
-      for(uint j=0;j<mat[i].size();j++) {
-	mat[i][j]=inVV[i][j];
+    void matrix<utype>::vecvec2mat(const vector<vector<utype> >& inVV) {
+      mat=vector<vector<utype> > (inVV.size());
+      for(uint i=0;i<mat.size();i++) {
+        mat[i]=vector<utype> (inVV[i].size());
+        for(uint j=0;j<mat[i].size();j++) {
+          mat[i][j]=inVV[i][j];
+        }
       }
     }
-  }
 
   // template<class utype>
   // void matrix<utype>::clear() {
@@ -158,13 +158,13 @@ namespace pflow {
   // }
 
   template<class utype>
-  void matrix<utype>::vec2mat(const vector<utype>& inV) {
-    mat=vector<vector<utype> > (1);
-    mat[0]=vector<utype> (inV.size());
-    for(uint j=0;j<mat[0].size();j++) {
-      mat[0][j]=inV[j];
+    void matrix<utype>::vec2mat(const vector<utype>& inV) {
+      mat=vector<vector<utype> > (1);
+      mat[0]=vector<utype> (inV.size());
+      for(uint j=0;j<mat[0].size();j++) {
+        mat[0][j]=inV[j];
+      }
     }
-  }
 
   // template<class utype>
   // void matrix<utype>::insert(const int& id, const vector<utype>& inV) {
@@ -176,7 +176,7 @@ namespace pflow {
   // vector<utype>::iterator p=mat.begin()+id;
   // mat.erase(p);
   // }
-  
+
   // template<class utype>
   // void matrix<utype>::erase_col(const int id) {
   //   for(int i=0;i<mat.size();i++) {
@@ -192,35 +192,35 @@ namespace pflow {
   // }
 
   template <class utype> matrix<utype>
-  xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
-    int isize=_xmatrix.rows,jsize=_xmatrix.cols;
-    matrix<utype> _matrix(isize,jsize);
-    for(register int i=0;i<isize;i++)
-      for(register int j=0;j<jsize;j++)
-	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
-    return _matrix;
-  }
+    xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
+      int isize=_xmatrix.rows,jsize=_xmatrix.cols;
+      matrix<utype> _matrix(isize,jsize);
+      for(register int i=0;i<isize;i++)
+        for(register int j=0;j<jsize;j++)
+          _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
+      return _matrix;
+    }
 
-//   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
-//     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
-//     matrix<double> _matrix(isize,jsize);
-//     for(register int i=0;i<isize;i++)
-//       for(register int j=0;j<jsize;j++)
-// 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
-//     return _matrix;
-//   }
-  
+  //   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
+  //     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
+  //     matrix<double> _matrix(isize,jsize);
+  //     for(register int i=0;i<isize;i++)
+  //       for(register int j=0;j<jsize;j++)
+  // 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
+  //     return _matrix;
+  //   }
+
   template <class utype> xmatrix<utype>
-  matrix2xmatrix(const matrix<utype>& _matrix) {
-    int isize=_matrix.size(),jsize=_matrix[0].size();
-    xmatrix<utype> _xmatrix(isize,jsize);
-    for(register int i=1;i<=isize;i++)
-      for(register int j=1;j<=jsize;j++)
-	_xmatrix(i,j)=_matrix[i-1][j-1];
-    return _xmatrix;
-  }
+    matrix2xmatrix(const matrix<utype>& _matrix) {
+      int isize=_matrix.size(),jsize=_matrix[0].size();
+      xmatrix<utype> _xmatrix(isize,jsize);
+      for(register int i=1;i<=isize;i++)
+        for(register int j=1;j<=jsize;j++)
+          _xmatrix(i,j)=_matrix[i-1][j-1];
+      return _xmatrix;
+    }
 
-  
+
 
 }
 
@@ -269,28 +269,28 @@ xstructure WignerSeitz(const xstructure& a) {
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
     for(int i=-1;i<=1;i++)
       for(int j=-1;j<=1;j++)
-	for(int k=-1;k<=1;k++) {
-	  rat=sstr.atoms.at(iat).cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
-	  projxoo=scalar_product(rat,xoo)/axoo/axoo;
-	  projyoo=scalar_product(rat,yoo)/ayoo/ayoo;
-	  projzoo=scalar_product(rat,zoo)/azoo/azoo;
-	  projxyo=scalar_product(rat,xyo)/axyo/axyo;
-	  projxzo=scalar_product(rat,xzo)/axzo/axzo;
-	  projyzo=scalar_product(rat,yzo)/ayzo/ayzo;
-	  projxyz=scalar_product(rat,xyz)/axyz/axyz;
-	  if((projxoo>-0.5 && projxoo<=0.5) &&
-	     (projyoo>-0.5 && projyoo<=0.5) &&
-	     (projzoo>-0.5 && projzoo<=0.5) &&
-	     (projxyo>-0.5 && projxyo<=0.5) &&
-	     (projxzo>-0.5 && projxzo<=0.5) &&
-	     (projyzo>-0.5 && projyzo<=0.5) &&
-	     (projxyz>-0.5 && projxyz<=0.5)) {
-	    sstr.atoms.at(iat).cpos(1)=rat(1);
-	    sstr.atoms.at(iat).cpos(2)=rat(2);
-	    sstr.atoms.at(iat).cpos(3)=rat(3);
-	    i=10;j=10;k=10;
-	  }
-	}
+        for(int k=-1;k<=1;k++) {
+          rat=sstr.atoms.at(iat).cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
+          projxoo=scalar_product(rat,xoo)/axoo/axoo;
+          projyoo=scalar_product(rat,yoo)/ayoo/ayoo;
+          projzoo=scalar_product(rat,zoo)/azoo/azoo;
+          projxyo=scalar_product(rat,xyo)/axyo/axyo;
+          projxzo=scalar_product(rat,xzo)/axzo/axzo;
+          projyzo=scalar_product(rat,yzo)/ayzo/ayzo;
+          projxyz=scalar_product(rat,xyz)/axyz/axyz;
+          if((projxoo>-0.5 && projxoo<=0.5) &&
+              (projyoo>-0.5 && projyoo<=0.5) &&
+              (projzoo>-0.5 && projzoo<=0.5) &&
+              (projxyo>-0.5 && projxyo<=0.5) &&
+              (projxzo>-0.5 && projxzo<=0.5) &&
+              (projyzo>-0.5 && projyzo<=0.5) &&
+              (projxyz>-0.5 && projxyz<=0.5)) {
+            sstr.atoms.at(iat).cpos(1)=rat(1);
+            sstr.atoms.at(iat).cpos(2)=rat(2);
+            sstr.atoms.at(iat).cpos(3)=rat(3);
+            i=10;j=10;k=10;
+          }
+        }
     sstr.atoms.at(iat).fpos=C2F(sstr.lattice,sstr.atoms.at(iat).cpos);
   }
   return sstr;
@@ -591,14 +591,14 @@ _atom ConvertAtomToLat(const _atom& in_at, const xmatrix<double>& lattice) {
 //  cutoff and stores it for each atom in the structure.
 namespace pflow {
   void GetStrNeighData(const xstructure& str, const double cutoff,
-		       deque<deque<_atom> >& neigh_mat) {
+      deque<deque<_atom> >& neigh_mat) {
     deque<_atom> atom_vec;
     neigh_mat.clear();
     // Get data from str.
     // Set scale to 1 so you don't need to rescale coordinates.
     xstructure sstr=str;
     sstr=ReScale(sstr,1.0);
-    
+
     // Create atom objects for each atom in structure.
     xvector<int> ijk(3);ijk.clear();
     for(uint iat=0;iat<sstr.atoms.size();iat++) {
@@ -730,7 +730,7 @@ namespace pflow {
     vector<double> vc(3,0.0);
     for(int ic=0;ic<3;ic++) {
       for(int jc=0;jc<3;jc++)
-	vc[ic]=vc[ic]+vf[jc]*lat[jc][ic];
+        vc[ic]=vc[ic]+vf[jc]*lat[jc][ic];
     }
     return vc;
   }
@@ -825,7 +825,7 @@ namespace pflow {
     vector<double> out_spin;
     for(uint iat=0;iat<a.atoms.size();iat++)
       out_spin.push_back(a.atoms.at(iat).spin);
-  return out_spin;
+    return out_spin;
   }
 }
 
@@ -838,7 +838,7 @@ namespace pflow {
     matrix<double> fpos(num_atoms,3);pflow::VVset(fpos,0.0);
     for(int i=0;i<num_atoms;i++)
       for(int j=0;j<3;j++)
-	fpos[i][j]=str.atoms.at(i).fpos(j+1);
+        fpos[i][j]=str.atoms.at(i).fpos(j+1);
     return fpos;
   }
 }
@@ -852,7 +852,7 @@ namespace pflow {
     matrix<double> cpos(num_atoms,3);pflow::VVset(cpos,0.0);
     for(int i=0;i<num_atoms;i++)
       for(int j=0;j<3;j++)
-	cpos[i][j]=str.atoms.at(i).cpos(j+1);
+        cpos[i][j]=str.atoms.at(i).cpos(j+1);
     return cpos;
   }
 }
@@ -914,7 +914,7 @@ namespace pflow {
     for(uint i=0;i<in_num_each_type.size();i++) {
       b.num_each_type.push_back(in_num_each_type.at(i));
       b.comp_each_type.push_back(in_num_each_type.at(i));
-     }
+    }
     return b;
   }
 }
@@ -933,26 +933,26 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure AddAllAtomPos(const xstructure& a,
-			   const matrix<double>& in_pos,
-			   const int in_coord_flag)  {
+      const matrix<double>& in_pos,
+      const int in_coord_flag)  {
     assert(in_coord_flag==0 || in_coord_flag==1);
     xstructure b(a);
     b.atoms.clear();
     _atom atom;
     if(in_coord_flag==0) {
       for(uint i=0;i<in_pos.size();i++) {
-	// atom=a.atoms.at(i);  // start from scratch
-	for(int j=1;j<=3;j++) atom.fpos(j)=in_pos[i][j-1];
-	atom.cpos=F2C(b.lattice,atom.fpos);
-	b.atoms.push_back(atom);
+        // atom=a.atoms.at(i);  // start from scratch
+        for(int j=1;j<=3;j++) atom.fpos(j)=in_pos[i][j-1];
+        atom.cpos=F2C(b.lattice,atom.fpos);
+        b.atoms.push_back(atom);
       }
     }
     if(in_coord_flag==1) {
       for(uint i=0;i<in_pos.size();i++) {
-	// atom=a.atoms.at(i);  // start from scratch
-	for(int j=1;j<=3;j++) atom.cpos(j)=in_pos[i][j-1];
-	atom.fpos=C2F(b.lattice,atom.cpos);
-	b.atoms.push_back(atom);
+        // atom=a.atoms.at(i);  // start from scratch
+        for(int j=1;j<=3;j++) atom.cpos(j)=in_pos[i][j-1];
+        atom.fpos=C2F(b.lattice,atom.cpos);
+        b.atoms.push_back(atom);
       }
     }
     return b;
@@ -964,26 +964,26 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   xstructure SetAllAtomPos(const xstructure& a,
-			   const matrix<double>& in_pos,
-			   const int in_coord_flag)  {
+      const matrix<double>& in_pos,
+      const int in_coord_flag)  {
     assert(in_coord_flag==0 || in_coord_flag==1);
     xstructure b(a);
     b.atoms.clear();
     _atom atom;
     if(in_coord_flag==0) {
       for(uint i=0;i<in_pos.size();i++) {
-	atom=a.atoms.at(i);
-	for(int j=1;j<=3;j++) atom.fpos(j)=in_pos[i][j-1];
-	atom.cpos=F2C(b.lattice,atom.fpos);
-	b.atoms.push_back(atom);
+        atom=a.atoms.at(i);
+        for(int j=1;j<=3;j++) atom.fpos(j)=in_pos[i][j-1];
+        atom.cpos=F2C(b.lattice,atom.fpos);
+        b.atoms.push_back(atom);
       }
     }
     if(in_coord_flag==1) {
       for(uint i=0;i<in_pos.size();i++) {
-	atom=a.atoms.at(i);
-	for(int j=1;j<=3;j++) atom.cpos(j)=in_pos[i][j-1];
-	atom.fpos=C2F(b.lattice,atom.cpos);
-	b.atoms.push_back(atom);
+        atom=a.atoms.at(i);
+        for(int j=1;j<=3;j++) atom.cpos(j)=in_pos[i][j-1];
+        atom.fpos=C2F(b.lattice,atom.cpos);
+        b.atoms.push_back(atom);
       }
     }
     return b;
@@ -999,29 +999,29 @@ namespace pflow {
     if(in.size()==a.num_each_type.size()) {
       cerr << "SetAllAtomNames: this routine must be fixed... it does not work here" << endl;
       exit(0);
-      
+
       for(uint iat=0;iat<b.num_each_type.size();iat++) {
-	b.atoms.at(iat).name=in.at(b.atoms.at(iat).type);       // CONVASP_MODE
-	if(b.atoms.at(iat).name.size()) {
-	  b.atoms.at(iat).name_is_given=TRUE;
-	  b.atoms.at(iat).CleanName();
-	  // DX 9/21/17 - Need to keep spin info b.atoms.at(iat).CleanSpin();
-	}
+        b.atoms.at(iat).name=in.at(b.atoms.at(iat).type);       // CONVASP_MODE
+        if(b.atoms.at(iat).name.size()) {
+          b.atoms.at(iat).name_is_given=TRUE;
+          b.atoms.at(iat).CleanName();
+          // DX 9/21/17 - Need to keep spin info b.atoms.at(iat).CleanSpin();
+        }
       }
       return b;
     }
     if(in.size()==a.atoms.size()) {
       for(uint iat=0;iat<b.atoms.size();iat++) {
-	b.atoms.at(iat).name=in.at(iat);
-	b.atoms.at(iat).name_is_given=TRUE;
-	b.atoms.at(iat).CleanName();
-	// DX 9/21/17 - Need to keep spin info b.atoms.at(iat).CleanSpin();
+        b.atoms.at(iat).name=in.at(iat);
+        b.atoms.at(iat).name_is_given=TRUE;
+        b.atoms.at(iat).CleanName();
+        // DX 9/21/17 - Need to keep spin info b.atoms.at(iat).CleanSpin();
       }
       return b;
     }
     cerr << "Must specity as many names as types/numbers: in.size()=" << (int) in.size()
-	 << "   =a.num_each_type.size()=" << (int) a.num_each_type.size()
-	 << "   =a.atoms.size()=" << (int) a.atoms.size() << endl;
+      << "   =a.num_each_type.size()=" << (int) a.num_each_type.size()
+      << "   =a.atoms.size()=" << (int) a.atoms.size() << endl;
     exit(0);
   }
 }
@@ -1036,18 +1036,18 @@ namespace pflow {
       cerr << "ERROR - SetNamesWereGiven: this routine must be fixed... it does not work here" << endl;
       exit(0);
       for(uint iat=0;iat<b.num_each_type.size();iat++)
-	b.atoms.at(iat).name_is_given=in.at(b.atoms.at(iat).type);      // CONVASP_MODE
+        b.atoms.at(iat).name_is_given=in.at(b.atoms.at(iat).type);      // CONVASP_MODE
       return b;
     }
     if(in.size()==a.atoms.size()) {
       for(uint iat=0;iat<b.atoms.size();iat++) {
-	b.atoms.at(iat).name_is_given=in.at(iat);
+        b.atoms.at(iat).name_is_given=in.at(iat);
       }
       return b;
     }
     cerr << "Must specity as many names as types/numbers: in.size()=" << (uint) in.size()
-	 << "   =a.num_each_type.size()=" << (uint) a.num_each_type.size()
-	 << "   =a.atoms.size()=" << (uint) a.atoms.size() << endl;
+      << "   =a.num_each_type.size()=" << (uint) a.num_each_type.size()
+      << "   =a.atoms.size()=" << (uint) a.atoms.size() << endl;
     exit(0);
   }
 }
@@ -1099,7 +1099,7 @@ namespace pflow {
     for(int i=0;i<size;i++) if(aurostd::abs((double)(a.at(i)-b.at(i)))>tol) return FALSE;
     return TRUE;
   }
-  
+
 }
 // ***************************************************************************
 // Function SmoothFunc
@@ -1120,16 +1120,16 @@ namespace pflow {
 
     for(int ix=0;ix<nx;ix++) {
       for(int i=-range;i<=range;i++) {
-	if((ix+i)>=0 && (ix+i)<nx) {
-	  wt[ix][i+range]=Normal((double)(ix+i),double(ix),sigma);
-	  norm[ix]=norm[ix]+wt[ix][i+range];
-	}
+        if((ix+i)>=0 && (ix+i)<nx) {
+          wt[ix][i+range]=Normal((double)(ix+i),double(ix),sigma);
+          norm[ix]=norm[ix]+wt[ix][i+range];
+        }
       }
     }
     // Normalize to one
     for(int ix=0;ix<nx;ix++) {
       for(int i=-range;i<=range;i++) {
-	wt[ix][i+range]=wt[ix][i+range]/norm[ix];
+        wt[ix][i+range]=wt[ix][i+range]/norm[ix];
       }
     }
 
@@ -1138,9 +1138,9 @@ namespace pflow {
     for(int ix=0;ix<nx;ix++) {
       double sf=0;
       for(int i=-range;i<=range;i++) {
-	if((ix+i)>0 && (ix+i)<nx) {
-	  sf+=wt[ix][i+range]*func[ix+i];
-	}
+        if((ix+i)>0 && (ix+i)<nx) {
+          sf+=wt[ix][i+range]*func[ix+i];
+        }
       }
       sfunc[ix]=sf;
     }
@@ -1174,12 +1174,12 @@ namespace pflow {
   void VVset(matrix<double> &mat,const double& value) {
     for(uint i=0;i<mat.size();i++)
       for(uint j=0;j<mat[i].size();j++)
-	mat[i][j]=(double) value;
+        mat[i][j]=(double) value;
   }
   void VVset(vector<vector<int> > &mat,const int& value) {
     for(uint i=0;i<mat.size();i++)
       for(uint j=0;j<mat[i].size();j++)
-	mat[i][j]=(int) value;
+        mat[i][j]=(int) value;
   }
 }
 
@@ -1328,7 +1328,7 @@ namespace pflow {
   void Mout(const matrix<double>& m, ostream& out) {
     for(uint i=0;i<m.size();i++) {
       for(uint j=0;j<m[i].size();j++) {
-	out << m[i][j] << " ";
+        out << m[i][j] << " ";
       }
       out << endl;
     }
@@ -1336,7 +1336,7 @@ namespace pflow {
   void Mout(const vector<vector<double> >& m, ostream& out) {
     for(uint i=0;i<m.size();i++) {
       for(uint j=0;j<m[i].size();j++) {
-	out << m[i][j] << " ";
+        out << m[i][j] << " ";
       }
       out << endl;
     }
@@ -1443,11 +1443,11 @@ namespace pflow {
     matrix<double> c(M,v);
     for(uint i=0;i<M;i++) {
       for(uint j=0;j<M;j++) {
-	double sum=0.0;
-	for(uint k=0;k<N;k++) {
-	  sum=sum+a[i][k]*b[k][j];
-	}
-	c[i][j]=sum;
+        double sum=0.0;
+        for(uint k=0;k<N;k++) {
+          sum=sum+a[i][k]*b[k][j];
+        }
+        c[i][j]=sum;
       }
     }
     return c;
@@ -1468,7 +1468,7 @@ namespace pflow {
     for(uint i=0;i<M;i++) {
       double sum=0;
       for(uint j=0;j<N;j++) {
-	sum=sum+A[i][j]*v[j];
+        sum=sum+A[i][j]*v[j];
       }
       u[i]=sum;
     }
@@ -1490,7 +1490,7 @@ namespace pflow {
     for(uint i=0;i<N;i++) {
       double sum=0;
       for(uint j=0;j<M;j++)
-	sum=sum+v[j]*A[j][i];
+        sum=sum+v[j]*A[j][i];
       u[i]=sum;
     }
     return u;
@@ -1502,7 +1502,7 @@ namespace pflow {
     for(uint i=0;i<N;i++) {
       double sum=0;
       for(uint j=0;j<M;j++)
-	sum=sum+v[j]*A[j][i];
+        sum=sum+v[j]*A[j][i];
       u[i]=sum;
     }
     return u;
@@ -1559,7 +1559,7 @@ namespace pflow {
 // I have shifted all indices to go from 0->(n-1).
 namespace pflow {
   void SetSpline(const vector<double>& x, const vector<double>& y,
-		 const double& yp1, const double& ypn, vector<double>& y2) {
+      const double& yp1, const double& ypn, vector<double>& y2) {
     int i,k;
     double p,qn,sig,un;
     int n=x.size();
@@ -1602,11 +1602,11 @@ namespace pflow {
 // I have shifted all indices to go from 0->(n-1).
 namespace pflow {
   void GetSplineInt(const vector<double>& xa, const vector<double>& ya,
-		    vector<double>& y2a, const double& x, double& y) {
+      vector<double>& y2a, const double& x, double& y) {
     int klo,khi,k;
     double h,b,a;
     int n=xa.size();
-    
+
     klo=0;
     khi=n-1;
     while (khi-klo > 1) {
@@ -1632,7 +1632,7 @@ namespace pflow {
 // spline interpolation with keywords for grep.
 namespace pflow {
   void PrintSpline(const vector<double>& x, const vector<double>& y,
-		   const int& npts, ostream& outf) {
+      const int& npts, ostream& outf) {
     outf.setf(std::ios::left, std::ios::adjustfield);
     outf.setf(std::ios::fixed, std::ios::floatfield);
     outf << "******************** Initial Data ********************" << endl;
@@ -1652,10 +1652,10 @@ namespace pflow {
       double xrange=x[ndat-1]-x[0];
       double dx=xrange/(double)(npts-1);
       for(int ip=0;ip<npts;ip++) {
-	double xp=x[0]+(double)ip*dx;
-	double yp;
-	GetSplineInt(x,y,y2,xp,yp);
-	outf << xp << " " << yp << "   " << "INTERPOLATED" << endl;
+        double xp=x[0]+(double)ip*dx;
+        double yp;
+        GetSplineInt(x,y,y2,xp,yp);
+        outf << xp << " " << yp << "   " << "INTERPOLATED" << endl;
       }
     }
   }
