@@ -473,6 +473,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
     }
 
     // ME200102 - BEGIN
+    // Store supercell generation parameters in xoption.
     aurostd::xoption supercell_opts;
     if (kflags.KBIN_MODULE_OPTIONS.supercell_method[0]) {
       supercell_opts.push_attached("SUPERCELL::METHOD", "SUPERCELL");
