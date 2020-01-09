@@ -9,6 +9,11 @@
         -- Updated KPPRA for phonons. (ME)
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
+        -- added schema name/unit/type to XHOST (SC)
+        -- added file2dequestring(), string2dequestring() (SC)
+        -- optimized NCPUS/NPAR/NCORE settings (SC)
+        -- patched _atom() class: constructor()/copy()/free() (SC)
+        -- updated xoptions so content can be lowercase (SC)
         -- AFLOW DFT calculations can now read in CHGCAR files. (ME)
         -- Improved runtimes and memory requirements for AAPL. (ME)
         -- Switched the thermal conductivity integration method to the tetrahedron method. (ME)
@@ -22,11 +27,6 @@
         -- Added a handler for the AFLOW database. (ME)
         -- Added an AFLOW-SQLITE interface. (ME)
         -- Updated SQLite to version 3.30.1 (2019-10-11, https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip). (ME)
-        -- added schema name/unit/type to XHOST (SC)
-        -- added file2dequestring(), string2dequestring() (SC)
-        -- optimized NCPUS/NPAR/NCORE settings (SC)
-        -- patched _atom() class: constructor()/copy()/free() (SC)
-        -- updated xoptions so content can be lowercase (SC)
         -- Added additional web output for entry page generation. (ME)
         -- Fixed bug that put NCORE into INCARs of linear response calculations. (ME)
         -- Fixed bug that caused phonon dispersion path builder to break for some lattices. (ME)
@@ -163,6 +163,10 @@
         -- use xoptions schema for property units in comparison code (DX)
         -- use ANRL setting as default for symmetry analysis in comparisons for quick conversion to AFLOW prototype designation (DX)
         -- use of xoptions throughout comparison functions (DX)
+        (AFLOW: aconvasp.cpp, aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib_database.cpp, aflowlib.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowrc.cpp, apennsy_gndstate.cpp, apennsy_main.cpp, avasp.cpp, bader.cpp, cce.cpp, chull.cpp, chull.h, compare_structure.cpp, compare_structure_function.cpp, compare_structure.h, contrib_shidong_auxiliary.cpp, gfa.cpp, iaims.cpp, init.cpp, ivasp.cpp, kbin.cpp, kvasp.cpp, lattice.cpp, Makefile, modules.cpp, ovasp.cpp, pflow_funcs.cpp, pflow.h, pflow_print.cpp, plotter.cpp, pocc.cpp, pocc.h, pocc_old.cpp, pocc_old.h, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_COMPARE.TXT, README_AFLOW_EXCEPTIONS.TXT, README_AFLOW.TXT, README_PROTO.TXT, SQLITE/shell.c, SQLITE/sqlite3.c, SQLITE/sqlite3ext.h, SQLITE/sqlite3.h, SQLITE/sqlite.cpp, SQLITE/sqlite.h, surface.cpp, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, xatom.cpp, xclasses.cpp, xproto.cpp, xproto_gus.cpp)
+        (ANRL: aflow_anrl.cpp, ANRL_CPPS_20180710/list.cpp)
+        (APL: aapl_cluster.cpp, aapl_ifcs.cpp, aapl_setup.cpp, aapl_tcond.cpp, apl_atomic_disp.cpp, apl_dirphoncalc.cpp, apl_dm_pdos_save.cpp, apl_doscalc.cpp, apl_group_velocity.cpp, apl.h, apl_hsqpoints.cpp, apl_kphonons.cpp, apl_lrphoncalc.cpp, apl_ltet.cpp, apl_pathbuilder.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_shellhandle.cpp, apl_supercell.cpp, apl_thermalpc.cpp, qha3phonons_eos.cpp, qha_aflowin_creator.cpp, qha_dm_pdos_save.cpp, qha_energies.cpp, qha_eoscalc.cpp, qha_eos.cpp, qha_eosrun.cpp, qha_gruneisen.cpp, qha_operations.cpp, README_AFLOW_APL.TXT, scqha_eos.cpp, scqha_gruneisen.cpp, scqha_T_freqs.cpp)
+        (AUROSTD: aurostd.h, boot.cpp, main.cpp, xcombos.cpp, xcombos.h, xcomplex.cpp, xcomplex.h, xerror.cpp, xerror.h, xmatrix.cpp, xmatrix.h, xoption.cpp, xoption.h, xscalar.cpp, xscalar.h, xtensor.cpp, xvector.cpp, xvector.h)
 3.1.227 - 2019/10/16
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.227.tar.xz
         -- Bug fixes for MPI (SC)
