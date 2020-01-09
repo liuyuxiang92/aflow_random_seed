@@ -53,6 +53,8 @@ const QMesh& QMesh::operator=(const QMesh& that) {
 void QMesh::copy(const QMesh& that) {
   _ibzqpts = that._ibzqpts;
   _isGammaCentered = that._isGammaCentered;
+  _littleGroups = that._littleGroups;
+  _littleGroupsCalculated = that._littleGroupsCalculated;
   _logger = that._logger;
   _nIQPs = that._nIQPs;
   _nQPs = that._nQPs;
@@ -77,6 +79,8 @@ void QMesh::free() {
   xmatrix<double> zeroMatrix(3, 3);
   _ibzqpts.clear();
   _isGammaCentered = false;
+  _littleGroups.clear();
+  _littleGroupsCalculated = false;
   _reduced = false;
   _nIQPs = 0;
   _nQPs = 0;
@@ -288,6 +292,22 @@ void QMesh::makeIrreducible() {
   _logger << "Found " << _nIQPs << " irreducible qpoints." << apl::endl;
 }
 
+// ME200109
+//calculateLittleGroups///////////////////////////////////////////////////////
+// Calculates little/small groups for each irreducible q-point.
+void QMesh::calculateLittleGroups() {
+  _littleGroups.resize(_nIQPs, vector<int>(1, 0));  // Identity is always invariant
+  uint nsymops = _recCell.pgroup.size();
+  int q = -1;
+  for (int iq = 0; iq < _nIQPs; iq++) {
+    q = _ibzqpts[iq];
+    const xvector<double>& fpos = _qpoints[q].fpos;
+    for (uint isym = 1; isym < nsymops; isym++) {
+      if (getQPointIndex(_recCell.pgroup[isym].Uf * fpos) == q) _littleGroups[iq].push_back(isym);
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                            GETTER FUNCTIONS                              //
@@ -427,6 +447,21 @@ bool QMesh::isReduced() const {
 
 bool QMesh::isGammaCentered() const {
   return _isGammaCentered;
+}
+
+// ME200109
+bool QMesh::littleGroupsCalculated() const {
+  return _littleGroupsCalculated;
+}
+
+const vector<int>& QMesh::getLittleGroup(int iq) const {
+  if (iq < _nIQPs) {
+    return _littleGroups[iq];
+  } else {
+    string function = _APL_QMESH_ERR_PREFIX_ + "getLittleGroup()";
+    string message = "Little groups are only calculated for irreducible q-points.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,7 @@
 //****************************************************************************
 //
 // Calculates thermal properties from phonon densities of states. Originally
-// written by Jahnatek and adapted/reworked by Marco Esters for use with POCC.
+// written by Jahnatek and adapted/rewritten by Marco Esters for use with POCC.
 //
 // The old code assumed that there was one DOS for the entire temperature range.
 // However, POCC has different DOS for different temperatures.

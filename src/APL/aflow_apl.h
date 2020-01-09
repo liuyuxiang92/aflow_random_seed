@@ -1295,6 +1295,7 @@ class QMesh {
     void initialize(const xvector<int>&, const xstructure& xs, bool=true);
 
     void makeIrreducible();
+    void calculateLittleGroups();  // ME200109
     void writeQpoints(string, bool=true);
     void writeIrredQpoints(string, bool=true);
 
@@ -1325,6 +1326,8 @@ class QMesh {
     const vector<int>& getWeights() const;
     bool isReduced() const;
     bool isGammaCentered() const;
+    bool littleGroupsCalculated() const;  // ME200109
+    const vector<int>& getLittleGroup(int) const;  // ME200109
 
   private:
     void free();
@@ -1334,6 +1337,8 @@ class QMesh {
 
     vector<int> _ibzqpts;  // The indices of the irreducible q-points
     bool _isGammaCentered;  // Indicates whether the includes the Gamma point
+    vector<vector<int> > _littleGroups;  // The little groups of the irreducible q-points
+    bool _littleGroupsCalculated;  // Indicates whether the little groups have been calculated
     int _nIQPs;  // The number of irreducible q-points
     int _nQPs;  // The number of q-points
     xvector<int> _qptGrid;  // The dimensions of the q-point mesh
@@ -1646,7 +1651,7 @@ class TCONDCalculator {
     void calculateTransitionProbabilitiesIsotope(int, int, const LTMethod&);
     vector<vector<double> > calculateTransitionProbabilitiesBoundary();
     void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
-    xmatrix<double> calculateThermalConductivityTensor(double, const vector<vector<int> >&,
+    xmatrix<double> calculateThermalConductivityTensor(double,
                                                        vector<vector<vector<double> > >&,
                                                        vector<vector<vector<double> > >&);
     vector<vector<double> > getOccupationNumbers(double);
@@ -1657,9 +1662,9 @@ class TCONDCalculator {
     vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
     xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
                               const vector<vector<xvector<double> > >&);
-    void getMeanFreeDispFull(const vector<vector<double> >&, const vector<vector<int> >&,
+    void getMeanFreeDispFull(const vector<vector<double> >&,
                              const vector<vector<double> >&, vector<vector<xvector<double> > >&);
-    void calculateDelta(int, int, const vector<vector<int> >&, const vector<vector<double> >&,
+    void calculateDelta(int, int, const vector<vector<double> >&,
                         const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
     void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
     

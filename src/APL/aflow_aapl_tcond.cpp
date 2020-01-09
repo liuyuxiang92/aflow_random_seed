@@ -188,12 +188,11 @@ void TCONDCalculator::calculateThermalConductivity() {
   // Thermal conductivity tensor and scattering rates
   thermal_conductivity.assign(temperatures.size(), xmatrix<double>(3, 3));
   vector<vector<vector<double> > > rates_total, rates_anharm;
-  // Only need small groups for full BTE
-  vector<vector<int> > small_groups;
-  if (!calc_options.flag("RTA")) small_groups = calculateSmallGroups();
+  // Only need little groups for full BTE
+  if (!calc_options.flag("RTA") && !_qm.littleGroupsCalculated()) _qm.calculateLittleGroups();
 
   for (uint t = 0; t < temperatures.size(); t++) {
-    thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], small_groups, rates_total, rates_anharm);
+    thermal_conductivity[t] = calculateThermalConductivityTensor(temperatures[t], rates_total, rates_anharm);
   }
 
   filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_RATES_FILE);
@@ -203,25 +202,6 @@ void TCONDCalculator::calculateThermalConductivity() {
 
   filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_AAPL_FILE_PREFIX + DEFAULT_AAPL_TCOND_FILE);
   writeThermalConductivity(filename);
-}
-
-//calculateSmallGroups////////////////////////////////////////////////////////
-// Calculates the small/little group for each irreducible q-point. These
-// groups will be used to symmetrize the mean free displacement in the full
-// BTE solution.
-vector<vector<int> > TCONDCalculator::calculateSmallGroups() {
-  vector<vector<int> > small_groups(nIQPs, vector<int>(1, 0));  // Identity is always invariant
-  const vector<_sym_op>& symops = _qm.getReciprocalCell().pgroup;
-  const vector<int>& ibzqpts = _qm.getIbzqpts();
-  int q = -1;
-  for (int iq = 0; iq < nIQPs; iq++) {
-    q = ibzqpts[iq];
-    const xvector<double>& fpos = _qm.getQPoint(q).fpos;
-    for (uint isym = 1; isym < symops.size(); isym++) {
-      if (_qm.getQPointIndex(symops[isym].Uf * fpos) == q) small_groups[iq].push_back(isym);
-    }
-  }
-  return small_groups;
 }
 
 } // namespace apl
@@ -979,7 +959,6 @@ void TCONDCalculator::getProcess(const vector<int>& process, vector<int>& qpts,
 // scattering rates for a specific temperature. The rates are passed by
 // reference so that they can be written into output files later.
 xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
-                                                                    const vector<vector<int> >& small_groups,
                                                                     vector<vector<vector<double> > >& rates_total,
                                                                     vector<vector<vector<double> > >& rates_anharm) {
   _logger << "Calculating thermal conductivity for " << T << " K." << apl::endl;
@@ -1006,7 +985,7 @@ xmatrix<double> TCONDCalculator::calculateThermalConductivityTensor(double T,
     std::cout << std::setw(25) << "Rel. Change in Norm" << std::endl;
     do {
       tcond_prev = tcond;
-      getMeanFreeDispFull(rates, small_groups, occ, mfd);
+      getMeanFreeDispFull(rates, occ, mfd);
 
       tcond = calcTCOND(T, occ, mfd);
       // Calculate relative changes to the Frobenius norm instead of just
@@ -1177,7 +1156,6 @@ xmatrix<double> TCONDCalculator::calcTCOND(double T, const vector<vector<double>
 // solution of the BTE. Since there are a lot of processes, threading speeds
 // up the calculations considerably.
 void TCONDCalculator::getMeanFreeDispFull(const vector<vector<double> >& rates,
-                                          const vector<vector<int> >& small_groups,
                                           const vector<vector<double> >& occ,
                                           vector<vector<xvector<double> > >& mfd) {
   // MPI variables
@@ -1195,14 +1173,14 @@ void TCONDCalculator::getMeanFreeDispFull(const vector<vector<double> >& rates,
   for (int icpu = 0; icpu < ncpus; icpu++) {
     threads.push_back(new std::thread(&TCONDCalculator::calculateDelta, this,
                                       thread_dist[icpu][0], thread_dist[icpu][1], 
-                                      std::ref(small_groups), std::ref(occ), std::ref(mfd), std::ref(delta)));
+                                      std::ref(occ), std::ref(mfd), std::ref(delta)));
   }
   for (int icpu = 0; icpu < ncpus; icpu++) {
     threads[icpu]->join();
     delete threads[icpu];
   }
 #else
-  calculateDelta(0, nIQPs, small_groups, occ, mfd, delta);
+  calculateDelta(0, nIQPs, occ, mfd, delta);
 #endif
 
   correctMFD(rates, delta, mfd);
@@ -1213,7 +1191,6 @@ void TCONDCalculator::getMeanFreeDispFull(const vector<vector<double> >& rates,
 // Only irreducible q-points need to be calculated since deltas of equivalent
 // q-points are related by symmetry.
 void TCONDCalculator::calculateDelta(int startIndex, int endIndex, 
-                                     const vector<vector<int> >& small_groups,
                                      const vector<vector<double> >& occ,
                                      const vector<vector<xvector<double> > >& mfd,
                                      vector<vector<xvector<double> > >& delta) {
@@ -1246,9 +1223,10 @@ void TCONDCalculator::calculateDelta(int startIndex, int endIndex,
     int symop = 0;
     const vector<_sym_op>& pgroup = _qm.getReciprocalCell().pgroup;
     xmatrix<double> Uc(3, 3);
-    uint nsym = small_groups[i].size();
+    const vector<int>& little_group = _qm.getLittleGroup(i);
+    uint nsym = little_group.size();
     for (uint isym = 0; isym < nsym; isym++) {
-      symop = small_groups[i][isym];
+      symop = little_group[isym];
       Uc += pgroup[symop].Uc;
     }
     Uc = 1.0/nsym * Uc;

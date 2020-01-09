@@ -7,6 +7,7 @@
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Added standard class methods to LTMethod and QMesh. (ME)
         -- Updated KPPRA for phonons. (ME)
+        -- Moved calculation of little groups from TCONDCalculator to QMesh. (ME)
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
