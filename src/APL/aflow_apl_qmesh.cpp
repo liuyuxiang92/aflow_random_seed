@@ -45,7 +45,7 @@ QMesh::QMesh(const QMesh& that) : _logger(that._logger) {
   copy(that);
 }
 
-const QMesh& QMesh::operator=(const QMesh& that) {
+QMesh& QMesh::operator=(const QMesh& that) {
   if (this != &that) copy(that);
   return *this;
 }

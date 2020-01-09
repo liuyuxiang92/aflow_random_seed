@@ -365,7 +365,7 @@ vector<vector<double> > TCONDCalculator::calculateModeGrueneisen(const vector<ve
             g_mode.im += ifc_prod * (prefactor.re * eigenprods[e][crt].im + prefactor.im * eigenprods[e][crt].re);
           }
         }
-        g_mode *= -10.0*au2nmTHz/(6.0 * std::pow(freq[q][br], 2));
+        g_mode *= -10.0 * au2nmTHz/(6.0 * std::pow(freq[q][br], 2));
         if (g_mode.im > _AFLOW_APL_EPS_) {  // _ZERO_TOL_ is too tight
           _logger << apl::warning << " Grueneisen parameter at mode "
                                   << iq << ", " << br << " is not real ("

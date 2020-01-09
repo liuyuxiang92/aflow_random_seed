@@ -1289,7 +1289,7 @@ class QMesh {
     QMesh(const xvector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const vector<int>&, const xstructure&, Logger&, bool=true);
     QMesh(const QMesh&);
-    const QMesh& operator=(const QMesh&);
+    QMesh& operator=(const QMesh&);
     ~QMesh();
     void clear(Logger&);
     void initialize(const xvector<int>&, const xstructure& xs, bool=true);
@@ -1363,9 +1363,9 @@ class LTMethod {
   public:
     LTMethod(QMesh&, Logger&);
     LTMethod(const LTMethod&);
-    const LTMethod& operator=(const LTMethod&);
-    void clear(QMesh&, Logger&);
+    LTMethod& operator=(const LTMethod&);
     ~LTMethod();
+    void clear(QMesh&, Logger&);
 
     void makeIrreducible();  // ME190625
 

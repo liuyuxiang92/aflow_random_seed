@@ -42,7 +42,7 @@ LTMethod::LTMethod(const LTMethod& that) : _qm(that._qm), _logger(that._logger) 
   copy(that);
 }
 
-const LTMethod& LTMethod::operator=(const LTMethod& that) {
+LTMethod& LTMethod::operator=(const LTMethod& that) {
   if (this != &that) copy(that);
   return *this;
 }
