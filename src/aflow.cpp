@@ -115,8 +115,8 @@ namespace aflowlib {
       sort(list2found.begin(),list2found.end());
       //     cerr << "aflowlib::LIB2SCRUB list2found.size()=" << list2found.size() << endl;
 	
-      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listREMOVE_MPCDF,listICSD2LINK;
-      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossREMOVE_MPCDF,ossICSD2LINK;
+      vector<string> listLIB2RAW,listRM,listANRL,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK;
+      stringstream ossLIB2RAW,ossRM,ossANRL,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK;
 
       vector<string> tokens;
       vector<string> vremoveALL;
@@ -127,7 +127,6 @@ namespace aflowlib {
 
       bool LIB2AUID=FALSE;//TRUE;
       bool REMOVE_MARYLOU=TRUE;
-      bool REMOVE_MPCDF=TRUE;
       bool ICSD2LINK=TRUE;//TRUE;
       
       for(uint j=0;j<list2found.size();j++) {
@@ -185,19 +184,6 @@ namespace aflowlib {
 	      //	    fixes++;
 	  }
 	}	
-	if(REMOVE_MPCDF) {
-	  if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_)) {
-	    string directory_MPCDF="~/LIBS/"+directory_LIB;
-	    aurostd::StringSubst(directory_MPCDF,"common","");
-	    aurostd::StringSubst(directory_MPCDF,"//","");
-	      aurostd::StringSubst(directory_MPCDF,"//","");
-	      
-	      //    cerr << "aflowlib::LIB2SCRUB fixing " << directory_LIB << endl;
-	      listREMOVE_MPCDF.push_back(directory_MPCDF);
-	      ossREMOVE_MPCDF << "rm -rfv \"" << directory_MPCDF << "\"" << endl;
-	      //	    fixes++;
-	  }
-	}
 
 	// check LIB2AUID MISSING	
 	if(LIB2AUID) {
@@ -340,22 +326,17 @@ namespace aflowlib {
 	aurostd::stringstream2file(ossICSD2LINK,XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
 	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ICSD2LINK."+vlib.at(i));
       }
-       cerr << "aflowlib::LIB2SCRUB listLIB2AUID.size()=" << listLIB2AUID.size() << endl;
+      cerr << "aflowlib::LIB2SCRUB listLIB2AUID.size()=" << listLIB2AUID.size() << endl;
       if(listLIB2AUID.size()) {
 	aurostd::stringstream2file(ossLIB2AUID,XHOST.tmpfs+"/xscrubber_LIB2AUID."+vlib.at(i));
 	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_LIB2AUID."+vlib.at(i));
       }
-     cerr << "aflowlib::LIB2SCRUB listREMOVE_MARYLOU.size()=" << listREMOVE_MARYLOU.size() << endl;
+      cerr << "aflowlib::LIB2SCRUB listREMOVE_MARYLOU.size()=" << listREMOVE_MARYLOU.size() << endl;
       if(listREMOVE_MARYLOU.size()) {
 	aurostd::stringstream2file(ossREMOVE_MARYLOU,XHOST.tmpfs+"/xscrubber_REMOVE_MARYLOU."+vlib.at(i));
 	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_REMOVE_MARYLOU."+vlib.at(i));
       }
-     cerr << "aflowlib::LIB2SCRUB listREMOVE_MPCDF.size()=" << listREMOVE_MPCDF.size() << endl;
-      if(listREMOVE_MPCDF.size()) {
-	aurostd::stringstream2file(ossREMOVE_MPCDF,XHOST.tmpfs+"/xscrubber_REMOVE_MPCDF."+vlib.at(i));
-	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_REMOVE_MPCDF."+vlib.at(i));
-      }
-     cerr << "aflowlib::LIB2SCRUB listRM.size()=" << listRM.size() << endl;
+      cerr << "aflowlib::LIB2SCRUB listRM.size()=" << listRM.size() << endl;
       if(listRM.size()) {
 	aurostd::stringstream2file(ossRM,XHOST.tmpfs+"/xscrubber_RM."+vlib.at(i));
 	aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_RM."+vlib.at(i));
