@@ -6,6 +6,7 @@
         -- APL now always uses a commensurate k-point grid for relaxations. (ME)
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
         -- Added standard class methods to LTMethod and QMesh. (ME)
+        -- Updated KPPRA for phonons. (ME)
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- AFLOW DFT calculations can now read in CHGCAR files. (ME)

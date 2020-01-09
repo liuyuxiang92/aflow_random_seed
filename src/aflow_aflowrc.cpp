@@ -220,7 +220,7 @@
 #define         DEFAULT_UNARY_KPPRA_STATIC                    XHOST.adefault.getattachedutype<int>("DEFAULT_UNARY_KPPRA_STATIC")
 #define AFLOWRC_DEFAULT_PHONONS_KSCHEME                       string("G")
 #define         DEFAULT_PHONONS_KSCHEME                       XHOST.adefault.getattachedscheme("DEFAULT_PHONONS_KSCHEME")
-#define AFLOWRC_DEFAULT_PHONONS_KPPRA                         2000  //CO181226  //ME190205 - 8000 uses too much memory e.g. for NaF - 2000 appears sufficient
+#define AFLOWRC_DEFAULT_PHONONS_KPPRA                         3000  //CO181226  //ME190205 - 8000 uses too much memory e.g. for NaF - 2000 appears sufficient; ME200108 - 3000 minimum for metals
 #define         DEFAULT_PHONONS_KPPRA                         XHOST.adefault.getattachedutype<int>("DEFAULT_PHONONS_KPPRA") //CO181226 //ME190112
 #define AFLOWRC_DEFAULT_DOS_EMIN                              -10.0
 #define         DEFAULT_DOS_EMIN                              XHOST.adefault.getattachedutype<double>("DEFAULT_DOS_EMIN")
