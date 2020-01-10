@@ -146,7 +146,13 @@ void QMesh::setupReciprocalCell(xstructure xs) {
   // Calculate the point group of the reciprocal cell. This requires some dummy
   // ofstream objects to parse into the function. These objects will be removed
   // when CalculatePointGroupKlattice is redesigned to work without ofstreams.
-  if (!xs.pgroupk_calculated) {  // ME190625 - need pgroupk, not pgroupk_xtal since we look at the entire BZ
+  // ME200110 - See "The Physics of Phonons" by G.P. Srivastava, p. 11 for a
+  // discussion of pgroupk vs pgroupk_xtal. Summary: The Wigner-Seitz cell of
+  // has the point group symmetry of its lattice. As long as we stay inside the
+  // BZ (which the Monkhorst-Pack mesh does), the mesh can be reduced using the
+  // point group of the reciprocal lattice. For example, diamond and zincblende
+  // have the same IBZ even though their crystals have different point groups.
+  if (!xs.pgroupk_calculated) {
     ofstream FileDevNull("/dev/null");
     if (!FileDevNull.is_open()) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
