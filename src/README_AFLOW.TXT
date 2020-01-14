@@ -18,7 +18,7 @@ aflow
    --FILE[=| ]file | --F[=| ]file | --f[=| ]file   
                                     List of directories to run from file
                                     containing a list of aflow.in one per line.
-   --quiet | -quiet | -q            Quiet: remove all '00000 MESSAGES'
+   --quiet | -quiet | -q            Quiet: remove all 'MMMMM MESSAGES'
    -c | --clean         cleans everything except aflow.in
               (if .gz or .bz2 inputs are present, they are decompressed)
 
@@ -201,11 +201,8 @@ aflow
                      mpcdf_eos  | eos
                      mpcdf_draco  | draco
                      mpcdf_cobra  | cobra
-                     mpcdf_hydra  | hydra                                                                // [MPCDF_HYDRA]
-                     teragrid_ranger  | ranger
-                     teragrid_kraken  | kraken
+                     mpcdf_hydra  | hydra 
                      fulton_marylou  | marylou
-                     trinity_parsons
                      ohad
                      host1
                 With this option, aflow tunes the MPI commands to "MACHINE" standards
@@ -293,7 +290,7 @@ HOST: fix default things for the HOST
                       DUKE_AFLOWLIB  | DUKE_HABANA | DOD_CONRAD | DOD_ONYX | DOD_GORDON | DOD_COPPER | 
                       DOD_GAFFNEY | DOD_KOEHR | DOD_MUSTANG | DOD_EULER |
                       MPCDF_EOS  | MPCDF_DRACO  | MPCDF_COBRA  | MPCDF_HYDRA  |
-                      TERAGRID_RANGER  | TERAGRID_KRAKEN  | TRINITY_PARSONS  | FULTON_MARYLOU   | MACHINE1 |
+                      FULTON_MARYLOU   | MACHINE1 |
   With this option, AFLOW takes the mpirun commands as specified in aflow_aflowr.cpp for this machine.
   MPI_COMMAND_XXXXXXX,  MPI_BINARY_DIR_XXXXXXX, sets up the AUTOTUNE (start,stop are neglected)
   and overrides the NCPUS value specified with the option --np=NUMBER (if specified)

@@ -925,7 +925,7 @@ namespace KBIN {
     FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
     if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
-      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time") << endl;
+      aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
       return FALSE;
     }
@@ -947,28 +947,28 @@ namespace KBIN {
     // ***************************************************************************
     // Get the KBIN_BIN name
     aurostd::StringstreamClean(aus);
-    aus << "00000  MESSAGE KBIN::VASP_Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time") << endl;
+    aus << "00000  MESSAGE KBIN::VASP_Directory Running KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // ***************************************************************************
     // Some verbose
-    if(kflags.KBIN_POCC) {aus << "00000  MESSAGE KBIN::VASP_Directory Running POCC_CALCULATION" << Message(aflags,"user,host,time") << endl;} // CO 180419 //POCC is special needs to run first because there is NO poscar defined yet
-    else if(kflags.KBIN_PHONONS_CALCULATION_APL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_APL" << Message(aflags,"user,host,time") << endl;
-    else if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,"user,host,time") << endl;   // CO 170601
-    else if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,"user,host,time") << endl; // CO 170601
-    else if(kflags.KBIN_PHONONS_CALCULATION_AGL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_AGL (Debye Model)" << Message(aflags,"user,host,time") << endl;
-    else if(kflags.KBIN_PHONONS_CALCULATION_AEL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_AEL (Elastic constants)" << Message(aflags,"user,host,time") << endl;
-    else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_FROZSL" << Message(aflags,"user,host,time") << endl;
+    if(kflags.KBIN_POCC) {aus << "00000  MESSAGE KBIN::VASP_Directory Running POCC_CALCULATION" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;} // CO 180419 //POCC is special needs to run first because there is NO poscar defined yet
+    else if(kflags.KBIN_PHONONS_CALCULATION_APL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_APL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    else if(kflags.KBIN_PHONONS_CALCULATION_QHA) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_QHA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;   // CO 170601
+    else if(kflags.KBIN_PHONONS_CALCULATION_AAPL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_AAPL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO 170601
+    else if(kflags.KBIN_PHONONS_CALCULATION_AGL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_AGL (Debye Model)" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    else if(kflags.KBIN_PHONONS_CALCULATION_AEL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_AEL (Elastic constants)" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) aus << "00000  MESSAGE KBIN::VASP_Directory Running PHONONS_CALCULATION_FROZSL" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     else {
-    if(vflags.KBIN_VASP_RUN.flag("GENERATE")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_GENERATE" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("STATIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_STATIC" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("KPOINTS")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_KPOINTS" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("RELAX")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_RELAX" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_RELAX_STATIC" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_STATIC_BANDS" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_RELAX_STATIC_BANDS" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_DIELECTRIC_STATIC" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_DIELECTRIC_DYNAMIC" << Message(aflags,"user,host,time") << endl;
-    if(vflags.KBIN_VASP_RUN.flag("DSCF")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_DSCF" << Message(aflags,"user,host,time") << endl;
+    if(vflags.KBIN_VASP_RUN.flag("GENERATE")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_GENERATE" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("STATIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_STATIC" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("KPOINTS")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_KPOINTS" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("RELAX")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_RELAX" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_RELAX_STATIC" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_STATIC_BANDS" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_RELAX_STATIC_BANDS" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_DIELECTRIC_STATIC" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_DIELECTRIC_DYNAMIC" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(vflags.KBIN_VASP_RUN.flag("DSCF")) aus << "00000  MESSAGE KBIN::VASP_Directory Running RUN_DSCF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //exit(0);
     // ***************************************************************************
@@ -976,7 +976,7 @@ namespace KBIN {
     ntasks=1; // default
     if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
       ntasks=vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();
-      aus << "00000  MESSAGE Loaded ntasks = " << ntasks << " - " << Message(aflags,"user,host,time") << endl;
+      aus << "00000  MESSAGE Loaded ntasks = " << ntasks << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++) {
 	aus << "00000  MESSAGE task " << i << "/" << ntasks << " in subdirectory " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i) << endl;
@@ -998,7 +998,7 @@ namespace KBIN {
       readModulesFromAflowIn(AflowIn, kflags, xvasp);  // ME 181027
       // some verbose
       if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
-	aus << "00000  MESSAGE START loop " << xvasp.POSCAR_index << "/" << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << " - " << Message(aflags,"user,host,time") << endl;
+	aus << "00000  MESSAGE START loop " << xvasp.POSCAR_index << "/" << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       if(LDEBUG) cerr << "KBIN::VASP_Directory: [1]" << xvasp.str << endl; 
@@ -1008,14 +1008,14 @@ namespace KBIN {
       xvasp.Directory=aflags.Directory;
       if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
 	xvasp.Directory=aflags.Directory+"/"+KBIN_SUBDIRECTORIES+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(xvasp.POSCAR_index);
-	aus << "00000  MESSAGE Taking loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time") << endl;
+	aus << "00000  MESSAGE Taking loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       // check for directory KESONG CHEC THIS (if Krun=FALSE, everything stops).
       if(Krun && vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
 	if(aurostd::FileExist(xvasp.Directory)) {
 	  Krun=FALSE; // avoid rerunning
-	  aus << "00000  MESSAGE Skipping loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time") << endl;
+	  aus << "00000  MESSAGE Skipping loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	} else {
 	  // before making it, check it again... NFS problem... check LOCK again
@@ -1025,7 +1025,7 @@ namespace KBIN {
 	  if(Krun && aurostd::EFileExist(xvasp.Directory+"/LLOCK")) Krun=FALSE;     // to fight against NFS cache
 	  if(Krun) {
 	    aurostd::DirectoryMake(xvasp.Directory);
-	    aus << "00000  MESSAGE Creating loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE Creating loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    aurostd::execute("echo \"NNNNN  KBIN LLOCK ASAP for NFS concurrent jobs (aflow"+string(AFLOW_VERSION)+")\" >> "+xvasp.Directory+"/LLOCK");
 	  }
@@ -1035,7 +1035,7 @@ namespace KBIN {
 
       if(Krun) {
 	aflags.Directory=xvasp.Directory; // so we are set ! since there are plenty of routines with aflags.Directory inside
-	aus << "00000  MESSAGE Performing loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time") << endl;
+	aus << "00000  MESSAGE Performing loop directory = " << xvasp.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       // ------------------------------------------
@@ -1084,11 +1084,11 @@ namespace KBIN {
 	   !aurostd::substring2bool(aurostd::CleanFileName(xvasp.Directory+"/"),"/116/") &&
 	   !aurostd::substring2bool(aurostd::CleanFileName(xvasp.Directory+"/"),"/117/")
 	   ) {
-	  aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SKIP_NOMIX (NEGLECT_NOMIX, NEGLECT_IMMISCIBLE) - " << Message(aflags,"user,host,time") << endl;
+	  aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SKIP_NOMIX (NEGLECT_NOMIX, NEGLECT_IMMISCIBLE) - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  //	cerr << "potentials=" << potentials << endl;
 	  if(MiscibilityCheck(potentials)==MISCIBILITY_SYSTEM_NOMIX) {
-	    aus << "00000  MESSAGE Skipping system: " << KBIN::VASP_PseudoPotential_CleanName(potentials) << " is known to be immiscible (aflow_nomix.cpp) - " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE Skipping system: " << KBIN::VASP_PseudoPotential_CleanName(potentials) << " is known to be immiscible (aflow_nomix.cpp) - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    stringstream command("");
 	    command << "cat " << xvasp.Directory << "/" << _AFLOWLOCK_ << " > " << xvasp.Directory << "/" << DEFAULT_AFLOW_IMMISCIBILITY_OUT << endl;
@@ -1097,12 +1097,12 @@ namespace KBIN {
 	  }
 	}
 	if(MiscibilityCheck(potentials)==MISCIBILITY_SYSTEM_MISCIBLE) {
-	  aus << "00000  MESSAGE Running system: " << KBIN::VASP_PseudoPotential_CleanName(potentials) << " is known to be miscible (aflow_nomix.cpp) - " << Message(aflags,"user,host,time") << endl;
+	  aus << "00000  MESSAGE Running system: " << KBIN::VASP_PseudoPotential_CleanName(potentials) << " is known to be miscible (aflow_nomix.cpp) - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  Krun=TRUE;
 	}
 	if(MiscibilityCheck(potentials)==MISCIBILITY_SYSTEM_UNKNOWN) {
-	  aus << "00000  MESSAGE Running system: " << KBIN::VASP_PseudoPotential_CleanName(potentials) << " is unknown (aflow_nomix.cpp) - " << Message(aflags,"user,host,time") << endl;
+	  aus << "00000  MESSAGE Running system: " << KBIN::VASP_PseudoPotential_CleanName(potentials) << " is unknown (aflow_nomix.cpp) - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  Krun=TRUE;
 	}
@@ -1131,15 +1131,15 @@ namespace KBIN {
 	ifstream DirectoryStream;
 	DirectoryStream.open(xvasp.Directory.c_str(),std::ios::in);
 	if(!DirectoryStream) {
-	  //   aus << "EEEEE  DIRECTORY_NOT_FOUND = " << Message(aflags,"user,host,time") << endl;
-	  aus << "XXXXX  MAKING DIRECTORY = " << xvasp.Directory << "  " << Message(aflags,"user,host,time") << endl;
+	  //   aus << "EEEEE  DIRECTORY_NOT_FOUND = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	  aus << "XXXXX  MAKING DIRECTORY = " << xvasp.Directory << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(aus,XHOST.QUIET); // return FALSE;
 	  string str="mkdir "+xvasp.Directory;
 	  system(str.c_str());
 	}
 	// some check
 	if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
-	  //    aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time") << endl;
+	  //    aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  //    aurostd::PrintMessageStream(aus,XHOST.QUIET);
 	  //    return FALSE;
 	}
@@ -1184,7 +1184,7 @@ namespace KBIN {
 	// GENERATE ONLY -------------------------------------------------------------
 	if(vflags.KBIN_VASP_RUN.flag("GENERATE")) {
 	  KBIN::VASP_Write_INPUT(xvasp,vflags); // VASP VASP WRITE
-	  aus << "00000  MESSAGE VASP generation files ONLY " << Message(aflags,"user,host,time") << endl;
+	  aus << "00000  MESSAGE VASP generation files ONLY " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  Krun=FALSE;
 	  xvasp.NRELAX=0;
@@ -1192,114 +1192,114 @@ namespace KBIN {
           // CO 180420 - added if/else-if for workflows that need to PRECEDE relax/static/etc.
 	  // RUN SOMETHING
           if(kflags.KBIN_POCC) {  // RUN POCC ------------------------  // CO 180419 //POCC is special, run as priority
-            aus << "00000  MESSAGE PERFORMING POCC_CALCULATION " << Message(aflags,"user,host,time") << endl;
+            aus << "00000  MESSAGE PERFORMING POCC_CALCULATION " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.NRELAX=-3;}
           else if(kflags.KBIN_PHONONS_CALCULATION_APL) {  // RUN PHONONS APL ------------------------
-	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-3;}
     // CO - START 170601
           else if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
-	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-3;}
           else if(kflags.KBIN_PHONONS_CALCULATION_AAPL) {  // RUN PHONONS AAPL ------------------------
-	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-3;}
     // CO - END 170601
           else if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
-	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model) " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-3;}
           else if(kflags.KBIN_PHONONS_CALCULATION_AEL) {  // RUN PHONONS AEL ------------------------
-	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AEL (Elastic constants) " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AEL (Elastic constants) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-3;}
           else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {  // RUN PHONONS FROZSL ------------------------
-	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_FROZSL " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_FROZSL " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-3;}
           else {
 	  if(vflags.KBIN_VASP_RUN.flag("STATIC")) {  // RUN STATIC ------------------------
-	    aus << "00000  MESSAGE Performing Static RUN " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE Performing Static RUN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    //	if(vflags.KBIN_VASP_KPOINTS_KMODE_isentry==TRUE || vflags.KBIN_VASP_KPOINTS_KSCHEME_isentry==TRUE || vflags.KBIN_VASP_KPOINTS_KPPRA_isentry==TRUE || vflags.KBIN_VASP_KPOINTS_KSHIFT_isentry) {
-	    //	  aus << "00000  MESSAGE Patching KPOINT for the Static RUN " << Message(aflags,"user,host,time") << endl;
+	    //	  aus << "00000  MESSAGE Patching KPOINT for the Static RUN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    //	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    //	}
 	    xvasp.NRELAX=-1;
 	  }
 	  if(vflags.KBIN_VASP_RUN.flag("KPOINTS")) {  // RUN KPOINTS ------------------------
-	    aus << "00000  MESSAGE Running KPOINTS swap " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE Running KPOINTS swap " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    xvasp.NRELAX=-2;
 	  }
 	  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS")) {  // RUN RELAX_STATIC_BANDS ------------------------
 	    xvasp.NRELAX=vflags.KBIN_VASP_RUN_NRELAX; //  aurostd::substring2utype<int>(AflowIn,"[VASP_RUN_RELAX_STATIC_BANDS=");
 	    if(xvasp.NRELAX<0)  {
-	      aus << "EEEEE  No relaxation to run or nrelax<0 [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	      aus << "EEEEE  No relaxation to run or nrelax<0 [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      Krun=FALSE;	   //	  FileINPUT.clear();FileINPUT.close();FileMESSAGE.clear();FileMESSAGE.close();
 	      xvasp.NRELAX=0;
 	    }
 	    //	if(xvasp.NRELAX>1 && xvasp.NRELAX!=2)
 	    {
-	      aus << "00000  MESSAGE RELAX_STATIC_BANDS Running [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	      aus << "00000  MESSAGE RELAX_STATIC_BANDS Running [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	    }
 	  }
 	  if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) {  // RUN RELAX_STATIC ------------------------
 	    xvasp.NRELAX=vflags.KBIN_VASP_RUN_NRELAX; //  aurostd::substring2utype<int>(AflowIn,"[VASP_RUN_RELAX_STATIC=");
 	    if(xvasp.NRELAX<0)  {
-	      aus << "EEEEE  No relaxation to run or nrelax<0 [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	      aus << "EEEEE  No relaxation to run or nrelax<0 [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      Krun=FALSE;	   //	  FileINPUT.clear();FileINPUT.close();FileMESSAGE.clear();FileMESSAGE.close();
 	      xvasp.NRELAX=0;
 	    }
 	    //	if(xvasp.NRELAX>1 && xvasp.NRELAX!=2)
 	    {
-	      aus << "00000  MESSAGE RELAX_STATIC Running [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	      aus << "00000  MESSAGE RELAX_STATIC Running [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	    }
 	  }
 	  if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) { // RUN STATIC_BANDS ------------------------
 	    xvasp.NRELAX=-1;	
-	    aus << "00000  MESSAGE STATIC_BANDS Running  " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE STATIC_BANDS Running  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	    //	  xvasp.NRELAX=0;//nrelax;	
 	  }
 	  if(vflags.KBIN_VASP_RUN.flag("RELAX")) { // RUN RELAX ------------------------
 	    if(!(aurostd::substring2bool(AflowIn,"[VASP_RUN_RELAX=") || aurostd::substring2bool(AflowIn,"[VASP_RUN]RELAX="))) {
 	      xvasp.NRELAX=2;
-	      aus << "00000  MESSAGE Running DEFAULT [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	      aus << "00000  MESSAGE Running DEFAULT [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    } else  { 	  
 	      xvasp.NRELAX=vflags.KBIN_VASP_RUN_NRELAX; //  aurostd::substring2utype<int>(AflowIn,"[VASP_RUN_RELAX=");
 	    }
 	    if(xvasp.NRELAX==0 || xvasp.NRELAX<0)  {
-	      aus << "EEEEE  No relaxation to run or nrelax<0 [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	      aus << "EEEEE  No relaxation to run or nrelax<0 [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      Krun=FALSE;	   //	  FileINPUT.clear();FileINPUT.close();FileMESSAGE.clear();FileMESSAGE.close();
 	      xvasp.NRELAX=0;
 	    }
-	    aus << "00000  MESSAGE RELAX Running [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE RELAX Running [nrelax=" << xvasp.NRELAX << "]  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	  }
 	  if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) { // RUN REPEAT_BANDS ------------------------
 	    xvasp.NRELAX=-1;	
-	    aus << "00000  MESSAGE REPEAT_BANDS Running  " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE REPEAT_BANDS Running  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	  }
 	  if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) { // RUN REPEAT_STATIC_BANDS ------------------------
 	    xvasp.NRELAX=-1;	
-	    aus << "00000  MESSAGE REPEAT_STATIC_BANDS Running  " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE REPEAT_STATIC_BANDS Running  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	  }
 	  if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) { // RUN REPEAT_DELSOL ------------------------
 	    xvasp.NRELAX=-1;	
-	    aus << "00000  MESSAGE REPEAT_DELSOL Running  " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE REPEAT_DELSOL Running  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	  }
           }
@@ -1370,7 +1370,7 @@ namespace KBIN {
 	    if(vflags.KBIN_VASP_RUN.flag("STATIC")) {    // xvasp.RELAX=-1
 	      xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
 	      KBIN::VASP_Write_INPUT(xvasp,vflags); // VASP VASP WRITE
-	      aus << 11111 << "  STATIC - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+	      aus << 11111 << "  STATIC - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
 	      if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [STATIC] ");return Krun;}
@@ -1386,11 +1386,11 @@ namespace KBIN {
 	      KBIN::VASP_Write_INPUT(xvasp,vflags); // VASP VASP WRITE
 	      if(PAWGGA2) {  // WAS A BUG IN PAW MAYBE IT IS FIXED
 		// STEP 1
-		aus << "11111  RELAXATION - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		aus << "11111  RELAXATION - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax2paw_gga",TRUE,FileMESSAGE);
 		if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [PAWGGA2 REL]");return Krun;}
-		aus << "22222  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		aus << "22222  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      } else {
 		if(xvasp.NRELAX==0) {
@@ -1398,7 +1398,7 @@ namespace KBIN {
 		  return FALSE;
 		} else { // DYNAMIC RUN
 		  for(xvasp.NRELAXING=1;xvasp.NRELAXING<=xvasp.NRELAX;xvasp.NRELAXING++) {
-		    aus << 11111*xvasp.NRELAXING << "  RELAXATION - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		    aus << 11111*xvasp.NRELAXING << "  RELAXATION - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 		    if(vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.content_int>0) KBIN::XVASP_INCAR_LDAU_ADIABATIC(xvasp,xvasp.NRELAXING); // ADIABATIC
 		    if(xvasp.NRELAXING<xvasp.NRELAX)  {
@@ -1421,7 +1421,7 @@ namespace KBIN {
 		  }
 		  xvasp.NRELAXING=xvasp.NRELAX;
 		  xvasp.NRELAXING++;
-		  aus << 11111*xvasp.NRELAXING << "  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		  aus << 11111*xvasp.NRELAXING << "  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); 
 		
 		  // if((vflags.KBIN_VASP_FORCE_OPTION_LDAU0.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry) && vflags.KBIN_VASP_FORCE_OPTION_LDAU_CUTOFF.isentry) {
@@ -1450,7 +1450,7 @@ namespace KBIN {
 	      if(vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) STRING_TO_SHOW="STATIC_BANDS";
 	      if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")) STRING_TO_SHOW="REPEAT_STATIC_BANDS";
 	      if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) STRING_TO_SHOW="REPEAT_BANDS";
-	      aus << "00000  MESSAGE MODE= (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+	      aus << "00000  MESSAGE MODE= (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	
 	      xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
@@ -1461,7 +1461,7 @@ namespace KBIN {
 		KBIN::VASP_Write_INPUT(xvasp,vflags); // VASP VASP WRITE
 		if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) {
 		  for(xvasp.NRELAXING=1;xvasp.NRELAXING<=xvasp.NRELAX;xvasp.NRELAXING++) {
-		    aus << 11111*xvasp.NRELAXING << "  RELAXATION (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		    aus << 11111*xvasp.NRELAXING << "  RELAXATION (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		    if(vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.content_int>0) KBIN::XVASP_INCAR_LDAU_ADIABATIC(xvasp,xvasp.NRELAXING); // ADIABATIC
 		    if(xvasp.NRELAXING<xvasp.NRELAX)  {
@@ -1479,7 +1479,7 @@ namespace KBIN {
 		      if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS RELAXATION=]");return Krun;}
 		    }
 		    xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
-		    aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time") << endl;
+		    aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		    if(xvasp.NRELAXING<xvasp.NRELAX) KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAXING,FileMESSAGE); 	// check if it is the case of turning off spin
 		  }
@@ -1487,11 +1487,11 @@ namespace KBIN {
 		  if(xvasp.NRELAX==2) KBIN::XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp,aflags,vflags,xvasp.NRELAX,FileMESSAGE); 	// check if it is the case of turning off spin
 		}
 		if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC")) {
-		  aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 		}
 		if(vflags.KBIN_VASP_RUN.flag("STATIC")) {
-		  aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << "00000  NO RELAXATION IN (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  xvasp.NRELAX=0;
 		}
@@ -1504,9 +1504,9 @@ namespace KBIN {
 		  stringstream lock_recycled;
 		  aurostd::file2stringstream(xvasp.Directory+"/REPEAT_STATIC_BANDS",lock_recycled);
 		  aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
-		  aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  //	aus << lock_recycled.str();
-		  aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		}
@@ -1536,9 +1536,9 @@ namespace KBIN {
 		  stringstream lock_recycled;
 		  aurostd::file2stringstream(xvasp.Directory+"/REPEAT_BANDS",lock_recycled);
 		  aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
-		  aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  //	aus << lock_recycled.str();
-		  aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		}
@@ -1564,7 +1564,7 @@ namespace KBIN {
 	      // STATIC PART ----------------------------------------------------------------------------
 	      // NOW DO THE STATIC PATCHING POSCAR
 	      if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC")) {
-		aus << "00000  MESSAGE Patching POSCAR  " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE Patching POSCAR  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		vflags.KBIN_VASP_RUN.push("STATIC");        // force to suck them up from STATIC_KPPRA....
 		// LOAD THE RELAXED STRUCTURE WHICH WILL BE USED FOR THE DIRECTIONS
@@ -1608,7 +1608,7 @@ namespace KBIN {
 		  
 		  // always recalculate standardization
                   if(vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE")==FALSE) {
-                    aus << "00000  MESSAGE WARNING RECALCULATING STANDARD STRUCTURE" << " - " << Message(aflags,"user,host,time") << endl;
+                    aus << "00000  MESSAGE WARNING RECALCULATING STANDARD STRUCTURE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
                     aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
                     aus << "00000  MESSAGE BEFORE: lattice: " << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
                     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1632,7 +1632,7 @@ namespace KBIN {
 		    // 		  cerr << "vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;		  exit(0);
 		  } else {
 		    // nothing
-		    aus << "00000  MESSAGE PRESERVING ORIGINAL STRUCTURE" << " - " << Message(aflags,"user,host,time") << endl;
+		    aus << "00000  MESSAGE PRESERVING ORIGINAL STRUCTURE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aus << "00000  MESSAGE ORIGINAL: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
 		    aus << "00000  MESSAGE ORIGINAL: lattice: " << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1647,7 +1647,7 @@ namespace KBIN {
 		  if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << rlattice << endl;}
 		  if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 		  if(foundBZ==FALSE) {
-		    aus << "EEEEE  ERROR (KBIN::VASP_Directory) Unrecoverable error, lattice not found " << " - " << Message(aflags,"user,host,time") << endl;
+		    aus << "EEEEE  ERROR (KBIN::VASP_Directory) Unrecoverable error, lattice not found " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aus << xvasp.str << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		    exit(0);
@@ -1657,7 +1657,7 @@ namespace KBIN {
 		xvasp.str.FixLattices();
 		rlattice=xvasp.str.lattice; // in rlattice I`ve always the final structure
 		// NOW DO THE STATIC PATCHING KPOINTS
-		aus << "00000  MESSAGE Patching KPOINTS  " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE Patching KPOINTS  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		//
 		// [OBSOLETE]	      KBIN::VASP_Produce_KPOINTS(xvasp,AflowIn,FileAFLOWIN,FileMESSAGE,aflags,kflags,vflags);
@@ -1665,7 +1665,7 @@ namespace KBIN {
 		KBIN::VASP_Modify_KPOINTS(xvasp,FileMESSAGE,aflags,vflags);
 		aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
 		// NOW DO THE STATIC PATCHING INCAR
-		aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] Patching INCAR (static_patching) " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] Patching INCAR (static_patching) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 		// KBIN::VASP_Produce_INCAR(xvasp,AflowIn,FileAFLOWIN,FileMESSAGE,aflags,kflags,vflags); // BETTER than produce, SHOULD reread it
 		KBIN::VASP_Reread_INCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
@@ -1680,7 +1680,7 @@ namespace KBIN {
 		if(vflags.KBIN_VASP_RUN.flag("STATIC")) xvasp.NRELAXING=xvasp.NRELAX; // 0;
 		xvasp.NRELAXING++;
 		aus << aurostd::PaddedPRE(aurostd::utype2string(11111*xvasp.NRELAXING),5,"0") << "  STATIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory 
-		    << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		    << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
 		if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [RELAX_STATIC_BANDS STATIC]");return Krun;}
@@ -1688,7 +1688,7 @@ namespace KBIN {
 		bool qmwrite=TRUE;
 		KBIN::VASP_Backup(xvasp,qmwrite,string("static"));
 		xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
-		aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("RELAX_STATIC") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS")
 	      // BANDS PART ----------------------------------------------------------------------------
@@ -1701,7 +1701,7 @@ namespace KBIN {
 		KBIN::VASP_Recycle(xvasp,"static");  // bring back the stuff
 		KBIN::VASP_RecycleExtraFile(xvasp,"CHGCAR","static");  // bring back the stuff
 		xvasp.aopts.flag("FLAG::CHGCAR_PRESERVED",TRUE); // in case of errors it is not lost bur recycled
-		aus << "00000  MESSAGE Patching KPOINTS with BANDS LATTICE = \"" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "\" - " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE Patching KPOINTS with BANDS LATTICE = \"" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "\" - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		// KBIN::VASP_Produce_KPOINTS(xvasp,AflowIn,FileAFLOWIN,FileMESSAGE,aflags,kflags,vflags);
 		// KBIN::VASP_Modify_KPOINTS(xvasp,FileMESSAGE,aflags,vflags);
@@ -1715,7 +1715,7 @@ namespace KBIN {
 		aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
 		xvasp.aopts.flag("FLAG::KPOINTS_PRESERVED",TRUE); // don`t touch kpoints if there are flaws
 		// NOW DO THE BANDS PATCHING INCAR
-		aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] Patching INCAR (bands_patching) " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] Patching INCAR (bands_patching) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 		//  KBIN::VASP_Produce_INCAR(xvasp,AflowIn,FileAFLOWIN,FileMESSAGE,aflags,kflags,vflags); // BETTER than produce, SHOULD reread it
 		KBIN::VASP_Reread_INCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
@@ -1736,7 +1736,7 @@ namespace KBIN {
 		}
 		// NOW DO THE BANDS RUN
 		xvasp.NRELAXING++;
-		aus << 11111*xvasp.NRELAXING << "  BANDS (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "," << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << "] - " << Message("user,host,time") << endl;
+		aus << 11111*xvasp.NRELAXING << "  BANDS (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "," << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << "] - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("ROTMAT");	// dont mess up KPOINTS in bands
 		vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("IBZKPT");    // dont mess up KPOINTS in bands
@@ -1747,7 +1747,7 @@ namespace KBIN {
 		bool qmwrite=FALSE;
 		KBIN::VASP_Backup(xvasp,qmwrite,string("bands"));
 		xvasp_spin_evolution.push_back(xvasp.str.qm_mag_atom); // keep track of spins
-		aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time") << endl;
+		aus << "00000  MESSAGE RESULT SPIN=" << xvasp_spin_evolution.at(xvasp_spin_evolution.size()-1) << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      } // vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")
 	      // DIELECTRIC PART - DSCF ----------------------------------------------------------------
@@ -1764,21 +1764,21 @@ namespace KBIN {
 		  vector<string> tokens; aurostd::string2tokensAdd(sversion,tokens,".");
 		  if(tokens.size()>0) dversion+=aurostd::string2utype<double>(tokens.at(0));
 		  if(tokens.size()>1) dversion+=aurostd::string2utype<double>(tokens.at(1))/10.0;
-		  aus << "00000  MESSAGE Found VASP version=" << sversion << "  " << Message(aflags,"user,host,time") << endl;
+		  aus << "00000  MESSAGE Found VASP version=" << sversion << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  if(dversion<5.2) { // cant do it
-		    aus << "EEEEE  ERROR: Dielectric calculations need VASP >=5.2 " << Message(aflags,"user,host,time") << endl;
+		    aus << "EEEEE  ERROR: Dielectric calculations need VASP >=5.2 " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		    Krun=FALSE;return Krun;}
 		  // PROCEED
 		  xvasp.NRELAXING++;
-		  aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_STATIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_STATIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  kflags.KBIN_MPI_NCPUS_BUFFER=kflags.KBIN_MPI_NCPUS;
 		  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS") && kflags.KBIN_MPI_NCPUS==24) {
 		    uint ncpus_before=kflags.KBIN_MPI_NCPUS;
 		    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) kflags.KBIN_MPI_NCPUS=DUKE_MATERIALS_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
 		    aflags.AFLOW_GLOBAL_NCPUS=-kflags.KBIN_MPI_NCPUS;
-		    aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC fixing mpivasp5 with " << ncpus_before << "-AMD cores to " << kflags.KBIN_MPI_NCPUS << "-AMD cores " << Message(aflags,"user,host,time") << endl;
+		    aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC fixing mpivasp5 with " << ncpus_before << "-AMD cores to " << kflags.KBIN_MPI_NCPUS << "-AMD cores " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  }	
 		  if((aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH") || aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI") || aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB"))
 		     && (kflags.KBIN_MPI_NCPUS==64 || kflags.KBIN_MPI_NCPUS==48 || kflags.KBIN_MPI_NCPUS==32)) {
@@ -1797,7 +1797,7 @@ namespace KBIN {
                     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX 20190509 - MACHINE002
 		    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX 20190107 - CMU EULER
 		    aflags.AFLOW_GLOBAL_NCPUS=-kflags.KBIN_MPI_NCPUS;
-		    aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC fixing mpivasp5 with " << ncpus_before << "-AMD cores to " << kflags.KBIN_MPI_NCPUS << "-AMD cores " << Message(aflags,"user,host,time") << endl;
+		    aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC fixing mpivasp5 with " << ncpus_before << "-AMD cores to " << kflags.KBIN_MPI_NCPUS << "-AMD cores " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  }	
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  // a. Reuse the INCAR.static  NELM = 0, and remove the NBANDS parameter.
@@ -1805,7 +1805,7 @@ namespace KBIN {
 		  // b. Retain the following static run entries and their values: ALGO, LREAL, NSIM, ISYM, IBRION, NSW, NELM, NELMIN, ENMAX, ISPIN, ISMEAR, SIGMA, and everything LDA+U related.
 		  // c. Set NBANDS to a value that is around 10x the VASP default obtained in STEP 00.
 		  // d. Eliminate PSTRESS, EMIN, EMAX, LORBIT, ISIF, NEDOS.
-		  aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC recycling static " << Message(aflags,"user,host,time") << endl;
+		  aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC recycling static " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  KBIN::VASP_Recycle(xvasp,"static");  // bring back the stuff
 		  KBIN::VASP_Reread_INCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
@@ -1824,10 +1824,10 @@ namespace KBIN {
 		}
 		if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC DYNAMIC
 		  xvasp.NRELAXING++;
-		  aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_DYNAMIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_DYNAMIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  // a. Reuse the STEP 01 WAVECAR + ALGO=EXACT  NELM=1 LOPTICS=.TRUE. CSHIFT=0.15 OMEGAMAX=25 NEDOS=12500  Remove LEPSILON and LRPA
-		  aus << "00000  MESSAGE Running RUN_DIELECTRIC_DYNAMIC recycling dielectric_static " << Message(aflags,"user,host,time") << endl;
+		  aus << "00000  MESSAGE Running RUN_DIELECTRIC_DYNAMIC recycling dielectric_static " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  KBIN::VASP_Recycle(xvasp,"dielectric_static"); // bring back the stuff
 		  KBIN::VASP_RecycleExtraFile(xvasp,"WAVECAR","dielectric_static");  // bring back the stuff
@@ -1844,14 +1844,14 @@ namespace KBIN {
 		}
 		if(vflags.KBIN_VASP_RUN.flag("DSCF") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC DYNAMIC
 		  xvasp.NRELAXING++;
-		  aus << 11111*xvasp.NRELAXING << "  RUN_DSCF (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << Message("user,host,time") << endl;
+		  aus << 11111*xvasp.NRELAXING << "  RUN_DSCF (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  exit(0);
 		}
 	      }
 	      // FINISHED
 	      xvasp.NRELAXING++;
-	      aus << 11111*xvasp.NRELAXING << "  END (" << STRING_TO_SHOW << ")        - " <<  xvasp.Directory << " - " << Message("user,host,time") << endl;
+	      aus << 11111*xvasp.NRELAXING << "  END (" << STRING_TO_SHOW << ")        - " <<  xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);  // put back the options
 
@@ -1884,16 +1884,16 @@ namespace KBIN {
 	      stringstream command,strdelsol;
 	      ifstream fdelsol;
 	      if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) STRING_TO_SHOW="REPEAT_DELSOL";
-	      aus << "00000  MESSAGE MODE= (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+	      aus << "00000  MESSAGE MODE= (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // LOAD FORMER LOCK
 	      if(aurostd::FileExist(xvasp.Directory+string("/REPEAT_DELSOL"))) {
 		stringstream lock_recycled;
 		aurostd::file2stringstream(xvasp.Directory+"/REPEAT_DELSOL",lock_recycled);
 		aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
-		aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		aus << "XXXXX FORMER LOCK BEGIN, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aus << lock_recycled.str();
-		aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time") << endl;
+		aus << "XXXXX FORMER LOCK END, recycled (" << STRING_TO_SHOW << ") - " << xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aus << "XXXXX ---------------------------------------------------------------------------------------------- " << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
@@ -1938,7 +1938,7 @@ namespace KBIN {
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 
 	      // NOW MODIFY THE INCAR
-	      aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] modifying INCAR (delsol_patching) " << Message(aflags,"user,host,time") << endl;
+	      aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] modifying INCAR (delsol_patching) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      KBIN::VASP_Reread_INCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
 	      stmp="NELECT="+aurostd::utype2string(NELECT+Nr);
@@ -1949,11 +1949,11 @@ namespace KBIN {
 	      aurostd::stringstream2file(xvasp.INCAR,string(xvasp.Directory+"/INCAR"));
 
 	      /* 		//Reread POSCAR
-				aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading POSCAR (delsol) " << Message(aflags,"user,host,time") << endl;
+				aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading POSCAR (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 				aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 				KBIN::VASP_Reread_POSCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
 				//Reread KPOINTS
-				aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading KPOINTS (delsol) " << Message(aflags,"user,host,time") << endl;
+				aus << "00000  MESSAGE [" << STRING_TO_SHOW << "] rereading KPOINTS (delsol) " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 				aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 				KBIN::VASP_Reread_KPOINTS(xvasp,FileMESSAGE,aflags); // REREAD IT
 	      */
@@ -1962,7 +1962,7 @@ namespace KBIN {
 
 	      // NOW RUN DELSOL plus
 	      uint vrelax=7;
-	      aus << 11111*vrelax << "  DELSOL plus (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << stmp << " "<< Message("user,host,time") << endl;
+	      aus << 11111*vrelax << "  DELSOL plus (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << stmp << " "<< Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      vrelax++;
 	      Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
@@ -1984,7 +1984,7 @@ namespace KBIN {
 	      KBIN::VASP_RecycleExtraFile(xvasp,"POSCAR","static");  // bring back the stuff
 	      KBIN::VASP_RecycleExtraFile(xvasp,"KPOINTS","static");  // bring back the stuff
 	      // NOW RUN DELSOL minus
-	      aus << 11111*vrelax << "  DELSOL minus (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << stmp << " "<< Message("user,host,time") << endl;
+	      aus << 11111*vrelax << "  DELSOL minus (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - " << stmp << " "<< Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      vrelax++;
 	      Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
@@ -1993,7 +1993,7 @@ namespace KBIN {
 	      qmwrite=FALSE;
 	      KBIN::VASP_Backup(xvasp,qmwrite,string("dsolm"));		
 	      // FINISHED
-	      aus << 11111*vrelax << "  END (" << STRING_TO_SHOW << ")        - " <<  xvasp.Directory << " - " << Message("user,host,time") << endl;
+	      aus << 11111*vrelax << "  END (" << STRING_TO_SHOW << ")        - " <<  xvasp.Directory << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      vflags.KBIN_VASP_RUN.flag("STATIC",FALSE);  // put back the options
 	      // CLEAN-UP BY WAHYU
@@ -2025,7 +2025,7 @@ namespace KBIN {
 	      // 1st step: 1/2
 	      kk1=(kbak_k1+1)/2;kk2=(kbak_k2+1)/2;kk3=(kbak_k3+1)/2;
 	      relax="11111a ";relaxfile="relax1";
-	      aus << relax << "RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3 << "]" << " - " << Message("user,host,time") << endl;
+	      aus << relax << "RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3 << "]" << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      xvasp.str.kpoints_k1=min(kk1,kbak_k1);xvasp.str.kpoints_k2=min(kk2,kbak_k2);xvasp.str.kpoints_k3=min(kk3,kbak_k3);
 	      xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
@@ -2036,7 +2036,7 @@ namespace KBIN {
 	      // 2nd step: 1/2
 	      kk1=3*(kbak_k1+1)/4;kk2=3*(kbak_k2+1)/4;kk3=3*(kbak_k3+1)/4;
 	      relax="11111b ";relaxfile="relax1";
-	      aus << relax << "RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3 << "]" << " - " << Message("user,host,time") << endl;
+	      aus << relax << "RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3 << "]" << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      xvasp.str.kpoints_k1=min(kk1,kbak_k1);xvasp.str.kpoints_k2=min(kk2,kbak_k2);xvasp.str.kpoints_k3=min(kk3,kbak_k3);
 	      xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
@@ -2047,7 +2047,7 @@ namespace KBIN {
 	      // 3rd step: 1/2
 	      kk1=kbak_k1;kk2=kbak_k2;kk3=kbak_k3;
 	      relax="11111c ";relaxfile="relax1";
-	      aus << relax << "RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3 << "]" << " - " << Message("user,host,time") << endl;
+	      aus << relax << "RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3 << "]" << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      xvasp.str.kpoints_k1=min(kk1,kbak_k1);xvasp.str.kpoints_k2=min(kk2,kbak_k2);xvasp.str.kpoints_k3=min(kk3,kbak_k3);
 	      xvasp.str.kpoints_kmax=max(xvasp.str.kpoints_k1,xvasp.str.kpoints_k2,xvasp.str.kpoints_k3);
@@ -2057,11 +2057,11 @@ namespace KBIN {
 	      // with PAWGGA2
 	      if(PAWGGA2) {
 		// STEP 1
-		aus << "11111  RELAXATION - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		aus << "11111  RELAXATION - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 		Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,"relax2paw_gga",FALSE,FileMESSAGE);
 		if(!Krun) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  runtime error [KPOINTS PAWGGA2]");return Krun;}
-		aus << "22222  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		aus << "22222  END        - " <<  xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      }
 	      // ----------------------------------------------------------
@@ -2070,7 +2070,7 @@ namespace KBIN {
 		int vrelax=1;
 		for(int i=1;i<=xvasp.NRELAX;i++) {
 		  aus << 11111*vrelax << "   RELAXATION - " << xvasp.Directory << " - K=[" << kk1 << " " << kk2 << " " << kk3
-		      << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		      << "]" << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 		  if(vflags.KBIN_VASP_FORCE_OPTION_LDAU_ADIABATIC.content_int>0) KBIN::XVASP_INCAR_LDAU_ADIABATIC(xvasp,i); // ADIABATIC
 		  if(i<xvasp.NRELAX)  {
@@ -2083,7 +2083,7 @@ namespace KBIN {
 		  }
 		  vrelax++;
 		}
-		aus << 11111*vrelax << "   END        - " << xvasp.Directory << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time") << endl;
+		aus << 11111*vrelax << "   END        - " << xvasp.Directory << " - " << kflags.KBIN_BIN << " - " << Message("user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
 	      }
 	    }
@@ -2101,8 +2101,8 @@ namespace KBIN {
       // some verbose
       if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
 	aus << "00000  MESSAGE END loop " << xvasp.POSCAR_index << "/" << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size()
-	    << " - " << Message(aflags,"user,host,time") << endl;
-	aus << "00000  MESSAGE END loop in directory =" << xvasp.Directory << " - " << Message(aflags,"user,host,time") << endl;
+	    << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	aus << "00000  MESSAGE END loop in directory =" << xvasp.Directory << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	// compress the subdirectories
 	if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
@@ -2147,7 +2147,7 @@ int CheckStringInFile(string FileIn,string str,int PID) {
 namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  BEGIN" << endl;
+    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  BEGIN" << endl;
     
     ostringstream aus_exec,aus;
     xoption xwarning,xfixed,xmessage;
@@ -2165,58 +2165,68 @@ namespace KBIN {
     
     // get CPUS from PBS/SLURM
     // string ausenv;
-    aus << "DDDDD  PBS_NUM_PPN=" << XHOST.PBS_NUM_PPN << "  PBS_NNODES=" << XHOST.PBS_NNODES << " - " << Message(aflags,"user,host,time") << endl;
-    aus << "DDDDD  SLURM_CPUS_ON_NODE=" << XHOST.SLURM_CPUS_ON_NODE << "  SLURM_NNODES=" << XHOST.SLURM_NNODES << " - " << Message(aflags,"user,host,time") << endl;
+    aus << "DDDDD  PBS_NUM_PPN=" << XHOST.PBS_NUM_PPN << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  PBS_NNODES=" << XHOST.PBS_NNODES << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  SLURM_CPUS_ON_NODE=" << XHOST.SLURM_CPUS_ON_NODE << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  SLURM_NNODES=" << XHOST.SLURM_NNODES << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  SLURM_NTASKS=" << XHOST.SLURM_NTASKS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    if(XHOST.SLURM_NTASKS>1 && XHOST.CPU_Cores>XHOST.SLURM_NTASKS && kflags.KBIN_MPI_NCPUS>XHOST.SLURM_NTASKS) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // to avoid HT
+    aus << "DDDDD  kflags.KBIN_MPI_NCPUS=" << kflags.KBIN_MPI_NCPUS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  XHOST.CPU_Cores=" << XHOST.CPU_Cores << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+    aus << "DDDDD  aflags.AFLOW_GLOBAL_NCPUS=" << aflags.AFLOW_GLOBAL_NCPUS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) { 	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {	//corey
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;}
-    //DX 20190509 - MACHINE001 - START
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;}
-    //DX 20190509 - MACHINE001 - END
-    //DX 20190509 - MACHINE002 - START
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;}
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) { 	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {
+    //   kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;
+    // }
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {	//corey
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;
+    // }
+    // //DX 20190509 - MACHINE001 - START
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
+    // //DX 20190509 - MACHINE001 - END
+    // //DX 20190509 - MACHINE002 - START
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
     //DX 20190509 - MACHINE002 - END
     //DX 20190107 - CMU EULER - START
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
-      //kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; 
-      if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;}
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
+    //  if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
     //DX 5/2/18 - CMU EULER - END
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::TERAGRID_RANGER")) {kflags.KBIN_MPI_NCPUS=XHOST.PBS_NNODES; if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;}
-    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::TERAGRID_KRAKEN")) {kflags.KBIN_MPI_NCPUS=XHOST.PBS_NNODES; if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;}
     
     // for reducint CPUs on the fly
     if(aflags.AFLOW_GLOBAL_NCPUS<0) kflags.KBIN_MPI_NCPUS=-aflags.AFLOW_GLOBAL_NCPUS; // this to force things on reducing CPUS
     
+    aus << "DDDDD  kflags.KBIN_MPI_NCPUS=" << kflags.KBIN_MPI_NCPUS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+
     // for for LS coupling
     if(vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option) {
       if(!aurostd::substring2bool(kflags.KBIN_BIN,VASPLS_BIN_POSTFIX_DEFAULT)) kflags.KBIN_BIN=kflags.KBIN_BIN+VASPLS_BIN_POSTFIX_DEFAULT; // standard LS
       if(!aurostd::substring2bool(kflags.KBIN_MPI_BIN,VASPLS_BIN_POSTFIX_DEFAULT)) kflags.KBIN_MPI_BIN=kflags.KBIN_MPI_BIN+VASPLS_BIN_POSTFIX_DEFAULT; // standard LS
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	
-      aus << "00000  MESSAGE SPIN-ORBIT TYPE CALCULATIONS , adding " << VASPLS_BIN_POSTFIX_DEFAULT << " to BIN " << " - " << Message(aflags,"user,host,time") << endl;
+      aus << "00000  MESSAGE SPIN-ORBIT TYPE CALCULATIONS , adding " << VASPLS_BIN_POSTFIX_DEFAULT << " to BIN " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
     if(kflags.KBIN_MPI) kflags.KBIN_BIN=kflags.KBIN_MPI_BIN; // forcing, no matter what
@@ -2225,18 +2235,18 @@ namespace KBIN {
       // ********* RUN VASP                
       { // ERRORS
 	bool error=FALSE;
-	if(aurostd::FileEmpty(xvasp.Directory+"/INCAR"))   {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time")+"  Empty INCAR ");error=TRUE;return FALSE;}
-	if(aurostd::FileEmpty(xvasp.Directory+"/POSCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time")+"  Empty POSCAR ");error=TRUE;return FALSE;}
-	if(aurostd::FileEmpty(xvasp.Directory+"/KPOINTS")) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time")+"  Empty KPOINTS ");error=TRUE;return FALSE;}
-	if(aurostd::FileEmpty(xvasp.Directory+"/POTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time")+"  Empty POTCAR ");error=TRUE;return FALSE;}
+	if(aurostd::FileEmpty(xvasp.Directory+"/INCAR"))   {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  Empty INCAR ");error=TRUE;return FALSE;}
+	if(aurostd::FileEmpty(xvasp.Directory+"/POSCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  Empty POSCAR ");error=TRUE;return FALSE;}
+	if(aurostd::FileEmpty(xvasp.Directory+"/KPOINTS")) {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  Empty KPOINTS ");error=TRUE;return FALSE;}
+	if(aurostd::FileEmpty(xvasp.Directory+"/POTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  Empty POTCAR ");error=TRUE;return FALSE;}
 	if(error) return FALSE;
 	
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [1]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [1]" << endl;
 	
 	// FIX INCAR if alternating
 	if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS_CELL_VOLUME")) {
-	  if(aurostd::_isodd(xvasp.NRELAXING))  aus << "00000  MESSAGE Alternating: RELAX_CELL_VOLUME - " << Message(aflags,"user,host,time") << endl;
-	  if(aurostd::_iseven(xvasp.NRELAXING)) aus << "00000  MESSAGE Alternating: RELAX_IONS - " << Message(aflags,"user,host,time") << endl;
+	  if(aurostd::_isodd(xvasp.NRELAXING))  aus << "00000  MESSAGE Alternating: RELAX_CELL_VOLUME - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	  if(aurostd::_iseven(xvasp.NRELAXING)) aus << "00000  MESSAGE Alternating: RELAX_IONS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("STATIC",FALSE);
 	  vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("ALL",FALSE);
@@ -2252,19 +2262,19 @@ namespace KBIN {
 	  aus_exec << "cd " << xvasp.Directory << endl;
 	  aus_exec << "rm -f vasp.out" << endl;
 	  if(kflags.KBIN_MPI==FALSE) {
-	    aus << "00000  MESSAGE SERIAL job - [" << xvasp.str.atoms.size() << "atoms] - " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE SERIAL job - [" << xvasp.str.atoms.size() << "atoms] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    aus_exec << kflags.KBIN_BIN << " > vasp.out " << endl;
-	    aus << "00000  MESSAGE Executing: " << kflags.KBIN_BIN << " > vasp.out " << Message(aflags,"user,host,time,memory") << endl;  // CO 170628 - SLOW WITH MEMORY
+	    aus << "00000  MESSAGE Executing: " << kflags.KBIN_BIN << " > vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    aurostd::execute(aus_exec);
 	    aurostd::Sleep(_KVASP_VASP_SLEEP_);
 	  } else {
-	    aus << "00000  MESSAGE MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time") << endl;
-	    if(kflags.KBIN_MPI_OPTIONS!="") aus << "00000  MESSAGE MPI OPTIONS=[" << kflags.KBIN_MPI_OPTIONS << "]" << Message(aflags,"user,host,time") << endl;	      
+	    aus << "00000  MESSAGE MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	    if(kflags.KBIN_MPI_OPTIONS!="") aus << "00000  MESSAGE MPI OPTIONS=[" << kflags.KBIN_MPI_OPTIONS << "]" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;	      
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	
-	    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL << endl;
-	    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL << endl;
+	    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL << endl;
+	    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL << endl;
 	    // NO HOST ------------------------------------------------------------------------
 	    if(!aflags.AFLOW_MACHINE_LOCAL.flag()) {
 	      aus << "00000  MESSAGE Executing: ";
@@ -2282,15 +2292,15 @@ namespace KBIN {
 		aus_exec << kflags.KBIN_MPI_STOP << " >> vasp.out " << endl;
 		aus << kflags.KBIN_MPI_STOP << " >> vasp.out ";
 	      }
-	      aus << Message(aflags,"user,host,time,memory") << endl; // CO 170628 - SLOW WITH MEMORY
+	      aus << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl; // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	
 	      aurostd::execute(aus_exec);
 	    }
 	    // HOST DUKE_BETA_MPICH ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_BETA_MPICH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_BETA_MPICH << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_BETA_MPICH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_BETA_MPICH << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2303,8 +2313,8 @@ namespace KBIN {
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {
 	      if(!aurostd::substring2bool(kflags.KBIN_MPI_BIN,"_openmpi")) kflags.KBIN_MPI_BIN=kflags.KBIN_MPI_BIN+"_openmpi"; // fix the OPENMPI
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_BETA_OPENMPI << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_BETA_OPENMPI << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_BETA_OPENMPI << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_BETA_OPENMPI << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2316,8 +2326,8 @@ namespace KBIN {
 	    // HOST DUKE_QRATS_MPICH ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_QRATS_MPICH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_QRATS_MPICH << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_QRATS_MPICH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_QRATS_MPICH << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2329,8 +2339,8 @@ namespace KBIN {
 	    // HOST DUKE_QFLOW_OPENMPI ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_QFLOW_OPENMPI << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_QFLOW_OPENMPI << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2345,21 +2355,22 @@ namespace KBIN {
 	      int local_NCPUS=kflags.KBIN_MPI_NCPUS;
 	      if(MPI_NCPUS_MPCDF_EOS>0) {
 		local_NCPUS=MPI_NCPUS_MPCDF_EOS;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_EOS" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
+		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_EOS" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_EOS=="FALSE" || MPI_HYPERTHREADING_MPCDF_EOS=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_EOS=="TRUE" || MPI_HYPERTHREADING_MPCDF_EOS=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_EOS << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_EOS << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE]	      if(MPI_HYPERTHREADING_MPCDF_EOS=="FALSE" || MPI_HYPERTHREADING_MPCDF_EOS=="OFF") {
+	      // [OBSOLETE]  local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE]	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE]	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_EOS=="TRUE" || MPI_HYPERTHREADING_MPCDF_EOS=="ON") {
+	      // [OBSOLETE]	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE]	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE]	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_EOS << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_EOS << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2374,21 +2385,22 @@ namespace KBIN {
 	      int local_NCPUS=kflags.KBIN_MPI_NCPUS;
 	      if(MPI_NCPUS_MPCDF_DRACO>0) {
 		local_NCPUS=MPI_NCPUS_MPCDF_DRACO;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_DRACO" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
+		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_DRACO" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_DRACO=="FALSE" || MPI_HYPERTHREADING_MPCDF_DRACO=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_DRACO=="TRUE" || MPI_HYPERTHREADING_MPCDF_DRACO=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_DRACO << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_DRACO << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_DRACO=="FALSE" || MPI_HYPERTHREADING_MPCDF_DRACO=="OFF") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_DRACO=="TRUE" || MPI_HYPERTHREADING_MPCDF_DRACO=="ON") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_DRACO << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_DRACO << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2403,21 +2415,22 @@ namespace KBIN {
  	      int local_NCPUS=kflags.KBIN_MPI_NCPUS;
 	      if(MPI_NCPUS_MPCDF_COBRA>0) {
 		local_NCPUS=MPI_NCPUS_MPCDF_COBRA;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_COBRA" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
+		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_COBRA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_COBRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_COBRA=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_COBRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_COBRA=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_COBRA << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_COBRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_COBRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_COBRA=="OFF") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_COBRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_COBRA=="ON") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_COBRA << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_COBRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2432,22 +2445,23 @@ namespace KBIN {
  	      int local_NCPUS=kflags.KBIN_MPI_NCPUS;
 	      if(MPI_NCPUS_MPCDF_HYDRA>0) {
 		local_NCPUS=MPI_NCPUS_MPCDF_HYDRA;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_HYDRA" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
+		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: kflags.KBIN_MPI_NCPUS=MPI_NCPUS_MPCDF_HYDRA" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      }
-	      if(MPI_HYPERTHREADING_MPCDF_HYDRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="OFF") {
-		local_NCPUS=local_NCPUS/2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      if(MPI_HYPERTHREADING_MPCDF_HYDRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="ON") {
-		local_NCPUS=local_NCPUS*2;
-		aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      }
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      //	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_HYDRA << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_HYDRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_HYDRA << " " << MPI_BINARY_DIR_MPCDF_HYDRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;   // poe not MPI run
+	      // [OBSOLETE] the HT should come out from the ntasks and not intercepted anymore here
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_HYDRA=="FALSE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="OFF") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS/2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = OFF" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      // [OBSOLETE] if(MPI_HYPERTHREADING_MPCDF_HYDRA=="TRUE" || MPI_HYPERTHREADING_MPCDF_HYDRA=="ON") {
+	      // [OBSOLETE] 	local_NCPUS=local_NCPUS*2;
+	      // [OBSOLETE] 	aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Forcing: HYPERTHREADING = ON" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      // [OBSOLETE] 	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+	      // [OBSOLETE] }
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << local_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      //	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_HYDRA << " " << local_NCPUS << " " << MPI_BINARY_DIR_MPCDF_HYDRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MPCDF_HYDRA << " " << MPI_BINARY_DIR_MPCDF_HYDRA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;   // poe not MPI run
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2461,8 +2475,8 @@ namespace KBIN {
 	    // HOST MACHINE001_MPICH ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE001 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE001 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  //CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE001 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE001 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  //CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2475,8 +2489,8 @@ namespace KBIN {
             // HOST MACHINE002_MPICH ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {
               // verbosization
-              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE002 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE002 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  //CO 170628 - SLOW WITH MEMORY
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE002 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE002 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  //CO 170628 - SLOW WITH MEMORY
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
               // run
               aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2488,8 +2502,8 @@ namespace KBIN {
 	    // HOST DUKE_MATERIALS ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_MATERIALS << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_MATERIALS << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_MATERIALS << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_MATERIALS << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2500,8 +2514,8 @@ namespace KBIN {
 	    // HOST DUKE_AFLOWLIB ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_AFLOWLIB << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_AFLOWLIB << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_AFLOWLIB << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_AFLOWLIB << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2512,8 +2526,8 @@ namespace KBIN {
 	    // HOST DUKE_HABANA ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_HABANA << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_HABANA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_DUKE_HABANA << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_HABANA << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2521,45 +2535,12 @@ namespace KBIN {
 	      aus_exec << MPI_COMMAND_DUKE_HABANA << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_DUKE_HABANA << kflags.KBIN_MPI_BIN << " >> vasp.out " << endl;
 	      aurostd::execute(aus_exec);
 	    }
-	    // HOST TERAGRID_RANGER ------------------------------------------------------------------------
-	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::TERAGRID_RANGER")) {
-	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_TERAGRID_RANGER << " " << MPI_BINARY_DIR_TERAGRID_RANGER << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
-	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      // run
-	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
-	      aus_exec << MPI_COMMAND_TERAGRID_RANGER << " " << MPI_BINARY_DIR_TERAGRID_RANGER << kflags.KBIN_MPI_BIN << " >> vasp.out " << endl;
-	      aurostd::execute(aus_exec);
-	    }
-	    // HOST TERAGRID_KRAKEN ------------------------------------------------------------------------
-	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::TERAGRID_KRAKEN")) {
-	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_TERAGRID_KRAKEN << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_TERAGRID_KRAKEN << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
-	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      // run
-	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
-	      aus_exec << MPI_COMMAND_TERAGRID_KRAKEN << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_TERAGRID_KRAKEN << kflags.KBIN_MPI_BIN << " >> vasp.out " << endl;
-	      aurostd::execute(aus_exec);
-	    }
-	    // HOST TRINITY_PARSONS ------------------------------------------------------------------------
-	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::TRINITY_PARSONS")) {
-	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_TRINITY_PARSONS << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_TRINITY_PARSONS << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
-	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-	      // run
-	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
-	      aus_exec << MPI_COMMAND_TRINITY_PARSONS << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_TRINITY_PARSONS << kflags.KBIN_MPI_BIN << " >> vasp.out " << endl;
-	      aurostd::execute(aus_exec);
-	    }
 	    // HOST FULTON_MARYLOU ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      //	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_FULTON_MARYLOU << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_FULTON_MARYLOU << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_FULTON_MARYLOU << " " << MPI_BINARY_DIR_FULTON_MARYLOU << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      //	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_FULTON_MARYLOU << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_FULTON_MARYLOU << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_FULTON_MARYLOU << " " << MPI_BINARY_DIR_FULTON_MARYLOU << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2571,8 +2552,8 @@ namespace KBIN {
 	    // HOST CMU_EULER ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_CMU_EULER << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_CMU_EULER << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  //CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_CMU_EULER << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_CMU_EULER << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  //CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2583,8 +2564,8 @@ namespace KBIN {
 	    // HOST OHAD ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE2 << " " << MPI_BINARY_DIR_MACHINE2 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE2 << " " << MPI_BINARY_DIR_MACHINE2 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2595,8 +2576,8 @@ namespace KBIN {
 	    // HOST HOST1 ------------------------------------------------------------------------
 	    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {
 	      // verbosization
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time","aflow_kvasp.cpp") << endl;
-	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE1 << " " << MPI_BINARY_DIR_MACHINE1 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory","aflow_kvasp.cpp") << endl;  // CO 170628 - SLOW WITH MEMORY
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	      aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  Executing: " << MPI_COMMAND_MACHINE1 << " " << MPI_BINARY_DIR_MACHINE1 << kflags.KBIN_MPI_BIN << " >> vasp.out " << Message(aflags,"user,host,time,memory",_AFLOW_FILE_NAME_) << endl;  // CO 170628 - SLOW WITH MEMORY
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      // run
 	      aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
@@ -2614,7 +2595,7 @@ namespace KBIN {
 	  nrun++;
 	  aus_exec << "cd " << xvasp.Directory << endl;
 	  if(kflags.KBIN_MPI==FALSE) {
-	    aus << "00000  MESSAGE QUEUED SERIAL job - [" << xvasp.str.atoms.size() << "atoms] - " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE QUEUED SERIAL job - [" << xvasp.str.atoms.size() << "atoms] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    aurostd::RemoveFile(string(xvasp.Directory+"/aflow.qsub.done"));
 	    aurostd::stringstream2file(xvasp.xqsub.QSUB,string(xvasp.Directory+"/aflow.qsub.run"));
@@ -2625,7 +2606,7 @@ namespace KBIN {
 	    KBIN::QSUB_WaitFinished(aflags,FileMESSAGE,FALSE);
 	    aurostd::RemoveFile(string(xvasp.Directory+"/aflow.qsub.done"));
 	  } else {
-	    aus << "00000  MESSAGE QUEUED MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE QUEUED MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    aurostd::RemoveFile(string(xvasp.Directory+"/aflow.qsub.done"));
 	    aurostd::stringstream2file(xvasp.xqsub.QSUB,string(xvasp.Directory+"/aflow.qsub.run"));
@@ -2639,10 +2620,10 @@ namespace KBIN {
 	  vasp_start=FALSE;
 	}
       }
-      if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [2]" << endl;
+      if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [2]" << endl;
 
-      if(aurostd::FileEmpty(xvasp.Directory+"/vasp.out"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time")+"  Empty vasp.out ");return FALSE;}
-      if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time")+"  Empty OUTCAR ");return FALSE;}
+      if(aurostd::FileEmpty(xvasp.Directory+"/vasp.out"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  Empty vasp.out ");return FALSE;}
+      if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  Empty OUTCAR ");return FALSE;}
       // DONT CHECK CONTCAR it can be empty
       // DONT CHECK OSZICAR it can be empty
 
@@ -2653,8 +2634,8 @@ namespace KBIN {
       kpoints_k3=xvasp.str.kpoints_k3; kpoints_s3=xvasp.str.kpoints_s3;
 
       // ***************** CHECK FOR ERRORS *********
-      if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [3a]  nrun=" << nrun<< endl;
-      if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [3b]  maxrun=" << maxrun<< endl;
+      if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [3a]  nrun=" << nrun<< endl;
+      if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [3b]  maxrun=" << maxrun<< endl;
 
       // check VASP version
       double DVERSION=0.0;
@@ -2666,7 +2647,7 @@ namespace KBIN {
       
     
       if(nrun<maxrun) {  
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  checking warnings" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  checking warnings" << endl;
 	xmessage.flag("REACHED_ACCURACY",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","reached required accuracy"));
 	xwarning.flag("KKSYM",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","Reciprocal lattice and k-lattice belong to different class of lattices"));
 	xwarning.flag("SGRCON",aurostd::substring_present_file_FAST(xvasp.Directory+"/vasp.out","VERY BAD NEWS! internal error in subroutine SGRCON"));
@@ -2735,7 +2716,7 @@ namespace KBIN {
 				      aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LEPSILON") ||
 				      aurostd::substring_present_file_FAST(xvasp.Directory+"/INCAR","LOPTICS"))) xwarning.flag("NPARN",FALSE);  // dont touch NPARN if LRPA or LEPSILON or LOPTICS necessary
 
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [4]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [4]" << endl;
   
 	int NBANDS_OUTCAR=0;
 	// [OBSOLETE] vector<string> nbands_tokens;
@@ -2752,7 +2733,7 @@ namespace KBIN {
       
 	if(1) {
 	  bool wdebug=FALSE;//TRUE;
-	  if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  printing warnings" << endl;
+	  if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  printing warnings" << endl;
 	  if(LDEBUG) wdebug=TRUE;
 	  if(wdebug || xmessage.flag("REACHED_ACCURACY")) aus << "MMMMM  MESSAGE xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
 	  if(wdebug) aus << "MMMMM  MESSAGE VASP_release=" << xwarning.getattachedscheme("SVERSION") << endl;
@@ -2793,7 +2774,7 @@ namespace KBIN {
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	}
 	
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [5]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [5]" << endl;
 	
 	// fix troubles
 	if(xmessage.flag("REACHED_ACCURACY") && xwarning.flag("IBZKPT")) xwarning.flag("IBZKPT",FALSE);  // priority
@@ -2823,37 +2804,37 @@ namespace KBIN {
 	vasp_start=FALSE;
 
 
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [6]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [6]" << endl;
 
 	// ********* CHECK NBANDS PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NBANDS PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NBANDS PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NBANDS") && !xfixed.flag("ALL")) { // check NBANDS
 	  if(xwarning.flag("NBANDS")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NBANDS problems ");
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NBANDS problems ");
 	    KBIN::XVASP_Afix_NBANDS(xvasp,nbands,!XHOST.QUIET);  // here it does the nbands_update
 	    xfixed.flag("NBANDS",TRUE);xfixed.flag("ALL",TRUE);
-	    aus << "WWWWW  FIX NBANDS = [" << nbands << "] - " << Message(aflags,"user,host,time") << endl;
+	    aus << "WWWWW  FIX NBANDS = [" << nbands << "] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    // cerr << "nbands=" << nbands << endl;
 	  }
 	}
 	// ********* CHECK LRF_COMMUTATOR PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK LRF_COMMUTATOR PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK LRF_COMMUTATOR PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LRF_COMMUTATOR") && !xfixed.flag("ALL")) { // check LRF_COMMUTATOR
 	  if(0 && xwarning.flag("LRF_COMMUTATOR")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  LRF_COMMUTATOR problems ");
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  LRF_COMMUTATOR problems ");
 	    //	  KBIN_XVASP_Afix_LRF_COMMUTATOR(xvasp,nbands);  // here it does the nbands_update
 	    xfixed.flag("LRF_COMMUTATOR",TRUE);xfixed.flag("ALL",TRUE);
-	    aus << "WWWWW  FIX LRF_COMMUTATOR = [" << nbands << "] - " << Message(aflags,"user,host,time") << endl;
+	    aus << "WWWWW  FIX LRF_COMMUTATOR = [" << nbands << "] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	  }
 	}
 	// // ********* CHECK SGRCON AND NIRMAT PROBLEMS ******************
-	//	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK SGRCON AND NIRMAT PROBLEMS]" << endl;
+	//	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK SGRCON AND NIRMAT PROBLEMS]" << endl;
 	// if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SGRCON") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	// 	if(xwarning.flag("SGRCON") && xwarning.flag("NIRMAT")) {
-	// 	  KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  SGRCON/NIRMAT problems ");
-	// 	  aus << "WWWWW  FIX SGRCON/NIRMAT - " << Message(aflags,"user,host,time") << endl;
+	// 	  KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  SGRCON/NIRMAT problems ");
+	// 	  aus << "WWWWW  FIX SGRCON/NIRMAT - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	// 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	// 	  KBIN::XVASP_Afix_GENERIC("SGRCON/NIRMAT",xvasp,kflags,vflags);
 	// 	  xfixed.flag("SGRCON",TRUE);xfixed.flag("ALL",TRUE);
@@ -2862,7 +2843,7 @@ namespace KBIN {
 	// 	}
 	// }
 	// ********* CHECK SYMMETRY PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK SYMMETRY PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK SYMMETRY PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ROTMAT") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	  if(xwarning.flag("KKSYM") || xwarning.flag("SGRCON") || xwarning.flag("NIRMAT")) {
 	    if(xwarning.flag("NIRMAT")) {
@@ -2870,14 +2851,14 @@ namespace KBIN {
 	      xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
 	      xvasp.str.kpoints_k2=kpoints_k2;xvasp.str.kpoints_s2=kpoints_s2;
 	      xvasp.str.kpoints_k3=kpoints_k3;xvasp.str.kpoints_s3=kpoints_s3;
-	      KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NIRMAT problems ");
+	      KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NIRMAT problems ");
 	      if(fix_NIRMAT<=6) {
-		aus << "WWWWW  FIX NIRMAT (" << fix_NIRMAT << ")- " << Message(aflags,"user,host,time") << endl;
+		aus << "WWWWW  FIX NIRMAT (" << fix_NIRMAT << ")- " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		KBIN::XVASP_Afix_ROTMAT(xvasp,fix_NIRMAT,!XHOST.QUIET,aflags,FileMESSAGE);
 		xfixed.flag("ALL",TRUE);
 	      } else {
-		aus << "WWWWW  FIX NIRMAT (" << 0 << ")- " << Message(aflags,"user,host,time") << endl;
+		aus << "WWWWW  FIX NIRMAT (" << 0 << ")- " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		KBIN::XVASP_Afix_ROTMAT(xvasp,0,!XHOST.QUIET,aflags,FileMESSAGE);
 		xfixed.flag("KKSYM",TRUE);xfixed.flag("NIRMAT",TRUE);xfixed.flag("ALL",TRUE);
@@ -2892,17 +2873,17 @@ namespace KBIN {
         //4. ISYM=0
         if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
           if(xfixed.flag("KKSYM_ISYM")==false){xfixed.flag("KKSYM",FALSE);} //CO181226 last step, and xwarning.flag("KKSYM") can be ignored if xfixed.flag("KKSYM_ISYM") applied
-	        //aus << "WWWWW  APPLYING NEW FIXES FOR KKSYM - " << Message(aflags,"user,host,time") << endl;
+	        //aus << "WWWWW  APPLYING NEW FIXES FOR KKSYM - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	        //aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_G_SHIFT")==false && !xvasp.str.kpoints_kscheme.empty() && !(xvasp.str.kpoints_kscheme[0]=='G' || xvasp.str.kpoints_kscheme[0]=='g')){
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
-	          aus << "WWWWW  FIX GAMMA_SHIFT - " << Message(aflags,"user,host,time") << endl;
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+	          aus << "WWWWW  FIX GAMMA_SHIFT - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	          KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags);
             xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_G_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
           }
           if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_SYMPREC")==false){
-	          aus << "WWWWW  FIX SYMPREC - " << Message(aflags,"user,host,time") << endl;
+	          aus << "WWWWW  FIX SYMPREC - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	          KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags);
             xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_SYMPREC",TRUE);xfixed.flag("ALL",TRUE);
@@ -2910,8 +2891,8 @@ namespace KBIN {
         }
         //CO181226 STOP - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
         if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_KMAX")==false){  //CO181226 - no point running many times, max is max
-	      KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
-	      aus << "WWWWW  FIX K1=K2=K3=KMAX - " << Message(aflags,"user,host,time") << endl;
+	      KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+	      aus << "WWWWW  FIX K1=K2=K3=KMAX - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	      xvasp.str.kpoints_k1=kpoints_k1;xvasp.str.kpoints_s1=kpoints_s1;
 	      xvasp.str.kpoints_k2=kpoints_k2;xvasp.str.kpoints_s2=kpoints_s2;
@@ -2922,9 +2903,9 @@ namespace KBIN {
         //CO181226 START - adding fix for "Reciprocal lattice and k-lattice belong to different class of lattices"
         if(apply_new_kksym_fix==true && xwarning.flag("KKSYM")){
           if(xfixed.flag("KKSYM")==false && xfixed.flag("KKSYM_ISYM")==false){
-            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
+            KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  \"Reciprocal lattice and k-lattice belong to different class of lattices\" problem");
             //THE NUCLEAR OPTION
-            aus << "WWWWW  FIX SYM=OFF- " << Message(aflags,"user,host,time") << endl;
+            aus << "WWWWW  FIX SYM=OFF- " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             KBIN::XVASP_Afix_ROTMAT(xvasp,6,!XHOST.QUIET,aflags,FileMESSAGE);
             xfixed.flag("KKSYM",TRUE);xfixed.flag("KKSYM_ISYM",TRUE);xfixed.flag("ALL",TRUE);
@@ -2935,11 +2916,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK SGRCON PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK SGRCON PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK SGRCON PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SGRCON") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	  if(xwarning.flag("SGRCON") && !xfixed.flag("SGRCON")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  SGRCON problems ");
-	    aus << "WWWWW  FIX SGRCON - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  SGRCON problems ");
+	    aus << "WWWWW  FIX SGRCON - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("SGRCON",xvasp,kflags,vflags);
 	    xfixed.flag("SGRCON",TRUE);xfixed.flag("ALL",TRUE);
@@ -2947,11 +2928,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK GAMMA_SHIFT PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK GAMMA_SHIFT PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK GAMMA_SHIFT PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("GAMMA_SHIFT") && !xfixed.flag("ALL")) {
 	  if(xwarning.flag("GAMMA_SHIFT") && !xfixed.flag("GAMMA_SHIFT")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  GAMMA_SHIFT problems ");
-	    aus << "WWWWW  FIX GAMMA_SHIFT - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  GAMMA_SHIFT problems ");
+	    aus << "WWWWW  FIX GAMMA_SHIFT - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("GAMMA_SHIFT",xvasp,kflags,vflags);
 	    xfixed.flag("GAMMA_SHIFT",TRUE);xfixed.flag("ALL",TRUE);
@@ -2959,11 +2940,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK MPICH11 PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK MPICH11 PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK MPICH11 PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH11") && !xfixed.flag("ALL")) {
 	  if(xwarning.flag("MPICH11") && !xfixed.flag("MPICH11")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  MPICH11 problems ");
-	    aus << "WWWWW  FIX MPICH11 - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  MPICH11 problems ");
+	    aus << "WWWWW  FIX MPICH11 - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("MPICH11",xvasp,kflags,vflags);
 	    xfixed.flag("MPICH11",TRUE);xfixed.flag("ALL",TRUE);
@@ -2972,8 +2953,8 @@ namespace KBIN {
 	}
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MPICH139") && !xfixed.flag("ALL")) {
 	  if(xwarning.flag("MPICH139") && !xfixed.flag("MPICH139")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  MPICH139 problems ");
-	    aus << "WWWWW  FIX MPICH139 - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  MPICH139 problems ");
+	    aus << "WWWWW  FIX MPICH139 - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("MPICH139",xvasp,kflags,vflags);
 	    xfixed.flag("MPICH139",TRUE);xfixed.flag("ALL",TRUE);
@@ -2981,11 +2962,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK IBZKPT PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK IBZKPT PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK IBZKPT PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("IBZKPT") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	  if(xwarning.flag("IBZKPT") && !xfixed.flag("IBZKPT")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  IBZKPT problems ");
-	    aus << "WWWWW  FIX IBZKPT - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  IBZKPT problems ");
+	    aus << "WWWWW  FIX IBZKPT - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("IBZKPT",xvasp,kflags,vflags);
 	    xfixed.flag("IBZKPT",TRUE);xfixed.flag("ALL",TRUE);
@@ -2993,11 +2974,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK NKXYZ_IKPTD PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NKXYZ_IKPTD PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NKXYZ_IKPTD PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NKXYZ_IKPTD") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	  if(xwarning.flag("NKXYZ_IKPTD") && !xfixed.flag("NKXYZ_IKPTD")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NKXYZ_IKPTD problems ");
-	    aus << "WWWWW  FIX NKXYZ_IKPTD - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NKXYZ_IKPTD problems ");
+	    aus << "WWWWW  FIX NKXYZ_IKPTD - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("NKXYZ_IKPTD",xvasp,kflags,vflags);
 	    xfixed.flag("NKXYZ_IKPTD",TRUE);xfixed.flag("ALL",TRUE);
@@ -3005,11 +2986,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK SYMPREC PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK SYMPREC PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK SYMPREC PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("SYMPREC") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	  if(xwarning.flag("SYMPREC") && !xfixed.flag("SYMPREC")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  SYMPREC problems ");
-	    aus << "WWWWW  FIX SYMPREC - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  SYMPREC problems ");
+	    aus << "WWWWW  FIX SYMPREC - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("SYMPREC",xvasp,kflags,vflags);
 	    xfixed.flag("SYMPREC",TRUE);xfixed.flag("ALL",TRUE);
@@ -3017,11 +2998,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK INVGRP PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK INVGRP PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK INVGRP PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("INVGRP") && !xfixed.flag("ALL")) { // OPTIONS FOR SYMMETRY
 	  if(xwarning.flag("INVGRP") && !xfixed.flag("INVGRP")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  INVGRP problems ");
-	    aus << "WWWWW  FIX INVGRP - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  INVGRP problems ");
+	    aus << "WWWWW  FIX INVGRP - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("INVGRP",xvasp,kflags,vflags);
 	    xfixed.flag("INVGRP",TRUE);xfixed.flag("ALL",TRUE);
@@ -3029,11 +3010,11 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK EDDRMM PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK EDDRMM PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK EDDRMM PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDRMM") && !xfixed.flag("ALL")) { // OPTIONS FOR EDDRMM
 	  if(xwarning.flag("EDDRMM") && !xfixed.flag("EDDRMM")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  EDDRMM problems ");
-	    aus << "WWWWW  FIX EDDRMM - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  EDDRMM problems ");
+	    aus << "WWWWW  FIX EDDRMM - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("EDDRMM",xvasp,kflags,vflags);
 	    xfixed.flag("EDDRMM",TRUE);xfixed.flag("ALL",TRUE);
@@ -3041,19 +3022,19 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK REAL_OPTLAY_1 REAL_OPT PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK REAL_OPTLAY_1 REAL_OPT PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK REAL_OPTLAY_1 REAL_OPT PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("LREAL") && !xfixed.flag("ALL")) { // OPTIONS FOR REAL_OPTLAY_1 OPTLAY
 	  if(xwarning.flag("REAL_OPTLAY_1") && !xfixed.flag("REAL_OPTLAY_1")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  REAL_OPTLAY_1 problems ");
-	    aus << "WWWWW  FIX REAL_OPTLAY_1 - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  REAL_OPTLAY_1 problems ");
+	    aus << "WWWWW  FIX REAL_OPTLAY_1 - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("LREAL",xvasp,kflags,vflags);
 	    xfixed.flag("REAL_OPTLAY_1",TRUE);xfixed.flag("ALL",TRUE);
 	    // if(nrun<maxrun) vasp_start=TRUE;
 	  }
 	  if(xwarning.flag("REAL_OPT") && !xfixed.flag("REAL_OPT")) {
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  REAL_OPT problems ");
-	    aus << "WWWWW  FIX REAL_OPT - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  REAL_OPT problems ");
+	    aus << "WWWWW  FIX REAL_OPT - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("LREAL",xvasp,kflags,vflags);
 	    xfixed.flag("REAL_OPT",TRUE);xfixed.flag("ALL",TRUE);
@@ -3061,15 +3042,15 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK BRMIX PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK BRMIX PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK BRMIX PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("BRMIX") && !xfixed.flag("ALL")) { // check BRMIX
 	  if(xwarning.flag("BRMIX") && !xfixed.flag("BRMIX")) { // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  BRMIX problems ");
-	    aus << "WWWWW  FIX BRMIX - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  BRMIX problems ");
+	    aus << "WWWWW  FIX BRMIX - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    /*	  if(aurostd::substring2bool(xvasp.INCAR,"IALGO=48",TRUE)) {
-		  KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  BRMIX problems not performed with IALGO=48 ");
-		  aus << "WWWWW  FIX BRMIX NOT PERFORMED with IALGO=48 - " << Message(aflags,"user,host,time") << endl;
+		  KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  BRMIX problems not performed with IALGO=48 ");
+		  aus << "WWWWW  FIX BRMIX NOT PERFORMED with IALGO=48 - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 		  xfixed.flag("BRMIX",TRUE);xfixed.flag("ALL",TRUE);
 		  } else {	
@@ -3079,47 +3060,47 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK DAV PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK DAV PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK DAV PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DAV") && !xfixed.flag("ALL")) { // check DAV
 	  if(xwarning.flag("DAV") && !xfixed.flag("DAV")) { // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  DAV problems ");
-	    aus << "WWWWW  FIX DAV - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  DAV problems ");
+	    aus << "WWWWW  FIX DAV - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("DAV",xvasp,kflags,vflags);
 	    xfixed.flag("DAV",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK EDDDAV PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK EDDDAV PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK EDDDAV PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EDDDAV") && !xfixed.flag("ALL")) { // check EDDDAV
 	  if(xwarning.flag("EDDDAV") && !xfixed.flag("EDDDAV")) { // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  EDDDAV problems ");
-	    aus << "WWWWW  FIX EDDDAV - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  EDDDAV problems ");
+	    aus << "WWWWW  FIX EDDDAV - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("EDDDAV",xvasp,kflags,vflags);
 	    xfixed.flag("EDDDAV",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK EFIELD_PEAD PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK EFIELD_PEAD PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK EFIELD_PEAD PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EFIELD_PEAD") && !xfixed.flag("ALL")) { // check EFIELD_PEAD
 	  if(xwarning.flag("EFIELD_PEAD")) { // can be applied many times && !xfixed.flag("EFIELD_PEAD")) { // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  EFIELD_PEAD problems ");
-	    aus << "WWWWW  FIX EFIELD_PEAD - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  EFIELD_PEAD problems ");
+	    aus << "WWWWW  FIX EFIELD_PEAD - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("EFIELD_PEAD",xvasp,kflags,vflags);
 	    xfixed.flag("EFIELD_PEAD",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK ZPOTRF PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK ZPOTRF PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK ZPOTRF PROBLEMS]" << endl;
 	if(0) if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ZPOTRF") && !xfixed.flag("ALL")) { // check ZPOTRF
             if(xwarning.flag("ZPOTRF") && !xfixed.flag("ZPOTRF")) { // Apply only ONCE
               counter_ZPOTRF++;
-              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  ZPOTRF problems ");
-              aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,"user,host,time") << endl;
+              KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  ZPOTRF problems ");
+              aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
               aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-              aus << "00000  MESSAGE WARNING SWAPPING TO CONVENTIONAL STRUCTURE" << " - " << Message(aflags,"user,host,time") << endl;
+              aus << "00000  MESSAGE WARNING SWAPPING TO CONVENTIONAL STRUCTURE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
               aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
               aus << "00000  MESSAGE BEFORE: structure: " << endl;
               aus << xvasp.str;
@@ -3135,10 +3116,10 @@ namespace KBIN {
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ZPOTRF") && !xfixed.flag("ALL")) { // check ZPOTRF
 	  if(xwarning.flag("ZPOTRF") && !xfixed.flag("ZPOTRF")) { // Apply only ONCE
 	    counter_ZPOTRF++;
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  ZPOTRF problems ");
-	    aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  ZPOTRF problems ");
+	    aus << "WWWWW  FIX ZPOTRF - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	    
-	    aus << "00000  MESSAGE WARNING CHANGING POTIM" << " - " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE WARNING CHANGING POTIM" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("ZPOTRF_POTIM",xvasp,kflags,vflags);
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3147,33 +3128,33 @@ namespace KBIN {
 	}
 	
 	// ********* CHECK EXCHANGE_CORRELATION PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK EXCHANGE_CORRELATION PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK EXCHANGE_CORRELATION PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("EXCCOR") && !xfixed.flag("ALL")) { // OPTIONS FOR EXCCOR
 	  if(xwarning.flag("EXCCOR") && !xfixed.flag("EXCCOR")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  EXCHANGE-CORRELATION problems ");
-	    aus << "WWWWW  FIX  EXCHANGE-CORRELATION - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  EXCHANGE-CORRELATION problems ");
+	    aus << "WWWWW  FIX  EXCHANGE-CORRELATION - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("EXCCOR",xvasp,kflags,vflags);
 	    xfixed.flag("EXCCOR",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* NEAREST NEIGHBOUR ATOMS PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NEAREST NEIGHBOUR ATOMS PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NEAREST NEIGHBOUR ATOMS PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NATOMS") && !xfixed.flag("ALL")) { // OPTIONS FOR NATOMS
 	  if(xwarning.flag("NATOMS") && !xfixed.flag("NATOMS")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NEAREST-NEIGHBOURS ATOMS problems ");
-	    aus << "WWWWW  FIX  NEAREST-NEIGHBOURS ATOMS - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NEAREST-NEIGHBOURS ATOMS problems ");
+	    aus << "WWWWW  FIX  NEAREST-NEIGHBOURS ATOMS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("NATOMS",xvasp,kflags,vflags);
 	    xfixed.flag("NATOMS",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* MEMORY PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK MEMORY PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK MEMORY PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("MEMORY") && !xfixed.flag("ALL")) { // OPTIONS FOR MEMORY
 	  if(xwarning.flag("MEMORY") && !xfixed.flag("MEMORY")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  MEMORY problems ");
-	    aus << "WWWWW  FIX  MEMORY - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  MEMORY problems ");
+	    aus << "WWWWW  FIX  MEMORY - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    stringstream command("");
 	    command << "cat " << xvasp.Directory << "/vasp.out | grep AFLOW > " << xvasp.Directory << "/" << DEFAULT_AFLOW_MEMORY_OUT << endl;
@@ -3185,66 +3166,66 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK PSMAXN PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK PSMAXN PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK PSMAXN PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("PSMAXN") && !xfixed.flag("ALL")) { // CHECK FOR PSMAXN
 	  if(xwarning.flag("PSMAXN") && !xfixed.flag("PSMAXN")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  PSMAXN problems ");
-	    aus << "WWWWW  FIX PSMAXN - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  PSMAXN problems ");
+	    aus << "WWWWW  FIX PSMAXN - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    enmax=KBIN::XVASP_Afix_GENERIC("PSMAXN",xvasp,kflags,vflags,enmax);
 	    xfixed.flag("PSMAXN",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK NPAR PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NPAR PROBLEM]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NPAR PROBLEM]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR") && !xfixed.flag("ALL")) { // CHECK FOR NPAR
 	  if(xwarning.flag("NPAR") && !xfixed.flag("NPAR")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NPAR problems ");
-	    aus << "WWWWW  FIX NPAR - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NPAR problems ");
+	    aus << "WWWWW  FIX NPAR - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("NPAR",xvasp,kflags,vflags);
 	    xfixed.flag("NPAR",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK NPARC PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NPARC PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NPARC PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARC") && !xfixed.flag("ALL")) { // CHECK FOR NPARC
 	  if(xwarning.flag("NPARC") && !xfixed.flag("NPARC")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NPARC problems ");
-	    aus << "WWWWW  FIX NPARC - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NPARC problems ");
+	    aus << "WWWWW  FIX NPARC - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("NPARC",xvasp,kflags,vflags,0.0,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
 	    xfixed.flag("NPARC",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK NPARN PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NPARN PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NPARN PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPARN") && !xfixed.flag("ALL")) { // CHECK FOR NPARN
 	  if(xwarning.flag("NPARN") && !xfixed.flag("NPARN")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NPARN problems ");
-	    aus << "WWWWW  FIX NPARN - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NPARN problems ");
+	    aus << "WWWWW  FIX NPARN - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("NPARN",xvasp,kflags,vflags,0.0,kflags.KBIN_MPI_NCPUS);  // this will kill the system as NBANDS_MPI=NPAR*NBANDS_SERIAL
 	    xfixed.flag("NPARN",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK NPAR_REMOVE PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK NPAR_REMOVE PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK NPAR_REMOVE PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("NPAR_REMOVE") && !xfixed.flag("ALL")) { // CHECK FOR NPAR_REMOVE
 	  if(xwarning.flag("NPAR_REMOVE") && !xfixed.flag("NPAR_REMOVE")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  NPAR_REMOVE problems ");
-	    aus << "WWWWW  FIX NPAR_REMOVE - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  NPAR_REMOVE problems ");
+	    aus << "WWWWW  FIX NPAR_REMOVE - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("NPAR_REMOVE",xvasp,kflags,vflags,0.0,kflags.KBIN_MPI_NCPUS);  // this will be asked when NPAR is needed
 	    xfixed.flag("NPAR_REMOVE",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* CHECK CSLOSHING PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK CSLOSHING PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK CSLOSHING PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("CSLOSHING") && !xfixed.flag("ALL")) { // check CSLOSHING
 	  if(xwarning.flag("CSLOSHING") && !xfixed.flag("CSLOSHING")) { // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  CSLOSHING problems ");
-	    aus << "WWWWW  FIX CSLOSHING - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  CSLOSHING problems ");
+	    aus << "WWWWW  FIX CSLOSHING - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("CSLOSHING",xvasp,kflags,vflags);
 	    //	  KBIN_XVASP_Afix_CSLOSHING(xvasp,kflags,vflags);
@@ -3252,22 +3233,22 @@ namespace KBIN {
 	  }
 	}
 	// ********* CHECK DENTET PROBLEMS ******************
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [CHECK DENTET PROBLEMS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [CHECK DENTET PROBLEMS]" << endl;
 	if(!vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("DENTET") && !xfixed.flag("ALL")) { // CHECK FOR DENTET
 	  if(xwarning.flag("DENTET") && !xfixed.flag("DENTET")) {  // Apply only ONCE
-	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time")+"  DENTET problems ");
-	    aus << "WWWWW  FIX DENTET - " << Message(aflags,"user,host,time") << endl;
+	    KBIN::VASP_Error(xvasp,"WWWWW  ERROR KBIN::VASP_Run: "+Message("time",_AFLOW_FILE_NAME_)+"  DENTET problems ");
+	    aus << "WWWWW  FIX DENTET - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	    KBIN::XVASP_Afix_GENERIC("DENTET",xvasp,kflags,vflags);
 	    xfixed.flag("DENTET",TRUE);xfixed.flag("ALL",TRUE);
 	  }
 	}
 	// ********* VASP TO BE RESTARTED *********
-	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [DONE WIHT CHECKS]" << endl;
+	if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [DONE WIHT CHECKS]" << endl;
 	if(xfixed.flag("ALL")) vasp_start=TRUE;
 	if(vasp_start) {
-	  if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  [VASP TO BE RESTARTED]" << endl;
-	  aus << "00000  RESTART VASP   - " << Message(aflags,"user,host,time") << endl;
+	  if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  [VASP TO BE RESTARTED]" << endl;
+	  aus << "00000  RESTART VASP   - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 	}
       }
@@ -3284,16 +3265,16 @@ namespace KBIN {
     if(!aurostd::FileExist(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file does not exist=CONTCAR ");}
     if(aurostd::FileEmpty(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file xsempty=CONTCAR ");}
 
-    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  Krun=" << Krun << endl;
+    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  Krun=" << Krun << endl;
     if(LDEBUG) {
-      aus << "KBIN::VASP_Run: " << Message("time") << "  Krun=" << Krun << endl;
+      aus << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  Krun=" << Krun << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
     
-    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time") << "  END" << endl;
+    if(LDEBUG) cerr << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  END" << endl;
 
     if(LDEBUG) {
-      aus << "KBIN::VASP_Run: " << Message("time") << "  END" << endl;
+      aus << "KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << "  END" << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
  
@@ -3318,7 +3299,7 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool Krun=TRUE;
-    if(relaxA!=relaxB)  {cerr << "ERROR KBIN::VASP_Run: " << Message("time") << " " << relaxA << "!=" << relaxB << endl;exit(0);}
+    if(relaxA!=relaxB)  {cerr << "ERROR KBIN::VASP_Run: " << Message("time",_AFLOW_FILE_NAME_) << " " << relaxA << "!=" << relaxB << endl;exit(0);}
     Krun=KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE);
     if(!Krun) {KBIN::VASP_Error(xvasp,"EEEEE  Error in  \"KBIN::VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE)\"");}
     // if(!Krun) return Krun;
@@ -3334,17 +3315,17 @@ namespace KBIN {
     ostringstream aus_exec,aus;
     aurostd::StringstreamClean(aus_exec);
     aurostd::StringstreamClean(aus);
-    // if(verbose) aus << "00000  MESSAGE RUN CHECK FINISHED : " << Message(aflags,"user,host,time") << endl;
+    // if(verbose) aus << "00000  MESSAGE RUN CHECK FINISHED : " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     // if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     // OUTCAR DOES NOT EXIST
     if(!aurostd::FileExist(xvasp.Directory+"/OUTCAR")) {
-      if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR does not exist) : " << Message(aflags,"user,host,time") << endl;
+      if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR does not exist) : " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
     // OTUCAR ESISTS BUT EMPTY
     if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR")) {
-      if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is empty) : " << Message(aflags,"user,host,time") << endl;
+      if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is empty) : " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
@@ -3356,13 +3337,13 @@ namespace KBIN {
     aus_exec << "cd " << xvasp.Directory << endl;
     aus_exec << "rm -f aflow.check_outcar.tmp " << endl;
     if(aurostd::substring_present_file(xvasp.Directory+"/aflow.check_outcar.tmp",aurostd::RemoveWhiteSpaces("Total CPU time used (sec)"),TRUE)) {
-      if(verbose) aus << "00000  MESSAGE RUN FINISHED (OUTCAR is complete) : " << Message(aflags,"user,host,time") << endl;
+      if(verbose) aus << "00000  MESSAGE RUN FINISHED (OUTCAR is complete) : " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aurostd::execute(aus_exec);
       return TRUE;
     }
     aurostd::execute(aus_exec);
-    if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is incomplete) : " << Message(aflags,"user,host,time") << endl;
+    if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is incomplete) : " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     return FALSE;
@@ -3560,7 +3541,7 @@ namespace KBIN {
     if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
     
     if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
-      aus << "EEEEE  DIRECTORY_NOT_FOUND = " << Message(aflags,"user,host,time") << endl;
+      aus << "EEEEE  DIRECTORY_NOT_FOUND = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
     } else {                                                                                                    // ******* Directory EXISTS
       // Check LOCK again
@@ -3573,25 +3554,25 @@ namespace KBIN {
       // // CHECK FOR LOCK
       // if(FileLOCK0 || FileLOCK1 || FileLOCK2) {                                                                 // ******* Directory is locked
       // 	// LOCK exist, then RUN already RUN
-      // 	aus << "EEEEE  LOCKED " << Message(aflags,"user,host,time") << endl;
+      // 	aus << "EEEEE  LOCKED " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       // 	aurostd::PrintMessageStream(aus,XHOST.QUIET);
       // 	exit(1);
       // }
       // if(FileSKIP0 || FileSKIP1 || FileSKIP2) {                                                                 // ******* Directory is skipped
       // 	// SKIP exist, then RUN already RUN
-      // 	aus << "EEEEE  SKIPPED " << Message(aflags,"user,host,time") << endl;
+      // 	aus << "EEEEE  SKIPPED " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       // 	aurostd::PrintMessageStream(aus,XHOST.QUIET);
       // 	exit(1);
       // }
       if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_) || aurostd::EFileExist(aflags.Directory+"/"+_AFLOWLOCK_))	{ // ******* Directory is locked
 	// LOCK exist, then RUN already RUN
-	aus << "EEEEE  LOCKED " << Message(aflags,"user,host,time") << endl;
+	aus << "EEEEE  LOCKED " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(aus,XHOST.QUIET);
 	exit(1);
       }
       if(aurostd::FileExist(aflags.Directory+"/SKIP") || aurostd::EFileExist(aflags.Directory+"/SKIP")) {	// ******* Directory is skipped
 	// SKIP exist, then RUN already RUN
-	aus << "EEEEE  SKIPPED " << Message(aflags,"user,host,time") << endl;
+	aus << "EEEEE  SKIPPED " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(aus,XHOST.QUIET);
 	exit(1);
       }
@@ -3606,22 +3587,22 @@ namespace KBIN {
       // CHECK FOR INCAR KPOINTS POSCAR POTCAR
       ifstream FileINCAR;string FileNameINCAR=aflags.Directory+"/INCAR";FileINCAR.open(FileNameINCAR.c_str(),std::ios::in);
       if(!FileINCAR)  {                                                                                        // ******* INCAR does not exist
-	aus << "EEEEE  INCAR ABSENT  = " << Message(aflags,"user,host,time") << endl;
+	aus << "EEEEE  INCAR ABSENT  = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintErrorStream(FileLOCK,aus,XHOST.QUIET);
       }
       ifstream FileKPOINTS;string FileNameKPOINTS=aflags.Directory+"/KPOINTS";FileKPOINTS.open(FileNameKPOINTS.c_str(),std::ios::in);
       if(!FileKPOINTS)  {                                                                                        // ******* KPOINTS does not exist
-	aus << "EEEEE  KPOINTS ABSENT  = " << Message(aflags,"user,host,time") << endl;
+	aus << "EEEEE  KPOINTS ABSENT  = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintErrorStream(FileLOCK,aus,XHOST.QUIET);
       }
       ifstream FilePOSCAR;string FileNamePOSCAR=aflags.Directory+"/POSCAR";FilePOSCAR.open(FileNamePOSCAR.c_str(),std::ios::in);
       if(!FilePOSCAR)  {                                                                                        // ******* POSCAR does not exist
-	aus << "EEEEE  POSCAR ABSENT  = " << Message(aflags,"user,host,time") << endl;
+	aus << "EEEEE  POSCAR ABSENT  = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintErrorStream(FileLOCK,aus,XHOST.QUIET);
       }
       ifstream FilePOTCAR;string FileNamePOTCAR=aflags.Directory+"/POTCAR";FilePOTCAR.open(FileNamePOTCAR.c_str(),std::ios::in);
       if(!FilePOTCAR)  {                                                                                        // ******* POTCAR does not exist
-	aus << "EEEEE  POTCAR ABSENT  = " << Message(aflags,"user,host,time") << endl;
+	aus << "EEEEE  POTCAR ABSENT  = " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintErrorStream(FileLOCK,aus,XHOST.QUIET);
       }
       // ----------------------------------------------------------------------------------------------------
@@ -3629,11 +3610,11 @@ namespace KBIN {
 	// VASP INCAR KPOINTS POSCAR POTCAR ARE PRESENT
 	/// ******************************************************************
 	// WRITE LOCK
-	aus << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow - " << Message(aflags,"user,host,time") << endl;
-	aus << "MMMMM  (C) " << XHOST.Copyright_Years << ", Stefano Curtarolo - Duke University   - " << Message(aflags,"user,host,time") << endl;
-	aus << "MMMMM  High-Throughput ab-initio Computing - " << Message(aflags,"user,host,time") << endl;
+	aus << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	aus << "MMMMM  (C) " << XHOST.Copyright_Years << ", Stefano Curtarolo - Duke University   - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+	aus << "MMMMM  High-Throughput ab-initio Computing - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	aus << "00000  MESSAGE GENERATING " << _AFLOWIN_ << " from VASP-xCARs files " << Message(aflags,"user,host,time") << endl;
+	aus << "00000  MESSAGE GENERATING " << _AFLOWIN_ << " from VASP-xCARs files " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
 	/// ******************************************************************
 	// RESET AFLOWIN
@@ -3648,7 +3629,7 @@ namespace KBIN {
 	FileINCAR.seekg(0);
 	FileAFLOWIN << AFLOWIN_SEPARATION_LINE << endl;
 	FileAFLOWIN << "[AFLOW] Automatically generated from XCARS by aflow/aflowd " << string(AFLOW_VERSION) << endl;
-	FileAFLOWIN << "[AFLOW] Automatic-Flow - " << Message(aflags,"user,host,time") << endl;
+	FileAFLOWIN << "[AFLOW] Automatic-Flow - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	FileAFLOWIN << AFLOWIN_SEPARATION_LINE << endl;
 	// WRITE HEADER
 	FileAFLOWIN << AFLOWIN_SEPARATION_LINE << endl;
@@ -3663,7 +3644,7 @@ namespace KBIN {
 	  str1=XHOST.argv.at(i);
 	  str2=XHOST.argv.at(i+1);
 	  if(str1=="--set" && str2.at(0)=='[') {
-	    aus << "00000  MESSAGE Adding " << str2 << " to " << _AFLOWIN_ << " " << Message(aflags,"user,host,time") << endl;
+	    aus << "00000  MESSAGE Adding " << str2 << " to " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
 	    FileAFLOWIN << str2 << endl;
 	  }
@@ -3693,7 +3674,7 @@ namespace KBIN {
 	/// ******************************************************************
 	// everything is done. check if we nned to delete VASP FILES
 	if(aurostd::args2flag(XHOST.argv,"--delete_xcars")) {
-	  aus << "00000  MESSAGE Removing vasp files in " << Message(aflags,"user,host,time") << endl;
+	  aus << "00000  MESSAGE Removing vasp files in " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
 	  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
 	  aus << "cd " << aflags.Directory << endl;
 	  aus << "rm -f `ls | grep -v " << _AFLOWIN_ << " | grep -v LOCK ` " << endl;
