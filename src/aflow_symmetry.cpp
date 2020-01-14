@@ -4765,13 +4765,14 @@ vector<double> PointGroupHistogramCheck(xstructure& a) {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------------------------- POINT GROUP OPERATIONS
-// SYM::CalculatePointGroupKlattice
+// SYM::CalculatePointGroupKLattice
 //
 // This function calculate the whole point group and saves in the aflow.pgroup file
 // Written by SC, dec 09
 //
+// ME200114 - made function name capitalization more consistent with other functions
 namespace SYM {
-  bool CalculatePointGroupKlattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  bool CalculatePointGroupKLattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss, string format) {  // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool Krun=TRUE;
     // DX AND COREY -START
@@ -4801,7 +4802,7 @@ namespace SYM {
       SYM::AddSymmetryToStructure(a,symop.Uc,symop.Uf,symop.ctau,symop.ftau,symop.ctrasl,symop.ftrasl,symop.basis_atoms_map,symop.basis_types_map,false,_PGROUPK_);
     }
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUPK_,osswrite,oss,format);
-    if(LDEBUG) cerr << "DEBUG: SYM::CalculatePointGroupKlattice: a.pgroupk.size()=" << a.pgroupk.size() << endl;
+    if(LDEBUG) cerr << "DEBUG: SYM::CalculatePointGroupKLattice: a.pgroupk.size()=" << a.pgroupk.size() << endl;
     return Krun;
   }
 } // namespace SYM

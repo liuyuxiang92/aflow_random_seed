@@ -9186,7 +9186,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc) {
     // DX 8/14/17 - START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
     // DX 8/14/17 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
     // DX 8/14/17 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
-    // DX 8/29/17 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKlattice(FALSE);
+    // DX 8/29/17 [OBSOLETE] -since performing full symmetry analysis by default - str_sp.CalculateSymmetryPointGroupKLattice(FALSE);
     // DX 4/26/18 - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp); would need to pass lattice symmetry from Standard_Lattice, but that information is not stored out of scope, commenting out 5 lines below 
     // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup=str_reciprocal_sp.pgroup=str_reciprocal_sc.pgroup=str_sp.pgroupk;
     // DX 4/26/18 [OBSOLETE] - possible that lattice exhibits lower symmetry than crystal (i.e., from str_sp) - str_reciprocal_in.pgroup_calculated=str_reciprocal_sp.pgroup_calculated=str_reciprocal_sc.pgroup_calculated=str_sp.pgroupk_calculated;
@@ -11299,7 +11299,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   // bool OSSWRITE=TRUE; // to FileMESSAGE, does not matter as it is /dev/null
   // ofstream FileMESSAGE("/dev/stderr");
   // SYM::CalculatePointGroup(FileMESSAGE,sstr,aflags,PGROUPWRITE,OSSWRITE,cout);
-  // SYM::CalculatePointGroupKlattice(FileMESSAGE,sstr,aflags,PGROUPKWRITE,OSSWRITE,cout);
+  // SYM::CalculatePointGroupKLattice(FileMESSAGE,sstr,aflags,PGROUPKWRITE,OSSWRITE,cout);
   // SYM::CalculateFactorGroup(FileMESSAGE,sstr,aflags,FGROUPWRITE,OSSWRITE,cout);
   // SYM::CalculateInequivalentAtoms(FileMESSAGE,sstr,aflags,IATOMSWRITE,OSSWRITE,cout);
 
@@ -13246,7 +13246,7 @@ bool xstructure::CalculateSymmetry(bool ossverbose,double radius) {
   return pflow::PerformFullSymmetry(*this,FileDevNull,aflags,kflags,ossverbose,oss);
   
   //SYM::CalculatePointGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
-  //SYM::CalculatePointGroupKlattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+  //SYM::CalculatePointGroupKLattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateSitePointGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateFactorGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateInequivalentAtoms(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
@@ -13269,7 +13269,7 @@ bool CalculateSymmetry(xstructure& str,bool ossverbose,ostream& oss,bool fffverb
   
   return pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,ossverbose,oss);
   //SYM::CalculatePointGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
-  //SYM::CalculatePointGroupKlattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+  //SYM::CalculatePointGroupKLattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculateSitePointGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculateFactorGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculateInequivalentAtoms(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
@@ -13469,49 +13469,90 @@ void CalculateSymmetryFactorGroup(xstructure& str) {
 
 // DX - Consider using pflow::CalculateFullSymmetry in aflow_aconvasp_main.cpp.
 //      It contains consistency checks for the symmetry analysis.
+// ME200114 - made capitalization more consistent with other functions
 // ***************************************************************************
-// Function CalculateSymmetryPointGroupKlattice
+// Function CalculateSymmetryPointGroupKLattice
 // ***************************************************************************
-void xstructure::CalculateSymmetryPointGroupKlattice(bool ossverbose) {
+void xstructure::CalculateSymmetryPointGroupKLattice(bool ossverbose) {
   ofstream FileDevNull("/dev/null");
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
   // LatticeReduction_avoid=TRUE;  // not necssary for klattice
-  SYM::CalculatePointGroupKlattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+  SYM::CalculatePointGroupKLattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
 }
 
-void xstructure::CalculateSymmetryPointGroupKlattice(void) {
+void xstructure::CalculateSymmetryPointGroupKLattice(void) {
   // LatticeReduction_avoid=TRUE;  // not necssary for klattice
-  CalculateSymmetryPointGroupKlattice(FALSE);
+  CalculateSymmetryPointGroupKLattice(FALSE);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
   ofstream FileDevNull("/dev/null");
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
   // str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
-  SYM::CalculatePointGroupKlattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+  SYM::CalculatePointGroupKLattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss) {
   // str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
-  CalculateSymmetryPointGroupKlattice(str,ossverbose,oss,FALSE);
+  CalculateSymmetryPointGroupKLattice(str,ossverbose,oss,FALSE);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose) {
   //  str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
-  CalculateSymmetryPointGroupKlattice(str,ossverbose,cout,FALSE);
+  CalculateSymmetryPointGroupKLattice(str,ossverbose,cout,FALSE);
 }
 
-void CalculateSymmetryPointGroupKlattice(xstructure& str) {
+void CalculateSymmetryPointGroupKLattice(xstructure& str) {
   //  str.LatticeReduction_avoid=TRUE;  // not necssary for klattice
   _aflags aflags;
   aflags.Directory="./";aflags.QUIET=TRUE;
-  CalculateSymmetryPointGroupKlattice(str,FALSE,cout,FALSE);
+  CalculateSymmetryPointGroupKLattice(str,FALSE,cout,FALSE);
+}
+
+// ME200114 - added missing function
+// ***************************************************************************
+// Function CalculateSymmetryPointGroupKCrystal
+// ***************************************************************************
+void xstructure::CalculateSymmetryPointGroupKCrystal(bool ossverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKCrystal(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
+}
+
+void xstructure::CalculateSymmetryPointGroupKCrystal(void) {
+  CalculateSymmetryPointGroupKLattice(FALSE);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
+  ofstream FileDevNull("/dev/null");
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  SYM::CalculatePointGroupKCrystal(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKCrystal(str,ossverbose,oss,FALSE);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKCrystal(str,ossverbose,cout,FALSE);
+}
+
+void CalculateSymmetryPointGroupKCrystal(xstructure& str) {
+  _aflags aflags;
+  aflags.Directory="./";aflags.QUIET=TRUE;
+  CalculateSymmetryPointGroupKCrystal(str,FALSE,cout,FALSE);
 }
 
 // ***************************************************************************

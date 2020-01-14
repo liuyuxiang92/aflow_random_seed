@@ -143,37 +143,22 @@ void QMesh::setupReciprocalCell(xstructure xs) {
   double tol = _AFLOW_APL_EPS_;
   _recCell.skewed = SYM::isLatticeSkewed(_recCell.lattice, min_dist, tol);
 
-  // Calculate the point group of the reciprocal cell. This requires some dummy
-  // ofstream objects to parse into the function. These objects will be removed
-  // when CalculatePointGroupKlattice is redesigned to work without ofstreams.
-  // ME200110 - See "The Physics of Phonons" by G.P. Srivastava, p. 11 for a
-  // discussion of pgroupk vs pgroupk_xtal. Summary: The Wigner-Seitz cell of
-  // has the point group symmetry of its lattice. As long as we stay inside the
-  // BZ (which the Monkhorst-Pack mesh does), the mesh can be reduced using the
-  // point group of the reciprocal lattice. For example, diamond and zincblende
-  // have the same IBZ even though their crystals have different point groups.
-  if (!xs.pgroupk_calculated) {
-    ofstream FileDevNull("/dev/null");
-    if (!FileDevNull.is_open()) {
-      string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
-      string message = "Error while opening /dev/null/. ";
-      message += "Point group of the reciprocal cell cannot be calculated.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-    }
-    _aflags aflags;
-    aflags.QUIET = true;
-    xs.LatticeReduction_avoid = true;
-    SYM::CalculatePointGroupKlattice(FileDevNull, xs, aflags, false,  // ME190625
-                                     false, _logger.getOutputStream());
-    FileDevNull.clear();
-    FileDevNull.close();
-    if (!xs.pgroupk_calculated) {  // ME190625
-      string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell";
+  // Calculate the point group of the reciprocal cell. "The Physics of Phonons"
+  // by G. P. Srivastava (p. 11) claims that pgroupk can be used to reduce the
+  // q-point grid, which seems to work for most phonon properties. However,
+  // the symmetry of the dynamical matrix (see DOI: 10.1103/RevModPhys.40.1)
+  // cannot be captured using pgroupk because it requires symmetry operations
+  // that map atoms in real space. Thus, pgroupk_xtal needs to be used to get
+  // the irreducible wedge.
+  if (!xs.pgroupk_xtal_calculated) {
+    xs.CalculateSymmetryPointGroupCrystal(false);
+    if (!xs.pgroupk_xtal_calculated) {
+      string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
       string message = "Calculation of the point group of the reciprocal cell unsuccessful.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
-  _recCell.pgroup = xs.pgroupk;  // ME190625
+  _recCell.pgroup = xs.pgroupk_xtal;
 }
 
 //generateGridPoints//////////////////////////////////////////////////////////

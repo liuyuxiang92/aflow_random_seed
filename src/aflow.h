@@ -1510,8 +1510,10 @@ class xstructure {
   void CalculateSymmetryFactorGroup(void);                      // Calculate the symmetry
   void CalculateSymmetryPointGroupCrystal(bool);                // Calculate the symmetry
   void CalculateSymmetryPointGroupCrystal(void);                // Calculate the symmetry
-  void CalculateSymmetryPointGroupKlattice(bool);               // Calculate the symmetry
-  void CalculateSymmetryPointGroupKlattice(void);               // Calculate the symmetry
+  void CalculateSymmetryPointGroupKLattice(bool);               // Calculate the symmetry
+  void CalculateSymmetryPointGroupKLattice(void);               // Calculate the symmetry
+  void CalculateSymmetryPointGroupKCrystal(bool);               // Calculate the symmetry  // ME200114
+  void CalculateSymmetryPointGroupKCrystal(void);               // Calculate the symmetry  // ME200114
   int  GenerateGridAtoms(int,int,int,int,int,int);              // generate grid of atoms
   int  GenerateGridAtoms(int,int,int);                          // generate grid of atoms
   int  GenerateGridAtoms(int);                                  // generate grid of atoms
@@ -2346,10 +2348,14 @@ void CalculateSymmetryFactorGroup(xstructure& str,bool ossverbose,ostream& oss,b
 void CalculateSymmetryFactorGroup(xstructure& str,bool ossverbose,ostream& oss);
 void CalculateSymmetryFactorGroup(xstructure& str,bool ossverbose);
 void CalculateSymmetryFactorGroup(xstructure& str);
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose,ostream& oss);
-void CalculateSymmetryPointGroupKlattice(xstructure& str,bool ossverbose);
-void CalculateSymmetryPointGroupKlattice(xstructure& str);
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose,ostream& oss);
+void CalculateSymmetryPointGroupKLattice(xstructure& str,bool ossverbose);
+void CalculateSymmetryPointGroupKLattice(xstructure& str);
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose);  // ME200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss);  // ME200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose);  // ME200114
+void CalculateSymmetryPointGroupKCrystal(xstructure& str);  // ME200114
 xstructure Rotate(const xstructure& a,const xmatrix<double>& rm);
 xstructure GetLTCell(const xmatrix<double>& lt,const xstructure& str);
 xstructure GetLTFVCell(const xvector<double>& nvec,const double phi,const xstructure& str);
@@ -3744,7 +3750,7 @@ namespace SYM {
   bool CalculatePointGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_); // DX
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format="txt"); // DX
   // DX and CO - END
-  bool CalculatePointGroupKlattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KLATTICE     _PGROUPK_
+  bool CalculatePointGroupKLattice(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KLATTICE     _PGROUPK_
   bool CalculatePointGroupKCrystal(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,string format="txt");  // POINT GROUP KCRYSTAL     _PGROUPK_XTAL_ // DX 12/5/17 - New group: reciprocal space counterpart of pgroup_xtal
   bool TransformSymmetryFromRealToReciprocal(ofstream &FileMESSAGE, xstructure& real_space_crystal, xstructure& reciprocal_space,
                                              _aflags& aflags, const bool& osswrite, ostream& oss, string& pgroup_type); // DX 8/8/17 - New klattice routine // DX 12/5/17 - Added pgroup_type option to account for pgroupk_xtal

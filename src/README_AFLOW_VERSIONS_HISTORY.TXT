@@ -4,11 +4,14 @@
         -- Added standard class methods to LTMethod and QMesh. (ME)
         -- Moved calculation of little groups from TCONDCalculator to QMesh. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
-        -- Save phonon calculation state using PHPOSCAR. (ME)
+        -- APL now saves the state for phonon calculation using PHPOSCAR. (ME)
         -- APL now always uses a commensurate k-point grid for relaxations. (ME)
         -- Refactored supercell generation code in APL. (ME)
         -- Updated KPPRA for phonons. (ME)
         -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
+        -- Switched the determination of the irreducible Brillouin zone in APL from pgroupk to pgroupk_xtal to capture the symmetry of the dynamical matrix. (ME)
+        -- Added missing function CalculateSymmetryPointGroupKCrystal. (ME)
+        -- Simplified symmetry calculations in (A)APL. (ME)
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)

@@ -162,35 +162,33 @@ namespace apl {
 // have the same symmetry.
 vector<vector<int> > ClusterSet::getSymmetryMap() {
   bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
+  string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap()";
   // Check if the symmetry of the supercell and the primitive cell are the
-  // same by comparing the lattice point groups. To calculate the point
-  // groups, some dummy objects are needed. These objects will be removed
-  // as soon as CalculatePointGroup is redesigned to work without output
-  // streams and flags.
-  ofstream FileDevNull("/dev/null");
-  ostream dummy_os(NULL);
-  _aflags aflags;
-  aflags.QUIET = true;
-  if (!scell.pgroup_calculated) {
-    if (!SYM::CalculatePointGroup(FileDevNull, scell, aflags,
-                                  false, false, dummy_os, scell.sym_eps)) {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
+  // same by comparing the crystal point groups.
+  if (!scell.pgroup_xtal_calculated) {
+    scell.CalculateSymmetryPointGroupCrystal(false);
+    if (!scell.pgroup_xtal_calculated) {
       string message = "Could not calculate the point group of the supercell.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
   if (!pcell.pgroup_xtal_calculated) {
-    if (!SYM::CalculatePointGroupCrystal(FileDevNull, pcell, aflags,
-                                         false, false, dummy_os, pcell.sym_eps)) {
-      string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
+    pcell.CalculateSymmetryPointGroupCrystal(false);
+    if (!pcell.pgroup_xtal_calculated) {
       string message = "Could not calculate the point group of the primitive cell.";
       throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
     }
   }
-  FileDevNull.clear();
-  FileDevNull.close();
 
   if (SYM::PointGroupsIdentical(scell.pgroup_xtal, pcell.pgroup_xtal, scell.sym_eps, false)) {
+    // Make sure that the factor group is calculated
+    if (!pcell.fgroup_calculated) {
+      pcell.CalculateSymmetryFactorGroup(false);
+      if (!pcell.pgroup_xtal_calculated) {
+        string message = "Could not calculate the factor group of the primitive cell.";
+        throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      }
+    }
     bool mapped = false;
     // Minimum distance for pcell is the same for scell and cheaper to compute
     pcell.dist_nn_min = SYM::minimumDistance(pcell.atoms, pcell.lattice);
@@ -218,7 +216,6 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
           }
         }
         if (!mapped) {
-          string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
           string message = "At least one atom of the supercell could not be mapped.";
           if (LDEBUG) {
             std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc;
@@ -230,7 +227,6 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
     }
     return sym_map;
   } else {
-    string function = _AAPL_CLUSTER_ERR_PREFIX_ + "getSymmetryMap";
     string message = "The point group of supercell is different than the point of the supercell.";
     message += " This feature is not implemented yet.";
     if (LDEBUG) {

@@ -122,6 +122,7 @@ void ThermalPropertiesCalculator::initialize(const vector<double>& freqs,
 void ThermalPropertiesCalculator::calculateThermalProperties(double Tstart,
                                                              double Tend,
                                                              double Tstep) {
+  _logger << "Calculating thermal properties." << apl::endl;
   if (Tstart > Tend) {
     string function = _APL_THERMO_ERR_PREFIX_ + "calculateThermalProperties()";
     string message = "Tstart cannot be higher than Tend.";

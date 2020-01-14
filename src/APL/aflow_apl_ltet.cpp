@@ -180,7 +180,7 @@ void LTMethod::findMostCompact(vector<vector<xvector<int> > >& tetrahedra) {
 void LTMethod::generateAllTetrahedra(const vector<vector<xvector<int> > >& tetrahedra) {
   vector<vector<vector<int> > > cornerMap(2, vector<vector<int> >(2, vector<int>(2)));
   vector<int> tet(4);
-  int j1, j2, j3, t = 0;
+  int j1 = 0, j2 = 0, j3 = 0, t = 0;
   for (int q3 = 0; q3 < _qm.getGrid(3); q3++) {
     for (int q2 = 0; q2 < _qm.getGrid(2); q2++) {
       for (int q1 = 0; q1 < _qm.getGrid(1); q1++) {
@@ -202,7 +202,7 @@ void LTMethod::generateAllTetrahedra(const vector<vector<xvector<int> > >& tetra
           }
           std::sort(tet.begin(), tet.end());
           _tetrahedra.push_back(tet);
-          _irredTetrahedra[t];
+          _irredTetrahedra.push_back(t);
           t++;
         }
       }

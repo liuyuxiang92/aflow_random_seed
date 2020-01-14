@@ -5980,7 +5980,7 @@ namespace pflow {
 	}
       } // DX 8/14/17
       if(kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK){ // DX 8/14/17
-	if(!SYM::CalculatePointGroupKlattice(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_WRITE,osswrite,oss,format)){
+	if(!SYM::CalculatePointGroupKLattice(FileMESSAGE,a,aflags,kflags.KBIN_SYMMETRY_PGROUPK_WRITE,osswrite,oss,format)){
 	  //cerr << "COREY TESTING POINTGROUP KLATTICE FAILED!!! exiting for now" << endl;
 	  //exit(1);
 	  if(!no_scan){
@@ -6607,7 +6607,7 @@ namespace pflow {
     bool PGROUPWRITE=TRUE,PGROUPKWRITE=TRUE,FGROUPWRITE=TRUE,SGROUPWRITE=FALSE,IATOMSWRITE=TRUE,AGROUPWRITE=TRUE;
     bool OSSWRITE=TRUE; // to FileMESSAGE, does not matter as it is /dev/null
     SYM::CalculatePointGroup(FileMESSAGE,xvasp.str,aflags,PGROUPWRITE,OSSWRITE,cout);
-    SYM::CalculatePointGroupKlattice(FileMESSAGE,xvasp.str,aflags,PGROUPKWRITE,OSSWRITE,cout);
+    SYM::CalculatePointGroupKLattice(FileMESSAGE,xvasp.str,aflags,PGROUPKWRITE,OSSWRITE,cout);
     SYM::CalculateFactorGroup(FileMESSAGE,xvasp.str,aflags,FGROUPWRITE,OSSWRITE,cout);
     SYM::CalculateSpaceGroup(FileMESSAGE,xvasp.str,aflags,SGROUPWRITE,OSSWRITE,cout);
     SYM::CalculateInequivalentAtoms(FileMESSAGE,xvasp.str,aflags,IATOMSWRITE,OSSWRITE,cout);
@@ -11389,7 +11389,7 @@ namespace pflow {
     xstructure a(input,IOAFLOW_AUTO);
     bool WRITE=TRUE;
     ofstream File("/dev/null");
-    // DX 8/15/17 SYM::CalculatePointGroupKlattice(File,a,aflags,WRITE,TRUE,cout);
+    // DX 8/15/17 SYM::CalculatePointGroupKLattice(File,a,aflags,WRITE,TRUE,cout);
     _kflags kflags;                                   // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUP=TRUE;       // DX 8/15/17 - Add in consistency checks
     kflags.KBIN_SYMMETRY_CALCULATE_PGROUPK=TRUE;      // DX 8/15/17 - Add in consistency checks
@@ -14012,7 +14012,7 @@ namespace pflow {
     bool WRITE=TRUE;
     ofstream File("/dev/null");
     SYM::CalculatePointGroup(File,a,aflags,WRITE,TRUE,cout);
-    SYM::CalculatePointGroupKlattice(File,a,aflags,WRITE,TRUE,cout);
+    SYM::CalculatePointGroupKLattice(File,a,aflags,WRITE,TRUE,cout);
     SYM::CalculateFactorGroup(File,a,aflags,WRITE,TRUE,cout);
     SYM::CalculatePointGroupCrystal(File,a,aflags,WRITE,TRUE,cout);
     a.sgroup_radius=radius;
@@ -14948,7 +14948,7 @@ int order_parameter_sum(const xstructure& str) {
   cout << "pgroup operations  =" << str.pgroup.size() << endl;
   SYM::CalculateFactorGroup(FileMESSAGE,str,aflags,FGROUPWRITE,OSSWRITE,cout);
   cout << "fgroup operations  =" << str.fgroup.size() << endl;
-  //  SYM::CalculatePointGroupKlattice(FileMESSAGE,str,aflags,PGROUPWRITE,OSSWRITE,cout);
+  //  SYM::CalculatePointGroupKLattice(FileMESSAGE,str,aflags,PGROUPWRITE,OSSWRITE,cout);
   // cout << "pgroupk operations =" << str.pgroup.size() << endl;
   // SYM::CalculateSpaceGroup(FileMESSAGE,str,aflags,SGROUPWRITE,OSSWRITE,cout);
   //  cout << "sgroup operations=" << str.sgroup.size() << endl;
