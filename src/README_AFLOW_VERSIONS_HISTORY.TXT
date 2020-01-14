@@ -12,6 +12,7 @@
         -- Switched the determination of the irreducible Brillouin zone in APL from pgroupk to pgroupk_xtal to capture the symmetry of the dynamical matrix. (ME)
         -- Added missing function CalculateSymmetryPointGroupKCrystal. (ME)
         -- Simplified symmetry calculations in (A)APL. (ME)
+        -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
         -- added schema name/unit/type to XHOST (SC)
