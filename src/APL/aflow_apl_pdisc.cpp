@@ -189,16 +189,15 @@ void PhononDispersionCalculator::calc(const IPCFreqFlags frequencyFormat) {
     threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
   }
 
-/* OBSOLETE ME 180801
-  for (int icpu = 0; icpu < ncpus; icpu++) {
-    startIndex = icpu * qpointsPerCPU;
-    endIndex = startIndex + qpointsPerCPU;
-    if (((uint)endIndex > _qpoints.size()) ||
-        ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
-      endIndex = _qpoints.size();
-    threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
-  }
-*/
+// OBSOLETE ME 180801
+//  for (int icpu = 0; icpu < ncpus; icpu++) {
+//    startIndex = icpu * qpointsPerCPU;
+//    endIndex = startIndex + qpointsPerCPU;
+//    if (((uint)endIndex > _qpoints.size()) ||
+//        ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
+//      endIndex = _qpoints.size();
+//    threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
+//  }
 
   // Wait to finish all threads here!
   for (uint i = 0; i < threads.size(); i++) {
