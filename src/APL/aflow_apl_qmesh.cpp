@@ -151,7 +151,7 @@ void QMesh::setupReciprocalCell(xstructure xs) {
   // that map atoms in real space. Thus, pgroupk_xtal needs to be used to get
   // the irreducible wedge.
   if (!xs.pgroupk_xtal_calculated) {
-    xs.CalculateSymmetryPointGroupCrystal(false);
+    xs.CalculateSymmetryPointGroupKCrystal(false);
     if (!xs.pgroupk_xtal_calculated) {
       string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
       string message = "Calculation of the point group of the reciprocal cell unsuccessful.";

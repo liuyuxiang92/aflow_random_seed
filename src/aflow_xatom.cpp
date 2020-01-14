@@ -13527,7 +13527,7 @@ void xstructure::CalculateSymmetryPointGroupKCrystal(bool ossverbose) {
 }
 
 void xstructure::CalculateSymmetryPointGroupKCrystal(void) {
-  CalculateSymmetryPointGroupKLattice(FALSE);
+  CalculateSymmetryPointGroupKCrystal(FALSE);
 }
 
 void CalculateSymmetryPointGroupKCrystal(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose) {
