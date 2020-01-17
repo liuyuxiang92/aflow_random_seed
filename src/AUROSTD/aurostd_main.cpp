@@ -4069,6 +4069,10 @@ namespace aurostd {
   // Function utype2string
   // ***************************************************************************
   
+  //  template<typename string> string utype2string(const string& from) {
+  //   return (string) stream2stream<string>(from);
+  // }
+
   template<typename utype> string utype2string(const utype& from) {
     return (string) stream2stream<string>(from);
   }
@@ -4078,6 +4082,11 @@ namespace aurostd {
   template<typename utype> string utype2string(const utype& from,int precision,char FORMAT) { //see DEFAULT_STREAM, FIXED_STREAM, SCIENTIFIC_STREAM
     return (string) stream2stream<string>(from,precision,FORMAT);
   }
+  //  string utype2string(const string& from) {
+  //    return (string) from;
+  //  }
+  //  string utype2string(const std::basic_string<char, std::char_traits<char>, std::allocator<char> >& from) {    return (string) from;  }
+  //  string utype2string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > from) {    return (string) from;  }
 
   //cannot template this the same as others, char's don't make sense with roff
   string utype2string(double from,bool roff) {return utype2string(from,AUROSTD_DEFAULT_PRECISION,roff,DEFAULT_STREAM);}

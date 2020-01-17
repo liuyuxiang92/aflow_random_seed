@@ -99,7 +99,8 @@ template<class utype> bool initialize_scalar(utype d) {
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","","",0);
-
+  //  s=utype2string(s);
+  //  s=utype2string("  ");
   
   //  utype uu; _aflowlib::web2utype("location",uu);
   // [OBSOLETE]  _aflowlib::web2utype("location",s);

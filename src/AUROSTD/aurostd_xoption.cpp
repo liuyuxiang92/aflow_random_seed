@@ -284,7 +284,9 @@ namespace aurostd {
   }
 
   bool xoption::isscheme(string check) const {                     //CO 180101
-    // checks only scheme (vxscheme) it does not go through the attached schemes (vxghost).
+    // ISSCHEME and FLAG checks only vxscheme... does not manage the ghost, so for example    // SC20200114
+    // CONVERT_UNIT_CELL (as flag) will not be confused with CONVERT_UNIT_CELL=STANDARD as method.   // SC20200114
+    // Thanks to Marco Esters for getting this bug.   // SC20200114
     string a,b;
     // check schemes list going through vxscheme 1 by 1
     for(uint i=0;i<vxscheme.size();i++) {
@@ -300,17 +302,6 @@ namespace aurostd {
 	return TRUE;
       }
     }
-    // check attached schemes list going through vxsghost 2 by 2  // SC 20191227
-    for(uint i=0;i<vxsghost.size();i+=2) {
-      //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;  
-      a=aurostd::toupper(vxsghost.at(i));                         // shortcuts
-      b=aurostd::toupper(check);                                  // shortcuts
-      if(a==b) {
-	//	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;  
-	return TRUE;
-      }
-    }
-    // nor in scheme nor in attached scheme... exit
     return FALSE;
   }
 
@@ -368,10 +359,29 @@ namespace aurostd {
   
   bool xoption::flag(void) const {  // same as ischeme
     if(vxscheme.size()>0) return TRUE;
-    if(vxsghost.size()>0) return TRUE;  // SC 20191227
+    // NO NEED ANYMORE SC20200114    if(vxsghost.size()>0) return TRUE;  // SC 20191227
     return FALSE;
   }
+
+  // now for the attached ones.
   
+  bool xoption::isdefined(string check) const {                        // SC20200114
+    // checks only scheme (vxscheme) it does not go through the attached schemes (vxghost).   // SC20200114
+    string a,b;   // SC20200114
+    // check schemes list going through vxscheme 1 by 1   // SC20200114
+    // check attached schemes list going through vxsghost 2 by 2  // SC 20191227    // SC20200114
+    for(uint i=0;i<vxsghost.size();i+=2) {   // SC20200114
+      //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;     // SC20200114
+      a=aurostd::toupper(vxsghost.at(i));                         // shortcuts   // SC20200114
+      b=aurostd::toupper(check);                                  // shortcuts   // SC20200114
+      if(a==b) {   // SC20200114
+	//	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;     // SC20200114
+	return TRUE;   // SC20200114
+      }   // SC20200114
+    }   // SC20200114
+    return FALSE;   // SC20200114
+  }   // SC20200114
+
   string xoption::getattachedscheme(string xscheme) const {
     if(vxsghost.size()==0) return "";
     for(uint i=0;i<vxsghost.size()-1;i+=2) {
