@@ -58,6 +58,7 @@ namespace aurostd {
       bool flag(string) const;     // interrogate=TRUE/FALSE, same as ischeme // CO 180101  // SC 20191227
       bool flag(void) const;       // return if there is any scheme inside // CO 180101 // SC 20191227
       // attached stuff..
+      bool isdefined(string) const;                                    // SC20200114
       uint opattachedscheme(string,string,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size()
       uint addattachedscheme(string scheme,string attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()
       // [OBSOLETE] uint purgeattachedscheme(string check);            // remove attached_scheme, then returns vghost.size() - same as pop_attached

@@ -456,6 +456,7 @@ namespace pflow {
   void XYZ(string options,istream& input);
   void XYZINSPHERE(istream& input,double radius);
   void XYZWS(istream& input);
+  void XelementPrint(string options,ostream& oss=cout);
   void ZVAL(string options);
 }
 

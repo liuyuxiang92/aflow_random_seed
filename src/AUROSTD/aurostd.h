@@ -624,6 +624,10 @@ namespace aurostd {
   // [OBSOLETE] string uint2string(uint from) __xprototype;
   // [OBSOLETE] string longint2string(long int from) __xprototype;
   // [OBSOLETE] string float2string(float from) __xprototype;
+  //  string utype2string(const std::basic_string<char, std::char_traits<char>, std::allocator<char> >& from) __xprototype;
+  //  string utype2string(std::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
+  //string utype2string(string from) __xprototype;
+  //  std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > utype2string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > from) __xprototype;
   template<typename utype> string utype2string(const utype& from) __xprototype;
   template<typename utype> string utype2string(const utype& from,int precision) __xprototype;
   string utype2string(double from,bool roff);
@@ -634,6 +638,7 @@ namespace aurostd {
   string utype2string(double from,int precision,bool roff,char FORMAT);
   string utype2string(double from,bool roff,double tol,char FORMAT);
   string utype2string(double from,int precision,bool roff,double tol,char FORMAT);
+  // string utype2string(const string& from) __xprototype;
   // [OBSOLETE]  template<class u1> string utype2string(u1) __xprototype;
   // [OBSOLETE]  template<class u1, class u2> string utype2string(u1,u2) __xprototype;
   // [OBSOLETE]  template<class u1, class u2, class u3> string utype2string(u1,u2,u3) __xprototype;

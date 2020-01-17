@@ -2600,13 +2600,13 @@ namespace init {
 
     // read them as
     LDEBUG=0; // david/corey put LDEBUG=1 so you seen how they answer
-    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.isdefined(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
     if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl;  // content
-    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.isdefined(\"SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
     if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::UNIT:AEL_BULK_MODULUS_REUSS") << endl;  // content
-    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.isdefined(\"SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
     if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.getattachedscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_REUSS") << endl;  // content
-    if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::TYPE:AEL_BULK_MODULUS_OSES\")=" << XHOST.vschema.isscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_OSES") << endl; // set or not set
+    if(LDEBUG) cerr << "XHOST.vschema.isdefined(\"SCHEMA::TYPE:AEL_BULK_MODULUS_OSES\")=" << XHOST.vschema.isscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_OSES") << endl; // set or not set
     if(LDEBUG) cerr << "XHOST.vschema.getattachedscheme(\"SCHEMA::TYPE:AEL_BULK_MODULUS_OSES\")=" << XHOST.vschema.getattachedscheme("SCHEMA::TYPE:AEL_BULK_MODULUS_OSES") << endl;  // content
 
     if(LDEBUG) cerr << "nschema=" << nschema << endl;

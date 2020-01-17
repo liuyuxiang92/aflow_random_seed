@@ -1321,6 +1321,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("XRD_DIST",aurostd::args2flag(argv,cmds,"--xrd_dist"));
   vpflow.args2addattachedscheme(argv,cmds,"XRD_DIST","--xrd_dist=|--XRD_DIST=","");
 
+  // XELEMENTS STUFF
+  vpflow.args2addattachedscheme(argv,cmds,"XELEMENT","--xelement=|--XELEMENT=|--element=|--ELEMENT=","");
+
   // [OBSOLETE] vpflow.flag("ZVAL",aurostd::args2flag(argv,cmds,"--zval|--ZVAL|--zval_cell|--ZVAL_CELL|--pomass|--POMASS|--pomass_cell|--POMASS_CELL"));
   vpflow.args2addattachedscheme(argv,cmds,"ZVAL","--zval=|--ZVAL=","");
   vpflow.args2addattachedscheme(argv,cmds,"ZVAL::CELL","--zval_cell=|--ZVAL_CELL=|--zvalcell=|--ZVALCELL=","");
@@ -1884,6 +1887,7 @@ namespace pflow {
       if(vpflow.flag("PLOT_XRAY")) {pflow::PLOT_XRAY(vpflow,cin); _PROGRAMRUN=true;} //CO190520
       if(vpflow.flag("PLOT_XRAY_FILE")) {pflow::PLOT_XRAY(vpflow); _PROGRAMRUN=true;} //CO190520
       if(vpflow.flag("XRD_DIST")) {pflow::GetAtomicPlaneDist(vpflow.getattachedscheme("XRD_DIST"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("XELEMENT")) {pflow::XelementPrint(vpflow.getattachedscheme("XELEMENT"),cout); _PROGRAMRUN=true;}
       // Y
       // Z
       if(vpflow.flag("ZVAL")) {pflow::ZVAL("ZVAL,"+vpflow.getattachedscheme("ZVAL")); _PROGRAMRUN=true;}
@@ -2223,8 +2227,9 @@ namespace pflow {
     strstream << tab << x << " --edata[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] < POSCAR" << endl;
     strstream << tab << x << " --effective-mass|--em DIRECTORY" << endl;
     strstream << tab << x << " --eigcurv=DIRECTORY(with bands)" << endl;
-    strstream << tab << x << " --enum|--multienum < POPSCAR" << endl;
-    strstream << tab << x << " --enumsort|--multienumsort < POPSCAR" << endl;
+    strstream << tab << x << " --element=Z|name|symbol[,property[,property]....]" << endl;
+    strstream << tab << x << " --enum|--multienum < POSCAR" << endl;
+    strstream << tab << x << " --enumsort|--multienumsort < POSCAR" << endl;
     strstream << tab << x << " --equivalent|--equiv|--inequivalent|--inequiv|--iatoms|--eatoms[=tolerance|=tight|=loose] [--no_scan] [--print=txt|--print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR" << endl;
     strstream << tab << x << " --ewald[=eta] < POSCAR" << endl;
     strstream << tab << x << " --findsym[=tolerance_relative: default " << DEFAULT_FINDSYM_TOL << "] < POSCAR" << endl;
