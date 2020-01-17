@@ -57,11 +57,11 @@ namespace pflow {
     xvector<double> data(6);
     data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
     oss << "a=" << data(1) << '\t'
-        << "b=" << data(2) << '\t'
-        << "c=" << data(3) << endl;
+      << "b=" << data(2) << '\t'
+      << "c=" << data(3) << endl;
     oss << "alpha=" << data(4) << '\t'
-        << "beta=" << data(5) << '\t'
-        << "gamma=" << data(6) << endl;
+      << "beta=" << data(5) << '\t'
+      << "gamma=" << data(6) << endl;
     oss << endl;
     oss << "System=not used" << endl;
     oss << "Space Group Number=not used" << endl;
@@ -69,10 +69,10 @@ namespace pflow {
     oss << endl;
     // If cartesian convert to direct
     oss << "Atom" << '\t' << "Oxi." << '\t' << "X" << '\t' << "Y" << '\t' << "Z" << '\t'
-        << "R(A)" << '\t' << "Occ." << endl;
+      << "R(A)" << '\t' << "Occ." << endl;
     for(uint i=0;i<str.atoms.size();i++) {
       oss << (str.atoms.at(i)).cleanname << '\t' << "0" << '\t' << str.atoms.at(i).fpos(1) << '\t' << str.atoms.at(i).fpos(2) << '\t' << str.atoms.at(i).fpos(3) << '\t'
-          << "1.00" << '\t' << "1.0000" << endl;
+        << "1.00" << '\t' << "1.0000" << endl;
     }
   }
 } // namespace pflow
@@ -136,29 +136,29 @@ namespace pflow {
             if(aurostd::abs(getcos(a1toa2,a2toa3)+1)<tol) angle=0;
             if(pflag(1)) {
               oss << setw(4) << a1.number+1
-                  << " " << setw(4) << a1.name.c_str()
-                  << " " << setw(3) << ijk(1,1)
-                  << " " << setw(3) << ijk(1,2)
-                  << " " << setw(3) << ijk(1,3)
-                  << "   ";
+                << " " << setw(4) << a1.name.c_str()
+                << " " << setw(3) << ijk(1,1)
+                << " " << setw(3) << ijk(1,2)
+                << " " << setw(3) << ijk(1,3)
+                << "   ";
               oss << endl;
             } // if plag(1)
             if(pflag(2)) {
               oss << "     " << setw(4) << a2.number+1
-                  << " " << setw(4) << a2.name.c_str()
-                  << " " << setw(3) << ijk(2,1)
-                  << " " << setw(3) << ijk(2,2)
-                  << " " << setw(3) << ijk(2,3)
-                  << "   ";
+                << " " << setw(4) << a2.name.c_str()
+                << " " << setw(3) << ijk(2,1)
+                << " " << setw(3) << ijk(2,2)
+                << " " << setw(3) << ijk(2,3)
+                << "   ";
               oss << endl;
             } // if plag(2)
             if(pflag(3)) {
               oss << "          " << setw(4) << a3.number+1
-                  << " " << setw(4) << a3.name.c_str()
-                  << " " << setw(3) << ijk(3,1)
-                  << " " << setw(3) << ijk(3,2)
-                  << " " << setw(3) << ijk(3,3)
-                  << "   ";
+                << " " << setw(4) << a3.name.c_str()
+                << " " << setw(3) << ijk(3,1)
+                << " " << setw(3) << ijk(3,2)
+                << " " << setw(3) << ijk(3,3)
+                << "   ";
               oss << "     "  << std::setprecision(4) << angle << endl;
             } // if plag(3)
             // Set print flags not to print until next looping.
@@ -176,7 +176,7 @@ namespace pflow {
 // Dane Morgan - Stefano Curtarolo
 namespace pflow {
   void CalcPathLength(const pflow::projdata& pd, vector<double>& pathl,
-                      vector<double>& dpathl) {
+      vector<double>& dpathl) {
     pflow::matrix<double> rlat=RecipLat(pd.lat);
     pathl[0]=0;
     dpathl[0]=0;
@@ -239,13 +239,13 @@ namespace pflow {
 // edited by Corey 1/8/14
 namespace pflow {
   bool PrintCHGCAR(const xstructure& str,
-                   const stringstream& chgcar_header,
-                   const vector<int>& ngrid,
-                   const vector<int>& format_dim,
-                   const vector<double>& chg_tot,
-                   const vector<double>& chg_diff,
-                   const string& output_name,
-                   ostream& oss) {  
+      const stringstream& chgcar_header,
+      const vector<int>& ngrid,
+      const vector<int>& format_dim,
+      const vector<double>& chg_tot,
+      const vector<double>& chg_diff,
+      const string& output_name,
+      ostream& oss) {  
 
     string soliloquy="pflow::PrintCHGCAR():  ";     // so you know who's talking
 
@@ -387,7 +387,7 @@ namespace pflow {
 // Dane Morgan - Stefano Curtarolo
 namespace pflow {
   void PrintChgInt(vector<pflow::matrix<double> >& rad_chg_int,
-                   pflow::matrix<double>& vor_chg_int, ostream& oss) {  
+      pflow::matrix<double>& vor_chg_int, ostream& oss) {  
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintChgInt: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
@@ -470,8 +470,8 @@ namespace pflow {
     oss << "_cell_angle_beta  " << setw(9) << data(5) <<endl;
     oss << "_cell_angle_gamma  " << setw(9) << data(6) <<endl;
     if(str.wyccar_ITC.size()!=0){
-    oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(spacegroupnumber,str.directory) << "'" << endl; //DX 20180526 - add directory
-    oss << "_symmetry_Int_Tables_Number  " << spacegroupnumber << endl;
+      oss << "_symmetry_space_group_name_H-M  '" << GetSpaceGroupName(spacegroupnumber,str.directory) << "'" << endl; //DX 20180526 - add directory
+      oss << "_symmetry_Int_Tables_Number  " << spacegroupnumber << endl;
     }
     else {
       // Output space group - Use P1 for now
@@ -517,56 +517,56 @@ namespace pflow {
         string wyckoff_letter = tokens[1];
         //DX 20191010 [OBOSLETE] oss << str.wyckoff_sites_ITC[i].type << i+1 << " 1.0 "
         oss << str.wyckoff_sites_ITC[i].type << i+1 << " " << str.wyckoff_sites_ITC[i].site_occupation << " " //DX 20191010
-              << setw(12) << str.wyckoff_sites_ITC[i].coord(1) <<" "
-              << setw(12) << str.wyckoff_sites_ITC[i].coord(2) <<" "
-              << setw(12) << str.wyckoff_sites_ITC[i].coord(3) <<" "
-              << " Biso 1.0 " << str.wyckoff_sites_ITC[i].type <<" "
-              << wyckoff_multiplicity <<" "
-              << wyckoff_letter << endl;
+          << setw(12) << str.wyckoff_sites_ITC[i].coord(1) <<" "
+          << setw(12) << str.wyckoff_sites_ITC[i].coord(2) <<" "
+          << setw(12) << str.wyckoff_sites_ITC[i].coord(3) <<" "
+          << " Biso 1.0 " << str.wyckoff_sites_ITC[i].type <<" "
+          << wyckoff_multiplicity <<" "
+          << wyckoff_letter << endl;
       }
 
-//      for(uint i=0;i<str.wyccar_ITC.size();i++){
-//        cerr << "str.wyccar_ITC[i]: " << str.wyccar_ITC[i] << endl;
-//        vector<string> tokens;
-//        aurostd::string2tokens(str.wyccar_ITC[i],tokens," ");
-//        cerr << "tokens: " << tokens.size() << endl;
-//        if(tokens.size()==7){
-//          oss << tokens[3] << i+1 << " 1.0 " 
-//              << setw(12) << tokens[0] <<" "
-//              << setw(12) << tokens[1] <<" "
-//              << setw(12) << tokens[2] <<" "
-//              << " Biso 1.0 " << tokens[3] <<" "
-//              << tokens[4] <<" "
-//              << tokens[5] << endl;
-//        }
-//      }
+      //      for(uint i=0;i<str.wyccar_ITC.size();i++){
+      //        cerr << "str.wyccar_ITC[i]: " << str.wyccar_ITC[i] << endl;
+      //        vector<string> tokens;
+      //        aurostd::string2tokens(str.wyccar_ITC[i],tokens," ");
+      //        cerr << "tokens: " << tokens.size() << endl;
+      //        if(tokens.size()==7){
+      //          oss << tokens[3] << i+1 << " 1.0 " 
+      //              << setw(12) << tokens[0] <<" "
+      //              << setw(12) << tokens[1] <<" "
+      //              << setw(12) << tokens[2] <<" "
+      //              << " Biso 1.0 " << tokens[3] <<" "
+      //              << tokens[4] <<" "
+      //              << tokens[5] << endl;
+      //        }
+      //      }
     }
     else {
-    oss << "  1  x,y,z" << endl;
+      oss << "  1  x,y,z" << endl;
 
-    //atom posns header
-    oss << "loop_" << endl;
-    oss << " _atom_site_label" << endl;
-    oss << " _atom_site_occupancy" << endl;
-    oss << " _atom_site_fract_x" << endl;
-    oss << " _atom_site_fract_y" << endl;
-    oss << " _atom_site_fract_z" << endl;
-    oss << " _atom_site_thermal_displace_type" << endl;
-    oss << " _atom_site_B_iso_or_equiv" << endl;
-    oss << " _atom_site_type_symbol" << endl;
+      //atom posns header
+      oss << "loop_" << endl;
+      oss << " _atom_site_label" << endl;
+      oss << " _atom_site_occupancy" << endl;
+      oss << " _atom_site_fract_x" << endl;
+      oss << " _atom_site_fract_y" << endl;
+      oss << " _atom_site_fract_z" << endl;
+      oss << " _atom_site_thermal_displace_type" << endl;
+      oss << " _atom_site_B_iso_or_equiv" << endl;
+      oss << " _atom_site_type_symbol" << endl;
 
-    // Coordinates in direct
+      // Coordinates in direct
 
-    oss.precision(10);
-    for(uint i=0;i<str.atoms.size();i++) {
-      //DX 20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
-      oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX 20191010
+      oss.precision(10);
+      for(uint i=0;i<str.atoms.size();i++) {
+        //DX 20191010 [OBSOLETE] oss << str.atoms.at(i).cleanname.c_str() << i+1 << " 1.0 "
+        oss << str.atoms.at(i).cleanname.c_str() << i+1 << " " << str.atoms.at(i).partial_occupation_value << " " //DX 20191010
           << setw(12) << str.atoms.at(i).fpos(1) <<" "
           << setw(12) << str.atoms.at(i).fpos(2) <<" "
           << setw(12) << str.atoms.at(i).fpos(3) <<" "
           << " Biso 1.0 " << str.atoms.at(i).cleanname.c_str() <<endl;
+      }
     }
-  }
   }
 } // namespace pflow
 
@@ -736,9 +736,9 @@ namespace pflow {
         int id=it2-it1+ntyp_min*it1-max(0,it1*(it1-1)/2);
         int nn=dist_diff[id].size();      
         oss << "  P" << id << " Pair between types: "
-            << it1 << " " << it2 <<endl;
+          << it1 << " " << it2 <<endl;
         oss << "    P" << id << " Comparing neighbors within cutoff (number): "
-            << cutoff << " (" << nn << ")" <<  endl;
+          << cutoff << " (" << nn << ")" <<  endl;
         double adiff=0;
         double adiff_n=0;
         // double perc_err=0;  // DANE not used
@@ -759,7 +759,7 @@ namespace pflow {
         tnn=tnn+nn;
         oss << "    P" << id << " Avg Difference: " << adiff << endl;
         oss << "    P" << id << " Avg Diff/vol_avg^1/3 %: "
-            << 100*adiff/std::pow((double) vavg,(double) 1.0/3.0) << endl;
+          << 100*adiff/std::pow((double) vavg,(double) 1.0/3.0) << endl;
         oss << "    P" << id << " Avg Difference/bond length %: " << 100*adiff_n << endl;
       }// it2
     }// it1
@@ -772,66 +772,66 @@ namespace pflow {
       tadiff_n=0;
     }
     oss << "  Totals for all pairs, compared by type, within cutoff (number): "
-        << cutoff << " (" << tnn << ")" <<  endl;
+      << cutoff << " (" << tnn << ")" <<  endl;
     oss << "    Tot Avg Difference: " << tadiff << endl;
     oss << "    Tot Avg Diff/vol_avg^1/3 %: "
-        << 100*tadiff/std::pow((double) vavg,(double) 1.0/3.0) << endl;
+      << 100*tadiff/std::pow((double) vavg,(double) 1.0/3.0) << endl;
     oss << "    Tot Avg Diff/bond_length %: "
-        << 100*tadiff_n << endl;
+      << 100*tadiff_n << endl;
 
     /* THIS NEEDS WORK - need to sum the rdfsh over all atoms of one type,
        then output average numbers.  This is still not perfect, since you could
        get cancelling errors.  Could try to do site to site comparison.
-       // Compare radial distribution functions
-       ntyp_max=max(ntyp1,ntyp2);
-       nprs_max=(ntyp_max+1)*(ntyp_max+2)/2;
-       vector<double> tmpsh1(nprs_max,0);
-       vector<double> tmpsh2(nprs_max,0);
-       double bin_width=0.01;
-       int nbins=Nint(cutoff/bin_width);
-       int smooth_width=5;
-       int nsh_max=2;
-       pflow::matrix<double> rdf_all_1;
-       pflow::matrix<double> rdf_all_2;
-       GetRDF(sstr1,cutoff,nbins,rdf_all_1);
-       GetRDF(sstr2,cutoff,nbins,rdf_all_2);
-       pflow::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width);
-       pflow::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width);
-       // Get shells
-       pflow::matrix<double> rdfsh_all_1;
-       pflow::matrix<double> rdfsh_loc_1; // Radial location of rdf shells.
-       pflow::matrix<double> rdfsh_all_2;
-       pflow::matrix<double> rdfsh_loc_2; // Radial location of rdf shells.
-       GetRDFShells(sstr1,cutoff,nbins,smooth_width,
-       rdf_all_1_sm,rdfsh_all_1,rdfsh_loc_1);
-       GetRDFShells(sstr2,cutoff,nbins,smooth_width,
-       rdf_all_2_sm,rdfsh_all_2,rdfsh_loc_2);
-       // print out position, number for each radial shell up to nsh_max.
-       // Print out for each type of pair
-       oss << "Radial shell comparison" << endl;
-       for(int ish=0;ish<nsh_max;ish++) { // Radial shells loop.
-       oss << "  Shell " << ish << endl;
-       oss << "                    ";
-       for(int it1=0;it1<ntyp_max;it1++) {
-       for(int it2=it1;it2<ntyp_max;it2++) {
-       oss << it1 << "-" << it2 << "  ";
-       }
-       }
-       oss << endl;
-       oss << "    Shell Occ Str1: ";
-       for(int it1=0;it1<ntyp1;it1++) {
-       for(int it2=0;it2<ntyp1;it2++) {
-       int id=it2+(ntyp1+1)*it1;
-       int idb=ntyp1*nat1+it2+(ntyp1+1)*it1;
-       cout << id<<" "<<idb<< " "<<rdfsh_all_1.size()<<" "<<ntyp1<<" "<< nat1<< endl;
-       tmpsh1[id]=rdfsh_all_1[ntyp1*nat1+id][ish];
-       oss << tmpsh1[id] << " ";
-       }
-       }
-       oss << endl;
-       }    
+    // Compare radial distribution functions
+    ntyp_max=max(ntyp1,ntyp2);
+    nprs_max=(ntyp_max+1)*(ntyp_max+2)/2;
+    vector<double> tmpsh1(nprs_max,0);
+    vector<double> tmpsh2(nprs_max,0);
+    double bin_width=0.01;
+    int nbins=Nint(cutoff/bin_width);
+    int smooth_width=5;
+    int nsh_max=2;
+    pflow::matrix<double> rdf_all_1;
+    pflow::matrix<double> rdf_all_2;
+    GetRDF(sstr1,cutoff,nbins,rdf_all_1);
+    GetRDF(sstr2,cutoff,nbins,rdf_all_2);
+    pflow::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width);
+    pflow::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width);
+    // Get shells
+    pflow::matrix<double> rdfsh_all_1;
+    pflow::matrix<double> rdfsh_loc_1; // Radial location of rdf shells.
+    pflow::matrix<double> rdfsh_all_2;
+    pflow::matrix<double> rdfsh_loc_2; // Radial location of rdf shells.
+    GetRDFShells(sstr1,cutoff,nbins,smooth_width,
+    rdf_all_1_sm,rdfsh_all_1,rdfsh_loc_1);
+    GetRDFShells(sstr2,cutoff,nbins,smooth_width,
+    rdf_all_2_sm,rdfsh_all_2,rdfsh_loc_2);
+    // print out position, number for each radial shell up to nsh_max.
+    // Print out for each type of pair
+    oss << "Radial shell comparison" << endl;
+    for(int ish=0;ish<nsh_max;ish++) { // Radial shells loop.
+    oss << "  Shell " << ish << endl;
+    oss << "                    ";
+    for(int it1=0;it1<ntyp_max;it1++) {
+    for(int it2=it1;it2<ntyp_max;it2++) {
+    oss << it1 << "-" << it2 << "  ";
+    }
+    }
+    oss << endl;
+    oss << "    Shell Occ Str1: ";
+    for(int it1=0;it1<ntyp1;it1++) {
+    for(int it2=0;it2<ntyp1;it2++) {
+    int id=it2+(ntyp1+1)*it1;
+    int idb=ntyp1*nat1+it2+(ntyp1+1)*it1;
+    cout << id<<" "<<idb<< " "<<rdfsh_all_1.size()<<" "<<ntyp1<<" "<< nat1<< endl;
+    tmpsh1[id]=rdfsh_all_1[ntyp1*nat1+id][ish];
+    oss << tmpsh1[id] << " ";
+    }
+    }
+    oss << endl;
+    }    
 
-    */
+*/
 
     // Number of each type up to rcut.
     nprs_max=ntyp_max*(ntyp_max+1)/2;
@@ -958,644 +958,645 @@ namespace pflow {
 
     xstructure str_aus(str);//,str_sp,str_sc; // CO171027
     while(symmetry_commensurate == false){
-    if(smode!="EDATA" || no_scan){
-      symmetry_commensurate=true;
-    }
-    // FORMAT = TXT
-    if(format=="txt"){
-    oss << "REAL LATTICE" << endl;
-    oss << " Real space a b c alpha beta gamma: ";
-    oss.precision(10);
-    xvector<double> data(6);
-    data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
-    oss.precision(10);oss << data(1) << " " << data(2) << " " << data(3) << " ";
-    oss.precision(3); oss << data(4) << " " << data(5) << " " << data(6) << endl;
-    oss.precision(4);
-    if(smode=="EDATA") {
-      oss << " Real space a b c alpha beta gamma: ";
-      oss.precision(10);oss << data(1)*angstrom2bohr << " " << data(2)*angstrom2bohr << " " << data(3)*angstrom2bohr << " ";
-      oss.precision(3); oss << data(4) << " " << data(5) << " " << data(6) << "   Bohrs/Degs " << endl;
-      oss.precision(4);
-    }
-    oss << " Real space Volume: " << vol << endl;
-    oss << " Real space c/a = " << data(3)/data(1) << endl;
+      if(smode!="EDATA" || no_scan){
+        symmetry_commensurate=true;
+      }
+      // FORMAT = TXT
+      if(format=="txt"){
+        oss << "REAL LATTICE" << endl;
+        oss << " Real space a b c alpha beta gamma: ";
+        oss.precision(10);
+        xvector<double> data(6);
+        data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
+        oss.precision(10);oss << data(1) << " " << data(2) << " " << data(3) << " ";
+        oss.precision(3); oss << data(4) << " " << data(5) << " " << data(6) << endl;
+        oss.precision(4);
+        if(smode=="EDATA") {
+          oss << " Real space a b c alpha beta gamma: ";
+          oss.precision(10);oss << data(1)*angstrom2bohr << " " << data(2)*angstrom2bohr << " " << data(3)*angstrom2bohr << " ";
+          oss.precision(3); oss << data(4) << " " << data(5) << " " << data(6) << "   Bohrs/Degs " << endl;
+          oss.precision(4);
+        }
+        oss << " Real space Volume: " << vol << endl;
+        oss << " Real space c/a = " << data(3)/data(1) << endl;
         str_aus=str;//,str_sp,str_sc; // CO171027
-      // DX 9/1/17 -Add tolerance - START
-      str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
-      str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-      // DX 9/1/17 -Add tolerance - END
-    if(smode=="EDATA") {
-      // str_aus.CalculateSymmetryPointGroup(FALSE);
-      // str_aus.CalculateSymmetryFactorGroup(FALSE);
-      // str_aus.CalculateSymmetryPointGroupCrystal(FALSE);
+        // DX 9/1/17 -Add tolerance - START
+        str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
+        str_aus.sym_eps_change_count = str_sp.sym_eps_change_count = str_sc.sym_eps_change_count = sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+        // DX 9/1/17 -Add tolerance - END
+        if(smode=="EDATA") {
+          // str_aus.CalculateSymmetryPointGroup(FALSE);
+          // str_aus.CalculateSymmetryFactorGroup(FALSE);
+          // str_aus.CalculateSymmetryPointGroupCrystal(FALSE);
           if(!already_calculated){  // CO 171025
-      str_aus.GetLatticeType(str_sp,str_sc);
-      if(orig_tolerance == AUROSTD_NAN){
-        orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
-      }
-      tolerance = str_sp.sym_eps;
-      sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+            str_aus.GetLatticeType(str_sp,str_sc);
+            if(orig_tolerance == AUROSTD_NAN){
+              orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
+            }
+            tolerance = str_sp.sym_eps;
+            sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
           }
-      oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
-      oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
-      oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//wahyu mod
-      oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_system << endl;
-      oss << " Real space: Pearson Symbol                   = " << str_aus.pearson_symbol << endl;
-      oss << "POINT GROUP CRYSTAL" << endl;
-      oss << " Real space: Crystal Family                   = " << str_aus.crystal_family << endl;
-      oss << " Real space: Crystal System                   = " << str_aus.crystal_system << endl;
-      oss << " Real space: Crystal Class                    = " << str_aus.point_group_crystal_class << endl;
-      oss << " Real space: Point Group (Hermann Mauguin)    = " << str_aus.point_group_Hermann_Mauguin << endl; // "      PGXTAL" << endl;
-      oss << " Real space: Point Group (Schoenflies)        = " << str_aus.point_group_Shoenflies << endl;
-      oss << " Real space: Point Group Orbifold             = " << str_aus.point_group_orbifold << endl;
-      oss << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
-      oss << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
-      oss << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
+          oss << "BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal)" << endl;
+          oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_type << endl;// " " << str.title << endl;
+          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_variation_type << endl;//wahyu mod
+          oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_system << endl;
+          oss << " Real space: Pearson Symbol                   = " << str_aus.pearson_symbol << endl;
+          oss << "POINT GROUP CRYSTAL" << endl;
+          oss << " Real space: Crystal Family                   = " << str_aus.crystal_family << endl;
+          oss << " Real space: Crystal System                   = " << str_aus.crystal_system << endl;
+          oss << " Real space: Crystal Class                    = " << str_aus.point_group_crystal_class << endl;
+          oss << " Real space: Point Group (Hermann Mauguin)    = " << str_aus.point_group_Hermann_Mauguin << endl; // "      PGXTAL" << endl;
+          oss << " Real space: Point Group (Schoenflies)        = " << str_aus.point_group_Shoenflies << endl;
+          oss << " Real space: Point Group Orbifold             = " << str_aus.point_group_orbifold << endl;
+          oss << " Real space: Point Group Type                 = " << str_aus.point_group_type << endl;
+          oss << " Real space: Point Group Order                = " << str_aus.point_group_order << endl;
+          oss << " Real space: Point Group Structure            = " << str_aus.point_group_structure << endl;
           PrintSGData(str_aus,tolerance,oss,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO 171025 // CO171027 //DX 20180823 - added xoption
-      //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
-      if(sym_eps_change_count != str_aus.sym_eps_change_count){
-        if(LDEBUG) {
-          cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
-        }
-        sym_eps_change_count = str_aus.sym_eps_change_count;
-        str_aus.ClearSymmetry();
-        oss.str("");
-        continue;
-      }
-      //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
-      sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-        // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
-        int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
-        bool derivative_structure=false;
-        if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan){
-          symmetry_commensurate=true;
-        }
-        else {
-          if(LDEBUG) {
-            cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+          //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
+          if(sym_eps_change_count != str_aus.sym_eps_change_count){
+            if(LDEBUG) {
+              cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+            }
+            sym_eps_change_count = str_aus.sym_eps_change_count;
+            str_aus.ClearSymmetry();
+            oss.str("");
+            continue;
           }
-          str_aus.ClearSymmetry();
-          oss.str("");
-          //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan)){
-          if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan)){
-            if(force_perform){
-              if(LDEBUG) {
-                cerr << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
+          //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
+          sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+          // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
+          int multiplicity_of_primitive=str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
+          bool derivative_structure=false;
+          if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan){
+            symmetry_commensurate=true;
+          }
+          else {
+            if(LDEBUG) {
+              cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName(str_aus.space_group_ITC,str_aus.directory) << ", pg=" << str_aus.point_group_Hermann_Mauguin << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+            }
+            str_aus.ClearSymmetry();
+            oss.str("");
+            //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan)){
+            if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan)){
+              if(force_perform){
+                if(LDEBUG) {
+                  cerr << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies). [dir=" << str.directory << "]" << endl;
+                }
+                no_scan=true; //Force it to continue 
+                tolerance = orig_tolerance;
+                str_aus.ClearSymmetry();
+                oss.str("");
+                continue;
               }
-              no_scan=true; //Force it to continue 
-              tolerance = orig_tolerance;
+            }
+            else {
               str_aus.ClearSymmetry();
               oss.str("");
+              sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
               continue;
             }
           }
-          else {
-            str_aus.ClearSymmetry();
-            oss.str("");
-            sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-            continue;
+          // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
+          oss << "BRAVAIS LATTICE OF THE LATTICE (pgroup)" << endl;
+          oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_lattice_type << endl;// " " << str.title << endl;
+          oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl;//wahyu mod
+          oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_lattice_system << endl;
+          oss << "SUPERLATTICE (equally decorated)" << endl;
+          oss << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
+          oss << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
+          // DX oss << " Real space: Superlattice System              = " << str_aus.bravais_lattice_system << endl;
+          oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX - fixed mistake in line above
+          oss << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
+          }
+          oss << "RECIPROCAL LATTICE" << endl;
+          oss << " Reciprocal space lattice:" << endl;
+          oss.precision(10);
+          oss <<"   "<<str.klattice(1,1)<<"  "<<str.klattice(1,2) <<" "<<str.klattice(1,3)<<endl;
+          oss <<"   "<<str.klattice(2,1)<<"  "<<str.klattice(2,2) <<" "<<str.klattice(2,3)<<endl;
+          oss <<"   "<<str.klattice(3,1)<<"  "<<str.klattice(3,2) <<" "<<str.klattice(3,3)<<endl;
+          oss << " Reciprocal space a b c alpha beta gamma: ";
+          data=Getabc_angles(str.klattice,DEGREES);
+          oss.precision(10);oss << data(1) << " " << data(2) << " " << data(3) << " ";
+          oss.precision(3); oss << data(4) << " " << data(5) << " " << data(6) << endl;
+          oss.precision(4);
+          double kvol=GetVol(str.klattice);
+          oss << " Reciprocal space Volume: " << kvol << endl;
+          if(smode=="EDATA") {
+            oss << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
+            oss << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl;//wahyu mod
+            //oss << " Reciprocal conventional lattice         = " << str_aus.reciprocal_conventional_lattice_type << endl;
+            oss << "SPRIM" << endl;
+            oss << str_sp << endl;
+            oss << "SCONV" << endl;
+            oss << str_sc << endl;
           }
         }
-        // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
-      oss << "BRAVAIS LATTICE OF THE LATTICE (pgroup)" << endl;
-      oss << " Real space: Bravais Lattice Primitive        = " << str_aus.bravais_lattice_lattice_type << endl;// " " << str.title << endl;
-      oss << " Real space: Lattice Variation                = " << str_aus.bravais_lattice_lattice_variation_type << endl;//wahyu mod
-      oss << " Real space: Lattice System                   = " << str_aus.bravais_lattice_lattice_system << endl;
-      oss << "SUPERLATTICE (equally decorated)" << endl;
-      oss << " Real space: Bravais Superlattice Primitive   = " << str_aus.bravais_superlattice_type << endl;
-      oss << " Real space: Superlattice Variation           = " << str_aus.bravais_superlattice_variation_type << endl;
-      // DX oss << " Real space: Superlattice System              = " << str_aus.bravais_lattice_system << endl;
-      oss << " Real space: Superlattice System              = " << str_aus.bravais_superlattice_system << endl; // DX - fixed mistake in line above
-      oss << " Real space: Pearson Symbol Superlattice      = " << str_aus.pearson_symbol_superlattice << endl;
-    }
-    oss << "RECIPROCAL LATTICE" << endl;
-    oss << " Reciprocal space lattice:" << endl;
-    oss.precision(10);
-    oss <<"   "<<str.klattice(1,1)<<"  "<<str.klattice(1,2) <<" "<<str.klattice(1,3)<<endl;
-    oss <<"   "<<str.klattice(2,1)<<"  "<<str.klattice(2,2) <<" "<<str.klattice(2,3)<<endl;
-    oss <<"   "<<str.klattice(3,1)<<"  "<<str.klattice(3,2) <<" "<<str.klattice(3,3)<<endl;
-    oss << " Reciprocal space a b c alpha beta gamma: ";
-    data=Getabc_angles(str.klattice,DEGREES);
-    oss.precision(10);oss << data(1) << " " << data(2) << " " << data(3) << " ";
-    oss.precision(3); oss << data(4) << " " << data(5) << " " << data(6) << endl;
-    oss.precision(4);
-    double kvol=GetVol(str.klattice);
-    oss << " Reciprocal space Volume: " << kvol << endl;
-    if(smode=="EDATA") {
-      oss << " Reciprocal lattice primitive            = " << str_aus.reciprocal_lattice_type << endl;
-      oss << " Reciprocal lattice variation            = " << str_aus.reciprocal_lattice_variation_type << endl;//wahyu mod
-      //oss << " Reciprocal conventional lattice         = " << str_aus.reciprocal_conventional_lattice_type << endl;
-      oss << "SPRIM" << endl;
-      oss << str_sp << endl;
-      oss << "SCONV" << endl;
-      oss << str_sc << endl;
-    }
-  }
-    // FORMAT = JSON
-    if(format=="json"){
-      string eendl="";
-      bool roff=true; //round off
-      bool PRINT_NULL=FALSE;
-      stringstream sscontent_json;
-      vector<string> vcontent_json;
-      
-      // Real lattice parameters
-      xvector<double> data(6);
-      data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
-      if(data.rows){
-        sscontent_json << "\"lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
-      } else {
-        if(PRINT_NULL){ sscontent_json << "\"lattice_parameters\":null" << eendl;}
-      }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-     
-      // Real lattice parameters (Bohr/Deg)    
-      if(smode=="EDATA") {
-        xvector<double> Bohr_Degs_data(6);
-        Bohr_Degs_data(1) =  data(1)*angstrom2bohr;
-        Bohr_Degs_data(2) =  data(2)*angstrom2bohr;
-        Bohr_Degs_data(3) =  data(3)*angstrom2bohr;
-        Bohr_Degs_data(4) =  data(4);
-        Bohr_Degs_data(5) =  data(5);
-        Bohr_Degs_data(6) =  data(6);
-        if(data.rows){
-          sscontent_json << "\"lattice_parameters_Bohr_deg\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(Bohr_Degs_data,5,roff),",") << "]" << eendl;
-        } else {
-          if(PRINT_NULL){ sscontent_json << "\"lattice_parameters_Bohr_deg\":null" << eendl;}
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      }
-      
-      // Real space volume
-      sscontent_json << "\"volume\":" << vol << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
-      // Real space c/a
-      sscontent_json << "\"c_over_a\":" << data(3)/data(1) << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-     
+        // FORMAT = JSON
+        if(format=="json"){
+          string eendl="";
+          bool roff=true; //round off
+          bool PRINT_NULL=FALSE;
+          stringstream sscontent_json;
+          vector<string> vcontent_json;
+
+          // Real lattice parameters
+          xvector<double> data(6);
+          data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
+          if(data.rows){
+            sscontent_json << "\"lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
+          } else {
+            if(PRINT_NULL){ sscontent_json << "\"lattice_parameters\":null" << eendl;}
+          }
+          vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+          // Real lattice parameters (Bohr/Deg)    
+          if(smode=="EDATA") {
+            xvector<double> Bohr_Degs_data(6);
+            Bohr_Degs_data(1) =  data(1)*angstrom2bohr;
+            Bohr_Degs_data(2) =  data(2)*angstrom2bohr;
+            Bohr_Degs_data(3) =  data(3)*angstrom2bohr;
+            Bohr_Degs_data(4) =  data(4);
+            Bohr_Degs_data(5) =  data(5);
+            Bohr_Degs_data(6) =  data(6);
+            if(data.rows){
+              sscontent_json << "\"lattice_parameters_Bohr_deg\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(Bohr_Degs_data,5,roff),",") << "]" << eendl;
+            } else {
+              if(PRINT_NULL){ sscontent_json << "\"lattice_parameters_Bohr_deg\":null" << eendl;}
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+          }
+
+          // Real space volume
+          sscontent_json << "\"volume\":" << vol << eendl;
+          vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+          // Real space c/a
+          sscontent_json << "\"c_over_a\":" << data(3)/data(1) << eendl;
+          vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
           str_aus=str;//,str_sp,str_sc; // CO171027
-      str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
-      if(smode=="EDATA") {
-          if(!already_calculated){  // CO 171025
-	str_aus.GetLatticeType(str_sp,str_sc);
-        if(orig_tolerance == AUROSTD_NAN){
-          orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
-        }
-        tolerance = str_sp.sym_eps;
-        sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-          }
-       
-        // Real space: bravais lattice primitive
-        if(str_aus.bravais_lattice_type.size()){
-          sscontent_json << "\"Bravais_lattice_type\":\"" << str_aus.bravais_lattice_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_lattice_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: bravais lattice variation
-        if(str_aus.bravais_lattice_variation_type.size()){
-          sscontent_json << "\"Bravais_lattice_variation_type\":\"" << str_aus.bravais_lattice_variation_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_lattice_variation_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // Real space: lattice system
-        if(str_aus.bravais_lattice_system.size()){
-          sscontent_json << "\"Bravais_lattice_system\":\"" << str_aus.bravais_lattice_system << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_lattice_system\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: Pearson symbol
-        if(str_aus.pearson_symbol.size()){
-          sscontent_json << "\"Pearson_symbol\":\"" << str_aus.pearson_symbol << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Pearson_symbol\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // Real space: crystal family
-        if(str_aus.crystal_family.size()){
-          sscontent_json << "\"crystal_family\":\"" << str_aus.crystal_family << "\"" << eendl;
-        } else {
-          sscontent_json << "\"crystal_family\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // Real space: crystal system
-        if(str_aus.crystal_system.size()){
-          sscontent_json << "\"crystal_system\":\"" << str_aus.crystal_system << "\"" << eendl;
-        } else {
-          sscontent_json << "\"crystal_system\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
- 
-        // Real space: point group crystal class
-        if(str_aus.point_group_crystal_class.size()){
-          sscontent_json << "\"point_group_crystal_class\":\"" << str_aus.point_group_crystal_class << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_crystal_class\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: point group Hermann Mauguin
-        if(str_aus.point_group_Hermann_Mauguin.size()){
-          sscontent_json << "\"point_group_Hermann_Mauguin\":\"" << str_aus.point_group_Hermann_Mauguin << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_Hermann_Mauguin\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // Real space: point group Schoenflies
-        if(str_aus.point_group_Shoenflies.size()){
-          sscontent_json << "\"point_group_Schoenflies\":\"" << str_aus.point_group_Shoenflies << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_Schoenflies\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: point group orbifold
-        if(str_aus.point_group_orbifold.size()){
-          sscontent_json << "\"point_group_orbifold\":\"" << str_aus.point_group_orbifold << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_orbifold\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // Real space: point group type
-        if(str_aus.point_group_type.size()){
-          sscontent_json << "\"point_group_type\":\"" << str_aus.point_group_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: point group order
-        if(str_aus.point_group_order.size()){
-          sscontent_json << "\"point_group_order\":\"" << str_aus.point_group_order << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_order\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: point group structure
-        if(str_aus.point_group_structure.size()){
-          sscontent_json << "\"point_group_structure\":\"" << str_aus.point_group_structure << "\"" << eendl;
-        } else {
-          sscontent_json << "\"point_group_structure\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // SGDATA
-            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO171027 //DX 20180823 - added xoption
-        //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
-        if(sym_eps_change_count != str_aus.sym_eps_change_count){
-          if(LDEBUG) {
-            cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
-          }
-          sym_eps_change_count = str_aus.sym_eps_change_count;
-          str_aus.ClearSymmetry();
-          sscontent_json.str("");
-          vcontent_json.clear();
-          continue;
-        }
-        //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
-        sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
-        int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
-        bool derivative_structure=false;
-        if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
-          symmetry_commensurate=true;
-            } else { // CO171027
-          if(LDEBUG) {
-            cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
-          }
-          str_aus.ClearSymmetry();
-          sscontent_json.str("");
-          vcontent_json.clear();
-          //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan)){
-          if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan)){
-            if(force_perform){
-              if(LDEBUG) {
-                cerr << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
+          str_aus.sym_eps = str_sp.sym_eps = str_sc.sym_eps = tolerance; 
+          if(smode=="EDATA") {
+            if(!already_calculated){  // CO 171025
+              str_aus.GetLatticeType(str_sp,str_sc);
+              if(orig_tolerance == AUROSTD_NAN){
+                orig_tolerance = str_sp.sym_eps;  // Use new tolerance calculated here 
               }
-              no_scan=true; //Force it to continue 
-              tolerance = orig_tolerance;
+              tolerance = str_sp.sym_eps;
+              sym_eps_change_count = str_aus.sym_eps_change_count = str_sp.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+            }
+
+            // Real space: bravais lattice primitive
+            if(str_aus.bravais_lattice_type.size()){
+              sscontent_json << "\"Bravais_lattice_type\":\"" << str_aus.bravais_lattice_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_lattice_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: bravais lattice variation
+            if(str_aus.bravais_lattice_variation_type.size()){
+              sscontent_json << "\"Bravais_lattice_variation_type\":\"" << str_aus.bravais_lattice_variation_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_lattice_variation_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: lattice system
+            if(str_aus.bravais_lattice_system.size()){
+              sscontent_json << "\"Bravais_lattice_system\":\"" << str_aus.bravais_lattice_system << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_lattice_system\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: Pearson symbol
+            if(str_aus.pearson_symbol.size()){
+              sscontent_json << "\"Pearson_symbol\":\"" << str_aus.pearson_symbol << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Pearson_symbol\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: crystal family
+            if(str_aus.crystal_family.size()){
+              sscontent_json << "\"crystal_family\":\"" << str_aus.crystal_family << "\"" << eendl;
+            } else {
+              sscontent_json << "\"crystal_family\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: crystal system
+            if(str_aus.crystal_system.size()){
+              sscontent_json << "\"crystal_system\":\"" << str_aus.crystal_system << "\"" << eendl;
+            } else {
+              sscontent_json << "\"crystal_system\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group crystal class
+            if(str_aus.point_group_crystal_class.size()){
+              sscontent_json << "\"point_group_crystal_class\":\"" << str_aus.point_group_crystal_class << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_crystal_class\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group Hermann Mauguin
+            if(str_aus.point_group_Hermann_Mauguin.size()){
+              sscontent_json << "\"point_group_Hermann_Mauguin\":\"" << str_aus.point_group_Hermann_Mauguin << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_Hermann_Mauguin\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group Schoenflies
+            if(str_aus.point_group_Shoenflies.size()){
+              sscontent_json << "\"point_group_Schoenflies\":\"" << str_aus.point_group_Shoenflies << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_Schoenflies\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group orbifold
+            if(str_aus.point_group_orbifold.size()){
+              sscontent_json << "\"point_group_orbifold\":\"" << str_aus.point_group_orbifold << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_orbifold\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group type
+            if(str_aus.point_group_type.size()){
+              sscontent_json << "\"point_group_type\":\"" << str_aus.point_group_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group order
+            if(str_aus.point_group_order.size()){
+              sscontent_json << "\"point_group_order\":\"" << str_aus.point_group_order << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_order\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: point group structure
+            if(str_aus.point_group_structure.size()){
+              sscontent_json << "\"point_group_structure\":\"" << str_aus.point_group_structure << "\"" << eendl;
+            } else {
+              sscontent_json << "\"point_group_structure\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // SGDATA
+            PrintSGData(str_aus,tolerance,sscontent_json,vpflow,no_scan,sg_setting,false,format,already_calculated);  // DX 8/31/17 - SGDATA // CO171027 //DX 20180823 - added xoption
+            //DX 20180608 - recalculate GetLatticeType() before changing tolerance - START
+            if(sym_eps_change_count != str_aus.sym_eps_change_count){
+              if(LDEBUG) {
+                cerr << "pflow::PrintData: WARNING: PrintSGData() changed the tolerance, need to recalculate GetLatticeType() at the new tolerance (i.e., sym_eps=" << str_aus.sym_eps << ") [dir=" << str.directory << "]" << endl; //DX 20180526 - add directory
+              }
+              sym_eps_change_count = str_aus.sym_eps_change_count;
               str_aus.ClearSymmetry();
               sscontent_json.str("");
               vcontent_json.clear();
               continue;
             }
-          }
-          else {
-            str_aus.ClearSymmetry();
-            sscontent_json.str("");
-            vcontent_json.clear();
+            //DX 20180608 - recalculate GetLatticeType() before changing tolerance - END
             sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
-            continue;
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+            // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - START
+            int multiplicity_of_primitive =str_sp.fgroup.size()/str_sp.pgroup_xtal.size();
+            bool derivative_structure=false;
+            if(SYM::ComparePointGroupAndSpaceGroupString(str_aus,multiplicity_of_primitive,derivative_structure) || no_scan == true){
+              symmetry_commensurate=true;
+            } else { // CO171027
+              if(LDEBUG) {
+                cerr << "pflow::PrintData: WARNING: Space group symbol and point group symbol do not match." << endl;
+              }
+              str_aus.ClearSymmetry();
+              sscontent_json.str("");
+              vcontent_json.clear();
+              //if(!SYM::change_tolerance(str_aus,tolerance,orig_tolerance,change_sym_count,str_aus.dist_nn_min,no_scan))
+              if(!SYM::change_tolerance(str_aus,tolerance,str_aus.dist_nn_min,no_scan))
+              {   //CO200106 - patching for auto-indenting
+                if(force_perform){
+                  if(LDEBUG) {
+                    cerr << "pflow::PrintData: WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << str.directory << endl;
+                  }
+                  no_scan=true; //Force it to continue 
+                  tolerance = orig_tolerance;
+                  str_aus.ClearSymmetry();
+                  sscontent_json.str("");
+                  vcontent_json.clear();
+                  continue;
+                }
+              }
+              else {
+                str_aus.ClearSymmetry();
+                sscontent_json.str("");
+                vcontent_json.clear();
+                sym_eps_change_count = str_aus.sym_eps_change_count; // DX 2/26/18 - added sym eps change count
+                continue;
+              }
+            }
+            // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
+
+            // Real space: bravais lattice lattice type
+            if(str_aus.bravais_lattice_lattice_type.size()){
+              sscontent_json << "\"Bravais_lattice_lattice_type\":\"" << str_aus.bravais_lattice_lattice_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_lattice_lattice_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: bravais lattice lattice variation type
+            if(str_aus.bravais_lattice_lattice_variation_type.size()){
+              sscontent_json << "\"Bravais_lattice_lattice_variation_type\":\"" << str_aus.bravais_lattice_lattice_variation_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_lattice_lattice_variation_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: bravais lattice lattice system
+            if(str_aus.bravais_lattice_lattice_system.size()){
+              sscontent_json << "\"Bravais_lattice_lattice_system\":\"" << str_aus.bravais_lattice_lattice_system << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_lattice_lattice_system\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: bravais superlattice type
+            if(str_aus.bravais_superlattice_type.size()){
+              sscontent_json << "\"Bravais_superlattice_type\":\"" << str_aus.bravais_superlattice_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_superlattice_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: bravais superlattice variation type
+            if(str_aus.bravais_superlattice_variation_type.size()){
+              sscontent_json << "\"Bravais_superlattice_variation_type\":\"" << str_aus.bravais_superlattice_variation_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_superlattice_variation_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: bravais superlattice system
+            if(str_aus.bravais_superlattice_system.size()){
+              sscontent_json << "\"Bravais_superlattice_system\":\"" << str_aus.bravais_superlattice_system << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Bravais_superlattice_system\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+            // Real space: pearson symbol superlattice
+            if(str_aus.pearson_symbol_superlattice.size()){
+              sscontent_json << "\"Pearson_symbol_superlattice\":\"" << str_aus.pearson_symbol_superlattice << "\"" << eendl;
+            } else {
+              sscontent_json << "\"Pearson_symbol_superlattice\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
           }
-        }
-        // DX 9/1/17 - Add consistency check for input symmetry method and ITC method - END
-        
-        // Real space: bravais lattice lattice type
-        if(str_aus.bravais_lattice_lattice_type.size()){
-          sscontent_json << "\"Bravais_lattice_lattice_type\":\"" << str_aus.bravais_lattice_lattice_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_lattice_lattice_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+          //RECIP
+          // Reciprocal space lattice
+          if(str_aus.klattice.rows){
+            sscontent_json << "\"reciprocal_lattice_vectors\":[" << aurostd::xmatDouble2String(str_aus.klattice,5,roff) << "]" << eendl;
+          } else {
+            sscontent_json << "\"reciprocal_lattice_vectors\":null" << eendl;
+          }
+          vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-        // Real space: bravais lattice lattice variation type
-        if(str_aus.bravais_lattice_lattice_variation_type.size()){
-          sscontent_json << "\"Bravais_lattice_lattice_variation_type\":\"" << str_aus.bravais_lattice_lattice_variation_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_lattice_lattice_variation_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+          // Reciprocal lattice parameters
+          data=Getabc_angles(str.klattice,DEGREES);
+          if(data.rows){
+            sscontent_json << "\"reciprocal_lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
+          } else {
+            sscontent_json << "\"reciprocal_lattice_parameters\":null" << eendl;
+          }
+          vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-        // Real space: bravais lattice lattice system
-        if(str_aus.bravais_lattice_lattice_system.size()){
-          sscontent_json << "\"Bravais_lattice_lattice_system\":\"" << str_aus.bravais_lattice_lattice_system << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_lattice_lattice_system\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+          // Reciprocal space volume
+          double kvol=GetVol(str.klattice);
+          sscontent_json << "\"reciprocal_volume\":" << kvol << eendl;
+          vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+          if(smode=="EDATA") {
+            // Reciprocal space: reciprocal lattice type
+            if(str_aus.reciprocal_lattice_type.size()){
+              sscontent_json << "\"reciprocal_lattice_type\":\"" << str_aus.reciprocal_lattice_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"reciprocal_lattice_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-        // Real space: bravais superlattice type
-        if(str_aus.bravais_superlattice_type.size()){
-          sscontent_json << "\"Bravais_superlattice_type\":\"" << str_aus.bravais_superlattice_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_superlattice_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+            // Reciprocal space: reciprocal lattice variation type
+            if(str_aus.reciprocal_lattice_variation_type.size()){
+              sscontent_json << "\"reciprocal_lattice_variation_type\":\"" << str_aus.reciprocal_lattice_variation_type << "\"" << eendl;
+            } else {
+              sscontent_json << "\"reciprocal_lattice_variation_type\":null" << eendl;
+            }
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-        // Real space: bravais superlattice variation type
-        if(str_aus.bravais_superlattice_variation_type.size()){
-          sscontent_json << "\"Bravais_superlattice_variation_type\":\"" << str_aus.bravais_superlattice_variation_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_superlattice_variation_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+            // SPRIM
+            sscontent_json << "\"standard_primitive_structure\":" << xstructure2json(str_sp) << eendl;
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
 
-        // Real space: bravais superlattice system
-        if(str_aus.bravais_superlattice_system.size()){
-          sscontent_json << "\"Bravais_superlattice_system\":\"" << str_aus.bravais_superlattice_system << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Bravais_superlattice_system\":null" << eendl;
+            // SCONV
+            sscontent_json << "\"standard_conventional_structure\":" << xstructure2json(str_sc) << eendl;
+            vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+          }
+          oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}" << endl;
         }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // Real space: pearson symbol superlattice
-        if(str_aus.pearson_symbol_superlattice.size()){
-          sscontent_json << "\"Pearson_symbol_superlattice\":\"" << str_aus.pearson_symbol_superlattice << "\"" << eendl;
-        } else {
-          sscontent_json << "\"Pearson_symbol_superlattice\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
-      //RECIP
-      // Reciprocal space lattice
-        if(str_aus.klattice.rows){
-          sscontent_json << "\"reciprocal_lattice_vectors\":[" << aurostd::xmatDouble2String(str_aus.klattice,5,roff) << "]" << eendl;
-        } else {
-          sscontent_json << "\"reciprocal_lattice_vectors\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
-      // Reciprocal lattice parameters
+      oss_final << oss.str();
+      str_sym=str_aus; // CO171027
+      //DX 20180822 - put attributes into vpflow - START
+      if(vpflow.flag("EDATA::CALCULATED")){ // DX 20180823 - if calculated remove
+        vpflow.pop_attached("EDATA::LATTICE_PARAMETERS"); 
+        vpflow.pop_attached("EDATA::COVERA"); 
+        vpflow.pop_attached("EDATA::VOLUME"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_TYPE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_SYSTEM"); 
+        vpflow.pop_attached("EDATA::PEARSON_SYMBOL"); 
+        vpflow.pop_attached("EDATA::CRYSTAL_FAMILY"); 
+        vpflow.pop_attached("EDATA::CRYSTAL_SYSTEM"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_CRYSTAL_CLASS"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_HERMANN_MAUGUIN"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_SHOENFLIES"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_ORBIFOLD"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_TYPE"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_ORDER"); 
+        vpflow.pop_attached("EDATA::POINT_GROUP_STRUCTURE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); 
+        vpflow.pop_attached("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); 
+        vpflow.pop_attached("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
+        vpflow.pop_attached("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
+        vpflow.pop_attached("EDATA::REAL_SPACE_VOLUME"); 
+        vpflow.pop_attached("EDATA::RECIPROCAL_LATTICE_TYPE"); 
+        vpflow.pop_attached("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
+        vpflow.pop_attached("EDATA::SPRIM"); 
+        vpflow.pop_attached("EDATA::SCONV"); 
+      }
+      //DX 20180823 - now populate xoption
+      vpflow.flag("EDATA::CALCULATED",TRUE);
+      xvector<double> data(6);
+      data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
+      vpflow.push_attached("EDATA::LATTICE_PARAMETERS",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,true),",")); 
+      vpflow.push_attached("EDATA::COVERA",aurostd::utype2string<double>(data(3)/data(1))); 
+      vpflow.push_attached("EDATA::VOLUME",aurostd::utype2string<double>(vol)); 
+      vpflow.push_attached("EDATA::BRAVAIS_LATTICE_TYPE",str_aus.bravais_lattice_type); 
+      vpflow.push_attached("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE",str_aus.bravais_lattice_variation_type); 
+      vpflow.push_attached("EDATA::BRAVAIS_LATTICE_SYSTEM",str_aus.bravais_lattice_system); 
+      vpflow.push_attached("EDATA::PEARSON_SYMBOL",str_aus.pearson_symbol); 
+      vpflow.push_attached("EDATA::CRYSTAL_FAMILY",str_aus.crystal_family); 
+      vpflow.push_attached("EDATA::CRYSTAL_SYSTEM",str_aus.crystal_system); 
+      vpflow.push_attached("EDATA::POINT_GROUP_CRYSTAL_CLASS",str_aus.point_group_crystal_class); 
+      vpflow.push_attached("EDATA::POINT_GROUP_HERMANN_MAUGUIN",str_aus.point_group_Hermann_Mauguin); 
+      vpflow.push_attached("EDATA::POINT_GROUP_SCHOENFLIES",str_aus.point_group_Shoenflies); 
+      vpflow.push_attached("EDATA::POINT_GROUP_ORBIFOLD",str_aus.point_group_orbifold); 
+      vpflow.push_attached("EDATA::POINT_GROUP_TYPE",aurostd::StringSubst(str_aus.point_group_type, " ", "_")); 
+      vpflow.push_attached("EDATA::POINT_GROUP_ORDER",str_aus.point_group_order); 
+      vpflow.push_attached("EDATA::POINT_GROUP_STRUCTURE",aurostd::StringSubst(str_aus.point_group_structure, " ", "_")); 
+      vpflow.push_attached("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE",str_aus.bravais_lattice_lattice_type); 
+      vpflow.push_attached("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE",str_aus.bravais_lattice_lattice_variation_type); 
+      vpflow.push_attached("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM",str_aus.bravais_lattice_lattice_system); 
+      vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_TYPE",str_aus.bravais_superlattice_type); 
+      vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE",str_aus.bravais_superlattice_variation_type); 
+      vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM",str_aus.bravais_superlattice_system); 
+      vpflow.push_attached("EDATA::PEARSON_SYMBOL_SUPERLATTICE",str_aus.pearson_symbol_superlattice); 
       data=Getabc_angles(str.klattice,DEGREES);
-      if(data.rows){
-        sscontent_json << "\"reciprocal_lattice_parameters\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,roff),",") << "]" << eendl;
-      } else {
-        sscontent_json << "\"reciprocal_lattice_parameters\":null" << eendl;
+      vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_PARAMETERS",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,true),",")); 
+      vpflow.push_attached("EDATA::RECIPROCAL_SPACE_VOLUME",aurostd::utype2string<double>(GetVol(str.klattice))); 
+      vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_TYPE",str_aus.reciprocal_lattice_type); 
+      vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE",str_aus.reciprocal_lattice_variation_type); 
+      stringstream ss_str_sp; ss_str_sp << str_sp << endl;
+      vpflow.push_attached("EDATA::SPRIM",ss_str_sp.str()); 
+      stringstream ss_str_sc; ss_str_sc << str_sc << endl;
+      vpflow.push_attached("EDATA::SCONV",ss_str_sc.str()); 
+      //DX 20180822 - put attributes into vpflow - END
+    }
+  } // namespace pflow
+
+  namespace pflow {
+    void PrintData(const xstructure& str,ostream& oss,string smode, const string& format) {
+      xstructure str_sym,str_sp,str_sc; // CO171027
+      double tolerance = AUROSTD_NAN;
+      bool no_scan = false;
+      int sg_setting = 1;
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
+    }
+  } // namespace pflow
+
+  namespace pflow {
+    void PrintData(const xstructure& str,ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format) {
+      xstructure str_sym,str_sp,str_sc; // CO171027
+      PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
+    }
+  } // namespace pflow
+
+  // ***************************************************************************
+  // pflow::PrintData1
+  // ***************************************************************************
+  // Prints out the comparison between two xstructures.
+  // Dane Morgan - Stefano Curtarolo
+  namespace pflow {
+    void PrintData1(const xstructure& str1, const double& rcut, ostream& oss) {
+      oss << PrintData1(str1,rcut);
+    }
+  } // namespace pflow
+
+  namespace pflow {
+    string PrintData1(const xstructure& str1, const double& rcut) {
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG) cerr << "pflow::PrintData1: BEGIN" << endl;
+      // LDEBUG=TRUE;
+      stringstream oss;
+      oss.setf(std::ios::left, std::ios::adjustfield);
+      oss.setf(std::ios::fixed, std::ios::floatfield);
+      oss.precision(4);
+      double cutoff=rcut;
+      //  oss.width(10);
+      // Rescale to avoid scale problems
+      xstructure sstr1=str1;
+      sstr1=ReScale(sstr1,1.0);
+      int nat1=sstr1.atoms.size();
+      int ntyp1=sstr1.num_each_type.size();
+      std::deque<int> num_each_type1=sstr1.num_each_type;
+
+      if(LDEBUG) cerr << "PrintData1 [2]" << endl;
+      oss << "*************************  Structure Comparison *************************" << endl;
+
+      // Nun atoms
+      oss << "Number of atoms" << endl;
+      oss << "  Num Atom Str1: " << nat1 << endl;
+
+      // Num types
+      oss << "Number of types" << endl;
+      oss << "  Num Type Str1: " << ntyp1 << endl;
+
+      // Stoichiometry
+      int wid=8;
+      vector<double> tmp_stoich1(ntyp1,0);
+      oss << "Stoichiometry" << endl;
+      oss << "  Type:        ";
+      for(int it=0;it<ntyp1;it++) {
+        oss << setw(wid) << it << " ";
       }
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-      // Reciprocal space volume
-      double kvol=GetVol(str.klattice);
-      sscontent_json << "\"reciprocal_volume\":" << kvol << eendl;
-      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      if(smode=="EDATA") {
-        // Reciprocal space: reciprocal lattice type
-        if(str_aus.reciprocal_lattice_type.size()){
-          sscontent_json << "\"reciprocal_lattice_type\":\"" << str_aus.reciprocal_lattice_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"reciprocal_lattice_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // Reciprocal space: reciprocal lattice variation type
-        if(str_aus.reciprocal_lattice_variation_type.size()){
-          sscontent_json << "\"reciprocal_lattice_variation_type\":\"" << str_aus.reciprocal_lattice_variation_type << "\"" << eendl;
-        } else {
-          sscontent_json << "\"reciprocal_lattice_variation_type\":null" << eendl;
-        }
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-        // SPRIM
-        sscontent_json << "\"standard_primitive_structure\":" << xstructure2json(str_sp) << eendl;
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-        
-        // SCONV
-        sscontent_json << "\"standard_conventional_structure\":" << xstructure2json(str_sc) << eendl;
-        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      oss << endl;
+      oss << "  Stoich Str1: ";
+      for(int it=0;it<ntyp1;it++) {
+        tmp_stoich1[it]=(double) num_each_type1[it]/ (double) nat1;
+        oss << setw(wid) << tmp_stoich1[it] << " ";
       }
-      oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}" << endl;
-    }
-    }
-    oss_final << oss.str();
-        str_sym=str_aus; // CO171027
-    //DX 20180822 - put attributes into vpflow - START
-    if(vpflow.flag("EDATA::CALCULATED")){ // DX 20180823 - if calculated remove
-      vpflow.pop_attached("EDATA::LATTICE_PARAMETERS"); 
-      vpflow.pop_attached("EDATA::COVERA"); 
-      vpflow.pop_attached("EDATA::VOLUME"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_TYPE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_SYSTEM"); 
-      vpflow.pop_attached("EDATA::PEARSON_SYMBOL"); 
-      vpflow.pop_attached("EDATA::CRYSTAL_FAMILY"); 
-      vpflow.pop_attached("EDATA::CRYSTAL_SYSTEM"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_CRYSTAL_CLASS"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_HERMANN_MAUGUIN"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_SHOENFLIES"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_ORBIFOLD"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_TYPE"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_ORDER"); 
-      vpflow.pop_attached("EDATA::POINT_GROUP_STRUCTURE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); 
-      vpflow.pop_attached("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); 
-      vpflow.pop_attached("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
-      vpflow.pop_attached("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
-      vpflow.pop_attached("EDATA::REAL_SPACE_VOLUME"); 
-      vpflow.pop_attached("EDATA::RECIPROCAL_LATTICE_TYPE"); 
-      vpflow.pop_attached("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
-      vpflow.pop_attached("EDATA::SPRIM"); 
-      vpflow.pop_attached("EDATA::SCONV"); 
-    }
-    //DX 20180823 - now populate xoption
-    vpflow.flag("EDATA::CALCULATED",TRUE);
-    xvector<double> data(6);
-    data=Getabc_angles(str.lattice,DEGREES);data(1)*=str.scale;data(2)*=str.scale;data(3)*=str.scale;
-    vpflow.push_attached("EDATA::LATTICE_PARAMETERS",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,true),",")); 
-    vpflow.push_attached("EDATA::COVERA",aurostd::utype2string<double>(data(3)/data(1))); 
-    vpflow.push_attached("EDATA::VOLUME",aurostd::utype2string<double>(vol)); 
-    vpflow.push_attached("EDATA::BRAVAIS_LATTICE_TYPE",str_aus.bravais_lattice_type); 
-    vpflow.push_attached("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE",str_aus.bravais_lattice_variation_type); 
-    vpflow.push_attached("EDATA::BRAVAIS_LATTICE_SYSTEM",str_aus.bravais_lattice_system); 
-    vpflow.push_attached("EDATA::PEARSON_SYMBOL",str_aus.pearson_symbol); 
-    vpflow.push_attached("EDATA::CRYSTAL_FAMILY",str_aus.crystal_family); 
-    vpflow.push_attached("EDATA::CRYSTAL_SYSTEM",str_aus.crystal_system); 
-    vpflow.push_attached("EDATA::POINT_GROUP_CRYSTAL_CLASS",str_aus.point_group_crystal_class); 
-    vpflow.push_attached("EDATA::POINT_GROUP_HERMANN_MAUGUIN",str_aus.point_group_Hermann_Mauguin); 
-    vpflow.push_attached("EDATA::POINT_GROUP_SCHOENFLIES",str_aus.point_group_Shoenflies); 
-    vpflow.push_attached("EDATA::POINT_GROUP_ORBIFOLD",str_aus.point_group_orbifold); 
-    vpflow.push_attached("EDATA::POINT_GROUP_TYPE",aurostd::StringSubst(str_aus.point_group_type, " ", "_")); 
-    vpflow.push_attached("EDATA::POINT_GROUP_ORDER",str_aus.point_group_order); 
-    vpflow.push_attached("EDATA::POINT_GROUP_STRUCTURE",aurostd::StringSubst(str_aus.point_group_structure, " ", "_")); 
-    vpflow.push_attached("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE",str_aus.bravais_lattice_lattice_type); 
-    vpflow.push_attached("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE",str_aus.bravais_lattice_lattice_variation_type); 
-    vpflow.push_attached("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM",str_aus.bravais_lattice_lattice_system); 
-    vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_TYPE",str_aus.bravais_superlattice_type); 
-    vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE",str_aus.bravais_superlattice_variation_type); 
-    vpflow.push_attached("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM",str_aus.bravais_superlattice_system); 
-    vpflow.push_attached("EDATA::PEARSON_SYMBOL_SUPERLATTICE",str_aus.pearson_symbol_superlattice); 
-    data=Getabc_angles(str.klattice,DEGREES);
-    vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_PARAMETERS",aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(data,5,true),",")); 
-    vpflow.push_attached("EDATA::RECIPROCAL_SPACE_VOLUME",aurostd::utype2string<double>(GetVol(str.klattice))); 
-    vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_TYPE",str_aus.reciprocal_lattice_type); 
-    vpflow.push_attached("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE",str_aus.reciprocal_lattice_variation_type); 
-    stringstream ss_str_sp; ss_str_sp << str_sp << endl;
-    vpflow.push_attached("EDATA::SPRIM",ss_str_sp.str()); 
-    stringstream ss_str_sc; ss_str_sc << str_sc << endl;
-    vpflow.push_attached("EDATA::SCONV",ss_str_sc.str()); 
-    //DX 20180822 - put attributes into vpflow - END
-  }
-} // namespace pflow
+      oss << endl;
 
-namespace pflow {
-      void PrintData(const xstructure& str,ostream& oss,string smode, const string& format) {
-        xstructure str_sym,str_sp,str_sc; // CO171027
-    double tolerance = AUROSTD_NAN;
-    bool no_scan = false;
-    int sg_setting = 1;
-        PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
-  }
-} // namespace pflow
+      if(LDEBUG) cerr << "PrintData1 [3]" << endl;
+      // Volume
+      double v1=sstr1.scale*sstr1.scale*sstr1.scale*GetVol(sstr1.lattice)/nat1;
+      oss << "Volume per atom" << endl;
+      oss << "  Vol Str1: " << v1 << endl;
 
-namespace pflow {
-      void PrintData(const xstructure& str,ostream& oss,string smode, double tolerance, bool no_scan, const int& sg_setting, const string& format) {
-        xstructure str_sym,str_sp,str_sc; // CO171027
-        PrintData(str,str_sym,str_sp,str_sc,oss,smode,tolerance,no_scan,sg_setting,format); // CO171027
-  }
-} // namespace pflow
+      // lat par and angles
+      //  vector<double> ldat1=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr1.lattice));
+      vector<double> ldat1=xvector2vector(Getabc_angles(sstr1.lattice,DEGREES));
+      ldat1=pflow::Sort_abc_angles(ldat1);  
+      oss << "Unit cell: tot_vol a b c alpha beta gamma" << endl;
+      oss << "  Cell Str1: ";
+      oss << v1*nat1 << " ";
+      pflow::Vout(ldat1,oss);
 
-// ***************************************************************************
-// pflow::PrintData1
-// ***************************************************************************
-// Prints out the comparison between two xstructures.
-// Dane Morgan - Stefano Curtarolo
-namespace pflow {
-  void PrintData1(const xstructure& str1, const double& rcut, ostream& oss) {
-    oss << PrintData1(str1,rcut);
-  }
-} // namespace pflow
+      // Volume adjusted distances
 
-namespace pflow {
-  string PrintData1(const xstructure& str1, const double& rcut) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "pflow::PrintData1: BEGIN" << endl;
-    // LDEBUG=TRUE;
-    stringstream oss;
-    oss.setf(std::ios::left, std::ios::adjustfield);
-    oss.setf(std::ios::fixed, std::ios::floatfield);
-    oss.precision(4);
-    double cutoff=rcut;
-    //  oss.width(10);
-    // Rescale to avoid scale problems
-    xstructure sstr1=str1;
-    sstr1=ReScale(sstr1,1.0);
-    int nat1=sstr1.atoms.size();
-    int ntyp1=sstr1.num_each_type.size();
-    std::deque<int> num_each_type1=sstr1.num_each_type;
-
-    if(LDEBUG) cerr << "PrintData1 [2]" << endl;
-    oss << "*************************  Structure Comparison *************************" << endl;
-
-    // Nun atoms
-    oss << "Number of atoms" << endl;
-    oss << "  Num Atom Str1: " << nat1 << endl;
-
-    // Num types
-    oss << "Number of types" << endl;
-    oss << "  Num Type Str1: " << ntyp1 << endl;
-
-    // Stoichiometry
-    int wid=8;
-    vector<double> tmp_stoich1(ntyp1,0);
-    oss << "Stoichiometry" << endl;
-    oss << "  Type:        ";
-    for(int it=0;it<ntyp1;it++) {
-      oss << setw(wid) << it << " ";
-    }
-    oss << endl;
-    oss << "  Stoich Str1: ";
-    for(int it=0;it<ntyp1;it++) {
-      tmp_stoich1[it]=(double) num_each_type1[it]/ (double) nat1;
-      oss << setw(wid) << tmp_stoich1[it] << " ";
-    }
-    oss << endl;
-
-    if(LDEBUG) cerr << "PrintData1 [3]" << endl;
-    // Volume
-    double v1=sstr1.scale*sstr1.scale*sstr1.scale*GetVol(sstr1.lattice)/nat1;
-    oss << "Volume per atom" << endl;
-    oss << "  Vol Str1: " << v1 << endl;
-
-    // lat par and angles
-    //  vector<double> ldat1=pflow::Getabc_angles(pflow::xmatrix2matrix(sstr1.lattice));
-    vector<double> ldat1=xvector2vector(Getabc_angles(sstr1.lattice,DEGREES));
-    ldat1=pflow::Sort_abc_angles(ldat1);  
-    oss << "Unit cell: tot_vol a b c alpha beta gamma" << endl;
-    oss << "  Cell Str1: ";
-    oss << v1*nat1 << " ";
-    pflow::Vout(ldat1,oss);
-
-    // Volume adjusted distances
-
-    double rescale1=std::pow((double) 1.0/v1,(double) 1.0/3.0);
-    xstructure str1_newvol=sstr1;
-    // str1_newvol=SetScale(str1_newvol,rescale1); // Sets vol/atom=1
-    str1_newvol.scale=rescale1;
-    pflow::matrix<double> dist1;
-    pflow::matrix<double> dist2;
-    pflow::matrix<double> dist_diff;
-    pflow::matrix<double> dist_diff_n;
-    // If cutoff < 0 use default of 4*(avg rad of an atom).  Note
-    // that in the rescaled str, where each atom has vavg=1, rad=.6204
-    // In the true str, where each atom has vol = v1, rad=0.6204*v1^(1/3).
-    if(LDEBUG) cerr << "PrintData1 [3]" << endl;
-    if(rcut<0) cutoff=4*0.6204*std::pow((double) v1,(double) 1.0/3.0);  // THAT`S WRONG
-    //  cerr << cutoff << endl;
-    if(rcut<0) cutoff=1.01*RadiusSphereLattice(str1_newvol.lattice); // better way to nail it for sure I`ll hit something. 1% to be sure of roundoff
-    //  cerr << cutoff << endl;
-    //  if(rcut<0) cutoff=max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))); // better way to nail it for sure I`ll hit something.
-    //  cerr << cutoff << endl;
-    if(LDEBUG) {cerr << "PrintData1 [4]  " << 4*0.6204*std::pow((double) v1,(double) 1.0/3.0)<< " " << RadiusSphereLattice(str1_newvol.lattice) << " " << max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))) << endl;}// exit(0);}
+      double rescale1=std::pow((double) 1.0/v1,(double) 1.0/3.0);
+      xstructure str1_newvol=sstr1;
+      // str1_newvol=SetScale(str1_newvol,rescale1); // Sets vol/atom=1
+      str1_newvol.scale=rescale1;
+      pflow::matrix<double> dist1;
+      pflow::matrix<double> dist2;
+      pflow::matrix<double> dist_diff;
+      pflow::matrix<double> dist_diff_n;
+      // If cutoff < 0 use default of 4*(avg rad of an atom).  Note
+      // that in the rescaled str, where each atom has vavg=1, rad=.6204
+      // In the true str, where each atom has vol = v1, rad=0.6204*v1^(1/3).
+      if(LDEBUG) cerr << "PrintData1 [3]" << endl;
+      if(rcut<0) cutoff=4*0.6204*std::pow((double) v1,(double) 1.0/3.0);  // THAT`S WRONG
+      //  cerr << cutoff << endl;
+      if(rcut<0) cutoff=1.01*RadiusSphereLattice(str1_newvol.lattice); // better way to nail it for sure I`ll hit something. 1% to be sure of roundoff
+      //  cerr << cutoff << endl;
+      //  if(rcut<0) cutoff=max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))); // better way to nail it for sure I`ll hit something.
+      //  cerr << cutoff << endl;
+      if(LDEBUG) {cerr << "PrintData1 [4]  " << 4*0.6204*std::pow((double) v1,(double) 1.0/3.0)<< " " << RadiusSphereLattice(str1_newvol.lattice) << " " << max(modulus(str1_newvol.lattice(1)),modulus(str1_newvol.lattice(2)),modulus(str1_newvol.lattice(3))) << endl;}// exit(0);}
     pflow::CmpStrDist(str1_newvol,str1_newvol,cutoff*rescale1,dist1,dist2,dist_diff,dist_diff_n);
     int nprs1=dist1.size();
     oss << "Avg of Distance Magnitude Differences" << endl;
     oss << "  Rescaling vol/atom of Str1 to the average vol/atom (return to orig scale factor): "
-        << str1_newvol.scale*str1_newvol.scale*str1_newvol.scale*GetVol(str1_newvol.lattice)/nat1 << " (" << 1/rescale1 << ")" << endl;
+      << str1_newvol.scale*str1_newvol.scale*str1_newvol.scale*GetVol(str1_newvol.lattice)/nat1 << " (" << 1/rescale1 << ")" << endl;
     oss << "  Working with the all the types up to num types (num pair types): " << ntyp1 << " (" << nprs1 << ")" << endl;
     oss << "  Including all pairs within cutoff: " << cutoff << endl;
 
@@ -1607,7 +1608,7 @@ namespace pflow {
         int id=it2-it1+ntyp1*it1-std::max(0,it1*(it1-1)/2);
         int nn=dist1[id].size();      
         oss << "  P" << id << "  " << nn << " Pairs between types: "
-            << it1 << " " << it2 << "   ";
+          << it1 << " " << it2 << "   ";
         for(int in=0;in<nn;in++) {
           oss << " " << dist1[id][in];
         }
@@ -1704,8 +1705,8 @@ namespace pflow {
     data=Getabc_angles(str.lattice,DEGREES);
     oss << "volume = " << str.scale*str.scale*str.scale*GetVol(str.lattice) << endl;
     oss << "a,b,c,alpha,beta,gamma = "
-        << str.scale*data(1) << " " << str.scale*data(2) << " " << str.scale*data(3) << " "
-        << data(4) << " " << data(5) << " " << data(6) << endl;
+      << str.scale*data(1) << " " << str.scale*data(2) << " " << str.scale*data(3) << " "
+      << data(4) << " " << data(5) << " " << data(6) << endl;
     oss << "b/a = " << data(2)/data(1) << "  c/a = " << data(3)/data(1) << endl;
     oss << "Lattice =" << endl;
     oss << str.scale*str.lattice << endl;
@@ -1714,8 +1715,8 @@ namespace pflow {
     data=Getabc_angles(str.klattice,DEGREES);
     oss << "volume = " << GetVol(str.klattice) << endl;
     oss << "a,b,c,alpha,beta,gamma = "
-        << str.scale*data(1) << " " << str.scale*data(2) << " " << str.scale*data(3) << " "
-        << data(4) << " " << data(5) << " " << data(6) << endl;
+      << str.scale*data(1) << " " << str.scale*data(2) << " " << str.scale*data(3) << " "
+      << data(4) << " " << data(5) << " " << data(6) << endl;
     oss << "K-Lattice =" << endl;
     oss << str.klattice << endl;
     oss << endl;
@@ -1763,9 +1764,9 @@ namespace pflow {
         pos=a.cpos;
       }
       oss << "   " << setw(9) << setprecision(4) << pos(1)
-          << setw(9) << setprecision(4) << pos(2)
-          << setw(9) << setprecision(4) << pos(3)
-          << endl;
+        << setw(9) << setprecision(4) << pos(2)
+        << setw(9) << setprecision(4) << pos(3)
+        << endl;
 
       for(uint in=1;in<neigh_mat.at(ia).size();in++) {
         _atom an = neigh_mat.at(ia).at(in);
@@ -1832,10 +1833,10 @@ namespace pflow {
         pos=a.cpos;
       }
       oss << "   "
-          << setw(9+xtra) << setprecision(4+xtra) << pos(1)
-          << setw(9+xtra) << setprecision(4+xtra) << pos(2)
-          << setw(9+xtra) << setprecision(4+xtra) << pos(3)
-          << endl;
+        << setw(9+xtra) << setprecision(4+xtra) << pos(1)
+        << setw(9+xtra) << setprecision(4+xtra) << pos(2)
+        << setw(9+xtra) << setprecision(4+xtra) << pos(3)
+        << endl;
 
       for(uint in=1;in<neigh_mat.at(ia).size();in++) {
         xvector<int> ijk(3);ijk=neigh_mat.at(ia).at(in).ijk;
@@ -1861,8 +1862,8 @@ namespace pflow {
 // Dane Morgan - Stefano Curtarolo
 namespace pflow {
   void PrintEwald(const xstructure& in_str, double& epoint,
-                  double& ereal, double& erecip, double& eewald,
-                  double& eta, const double& SUMTOL, ostream& oss) {
+      double& ereal, double& erecip, double& eewald,
+      double& eta, const double& SUMTOL, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintEwald: BEGIN" << endl;
     oss.setf(std::ios::left, std::ios::adjustfield);
@@ -1883,29 +1884,29 @@ namespace pflow {
     oss << "SUMTOL is the following percentage of your total Ewald energy: " << std::setiosflags(std::ios::scientific) << 100*SUMTOL/eewald << endl;
     oss.setf(std::ios::fixed, std::ios::floatfield);
     oss << "                         "
-        << setw(wid) << "Total(eV)"
-        << setw(wid) << "Per atom(eV)"
-        << setw(wid) << "Total(NoUnit)" << endl;
+      << setw(wid) << "Total(eV)"
+      << setw(wid) << "Per atom(eV)"
+      << setw(wid) << "Total(NoUnit)" << endl;
     oss << "Point Energy:            "
-        << " " << setw(wid) << setprecision(prec) << epoint
-        << " " << setw(wid) << setprecision(prec) << epoint/nat
-        << " " << setw(wid) << setprecision(prec) << eV2NoUnit*epoint
-        << endl;
+      << " " << setw(wid) << setprecision(prec) << epoint
+      << " " << setw(wid) << setprecision(prec) << epoint/nat
+      << " " << setw(wid) << setprecision(prec) << eV2NoUnit*epoint
+      << endl;
     oss << "Real Space Energy:       "
-        << " " << setw(wid) << setprecision(prec) << ereal
-        << " " << setw(wid) << setprecision(prec) << ereal/nat
-        << " " << setw(wid) << setprecision(prec) << eV2NoUnit*ereal
-        << endl;
+      << " " << setw(wid) << setprecision(prec) << ereal
+      << " " << setw(wid) << setprecision(prec) << ereal/nat
+      << " " << setw(wid) << setprecision(prec) << eV2NoUnit*ereal
+      << endl;
     oss << "Recipricol Space Energy: "
-        << " " << setw(wid) << setprecision(prec) << erecip
-        << " " << setw(wid) << setprecision(prec) << erecip/nat
-        << " " << setw(wid) << setprecision(prec) << eV2NoUnit*erecip
-        << endl;
+      << " " << setw(wid) << setprecision(prec) << erecip
+      << " " << setw(wid) << setprecision(prec) << erecip/nat
+      << " " << setw(wid) << setprecision(prec) << eV2NoUnit*erecip
+      << endl;
     oss << "Total Ewald Energy:      "
-        << " " << setw(wid) << setprecision(prec) << eewald
-        << " " << setw(wid) << setprecision(prec) << eewald/nat
-        << " " << setw(wid) << setprecision(prec) << eV2NoUnit*eewald
-        << endl;
+      << " " << setw(wid) << setprecision(prec) << eewald
+      << " " << setw(wid) << setprecision(prec) << eewald/nat
+      << " " << setw(wid) << setprecision(prec) << eV2NoUnit*eewald
+      << endl;
   }
 } // namespace pflow
 
@@ -2203,12 +2204,12 @@ void PrintNdata(const xstructure& str, ostream& oss) {
   double normalization=std::pow((double) volume,(double) 1.0/3.0);
 
   printf(" %6.5f %6.5f %6.5f %6.5f %6.5f %6.5f \n",
-         modulus(sstr.lattice(1))/normalization,
-         modulus(sstr.lattice(2))/normalization,
-         modulus(sstr.lattice(3))/normalization,
-         aurostd::angle(sstr.lattice(2,1),sstr.lattice(2,2),sstr.lattice(2,3),sstr.lattice(3,1),sstr.lattice(3,2),sstr.lattice(3,3)),
-         aurostd::angle(sstr.lattice(1,1),sstr.lattice(1,2),sstr.lattice(1,3),sstr.lattice(3,1),sstr.lattice(3,2),sstr.lattice(3,3)),
-         aurostd::angle(sstr.lattice(1,1),sstr.lattice(1,2),sstr.lattice(1,3),sstr.lattice(2,1),sstr.lattice(2,2),sstr.lattice(2,3)));//,volume);
+      modulus(sstr.lattice(1))/normalization,
+      modulus(sstr.lattice(2))/normalization,
+      modulus(sstr.lattice(3))/normalization,
+      aurostd::angle(sstr.lattice(2,1),sstr.lattice(2,2),sstr.lattice(2,3),sstr.lattice(3,1),sstr.lattice(3,2),sstr.lattice(3,3)),
+      aurostd::angle(sstr.lattice(1,1),sstr.lattice(1,2),sstr.lattice(1,3),sstr.lattice(3,1),sstr.lattice(3,2),sstr.lattice(3,3)),
+      aurostd::angle(sstr.lattice(1,1),sstr.lattice(1,2),sstr.lattice(1,3),sstr.lattice(2,1),sstr.lattice(2,2),sstr.lattice(2,3)));//,volume);
 }
 
 // ***************************************************************************
@@ -2258,12 +2259,12 @@ void PrintPDB(const xstructure& str, ostream& oss) {
   xvector<double> data(6);
   data=Getabc_angles(sstr.lattice,DEGREES);//  no need to rescale
   oss << "CRYST1" << setw(9) << data(1)
-      << setw(9) << data(2)
-      << setw(9) << data(3);
+    << setw(9) << data(2)
+    << setw(9) << data(3);
   oss.precision(2);
   oss << setw(7) << data(4)
-      << setw(7) << data(5)
-      << setw(7) << data(6);
+    << setw(7) << data(5)
+    << setw(7) << data(6);
   // Output space group - Use P1 for now
   oss << setw(11) << "P1" << endl;
   // oss << "              P1" << endl;
@@ -2271,12 +2272,12 @@ void PrintPDB(const xstructure& str, ostream& oss) {
   oss.precision(3);
   for(uint i=0;i<sstr.atoms.size();i++) {
     oss << "ATOM  " << setw(5) << i+1 << setw(4) << sstr.atoms.at(i).cleanname.c_str()
-        << " " << "MOL" << " H" << setw(4) << 0 << " " << "   "
-        << setw(8) << sstr.atoms.at(i).cpos(1)
-        << setw(8) << sstr.atoms.at(i).cpos(2)
-        << setw(8) << sstr.atoms.at(i).cpos(3)
-        << "  1.00" << "  0.00"
-        << setw(12) << sstr.atoms.at(i).cleanname.c_str() << "0" << endl;
+      << " " << "MOL" << " H" << setw(4) << 0 << " " << "   "
+      << setw(8) << sstr.atoms.at(i).cpos(1)
+      << setw(8) << sstr.atoms.at(i).cpos(2)
+      << setw(8) << sstr.atoms.at(i).cpos(3)
+      << "  1.00" << "  0.00"
+      << setw(12) << sstr.atoms.at(i).cleanname.c_str() << "0" << endl;
   }
   oss << "TER" << endl;
 }
@@ -2319,14 +2320,14 @@ void PrintRBAnal(const int& nim, const string& path_flag, ostream& oss) {
   d_from_init=pflow::GetRBDistFromStrI(strvec,strvec[0],path_flag_temp);
   d_from_final=pflow::GetRBDistFromStrI(strvec,strvec[nim+1],path_flag_temp);
   oss << "** Here we calculate with distance method (eE=exact, nN=nearest): "
-      << path_flag_temp << " **" << endl;
+    << path_flag_temp << " **" << endl;
   oss << "Dir    Dist(Cum)   Dist(00)    Dist(END)   Ener" <<endl;  
   for(int im=0;im<nim+2;im++) {
     oss << setprecision(p) << setw(5) << dirvec[im]
-        << "  " << setw(w) << dcum[im]
-        << "  " << setw(w) << d_from_init[im]
-        << "  " << setw(w) << d_from_final[im]
-        << "  " << setw(w) << enervec[im] << endl;
+      << "  " << setw(w) << dcum[im]
+      << "  " << setw(w) << d_from_init[im]
+      << "  " << setw(w) << d_from_final[im]
+      << "  " << setw(w) << enervec[im] << endl;
   }
   // Nearest flag
   path_flag_temp="N";
@@ -2334,20 +2335,20 @@ void PrintRBAnal(const int& nim, const string& path_flag, ostream& oss) {
   d_from_init=pflow::GetRBDistFromStrI(strvec,strvec[0],path_flag_temp);
   d_from_final=pflow::GetRBDistFromStrI(strvec,strvec[nim+1],path_flag_temp);
   oss << "** Here we calculate with distance method (eE=exact, nN=nearest): "
-      << path_flag_temp << " **" << endl;
+    << path_flag_temp << " **" << endl;
   oss << "Dir    Dist(Cum)   Dist(00)    Dist(END)   Ener" <<endl;  
   for(int im=0;im<nim+2;im++) {
     oss << setprecision(p) << setw(5) << dirvec[im]
-        << "  " << setw(w) << dcum[im]
-        << "  " << setw(w) << d_from_init[im]
-        << "  " << setw(w) << d_from_final[im]
-        << "  " << setw(w) << enervec[im] << endl;
+      << "  " << setw(w) << dcum[im]
+      << "  " << setw(w) << d_from_init[im]
+      << "  " << setw(w) << d_from_final[im]
+      << "  " << setw(w) << enervec[im] << endl;
   }
 
   oss << endl;
   oss << "*******  SPLINE FIT *******" << endl;
   oss << "Distance used in spline (eE=exact, nN=nearest): "
-      << path_flag << endl;  
+    << path_flag << endl;  
   oss << endl;
   pflow::PrintSpline(dcum,enervec,DEFAULT_NPT_FOR_SPLINE,oss);
 }  
@@ -2358,8 +2359,8 @@ void PrintRBAnal(const int& nim, const string& path_flag, ostream& oss) {
 // This function prints out the displacement info for 2 POSCAR.
 // Dane Morgan - Stefano Curtarolo
 void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
-                       pflow::matrix<double>& cm, const string& path_flag,
-                       ostream& oss) {
+    pflow::matrix<double>& cm, const string& path_flag,
+    ostream& oss) {
   oss << "*******  BEGIN:  Structure 2 - Structure 1  *******" << endl;
   oss << diffstr;
   oss << "*******  END:  Structure 2 - Structure 1  *******" << endl;
@@ -2379,12 +2380,12 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
 // This function prints out the RDF information.
 // Dane Morgan - Stefano Curtarolo
 void PrintRDF(const xstructure& str, const double& rmax,
-              const int& nbins,
-              const int& smooth_width,
-              const pflow::matrix<double>& rdf_all,
-              pflow::matrix<double>& rdfsh_all,
-              pflow::matrix<double>& rdfsh_loc,
-              ostream& oss) {
+    const int& nbins,
+    const int& smooth_width,
+    const pflow::matrix<double>& rdf_all,
+    pflow::matrix<double>& rdfsh_all,
+    pflow::matrix<double>& rdfsh_loc,
+    ostream& oss) {
   int natoms=str.atoms.size();
   //  vector<int> types=str.GetTypes();
   //  vector<int> num_each_type=str.GetNumEachType();
@@ -2475,12 +2476,12 @@ void PrintRDF(const xstructure& str, const double& rmax,
 // This function prints out the RDF shells comparison information.
 // Dane Morgan - Stefano Curtarolo
 void PrintRDFCmp(const xstructure& str_A, const xstructure& str_B,
-                 const double& rmax, const int nbins,
-                 const double& smooth_width,const int nsh,
-                 const pflow::matrix<double>& rdfsh_all_A,
-                 const pflow::matrix<double>& rdfsh_all_B,
-                 const vector<int>& best_match,
-                 const pflow::matrix<double>& rms_mat, ostream& oss) {
+    const double& rmax, const int nbins,
+    const double& smooth_width,const int nsh,
+    const pflow::matrix<double>& rdfsh_all_A,
+    const pflow::matrix<double>& rdfsh_all_B,
+    const vector<int>& best_match,
+    const pflow::matrix<double>& rms_mat, ostream& oss) {
   int nat=str_A.atoms.size();   if(str_B.atoms.size()) {;} // phony to keep str_B busy
   std::deque<int> num_each_type=str_A.num_each_type;
   int nt=num_each_type.size();
@@ -2522,7 +2523,7 @@ void PrintRDFCmp(const xstructure& str_A, const xstructure& str_B,
     int iB=best_match[iA];
     rms_tot+=rms_mat[iA][iB];
     oss << "A atom / Best matching B atom / RMS: "
-        << iA+1 << " " << iB+1 << " " << rms_mat[iA][iB] << endl;
+      << iA+1 << " " << iB+1 << " " << rms_mat[iA][iB] << endl;
 
     // Detailed data on the A and B shells
     // Header line
@@ -2586,17 +2587,17 @@ void PrintRDFCmp(const xstructure& str_A, const xstructure& str_B,
 // Wahyu Setyawan
 void PrintRSM(const xstructure& str, ostream& oss) {
   string atName[]={"H    ","He   ","Li   ","Be   ","B    ","C    ","N    ","O    ","F    ","Ne   ",
-                   "Na   ","Mg   ","Al   ","Si   ","P    ","S    ","Cl   ","Ar   ","K    ","Ca   ",
-                   "Sc   ","Ti   ","V    ","Cr   ","Mn   ","Fe   ","Co   ","Ni   ","Cu   ","Zn   ",
-                   "Ga   ","Ge   ","As   ","Se   ","Br   ","Kr   ","Rb   ","Sr   ","Y    ","Zr   ",
-                   "Nb   ","Mo   ","Tc   ","Ru   ","Rh   ","Pd   ","Ag   ","Cd   ","In   ","Sn   ",
-                   "Sb   ","Te   ","I    ","Xe   ","Cs   ","Ba   ","La   ","Ce   ","Pr   ","Nd   ",
-                   "Pm   ","Sm   ","Eu   ","Gd   ","Tb   ","Dy   ","Ho   ","Er   ","Tm   ","Yb   ",
-                   "Lu   ","Hf   ","Ta   ","W    ","Re   ","Os   ","Ir   ","Pt   ","Au   ","Hg   ",
-                   "Tl   ","Pb   ","Bi   ","Po   ","At   ","Rn   ","Fr   ","Ra   ","Ac   ","Th   ",
-                   "Pa   ","U    ","Np   ","Pu   ","Am   ","Cm   ","Bk   ","Cf   ","Es   ","Fm   "};
+    "Na   ","Mg   ","Al   ","Si   ","P    ","S    ","Cl   ","Ar   ","K    ","Ca   ",
+    "Sc   ","Ti   ","V    ","Cr   ","Mn   ","Fe   ","Co   ","Ni   ","Cu   ","Zn   ",
+    "Ga   ","Ge   ","As   ","Se   ","Br   ","Kr   ","Rb   ","Sr   ","Y    ","Zr   ",
+    "Nb   ","Mo   ","Tc   ","Ru   ","Rh   ","Pd   ","Ag   ","Cd   ","In   ","Sn   ",
+    "Sb   ","Te   ","I    ","Xe   ","Cs   ","Ba   ","La   ","Ce   ","Pr   ","Nd   ",
+    "Pm   ","Sm   ","Eu   ","Gd   ","Tb   ","Dy   ","Ho   ","Er   ","Tm   ","Yb   ",
+    "Lu   ","Hf   ","Ta   ","W    ","Re   ","Os   ","Ir   ","Pt   ","Au   ","Hg   ",
+    "Tl   ","Pb   ","Bi   ","Po   ","At   ","Rn   ","Fr   ","Ra   ","Ac   ","Th   ",
+    "Pa   ","U    ","Np   ","Pu   ","Am   ","Cm   ","Bk   ","Cf   ","Es   ","Fm   "};
   oss<<"#Title"<<endl
-     <<"#23456#8901##4567#9012#456#890#2345678#0123456#8901234#67890#23456789"<<endl;
+    <<"#23456#8901##4567#9012#456#890#2345678#0123456#8901234#67890#23456789"<<endl;
   int num_atoms;
   num_atoms=0;
   for(uint i=0;i<str.num_each_type.size();i++)
@@ -2605,15 +2606,15 @@ void PrintRSM(const xstructure& str, ostream& oss) {
   oss.setf(std::ios::fixed);
   for(int i=0;i<num_atoms;i++) {
     oss<<"ATOM  "
-       <<setw(5)<<i+9
-       <<" "
-       <<atName[-1+str.atoms.at(i).type]
-       <<"UNK  "
-       <<setw(4)<<str.atoms.at(i).type
-       <<"    "
-       <<setprecision(3)<<setw(8)<<str.scale*str.atoms.at(i).cpos(1)
-       <<setprecision(3)<<setw(8)<<str.scale*str.atoms.at(i).cpos(2)
-       <<setprecision(3)<<setw(8)<<str.scale*str.atoms.at(i).cpos(3)<<endl;
+      <<setw(5)<<i+9
+      <<" "
+      <<atName[-1+str.atoms.at(i).type]
+      <<"UNK  "
+      <<setw(4)<<str.atoms.at(i).type
+      <<"    "
+      <<setprecision(3)<<setw(8)<<str.scale*str.atoms.at(i).cpos(1)
+      <<setprecision(3)<<setw(8)<<str.scale*str.atoms.at(i).cpos(2)
+      <<setprecision(3)<<setw(8)<<str.scale*str.atoms.at(i).cpos(3)<<endl;
     //        fprintf(fid,'%6s%5d%1s%5s%5s %3d%4s%8.4f%8.4f%8.4f\n', ...^M
     //            'ATOM  ',ptr+8,' ',atName((label(i)-1)*5+1:label(i)*5),'UNK  ',label(i),'    ',x,y,z);^M
   }
@@ -2623,25 +2624,25 @@ void PrintRSM(const xstructure& str, ostream& oss) {
   double latt3[3]={str.scale*str.lattice(3,1),str.scale*str.lattice(3,2),str.scale*str.lattice(3,3)};
 
   double cellframe[8][3]={{0,0,0},
-                          {latt1[0],latt1[1],latt1[2]}, //latt(1,:)
-                          {latt2[0],latt2[1],latt2[2]}, //latt(2,:)
-                          {latt3[0],latt3[1],latt3[2]}, //latt(3,:)
-                          {latt1[0]+latt2[0],latt1[1]+latt2[1],latt1[2]+latt2[2]}, //latt(1,:)+latt(2,:);
-                          {latt1[0]+latt3[0],latt1[1]+latt3[1],latt1[2]+latt3[2]}, //latt(1,:)+latt(3,:);
-                          {latt3[0]+latt2[0],latt3[1]+latt2[1],latt3[2]+latt2[2]}, //latt(3,:)+latt(2,:);
-                          {latt1[0]+latt2[0]+latt3[0],latt1[1]+latt2[1]+latt3[1],latt1[2]+latt2[2]+latt3[2]}};
+    {latt1[0],latt1[1],latt1[2]}, //latt(1,:)
+    {latt2[0],latt2[1],latt2[2]}, //latt(2,:)
+    {latt3[0],latt3[1],latt3[2]}, //latt(3,:)
+    {latt1[0]+latt2[0],latt1[1]+latt2[1],latt1[2]+latt2[2]}, //latt(1,:)+latt(2,:);
+    {latt1[0]+latt3[0],latt1[1]+latt3[1],latt1[2]+latt3[2]}, //latt(1,:)+latt(3,:);
+    {latt3[0]+latt2[0],latt3[1]+latt2[1],latt3[2]+latt2[2]}, //latt(3,:)+latt(2,:);
+    {latt1[0]+latt2[0]+latt3[0],latt1[1]+latt2[1]+latt3[1],latt1[2]+latt2[2]+latt3[2]}};
 
   for(int i=0;i<8;i++) {
     oss<<"ATOM  "
-       <<setw(5)<<i+1
-       <<" "
-       <<"X    "
-       <<"UNK  "
-       <<setw(4)<<0
-       <<"    "
-       <<setprecision(3)<<setw(8)<<cellframe[i][0]
-       <<setprecision(3)<<setw(8)<<cellframe[i][1]
-       <<setprecision(3)<<setw(8)<<cellframe[i][2]<<endl;
+      <<setw(5)<<i+1
+      <<" "
+      <<"X    "
+      <<"UNK  "
+      <<setw(4)<<0
+      <<"    "
+      <<setprecision(3)<<setw(8)<<cellframe[i][0]
+      <<setprecision(3)<<setw(8)<<cellframe[i][1]
+      <<setprecision(3)<<setw(8)<<cellframe[i][2]<<endl;
     //        fprintf(fid,'%6s%5d%1s%5s%5s %3d%4s%8.4f%8.4f%8.4f\n', ...^M
     //            'ATOM  ',i,' ','X    ','UNK  ',0,'    ',x,y,z);^M
   }
@@ -2649,27 +2650,25 @@ void PrintRSM(const xstructure& str, ostream& oss) {
   int lineframe[12][2]={{1,2},  {1,3},  {1,4},  {8,7},  {8,6},  {8,5},  {2,5},  {2,6},  {3,5},  {3,7},  {4,6},  {4,7}};
   for(int i=0;i<12;i++) {
     oss<<"CONECT "
-       <<setw(4)<<lineframe[i][0]
-       <<" "
-       <<setw(4)<<lineframe[i][1]<<endl;
+      <<setw(4)<<lineframe[i][0]
+      <<" "
+      <<setw(4)<<lineframe[i][1]<<endl;
     //    fprintf(fid,'%6s %4d %4d\n','CONECT',lineframe(i,1),lineframe(i,2));^M
   }
 
   oss<<"END"<<endl
-     <<"#!rasmol -rsm file"<<endl
-     <<"load pdb inline"<<endl
-     <<"spacefill 150"<<endl
-     <<"select 0"<<endl
-     <<"spacefill 10"<<endl
-     <<"exit"<<endl;
+    <<"#!rasmol -rsm file"<<endl
+    <<"load pdb inline"<<endl
+    <<"spacefill 150"<<endl
+    <<"select 0"<<endl
+    <<"spacefill 10"<<endl
+    <<"exit"<<endl;
 
-  /*
-    %#23456#8901##4567#9012#456#890#2345678#0123456#8901234#67890#23456789^M
-    %COLO      1 Al   UNK  0001       0.500   0.500   0.000   0.2^M
-    %ATOM      1 Al   UNK  0001       0.000   0.000   0.000^M
-    %ATOM      2 O    UNK  0002       2.000   0.000   0.000^M
-    %CONECTxxxxxyyyyy^M
-  */
+  //%#23456#8901##4567#9012#456#890#2345678#0123456#8901234#67890#23456789^M
+  //%COLO      1 Al   UNK  0001       0.500   0.500   0.000   0.2^M
+  //%ATOM      1 Al   UNK  0001       0.000   0.000   0.000^M
+  //%ATOM      2 O    UNK  0002       2.000   0.000   0.000^M
+  //%CONECTxxxxxyyyyy^M
 }
 
 // DX 8/30/17 - SGDATA
@@ -2679,12 +2678,12 @@ void PrintRSM(const xstructure& str, ostream& oss) {
 // This funtion prints out space group data.
 // David Hicks (DX)
 namespace pflow {
-    bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone, const string& format,bool already_calculated) {
-  double tolerance=SYM::defaultTolerance(str_sg);
-      if(already_calculated){tolerance=str_sg.sym_eps;} // CO 171025
-  bool no_scan=false;
-  int setting=1;
-      return PrintSGData(str_sg,tolerance,oss,no_scan,setting,standalone,format,already_calculated);
+  bool PrintSGData(xstructure& str_sg, ostream& oss, bool standalone, const string& format,bool already_calculated) {
+    double tolerance=SYM::defaultTolerance(str_sg);
+    if(already_calculated){tolerance=str_sg.sym_eps;} // CO 171025
+    bool no_scan=false;
+    int setting=1;
+    return PrintSGData(str_sg,tolerance,oss,no_scan,setting,standalone,format,already_calculated);
   }
 }
 
@@ -2698,7 +2697,7 @@ namespace pflow {
 //DX 20180822 - add xoption - END
 
 namespace pflow {
-    bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { // DX 2/26/18 - added & to tolerance
+  bool PrintSGData(xstructure& str_sg, double& tolerance, ostream& oss_final, aurostd::xoption& vpflow, bool no_scan, const int& setting, bool standalone, const string& format,bool already_calculated) { // DX 2/26/18 - added & to tolerance
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "pflow::PrintSGData: BEGIN" << endl;
     stringstream oss;
@@ -2706,7 +2705,7 @@ namespace pflow {
     // Print out structural data
     oss.setf(std::ios::fixed,std::ios::floatfield);
     // DX TEST str_sg.SpaceGroup_ITC(tolerance);
-      if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} // CO 171025
+    if(!already_calculated){str_sg.SpaceGroup_ITC(tolerance, -1, setting, no_scan);} // CO 171025
     // FORMAT = TXT
     if(format=="txt"){
       oss << "SPACE GROUP OF THE CRYSTAL" << endl;
@@ -2721,12 +2720,12 @@ namespace pflow {
       oss << " Origin                                       = " << roundoff(str_sg.origin_ITC,1e-8) << endl;
       oss << " General Wyckoff position" << endl;
       for(uint i=0;i<str_sg.general_position_ITC.size();i++){
-	oss << "  " << i+1 << " " << str_sg.general_position_ITC[i] << endl;
+        oss << "  " << i+1 << " " << str_sg.general_position_ITC[i] << endl;
       }
       oss << " Representative Wyckoff positions" << endl;
       for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
         if(i>4 && i!=str_sg.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
-	  oss << str_sg.wyccar_ITC[i] << endl;
+          oss << str_sg.wyccar_ITC[i] << endl;
         }
       }
       oss << "WYCCAR" << endl;
@@ -2736,9 +2735,9 @@ namespace pflow {
         wss << str_sg.wyccar_ITC[i] << endl;
       }
       if(str_sg.wyccar_ITC.size()!=0){ //DX 20180526 - skip if fails
-      xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
-      oss << xstr_wyccar << endl;
-    }
+        xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
+        oss << xstr_wyccar << endl;
+      }
     }
     // FORMAT = JSON
     else if(format=="json"){
@@ -2773,7 +2772,7 @@ namespace pflow {
         if(PRINT_NULL){ sscontent_json << "\"space_group_Hall\":null" << eendl;}
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
+
       // space group label (Schoenflies)
       string sg_Schoenflies = GetSpaceGroupSchoenflies(str_sg.space_group_ITC, str_sg.directory); //DX 20180526 - add directory
       if(sg_Schoenflies.size()){
@@ -2782,7 +2781,7 @@ namespace pflow {
         if(PRINT_NULL){ sscontent_json << "\"space_group_Schoenflies\":null" << eendl;}
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
+
       // Laue
       string laue = GetLaueLabel(str_sg.point_group_ITC);
       if(laue.size()){
@@ -2791,7 +2790,7 @@ namespace pflow {
         if(PRINT_NULL){ sscontent_json << "\"Laue\":null" << eendl;}
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
+
       // crystal class
       if(str_sg.point_group_ITC.size()){
         sscontent_json << "\"crystal_class\":\"" << str_sg.point_group_ITC << "\"" << eendl;
@@ -2799,7 +2798,7 @@ namespace pflow {
         if(PRINT_NULL){ sscontent_json << "\"crystal_class\":null" << eendl;}
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
+
       // ITC setting
       if(str_sg.setting_ITC){
         sscontent_json << "\"setting_ITC\":\"" << str_sg.setting_ITC << "\"" << eendl;
@@ -2815,7 +2814,7 @@ namespace pflow {
         if(PRINT_NULL){ sscontent_json << "\"origin_ITC\":null" << eendl;}
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-      
+
       // general Wyckoff position
       if(str_sg.general_position_ITC.size()){
         sscontent_json << "\"general_position_ITC\":[";
@@ -2832,7 +2831,7 @@ namespace pflow {
         if(PRINT_NULL){ sscontent_json << "\"setting_ITC\":null" << eendl;}
       }
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-     
+
       // representative Wyckoff positions
       if(str_sg.wyccar_ITC.size()){
         sscontent_json << "\"Wyckoff_positions\":["<< eendl;
@@ -2889,7 +2888,7 @@ namespace pflow {
         sscontent_json << "]" << eendl;  	    
         vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       }
- 
+
       // WYCCAR
       if(str_sg.wyccar_ITC.size()){
         // convert vector<string> of WYCCAR to xstructure
@@ -2898,7 +2897,7 @@ namespace pflow {
           wss << str_sg.wyccar_ITC[i] << endl;
         }
         xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
-        
+
         sscontent_json << "\"wyccar\":" << xstructure2json(xstr_wyccar) << eendl;
       } else {
         if(PRINT_NULL){ sscontent_json << "\"wyccar\":null" << eendl;}
@@ -3019,8 +3018,8 @@ pflow::matrix<double> GetAngleMat(const xvector<double>& q, const vector<xvector
 // stored, with their neighbors, as atoms in neigh_mat.
 // Dane Morgan - Stefano Curtarolo
 void GetGoodShellPoints(vector<xvector<double> >& points, const xstructure& str,
-                        const int& ns, const double& rmin,const double& rmax,
-                        const string& sname,deque<deque<_atom> >& neigh_mat) {
+    const int& ns, const double& rmin,const double& rmax,
+    const string& sname,deque<deque<_atom> >& neigh_mat) {
   xstructure sstr=str;
   sstr=ReScale(sstr,1.0);
   xmatrix<double> lat(3,3);
@@ -3147,18 +3146,18 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
       a.cpos=F2C(lattice,pt);
       if(sstr.coord_flag==FALSE) { // direct
         oss << setprecision(10) << setw(7) << ia+1 << "(" << newcnt << ")"
-            << "  UAvg "
-            << " " << setw(10) << pt(1)
-            << " " << setw(10) << pt(2)
-            << " " << setw(10) << pt(3) << endl;
+          << "  UAvg "
+          << " " << setw(10) << pt(1)
+          << " " << setw(10) << pt(2)
+          << " " << setw(10) << pt(3) << endl;
       }
       if(sstr.coord_flag==TRUE) { // cart
         xvector<double> cv(3);cv=F2C(lattice,pt);
         oss << setprecision(10) << setw(7) << ia+1 << "(" << newcnt << ")"
-            << "  UAvg "
-            << " " << setw(10) << cv(1)
-            << " " << setw(10) << cv(2)
-            << " " << setw(10) << cv(3) << endl;
+          << "  UAvg "
+          << " " << setw(10) << cv(1)
+          << " " << setw(10) << cv(2)
+          << " " << setw(10) << cv(3) << endl;
       }
 
       // Print out avg position of neighbors.
@@ -3216,16 +3215,16 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
     xvector<double> pt(3);pt=a.fpos;
     if(sstr.coord_flag==FALSE) { // direct
       oss << setprecision(10) << setw(7) << ia+1
-          << " " << setw(10) << pt(1)
-          << " " << setw(10) << pt(2)
-          << " " << setw(10) << pt(3) << endl;
+        << " " << setw(10) << pt(1)
+        << " " << setw(10) << pt(2)
+        << " " << setw(10) << pt(3) << endl;
     }
     if(sstr.coord_flag==TRUE) { // cart
       xvector<double> cv(3);cv=F2C(lattice,pt);
       oss << setprecision(10) << setw(7) << ia+1
-          << " " << setw(10) << cv(1)
-          << " " << setw(10) << cv(2)
-          << " " << setw(10) << cv(3) << endl;
+        << " " << setw(10) << cv(1)
+        << " " << setw(10) << cv(2)
+        << " " << setw(10) << cv(3) << endl;
     }
     for(uint in=1;in<neigh_mat.at(ia).size();in++) {
       _atom an=neigh_mat.at(ia).at(in);
@@ -3287,7 +3286,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
 } // end routine
 
 // void PrintShell(const xstructure& str, const int& ns,const double& rmin,
-// const double& rmax,const string& sname, const int lin_dens) {  
+// const double& rmax,const string& sname, const int lin_dens) {    //[CO200106 - close bracket for indenting]}
 
 // ***************************************************************************
 // PrintSumDOS
@@ -3322,9 +3321,9 @@ void PrintXYZ(const xstructure& a, const xvector<int>& n, ostream& oss) {
       for(int k=0;k<n(3);k++) {
         for(uint iat=0;iat<sstr.atoms.size();iat++) {
           oss << sstr.atoms.at(iat).cleanname << " "
-              << (sstr.atoms.at(iat).cpos(1)+i*sstr.lattice(1,1)+j*sstr.lattice(2,1)+k*sstr.lattice(3,1)) << " "
-              << (sstr.atoms.at(iat).cpos(2)+i*sstr.lattice(1,2)+j*sstr.lattice(2,2)+k*sstr.lattice(3,2)) << " "
-              << (sstr.atoms.at(iat).cpos(3)+i*sstr.lattice(1,3)+j*sstr.lattice(2,3)+k*sstr.lattice(3,3)) << " " << endl;
+            << (sstr.atoms.at(iat).cpos(1)+i*sstr.lattice(1,1)+j*sstr.lattice(2,1)+k*sstr.lattice(3,1)) << " "
+            << (sstr.atoms.at(iat).cpos(2)+i*sstr.lattice(1,2)+j*sstr.lattice(2,2)+k*sstr.lattice(3,2)) << " "
+            << (sstr.atoms.at(iat).cpos(3)+i*sstr.lattice(1,3)+j*sstr.lattice(2,3)+k*sstr.lattice(3,3)) << " " << endl;
         } // iat
       } // k
     } // j
@@ -3363,26 +3362,26 @@ void PrintXYZws(const xstructure& a, ostream& oss) {
     for(int i=-1;i<=1;i++)
       for(int j=-1;j<=1;j++)
         for(int k=-1;k<=1;k++)
-          {
-            rat=sstr.atoms.at(iat).cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
-            projxoo=scalar_product(rat,xoo)/axoo/axoo;
-            projyoo=scalar_product(rat,yoo)/ayoo/ayoo;
-            projzoo=scalar_product(rat,zoo)/azoo/azoo;
-            projxyo=scalar_product(rat,xyo)/axyo/axyo;
-            projxzo=scalar_product(rat,xzo)/axzo/axzo;
-            projyzo=scalar_product(rat,yzo)/ayzo/ayzo;
-            projxyz=scalar_product(rat,xyz)/axyz/axyz;
-            //  if((projxoo>-0.5 && projxoo<=0.5))
-            //  oss << projxoo << " " << projyoo << " " << projzoo << endl;
-            if((projxoo>-0.5 && projxoo<=0.5) &&
-               (projyoo>-0.5 && projyoo<=0.5) &&
-               (projzoo>-0.5 && projzoo<=0.5) &&
-               (projxyo>-0.5 && projxyo<=0.5) &&
-               (projxzo>-0.5 && projxzo<=0.5) &&
-               (projyzo>-0.5 && projyzo<=0.5) &&
-               (projxyz>-0.5 && projxyz<=0.5))
-              oss << sstr.atoms.at(iat).cleanname << " " << rat(1) << " " << rat(2) << " " << rat(3) << " " << endl;
-          }
+        {
+          rat=sstr.atoms.at(iat).cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
+          projxoo=scalar_product(rat,xoo)/axoo/axoo;
+          projyoo=scalar_product(rat,yoo)/ayoo/ayoo;
+          projzoo=scalar_product(rat,zoo)/azoo/azoo;
+          projxyo=scalar_product(rat,xyo)/axyo/axyo;
+          projxzo=scalar_product(rat,xzo)/axzo/axzo;
+          projyzo=scalar_product(rat,yzo)/ayzo/ayzo;
+          projxyz=scalar_product(rat,xyz)/axyz/axyz;
+          //  if((projxoo>-0.5 && projxoo<=0.5))
+          //  oss << projxoo << " " << projyoo << " " << projzoo << endl;
+          if((projxoo>-0.5 && projxoo<=0.5) &&
+              (projyoo>-0.5 && projyoo<=0.5) &&
+              (projzoo>-0.5 && projzoo<=0.5) &&
+              (projxyo>-0.5 && projxyo<=0.5) &&
+              (projxzo>-0.5 && projxzo<=0.5) &&
+              (projyzo>-0.5 && projyzo<=0.5) &&
+              (projxyz>-0.5 && projxyz<=0.5))
+            oss << sstr.atoms.at(iat).cleanname << " " << rat(1) << " " << rat(2) << " " << rat(3) << " " << endl;
+        }
 }
 
 // ***************************************************************************
@@ -3463,7 +3462,7 @@ double CorrectionFactor(const double& th) {
 // ***************************************************************************
 // Dane Morgan - Stefano Curtarolo
 // Updated by Corey Oses 190520
-void PrintXray(const xstructure& str, double lambda, ostream& oss) {  
+void PrintXray(const xstructure& str, double lambda, ostream& oss) {
   oss.setf(std::ios::left, std::ios::adjustfield);
   oss.setf(std::ios::fixed, std::ios::floatfield);
   //  oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -3521,14 +3520,14 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
             theta=asin(term);
             theta=theta*360.0/TWOPI; // rad->degrees
             if(theta>tol) oss
-                            <<setw(w2)<<2.0*theta<<" " // angle
-                            <<setw(w3)<<sf[id]<<" " // sf
-                            <<setw(w1)<<ii0<<" " // h
-                            <<setw(w1)<<ii1<<" " // k
-                            <<setw(w1)<<ii2<<" " // l
-                            <<setw(w2)<<dist[id]<<" " // dist
-                            << "SINGLE"
-                            << endl;
+              <<setw(w2)<<2.0*theta<<" " // angle
+                <<setw(w3)<<sf[id]<<" " // sf
+                <<setw(w1)<<ii0<<" " // h
+                <<setw(w1)<<ii1<<" " // k
+                <<setw(w1)<<ii2<<" " // l
+                <<setw(w2)<<dist[id]<<" " // dist
+                << "SINGLE"
+                << endl;
           } // if term<=1
         } // if dist>0
       } // i2
@@ -3546,17 +3545,17 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
         theta=asin(term);
         theta=theta*360.0/TWOPI; // rad->degrees
         if(theta>tol) oss
-                        <<setw(w2)<<2.0*theta<<" " // angle
-                        <<setw(w3)<<setprecision(2)<<data[i][4]<<setprecision(PREC_DEFAULT)<<" " // sf
-                        <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // % max sf
-                        <<setw(w1)<<(int)data[i][0]<<" " // h
-                        <<setw(w1)<<(int)data[i][1]<<" " // k
-                        <<setw(w1)<<(int)data[i][2]<<" " // l
-                        <<setw(w2)<<data[i][3]<<" " // dist
-                        <<setw(5)<<(int)data[i][5]<<" " // mult.
-                        <<setw(w2)<<CorrectionFactor(theta*TWOPI/360.0)<<" " // correction.
-                        << " GROUP"
-                        << endl;
+          <<setw(w2)<<2.0*theta<<" " // angle
+            <<setw(w3)<<setprecision(2)<<data[i][4]<<setprecision(PREC_DEFAULT)<<" " // sf
+            <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // % max sf
+            <<setw(w1)<<(int)data[i][0]<<" " // h
+            <<setw(w1)<<(int)data[i][1]<<" " // k
+            <<setw(w1)<<(int)data[i][2]<<" " // l
+            <<setw(w2)<<data[i][3]<<" " // dist
+            <<setw(5)<<(int)data[i][5]<<" " // mult.
+            <<setw(w2)<<CorrectionFactor(theta*TWOPI/360.0)<<" " // correction.
+            << " GROUP"
+            << endl;
       } // if term<=1
     } // if dist>0
   } // for
@@ -3574,19 +3573,19 @@ void PrintXray(const xstructure& str, double lambda, ostream& oss) {
         if(theta>tol) {
           // initial 0.
           oss <<setw(w2)<<2.0*theta<<" " // angle
-              <<setw(w2)<<"0"<<" " // sf
-              << "TOPLOT"
-              << endl;
+            <<setw(w2)<<"0"<<" " // sf
+            << "TOPLOT"
+            << endl;
           // true value of sf/intmax.
           oss <<setw(w2)<<2.0*theta<<" " // angle
-              <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // sf
-              << "TOPLOT"
-              << endl;
+            <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // sf
+            << "TOPLOT"
+            << endl;
           // final 0.
           oss <<setw(w2)<<2.0*theta<<" " // angle
-              <<setw(w2)<<"0"<<" " // sf
-              << "TOPLOT"
-              << endl;
+            <<setw(w2)<<"0"<<" " // sf
+            << "TOPLOT"
+            << endl;
           // tpx
         } // if theta<tol
       } // if term<=1

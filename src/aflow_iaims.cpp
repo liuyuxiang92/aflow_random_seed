@@ -383,7 +383,7 @@ namespace KBIN {
         if(atomABC.size()==2 && volumeABC.size()==0) {
           done=TRUE;
           deque<string> atomX;deque<double> volumeX;
-          for(uint isp=0;isp<=1;isp++) {atomX.push_back(atomABC[isp]);volumeX.push_back(GetAtomVolume(atomABC[isp]));}//KBIN::AIMS_PseudoPotential_CleanName(atomABC[isp])));}
+          for(uint isp=0;isp<=1;isp++) {atomX.push_back(atomABC[isp]);volumeX.push_back(GetAtomVolume(atomABC[isp]));} //KBIN::AIMS_PseudoPotential_CleanName(atomABC[isp]))); //CO200106 - patching for auto-indenting
           xaims.str=aflowlib::PrototypeLibraries(FileMESSAGE,label,parameters,atomX,volumeX,-1.0,LIBRARY_MODE_HTQC);
         }
         if(atomABC.size()==2 && volumeABC.size()==1) {
@@ -984,7 +984,7 @@ namespace KBIN {
     FileContent=xaims.CONTROL.str();
     xaims.CONTROL.str(std::string());
     xaims.aopts.flag("FLAG::XAIMS_CONTROL_changed",TRUE);
-    
+
     if(aimsflags.KBIN_AIMS_CONTROL_VERBOSE) xaims.CONTROL << "# Preparing generic control.in" << endl;
 
     // ***************************************************************************
@@ -1053,8 +1053,8 @@ namespace KBIN {
 
 #endif
 
-  // ***************************************************************************
-  // *                                                                         *
-  // *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
-  // *                                                                         *
-  // ***************************************************************************
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2019           *
+// *                                                                         *
+// ***************************************************************************

@@ -496,11 +496,11 @@ void PrintNdata(const xstructure&,ostream& oss=cout);
 void PrintPDB(const xstructure&,ostream& oss=cout);
 void platon2print(xstructure,bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3,ostream& sout);
 void PrintRDF(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const pflow::matrix<double>& rdf_all,
-	      pflow::matrix<double>& rdfsh_all,pflow::matrix<double>& rdfsh_loc,ostream& oss=cout);
+    pflow::matrix<double>& rdfsh_all,pflow::matrix<double>& rdfsh_loc,ostream& oss=cout);
 void PrintRDFCmp(const xstructure& str_A,const xstructure& str_B,const double& rmax,const int nbins,
-		 const double& smooth_width,const int nsh,const pflow::matrix<double>& rdfsh_all_A,
-		 const pflow::matrix<double>& rdfsh_all_B,const vector<int>& best_match,
-		 const pflow::matrix<double>& rms_mat,ostream& oss=cout);
+    const double& smooth_width,const int nsh,const pflow::matrix<double>& rdfsh_all_A,
+    const pflow::matrix<double>& rdfsh_all_B,const vector<int>& best_match,
+    const pflow::matrix<double>& rms_mat,ostream& oss=cout);
 void PrintRSM(const xstructure&,ostream& oss=cout);
 void PrintShell(const xstructure& str,const int& ns,const double& rmin,const double& rmax,const string& sname,const int lin_dens,ostream& oss=cout);
 double CorrectionFactor(const double& th);
@@ -542,22 +542,22 @@ namespace pflow {
   vector<uint> GetXrayPeaks(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_intensity_smooth,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520  //CO190620 - v_peaks_amplitude not needed
   vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth); //CO190520  //CO190620 - v_peaks_amplitude not needed
   void GetXray(const xstructure& str,vector<double>& dist,vector<double>& sf,
-	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
+      vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
   void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,
-        vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
-        vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO190409  //CO190620 - intmax can be grabbed later
+      vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
+      vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO190409  //CO190620 - intmax can be grabbed later
   void GetRDF(xstructure str,const double& rmax,const int& nbins,matrix<double>& rdf_all);
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,
-		    const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
+      const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
   double RdfSh_RMS(const int iaA,const int iaB,const int nsh_max,const int nt,
-		   const pflow::matrix<double>& rdfsh_all_A,const pflow::matrix<double>& rdfsh_all_B);
+      const pflow::matrix<double>& rdfsh_all_A,const pflow::matrix<double>& rdfsh_all_B);
   void CmpRDFShells(const xstructure& str_A,const xstructure& str_B,const pflow::matrix<double>& rdfsh_all_A,
-		    const pflow::matrix<double>& rdfsh_all_B,const int nsh,vector<int>& best_match,
-		    pflow::matrix<double>& rms_mat);
+      const pflow::matrix<double>& rdfsh_all_B,const int nsh,vector<int>& best_match,
+      pflow::matrix<double>& rms_mat);
   pflow::matrix<double> GetSmoothRDF(const pflow::matrix<double>& rdf,const double& sigma);
   void CmpStrDist(xstructure str1,xstructure str2,const double& cutoff,
-		  pflow::matrix<double>& dist1,pflow::matrix<double>& dist2,
-		  pflow::matrix<double>& dist_diff,matrix<double>& dist_diff_n);
+      pflow::matrix<double>& dist1,pflow::matrix<double>& dist2,
+      pflow::matrix<double>& dist_diff,matrix<double>& dist_diff_n);
 }
 
 // aflow_pflow.cpp
@@ -570,27 +570,27 @@ int Sign(const double& x);
 namespace pflow {
   class pdosdata
   {
-  public:
-    // Constructors
-    pdosdata(); // default
-    void PrintParams(ostream& oss, const vector<string>& Ltotnames);
-    void PrintPDOS(ostream& oss, const int& sp);
-    // variables
-    string PDOSinfile;
-    pflow::matrix<int> pdos_at;
-    pflow::matrix<int> pdos_k;
-    pflow::matrix<int> pdos_b;
-    pflow::matrix<int> pdos_lm;
-    pflow::matrix<double> pdos;
-    double emin;
-    double emax;
-    double efermi;
-    double smooth_sigma;
-    int spin;
-    int nlm;
-    int natoms;
-    int print_params;
-    int nbins;
+    public:
+      // Constructors
+      pdosdata(); // default
+      void PrintParams(ostream& oss, const vector<string>& Ltotnames);
+      void PrintPDOS(ostream& oss, const int& sp);
+      // variables
+      string PDOSinfile;
+      pflow::matrix<int> pdos_at;
+      pflow::matrix<int> pdos_k;
+      pflow::matrix<int> pdos_b;
+      pflow::matrix<int> pdos_lm;
+      pflow::matrix<double> pdos;
+      double emin;
+      double emax;
+      double efermi;
+      double smooth_sigma;
+      int spin;
+      int nlm;
+      int natoms;
+      int print_params;
+      int nbins;
   };
 }
 
@@ -599,70 +599,70 @@ namespace pflow {
 namespace pflow {
   class rtparams
   {
-  public:
-    void free();
-    void copy(const rtparams& b);
-    // Constructors
-    rtparams(); // default
-    rtparams(const rtparams& b); // default
-    //Operators
-    const rtparams& operator=(const rtparams& b);
-    // Accessors
-    void Print() const;
-    // variables
-    double resx;
-    double resy;
-    vector<double> viewdir;
-    int viewdir_s;
-    vector<double> updir;
-    int updir_s;
-    double zoom;
-    double aspectratio;
-    double antialiasing;
-    double raydepth;
-    vector<double> center;
-    vector<double> center_guide;
-    int center_s;
-    vector<double> background;
-    pflow::matrix<double> lightcenter;
-    vector<double> lightrad;
-    pflow::matrix<double> lightcolor;
-    // Sphere texture variables (ambient, diffuse, specular, opacity)
-    pflow::matrix<double> sphtex_tex;
-    vector<double> sphtex_tex_def;
-    pflow::matrix<double> sphtex_color;
-    vector<double> sphtex_color_def;
-    pflow::matrix<double> sphtex_phong;
-    vector<double> sphtex_phong_def;
-    vector<string> sphtex_names;
-    vector<double> sph_rad;
-    // Plane variables
-    int plane;
-    int plane_s;
-    vector<double> plane_center;
-    vector<double> plane_normal;
-    vector<double> plane_color;
-    vector<double> planetex_tex;
-    vector<double> plane_center_def;
-    vector<double> plane_normal_def;
-    vector<double> plane_color_def;
-    vector<double> planetex_tex_def;
-    int plane_center_s;
-    int plane_normal_s;
-    int plane_color_s;
-    int planetex_tex_s;
-    double sph_rad_def;
-    string shading;
-    string outfile;
-    pflow::matrix<double> sc;
-    int sc_s;
-    int calc_type;
-    vector<string> input_files;
-    int first_set;
-    string insert_file;
-    vector<double> rotation;
-    vector<double> struct_origin;
-    int struct_origin_s;
+    public:
+      void free();
+      void copy(const rtparams& b);
+      // Constructors
+      rtparams(); // default
+      rtparams(const rtparams& b); // default
+      //Operators
+      const rtparams& operator=(const rtparams& b);
+      // Accessors
+      void Print() const;
+      // variables
+      double resx;
+      double resy;
+      vector<double> viewdir;
+      int viewdir_s;
+      vector<double> updir;
+      int updir_s;
+      double zoom;
+      double aspectratio;
+      double antialiasing;
+      double raydepth;
+      vector<double> center;
+      vector<double> center_guide;
+      int center_s;
+      vector<double> background;
+      pflow::matrix<double> lightcenter;
+      vector<double> lightrad;
+      pflow::matrix<double> lightcolor;
+      // Sphere texture variables (ambient, diffuse, specular, opacity)
+      pflow::matrix<double> sphtex_tex;
+      vector<double> sphtex_tex_def;
+      pflow::matrix<double> sphtex_color;
+      vector<double> sphtex_color_def;
+      pflow::matrix<double> sphtex_phong;
+      vector<double> sphtex_phong_def;
+      vector<string> sphtex_names;
+      vector<double> sph_rad;
+      // Plane variables
+      int plane;
+      int plane_s;
+      vector<double> plane_center;
+      vector<double> plane_normal;
+      vector<double> plane_color;
+      vector<double> planetex_tex;
+      vector<double> plane_center_def;
+      vector<double> plane_normal_def;
+      vector<double> plane_color_def;
+      vector<double> planetex_tex_def;
+      int plane_center_s;
+      int plane_normal_s;
+      int plane_color_s;
+      int planetex_tex_s;
+      double sph_rad_def;
+      string shading;
+      string outfile;
+      pflow::matrix<double> sc;
+      int sc_s;
+      int calc_type;
+      vector<string> input_files;
+      int first_set;
+      string insert_file;
+      vector<double> rotation;
+      vector<double> struct_origin;
+      int struct_origin_s;
   };
 
   void SetRTParams(xstructure& str, pflow::rtparams& rtp);
@@ -697,55 +697,55 @@ namespace pflow {
 namespace pflow {
   class projdata
   {
-  public:
-    // Constructors
-    projdata(); // default
-    void Print(ostream& outf);
-    // variables
-    int nl_max; // 4 for s,p,d,f orbitals
-    int nlm_max; // 16 for s,p,d,f orbitals
-    int nlmtot_max; // 20 for s,p,d,f orbitals + p,d,f,all totals
-    int nl; // 3 for spd
-    int nlm; // 9 for spd
-    int nlmtot; // 9+Psum+Dsum+Allsum=12 (for spd)
-    int nkpts;
-    int nbands;
-    int nions;
-    int ntypes;
-    vector<int> num_each_type;
-    pflow::matrix<double> wfermi_u;
-    pflow::matrix<double> wfermi_d;
-    vector<double> wkpt;
-    vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_u;
-    vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_d;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_u;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_d;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_u;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_d;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_u;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_d;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_u;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_d;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_l_u;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_l_d;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_u;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_d;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_l_u;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_l_d;
-    pflow::matrix<double> occ_vs_ion_lm_u;
-    pflow::matrix<double> occ_vs_ion_lm_d;
-    pflow::matrix<double> occ_vs_ion_l_u;
-    pflow::matrix<double> occ_vs_ion_l_d;
-    pflow::matrix<double> ener_k_b_u;
-    pflow::matrix<double> ener_k_b_d;
-    int sp;
-    int rspin;
-    pflow::matrix<double> kpts;
-    vector<string> LMnames;
-    vector<string> Lnames;
-    vector<string> LLMnames;
-    string PROOUTinfile;
-    pflow::matrix<double> lat;
+    public:
+      // Constructors
+      projdata(); // default
+      void Print(ostream& outf);
+      // variables
+      int nl_max; // 4 for s,p,d,f orbitals
+      int nlm_max; // 16 for s,p,d,f orbitals
+      int nlmtot_max; // 20 for s,p,d,f orbitals + p,d,f,all totals
+      int nl; // 3 for spd
+      int nlm; // 9 for spd
+      int nlmtot; // 9+Psum+Dsum+Allsum=12 (for spd)
+      int nkpts;
+      int nbands;
+      int nions;
+      int ntypes;
+      vector<int> num_each_type;
+      pflow::matrix<double> wfermi_u;
+      pflow::matrix<double> wfermi_d;
+      vector<double> wkpt;
+      vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_u;
+      vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_d;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_u;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_d;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_u;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_d;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_u;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_d;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_u;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_d;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_l_u;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_l_d;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_u;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_d;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_l_u;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_l_d;
+      pflow::matrix<double> occ_vs_ion_lm_u;
+      pflow::matrix<double> occ_vs_ion_lm_d;
+      pflow::matrix<double> occ_vs_ion_l_u;
+      pflow::matrix<double> occ_vs_ion_l_d;
+      pflow::matrix<double> ener_k_b_u;
+      pflow::matrix<double> ener_k_b_d;
+      int sp;
+      int rspin;
+      pflow::matrix<double> kpts;
+      vector<string> LMnames;
+      vector<string> Lnames;
+      vector<string> LLMnames;
+      string PROOUTinfile;
+      pflow::matrix<double> lat;
   };
 }
 
@@ -802,42 +802,42 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist, pflow::matrix
 
 namespace pflow {
   class pd_params {
-  public:
-    string type;
-    double scale;
-    pflow::matrix<double> pts;
-    pflow::matrix<double> dpts;
-    int Nx,Ny;
-    string orig_loc;
-    string ortho;
-    void Print(ostream& outf) const;
+    public:
+      string type;
+      double scale;
+      pflow::matrix<double> pts;
+      pflow::matrix<double> dpts;
+      int Nx,Ny;
+      string orig_loc;
+      string ortho;
+      void Print(ostream& outf) const;
   };
-  
+
   bool ReadCHGCAR(xstructure& str,stringstream& chgcar_header, vector<int>& ngrid, vector<int>& format_dim, vector<double>& chg_tot,
-                  vector<double>& chg_diff, stringstream& chgcar_ss,ostream& oss=cout);
+      vector<double>& chg_diff, stringstream& chgcar_ss,ostream& oss=cout);
   bool ReadChg(xstructure& str,vector<int>& ngrid, vector<double>& chg_tot,
-               vector<double>& chg_diff, istream& chgfile);
+      vector<double>& chg_diff, istream& chgfile);
   void GetChgInt(vector<pflow::matrix<double> >& rad_chg_int, pflow::matrix<double>& vor_chg_int,
-		 xstructure& str,vector<int>& ngrid,vector<double>& chg_tot, vector<double>& chg_diff);
+      xstructure& str,vector<int>& ngrid,vector<double>& chg_tot, vector<double>& chg_diff);
   void ReadPlaneDensParams(const xstructure& str, pd_params& pdp, istream& infile);
   void GetPlaneDens(const pd_params& pdp, vector<double>& dens2d_tot, vector<double>& dens2d_diff,
-		    const xstructure& str, const vector<int>& ngrid,
-		    const vector<double>& chg_tot, const vector<double>& chg_diff);
+      const xstructure& str, const vector<int>& ngrid,
+      const vector<double>& chg_tot, const vector<double>& chg_diff);
   void PrintPlaneDens(const pd_params& pdp, const vector<double>& dens2d_tot,
-		      const vector<double>& dens2d_diff, const xstructure& str);
+      const vector<double>& dens2d_diff, const xstructure& str);
 }
 
 // ---------------------------------------------------------------------------
 // EWALD FUNCS EWALD FUNCS EWALD FUNCS EWALD FUNCS EWALD FUNCS EWALD FUNCS EWA
 namespace pflow {
   void Ewald(const xstructure& in_str,double& epoint,double& ereal,
-	     double& erecip,double& eewald,double& eta,const double& SUMTOL);
+      double& erecip,double& eewald,double& eta,const double& SUMTOL);
   double GetEta(const int& natoms,const double& vol);
   double GetPointEner(const double& rteta,const vector<double>& atchg,const double& vol);
   double GetRecipEner(const double& eta,const vector<double>& atchg,const double& vol,
-		      const pflow::matrix<double>& rlat,const pflow::matrix<double>& fpos,const double& SUMTOL);
+      const pflow::matrix<double>& rlat,const pflow::matrix<double>& fpos,const double& SUMTOL);
   double GetRealEner(const double& eta,const vector<double>& atchg,const double& vol,
-		     const pflow::matrix<double>& lat,const pflow::matrix<double>& fpos,const double& SUMTOL);
+      const pflow::matrix<double>& lat,const pflow::matrix<double>& fpos,const double& SUMTOL);
   double GetScreenedESEner(void);
   double ScreenedESEner(const xstructure& in_str,const double& Ks,const double& SUMTOL);
 }

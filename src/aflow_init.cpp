@@ -76,12 +76,12 @@ namespace init {
 
     XHOST.tmpfs=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","/tmp");
     XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
-    
+
     XHOST.user=aurostd::execute2string("whoami");  // AS SOON AS POSSIBLE
     XHOST.home=aurostd::execute2string("cd && pwd");  // AS SOON AS POSSIBLE
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT 180719
     XHOST.POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT 181212
-    
+
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     //  XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
@@ -90,7 +90,7 @@ namespace init {
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);exit(1);}
-  
+
     // IMMEDIATELY GET PIDS
     XHOST.PID=getpid();XHOST.ostrPID.clear();XHOST.ostrPID.str(std::string());XHOST.ostrPID<<XHOST.PID;  // initialize PID ??
     // if(INIT_VERBOSE) oss << aurostd::PaddedPOST("XHOST.ostrPID = ",depth_short) << XHOST.ostrPID.str() << endl;
@@ -114,20 +114,20 @@ namespace init {
       // XHOST.CPU_Model
       aurostd::string2vectorstring(aurostd::execute2string("cat "+CPU_File+" | grep \"model name\""),tokens);
       if(tokens.size()>0) {
-	aurostd::StringSubst(tokens.at(0),": ",":");aurostd::string2tokens(string(tokens.at(0)),tokens,":");
-	if(tokens.size()>1) {
-	  aurostd::StringSubst(tokens.at(1)," ","_");aurostd::StringSubst(tokens.at(1),"__","_");
-	  aurostd::StringSubst(tokens.at(1),"__","_");aurostd::StringSubst(tokens.at(1),"__","_");
-	  XHOST.CPU_Model=tokens.at(1);
-	}
+        aurostd::StringSubst(tokens.at(0),": ",":");aurostd::string2tokens(string(tokens.at(0)),tokens,":");
+        if(tokens.size()>1) {
+          aurostd::StringSubst(tokens.at(1)," ","_");aurostd::StringSubst(tokens.at(1),"__","_");
+          aurostd::StringSubst(tokens.at(1),"__","_");aurostd::StringSubst(tokens.at(1),"__","_");
+          XHOST.CPU_Model=tokens.at(1);
+        }
       }
       // XHOST.CPU_MHz
       aurostd::string2vectorstring(aurostd::execute2string("cat "+CPU_File+" | grep \"cpu MHz\""),tokens);
       if(tokens.size()>0) {
-	aurostd::StringSubst(tokens.at(0),": ",":");aurostd::string2tokens(string(tokens.at(0)),tokens,":");
-	if(tokens.size()>1) {
-	  aurostd::StringSubst(tokens.at(1)," ","_");XHOST.CPU_MHz=aurostd::utype2string(ceil(aurostd::string2utype<double>(tokens.at(1))));
-	}
+        aurostd::StringSubst(tokens.at(0),": ",":");aurostd::string2tokens(string(tokens.at(0)),tokens,":");
+        if(tokens.size()>1) {
+          aurostd::StringSubst(tokens.at(1)," ","_");XHOST.CPU_MHz=aurostd::utype2string(ceil(aurostd::string2utype<double>(tokens.at(1))));
+        }
       }
     }
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [3]" << endl;
@@ -173,7 +173,7 @@ namespace init {
       oss << aurostd::PaddedPOST("RAM_MB = ",depth_short) << XHOST.RAM_MB << " (" << XHOST.RAM_GB << "GB)" << endl;
       oss << aurostd::PaddedPOST("random_seed = ",depth_short) << random_seed << endl;
     }
-   
+
     // NAME and OS
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [6]" << endl;
     static struct utsname os;
@@ -255,7 +255,7 @@ namespace init {
     if(aurostd::substring2bool(XHOST.argv.at(0),"apennsy") || aurostd::substring2bool(XHOST.argv.at(0),"apennsy")) XHOST.progname="apennsy";
     if(INIT_VERBOSE) oss << "--- PROGNAME ------------ " << endl;
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("progname = ",depth_short) << XHOST.progname << endl;
-    
+
     // IP
     // ifconfig | grep inet | grep -v 127 | grep -v inet6
     // GET PROGRAMS
@@ -288,10 +288,10 @@ namespace init {
       string aflow_data="";
       for(uint i=0;i<tokens.size()-1;i++) {aflow_data+=tokens.at(i)+"/";} aflow_data+=string("aflow_data");
       if(aurostd::FileExist(aflow_data)) {
-	XHOST.vcmd.push_back(aflow_data);
-	for(uint i=0;i<XHOST.vcmd.size();i++)
-	  if(aurostd::substring2bool(XHOST.vcmd.at(i),"aflow_data")) 
-	    XHOST.vcmd.at(i)=aflow_data;
+        XHOST.vcmd.push_back(aflow_data);
+        for(uint i=0;i<XHOST.vcmd.size();i++)
+          if(aurostd::substring2bool(XHOST.vcmd.at(i),"aflow_data")) 
+            XHOST.vcmd.at(i)=aflow_data;
       }
     }
     // search for updates and proxies
@@ -354,14 +354,14 @@ namespace init {
     // TEMPERATURE
     XHOST.sensors_allowed=TRUE;
     if(0)  if(XHOST.is_command("sensors")) {
-	init::GetTEMPs();
-	if(INIT_VERBOSE) oss << "XHOST.vTemperatureCore.size()=" << XHOST.vTemperatureCore.size() << endl;
-	if(INIT_VERBOSE && XHOST.vTemperatureCore.size()) {
-	  oss << "--- TEMPERATURES --------------- " << endl;
-	  for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"TEMP(C)=[":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]\n");}
-	  //;if(i<XHOST.vTemperatureCore.size()-1) oss << ","; else oss << "]" << endl;}
-	}
+      init::GetTEMPs();
+      if(INIT_VERBOSE) oss << "XHOST.vTemperatureCore.size()=" << XHOST.vTemperatureCore.size() << endl;
+      if(INIT_VERBOSE && XHOST.vTemperatureCore.size()) {
+        oss << "--- TEMPERATURES --------------- " << endl;
+        for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {oss << (i==0?"TEMP(C)=[":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]\n");}
+        //;if(i<XHOST.vTemperatureCore.size()-1) oss << ","; else oss << "]" << endl; //CO200106 - patching for auto-indenting
       }
+    }
     // QUEUE STUFF
     XHOST.is_PBS=FALSE;
     XHOST.PBS_NUM_PPN=aurostd::getenv2uint("PBS_NUM_PPN");
@@ -473,20 +473,20 @@ namespace init {
     // DEBUG  cerr << "vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl; 
     for(uint i=0;i<vstrs.size();i++) { // oss << vstrs.at(i) << endl;
       if(aurostd::FileExist(vstrs.at(i))) {
-	if(aurostd::substring2bool(vstrs.at(i),"AUID")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_AUID=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	if(aurostd::FileExist(vstrs.at(i)+"/LIB")) {
-	  if(aurostd::substring2bool(vstrs.at(i),"ICSD")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_ICSD=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB0")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB0=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB1")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB1=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB2")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB2=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB3")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB3=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB4")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB4=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB5")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB5=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB6")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB6=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB7")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB7=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB8")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB8=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	  if(aurostd::substring2bool(vstrs.at(i),"LIB9")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB9=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
-	}
+        if(aurostd::substring2bool(vstrs.at(i),"AUID")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_AUID=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+        if(aurostd::FileExist(vstrs.at(i)+"/LIB")) {
+          if(aurostd::substring2bool(vstrs.at(i),"ICSD")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_ICSD=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB0")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB0=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB1")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB1=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB2")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB2=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB3")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB3=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB4")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB4=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB5")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB5=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB6")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB6=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB7")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB7=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB8")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB8=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+          if(aurostd::substring2bool(vstrs.at(i),"LIB9")) {vAFLOW_PROJECTS_DIRECTORIES.push_back(vstrs.at(i)); XHOST_LIBRARY_LIB9=vAFLOW_PROJECTS_DIRECTORIES.size()-1;}
+        }
       }
     }
     // DEBUG cerr << "vAFLOW_PROJECTS_DIRECTORIES.size()=" << vAFLOW_PROJECTS_DIRECTORIES.size() << endl;
@@ -512,48 +512,48 @@ namespace init {
       // 	oss << "Library_CALCULATED_AUID_LIB.size()=" << tokens.size() << endl;
       //       }
       if(XHOST_LIBRARY_ICSD!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_ICSD_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_ICSD_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB0!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB0_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB0_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB1!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB1_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB1_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB2!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB2_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB2_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB3!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB3_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB3_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB4!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB4_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB4_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB5!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB5_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB5_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB6!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB6_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB6_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB7!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB7_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB7_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB8!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB8_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB8_LIB.size()=" << tokens.size() << endl;
       }
       if(XHOST_LIBRARY_LIB9!=LIBRARY_NOTHING) {
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
-	oss << "Library_CALCULATED_LIB9_LIB.size()=" << tokens.size() << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
+        oss << "Library_CALCULATED_LIB9_LIB.size()=" << tokens.size() << endl;
       }
     }
 
@@ -604,9 +604,9 @@ namespace init {
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
-			     aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
-			     aurostd::args2attachedflag(argv,cmds,"--run=") ||
-			     aurostd::args2flag(argv,cmds,"--generate_vasp_from_aflowin|--generate_aflowin_from_vasp"));
+        aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
+        aurostd::args2attachedflag(argv,cmds,"--run=") ||
+        aurostd::args2flag(argv,cmds,"--generate_vasp_from_aflowin|--generate_aflowin_from_vasp"));
     // DX - START
     XHOST.vflag_control.flag("AFLOWIN_SYM",aurostd::args2flag(argv,cmds,"--generate_symmetry|--generate_sym")); // DX
     // DX - END
@@ -616,7 +616,7 @@ namespace init {
 
     // DIRECTORY NEEDS A SPECIAL TREATMENT
     found=FALSE;
-  
+
     string dir_default="./",dir=dir_default;
     found=FALSE;
     if(!found&&(found=aurostd::args2flag(argv,"--DIRECTORY|--directory|--D|--d"))) {dir=aurostd::args2string(argv,"--DIRECTORY|--directory|--D|--d",dir_default);if(INIT_VERBOSE) cerr << "--DIRECTORY " << dir << " " << endl;}
@@ -667,7 +667,7 @@ namespace init {
     if(XHOST.vflag_control.flag("VFILES")) XHOST.vflag_control.push_attached("VFILES",files); 
     if(XHOST.vflag_control.flag("VFILES")) if(INIT_VERBOSE) cerr << "XHOST.vflag_control.flag(\"VFILES\")=[" << XHOST.vflag_control.getattachedscheme("VFILES") << "]" << endl; 
     // exit(0); 
-  
+
     XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"-h|--help"));
     XHOST.vflag_control.flag("AFLOW_EXCEPTIONS", aurostd::args2flag(argv, cmds, "-e|--errors|--exceptions"));  // ME180531
     XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3",aurostd::args2flag(argv,cmds,"-l|--license"));
@@ -693,31 +693,31 @@ namespace init {
     XHOST.vflag_control.flag("README_XAFLOW",aurostd::args2flag(argv,cmds,"--readme=xaflow|--readme_xaflow"));
     XHOST.vflag_control.flag("README_AFLOWRC",aurostd::args2flag(argv,cmds,"--readme=aflowrc|--readme_aflowrc"));
     if(!(XHOST.vflag_control.flag("AFLOW_HELP") || 
-	 XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") ||
-	 XHOST.vflag_control.flag("README_AFLOW") ||
-	 XHOST.vflag_control.flag("README_AFLOW_PFLOW") ||
-	 XHOST.vflag_control.flag("README_FROZSL") ||
-	 XHOST.vflag_control.flag("README_APL") ||
-	 XHOST.vflag_control.flag("README_QHA") ||
-	 XHOST.vflag_control.flag("README_AAPL") ||
-	 XHOST.vflag_control.flag("README_AGL") ||
-	 XHOST.vflag_control.flag("README_AEL") ||
-	 XHOST.vflag_control.flag("README_ANRL") ||
-	 XHOST.vflag_control.flag("README_COMPARE") ||
-	 XHOST.vflag_control.flag("README_GFA") || //CO190401
-	 XHOST.vflag_control.flag("README_SYMMETRY") ||
-	 XHOST.vflag_control.flag("README_CCE") || //CO190620
-	 XHOST.vflag_control.flag("README_CHULL") || //CO19620
-	 XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
-	 XHOST.vflag_control.flag("README_APENNSY") ||
-	 XHOST.vflag_control.flag("README_SCRIPTING") ||
-	 XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME180531
-	 XHOST.vflag_control.flag("README_HTRESOURCES") ||
-	 XHOST.vflag_control.flag("README_XAFLOW") ||
-	 XHOST.vflag_control.flag("README_AFLOWRC") ||
-	 FALSE)){  // CO 180306 - need to catch --readme such that it doesn't interfere with --readme=
-      XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO 180306
-    }
+          XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") ||
+          XHOST.vflag_control.flag("README_AFLOW") ||
+          XHOST.vflag_control.flag("README_AFLOW_PFLOW") ||
+          XHOST.vflag_control.flag("README_FROZSL") ||
+          XHOST.vflag_control.flag("README_APL") ||
+          XHOST.vflag_control.flag("README_QHA") ||
+          XHOST.vflag_control.flag("README_AAPL") ||
+          XHOST.vflag_control.flag("README_AGL") ||
+          XHOST.vflag_control.flag("README_AEL") ||
+          XHOST.vflag_control.flag("README_ANRL") ||
+          XHOST.vflag_control.flag("README_COMPARE") ||
+          XHOST.vflag_control.flag("README_GFA") || //CO190401
+          XHOST.vflag_control.flag("README_SYMMETRY") ||
+          XHOST.vflag_control.flag("README_CCE") || //CO190620
+          XHOST.vflag_control.flag("README_CHULL") || //CO19620
+          XHOST.vflag_control.flag("README_PARTIAL_OCCUPATION") ||
+          XHOST.vflag_control.flag("README_APENNSY") ||
+          XHOST.vflag_control.flag("README_SCRIPTING") ||
+          XHOST.vflag_control.flag("README_EXCEPTIONS") ||  // ME180531
+          XHOST.vflag_control.flag("README_HTRESOURCES") ||
+          XHOST.vflag_control.flag("README_XAFLOW") ||
+          XHOST.vflag_control.flag("README_AFLOWRC") ||
+          FALSE)){  // CO 180306 - need to catch --readme such that it doesn't interfere with --readme=
+            XHOST.vflag_control.flag("AFLOW_HELP",aurostd::args2flag(argv,cmds,"--readme"));  // CO 180306
+          }
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"AFLOW_HELP\")=" << XHOST.vflag_control.flag("AFLOW_HELP") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_AFLOW_LICENSE_GPL3\")=" << XHOST.vflag_control.flag("README_AFLOW_LICENSE_GPL3") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"README_AFLOW\")=" << XHOST.vflag_control.flag("README_AFLOW") << endl;
@@ -837,7 +837,7 @@ namespace init {
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=",""));
     if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME181113
       XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME181113
-      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME 181113
+      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME 181113  //[CO200106 - close bracket for indenting]}
     }
 
     // ME 181103 - set MPI when number of threads is larger than 1
@@ -854,7 +854,7 @@ namespace init {
       XHOST.vflag_control.push_attached("AFLOWLIB_SERVER","aflowlib.duke.edu");
     }
     if(XHOST.vflag_control.flag("AFLOWLIB_SERVER") &&
-       !(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="aflowlib.duke.edu" || XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="materials.duke.edu")) {
+        !(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="aflowlib.duke.edu" || XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")=="materials.duke.edu")) {
       cerr << "ERROR  init::InitMachine: \"--server=\" can be only \"aflowlib.duke.edu\" or \"materials.duke.edu\"" << endl;
       exit(0);
     }
@@ -871,7 +871,7 @@ namespace init {
     XHOST.AFLOW_RUNXflag=!XHOST.AFLOW_MULTIflag && (aurostd::args2attachedflag(XHOST.argv,"--run=") || aurostd::args2attachedflag(XHOST.argv,"-run="));
 
     //   cerr << "init::InitMachine: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
-    
+
     XHOST.AFLOW_RUNXnumber=0;
     XHOST.vflag_pflow.clear(); 
     XHOST.vflag_apennsy.clear(); 
@@ -907,7 +907,7 @@ namespace init {
     //    if(LDEBUG) cout << "OUTREACH OPTIONS: vxscheme.size()=" << XHOST.vflag_control.vxscheme.size() << endl;  OBSOLETE ME 181102
     if(LDEBUG) cout << "OUTREACH OPTIONS: vxsghost.size()=" << XHOST.vflag_control.vxsghost.size() << endl;
     if(LDEBUG) cout << "OUTREACH OPTIONS: argv.size()=" << argv.size() << endl;
-  
+
     // LOADING ANRL WEB
     XHOST.vflag_control.flag("WWW",aurostd::args2flag(argv,cmds,"--www|--web|--php|-www|-web|-php"));
 
@@ -924,13 +924,13 @@ namespace init {
     if(INIT_VERBOSE) exit(0);
     // CHECK CRC
     // aurostd::crc64_main();
-    
+
     // NOW LOAD schema
     init::InitSchema(INIT_VERBOSE);
-    
+
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
-    
+
     return TRUE;
   }
 } // namespace init
@@ -983,18 +983,18 @@ namespace init {
     string aflow_data_path=aurostd::args2attachedstring(XHOST.argv,"--aflow_data_path=",(string) "");
     if(aflow_data_path=="") {
       if(XHOST.hostname=="nietzsche.mems.duke.edu"&&XHOST.user=="auro"&&aurostd::FileExist(XHOST.home+"/work/AFLOW3/aflow_data")) {  // CO, special stefano
-	out=aurostd::execute2string(string(XHOST.home+"/work/AFLOW3/aflow_data")+string(" ")+str2load);
-	if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
-	if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
-	if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
+        out=aurostd::execute2string(string(XHOST.home+"/work/AFLOW3/aflow_data")+string(" ")+str2load);
+        if(LDEBUG) cerr << soliloquy << " FOUND " << XHOST.home << "/work/AFLOW3/aflow_data" << endl;
+        if(LDEBUG) cerr << soliloquy << " out=" << out << endl; 
+        if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << endl; 
       } else {
         if(LDEBUG) {cerr << soliloquy << " issuing command: " << XHOST.command("aflow_data") << " " << str2load << endl;}
-	out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
+        out=aurostd::execute2string(XHOST.command("aflow_data")+" "+str2load);
       }
     } else { // cerr << string(aflow_data_path+"/"+XHOST.command("aflow_data")) << endl;
       out=aurostd::execute2string(aflow_data_path+"/"+XHOST.command("aflow_data")+" "+str2load);
     }
-  
+
     if(LDEBUG) cerr << soliloquy << "  length=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
     //    if(LDEBUG) exit(0);
@@ -1014,10 +1014,10 @@ string vAURL_cutout(string cutout,bool LVERBOSE) {
   for(uint i=0;i<tokens.size();i++) {
     for(uint j=0;j<vvAURL.size();j++) {
       if(aurostd::substring2bool(vvAURL.at(j),tokens.at(i))) {
-	aurostd::StringSubst(vvAURL.at(j),tokens.at(i),"");
-	aurostd::StringSubst(vvAURL.at(j),"aflowlib.duke.edu:","");
-	aurostd::StringSubst(vvAURL.at(j),"materials.duke.edu:","");
-	sss << vvAURL.at(j) << endl;
+        aurostd::StringSubst(vvAURL.at(j),tokens.at(i),"");
+        aurostd::StringSubst(vvAURL.at(j),"aflowlib.duke.edu:","");
+        aurostd::StringSubst(vvAURL.at(j),"materials.duke.edu:","");
+        sss << vvAURL.at(j) << endl;
       }
     }
   }
@@ -1036,9 +1036,9 @@ namespace init {
 
     if(str=="Library_HTQC") { 
       if(XHOST_Library_HTQC.empty()) {
-	return XHOST_Library_HTQC=init::InitLoadString(str,LVERBOSE);
+        return XHOST_Library_HTQC=init::InitLoadString(str,LVERBOSE);
       } else { 
-	return XHOST_Library_HTQC;
+        return XHOST_Library_HTQC;
       }
     } // FIX
     // FILES CALCULATED
@@ -1173,32 +1173,32 @@ namespace init {
 
       // check if available
       if((*vLibrary).empty()) {   // find and LOAD
-	string str2search=str;
-	aurostd::StringSubst(str2search,"Library_ICSD","aflow_library_icsd");
-	(*vLibrary)="";
-	for(uint j=0;j<vAFLOW_LIBRARY_DIRECTORIES.size() && (*vLibrary).empty();j++) {   // cycle through possible directories
-	  FileLibrary=aurostd::CleanFileName(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/"+str2search+".dat");
-	  if(aurostd::FileExist(FileLibrary) && aurostd::FileNotEmpty(FileLibrary)) {
-	    if(LDEBUG || LVERBOSE) cerr << "00000  AFLOW LIBRARY  (" << j << ")  found=" <<  FileLibrary << endl;
-	    if(LDEBUG || LVERBOSE) cerr << "loading... ";
-	    if(LDEBUG || LVERBOSE) cerr.flush();
-	    if(grep=="") {
-	      aurostd::file2string(FileLibrary,(*vLibrary));
-	    } else {
-	      (*vLibrary)=aurostd::execute2string("cat "+FileLibrary+" | grep -E '"+grep+"'");
-	    }
-	    if(LDEBUG || LVERBOSE) cerr << "length=" << (*vLibrary).size();// << " " << endl;
-	    if(LDEBUG || LVERBOSE) cerr.flush();
-	  }
-	} // cycle through possible directories
-	if((*vLibrary).empty()) {
-	  cerr << "WARNING - init::InitGlobalObject: " << str << " not found! " << endl;// exit(0);
-	  return "";
-	}
-	out=(*vLibrary);
+        string str2search=str;
+        aurostd::StringSubst(str2search,"Library_ICSD","aflow_library_icsd");
+        (*vLibrary)="";
+        for(uint j=0;j<vAFLOW_LIBRARY_DIRECTORIES.size() && (*vLibrary).empty();j++) {   // cycle through possible directories
+          FileLibrary=aurostd::CleanFileName(vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/"+str2search+".dat");
+          if(aurostd::FileExist(FileLibrary) && aurostd::FileNotEmpty(FileLibrary)) {
+            if(LDEBUG || LVERBOSE) cerr << "00000  AFLOW LIBRARY  (" << j << ")  found=" <<  FileLibrary << endl;
+            if(LDEBUG || LVERBOSE) cerr << "loading... ";
+            if(LDEBUG || LVERBOSE) cerr.flush();
+            if(grep=="") {
+              aurostd::file2string(FileLibrary,(*vLibrary));
+            } else {
+              (*vLibrary)=aurostd::execute2string("cat "+FileLibrary+" | grep -E '"+grep+"'");
+            }
+            if(LDEBUG || LVERBOSE) cerr << "length=" << (*vLibrary).size();// << " " << endl;
+            if(LDEBUG || LVERBOSE) cerr.flush();
+          }
+        } // cycle through possible directories
+        if((*vLibrary).empty()) {
+          cerr << "WARNING - init::InitGlobalObject: " << str << " not found! " << endl;// exit(0);
+          return "";
+        }
+        out=(*vLibrary);
       }
     } 
-   
+
     if(out=="") {
       //    cerr << "ERROR: init::InitGlobalObject str = " << str << " not found ..." << endl; // exit(0);
     }
@@ -1217,18 +1217,18 @@ namespace init {
     aurostd::StringSubst(str2search,"Library_ICSD","aflow_library_icsd.dat");
     if(str=="Library_ICSD") { 
       if(XHOST_Library_ICSD_ALL.empty()) { 
-	return XHOST_Library_ICSD_ALL=init::InitLoadString(str,LVERBOSE);
+        return XHOST_Library_ICSD_ALL=init::InitLoadString(str,LVERBOSE);
       } else { 
-	return XHOST_Library_ICSD_ALL;
+        return XHOST_Library_ICSD_ALL;
       }
     } // FIX
-  
+
     string FileLibrary,out="";
     for(uint j=0;j<vAFLOW_LIBRARY_DIRECTORIES.size() && out.empty();j++) {   // cycle through possible directories
       FileLibrary=vAFLOW_LIBRARY_DIRECTORIES.at(j)+"/"+str2search;
       if(LDEBUG || LVERBOSE) cerr << "DDDDD  InitLibraryObject: (" << j << ")  " <<  FileLibrary << endl;
       if(aurostd::FileExist(FileLibrary) && aurostd::FileNotEmpty(FileLibrary))
-	out=aurostd::file2string(FileLibrary,out);
+        out=aurostd::file2string(FileLibrary,out);
     } // cycle through possible directories
     if(!out.empty()) {
       if(LDEBUG || LVERBOSE) cerr << "00000  MESSAGE InitLibraryObject: AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl;
@@ -1236,7 +1236,7 @@ namespace init {
       cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") initLibraryObject: AFLOW_LIBRARY not found! " << endl;
       //     exit(0);
     }
- 
+
     return out;
   }
 } // namespace init
@@ -1264,22 +1264,20 @@ namespace init {
     if(lib=="LIB8" || lib=="lib8" ||  lib=="8") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8);
     if(lib=="LIB9" || lib=="lib9" ||  lib=="9") out=vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9);    
     return out;
- 
-    /*
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)" "init::AFLOW_Projects_Directories(\"AUID\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)" "init::AFLOW_Projects_Directories(\"ICSD\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0)" "init::AFLOW_Projects_Directories(\"LIB0\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1)" "init::AFLOW_Projects_Directories(\"LIB1\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)" "init::AFLOW_Projects_Directories(\"LIB2\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)" "init::AFLOW_Projects_Directories(\"LIB3\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)" "init::AFLOW_Projects_Directories(\"LIB4\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5)" "init::AFLOW_Projects_Directories(\"LIB5\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6)" "init::AFLOW_Projects_Directories(\"LIB6\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7)" "init::AFLOW_Projects_Directories(\"LIB7\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8)" "init::AFLOW_Projects_Directories(\"LIB8\")" *cpp
-      subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9)" "init::AFLOW_Projects_Directories(\"LIB9\")" *cpp
-    */
-    
+
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_AUID)" "init::AFLOW_Projects_Directories(\"AUID\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_ICSD)" "init::AFLOW_Projects_Directories(\"ICSD\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB0)" "init::AFLOW_Projects_Directories(\"LIB0\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB1)" "init::AFLOW_Projects_Directories(\"LIB1\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB2)" "init::AFLOW_Projects_Directories(\"LIB2\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB3)" "init::AFLOW_Projects_Directories(\"LIB3\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB4)" "init::AFLOW_Projects_Directories(\"LIB4\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB5)" "init::AFLOW_Projects_Directories(\"LIB5\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB6)" "init::AFLOW_Projects_Directories(\"LIB6\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB7)" "init::AFLOW_Projects_Directories(\"LIB7\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB8)" "init::AFLOW_Projects_Directories(\"LIB8\")" *cpp
+    //subst "vAFLOW_PROJECTS_DIRECTORIES.at(XHOST_LIBRARY_LIB9)" "init::AFLOW_Projects_Directories(\"LIB9\")" *cpp
+
   }
 } // namespace init
 
@@ -1291,7 +1289,7 @@ namespace init {
   uint GetTEMPs(void) {
     pthread_mutex_lock(&mutex_INIT_GetTEMPs);
     // pthread_mutex_unlock(&mutex_INIT_GetTEMPs);
-    
+
     // if(aurostd::execute2string("ps aux | grep sensors | grep -v sensorsd | grep -v grep")!="") LOCAL_is_sensor=FALSE; // must postpone
     XHOST.vTemperatureCore.clear();
     if(XHOST.sensors_allowed) {
@@ -1359,7 +1357,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
   if(LDEBUG) cerr << "AFLOW_getTEMP: warning_beep=" << warning_beep << "   -   AFLOW_CORE_TEMPERATURE_BEEP=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
   if(LDEBUG) cerr << "AFLOW_getTEMP: warning_halt=" << warning_halt << "   -   AFLOW_CORE_TEMPERATURE_HALT=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
   if(WRITE!="") aurostd::RemoveFile(WRITE);
-      
+
   while(init::GetTEMPs()) {
     stringstream oss;
     double Tmax=aurostd::max(XHOST.vTemperatureCore);
@@ -1380,7 +1378,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     if(maxmem<100.0) oss << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",maxmem),4) << " (" << maxmem << ")]";
     if(Tmax>=warning_beep) oss << "  (beep) MAX>" << warning_beep;// << endl;
     if(Tmax>=warning_halt) oss << "  (halt) SHUTDOWN>" << warning_halt;// << endl;
-  
+
     if(WRITE!="") {
       stringstream aus;vector<string> vlines;
       //      if(aurostd::FileExist(WRITE))
@@ -1392,11 +1390,11 @@ uint AFLOW_getTEMP(vector<string> argv) {
       aus << "</head> <!?php print strftime('%c'); ?> <pre>"<<endl;
       aus <<  oss.str() << endl;
       for(uint i=0;i<vlines.size();i++)
-	if(i>4 && i<vlines.size()-1) aus << vlines.at(i) << endl;
+        if(i>4 && i<vlines.size()-1) aus << vlines.at(i) << endl;
       aus << "</pre> </body> </html>"<<endl;
       aurostd::stringstream2file(aus,WRITE);
     }
-  
+
     if(Tmax>=warning_beep) { aurostd::execute(XHOST.command("beep")+" -l 100 -f "+aurostd::utype2string<double>(50*(Tmax-Tzero)));}
     if(Tmax>=warning_halt) {
       aurostd::execute(XHOST.command("beep")+" -f 1000");aurostd::execute(XHOST.command("beep")+" -f 1500");
@@ -1407,7 +1405,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
     //   if(maxmem>0.0 && maxmem<100.0) AFLOW_checkMEMORY("vasp",maxmem);
     //    if(maxmem>0.0 && maxmem<100.0) AFLOW_checkMEMORY("aflow",maxmem);
     // if(maxmem>0.0 && maxmem<100.0) AFLOW_checkMEMORY("clamd",maxmem);
-  
+
     cout << oss.str();// cerr << oss.str();
     oss.str(std::string());
     cout << endl;cout.flush();//cerr << endl;cerr.flush();
@@ -1532,12 +1530,12 @@ double AFLOW_checkMEMORY(string progname,double memory) {
     if(tokens.size()>4) {
       if(aurostd::string2utype<double>(tokens.at(3))>maxmem) maxmem=aurostd::string2utype<double>(tokens.at(3));
       if(memory>0.0 && memory<100.0) {
-	if(aurostd::string2utype<double>(tokens.at(3))>memory) {
-	  command=string(XHOST.command("kill")+" -9 "+tokens.at(1));
-	  aurostd::execute(command);
-	  //	  cerr << endl << "AFLOW_checkMEMORY: killing(" << memory << ") = " << vps.at(i) << endl;
-	  cout << endl << "AFLOW_checkMEMORY [date=" << aflow_get_time_string() << "]: kill(" << tokens.at(3) << ">" << aurostd::utype2string<double>(memory,4) << ") = [" << vps.at(i) << "]" << endl;
-	}
+        if(aurostd::string2utype<double>(tokens.at(3))>memory) {
+          command=string(XHOST.command("kill")+" -9 "+tokens.at(1));
+          aurostd::execute(command);
+          //	  cerr << endl << "AFLOW_checkMEMORY: killing(" << memory << ") = " << vps.at(i) << endl;
+          cout << endl << "AFLOW_checkMEMORY [date=" << aflow_get_time_string() << "]: kill(" << tokens.at(3) << ">" << aurostd::utype2string<double>(memory,4) << ") = [" << vps.at(i) << "]" << endl;
+        }
       }
     }
   }
@@ -1577,7 +1575,8 @@ string Message(string str1,string list2print) {return string(" - "+str1+Message(
 string Message(const _aflags& aflags) {
   string strout=" - [dir="+aflags.Directory+"]"+=Message("user,host,time",_AFLOW_FILE_NAME_);
   if(AFLOW_PTHREADS::FLAG) strout+=" - [thread="+aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER)+"/"+aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS)+"]";
-  return strout;}
+  return strout;
+}
 string Message(const _aflags& aflags,string list2print1,string list2print2) {
   stringstream strout;
   if(!list2print1.empty()) strout << " [dir=" << aflags.Directory << "]" << Message(list2print1);
@@ -1605,7 +1604,7 @@ namespace init {
   bool ErrorOption(ostream &oss,const string& options, const string& routine,vector<string> vusage) {
     vector<string> tokens_options;
     aurostd::string2tokens(options,tokens_options,",");
-     
+
     oss << "ERROR: " << routine << ":" << endl;
     oss << "       Wrong number/type of input parameters! (" << tokens_options.size() << ")" << endl;
     string usage="       Usage: ";
@@ -1654,7 +1653,7 @@ namespace init {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG || INIT_VERBOSE);
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchema: [BEGIN]" << endl;
-   
+
     uint nschema=0;
 
     // schema is CAPITAL, content is not necessarily
@@ -2598,7 +2597,7 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:WYCKOFF_SITE_SYMMETRIES_ORIG","");
     XHOST.vschema.push_attached("SCHEMA::TYPE:WYCKOFF_SITE_SYMMETRIES_ORIG","strings");
     nschema++;
-  
+
     // read them as
     LDEBUG=0; // david/corey put LDEBUG=1 so you seen how they answer
     if(LDEBUG) cerr << "XHOST.vschema.flag(\"SCHEMA::NAME:AEL_BULK_MODULUS_REUSS\")=" << XHOST.vschema.isscheme("SCHEMA::NAME:AEL_BULK_MODULUS_REUSS") << endl; // set or not set
@@ -2613,179 +2612,177 @@ namespace init {
     if(LDEBUG) cerr << "nschema=" << nschema << endl;
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchema: [END]" << endl;
     if(LDEBUG) exit(0);
-    
+
     return nschema;
- 
-    /*
+
     // since david gave me stuff in small letters, I used this to fix the text.. you can use it too if you have a bunch of them
 
-      SchemaFixName("ael_bulk_modulus_reuss","GPa","number");
-      SchemaFixName("ael_bulk_modulus_voigt","GPa","number");
-      SchemaFixName("ael_bulk_modulus_vrh","GPa","number");
-      SchemaFixName("ael_compliance_tensor","","numbers");
-      SchemaFixName("ael_elastic_anisotropy","","number");
-      SchemaFixName("ael_poisson_ratio","","number");
-      SchemaFixName("ael_shear_modulus_reuss","GPa","number");
-      SchemaFixName("ael_shear_modulus_voigt","GPa","number");
-      SchemaFixName("ael_shear_modulus_vrh","GPa","number");
-      SchemaFixName("ael_stiffness_tensor","","numbers");
-      SchemaFixName("aflow_version","","string");
-      SchemaFixName("aflowlib_date","","string");
-      SchemaFixName("aflowlib_version","","string");
-      SchemaFixName("agl_acoustic_debye","K","number");
-      SchemaFixName("agl_bulk_modulus_isothermal_300K","GPa","number");
-      SchemaFixName("agl_bulk_modulus_static_300K","GPa","number");
-      SchemaFixName("agl_debye","K","number");
-      SchemaFixName("agl_gruneisen","","number");
-      SchemaFixName("agl_heat_capacity_Cp_300K","kB/cell","number");
-      SchemaFixName("agl_heat_capacity_Cv_300K","kB/cell","number");
-      SchemaFixName("agl_thermal_conductivity_300K","W/(m K)","number");
-      SchemaFixName("agl_thermal_expansion_300K","K^-1","number");
-      SchemaFixName("auid","","string");
-      SchemaFixName("aurl","","string");
-      SchemaFixName("bader_atomic_volumes","A^3","numbers");
-      SchemaFixName("bader_net_charges","","numbers");
-      SchemaFixName("Bravais_lattice_lattice_system","","string");
-      SchemaFixName("Bravais_lattice_lattice_system_orig","","string");
-      SchemaFixName("Bravais_lattice_lattice_type","","string");
-      SchemaFixName("Bravais_lattice_lattice_type_orig","","string");
-      SchemaFixName("Bravais_lattice_lattice_variation_type","","string");
-      SchemaFixName("Bravais_lattice_lattice_variation_type_orig","","string");
-      SchemaFixName("Bravais_lattice_orig","","string");
-      SchemaFixName("Bravais_lattice_relax","","string");
-      SchemaFixName("Bravais_superlattice_lattice_system","","string");
-      SchemaFixName("Bravais_superlattice_lattice_system_orig","","string");
-      SchemaFixName("Bravais_superlattice_lattice_type","","string");
-      SchemaFixName("Bravais_superlattice_lattice_type_orig","","string");
-      SchemaFixName("Bravais_superlattice_lattice_variation_type","","string");
-      SchemaFixName("Bravais_superlattice_lattice_variation_type_orig","","string");
-      SchemaFixName("calculation_cores","","number");
-      SchemaFixName("calculation_memory","MB","number");
-      SchemaFixName("calculation_time","seconds","number");
-      SchemaFixName("catalog","","string");
-      SchemaFixName("code","","string");
-      SchemaFixName("composition","","numbers");
-      SchemaFixName("compound","","string");
-      SchemaFixName("crystal_class","","string");
-      SchemaFixName("crystal_class_orig","","string");
-      SchemaFixName("crystal_family","","string");
-      SchemaFixName("crystal_family_orig","","string");
-      SchemaFixName("crystal_system","","string");
-      SchemaFixName("crystal_system_orig","","string");
-      SchemaFixName("data_api","","string");
-      SchemaFixName("data_source","","string");
-      SchemaFixName("delta_electronic_energy_convergence","eV","number");
-      SchemaFixName("delta_electronic_energy_threshold","eV","number");
-      SchemaFixName("density","g/cm^3","number");
-      SchemaFixName("dft_type","","string");
-      SchemaFixName("eentropy_atom","eV/atom","number");
-      SchemaFixName("eentropy_cell","eV","number");
-      SchemaFixName("Egap","eV","number");
-      SchemaFixName("Egap_fit","eV","number");
-      SchemaFixName("Egap_type","","string");
-      SchemaFixName("energy_atom","eV/atom","number");
-      SchemaFixName("energy_cell","eV","number");
-      SchemaFixName("energy_cutoff","eV","number");
-      SchemaFixName("enthalpy_atom","eV/atom","number");
-      SchemaFixName("enthalpy_cell","eV","number");
-      SchemaFixName("enthalpy_formation_atom","eV/atom","number");
-      SchemaFixName("enthalpy_formation_cell","eV","number");
-      SchemaFixName("entropic_temperature","K","number");
-      SchemaFixName("files","","strings");
-      SchemaFixName("forces","eV/A","numbers");
-      SchemaFixName("geometry","","numbers");
-      SchemaFixName("geometry_orig","","numbers");
-      SchemaFixName("kpoints","","strings");
-      SchemaFixName("kpoints_bands_nkpts","","number");
-      SchemaFixName("kpoints_bands_path","","strings");
-      SchemaFixName("kpoints_relax","","numbers");
-      SchemaFixName("kpoints_static","","numbers");
-      SchemaFixName("lattice_system_orig","","string");
-      SchemaFixName("lattice_system_relax","","string");
-      SchemaFixName("lattice_variation_orig","","string");
-      SchemaFixName("lattice_variation_relax","","string");
-      SchemaFixName("ldau_j","eV","numbers");
-      SchemaFixName("ldau_l","","numbers");
-      SchemaFixName("ldau_TLUJ","","numbers");
-      SchemaFixName("ldau_type","","number");
-      SchemaFixName("ldau_u","eV","numbers");
-      SchemaFixName("loop","","strings");
-      SchemaFixName("natoms","","number");
-      SchemaFixName("nbondxx","A","numbers");
-      SchemaFixName("node_CPU_Cores","","number");
-      SchemaFixName("node_CPU_MHz","MHz","number");
-      SchemaFixName("node_CPU_Model","","string");
-      SchemaFixName("node_RAM_GB","GB","number");
-      SchemaFixName("nspecies","","number");
-      SchemaFixName("Pearson_symbol_orig","","string");
-      SchemaFixName("Pearson_symbol_relax","","string");
-      SchemaFixName("Pearson_symbol_superlattice","","string");
-      SchemaFixName("Pearson_symbol_superlattice_orig","","string");
-      SchemaFixName("point_group_Hermann_Mauguin","","string");
-      SchemaFixName("point_group_Hermann_Mauguin_orig","","string");
-      SchemaFixName("point_group_orbifold","","string");
-      SchemaFixName("point_group_orbifold_orig","","string");
-      SchemaFixName("point_group_order","","number");
-      SchemaFixName("point_group_order_orig","","number");
-      SchemaFixName("point_group_Schoenflies","","string");
-      SchemaFixName("point_group_Schoenflies_orig","","string");
-      SchemaFixName("point_group_structure","","string");
-      SchemaFixName("point_group_structure_orig","","string");
-      SchemaFixName("point_group_type","","string");
-      SchemaFixName("point_group_type_orig","","string");
-      SchemaFixName("positions_cartesian","A","numbers");
-      SchemaFixName("positions_fractional","","numbers");
-      SchemaFixName("pressure","kbar" ,"number");
-      SchemaFixName("pressure_final","kbar" ,"number");
-      SchemaFixName("pressure_residual","kbar" ,"number");
-      SchemaFixName("Pulay_stress","kbar","number");
-      SchemaFixName("PV_atom","eV/atom","number");
-      SchemaFixName("PV_cell","eV","number");
-      SchemaFixName("prototype","","string");
-      SchemaFixName("reciprocal_geometry","","numbers");
-      SchemaFixName("reciprocal_geometry_orig","","numbers");
-      SchemaFixName("reciprocal_lattice_type","","string");
-      SchemaFixName("reciprocal_lattice_type_orig","","string");
-      SchemaFixName("reciprocal_lattice_variation_type","","string");
-      SchemaFixName("reciprocal_lattice_variation_type_orig","","string");
-      SchemaFixName("reciprocal_volume_cell","A^-3","number");
-      SchemaFixName("reciprocal_volume_cell_orig","A^-3/atom","number");
-      SchemaFixName("scintillation_attenuation_length","cm","number");
-      SchemaFixName("sg","","strings");
-      SchemaFixName("sg2","","strings");
-      SchemaFixName("spacegroup_orig","","number");
-      SchemaFixName("spacegroup_relax","","number");
-      SchemaFixName("species","","strings");
-      SchemaFixName("species_pp","","strings");
-      SchemaFixName("species_pp_ZVAL","","numbers");
-      SchemaFixName("species_pp_version","","strings");
-      SchemaFixName("spinD","uB","numbers");
-      SchemaFixName("spinF","uB","number");
-      SchemaFixName("spin_atom","uB/atom","number");
-      SchemaFixName("spin_cell","uB","number");
-      SchemaFixName("stoichiometry","","numbers");
-      SchemaFixName("stress_tensor","kbar","numbers");
-      SchemaFixName("title","","string");
-      SchemaFixName("valence_cell_iupac","","number");
-      SchemaFixName("valence_cell_std","","number");
-      SchemaFixName("volume_atom","A^3/atom","number");
-      SchemaFixName("volume_cell","A^3","number");
-      SchemaFixName("Wyckoff_letters","","strings");
-      SchemaFixName("Wyckoff_letters_orig","","strings");
-      SchemaFixName("Wyckoff_multiplicities","","numbers");
-      SchemaFixName("Wyckoff_multiplicities_orig","","numbers");
-      SchemaFixName("Wyckoff_site_symmetries","","strings");
-      SchemaFixName("Wyckoff_site_symmetries_orig","","strings");
-    */
+    //SchemaFixName("ael_bulk_modulus_reuss","GPa","number");
+    //SchemaFixName("ael_bulk_modulus_voigt","GPa","number");
+    //SchemaFixName("ael_bulk_modulus_vrh","GPa","number");
+    //SchemaFixName("ael_compliance_tensor","","numbers");
+    //SchemaFixName("ael_elastic_anisotropy","","number");
+    //SchemaFixName("ael_poisson_ratio","","number");
+    //SchemaFixName("ael_shear_modulus_reuss","GPa","number");
+    //SchemaFixName("ael_shear_modulus_voigt","GPa","number");
+    //SchemaFixName("ael_shear_modulus_vrh","GPa","number");
+    //SchemaFixName("ael_stiffness_tensor","","numbers");
+    //SchemaFixName("aflow_version","","string");
+    //SchemaFixName("aflowlib_date","","string");
+    //SchemaFixName("aflowlib_version","","string");
+    //SchemaFixName("agl_acoustic_debye","K","number");
+    //SchemaFixName("agl_bulk_modulus_isothermal_300K","GPa","number");
+    //SchemaFixName("agl_bulk_modulus_static_300K","GPa","number");
+    //SchemaFixName("agl_debye","K","number");
+    //SchemaFixName("agl_gruneisen","","number");
+    //SchemaFixName("agl_heat_capacity_Cp_300K","kB/cell","number");
+    //SchemaFixName("agl_heat_capacity_Cv_300K","kB/cell","number");
+    //SchemaFixName("agl_thermal_conductivity_300K","W/(m K)","number");
+    //SchemaFixName("agl_thermal_expansion_300K","K^-1","number");
+    //SchemaFixName("auid","","string");
+    //SchemaFixName("aurl","","string");
+    //SchemaFixName("bader_atomic_volumes","A^3","numbers");
+    //SchemaFixName("bader_net_charges","","numbers");
+    //SchemaFixName("Bravais_lattice_lattice_system","","string");
+    //SchemaFixName("Bravais_lattice_lattice_system_orig","","string");
+    //SchemaFixName("Bravais_lattice_lattice_type","","string");
+    //SchemaFixName("Bravais_lattice_lattice_type_orig","","string");
+    //SchemaFixName("Bravais_lattice_lattice_variation_type","","string");
+    //SchemaFixName("Bravais_lattice_lattice_variation_type_orig","","string");
+    //SchemaFixName("Bravais_lattice_orig","","string");
+    //SchemaFixName("Bravais_lattice_relax","","string");
+    //SchemaFixName("Bravais_superlattice_lattice_system","","string");
+    //SchemaFixName("Bravais_superlattice_lattice_system_orig","","string");
+    //SchemaFixName("Bravais_superlattice_lattice_type","","string");
+    //SchemaFixName("Bravais_superlattice_lattice_type_orig","","string");
+    //SchemaFixName("Bravais_superlattice_lattice_variation_type","","string");
+    //SchemaFixName("Bravais_superlattice_lattice_variation_type_orig","","string");
+    //SchemaFixName("calculation_cores","","number");
+    //SchemaFixName("calculation_memory","MB","number");
+    //SchemaFixName("calculation_time","seconds","number");
+    //SchemaFixName("catalog","","string");
+    //SchemaFixName("code","","string");
+    //SchemaFixName("composition","","numbers");
+    //SchemaFixName("compound","","string");
+    //SchemaFixName("crystal_class","","string");
+    //SchemaFixName("crystal_class_orig","","string");
+    //SchemaFixName("crystal_family","","string");
+    //SchemaFixName("crystal_family_orig","","string");
+    //SchemaFixName("crystal_system","","string");
+    //SchemaFixName("crystal_system_orig","","string");
+    //SchemaFixName("data_api","","string");
+    //SchemaFixName("data_source","","string");
+    //SchemaFixName("delta_electronic_energy_convergence","eV","number");
+    //SchemaFixName("delta_electronic_energy_threshold","eV","number");
+    //SchemaFixName("density","g/cm^3","number");
+    //SchemaFixName("dft_type","","string");
+    //SchemaFixName("eentropy_atom","eV/atom","number");
+    //SchemaFixName("eentropy_cell","eV","number");
+    //SchemaFixName("Egap","eV","number");
+    //SchemaFixName("Egap_fit","eV","number");
+    //SchemaFixName("Egap_type","","string");
+    //SchemaFixName("energy_atom","eV/atom","number");
+    //SchemaFixName("energy_cell","eV","number");
+    //SchemaFixName("energy_cutoff","eV","number");
+    //SchemaFixName("enthalpy_atom","eV/atom","number");
+    //SchemaFixName("enthalpy_cell","eV","number");
+    //SchemaFixName("enthalpy_formation_atom","eV/atom","number");
+    //SchemaFixName("enthalpy_formation_cell","eV","number");
+    //SchemaFixName("entropic_temperature","K","number");
+    //SchemaFixName("files","","strings");
+    //SchemaFixName("forces","eV/A","numbers");
+    //SchemaFixName("geometry","","numbers");
+    //SchemaFixName("geometry_orig","","numbers");
+    //SchemaFixName("kpoints","","strings");
+    //SchemaFixName("kpoints_bands_nkpts","","number");
+    //SchemaFixName("kpoints_bands_path","","strings");
+    //SchemaFixName("kpoints_relax","","numbers");
+    //SchemaFixName("kpoints_static","","numbers");
+    //SchemaFixName("lattice_system_orig","","string");
+    //SchemaFixName("lattice_system_relax","","string");
+    //SchemaFixName("lattice_variation_orig","","string");
+    //SchemaFixName("lattice_variation_relax","","string");
+    //SchemaFixName("ldau_j","eV","numbers");
+    //SchemaFixName("ldau_l","","numbers");
+    //SchemaFixName("ldau_TLUJ","","numbers");
+    //SchemaFixName("ldau_type","","number");
+    //SchemaFixName("ldau_u","eV","numbers");
+    //SchemaFixName("loop","","strings");
+    //SchemaFixName("natoms","","number");
+    //SchemaFixName("nbondxx","A","numbers");
+    //SchemaFixName("node_CPU_Cores","","number");
+    //SchemaFixName("node_CPU_MHz","MHz","number");
+    //SchemaFixName("node_CPU_Model","","string");
+    //SchemaFixName("node_RAM_GB","GB","number");
+    //SchemaFixName("nspecies","","number");
+    //SchemaFixName("Pearson_symbol_orig","","string");
+    //SchemaFixName("Pearson_symbol_relax","","string");
+    //SchemaFixName("Pearson_symbol_superlattice","","string");
+    //SchemaFixName("Pearson_symbol_superlattice_orig","","string");
+    //SchemaFixName("point_group_Hermann_Mauguin","","string");
+    //SchemaFixName("point_group_Hermann_Mauguin_orig","","string");
+    //SchemaFixName("point_group_orbifold","","string");
+    //SchemaFixName("point_group_orbifold_orig","","string");
+    //SchemaFixName("point_group_order","","number");
+    //SchemaFixName("point_group_order_orig","","number");
+    //SchemaFixName("point_group_Schoenflies","","string");
+    //SchemaFixName("point_group_Schoenflies_orig","","string");
+    //SchemaFixName("point_group_structure","","string");
+    //SchemaFixName("point_group_structure_orig","","string");
+    //SchemaFixName("point_group_type","","string");
+    //SchemaFixName("point_group_type_orig","","string");
+    //SchemaFixName("positions_cartesian","A","numbers");
+    //SchemaFixName("positions_fractional","","numbers");
+    //SchemaFixName("pressure","kbar" ,"number");
+    //SchemaFixName("pressure_final","kbar" ,"number");
+    //SchemaFixName("pressure_residual","kbar" ,"number");
+    //SchemaFixName("Pulay_stress","kbar","number");
+    //SchemaFixName("PV_atom","eV/atom","number");
+    //SchemaFixName("PV_cell","eV","number");
+    //SchemaFixName("prototype","","string");
+    //SchemaFixName("reciprocal_geometry","","numbers");
+    //SchemaFixName("reciprocal_geometry_orig","","numbers");
+    //SchemaFixName("reciprocal_lattice_type","","string");
+    //SchemaFixName("reciprocal_lattice_type_orig","","string");
+    //SchemaFixName("reciprocal_lattice_variation_type","","string");
+    //SchemaFixName("reciprocal_lattice_variation_type_orig","","string");
+    //SchemaFixName("reciprocal_volume_cell","A^-3","number");
+    //SchemaFixName("reciprocal_volume_cell_orig","A^-3/atom","number");
+    //SchemaFixName("scintillation_attenuation_length","cm","number");
+    //SchemaFixName("sg","","strings");
+    //SchemaFixName("sg2","","strings");
+    //SchemaFixName("spacegroup_orig","","number");
+    //SchemaFixName("spacegroup_relax","","number");
+    //SchemaFixName("species","","strings");
+    //SchemaFixName("species_pp","","strings");
+    //SchemaFixName("species_pp_ZVAL","","numbers");
+    //SchemaFixName("species_pp_version","","strings");
+    //SchemaFixName("spinD","uB","numbers");
+    //SchemaFixName("spinF","uB","number");
+    //SchemaFixName("spin_atom","uB/atom","number");
+    //SchemaFixName("spin_cell","uB","number");
+    //SchemaFixName("stoichiometry","","numbers");
+    //SchemaFixName("stress_tensor","kbar","numbers");
+    //SchemaFixName("title","","string");
+    //SchemaFixName("valence_cell_iupac","","number");
+    //SchemaFixName("valence_cell_std","","number");
+    //SchemaFixName("volume_atom","A^3/atom","number");
+    //SchemaFixName("volume_cell","A^3","number");
+    //SchemaFixName("Wyckoff_letters","","strings");
+    //SchemaFixName("Wyckoff_letters_orig","","strings");
+    //SchemaFixName("Wyckoff_multiplicities","","numbers");
+    //SchemaFixName("Wyckoff_multiplicities_orig","","numbers");
+    //SchemaFixName("Wyckoff_site_symmetries","","strings");
+    //SchemaFixName("Wyckoff_site_symmetries_orig","","strings");
   }
 }
 
-  // **************************************************************************
+// **************************************************************************
 
 #endif
 
-  // **************************************************************************
-  // *                                                                        *
-  // *             STEFANO CURTAROLO - Duke University 2003-2019              *
-  // *                                                                        *
-  // **************************************************************************
+// **************************************************************************
+// *                                                                        *
+// *             STEFANO CURTAROLO - Duke University 2003-2019              *
+// *                                                                        *
+// **************************************************************************

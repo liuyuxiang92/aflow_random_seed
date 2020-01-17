@@ -25,8 +25,8 @@
 // the intensity, but DW is appropriate to modulate the scattering factors
 // (see Warren,eq.3.24).
 double DebyeWallerFactor(double theta,
-			 double temp, double debye_temp,
-			 double mass,double lambda) {
+    double temp, double debye_temp,
+    double mass,double lambda) {
   double st=sin(theta);
   double h=PLANCKSCONSTANT_h; //ME181020
   double twoB=h*h*temp*12.0/(mass*KBOLTZ*debye_temp*debye_temp);
@@ -73,16 +73,16 @@ xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,cons
 
   if(LDEBUG) {
     cerr << soliloquy << " lhs=";
-      for(uint i=0;i<lhs.size();i++){
-        cerr << lhs[i] << (i!=lhs.size()-1?", ":"");
-      }
-      cerr << endl;
-    cerr << soliloquy << " rhs=";
-      for(uint i=0;i<rhs.size();i++){
-        cerr << rhs[i] << (i!=rhs.size()-1?", ":"");
-      }
-      cerr << endl;
+    for(uint i=0;i<lhs.size();i++){
+      cerr << lhs[i] << (i!=lhs.size()-1?", ":"");
     }
+    cerr << endl;
+    cerr << soliloquy << " rhs=";
+    for(uint i=0;i<rhs.size();i++){
+      cerr << rhs[i] << (i!=rhs.size()-1?", ":"");
+    }
+    cerr << endl;
+  }
 
   //[OBSOLETE CO 180801]vector<xvector<double> > lhs;
   //[OBSOLETE CO 180801]vector<xvector<double> > rhs;
@@ -102,7 +102,7 @@ xvector<double> balanceChemicalEquation(const vector<xvector<double> >& lhs,cons
   //[OBSOLETE CO 180801]    cerr << endl;
   //[OBSOLETE CO 180801]  }
   //[OBSOLETE CO 180801]} else {lhs=_lhs;rhs=_rhs;}
-  
+
   // needs to organized in the following way
   // [[Mn=2,Cu=1,Fe=0],   //left_hand_side
   // [Mn=0,Cu=5,Fe=3],    //left_hand_side
@@ -177,869 +177,759 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
 }
 
 namespace pflow {
-//CO190321
-//follows procedure outlined in: De Leon et al., PRL 114, 165502 (2015) (supp info)
+  //CO190321
+  //follows procedure outlined in: De Leon et al., PRL 114, 165502 (2015) (supp info)
 #define DEFAULT_SURFACE_LAYERS 3  //See W. Sun and G. Ceder, Surface Science 617 (2013) 53-59, fix/relax these layers of the slab
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  _kflags kflags;
-  _vflags vflags;
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
-  ofstream FileMESSAGE;
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,FileMESSAGE,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  _kflags kflags;
-  _vflags vflags;
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
-}
-void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::GeneralizedStackingFaultEnergyCalculation():";
-  stringstream message;
-  std::streamsize prec = 8;
-  bool check_min_dist=true; //turn off if it gets too slow
-  int count_check_min_dist=0;
-  
-  message << aflow::Banner("BANNER_NORMAL");
-  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
-  if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
- 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - get conventional cell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  if(LDEBUG) {cerr << soliloquy << " get conventional cell" << endl;}
-  
-  xstructure xstr_bulk(xstr_in);
-  double min_dist=xstr_bulk.dist_nn_min;
-  if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr_bulk);}
-  double min_dist_orig=min_dist;
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,oss);
   }
-  
-  bool convert_sconv=true;
-  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){
-      //throw a warning here instead, minimum distance MIGHT change with sconv
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);
-      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
-      min_dist_orig=min_dist;
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ostream& oss){
+    _aflags aflags; aflags.Directory=".";
+    _kflags kflags;
+    _vflags vflags;
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
+  }
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
+  }
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+    ofstream FileMESSAGE;
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,FileMESSAGE,oss);
+  }
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss){
+    _aflags aflags; aflags.Directory=".";
+    _kflags kflags;
+    _vflags vflags;
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return GeneralizedStackingFaultEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::GeneralizedStackingFaultEnergyCalculation():";
+    stringstream message;
+    std::streamsize prec = 8;
+    bool check_min_dist=true; //turn off if it gets too slow
+    int count_check_min_dist=0;
+
+    message << aflow::Banner("BANNER_NORMAL");
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - get conventional cell
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " get conventional cell" << endl;}
+
+    xstructure xstr_bulk(xstr_in);
+    double min_dist=xstr_bulk.dist_nn_min;
+    if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr_bulk);}
+    double min_dist_orig=min_dist;
+    if(check_min_dist){ //sanity check as we rotate structure/atoms
+      min_dist=xstr_bulk.MinDist();
+      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
     }
-  }
-  xstr_bulk.ReScale(1.0);
-  xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
-  xstr_bulk.BringInCell();
-  xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
-  if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
-  //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
-  
-  message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
-  
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - get conventional cell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - get sym info for structure (mostly for FPOSMatch)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  xstructure xstr_sym(xstr_bulk);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
-  pflow::PerformFullSymmetry(xstr_sym);
-  xstr_bulk.dist_nn_min=xstr_sym.dist_nn_min;
-  xstr_bulk.sym_eps=xstr_sym.sym_eps;
-  bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,xstr_bulk.dist_nn_min,xstr_bulk.sym_eps);
-  if(LDEBUG){
-    cerr << soliloquy << " xstr_bulk.dist_nn_min=" << xstr_bulk.dist_nn_min << endl;
-    cerr << soliloquy << " xstr_bulk.sym_eps=" << xstr_bulk.sym_eps << endl;
-    cerr << soliloquy << " skew=" << skew << endl;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - get sym info for structure (mostly for FPOSMatch)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - read flags
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
-  
-  int h_s=1,k_s=1,l_s=0;  //hkl of shear
-  xvector<int> hkl_s,hkl_s_ORIG;
-  double step_size=0.2;   //step size
-  int fixed_layers=DEFAULT_SURFACE_LAYERS;     //number of fixed layers
-  bool spin_off=false;
-  bool partial_dissociation=false;
-
-  vector<string> tokens;
-  aurostd::string2tokens(vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::SHEAR_DIRECTION"),tokens,",");
-  if(tokens.size()==3){
-    h_s=aurostd::string2utype<int>(tokens[0]);
-    k_s=aurostd::string2utype<int>(tokens[1]);
-    l_s=aurostd::string2utype<int>(tokens[2]);
-  }
-  hkl_s[1]=h_s;hkl_s[2]=k_s;hkl_s[3]=l_s;
-  if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
-  hkl_s_ORIG=hkl_s;
-  string step_size_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE"); //step size
-  if(aurostd::isfloat(step_size_string)){
-    double _step_size=aurostd::string2utype<double>(step_size_string);
-    if(_step_size>0.0 && _step_size<1.0){step_size=_step_size;}
-  }
-  string steps_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEPS"); //step size
-  if(aurostd::isfloat(steps_string)){
-    int _steps=aurostd::string2utype<int>(steps_string);
-    if(_steps>0){step_size=1.0/_steps;}
-  }
-  string fixed_layers_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::FIXED_LAYERS");
-  if(aurostd::isfloat(fixed_layers_string)){
-    int _fixed_layers=aurostd::string2utype<int>(fixed_layers_string);
-    if(_fixed_layers>0){fixed_layers=_fixed_layers;}
-  }
-  spin_off=vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::SPIN_OFF");
-  partial_dissociation=vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::PARTIAL_DISSOCIATION");
-
-  std::streamsize prec_original = message.precision(); //original
-  std::ios_base::fmtflags ff_original = message.flags();  //original
-  message.precision(prec);
-  message.unsetf(std::ios_base::floatfield);
-  
-  message << "shear_direction" << hkl_s;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "step_size=" << step_size;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "fixed_layers=" << fixed_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  
-  message.precision(prec_original); //set back
-  message.flags(ff_original); //set back
-
-  aurostd::xoption slab_flags=vpflow; //may modify based on how many layers in unit cell
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - read flags
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create slab
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  xvector<int> hkl_i;
-  int total_layers;
-  xstructure xstr_slab_newbasis;  //xstr_rotated
-  vector<int> sc2pcMap_slab,pc2scMap_slab;
-
-  //create define for rigidrotation vs. slabbasis
-  //convert n_s (fractional) to cartesian then fraction of new basis (S=CB)
-
-  xstructure xstr_slab;
-  xmatrix<double> rotation; //=xstr_slab_newbasis.lattice*inverse(xstr_bulk.lattice); //xstr_slab_newbasis.lattice = rotation * xstr_bulk.lattice
-  //[CO190805 - this does NOT work]if(0){
-  //[CO190805 - this does NOT work]  xstr_slab=slab::CreateSlab_RigidRotation(slab_flags,xstr_bulk,hkl_i,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
-  //[CO190805 - this does NOT work]}else{
-  xstr_slab=slab::CreateSlab_SurfaceLattice(slab_flags,xstr_bulk,hkl_i,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,AUROSTD_MAX_DOUBLE,oss);
-  //[CO190805 - this does NOT work]}
-  //cerr << rotation << endl << endl;
-  //rotation=inverse(xstr_bulk.lattice)*xstr_slab_newbasis.lattice;
-  //cerr << rotation << endl << endl;
-  //exit(0);
-
-  //xmatrix<double> rotation=xstr_slab_newbasis.c2f*xstr_bulk.f2c;  //VERY POWERFUL
-  //xmatrix<double> rotation=trasp(trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_bulk.lattice)));
-  //xmatrix<double> rotation=aurostd::inverse(trasp(xstr_slab_newbasis.lattice*aurostd::inverse(xstr_bulk.lattice)));
-  if(LDEBUG){
-    cerr << soliloquy << " xstr_bulk.lattice=" << endl;cerr << xstr_bulk.lattice << endl;
-    cerr << soliloquy << " xstr_slab_newbasis.lattice=" << endl;cerr << xstr_slab_newbasis.lattice << endl;
-    cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;
-  }
-  
-	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
-  
-  //rotate n_s too
-  //[CO190408 - do rotation last!]bool rotate_shear=false;
-  //[CO190408 - do rotation last!]if(rotate_shear){
-  //[CO190408 - do rotation last!]  n_s=R*n_s;  //CO190322 - don't think this needs to be rotated
-  //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " rotated n_s=" << n_s << endl;}  //CO190322 - don't think this needs to be rotated
-  //[CO190408 - do rotation last!]}
-  //[CO190408 - do rotation last!]//create rotated primitive cell: faster to rotate smaller cell than bigger one
-  //[CO190408 - do rotation last!]xstructure xstr_slab_newbasis(a);
-  //[CO190408 - do rotation last!]if(0){  //try rotating atoms, DOES NOT WORK
-  //[CO190408 - do rotation last!]  _sym_op rot; rot.setUc(R,xstr_bulk.lattice); rot.is_pgroup=true;  //just rotation
-  //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " sym_op=" << endl;cerr << rot << endl;}
-  //[CO190408 - do rotation last!]  if(1){  //try ApplyXstructure(), same as ApplyAtomValidate on all atoms individually
-  //[CO190408 - do rotation last!]    xstr_slab_newbasis=SYM::ApplyXstructure(rot,xstr_bulk,false);  //no incell, we'll figure this out later
-  //[CO190408 - do rotation last!]  } else {  //try ApplyAtomValidate
-  //[CO190408 - do rotation last!]    for(uint i=0;i<xstr_bulk.atoms.size();i++){
-  //[CO190408 - do rotation last!]      if(!SYM::ApplyAtomValidate(xstr_bulk.atoms[i],xstr_slab_newbasis.atoms[i],rot,xstr_bulk,true,false)){
-  //[CO190408 - do rotation last!]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ApplyAtomValidate() failed",_VALUE_ERROR_);
-  //[CO190408 - do rotation last!]      }
-  //[CO190408 - do rotation last!]    }
-  //[CO190408 - do rotation last!]  }
-  //[CO190408 - do rotation last!]} else {  //try rotating lattice, seems to work
-  //[CO190408 - do rotation last!]  //xstr_slab_newbasis.lattice=R * xstr_slab_newbasis.lattice * inverse(R);
-  //[CO190408 - do rotation last!]  xstr_slab_newbasis.lattice=R * xstr_slab_newbasis.lattice;
-  //[CO190408 - do rotation last!]  xstr_slab_newbasis.FixLattices();
-  //[CO190408 - do rotation last!]  const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
-  //[CO190408 - do rotation last!]  for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
-  //[CO190408 - do rotation last!]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
-  //[CO190408 - do rotation last!]}
-  //[CO190408 - do rotation last!]if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis=" << endl;cerr << xstr_slab_newbasis << endl;}
-  //[CO190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
-  //[CO190408 - do rotation last!]  min_dist=xstr_slab_newbasis.MinDist();
-  //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  //[CO190408 - do rotation last!]}
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create slab
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
-  
-  //we need UN-ROTATED lattice here so we can get the right distance
-  xvector<double> n_i=slab::HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
-  xvector<double> n_i_ORIG=n_i;
-  if(LDEBUG) {cerr << soliloquy << " n_i[hkl=" << hkl_i << "]=" << n_i << endl;}
-
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]//n_i and n_s must be perpendicular
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]if(!aurostd::isequal(aurostd::scalar_product(n_i,n_s),0.0,0.1)){
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i(" << n_i << ") is not perpendicular to n_s(" << n_s << ")" << endl;
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i DOT n_s = " << aurostd::scalar_product(n_i,n_s) << endl;
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
-  //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]}
-  
-  //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
-  //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_layers=getDistanceBetweenImages(xstr_bulk.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
-  xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
-  xvector<double> n_s_ORIG=n_s;
-  if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;}
-
-  double angle_ns_unrotated=aurostd::angle(n_i,n_s);
-  if(LDEBUG) {cerr << soliloquy << " angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;}
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - get n_i_rotated and n_s_rotated
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  //rotate n_i and n_s
-  if(LDEBUG) {cerr << soliloquy << " n_i[hkl=" << hkl_i << "](unrotated)=" << n_i << endl;}
-  xvector<double> n_i_rotated=rotation*n_i;n_i_rotated/=aurostd::modulus(n_i_rotated);  //rotate to match structure rotation
-  if(LDEBUG) {cerr << soliloquy << " n_i[hkl=" << hkl_i << "](rotated)  =" << n_i_rotated << endl;}
-  
-  if(!aurostd::isequal(abs(n_i_rotated[3]),1.0)){
-    message << "Rotation unsuccessful, n_i should be aligned along the z-axis" << endl;
-    message << "n_i(rotated)  =" << n_i_rotated << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
-  }
-  
-  if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "](unrotated)=" << n_s << endl;}
-  xvector<double> n_s_rotated=rotation*n_s;n_s_rotated/=aurostd::modulus(n_s_rotated);  //rotate to match structure rotation
-  if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "](rotated)  =" << n_s_rotated << endl;}
-  
-  double angle_ns_rotated=aurostd::angle(n_i_rotated,n_s_rotated);
-  if(LDEBUG) {
-    cerr << soliloquy << " angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;
-    cerr << soliloquy << " angle_ns(rotated)  =" << rad2deg*angle_ns_rotated << endl;
-  }
-
-  if(!aurostd::isequal(angle_ns_unrotated,angle_ns_rotated)){
-    message << "Rotation unsuccessful" << endl;
-    message << "angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;
-    message << "angle_ns(rotated)  =" << rad2deg*angle_ns_rotated << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - get n_i_rotated and n_s_rotated
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - find symmetrically equivalent n_s if necessary
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  if(!partial_dissociation){
-    if(!aurostd::isequal(rad2deg*angle_ns_unrotated,90.0) || aurostd::isequal(n_s_rotated[3],0.0)){ //not sure about partial dissociation
-      message << "Need to find symmetrically equivalent n_s (angle_ns_unrotated(degrees)=" << rad2deg*angle_ns_unrotated << ",n_s(rotated)=" << n_s_rotated << ")";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
-      
-      const vector<_sym_op>& v_pgroups=xstr_sym.pgroup_xtal;
-      vector<xvector<double> > v_n_s_sym,v_n_s_sym_rotated;
-      vector<uint> v_pgs;
-      xvector<double> n_s_sym,n_s_sym_rotated;
-      double angle_nssym_unrotated=0.0;
-      for(uint pg=0;pg<v_pgroups.size();pg++){
-        n_s_sym=v_pgroups[pg].Uc*n_s;
-        angle_nssym_unrotated=aurostd::angle(n_i,n_s_sym);
-        if(aurostd::isequal(rad2deg*angle_nssym_unrotated,90.0)){
-          n_s_sym_rotated=rotation*n_s_sym;
-          if(aurostd::isequal(n_s_sym_rotated[3],0.0)){
-            if(LDEBUG){cerr << soliloquy << " found viable symmetrically equivalent n_s=" << n_s_sym << ", n_s_sym_rotated=" << n_s_sym_rotated << ", pg=" << pg << endl;}
-            v_n_s_sym.push_back(n_s_sym);
-            v_n_s_sym_rotated.push_back(n_s_sym_rotated);
-            v_pgs.push_back(pg);
-          }
-        }
+    bool convert_sconv=true;
+    if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
+    if(check_min_dist){ //sanity check as we rotate structure/atoms
+      min_dist=xstr_bulk.MinDist();
+      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){
+        //throw a warning here instead, minimum distance MIGHT change with sconv
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);
+        message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+        min_dist_orig=min_dist;
       }
-      
-      if(v_n_s_sym.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find any viable symmetrically equivalent n_s",_RUNTIME_ERROR_);}
-
-      //sort the two lists (symmetrically equivalent and rotated variants) by the rotated variants
-      //look for 1 0 0 first, then -1 0 0, then
-      //not absolutely necessary, but it will prevent us from rerunning symmetrically equivalent in the future (directory name)
-      //it's also cleaner
-      xvector<double> xvtmp,xvtmp_rotated;
-      uint uitmp=0;
-      bool swap=false;
-      bool sing_dir_vec_i=false;      //if direction i is single direction vector (prefer these)
-      bool sing_dir_vec_j=false;      //if direction j is single direction vector (prefer these)
-      bool equ_comp_vec_i=false;      //if component 1 and 2 are equivalent (component 3 is 0) (prefer these)
-      bool equ_comp_vec_j=false;      //if component 1 and 2 are equivalent (component 3 is 0) (prefer these)
-      bool components_equ=false;      //if components are equal
-      bool components_equ_abs=false;  //if abs() of components are equal
-      bool j_gt_i_abs=false;          //if abs() of j k-component is greater than abs() of i k-component
-      bool j_gt_i=false;              //if j k-component is greater than i k-component
-      int lrows=n_s.lrows;
-      for(uint i=0;i<v_n_s_sym_rotated.size()-1;i++){
-        for(uint j=i+1;j<v_n_s_sym_rotated.size();j++){
-          if(LDEBUG){cerr << soliloquy << " comparing " << v_n_s_sym_rotated[i] << " with " << v_n_s_sym_rotated[j] << endl;}
-
-          swap=false;
-
-          //first look for single direction vectors (1.0000e+00  0.0000e+00  0.0000e+00 vs 5.0000e-01 -8.6603e-01  0.0000e+00), we prefer these
-          //second look for vectors with equal components (7.0711e-01 -7.0711e-01  0.0000e+00)
-
-          if(swap==false){
-            sing_dir_vec_i=false;
-            sing_dir_vec_j=false;
-            for(int k=v_n_s_sym_rotated[i].lrows;k<=v_n_s_sym_rotated[i].urows;k++){
-              if(aurostd::isequal(abs(v_n_s_sym_rotated[i][k]),1.0)){
-                if(LDEBUG){cerr << soliloquy << " [i] is single direction" << endl;}
-                sing_dir_vec_i=true;
-              }
-              if(aurostd::isequal(abs(v_n_s_sym_rotated[j][k]),1.0)){
-                if(LDEBUG){cerr << soliloquy << " [j] is single direction" << endl;}
-                sing_dir_vec_j=true;
-              }
-            }
-            if(sing_dir_vec_i != sing_dir_vec_j){
-              if(sing_dir_vec_j==true && sing_dir_vec_i==false){swap=true;}
-              else{continue;}
-            }
-          }
-
-          if(swap==false){
-            equ_comp_vec_i=false;
-            equ_comp_vec_j=false;
-            if(aurostd::isequal(abs(v_n_s_sym_rotated[i][lrows]),abs(v_n_s_sym_rotated[i][lrows+1]))){equ_comp_vec_i=true;}
-            if(aurostd::isequal(abs(v_n_s_sym_rotated[j][lrows]),abs(v_n_s_sym_rotated[j][lrows+1]))){equ_comp_vec_j=true;}
-            if(equ_comp_vec_i != equ_comp_vec_j){
-              if(equ_comp_vec_j==true && equ_comp_vec_i==false){swap=true;}
-              //otherwise compare by elements
-            }
-          }
-
-          //finally compare individual components
-          if(swap==false){
-            for(int k=v_n_s_sym_rotated[i].lrows;k<=v_n_s_sym_rotated[i].urows && swap==false;k++){
-              components_equ=aurostd::isequal(v_n_s_sym_rotated[i][k],v_n_s_sym_rotated[j][k]);
-              if(LDEBUG){cerr << soliloquy << " [i][k=" << k << "] ?== [j][k=" << k << "] == " << components_equ << endl;}
-              if(components_equ==false){
-                components_equ_abs=aurostd::isequal(abs(v_n_s_sym_rotated[i][k]),abs(v_n_s_sym_rotated[j][k]));
-                j_gt_i_abs=bool(abs(v_n_s_sym_rotated[j][k])>abs(v_n_s_sym_rotated[i][k]));
-                j_gt_i=bool(v_n_s_sym_rotated[j][k]>v_n_s_sym_rotated[i][k]);
-                if(LDEBUG){
-                  cerr << soliloquy << " abs([i][k=" << k << "]) ?== abs([j][k=" << k << "]) == " << components_equ_abs << endl;
-                  cerr << soliloquy << " abs([j][k=" << k << "]) ?> abs([i][k=" << k << "]) == " << j_gt_i_abs << endl;
-                  cerr << soliloquy << " [j][k=" << k << "] ?> [i][k=" << k << "] == " << j_gt_i << endl;
-                }
-                if( (components_equ_abs==false && j_gt_i_abs==true) || 
-                    (components_equ_abs==true && components_equ==false && j_gt_i==true) ){swap=true;}
-                break;  //very important, comparing 5 with -5
-              }
-            }
-          }
-          if(swap){
-            if(LDEBUG){cerr << soliloquy << " swapping " << v_n_s_sym_rotated[i] << " and " << v_n_s_sym_rotated[j] << endl;}
-            xvtmp=v_n_s_sym[i];
-            xvtmp_rotated=v_n_s_sym_rotated[i];
-            uitmp=v_pgs[i];
-            v_n_s_sym[i]=v_n_s_sym[j];
-            v_n_s_sym_rotated[i]=v_n_s_sym_rotated[j];
-            v_pgs[i]=v_pgs[j];
-            v_n_s_sym[j]=xvtmp;
-            v_n_s_sym_rotated[j]=xvtmp_rotated;
-            v_pgs[j]=uitmp;
-          }
-        }
-      }
-
-      if(LDEBUG){
-        for(uint i=0;i<v_n_s_sym.size();i++){
-          cerr << soliloquy << " v_n_s_sym[i=" << i << "]=" << v_n_s_sym[i] << ", v_n_s_sym_rotated[i=" << i << "]=" << v_n_s_sym_rotated[i] << ", v_pgs[i=" << i << "]="<< v_pgs[i] << endl;
-        }
-      }
-
-      n_s=v_n_s_sym[0];
-      n_s_rotated=v_n_s_sym_rotated[0];
-      
-      
-      //fix hkl_s as well for directory labeling
-      //cannot use n_s, as it is normalized
-      //rotated hkl_s by v_pgroups
-      //rotate in Cartesian coordinates, then convert to fractional
-      xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);  //do not normalize
-      n_s_tmp=v_pgroups[v_pgs[0]].Uc*n_s_tmp; //rotate
-      hkl_s=aurostd::xvectordouble2int(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
-      
-      message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
-      message << "n_s=" << n_s << endl;
-      message << "n_s(rotated)=" << n_s_rotated << endl;
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     }
-  }
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - find symmetrically equivalent n_s if necessary
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    xstr_bulk.ReScale(1.0);
+    xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
+    xstr_bulk.BringInCell();
+    xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
+    if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
+    //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - resolve layers count
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  //d_spacing is based on lattice ONLY, no crystal information
-  //d_layers,d_cells are based on CRYSTAL (lattice + basis)
-  //d_layers finds distance in direction of n_s to next structure image
-  //d_cells makes sure you loop outside cell at least once
-  //d_spacing <= d_layers <= d_cells
-  double d_spacing_i=slab::getSpacingHKLPlane(xstr_bulk,hkl_i); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_i*h_i+k_i*k_i+l_i*l_i);
-  double d_layers_i=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
-  double d_cells_i=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
-  int layers_per_cell_i=(int)(d_cells_i/d_layers_i);  //floor
-  int supercell_layers_i=(total_layers+layers_per_cell_i-1)/layers_per_cell_i;  //ceil //(double)total_layers;
-  if(LDEBUG) {
-    cerr << soliloquy << " n_i[hkl=" << hkl_i << "]=" << n_i << endl;
-    cerr << soliloquy << " d_spacing_i=" << d_spacing_i << endl;
-    cerr << soliloquy << " d_layers_i=" << d_layers_i << endl;
-    cerr << soliloquy << " d_cells_i=" << d_cells_i << endl;
-    cerr << soliloquy << " layers_per_cell_i=" << layers_per_cell_i << endl;
-    cerr << soliloquy << " supercell_layers_i=" << supercell_layers_i << endl;
-  }
-  double d_spacing_s=slab::getSpacingHKLPlane(xstr_bulk,hkl_s); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
-  double d_layers_s=slab::getDistanceBetweenImages(xstr_bulk,n_s,false); //this depends on UN-ROTATED lattice
-  double d_cells_s=slab::getDistanceBetweenImages(xstr_bulk,n_s,true); //go outside cell
-  int layers_per_cell_s=(int)(d_cells_s/d_layers_s);  //floor
-  int supercell_layers_s=(total_layers+layers_per_cell_s-1)/layers_per_cell_s;  //ceil //(double)total_layers;
-  if(LDEBUG) {
-    cerr << soliloquy << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;
-    cerr << soliloquy << " d_spacing_s=" << d_spacing_s << endl;
-    cerr << soliloquy << " d_layers_s=" << d_layers_s << endl;
-    cerr << soliloquy << " d_cells_s=" << d_cells_s << endl;
-    cerr << soliloquy << " layers_per_cell_s=" << layers_per_cell_s << endl;
-    cerr << soliloquy << " supercell_layers_s=" << supercell_layers_s << endl;
-  }
-  //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"layers_per_cell_s<1 (="+aurostd::utype2string(layers_per_cell_s)+")",_INPUT_ERROR_);}
-  //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s>1){  //let's adjust total_layers input to CreateSlab_RigidRotation() which builds supercell assuming layers_per_cell_s==1
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  int total_layers=DEFAULT_TOTAL_LAYERS;
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  if(aurostd::isfloat(total_layers_string)){
-  //[CO190520 - do NOT reduce total_layers based on shear direction]    int _total_layers=aurostd::string2utype<int>(total_layers_string);
-  //[CO190520 - do NOT reduce total_layers based on shear direction]    if(_total_layers>0){total_layers=_total_layers;}
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  }
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  if(LDEBUG){cerr << soliloquy << " total_layers(pre)=" << total_layers << endl;}
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  total_layers=(total_layers+layers_per_cell_s-1)/layers_per_cell_s;  //ceil
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  if(LDEBUG){cerr << soliloquy << " total_layers(post)=" << total_layers << endl;}
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  slab_flags.pop_attached("CREATE_SLAB::TOTAL_LAYERS");
-  //[CO190520 - do NOT reduce total_layers based on shear direction]  slab_flags.push_attached("CREATE_SLAB::TOTAL_LAYERS",aurostd::utype2string(total_layers));
-  //[CO190520 - do NOT reduce total_layers based on shear direction]}
+    message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - resolve layers count
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - rotate n_i and n_s
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //swap for rotated variants, we saved originals already
-  n_i=n_i_rotated;
-  n_s=n_s_rotated;
-  
-  if(!partial_dissociation){
-    //check that there is NO z component to n_s after rotation
-    if(!aurostd::isequal(n_s[3],0.0)){
-      message << "The shear plane and plane of interest are incommensurate" << endl;
-      message << "rotation=" << endl; message << rotation << endl;
-      message << "hkl_i=" << hkl_i << ", n_i(rotated)=" << n_i << endl;
-      message << "hkl_s=" << hkl_s << ", n_s(rotated)=" << n_s << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    if(check_min_dist){ //sanity check as we rotate structure/atoms
+      min_dist=xstr_bulk.MinDist();
+      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
     }
-  }
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - rotate n_i and n_s
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - define half plane
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " defining half plane" << endl;}
-  //[CO190423 - too much work, rely on atom.ijk instead!]
-  //[CO190423 - too much work, rely on atom.ijk instead!]int count_total,count_above,count_below;
-  //[CO190423 - too much work, rely on atom.ijk instead!]count_total=xstr_slab.atoms.size();
-  //[CO190423 - too much work, rely on atom.ijk instead!]count_above=count_total/2;count_below=count_total-count_above;
-  //[CO190423 - too much work, rely on atom.ijk instead!]//count_above=count_below=count_total/2;
-  //[CO190423 - too much work, rely on atom.ijk instead!]//int count_above=0,count_below=0,count_total=xstr_slab.atoms.size();
-  //[CO190423 - too much work, rely on atom.ijk instead!]
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {
-  //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_above=" << count_above << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_below=" << count_below << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_total=" << count_total << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above!=count_below){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above!=count_below";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above+count_below!=count_total){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above+count_below!=count_total";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]
-  //[CO190423 - too much work, rely on atom.ijk instead!]//half-plane is bad idea, too much room for error
-  //[CO190423 - too much work, rely on atom.ijk instead!]////define half plane along c-axis
-  //[CO190423 - too much work, rely on atom.ijk instead!]////normal vector is simply c-axis
-  //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> n_hp=xstr_slab_newbasis_supercell.lattice(3);n_hp/=aurostd::modulus(n_hp); //unit vector
-  //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> p_hp=aurostd::modulus(xstr_slab_newbasis_supercell.lattice(3))/2.0*n_hp; //half plane value
-  //[CO190423 - too much work, rely on atom.ijk instead!]//double D_hp=-aurostd::scalar_product(n_hp,p_hp);
-  //[CO190423 - too much work, rely on atom.ijk instead!]//if(LDEBUG) {
-  //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " n_hp=" << n_hp << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " p_hp=" << p_hp << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " D_hp=" << D_hp << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]//}
-  
-  //[CO190423 - too much work, rely on atom.ijk instead!]//define zero plane along c-axis
-  //[CO190423 - too much work, rely on atom.ijk instead!]//normal vector is simply c-axis
-  //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> n_zp=xstr_slab.lattice(3);n_zp/=aurostd::modulus(n_zp); //unit vector
-  //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> p_zp; //0,0,0
-  //[CO190423 - too much work, rely on atom.ijk instead!]double D_zp=-aurostd::scalar_product(n_zp,p_zp);
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {
-  //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " n_zp=" << n_zp << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " p_zp=" << p_zp << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " D_zp=" << D_zp << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - define half plane
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - identify selective dynamics
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " identifying selective dynamics" << endl;}
 
-  //k in atom.ijk will go from 0 to supercell_layers_i-1
-  
-  //sometimes k_min==0, sometimes k_min==1 (look at GetSuperCell())
-  //get k_min and k_max first
-  int k=0,k_min=xstr_slab.atoms.size(),k_max=-xstr_slab.atoms.size();
-  for(uint i=0;i<xstr_slab.atoms.size();i++){
-    const _atom& atom=xstr_slab.atoms[i];
-    if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
-    k=atom.ijk[3];
-    if(k<k_min){k_min=k;}
-    if(k>k_max){k_max=k;}
-  }
-  if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
-  if(k_max-k_min+1!=supercell_layers_i){  //test of stupidity
-    message << "k_max-k_min+1!=supercell_layers_i";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
-  }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - get conventional cell
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  uint count_total_fixed=0,count_bottom_fixed=0,count_top_fixed=0; //tests of stupidity
-  bool fixed_bottom=false,fixed_top=false;
-  
-  xstr_slab.isd=true; //set selective dynamics
-  for(uint i=0;i<xstr_slab.atoms.size();i++){
-    _atom& atom=xstr_slab.atoms[i];
-    if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
-    k=atom.ijk[3];
-    fixed_bottom=(k<(k_min+fixed_layers));
-    fixed_top=(k>(k_min+(supercell_layers_i-fixed_layers-1)));
-    //keeping top/bottom fixed provides shielding to the effect of vacuum
-    if(fixed_bottom || fixed_top){  //keep fixed
-      atom.sd="FFF";  //keep fixed
-      count_total_fixed++;
-      if(fixed_bottom){count_bottom_fixed++;}
-      else if(fixed_top){count_top_fixed++;}
-      if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " is FIXED" << endl;}
-    } else {
-      //we only allow relaxation in z-direction because we want to allow planes of atoms to come together/go apart
-      //atom.sd="TTT";  //default, allow relaxation
-      atom.sd="FFT";  //default, allow relaxation //CORRECTION: only relax in z direction: Vitek Phil Mag 18, 773-786 (1968), also http://theory.cm.utexas.edu/forum/viewtopic.php?t=3301
-      if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " will RELAX" << endl;}
-    }
-  }
-  if(LDEBUG) {
-    cerr << soliloquy << " count_bottom_fixed=" << count_bottom_fixed << endl;
-    cerr << soliloquy << " count_top_fixed=" << count_top_fixed << endl;
-    cerr << soliloquy << " count_bottom_fixed+count_top_fixed=" << count_bottom_fixed+count_top_fixed << endl;
-    cerr << soliloquy << " count_total_fixed=" << count_total_fixed << endl;
-  }
-  if(count_total_fixed!=count_bottom_fixed+count_top_fixed){
-    message << "count_total_fixed!=count_bottom_fixed+count_top_fixed (" << count_total_fixed << "!=" << count_bottom_fixed+count_top_fixed << ")";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
-  }
-  
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
-  //[CO190423 - too much work, rely on atom.ijk instead!]//http://mathworld.wolfram.com/Plane.html
-  //[CO190423 - too much work, rely on atom.ijk instead!]xstr_slab.isd=true; //set selective dynamics
-  //[CO190423 - too much work, rely on atom.ijk instead!]double signed_point_plane_distance=0.0;
-  //[CO190423 - too much work, rely on atom.ijk instead!]vector<atom_plane_dist> v_apd;
-  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<xstr_slab.atoms.size();i++){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  xstr_slab.atoms[i].sd="TTT";  //default, change to FFF later
-  //[CO190423 - too much work, rely on atom.ijk instead!]  signed_point_plane_distance=aurostd::scalar_product(n_zp,xstr_slab.atoms[i].cpos)+D_zp; //n_zp is already normalized to 1.0
-  //[CO190423 - too much work, rely on atom.ijk instead!]  if(LDEBUG) {
-  //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " atom.ijk=" << xstr_slab.atoms[i].ijk << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " signed_point_plane_distance[atom=" << i << "]=" << signed_point_plane_distance << endl;
-  //[CO190423 - too much work, rely on atom.ijk instead!]  }
-  //[CO190423 - too much work, rely on atom.ijk instead!]  //(std::signbit(signed_point_plane_distance + _ZERO_TOL_ ) ? count_below++ : count_above++);  //not great about atoms right on plane
-  //[CO190423 - too much work, rely on atom.ijk instead!]  //[do later]((signed_point_plane_distance<-_ZERO_TOL_)? count_below++ : count_above++);
-  //[CO190423 - too much work, rely on atom.ijk instead!]  v_apd.push_back(atom_plane_dist());
-  //[CO190423 - too much work, rely on atom.ijk instead!]  v_apd.back().index=i;
-  //[CO190423 - too much work, rely on atom.ijk instead!]  v_apd.back().distance=signed_point_plane_distance;
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]std::sort(v_apd.begin(),v_apd.end()); //sort by distance, we will take from bottom/top halves
-  //[CO190423 - too much work, rely on atom.ijk instead!]
-  //[CO190423 - too much work, rely on atom.ijk instead!]//get number to keep fixed, assume a layer is one unit cell
-  //[CO190423 - too much work, rely on atom.ijk instead!]//uint count_keep_fixed=xstr_bulk.atoms.size() * supercell_layers_i * supercell_layers_i * fixed_layers;
-  //[CO190423 - too much work, rely on atom.ijk instead!]uint count_keep_fixed=xstr_bulk.atoms.size() * xy_dims * xy_dims * fixed_layers;
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " count_keep_fixed=" << count_keep_fixed << endl;}
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(2*count_keep_fixed>xstr_slab.atoms.size()){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "2*count_keep_fixed>xstr_slab.atoms.size()";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]
-  //[CO190423 - too much work, rely on atom.ijk instead!]//fixed selective dynamics stuff at once
-  //[CO190423 - too much work, rely on atom.ijk instead!]uint count_check=0;
-  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<count_keep_fixed;i++){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //bottom
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [1]";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]count_check=0;
-  //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_keep_fixed;i--){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //top
-  //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
-  //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [2]";
-  //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
-  //[CO190423 - too much work, rely on atom.ijk instead!]}
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - get sym info for structure (mostly for FPOSMatch)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - identify selective dynamics
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create shear sub-directories
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //I was going to create a check to compare fpos' of atoms from shear_fraction==0 and shear_fraction==1
-  //however, they will NOT be necessarily the same
-  //if we rotate along 111 and shear along 112, the atoms will go into a new layer (z-axis)
-  //need to check this thoroughly
-
-  int dir_count=0,dir_count_total=0;
-  bool create_final_duplicate_directory=(true || LDEBUG); //debug really, we don't need the 1.0 shear fraction directory
-  double shear_fraction=0.0;
-  double shear_fraction_final=(1.0+(create_final_duplicate_directory?_ZERO_TOL_:-_ZERO_TOL_));  //it's just a LITTLE bigger than 1.0 for the while loop
-
-  //for partial dissociation
-  double z_shift_fpos=0.0;  //for partial dissociation
-  xvector<double> n_z=xstr_slab_newbasis.lattice(3);
-  if(partial_dissociation){
-    xvector<double> total_shift_cpos=(d_layers_s) * n_s;
-    xvector<double> total_shift_fpos=xstr_slab_newbasis.c2f*total_shift_cpos;
-    z_shift_fpos=total_shift_fpos[3];
+    xstructure xstr_sym(xstr_bulk);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
+    pflow::PerformFullSymmetry(xstr_sym);
+    xstr_bulk.dist_nn_min=xstr_sym.dist_nn_min;
+    xstr_bulk.sym_eps=xstr_sym.sym_eps;
+    bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,xstr_bulk.dist_nn_min,xstr_bulk.sym_eps);
     if(LDEBUG){
-      cerr << soliloquy << " total_shift_cpos=" << total_shift_cpos << endl;
-      cerr << soliloquy << " total_shift_fpos=" << total_shift_fpos << endl;
-      cerr << soliloquy << " z_shift_fpos=" << z_shift_fpos << endl;
+      cerr << soliloquy << " xstr_bulk.dist_nn_min=" << xstr_bulk.dist_nn_min << endl;
+      cerr << soliloquy << " xstr_bulk.sym_eps=" << xstr_bulk.sym_eps << endl;
+      cerr << soliloquy << " skew=" << skew << endl;
     }
-  }
-  if(LDEBUG){cerr << soliloquy << " z_shift_fpos=" << z_shift_fpos << endl;}
 
-  //stringstream POSCAR;
-  stringstream new_AflowIn_ss;
-  stringstream arun_dirname;
-  _xvasp xvasp;
-  //_aflags aflags; aflags.Directory=".";
-  //_kflags kflags; 
-  //_vflags vflags;
-  //[CO190405 - does not work, could be multiple layers within this spacing]double d_layers_s=getSpacingHKLPlane(xstr_slab.lattice,h_s,k_s,l_s); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
-  //get dir_count_total
-  dir_count=0;shear_fraction=0.0;
-  while(shear_fraction<shear_fraction_final){shear_fraction+=step_size;dir_count_total++;}
-  dir_count=0;shear_fraction=0.0;
-  
-  //check if vasp is already done
-  bool all_vasp_done=true;
-  string FileName;
-  while(shear_fraction<shear_fraction_final){
-    xvasp.clear();
-    //create directory name
-    xvasp.Directory=aflags.Directory;
-    xvasp.AVASP_arun=true;
-    xvasp.AVASP_arun_mode="GSFE"; //generalized stacking fault energy
-    arun_dirname.str("");
-    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
-    //arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
-    //arun_dirname << "sHKL" << aurostd::utype2string(hkl_s[1]) << aurostd::utype2string(hkl_s[2]) << aurostd::utype2string(hkl_s[3]) << "-";
-    //arun_dirname << "sf" << aurostd::utype2string(shear_fraction,8);
-    arun_dirname << "PL=" << aurostd::joinWDelimiter(hkl_i,":") << "-"; //cannot have - before numbers as there can be negative directions, use : to help readability
-    arun_dirname << "DIR=" << aurostd::joinWDelimiter(hkl_s,":") << "-";//cannot have - before numbers as there can be negative directions, use : to help readability
-    arun_dirname << "FRAC=" << aurostd::utype2string(shear_fraction,3);  //fix precision here if you want
-    xvasp.AVASP_arun_runname=arun_dirname.str();
-    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - get sym info for structure (mostly for FPOSMatch)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
-    if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
-    if(!aurostd::EFileExist(FileName)){all_vasp_done=false;break;}
-    shear_fraction+=step_size;
-    dir_count++;
-  }
-  dir_count=0;shear_fraction=0.0;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - read flags
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
 
-  //create directories if vasp is not done
-  int half_k=supercell_layers_i/2;  //floor
-  //half_k=(supercell_layers_i+2-1)/2;  //ceil
-  uint count_total=0,count_bottom=0,count_top=0; //tests of stupidity
-  while(shear_fraction<shear_fraction_final){
-    if(all_vasp_done==false){
-      xvasp.clear();
-      if(LDEBUG) {cerr << soliloquy << " shear_fraction=" << shear_fraction << endl;}
+    int h_s=1,k_s=1,l_s=0;  //hkl of shear
+    xvector<int> hkl_s,hkl_s_ORIG;
+    double step_size=0.2;   //step size
+    int fixed_layers=DEFAULT_SURFACE_LAYERS;     //number of fixed layers
+    bool spin_off=false;
+    bool partial_dissociation=false;
 
-      //apply shear
-      if(LDEBUG) {cerr << soliloquy << " applying shear" << endl;}
-      xstructure xstr_shear(xstr_slab);
-      xstr_shear.write_DEBUG_flag=FALSE;  //FORCE
-      const xmatrix<double>& c2f=xstr_slab.c2f;
+    vector<string> tokens;
+    aurostd::string2tokens(vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::SHEAR_DIRECTION"),tokens,",");
+    if(tokens.size()==3){
+      h_s=aurostd::string2utype<int>(tokens[0]);
+      k_s=aurostd::string2utype<int>(tokens[1]);
+      l_s=aurostd::string2utype<int>(tokens[2]);
+    }
+    hkl_s[1]=h_s;hkl_s[2]=k_s;hkl_s[3]=l_s;
+    if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
+    hkl_s_ORIG=hkl_s;
+    string step_size_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE"); //step size
+    if(aurostd::isfloat(step_size_string)){
+      double _step_size=aurostd::string2utype<double>(step_size_string);
+      if(_step_size>0.0 && _step_size<1.0){step_size=_step_size;}
+    }
+    string steps_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEPS"); //step size
+    if(aurostd::isfloat(steps_string)){
+      int _steps=aurostd::string2utype<int>(steps_string);
+      if(_steps>0){step_size=1.0/_steps;}
+    }
+    string fixed_layers_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::FIXED_LAYERS");
+    if(aurostd::isfloat(fixed_layers_string)){
+      int _fixed_layers=aurostd::string2utype<int>(fixed_layers_string);
+      if(_fixed_layers>0){fixed_layers=_fixed_layers;}
+    }
+    spin_off=vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::SPIN_OFF");
+    partial_dissociation=vpflow.flag("GENERALIZED_STACKING_FAULT_ENERGY::PARTIAL_DISSOCIATION");
 
-      count_total=0;count_bottom=0;count_top=0;
-      for(uint i=0;i<xstr_shear.atoms.size();i++){
-        _atom& atom=xstr_shear.atoms[i];
-        if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << endl;}
-        k=atom.ijk[3];
-        if(k<(k_min+half_k)){ //not shearing
-          if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " NOT shearing" << endl;}
-          count_bottom++;
-        } else {  //shearing
-          if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " shearing" << endl;}
-          atom.cpos += (shear_fraction * d_layers_s) * n_s;
-          if(partial_dissociation){atom.cpos -= (shear_fraction * z_shift_fpos) * n_z;}
-          atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
-          count_top++;
+    std::streamsize prec_original = message.precision(); //original
+    std::ios_base::fmtflags ff_original = message.flags();  //original
+    message.precision(prec);
+    message.unsetf(std::ios_base::floatfield);
+
+    message << "shear_direction" << hkl_s;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "step_size=" << step_size;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "fixed_layers=" << fixed_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+    message.precision(prec_original); //set back
+    message.flags(ff_original); //set back
+
+    aurostd::xoption slab_flags=vpflow; //may modify based on how many layers in unit cell
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - read flags
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - create slab
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+    xvector<int> hkl_i;
+    int total_layers;
+    xstructure xstr_slab_newbasis;  //xstr_rotated
+    vector<int> sc2pcMap_slab,pc2scMap_slab;
+
+    //create define for rigidrotation vs. slabbasis
+    //convert n_s (fractional) to cartesian then fraction of new basis (S=CB)
+
+    xstructure xstr_slab;
+    xmatrix<double> rotation; //=xstr_slab_newbasis.lattice*inverse(xstr_bulk.lattice); //xstr_slab_newbasis.lattice = rotation * xstr_bulk.lattice
+    //[CO190805 - this does NOT work]if(0){
+    //[CO190805 - this does NOT work]  xstr_slab=slab::CreateSlab_RigidRotation(slab_flags,xstr_bulk,hkl_i,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,oss);
+    //[CO190805 - this does NOT work]}else{
+    xstr_slab=slab::CreateSlab_SurfaceLattice(slab_flags,xstr_bulk,hkl_i,total_layers,rotation,xstr_slab_newbasis,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,AUROSTD_MAX_DOUBLE,oss);
+    //[CO190805 - this does NOT work]}
+    //cerr << rotation << endl << endl;
+    //rotation=inverse(xstr_bulk.lattice)*xstr_slab_newbasis.lattice;
+    //cerr << rotation << endl << endl;
+    //exit(0);
+
+    //xmatrix<double> rotation=xstr_slab_newbasis.c2f*xstr_bulk.f2c;  //VERY POWERFUL
+    //xmatrix<double> rotation=trasp(trasp(xstr_slab_newbasis.lattice)*inverse(trasp(xstr_bulk.lattice)));
+    //xmatrix<double> rotation=aurostd::inverse(trasp(xstr_slab_newbasis.lattice*aurostd::inverse(xstr_bulk.lattice)));
+    if(LDEBUG){
+      cerr << soliloquy << " xstr_bulk.lattice=" << endl;cerr << xstr_bulk.lattice << endl;
+      cerr << soliloquy << " xstr_slab_newbasis.lattice=" << endl;cerr << xstr_slab_newbasis.lattice << endl;
+      cerr << soliloquy << " rotation=" << endl;cerr << rotation << endl;
+    }
+
+    if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+
+    //rotate n_s too
+    //[CO190408 - do rotation last!]bool rotate_shear=false;
+    //[CO190408 - do rotation last!]if(rotate_shear){
+    //[CO190408 - do rotation last!]  n_s=R*n_s;  //CO190322 - don't think this needs to be rotated
+    //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " rotated n_s=" << n_s << endl;}  //CO190322 - don't think this needs to be rotated
+    //[CO190408 - do rotation last!]}
+    //[CO190408 - do rotation last!]//create rotated primitive cell: faster to rotate smaller cell than bigger one
+    //[CO190408 - do rotation last!]xstructure xstr_slab_newbasis(a);
+    //[CO190408 - do rotation last!]if(0){  //try rotating atoms, DOES NOT WORK
+    //[CO190408 - do rotation last!]  _sym_op rot; rot.setUc(R,xstr_bulk.lattice); rot.is_pgroup=true;  //just rotation
+    //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " sym_op=" << endl;cerr << rot << endl;}
+    //[CO190408 - do rotation last!]  if(1){  //try ApplyXstructure(), same as ApplyAtomValidate on all atoms individually
+    //[CO190408 - do rotation last!]    xstr_slab_newbasis=SYM::ApplyXstructure(rot,xstr_bulk,false);  //no incell, we'll figure this out later
+    //[CO190408 - do rotation last!]  } else {  //try ApplyAtomValidate
+    //[CO190408 - do rotation last!]    for(uint i=0;i<xstr_bulk.atoms.size();i++){
+    //[CO190408 - do rotation last!]      if(!SYM::ApplyAtomValidate(xstr_bulk.atoms[i],xstr_slab_newbasis.atoms[i],rot,xstr_bulk,true,false)){
+    //[CO190408 - do rotation last!]        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ApplyAtomValidate() failed",_VALUE_ERROR_);
+    //[CO190408 - do rotation last!]      }
+    //[CO190408 - do rotation last!]    }
+    //[CO190408 - do rotation last!]  }
+    //[CO190408 - do rotation last!]} else {  //try rotating lattice, seems to work
+    //[CO190408 - do rotation last!]  //xstr_slab_newbasis.lattice=R * xstr_slab_newbasis.lattice * inverse(R);
+    //[CO190408 - do rotation last!]  xstr_slab_newbasis.lattice=R * xstr_slab_newbasis.lattice;
+    //[CO190408 - do rotation last!]  xstr_slab_newbasis.FixLattices();
+    //[CO190408 - do rotation last!]  const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
+    //[CO190408 - do rotation last!]  for(uint i=0;i<xstr_slab_newbasis.atoms.size();i++){xstr_slab_newbasis.atoms[i].cpos=f2c*xstr_slab_newbasis.atoms[i].fpos;}
+    //[CO190408 - do rotation last!]  //xstr_slab_newbasis=Standard_Conventional_UnitCellForm(a);xstr_slab_newbasis.clean(); //DX 20191220 - uppercase to lowercase clean
+    //[CO190408 - do rotation last!]}
+    //[CO190408 - do rotation last!]if(LDEBUG) {cerr << soliloquy << " xstr_slab_newbasis=" << endl;cerr << xstr_slab_newbasis << endl;}
+    //[CO190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
+    //[CO190408 - do rotation last!]  min_dist=xstr_slab_newbasis.MinDist();
+    //[CO190408 - do rotation last!]  if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+    //[CO190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    //[CO190408 - do rotation last!]}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - create slab
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - defining hkl normals
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
+
+    //we need UN-ROTATED lattice here so we can get the right distance
+    xvector<double> n_i=slab::HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
+    xvector<double> n_i_ORIG=n_i;
+    if(LDEBUG) {cerr << soliloquy << " n_i[hkl=" << hkl_i << "]=" << n_i << endl;}
+
+    //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]//n_i and n_s must be perpendicular
+    //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]if(!aurostd::isequal(aurostd::scalar_product(n_i,n_s),0.0,0.1)){
+    //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i(" << n_i << ") is not perpendicular to n_s(" << n_s << ")" << endl;
+    //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i DOT n_s = " << aurostd::scalar_product(n_i,n_s) << endl;
+    //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+    //[CO190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]}
+
+    //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
+    //[CO190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_layers=getDistanceBetweenImages(xstr_bulk.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
+    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
+    xvector<double> n_s_ORIG=n_s;
+    if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;}
+
+    double angle_ns_unrotated=aurostd::angle(n_i,n_s);
+    if(LDEBUG) {cerr << soliloquy << " angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - defining hkl normals
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - get n_i_rotated and n_s_rotated
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //rotate n_i and n_s
+    if(LDEBUG) {cerr << soliloquy << " n_i[hkl=" << hkl_i << "](unrotated)=" << n_i << endl;}
+    xvector<double> n_i_rotated=rotation*n_i;n_i_rotated/=aurostd::modulus(n_i_rotated);  //rotate to match structure rotation
+    if(LDEBUG) {cerr << soliloquy << " n_i[hkl=" << hkl_i << "](rotated)  =" << n_i_rotated << endl;}
+
+    if(!aurostd::isequal(abs(n_i_rotated[3]),1.0)){
+      message << "Rotation unsuccessful, n_i should be aligned along the z-axis" << endl;
+      message << "n_i(rotated)  =" << n_i_rotated << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "](unrotated)=" << n_s << endl;}
+    xvector<double> n_s_rotated=rotation*n_s;n_s_rotated/=aurostd::modulus(n_s_rotated);  //rotate to match structure rotation
+    if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "](rotated)  =" << n_s_rotated << endl;}
+
+    double angle_ns_rotated=aurostd::angle(n_i_rotated,n_s_rotated);
+    if(LDEBUG) {
+      cerr << soliloquy << " angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;
+      cerr << soliloquy << " angle_ns(rotated)  =" << rad2deg*angle_ns_rotated << endl;
+    }
+
+    if(!aurostd::isequal(angle_ns_unrotated,angle_ns_rotated)){
+      message << "Rotation unsuccessful" << endl;
+      message << "angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;
+      message << "angle_ns(rotated)  =" << rad2deg*angle_ns_rotated << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - get n_i_rotated and n_s_rotated
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - find symmetrically equivalent n_s if necessary
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(!partial_dissociation){
+      if(!aurostd::isequal(rad2deg*angle_ns_unrotated,90.0) || aurostd::isequal(n_s_rotated[3],0.0)){ //not sure about partial dissociation
+        message << "Need to find symmetrically equivalent n_s (angle_ns_unrotated(degrees)=" << rad2deg*angle_ns_unrotated << ",n_s(rotated)=" << n_s_rotated << ")";
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+
+        const vector<_sym_op>& v_pgroups=xstr_sym.pgroup_xtal;
+        vector<xvector<double> > v_n_s_sym,v_n_s_sym_rotated;
+        vector<uint> v_pgs;
+        xvector<double> n_s_sym,n_s_sym_rotated;
+        double angle_nssym_unrotated=0.0;
+        for(uint pg=0;pg<v_pgroups.size();pg++){
+          n_s_sym=v_pgroups[pg].Uc*n_s;
+          angle_nssym_unrotated=aurostd::angle(n_i,n_s_sym);
+          if(aurostd::isequal(rad2deg*angle_nssym_unrotated,90.0)){
+            n_s_sym_rotated=rotation*n_s_sym;
+            if(aurostd::isequal(n_s_sym_rotated[3],0.0)){
+              if(LDEBUG){cerr << soliloquy << " found viable symmetrically equivalent n_s=" << n_s_sym << ", n_s_sym_rotated=" << n_s_sym_rotated << ", pg=" << pg << endl;}
+              v_n_s_sym.push_back(n_s_sym);
+              v_n_s_sym_rotated.push_back(n_s_sym_rotated);
+              v_pgs.push_back(pg);
+            }
+          }
         }
-        count_total++;
-      }
-      if(LDEBUG) {
-        cerr << soliloquy << " count_bottom=" << count_bottom << endl;
-        cerr << soliloquy << " count_top=" << count_top << endl;
-        cerr << soliloquy << " count_bottom+count_top=" << count_bottom+count_top << endl;
-        cerr << soliloquy << " count_total=" << count_total << endl;
-        cerr << soliloquy << " xstr_shear.atoms.size()=" << xstr_shear.atoms.size() << endl;
-      }
-      if(count_total!=xstr_shear.atoms.size()){
-        message << "count_total!=xstr_shear.atoms.size()";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
-      }
-      if(count_total!=count_bottom+count_top){
-        message << "count_total!=count_bottom+count_top";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
-      }
 
-      //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
-      //[CO190423 - too much work, rely on atom.ijk instead!]  for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_above;i--){  //top (furthest away)
-      //[CO190423 - too much work, rely on atom.ijk instead!]    _atom& atom=xstr_shear.atoms[v_apd[i].index];
-      //[CO190423 - too much work, rely on atom.ijk instead!]    atom.cpos += (shear_fraction * d_layers_s) * n_s;
-      //[CO190423 - too much work, rely on atom.ijk instead!]    atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
-      //[CO190423 - too much work, rely on atom.ijk instead!]  }
-      //[CO190423 - too much work, rely on atom.ijk instead!]}
-      //for(uint i=0;i<v_apd.size();i++){
-      //  //if(!std::signbit(v_apd[i].distance)){ //not great about atoms right on plane
-      //  if(signed_point_plane_distance>=-_ZERO_TOL_){ //above plane, opposite of what is defined above for count_below/count_above
-      //    xstr_shear.atoms[v_apd[i].index].cpos += shear_fraction * d_layers_s;
-      //    xstr_shear.atoms[v_apd[i].index].fpos = C2F(xstr_shear.lattice,xstr_shear.atoms[v_apd[i].index].cpos);
-      //  }
-      //}
-      xstr_shear.BringInCell(); //wrap around
-      if(LDEBUG) {cerr << soliloquy << " xstr_shear=" << endl;cerr << xstr_shear << endl;}
+        if(v_n_s_sym.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot find any viable symmetrically equivalent n_s",_RUNTIME_ERROR_);}
 
-      if(check_min_dist){ //sanity check as we rotate structure/atoms
-        min_dist=xstr_shear.MinDist();
-        if(LDEBUG) {cerr << soliloquy << " mindist[" << (count_check_min_dist++)+dir_count << "]=" << min_dist << endl;}
-        if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+        //sort the two lists (symmetrically equivalent and rotated variants) by the rotated variants
+        //look for 1 0 0 first, then -1 0 0, then
+        //not absolutely necessary, but it will prevent us from rerunning symmetrically equivalent in the future (directory name)
+        //it's also cleaner
+        xvector<double> xvtmp,xvtmp_rotated;
+        uint uitmp=0;
+        bool swap=false;
+        bool sing_dir_vec_i=false;      //if direction i is single direction vector (prefer these)
+        bool sing_dir_vec_j=false;      //if direction j is single direction vector (prefer these)
+        bool equ_comp_vec_i=false;      //if component 1 and 2 are equivalent (component 3 is 0) (prefer these)
+        bool equ_comp_vec_j=false;      //if component 1 and 2 are equivalent (component 3 is 0) (prefer these)
+        bool components_equ=false;      //if components are equal
+        bool components_equ_abs=false;  //if abs() of components are equal
+        bool j_gt_i_abs=false;          //if abs() of j k-component is greater than abs() of i k-component
+        bool j_gt_i=false;              //if j k-component is greater than i k-component
+        int lrows=n_s.lrows;
+        for(uint i=0;i<v_n_s_sym_rotated.size()-1;i++){
+          for(uint j=i+1;j<v_n_s_sym_rotated.size();j++){
+            if(LDEBUG){cerr << soliloquy << " comparing " << v_n_s_sym_rotated[i] << " with " << v_n_s_sym_rotated[j] << endl;}
+
+            swap=false;
+
+            //first look for single direction vectors (1.0000e+00  0.0000e+00  0.0000e+00 vs 5.0000e-01 -8.6603e-01  0.0000e+00), we prefer these
+            //second look for vectors with equal components (7.0711e-01 -7.0711e-01  0.0000e+00)
+
+            if(swap==false){
+              sing_dir_vec_i=false;
+              sing_dir_vec_j=false;
+              for(int k=v_n_s_sym_rotated[i].lrows;k<=v_n_s_sym_rotated[i].urows;k++){
+                if(aurostd::isequal(abs(v_n_s_sym_rotated[i][k]),1.0)){
+                  if(LDEBUG){cerr << soliloquy << " [i] is single direction" << endl;}
+                  sing_dir_vec_i=true;
+                }
+                if(aurostd::isequal(abs(v_n_s_sym_rotated[j][k]),1.0)){
+                  if(LDEBUG){cerr << soliloquy << " [j] is single direction" << endl;}
+                  sing_dir_vec_j=true;
+                }
+              }
+              if(sing_dir_vec_i != sing_dir_vec_j){
+                if(sing_dir_vec_j==true && sing_dir_vec_i==false){swap=true;}
+                else{continue;}
+              }
+            }
+
+            if(swap==false){
+              equ_comp_vec_i=false;
+              equ_comp_vec_j=false;
+              if(aurostd::isequal(abs(v_n_s_sym_rotated[i][lrows]),abs(v_n_s_sym_rotated[i][lrows+1]))){equ_comp_vec_i=true;}
+              if(aurostd::isequal(abs(v_n_s_sym_rotated[j][lrows]),abs(v_n_s_sym_rotated[j][lrows+1]))){equ_comp_vec_j=true;}
+              if(equ_comp_vec_i != equ_comp_vec_j){
+                if(equ_comp_vec_j==true && equ_comp_vec_i==false){swap=true;}
+                //otherwise compare by elements
+              }
+            }
+
+            //finally compare individual components
+            if(swap==false){
+              for(int k=v_n_s_sym_rotated[i].lrows;k<=v_n_s_sym_rotated[i].urows && swap==false;k++){
+                components_equ=aurostd::isequal(v_n_s_sym_rotated[i][k],v_n_s_sym_rotated[j][k]);
+                if(LDEBUG){cerr << soliloquy << " [i][k=" << k << "] ?== [j][k=" << k << "] == " << components_equ << endl;}
+                if(components_equ==false){
+                  components_equ_abs=aurostd::isequal(abs(v_n_s_sym_rotated[i][k]),abs(v_n_s_sym_rotated[j][k]));
+                  j_gt_i_abs=bool(abs(v_n_s_sym_rotated[j][k])>abs(v_n_s_sym_rotated[i][k]));
+                  j_gt_i=bool(v_n_s_sym_rotated[j][k]>v_n_s_sym_rotated[i][k]);
+                  if(LDEBUG){
+                    cerr << soliloquy << " abs([i][k=" << k << "]) ?== abs([j][k=" << k << "]) == " << components_equ_abs << endl;
+                    cerr << soliloquy << " abs([j][k=" << k << "]) ?> abs([i][k=" << k << "]) == " << j_gt_i_abs << endl;
+                    cerr << soliloquy << " [j][k=" << k << "] ?> [i][k=" << k << "] == " << j_gt_i << endl;
+                  }
+                  if( (components_equ_abs==false && j_gt_i_abs==true) || 
+                      (components_equ_abs==true && components_equ==false && j_gt_i==true) ){swap=true;}
+                  break;  //very important, comparing 5 with -5
+                }
+              }
+            }
+            if(swap){
+              if(LDEBUG){cerr << soliloquy << " swapping " << v_n_s_sym_rotated[i] << " and " << v_n_s_sym_rotated[j] << endl;}
+              xvtmp=v_n_s_sym[i];
+              xvtmp_rotated=v_n_s_sym_rotated[i];
+              uitmp=v_pgs[i];
+              v_n_s_sym[i]=v_n_s_sym[j];
+              v_n_s_sym_rotated[i]=v_n_s_sym_rotated[j];
+              v_pgs[i]=v_pgs[j];
+              v_n_s_sym[j]=xvtmp;
+              v_n_s_sym_rotated[j]=xvtmp_rotated;
+              v_pgs[j]=uitmp;
+            }
+          }
+        }
+
+        if(LDEBUG){
+          for(uint i=0;i<v_n_s_sym.size();i++){
+            cerr << soliloquy << " v_n_s_sym[i=" << i << "]=" << v_n_s_sym[i] << ", v_n_s_sym_rotated[i=" << i << "]=" << v_n_s_sym_rotated[i] << ", v_pgs[i=" << i << "]="<< v_pgs[i] << endl;
+          }
+        }
+
+        n_s=v_n_s_sym[0];
+        n_s_rotated=v_n_s_sym_rotated[0];
+
+
+        //fix hkl_s as well for directory labeling
+        //cannot use n_s, as it is normalized
+        //rotated hkl_s by v_pgroups
+        //rotate in Cartesian coordinates, then convert to fractional
+        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);  //do not normalize
+        n_s_tmp=v_pgroups[v_pgs[0]].Uc*n_s_tmp; //rotate
+        hkl_s=aurostd::xvectordouble2int(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
+
+        message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
+        message << "n_s=" << n_s << endl;
+        message << "n_s(rotated)=" << n_s_rotated << endl;
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }
+    }
 
-      //if(0){
-      //  string destination=aurostd::utype2string(h_i)+aurostd::utype2string(k_i)+aurostd::utype2string(l_i) + "/" + aurostd::utype2string(dir_count);
-      //  if(LDEBUG) {cerr << soliloquy << " creating " << destination << endl;}
-      //  aurostd::DirectoryMake(destination);
-      //  destination+="/POSCAR";
-      //  stringstream POSCAR; POSCAR.str("");
-      //  POSCAR << xstr;
-      //  aurostd::stringstream2file(POSCAR,destination);
-      //}
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - find symmetrically equivalent n_s if necessary
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      //load in xstructure
-      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
-      xvasp.str=xstr_shear;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - resolve layers count
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    //d_spacing is based on lattice ONLY, no crystal information
+    //d_layers,d_cells are based on CRYSTAL (lattice + basis)
+    //d_layers finds distance in direction of n_s to next structure image
+    //d_cells makes sure you loop outside cell at least once
+    //d_spacing <= d_layers <= d_cells
+    double d_spacing_i=slab::getSpacingHKLPlane(xstr_bulk,hkl_i); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_i*h_i+k_i*k_i+l_i*l_i);
+    double d_layers_i=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
+    double d_cells_i=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
+    int layers_per_cell_i=(int)(d_cells_i/d_layers_i);  //floor
+    int supercell_layers_i=(total_layers+layers_per_cell_i-1)/layers_per_cell_i;  //ceil //(double)total_layers;
+    if(LDEBUG) {
+      cerr << soliloquy << " n_i[hkl=" << hkl_i << "]=" << n_i << endl;
+      cerr << soliloquy << " d_spacing_i=" << d_spacing_i << endl;
+      cerr << soliloquy << " d_layers_i=" << d_layers_i << endl;
+      cerr << soliloquy << " d_cells_i=" << d_cells_i << endl;
+      cerr << soliloquy << " layers_per_cell_i=" << layers_per_cell_i << endl;
+      cerr << soliloquy << " supercell_layers_i=" << supercell_layers_i << endl;
+    }
+    double d_spacing_s=slab::getSpacingHKLPlane(xstr_bulk,hkl_s); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
+    double d_layers_s=slab::getDistanceBetweenImages(xstr_bulk,n_s,false); //this depends on UN-ROTATED lattice
+    double d_cells_s=slab::getDistanceBetweenImages(xstr_bulk,n_s,true); //go outside cell
+    int layers_per_cell_s=(int)(d_cells_s/d_layers_s);  //floor
+    int supercell_layers_s=(total_layers+layers_per_cell_s-1)/layers_per_cell_s;  //ceil //(double)total_layers;
+    if(LDEBUG) {
+      cerr << soliloquy << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;
+      cerr << soliloquy << " d_spacing_s=" << d_spacing_s << endl;
+      cerr << soliloquy << " d_layers_s=" << d_layers_s << endl;
+      cerr << soliloquy << " d_cells_s=" << d_cells_s << endl;
+      cerr << soliloquy << " layers_per_cell_s=" << layers_per_cell_s << endl;
+      cerr << soliloquy << " supercell_layers_s=" << supercell_layers_s << endl;
+    }
+    //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"layers_per_cell_s<1 (="+aurostd::utype2string(layers_per_cell_s)+")",_INPUT_ERROR_);}
+    //[CO190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s>1){  //let's adjust total_layers input to CreateSlab_RigidRotation() which builds supercell assuming layers_per_cell_s==1
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  int total_layers=DEFAULT_TOTAL_LAYERS;
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  if(aurostd::isfloat(total_layers_string)){
+    //[CO190520 - do NOT reduce total_layers based on shear direction]    int _total_layers=aurostd::string2utype<int>(total_layers_string);
+    //[CO190520 - do NOT reduce total_layers based on shear direction]    if(_total_layers>0){total_layers=_total_layers;}
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  }
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  if(LDEBUG){cerr << soliloquy << " total_layers(pre)=" << total_layers << endl;}
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  total_layers=(total_layers+layers_per_cell_s-1)/layers_per_cell_s;  //ceil
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  if(LDEBUG){cerr << soliloquy << " total_layers(post)=" << total_layers << endl;}
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  slab_flags.pop_attached("CREATE_SLAB::TOTAL_LAYERS");
+    //[CO190520 - do NOT reduce total_layers based on shear direction]  slab_flags.push_attached("CREATE_SLAB::TOTAL_LAYERS",aurostd::utype2string(total_layers));
+    //[CO190520 - do NOT reduce total_layers based on shear direction]}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - resolve layers count
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - rotate n_i and n_s
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //swap for rotated variants, we saved originals already
+    n_i=n_i_rotated;
+    n_s=n_s_rotated;
+
+    if(!partial_dissociation){
+      //check that there is NO z component to n_s after rotation
+      if(!aurostd::isequal(n_s[3],0.0)){
+        message << "The shear plane and plane of interest are incommensurate" << endl;
+        message << "rotation=" << endl; message << rotation << endl;
+        message << "hkl_i=" << hkl_i << ", n_i(rotated)=" << n_i << endl;
+        message << "hkl_s=" << hkl_s << ", n_s(rotated)=" << n_s << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+      }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - rotate n_i and n_s
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - define half plane
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " defining half plane" << endl;}
+    //[CO190423 - too much work, rely on atom.ijk instead!]
+    //[CO190423 - too much work, rely on atom.ijk instead!]int count_total,count_above,count_below;
+    //[CO190423 - too much work, rely on atom.ijk instead!]count_total=xstr_slab.atoms.size();
+    //[CO190423 - too much work, rely on atom.ijk instead!]count_above=count_total/2;count_below=count_total-count_above;
+    //[CO190423 - too much work, rely on atom.ijk instead!]//count_above=count_below=count_total/2;
+    //[CO190423 - too much work, rely on atom.ijk instead!]//int count_above=0,count_below=0,count_total=xstr_slab.atoms.size();
+    //[CO190423 - too much work, rely on atom.ijk instead!]
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {
+    //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_above=" << count_above << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_below=" << count_below << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " count_total=" << count_total << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above!=count_below){
+    //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above!=count_below";
+    //[CO190423 - too much work, rely on atom.ijk instead!]  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(count_above+count_below!=count_total){
+    //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_above+count_below!=count_total";
+    //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]
+    //[CO190423 - too much work, rely on atom.ijk instead!]//half-plane is bad idea, too much room for error
+    //[CO190423 - too much work, rely on atom.ijk instead!]////define half plane along c-axis
+    //[CO190423 - too much work, rely on atom.ijk instead!]////normal vector is simply c-axis
+    //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> n_hp=xstr_slab_newbasis_supercell.lattice(3);n_hp/=aurostd::modulus(n_hp); //unit vector
+    //[CO190423 - too much work, rely on atom.ijk instead!]//xvector<double> p_hp=aurostd::modulus(xstr_slab_newbasis_supercell.lattice(3))/2.0*n_hp; //half plane value
+    //[CO190423 - too much work, rely on atom.ijk instead!]//double D_hp=-aurostd::scalar_product(n_hp,p_hp);
+    //[CO190423 - too much work, rely on atom.ijk instead!]//if(LDEBUG) {
+    //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " n_hp=" << n_hp << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " p_hp=" << p_hp << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]//  cerr << soliloquy << " D_hp=" << D_hp << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]//}
+
+    //[CO190423 - too much work, rely on atom.ijk instead!]//define zero plane along c-axis
+    //[CO190423 - too much work, rely on atom.ijk instead!]//normal vector is simply c-axis
+    //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> n_zp=xstr_slab.lattice(3);n_zp/=aurostd::modulus(n_zp); //unit vector
+    //[CO190423 - too much work, rely on atom.ijk instead!]xvector<double> p_zp; //0,0,0
+    //[CO190423 - too much work, rely on atom.ijk instead!]double D_zp=-aurostd::scalar_product(n_zp,p_zp);
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {
+    //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " n_zp=" << n_zp << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " p_zp=" << p_zp << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]  cerr << soliloquy << " D_zp=" << D_zp << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - define half plane
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - identify selective dynamics
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " identifying selective dynamics" << endl;}
+
+    //k in atom.ijk will go from 0 to supercell_layers_i-1
+
+    //sometimes k_min==0, sometimes k_min==1 (look at GetSuperCell())
+    //get k_min and k_max first
+    int k=0,k_min=xstr_slab.atoms.size(),k_max=-xstr_slab.atoms.size();
+    for(uint i=0;i<xstr_slab.atoms.size();i++){
+      const _atom& atom=xstr_slab.atoms[i];
+      if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
+      k=atom.ijk[3];
+      if(k<k_min){k_min=k;}
+      if(k>k_max){k_max=k;}
+    }
+    if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
+    if(k_max-k_min+1!=supercell_layers_i){  //test of stupidity
+      message << "k_max-k_min+1!=supercell_layers_i";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+    }
+
+    uint count_total_fixed=0,count_bottom_fixed=0,count_top_fixed=0; //tests of stupidity
+    bool fixed_bottom=false,fixed_top=false;
+
+    xstr_slab.isd=true; //set selective dynamics
+    for(uint i=0;i<xstr_slab.atoms.size();i++){
+      _atom& atom=xstr_slab.atoms[i];
+      if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
+      k=atom.ijk[3];
+      fixed_bottom=(k<(k_min+fixed_layers));
+      fixed_top=(k>(k_min+(supercell_layers_i-fixed_layers-1)));
+      //keeping top/bottom fixed provides shielding to the effect of vacuum
+      if(fixed_bottom || fixed_top){  //keep fixed
+        atom.sd="FFF";  //keep fixed
+        count_total_fixed++;
+        if(fixed_bottom){count_bottom_fixed++;}
+        else if(fixed_top){count_top_fixed++;}
+        if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " is FIXED" << endl;}
+      } else {
+        //we only allow relaxation in z-direction because we want to allow planes of atoms to come together/go apart
+        //atom.sd="TTT";  //default, allow relaxation
+        atom.sd="FFT";  //default, allow relaxation //CORRECTION: only relax in z direction: Vitek Phil Mag 18, 773-786 (1968), also http://theory.cm.utexas.edu/forum/viewtopic.php?t=3301
+        if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " will RELAX" << endl;}
+      }
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " count_bottom_fixed=" << count_bottom_fixed << endl;
+      cerr << soliloquy << " count_top_fixed=" << count_top_fixed << endl;
+      cerr << soliloquy << " count_bottom_fixed+count_top_fixed=" << count_bottom_fixed+count_top_fixed << endl;
+      cerr << soliloquy << " count_total_fixed=" << count_total_fixed << endl;
+    }
+    if(count_total_fixed!=count_bottom_fixed+count_top_fixed){
+      message << "count_total_fixed!=count_bottom_fixed+count_top_fixed (" << count_total_fixed << "!=" << count_bottom_fixed+count_top_fixed << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+    }
+
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
+    //[CO190423 - too much work, rely on atom.ijk instead!]//http://mathworld.wolfram.com/Plane.html
+    //[CO190423 - too much work, rely on atom.ijk instead!]xstr_slab.isd=true; //set selective dynamics
+    //[CO190423 - too much work, rely on atom.ijk instead!]double signed_point_plane_distance=0.0;
+    //[CO190423 - too much work, rely on atom.ijk instead!]vector<atom_plane_dist> v_apd;
+    //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<xstr_slab.atoms.size();i++){
+    //[CO190423 - too much work, rely on atom.ijk instead!]  xstr_slab.atoms[i].sd="TTT";  //default, change to FFF later
+    //[CO190423 - too much work, rely on atom.ijk instead!]  signed_point_plane_distance=aurostd::scalar_product(n_zp,xstr_slab.atoms[i].cpos)+D_zp; //n_zp is already normalized to 1.0
+    //[CO190423 - too much work, rely on atom.ijk instead!]  if(LDEBUG) {
+    //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " atom.ijk=" << xstr_slab.atoms[i].ijk << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]    cerr << soliloquy << " signed_point_plane_distance[atom=" << i << "]=" << signed_point_plane_distance << endl;
+    //[CO190423 - too much work, rely on atom.ijk instead!]  }
+    //[CO190423 - too much work, rely on atom.ijk instead!]  //(std::signbit(signed_point_plane_distance + _ZERO_TOL_ ) ? count_below++ : count_above++);  //not great about atoms right on plane
+    //[CO190423 - too much work, rely on atom.ijk instead!]  //[do later]((signed_point_plane_distance<-_ZERO_TOL_)? count_below++ : count_above++);
+    //[CO190423 - too much work, rely on atom.ijk instead!]  v_apd.push_back(atom_plane_dist());
+    //[CO190423 - too much work, rely on atom.ijk instead!]  v_apd.back().index=i;
+    //[CO190423 - too much work, rely on atom.ijk instead!]  v_apd.back().distance=signed_point_plane_distance;
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]std::sort(v_apd.begin(),v_apd.end()); //sort by distance, we will take from bottom/top halves
+    //[CO190423 - too much work, rely on atom.ijk instead!]
+    //[CO190423 - too much work, rely on atom.ijk instead!]//get number to keep fixed, assume a layer is one unit cell
+    //[CO190423 - too much work, rely on atom.ijk instead!]//uint count_keep_fixed=xstr_bulk.atoms.size() * supercell_layers_i * supercell_layers_i * fixed_layers;
+    //[CO190423 - too much work, rely on atom.ijk instead!]uint count_keep_fixed=xstr_bulk.atoms.size() * xy_dims * xy_dims * fixed_layers;
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << soliloquy << " count_keep_fixed=" << count_keep_fixed << endl;}
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(2*count_keep_fixed>xstr_slab.atoms.size()){
+    //[CO190423 - too much work, rely on atom.ijk instead!]  message << "2*count_keep_fixed>xstr_slab.atoms.size()";
+    //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]
+    //[CO190423 - too much work, rely on atom.ijk instead!]//fixed selective dynamics stuff at once
+    //[CO190423 - too much work, rely on atom.ijk instead!]uint count_check=0;
+    //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<count_keep_fixed;i++){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //bottom
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
+    //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [1]";
+    //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]count_check=0;
+    //[CO190423 - too much work, rely on atom.ijk instead!]for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_keep_fixed;i--){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //top
+    //[CO190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
+    //[CO190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [2]";
+    //[CO190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+    //[CO190423 - too much work, rely on atom.ijk instead!]}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - identify selective dynamics
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - create shear sub-directories
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //I was going to create a check to compare fpos' of atoms from shear_fraction==0 and shear_fraction==1
+    //however, they will NOT be necessarily the same
+    //if we rotate along 111 and shear along 112, the atoms will go into a new layer (z-axis)
+    //need to check this thoroughly
+
+    int dir_count=0,dir_count_total=0;
+    bool create_final_duplicate_directory=(true || LDEBUG); //debug really, we don't need the 1.0 shear fraction directory
+    double shear_fraction=0.0;
+    double shear_fraction_final=(1.0+(create_final_duplicate_directory?_ZERO_TOL_:-_ZERO_TOL_));  //it's just a LITTLE bigger than 1.0 for the while loop
+
+    //for partial dissociation
+    double z_shift_fpos=0.0;  //for partial dissociation
+    xvector<double> n_z=xstr_slab_newbasis.lattice(3);
+    if(partial_dissociation){
+      xvector<double> total_shift_cpos=(d_layers_s) * n_s;
+      xvector<double> total_shift_fpos=xstr_slab_newbasis.c2f*total_shift_cpos;
+      z_shift_fpos=total_shift_fpos[3];
+      if(LDEBUG){
+        cerr << soliloquy << " total_shift_cpos=" << total_shift_cpos << endl;
+        cerr << soliloquy << " total_shift_fpos=" << total_shift_fpos << endl;
+        cerr << soliloquy << " z_shift_fpos=" << z_shift_fpos << endl;
+      }
+    }
+    if(LDEBUG){cerr << soliloquy << " z_shift_fpos=" << z_shift_fpos << endl;}
+
+    //stringstream POSCAR;
+    stringstream new_AflowIn_ss;
+    stringstream arun_dirname;
+    _xvasp xvasp;
+    //_aflags aflags; aflags.Directory=".";
+    //_kflags kflags; 
+    //_vflags vflags;
+    //[CO190405 - does not work, could be multiple layers within this spacing]double d_layers_s=getSpacingHKLPlane(xstr_slab.lattice,h_s,k_s,l_s); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
+    //get dir_count_total
+    dir_count=0;shear_fraction=0.0;
+    while(shear_fraction<shear_fraction_final){shear_fraction+=step_size;dir_count_total++;}
+    dir_count=0;shear_fraction=0.0;
+
+    //check if vasp is already done
+    bool all_vasp_done=true;
+    string FileName;
+    while(shear_fraction<shear_fraction_final){
+      xvasp.clear();
       //create directory name
       xvasp.Directory=aflags.Directory;
       xvasp.AVASP_arun=true;
@@ -1054,7 +944,580 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
       arun_dirname << "FRAC=" << aurostd::utype2string(shear_fraction,3);  //fix precision here if you want
       xvasp.AVASP_arun_runname=arun_dirname.str();
       AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
-      
+
+      FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+      if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
+      if(!aurostd::EFileExist(FileName)){all_vasp_done=false;break;}
+      shear_fraction+=step_size;
+      dir_count++;
+    }
+    dir_count=0;shear_fraction=0.0;
+
+    if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+
+    //create directories if vasp is not done
+    int half_k=supercell_layers_i/2;  //floor
+    //half_k=(supercell_layers_i+2-1)/2;  //ceil
+    uint count_total=0,count_bottom=0,count_top=0; //tests of stupidity
+    while(shear_fraction<shear_fraction_final){
+      if(all_vasp_done==false){
+        xvasp.clear();
+        if(LDEBUG) {cerr << soliloquy << " shear_fraction=" << shear_fraction << endl;}
+
+        //apply shear
+        if(LDEBUG) {cerr << soliloquy << " applying shear" << endl;}
+        xstructure xstr_shear(xstr_slab);
+        xstr_shear.write_DEBUG_flag=FALSE;  //FORCE
+        const xmatrix<double>& c2f=xstr_slab.c2f;
+
+        count_total=0;count_bottom=0;count_top=0;
+        for(uint i=0;i<xstr_shear.atoms.size();i++){
+          _atom& atom=xstr_shear.atoms[i];
+          if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << endl;}
+          k=atom.ijk[3];
+          if(k<(k_min+half_k)){ //not shearing
+            if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " NOT shearing" << endl;}
+            count_bottom++;
+          } else {  //shearing
+            if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " shearing" << endl;}
+            atom.cpos += (shear_fraction * d_layers_s) * n_s;
+            if(partial_dissociation){atom.cpos -= (shear_fraction * z_shift_fpos) * n_z;}
+            atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
+            count_top++;
+          }
+          count_total++;
+        }
+        if(LDEBUG) {
+          cerr << soliloquy << " count_bottom=" << count_bottom << endl;
+          cerr << soliloquy << " count_top=" << count_top << endl;
+          cerr << soliloquy << " count_bottom+count_top=" << count_bottom+count_top << endl;
+          cerr << soliloquy << " count_total=" << count_total << endl;
+          cerr << soliloquy << " xstr_shear.atoms.size()=" << xstr_shear.atoms.size() << endl;
+        }
+        if(count_total!=xstr_shear.atoms.size()){
+          message << "count_total!=xstr_shear.atoms.size()";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+        }
+        if(count_total!=count_bottom+count_top){
+          message << "count_total!=count_bottom+count_top";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+        }
+
+        //[CO190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
+        //[CO190423 - too much work, rely on atom.ijk instead!]  for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_above;i--){  //top (furthest away)
+        //[CO190423 - too much work, rely on atom.ijk instead!]    _atom& atom=xstr_shear.atoms[v_apd[i].index];
+        //[CO190423 - too much work, rely on atom.ijk instead!]    atom.cpos += (shear_fraction * d_layers_s) * n_s;
+        //[CO190423 - too much work, rely on atom.ijk instead!]    atom.fpos = c2f*atom.cpos; //C2F(xstr_shear.lattice,atom.cpos);
+        //[CO190423 - too much work, rely on atom.ijk instead!]  }
+        //[CO190423 - too much work, rely on atom.ijk instead!]}
+        //for(uint i=0;i<v_apd.size();i++)
+        //  //if(!std::signbit(v_apd[i].distance)) //not great about atoms right on plane
+        //  { //CO200106 - patching for auto-indenting
+        //  if(signed_point_plane_distance>=-_ZERO_TOL_){ //above plane, opposite of what is defined above for count_below/count_above
+        //    xstr_shear.atoms[v_apd[i].index].cpos += shear_fraction * d_layers_s;
+        //    xstr_shear.atoms[v_apd[i].index].fpos = C2F(xstr_shear.lattice,xstr_shear.atoms[v_apd[i].index].cpos);
+        //  }
+        //}
+        xstr_shear.BringInCell(); //wrap around
+        if(LDEBUG) {cerr << soliloquy << " xstr_shear=" << endl;cerr << xstr_shear << endl;}
+
+        if(check_min_dist){ //sanity check as we rotate structure/atoms
+          min_dist=xstr_shear.MinDist();
+          if(LDEBUG) {cerr << soliloquy << " mindist[" << (count_check_min_dist++)+dir_count << "]=" << min_dist << endl;}
+          if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+        }
+
+        //if(0){
+        //  string destination=aurostd::utype2string(h_i)+aurostd::utype2string(k_i)+aurostd::utype2string(l_i) + "/" + aurostd::utype2string(dir_count);
+        //  if(LDEBUG) {cerr << soliloquy << " creating " << destination << endl;}
+        //  aurostd::DirectoryMake(destination);
+        //  destination+="/POSCAR";
+        //  stringstream POSCAR; POSCAR.str("");
+        //  POSCAR << xstr;
+        //  aurostd::stringstream2file(POSCAR,destination);
+        //}
+
+        //load in xstructure
+        xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+        xvasp.str=xstr_shear;
+
+        //create directory name
+        xvasp.Directory=aflags.Directory;
+        xvasp.AVASP_arun=true;
+        xvasp.AVASP_arun_mode="GSFE"; //generalized stacking fault energy
+        arun_dirname.str("");
+        arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+        //arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+        //arun_dirname << "sHKL" << aurostd::utype2string(hkl_s[1]) << aurostd::utype2string(hkl_s[2]) << aurostd::utype2string(hkl_s[3]) << "-";
+        //arun_dirname << "sf" << aurostd::utype2string(shear_fraction,8);
+        arun_dirname << "PL=" << aurostd::joinWDelimiter(hkl_i,":") << "-"; //cannot have - before numbers as there can be negative directions, use : to help readability
+        arun_dirname << "DIR=" << aurostd::joinWDelimiter(hkl_s,":") << "-";//cannot have - before numbers as there can be negative directions, use : to help readability
+        arun_dirname << "FRAC=" << aurostd::utype2string(shear_fraction,3);  //fix precision here if you want
+        xvasp.AVASP_arun_runname=arun_dirname.str();
+        AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+        setPreserveUnitCell(xvasp);
+        //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
+        if(1){
+          xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT",FALSE);
+          //xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT",TRUE);
+          xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP",TRUE);
+          xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); //clear
+          xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "KPOINTS" << endl;
+          xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << endl;
+          xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "Gamma" << endl;
+          xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "11 11 1" << endl;
+          xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << endl;
+        }
+
+        //relax ions ONLY
+        xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS");
+        xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE);  //no volume changes +/*
+        if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
+
+        //make aflow.in
+        AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
+      }
+      shear_fraction+=step_size;
+      dir_count++;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - create shear sub-directories
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(!all_vasp_done){
+      message << "Now waiting for sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+      return;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - postprocessing
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - postprocessing
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  }
+
+  //CO190321
+  //follows procedure outlined in: W. Sun and G. Ceder, Surface Science 617 (2013) 53-59
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return CleavageEnergyCalculation(vpflow,xstr_in,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ostream& oss){
+    _aflags aflags; aflags.Directory=".";
+    _kflags kflags;
+    _vflags vflags;
+    return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
+    ofstream FileMESSAGE;
+    return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return CleavageEnergyCalculation(vpflow,xstr_in,FileMESSAGE,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss){
+    _aflags aflags; aflags.Directory=".";
+    _kflags kflags;
+    _vflags vflags;
+    return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+    xstructure xstr_in(input,IOAFLOW_AUTO);
+    return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
+  }
+  void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::CleavageEnergyCalculation():";
+    stringstream message;
+    std::streamsize prec = 8;
+    bool check_min_dist=true; //turn off if it gets too slow
+    int count_check_min_dist=0;
+
+    message << aflow::Banner("BANNER_NORMAL");
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+    if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - get conventional cell
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " get conventional cell" << endl;}
+
+    xstructure xstr_bulk(xstr_in);
+    double min_dist=xstr_bulk.dist_nn_min;
+    if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr_bulk);}
+    double min_dist_orig=min_dist;
+    if(check_min_dist){ //sanity check as we rotate structure/atoms
+      min_dist=xstr_bulk.MinDist();
+      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    }
+
+    bool convert_sconv=true;
+    if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
+    if(check_min_dist){ //sanity check as we rotate structure/atoms
+      min_dist=xstr_bulk.MinDist();
+      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){
+        //throw a warning here instead, minimum distance MIGHT change with sconv
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);
+        message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+        min_dist_orig=min_dist;
+      }
+    }
+    xstr_bulk.ReScale(1.0);
+    xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
+    xstr_bulk.BringInCell();
+    xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
+    if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
+    //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
+
+    message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+
+    if(check_min_dist){ //sanity check as we rotate structure/atoms
+      min_dist=xstr_bulk.MinDist();
+      if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - get conventional cell
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - get sym info for structure (mostly for FPOSMatch)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    xstructure xstr_sym(xstr_bulk);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
+    pflow::PerformFullSymmetry(xstr_sym);
+    xstr_bulk.dist_nn_min=xstr_sym.dist_nn_min;
+    xstr_bulk.sym_eps=xstr_sym.sym_eps;
+    bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,xstr_bulk.dist_nn_min,xstr_bulk.sym_eps);
+    if(LDEBUG){
+      cerr << soliloquy << " xstr_bulk.dist_nn_min=" << xstr_bulk.dist_nn_min << endl;
+      cerr << soliloquy << " xstr_bulk.sym_eps=" << xstr_bulk.sym_eps << endl;
+      cerr << soliloquy << " skew=" << skew << endl;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - get sym info for structure (mostly for FPOSMatch)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - read flags
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
+
+    int h_i=1,k_i=1,l_i=1;  //hkl of interest //needed for dirname
+    xvector<int> hkl_i;     //needed for dirname
+    int relaxation_layers=DEFAULT_SURFACE_LAYERS;      //number of relaxation layers
+    bool spin_off=false;
+
+    vector<string> tokens;
+    aurostd::string2tokens(vpflow.getattachedscheme("CREATE_SLAB::PLANE_INTEREST"),tokens,",");
+    if(tokens.size()==3){
+      h_i=aurostd::string2utype<int>(tokens[0]);
+      k_i=aurostd::string2utype<int>(tokens[1]);
+      l_i=aurostd::string2utype<int>(tokens[2]);
+    }
+    hkl_i[1]=h_i;hkl_i[2]=k_i;hkl_i[3]=l_i;
+    if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
+    string relaxation_layers_string=vpflow.getattachedscheme("CLEAVAGE_ENERGY::RELAXATION_LAYERS"); //step size
+    if(aurostd::isfloat(relaxation_layers_string)){
+      int _relaxation_layers=aurostd::string2utype<int>(relaxation_layers_string);
+      if(_relaxation_layers>0){relaxation_layers=_relaxation_layers;}
+    }
+    spin_off=vpflow.flag("CLEAVAGE_ENERGY::SPIN_OFF");
+
+    std::streamsize prec_original = message.precision(); //original
+    std::ios_base::fmtflags ff_original = message.flags();  //original
+    message.precision(prec);
+    message.unsetf(std::ios_base::floatfield);
+
+    message << "relaxation_layers=" << relaxation_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+    message.precision(prec_original); //set back
+    message.flags(ff_original); //set back
+    //exit(0);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - read flags
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - defining hkl normals
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
+
+    xvector<double> n_i=slab::HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
+    if(LDEBUG) {cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - defining hkl normals
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - run bulk (with our parameters)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    int dir_count=0,dir_count_total=2;  //two total dirs, bulk and slab
+    bool all_vasp_done=true;
+    string FileName;
+
+    stringstream new_AflowIn_ss;
+    stringstream arun_dirname;
+    _xvasp xvasp;
+
+    xvasp.clear();
+    //create directory name
+    xvasp.Directory=aflags.Directory;
+    xvasp.AVASP_arun=true;
+    xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+    arun_dirname.str("");
+    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+    arun_dirname << "bulk";
+    xvasp.AVASP_arun_runname=arun_dirname.str();
+    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+    all_vasp_done=true;
+    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
+    if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
+
+    bool convert_sprim=true;
+    if(!all_vasp_done){
+      message << "Creating bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+      xvasp.clear();
+
+      //load in xstructure
+      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+      xvasp.str=xstr_bulk;
+      if(convert_sprim){
+        xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
+        xvasp.str.ReScale(1.0);
+        xvasp.str.ShifOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
+        xvasp.str.BringInCell();
+        xvasp.str.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
+      }
+      xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
+
+      //create directory name
+      xvasp.Directory=aflags.Directory;
+      xvasp.AVASP_arun=true;
+      xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+      arun_dirname.str("");
+      arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+      arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+      arun_dirname << "bulk";
+      xvasp.AVASP_arun_runname=arun_dirname.str();
+      AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+      setPreserveUnitCell(xvasp);
+      //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
+      if(1){
+        xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT",FALSE);
+        //xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT",TRUE);
+        xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP",TRUE);
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); //clear
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "KPOINTS" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "Gamma" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "11 11 11" << endl;
+        xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << endl;
+      }
+
+      //relax ions ONLY
+      xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","ALL");
+      if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
+
+      //make aflow.in
+      AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
+    }
+    dir_count++;
+
+    if(!all_vasp_done){
+      message << "Now waiting for the bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+      return;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - run bulk (with our parameters)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - grab relaxed bulk
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    xstructure xstr_relaxed=KBIN::GetMostRelaxedStructure(xvasp.Directory);
+    message << "structure(bulk_relaxed)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << xstr_relaxed << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - grab relaxed bulk
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - create slab
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+    //xvector<int> hkl_i;
+    int total_layers = 0;
+    xmatrix<double> rotation;
+    xstructure xstr_slablattice;
+    vector<int> sc2pcMap_slab,pc2scMap_slab;
+
+    xstructure xstr_slab=slab::CreateSlab_SurfaceLattice(vpflow,xstr_relaxed,hkl_i,total_layers,rotation,xstr_slablattice,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,AUROSTD_MAX_DOUBLE,oss);
+
+    if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - create slab
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - resolve layers count
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG){cerr << soliloquy << " resolving layers count" << endl;}
+
+    double d_spacing=slab::getSpacingHKLPlane(xstr_bulk,hkl_i); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
+    double d_layers=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
+    double d_cells=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
+    int layers_per_cell=(int)(d_cells/d_layers);  //floor
+    int supercell_layers=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil //(double)total_layers;
+    if(LDEBUG) {
+      cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;
+      cerr << soliloquy << " d_spacing=" << d_spacing << endl;
+      cerr << soliloquy << " d_layers=" << d_layers << endl;
+      cerr << soliloquy << " d_cells=" << d_cells << endl;
+      cerr << soliloquy << " abs(d_layers-d_cells)=" << abs(d_layers-d_cells) << endl;
+      cerr << soliloquy << " layers_per_cell=" << layers_per_cell << endl;
+      cerr << soliloquy << " supercell_layers=" << supercell_layers << endl;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - resolve layers count
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - identify selective dynamics
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    if(LDEBUG) {cerr << soliloquy << " identifying selective dynamics" << endl;}
+
+    //k in atom.ijk will go from 0 to supercell_layers-1
+
+    //sometimes k_min==0, sometimes k_min==1 (look at GetSuperCell())
+    //get k_min and k_max first
+    int k=0,k_min=xstr_slab.atoms.size(),k_max=-xstr_slab.atoms.size();
+    for(uint i=0;i<xstr_slab.atoms.size();i++){
+      const _atom& atom=xstr_slab.atoms[i];
+      if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
+      k=atom.ijk[3];
+      if(k<k_min){k_min=k;}
+      if(k>k_max){k_max=k;}
+    }
+    if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
+    if(k_max-k_min+1!=supercell_layers){  //test of stupidity
+      message << "k_max-k_min!=supercell_layers";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+    }
+
+    uint count_total_relaxing=0,count_bottom_relaxing=0,count_top_relaxing=0; //tests of stupidity
+    bool relax_bottom=false,relax_top=false;
+
+    xstr_slab.isd=true; //set selective dynamics
+    for(uint i=0;i<xstr_slab.atoms.size();i++){
+      _atom& atom=xstr_slab.atoms[i];
+      if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
+      k=atom.ijk[3];
+      relax_bottom=(k<(k_min+relaxation_layers));
+      relax_top=(k>(k_min+(supercell_layers-relaxation_layers-1)));
+      if(relax_bottom || relax_top){  //relax
+        //atom.sd="TTT";  //default, allow relaxation
+        atom.sd="FFT";  //default, allow relaxation //CORRECTION: only relax in z direction: Vitek Phil Mag 18, 773-786 (1968), also http://theory.cm.utexas.edu/forum/viewtopic.php?t=3301
+        count_total_relaxing++;
+        if(relax_bottom){count_bottom_relaxing++;}
+        else if(relax_top){count_top_relaxing++;}
+        if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " will RELAX" << endl;}
+      } else {
+        atom.sd="FFF";  //keep fixed
+        if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " is FIXED" << endl;}
+      }
+    }
+    if(LDEBUG) {
+      cerr << soliloquy << " count_bottom_relaxing=" << count_bottom_relaxing << endl;
+      cerr << soliloquy << " count_top_relaxing=" << count_top_relaxing << endl;
+      cerr << soliloquy << " count_bottom_relaxing+count_top_relaxing=" << count_bottom_relaxing+count_top_relaxing << endl;
+      cerr << soliloquy << " count_total_relaxing=" << count_total_relaxing << endl;
+    }
+    if(count_total_relaxing!=count_bottom_relaxing+count_top_relaxing){
+      message << "count_total_relaxing!=count_bottom_relaxing+count_top_relaxing (" << count_total_relaxing << "!=" << count_bottom_relaxing+count_top_relaxing << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - identify selective dynamics
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - run slab
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    xvasp.clear();
+    //create directory name
+    xvasp.Directory=aflags.Directory;
+    xvasp.AVASP_arun=true;
+    xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+    arun_dirname.str("");
+    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+    arun_dirname << "slab";
+    xvasp.AVASP_arun_runname=arun_dirname.str();
+    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
+    all_vasp_done=true;
+    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
+    if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
+
+    if(!all_vasp_done){
+      message << "Creating slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+      xvasp.clear();
+      //load in xstructure
+      xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
+      xvasp.str=xstr_slab;
+      xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
+
+      //create directory name
+      xvasp.Directory=aflags.Directory;
+      xvasp.AVASP_arun=true;
+      xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
+      arun_dirname.str("");
+      arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
+      arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
+      arun_dirname << "slab";
+      xvasp.AVASP_arun_runname=arun_dirname.str();
+      AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+
       setPreserveUnitCell(xvasp);
       //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
       if(1){
@@ -1071,510 +1534,47 @@ void GeneralizedStackingFaultEnergyCalculation(const aurostd::xoption& vpflow,co
 
       //relax ions ONLY
       xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS");
-      xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE);  //no volume changes +/*
       if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
 
       //make aflow.in
       AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
+
     }
-    shear_fraction+=step_size;
     dir_count++;
-  }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create shear sub-directories
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(!all_vasp_done){
-	  message << "Now waiting for sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-    return;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - postprocessing
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - postprocessing
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-}
-
-//CO190321
-//follows procedure outlined in: W. Sun and G. Ceder, Surface Science 617 (2013) 53-59
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CleavageEnergyCalculation(vpflow,xstr_in,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  _kflags kflags;
-  _vflags vflags;
-  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss){
-  ofstream FileMESSAGE;
-  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CleavageEnergyCalculation(vpflow,xstr_in,FileMESSAGE,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,ofstream& FileMESSAGE,ostream& oss){
-  _aflags aflags; aflags.Directory=".";
-  _kflags kflags;
-  _vflags vflags;
-  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,istream& input,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
-  xstructure xstr_in(input,IOAFLOW_AUTO);
-  return CleavageEnergyCalculation(vpflow,xstr_in,aflags,kflags,vflags,FileMESSAGE,oss);
-}
-void CleavageEnergyCalculation(const aurostd::xoption& vpflow,const xstructure& xstr_in,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss){
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="pflow::CleavageEnergyCalculation():";
-  stringstream message;
-  std::streamsize prec = 8;
-  bool check_min_dist=true; //turn off if it gets too slow
-  int count_check_min_dist=0;
-  
-  message << aflow::Banner("BANNER_NORMAL");
-  pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
-  if(LDEBUG) {cerr << soliloquy << " starting" << endl;}
- 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - get conventional cell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  if(LDEBUG) {cerr << soliloquy << " get conventional cell" << endl;}
-  
-  xstructure xstr_bulk(xstr_in);
-  double min_dist=xstr_bulk.dist_nn_min;
-  if(min_dist==AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr_bulk);}
-  double min_dist_orig=min_dist;
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-  
-  bool convert_sconv=true;
-  if(convert_sconv){xstr_bulk=Standard_Conventional_UnitCellForm(xstr_bulk);xstr_bulk.clean();}  //best to work with standard conventional unitcell //DX 20191220 - uppercase to lowercase clean
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){
-      //throw a warning here instead, minimum distance MIGHT change with sconv
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);
-      message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
-      min_dist_orig=min_dist;
-    }
-  }
-  xstr_bulk.ReScale(1.0);
-  xstr_bulk.ShifOriginToAtom(0);xstr_bulk.origin=0.0; //reset origin
-  xstr_bulk.BringInCell();
-  xstr_bulk.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
-  if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
-  //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
-  
-  message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
-  
-  if(check_min_dist){ //sanity check as we rotate structure/atoms
-    min_dist=xstr_bulk.MinDist();
-    if(LDEBUG) {cerr << soliloquy << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed",_VALUE_ERROR_);}
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - get conventional cell
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - get sym info for structure (mostly for FPOSMatch)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  xstructure xstr_sym(xstr_bulk);  //make a copy so we don't carry around all the symmetry in memory as we make copies of a
-  pflow::PerformFullSymmetry(xstr_sym);
-  xstr_bulk.dist_nn_min=xstr_sym.dist_nn_min;
-  xstr_bulk.sym_eps=xstr_sym.sym_eps;
-  bool skew=SYM::isLatticeSkewed(xstr_bulk.lattice,xstr_bulk.dist_nn_min,xstr_bulk.sym_eps);
-  if(LDEBUG){
-    cerr << soliloquy << " xstr_bulk.dist_nn_min=" << xstr_bulk.dist_nn_min << endl;
-    cerr << soliloquy << " xstr_bulk.sym_eps=" << xstr_bulk.sym_eps << endl;
-    cerr << soliloquy << " skew=" << skew << endl;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - get sym info for structure (mostly for FPOSMatch)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - read flags
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " reading flags" << endl;}
-  
-  int h_i=1,k_i=1,l_i=1;  //hkl of interest //needed for dirname
-  xvector<int> hkl_i;     //needed for dirname
-  int relaxation_layers=DEFAULT_SURFACE_LAYERS;      //number of relaxation layers
-  bool spin_off=false;
-
-  vector<string> tokens;
-  aurostd::string2tokens(vpflow.getattachedscheme("CREATE_SLAB::PLANE_INTEREST"),tokens,",");
-  if(tokens.size()==3){
-    h_i=aurostd::string2utype<int>(tokens[0]);
-    k_i=aurostd::string2utype<int>(tokens[1]);
-    l_i=aurostd::string2utype<int>(tokens[2]);
-  }
-  hkl_i[1]=h_i;hkl_i[2]=k_i;hkl_i[3]=l_i;
-  if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
-  string relaxation_layers_string=vpflow.getattachedscheme("CLEAVAGE_ENERGY::RELAXATION_LAYERS"); //step size
-  if(aurostd::isfloat(relaxation_layers_string)){
-    int _relaxation_layers=aurostd::string2utype<int>(relaxation_layers_string);
-    if(_relaxation_layers>0){relaxation_layers=_relaxation_layers;}
-  }
-  spin_off=vpflow.flag("CLEAVAGE_ENERGY::SPIN_OFF");
-
-  std::streamsize prec_original = message.precision(); //original
-  std::ios_base::fmtflags ff_original = message.flags();  //original
-  message.precision(prec);
-  message.unsetf(std::ios_base::floatfield);
-  
-  message << "relaxation_layers=" << relaxation_layers;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  
-  message.precision(prec_original); //set back
-  message.flags(ff_original); //set back
-  //exit(0);
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - read flags
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " defining HKL normals" << endl;}
-  
-  xvector<double> n_i=slab::HKLPlane2Normal(xstr_bulk.lattice,hkl_i);
-  if(LDEBUG) {cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;}
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - defining hkl normals
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - run bulk (with our parameters)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  int dir_count=0,dir_count_total=2;  //two total dirs, bulk and slab
-  bool all_vasp_done=true;
-  string FileName;
-  
-  stringstream new_AflowIn_ss;
-  stringstream arun_dirname;
-  _xvasp xvasp;
-
-  xvasp.clear();
-  //create directory name
-  xvasp.Directory=aflags.Directory;
-  xvasp.AVASP_arun=true;
-  xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
-  arun_dirname.str("");
-  arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
-  arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
-  arun_dirname << "bulk";
-  xvasp.AVASP_arun_runname=arun_dirname.str();
-  AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
-
-  all_vasp_done=true;
-  FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
-  if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
-  if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
-
-  bool convert_sprim=true;
-  if(!all_vasp_done){
-    message << "Creating bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    
-    xvasp.clear();
-
-    //load in xstructure
-    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
-    xvasp.str=xstr_bulk;
-    if(convert_sprim){
-      xvasp.str=Standard_Primitive_UnitCellForm(xvasp.str);
-      xvasp.str.ReScale(1.0);
-      xvasp.str.ShifOriginToAtom(0);xvasp.str.origin=0.0; //reset origin
-      xvasp.str.BringInCell();
-      xvasp.str.clean();  //clear origin! //DX 20191220 - uppercase to lowercase clean
-    }
-    xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
-
-    //create directory name
-    xvasp.Directory=aflags.Directory;
-    xvasp.AVASP_arun=true;
-    xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
-    arun_dirname.str("");
-    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
-    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
-    arun_dirname << "bulk";
-    xvasp.AVASP_arun_runname=arun_dirname.str();
-    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
-
-    setPreserveUnitCell(xvasp);
-    //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
-    if(1){
-      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT",FALSE);
-      //xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT",TRUE);
-      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP",TRUE);
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); //clear
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "KPOINTS" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "Gamma" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "11 11 11" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << endl;
+    if(!all_vasp_done){
+      message << "Now waiting for the slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+      return;
     }
 
-    //relax ions ONLY
-    xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","ALL");
-    if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - run slab
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //make aflow.in
-    AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // START - postprocessing
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // STOP - postprocessing
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   }
-  dir_count++;
-
-  if(!all_vasp_done){
-	  message << "Now waiting for the bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-    return;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - run bulk (with our parameters)
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - grab relaxed bulk
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  xstructure xstr_relaxed=KBIN::GetMostRelaxedStructure(xvasp.Directory);
-  message << "structure(bulk_relaxed)=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  message << xstr_relaxed << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - grab relaxed bulk
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - create slab
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  //xvector<int> hkl_i;
-  int total_layers = 0;
-  xmatrix<double> rotation;
-  xstructure xstr_slablattice;
-  vector<int> sc2pcMap_slab,pc2scMap_slab;
-
-  xstructure xstr_slab=slab::CreateSlab_SurfaceLattice(vpflow,xstr_relaxed,hkl_i,total_layers,rotation,xstr_slablattice,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,AUROSTD_MAX_DOUBLE,oss);
-  
-	if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - create slab
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - resolve layers count
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG){cerr << soliloquy << " resolving layers count" << endl;}
-  
-  double d_spacing=slab::getSpacingHKLPlane(xstr_bulk,hkl_i); //aurostd::modulus(xstr_slab.lattice(1))/sqrt(h_s*h_s+k_s*k_s+l_s*l_s);
-  double d_layers=slab::getDistanceBetweenImages(xstr_bulk,n_i,false); //this depends on UN-ROTATED lattice
-  double d_cells=slab::getDistanceBetweenImages(xstr_bulk,n_i,true); //go outside cell
-  int layers_per_cell=(int)(d_cells/d_layers);  //floor
-  int supercell_layers=(total_layers+layers_per_cell-1)/layers_per_cell;  //ceil //(double)total_layers;
-  if(LDEBUG) {
-    cerr << soliloquy << " n_i[h=" << hkl_i << "]=" << n_i << endl;
-    cerr << soliloquy << " d_spacing=" << d_spacing << endl;
-    cerr << soliloquy << " d_layers=" << d_layers << endl;
-    cerr << soliloquy << " d_cells=" << d_cells << endl;
-    cerr << soliloquy << " abs(d_layers-d_cells)=" << abs(d_layers-d_cells) << endl;
-    cerr << soliloquy << " layers_per_cell=" << layers_per_cell << endl;
-    cerr << soliloquy << " supercell_layers=" << supercell_layers << endl;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - resolve layers count
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - identify selective dynamics
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  if(LDEBUG) {cerr << soliloquy << " identifying selective dynamics" << endl;}
-
-  //k in atom.ijk will go from 0 to supercell_layers-1
-  
-  //sometimes k_min==0, sometimes k_min==1 (look at GetSuperCell())
-  //get k_min and k_max first
-  int k=0,k_min=xstr_slab.atoms.size(),k_max=-xstr_slab.atoms.size();
-  for(uint i=0;i<xstr_slab.atoms.size();i++){
-    const _atom& atom=xstr_slab.atoms[i];
-    if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
-    k=atom.ijk[3];
-    if(k<k_min){k_min=k;}
-    if(k>k_max){k_max=k;}
-  }
-  if(LDEBUG) {cerr << soliloquy << " k_min=" << k_min << ", k_max=" << k_max << endl;}
-  if(k_max-k_min+1!=supercell_layers){  //test of stupidity
-    message << "k_max-k_min!=supercell_layers";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
-  }
-
-  uint count_total_relaxing=0,count_bottom_relaxing=0,count_top_relaxing=0; //tests of stupidity
-  bool relax_bottom=false,relax_top=false;
-  
-  xstr_slab.isd=true; //set selective dynamics
-  for(uint i=0;i<xstr_slab.atoms.size();i++){
-    _atom& atom=xstr_slab.atoms[i];
-    if(LDEBUG) {cerr << soliloquy << " atom.fpos=" << atom.fpos << ", atom.ijk=" << atom.ijk << endl;}
-    k=atom.ijk[3];
-    relax_bottom=(k<(k_min+relaxation_layers));
-    relax_top=(k>(k_min+(supercell_layers-relaxation_layers-1)));
-    if(relax_bottom || relax_top){  //relax
-      //atom.sd="TTT";  //default, allow relaxation
-      atom.sd="FFT";  //default, allow relaxation //CORRECTION: only relax in z direction: Vitek Phil Mag 18, 773-786 (1968), also http://theory.cm.utexas.edu/forum/viewtopic.php?t=3301
-      count_total_relaxing++;
-      if(relax_bottom){count_bottom_relaxing++;}
-      else if(relax_top){count_top_relaxing++;}
-      if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " will RELAX" << endl;}
-    } else {
-      atom.sd="FFF";  //keep fixed
-      if(LDEBUG) {cerr << soliloquy << " atom.ijk=" << atom.ijk << " is FIXED" << endl;}
-    }
-  }
-  if(LDEBUG) {
-    cerr << soliloquy << " count_bottom_relaxing=" << count_bottom_relaxing << endl;
-    cerr << soliloquy << " count_top_relaxing=" << count_top_relaxing << endl;
-    cerr << soliloquy << " count_bottom_relaxing+count_top_relaxing=" << count_bottom_relaxing+count_top_relaxing << endl;
-    cerr << soliloquy << " count_total_relaxing=" << count_total_relaxing << endl;
-  }
-  if(count_total_relaxing!=count_bottom_relaxing+count_top_relaxing){
-    message << "count_total_relaxing!=count_bottom_relaxing+count_top_relaxing (" << count_total_relaxing << "!=" << count_bottom_relaxing+count_top_relaxing << ")";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_); //CO190226
-  }
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - identify selective dynamics
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - run slab
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  xvasp.clear();
-  //create directory name
-  xvasp.Directory=aflags.Directory;
-  xvasp.AVASP_arun=true;
-  xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
-  arun_dirname.str("");
-  arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
-  arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
-  arun_dirname << "slab";
-  xvasp.AVASP_arun_runname=arun_dirname.str();
-  AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
-
-  all_vasp_done=true;
-  FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
-  if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
-  if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
-
-  if(!all_vasp_done){
-    message << "Creating slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    
-    xvasp.clear();
-    //load in xstructure
-    xvasp.str.clear(); //DX 20191220 - uppercase to lowercase clear
-    xvasp.str=xstr_slab;
-    xvasp.str.write_DEBUG_flag=FALSE;  //FORCE
-
-    //create directory name
-    xvasp.Directory=aflags.Directory;
-    xvasp.AVASP_arun=true;
-    xvasp.AVASP_arun_mode="CLEAVENG"; //generalized stacking fault energy
-    arun_dirname.str("");
-    arun_dirname << std::setfill('0') << std::setw(aurostd::getZeroPadding(dir_count_total)) << dir_count+1 << "_";
-    arun_dirname << "iHKL" << aurostd::utype2string(hkl_i[1]) << aurostd::utype2string(hkl_i[2]) << aurostd::utype2string(hkl_i[3]) << "-";
-    arun_dirname << "slab";
-    xvasp.AVASP_arun_runname=arun_dirname.str();
-    AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
-
-    setPreserveUnitCell(xvasp);
-    //set k-points to 11x11x1 as per 10.1103/PhysRevLett.114.165502, this is just a quick fix for now
-    if(1){
-      xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT",FALSE);
-      //xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT",TRUE);
-      xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP",TRUE);
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP.str(""); //clear
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "KPOINTS" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "Gamma" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "11 11 1" << endl;
-      xvasp.AVASP_KPOINTS_EXPLICIT_START_STOP << "0 0 0" << endl;
-    }
-
-    //relax ions ONLY
-    xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE","IONS");
-    if(spin_off){xvasp.aopts.flag("FLAG::AVASP_SPIN",FALSE);}
-
-    //make aflow.in
-    AVASP_MakeSingleAFLOWIN(xvasp,new_AflowIn_ss,true); //false,-1,false);  //don't write/print and hence don't pthread
-
-  }
-  dir_count++;
-  
-  if(!all_vasp_done){
-	  message << "Now waiting for the slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-    return;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - run slab
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // START - postprocessing
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // STOP - postprocessing
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-}
 } // namespace pflow
 
 // ***************************************************************************
 // ParseChemFormula
 // ***************************************************************************
 void ParseChemFormula(string& ChemFormula,vector<string>& ChemNameRef,vector<float>& ChemConcRef) {
-  /*
-    ChemFormula=MgB2.3 -> ChemNameRef=["Mg","B"] and ChemConcRef=[1,2.3]
+  //ChemFormula=MgB2.3 -> ChemNameRef=["Mg","B"] and ChemConcRef=[1,2.3]
 
-    input:
-    ChemFormula
+  //input:
+  //ChemFormula
 
-    output:
-    ChemNameRef, ChemConcRef
+  //output:
+  //ChemNameRef, ChemConcRef
 
-    wahyu@alumni.duke.edu
-  */
+  //wahyu@alumni.duke.edu
+
   uint nchar;
   //  int i,j,k,L,itmp;
   float AtomConc;
@@ -1641,21 +1641,19 @@ void ParseChemFormula(string& ChemFormula,vector<string>& ChemNameRef,vector<flo
 // ParseChemFormulaIndividual
 // ***************************************************************************
 void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSymbol, float& AtomConc) {
-  /*
-    get 1 valid pair of atom symbol and its concentration from ChemFormula.
-    start from the beginning of ChemFormula. If found, return the AtomSymbol and AtomConc
-    and truncate it from the ChemFormula.
+  //get 1 valid pair of atom symbol and its concentration from ChemFormula.
+  //start from the beginning of ChemFormula. If found, return the AtomSymbol and AtomConc
+  //and truncate it from the ChemFormula.
 
-    input:
-    nchar     : the number of characters in the atom symbol
+  //input:
+  //nchar     : the number of characters in the atom symbol
 
-    wahyu@alumni.duke.edu
-   */
+  //wahyu@alumni.duke.edu
 
   uint iret;
   int i;
   string sN,sC;
-  
+
   AtomSymbol="";
   AtomConc=0.0;
   sN=ChemFormula.substr(0,nchar);
@@ -1690,136 +1688,136 @@ void ParseChemFormulaIndividual(uint nchar, string& ChemFormula, string& AtomSym
 // ***************************************************************************
 // Corey Oses 190620
 namespace pflow {
-void GetXray2ThetaIntensity(const xstructure& str,
-    vector<double>& v_twotheta,
-    vector<double>& v_intensity,
-    double lambda) { //CO190520 //CO190620 - v_amplitude can be calculated later
-  int num_atoms=str.atoms.size();
-  //  vector<string> names=str.GetNames();
-  vector<double> dist,sf;
-  vector<double> scatt_fact(num_atoms,0.0);
-  vector<double> mass(num_atoms,0.0);
-  vector<double> twoB_vec(num_atoms,0.0);
-  //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
-  vector<vector<double> > ids;
-  pflow::matrix<double> data;
-  pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
+  void GetXray2ThetaIntensity(const xstructure& str,
+      vector<double>& v_twotheta,
+      vector<double>& v_intensity,
+      double lambda) { //CO190520 //CO190620 - v_amplitude can be calculated later
+    int num_atoms=str.atoms.size();
+    //  vector<string> names=str.GetNames();
+    vector<double> dist,sf;
+    vector<double> scatt_fact(num_atoms,0.0);
+    vector<double> mass(num_atoms,0.0);
+    vector<double> twoB_vec(num_atoms,0.0);
+    //pflow::GetXray(str,dist,sf,lambda,scatt_fact,mass,twoB_vec);
+    vector<vector<double> > ids;
+    pflow::matrix<double> data;
+    pflow::GetXrayData(str,dist,sf,scatt_fact,mass,twoB_vec,ids,data,lambda); //CO190620 - intmax can be grabbed later
 
-  v_twotheta.clear();
+    v_twotheta.clear();
 
-  double tol=XRAY_THETA_TOL;
+    double tol=XRAY_THETA_TOL;
 
-  for(uint i=0;i<data.size();i++) {
-    double theta=0;
-    if(data[i][3]>0) {
-      double term=lambda/(2.0*data[i][3]);
-      if(term<=1) {
-        theta=asin(term);
-        theta=theta*360.0/TWOPI; // rad->degrees
-        if(theta>tol){
-          v_twotheta.push_back(2.0*theta);
-          v_intensity.push_back(data[i][4]);
-        } // if theta<tol
-      } // if term<=1
-    } // if dist>0
-  } // for
-}
-
-vector<uint> GetXrayPeaks(const xstructure& str,
-    vector<double>& v_twotheta,
-    vector<double>& v_intensity,
-    vector<double>& v_intensity_smooth,
-    double lambda) { //CO190520 //CO190620 - v_peaks_amplitude not needed
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetXrayPeaks():";
-  if(LDEBUG){cerr << soliloquy << " input str=" << endl;cerr << str << endl;}
-  GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
-  return GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
-}
-vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO190520 //CO190620 - v_peaks_amplitude not needed
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetXrayPeaks():";
-
-  if(v_twotheta.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
-  if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
-
-  xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
-  uint smoothing_iterations=4,avg_window=4;int width_maximum=1;double significance_multiplier=1.0;  //defaults
-
-  //fix avg_window to derive from degree separation, not points
-  double twotheta_smoothing=5.0;  //avg over 5 degrees
-  double twotheta_diff=(v_twotheta[1]-v_twotheta[0]);
-  double davg_window=twotheta_smoothing/twotheta_diff;
-  avg_window=max(avg_window,(uint)davg_window);
-  if(LDEBUG){
-    cerr << soliloquy << " twotheta_smoothing=" << twotheta_smoothing << endl;
-    cerr << soliloquy << " twotheta_diff=" << twotheta_diff << endl;
-    cerr << soliloquy << " davg_window=" << davg_window << endl;
-    cerr << soliloquy << " avg_window=" << avg_window << endl;
+    for(uint i=0;i<data.size();i++) {
+      double theta=0;
+      if(data[i][3]>0) {
+        double term=lambda/(2.0*data[i][3]);
+        if(term<=1) {
+          theta=asin(term);
+          theta=theta*360.0/TWOPI; // rad->degrees
+          if(theta>tol){
+            v_twotheta.push_back(2.0*theta);
+            v_intensity.push_back(data[i][4]);
+          } // if theta<tol
+        } // if term<=1
+      } // if dist>0
+    } // for
   }
 
-  //COREY COME BACK, plug in 20-120 range
-  vector<int> _peak_indices=aurostd::getPeaks(xv_intensity,xv_intensity_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);  //indices wrt xvector (starts at 1), need to convert
-  v_intensity_smooth=aurostd::xvector2vector<double>(xv_intensity_smooth);
-  vector<uint> peak_indices;for(uint i=0;i<_peak_indices.size();i++){peak_indices.push_back(_peak_indices[i]-xv_intensity.lrows);} //shift indices for xvector -> vector conversion
-
-  if(LDEBUG){
-    cerr << soliloquy << " _peak_indices=" << aurostd::joinWDelimiter(_peak_indices,",") << endl;
-    cerr << soliloquy << "  peak_indices=" << aurostd::joinWDelimiter(peak_indices,",") << endl;
+  vector<uint> GetXrayPeaks(const xstructure& str,
+      vector<double>& v_twotheta,
+      vector<double>& v_intensity,
+      vector<double>& v_intensity_smooth,
+      double lambda) { //CO190520 //CO190620 - v_peaks_amplitude not needed
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="GetXrayPeaks():";
+    if(LDEBUG){cerr << soliloquy << " input str=" << endl;cerr << str << endl;}
+    GetXray2ThetaIntensity(str,v_twotheta,v_intensity,lambda);  //v_amplitude can be grabbed later
+    return GetXrayPeaks(v_twotheta,v_intensity,v_intensity_smooth);
   }
+  vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO190520 //CO190620 - v_peaks_amplitude not needed
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="GetXrayPeaks():";
 
-  return peak_indices;
+    if(v_twotheta.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
 
-  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth.clear();
-  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_twotheta.clear();
-  //[CO190620 - moved to aurostd::getPeaks()]v_peaks_intensity.clear();
-  //[CO190620 - moved to aurostd::getPeaks()]
-  //[CO190620 - moved to aurostd::getPeaks()]//using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
-  //[CO190620 - moved to aurostd::getPeaks()]//raw data is X
-  //[CO190620 - moved to aurostd::getPeaks()]//smooth data via moving average to get Y
-  //[CO190620 - moved to aurostd::getPeaks()]//stddev(X-Y) is sigma
-  //[CO190620 - moved to aurostd::getPeaks()]//detect peaks when (X-Y)>multiplier*sigma
-  //[CO190620 - moved to aurostd::getPeaks()]
-  //[CO190620 - moved to aurostd::getPeaks()]//smooth data
-  //[CO190620 - moved to aurostd::getPeaks()]uint smoothing_iterations=4;int avg_window=4;
-  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity);
-  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity_smooth=xv_intensity;
-  //[CO190620 - moved to aurostd::getPeaks()]for(uint i=0;i<smoothing_iterations;i++){xv_intensity_smooth=aurostd::moving_average(xv_intensity_smooth,avg_window);}
-  //[CO190620 - moved to aurostd::getPeaks()]xvector<double> diff=xv_intensity-xv_intensity_smooth;
-  //[CO190620 - moved to aurostd::getPeaks()]double sigma=aurostd::stddev(diff);
-  //[CO190620 - moved to aurostd::getPeaks()]double multiplier=1;
-  //[CO190620 - moved to aurostd::getPeaks()]
-  //[CO190620 - moved to aurostd::getPeaks()]bool local_maximum=false;
-  //[CO190620 - moved to aurostd::getPeaks()]bool significant=false;
-  //[CO190620 - moved to aurostd::getPeaks()]for(int i=xv_intensity.lrows;i<=xv_intensity.urows;i++){
-  //[CO190620 - moved to aurostd::getPeaks()]  local_maximum=(i>xv_intensity.lrows && i<xv_intensity.urows && xv_intensity[i]>xv_intensity[i-1] && xv_intensity[i]>xv_intensity[i+1]);
-  //[CO190620 - moved to aurostd::getPeaks()]  significant=(diff[i]>multiplier*sigma);
-  //[CO190620 - moved to aurostd::getPeaks()]  if(local_maximum && significant){
-  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_twotheta.push_back(v_twotheta[i-xv_intensity.lrows]);
-  //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_intensity.push_back(v_intensity[i-xv_intensity.lrows]);
-  //[CO190620 - moved to aurostd::getPeaks()]    if(LDEBUG) {cerr << soliloquy << " PEAK[two-theta=" << v_twotheta[i-xv_intensity.lrows] << "]=" << xv_intensity[i] << endl;}
-  //[CO190620 - moved to aurostd::getPeaks()]  }
-  //[CO190620 - moved to aurostd::getPeaks()]}
-  //[CO190620 - moved to aurostd::getPeaks()]
-  //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth=aurostd::xvector2vector(xv_intensity_smooth);
-  //[CO190620 - moved to aurostd::getPeaks()]
-  //[CO190620 - moved to aurostd::getPeaks()]if(0){  //don't bother sorting
-  //[CO190620 - moved to aurostd::getPeaks()]  for(uint i=0;i<v_peaks_twotheta.size();i++){
-  //[CO190620 - moved to aurostd::getPeaks()]    for(uint j=i+1;j<v_peaks_twotheta.size();j++){
-  //[CO190620 - moved to aurostd::getPeaks()]      if(v_peaks_intensity[j]>v_peaks_intensity[i]){  //CO190620 - use intensity vs. amplitude
-  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_twotheta=v_peaks_twotheta[i];
-  //[CO190620 - moved to aurostd::getPeaks()]        double tmp_intensity=v_peaks_intensity[i];
-  //[CO190620 - moved to aurostd::getPeaks()]        
-  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[i]=v_peaks_twotheta[j];
-  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[i]=v_peaks_intensity[j];
-  //[CO190620 - moved to aurostd::getPeaks()]        
-  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[j]=tmp_twotheta;
-  //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[j]=tmp_intensity;
-  //[CO190620 - moved to aurostd::getPeaks()]      }
-  //[CO190620 - moved to aurostd::getPeaks()]    }
-  //[CO190620 - moved to aurostd::getPeaks()]  }
-  //[CO190620 - moved to aurostd::getPeaks()]}
-}
+    xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
+    uint smoothing_iterations=4,avg_window=4;int width_maximum=1;double significance_multiplier=1.0;  //defaults
+
+    //fix avg_window to derive from degree separation, not points
+    double twotheta_smoothing=5.0;  //avg over 5 degrees
+    double twotheta_diff=(v_twotheta[1]-v_twotheta[0]);
+    double davg_window=twotheta_smoothing/twotheta_diff;
+    avg_window=max(avg_window,(uint)davg_window);
+    if(LDEBUG){
+      cerr << soliloquy << " twotheta_smoothing=" << twotheta_smoothing << endl;
+      cerr << soliloquy << " twotheta_diff=" << twotheta_diff << endl;
+      cerr << soliloquy << " davg_window=" << davg_window << endl;
+      cerr << soliloquy << " avg_window=" << avg_window << endl;
+    }
+
+    //COREY COME BACK, plug in 20-120 range
+    vector<int> _peak_indices=aurostd::getPeaks(xv_intensity,xv_intensity_smooth,smoothing_iterations,avg_window,width_maximum,significance_multiplier);  //indices wrt xvector (starts at 1), need to convert
+    v_intensity_smooth=aurostd::xvector2vector<double>(xv_intensity_smooth);
+    vector<uint> peak_indices;for(uint i=0;i<_peak_indices.size();i++){peak_indices.push_back(_peak_indices[i]-xv_intensity.lrows);} //shift indices for xvector -> vector conversion
+
+    if(LDEBUG){
+      cerr << soliloquy << " _peak_indices=" << aurostd::joinWDelimiter(_peak_indices,",") << endl;
+      cerr << soliloquy << "  peak_indices=" << aurostd::joinWDelimiter(peak_indices,",") << endl;
+    }
+
+    return peak_indices;
+
+    //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth.clear();
+    //[CO190620 - moved to aurostd::getPeaks()]v_peaks_twotheta.clear();
+    //[CO190620 - moved to aurostd::getPeaks()]v_peaks_intensity.clear();
+    //[CO190620 - moved to aurostd::getPeaks()]
+    //[CO190620 - moved to aurostd::getPeaks()]//using method outlined here: https://dsp.stackexchange.com/questions/1302/peak-detection-approach
+    //[CO190620 - moved to aurostd::getPeaks()]//raw data is X
+    //[CO190620 - moved to aurostd::getPeaks()]//smooth data via moving average to get Y
+    //[CO190620 - moved to aurostd::getPeaks()]//stddev(X-Y) is sigma
+    //[CO190620 - moved to aurostd::getPeaks()]//detect peaks when (X-Y)>multiplier*sigma
+    //[CO190620 - moved to aurostd::getPeaks()]
+    //[CO190620 - moved to aurostd::getPeaks()]//smooth data
+    //[CO190620 - moved to aurostd::getPeaks()]uint smoothing_iterations=4;int avg_window=4;
+    //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity);
+    //[CO190620 - moved to aurostd::getPeaks()]xvector<double> xv_intensity_smooth=xv_intensity;
+    //[CO190620 - moved to aurostd::getPeaks()]for(uint i=0;i<smoothing_iterations;i++){xv_intensity_smooth=aurostd::moving_average(xv_intensity_smooth,avg_window);}
+    //[CO190620 - moved to aurostd::getPeaks()]xvector<double> diff=xv_intensity-xv_intensity_smooth;
+    //[CO190620 - moved to aurostd::getPeaks()]double sigma=aurostd::stddev(diff);
+    //[CO190620 - moved to aurostd::getPeaks()]double multiplier=1;
+    //[CO190620 - moved to aurostd::getPeaks()]
+    //[CO190620 - moved to aurostd::getPeaks()]bool local_maximum=false;
+    //[CO190620 - moved to aurostd::getPeaks()]bool significant=false;
+    //[CO190620 - moved to aurostd::getPeaks()]for(int i=xv_intensity.lrows;i<=xv_intensity.urows;i++){
+    //[CO190620 - moved to aurostd::getPeaks()]  local_maximum=(i>xv_intensity.lrows && i<xv_intensity.urows && xv_intensity[i]>xv_intensity[i-1] && xv_intensity[i]>xv_intensity[i+1]);
+    //[CO190620 - moved to aurostd::getPeaks()]  significant=(diff[i]>multiplier*sigma);
+    //[CO190620 - moved to aurostd::getPeaks()]  if(local_maximum && significant){
+    //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_twotheta.push_back(v_twotheta[i-xv_intensity.lrows]);
+    //[CO190620 - moved to aurostd::getPeaks()]    v_peaks_intensity.push_back(v_intensity[i-xv_intensity.lrows]);
+    //[CO190620 - moved to aurostd::getPeaks()]    if(LDEBUG) {cerr << soliloquy << " PEAK[two-theta=" << v_twotheta[i-xv_intensity.lrows] << "]=" << xv_intensity[i] << endl;}
+    //[CO190620 - moved to aurostd::getPeaks()]  }
+    //[CO190620 - moved to aurostd::getPeaks()]}
+    //[CO190620 - moved to aurostd::getPeaks()]
+    //[CO190620 - moved to aurostd::getPeaks()]v_intensity_smooth=aurostd::xvector2vector(xv_intensity_smooth);
+    //[CO190620 - moved to aurostd::getPeaks()]
+    //[CO190620 - moved to aurostd::getPeaks()]if(0){  //don't bother sorting
+    //[CO190620 - moved to aurostd::getPeaks()]  for(uint i=0;i<v_peaks_twotheta.size();i++){
+    //[CO190620 - moved to aurostd::getPeaks()]    for(uint j=i+1;j<v_peaks_twotheta.size();j++){
+    //[CO190620 - moved to aurostd::getPeaks()]      if(v_peaks_intensity[j]>v_peaks_intensity[i]){  //CO190620 - use intensity vs. amplitude
+    //[CO190620 - moved to aurostd::getPeaks()]        double tmp_twotheta=v_peaks_twotheta[i];
+    //[CO190620 - moved to aurostd::getPeaks()]        double tmp_intensity=v_peaks_intensity[i];
+    //[CO190620 - moved to aurostd::getPeaks()]        
+    //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[i]=v_peaks_twotheta[j];
+    //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[i]=v_peaks_intensity[j];
+    //[CO190620 - moved to aurostd::getPeaks()]        
+    //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_twotheta[j]=tmp_twotheta;
+    //[CO190620 - moved to aurostd::getPeaks()]        v_peaks_intensity[j]=tmp_intensity;
+    //[CO190620 - moved to aurostd::getPeaks()]      }
+    //[CO190620 - moved to aurostd::getPeaks()]    }
+    //[CO190620 - moved to aurostd::getPeaks()]  }
+    //[CO190620 - moved to aurostd::getPeaks()]}
+  }
 } // namespace pflow
 
 //[CO190629 - replaced with aurostd::compareVecElements<double>]// ***************************************************************************
@@ -1869,241 +1867,241 @@ vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>&
 //[CO190629 - replaced with aurostd::compareVecElements<int>]//    }
 
 namespace pflow {
-void GetXrayData(const xstructure& str,
-         vector<double>& dist,
-         vector<double>& sf,
-         vector<double>& scatt_fact,
-	       vector<double>& mass,vector<double>& twoB_vec,
-         vector<vector<double> >& ids,
-         pflow::matrix<double>& data,
-	       double lambda) { //CO190520  //CO190620 - intmax can be grabbed later
-  //int num_atoms=str.atoms.size();
-  //  vector<string> names=str.GetNames();
-  //vector<double> dist,sf;
-  //vector<double> scatt_fact(num_atoms,0.0);
-  //vector<double> mass(num_atoms,0.0);
-  //vector<double> twoB_vec(num_atoms,0.0);
-  pflow::GetXray(str,dist,sf,scatt_fact,mass,twoB_vec,lambda);
+  void GetXrayData(const xstructure& str,
+      vector<double>& dist,
+      vector<double>& sf,
+      vector<double>& scatt_fact,
+      vector<double>& mass,vector<double>& twoB_vec,
+      vector<vector<double> >& ids,
+      pflow::matrix<double>& data,
+      double lambda) { //CO190520  //CO190620 - intmax can be grabbed later
+    //int num_atoms=str.atoms.size();
+    //  vector<string> names=str.GetNames();
+    //vector<double> dist,sf;
+    //vector<double> scatt_fact(num_atoms,0.0);
+    //vector<double> mass(num_atoms,0.0);
+    //vector<double> twoB_vec(num_atoms,0.0);
+    pflow::GetXray(str,dist,sf,scatt_fact,mass,twoB_vec,lambda);
 
-  double tol=1.0E-5;
-  //int w1=4; // int
-  //int w2=12; // some doubles
-  //int w3=20; // Integrated intensities
-  int tlen=sf.size();
-  int len=Nint(std::pow((double) tlen,(double) 1.0/3.0));
-  int kmx=(len-1)/2; // len should be odd.
+    double tol=1.0E-5;
+    //int w1=4; // int
+    //int w2=12; // some doubles
+    //int w3=20; // Integrated intensities
+    int tlen=sf.size();
+    int len=Nint(std::pow((double) tlen,(double) 1.0/3.0));
+    int kmx=(len-1)/2; // len should be odd.
 
-  // Sort by theta (reverse sort by distance).
-  // Define an id pointer to sort.
-  vector<double> v(5);
-  // pflow::matrix<double> ids(tlen,v);
-  //vector<vector<double> > ids(tlen,v);  //CO190409
-  ids.resize(tlen,v);
-  for(int i0=-kmx;i0<=kmx;i0++) {
-    for(int i1=-kmx;i1<=kmx;i1++) {
-      for(int i2=-kmx;i2<=kmx;i2++) {
-        int ii0=i0+kmx;
-        int ii1=i1+kmx;
-        int ii2=i2+kmx;
-        int id=ii2+ii1*len+ii0*len*len;
-        ids[id][0]=dist[id];
-        ids[id][1]=id;
-        ids[id][2]=i0;
-        ids[id][3]=i1;
-        ids[id][4]=i2;
-      } // i2
-    } // i1
-  } // i0
+    // Sort by theta (reverse sort by distance).
+    // Define an id pointer to sort.
+    vector<double> v(5);
+    // pflow::matrix<double> ids(tlen,v);
+    //vector<vector<double> > ids(tlen,v);  //CO190409
+    ids.resize(tlen,v);
+    for(int i0=-kmx;i0<=kmx;i0++) {
+      for(int i1=-kmx;i1<=kmx;i1++) {
+        for(int i2=-kmx;i2<=kmx;i2++) {
+          int ii0=i0+kmx;
+          int ii1=i1+kmx;
+          int ii2=i2+kmx;
+          int id=ii2+ii1*len+ii0*len*len;
+          ids[id][0]=dist[id];
+          ids[id][1]=id;
+          ids[id][2]=i0;
+          ids[id][3]=i1;
+          ids[id][4]=i2;
+        } // i2
+      } // i1
+    } // i0
 
-  //[CO190629 - waste of a class]sort(ids.begin(),ids.end(),ids_cmp());
-  //[CO190629 - does NOT work, sort ONLY by 0th index]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElements<double>);  //CO190629 - note that it is in descending order by distance (greater go first)
-  //[CO190629 - rbegin()/rend() != descending sort, this WILL change results]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElement<double>(0));  //CO190629 - note that it is in descending order by distance (greater go first)
-  sort(ids.begin(),ids.end(),aurostd::compareVecElement<double>(0,false));  //CO190629 - note that it is in descending order by distance (greater go first)
+    //[CO190629 - waste of a class]sort(ids.begin(),ids.end(),ids_cmp());
+    //[CO190629 - does NOT work, sort ONLY by 0th index]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElements<double>);  //CO190629 - note that it is in descending order by distance (greater go first)
+    //[CO190629 - rbegin()/rend() != descending sort, this WILL change results]sort(ids.rbegin(),ids.rend(),aurostd::compareVecElement<double>(0));  //CO190629 - note that it is in descending order by distance (greater go first)
+    sort(ids.begin(),ids.end(),aurostd::compareVecElement<double>(0,false));  //CO190629 - note that it is in descending order by distance (greater go first)
 
-  // Add corrections to all the amplitudes.
-  // Get max amplitude for normalizing and percentages.
-  double ampmax=1E-8;
-  for(int i0=-kmx;i0<=kmx;i0++) {
-    for(int i1=-kmx;i1<=kmx;i1++) {
-      for(int i2=-kmx;i2<=kmx;i2++) {
-        int ii0=i0+kmx;
-        int ii1=i1+kmx;
-        int ii2=i2+kmx;
-        int id1=ii2+ii1*len+ii0*len*len;
-        int id=(int) ids[id1][1];
-        ii0=(int) ids[id1][2];
-        ii1=(int) ids[id1][3];
-        ii2=(int) ids[id1][4];
-        double theta=0;
-        if(dist[id]>0) {
-          double term=lambda/(2.0*dist[id]);
-          if(term<=1) {
-            theta=asin(term);
-            if(theta>tol) {
-              sf[id]=sf[id]*CorrectionFactor(theta);
-              if(sf[id]>ampmax) {ampmax=sf[id];}
-            } // if theta>tol
-          } // if term<=1
-        } // if dist>0
-      } // i2
-    } // i1
-  } // i0
+    // Add corrections to all the amplitudes.
+    // Get max amplitude for normalizing and percentages.
+    double ampmax=1E-8;
+    for(int i0=-kmx;i0<=kmx;i0++) {
+      for(int i1=-kmx;i1<=kmx;i1++) {
+        for(int i2=-kmx;i2<=kmx;i2++) {
+          int ii0=i0+kmx;
+          int ii1=i1+kmx;
+          int ii2=i2+kmx;
+          int id1=ii2+ii1*len+ii0*len*len;
+          int id=(int) ids[id1][1];
+          ii0=(int) ids[id1][2];
+          ii1=(int) ids[id1][3];
+          ii2=(int) ids[id1][4];
+          double theta=0;
+          if(dist[id]>0) {
+            double term=lambda/(2.0*dist[id]);
+            if(term<=1) {
+              theta=asin(term);
+              if(theta>tol) {
+                sf[id]=sf[id]*CorrectionFactor(theta);
+                if(sf[id]>ampmax) {ampmax=sf[id];}
+              } // if theta>tol
+            } // if term<=1
+          } // if dist>0
+        } // i2
+      } // i1
+    } // i0
 
-  //[CO190520 - printing moved to PrintXray()]// Print out all data.
-  //[CO190520 - printing moved to PrintXray()]oss << "Wavelength (Ang) = " << lambda << endl;
-  //[CO190520 - printing moved to PrintXray()]oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO190329
-  //[CO190520 - printing moved to PrintXray()]for(uint iat=0;iat<(uint) num_atoms;iat++) {
-  //[CO190520 - printing moved to PrintXray()]  oss <<setw(4)<<iat+1<<" "<<setw(4)<<str.atoms.at(iat).cleanname << " ";
-  //[CO190520 - printing moved to PrintXray()]  if(str.atoms.at(iat).cleanname.length()>1) oss << " ";
-  //[CO190520 - printing moved to PrintXray()]  oss <<setw(w2)<<scatt_fact[iat]<<setw(w2)<<KILOGRAM2AMU*mass[iat]<<setw(w2)<<1E+20*twoB_vec[iat]/2.0<<endl;
-  //[CO190520 - printing moved to PrintXray()]}
-  //[CO190520 - printing moved to PrintXray()]oss << "******************** All data ********************" << endl;
-  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Intensity            h    k    l    dist         keyword " << endl;
-  //[CO190520 - printing moved to PrintXray()]for(int i0=-kmx;i0<=kmx;i0++) {
-  //[CO190520 - printing moved to PrintXray()]  for(int i1=-kmx;i1<=kmx;i1++) {
-  //[CO190520 - printing moved to PrintXray()]    for(int i2=-kmx;i2<=kmx;i2++) {
-  //[CO190520 - printing moved to PrintXray()]      int ii0=i0+kmx;
-  //[CO190520 - printing moved to PrintXray()]      int ii1=i1+kmx;
-  //[CO190520 - printing moved to PrintXray()]      int ii2=i2+kmx;
-  //[CO190520 - printing moved to PrintXray()]      int id1=ii2+ii1*len+ii0*len*len;
-  //[CO190520 - printing moved to PrintXray()]      int id=(int) ids[id1][1];
-  //[CO190520 - printing moved to PrintXray()]      ii0=(int) ids[id1][2];
-  //[CO190520 - printing moved to PrintXray()]      ii1=(int) ids[id1][3];
-  //[CO190520 - printing moved to PrintXray()]      ii2=(int) ids[id1][4];
-  //[CO190520 - printing moved to PrintXray()]      double theta=0;
-  //[CO190520 - printing moved to PrintXray()]      if(dist[id]>0) {
-  //[CO190520 - printing moved to PrintXray()]        double term=lambda/(2.0*dist[id]);
-  //[CO190520 - printing moved to PrintXray()]        if(term<=1) {
-  //[CO190520 - printing moved to PrintXray()]          theta=asin(term);
-  //[CO190520 - printing moved to PrintXray()]          theta=theta*360.0/TWOPI; // rad->degrees
-  //[CO190520 - printing moved to PrintXray()]          if(theta>tol) oss
-  //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<2.0*theta<<" " // angle
-  //[CO190520 - printing moved to PrintXray()]                          <<setw(w3)<<sf[id]<<" " // sf
-  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii0<<" " // h
-  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii1<<" " // k
-  //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii2<<" " // l
-  //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<dist[id]<<" " // dist
-  //[CO190520 - printing moved to PrintXray()]                          << "SINGLE"
-  //[CO190520 - printing moved to PrintXray()]                          << endl;
-  //[CO190520 - printing moved to PrintXray()]        } // if term<=1
-  //[CO190520 - printing moved to PrintXray()]      } // if dist>0
-  //[CO190520 - printing moved to PrintXray()]    } // i2
-  //[CO190520 - printing moved to PrintXray()]  } // i1
-  //[CO190520 - printing moved to PrintXray()]} // i0
+    //[CO190520 - printing moved to PrintXray()]// Print out all data.
+    //[CO190520 - printing moved to PrintXray()]oss << "Wavelength (Ang) = " << lambda << endl;
+    //[CO190520 - printing moved to PrintXray()]oss << "Atom_Name  ScattFact   Mass(amu)   B(Ang)(DW=exp(-B*sin(theta)^2/lambda^2))" << endl; //CO190329
+    //[CO190520 - printing moved to PrintXray()]for(uint iat=0;iat<(uint) num_atoms;iat++) {
+    //[CO190520 - printing moved to PrintXray()]  oss <<setw(4)<<iat+1<<" "<<setw(4)<<str.atoms.at(iat).cleanname << " ";
+    //[CO190520 - printing moved to PrintXray()]  if(str.atoms.at(iat).cleanname.length()>1) oss << " ";
+    //[CO190520 - printing moved to PrintXray()]  oss <<setw(w2)<<scatt_fact[iat]<<setw(w2)<<KILOGRAM2AMU*mass[iat]<<setw(w2)<<1E+20*twoB_vec[iat]/2.0<<endl;
+    //[CO190520 - printing moved to PrintXray()]}
+    //[CO190520 - printing moved to PrintXray()]oss << "******************** All data ********************" << endl;
+    //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Intensity            h    k    l    dist         keyword " << endl;
+    //[CO190520 - printing moved to PrintXray()]for(int i0=-kmx;i0<=kmx;i0++) {
+    //[CO190520 - printing moved to PrintXray()]  for(int i1=-kmx;i1<=kmx;i1++) {
+    //[CO190520 - printing moved to PrintXray()]    for(int i2=-kmx;i2<=kmx;i2++) {
+    //[CO190520 - printing moved to PrintXray()]      int ii0=i0+kmx;
+    //[CO190520 - printing moved to PrintXray()]      int ii1=i1+kmx;
+    //[CO190520 - printing moved to PrintXray()]      int ii2=i2+kmx;
+    //[CO190520 - printing moved to PrintXray()]      int id1=ii2+ii1*len+ii0*len*len;
+    //[CO190520 - printing moved to PrintXray()]      int id=(int) ids[id1][1];
+    //[CO190520 - printing moved to PrintXray()]      ii0=(int) ids[id1][2];
+    //[CO190520 - printing moved to PrintXray()]      ii1=(int) ids[id1][3];
+    //[CO190520 - printing moved to PrintXray()]      ii2=(int) ids[id1][4];
+    //[CO190520 - printing moved to PrintXray()]      double theta=0;
+    //[CO190520 - printing moved to PrintXray()]      if(dist[id]>0) {
+    //[CO190520 - printing moved to PrintXray()]        double term=lambda/(2.0*dist[id]);
+    //[CO190520 - printing moved to PrintXray()]        if(term<=1) {
+    //[CO190520 - printing moved to PrintXray()]          theta=asin(term);
+    //[CO190520 - printing moved to PrintXray()]          theta=theta*360.0/TWOPI; // rad->degrees
+    //[CO190520 - printing moved to PrintXray()]          if(theta>tol) oss
+    //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<2.0*theta<<" " // angle
+    //[CO190520 - printing moved to PrintXray()]                          <<setw(w3)<<sf[id]<<" " // sf
+    //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii0<<" " // h
+    //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii1<<" " // k
+    //[CO190520 - printing moved to PrintXray()]                          <<setw(w1)<<ii2<<" " // l
+    //[CO190520 - printing moved to PrintXray()]                          <<setw(w2)<<dist[id]<<" " // dist
+    //[CO190520 - printing moved to PrintXray()]                          << "SINGLE"
+    //[CO190520 - printing moved to PrintXray()]                          << endl;
+    //[CO190520 - printing moved to PrintXray()]        } // if term<=1
+    //[CO190520 - printing moved to PrintXray()]      } // if dist>0
+    //[CO190520 - printing moved to PrintXray()]    } // i2
+    //[CO190520 - printing moved to PrintXray()]  } // i1
+    //[CO190520 - printing moved to PrintXray()]} // i0
 
-  // Now group everything at the same distance together and only store one entry for each distance.
-  // Choose hkl such that h is the largest, k the second, and l the third.
-  // Multiply the sf by the number of degenerate points at that distance.
-  // Get max integrated intensity for normalizations and percentages.
-  //[CO190620 - not needed here]double intmax=1E-8;
-  double odist=dist[(int)ids[0][1]]; // Initialize odsit to first distance.
-  double osf=sf[(int)ids[0][1]]; // Initialize osf to first distance.
-  vector<vector<int> > hkl_list;
-  vector<int> hkl(3);
-  //pflow::matrix<double> data;
-  for(int i0=-kmx;i0<=kmx;i0++) {
-    for(int i1=-kmx;i1<=kmx;i1++) {
-      for(int i2=-kmx;i2<=kmx;i2++) {
-        int ii0=i0+kmx;
-        int ii1=i1+kmx;
-        int ii2=i2+kmx;
-        int id1=ii2+ii1*len+ii0*len*len;
-        int id=(int) ids[id1][1];
-        ii0=(int) ids[id1][2];
-        ii1=(int) ids[id1][3];
-        ii2=(int) ids[id1][4];
-        double pdist=dist[id]; // Get present distance.
-        // Create vector of all the hkl values with the same distance
-        if(aurostd::abs(pdist-odist)<tol) { // Add present h,k,l to hkl_list.
-          hkl[0]=ii0;		    
-          hkl[1]=ii1;		    
-          hkl[2]=ii2;		    
-          hkl_list.push_back(hkl);
-        }
-        else { // Store one hkl, dist, total sf, multiplicity of point in data vector and then reset hkl_list vector to new hkl.
-          vector<double> datav(6);
-          // Sort hkl
-          //[CO190629 - waste of a class]sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
-          sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order by hkl (greater go first)
-          datav[0]=(double) hkl_list[0][0];  
-          datav[1]=(double) hkl_list[0][1];  
-          datav[2]=(double) hkl_list[0][2];  
-          datav[3]=odist;
-          datav[4]=osf*hkl_list.size();
-          datav[5]=hkl_list.size();
-          data.push_back(datav);
-          //[CO190620 - not needed here]if(datav[4]>intmax) {intmax=datav[4];}
-          vector<int> v(0);
-          hkl_list= vector<vector<int> > (0,v);
-          hkl[0]=ii0;		    
-          hkl[1]=ii1;		    
-          hkl[2]=ii2;		    
-          hkl_list.push_back(hkl);
-        }
-        odist=pdist;
-        osf=sf[id];
-      } // i2
-    } // i1
-  } // i0
+    // Now group everything at the same distance together and only store one entry for each distance.
+    // Choose hkl such that h is the largest, k the second, and l the third.
+    // Multiply the sf by the number of degenerate points at that distance.
+    // Get max integrated intensity for normalizations and percentages.
+    //[CO190620 - not needed here]double intmax=1E-8;
+    double odist=dist[(int)ids[0][1]]; // Initialize odsit to first distance.
+    double osf=sf[(int)ids[0][1]]; // Initialize osf to first distance.
+    vector<vector<int> > hkl_list;
+    vector<int> hkl(3);
+    //pflow::matrix<double> data;
+    for(int i0=-kmx;i0<=kmx;i0++) {
+      for(int i1=-kmx;i1<=kmx;i1++) {
+        for(int i2=-kmx;i2<=kmx;i2++) {
+          int ii0=i0+kmx;
+          int ii1=i1+kmx;
+          int ii2=i2+kmx;
+          int id1=ii2+ii1*len+ii0*len*len;
+          int id=(int) ids[id1][1];
+          ii0=(int) ids[id1][2];
+          ii1=(int) ids[id1][3];
+          ii2=(int) ids[id1][4];
+          double pdist=dist[id]; // Get present distance.
+          // Create vector of all the hkl values with the same distance
+          if(aurostd::abs(pdist-odist)<tol) { // Add present h,k,l to hkl_list.
+            hkl[0]=ii0;		    
+            hkl[1]=ii1;		    
+            hkl[2]=ii2;		    
+            hkl_list.push_back(hkl);
+          }
+          else { // Store one hkl, dist, total sf, multiplicity of point in data vector and then reset hkl_list vector to new hkl.
+            vector<double> datav(6);
+            // Sort hkl
+            //[CO190629 - waste of a class]sort(hkl_list.begin(),hkl_list.end(),hkl_cmp());
+            sort(hkl_list.rbegin(),hkl_list.rend(),aurostd::compareVecElements<int>);  //CO190629 - note that it is in descending order by hkl (greater go first)
+            datav[0]=(double) hkl_list[0][0];  
+            datav[1]=(double) hkl_list[0][1];  
+            datav[2]=(double) hkl_list[0][2];  
+            datav[3]=odist;
+            datav[4]=osf*hkl_list.size();
+            datav[5]=hkl_list.size();
+            data.push_back(datav);
+            //[CO190620 - not needed here]if(datav[4]>intmax) {intmax=datav[4];}
+            vector<int> v(0);
+            hkl_list= vector<vector<int> > (0,v);
+            hkl[0]=ii0;		    
+            hkl[1]=ii1;		    
+            hkl[2]=ii2;		    
+            hkl_list.push_back(hkl);
+          }
+          odist=pdist;
+          osf=sf[id];
+        } // i2
+      } // i1
+    } // i0
 
-  //[CO190520 - printing moved to PrintXray()]// Output grouped data
-  //[CO190520 - printing moved to PrintXray()]oss << "******************** Grouped data ********************" << endl;
-  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      IntIntensity         %ofMaxInt    h    k    l    dist         mult. correction    keyword " << endl;
-  //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
-  //[CO190520 - printing moved to PrintXray()]  double theta=0;
-  //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
-  //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
-  //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
-  //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
-  //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
-  //[CO190520 - printing moved to PrintXray()]      if(theta>tol) oss
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<2.0*theta<<" " // angle
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w3)<<setprecision(2)<<data[i][4]<<setprecision(PREC_DEFAULT)<<" " // sf
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // % max sf
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][0]<<" " // h
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][1]<<" " // k
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][2]<<" " // l
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<data[i][3]<<" " // dist
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(5)<<(int)data[i][5]<<" " // mult.
-  //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<CorrectionFactor(theta*TWOPI/360.0)<<" " // correction.
-  //[CO190520 - printing moved to PrintXray()]                      << " GROUP"
-  //[CO190520 - printing moved to PrintXray()]                      << endl;
-  //[CO190520 - printing moved to PrintXray()]    } // if term<=1
-  //[CO190520 - printing moved to PrintXray()]  } // if dist>0
-  //[CO190520 - printing moved to PrintXray()]} // for
+    //[CO190520 - printing moved to PrintXray()]// Output grouped data
+    //[CO190520 - printing moved to PrintXray()]oss << "******************** Grouped data ********************" << endl;
+    //[CO190520 - printing moved to PrintXray()]oss << "2*theta      IntIntensity         %ofMaxInt    h    k    l    dist         mult. correction    keyword " << endl;
+    //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
+    //[CO190520 - printing moved to PrintXray()]  double theta=0;
+    //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
+    //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
+    //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
+    //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
+    //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
+    //[CO190520 - printing moved to PrintXray()]      if(theta>tol) oss
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<2.0*theta<<" " // angle
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w3)<<setprecision(2)<<data[i][4]<<setprecision(PREC_DEFAULT)<<" " // sf
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // % max sf
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][0]<<" " // h
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][1]<<" " // k
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w1)<<(int)data[i][2]<<" " // l
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<data[i][3]<<" " // dist
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(5)<<(int)data[i][5]<<" " // mult.
+    //[CO190520 - printing moved to PrintXray()]                      <<setw(w2)<<CorrectionFactor(theta*TWOPI/360.0)<<" " // correction.
+    //[CO190520 - printing moved to PrintXray()]                      << " GROUP"
+    //[CO190520 - printing moved to PrintXray()]                      << endl;
+    //[CO190520 - printing moved to PrintXray()]    } // if term<=1
+    //[CO190520 - printing moved to PrintXray()]  } // if dist>0
+    //[CO190520 - printing moved to PrintXray()]} // for
 
-  //[CO190520 - printing moved to PrintXray()]// Output data to plot
-  //[CO190520 - printing moved to PrintXray()]oss << "******************** To Plot data ********************" << endl;
-  //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Amplitude    keyword " << endl;
-  //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
-  //[CO190520 - printing moved to PrintXray()]  double theta=0;
-  //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
-  //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
-  //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
-  //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
-  //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
-  //[CO190520 - printing moved to PrintXray()]      if(theta>tol) {
-  //[CO190520 - printing moved to PrintXray()]        // initial 0.
-  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
-  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
-  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
-  //[CO190520 - printing moved to PrintXray()]            << endl;
-  //[CO190520 - printing moved to PrintXray()]        // true value of sf/intmax.
-  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
-  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // sf
-  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
-  //[CO190520 - printing moved to PrintXray()]            << endl;
-  //[CO190520 - printing moved to PrintXray()]        // final 0.
-  //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
-  //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
-  //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
-  //[CO190520 - printing moved to PrintXray()]            << endl;
-  //[CO190520 - printing moved to PrintXray()]        // tpx
-  //[CO190520 - printing moved to PrintXray()]      } // if theta<tol
-  //[CO190520 - printing moved to PrintXray()]    } // if term<=1
-  //[CO190520 - printing moved to PrintXray()]  } // if dist>0
-  //[CO190520 - printing moved to PrintXray()]} // for
-} // end routine
+    //[CO190520 - printing moved to PrintXray()]// Output data to plot
+    //[CO190520 - printing moved to PrintXray()]oss << "******************** To Plot data ********************" << endl;
+    //[CO190520 - printing moved to PrintXray()]oss << "2*theta      Amplitude    keyword " << endl;
+    //[CO190520 - printing moved to PrintXray()]for(uint i=0;i<data.size();i++) {
+    //[CO190520 - printing moved to PrintXray()]  double theta=0;
+    //[CO190520 - printing moved to PrintXray()]  if(data[i][3]>0) {
+    //[CO190520 - printing moved to PrintXray()]    double term=lambda/(2.0*data[i][3]);
+    //[CO190520 - printing moved to PrintXray()]    if(term<=1) {
+    //[CO190520 - printing moved to PrintXray()]      theta=asin(term);
+    //[CO190520 - printing moved to PrintXray()]      theta=theta*360.0/TWOPI; // rad->degrees
+    //[CO190520 - printing moved to PrintXray()]      if(theta>tol) {
+    //[CO190520 - printing moved to PrintXray()]        // initial 0.
+    //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+    //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
+    //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+    //[CO190520 - printing moved to PrintXray()]            << endl;
+    //[CO190520 - printing moved to PrintXray()]        // true value of sf/intmax.
+    //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+    //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<setprecision(2)<<100*data[i][4]/intmax<<setprecision(PREC_DEFAULT)<<" " // sf
+    //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+    //[CO190520 - printing moved to PrintXray()]            << endl;
+    //[CO190520 - printing moved to PrintXray()]        // final 0.
+    //[CO190520 - printing moved to PrintXray()]        oss <<setw(w2)<<2.0*theta<<" " // angle
+    //[CO190520 - printing moved to PrintXray()]            <<setw(w2)<<"0"<<" " // sf
+    //[CO190520 - printing moved to PrintXray()]            << "TOPLOT"
+    //[CO190520 - printing moved to PrintXray()]            << endl;
+    //[CO190520 - printing moved to PrintXray()]        // tpx
+    //[CO190520 - printing moved to PrintXray()]      } // if theta<tol
+    //[CO190520 - printing moved to PrintXray()]    } // if term<=1
+    //[CO190520 - printing moved to PrintXray()]  } // if dist>0
+    //[CO190520 - printing moved to PrintXray()]} // for
+  } // end routine
 } // namespace pflow
 
 // ***************************************************************************
@@ -2114,15 +2112,15 @@ void GetXrayData(const xstructure& str,
 // updated by Corey Oses 190520
 namespace pflow {
   void GetXray(const xstructure& str, vector<double>& dist,vector<double>& sf,
-	       vector<double>& scatt_fact, //CO190520
-	       vector<double>& mass, vector<double>& twoB_vec,double lambda) {
+      vector<double>& scatt_fact, //CO190520
+      vector<double>& mass, vector<double>& twoB_vec,double lambda) {
     string soliloquy="pflow::GetXray():"; //CO190322
     stringstream message; //CO190322
     // Get data from str.
     // Set scale to 1 so you don't need to rescale coordinates.
     xstructure sstr=str;
     sstr=ReScale(sstr,1.0);
-  
+
     xmatrix<double> rlat(3,3);rlat=sstr.klattice;
     int num_atoms=sstr.atoms.size();
     //  matrix<double> fpos=GetFpos(sstr);
@@ -2157,7 +2155,7 @@ namespace pflow {
     double sfi; //imaginary part of structure factor
     dist = vector<double> (tlen,0.0);
     sf = vector<double> (tlen,0.0);
-  
+
     //initialization
     int ii0=0;
     int ii1=0;
@@ -2167,7 +2165,7 @@ namespace pflow {
     double rvnorm=0.0;
     double term=0.0;
     double gdotr;
-  
+
     for(int i0=-kmx;i0<=kmx;i0++) {
       for(int i1=-kmx;i1<=kmx;i1++) {
         for(int i2=-kmx;i2<=kmx;i2++) {
@@ -2224,14 +2222,14 @@ namespace pflow {
 // Dane Morgan, Modified by Stefano Curtarolo
 namespace pflow {
   void GetRDF(xstructure str, const double& rmax,
-	      const int& nbins, matrix<double>& rdf_all) {
+      const int& nbins, matrix<double>& rdf_all) {
     int natoms=str.atoms.size();
     std::deque<int> num_each_type=str.num_each_type;
     int ntyp=num_each_type.size();
     rdf_all=matrix<double> ((ntyp+1)*natoms,nbins);
     deque<deque<_atom> > nmat;
     // [OBSOLETE]    pflow::GetStrNeighData(str,rmax,nmat);
-   str.GetStrNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy
+    str.GetStrNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy
     // for(int i=0;i<nmat[0].size();i++) cout << AtomDist(nmat[0][0],nmat[0][i]) << " "; cout << endl; exit(0);
     for(int I1=0;I1<(int)nmat.size();I1++) { // Each atom for which we find RDF.
       int I2=1;
@@ -2241,18 +2239,18 @@ namespace pflow {
       // Check each atom neighbor for I1 in proper range.
       dist=AtomDist(a1,nmat.at(I1).at(I2));
       while (dist<rmax && I2<s2) {
-	int ib=int((dist/rmax)*nbins); // first bin is [0,rmax/nbins).
-	int J2=nmat.at(I1).at(I2).type;     // CONVASP_MODE
-	//      cout << I1 << " " << I2 << " " <<  J2 << " " << s2 << " " << dist << " " << ib << endl;
-	rdf_all[(ntyp+1)*I1+J2][ib]++; // Does all binning for atom/type RDFs.
-	I2++;
-	if(I2<s2) dist=AtomDist(a1,nmat[I1][I2]);
+        int ib=int((dist/rmax)*nbins); // first bin is [0,rmax/nbins).
+        int J2=nmat.at(I1).at(I2).type;     // CONVASP_MODE
+        //      cout << I1 << " " << I2 << " " <<  J2 << " " << s2 << " " << dist << " " << ib << endl;
+        rdf_all[(ntyp+1)*I1+J2][ib]++; // Does all binning for atom/type RDFs.
+        I2++;
+        if(I2<s2) dist=AtomDist(a1,nmat[I1][I2]);
       }  
       // Get sum over all types
       for(int ib=0;ib<nbins;ib++) {
-	for(int it=0;it<ntyp;it++) {
-	  rdf_all[(ntyp+1)*I1+ntyp][ib]+=rdf_all[(ntyp+1)*I1+it][ib];
-	}
+        for(int it=0;it<ntyp;it++) {
+          rdf_all[(ntyp+1)*I1+ntyp][ib]+=rdf_all[(ntyp+1)*I1+it][ib];
+        }
       }
     } // I1 loop
   }
@@ -2273,8 +2271,8 @@ namespace pflow {
 //  >=0 again.
 namespace pflow {
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,
-		    const int& smooth_width,const matrix<double>& rdf,
-		    matrix<double>& rdfsh,matrix<double>& rdfsh_loc) {
+      const int& smooth_width,const matrix<double>& rdf,
+      matrix<double>& rdfsh,matrix<double>& rdfsh_loc) {
     // double TOL=1e-5; // DANE not used
     // int natom=(int)str.atoms.size(); // DANE not used
     if(smooth_width) {;} // phony just to keep smooth_width busy
@@ -2308,37 +2306,37 @@ namespace pflow {
       vector<double> drdf(nbins,0.0);
       vector<double> ddrdf(nbins,0.0);
       for(int ib=1;ib<nbins-1;ib++) {
-	drdf[ib]=(rdf[i][ib+1]-rdf[i][ib-1]);
+        drdf[ib]=(rdf[i][ib+1]-rdf[i][ib-1]);
       }
       for(int ib=1;ib<nbins-1;ib++) {
-	//      ddrdf[ib]=(rdf[i][ib+1]+rdf[i][ib-1]-2*rdf[i][ib]);
-	ddrdf[ib]=(drdf[ib+1]-drdf[ib-1]);
+        //      ddrdf[ib]=(rdf[i][ib+1]+rdf[i][ib-1]-2*rdf[i][ib]);
+        ddrdf[ib]=(drdf[ib+1]-drdf[ib-1]);
       }
 
       // get all zeros of drdf with ddrf!=0
       // -999 means nothing,-1 means ddrdf<0, 0 means ddrdf=0, +1 means ddrdf>0.
       vector<int> drdf_zeros(nbins-1,-999);
       for(int ib=1;ib<nbins-1;ib++) {
-	// If drdf==0
-	if(drdf[ib]==0 && ddrdf[ib]<0) drdf_zeros[ib]=-1;
-	if(drdf[ib]==0 && ddrdf[ib]==0) drdf_zeros[ib]=0;
-	if(drdf[ib]==0 && ddrdf[ib]==1) drdf_zeros[ib]=1;
-	// If drdf== is passing through 0 from +->- or -->+
-	if(drdf[ib]!=0) {
-	  if(drdf[ib-1]>0 && drdf[ib+1]<0) drdf_zeros[ib]=-1;
-	  if(drdf[ib-1]<0 && drdf[ib+1]>0) drdf_zeros[ib]=+1;
-	  // If drdf== is becoming or changinf from 0 through
-	  // 0->+/- or +/-->0.
-	  if(drdf[ib-1]==0 && ddrdf[ib]<0) drdf_zeros[ib]=-1;
-	  if(drdf[ib-1]==0 && ddrdf[ib]==0) drdf_zeros[ib]=0;
-	  if(drdf[ib-1]==0 && ddrdf[ib]>0) drdf_zeros[ib]=1;
-	  if(drdf[ib+1]==0 && ddrdf[ib]<0) drdf_zeros[ib]=-1;
-	  if(drdf[ib+1]==0 && ddrdf[ib]==0) drdf_zeros[ib]=0;
-	  if(drdf[ib+1]==0 && ddrdf[ib]>0) drdf_zeros[ib]=1;
-	}
+        // If drdf==0
+        if(drdf[ib]==0 && ddrdf[ib]<0) drdf_zeros[ib]=-1;
+        if(drdf[ib]==0 && ddrdf[ib]==0) drdf_zeros[ib]=0;
+        if(drdf[ib]==0 && ddrdf[ib]==1) drdf_zeros[ib]=1;
+        // If drdf== is passing through 0 from +->- or -->+
+        if(drdf[ib]!=0) {
+          if(drdf[ib-1]>0 && drdf[ib+1]<0) drdf_zeros[ib]=-1;
+          if(drdf[ib-1]<0 && drdf[ib+1]>0) drdf_zeros[ib]=+1;
+          // If drdf== is becoming or changinf from 0 through
+          // 0->+/- or +/-->0.
+          if(drdf[ib-1]==0 && ddrdf[ib]<0) drdf_zeros[ib]=-1;
+          if(drdf[ib-1]==0 && ddrdf[ib]==0) drdf_zeros[ib]=0;
+          if(drdf[ib-1]==0 && ddrdf[ib]>0) drdf_zeros[ib]=1;
+          if(drdf[ib+1]==0 && ddrdf[ib]<0) drdf_zeros[ib]=-1;
+          if(drdf[ib+1]==0 && ddrdf[ib]==0) drdf_zeros[ib]=0;
+          if(drdf[ib+1]==0 && ddrdf[ib]>0) drdf_zeros[ib]=1;
+        }
 
-	// tpx
-	//      cout << "drdf_zeros " << ib << " " << rdf[i][ib] << " " << drdf[ib] << " " << ddrdf[ib] << " " << drdf_zeros[ib] << endl;
+        // tpx
+        //      cout << "drdf_zeros " << ib << " " << rdf[i][ib] << " " << drdf[ib] << " " << ddrdf[ib] << " " << drdf_zeros[ib] << endl;
       }
 
       // get the actual shell atoms counts and avg radius.
@@ -2346,23 +2344,23 @@ namespace pflow {
       double rsh_avg=0;
       double state_dn=0;
       for(int ib=0;ib<nbins-2;ib++) {
-	//tpx
-	//           cout << i << " " << ib << " "
-	//	         << rdf[i][ib] << " " << drdf[ib] << " " << shell << " " << endl;
-	shell=shell+rdf[i][ib];
-	double rad=(dr*(double)ib)+dr/2.0;
-	rsh_avg=rsh_avg+rdf[i][ib]*rad;
-	if(drdf_zeros[ib]==-1) { // Set state_dn
-	  state_dn=1;
-	}
-	if(state_dn && drdf_zeros[ib]==1) { // New shell
-	  if(shell>0) rsh_avg=rsh_avg/shell;
-	  rdfsh[i].push_back(shell);
-	  rdfsh_loc[i].push_back(rsh_avg);
-	  shell=0;
-	  rsh_avg=0;
-	  state_dn=0;
-	}
+        //tpx
+        //           cout << i << " " << ib << " "
+        //	         << rdf[i][ib] << " " << drdf[ib] << " " << shell << " " << endl;
+        shell=shell+rdf[i][ib];
+        double rad=(dr*(double)ib)+dr/2.0;
+        rsh_avg=rsh_avg+rdf[i][ib]*rad;
+        if(drdf_zeros[ib]==-1) { // Set state_dn
+          state_dn=1;
+        }
+        if(state_dn && drdf_zeros[ib]==1) { // New shell
+          if(shell>0) rsh_avg=rsh_avg/shell;
+          rdfsh[i].push_back(shell);
+          rdfsh_loc[i].push_back(rsh_avg);
+          shell=0;
+          rsh_avg=0;
+          state_dn=0;
+        }
       } // for ib
     } // for i
   }
@@ -2375,8 +2373,8 @@ namespace pflow {
 // atoms for each type and returns the rms.  
 namespace pflow {
   double RdfSh_RMS(const int iaA, const int iaB, const int nsh_max,const int nt,
-		   const matrix<double>& rdfsh_all_A
-		   ,const matrix<double>& rdfsh_all_B) {
+      const matrix<double>& rdfsh_all_A
+      ,const matrix<double>& rdfsh_all_B) {
     double rms=0;
     int cnt=0;
     for(int it=0;it<nt;it++) {
@@ -2385,11 +2383,11 @@ namespace pflow {
       int tempsh=min((int) rdfsh_all_A[idA].size(),(int) rdfsh_all_B[idB].size());
       int nsh = min(tempsh,nsh_max);
       for(int ish=0;ish<nsh;ish++) {
-	cnt++;
-	rms+=(rdfsh_all_A[idA][ish]-rdfsh_all_B[idB][ish])
-	  *(rdfsh_all_A[idA][ish]-rdfsh_all_B[idB][ish]);
-	// tpx
-	//      cout << "iaA,iaB,it,ish,cnt,rms " <<iaA<<" "<<iaB<<" "<<it<<" "<<ish<<" "<< cnt << " " << rms << endl;
+        cnt++;
+        rms+=(rdfsh_all_A[idA][ish]-rdfsh_all_B[idB][ish])
+          *(rdfsh_all_A[idA][ish]-rdfsh_all_B[idB][ish]);
+        // tpx
+        //      cout << "iaA,iaB,it,ish,cnt,rms " <<iaA<<" "<<iaB<<" "<<it<<" "<<ish<<" "<< cnt << " " << rms << endl;
       }
     }
     if(cnt>0) rms=sqrt(rms/cnt);
@@ -2414,10 +2412,10 @@ namespace pflow {
 // str_A and str_B must have the same number of each type of atom.
 namespace pflow {
   void CmpRDFShells(const xstructure& str_A, const xstructure& str_B,
-		    const matrix<double>& rdfsh_all_A,
-		    const matrix<double>& rdfsh_all_B,
-		    const int nsh, vector<int>& best_match,
-		    matrix<double>& rms_mat) {
+      const matrix<double>& rdfsh_all_A,
+      const matrix<double>& rdfsh_all_B,
+      const int nsh, vector<int>& best_match,
+      matrix<double>& rms_mat) {
     double TOL=1e-15;
     std::deque<int> netype_A=str_A.num_each_type;
     std::deque<int> netype_B=str_B.num_each_type;
@@ -2437,7 +2435,7 @@ namespace pflow {
 
     for(int iaA=0;iaA<nat;iaA++) {
       for(int iaB=0;iaB<nat;iaB++) {
-	rms_mat[iaA][iaB]=RdfSh_RMS(iaA,iaB,nsh,nt,rdfsh_all_A,rdfsh_all_B);
+        rms_mat[iaA][iaB]=RdfSh_RMS(iaA,iaB,nsh,nt,rdfsh_all_A,rdfsh_all_B);
       }
     }
     // Get best_match matrix.
@@ -2455,16 +2453,16 @@ namespace pflow {
       // Check each B atom and if it is the right type and lowest rms
       // then track its id.
       for(int ipB=0;ipB<(int)cand_Batoms.size();ipB++) {
-	int iaB=cand_Batoms[ipB];
-	int typeB=str_B.atoms.at(iaB).type;
-	if(typeA==typeB) {
-	  trms=rms_mat[iaA][iaB];
-	  if(rms<-1) rms=trms+1.0;
-	  if(trms<rms-TOL) {
-	    best_at_id=iaB;
-	    rms=trms;
-	  }
-	}
+        int iaB=cand_Batoms[ipB];
+        int typeB=str_B.atoms.at(iaB).type;
+        if(typeA==typeB) {
+          trms=rms_mat[iaA][iaB];
+          if(rms<-1) rms=trms+1.0;
+          if(trms<rms-TOL) {
+            best_at_id=iaB;
+            rms=trms;
+          }
+        }
       }
       best_match[iaA]=best_at_id;
       // Remove best_at_id from future comparisons.
@@ -2479,7 +2477,7 @@ namespace pflow {
 // This function gets a smoothed RDF.
 namespace pflow {
   matrix<double> GetSmoothRDF(const matrix<double>& rdf,
-			      const double& sigma) {
+      const double& sigma) {
     matrix<double> rdf_sm=rdf;
     for(int i=0;i<(int)rdf.size();i++) {
       rdf_sm[i]=pflow::SmoothFunc(rdf[i],sigma);
@@ -2500,8 +2498,8 @@ namespace pflow {
 // Original by Dane Morgan, modified by STefano Curtarolo for type shift !
 namespace pflow {
   void CmpStrDist(xstructure str1, xstructure str2,const double& cutoff,
-		  matrix<double>& dist1, matrix<double>& dist2,
-		  matrix<double>& dist_diff,matrix<double>& dist_diff_n) {
+      matrix<double>& dist1, matrix<double>& dist2,
+      matrix<double>& dist_diff,matrix<double>& dist_diff_n) {
 
     deque<deque<_atom> > neigh_mat1;
     deque<deque<_atom> > neigh_mat2;
@@ -2523,26 +2521,26 @@ namespace pflow {
     for(int ia=0;ia<(int)neigh_mat1.size();ia++) {
       _atom a = neigh_mat1[ia][0];
       for(int in=1;in<(int)neigh_mat1[ia].size();in++) {
-	_atom an = neigh_mat1[ia][in];
-	int ta=a.type;              // CONVASP_MODE
-	int tna=an.type;            // CONVASP_MODE
-	int i=std::min(ta,tna);
-	int j=std::max(ta,tna);
-	int id=j-i+ntypes1*i-max(0,i*(i-1)/2);
-	dist1[id].push_back(AtomDist(a,an));
+        _atom an = neigh_mat1[ia][in];
+        int ta=a.type;              // CONVASP_MODE
+        int tna=an.type;            // CONVASP_MODE
+        int i=std::min(ta,tna);
+        int j=std::max(ta,tna);
+        int id=j-i+ntypes1*i-max(0,i*(i-1)/2);
+        dist1[id].push_back(AtomDist(a,an));
       } // in
     } // ia
     // dist2
     for(int ia=0;ia<(int)neigh_mat2.size();ia++) {
       _atom a = neigh_mat2[ia][0];
       for(int in=1;in<(int)neigh_mat2[ia].size();in++) {
-	_atom an = neigh_mat2[ia][in];
-	int ta=a.type;            // CONVASP_MODE
-	int tna=an.type;          // CONVASP_MODE
-	int i=std::min(ta,tna);
-	int j=std::max(ta,tna);
-	int id=j-i+ntypes2*i-max(0,i*(i-1)/2);
-	dist2[id].push_back(AtomDist(a,an));
+        _atom an = neigh_mat2[ia][in];
+        int ta=a.type;            // CONVASP_MODE
+        int tna=an.type;          // CONVASP_MODE
+        int i=std::min(ta,tna);
+        int j=std::max(ta,tna);
+        int id=j-i+ntypes2*i-max(0,i*(i-1)/2);
+        dist2[id].push_back(AtomDist(a,an));
       } // in
     } // ia
 
@@ -2564,16 +2562,16 @@ namespace pflow {
     dist_diff_n = matrix<double> (nprs_min,tmpvec);
     for(int i=0;i<ntypes_min;i++) {
       for(int j=i;j<ntypes_min;j++) {
-	int id1=j-i+ntypes1*i-max(0,i*(i-1)/2);
-	int id2=j-i+ntypes2*i-max(0,i*(i-1)/2);
-	int idmin=j-i+ntypes_min*i-max(0,i*(i-1)/2);
-	int num_dist=std::min((int)dist1[id1].size(),(int)dist2[id2].size());
-	for(int ip=0;ip<num_dist;ip++) {
-	  double d1=dist1[id1][ip];
-	  double d2=dist2[id2][ip];
-	  dist_diff[idmin].push_back(d2-d1);
-	  dist_diff_n[idmin].push_back(2*(d2-d1)/(d1+d2));
-	}// ip
+        int id1=j-i+ntypes1*i-max(0,i*(i-1)/2);
+        int id2=j-i+ntypes2*i-max(0,i*(i-1)/2);
+        int idmin=j-i+ntypes_min*i-max(0,i*(i-1)/2);
+        int num_dist=std::min((int)dist1[id1].size(),(int)dist2[id2].size());
+        for(int ip=0;ip<num_dist;ip++) {
+          double d1=dist1[id1][ip];
+          double d2=dist2[id2][ip];
+          dist_diff[idmin].push_back(d2-d1);
+          dist_diff_n[idmin].push_back(2*(d2-d1)/(d1+d2));
+        }// ip
       }// j
     }// i
   } // end routine
@@ -2601,18 +2599,18 @@ namespace pflow {
       outf << "  ATOMS = ";
       Vout(pdos_at[i],outf);
       if(pdos_k.size()>0) {
-	outf << "  KPOINTS = ";
-	Vout(pdos_k[i],outf);
+        outf << "  KPOINTS = ";
+        Vout(pdos_k[i],outf);
       }
       if(pdos_b.size()>0) {
-	outf << "  BANDS = ";
-	Vout(pdos_b[i],outf);
+        outf << "  BANDS = ";
+        Vout(pdos_b[i],outf);
       }
       outf << "  LMVALUES = ";
       Vout(pdos_lm[i],outf);
       outf << "  # ( LMVALUES = ";
       for(int j=0;j<(int)pdos_lm[i].size();j++) {
-	outf << " " << Ltotnames[pdos_lm[i][j]-1];
+        outf << " " << Ltotnames[pdos_lm[i][j]-1];
       }
       outf << " )" << endl;
     }
@@ -2622,12 +2620,12 @@ namespace pflow {
     outf.precision(5);
     outf.setf(std::ios::fixed,std::ios::floatfield);
     outf.setf(std::ios::left,std::ios::adjustfield);
-    
+
     if(sp==0) outf << "# Energy         Up            Cumulative_Up" << endl;
     if(sp==1) outf << "# Energy         Up             Dn             Up-Dn        Cumulative_Up   Cumulative_Dn   Cumulative_Up-Dn" << endl;
     for(int ib=0;ib<(int)pdos.size();ib++) {
       for(int i=0;i<(int)pdos[ib].size();i++) {
-	outf << setw(10) << pdos[ib][i] << "     ";
+        outf << setw(10) << pdos[ib][i] << "     ";
       }
       outf << endl;
     }
@@ -2640,7 +2638,7 @@ namespace pflow {
 namespace pflow {
   void rtparams::free() {
   }
-  
+
   void rtparams::copy(const rtparams& b) {
     resx=b.resx;
     resy=b.resy;
@@ -2754,7 +2752,7 @@ namespace pflow {
     plane_color_s=0;
     planetex_tex_s=0;
   }
-  
+
   rtparams::rtparams(const rtparams& b) {copy(b);}
 
   const rtparams& rtparams::operator=(const rtparams& b) {
@@ -2771,8 +2769,8 @@ namespace pflow {
     cout << "UPDIR = " << updir[0] << " " << updir[1] << " " << updir[2] << endl;
     cout << "STRUCTURE_ORIGIN = " << struct_origin[0] << " " << struct_origin[1] << " " << struct_origin[2] << endl;
     cout << "ROTATION = " << rotation[0] << " " << rotation[1]
-	 << " " << rotation[2] << " " << rotation[3]
-	 << " " << rotation[4] << " " << rotation[5] << endl;
+      << " " << rotation[2] << " " << rotation[3]
+      << " " << rotation[4] << " " << rotation[5] << endl;
   }
 }
 
@@ -2784,7 +2782,7 @@ namespace pflow {
 // Dane Morgan style
 namespace pflow {
   void GetDatFromOutcar(vector<matrix<double> >& lat_vec,
-			deque<int>& num_each_type, ifstream& outcar_inf) {
+      deque<int>& num_each_type, ifstream& outcar_inf) {
     int first_lat=1;
     vector<string> a(3,"Z");
     lat_vec.clear();
@@ -2792,25 +2790,25 @@ namespace pflow {
     while (outcar_inf >> a[2]) {
       string key= (a[0]+" "+a[1]+" "+a[2]);
       if(key=="reciprocal lattice vectors") {
-	matrix<double> lat(3,3);
-	for(int ic=0;ic<3;ic++) {
-	  outcar_inf >> lat[ic][0] >> lat[ic][1] >> lat[ic][2];
-	  outcar_inf >>sdum>>sdum>>sdum;
-	}
-	if(!first_lat) { // skip first lat.
-	  lat_vec.push_back(lat);
-	}
-	first_lat=0;
+        matrix<double> lat(3,3);
+        for(int ic=0;ic<3;ic++) {
+          outcar_inf >> lat[ic][0] >> lat[ic][1] >> lat[ic][2];
+          outcar_inf >>sdum>>sdum>>sdum;
+        }
+        if(!first_lat) { // skip first lat.
+          lat_vec.push_back(lat);
+        }
+        first_lat=0;
       }
       if(key=="ions per type") {
-	string s;
-	int id=0;
-	getline(outcar_inf,s);
-	aurostd::GetNextVal(s,id).c_str(); // remove an "=" sign.
-	while (id<(int)s.size()) {
-	  int n=atoi(aurostd::GetNextVal(s,id).c_str());
-	  num_each_type.push_back(n);
-	}
+        string s;
+        int id=0;
+        getline(outcar_inf,s);
+        aurostd::GetNextVal(s,id).c_str(); // remove an "=" sign.
+        while (id<(int)s.size()) {
+          int n=atoi(aurostd::GetNextVal(s,id).c_str());
+          num_each_type.push_back(n);
+        }
       }
       a[0]=a[1];
       a[1]=a[2];
@@ -2825,7 +2823,7 @@ namespace pflow {
 // This gets the fpos from XDATCAR.
 namespace pflow {
   void GetDatFromXdatcar(vector<matrix<double> >& fpos_vec,
-			 ifstream& xdatcar_inf)
+      ifstream& xdatcar_inf)
   {
     fpos_vec.clear();
     string s;
@@ -2842,14 +2840,14 @@ namespace pflow {
       int id;
       string key;
       while (s.size()>1 && key!="Konfig=") {
-	id=0;
-	for(int ic=0;ic<3;ic++) {
-	  dpvec[ic]=atof(aurostd::GetNextVal(s,id).c_str());
-	}
-	dpmat.push_back(dpvec);
-	if(!getline(xdatcar_inf,s)) keep_reading=0;
-	id=0;
-	key=aurostd::GetNextVal(s,id);
+        id=0;
+        for(int ic=0;ic<3;ic++) {
+          dpvec[ic]=atof(aurostd::GetNextVal(s,id).c_str());
+        }
+        dpmat.push_back(dpvec);
+        if(!getline(xdatcar_inf,s)) keep_reading=0;
+        id=0;
+        key=aurostd::GetNextVal(s,id);
       }
       fpos_vec.push_back(dpmat);
       dpmat=matrix<double> (0);
@@ -2880,7 +2878,7 @@ namespace pflow {
     if(lat_vec.size()<fpos_vec.size()) {
       matrix<double> tlat=lat_vec[lat_vec.size()-1];
       for(int i=(int)lat_vec.size();i<(int)fpos_vec.size();i++) {
-	lat_vec.push_back(tlat);
+        lat_vec.push_back(tlat);
       }
     }
     vector<xstructure> vstr;
@@ -2936,21 +2934,21 @@ namespace pflow {
       getline(rtinfile,s);
       s_ns=aurostd::RemoveSpaces(s); // Get string with no spaces.
       if(s_ns.size()>0) { // Make sure line was not blank
-	if(s_ns[0]!='#') { // Exclude comment lines
-	  string token,sval;
-	  int id=s.find('=');
-	  if(id>=(int)s.length()) {
-	    cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-	    cout << "ERROR: Exiting" << endl;
-	    exit(1);
-	  }
-	  token=s.substr(0,id);
-	  token=aurostd::RemoveSpaces(token);
-	  int i_f=std::min(s.length(),s.find('#')); // End of string
-	  sval=s.substr(id+1,i_f-id-1);
-	  token_vec.push_back(token);
-	  val_vec.push_back(sval);
-	} //if s_ns[0]!=#
+        if(s_ns[0]!='#') { // Exclude comment lines
+          string token,sval;
+          int id=s.find('=');
+          if(id>=(int)s.length()) {
+            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
+            cout << "ERROR: Exiting" << endl;
+            exit(1);
+          }
+          token=s.substr(0,id);
+          token=aurostd::RemoveSpaces(token);
+          int i_f=std::min(s.length(),s.find('#')); // End of string
+          sval=s.substr(id+1,i_f-id-1);
+          token_vec.push_back(token);
+          val_vec.push_back(sval);
+        } //if s_ns[0]!=#
       } // if s_ns.size>0
 
     } // while !rtinfile.eof
@@ -2965,256 +2963,256 @@ namespace pflow {
       double val;
       int found_token=0;
       if(tok=="RESX") {
-	id=0;
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	rtp.resx=val;
-	found_token=1;
+        id=0;
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        rtp.resx=val;
+        found_token=1;
       }// RESX
       if(tok=="RESY") {
-	id=0;
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	rtp.resy=val;
-	found_token=1;
+        id=0;
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        rtp.resy=val;
+        found_token=1;
       }// RESY
       if(tok=="VIEWDIR") {
-	// Note that there are 3 values here.
-	int id=0;
-	for(int ic=0;ic<3;ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.viewdir[ic]=val;
-	}
-	found_token=1;
-	rtp.viewdir_s=1;
+        // Note that there are 3 values here.
+        int id=0;
+        for(int ic=0;ic<3;ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.viewdir[ic]=val;
+        }
+        found_token=1;
+        rtp.viewdir_s=1;
       }// VIEWDIR
       if(tok=="UPDIR") {
-	// Note that there are 3 values here.
-	int id=0;
-	for(int ic=0;ic<3;ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.updir[ic]=val;
-	}
-	found_token=1;
-	rtp.updir_s=1;
+        // Note that there are 3 values here.
+        int id=0;
+        for(int ic=0;ic<3;ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.updir[ic]=val;
+        }
+        found_token=1;
+        rtp.updir_s=1;
       }// UPDIR
       if(tok=="ZOOM") {
-	id=0;
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	rtp.zoom=val;
-	found_token=1;
+        id=0;
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        rtp.zoom=val;
+        found_token=1;
       }// ZOOM
       if(tok=="ASPECTRATIO") {
-	id=0;
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	rtp.aspectratio=val;
-	found_token=1;
+        id=0;
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        rtp.aspectratio=val;
+        found_token=1;
       }// ASPECTRATIO
       if(tok=="ANTIALIASING") {
-	id=0;
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	rtp.antialiasing=val;
-	found_token=1;
+        id=0;
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        rtp.antialiasing=val;
+        found_token=1;
       }// ANTIALIASING
       if(tok=="RAYDEPTH") {
-	id=0;
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	rtp.raydepth=val;
-	found_token=1;
+        id=0;
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        rtp.raydepth=val;
+        found_token=1;
       }// RAYDEPTH
       if(tok=="CENTER") {
-	// Note that there are 6 values here.
-	int id=0;
-	for(int ic=0;ic<6;ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.center_guide[ic]=val;
-	}
-	rtp.center_s=1;
-	found_token=1;
+        // Note that there are 6 values here.
+        int id=0;
+        for(int ic=0;ic<6;ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.center_guide[ic]=val;
+        }
+        rtp.center_s=1;
+        found_token=1;
       }// CENTER
       if(tok=="LIGHT") {
-	/* This is a little confusing.  There can be multiple
-	   LIGHT tokens.  Each time one is found a new LIGHT is
-	   added to the rtparams object.  Note that there are
-	   7 values here.  3 for center, 1 for rad, 3 for color.
-	   These values must be pushed back onto the correct vectors
-	   and matrices.  However, for the first LIGHT token, one must
-	   overwrite the default rather than add a new light.  
-	*/
-	vector<double> lcen(3);
-	double lrad;
-	vector<double> lcolor(3);
-	int id=0;
-	for(int ic=0;ic<3;ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  lcen[ic]=val;
-	}
-	val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	lrad=val;
-	for(int ic=0;ic<3;ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  lcolor[ic]=val;
-	}
-	if(first_light) {
-	  first_light=0;
-	  rtp.lightcenter[0]=lcen;
-	  rtp.lightrad[0]=lrad;
-	  rtp.lightcolor[0]=lcolor;
-	}
-	else {
-	  rtp.lightcenter.push_back(lcen);
-	  rtp.lightrad.push_back(lrad);
-	  rtp.lightcolor.push_back(lcolor);
-	}
-	found_token=1;
+        /* This is a little confusing.  There can be multiple
+           LIGHT tokens.  Each time one is found a new LIGHT is
+           added to the rtparams object.  Note that there are
+           7 values here.  3 for center, 1 for rad, 3 for color.
+           These values must be pushed back onto the correct vectors
+           and matrices.  However, for the first LIGHT token, one must
+           overwrite the default rather than add a new light.  
+           */
+        vector<double> lcen(3);
+        double lrad;
+        vector<double> lcolor(3);
+        int id=0;
+        for(int ic=0;ic<3;ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          lcen[ic]=val;
+        }
+        val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        lrad=val;
+        for(int ic=0;ic<3;ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          lcolor[ic]=val;
+        }
+        if(first_light) {
+          first_light=0;
+          rtp.lightcenter[0]=lcen;
+          rtp.lightrad[0]=lrad;
+          rtp.lightcolor[0]=lcolor;
+        }
+        else {
+          rtp.lightcenter.push_back(lcen);
+          rtp.lightrad.push_back(lrad);
+          rtp.lightcolor.push_back(lcolor);
+        }
+        found_token=1;
       }// LIGHT
       if(tok=="BACKGROUND") {
-	// Note that there are 3 values here.
-	int id=0;
-	for(int ic=0;ic<3;ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.background[ic]=val;
-	}
-	found_token=1;
+        // Note that there are 3 values here.
+        int id=0;
+        for(int ic=0;ic<3;ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.background[ic]=val;
+        }
+        found_token=1;
       }// BACKGROUND
       if(tok=="ATOMCOLOR") {
-	// Note that there are 4 values here.
-	int id=0;
-	tmp = vector<double> (4);
-	for(int ic=0;ic<(int)tmp.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  tmp[ic]=val;
-	}
-	rtp.sphtex_color.push_back(tmp);
-	found_token=1;
+        // Note that there are 4 values here.
+        int id=0;
+        tmp = vector<double> (4);
+        for(int ic=0;ic<(int)tmp.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          tmp[ic]=val;
+        }
+        rtp.sphtex_color.push_back(tmp);
+        found_token=1;
       }// ATOMCOLOR
       if(tok=="ATOMTEXTURE") {
-	// Note that there are 5 values here.
-	int id=0;
-	tmp = vector<double> (5);
-	for(int ic=0;ic<(int)tmp.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  tmp[ic]=val;
-	}
-	rtp.sphtex_tex.push_back(tmp);
-	found_token=1;
+        // Note that there are 5 values here.
+        int id=0;
+        tmp = vector<double> (5);
+        for(int ic=0;ic<(int)tmp.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          tmp[ic]=val;
+        }
+        rtp.sphtex_tex.push_back(tmp);
+        found_token=1;
       }// ATOMTEXTURE
       if(tok=="ATOMRAD") {
-	// Note that there are 2 values here.
-	int id=0;
-	tmp = vector<double> (2);
-	for(int ic=0;ic<(int)tmp.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.sph_rad.push_back(val);
-	}
-	found_token=1;
+        // Note that there are 2 values here.
+        int id=0;
+        tmp = vector<double> (2);
+        for(int ic=0;ic<(int)tmp.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.sph_rad.push_back(val);
+        }
+        found_token=1;
       }//ATOMRAD
       if(tok=="SHADING") {
-	int id=0;
-	rtp.shading = aurostd::GetNextVal(val_vec[i],id);
-	found_token=1;
+        int id=0;
+        rtp.shading = aurostd::GetNextVal(val_vec[i],id);
+        found_token=1;
       }// SHADING
       if(tok=="OUTFILE") {
-	int id=0;
-	rtp.outfile = aurostd::GetNextVal(val_vec[i],id);
-	found_token=1;
+        int id=0;
+        rtp.outfile = aurostd::GetNextVal(val_vec[i],id);
+        found_token=1;
       }// OUTFILE
       if(tok=="SUPERCELL") {
-	// Note that there are 9 values here.
-	int id=0;
-	for(int ic=0;ic<3;ic++) {
-	  for(int jc=0;jc<3;jc++) {
-	    val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	    rtp.sc[ic][jc]=val;
-	  }
-	}
-	found_token=1;
-	rtp.sc_s=1;
+        // Note that there are 9 values here.
+        int id=0;
+        for(int ic=0;ic<3;ic++) {
+          for(int jc=0;jc<3;jc++) {
+            val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+            rtp.sc[ic][jc]=val;
+          }
+        }
+        found_token=1;
+        rtp.sc_s=1;
       }//SUPERCELL
       if(tok=="CALCTYPE") {
-	int id=0;
-	rtp.calc_type=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        int id=0;
+        rtp.calc_type=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }//CALCTYPE
       if(tok=="INFILE") {
-	int id=0;
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) rtp.input_files.push_back(s);
-	}
-	found_token=1;
+        int id=0;
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) rtp.input_files.push_back(s);
+        }
+        found_token=1;
       }//INSERT_FILE
       if(tok=="INSERT_FILE") {
-	int id=0;
-	string s;
-	s=aurostd::GetNextVal(val_vec[i],id);
-	rtp.insert_file=s;
-	found_token=1;
+        int id=0;
+        string s;
+        s=aurostd::GetNextVal(val_vec[i],id);
+        rtp.insert_file=s;
+        found_token=1;
       }//INSERT_FILE
       if(tok=="ROTATION") {
-	int id=0;
-	for(int ic=0;ic<6;ic++) {
-	  string s=aurostd::GetNextVal(val_vec[i],id);
-	  rtp.rotation[ic] = atof(s.c_str());
-	  //rtp.rotation[ic] = atof(aurostd::GetNextVal(val_vec[ic],id).c_str());
-	}
-	found_token=1;
+        int id=0;
+        for(int ic=0;ic<6;ic++) {
+          string s=aurostd::GetNextVal(val_vec[i],id);
+          rtp.rotation[ic] = atof(s.c_str());
+          //rtp.rotation[ic] = atof(aurostd::GetNextVal(val_vec[ic],id).c_str());
+        }
+        found_token=1;
       }//ROTATION
       if(tok=="STRUCTURE_ORIGIN") {
-	int id=0;
-	for(int ic=0;ic<3;ic++) {
-	  string s=aurostd::GetNextVal(val_vec[i],id);
-	  rtp.struct_origin[ic] = atof(s.c_str());
-	}
-	rtp.struct_origin_s=1;
-	found_token=1;
+        int id=0;
+        for(int ic=0;ic<3;ic++) {
+          string s=aurostd::GetNextVal(val_vec[i],id);
+          rtp.struct_origin[ic] = atof(s.c_str());
+        }
+        rtp.struct_origin_s=1;
+        found_token=1;
       }//STRUCTURE_ORIGIN
       if(tok=="PLANE") {
-	int id=0;
-	rtp.plane=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        int id=0;
+        rtp.plane=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }//PLANE
       if(tok=="PLANECENTER") {
-	// Note that there are 3 values here.
-	int id=0;
-	for(int ic=0;ic<(int)rtp.plane_center.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.plane_center[ic]=val;
-	}
-	found_token=1;
-	rtp.updir_s=1;
+        // Note that there are 3 values here.
+        int id=0;
+        for(int ic=0;ic<(int)rtp.plane_center.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.plane_center[ic]=val;
+        }
+        found_token=1;
+        rtp.updir_s=1;
       }// PLANECENTER
       if(tok=="PLANENORMAL") {
-	// Note that there are 3 values here.
-	int id=0;
-	for(int ic=0;ic<(int)rtp.plane_normal.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.plane_normal[ic]=val;
-	}
-	found_token=1;
+        // Note that there are 3 values here.
+        int id=0;
+        for(int ic=0;ic<(int)rtp.plane_normal.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.plane_normal[ic]=val;
+        }
+        found_token=1;
       }// PLANENORMAL
       if(tok=="PLANETEXTURE") {
-	// Note that there are 4 values here.
-	int id=0;
-	for(int ic=0;ic<(int)rtp.planetex_tex.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.planetex_tex[ic]=val;
-	}
-	found_token=1;
+        // Note that there are 4 values here.
+        int id=0;
+        for(int ic=0;ic<(int)rtp.planetex_tex.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.planetex_tex[ic]=val;
+        }
+        found_token=1;
       }// PLANETEXTURE
       if(tok=="PLANECOLOR") {
-	// Note that there are 3 values here.
-	int id=0;
-	for(int ic=0;ic<(int)rtp.plane_color.size();ic++) {
-	  val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	  rtp.plane_color[ic]=val;
-	}
-	found_token=1;
+        // Note that there are 3 values here.
+        int id=0;
+        for(int ic=0;ic<(int)rtp.plane_color.size();ic++) {
+          val=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+          rtp.plane_color[ic]=val;
+        }
+        found_token=1;
       }// PLANECOLOR
 
       if(!found_token) {
-	cerr << "ERROR: You have input a token " << tok <<endl;
-	cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-	exit(1);
+        cerr << "ERROR: You have input a token " << tok <<endl;
+        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
+        exit(1);
       }
 
     } // for i
@@ -3233,11 +3231,11 @@ namespace pflow {
     uint iline=0;
     while (iline<vline.size()) {
       if(aurostd::RemoveWhiteSpaces(vline.at(iline))=="") {
-	xstructure str(sss);
-	vstr.push_back(str);
-	sss.clear();sss.str("");
+        xstructure str(sss);
+        vstr.push_back(str);
+        sss.clear();sss.str("");
       } else {
-	sss << vline.at(iline) << endl;
+        sss << vline.at(iline) << endl;
       }
       iline++;
     } 
@@ -3266,8 +3264,8 @@ namespace pflow {
 // quite easily if that is needed.
 namespace pflow {
   void JoinStrVec(vector<xstructure> vstr1,
-		  vector<xstructure> vstr2,
-		  vector<xstructure>& vstrtot) {
+      vector<xstructure> vstr2,
+      vector<xstructure>& vstrtot) {
     // cout << "In JOIN" << endl;
     // cout << "strlist1 size " << vstr1.size() << endl;
     // cout << "strlist2 size " << vstr2.size() << endl;
@@ -3276,13 +3274,13 @@ namespace pflow {
     if(size1<size2) {// Pad vstr1
       xstructure str=vstr1[size1-1];
       for(int is=size1;is<size2;is++) {
-	vstr1.push_back(str);
+        vstr1.push_back(str);
       }
     }
     if(size2<size1) {// Pad vstr2
       xstructure str=vstr2[size2-1];
       for(int is=size2;is<size1;is++) {
-	vstr2.push_back(str);
+        vstr2.push_back(str);
       }
     }
     for(int is=0;is<size1;is++) {
@@ -3298,15 +3296,15 @@ namespace pflow {
       // Loop over str2 atoms, assign them a type and c/d positions in an atom.
       int cnt=0;
       for(int it=0;it<num_types_2;it++) {
-	for(int ia=0;ia<num_each_type_2.at(it);ia++) {
-	  _atom a;
-	  a=pflow::SetCpos(a,cpos2[cnt]);
-	  a.fpos=C2F(xlat1,a.cpos);
-	  //	a=pflow::SetFpos(a,C2F(lat1,cpos2[cnt]));
-	  a=pflow::SetType(a,num_types_1+it);
-	  str1.AddAtom(a);
-	  cnt++;
-	}
+        for(int ia=0;ia<num_each_type_2.at(it);ia++) {
+          _atom a;
+          a=pflow::SetCpos(a,cpos2[cnt]);
+          a.fpos=C2F(xlat1,a.cpos);
+          //	a=pflow::SetFpos(a,C2F(lat1,cpos2[cnt]));
+          a=pflow::SetType(a,num_types_1+it);
+          str1.AddAtom(a);
+          cnt++;
+        }
       }
       //      cout << str1.atoms.size() << endl;
       vstrtot.push_back(str1);
@@ -3368,7 +3366,7 @@ namespace pflow {
     if(r>1) r=1;
     if(rtp.center_s) {
       for(int ic=0;ic<3;ic++) {
-	rtp.center[ic]=rtp.center_guide[2*ic]+r*(rtp.center_guide[2*ic+1]-rtp.center_guide[2*ic]);
+        rtp.center[ic]=rtp.center_guide[2*ic]+r*(rtp.center_guide[2*ic+1]-rtp.center_guide[2*ic]);
       }
     }
     //tpx
@@ -3409,47 +3407,47 @@ namespace pflow {
       size=rtp.sphtex_tex_def.size();
       tmp=matrix<double> (ntypes,rtp.sphtex_tex_def);
       for(int i=0;i<(int)rtp.sphtex_tex.size();i++) {
-	int id=(int)rtp.sphtex_tex[i][0]-1;
-	for(int j=1;j<size+1;j++) {
-	  if(id>=0 && id<ntypes) tmp[id][j-1]=rtp.sphtex_tex[i][j];
-	}
+        int id=(int)rtp.sphtex_tex[i][0]-1;
+        for(int j=1;j<size+1;j++) {
+          if(id>=0 && id<ntypes) tmp[id][j-1]=rtp.sphtex_tex[i][j];
+        }
       }
       rtp.sphtex_tex=tmp;
       // Set sphtex_color
       size=rtp.sphtex_color_def.size();
       tmp=matrix<double> (ntypes,rtp.sphtex_color_def);
       for(int i=0;i<(int)rtp.sphtex_color.size();i++) {
-	int id=(int)rtp.sphtex_color[i][0]-1;
-	for(int j=1;j<size+1;j++) {
-	  if(id>=0 && id<ntypes) tmp[id][j-1]=rtp.sphtex_color[i][j];
-	}
+        int id=(int)rtp.sphtex_color[i][0]-1;
+        for(int j=1;j<size+1;j++) {
+          if(id>=0 && id<ntypes) tmp[id][j-1]=rtp.sphtex_color[i][j];
+        }
       }
       rtp.sphtex_color=tmp;
       // Set sphtex_phong
       size=rtp.sphtex_phong_def.size();
       tmp=matrix<double> (ntypes,rtp.sphtex_phong_def);
       for(int i=0;i<(int)rtp.sphtex_phong.size();i++) {
-	int id=(int)rtp.sphtex_phong[i][0]-1;
-	for(int j=1;j<size+1;j++) {
-	  if(id>=0 && id<ntypes) tmp[id][j-1]=rtp.sphtex_phong[i][j];
-	}
+        int id=(int)rtp.sphtex_phong[i][0]-1;
+        for(int j=1;j<size+1;j++) {
+          if(id>=0 && id<ntypes) tmp[id][j-1]=rtp.sphtex_phong[i][j];
+        }
       }
       rtp.sphtex_phong=tmp;
       // Set sph_rad
       size=1;
       vector<double> vtmp(ntypes,rtp.sph_rad_def);
       for(int i=0;i<(int)rtp.sph_rad.size()/2;i++) {
-	int id=(int)rtp.sph_rad[2*i]-1;
-	if(id>=0 && id<ntypes) vtmp[id]=rtp.sph_rad[2*i+1];
+        int id=(int)rtp.sph_rad[2*i]-1;
+        if(id>=0 && id<ntypes) vtmp[id]=rtp.sph_rad[2*i+1];
       }
       rtp.sph_rad=vtmp;
       // Set sphtex_names
       rtp.sphtex_names = vector<string> (ntypes,"txt_atom_type_");
       for(int it=0;it<ntypes;it++) {
-	ostringstream os;
-	os << it+1 << ends;
-	string s(os.str());
-	rtp.sphtex_names[it]=rtp.sphtex_names[it]+s;
+        ostringstream os;
+        os << it+1 << ends;
+        string s(os.str());
+        rtp.sphtex_names[it]=rtp.sphtex_names[it]+s;
       }
       rtp.first_set=0;
     }// if first_set    
@@ -3461,10 +3459,10 @@ namespace pflow {
     //  if(!rtp.updir_s) {rtp.updir=lat[0];}
 
     /*
-      Set up struct_origin, which is the point around which rotation
-      will take place.  Here we default to the first moment of the atom
-      positions.
-    */
+       Set up struct_origin, which is the point around which rotation
+       will take place.  Here we default to the first moment of the atom
+       positions.
+       */
     if(! rtp.struct_origin_s) {// If struct_orig was not set by user
       // rtp.struct_origin=SVprod(0.5,VVsum(lat[0],VVsum(lat[1],lat[2])));
       vector<double> mom1=xvector2vector(GetMom1(str));
@@ -3472,22 +3470,22 @@ namespace pflow {
     }
 
     /*
-      Set up center (where camera is located).
-      Define the center to be displaced from the centroid along the view
-      direction. Define center to be located a distance d=-2.0*R/tan(45)=-2.0*R
-      from the centroid, where R is the the largest projected distance
-      of an atom from the centroid (first moment) in the image plane (the
-      plane defined to be perpendicular to the view direction and containing the
-      centroid).  So define
-      mom1=first moment
-      vd=unit vector along view direction
-      up=unit vector along up direction
-      upp=unit vector consisting of projection of up vector into the image plane.
-      vdp=unit vector in image plane perpendicular to vd and updir.
+       Set up center (where camera is located).
+       Define the center to be displaced from the centroid along the view
+       direction. Define center to be located a distance d=-2.0*R/tan(45)=-2.0*R
+       from the centroid, where R is the the largest projected distance
+       of an atom from the centroid (first moment) in the image plane (the
+       plane defined to be perpendicular to the view direction and containing the
+       centroid).  So define
+       mom1=first moment
+       vd=unit vector along view direction
+       up=unit vector along up direction
+       upp=unit vector consisting of projection of up vector into the image plane.
+       vdp=unit vector in image plane perpendicular to vd and updir.
 
-      Actually, instead of mom1 being the centroid just set it to the
-      struct_origin.  All else is the same.
-    */
+       Actually, instead of mom1 being the centroid just set it to the
+       struct_origin.  All else is the same.
+       */
     if(! rtp.center_s) {// If center was not set by user
       vector<double> mom1=rtp.struct_origin;
       vector<double> vd=pflow::SVprod(1.0/pflow::norm(rtp.viewdir),rtp.viewdir);
@@ -3499,20 +3497,20 @@ namespace pflow {
       double proj=0;
       //      double max_iat=0;
       for(int iat=0;iat<nat;iat++) {
-	double p1=pflow::VVprod(pflow::VVdiff(cpos[iat],mom1),vdp);
-	double p2=pflow::VVprod(pflow::VVdiff(cpos[iat],mom1),upp);
-	double nproj=sqrt(p1*p1+p2*p2);
-	if(nproj>proj) {
-	  proj=nproj;
-	  //	  max_iat=iat;
-	}
+        double p1=pflow::VVprod(pflow::VVdiff(cpos[iat],mom1),vdp);
+        double p2=pflow::VVprod(pflow::VVdiff(cpos[iat],mom1),upp);
+        double nproj=sqrt(p1*p1+p2*p2);
+        if(nproj>proj) {
+          proj=nproj;
+          //	  max_iat=iat;
+        }
       }
       double displ=-2.0*proj;
       rtp.center=pflow::VVsum(mom1,pflow::SVprod(displ,vd));
     }// if ! center_s
     else { // if center is set by user
       for(int ic=0;ic<3;ic++) {
-	rtp.center[ic]=rtp.center_guide[2*ic];
+        rtp.center[ic]=rtp.center_guide[2*ic];
       }
     }
   }
@@ -3523,15 +3521,15 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void GetRTDatFile(xstructure str, const pflow::rtparams& rtp,
-		    ostringstream& rtdat_file) {
+      ostringstream& rtdat_file) {
     rtdat_file << "BEGIN_SCENE" << endl;
     rtdat_file << "  RESOLUTION " << rtp.resx << " " << rtp.resy << endl;
-    /*
-      string tga="tga";
-      string outfile;
-      outfile=rtp.outfile+"_"+tga;
-      rtdat_file << "  OUTFILE " << outfile << endl;
-    */
+
+    //string tga="tga";
+    //string outfile;
+    //outfile=rtp.outfile+"_"+tga;
+    //rtdat_file << "  OUTFILE " << outfile << endl;
+
     rtdat_file << endl;
     rtdat_file << "CAMERA" << endl;
     rtdat_file << "  ZOOM " << rtp.zoom << endl;
@@ -3574,11 +3572,11 @@ namespace pflow {
     int cnt=0;
     for(int it=0;it<ntype;it++) {
       for(int iat=0;iat<num_each_type.at(it);iat++) {
-	rtdat_file << "SPHERE CENTER " << cpos[cnt][0] << " " << cpos[cnt][1] << " " << cpos[cnt][2];
-	rtdat_file << " RAD " << rtp.sph_rad[it];
-	rtdat_file << " " << rtp.sphtex_names[it] << endl;
-	rtdat_file << endl;
-	cnt++;
+        rtdat_file << "SPHERE CENTER " << cpos[cnt][0] << " " << cpos[cnt][1] << " " << cpos[cnt][2];
+        rtdat_file << " RAD " << rtp.sph_rad[it];
+        rtdat_file << " " << rtp.sphtex_names[it] << endl;
+        rtdat_file << endl;
+        cnt++;
       }
     }
     // Do plane
@@ -3655,7 +3653,7 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void GetRTencFile(const pflow::rtparams& rtp, const int nim,
-		    ostringstream& os) {
+      ostringstream& os) {
     os << "PATTERN         IBBPBBPBBPBBPBB" << endl;
     os << "OUTPUT          "<< rtp.outfile << ".mpg" << endl;
     os << "GOP_SIZE        16" << endl;
@@ -3703,7 +3701,7 @@ namespace pflow {
     ostringstream encoder_stream;
     encoder_stream << "mpeg_encode " << " " << encfile << ends;
     /*  char* encoder_char = encoder_stream.str().c_str();
-	system(encoder_char);*/
+        system(encoder_char);*/
     system(encoder_stream.str().c_str());
     // Get outfile.mpg name
     string file;
@@ -3722,97 +3720,97 @@ namespace pflow {
     pflow::rtparams rtp; // Object that stores RT params.
     ReadInRTParams(rtinfile,rtp); // Sets RT params object from input.
     switch (rtp.calc_type) {
-    case 0:{ // A single file of structures.
-      // Read in structure list.
-      if(rtp.input_files.size()<1) {
-	cerr << "ERROR: RayTraceManager" << endl;
-	cerr << "ERROR: You must specify a structure list file to open with the token INFILE." << endl;
-	cerr << "ERROR: For example:  INFILE = STRLIST ." << endl;
-	cerr << "ERROR: Exiting." << endl;
-	exit(1);
-      }
-      ifstream strlist_inf(rtp.input_files[0].c_str());
-      aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf,cerr);
-      vector<xstructure> vstr;
-      cout << endl;
-      cout << "Reading in structure list." << endl;
-      cout << endl;
-      pflow::ReadInStrVec(vstr,strlist_inf);
-      int nstr=vstr.size();
-      cout << "We are working with this many structures: " << nstr << endl;
-      // Set rtparams.
-      pflow::SetRTParams(vstr[0],rtp);
-      // Set structures from rtparams.
-      for(int is=0;is<nstr;is++) {
-	pflow::SetStrFromRTParams(vstr[is],rtp);
-      }
-      cout << endl;
-      cout << "Here are the values of the ray trace parameters." << endl;
-      rtp.Print();
-      cout << endl;
-      // Rotate vstr
-      RotateStrVec(vstr,rtp.rotation);
-      // Create dat,tga,jpg files.
-      string datfile,tgafile,jpgfile;
-      for(int is=0;is<nstr;is++) {
-	cout << endl;
-	cout << "Creating dat/tga/jpg file num " << is+1 << " out of a total of " << nstr << endl;
-	cout << endl;
-	// Update rtparams
-	pflow::UpDateRTParams(rtp,is,nstr);
-	// Get dat file stringstream.
-	ostringstream rtdat_file;
-	xstructure str=vstr[is];
-	pflow::GetRTDatFile(str,rtp,rtdat_file);       // Puts formatted .dat file into a stringstream.
-	datfile=pflow::PrintRTDatFile(rtdat_file,rtp); // Prints outfile.dat file and returns name.
-	tgafile=pflow::CreateRTtgaFile(datfile,rtp);   // Creates outfile.tga file and returns name.
-	jpgfile=pflow::CreateRTjpgFile(tgafile,rtp);   // Creates outfile.jpg file and returns name.
-	// Copy files to proper names (outfile.num.suffix).
-	ostringstream mvcmd_dat;
-	ostringstream mvcmd_tga;
-	ostringstream mvcmd_jpg;
-	string name;
-	string num = aurostd::PaddedNumString(is,5);
-	string datname = (rtp.outfile+"_"+num+".dat");
-	mvcmd_dat << "mv " << datfile << " " << datname << ends;
-	system(mvcmd_dat.str().c_str());
-	string tganame = (rtp.outfile+"_"+num+".tga");
-	mvcmd_tga << "mv " << tgafile << " " << tganame << ends;
-	system(mvcmd_tga.str().c_str());
-	string jpgname = (rtp.outfile+"_"+num+".jpg");
-	mvcmd_jpg << "mv " << jpgfile << " " << jpgname << ends;
-	system(mvcmd_jpg.str().c_str());
-	if(nstr>1) { // Remove dat,tga files if there are a lot of them.
-	  ostringstream rmcmd_dat;
-	  ostringstream rmcmd_tga;
-	  rmcmd_dat << "/bin/rm " << datname << ends;
-	  system(rmcmd_dat.str().c_str());
-	  //	rmcmd_tga << "/bin/rm " << tganame << ends;
-	  //	system(rmcmd_tga.str());
-	}
-      }
-      // Get and print enc file for mpeg encoder.
-      ostringstream rtenc_file;
-      GetRTencFile(rtp,nstr,rtenc_file);
-      string encfile;
-      encfile=PrintRTencFile(rtp,rtenc_file);
-      // Create mpg file with mpeg encoder.
-      cout << endl;
-      cout << "Creating mpg file " << rtp.outfile << ".mpg" << endl;
-      cout << endl;
-      string mpgfile;
-      mpgfile=CreateRTmpgFile(rtp,encfile);
-      break;
-    }
-    default:{
-      cout << endl;
-      cerr << "ERROR: RTManager" <<endl;
-      cerr << "ERROR: You have set CALCTYPE= " << rtp.calc_type << endl;
-      cerr << "ERROR: This does not correspond to any function. "<< endl;
-      cerr << "ERROR: exiting" << endl;
-      cout << endl;
-      exit(1);
-    }
+      case 0:{ // A single file of structures.
+               // Read in structure list.
+               if(rtp.input_files.size()<1) {
+                 cerr << "ERROR: RayTraceManager" << endl;
+                 cerr << "ERROR: You must specify a structure list file to open with the token INFILE." << endl;
+                 cerr << "ERROR: For example:  INFILE = STRLIST ." << endl;
+                 cerr << "ERROR: Exiting." << endl;
+                 exit(1);
+               }
+               ifstream strlist_inf(rtp.input_files[0].c_str());
+               aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf,cerr);
+               vector<xstructure> vstr;
+               cout << endl;
+               cout << "Reading in structure list." << endl;
+               cout << endl;
+               pflow::ReadInStrVec(vstr,strlist_inf);
+               int nstr=vstr.size();
+               cout << "We are working with this many structures: " << nstr << endl;
+               // Set rtparams.
+               pflow::SetRTParams(vstr[0],rtp);
+               // Set structures from rtparams.
+               for(int is=0;is<nstr;is++) {
+                 pflow::SetStrFromRTParams(vstr[is],rtp);
+               }
+               cout << endl;
+               cout << "Here are the values of the ray trace parameters." << endl;
+               rtp.Print();
+               cout << endl;
+               // Rotate vstr
+               RotateStrVec(vstr,rtp.rotation);
+               // Create dat,tga,jpg files.
+               string datfile,tgafile,jpgfile;
+               for(int is=0;is<nstr;is++) {
+                 cout << endl;
+                 cout << "Creating dat/tga/jpg file num " << is+1 << " out of a total of " << nstr << endl;
+                 cout << endl;
+                 // Update rtparams
+                 pflow::UpDateRTParams(rtp,is,nstr);
+                 // Get dat file stringstream.
+                 ostringstream rtdat_file;
+                 xstructure str=vstr[is];
+                 pflow::GetRTDatFile(str,rtp,rtdat_file);       // Puts formatted .dat file into a stringstream.
+                 datfile=pflow::PrintRTDatFile(rtdat_file,rtp); // Prints outfile.dat file and returns name.
+                 tgafile=pflow::CreateRTtgaFile(datfile,rtp);   // Creates outfile.tga file and returns name.
+                 jpgfile=pflow::CreateRTjpgFile(tgafile,rtp);   // Creates outfile.jpg file and returns name.
+                 // Copy files to proper names (outfile.num.suffix).
+                 ostringstream mvcmd_dat;
+                 ostringstream mvcmd_tga;
+                 ostringstream mvcmd_jpg;
+                 string name;
+                 string num = aurostd::PaddedNumString(is,5);
+                 string datname = (rtp.outfile+"_"+num+".dat");
+                 mvcmd_dat << "mv " << datfile << " " << datname << ends;
+                 system(mvcmd_dat.str().c_str());
+                 string tganame = (rtp.outfile+"_"+num+".tga");
+                 mvcmd_tga << "mv " << tgafile << " " << tganame << ends;
+                 system(mvcmd_tga.str().c_str());
+                 string jpgname = (rtp.outfile+"_"+num+".jpg");
+                 mvcmd_jpg << "mv " << jpgfile << " " << jpgname << ends;
+                 system(mvcmd_jpg.str().c_str());
+                 if(nstr>1) { // Remove dat,tga files if there are a lot of them.
+                   ostringstream rmcmd_dat;
+                   ostringstream rmcmd_tga;
+                   rmcmd_dat << "/bin/rm " << datname << ends;
+                   system(rmcmd_dat.str().c_str());
+                   //	rmcmd_tga << "/bin/rm " << tganame << ends;
+                   //	system(rmcmd_tga.str());
+                 }
+               }
+               // Get and print enc file for mpeg encoder.
+               ostringstream rtenc_file;
+               GetRTencFile(rtp,nstr,rtenc_file);
+               string encfile;
+               encfile=PrintRTencFile(rtp,rtenc_file);
+               // Create mpg file with mpeg encoder.
+               cout << endl;
+               cout << "Creating mpg file " << rtp.outfile << ".mpg" << endl;
+               cout << endl;
+               string mpgfile;
+               mpgfile=CreateRTmpgFile(rtp,encfile);
+               break;
+             }
+      default:{
+                cout << endl;
+                cerr << "ERROR: RTManager" <<endl;
+                cerr << "ERROR: You have set CALCTYPE= " << rtp.calc_type << endl;
+                cerr << "ERROR: This does not correspond to any function. "<< endl;
+                cerr << "ERROR: exiting" << endl;
+                cout << endl;
+                exit(1);
+              }
     }//switch
   }
 }
@@ -3881,7 +3879,7 @@ namespace pflow {
       angles[ic]=angles[ic]*TWOPI/360.0;
     }
     matrix<double> irm=GetRotationMatrix(angles);
-  
+
     // get primitive rotation matrix.
     int s=vstr.size()-1;
     if(s<1) s=1;
@@ -3961,12 +3959,12 @@ namespace pflow {
     LLMnames[18]="Ftot  ";
     LLMnames[19]="Tot   ";
   }
-  
+
   void projdata::Print(ostream& outf) {
     outf.precision(3);
     outf.setf(std::ios::fixed,std::ios::floatfield);
     outf.setf(std::ios::left,std::ios::adjustfield);
-  
+
     int ioncnt;
     int w1=5;
     int w2=6;
@@ -3998,7 +3996,7 @@ namespace pflow {
     for(int ib=0;ib<(int)wfermi_u.size();ib++) {
       outf << " " << ib;
       for(int ik=0;ik<(int)wfermi_u[ib].size();ik++) {
-	outf << "   " << wfermi_u[ib][ik];
+        outf << "   " << wfermi_u[ib][ik];
       }
       outf << endl;
     }
@@ -4006,7 +4004,7 @@ namespace pflow {
     for(int ib=0;ib<(int)wfermi_d.size();ib++) {
       outf << " " << ib;
       for(int ik=0;ik<(int)wfermi_d[ib].size();ik++) {
-	outf << "   " << wfermi_d[ib][ik];
+        outf << "   " << wfermi_d[ib][ik];
       }
       outf << endl;
     }
@@ -4014,19 +4012,19 @@ namespace pflow {
     outf << "kpt values and weights" << endl;
     for(int ik=0;ik<(int)wkpt.size();ik++) {
       outf << "  " << ik+1 << "  "
-	   << kpts[ik][0] << "  "
-	   << kpts[ik][1] << "  "
-	   << kpts[ik][2] << "      "
-	   << wkpt[ik] << endl;
+        << kpts[ik][0] << "  "
+        << kpts[ik][1] << "  "
+        << kpts[ik][2] << "      "
+        << wkpt[ik] << endl;
     }
 
     outf << "Band energies" << endl;
     outf << "   " << "kpt   " << "band  " << "energy (up/dn) " << endl;
     for(int ik=0;ik<(int)ener_k_b_u.size();ik++) {
       for(int ib=0;ib<(int)ener_k_b_u[ik].size();ib++) {
-	outf << "   " << setw(5) << ik+1 << " " << setw(5) << ib+1 << " " << setprecision(5) << ener_k_b_u[ik][ib];
-	if(sp) outf << "  " << setprecision(5) << ener_k_b_d[ik][ib];
-	outf << endl;
+        outf << "   " << setw(5) << ik+1 << " " << setw(5) << ib+1 << " " << setprecision(5) << ener_k_b_u[ik][ib];
+        if(sp) outf << "  " << setprecision(5) << ener_k_b_d[ik][ib];
+        outf << endl;
       }
     }
 
@@ -4037,22 +4035,22 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<(int)pdat_u.size();it++) {
       for(int iat=0;iat<num_each_type.at(it);iat++) {
-	ioncnt++;
-	for(int ik=0;ik<(int)pdat_u[it].size();ik++) {
-	  for(int ib=0;ib<(int)pdat_u[it][ik][iat].size();ib++) {
-	    for(int ilm=0;ilm<(int)pdat_u[it][ik][iat][ib].size();ilm++) {
-	      outf << "   ";
-	      outf << setw(w2) << it+1;
-	      outf << setw(w2) << ioncnt+1;
-	      outf << setw(w2) << ik+1;
-	      outf << setw(w2) << ib+1;
-	      outf << "   " << LMnames[ilm];
-	      outf << "  " << setw(w2) << pdat_u[it][ik][iat][ib][ilm];
-	      if(sp) outf << "  " << setw(w2) << pdat_d[it][ik][iat][ib][ilm];
-	      outf << endl;
-	    }
-	  }
-	}
+        ioncnt++;
+        for(int ik=0;ik<(int)pdat_u[it].size();ik++) {
+          for(int ib=0;ib<(int)pdat_u[it][ik][iat].size();ib++) {
+            for(int ilm=0;ilm<(int)pdat_u[it][ik][iat][ib].size();ilm++) {
+              outf << "   ";
+              outf << setw(w2) << it+1;
+              outf << setw(w2) << ioncnt+1;
+              outf << setw(w2) << ik+1;
+              outf << setw(w2) << ib+1;
+              outf << "   " << LMnames[ilm];
+              outf << "  " << setw(w2) << pdat_u[it][ik][iat][ib][ilm];
+              if(sp) outf << "  " << setw(w2) << pdat_d[it][ik][iat][ib][ilm];
+              outf << endl;
+            }
+          }
+        }
       }
     }
 
@@ -4072,123 +4070,123 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<ntypes;it++) {
       for(int iat=0;iat<num_each_type.at(it);iat++) {
-	ioncnt++;
-	for(int ik=0;ik<nkpts;ik++) {
-	  for(int ib=0;ib<nbands;ib++) {
-	    outf << "   " << setw(w1) << ioncnt+1;
-	    outf << " " << setw(w1) << it+1;
-	    outf << " " << setw(w1) << ik+1;
-	    outf << " " << setw(w1) << ib+1;
-	    outf << " " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][0];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][4];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][5];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][6];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][7];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][8];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][9];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][10];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][11];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][12];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][13];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][14];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][15];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][4];
-	    outf << " " << key;
-	    outf << endl;
-	  }
-	}
+        ioncnt++;
+        for(int ik=0;ik<nkpts;ik++) {
+          for(int ib=0;ib<nbands;ib++) {
+            outf << "   " << setw(w1) << ioncnt+1;
+            outf << " " << setw(w1) << it+1;
+            outf << " " << setw(w1) << ik+1;
+            outf << " " << setw(w1) << ib+1;
+            outf << " " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][0];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][1];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][2];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][3];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][1];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][4];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][5];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][6];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][7];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][8];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][2];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][9];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][10];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][11];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][12];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][13];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][14];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][15];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][3];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][4];
+            outf << " " << key;
+            outf << endl;
+          }
+        }
       }
     }
     if(sp) {
       outf << "Down spin"<< endl;
       outf << "   " << "ion   " << "type  " << "kpt   " << "band  ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  for(int ik=0;ik<nkpts;ik++) {
-	    for(int ib=0;ib<nbands;ib++) {
-	      outf << "   " << setw(w1) << ioncnt+1;
-	      outf << " " << setw(w1) << it+1;
-	      outf << " " << setw(w1) << ik+1;
-	      outf << " " << setw(w1) << ib+1;
-	      outf << " " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][0];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][1];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][2];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][3];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][1];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][4];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][5];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][6];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][7];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][8];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][2];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][9];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][10];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][11];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][12];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][13];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][14];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][15];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][3];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][4];
-	      outf << " " << key;
-	      outf << endl;
-	    }
-	  }
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          for(int ik=0;ik<nkpts;ik++) {
+            for(int ib=0;ib<nbands;ib++) {
+              outf << "   " << setw(w1) << ioncnt+1;
+              outf << " " << setw(w1) << it+1;
+              outf << " " << setw(w1) << ik+1;
+              outf << " " << setw(w1) << ib+1;
+              outf << " " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][0];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][1];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][2];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][3];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][1];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][4];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][5];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][6];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][7];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][8];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][2];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][9];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][10];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][11];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][12];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][13];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][14];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][15];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][3];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][4];
+              outf << " " << key;
+              outf << endl;
+            }
+          }
+        }
       }
       outf << "Up-Down spin"<< endl;
       outf << "   " << "ion   " << "type  " << "kpt   " << "band  ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  for(int ik=0;ik<nkpts;ik++) {
-	    for(int ib=0;ib<nbands;ib++) {
-	      outf << "   " << setw(w1) << ioncnt+1;
-	      outf << " " << setw(w1) << it+1;
-	      outf << " " << setw(w1) << ik+1;
-	      outf << " " << setw(w1) << ib+1;
-	      outf << " " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][0]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][0];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][1]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][1];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][2]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][2];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][3]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][3];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][1]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][1];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][4]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][4];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][5]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][5];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][6]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][6];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][7]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][7];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][8]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][8];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][2]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][2];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][9]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][9];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][10]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][10];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][11]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][11];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][12]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][12];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][13]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][13];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][14]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][14];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][15]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][15];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][3]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][3];
-	      outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][4]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][4];
-	      outf << " " << key;
-	      outf << endl;
-	    }
-	  }
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          for(int ik=0;ik<nkpts;ik++) {
+            for(int ib=0;ib<nbands;ib++) {
+              outf << "   " << setw(w1) << ioncnt+1;
+              outf << " " << setw(w1) << it+1;
+              outf << " " << setw(w1) << ik+1;
+              outf << " " << setw(w1) << ib+1;
+              outf << " " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][0]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][0];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][1]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][1];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][2]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][2];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][3]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][3];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][1]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][1];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][4]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][4];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][5]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][5];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][6]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][6];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][7]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][7];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][8]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][8];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][2]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][2];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][9]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][9];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][10]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][10];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][11]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][11];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][12]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][12];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][13]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][13];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][14]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][14];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][15]-occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][15];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][3]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][3];
+              outf << "  " << setw(w2) << occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][4]-occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][4];
+              outf << " " << key;
+              outf << endl;
+            }
+          }
+        }
       }
     }
 
@@ -4208,114 +4206,114 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<ntypes;it++) {
       for(int iat=0;iat<num_each_type.at(it);iat++) {
-	ioncnt++;
-	for(int ib=0;ib<nbands;ib++) {
-	  outf << "   " << setw(w1) << ioncnt+1;
-	  outf << " " << setw(w1) << it+1;
-	  outf << " " << setw(w1) << ib+1;
-	  outf << " " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][0];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][4];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][5];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][6];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][7];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][8];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][9];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][10];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][11];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][12];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][13];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][14];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][15];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][4];
-	  outf << " " << key;
-	  outf << endl;
-	}
+        ioncnt++;
+        for(int ib=0;ib<nbands;ib++) {
+          outf << "   " << setw(w1) << ioncnt+1;
+          outf << " " << setw(w1) << it+1;
+          outf << " " << setw(w1) << ib+1;
+          outf << " " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][0];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][1];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][2];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][3];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][1];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][4];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][5];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][6];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][7];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][8];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][2];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][9];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][10];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][11];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][12];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][13];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][14];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][15];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][3];
+          outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][4];
+          outf << " " << key;
+          outf << endl;
+        }
       }
     }
     if(sp) {
       outf << "Down spin"<< endl;
       outf << "   " << "ion   " << "type  " << "band  ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  for(int ib=0;ib<nbands;ib++) {
-	    outf << "   " << setw(w1) << ioncnt+1;
-	    outf << " " << setw(w1) << it+1;
-	    outf << " " << setw(w1) << ib+1;
-	    outf << " " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][0];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][4];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][5];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][6];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][7];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][8];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][9];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][10];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][11];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][12];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][13];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][14];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][15];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][4];
-	    outf << " " << key;
-	    outf << endl;
-	  }
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          for(int ib=0;ib<nbands;ib++) {
+            outf << "   " << setw(w1) << ioncnt+1;
+            outf << " " << setw(w1) << it+1;
+            outf << " " << setw(w1) << ib+1;
+            outf << " " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][0];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][1];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][2];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][3];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][1];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][4];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][5];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][6];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][7];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][8];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][2];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][9];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][10];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][11];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][12];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][13];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][14];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_d[ioncnt][ib][15];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][3];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_d[ioncnt][ib][4];
+            outf << " " << key;
+            outf << endl;
+          }
+        }
       }
       outf << "Up-Down spin"<< endl;
       outf << "   " << "ion   " << "type  " << "band  ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  for(int ib=0;ib<nbands;ib++) {
-	    outf << "   " << setw(w1) << ioncnt+1;
-	    outf << " " << setw(w1) << it+1;
-	    outf << " " << setw(w1) << ib+1;
-	    outf << " " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][0]-occ_vs_ion_bnd_lm_d[ioncnt][ib][0];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][1]-occ_vs_ion_bnd_lm_d[ioncnt][ib][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][2]-occ_vs_ion_bnd_lm_d[ioncnt][ib][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][3]-occ_vs_ion_bnd_lm_d[ioncnt][ib][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][1]-occ_vs_ion_bnd_l_d[ioncnt][ib][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][4]-occ_vs_ion_bnd_lm_d[ioncnt][ib][4];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][5]-occ_vs_ion_bnd_lm_d[ioncnt][ib][5];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][6]-occ_vs_ion_bnd_lm_d[ioncnt][ib][6];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][7]-occ_vs_ion_bnd_lm_d[ioncnt][ib][7];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][8]-occ_vs_ion_bnd_lm_d[ioncnt][ib][8];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][2]-occ_vs_ion_bnd_l_d[ioncnt][ib][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][9]-occ_vs_ion_bnd_lm_d[ioncnt][ib][9];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][10]-occ_vs_ion_bnd_lm_d[ioncnt][ib][10];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][11]-occ_vs_ion_bnd_lm_d[ioncnt][ib][11];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][12]-occ_vs_ion_bnd_lm_d[ioncnt][ib][12];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][13]-occ_vs_ion_bnd_lm_d[ioncnt][ib][13];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][14]-occ_vs_ion_bnd_lm_d[ioncnt][ib][14];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][15]-occ_vs_ion_bnd_lm_d[ioncnt][ib][15];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][3]-occ_vs_ion_bnd_l_d[ioncnt][ib][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][4]-occ_vs_ion_bnd_l_d[ioncnt][ib][4];
-	    outf << " " << key;
-	    outf << endl;
-	  }
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          for(int ib=0;ib<nbands;ib++) {
+            outf << "   " << setw(w1) << ioncnt+1;
+            outf << " " << setw(w1) << it+1;
+            outf << " " << setw(w1) << ib+1;
+            outf << " " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][0]-occ_vs_ion_bnd_lm_d[ioncnt][ib][0];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][1]-occ_vs_ion_bnd_lm_d[ioncnt][ib][1];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][2]-occ_vs_ion_bnd_lm_d[ioncnt][ib][2];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][3]-occ_vs_ion_bnd_lm_d[ioncnt][ib][3];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][1]-occ_vs_ion_bnd_l_d[ioncnt][ib][1];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][4]-occ_vs_ion_bnd_lm_d[ioncnt][ib][4];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][5]-occ_vs_ion_bnd_lm_d[ioncnt][ib][5];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][6]-occ_vs_ion_bnd_lm_d[ioncnt][ib][6];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][7]-occ_vs_ion_bnd_lm_d[ioncnt][ib][7];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][8]-occ_vs_ion_bnd_lm_d[ioncnt][ib][8];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][2]-occ_vs_ion_bnd_l_d[ioncnt][ib][2];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][9]-occ_vs_ion_bnd_lm_d[ioncnt][ib][9];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][10]-occ_vs_ion_bnd_lm_d[ioncnt][ib][10];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][11]-occ_vs_ion_bnd_lm_d[ioncnt][ib][11];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][12]-occ_vs_ion_bnd_lm_d[ioncnt][ib][12];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][13]-occ_vs_ion_bnd_lm_d[ioncnt][ib][13];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][14]-occ_vs_ion_bnd_lm_d[ioncnt][ib][14];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_lm_u[ioncnt][ib][15]-occ_vs_ion_bnd_lm_d[ioncnt][ib][15];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][3]-occ_vs_ion_bnd_l_d[ioncnt][ib][3];
+            outf << "  " << setw(w2) << occ_vs_ion_bnd_l_u[ioncnt][ib][4]-occ_vs_ion_bnd_l_d[ioncnt][ib][4];
+            outf << " " << key;
+            outf << endl;
+          }
+        }
       }
     }// if sp
 
@@ -4335,114 +4333,114 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<ntypes;it++) {
       for(int iat=0;iat<num_each_type.at(it);iat++) {
-	ioncnt++;
-	for(int ik=0;ik<nkpts;ik++) {
-	  outf << "   " << setw(w1) << ioncnt+1;
-	  outf << " " << setw(w1) << it+1;
-	  outf << " " << setw(w1) << ik+1;
-	  outf << " " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][0];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][4];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][5];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][6];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][7];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][8];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][9];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][10];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][11];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][12];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][13];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][14];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][15];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][4];
-	  outf << " " << key;
-	  outf << endl;
-	}
+        ioncnt++;
+        for(int ik=0;ik<nkpts;ik++) {
+          outf << "   " << setw(w1) << ioncnt+1;
+          outf << " " << setw(w1) << it+1;
+          outf << " " << setw(w1) << ik+1;
+          outf << " " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][0];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][1];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][2];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][3];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][1];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][4];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][5];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][6];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][7];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][8];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][2];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][9];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][10];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][11];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][12];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][13];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][14];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][15];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][3];
+          outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][4];
+          outf << " " << key;
+          outf << endl;
+        }
       }
     }
     if(sp) {
       outf << "Down spin"<< endl;
       outf << "   " << "ion   " << "type  " << "kpt   ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  for(int ik=0;ik<nkpts;ik++) {
-	    outf << "   " << setw(w1) << ioncnt+1;
-	    outf << " " << setw(w1) << it+1;
-	    outf << " " << setw(w1) << ik+1;
-	    outf << " " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][0];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][4];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][5];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][6];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][7];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][8];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][9];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][10];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][11];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][12];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][13];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][14];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][15];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][4];
-	    outf << " " << key;
-	    outf << endl;
-	  }
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          for(int ik=0;ik<nkpts;ik++) {
+            outf << "   " << setw(w1) << ioncnt+1;
+            outf << " " << setw(w1) << it+1;
+            outf << " " << setw(w1) << ik+1;
+            outf << " " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][0];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][1];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][2];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][3];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][1];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][4];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][5];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][6];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][7];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][8];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][2];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][9];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][10];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][11];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][12];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][13];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][14];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_d[ioncnt][ik][15];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][3];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_d[ioncnt][ik][4];
+            outf << " " << key;
+            outf << endl;
+          }
+        }
       }
       outf << "Up-Down spin"<< endl;
       outf << "   " << "ion   " << "type  " << "kpt   ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  for(int ik=0;ik<nkpts;ik++) {
-	    outf << "   " << setw(5) << ioncnt+1;
-	    outf << " " << setw(5) << it+1;
-	    outf << " " << setw(5) << ik+1;
-	    outf << " " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][0]-occ_vs_ion_kpt_lm_d[ioncnt][ik][0];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][1]-occ_vs_ion_kpt_lm_d[ioncnt][ik][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][2]-occ_vs_ion_kpt_lm_d[ioncnt][ik][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][3]-occ_vs_ion_kpt_lm_d[ioncnt][ik][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][1]-occ_vs_ion_kpt_l_d[ioncnt][ik][1];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][4]-occ_vs_ion_kpt_lm_d[ioncnt][ik][4];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][5]-occ_vs_ion_kpt_lm_d[ioncnt][ik][5];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][6]-occ_vs_ion_kpt_lm_d[ioncnt][ik][6];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][7]-occ_vs_ion_kpt_lm_d[ioncnt][ik][7];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][8]-occ_vs_ion_kpt_lm_d[ioncnt][ik][8];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][2]-occ_vs_ion_kpt_l_d[ioncnt][ik][2];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][9]-occ_vs_ion_kpt_lm_d[ioncnt][ik][9];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][10]-occ_vs_ion_kpt_lm_d[ioncnt][ik][10];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][11]-occ_vs_ion_kpt_lm_d[ioncnt][ik][11];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][12]-occ_vs_ion_kpt_lm_d[ioncnt][ik][12];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][13]-occ_vs_ion_kpt_lm_d[ioncnt][ik][13];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][14]-occ_vs_ion_kpt_lm_d[ioncnt][ik][14];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][15]-occ_vs_ion_kpt_lm_d[ioncnt][ik][15];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][3]-occ_vs_ion_kpt_l_d[ioncnt][ik][3];
-	    outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][4]-occ_vs_ion_kpt_l_d[ioncnt][ik][4];
-	    outf << " " << key;
-	    outf << endl;
-	  }
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          for(int ik=0;ik<nkpts;ik++) {
+            outf << "   " << setw(5) << ioncnt+1;
+            outf << " " << setw(5) << it+1;
+            outf << " " << setw(5) << ik+1;
+            outf << " " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][0]-occ_vs_ion_kpt_lm_d[ioncnt][ik][0];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][1]-occ_vs_ion_kpt_lm_d[ioncnt][ik][1];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][2]-occ_vs_ion_kpt_lm_d[ioncnt][ik][2];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][3]-occ_vs_ion_kpt_lm_d[ioncnt][ik][3];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][1]-occ_vs_ion_kpt_l_d[ioncnt][ik][1];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][4]-occ_vs_ion_kpt_lm_d[ioncnt][ik][4];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][5]-occ_vs_ion_kpt_lm_d[ioncnt][ik][5];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][6]-occ_vs_ion_kpt_lm_d[ioncnt][ik][6];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][7]-occ_vs_ion_kpt_lm_d[ioncnt][ik][7];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][8]-occ_vs_ion_kpt_lm_d[ioncnt][ik][8];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][2]-occ_vs_ion_kpt_l_d[ioncnt][ik][2];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][9]-occ_vs_ion_kpt_lm_d[ioncnt][ik][9];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][10]-occ_vs_ion_kpt_lm_d[ioncnt][ik][10];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][11]-occ_vs_ion_kpt_lm_d[ioncnt][ik][11];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][12]-occ_vs_ion_kpt_lm_d[ioncnt][ik][12];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][13]-occ_vs_ion_kpt_lm_d[ioncnt][ik][13];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][14]-occ_vs_ion_kpt_lm_d[ioncnt][ik][14];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_lm_u[ioncnt][ik][15]-occ_vs_ion_kpt_lm_d[ioncnt][ik][15];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][3]-occ_vs_ion_kpt_l_d[ioncnt][ik][3];
+            outf << "  " << setw(w2) << occ_vs_ion_kpt_l_u[ioncnt][ik][4]-occ_vs_ion_kpt_l_d[ioncnt][ik][4];
+            outf << " " << key;
+            outf << endl;
+          }
+        }
       }
     }
 
@@ -4462,105 +4460,105 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<ntypes;it++) {
       for(int iat=0;iat<num_each_type.at(it);iat++) {
-	ioncnt++;
-	outf << "   " << setw(w1) << ioncnt+1;
-	outf << " " << setw(w1) << it+1;
-	outf << " " << setw(w2) << occ_vs_ion_lm_u[ioncnt][0];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][1];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][2];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][3];
-	outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][1];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][4];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][5];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][6];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][7];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][8];
-	outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][2];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][9];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][10];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][11];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][12];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][13];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][14];
-	outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][15];
-	outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][3];
-	outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][4];
-	outf << " " << key;
-	outf << endl;
+        ioncnt++;
+        outf << "   " << setw(w1) << ioncnt+1;
+        outf << " " << setw(w1) << it+1;
+        outf << " " << setw(w2) << occ_vs_ion_lm_u[ioncnt][0];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][1];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][2];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][3];
+        outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][1];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][4];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][5];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][6];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][7];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][8];
+        outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][2];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][9];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][10];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][11];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][12];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][13];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][14];
+        outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][15];
+        outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][3];
+        outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][4];
+        outf << " " << key;
+        outf << endl;
       }
     }
     if(sp) {
       outf << "Down spin"<< endl;
       outf << "   " << "ion   " << "type  ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  outf << "   " << setw(w1) << ioncnt+1;
-	  outf << " " << setw(w1) << it+1;
-	  outf << " " << setw(w2) << occ_vs_ion_lm_d[ioncnt][0];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][4];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][5];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][6];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][7];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][8];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][9];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][10];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][11];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][12];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][13];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][14];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][15];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][4];
-	  outf << " " << key;
-	  outf << endl;
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          outf << "   " << setw(w1) << ioncnt+1;
+          outf << " " << setw(w1) << it+1;
+          outf << " " << setw(w2) << occ_vs_ion_lm_d[ioncnt][0];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][1];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][2];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][3];
+          outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][1];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][4];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][5];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][6];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][7];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][8];
+          outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][2];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][9];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][10];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][11];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][12];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][13];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][14];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_d[ioncnt][15];
+          outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][3];
+          outf << "  " << setw(w2) << occ_vs_ion_l_d[ioncnt][4];
+          outf << " " << key;
+          outf << endl;
+        }
       }
       outf << "Up-Down spin"<< endl;
       outf << "   " << "ion   " << "type  ";
       for(int ilm=0;ilm<(int)LLMnames.size();ilm++) {
-	outf << LLMnames[ilm] << "  ";
+        outf << LLMnames[ilm] << "  ";
       }
       outf << endl;
       ioncnt=-1;
       for(int it=0;it<ntypes;it++) {
-	for(int iat=0;iat<num_each_type.at(it);iat++) {
-	  ioncnt++;
-	  outf << "   " << setw(5) << ioncnt+1;
-	  outf << " " << setw(5) << it+1;
-	  outf << " " << setw(w2) << occ_vs_ion_lm_u[ioncnt][0]-occ_vs_ion_lm_d[ioncnt][0];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][1]-occ_vs_ion_lm_d[ioncnt][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][2]-occ_vs_ion_lm_d[ioncnt][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][3]-occ_vs_ion_lm_d[ioncnt][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][1]-occ_vs_ion_l_d[ioncnt][1];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][4]-occ_vs_ion_lm_d[ioncnt][4];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][5]-occ_vs_ion_lm_d[ioncnt][5];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][6]-occ_vs_ion_lm_d[ioncnt][6];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][7]-occ_vs_ion_lm_d[ioncnt][7];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][8]-occ_vs_ion_lm_d[ioncnt][8];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][2]-occ_vs_ion_l_d[ioncnt][2];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][9]-occ_vs_ion_lm_d[ioncnt][9];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][10]-occ_vs_ion_lm_d[ioncnt][10];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][11]-occ_vs_ion_lm_d[ioncnt][11];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][12]-occ_vs_ion_lm_d[ioncnt][12];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][13]-occ_vs_ion_lm_d[ioncnt][13];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][14]-occ_vs_ion_lm_d[ioncnt][14];
-	  outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][15]-occ_vs_ion_lm_d[ioncnt][15];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][3]-occ_vs_ion_l_d[ioncnt][3];
-	  outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][4]-occ_vs_ion_l_d[ioncnt][4];
-	  outf << " " << key;
-	  outf << endl;
-	}
+        for(int iat=0;iat<num_each_type.at(it);iat++) {
+          ioncnt++;
+          outf << "   " << setw(5) << ioncnt+1;
+          outf << " " << setw(5) << it+1;
+          outf << " " << setw(w2) << occ_vs_ion_lm_u[ioncnt][0]-occ_vs_ion_lm_d[ioncnt][0];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][1]-occ_vs_ion_lm_d[ioncnt][1];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][2]-occ_vs_ion_lm_d[ioncnt][2];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][3]-occ_vs_ion_lm_d[ioncnt][3];
+          outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][1]-occ_vs_ion_l_d[ioncnt][1];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][4]-occ_vs_ion_lm_d[ioncnt][4];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][5]-occ_vs_ion_lm_d[ioncnt][5];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][6]-occ_vs_ion_lm_d[ioncnt][6];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][7]-occ_vs_ion_lm_d[ioncnt][7];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][8]-occ_vs_ion_lm_d[ioncnt][8];
+          outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][2]-occ_vs_ion_l_d[ioncnt][2];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][9]-occ_vs_ion_lm_d[ioncnt][9];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][10]-occ_vs_ion_lm_d[ioncnt][10];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][11]-occ_vs_ion_lm_d[ioncnt][11];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][12]-occ_vs_ion_lm_d[ioncnt][12];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][13]-occ_vs_ion_lm_d[ioncnt][13];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][14]-occ_vs_ion_lm_d[ioncnt][14];
+          outf << "  " << setw(w2) << occ_vs_ion_lm_u[ioncnt][15]-occ_vs_ion_lm_d[ioncnt][15];
+          outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][3]-occ_vs_ion_l_d[ioncnt][3];
+          outf << "  " << setw(w2) << occ_vs_ion_l_u[ioncnt][4]-occ_vs_ion_l_d[ioncnt][4];
+          outf << " " << key;
+          outf << endl;
+        }
       }
     }// sp
   }
@@ -4621,9 +4619,9 @@ namespace pflow {
     pd.wfermi_u = matrix<double> (pd.nbands,pd.nkpts,0.0);
     for(int ib=0;ib<pd.nbands;ib++) {
       for(int ik=0;ik<pd.nkpts;ik++) {
-	infile >> pd.wfermi_u[ib][ik];
-	// tpx
-	// cout<<"ib,ik,wfermi_u "<<ib<<" "<<ik<<" "<<pd.wfermi_u[ib][ik]<<endl;
+        infile >> pd.wfermi_u[ib][ik];
+        // tpx
+        // cout<<"ib,ik,wfermi_u "<<ib<<" "<<ik<<" "<<pd.wfermi_u[ib][ik]<<endl;
       }
     }
 
@@ -4647,17 +4645,17 @@ namespace pflow {
     vector<double> ival(pd.nlm);
     for(int it=0;it<pd.ntypes;it++) {
       for(int ik=0;ik<pd.nkpts;ik++) {
-	for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
-	  for(int ib=0;ib<pd.nbands;ib++) {
-	    for(int ilm=0;ilm<pd.nlm;ilm++) {
-	      infile >> rval[ilm] >> ival[ilm];
-	      std::complex<double> ctmp (rval[ilm],ival[ilm]);
-	      pd.pdat_u[it][ik][iat][ib][ilm]=ctmp;
-	      // tpx
-	      //  cout << "PROJ ib,ilm " << ib << " " << ilm << " " <<  rval[ilm] << " " <<  ival[ilm] << " " << pd.pdat_u[it][ik][iat][ib][ilm] << endl;
-	    }
-	  }
-	}
+        for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
+          for(int ib=0;ib<pd.nbands;ib++) {
+            for(int ilm=0;ilm<pd.nlm;ilm++) {
+              infile >> rval[ilm] >> ival[ilm];
+              std::complex<double> ctmp (rval[ilm],ival[ilm]);
+              pd.pdat_u[it][ik][iat][ib][ilm]=ctmp;
+              // tpx
+              //  cout << "PROJ ib,ilm " << ib << " " << ilm << " " <<  rval[ilm] << " " <<  ival[ilm] << " " << pd.pdat_u[it][ik][iat][ib][ilm] << endl;
+            }
+          }
+        }
       }
     }
 
@@ -4673,21 +4671,21 @@ namespace pflow {
     }
     if(have_aug) {
       for(int ik=0;ik<pd.nkpts;ik++) {
-	for(int ib=0;ib<pd.nbands;ib++) {
-	  for(int it=0;it<pd.ntypes;it++) {
-	    for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
-	      for(int ilm=0;ilm<pd.nlm;ilm++) {
-		infile >> rval[ilm];
-		//tpx
-		// cout << "Rval " << rval[ilm] << " " << ilm  << endl;
-	      }
-	      for(int ilm=0;ilm<pd.nlm;ilm++) {
-		pd.pdat_u[it][ik][iat][ib][ilm]=
-		  pd.pdat_u[it][ik][iat][ib][ilm]+rval[ilm];
-	      }
-	    }
-	  }
-	}
+        for(int ib=0;ib<pd.nbands;ib++) {
+          for(int it=0;it<pd.ntypes;it++) {
+            for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
+              for(int ilm=0;ilm<pd.nlm;ilm++) {
+                infile >> rval[ilm];
+                //tpx
+                // cout << "Rval " << rval[ilm] << " " << ilm  << endl;
+              }
+              for(int ilm=0;ilm<pd.nlm;ilm++) {
+                pd.pdat_u[it][ik][iat][ib][ilm]=
+                  pd.pdat_u[it][ik][iat][ib][ilm]+rval[ilm];
+              }
+            }
+          }
+        }
       }
       getline(infile,s); // Gets final carriage return last line of augmentation charges.
     }//if have_aug
@@ -4703,16 +4701,16 @@ namespace pflow {
       getline(infile,s); // Gets final carriage return from previous line.
       getline(infile,s); // Gets line.
       for(int ib=0;ib<pd.nbands;ib++) {
-	infile >>sdum>>sdum>>sdum>>sdum>>pd.ener_k_b_u[ik][ib]>>sdum>>sdum>>sdum;
-	for(int ii=0;ii<pd.nions+skip;ii++) {
-	  // Gets lines (nbands*(nions+skip)).  Note that
-	  // the numer of blank lines varies in different vasp versions
-	  // so this loop does not count blank lines.
-	  getline(infile,s);
-	  if(aurostd::RemoveSpaces(s).size()==0) {
-	    ii=ii-1; // Don't count blank lines.
-	  }
-	}
+        infile >>sdum>>sdum>>sdum>>sdum>>pd.ener_k_b_u[ik][ib]>>sdum>>sdum>>sdum;
+        for(int ii=0;ii<pd.nions+skip;ii++) {
+          // Gets lines (nbands*(nions+skip)).  Note that
+          // the numer of blank lines varies in different vasp versions
+          // so this loop does not count blank lines.
+          getline(infile,s);
+          if(aurostd::RemoveSpaces(s).size()==0) {
+            ii=ii-1; // Don't count blank lines.
+          }
+        }
       }
     }
 
@@ -4725,17 +4723,17 @@ namespace pflow {
       // Set spin polarization dependent variables.
       pd.sp=1;
       pd.rspin=1;
-    
+
       getline(infile,s); // Gets endline after PROOUT.
       getline(infile,s); // get line.
       getline(infile,s); // get line.
-    
+
       // Fermi weights (kpts (inner loop) and bands (outer loop)).
       pd.wfermi_d = matrix<double> (pd.nbands,pd.nkpts,0.0);
       for(int ib=0;ib<pd.nbands;ib++) {
-	for(int ik=0;ik<pd.nkpts;ik++) {
-	  infile >> pd.wfermi_d[ib][ik];
-	}
+        for(int ik=0;ik<pd.nkpts;ik++) {
+          infile >> pd.wfermi_d[ib][ik];
+        }
       }
 
       // Projections
@@ -4745,19 +4743,19 @@ namespace pflow {
       vector<double> rval(pd.nlm);
       vector<double> ival(pd.nlm);
       for(int it=0;it<pd.ntypes;it++) {
-	for(int ik=0;ik<pd.nkpts;ik++) {
-	  for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
-	    for(int ib=0;ib<pd.nbands;ib++) {
-	      for(int ilm=0;ilm<pd.nlm;ilm++) {
-		infile >> rval[ilm] >> ival[ilm];
-	      }
-	      for(int ilm=0;ilm<pd.nlm;ilm++) {
-		std::complex<double> ctmp (rval[ilm],ival[ilm]);
-		pd.pdat_d[it][ik][iat][ib][ilm]=ctmp;
-	      }
-	    }
-	  }
-	}
+        for(int ik=0;ik<pd.nkpts;ik++) {
+          for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
+            for(int ib=0;ib<pd.nbands;ib++) {
+              for(int ilm=0;ilm<pd.nlm;ilm++) {
+                infile >> rval[ilm] >> ival[ilm];
+              }
+              for(int ilm=0;ilm<pd.nlm;ilm++) {
+                std::complex<double> ctmp (rval[ilm],ival[ilm]);
+                pd.pdat_d[it][ik][iat][ib][ilm]=ctmp;
+              }
+            }
+          }
+        }
       }
 
       // Augmented Projections
@@ -4766,50 +4764,50 @@ namespace pflow {
       getline(infile,s); // Gets "augmentation part"
       c = infile.peek();
       if(c=='#') {
-	have_aug=0; // There are no augmented projections.
+        have_aug=0; // There are no augmented projections.
       }
       else {
-	have_aug=1; // There are augmented projections.
+        have_aug=1; // There are augmented projections.
       }
       if(have_aug) {
-	for(int ik=0;ik<pd.nkpts;ik++) {
-	  for(int ib=0;ib<pd.nbands;ib++) {
-	    for(int it=0;it<pd.ntypes;it++) {
-	      for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
-		for(int ilm=0;ilm<pd.nlm;ilm++) {
-		  infile >> rval[ilm];
-		}
-		for(int ilm=0;ilm<pd.nlm;ilm++) {
-		  pd.pdat_d[it][ik][iat][ib][ilm]=
-		    pd.pdat_d[it][ik][iat][ib][ilm]+rval[ilm];
-		}
-	      }
-	    }
-	  }
-	}
-	getline(infile,s); // Gets final carriage return last line of augmentation charges.
+        for(int ik=0;ik<pd.nkpts;ik++) {
+          for(int ib=0;ib<pd.nbands;ib++) {
+            for(int it=0;it<pd.ntypes;it++) {
+              for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
+                for(int ilm=0;ilm<pd.nlm;ilm++) {
+                  infile >> rval[ilm];
+                }
+                for(int ilm=0;ilm<pd.nlm;ilm++) {
+                  pd.pdat_d[it][ik][iat][ib][ilm]=
+                    pd.pdat_d[it][ik][iat][ib][ilm]+rval[ilm];
+                }
+              }
+            }
+          }
+        }
+        getline(infile,s); // Gets final carriage return last line of augmentation charges.
       }//if have_aug
 
       // Kpt weights and values and energy vs. kpt,bnd
       pd.ener_k_b_d = matrix<double> (pd.nkpts,pd.nbands,0.0);
       getline(infile,s); // Gets line "# of k-points: ..."
       for(int ik=0;ik<pd.nkpts;ik++) {
-	getline(infile,s); // Gets blank line.
-	infile >>sdum>>sdum>>sdum>>pd.kpts[ik][0]>>pd.kpts[ik][1]>>pd.kpts[ik][2]>>sdum>>sdum>>pd.wkpt[ik];
-	getline(infile,s); // Gets final carriage return from previous line.
-	getline(infile,s); // Gets line.
-	for(int ib=0;ib<pd.nbands;ib++) {
-	  infile >>sdum>>sdum>>sdum>>sdum>>pd.ener_k_b_d[ik][ib]>>sdum>>sdum>>sdum;
-	  for(int ii=0;ii<pd.nions+skip;ii++) {
-	    // Gets lines (nbands*(nions+skip)).  Note that
-	    // the numer of blank lines varies in different vasp versions
-	    // so this loop does not count blank lines.
-	    getline(infile,s);
-	    if(aurostd::RemoveSpaces(s).size()==0) {
-	      ii=ii-1; // Don't count blank lines.
-	    }
-	  }
-	}
+        getline(infile,s); // Gets blank line.
+        infile >>sdum>>sdum>>sdum>>pd.kpts[ik][0]>>pd.kpts[ik][1]>>pd.kpts[ik][2]>>sdum>>sdum>>pd.wkpt[ik];
+        getline(infile,s); // Gets final carriage return from previous line.
+        getline(infile,s); // Gets line.
+        for(int ib=0;ib<pd.nbands;ib++) {
+          infile >>sdum>>sdum>>sdum>>sdum>>pd.ener_k_b_d[ik][ib]>>sdum>>sdum>>sdum;
+          for(int ii=0;ii<pd.nions+skip;ii++) {
+            // Gets lines (nbands*(nions+skip)).  Note that
+            // the numer of blank lines varies in different vasp versions
+            // so this loop does not count blank lines.
+            getline(infile,s);
+            if(aurostd::RemoveSpaces(s).size()==0) {
+              ii=ii-1; // Don't count blank lines.
+            }
+          }
+        }
       }
 
     }// if spin polarized
@@ -4848,48 +4846,48 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<pd.ntypes;it++) {
       for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
-	ioncnt++;
-	for(int ik=0;ik<pd.nkpts;ik++) {
-	  for(int ib=0;ib<pd.nbands;ib++) {
-	    for(int ilm=0;ilm<pd.nlm;ilm++) {
-	      double temp;
-	      temp=ProcessProjection(pd.pdat_u[it][ik][iat][ib][ilm]).real();
-	      if(only_occ) {
-		pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm]=pd.rspin*pd.wfermi_u[ib][ik]*(temp);
-	      }
-	      else {
-		pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm]=pd.rspin*(temp);
-	      }
-	      pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][ilm]=
-		pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][ilm]+
-		pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm];
-	      pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][ilm]=
-		pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][ilm]+
-		pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm];
-	      pd.occ_vs_ion_lm_u[ioncnt][ilm]=
-		pd.occ_vs_ion_lm_u[ioncnt][ilm]+
-		pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm];
-	      if(pd.sp) {
-		temp=ProcessProjection(pd.pdat_d[it][ik][iat][ib][ilm]).real();
-		if(only_occ) {
-		  pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm]=pd.rspin*pd.wfermi_d[ib][ik]*(temp);
-		}
-		else {
-		  pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm]=pd.rspin*(temp);
-		}
-		pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][ilm]=
-		  pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][ilm]+
-		  pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm];
-		pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][ilm]=
-		  pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][ilm]+
-		  pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm];
-		pd.occ_vs_ion_lm_d[ioncnt][ilm]=
-		  pd.occ_vs_ion_lm_d[ioncnt][ilm]+
-		  pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm];
-	      }
-	    }
-	  }
-	}
+        ioncnt++;
+        for(int ik=0;ik<pd.nkpts;ik++) {
+          for(int ib=0;ib<pd.nbands;ib++) {
+            for(int ilm=0;ilm<pd.nlm;ilm++) {
+              double temp;
+              temp=ProcessProjection(pd.pdat_u[it][ik][iat][ib][ilm]).real();
+              if(only_occ) {
+                pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm]=pd.rspin*pd.wfermi_u[ib][ik]*(temp);
+              }
+              else {
+                pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm]=pd.rspin*(temp);
+              }
+              pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][ilm]=
+                pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][ilm]+
+                pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm];
+              pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][ilm]=
+                pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][ilm]+
+                pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm];
+              pd.occ_vs_ion_lm_u[ioncnt][ilm]=
+                pd.occ_vs_ion_lm_u[ioncnt][ilm]+
+                pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][ilm];
+              if(pd.sp) {
+                temp=ProcessProjection(pd.pdat_d[it][ik][iat][ib][ilm]).real();
+                if(only_occ) {
+                  pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm]=pd.rspin*pd.wfermi_d[ib][ik]*(temp);
+                }
+                else {
+                  pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm]=pd.rspin*(temp);
+                }
+                pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][ilm]=
+                  pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][ilm]+
+                  pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm];
+                pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][ilm]=
+                  pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][ilm]+
+                  pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm];
+                pd.occ_vs_ion_lm_d[ioncnt][ilm]=
+                  pd.occ_vs_ion_lm_d[ioncnt][ilm]+
+                  pd.wkpt[ik]*pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][ilm];
+              }
+            }
+          }
+        }
       }
     }
 
@@ -4916,103 +4914,103 @@ namespace pflow {
     ioncnt=-1;
     for(int it=0;it<pd.ntypes;it++) {
       for(int iat=0;iat<pd.num_each_type.at(it);iat++) {
-	ioncnt++;
-	for(int ik=0;ik<pd.nkpts;ik++) {
-	  for(int ib=0;ib<pd.nbands;ib++) {
+        ioncnt++;
+        for(int ik=0;ik<pd.nkpts;ik++) {
+          for(int ib=0;ib<pd.nbands;ib++) {
 
-	    // S
-	    pd.occ_vs_ion_l_u[ioncnt][0]+=pd.occ_vs_ion_lm_u[ioncnt][0];
-	    pd.occ_vs_ion_kpt_l_u[ioncnt][ik][0]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][0];
-	    pd.occ_vs_ion_bnd_l_u[ioncnt][ib][0]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][0];
-	    pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][0]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][0];
-	    if(pd.sp) {
-	      pd.occ_vs_ion_l_d[ioncnt][0]+=pd.occ_vs_ion_lm_d[ioncnt][0];
-	      pd.occ_vs_ion_kpt_l_d[ioncnt][ik][0]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][0];
-	      pd.occ_vs_ion_bnd_l_d[ioncnt][ib][0]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][0];
-	      pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][0]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][0];
-	    }
+            // S
+            pd.occ_vs_ion_l_u[ioncnt][0]+=pd.occ_vs_ion_lm_u[ioncnt][0];
+            pd.occ_vs_ion_kpt_l_u[ioncnt][ik][0]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][0];
+            pd.occ_vs_ion_bnd_l_u[ioncnt][ib][0]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][0];
+            pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][0]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][0];
+            if(pd.sp) {
+              pd.occ_vs_ion_l_d[ioncnt][0]+=pd.occ_vs_ion_lm_d[ioncnt][0];
+              pd.occ_vs_ion_kpt_l_d[ioncnt][ik][0]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][0];
+              pd.occ_vs_ion_bnd_l_d[ioncnt][ib][0]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][0];
+              pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][0]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][0];
+            }
 
-	    // P
-	    for(int ip=0;ip<3;ip++) {
-	      pd.occ_vs_ion_l_u[ioncnt][1]+=pd.occ_vs_ion_lm_u[ioncnt][1+ip];
-	      pd.occ_vs_ion_kpt_l_u[ioncnt][ik][1]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][1+ip];
-	      pd.occ_vs_ion_bnd_l_u[ioncnt][ib][1]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][1+ip];
-	      pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][1]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][1+ip];
-	      if(pd.sp) {
-		pd.occ_vs_ion_l_d[ioncnt][1]+=pd.occ_vs_ion_lm_d[ioncnt][1+ip];
-		pd.occ_vs_ion_kpt_l_d[ioncnt][ik][1]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][1+ip];
-		pd.occ_vs_ion_bnd_l_d[ioncnt][ib][1]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][1+ip];
-		pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][1]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][1+ip];
-	      }
-	    }
+            // P
+            for(int ip=0;ip<3;ip++) {
+              pd.occ_vs_ion_l_u[ioncnt][1]+=pd.occ_vs_ion_lm_u[ioncnt][1+ip];
+              pd.occ_vs_ion_kpt_l_u[ioncnt][ik][1]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][1+ip];
+              pd.occ_vs_ion_bnd_l_u[ioncnt][ib][1]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][1+ip];
+              pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][1]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][1+ip];
+              if(pd.sp) {
+                pd.occ_vs_ion_l_d[ioncnt][1]+=pd.occ_vs_ion_lm_d[ioncnt][1+ip];
+                pd.occ_vs_ion_kpt_l_d[ioncnt][ik][1]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][1+ip];
+                pd.occ_vs_ion_bnd_l_d[ioncnt][ib][1]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][1+ip];
+                pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][1]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][1+ip];
+              }
+            }
 
-	    // D
-	    for(int id=0;id<5;id++) {
-	      pd.occ_vs_ion_l_u[ioncnt][2]+=pd.occ_vs_ion_lm_u[ioncnt][4+id];
-	      pd.occ_vs_ion_kpt_l_u[ioncnt][ik][2]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][4+id];
-	      pd.occ_vs_ion_bnd_l_u[ioncnt][ib][2]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][4+id];
-	      pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][2]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][4+id];
-	      if(pd.sp) {
-		pd.occ_vs_ion_l_d[ioncnt][2]+=pd.occ_vs_ion_lm_d[ioncnt][4+id];
-		pd.occ_vs_ion_kpt_l_d[ioncnt][ik][2]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][4+id];
-		pd.occ_vs_ion_bnd_l_d[ioncnt][ib][2]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][4+id];
-		pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][2]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][4+id];
-	      }
-	    }
+            // D
+            for(int id=0;id<5;id++) {
+              pd.occ_vs_ion_l_u[ioncnt][2]+=pd.occ_vs_ion_lm_u[ioncnt][4+id];
+              pd.occ_vs_ion_kpt_l_u[ioncnt][ik][2]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][4+id];
+              pd.occ_vs_ion_bnd_l_u[ioncnt][ib][2]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][4+id];
+              pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][2]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][4+id];
+              if(pd.sp) {
+                pd.occ_vs_ion_l_d[ioncnt][2]+=pd.occ_vs_ion_lm_d[ioncnt][4+id];
+                pd.occ_vs_ion_kpt_l_d[ioncnt][ik][2]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][4+id];
+                pd.occ_vs_ion_bnd_l_d[ioncnt][ib][2]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][4+id];
+                pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][2]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][4+id];
+              }
+            }
 
-	    // F
-	    for(int id=0;id<7;id++) {
-	      pd.occ_vs_ion_l_u[ioncnt][3]+=pd.occ_vs_ion_lm_u[ioncnt][9+id];
-	      pd.occ_vs_ion_kpt_l_u[ioncnt][ik][3]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][9+id];
-	      pd.occ_vs_ion_bnd_l_u[ioncnt][ib][3]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][9+id];
-	      pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][3]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][9+id];
-	      if(pd.sp) {
-		pd.occ_vs_ion_l_d[ioncnt][3]+=pd.occ_vs_ion_lm_d[ioncnt][9+id];
-		pd.occ_vs_ion_kpt_l_d[ioncnt][ik][3]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][9+id];
-		pd.occ_vs_ion_bnd_l_d[ioncnt][ib][3]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][9+id];
-		pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][3]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][9+id];
-	      }
-	    }
+            // F
+            for(int id=0;id<7;id++) {
+              pd.occ_vs_ion_l_u[ioncnt][3]+=pd.occ_vs_ion_lm_u[ioncnt][9+id];
+              pd.occ_vs_ion_kpt_l_u[ioncnt][ik][3]+=pd.occ_vs_ion_kpt_lm_u[ioncnt][ik][9+id];
+              pd.occ_vs_ion_bnd_l_u[ioncnt][ib][3]+=pd.occ_vs_ion_bnd_lm_u[ioncnt][ib][9+id];
+              pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][3]+=pd.occ_vs_ion_kpt_bnd_lm_u[ioncnt][ik][ib][9+id];
+              if(pd.sp) {
+                pd.occ_vs_ion_l_d[ioncnt][3]+=pd.occ_vs_ion_lm_d[ioncnt][9+id];
+                pd.occ_vs_ion_kpt_l_d[ioncnt][ik][3]+=pd.occ_vs_ion_kpt_lm_d[ioncnt][ik][9+id];
+                pd.occ_vs_ion_bnd_l_d[ioncnt][ib][3]+=pd.occ_vs_ion_bnd_lm_d[ioncnt][ib][9+id];
+                pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][3]+=pd.occ_vs_ion_kpt_bnd_lm_d[ioncnt][ik][ib][9+id];
+              }
+            }
 
-	  }//ib
-	}//ik
+          }//ib
+        }//ik
 
-	// Normalize sums over m for multiple counting.
-	for(int il=0;il<pd.nl;il++) {
-	  pd.occ_vs_ion_l_u[ioncnt][il]/=(pd.nbands*pd.nkpts);
-	  if(pd.sp)  pd.occ_vs_ion_l_d[ioncnt][il]/=(pd.nbands*pd.nkpts);
-	  for(int ik=0;ik<pd.nkpts;ik++) {
-	    pd.occ_vs_ion_kpt_l_u[ioncnt][ik][il]/=(pd.nbands);
+        // Normalize sums over m for multiple counting.
+        for(int il=0;il<pd.nl;il++) {
+          pd.occ_vs_ion_l_u[ioncnt][il]/=(pd.nbands*pd.nkpts);
+          if(pd.sp)  pd.occ_vs_ion_l_d[ioncnt][il]/=(pd.nbands*pd.nkpts);
+          for(int ik=0;ik<pd.nkpts;ik++) {
+            pd.occ_vs_ion_kpt_l_u[ioncnt][ik][il]/=(pd.nbands);
 
-	    if(pd.sp) pd.occ_vs_ion_kpt_l_d[ioncnt][ik][il]/=(pd.nbands);
-	  }
-	  for(int ib=0;ib<pd.nbands;ib++) {
-	    pd.occ_vs_ion_bnd_l_u[ioncnt][ib][il]/=(pd.nkpts);
-	    if(pd.sp) pd.occ_vs_ion_bnd_l_d[ioncnt][ib][il]/=(pd.nkpts);
-	  }
-	}
+            if(pd.sp) pd.occ_vs_ion_kpt_l_d[ioncnt][ik][il]/=(pd.nbands);
+          }
+          for(int ib=0;ib<pd.nbands;ib++) {
+            pd.occ_vs_ion_bnd_l_u[ioncnt][ib][il]/=(pd.nkpts);
+            if(pd.sp) pd.occ_vs_ion_bnd_l_d[ioncnt][ib][il]/=(pd.nkpts);
+          }
+        }
 
-	// Calculate total sums over L.
+        // Calculate total sums over L.
 
-	int iid=pd.nl_max;
-	for(int id=0;id<pd.nl_max;id++) {
-	  pd.occ_vs_ion_l_u[ioncnt][iid]+=pd.occ_vs_ion_l_u[ioncnt][id];	
-	  if(pd.sp) pd.occ_vs_ion_l_d[ioncnt][iid]+=pd.occ_vs_ion_l_d[ioncnt][id];
-	  for(int ik=0;ik<pd.nkpts;ik++) {
-	    pd.occ_vs_ion_kpt_l_u[ioncnt][ik][iid]+=pd.occ_vs_ion_kpt_l_u[ioncnt][ik][id];
-	    if(pd.sp) pd.occ_vs_ion_kpt_l_d[ioncnt][ik][iid]+=pd.occ_vs_ion_kpt_l_d[ioncnt][ik][id];
-	  }
-	  for(int ib=0;ib<pd.nbands;ib++) {
-	    pd.occ_vs_ion_bnd_l_u[ioncnt][ib][iid]+=pd.occ_vs_ion_bnd_l_u[ioncnt][ib][id];
-	    if(pd.sp) pd.occ_vs_ion_bnd_l_d[ioncnt][ib][iid]+=pd.occ_vs_ion_bnd_l_d[ioncnt][ib][id];
-	  }
-	  for(int ik=0;ik<pd.nkpts;ik++) {
-	    for(int ib=0;ib<pd.nbands;ib++) {
-	      pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][iid]+=pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][id];
-	      if(pd.sp) pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][iid]+=pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][id];
-	    }
-	  }
-	}
+        int iid=pd.nl_max;
+        for(int id=0;id<pd.nl_max;id++) {
+          pd.occ_vs_ion_l_u[ioncnt][iid]+=pd.occ_vs_ion_l_u[ioncnt][id];	
+          if(pd.sp) pd.occ_vs_ion_l_d[ioncnt][iid]+=pd.occ_vs_ion_l_d[ioncnt][id];
+          for(int ik=0;ik<pd.nkpts;ik++) {
+            pd.occ_vs_ion_kpt_l_u[ioncnt][ik][iid]+=pd.occ_vs_ion_kpt_l_u[ioncnt][ik][id];
+            if(pd.sp) pd.occ_vs_ion_kpt_l_d[ioncnt][ik][iid]+=pd.occ_vs_ion_kpt_l_d[ioncnt][ik][id];
+          }
+          for(int ib=0;ib<pd.nbands;ib++) {
+            pd.occ_vs_ion_bnd_l_u[ioncnt][ib][iid]+=pd.occ_vs_ion_bnd_l_u[ioncnt][ib][id];
+            if(pd.sp) pd.occ_vs_ion_bnd_l_d[ioncnt][ib][iid]+=pd.occ_vs_ion_bnd_l_d[ioncnt][ib][id];
+          }
+          for(int ik=0;ik<pd.nkpts;ik++) {
+            for(int ib=0;ib<pd.nbands;ib++) {
+              pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][iid]+=pd.occ_vs_ion_kpt_bnd_l_u[ioncnt][ik][ib][id];
+              if(pd.sp) pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][iid]+=pd.occ_vs_ion_kpt_bnd_l_d[ioncnt][ik][ib][id];
+            }
+          }
+        }
 
       }// at
     }// type
@@ -5024,50 +5022,50 @@ namespace pflow {
     if(pd.sp) pd.occ_vs_ion_kpt_bnd_lmtot_d = matrix<matrix<double> > (pd.nions,pd.nkpts,m1);
     for(int ii=0;ii<pd.nions;ii++) {
       for(int ik=0;ik<pd.nkpts;ik++) {
-	for(int ib=0;ib<pd.nbands;ib++) {
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][0]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][0];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][1]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][1];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][2]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][2];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][3]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][3];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][4]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][1];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][5]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][4];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][6]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][5];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][7]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][6];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][8]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][7];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][9]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][8];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][10]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][2];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][11]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][9];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][12]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][10];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][13]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][11];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][14]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][12];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][15]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][13];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][16]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][14];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][17]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][15];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][18]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][3];
-	  pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][19]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][4];
-	  if(pd.sp) {
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][0]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][0];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][1]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][1];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][2]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][2];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][3]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][3];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][4]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][1];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][5]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][4];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][6]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][5];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][7]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][6];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][8]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][7];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][9]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][8];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][10]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][2];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][11]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][9];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][12]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][10];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][13]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][11];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][14]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][12];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][15]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][13];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][16]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][14];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][17]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][15];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][18]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][3];
-	    pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][19]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][4];
-	  }
-	}
+        for(int ib=0;ib<pd.nbands;ib++) {
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][0]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][0];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][1]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][1];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][2]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][2];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][3]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][3];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][4]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][1];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][5]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][4];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][6]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][5];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][7]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][6];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][8]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][7];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][9]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][8];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][10]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][2];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][11]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][9];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][12]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][10];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][13]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][11];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][14]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][12];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][15]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][13];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][16]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][14];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][17]=pd.occ_vs_ion_kpt_bnd_lm_u[ii][ik][ib][15];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][18]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][3];
+          pd.occ_vs_ion_kpt_bnd_lmtot_u[ii][ik][ib][19]=pd.occ_vs_ion_kpt_bnd_l_u[ii][ik][ib][4];
+          if(pd.sp) {
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][0]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][0];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][1]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][1];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][2]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][2];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][3]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][3];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][4]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][1];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][5]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][4];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][6]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][5];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][7]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][6];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][8]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][7];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][9]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][8];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][10]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][2];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][11]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][9];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][12]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][10];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][13]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][11];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][14]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][12];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][15]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][13];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][16]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][14];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][17]=pd.occ_vs_ion_kpt_bnd_lm_d[ii][ik][ib][15];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][18]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][3];
+            pd.occ_vs_ion_kpt_bnd_lmtot_d[ii][ik][ib][19]=pd.occ_vs_ion_kpt_bnd_l_d[ii][ik][ib][4];
+          }
+        }
       }
     }
   }
@@ -5090,12 +5088,12 @@ namespace pflow {
     double e;
     for(int ik=0;ik<prd.nkpts;ik++) {
       for(int ib=0;ib<prd.nbands;ib++) {
-	e = prd.ener_k_b_u[ik][ib];
-	if(emn>e) emn=e;
-	if(emx<e) emx=e;
-	if(prd.sp) e = prd.ener_k_b_d[ik][ib];
-	if(emn>e) emn=e;
-	if(emx<e) emx=e;
+        e = prd.ener_k_b_u[ik][ib];
+        if(emn>e) emn=e;
+        if(emx<e) emx=e;
+        if(prd.sp) e = prd.ener_k_b_d[ik][ib];
+        if(emn>e) emn=e;
+        if(emx<e) emx=e;
       }
     }
     pdd.emin=emn-0.5;
@@ -5103,7 +5101,7 @@ namespace pflow {
     pdd.nbins=300;
     pdd.smooth_sigma=(pdd.emax-pdd.emin)/pdd.nbins;
     pdd.print_params=0;
-	  
+
     // Read in all the tokens.
 
     string s,s_ns;
@@ -5113,22 +5111,22 @@ namespace pflow {
       getline(infile,s);
       s_ns=aurostd::RemoveSpaces(s); // Get string with no spaces.
       if(s_ns.size()>0) { // Make sure line was not blank
-	if(s_ns[0]!='#') { // Exclude comment lines
-	  string token;
-	  string sval;
-	  int id=s.find('=');
-	  if(id>=(int)s.length()) {
-	    cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-	    cout << "ERROR: Exiting" << endl;
-	    exit(1);
-	  }
-	  token=s.substr(0,id);
-	  token=aurostd::RemoveSpaces(token);
-	  int i_f=std::min((int)s.length(),(int)s.find('#')); // End of string
-	  sval=s.substr(id+1,i_f-id-1);
-	  token_vec.push_back(token);
-	  val_vec.push_back(sval);
-	} //if s_ns[0]!=#
+        if(s_ns[0]!='#') { // Exclude comment lines
+          string token;
+          string sval;
+          int id=s.find('=');
+          if(id>=(int)s.length()) {
+            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
+            cout << "ERROR: Exiting" << endl;
+            exit(1);
+          }
+          token=s.substr(0,id);
+          token=aurostd::RemoveSpaces(token);
+          int i_f=std::min((int)s.length(),(int)s.find('#')); // End of string
+          sval=s.substr(id+1,i_f-id-1);
+          token_vec.push_back(token);
+          val_vec.push_back(sval);
+        } //if s_ns[0]!=#
       } // if s_ns.size>0
 
     } // while !infile.eof
@@ -5144,100 +5142,100 @@ namespace pflow {
       int ival;
       int found_token=0;
       if(tok=="ATOMS") {
-	id=0;
-	atom_cnt++;
-	tmp.clear();
-	// set up atoms matrix
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) {
-	    ival=atoi(s.c_str());
-	    tmp.push_back(ival);
-	  }
-	}
-	pdd.pdos_at.push_back(tmp);
-	// add vector to pdos_k,pdos_b,pdos_lm
-	tmp.clear();
-	pdd.pdos_k.push_back(tmp);
-	pdd.pdos_b.push_back(tmp);
-	pdd.pdos_lm.push_back(tmp);
-	found_token=1;
+        id=0;
+        atom_cnt++;
+        tmp.clear();
+        // set up atoms matrix
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) {
+            ival=atoi(s.c_str());
+            tmp.push_back(ival);
+          }
+        }
+        pdd.pdos_at.push_back(tmp);
+        // add vector to pdos_k,pdos_b,pdos_lm
+        tmp.clear();
+        pdd.pdos_k.push_back(tmp);
+        pdd.pdos_b.push_back(tmp);
+        pdd.pdos_lm.push_back(tmp);
+        found_token=1;
       }// ATOMS
       if(tok=="KPOINTS") {
-	if((int)pdd.pdos_k.size()!=atom_cnt || atom_cnt==0) AtomCntError(tok,(int)pdd.pdos_k.size(),atom_cnt);
-	id=0;
-	tmp.clear();
-	// set up atoms matrix
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) {
-	    ival=atoi(s.c_str());
-	    pdd.pdos_k[pdd.pdos_k.size()-1].push_back(ival);
-	  }
-	}
-	found_token=1;
+        if((int)pdd.pdos_k.size()!=atom_cnt || atom_cnt==0) AtomCntError(tok,(int)pdd.pdos_k.size(),atom_cnt);
+        id=0;
+        tmp.clear();
+        // set up atoms matrix
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) {
+            ival=atoi(s.c_str());
+            pdd.pdos_k[pdd.pdos_k.size()-1].push_back(ival);
+          }
+        }
+        found_token=1;
       }// KPOINTS
       if(tok=="BANDS") {
-	id=0;
-	tmp.clear();
-	// set up atoms matrix
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) {
-	    ival=atoi(s.c_str());
-	    pdd.pdos_b[pdd.pdos_b.size()-1].push_back(ival);
-	  }
-	}
-	found_token=1;
+        id=0;
+        tmp.clear();
+        // set up atoms matrix
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) {
+            ival=atoi(s.c_str());
+            pdd.pdos_b[pdd.pdos_b.size()-1].push_back(ival);
+          }
+        }
+        found_token=1;
       }// LMVALUES
       if(tok=="LMVALUES") {
-	if((int)pdd.pdos_lm.size()!=atom_cnt || atom_cnt==0) AtomCntError(tok,(int)pdd.pdos_lm.size(),atom_cnt);
-	id=0;
-	tmp.clear();
-	// set up atoms matrix
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) {
-	    ival=atoi(s.c_str());
-	    pdd.pdos_lm[pdd.pdos_lm.size()-1].push_back(ival);
-	  }
-	}
-	found_token=1;
+        if((int)pdd.pdos_lm.size()!=atom_cnt || atom_cnt==0) AtomCntError(tok,(int)pdd.pdos_lm.size(),atom_cnt);
+        id=0;
+        tmp.clear();
+        // set up atoms matrix
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) {
+            ival=atoi(s.c_str());
+            pdd.pdos_lm[pdd.pdos_lm.size()-1].push_back(ival);
+          }
+        }
+        found_token=1;
       }// LMVALUES
       if(tok=="EMIN") {
-	id=0;
-	pdd.emin=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.emin=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// EMIN
       if(tok=="EMAX") {
-	id=0;
-	pdd.emax=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.emax=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// EMAX
       if(tok=="NBINS") {
-	id=0;
-	pdd.nbins=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.nbins=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// NBIN
       if(tok=="SMOOTH_SIGMA") {
-	id=0;
-	pdd.smooth_sigma=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.smooth_sigma=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// SMOOTH_SIGMA
       if(tok=="PRINT_PARAMS") {
-	id=0;
-	pdd.print_params=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.print_params=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// PRINT_PARAMS
 
       if(!found_token) {
-	cerr << "ERROR: You have input a token " << tok <<endl;
-	cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-	exit(1);
+        cerr << "ERROR: You have input a token " << tok <<endl;
+        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
+        exit(1);
       }
 
     } // for i
@@ -5265,48 +5263,48 @@ namespace pflow {
     // Check that all data is within bounds
     for(int i=0;i<(int)pdd.pdos_at.size();i++) { // cases
       for(int ia=0;ia<(int)pdd.pdos_at[i].size();ia++) {
-	int atp=pdd.pdos_at[i][ia];
-	if(atp<1 || atp>prd.nions) {
-	  cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-	  cerr << "ERROR: Error in case: " << i+1 << endl;
-	  cerr << "ERROR: You have entered too low or high an atom number in entry: " << ia+1 << endl;
-	  cerr << "ERROR: Bad value is: " << atp << endl;
-	  cerr << "ERROR: Exiting." << endl;
-	  exit(1);
-	}
+        int atp=pdd.pdos_at[i][ia];
+        if(atp<1 || atp>prd.nions) {
+          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
+          cerr << "ERROR: Error in case: " << i+1 << endl;
+          cerr << "ERROR: You have entered too low or high an atom number in entry: " << ia+1 << endl;
+          cerr << "ERROR: Bad value is: " << atp << endl;
+          cerr << "ERROR: Exiting." << endl;
+          exit(1);
+        }
       }
       for(int ik=0;ik<(int)pdd.pdos_k[i].size();ik++) {
-	int kp=pdd.pdos_k[i][ik];
-	if(kp<1 || kp>prd.nkpts) {
-	  cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-	  cerr << "ERROR: Error in case: " << i+1 << endl;
-	  cerr << "ERROR: You have entered too low or high a kpt number in entry: " << ik+1 << endl;
-	  cerr << "ERROR: Bad value is: " << kp << endl;
-	  cerr << "ERROR: Exiting." << endl;
-	  exit(1);
-	}
+        int kp=pdd.pdos_k[i][ik];
+        if(kp<1 || kp>prd.nkpts) {
+          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
+          cerr << "ERROR: Error in case: " << i+1 << endl;
+          cerr << "ERROR: You have entered too low or high a kpt number in entry: " << ik+1 << endl;
+          cerr << "ERROR: Bad value is: " << kp << endl;
+          cerr << "ERROR: Exiting." << endl;
+          exit(1);
+        }
       }
       for(int ib=0;ib<(int)pdd.pdos_b[i].size();ib++) {
-	int bp=pdd.pdos_b[i][ib];
-	if(bp<1 || bp>prd.nbands) {
-	  cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-	  cerr << "ERROR: Error in case: " << i+1 << endl;
-	  cerr << "ERROR: You have entered too low or high a bnd number in entry: " << ib+1 << endl;
-	  cerr << "ERROR: Bad value is: " << bp << endl;
-	  cerr << "ERROR: Exiting." << endl;
-	  exit(1);
-	}
+        int bp=pdd.pdos_b[i][ib];
+        if(bp<1 || bp>prd.nbands) {
+          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
+          cerr << "ERROR: Error in case: " << i+1 << endl;
+          cerr << "ERROR: You have entered too low or high a bnd number in entry: " << ib+1 << endl;
+          cerr << "ERROR: Bad value is: " << bp << endl;
+          cerr << "ERROR: Exiting." << endl;
+          exit(1);
+        }
       }
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
-	int lmp=pdd.pdos_lm[i][ilm];
-	if(lmp<1 || lmp>prd.nlmtot) {
-	  cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
-	  cerr << "ERROR: Error in case: " << i+1 << endl;
-	  cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
-	  cerr << "ERROR: Bad value is: " << lmp << endl;
-	  cerr << "ERROR: Exiting." << endl;
-	  exit(1);
-	}
+        int lmp=pdd.pdos_lm[i][ilm];
+        if(lmp<1 || lmp>prd.nlmtot) {
+          cerr << "ERROR: ProjFuncs/ReadPDOSdat" << endl;
+          cerr << "ERROR: Error in case: " << i+1 << endl;
+          cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
+          cerr << "ERROR: Bad value is: " << lmp << endl;
+          cerr << "ERROR: Exiting." << endl;
+          exit(1);
+        }
       }
     }
   }// end routine
@@ -5329,39 +5327,39 @@ namespace pflow {
     }
     for(int i=0;i<(int)pdd.pdos_at.size();i++) { // cases
       for(int ia=0;ia<(int)pdd.pdos_at[i].size();ia++) {
-	int at=pdd.pdos_at[i][ia]-1;
-	for(int ik=0;ik<(int)pdd.pdos_k[i].size();ik++) {
-	  int kp=pdd.pdos_k[i][ik]-1;
-	  for(int ib=0;ib<(int)pdd.pdos_b[i].size();ib++) {
-	    int bp=pdd.pdos_b[i][ib]-1;
-	    for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
-	      int lmp=pdd.pdos_lm[i][ilm]-1;
-	      e = prd.ener_k_b_u[kp][bp];
-	      ibin=int((e-pdd.emin)/de);
-	      if(ibin>=0 && ibin<pdd.nbins) {
-		pdd.pdos[ibin][1]+=prd.occ_vs_ion_kpt_bnd_lmtot_u[at][kp][bp][lmp]*prd.wkpt[kp];
-		if(prd.sp) {
-		  e = prd.ener_k_b_d[kp][bp];
-		  ibin=int((e-pdd.emin)/de);
-		  pdd.pdos[ibin][2]+=prd.occ_vs_ion_kpt_bnd_lmtot_d[at][kp][bp][lmp]*prd.wkpt[kp];
-		}
-	      }// ibin in range
-	    }//ilm
-	  }//ik
-	}//ib
+        int at=pdd.pdos_at[i][ia]-1;
+        for(int ik=0;ik<(int)pdd.pdos_k[i].size();ik++) {
+          int kp=pdd.pdos_k[i][ik]-1;
+          for(int ib=0;ib<(int)pdd.pdos_b[i].size();ib++) {
+            int bp=pdd.pdos_b[i][ib]-1;
+            for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
+              int lmp=pdd.pdos_lm[i][ilm]-1;
+              e = prd.ener_k_b_u[kp][bp];
+              ibin=int((e-pdd.emin)/de);
+              if(ibin>=0 && ibin<pdd.nbins) {
+                pdd.pdos[ibin][1]+=prd.occ_vs_ion_kpt_bnd_lmtot_u[at][kp][bp][lmp]*prd.wkpt[kp];
+                if(prd.sp) {
+                  e = prd.ener_k_b_d[kp][bp];
+                  ibin=int((e-pdd.emin)/de);
+                  pdd.pdos[ibin][2]+=prd.occ_vs_ion_kpt_bnd_lmtot_d[at][kp][bp][lmp]*prd.wkpt[kp];
+                }
+              }// ibin in range
+            }//ilm
+          }//ik
+        }//ib
       }//iat
     }//cases
     // Now do Up-Dn if spin polarized.
     if(prd.sp) {
       for(int ibin=0;ibin<pdd.nbins;ibin++) {
-	pdd.pdos[ibin][3]=pdd.pdos[ibin][1]-pdd.pdos[ibin][2];
+        pdd.pdos[ibin][3]=pdd.pdos[ibin][1]-pdd.pdos[ibin][2];
       }
     }
 
     // Normalize DOS to a density
     for(int ib=0;ib<pdd.nbins;ib++) {
       for(int i=1;i<sp_size+1;i++) {
-	pdd.pdos[ib][i]/=de;
+        pdd.pdos[ib][i]/=de;
       }
     }
 
@@ -5374,7 +5372,7 @@ namespace pflow {
     }
     for(int ib=1;ib<pdd.nbins;ib++) {
       for(int i=1;i<sp_size+1;i++) {
-	pdd.pdos[ib][i+sp_size]=pdd.pdos[ib-1][i+sp_size]+pdd.pdos[ib][i]*de;
+        pdd.pdos[ib][i+sp_size]=pdd.pdos[ib-1][i+sp_size]+pdd.pdos[ib][i]*de;
       }
     }
   }//end routine
@@ -5396,50 +5394,49 @@ namespace pflow {
     for(int is=1;is<=sp_size;is++) {
       vector<double> tdos(pdd.nbins);
       for(int ib=0;ib<pdd.nbins;ib++) {
-	tdos[ib]=pdd.pdos[ib][is];
+        tdos[ib]=pdd.pdos[ib][is];
       }
       double sig=pdd.smooth_sigma/de;
       tdos=SmoothFunc(tdos,sig);
       for(int ib=0;ib<pdd.nbins;ib++) {
-	pdd.pdos[ib][is]=tdos[ib];
+        pdd.pdos[ib][is]=tdos[ib];
       }
     }
 
-    /* Old smooth DOS calc - does not seem to work right!
-       int range=(int)(5.0*pdd.smooth_sigma/de); // Uses gaussian out to 5 sigma.
-       matrix<double> wt(pdd.nbins,2*range+1,0.0);
+    //Old smooth DOS calc - does not seem to work right!
+    //int range=(int)(5.0*pdd.smooth_sigma/de); // Uses gaussian out to 5 sigma.
+    //matrix<double> wt(pdd.nbins,2*range+1,0.0);
 
-       // Get Gaussian weights
-       vector<double> norm(pdd.nbins,0.0);
-       for(int ib=0;ib<pdd.nbins;ib++) {
-       for(int i=-range;i<=range;i++) {
-       double x=(double)(i)*de+de/2.0;
-       if((ib+i)>=0 && (ib+i)<pdd.nbins) {
-       wt[ib][i+range]=Normal(x,de/2,pdd.smooth_sigma);
-       norm[ib]=norm[ib]+wt[ib][i+range];
-       }
-       }
-       }
-       // Normalize to one
-       for(int ib=0;ib<pdd.nbins;ib++) {
-       for(int i=-range;i<=range;i++) {
-       wt[ib][i+range]=wt[ib][i+range]/norm[ib];
-       }
-       }
+    //// Get Gaussian weights
+    //vector<double> norm(pdd.nbins,0.0);
+    //for(int ib=0;ib<pdd.nbins;ib++) {
+    //for(int i=-range;i<=range;i++) {
+    //double x=(double)(i)*de+de/2.0;
+    //if((ib+i)>=0 && (ib+i)<pdd.nbins) {
+    //wt[ib][i+range]=Normal(x,de/2,pdd.smooth_sigma);
+    //norm[ib]=norm[ib]+wt[ib][i+range];
+    //}
+    //}
+    //}
+    //// Normalize to one
+    //for(int ib=0;ib<pdd.nbins;ib++) {
+    //for(int i=-range;i<=range;i++) {
+    //wt[ib][i+range]=wt[ib][i+range]/norm[ib];
+    //}
+    //}
 
-       // Average in weighted nearby bins.
-       for(int is=1;is<=sp_size;is++) {
-       for(int ib=0;ib<pdd.nbins;ib++) {
-       double tdos=0;
-       for(int i=-range;i<=range;i++) {
-       if((ib+i)>0 && (ib+i)<pdd.nbins) {
-       tdos=tdos+wt[ib][i+range]*pdd.pdos[ib+i][is];
-       }
-       }
-       pdd.pdos[ib][is]=tdos;
-       }
-       }
-    */
+    //// Average in weighted nearby bins.
+    //for(int is=1;is<=sp_size;is++) {
+    //for(int ib=0;ib<pdd.nbins;ib++) {
+    //double tdos=0;
+    //for(int i=-range;i<=range;i++) {
+    //if((ib+i)>0 && (ib+i)<pdd.nbins) {
+    //tdos=tdos+wt[ib][i+range]*pdd.pdos[ib+i][is];
+    //}
+    //}
+    //pdd.pdos[ib][is]=tdos;
+    //}
+    //}
   }
 }
 
@@ -5492,22 +5489,22 @@ namespace pflow {
       getline(infile,s);
       s_ns=aurostd::RemoveSpaces(s); // Get string with no spaces.
       if(s_ns.size()>0) { // Make sure line was not blank
-	if(s_ns[0]!='#') { // Exclude comment lines
-	  string token;
-	  string sval;
-	  int id=s.find('=');
-	  if(id>=(int)s.length()) {
-	    cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
-	    cout << "ERROR: Exiting" << endl;
-	    exit(1);
-	  }
-	  token=s.substr(0,id);
-	  token=aurostd::RemoveSpaces(token);
-	  int i_f=std::min((int)s.length(),(int)s.find('#')); // End of string
-	  sval=s.substr(id+1,i_f-id-1);
-	  token_vec.push_back(token);
-	  val_vec.push_back(sval);
-	} //if s_ns[0]!=#
+        if(s_ns[0]!='#') { // Exclude comment lines
+          string token;
+          string sval;
+          int id=s.find('=');
+          if(id>=(int)s.length()) {
+            cout << "ERROR: The following token is incorrectly formatted: " << s << endl;
+            cout << "ERROR: Exiting" << endl;
+            exit(1);
+          }
+          token=s.substr(0,id);
+          token=aurostd::RemoveSpaces(token);
+          int i_f=std::min((int)s.length(),(int)s.find('#')); // End of string
+          sval=s.substr(id+1,i_f-id-1);
+          token_vec.push_back(token);
+          val_vec.push_back(sval);
+        } //if s_ns[0]!=#
       } // if s_ns.size>0
     } // while !infile.eof
 
@@ -5522,83 +5519,83 @@ namespace pflow {
       int ival;
       int found_token=0;
       if(tok=="ATOMS") {
-	id=0;
-	atom_cnt++;
-	tmp.clear();
-	// set up atoms matrix
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) {
-	    ival=atoi(s.c_str());
-	    tmp.push_back(ival);
-	  }
-	}
-	pdd.pdos_at.push_back(tmp);
-	// add vector to pdos_lm
-	tmp.clear();
-	pdd.pdos_lm.push_back(tmp);
-	found_token=1;
+        id=0;
+        atom_cnt++;
+        tmp.clear();
+        // set up atoms matrix
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) {
+            ival=atoi(s.c_str());
+            tmp.push_back(ival);
+          }
+        }
+        pdd.pdos_at.push_back(tmp);
+        // add vector to pdos_lm
+        tmp.clear();
+        pdd.pdos_lm.push_back(tmp);
+        found_token=1;
       }// ATOMS
       if(tok=="LMVALUES") {
-	if((int)pdd.pdos_lm.size()!=atom_cnt || atom_cnt==0) AtomCntError(tok,(int)pdd.pdos_lm.size(),atom_cnt);
-	id=0;
-	tmp.clear();
-	// set up atoms matrix
-	while (id<(int)val_vec[i].size()) {
-	  string s;
-	  s=aurostd::GetNextVal(val_vec[i],id);
-	  if(s.size()>0) {
-	    ival=atoi(s.c_str());
-	    pdd.pdos_lm[pdd.pdos_lm.size()-1].push_back(ival);
-	  }
-	}
-	found_token=1;
+        if((int)pdd.pdos_lm.size()!=atom_cnt || atom_cnt==0) AtomCntError(tok,(int)pdd.pdos_lm.size(),atom_cnt);
+        id=0;
+        tmp.clear();
+        // set up atoms matrix
+        while (id<(int)val_vec[i].size()) {
+          string s;
+          s=aurostd::GetNextVal(val_vec[i],id);
+          if(s.size()>0) {
+            ival=atoi(s.c_str());
+            pdd.pdos_lm[pdd.pdos_lm.size()-1].push_back(ival);
+          }
+        }
+        found_token=1;
       }// LMVALUES
       if(tok=="SMOOTH_SIGMA") {
-	id=0;
-	pdd.smooth_sigma=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.smooth_sigma=atof(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// SMOOTH_SIGMA
       if(tok=="PRINT_PARAMS") {
-	id=0;
-	pdd.print_params=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.print_params=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// PRINT_PARAMS
       if(tok=="EFERMI") {
-	id=0;
-	pdd.efermi=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.efermi=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// EFERMI
       if(tok=="SPIN") {
-	id=0;
-	pdd.spin=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.spin=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// SPIN
       if(tok=="NLM") {
-	id=0;
-	pdd.nlm=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
-	found_token=1;
+        id=0;
+        pdd.nlm=atoi(aurostd::GetNextVal(val_vec[i],id).c_str());
+        found_token=1;
       }// NLM
       if(!found_token) {
-	cerr << "ERROR: You have input a token " << tok <<endl;
-	cerr << "ERROR: This token is not recognized. Exiting! " << endl;
-	exit(1);
+        cerr << "ERROR: You have input a token " << tok <<endl;
+        cerr << "ERROR: This token is not recognized. Exiting! " << endl;
+        exit(1);
       }
     } // for i over tokens
 
     // Check that all data is within bounds
     for(int i=0;i<(int)pdd.pdos_at.size();i++) { // cases
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
-	int lmp=pdd.pdos_lm[i][ilm];
-	if(lmp<1 || lmp>pdd.nlm) {
-	  cerr << "ERROR: SumPDOSFuncs/ReadSumDOSParams" << endl;
-	  cerr << "ERROR: Error in case: " << i+1 << endl;
-	  cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
-	  cerr << "ERROR: Bad value is: " << lmp << endl;
-	  cerr << "ERROR: Exiting." << endl;
-	  exit(1);
-	}
+        int lmp=pdd.pdos_lm[i][ilm];
+        if(lmp<1 || lmp>pdd.nlm) {
+          cerr << "ERROR: SumPDOSFuncs/ReadSumDOSParams" << endl;
+          cerr << "ERROR: Error in case: " << i+1 << endl;
+          cerr << "ERROR: You have entered too low or high an lm number in entry: " << ilm+1 << endl;
+          cerr << "ERROR: Bad value is: " << lmp << endl;
+          cerr << "ERROR: Exiting." << endl;
+          exit(1);
+        }
       }
     }
   }// end routine
@@ -5610,7 +5607,7 @@ namespace pflow {
 // Reads in pdos data from PDOSinfile.
 namespace pflow {
   void ReadInPDOSData(pflow::matrix<matrix<double> >& allpdos, pflow::pdosdata& pdd,
-		      ifstream& infile) {
+      ifstream& infile) {
     string sdum;
     // Get natoms
     infile >> pdd.natoms;
@@ -5643,27 +5640,27 @@ namespace pflow {
       // the previous line has been read in by >>.  Only for atom 0 is the
       // previous line read in by getline, so only one more getline is needed.
       if(ia>0) {
-	getline(infile,sdum);
+        getline(infile,sdum);
       }
       // Loop over each bin
       for(int ib=0;ib<pdd.nbins;ib++) {
-	// Read in energy into first spin and nlm array elements.
-	infile >> allpdos[ia][0][0][ib];
-	// Loop over each lm
-	for(int ilm=1;ilm<=pdd.nlm;ilm++) {
-	  // Loop over each spin
-	  for(int is=0;is<pdd.spin;is++) {
-	    infile >> allpdos[ia][is][ilm][ib];
-	    // tpx
-	    /*
-	      cout << "ia ib is ilm allpdos " << ia << " "
-	      << ib << " "
-	      << is << " "
-	      << ilm << " "
-	      << allpdos[ia][is][ilm][ib] << endl;
-	    */
-	  } // spin
-	} // lm
+        // Read in energy into first spin and nlm array elements.
+        infile >> allpdos[ia][0][0][ib];
+        // Loop over each lm
+        for(int ilm=1;ilm<=pdd.nlm;ilm++) {
+          // Loop over each spin
+          for(int is=0;is<pdd.spin;is++) {
+            infile >> allpdos[ia][is][ilm][ib];
+            // tpx
+            /*
+               cout << "ia ib is ilm allpdos " << ia << " "
+               << ib << " "
+               << is << " "
+               << ilm << " "
+               << allpdos[ia][is][ilm][ib] << endl;
+               */
+          } // spin
+        } // lm
       } // bin
     } // at
   } // end routine
@@ -5688,64 +5685,64 @@ namespace pflow {
     // Loop over flagged atoms and lm and sum
     for(int ic=0;ic<(int)pdd.pdos_at.size();ic++) {
       for(int ida=0;ida<(int)pdd.pdos_at[ic].size();ida++) {
-	int ia=pdd.pdos_at[ic][ida]-1;
-	// Error check
-	if(ia<0 || ia>=pdd.natoms) {
-	  cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-	  cerr << "ERROR: Error in case: " << ic+1 << endl;
-	  cerr << "ERROR: You have entered too low or high an atom number in entry: " << ida+1 << endl;
-	  cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
-	  cerr << "ERROR: Bad value is: " << ia+1 << endl;
-	  cerr << "ERROR: Exiting." << endl;
-	  exit(1);
-	}
-	// Loop over each lm
-	for(int idlm=0;idlm<(int)pdd.pdos_lm[ic].size();idlm++) {
-	  int ilm=pdd.pdos_lm[ic][idlm];
-	  // Error check
-	  if(ilm<1 || ilm>pdd.nlm) {
-	    cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-	    cerr << "ERROR: Error in case: " << ic+1 << endl;
-	    cerr << "ERROR: You have entered too low or high an lm number in entry: " << idlm+1 << endl;
-	    cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
-	    cerr << "ERROR: Bad value is: " << ilm << endl;
-	    cerr << "ERROR: Exiting." << endl;
-	    exit(1);
-	  }
-	  // Loop over each bin
-	  for(int ib=0;ib<pdd.nbins;ib++) {
-	    // Do spin sum
-	    //  double val; // DANE not used
-	    // Note: allpdos[atoms][spin][lm][bin]
-	    switch (pdd.spin) {
-	    case 1:{ // non spin polarized
-	      pdd.pdos[ib][1]=pdd.pdos[ib][1]+allpdos[ia][0][ilm][ib];
-	      break;
-	    }
-	    case 2:{ // spin polarized
-	      pdd.pdos[ib][1]=pdd.pdos[ib][1]+allpdos[ia][0][ilm][ib];
-	      pdd.pdos[ib][2]=pdd.pdos[ib][2]+allpdos[ia][1][ilm][ib];
-	      break;
-	    }
-	    default:
-	      cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
-	      cerr << "ERROR: Error in case: " << ic+1 << endl;
-	      cerr << "ERROR: You have entered too low or high an spin number" << endl;
-	      cerr << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
-	      cerr << "ERROR: Bad value is: " << pdd.spin << endl;
-	      cerr << "ERROR: Exiting." << endl;
-	      exit(1);
-	    } // switch spin
-	  } // bin
-	} // lm
+        int ia=pdd.pdos_at[ic][ida]-1;
+        // Error check
+        if(ia<0 || ia>=pdd.natoms) {
+          cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
+          cerr << "ERROR: Error in case: " << ic+1 << endl;
+          cerr << "ERROR: You have entered too low or high an atom number in entry: " << ida+1 << endl;
+          cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
+          cerr << "ERROR: Bad value is: " << ia+1 << endl;
+          cerr << "ERROR: Exiting." << endl;
+          exit(1);
+        }
+        // Loop over each lm
+        for(int idlm=0;idlm<(int)pdd.pdos_lm[ic].size();idlm++) {
+          int ilm=pdd.pdos_lm[ic][idlm];
+          // Error check
+          if(ilm<1 || ilm>pdd.nlm) {
+            cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
+            cerr << "ERROR: Error in case: " << ic+1 << endl;
+            cerr << "ERROR: You have entered too low or high an lm number in entry: " << idlm+1 << endl;
+            cerr << "ERROR: Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
+            cerr << "ERROR: Bad value is: " << ilm << endl;
+            cerr << "ERROR: Exiting." << endl;
+            exit(1);
+          }
+          // Loop over each bin
+          for(int ib=0;ib<pdd.nbins;ib++) {
+            // Do spin sum
+            //  double val; // DANE not used
+            // Note: allpdos[atoms][spin][lm][bin]
+            switch (pdd.spin) {
+              case 1:{ // non spin polarized
+                       pdd.pdos[ib][1]=pdd.pdos[ib][1]+allpdos[ia][0][ilm][ib];
+                       break;
+                     }
+              case 2:{ // spin polarized
+                       pdd.pdos[ib][1]=pdd.pdos[ib][1]+allpdos[ia][0][ilm][ib];
+                       pdd.pdos[ib][2]=pdd.pdos[ib][2]+allpdos[ia][1][ilm][ib];
+                       break;
+                     }
+              default:
+                     cerr << "ERROR: SumPDOSFuncs/SumPDOS" << endl;
+                     cerr << "ERROR: Error in case: " << ic+1 << endl;
+                     cerr << "ERROR: You have entered too low or high an spin number" << endl;
+                     cerr << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
+                     cerr << "ERROR: Bad value is: " << pdd.spin << endl;
+                     cerr << "ERROR: Exiting." << endl;
+                     exit(1);
+            } // switch spin
+          } // bin
+        } // lm
       } // at
     } // case
-      // Get cumulative and difference values
+    // Get cumulative and difference values
     double dE=pdd.pdos[1][0]-pdd.pdos[0][0];
     if(pdd.spin==1) {
       pdd.pdos[0][2]=0;
       for(int ib=1;ib<pdd.nbins;ib++) {
-	pdd.pdos[ib][2]=pdd.pdos[ib-1][2]+pdd.pdos[ib][1]*dE;
+        pdd.pdos[ib][2]=pdd.pdos[ib-1][2]+pdd.pdos[ib][1]*dE;
       }
     }
     else {
@@ -5754,10 +5751,10 @@ namespace pflow {
       pdd.pdos[0][5]=0;
       pdd.pdos[0][6]=0;
       for(int ib=1;ib<pdd.nbins;ib++) {
-	pdd.pdos[ib][3]=pdd.pdos[ib][1]-pdd.pdos[ib][2];
-	pdd.pdos[ib][4]=pdd.pdos[ib-1][4]+pdd.pdos[ib][1]*dE;
-	pdd.pdos[ib][5]=pdd.pdos[ib-1][5]+pdd.pdos[ib][2]*dE;
-	pdd.pdos[ib][6]=pdd.pdos[ib-1][6]+pdd.pdos[ib][3]*dE;
+        pdd.pdos[ib][3]=pdd.pdos[ib][1]-pdd.pdos[ib][2];
+        pdd.pdos[ib][4]=pdd.pdos[ib-1][4]+pdd.pdos[ib][1]*dE;
+        pdd.pdos[ib][5]=pdd.pdos[ib-1][5]+pdd.pdos[ib][2]*dE;
+        pdd.pdos[ib][6]=pdd.pdos[ib-1][6]+pdd.pdos[ib][3]*dE;
       }
     }
   }
@@ -5790,11 +5787,11 @@ namespace pflow {
       // If path_flag is n/N then the path is taken between
       // nearest images.  Otherwise path is between the atoms given.
       if(path_flag=="n" || path_flag=="N") {
-	vector<double> ddp=pflow::vecC2F(lat,dp);
-	for(int ic=0;ic<3;ic++) {
-	  ddp[ic]=ddp[ic]-Nint(ddp[ic]);
-	}
-	dp=pflow::vecF2C(lat,ddp);
+        vector<double> ddp=pflow::vecC2F(lat,dp);
+        for(int ic=0;ic<3;ic++) {
+          ddp[ic]=ddp[ic]-Nint(ddp[ic]);
+        }
+        dp=pflow::vecF2C(lat,ddp);
       }
       dtot=dtot+pflow::norm(dp)*pflow::norm(dp);
     }
@@ -5814,10 +5811,10 @@ namespace pflow {
     for(int im=0;im<nim+2;im++) {
       ostringstream tmp;
       if(im<10) {
-	tmp << "0" << im << ends;
+        tmp << "0" << im << ends;
       }
       else {
-	tmp << im << ends;
+        tmp << im << ends;
       }
       rbdir[im]=tmp.str();
     }
@@ -5862,10 +5859,10 @@ namespace pflow {
     for(int im=0;im<nim+2;im++) {
       ostringstream file;
       if(im==0 || im==(nim+1)) { // First and last files are POSCAR
-	file << rbdir[im] << "/POSCAR" << ends;
+        file << rbdir[im] << "/POSCAR" << ends;
       }
       else {
-	file << rbdir[im] << "/CONTCAR" << ends;
+        file << rbdir[im] << "/CONTCAR" << ends;
       }
       ifstream ifaustream(file.str().c_str());
       ifaustream >> vstr[im];
@@ -5918,8 +5915,8 @@ namespace pflow {
 // structure, I (dist[j] = strI - str[j]).
 namespace pflow {
   vector<double> GetRBDistFromStrI(const vector<xstructure>& vstr,
-				   const xstructure& strI,
-				   const string& path_flag) {
+      const xstructure& strI,
+      const string& path_flag) {
     int nim = vstr.size()-2;
     vector<double> d((nim+2),0.0);
     xstructure diffstr;
@@ -5937,8 +5934,8 @@ namespace pflow {
 // This function gets the displacement between two POSCAR files (str2-str1).  
 namespace pflow {
   void RBPoscarDisp(const xstructure& str1in, const xstructure& str2in,
-		    xstructure& diffstr, double& totdist, matrix<double>& cm,
-		    const string& path_flag) {
+      xstructure& diffstr, double& totdist, matrix<double>& cm,
+      const string& path_flag) {
     diffstr=str1in;
     xstructure str1=str1in;
     xstructure str2=str2in;
@@ -5961,11 +5958,11 @@ namespace pflow {
       // If path_flag is n/N then the path is taken between
       // nearest images.  Otherwise path is between the atoms given.
       if(path_flag=="n" || path_flag=="N") {
-	vector<double> ddp=pflow::vecC2F(lat1,dp);
-	for(int ic=0;ic<3;ic++) {
-	  ddp[ic]=ddp[ic]-Nint(ddp[ic]);
-	}
-	dp=pflow::vecF2C(lat1,ddp);
+        vector<double> ddp=pflow::vecC2F(lat1,dp);
+        for(int ic=0;ic<3;ic++) {
+          ddp[ic]=ddp[ic]-Nint(ddp[ic]);
+        }
+        dp=pflow::vecF2C(lat1,ddp);
       }
       totdist=totdist+pflow::norm(dp)*pflow::norm(dp);
       cposdiff[iat]=dp;
@@ -6068,12 +6065,12 @@ namespace pflow {
     string keyword = "augmentation";
     if(ds==keyword) {
       for(int i=0;i<(5*natoms-1);i++) {
-	cin >> ds;
+        cin >> ds;
       }
     }
     else {
       for(int i=0;i<(natoms-1);i++) {
-	cin >> ds;
+        cin >> ds;
       }
     }
 
@@ -6088,10 +6085,10 @@ namespace pflow {
     // Read in 4*natoms=4*natoms dummy fields.  This is
     // not necessary and the lines only exist in vasp 4.4.5.
     /*
-      for(int i=0;i<4*natoms;i++) {
-      cin >> ds;
-      }
-    */
+       for(int i=0;i<4*natoms;i++) {
+       cin >> ds;
+       }
+       */
 
     // Loop over grid and bin charge densities.
 
@@ -6122,49 +6119,49 @@ namespace pflow {
     for(int iat=0;iat<natoms;iat++) {
       // Initialize radial positions in rad_chg_int    
       for(int ib=0;ib<NRBIN;ib++) {
-	rad_chg_int[iat][ib][0]=(ib+1)*DR;
+        rad_chg_int[iat][ib][0]=(ib+1)*DR;
       }
       // Find location of atom on grid.
       vector<int> at_grid_pos(3);
       for(int ic=0;ic<3;ic++) {
-	at_grid_pos[ic]=Nint(at_fpos[iat][ic]*ngrid[ic]);
+        at_grid_pos[ic]=Nint(at_fpos[iat][ic]*ngrid[ic]);
       }
       // Grid loop: This loops over grid points shifted to center around grid point approximation to
       // position of iat.  The ig values therefore need to be modified to be true grid points
       // (true_ig) by undoing the shift (adding back the at_grid_pos).
       for(ig[0]=-imax[0];ig[0]<imax[0];ig[0]++) {
-	for(ig[1]=-imax[1];ig[1]<imax[1];ig[1]++) {
-	  for(ig[2]=-imax[2];ig[2]<imax[2];ig[2]++) {
-	    // Get true grid points
-	    vector<int> true_ig(3);
-	    vector<double> chg_fpos(3);
-	    for(int ic=0;ic<3;ic++) {
-	      true_ig[ic]=ig[ic]+at_grid_pos[ic];
-	      // Get true position of this grid point in direct coords.
-	      chg_fpos[ic]=((float)true_ig[ic]/(float)ngrid[ic]);
-	      // Shift true grid point back into the 000 cell.
-	      true_ig[ic]=true_ig[ic]-(int)((float)true_ig[ic]/(float)ngrid[ic])*ngrid[ic];
-	      if(true_ig[ic]<0) true_ig[ic]=true_ig[ic]+ngrid[ic];
-	    } // ic
-	    // Get charge values for each grid position
-	    int id=true_ig[0]+true_ig[1]*ngrid[0]+true_ig[2]*ngrid[0]*ngrid[1];
-	    double chgtot=chg_tot[id];
-	    double chgdiff=chg_diff[id];
-	    double chgup=0.5*(chg_tot[id]+chg_diff[id]);
-	    double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
-	    vector<double> fpos(3);
-	    // Get distance from iat to true grid point position.
-	    double dist=pflow::GetDistToAtomDir(str,chg_fpos,iat);
-	    // Get bin for this atom and increment radial charge density.
-	    int ibin=(int)(dist/DR);	  
-	    if(ibin<NRBIN) {
-	      rad_chg_int[iat][ibin][1]=rad_chg_int[iat][ibin][1]+chgtot;
-	      rad_chg_int[iat][ibin][2]=rad_chg_int[iat][ibin][2]+chgdiff;
-	      rad_chg_int[iat][ibin][3]=rad_chg_int[iat][ibin][3]+chgup;
-	      rad_chg_int[iat][ibin][4]=rad_chg_int[iat][ibin][4]+chgdn;
-	    } // if ibin<NRBIN
-	  } // ig[2]
-	} // ig[1]
+        for(ig[1]=-imax[1];ig[1]<imax[1];ig[1]++) {
+          for(ig[2]=-imax[2];ig[2]<imax[2];ig[2]++) {
+            // Get true grid points
+            vector<int> true_ig(3);
+            vector<double> chg_fpos(3);
+            for(int ic=0;ic<3;ic++) {
+              true_ig[ic]=ig[ic]+at_grid_pos[ic];
+              // Get true position of this grid point in direct coords.
+              chg_fpos[ic]=((float)true_ig[ic]/(float)ngrid[ic]);
+              // Shift true grid point back into the 000 cell.
+              true_ig[ic]=true_ig[ic]-(int)((float)true_ig[ic]/(float)ngrid[ic])*ngrid[ic];
+              if(true_ig[ic]<0) true_ig[ic]=true_ig[ic]+ngrid[ic];
+            } // ic
+            // Get charge values for each grid position
+            int id=true_ig[0]+true_ig[1]*ngrid[0]+true_ig[2]*ngrid[0]*ngrid[1];
+            double chgtot=chg_tot[id];
+            double chgdiff=chg_diff[id];
+            double chgup=0.5*(chg_tot[id]+chg_diff[id]);
+            double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
+            vector<double> fpos(3);
+            // Get distance from iat to true grid point position.
+            double dist=pflow::GetDistToAtomDir(str,chg_fpos,iat);
+            // Get bin for this atom and increment radial charge density.
+            int ibin=(int)(dist/DR);	  
+            if(ibin<NRBIN) {
+              rad_chg_int[iat][ibin][1]=rad_chg_int[iat][ibin][1]+chgtot;
+              rad_chg_int[iat][ibin][2]=rad_chg_int[iat][ibin][2]+chgdiff;
+              rad_chg_int[iat][ibin][3]=rad_chg_int[iat][ibin][3]+chgup;
+              rad_chg_int[iat][ibin][4]=rad_chg_int[iat][ibin][4]+chgdn;
+            } // if ibin<NRBIN
+          } // ig[2]
+        } // ig[1]
       } // ig[0]
     } // iat
 
@@ -6172,49 +6169,49 @@ namespace pflow {
     vor_chg_int = matrix<double> (natoms,4,0.0);
     for(ig[0]=0;ig[0]<ngrid[0];ig[0]++) {
       for(ig[1]=0;ig[1]<ngrid[1];ig[1]++) {
-	for(ig[2]=0;ig[2]<ngrid[2];ig[2]++) {
-	  // Get charge values for this grid position
-	  int id=ig[0]+ig[1]*ngrid[0]+ig[2]*ngrid[0]*ngrid[1];
-	  double chgtot=chg_tot[id];
-	  double chgdiff=chg_diff[id];
-	  double chgup=0.5*(chg_tot[id]+chg_diff[id]);
-	  double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
-	  vector<double> fpos(3);
-	  // Set up grid positions in direct coordinates.
-	  for(int ic=0;ic<3;ic++) {
-	    fpos[ic]=((float)ig[ic])/(float)ngrid[ic];
-	  } // ic
-	  // Loop over atoms
-	  double dist;
-	  double min_dist=pflow::GetDistToAtomImageDir(str,fpos,0);
-	  int min_dist_id=0;
-	  for(int iat=0;iat<natoms;iat++) {
-	    // Get "image" distance to each atom (distance to closest image)
-	    dist=pflow::GetDistToAtomImageDir(str,fpos,iat);
-	    // Keep track of which atom is the minimum "image" distance away
-	    if(dist<min_dist) {
-	      min_dist=dist;
-	      min_dist_id=iat;
-	    } // if dist<min_dist
-	  } // iat
-	  vor_chg_int[min_dist_id][0]=vor_chg_int[min_dist_id][0]+chgtot;
-	  vor_chg_int[min_dist_id][1]=vor_chg_int[min_dist_id][1]+chgdiff;
-	  vor_chg_int[min_dist_id][2]=vor_chg_int[min_dist_id][2]+chgup;
-	  vor_chg_int[min_dist_id][3]=vor_chg_int[min_dist_id][3]+chgdn;
-	} // ig[2]
+        for(ig[2]=0;ig[2]<ngrid[2];ig[2]++) {
+          // Get charge values for this grid position
+          int id=ig[0]+ig[1]*ngrid[0]+ig[2]*ngrid[0]*ngrid[1];
+          double chgtot=chg_tot[id];
+          double chgdiff=chg_diff[id];
+          double chgup=0.5*(chg_tot[id]+chg_diff[id]);
+          double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
+          vector<double> fpos(3);
+          // Set up grid positions in direct coordinates.
+          for(int ic=0;ic<3;ic++) {
+            fpos[ic]=((float)ig[ic])/(float)ngrid[ic];
+          } // ic
+          // Loop over atoms
+          double dist;
+          double min_dist=pflow::GetDistToAtomImageDir(str,fpos,0);
+          int min_dist_id=0;
+          for(int iat=0;iat<natoms;iat++) {
+            // Get "image" distance to each atom (distance to closest image)
+            dist=pflow::GetDistToAtomImageDir(str,fpos,iat);
+            // Keep track of which atom is the minimum "image" distance away
+            if(dist<min_dist) {
+              min_dist=dist;
+              min_dist_id=iat;
+            } // if dist<min_dist
+          } // iat
+          vor_chg_int[min_dist_id][0]=vor_chg_int[min_dist_id][0]+chgtot;
+          vor_chg_int[min_dist_id][1]=vor_chg_int[min_dist_id][1]+chgdiff;
+          vor_chg_int[min_dist_id][2]=vor_chg_int[min_dist_id][2]+chgup;
+          vor_chg_int[min_dist_id][3]=vor_chg_int[min_dist_id][3]+chgdn;
+        } // ig[2]
       } // ig[1]
     } // ig[0]
 
     // Normalize and turn rad_chg_int from chg in each radial shell to cumulative integral.
     for(int iat=0;iat<natoms;iat++) {
       for(int i=0;i<4;i++) {
-	vor_chg_int[iat][i]=vor_chg_int[iat][i]/npts;
+        vor_chg_int[iat][i]=vor_chg_int[iat][i]/npts;
       }
       for(int i=1;i<5;i++) {
-	for(int ib=0;ib<NRBIN;ib++) {
-	  rad_chg_int[iat][ib][i]=rad_chg_int[iat][ib][i]/npts;
-	  if(ib>0) rad_chg_int[iat][ib][i]=(rad_chg_int[iat][ib][i]+rad_chg_int[iat][ib-1][i]);
-	} // ib
+        for(int ib=0;ib<NRBIN;ib++) {
+          rad_chg_int[iat][ib][i]=rad_chg_int[iat][ib][i]/npts;
+          if(ib>0) rad_chg_int[iat][ib][i]=(rad_chg_int[iat][ib][i]+rad_chg_int[iat][ib-1][i]);
+        } // ib
       } // for loop over tot,diff,up,dn
     } // iat
   }
@@ -6226,13 +6223,13 @@ namespace pflow {
     outf << scale << " # scale " << endl;
     for(int ic=0;ic<3;ic++) {
       for(int jc=0;jc<3;jc++) {
-	outf << pts[ic][jc] << " ";
+        outf << pts[ic][jc] << " ";
       }
       outf << " # pts " << endl;
     }
     for(int ic=0;ic<3;ic++) {
       for(int jc=0;jc<3;jc++) {
-	outf << dpts[ic][jc] << " ";
+        outf << dpts[ic][jc] << " ";
       }
       outf << " # dpts " << endl;
     }
@@ -6361,8 +6358,9 @@ namespace pflow {
     //if we get here, assume CHGCAR is formatted correctly for now
     //read in header, scaling factor, lattice vectors, number of atoms, coordinate type
     if(LDEBUG) oss << soliloquy << "READING POSCAR" << endl;
-    //DX 20190618 [OBSOLETE] for(uint i=0;i<7;i++) {
-    for(uint i=0;i<poscar_header_count;i++) { //DX 20190618
+    //DX 20190618 [OBSOLETE] for(uint i=0;i<7;i++)
+    for(uint i=0;i<poscar_header_count;i++) //DX 20190618
+    { //CO200106 - patching for auto-indenting
       poscar << vcontent.at(i) << endl;
       chgcar_header << vcontent.at(i) << endl;
       linecount=i;
@@ -6522,11 +6520,11 @@ namespace pflow {
 //  the integrated charges in a sphere vs. the radius of the sphere.
 namespace pflow {
   void GetChgInt(vector<matrix<double> >& rad_chg_int,
-		 matrix<double>& vor_chg_int,
-		 xstructure& str,
-		 vector<int>& ngrid,
-		 vector<double>& chg_tot,
-		 vector<double>& chg_diff) {
+      matrix<double>& vor_chg_int,
+      xstructure& str,
+      vector<int>& ngrid,
+      vector<double>& chg_tot,
+      vector<double>& chg_diff) {
     // Loop over grid and bin charge densities.
 
     // Radial charge integration.
@@ -6558,99 +6556,99 @@ namespace pflow {
     for(int iat=0;iat<natoms;iat++) {
       // Initialize radial positions in rad_chg_int    
       for(int ib=0;ib<NRBIN;ib++) {
-	rad_chg_int[iat][ib][0]=(ib+1)*DR;
+        rad_chg_int[iat][ib][0]=(ib+1)*DR;
       }
       // Find location of atom on grid.
       vector<int> at_grid_pos(3);
       for(int ic=0;ic<3;ic++) {
-	at_grid_pos[ic]=Nint(at_fpos[iat][ic]*ngrid[ic]);
+        at_grid_pos[ic]=Nint(at_fpos[iat][ic]*ngrid[ic]);
       }
       // Grid loop: This loops over grid points shifted to center around grid point approximation to
       // position of iat.  The ig values therefore need to be modified to be true grid points
       // (true_ig) by undoing the shift (adding back the at_grid_pos).
       for(ig[0]=-imax[0];ig[0]<imax[0];ig[0]++) {
-	for(ig[1]=-imax[1];ig[1]<imax[1];ig[1]++) {
-	  for(ig[2]=-imax[2];ig[2]<imax[2];ig[2]++) {
-	    // Get true grid points
-	    vector<int> true_ig(3);
-	    vector<double> chg_fpos(3);
-	    for(int ic=0;ic<3;ic++) {
-	      true_ig[ic]=ig[ic]+at_grid_pos[ic];
-	      // Get true position of this grid point in direct coords.
-	      chg_fpos[ic]=((float)true_ig[ic]/(float)ngrid[ic]);
-	      // Shift true grid point back into the 000 cell.
-	      true_ig[ic]=true_ig[ic]-(int)((float)true_ig[ic]/(float)ngrid[ic])*ngrid[ic];
-	      if(true_ig[ic]<0) true_ig[ic]=true_ig[ic]+ngrid[ic];
-	    } // ic
-	      // Get charge values for each grid position
-	    int id=true_ig[0]+true_ig[1]*ngrid[0]+true_ig[2]*ngrid[0]*ngrid[1];
-	    double chgtot=chg_tot[id];
-	    double chgdiff=chg_diff[id];
-	    double chgup=0.5*(chg_tot[id]+chg_diff[id]);
-	    double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
-	    vector<double> fpos(3);
-	    // Get distance from iat to true grid point position.
-	    double dist=pflow::GetDistToAtomDir(str,chg_fpos,iat);
-	    // Get bin for this atom and increment radial charge density.
-	    int ibin=(int)(dist/DR);	  
-	    if(ibin<NRBIN) {
-	      rad_chg_int[iat][ibin][1]=rad_chg_int[iat][ibin][1]+chgtot;
-	      rad_chg_int[iat][ibin][2]=rad_chg_int[iat][ibin][2]+chgdiff;
-	      rad_chg_int[iat][ibin][3]=rad_chg_int[iat][ibin][3]+chgup;
-	      rad_chg_int[iat][ibin][4]=rad_chg_int[iat][ibin][4]+chgdn;
-	    } // if ibin<NRBIN
-	  } // ig[2]
-	} // ig[1]
+        for(ig[1]=-imax[1];ig[1]<imax[1];ig[1]++) {
+          for(ig[2]=-imax[2];ig[2]<imax[2];ig[2]++) {
+            // Get true grid points
+            vector<int> true_ig(3);
+            vector<double> chg_fpos(3);
+            for(int ic=0;ic<3;ic++) {
+              true_ig[ic]=ig[ic]+at_grid_pos[ic];
+              // Get true position of this grid point in direct coords.
+              chg_fpos[ic]=((float)true_ig[ic]/(float)ngrid[ic]);
+              // Shift true grid point back into the 000 cell.
+              true_ig[ic]=true_ig[ic]-(int)((float)true_ig[ic]/(float)ngrid[ic])*ngrid[ic];
+              if(true_ig[ic]<0) true_ig[ic]=true_ig[ic]+ngrid[ic];
+            } // ic
+            // Get charge values for each grid position
+            int id=true_ig[0]+true_ig[1]*ngrid[0]+true_ig[2]*ngrid[0]*ngrid[1];
+            double chgtot=chg_tot[id];
+            double chgdiff=chg_diff[id];
+            double chgup=0.5*(chg_tot[id]+chg_diff[id]);
+            double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
+            vector<double> fpos(3);
+            // Get distance from iat to true grid point position.
+            double dist=pflow::GetDistToAtomDir(str,chg_fpos,iat);
+            // Get bin for this atom and increment radial charge density.
+            int ibin=(int)(dist/DR);	  
+            if(ibin<NRBIN) {
+              rad_chg_int[iat][ibin][1]=rad_chg_int[iat][ibin][1]+chgtot;
+              rad_chg_int[iat][ibin][2]=rad_chg_int[iat][ibin][2]+chgdiff;
+              rad_chg_int[iat][ibin][3]=rad_chg_int[iat][ibin][3]+chgup;
+              rad_chg_int[iat][ibin][4]=rad_chg_int[iat][ibin][4]+chgdn;
+            } // if ibin<NRBIN
+          } // ig[2]
+        } // ig[1]
       } // ig[0]
     } // iat
 
-      // Voronoi charge integration
+    // Voronoi charge integration
     vor_chg_int = matrix<double> (natoms,4,0.0);
     for(ig[0]=0;ig[0]<ngrid[0];ig[0]++) {
       for(ig[1]=0;ig[1]<ngrid[1];ig[1]++) {
-	for(ig[2]=0;ig[2]<ngrid[2];ig[2]++) {
-	  // Get charge values for this grid position
-	  int id=ig[0]+ig[1]*ngrid[0]+ig[2]*ngrid[0]*ngrid[1];
-	  double chgtot=chg_tot[id];
-	  double chgdiff=chg_diff[id];
-	  double chgup=0.5*(chg_tot[id]+chg_diff[id]);
-	  double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
-	  vector<double> fpos(3);
-	  // Set up grid positions in direct coordinates.
-	  for(int ic=0;ic<3;ic++) {
-	    fpos[ic]=((float)ig[ic])/(float)ngrid[ic];
-	  } // ic
-	    // Loop over atoms
-	  double dist;
-	  double min_dist=pflow::GetDistToAtomImageDir(str,fpos,0);
-	  int min_dist_id=0;
-	  for(int iat=0;iat<natoms;iat++) {
-	    // Get "image" distance to each atom (distance to closest image)
-	    dist=pflow::GetDistToAtomImageDir(str,fpos,iat);
-	    // Keep track of which atom is the minimum "image" distance away
-	    if(dist<min_dist) {
-	      min_dist=dist;
-	      min_dist_id=iat;
-	    } // if dist<min_dist
-	  } // iat
-	  vor_chg_int[min_dist_id][0]=vor_chg_int[min_dist_id][0]+chgtot;
-	  vor_chg_int[min_dist_id][1]=vor_chg_int[min_dist_id][1]+chgdiff;
-	  vor_chg_int[min_dist_id][2]=vor_chg_int[min_dist_id][2]+chgup;
-	  vor_chg_int[min_dist_id][3]=vor_chg_int[min_dist_id][3]+chgdn;
-	} // ig[2]
+        for(ig[2]=0;ig[2]<ngrid[2];ig[2]++) {
+          // Get charge values for this grid position
+          int id=ig[0]+ig[1]*ngrid[0]+ig[2]*ngrid[0]*ngrid[1];
+          double chgtot=chg_tot[id];
+          double chgdiff=chg_diff[id];
+          double chgup=0.5*(chg_tot[id]+chg_diff[id]);
+          double chgdn=0.5*(chg_tot[id]-chg_diff[id]);
+          vector<double> fpos(3);
+          // Set up grid positions in direct coordinates.
+          for(int ic=0;ic<3;ic++) {
+            fpos[ic]=((float)ig[ic])/(float)ngrid[ic];
+          } // ic
+          // Loop over atoms
+          double dist;
+          double min_dist=pflow::GetDistToAtomImageDir(str,fpos,0);
+          int min_dist_id=0;
+          for(int iat=0;iat<natoms;iat++) {
+            // Get "image" distance to each atom (distance to closest image)
+            dist=pflow::GetDistToAtomImageDir(str,fpos,iat);
+            // Keep track of which atom is the minimum "image" distance away
+            if(dist<min_dist) {
+              min_dist=dist;
+              min_dist_id=iat;
+            } // if dist<min_dist
+          } // iat
+          vor_chg_int[min_dist_id][0]=vor_chg_int[min_dist_id][0]+chgtot;
+          vor_chg_int[min_dist_id][1]=vor_chg_int[min_dist_id][1]+chgdiff;
+          vor_chg_int[min_dist_id][2]=vor_chg_int[min_dist_id][2]+chgup;
+          vor_chg_int[min_dist_id][3]=vor_chg_int[min_dist_id][3]+chgdn;
+        } // ig[2]
       } // ig[1]
     } // ig[0]
 
-      // Normalize and turn rad_chg_int from chg in each radial shell to cumulative integral.
+    // Normalize and turn rad_chg_int from chg in each radial shell to cumulative integral.
     for(int iat=0;iat<natoms;iat++) {
       for(int i=0;i<4;i++) {
-	vor_chg_int[iat][i]=vor_chg_int[iat][i]/npts;
+        vor_chg_int[iat][i]=vor_chg_int[iat][i]/npts;
       }
       for(int i=1;i<5;i++) {
-	for(int ib=0;ib<NRBIN;ib++) {
-	  rad_chg_int[iat][ib][i]=rad_chg_int[iat][ib][i]/npts;
-	  if(ib>0) rad_chg_int[iat][ib][i]=(rad_chg_int[iat][ib][i]+rad_chg_int[iat][ib-1][i]);
-	} // ib
+        for(int ib=0;ib<NRBIN;ib++) {
+          rad_chg_int[iat][ib][i]=rad_chg_int[iat][ib][i]/npts;
+          if(ib>0) rad_chg_int[iat][ib][i]=(rad_chg_int[iat][ib][i]+rad_chg_int[iat][ib-1][i]);
+        } // ib
       } // for loop over tot,diff,up,dn
     } // iat
   }
@@ -6684,7 +6682,7 @@ namespace pflow {
     getline(infile,s);
     for(int ic=0;ic<3;ic++) {
       for(int jc=0;jc<3;jc++) {
-	infile >> pdp.pts[ic][jc];
+        infile >> pdp.pts[ic][jc];
       }
       getline(infile,s);
       // transform points to cart coordinates if necesary.
@@ -6706,10 +6704,10 @@ namespace pflow {
       pdp.dpts[2]=pflow::CompAperpB(pdp.dpts[2],pdp.dpts[1]);
       double norm_new=norm(pdp.dpts[2]);
       if(norm_new<TOL) {
-	cout << "ERROR: ChgFuncs/ReadPlaneDensParams" << endl;
-	cout << "Your two axis are parallel and no plane can be determined." << endl;
-	cout << "Exiting." << endl;
-	exit(1);
+        cout << "ERROR: ChgFuncs/ReadPlaneDensParams" << endl;
+        cout << "Your two axis are parallel and no plane can be determined." << endl;
+        cout << "Exiting." << endl;
+        exit(1);
       }
       pdp.dpts[2]=SVprod(norm_orig/norm_new,pdp.dpts[2]);
     }
@@ -6744,12 +6742,12 @@ namespace pflow {
 // parameters for this routine.
 namespace pflow {
   void GetPlaneDens(const pd_params& pdp,
-		    vector<double>& dens2d_tot,
-		    vector<double>& dens2d_diff,
-		    const xstructure& str,
-		    const vector<int>& ngrid,
-		    const vector<double>& chg_tot,
-		    const vector<double>& chg_diff) {
+      vector<double>& dens2d_tot,
+      vector<double>& dens2d_diff,
+      const xstructure& str,
+      const vector<int>& ngrid,
+      const vector<double>& chg_tot,
+      const vector<double>& chg_diff) {
     if(str.atoms.size()) {;} // phony just to keep str busy
     int Nx=pdp.Nx;
     int Ny=pdp.Ny;
@@ -6759,31 +6757,31 @@ namespace pflow {
     // Loop over each point in the 2d plane
     for(int i=0;i<Nx;i++) {
       for(int j=0;j<Ny;j++) {
-	// Get id2d for this point.
-	int id2d =i+Nx*j;
-	// Get direct coordinates for this point.
-	vector<double> pt(3,0.0);
-	vector<double> Xpt(3,0.0);
-	vector<double> Ypt(3,0.0);
-	Xpt=SVprod(float(i)/float(Nx-1),pdp.dpts[1]);
-	Ypt=SVprod(float(j)/float(Ny-1),pdp.dpts[2]);
-	pt=VVsum(Xpt,Ypt);
-	pt=VVsum(pdp.dpts[0],pt);
-	// Get charge at this point.
-	// Simply use value of charge at nearest point
-	// on the 3d charge grid.
-	int ii=Nint(ngrid[0]*pt[0])%ngrid[0];
-	int jj=Nint(ngrid[1]*pt[1])%ngrid[1];
-	int kk=Nint(ngrid[2]*pt[2])%ngrid[2];
-	if(ii<0) ii=ii+ngrid[0];
-	if(jj<0) jj=jj+ngrid[1];
-	if(kk<0) kk=kk+ngrid[2];
-	int id3d = ii+ngrid[0]*jj+ngrid[0]*ngrid[1]*kk;
-	dens2d_tot[id2d]=chg_tot[id3d];
-	dens2d_diff[id2d]=chg_diff[id3d];
+        // Get id2d for this point.
+        int id2d =i+Nx*j;
+        // Get direct coordinates for this point.
+        vector<double> pt(3,0.0);
+        vector<double> Xpt(3,0.0);
+        vector<double> Ypt(3,0.0);
+        Xpt=SVprod(float(i)/float(Nx-1),pdp.dpts[1]);
+        Ypt=SVprod(float(j)/float(Ny-1),pdp.dpts[2]);
+        pt=VVsum(Xpt,Ypt);
+        pt=VVsum(pdp.dpts[0],pt);
+        // Get charge at this point.
+        // Simply use value of charge at nearest point
+        // on the 3d charge grid.
+        int ii=Nint(ngrid[0]*pt[0])%ngrid[0];
+        int jj=Nint(ngrid[1]*pt[1])%ngrid[1];
+        int kk=Nint(ngrid[2]*pt[2])%ngrid[2];
+        if(ii<0) ii=ii+ngrid[0];
+        if(jj<0) jj=jj+ngrid[1];
+        if(kk<0) kk=kk+ngrid[2];
+        int id3d = ii+ngrid[0]*jj+ngrid[0]*ngrid[1]*kk;
+        dens2d_tot[id2d]=chg_tot[id3d];
+        dens2d_diff[id2d]=chg_diff[id3d];
       }
     }  
-  }  
+  }
 }
 
 // ***************************************************************************
@@ -6791,11 +6789,11 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   void PrintPlaneDens(const pd_params& pdp,
-		      const vector<double>& dens2d_tot,
-		      const vector<double>& dens2d_diff,
-		      const xstructure& str) {  
+      const vector<double>& dens2d_tot,
+      const vector<double>& dens2d_diff,
+      const xstructure& str) {  
     if(str.atoms.size()) {;} // phony just to keep str busy
-    
+
     ofstream outf_tot("dens2d.tot.out");
     ofstream outf_up("dens2d.up.out");
     ofstream outf_dn("dens2d.dn.out");
@@ -6805,11 +6803,11 @@ namespace pflow {
     int Ny=pdp.Ny;
     for(int i=0;i<Nx;i++) {
       for(int j=0;j<Ny;j++) {
-	int id=i+Nx*j;
-	outf_tot << dens2d_tot[id] << " ";
-	outf_diff << dens2d_diff[id] << " ";
-	outf_up << (dens2d_tot[id]+dens2d_diff[id])/2.0 << " ";
-	outf_dn << (dens2d_tot[id]-dens2d_diff[id])/2.0 << " ";
+        int id=i+Nx*j;
+        outf_tot << dens2d_tot[id] << " ";
+        outf_diff << dens2d_diff[id] << " ";
+        outf_up << (dens2d_tot[id]+dens2d_diff[id])/2.0 << " ";
+        outf_dn << (dens2d_tot[id]-dens2d_diff[id])/2.0 << " ";
       }
       outf_tot << endl;
       outf_diff << endl;
@@ -6919,7 +6917,7 @@ double CONV_FACT=(1.0E+10*E_ELECTRON/(4.0*PI*EPS_VACUUM));
 
 namespace pflow {
   void Ewald(const xstructure& in_str,double& epoint,double& ereal,
-	     double& erecip,double& eewald,double& eta,const double& SUMTOL) {
+      double& erecip,double& eewald,double& eta,const double& SUMTOL) {
     xstructure str=in_str;
     str=PutInCell(str);
     matrix<double> lat = pflow::GetScaledLat(str);
@@ -6980,7 +6978,7 @@ namespace pflow {
 // Gets point energy.
 namespace pflow {
   double GetPointEner(const double& rteta, const vector<double>& atchg,
-		      const double& vol) {
+      const double& vol) {
     double ept=0;
     double chg_cell_corr=0;
     for(int ia=0;ia<(int) atchg.size();ia++) {
@@ -7001,8 +6999,8 @@ namespace pflow {
 // Gets recipricol energy.
 namespace pflow {
   double GetRecipEner(const double& eta,const vector<double>& atchg,
-		      const double& vol,const matrix<double>& rlat,
-		      const matrix<double>& atfpos,const double& SUMTOL) {
+      const double& vol,const matrix<double>& rlat,
+      const matrix<double>& atfpos,const double& SUMTOL) {
     double TOL=1e-16;
     double log_eps=-30; // This assumes sf<
     double arg=0;
@@ -7013,56 +7011,56 @@ namespace pflow {
       double maxterm=0;
       vector<int> ig(3);
       for(ig[0]=-gcnt;ig[0]<=gcnt;ig[0]++) {
-	for(ig[1]=-gcnt;ig[1]<=gcnt;ig[1]++) {
-	  for(ig[2]=-gcnt;ig[2]<=gcnt;ig[2]++) {
-	    if( (abs(ig[0])==gcnt) || (abs(ig[1])==gcnt) ||
-		 (abs(ig[2])==gcnt) || gcnt==1) { // Just does new shells
-	      vector<double> gvec=pflow::VMmult(ig,rlat);
-	      double gsq=pflow::VVdot(gvec,gvec);
-	      if(gsq>TOL) { // Avoid gsq=0.
-		// get structure factor
-		double sfr=0;
-		double sfi=0;
-		for(int ia=0;ia<(int) atfpos.size();ia++) {
-		  double exparg=TWOPI*pflow::VVprod(atfpos[ia],ig);
-		  sfr=sfr+atchg[ia]*cos(exparg);
-		  sfi=sfi+atchg[ia]*sin(exparg);
-		}
-		if(aurostd::abs(sfr)<1e-16) {sfr=0.0;}
-		if(aurostd::abs(sfi)<1e-16) {sfi=0.0;}
-		double sf=sfr*sfr+sfi*sfi;
-		// Get expval.  In order not to get floating point
-		// errors due to manipulating small numbers we must
-		// not evaluate the exp when it produces irrelevantly
-		// small arguments.  This happens when
-		// expval*sf << eps (where safe eps=1e-30), or equivalently,
-		// when ln(sf)-ln(g^2)-g^2/(4eta) < ln(eps)
-		arg=gsq/(4.0*eta);
-		double expval;
-		double term1=0;
-		if(sf>0) {
-		  term1=log(sf)-log(gsq)-gsq/(4*eta);
-		}
-		if(term1<log_eps) { // Avoids some floating point exceptions.
-		  expval=0;
-		}
-		else {
-		  expval=exp(-arg)/gsq;
-		}
-		double term=expval*sf;
-		//	      if(term<1e-16) {term=0;}
-		erecip=erecip+term;
-		// Set maxterm to max of abs(term) and expval.
-		// The expval term is needed since in some shells
-		// term may be very small due to coincidently small sf,
-		// even before convergence.
-		if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
-		if(expval>maxterm) {maxterm=expval;}
-		// ADD FORCES ???
-	      } // If gsq>TOL
-	    } // If to do only new shells (ig==gcnt)
-	  } // ig0
-	} // ig1
+        for(ig[1]=-gcnt;ig[1]<=gcnt;ig[1]++) {
+          for(ig[2]=-gcnt;ig[2]<=gcnt;ig[2]++) {
+            if( (abs(ig[0])==gcnt) || (abs(ig[1])==gcnt) ||
+                (abs(ig[2])==gcnt) || gcnt==1) { // Just does new shells
+              vector<double> gvec=pflow::VMmult(ig,rlat);
+              double gsq=pflow::VVdot(gvec,gvec);
+              if(gsq>TOL) { // Avoid gsq=0.
+                // get structure factor
+                double sfr=0;
+                double sfi=0;
+                for(int ia=0;ia<(int) atfpos.size();ia++) {
+                  double exparg=TWOPI*pflow::VVprod(atfpos[ia],ig);
+                  sfr=sfr+atchg[ia]*cos(exparg);
+                  sfi=sfi+atchg[ia]*sin(exparg);
+                }
+                if(aurostd::abs(sfr)<1e-16) {sfr=0.0;}
+                if(aurostd::abs(sfi)<1e-16) {sfi=0.0;}
+                double sf=sfr*sfr+sfi*sfi;
+                // Get expval.  In order not to get floating point
+                // errors due to manipulating small numbers we must
+                // not evaluate the exp when it produces irrelevantly
+                // small arguments.  This happens when
+                // expval*sf << eps (where safe eps=1e-30), or equivalently,
+                // when ln(sf)-ln(g^2)-g^2/(4eta) < ln(eps)
+                arg=gsq/(4.0*eta);
+                double expval;
+                double term1=0;
+                if(sf>0) {
+                  term1=log(sf)-log(gsq)-gsq/(4*eta);
+                }
+                if(term1<log_eps) { // Avoids some floating point exceptions.
+                  expval=0;
+                }
+                else {
+                  expval=exp(-arg)/gsq;
+                }
+                double term=expval*sf;
+                //	      if(term<1e-16) {term=0;}
+                erecip=erecip+term;
+                // Set maxterm to max of abs(term) and expval.
+                // The expval term is needed since in some shells
+                // term may be very small due to coincidently small sf,
+                // even before convergence.
+                if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
+                if(expval>maxterm) {maxterm=expval;}
+                // ADD FORCES ???
+              } // If gsq>TOL
+            } // If to do only new shells (ig==gcnt)
+          } // ig0
+        } // ig1
       } // ig2
       gcnt++; // Add new shell
       if(maxterm<SUMTOL) {gcont=0;} // Do not add another shell
@@ -7080,8 +7078,8 @@ namespace pflow {
 // Gets real space energy.
 namespace pflow {
   double GetRealEner(const double& eta,const vector<double>& atchg,
-		     const double& vol,const matrix<double>& lat,
-		     const matrix<double>& atfpos,const double& SUMTOL) {
+      const double& vol,const matrix<double>& lat,
+      const matrix<double>& atfpos,const double& SUMTOL) {
     if(vol) {;} // phony just to keep vol busy
 
     double ereal=0;
@@ -7096,51 +7094,51 @@ namespace pflow {
       double maxterm=0;
       vector<int> ir(3);
       for(ir[0]=-rcnt;ir[0]<=rcnt;ir[0]++) {
-	for(ir[1]=-rcnt;ir[1]<=rcnt;ir[1]++) {
-	  for(ir[2]=-rcnt;ir[2]<=rcnt;ir[2]++) {
-	    if( (abs(ir[0])==rcnt) || (abs(ir[1])==rcnt) ||
-		 (abs(ir[2])==rcnt) || rcnt==1) { // Just does new shells
-	      for(int ia=0;ia<nat;ia++) { // All atoms in unit cell
-		for(int ja=0;ja<nat;ja++) { // All neighbors in cell given by ir
-		  // Get displacement between atoms ia(cell 0) and ja(cell ir).
-		  vector<double> disp=pflow::VVdiff(atfpos[ja],atfpos[ia]);
-		  disp=pflow::VVsum(disp,ir);
-		  disp=pflow::vecF2C(lat,disp);
-		  double dist=pflow::norm(disp);
-		  if(dist>TOL) { // Avoid atom dist to itself.
-		    erfcarg=rteta*dist;
-		    // Get erfcval.  In order not to get floating point
-		    // errors due to manipulating small numbers we must
-		    // not evaluate the erfc when it produces irrelevantly
-		    // small arguments.  This happens when
-		    // erfc(x)*abs(q) << eps (where safe eps=1e-30), or equivalently,
-		    // when ln(abs(q))-x^2-ln(x)-0.5*ln(pi) < ln(eps) (where I have
-		    // used the asymptotic form erfc(x)~e^-x^2/(x*rt(pi))
-		    // for large x.
-		    double erfcval;
-		    double term1=atchg[ia]*atchg[ja]/dist;
-		    double term2=0;
-		    if(abs(term1)>0) {
-		      term2=log(abs(term1))-erfcarg*erfcarg-log(erfcarg)-0.5*log(PI);
-		    }
-		    if(term2<log_eps) { // Avoids some floating point exceptions.
-		      erfcval=0;
-		    }
-		    else {
-		      erfcval=erfc(erfcarg);
-		    }
-		    // tpx
-		    // cout << "term1 erfcval " << term1 << " " << erfcval << endl;
-		    double term=term1*erfcval;
-		    ereal=ereal+term;
-		    if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
-		    // FORCES ???
-		  } // rdist>TOL
-		} // ja
-	      } // ia
-	    } // if to do only new shells (ir==rcnt)
-	  } // rg0
-	} // rg1
+        for(ir[1]=-rcnt;ir[1]<=rcnt;ir[1]++) {
+          for(ir[2]=-rcnt;ir[2]<=rcnt;ir[2]++) {
+            if( (abs(ir[0])==rcnt) || (abs(ir[1])==rcnt) ||
+                (abs(ir[2])==rcnt) || rcnt==1) { // Just does new shells
+              for(int ia=0;ia<nat;ia++) { // All atoms in unit cell
+                for(int ja=0;ja<nat;ja++) { // All neighbors in cell given by ir
+                  // Get displacement between atoms ia(cell 0) and ja(cell ir).
+                  vector<double> disp=pflow::VVdiff(atfpos[ja],atfpos[ia]);
+                  disp=pflow::VVsum(disp,ir);
+                  disp=pflow::vecF2C(lat,disp);
+                  double dist=pflow::norm(disp);
+                  if(dist>TOL) { // Avoid atom dist to itself.
+                    erfcarg=rteta*dist;
+                    // Get erfcval.  In order not to get floating point
+                    // errors due to manipulating small numbers we must
+                    // not evaluate the erfc when it produces irrelevantly
+                    // small arguments.  This happens when
+                    // erfc(x)*abs(q) << eps (where safe eps=1e-30), or equivalently,
+                    // when ln(abs(q))-x^2-ln(x)-0.5*ln(pi) < ln(eps) (where I have
+                    // used the asymptotic form erfc(x)~e^-x^2/(x*rt(pi))
+                    // for large x.
+                    double erfcval;
+                    double term1=atchg[ia]*atchg[ja]/dist;
+                    double term2=0;
+                    if(abs(term1)>0) {
+                      term2=log(abs(term1))-erfcarg*erfcarg-log(erfcarg)-0.5*log(PI);
+                    }
+                    if(term2<log_eps) { // Avoids some floating point exceptions.
+                      erfcval=0;
+                    }
+                    else {
+                      erfcval=erfc(erfcarg);
+                    }
+                    // tpx
+                    // cout << "term1 erfcval " << term1 << " " << erfcval << endl;
+                    double term=term1*erfcval;
+                    ereal=ereal+term;
+                    if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
+                    // FORCES ???
+                  } // rdist>TOL
+                } // ja
+              } // ia
+            } // if to do only new shells (ir==rcnt)
+          } // rg0
+        } // rg1
       } // rg2
       rcnt++; // Add new shell
       if(maxterm<SUMTOL) {rcont=0;} // Do not add another shell
@@ -7181,28 +7179,28 @@ namespace pflow {
       double maxterm=0;
       vector<int> ir(3);
       for(ir[0]=-rcnt;ir[0]<=rcnt;ir[0]++) {
-	for(ir[1]=-rcnt;ir[1]<=rcnt;ir[1]++) {
-	  for(ir[2]=-rcnt;ir[2]<=rcnt;ir[2]++) {
-	    if( (abs(ir[0])==rcnt) || (abs(ir[1])==rcnt) ||
-		 (abs(ir[2])==rcnt) || rcnt==1) { // Just does new shells
-	      for(int ia=0;ia<nat;ia++) { // All atoms in unit cell
-		for(int ja=0;ja<nat;ja++) { // All neighbors in cell given by ir
-		  // Get displacement between atoms ia(cell 0) and ja(cell ir).
-		  vector<double> disp=pflow::VVdiff(atfpos[ja],atfpos[ia]);
-		  disp=pflow::VVsum(disp,ir);
-		  disp=pflow::vecF2C(lat,disp);
-		  double dist=pflow::norm(disp);
-		  if(dist>TOL) { // Avoid atom dist to itself.
-		    double term=exp(-Ks*dist)*atchg[ia]*atchg[ja]/dist;
-		    ereal=ereal+term;
-		    if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
-		    // FORCES ???
-		  } // rdist>TOL
-		} // ja
-	      } // ia
-	    } // if to do only new shells (ir==rcnt)
-	  } // rg0
-	} // rg1
+        for(ir[1]=-rcnt;ir[1]<=rcnt;ir[1]++) {
+          for(ir[2]=-rcnt;ir[2]<=rcnt;ir[2]++) {
+            if( (abs(ir[0])==rcnt) || (abs(ir[1])==rcnt) ||
+                (abs(ir[2])==rcnt) || rcnt==1) { // Just does new shells
+              for(int ia=0;ia<nat;ia++) { // All atoms in unit cell
+                for(int ja=0;ja<nat;ja++) { // All neighbors in cell given by ir
+                  // Get displacement between atoms ia(cell 0) and ja(cell ir).
+                  vector<double> disp=pflow::VVdiff(atfpos[ja],atfpos[ia]);
+                  disp=pflow::VVsum(disp,ir);
+                  disp=pflow::vecF2C(lat,disp);
+                  double dist=pflow::norm(disp);
+                  if(dist>TOL) { // Avoid atom dist to itself.
+                    double term=exp(-Ks*dist)*atchg[ia]*atchg[ja]/dist;
+                    ereal=ereal+term;
+                    if(aurostd::abs(term)>maxterm) {maxterm=aurostd::abs(term);}
+                    // FORCES ???
+                  } // rdist>TOL
+                } // ja
+              } // ia
+            } // if to do only new shells (ir==rcnt)
+          } // rg0
+        } // rg1
       } // rg2
       rcnt++; // Add new shell
       if(maxterm<SUMTOL) {rcont=0;} // Do not add another shell
@@ -7243,18 +7241,18 @@ namespace pflow {
     int count=0, j=0; //count is the number of rows of kpoints
     while (getline(KPATH, line)) {
       if(aurostd::CountWordsinString(line)>=3) {
-	vector<double> kpt_tmp;
-	double a1, a2, a3;
-	string a5;
-	strline.clear();
-	strline.str(line);
-	strline >> a1 >> a2 >> a3 >> stmp >> a5;
-	kpt_tmp.push_back(a1);
-	kpt_tmp.push_back(a2);
-	kpt_tmp.push_back(a3);
-	kpoints.push_back(kpt_tmp);
-	kpointslabel.push_back(a5);
-	j++;
+        vector<double> kpt_tmp;
+        double a1, a2, a3;
+        string a5;
+        strline.clear();
+        strline.str(line);
+        strline >> a1 >> a2 >> a3 >> stmp >> a5;
+        kpt_tmp.push_back(a1);
+        kpt_tmp.push_back(a2);
+        kpt_tmp.push_back(a3);
+        kpoints.push_back(kpt_tmp);
+        kpointslabel.push_back(a5);
+        j++;
       }
       count =j;
     }
@@ -7281,29 +7279,29 @@ namespace pflow {
     //Sorting
     for (int i=0; i<(NKPOINTS-1); i++) {
       for (int j=i+1; j<NKPOINTS; j++) {
-	if(klinedistance[j] > klinedistance[i]) {
-	  //Sorting kline distance
-	  double tmp;
-	  tmp=klinedistance[i];
-	  klinedistance[i]=klinedistance[j];
-	  klinedistance[j]=tmp;
-	  //Meanwhile change the order of the kpoints label
-	  string kplabel_tmp;
-	  kplabel_tmp=kpointslabel[i];
-	  kpointslabel[i]=kpointslabel[j];
-	  kpointslabel[j]=kplabel_tmp;
-	  //Meanwhile change the order of the kpoints label
-	  double k0, k1, k2;
-	  k0=kpoints[i][0];
-	  k1=kpoints[i][1];
-	  k2=kpoints[i][3];
-	  kpoints[i][0]=kpoints[j][0];
-	  kpoints[i][1]=kpoints[j][1];
-	  kpoints[i][2]=kpoints[j][2];
-	  kpoints[j][0]=k0;
-	  kpoints[j][1]=k1;
-	  kpoints[j][2]=k2;
-	}
+        if(klinedistance[j] > klinedistance[i]) {
+          //Sorting kline distance
+          double tmp;
+          tmp=klinedistance[i];
+          klinedistance[i]=klinedistance[j];
+          klinedistance[j]=tmp;
+          //Meanwhile change the order of the kpoints label
+          string kplabel_tmp;
+          kplabel_tmp=kpointslabel[i];
+          kpointslabel[i]=kpointslabel[j];
+          kpointslabel[j]=kplabel_tmp;
+          //Meanwhile change the order of the kpoints label
+          double k0, k1, k2;
+          k0=kpoints[i][0];
+          k1=kpoints[i][1];
+          k2=kpoints[i][3];
+          kpoints[i][0]=kpoints[j][0];
+          kpoints[i][1]=kpoints[j][1];
+          kpoints[i][2]=kpoints[j][2];
+          kpoints[j][0]=k0;
+          kpoints[j][1]=k1;
+          kpoints[j][2]=k2;
+        }
       }
     }
     //Formating output
@@ -7318,11 +7316,11 @@ namespace pflow {
 
     for (int i=1; i<(NKPOINTS-1); i++) {
       if(kpointslabel[i].compare(kpointslabel[i-1])!=0) {
-	cout << kpoints[i][0] <<" ";
-	cout << kpoints[i][1] <<" ";
-	cout << kpoints[i][2]<<"  ";
-	cout << klinedistance[i] <<"   ";
-	cout << kpointslabel[i] << endl;
+        cout << kpoints[i][0] <<" ";
+        cout << kpoints[i][1] <<" ";
+        cout << kpoints[i][2]<<"  ";
+        cout << klinedistance[i] <<"   ";
+        cout << kpointslabel[i] << endl;
       }
     }
   }
@@ -7333,51 +7331,51 @@ namespace pflow {
 // prettyPrintCompound
 namespace pflow {
 
-static const double ZERO_TOL = 1E-8;  // from CHULL
+  static const double ZERO_TOL = 1E-8;  // from CHULL
 
-string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO190629
-  vector<double> vcomposition;
-  vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
-  return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO190629
-}
+  string prettyPrintCompound(const string& compound, vector_reduction_type vred, bool exclude1, filetype ftype) {  //char mode  //CO190629
+    vector<double> vcomposition;
+    vector<string> vspecies =  stringElements2VectorElements(compound, vcomposition);
+    return prettyPrintCompound(vspecies, vcomposition, vred, exclude1, ftype);  //mode  //CO190629
+  }
 
-// Moved here from the ConvexHull class
-string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO190629
-  return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO190629
-}
+  // Moved here from the ConvexHull class
+  string prettyPrintCompound(const vector<string>& vspecies,const vector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // overload //char mode //CO190629
+    return prettyPrintCompound(vspecies,aurostd::vector2xvector<double>(vcomposition),vred,exclude1,ftype); //mode //CO190629
+  }
 
-string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO19062
-  // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
-  string soliloquy="pflow::prettyPrintCompound():";
-  uint precision=COEF_PRECISION;
-  stringstream output;output.precision(precision);
-  if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}
-  // special case, unary
-  if(vspecies.size() == 1) {
-    output << vspecies[0];
-    if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
+  string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO19062
+    // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
+    string soliloquy="pflow::prettyPrintCompound():";
+    uint precision=COEF_PRECISION;
+    stringstream output;output.precision(precision);
+    if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vspecies.size() != vcomposition.rows", _INDEX_MISMATCH_);}
+    // special case, unary
+    if(vspecies.size() == 1) {
+      output << vspecies[0];
+      if(!exclude1) {output << (vred==gcd_vrt?1:vcomposition[vcomposition.lrows]);}
+      return output.str();
+    }
+    xvector<double> comp=vcomposition;
+    xvector<double> final_comp=comp; //DX 20191125
+    //DX 20191125 [OBSOLETE] if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
+    if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX 20191125 - new function form
+    else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
+    else if(vred==no_vrt){;}
+    else {throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+    if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
+    for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
+      output << vspecies[i];
+      if(!(exclude1 && aurostd::identical(final_comp[i+final_comp.lrows],1.0,ZERO_TOL))) {
+        if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
+        } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
+        output << final_comp[i+final_comp.lrows];
+        if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
+        else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
+      }
+    }
     return output.str();
   }
-  xvector<double> comp=vcomposition;
-  xvector<double> final_comp=comp; //DX 20191125
-  //DX 20191125 [OBSOLETE] if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
-  if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX 20191125 - new function form
-  else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
-  else if(vred==no_vrt){;}
-  else {throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Empty composition");}
-  for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
-    output << vspecies[i];
-    if(!(exclude1 && aurostd::identical(final_comp[i+final_comp.lrows],1.0,ZERO_TOL))) {
-      if(ftype==latex_ft) {output << "$_{"; //mode==_latex_ //CO190629
-      } else if(ftype==gnuplot_ft){output<< "_{";}  //mode==_gnuplot_ //CO190629
-      output << final_comp[i+final_comp.lrows];
-      if(ftype==latex_ft) {output << "}$";} //mode==_latex_ //CO190629
-      else if(ftype==gnuplot_ft){output<< "}";} //mode==_gnuplot_ //CO190629
-    }
-  }
-  return output.str();
-}
 }
 
 // ***************************************************************************

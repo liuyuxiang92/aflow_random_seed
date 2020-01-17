@@ -103,13 +103,13 @@
 
 //--------------------------------------------------------- extra on data types
 
-/* namespace aurostd { */
-/*   double atof(string str); */
-/*   int atoi(string str); */
-/*   long atol(string str); */
-/*   // long long atoll(string str); */
-/*   // long long atoq(string str); */
-/* } */
+// namespace aurostd {
+//   double atof(string str);
+//   int atoi(string str);
+//   long atol(string str);
+//   // long long atoll(string str);
+//   // long long atoq(string str);
+// }
 
 namespace aurostd {
   // namespace aurostd
@@ -145,7 +145,7 @@ namespace aurostd {
   void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance=0.01);  //CO191201
   void GCD(long double a,long double b,long double& gcd,long double tolerance=0.01);  //CO191201
   int LCM(int a,int b); //CO190520
-  
+
   template<class utype> bool _isinteger(utype,utype=(utype)0.01) __xprototype;  //CO191201
   //bool isinteger(bool x,bool tolerance=(bool)0.01); //CO191201
   //bool isinteger(char x,char tolerance=(char)0.01); //CO191201
@@ -178,10 +178,10 @@ namespace aurostd {
   template<class utype> utype angle(utype,utype,utype,utype) __xprototype;
   template<class utype> utype modulus(utype,utype,utype) __xprototype;
   template<class utype> utype modulus(utype,utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype round(utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype floor(utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype ceil(utype) __xprototype;
-// [OBSOLETE]  template<class utype> utype trunc(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype round(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype floor(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype ceil(utype) __xprototype;
+  // [OBSOLETE]  template<class utype> utype trunc(utype) __xprototype;
 
   double ln(double);
   float lnf(float);
@@ -469,19 +469,18 @@ namespace aurostd {
   template<class utype> bool isdifferent(const utype&,const utype&) __xprototype;
   template<class utype> bool isequal(const utype&,const utype&,const utype&) __xprototype;
   template<class utype> bool isequal(const utype&,const utype&) __xprototype;
-  /* with utype
-     template<class utype> bool identical(utype,utype,utype) __xprototype;
-     template<class utype> bool identical(utype,utype) __xprototype;
-     template<class utype> bool isdifferent(utype,utype,utype) __xprototype;
-     template<class utype> bool isdifferent(utype,utype) __xprototype;
-     template<class utype> bool isequal(utype,utype,utype) __xprototype;
-     template<class utype> bool isequal(utype,utype) __xprototype;
-  */
+  // with utype
+  //template<class utype> bool identical(utype,utype,utype) __xprototype;
+  //template<class utype> bool identical(utype,utype) __xprototype;
+  //template<class utype> bool isdifferent(utype,utype,utype) __xprototype;
+  //template<class utype> bool isdifferent(utype,utype) __xprototype;
+  //template<class utype> bool isequal(utype,utype,utype) __xprototype;
+  //template<class utype> bool isequal(utype,utype) __xprototype;
 }
 
 //--------------------------------------------------------------- extra min/max // __XEXTRA_MINMAX_CPP
 namespace aurostd {
- // namespace aurostd
+  // namespace aurostd
   template<class utype> utype min(utype,utype) __xprototype;  // __XEXTRA_MINMAX_CPP
   template<class utype> utype min(utype,utype,utype) __xprototype;  // __XEXTRA_MINMAX_CPP
   template<class utype> utype min(utype,utype,utype,utype) __xprototype;  // __XEXTRA_MINMAX_CPP

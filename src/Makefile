@@ -93,9 +93,9 @@ BACKUP=/common/AFLOW/SRC/
 
 # ME190823 - SQLite options
 # See https://www.sqlite.org/compile.html for compile-time options
-# The link recommends -DSQLITE-THREADSAFE=0, but that would disable
+# The link recommends -DSQLITE_THREADSAFE=0, but that would disable
 # all threading capabilities
-SQLITE_OPTS=-DSQLITE-THREADSAFE=1
+SQLITE_OPTS=-DSQLITE_THREADSAFE=1
 
 # Library MKL dynamic link
 #LIB_MKL= -L /opt/intel/mkl100/lib/32 -lmkl_lapack -lmkl_core -lmkl_intel -lmkl_sequential

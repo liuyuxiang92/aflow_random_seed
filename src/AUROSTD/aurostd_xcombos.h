@@ -23,7 +23,7 @@ namespace aurostd {
       int n_choices, m_choose;
       //[OBSOLETE ME180705]bool m_permutation; //otherwise combination
       bool m_sort;
-      
+
       bool m_started;
       bool m_exhausted; //all possibilities explored
       char m_mode; // C: combinations, E: enumeration, P: permutations,
@@ -38,7 +38,7 @@ namespace aurostd {
 
       //for enumerations
       std::vector<int> m_sets; 
-      
+
       void incrementPermutation();
       void incrementCombinations();
       void incrementEnumerations();
@@ -71,7 +71,7 @@ namespace aurostd {
       template<class utype> std::vector<utype> applyCombo(const std::vector<utype>& v_items) const;
       template<class utype> std::vector<utype> applyCombo(const std::vector<std::vector<utype> >& v_items) const;
       bool increment(); //nice wrapper for ++, returns m_exhausted
-    //NECESSARY PUBLIC CLASS METHODS - STOP
+      //NECESSARY PUBLIC CLASS METHODS - STOP
   };
 } // namespace aurostd
 

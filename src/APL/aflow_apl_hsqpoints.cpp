@@ -21,7 +21,7 @@ namespace apl
   // ***************************************************************************************
   PhononHSQpoints::~PhononHSQpoints()
   {
-     this->clear();
+    this->clear();
   }
   // ***************************************************************************************
   void PhononHSQpoints::clear()
@@ -65,59 +65,59 @@ namespace apl
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
     }
     while ( getline (in,line) )
-      {
-        if(line==""){
-        } else if(line[0]=='#'){
+    {
+      if(line==""){
+      } else if(line[0]=='#'){
         vector<string> vsr;
         apl::tokenize(line, vsr, string(" "));
-         xvector<double> tmp(3,1);
-         tmp[1]=atof(vsr[vsr.size()-3].c_str());
-         tmp[2]=atof(vsr[vsr.size()-2].c_str());
-         tmp[3]=atof(vsr[vsr.size()-1].c_str());
-         _hs_kpoints.push_back(tmp);
-        } else {
+        xvector<double> tmp(3,1);
+        tmp[1]=atof(vsr[vsr.size()-3].c_str());
+        tmp[2]=atof(vsr[vsr.size()-2].c_str());
+        tmp[3]=atof(vsr[vsr.size()-1].c_str());
+        _hs_kpoints.push_back(tmp);
+      } else {
         vector<string> vsr;
         apl::tokenize(line, vsr, string(" "));
-         if(vsr.size()!=5)
-         {
-            // ME190726 - exit clean-up
-            //_logger << apl::error << file<<" format error " << apl::endl; exit(0);
-            // ME191031 - use xerror
-            //throw APLRuntimeError("Format error in file " + file + ".");
-            string function = "PhononHSQpoints::read_qpointfile()";
-            string message = "Format error in file " + file + ".";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
-         }
-         xvector<double> tmp(3,1);
-         tmp[1]=atof(vsr[0].c_str());
-         tmp[2]=atof(vsr[1].c_str());
-         tmp[3]=atof(vsr[2].c_str());
-         _qpoints.push_back(tmp);
+        if(vsr.size()!=5)
+        {
+          // ME190726 - exit clean-up
+          //_logger << apl::error << file<<" format error " << apl::endl; exit(0);
+          // ME191031 - use xerror
+          //throw APLRuntimeError("Format error in file " + file + ".");
+          string function = "PhononHSQpoints::read_qpointfile()";
+          string message = "Format error in file " + file + ".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_WRONG_FORMAT_);
+        }
+        xvector<double> tmp(3,1);
+        tmp[1]=atof(vsr[0].c_str());
+        tmp[2]=atof(vsr[1].c_str());
+        tmp[3]=atof(vsr[2].c_str());
+        _qpoints.push_back(tmp);
         _path_segment.push_back(atoi(vsr[3].c_str()));
         _path.push_back(atof(vsr[4].c_str()));
-        }
       }
+    }
     in.close();
- }
+  }
   // ***************************************************************************************
-    vector<xvector<double> > PhononHSQpoints::get_qpoints()
-    {
-      return _qpoints;
-    }
+  vector<xvector<double> > PhononHSQpoints::get_qpoints()
+  {
+    return _qpoints;
+  }
   // ***************************************************************************************
-    vector<xvector<double> > PhononHSQpoints::get_hs_kpoints()
-    {
-      return _hs_kpoints;
-    }
+  vector<xvector<double> > PhononHSQpoints::get_hs_kpoints()
+  {
+    return _hs_kpoints;
+  }
   // ***************************************************************************************
-    vector<double> PhononHSQpoints::get_path()
-    {
-      return _path;
-    }
+  vector<double> PhononHSQpoints::get_path()
+  {
+    return _path;
+  }
   // ***************************************************************************************
-    vector<int> PhononHSQpoints::get_path_segment()
-    {
-      return _path_segment;
-    }
+  vector<int> PhononHSQpoints::get_path_segment()
+  {
+    return _path_segment;
+  }
   // ***************************************************************************************
 }

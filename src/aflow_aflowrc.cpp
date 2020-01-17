@@ -698,7 +698,7 @@
 #define         DEFAULT_AGL_WRITE_GIBBS_INPUT                 XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_WRITE_GIBBS_INPUT")
 #define AFLOWRC_DEFAULT_AGL_PLOT_RESULTS                      FALSE
 #define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
-  
+
 // CORES // DONE
 #define AFLOWRC_AFLOW_CORE_TEMPERATURE_BEEP                   56.0    // Celsius
 #define         AFLOW_CORE_TEMPERATURE_BEEP                   XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_BEEP") 
@@ -852,7 +852,7 @@
 #define         MPI_COMMAND_MACHINE2                          XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE2")
 #define AFLOWRC_MPI_BINARY_DIR_MACHINE2                       string("/home/aflow/bin/")  // future expansions
 #define         MPI_BINARY_DIR_MACHINE2                       XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE2")
- 
+
 #endif // _AFLOW_AFLOWRC_H_
 
 // POCC STUFF
@@ -879,14 +879,14 @@ namespace aflowrc {
     for(uint i=0;i<XHOST.vaflowrc.size()&&!found;i++) {
       aurostd::string2tokens(XHOST.vaflowrc.at(i),tokens,"=");
       if(tokens.size()>0&&!found) {
-	if(aurostd::RemoveWhiteSpaces(tokens.at(0))==schema&&!found) {
-    //CO181226 - it is possible to have '=' inside value: MPI_START_DEFAULT="export OMP_NUM_THREADS=1"
-    //treat tokens[0] as special
-    tokens.erase(tokens.begin()); //remove key
-	  found=TRUE; aus=aurostd::RemoveWhiteSpacesFromTheBack(aurostd::joinWDelimiter(tokens,"="));  //CO 180705 - if there are spaces between ="" and //, then the value is set to the spaces (not an empty string!)  //CO181226 - join again by '='
-	  aurostd::string2tokens(aus,tokens,"\""); //	    if(tokens.size()>0) cerr << tokens.at(0) << endl;
-	  if(tokens.size()>0) string_to_add=tokens.at(0);
-	}
+        if(aurostd::RemoveWhiteSpaces(tokens.at(0))==schema&&!found) {
+          //CO181226 - it is possible to have '=' inside value: MPI_START_DEFAULT="export OMP_NUM_THREADS=1"
+          //treat tokens[0] as special
+          tokens.erase(tokens.begin()); //remove key
+          found=TRUE; aus=aurostd::RemoveWhiteSpacesFromTheBack(aurostd::joinWDelimiter(tokens,"="));  //CO 180705 - if there are spaces between ="" and //, then the value is set to the spaces (not an empty string!)  //CO181226 - join again by '='
+          aurostd::string2tokens(aus,tokens,"\""); //	    if(tokens.size()>0) cerr << tokens.at(0) << endl;
+          if(tokens.size()>0) string_to_add=tokens.at(0);
+        }
       }
     }
     // fix ~/ with XHOST.user
@@ -895,13 +895,13 @@ namespace aflowrc {
     return found;
   }
   template<class utype> 
-  bool load_default(string schema,utype schema_default) {
-    bool found=XHOST.adefault.args2addattachedscheme(XHOST.vaflowrc,schema,string(schema+"="),""); // add what is present
-    if(!found) XHOST.adefault.push_attached(schema,aurostd::utype2string<utype>(schema_default));  // add default if not present
-    return found;
-  }
+    bool load_default(string schema,utype schema_default) {
+      bool found=XHOST.adefault.args2addattachedscheme(XHOST.vaflowrc,schema,string(schema+"="),""); // add what is present
+      if(!found) XHOST.adefault.push_attached(schema,aurostd::utype2string<utype>(schema_default));  // add default if not present
+      return found;
+    }
 }
-  
+
 // ***************************************************************************
 // aflowrc::is_available
 // ***************************************************************************
@@ -969,8 +969,8 @@ namespace aflowrc {
 
     if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)) 
       if(!aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN"))
-	 cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
-	 
+        cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
+
     aurostd::file2string(XHOST.aflowrc_filename,XHOST.aflowrc_content);
     // oss << "BEGIN" << endl << XHOST.aflowrc_content << "END" << endl;
     // XHOST.aflowrc_content=aurostd::RemoveComments(XHOST.aflowrc_content); // NOW Clean XHOST.aflowrc_content
@@ -1044,7 +1044,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AFLOW_FROZSL_MODES_OUT",AFLOWRC_DEFAULT_AFLOW_FROZSL_MODES_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_FROZSL_EIGEN_OUT",AFLOWRC_DEFAULT_AFLOW_FROZSL_EIGEN_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_END_OUT",AFLOWRC_DEFAULT_AFLOW_END_OUT);
-    
+
     // DEFAULT GENERIC MPI
     aflowrc::load_default("MPI_START_DEFAULT",AFLOWRC_MPI_START_DEFAULT); 
     aflowrc::load_default("MPI_STOP_DEFAULT",AFLOWRC_MPI_STOP_DEFAULT); 
@@ -1061,7 +1061,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP5_MPI_BIN",AFLOWRC_DEFAULT_VASP5_MPI_BIN); 
     // BINARY AIMS
     aflowrc::load_default("DEFAULT_AIMS_BIN",AFLOWRC_DEFAULT_AIMS_BIN); 
-    
+
     // POTCARS
     aflowrc::load_default("DEFAULT_VASP_POTCAR_DIRECTORIES",AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES); 
     aflowrc::load_default("DEFAULT_VASP_POTCAR_DATE",AFLOWRC_DEFAULT_VASP_POTCAR_DATE); 
@@ -1076,7 +1076,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE",AFLOWRC_DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE);
     aflowrc::load_default("DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN",AFLOWRC_DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN);
     aflowrc::load_default("DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN",AFLOWRC_DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN);
-    
+
     // DEFAULT KPOINTS/DOS
     aflowrc::load_default("DEFAULT_BANDS_GRID",AFLOWRC_DEFAULT_BANDS_GRID); 
     aflowrc::load_default("DEFAULT_BANDS_LATTICE",AFLOWRC_DEFAULT_BANDS_LATTICE); 
@@ -1134,7 +1134,7 @@ namespace aflowrc {
     // AFLOW_LIBRARY AFLOW_PROJECT
     aflowrc::load_default("DEFAULT_AFLOW_LIBRARY_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES);
     aflowrc::load_default("DEFAULT_AFLOW_PROJECTS_DIRECTORIES",AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES);
-    
+
     // DEFAULT PLATON/FINDSYM
     aflowrc::load_default("DEFAULT_PLATON_P_EQUAL",AFLOWRC_DEFAULT_PLATON_P_EQUAL);
     aflowrc::load_default("DEFAULT_PLATON_P_EXACT",AFLOWRC_DEFAULT_PLATON_P_EXACT);
@@ -1157,7 +1157,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_GNUPLOT_GREEK_FONT_BOLD",AFLOWRC_DEFAULT_GNUPLOT_GREEK_FONT_BOLD); 
     aflowrc::load_default("DEFAULT_GNUPLOT_GREEK_FONT_ITALICS",AFLOWRC_DEFAULT_GNUPLOT_GREEK_FONT_ITALICS); 
     aflowrc::load_default("DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS",AFLOWRC_DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS); 
- 
+
     // DEFAULT CHULL
     aflowrc::load_default("DEFAULT_CHULL_ALLOWED_DFT_TYPES",AFLOWRC_DEFAULT_CHULL_ALLOWED_DFT_TYPES); 
     aflowrc::load_default("DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES",AFLOWRC_DEFAULT_CHULL_ALLOW_ALL_FORMATION_ENERGIES); 
@@ -1254,12 +1254,12 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
     aflowrc::load_default("DEFAULT_APL_HSKPTS_FILE",AFLOWRC_DEFAULT_APL_HSKPTS_FILE);
-// ME190614 - START
+    // ME190614 - START
     aflowrc::load_default("DEFAULT_APL_PHDOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE);
     aflowrc::load_default("DEFAULT_APL_PHPOSCAR_FILE",AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE);
     aflowrc::load_default("DEFAULT_APL_PHKPOINTS_FILE",AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE);
     aflowrc::load_default("DEFAULT_APL_PHEIGENVAL_FILE",AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE);
-// ME190614 - END
+    // ME190614 - END
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
     aflowrc::load_default("DEFAULT_AAPL_BTE",AFLOWRC_DEFAULT_AAPL_BTE);
@@ -1291,7 +1291,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AAPL_BOUNDARY_FILE",AFLOWRC_DEFAULT_AAPL_BOUNDARY_FILE);
     aflowrc::load_default("DEFAULT_AAPL_TCOND_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_FILE);
     //aflowrc::load_default("DEFAULT_AAPL_TCOND_PLOT_FILE",AFLOWRC_DEFAULT_AAPL_TCOND_PLOT_FILE);  OBSOLETE ME191104
- 
+
     // DEFAULT AEL
     //// DEFAULT AEL STRAIN CALCS
     aflowrc::load_default("DEFAULT_AEL_STRAIN_SYMMETRY",AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY);
@@ -1341,7 +1341,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AGL_HUGONIOT_CALC",AFLOWRC_DEFAULT_AGL_HUGONIOT_CALC);
     aflowrc::load_default("DEFAULT_AGL_HUGONIOT_EXTRAPOLATE",AFLOWRC_DEFAULT_AGL_HUGONIOT_EXTRAPOLATE);
     aflowrc::load_default("DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE",AFLOWRC_DEFAULT_AGL_RUN_ALL_PRESSURE_TEMPERATURE);
-    
+
     //// DEFAULT AGL OUTPUT FILES
     aflowrc::load_default("DEFAULT_AGL_FILE_PREFIX",AFLOWRC_DEFAULT_AGL_FILE_PREFIX);
     aflowrc::load_default("DEFAULT_AGL_WRITE_FULL_RESULTS",AFLOWRC_DEFAULT_AGL_WRITE_FULL_RESULTS);
@@ -1388,7 +1388,7 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_MACHINE001",AFLOWRC_MPI_COMMAND_MACHINE001); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE001",AFLOWRC_MPI_BINARY_DIR_MACHINE001); 
     //DX 20190509 - MACHINE001 - END
-    
+
     //DX 20190509 - MACHINE002 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE002",AFLOWRC_MPI_OPTIONS_MACHINE002);
     aflowrc::load_default("MPI_COMMAND_MACHINE002",AFLOWRC_MPI_COMMAND_MACHINE002);
@@ -1436,7 +1436,7 @@ namespace aflowrc {
     aflowrc::load_default("MPI_OPTIONS_MACHINE2",AFLOWRC_MPI_OPTIONS_MACHINE2); 
     aflowrc::load_default("MPI_COMMAND_MACHINE2",AFLOWRC_MPI_COMMAND_MACHINE2); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE2",AFLOWRC_MPI_BINARY_DIR_MACHINE2); 
-    
+
     if(LDEBUG) oss << "aflowrc::read: END" << endl;
 
     return TRUE;
@@ -1546,7 +1546,7 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_DEFAULT=\"" << AFLOWRC_MPI_COMMAND_DEFAULT << "\"" << endl;
     aflowrc << "MPI_NCPUS_DEFAULT=" << AFLOWRC_MPI_NCPUS_DEFAULT << endl;
     aflowrc << "MPI_NCPUS_MAX=" << AFLOWRC_MPI_NCPUS_MAX << endl;
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS BINARY" << endl;
     aflowrc << "DEFAULT_VASP_GAMMA_BIN=\"" << AFLOWRC_DEFAULT_VASP_GAMMA_BIN << "\"" << endl;
@@ -1556,7 +1556,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_VASP5_BIN=\"" << AFLOWRC_DEFAULT_VASP5_BIN << "\"" << endl;
     aflowrc << "DEFAULT_VASP5_MPI_BIN=\"" << AFLOWRC_DEFAULT_VASP5_MPI_BIN << "\"" << endl;
     aflowrc << "DEFAULT_AIMS_BIN=\"" << AFLOWRC_DEFAULT_AIMS_BIN << "\"" << endl;
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POTCARS" << endl;
     aflowrc << "DEFAULT_VASP_POTCAR_DIRECTORIES=\"" << AFLOWRC_DEFAULT_VASP_POTCAR_DIRECTORIES << "\"" << endl;
@@ -1635,7 +1635,7 @@ namespace aflowrc {
     aflowrc << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     aflowrc << "DEFAULT_AFLOW_LIBRARY_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_PROJECTS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULT PLATON/FINDSYM" << endl;
     aflowrc << "DEFAULT_PLATON_P_EQUAL=" << AFLOWRC_DEFAULT_PLATON_P_EQUAL << endl;
@@ -1660,7 +1660,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_GNUPLOT_GREEK_FONT_BOLD=\"" << AFLOWRC_DEFAULT_GNUPLOT_GREEK_FONT_BOLD << "\"" << endl;
     aflowrc << "DEFAULT_GNUPLOT_GREEK_FONT_ITALICS=\"" << AFLOWRC_DEFAULT_GNUPLOT_GREEK_FONT_ITALICS << "\"" << endl;
     aflowrc << "DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS=\"" << AFLOWRC_DEFAULT_GNUPLOT_GREEK_FONT_BOLD_ITALICS << "\"" << endl;
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS CHULL" << endl;
     aflowrc << "DEFAULT_CHULL_ALLOWED_DFT_TYPES=\"" << AFLOWRC_DEFAULT_CHULL_ALLOWED_DFT_TYPES << "\"  // comma-separated list of dft_types to include (string match)" << endl;
@@ -1699,11 +1699,11 @@ namespace aflowrc {
     aflowrc << " " << endl; //CO190628
     aflowrc << "// DEFAULTS GFA" << endl; //CO190628
     aflowrc << "DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF=" << AFLOWRC_DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << " // DOUBLE in eV" << endl; //CO190628
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS ARUN" << endl;
     aflowrc << "ARUN_DIRECTORY_PREFIX=\"" << AFLOWRC_ARUN_DIRECTORY_PREFIX << "\"" << endl;
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POCC" << endl;
     aflowrc << "DEFAULT_POCC_TEMPERATURE_STRING=\"" << AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
@@ -1721,7 +1721,7 @@ namespace aflowrc {
     aflowrc << "POCC_ALL_SITE_CONFIGURATIONS_FILE=\"" << AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     aflowrc << "POCC_OUT_FILE=\"" << AFLOWRC_POCC_OUT_FILE << "\"" << endl;
     aflowrc << "POCC_DOSCAR_FILE=\"" << AFLOWRC_POCC_DOSCAR_FILE << "\"" << endl;
-    
+
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS APL" << endl;
     aflowrc << "DEFAULT_APL_PREC=\"" << AFLOWRC_DEFAULT_APL_PREC << "\"" << endl;
@@ -1757,12 +1757,12 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HSKPTS_FILE=\"" << AFLOWRC_DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
-// ME190614 - START
+    // ME190614 - START
     aflowrc << "DEFAULT_APL_PHDOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHPOSCAR_FILE=\"" << AFLOWRC_DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHKPOINTS_FILE=\"" << AFLOWRC_DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PHEIGENVAL_FILE=\"" << AFLOWRC_DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
-// ME190614 - END
+    // ME190614 - END
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
@@ -1885,7 +1885,7 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_MACHINE001=\"" << AFLOWRC_MPI_COMMAND_MACHINE001 << "\"" << "// MACHINE001" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE001=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE001 << "\"" << "// MACHINE001" << endl; 
     //DX 20190509 - MACHINE001 - END
-    
+
     //DX 20190509 - MACHINE002 - START
     aflowrc << "MPI_OPTIONS_MACHINE002=\"" << AFLOWRC_MPI_OPTIONS_MACHINE002 << "\"" << "// MACHINE002" << endl;
     aflowrc << "MPI_COMMAND_MACHINE002=\"" << AFLOWRC_MPI_COMMAND_MACHINE002 << "\"" << "// MACHINE002" << endl;
@@ -1934,14 +1934,14 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_MACHINE2=\"" << AFLOWRC_MPI_COMMAND_MACHINE2 << "\"" << "  // MACHINE2" << endl;
     aflowrc << "MPI_BINARY_DIR_MACHINE2=\"" << AFLOWRC_MPI_BINARY_DIR_MACHINE2 << "\"" << "  // MACHINE2" << endl; 
 
-   
+
     aflowrc << " " << endl;
     aflowrc << "// ****************************************************************************************************" << endl;
-  
+
     //   XHOST.DEBUG=TRUE;
     //[CO190808 - issue this ONLY if it was written, should fix www-data]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
-      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO190808 - issue this ONLY if it was written, should fix www-data}
+      cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO190808 - issue this ONLY if it was written, should fix www-data
     }
     if(LDEBUG) oss << "aflowrc::write_default: END" << endl;
     //    exit(0);
@@ -2040,7 +2040,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP5_BIN\")=\"" << DEFAULT_VASP5_BIN << "\""   << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP5_MPI_BIN\")=\"" << DEFAULT_VASP5_MPI_BIN << "\""   << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AIMS_BIN\")=\"" << DEFAULT_AIMS_BIN << "\""   << endl;
- 
+
     if(LDEBUG) oss << "// DEFAULTS POTCARS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_POTCAR_DIRECTORIES\")=\"" << DEFAULT_VASP_POTCAR_DIRECTORIES << "\""   << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_POTCAR_DATE\")=\"" << DEFAULT_VASP_POTCAR_DATE << "\""   << endl;
@@ -2055,7 +2055,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE\")=\"" << DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE << "\""   << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN\")=\"" << DEFAULT_VASP_POTCAR_DIR_POTPAW_LDA_KIN << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"VASP_PSEUDOPOTENTIAL_DIRECTORY_POTPAW_PBE_KIN_\")=\"" << DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN << "\"" << endl;
-    
+
     if(LDEBUG) oss << "// DEFAULT KPOINTS/DOS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_BANDS_GRID\")=" << DEFAULT_BANDS_GRID << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_BANDS_LATTICE\")=\"" << DEFAULT_BANDS_LATTICE << "\""   << endl;
@@ -2113,7 +2113,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "// AFLOW_LIBRARY AFLOW_PROJECT" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_LIBRARY_DIRECTORIES\")=\"" << DEFAULT_AFLOW_LIBRARY_DIRECTORIES << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PROJECTS_DIRECTORIES\")=\"" << DEFAULT_AFLOW_PROJECTS_DIRECTORIES << "\"" << endl;
-    
+
     if(LDEBUG) oss << "// DEFAULT PLATON/FINDSYM" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_PLATON_P_EQUAL\")=" << DEFAULT_PLATON_P_EQUAL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_PLATON_P_EXACT\")=" << DEFAULT_PLATON_P_EXACT << endl;
@@ -2170,13 +2170,13 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_CHULL_LATEX_ROTATE_LABELS\")=" << DEFAULT_CHULL_LATEX_ROTATE_LABELS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_LATEX_BOLD_LABELS\")=" << DEFAULT_CHULL_LATEX_BOLD_LABELS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_CHULL_PNG_RESOLUTION\")=" << DEFAULT_CHULL_PNG_RESOLUTION << endl;
-    
+
     if(LDEBUG) oss << "// DEFAULTS GFA" << endl;  //CO190628
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF\")=" << DEFAULT_GFA_FORMATION_ENTHALPY_CUTOFF << endl;  //CO190628
-    
+
     if(LDEBUG) oss << "// DEFAULTS ARUN" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
-    
+
     if(LDEBUG) oss << "// DEFAULTS POCC" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_TEMPERATURE_STRING\")=\"" << DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_SITE_TOL\")=" << DEFAULT_POCC_SITE_TOL << endl;
@@ -2193,7 +2193,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SITE_CONFIGURATIONS_FILE\")=\"" << POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_OUT_FILE\")=\"" << POCC_OUT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_DOSCAR_FILE\")=\"" << POCC_DOSCAR_FILE << "\"" << endl;
-    
+
     if(LDEBUG) oss << "// DEFAULTS APL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PREC\")=\"" << DEFAULT_APL_PREC << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_ENGINE\")=\"" << DEFAULT_APL_ENGINE << "\"" << endl;
@@ -2228,12 +2228,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HSKPTS_FILE\")=\"" << DEFAULT_APL_HSKPTS_FILE << "\"" << endl;
-// ME190614 - START
+    // ME190614 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHDOSCAR_FILE\")=\"" << DEFAULT_APL_PHDOSCAR_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHPOSCAR_FILE\")=\"" << DEFAULT_APL_PHPOSCAR_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHKPOINTS_FILE\")=\"" << DEFAULT_APL_PHKPOINTS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PHEIGENVAL_FILE\")=\"" << DEFAULT_APL_PHEIGENVAL_FILE << "\"" << endl;
-// ME190614 - END
+    // ME190614 - END
 
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
@@ -2264,7 +2264,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BOUNDARY_FILE\")=\"" << DEFAULT_AAPL_BOUNDARY_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_FILE\")=\"" << DEFAULT_AAPL_TCOND_FILE << "\"" << endl;
     //if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_TCOND_PLOT_FILE\")=\"" << DEFAULT_AAPL_TCOND_PLOT_FILE << "\"" << endl;  OBSOLETE ME190411
-    
+
     if(LDEBUG) oss << "// DEFAULTS AEL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_STRAIN_SYMMETRY\")=" << AFLOWRC_DEFAULT_AEL_STRAIN_SYMMETRY << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AEL_NNORMAL_STRAINS\")=" << AFLOWRC_DEFAULT_AEL_NNORMAL_STRAINS << endl;
@@ -2311,7 +2311,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_DIRNAME_ARUN\")=" << AFLOWRC_DEFAULT_AGL_DIRNAME_ARUN << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_GIBBS_INPUT\")=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_PLOT_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
-    
+
     if(LDEBUG) oss << "// DEFAULT CORE" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_BEEP\")=" << AFLOW_CORE_TEMPERATURE_BEEP << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
@@ -2351,13 +2351,13 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE001\")=\"" << MPI_COMMAND_MACHINE001 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE001\")=\"" << MPI_BINARY_DIR_MACHINE001 << "\"" << endl;
     //DX 20190509 - MACHINE001 - END
-    
+
     //DX 20190509 - MACHINE002 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE002\")=\"" << MPI_OPTIONS_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MACHINE002\")=\"" << MPI_COMMAND_MACHINE002 << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE002\")=\"" << MPI_BINARY_DIR_MACHINE002 << "\"" << endl;
     //DX 20190509 - MACHINE002 - END
-    
+
     //DX 20190107 - CMU EULER - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_CMU_EULER\")=\"" << MPI_OPTIONS_CMU_EULER << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_CMU_EULER\")=\"" << MPI_COMMAND_CMU_EULER << "\"" << endl;
@@ -2369,7 +2369,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"MPI_NCPUS_MPCDF_EOS\")=\"" << MPI_NCPUS_MPCDF_EOS << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype(\"MPI_HYPERTHREADING_MPCDF_EOS\")=\"" << MPI_HYPERTHREADING_MPCDF_EOS << "\"" << "            // FALSE/OFF, IGNORE/NEGLECT, TRUE/ON " << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MPCDF_EOS\")=\"" << MPI_BINARY_DIR_MPCDF_EOS << "\"" << endl;
-    
+
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MPCDF_DRACO\")=\"" << MPI_OPTIONS_MPCDF_DRACO << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_MPCDF_DRACO\")=\"" << MPI_COMMAND_MPCDF_DRACO << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"MPI_NCPUS_MPCDF_DRACO\")=\"" << MPI_NCPUS_MPCDF_DRACO << "\"" << endl;
@@ -2401,7 +2401,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_MACHINE2\")=\"" << MPI_BINARY_DIR_MACHINE2 << "\"" << endl;
 
     //   if(LDEBUG) oss << "XHOST.adefault.content=" << XHOST.adefault.content_string << endl;
-    
+
     if(LDEBUG) oss << "aflowrc::print_aflowrc: END" << endl;
 
     oss.flush();

@@ -17,15 +17,13 @@
 #endif
 
 // ----------------------------------------------------------------------------
-/*
-  namespace aurostd {
-  template<class utype> utype                        
-  nint(utype x) {
-  if(x>=0) return (int)(x+0.5);
-  else return (int)(x-0.5);
-  }
-  }
-*/
+//namespace aurostd {
+//template<class utype> utype                        
+//nint(utype x) {
+//if(x>=0) return (int)(x+0.5);
+//else return (int)(x-0.5);
+//}
+//}
 
 // namespace aurostd {
 //   double atof(string str) { return atof(str.c_str());}
@@ -184,8 +182,8 @@ namespace aurostd {
   double abs(double x) { return (double) std::fabs(x);}
   long int abs(long int x) { return (long int) std::labs(x);}
   long long int abs(long long int x) { return (long long int) std::llabs(x);}
-  unsigned long int abs(unsigned long int x) { return (unsigned long int) x;} //std::llabs(x);}  //CO, unsigned is already abs
-  unsigned long long int abs(unsigned long long int x) { return (unsigned long long int) x;} //std::llabs(x);}  //CO, unsigned is already abs
+  unsigned long int abs(unsigned long int x) { return (unsigned long int) x;} //std::llabs(x);  //CO, unsigned is already abs
+  unsigned long long int abs(unsigned long long int x) { return (unsigned long long int) x;} //std::llabs(x);  //CO, unsigned is already abs
   long double abs(long double x) { return (long double) fabsl(x);}
 #ifdef _AUROSTD_XCOMPLEX_
   float abs(xcomplex<float> x) { return (float) sqrtf(x.re*x.re+x.im*x.im);}
@@ -348,10 +346,10 @@ namespace aurostd {
   //}
   // namespace aurostd
   template<class utype>
-  utype nint(utype x) {
-    if(x>=0) return (utype) std::floor((double)   x+0.5);
-    else      return (utype) -std::floor((double) -x+0.5);
-  }
+    utype nint(utype x) {
+      if(x>=0) return (utype) std::floor((double)   x+0.5);
+      else      return (utype) -std::floor((double) -x+0.5);
+    }
   char nint(char x) {
     return (char) x;
   }
@@ -375,33 +373,33 @@ namespace aurostd {
   long int nint(long int x) {
     if(x>=0) return (long int) std::floor((double)   x+0.5);
     else      return (long int) -std::floor((double) -x+0.5);
-}
+  }
   long long int nint(long long int x) {
     if(x>=0) return (long long int) std::floor((double)   x+0.5);
     else      return (long long int) -std::floor((double) -x+0.5);
-}
+  }
   long long unsigned int nint(long long unsigned int x) {
     return (long long unsigned int) std::floor((double)   x+0.5);
     //if(x>=0) return (long long int) std::floor((double)   x+0.5);//CO 180719
     //else      return (long long int) -std::floor((double) -x+0.5);//CO 180719
-}
+  }
   long double nint(long double x) {
     if(x>=0) return (long double) std::floor((double)   x+0.5);
     else      return (long double) -std::floor((double) -x+0.5);
-}
+  }
 }
 
 // ***************************************************************************
 // Function GCD
 // ***************************************************************************
 namespace aurostd {
-//CO191112 - extended GCD, get Bezout coefficients
-//algorithm inspired by python solution of https://brilliant.org/wiki/extended-euclidean-algorithm/
-//ax+by=gcd(a,b)
-//a=Z,b=0;gcd=Z;x=1;y=0;
-//a=0,b=Z;gcd=Z;x=0;y=1;
-//a=0,b=0;gcd=undefined;x=undefined;y=undefined  //all integers are common divisors of 0 and 0, so there is no greatest one.
-//note this implementation gives different results from matlab for gcd(1,1): either x or y can be 1, the other is zero
+  //CO191112 - extended GCD, get Bezout coefficients
+  //algorithm inspired by python solution of https://brilliant.org/wiki/extended-euclidean-algorithm/
+  //ax+by=gcd(a,b)
+  //a=Z,b=0;gcd=Z;x=1;y=0;
+  //a=0,b=Z;gcd=Z;x=0;y=1;
+  //a=0,b=0;gcd=undefined;x=undefined;y=undefined  //all integers are common divisors of 0 and 0, so there is no greatest one.
+  //note this implementation gives different results from matlab for gcd(1,1): either x or y can be 1, the other is zero
   template<class utype>
     void _GCD(utype a,utype b,utype& gcd,utype& x,utype& y){ //CO180409
       if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
@@ -515,7 +513,7 @@ namespace aurostd {
 //     if(aurostd::abs(x-((utype)aurostd::nint(x)))<0.01) return TRUE;
 //     return FALSE;
 //   }
-  
+
 //   // bool _aurostd_initialize_isinteger(bool x) { return isinteger(x);}
 //   // bool _aurostd_initialize_isinteger(char x) { return isinteger(x);}
 //   bool _aurostd_initialize_isinteger(int x) { return isinteger(x);}
@@ -580,7 +578,7 @@ namespace aurostd {
 // ***************************************************************************
 namespace aurostd {
   template<class utype> bool _iszero(utype a,utype tol) {return abs(a) <= tol;}  //CO191201
-  
+
   //bool iszero(bool x,bool tolerance){return _iszero(x,tolerance);}  //CO191201
   //bool iszero(char x,char tolerance){return _iszero(x,tolerance);}  //CO191201
   bool iszero(uint x,uint){return (bool) x==(uint)0;}  //CO191201
@@ -606,14 +604,14 @@ namespace aurostd {
     }
     return TRUE;
   }
-  
+
   template<class utype>
-  utype factorial(utype x) {
-    utype out=1;  
-    for(int i=1;(utype) i<=x;i++) out=out*(utype) i;
-    return out;
-  }
-  
+    utype factorial(utype x) {
+      utype out=1;  
+      for(int i=1;(utype) i<=x;i++) out=out*(utype) i;
+      return out;
+    }
+
   bool _aurostd_initialize_factorial(bool x) { return factorial(x);}
   char _aurostd_initialize_factorial(char x) { return factorial(x);}
   int _aurostd_initialize_factorial(int x) { return factorial(x);}
@@ -636,7 +634,7 @@ namespace aurostd {
   long long int _aurostd_initialize_fact(long long int x) { return fact(x);}
   unsigned long long int _aurostd_initialize_fact(unsigned long long int x) { return fact(x);}
   long double _aurostd_initialize_fact(long double x) { return fact(x);}
-  
+
 }
 
 
@@ -671,20 +669,20 @@ namespace aurostd {
 namespace aurostd {
   // namespace aurostd
   template<class utype>
-  bool _isodd(utype x) {
-    if(_isfloat(x)) {
-      cerr << _AUROSTD_XLIBS_ERROR_ << " _isodd implemented only for integers !" << endl;
-      exit(0);
+    bool _isodd(utype x) {
+      if(_isfloat(x)) {
+        cerr << _AUROSTD_XLIBS_ERROR_ << " _isodd implemented only for integers !" << endl;
+        exit(0);
+      }
+      if(!mod(x,(utype) 2)) return FALSE;
+      else return TRUE;
     }
-    if(!mod(x,(utype) 2)) return FALSE;
-    else return TRUE;
-  }
   bool _isodd(int x) {
-     if(!mod(x,(int) 2)) return FALSE;
+    if(!mod(x,(int) 2)) return FALSE;
     else return TRUE;
   }
   bool _isodd(uint x) {
-     if(!mod(x,(uint) 2)) return FALSE;
+    if(!mod(x,(uint) 2)) return FALSE;
     else return TRUE;
   }
   bool _isodd(long int x) {
@@ -707,14 +705,14 @@ namespace aurostd {
 namespace aurostd {
   // namespace aurostd
   template<class utype>
-  bool _iseven(utype x) {
-    if(_isfloat(x)) {
-      cerr << _AUROSTD_XLIBS_ERROR_ << " _iseven implemented only for integers !" << endl;
-      exit(0);
+    bool _iseven(utype x) {
+      if(_isfloat(x)) {
+        cerr << _AUROSTD_XLIBS_ERROR_ << " _iseven implemented only for integers !" << endl;
+        exit(0);
+      }
+      if(mod(x,(utype) 2)) return FALSE;
+      else return TRUE;
     }
-    if(mod(x,(utype) 2)) return FALSE;
-    else return TRUE;
-  }
   bool _iseven(int x) {
     if(mod(x,(int) 2)) return FALSE;
     else return TRUE;
@@ -742,24 +740,24 @@ namespace aurostd {
 namespace aurostd {
   // namespace aurostd
   template<class utype>
-  utype angle(utype x1,utype x2,utype x3,utype y1,utype y2,utype y3) {
-    return (utype) std::acos((x1*y1+x2*y2+x3*y3)/(std::sqrt(x1*x1+x2*x2+x3*x3)*std::sqrt(y1*y1+y2*y2+y3*y3)))*rad2deg;
-  }
+    utype angle(utype x1,utype x2,utype x3,utype y1,utype y2,utype y3) {
+      return (utype) std::acos((x1*y1+x2*y2+x3*y3)/(std::sqrt(x1*x1+x2*x2+x3*x3)*std::sqrt(y1*y1+y2*y2+y3*y3)))*rad2deg;
+    }
 
   template<class utype>
-  utype angle(utype x1,utype x2,utype y1,utype y2) {
-    return (utype) std::acos((x1*y1+x2*y2)/(std::sqrt(x1*x1+x2*x2)*std::sqrt(y1*y1+y2*y2)))*rad2deg;
-  }
+    utype angle(utype x1,utype x2,utype y1,utype y2) {
+      return (utype) std::acos((x1*y1+x2*y2)/(std::sqrt(x1*x1+x2*x2)*std::sqrt(y1*y1+y2*y2)))*rad2deg;
+    }
 
   template<class utype>
-  utype modulus(utype x1,utype x2,utype x3) {
-    return (utype) std::sqrt(x1*x1+x2*x2+x3*x3);
-  }
+    utype modulus(utype x1,utype x2,utype x3) {
+      return (utype) std::sqrt(x1*x1+x2*x2+x3*x3);
+    }
 
   template<class utype>
-  utype modulus(utype x1,utype x2) {
-    return (utype) std::sqrt(x1*x1+x2*x2);
-  }
+    utype modulus(utype x1,utype x2) {
+      return (utype) std::sqrt(x1*x1+x2*x2);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -767,58 +765,56 @@ namespace aurostd {
 namespace aurostd {
   // with const utype&
   template<class utype> bool                             // is scalar == scalar ?
-  identical(const utype& a,const utype& b,const utype& _tol_) {
-    if(abs(a-b)<=_tol_) return TRUE;
-    return FALSE;
-  }
+    identical(const utype& a,const utype& b,const utype& _tol_) {
+      if(abs(a-b)<=_tol_) return TRUE;
+      return FALSE;
+    }
   template<class utype> bool                             // is scalar == scalar ?
-  identical(const utype& a,const utype& b) {
-    return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  } 
+    identical(const utype& a,const utype& b) {
+      return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+    } 
   template<class utype> bool                             // is scalar != scalar ?
-  isdifferent(const utype& a,const utype& b,const utype& _tol_) {
-    return (bool) !identical(a,b,_tol_);
-  }
+    isdifferent(const utype& a,const utype& b,const utype& _tol_) {
+      return (bool) !identical(a,b,_tol_);
+    }
   template<class utype> bool                             // is scalar != scalar ?
-  isdifferent(const utype& a,const utype& b) {
-    return (bool) !identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  }
+    isdifferent(const utype& a,const utype& b) {
+      return (bool) !identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+    }
   template<class utype> bool                             // is scalar == scalar ?
-  isequal(const utype& a,const utype& b,const utype& _tol_) {
-    return (bool) identical(a,b,_tol_);
-  }
+    isequal(const utype& a,const utype& b,const utype& _tol_) {
+      return (bool) identical(a,b,_tol_);
+    }
   template<class utype> bool                             // is scalar == scalar ?
-  isequal(const utype& a,const utype& b) {
-    return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  }
-  /*
-  // with utype
-  template<class utype> bool                             // is scalar == scalar ?
-  identical(utype a,utype b,utype _tol_) {
-    if(abs(a-b)<=_tol_) return TRUE;
-    return FALSE;
-  }
-  template<class utype> bool                             // is scalar == scalar ?
-  identical(utype a,utype b) {
-    return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  } 
-  template<class utype> bool                             // is scalar != scalar ?
-  isdifferent(utype a,utype b,utype _tol_) {
-    return (bool) !identical(a,b,_tol_);
-  }
-  template<class utype> bool                             // is scalar != scalar ?
-  isdifferent(utype a,utype b) {
-    return (bool) !identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  }
-  template<class utype> bool                             // is scalar == scalar ?
-  isequal(utype a,utype b,utype _tol_) {
-    return (bool) identical(a,b,_tol_);
-  }
-  template<class utype> bool                             // is scalar == scalar ?
-  isequal(utype a,utype b) {
-    return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  }
-  */
+    isequal(const utype& a,const utype& b) {
+      return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+    }
+  //// with utype
+  //template<class utype> bool                             // is scalar == scalar ?
+  //identical(utype a,utype b,utype _tol_) {
+  //if(abs(a-b)<=_tol_) return TRUE;
+  //return FALSE;
+  //}
+  //template<class utype> bool                             // is scalar == scalar ?
+  //identical(utype a,utype b) {
+  //return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+  //} 
+  //template<class utype> bool                             // is scalar != scalar ?
+  //isdifferent(utype a,utype b,utype _tol_) {
+  //return (bool) !identical(a,b,_tol_);
+  //}
+  //template<class utype> bool                             // is scalar != scalar ?
+  //isdifferent(utype a,utype b) {
+  //return (bool) !identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+  //}
+  //template<class utype> bool                             // is scalar == scalar ?
+  //isequal(utype a,utype b,utype _tol_) {
+  //return (bool) identical(a,b,_tol_);
+  //}
+  //template<class utype> bool                             // is scalar == scalar ?
+  //isequal(utype a,utype b) {
+  //return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+  //}
 }
 
 // ----------------------------------------------------------------------------
@@ -904,10 +900,10 @@ namespace aurostd {
 namespace aurostd {
   // namespace aurostd
   template<class utype>
-  utype _roundoff(const utype& x,utype tolerance) {
-    return ((abs(x)<(utype) tolerance) ? (utype) 0.0 : x);
-  }
-  
+    utype _roundoff(const utype& x,utype tolerance) {
+      return ((abs(x)<(utype) tolerance) ? (utype) 0.0 : x);
+    }
+
   int roundoff(int x,int tolerance){return _roundoff(x,tolerance);}
   long roundoff(long x,long tolerance){return _roundoff(x,tolerance);}
   uint roundoff(uint x,uint tolerance){return _roundoff(x,tolerance);}
