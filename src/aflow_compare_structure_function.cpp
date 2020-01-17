@@ -4344,7 +4344,7 @@ namespace compare{
             same_species,
             comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
             comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"),
-            comparison_options.flag("COMPARE_STRUCTURE::STORE_COMPARISON_LOGS")));
+            comparison_options.flag("COMPARISON_OPTIONS::STORE_COMPARISON_LOGS"))); //DX 20200113 - fixed typo
     }        
 
     // join threads
