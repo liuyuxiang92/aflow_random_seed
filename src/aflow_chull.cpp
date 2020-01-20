@@ -2287,11 +2287,11 @@ namespace chull {
   bool CoordGroup::operator<(const CoordGroup& other) const {
     // safety, so it doesn't break, but it's outside scope of function
     string soliloquy="CoordGroup::operator<():";
-    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between stoichiometries");} //{return (m_coords.rows<other.m_coords.rows);}
-  for(int i=m_coords.lrows;i<=m_coords.urows;i++) {
-    if(m_coords(i)!=other.m_coords(i)) {return (m_coords(i)<other.m_coords(i));}
-  }
-  return false;
+    if(m_coords.rows!=other.m_coords.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between stoichiometries");} //return (m_coords.rows<other.m_coords.rows);
+    for(int i=m_coords.lrows;i<=m_coords.urows;i++) {
+      if(m_coords(i)!=other.m_coords(i)) {return (m_coords(i)<other.m_coords(i));}
+    }
+    return false;
   }
 
   void CoordGroup::clear() {CoordGroup a;copy(a);} //clear PUBLIC
@@ -2400,11 +2400,11 @@ namespace chull {
   bool Alloy::operator<(const Alloy& other) const {
     // safety, so it doesn't break, but it's outside scope of function
     string soliloquy="Alloy::operator<():";
-    if(m_elements_present.rows!=other.m_elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between alloys");} //{return (m_elements_present.rows<other.m_elements_present.rows);}
-  for(int i=m_elements_present.lrows;i<=m_elements_present.urows;i++) {
-    if(m_elements_present[i]!=other.m_elements_present[i]) {return (m_elements_present[i]<other.m_elements_present[i]);}
-  }
-  return false;
+    if(m_elements_present.rows!=other.m_elements_present.rows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Dimension mismatch between alloys");} //return (m_elements_present.rows<other.m_elements_present.rows);
+    for(int i=m_elements_present.lrows;i<=m_elements_present.urows;i++) {
+      if(m_elements_present[i]!=other.m_elements_present[i]) {return (m_elements_present[i]<other.m_elements_present[i]);}
+    }
+    return false;
   }
 
   void Alloy::clear() {Alloy a;copy(a);} //clear PUBLIC
