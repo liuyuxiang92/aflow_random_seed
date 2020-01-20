@@ -108,6 +108,9 @@ bool relaxStructureAPL_VASP(int start_relax,
   Krun = (Krun && VASP_Write_INPUT(xvasp, vflags));
 
   // Run relaxations
+  // ME200115 - set for SPIN_REMOVE_RELAX
+  int nrelax = xvasp.NRELAX;
+  xvasp.NRELAX = _NUM_RELAX_;
   if (Krun) {
     int i = 0;
     for (i = start_relax; Krun && i <= _NUM_RELAX_; i++) {
@@ -119,6 +122,7 @@ bool relaxStructureAPL_VASP(int start_relax,
         XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, fileMessage);
       } else { 
         Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
+        XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  // ME200115 - or else SPIN_REMOVE_RELAX_2 does not work
       }
     }
     if (Krun && (i == _NUM_RELAX_)) {
@@ -197,6 +201,7 @@ bool relaxStructureAPL_VASP(int start_relax,
   vflags.KBIN_VASP_KPOINTS_FILE = kbin_vasp_kpoints_file_back;
   vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP.str("");
   vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP << kbin_vasp_kpoints_explicit_start_stop_back;
+  xvasp.NRELAX = nrelax;
 
   return Krun;
 }
@@ -479,7 +484,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       supercell_opts.push_attached("SUPERCELL::METHOD", "SUPERCELL");
       supercell_opts.push_attached("SUPERCELL::VALUE", USER_SUPERCELL);
     } else if (kflags.KBIN_MODULE_OPTIONS.supercell_method[1]) {
-      if (kflags.KBIN_MODULE_OPTIONS.minatoms_restricted) { 
+      if (kflags.KBIN_MODULE_OPTIONS.minatoms_restricted) {
         supercell_opts.push_attached("SUPERCELL::METHOD", "MINATOMS_RESTRICTED");
         supercell_opts.push_attached("SUPERCELL::VALUE", aurostd::utype2string<int>(USER_MINATOMS_RESTRICTED));
       } else {
@@ -501,7 +506,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
 
     if (USER_DC) {
       if (USER_DC_METHOD == "LATTICE") {
-        USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // ME191202 - must be variation_type to get e.g. MCLC3
+        //USER_DC_INITLATTICE = xinput.getXStr().bravais_lattice_variation_type;  // OBSOLETE ME200117 - this will be determined by the phonon dispersion calculator
       } else if (USER_DC_METHOD == "MANUAL") {
         // Make sure that the number of coordinates and labels agree
         tokens.clear();
@@ -881,7 +886,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
     } else {
       logger << "an iterative scheme." << apl::endl;
     }
-    logger << "The equation will be solved using the adaptive broadening method along a ";
+    logger << "The equation will be solved using the tetrahedron method along a ";
     logger << USER_THERMALGRID[0] << "x" << USER_THERMALGRID[1] << "x" << USER_THERMALGRID[2] << " q-point mesh." << apl::endl;
     logger << "Isotope effects will " << (USER_ISOTOPE?"":"NOT ") << "be included." << apl::endl;
     if (USER_BOUNDARY || USER_CUMULATIVEK) {
@@ -1332,7 +1337,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
           string vaspVersion;
           vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
           if (!vaspVersion.empty()) {
-            logger << "[" << vaspVersion << "]";
+            logger << "[" << (vaspVersion[0] - '0') << "]";  // ME200115 - to remove non-printable characters
             if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
               logger << apl::warning << "." << apl::endl;
               // if(_WITHIN_DUKE_){ OBSOLETE - ME 190108
@@ -1396,24 +1401,26 @@ void RunPhonons_APL_181216(_xinput& xinput,
         string message = "Relaxation calculations did not run successfully.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
       }
-      // Write structure into PHPOSCAR to save state
-      xstructure xstr = xinput.getXStr();
-      xstr.is_vasp5_poscar_format = true;
-      stringstream poscar;
-      poscar << xstr;
-      aurostd::stringstream2file(poscar, phposcar_file);
-      if (!aurostd::FileExist(phposcar_file)) {
-        string function = "KBIN::RunPhonons_APL()";
-        string message = "Cannot open output file " + phposcar_file + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
-      }
 
       // Reinitialize the supercell with the new structure
       supercell.initialize(xinput.getXStr());
     }
+
     // Build after relaxations are done
     supercell.build(scell_dims);
     if (USER_MAXSHELL > 0) supercell.setupShellRestrictions(USER_MAXSHELL);
+
+    // Write supercell input structure into PHPOSCAR to save state
+    xstructure xstr = supercell.getInputStructure();
+    xstr.is_vasp5_poscar_format = true;
+    stringstream poscar;
+    poscar << xstr;
+    aurostd::stringstream2file(poscar, phposcar_file);
+    if (!aurostd::FileExist(phposcar_file)) {
+      string function = "KBIN::RunPhonons_APL()";
+      string message = "Cannot open output file " + phposcar_file + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    }
     // ME200102 - END
 
     // ME190626 - Convert projection directions for DOS to Cartesian
@@ -1917,6 +1924,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       // Init path according to the aflow's definition for elec. struc.
       // ME 181029 - Restructured
       if (USER_DC_METHOD == "LATTICE") {
+        supercell.projectToPrimitive();  // ME200117 - project to primitive
         pdisc.initPathLattice(USER_DC_INITLATTICE,USER_DC_NPOINTS);
       } else {
         if (!USER_DC_INITCOORDS_LABELS.empty() && !USER_DC_INITCOORDS_FRAC.empty()) {
@@ -1936,6 +1944,7 @@ void RunPhonons_APL_181216(_xinput& xinput,
       // Write results into PDIS file
       pdisc.writePDIS(aflags.Directory);
       pdisc.writePHEIGENVAL(aflags.Directory);  // ME190614
+      if (USER_DC_METHOD == "LATTICE") supercell.projectToOriginal();  // ME200117 - reset to original
 	//QHA/SCQHA/QHA3P  START //PN180705
 	//////////////////////////////////////////////////////////////////////
         ptr_hsq.reset(new apl::PhononHSQpoints(logger));

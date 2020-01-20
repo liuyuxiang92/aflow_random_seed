@@ -15,7 +15,7 @@
 // U:     internal energy (in meV)
 // Fvib:  vibrational free energy (in meV)
 // Cv:    isochoric heat capacity (in kB)
-// Svib:  vibrational entropy (in kB)o
+// Svib:  vibrational entropy (in kB)
 //
 // For the calculations, frequencies are assumed to be in THz divided by 2pi (as
 // is standard for the APL DOS calculator).

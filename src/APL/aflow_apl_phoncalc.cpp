@@ -186,7 +186,7 @@ namespace apl {
 
         int atomID = (DISTORTION_INEQUIVONLY ? _supercell.getUniqueAtomID(i) : i); //CO190218
         const vector<_sym_op>& agroup = _supercell.getAGROUP(atomID); //CO190218
-        
+
         //_supercell.center(atomID);  //CO //CO190218 // OBSOLETE ME191218
 
         // Generate next independent distortion by symmetry operations...
@@ -1153,10 +1153,11 @@ namespace apl {
     double value;
     // ME 180828 - Prepare derivative calculation
     xvector<xcomplex<double> > derivative(3);
-    double nbCells = 1.0;  // for NAC derivative
-    for (int i = 1; i < 4; i++) {
-      nbCells *= _supercell.scell[i];
-    }
+    // OBSOLETE ME200115 - not used
+    //double nbCells = 1.0;  // for NAC derivative
+    //for (int i = 1; i < 4; i++) {
+    //  nbCells *= _supercell.scell[i];
+    //}
     vector<xmatrix<xcomplex<double> > > dDynMat_NAC;
     if (calc_derivative) {  // reset dDynMat
       dDynMat.clear();

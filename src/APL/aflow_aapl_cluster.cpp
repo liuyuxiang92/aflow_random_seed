@@ -35,7 +35,7 @@ ClusterSet::ClusterSet(const Supercell& supercell, const int& cut_shell,
   _logger << "CLUSTER: Building coordination shells." << apl::endl;
 
   scell = supercell.getSupercellStructure();
-  pcell = supercell.getPrimitiveStructure();
+  pcell = supercell.getInputStructure();
   sc_dim = supercell.scell;
   pc2scMap = supercell._pc2scMap;
   sc2pcMap = supercell._sc2pcMap;
@@ -62,7 +62,7 @@ ClusterSet::ClusterSet(const string& filename, const Supercell& supercell,
 
   order = _order;
   scell = supercell.getSupercellStructure();
-  pcell = supercell.getPrimitiveStructure();
+  pcell = supercell.getInputStructure();
   sc_dim = supercell.scell;
   pc2scMap = supercell._pc2scMap;
   sc2pcMap = supercell._sc2pcMap;
@@ -208,7 +208,7 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
       for (uint atsc = 0; atsc < natoms; atsc++) {
         mapped = false;
         fpos_scaled = (pcell.fgroup[fg].Uf * scell.atoms[atsc].fpos) + ftau_scaled;
-        for (uint at_map = 0; at_map < natoms; at_map++) {
+        for (uint at_map = 0; at_map < natoms && !mapped; at_map++) {
           if (SYM::FPOSMatch(fpos_scaled, scell.atoms[at_map].fpos,
                              scell.lattice, scell.f2c, skewed, scell.sym_eps)) { //DX 20190619 - lattice and f2c as input
             sym_map[fg][atsc] = at_map;
@@ -218,8 +218,8 @@ vector<vector<int> > ClusterSet::getSymmetryMap() {
         if (!mapped) {
           string message = "At least one atom of the supercell could not be mapped.";
           if (LDEBUG) {
-            std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc;
-            std::cerr << "using symmetry fgroup number " << fg << std::endl;
+            std::cerr << "ClusterSet::getSymmetryMap: Failed to map atom " << atsc
+                      << " using fgroup number " << fg << "." << std::endl;
           }
           throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
         }

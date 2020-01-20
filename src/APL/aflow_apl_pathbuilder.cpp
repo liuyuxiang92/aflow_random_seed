@@ -634,10 +634,15 @@ namespace apl {
       points = _points;
       labels = _labels;
     }
-    // Convert to reciprocal coordinates
+    // ME200117 - Convert to reciprocal coordinates of the
+    // original structure or the distances will be wrong
     if (_store == CARTESIAN_LATTICE) {
-      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getInputStructure().lattice)));
+      xmatrix<double> c2f = inverse(trasp(ReciprocalLattice(sc.getOriginalStructure().lattice)));
       for (uint i = 0; i < points.size(); i++) points[i] = c2f * points[i];
+    } else {
+      xmatrix<double> f2c = trasp(ReciprocalLattice(sc.getInputStructure().lattice));
+      xmatrix<double> c2f_orig = inverse(trasp(ReciprocalLattice(sc.getOriginalStructure().lattice)));
+      for (uint i = 0; i < points.size(); i++) points[i] = c2f_orig * f2c * points[i];
     }
 
     xKPOINTS xkpts;

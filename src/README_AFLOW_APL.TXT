@@ -367,6 +367,9 @@ the point density, and the frequency unit.
              [AFLOW_APL]DCUSERPATH=G-X|X-U|K-G|G-L
 
       The labels must correspond to the labels for the lattice as set by the AFLOW standard.
+
+      NOTE: DCPATH=LATTICE will project the phonon dispersions to the primitive cell, so the
+      labels must correspond to a high-symmetry point in the primitive lattice.
       
       MANUAL lets the user specify which path and points to use. Three parameters need
       to be set to use MANUAL.

@@ -588,15 +588,19 @@ class Supercell {
   int _maxShellID;
   vector<double> _maxShellRadius;
   bool _isConstructed;
+  vector<vector<vector<xvector<double> > > > phase_vectors;  // ME200116
 
  private:
   void calculateWholeSymmetry(xstructure&);
   xstructure calculatePrimitiveStructure() const;
+  bool getMaps(const xstructure&, const xstructure&);  // ME200117
 
  public:
   Supercell(const xstructure&, const _aflags& aflags, Logger&); //CO181226
   Supercell(const Supercell&);
   ~Supercell();
+  void projectToPrimitive();  // ME200117
+  void projectToOriginal();  // ME200117
   void initialize(const xstructure&);  // ME191225
   void LightCopy(const xstructure& a, xstructure& b);
   void clear();
@@ -631,6 +635,7 @@ class Supercell {
   const xstructure& getPrimitiveStructure() const;
   const xstructure& getInputStructure() const;
   const xstructure& getInputStructureLight() const;
+  const xstructure& getOriginalStructure() const;  // ME200117
   int atomGoesTo(const _sym_op&, int, int, bool = TRUE); //CO190218
   int atomComesFrom(const _sym_op&, int, int, bool = TRUE); //CO190218
   const _sym_op& getSymOpWhichMatchAtoms(int, int, int);
@@ -641,6 +646,7 @@ class Supercell {
   xvector<double> getCPositionItsNearestImage(int, int);
   bool compareFPositions(xvector<double>&, xvector<double>&);          //CO
   bool compareFPositions(xvector<double>&, xvector<double>&, double);  //CO
+  void calculatePhaseVectors();  // ME200116
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&);
   bool calcShellPhaseFactor(int, int, const xvector<double>&, xcomplex<double>&,
                             int&, xvector<xcomplex<double> >&, bool);  // ME 180828

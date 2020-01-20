@@ -15,6 +15,8 @@
 
 using namespace std;
 
+static const xcomplex<double> iONE(0.0, 1.0);  // ME200116
+
 namespace apl {
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -131,6 +133,7 @@ Supercell& Supercell::operator=(const Supercell& that) {
     _maxShellRadius.clear();
     _maxShellRadius = that._maxShellRadius;
     _isConstructed = that._isConstructed;  //CO
+    phase_vectors = that.phase_vectors;
   }
 
   return *this;
@@ -156,6 +159,7 @@ void Supercell::clear() {
   //_sym_eps = AUROSTD_NAN; //CO, same for _sc and _pc (DO NOT RESET)
   _maxShellRadius.clear();
   _maxShellID = -1;
+  phase_vectors.clear();
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -441,7 +445,10 @@ void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
   _scStructure_original = _scStructure;  //COPY EVERYTHING ONCE, will be very slow
   LightCopy(_scStructure, _scStructure_light);
   //_scStructure_atoms_original = _scStructure.atoms;
-  
+
+  // ME200116 - calculate phase vectors; significantly speeds up post-processing
+  calculatePhaseVectors();
+
   if(LDEBUG){
     cerr << soliloquy << " this is the supercell to be analyzed" << std::endl; //CO190218
     cerr << _scStructure << std::endl;
@@ -814,6 +821,84 @@ void Supercell::trimStructure(int n, const xvector<double>& a,
 
 // ///////////////////////////////////////////////////////////////////////////
 
+// ME200116 - rebase to primitive
+void Supercell::projectToPrimitive() {
+  if (getMaps(_pcStructure, _scStructure)) {
+    _inStructure = _pcStructure;
+    calculatePhaseVectors();
+  } else {
+    _logger << apl::warning << " apl::Supercell::projectToPrimitive(): Could "
+            << " map the primitive cell to the supercell. Phonon dispersions "
+            << " will be calculated using the original structure instead." << apl::endl;
+  }
+}
+
+// ME200116 - rebase to original
+void Supercell::projectToOriginal() {
+  if (getMaps(_inStructure_original, _scStructure)) {
+    _inStructure = _inStructure_original;
+    calculatePhaseVectors();
+  } else {
+    // If the mapping fails for the original structure,
+    // something went seriously wrong
+    string function = "apl::Supercell::projectToOriginal()";
+    string message = "Mapping between original structure and supercell failed."
+                     " This is likely a bug in the code.";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+  }
+}
+
+// ME200116 - calculate sc2pcMap and pc2scMap
+// Returns true when mapping is successful.
+bool Supercell::getMaps(const xstructure& pcell, const xstructure& scell) {
+  bool LDEBUG = (FALSE || XHOST.DEBUG);
+  _pc2scMap.clear();
+  _sc2pcMap.clear();
+  uint natoms_pc = pcell.atoms.size();
+  uint natoms_sc = scell.atoms.size();
+  _pc2scMap.resize(natoms_pc);
+  _sc2pcMap.resize(natoms_sc);
+  xvector<double> fpos(3);
+
+  // sc2pcMap
+  for (uint i = 0; i < natoms_sc; i++) {
+    fpos = pcell.c2f * _scStructure.atoms[i].cpos;
+    uint j = 0;
+    for (j = 0; j < natoms_pc; j++) {
+      if (SYM::FPOSMatch(fpos, pcell.atoms[j].fpos, pcell.lattice, pcell.f2c, false, pcell.sym_eps)) {
+        _sc2pcMap[i] = j;
+        break;
+      }
+    }
+    if (j == natoms_pc) {
+      if (LDEBUG) {
+        std::cerr << "apl::Supercell::getMaps(): sc2pcMap failed for atom " << i << "." << std::endl;
+      }
+      return false;
+    }
+  }
+
+  // pc2scMap
+  for (uint i = 0; i < natoms_pc; i++) {
+    uint j = 0;
+    for (j = 0; j < natoms_sc; j++) {
+      if (aurostd::isequal(pcell.atoms[i].cpos, scell.atoms[j].cpos)) {
+        _pc2scMap[i] = j;
+        break;
+      }
+    }
+    if (j == natoms_sc) {
+      if (LDEBUG) {
+        std::cerr << "apl::Supercell::getMaps(): pc2scMap failed for atom " << i << "." << std::endl;
+      }
+      return false;
+    }
+  }
+  return true;
+}
+
+// ///////////////////////////////////////////////////////////////////////////
+
 //int Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
 // ME200102 - do not build the supercell here, just retrieve dimensions.
 xvector<int> Supercell::buildSuitableForShell(int MIN_NN_SHELLS, bool shouldBeFullShell, bool VERBOSE) {
@@ -1063,6 +1148,11 @@ const xstructure& Supercell::getPrimitiveStructure() const {
 
 const xstructure& Supercell::getInputStructure() const {
   return _inStructure;
+}
+
+// ME200117
+const xstructure& Supercell::getOriginalStructure() const {
+  return _inStructure_original;
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -1929,6 +2019,53 @@ int Supercell::getAtomNumber(int i) const {
 }
 
 // ///////////////////////////////////////////////////////////////////////////
+
+// ME200116 - Calculate the real space vectors for the phases once.
+// Calculating them once for all atoms is very quick and significantly speeds
+// up dynamical matrix calculations.
+void Supercell::calculatePhaseVectors() {
+  uint natoms_in = _inStructure.atoms.size();
+  uint natoms_sc = _scStructure.atoms.size();
+  phase_vectors.clear();
+  phase_vectors.resize(natoms_in, vector<vector<xvector<double> > >(natoms_sc));
+  xvector<double> rf(3), rc(3), delta(3), pf(3), pc(3);
+  double rshell = 0.0;
+  int at1pc = -1, at2pc = -1, at1sc = -1, at2sc = -1, centerIDsc = -1;
+
+  for (uint centerID = 0; centerID < natoms_in; centerID++) {
+    centerIDsc = pc2scMap(centerID);
+    at2pc = sc2pcMap(centerIDsc);
+    at2sc = pc2scMap(at2pc);
+    for (uint atomID = 0; atomID < natoms_sc; atomID++) {
+      at1pc = sc2pcMap(atomID);
+      at1sc = pc2scMap(at1pc);
+      // Get the nearest image of atomID and determine the shell radius
+      rf = getFPositionItsNearestImage(atomID, centerIDsc);
+      rc = F2C(_scStructure.lattice, rf);
+      rshell = aurostd::modulus(rc);
+      delta = _scStructure.atoms[at1sc].cpos - _scStructure.atoms[at2sc].cpos;
+      // Get the phase vectors for all atoms that sit on the shell
+      if (!_isShellRestricted || (rshell <= _maxShellRadius[centerIDsc] + _AFLOW_APL_EPS_)) {
+        for (int ii = -1; ii <= 1; ii++) {
+          for (int jj = -1; jj <= 1; jj++) {
+            for (int kk = -1; kk <= 1; kk++) {
+              pf[1] = rf[1] + ii;
+              pf[2] = rf[2] + jj;
+              pf[3] = rf[3] + kk;
+              pc = F2C(_scStructure.lattice, pf);
+              if (aurostd::isequal(aurostd::modulus(pc), rshell, _AFLOW_APL_EPS_)) {
+                pc -= delta;
+                phase_vectors[centerID][atomID].push_back(pc);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ///////////////////////////////////////////////////////////////////////////
 // ME 180827 -- overloaded to calculate derivatives
 bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
                                      xcomplex<double>& phase) {
@@ -1937,25 +2074,15 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
   return calcShellPhaseFactor(atomID, centerID, qpoint, phase, i, placeholder, false);
 }
 
+// ME200116 - rewritten to accommodate new phase vectors
 bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<double>& qpoint,
-                                     xcomplex<double>& phase, int& ifound,
+                                     xcomplex<double>& phase, int& multiplicity,
                                      xvector<xcomplex<double> >& derivative, bool calc_derivative) {
-  // Get the nearest image of this atom, it determine also the shell radius
-  xvector<double> rf = getFPositionItsNearestImage(atomID, centerID);
-  xvector<double> rc = F2C(_scStructure.lattice, rf);
-  double rshell = aurostd::modulus(rc);
-  // ME 180829 -- correction for the real space vector pc. With delta, the
-  // phases in AAPL are easier to calculate.
-  int at1pc = sc2pcMap(atomID);
-  int at2pc = sc2pcMap(centerID);
-  int at1sc = pc2scMap(at1pc);
-  int at2sc = pc2scMap(at2pc);
-  xvector<double> delta = getSupercellStructure().atoms[at1sc].cpos - getSupercellStructure().atoms[at2sc].cpos;
-
-  // Initialize
-  bool isCountable = false;
-  xcomplex<double> iONE(0.0, 1.0);
-  phase = 0.0;
+  centerID = sc2pcMap(centerID);
+  const vector<xvector<double> >& vec = phase_vectors[centerID][atomID];
+  multiplicity = (int) vec.size();
+  phase.re = 0.0;
+  phase.im = 0.0;
   if (calc_derivative) {
     for (int i = 1; i < 4; i++) {
       derivative[i].re = 0.0;
@@ -1963,42 +2090,16 @@ bool Supercell::calcShellPhaseFactor(int atomID, int centerID, const xvector<dou
     }
   }
 
-  // Count in all atoms which sit on this shell
-  if (!_isShellRestricted || (rshell <= _maxShellRadius[centerID] + _AFLOW_APL_EPS_)) {
-    isCountable = true;
-    ifound = 0;
-    xvector<double> pf(3), pc(3);
-
-    for (_AFLOW_APL_REGISTER_ int ii = -1; ii <= 1; ii++)
-      for (_AFLOW_APL_REGISTER_ int jj = -1; jj <= 1; jj++)
-        for (_AFLOW_APL_REGISTER_ int kk = -1; kk <= 1; kk++) {
-          pf(1) = rf(1) + ii;
-          pf(2) = rf(2) + jj;
-          pf(3) = rf(3) + kk;
-          pc = F2C(_scStructure.lattice, pf);
-          
-
-          if (aurostd::abs(aurostd::modulus(pc) - rshell) < _AFLOW_APL_EPS_) {
-            //cout << centerID+1 << " " << atomID+1 << " " << aurostd::modulus(pc) << " "; printXVector(pc);
-            pc -= delta;
-            phase = phase + exp(iONE * scalar_product(qpoint, pc));
-            if (calc_derivative) {
-              for (uint i = 1; i < 4; i++) {
-                derivative[i] += exp(iONE * (scalar_product(qpoint, pc))) * iONE * (pc(i));
-              }
-            }
-            ifound++;
-          }
-        }
-    phase *= (1.0 / ifound);
+  xcomplex<double> p;
+  for (int i = 0; i < multiplicity; i++) {
+    p = exp(iONE * scalar_product(qpoint, vec[i]))/((double) multiplicity);
+    phase += p;
     if (calc_derivative) {
-      for (int i = 1; i < 4; i++) {
-        derivative[i] /= (double) ifound;
-      }
+      for (int j = 1; j < 4; j++) derivative[j] += vec[i][j] * p * iONE;
     }
   }
-  //
-  return isCountable;
+
+  return (multiplicity > 0);
 }
 
 }  // namespace apl

@@ -172,7 +172,7 @@ void TCONDCalculator::calculateThermalConductivity() {
 
   // Grueneisen parameters
   _logger << "Calculating Grueneisen parameters." << apl::endl;
-  vector<vector<vector<xcomplex<double> > > > phases = calculatePhases();
+  vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);
   vector<vector<double> > grueneisen_modes = calculateModeGrueneisen(phases);
   phases.clear();
   vector<double> grueneisen_avg(temperatures.size());

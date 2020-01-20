@@ -1,17 +1,21 @@
 3.1.229 - 2020/02/01
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.229.tar.xz
         -- Sped up determination of irreducible tetrahedra for the tetrahedron method. (ME)
-        -- Added standard class methods to LTMethod and QMesh. (ME)
-        -- Moved calculation of little groups from TCONDCalculator to QMesh. (ME)
         -- Sped up APL force constant matrix calculation. (ME)
+        -- Sped up the calculation of the dynamical matrix. (ME)
+        -- Phonon dispersions are now projected to the primitive cell when using DCPATH=LATTICE. (ME)
         -- APL now saves the state for phonon calculation using PHPOSCAR. (ME)
         -- APL now always uses a commensurate k-point grid for relaxations. (ME)
-        -- Refactored supercell generation code in APL. (ME)
         -- Updated KPPRA for phonons. (ME)
-        -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
-        -- Switched the determination of the irreducible Brillouin zone in APL from pgroupk to pgroupk_xtal to capture the symmetry of the dynamical matrix. (ME)
-        -- Added missing function CalculateSymmetryPointGroupKCrystal. (ME)
+        -- Added standard class methods to LTMethod and QMesh. (ME)
+        -- Moved calculation of little groups from TCONDCalculator to QMesh. (ME)
+        -- Refactored supercell generation code in APL. (ME)
         -- Simplified symmetry calculations in (A)APL. (ME)
+        -- Fixed bug in apl::ClusterSet for conventional unit cells. (ME)
+        -- Fixed bug for SPIN_REMOVE_RELAX_2 in APL relaxations. (ME)
+        -- Switched the determination of the irreducible Brillouin zone in APL from pgroupk to pgroupk_xtal to capture the symmetry of the dynamical matrix. (ME)
+        -- Redesigned ThermalPropertiesCalculator to take temperature-dependent DOS. (ME)
+        -- Added missing function CalculateSymmetryPointGroupKCrystal. (ME)
         -- Changed getVASPVersionString function to not throw errors anymore (broke post-processing). (ME)
 3.1.228 - 2019/12/27
         Location: http://materials.duke.edu/AFLOW/aflow.3.1.228.tar.xz
