@@ -23,43 +23,52 @@
 // -------------------------------------------------------------- class xvector
 
 namespace aurostd {
+  template<class utype> class xmatrix;  //forward declaration  //CO191110
   // namespace aurostd
   template<class utype>
     class xvector {
-  public:
-    //   xvector();                                        // default constructor
-    // xvector(int);                                       // default constructor
-    xvector(int=3,int=1);                                  // default constructor
-    xvector(const xvector<utype>&);                        // copy constructor
-    // xvector (const xmatrix<utype>&);                    // make a vector of a xmatrix
-    xvector<utype>& operator=(const xvector<utype>&);	   // assignment
-    //     operator xvector<utype>() { return *this;};      // IBM_CPP
-    ~xvector();                                            // default destructor
-    utype& operator[](int) const;		                    // indicize
-    utype& operator()(int) const;		                    // indicize
-    utype& operator()(int,bool) const;        // indicize boundary conditions
-    xvector<utype>& operator +=(const xvector<utype>&);
-    xvector<utype>& operator +=(utype); //CO 180409
-    xvector<utype>& operator -=(const xvector<utype>&);
-    xvector<utype>& operator -=(utype); //CO 180409
-    xvector<utype>& operator *=(utype r); //(const utype& r) //CO 171130 - v*=v[1] doesn't work //CO 180409
-    xvector<utype>& operator /=(utype r); //(const utype& r) //CO 171130 - v/=v[1] doesn't work //CO 180409
-    // xvector<utype>& operator *=(const xvector<utype>&);
-    // xvector<utype>& operator /=(const xvector<utype>&);
-    //    friend std::ostream& operator<<<utype>(std::ostream&,const xvector<utype>&);
-    //    friend std::ostream& operator< <utype>(std::ostream&,const xvector<utype>&);
-    int rows,lrows,urows;  
-    bool isfloat,iscomplex;
-    // operations
-    void set(const utype&);
-    void reset(void);
-    void clear(void);
-  private:
-    utype *corpus;
-    // bool isfloat,iscomplex;
-    char size;
-    long int vsize;
-  };
+      public:
+        //   xvector();                                        // default constructor
+        // xvector(int);                                       // default constructor
+        xvector(int=3,int=1);                                  // default constructor
+        xvector(const xvector<utype>&);                        // copy constructor
+        xvector(const xmatrix<utype>&);                        // copy constructor //CO191110
+        // xvector (const xmatrix<utype>&);                    // make a vector of a xmatrix
+        xvector<utype>& operator=(const xvector<utype>&);	   // assignment
+        //     operator xvector<utype>() { return *this;};      // IBM_CPP
+        ~xvector();                                            // default destructor
+        utype& operator[](int) const;		                    // indicize
+        utype& operator()(int) const;		                    // indicize
+        utype& operator()(int,bool) const;        // indicize boundary conditions
+        xvector<utype>& operator +=(const xvector<utype>&);
+        xvector<utype>& operator +=(utype); //CO 180409
+        xvector<utype>& operator -=(const xvector<utype>&);
+        xvector<utype>& operator -=(utype); //CO 180409
+        xvector<utype>& operator *=(utype r); //(const utype& r) //CO 171130 - v*=v[1] doesn't work //CO 180409
+        xvector<utype>& operator /=(utype r); //(const utype& r) //CO 171130 - v/=v[1] doesn't work //CO 180409
+        // xvector<utype>& operator *=(const xvector<utype>&);
+        // xvector<utype>& operator /=(const xvector<utype>&);
+        //    friend std::ostream& operator<<<utype>(std::ostream&,const xvector<utype>&);
+        //    friend std::ostream& operator< <utype>(std::ostream&,const xvector<utype>&);
+        int rows,lrows,urows;  
+        bool isfloat,iscomplex;
+        // operations
+        void set(const utype&);
+        void reset(void);
+        void clear(void);
+      private:
+        utype *corpus;
+        // bool isfloat,iscomplex;
+        char size;
+        long int vsize;
+
+        //NECESSARY PRIVATE CLASS METHODS - START
+        void free();  //CO190808
+        void copy(const xvector<utype>& b);  //CO190808
+        void copy(const xmatrix<utype>& b);  //CO190808
+        void refresh(); //CO190808 - refresh internal properties dependent on lrows, urows, utype
+        //NECESSARY END CLASS METHODS - END
+    };
 }
 
 // ----------------------------------------------------------------------------
@@ -71,10 +80,10 @@ namespace aurostd {
 namespace aurostd {
   // namespace aurostd
   // template<class utype> std::ostream& operator<<(std::ostream&,const xvector<utype>&);
-  
+
   template<class utype>
     std::ostream& operator<<(std::ostream&,const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<utype>
     operator+(const xvector<utype>&) __xprototype;
 
@@ -194,23 +203,23 @@ namespace aurostd {
 
   template<class utype> bool
     operator!=(const xvector<utype>&,const xvector<utype>&) __xprototype;
-  
+
   template<class utype> bool
     isinteger(const xvector<utype>&,const utype& tol=(utype)0.01) __xprototype; //CO 180409
-  
+
   template<class utype> bool
-    iszero(const xvector<utype>&, const double& tol=1e-7) __xprototype;  // ME180702
+    iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  // ME180702 //CO191201 - 1e-7 seems arbitrary
   // CONSTRUCTIONS OF VECTORS FROM SCALARS
-  
+
   template<class utype> xvector<utype>
     reshape(const utype&) __xprototype;
-  
+
   template<class utype> xvector<utype>
     reshape(const utype&,const utype&) __xprototype;
-  
+
   template<class utype> xvector<utype>
     reshape(const utype&,const utype&,const utype&) __xprototype;
-  
+
   template<class utype> xvector<utype>
     reshape(const utype&,const utype&,const utype&,const utype&) __xprototype;
 
@@ -236,25 +245,25 @@ namespace aurostd {
 
   template<class utype> xvector<long double>
     xlongdouble(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<double>
     xdouble(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<double>
     floor(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<double>
     ceil(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<double>
     round(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<double>
     trunc(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<float>
     xfloat(const xvector<utype>&) __xprototype;
-  
+
   template<class utype> xvector<long int>
     xlongint(const xvector<utype>&) __xprototype;
 
@@ -271,7 +280,7 @@ namespace aurostd {
     vector2xvector(const vector<utype>&,int lrows=1) __xprototype; //CO 180409
 
   xvector<double> xvectorint2double(const xvector<int>&); //CO 180515
-  xvector<int> xvectordouble2int(const xvector<double>&); //CO 180515
+  xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO 180515
 
   // OPERATIONS ON XVECTORS
 
@@ -329,20 +338,43 @@ namespace aurostd {
   template<class utype> xvector<utype>                  // clear values too small
     roundoff(const xvector<utype>&,utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; // claar values too small //CO 180409
 
-  int GCD(const xvector<int>&);                         // get GCD of vector //CO 180409
-  int LCM(const xvector<int>&);                         // get LCM of vector //CO 180520
+  void GCD(const xvector<int>&,int&);                         // get GCD of xvector //CO 180409 //CO191201
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd); //CO191201
+  void GCD(const xvector<int>& va,const xvector<int>& vb,xvector<int>& vgcd,xvector<int>& vx,xvector<int>& vy); //CO191201
+  int LCM(const xvector<int>&);                         // get LCM of xvector //CO 180520
 
-  template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO 180409
-    reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO 180409
-        const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409
+  //DX 20191125 [OBSOLETE] template<class utype> xvector<utype>                                       // simply divide by GCD (useful for compounds) //CO 180409
+  //DX 20191125 [OBSOLETE]   reduceByGCD(const xvector<utype>& in_V,                                  // simply divide by GCD (useful for compounds) //CO 180409
+  //DX 20191125 [OBSOLETE]       const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409
+
+  template<class utype> 
+    void reduceByGCD(const xvector<utype>& in_V,                    // simply divide by GCD (useful for compounds) //CO 180409
+        xvector<utype>& out_V,                                        // simply divide by GCD (useful for compounds) //CO 180409
+        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //CO 180409 //CO191201
+
+  void GCD(const vector<int>&,int&);                          // get GCD of vector //DX 20191125 (modeled after CO's xvector version) //CO191201
+  int LCM(const vector<int>&);                          // get LCM of vector //DX 20191125 (modeled after CO's xvector version)
+
+  template<class utype> 
+    void reduceByGCD(const vector<utype>& in_V,                     // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+        vector<utype>& out_V,                                         // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)  //CO191201
+
+  void GCD(const deque<int>&,int& gcd);                           // get GCD of deque //DX 20191125 (modeled after CO's xvector version)  //CO191201
+  int LCM(const deque<int>&);                           // get LCM of deque //DX 20191125 (modeled after CO's xvector version)
+
+  template<class utype> 
+    void reduceByGCD(const deque<utype>& in_V,                      // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+        deque<utype>& out_V,                                          // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)
+        utype tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype; // simply divide by GCD (useful for compounds) //DX 20191125 (modeled after CO's xvector version)  //CO191201
 
   template<class utype> xvector<utype> 
     normalizeSumToOne(const xvector<utype>& in_V,
         const utype& tol=(utype)_AUROSTD_XVECTOR_TOLERANCE_ROUNDOFF_) __xprototype; //CO 180801
-  
+
   template<class utype> void                                   // swap
     swap(xvector<utype>&,const int&,const int&) __xprototype;  // swap
-  
+
   template<class utype> void                              //shift lrows so first index is i //CO 180409
     shiftlrows(xvector<utype>&,const int&) __xprototype;  //shift lrows so first index is i //CO 180409
 
@@ -362,12 +394,12 @@ namespace aurostd {
     log10(const xvector<utype>&) __xprototype;
 
   // TRIDIMENSIONAL OPERATIONS
-  
+
   template<class utype> utype
     distance(const xvector<utype>&,const xvector<utype>&) __xprototype;
-  
+
   // TRIGONOMETRIC OPERATIONS
-  
+
   template<class utype> xvector<utype>
     sin(const xvector<utype>&) __xprototype;
 
@@ -430,7 +462,7 @@ namespace aurostd {
     cos(const xvector<utype>&,const xvector<utype>&) __xprototype;
   template<class utype> double   // cos of angle between two vectors
     getcos(const xvector<utype>&,const xvector<utype>&) __xprototype;
-  
+
   template<class utype> double   // sin of angle between two vectors
     sin(const xvector<utype>&,const xvector<utype>&) __xprototype;
   template<class utype> double   // sin of angle between two vectors
@@ -461,7 +493,7 @@ namespace aurostd {
 
   template<class utype> xvector<utype>
     getGeneralNormal(const vector<xvector<utype> >& _directive_vectors); //CO 180409
-  
+
   template<class utype> xvector<utype>
     pointLineIntersection(const xvector<utype>& a,const xvector<utype>& n,const xvector<utype>& p); //CO 180520
 
@@ -477,44 +509,44 @@ namespace aurostd {
 
   template<class utype> xvector<utype> // HEAPSORT
     heapsort(const xvector<utype>& a) __xprototype;
-  
+
   template<class utype> xvector<utype>  // QUICKSORT
     quicksort(const xvector<utype>&) __xprototype;
-  
+
   template<class utype1, class utype2> void  // QUICKSORT
     quicksort2(unsigned long n, xvector<utype1>&, xvector<utype2>&) __xprototype;
-  
+
   template<class utype1, class utype2, class utype3> void   // QUICKSORT
     quicksort3(unsigned long n, xvector<utype1>&, xvector<utype2>&, xvector<utype3>&)
     __xprototype;
-  
+
   template<class utype1, class utype2, class utype3> void   // QUICKSORT
     quicksort4(unsigned long n, xvector<utype1>&, xvector<utype2>&, xvector<utype3>&)
     __xprototype;
-  
+
   template<class utype> xvector<utype>             // SSORT shortcup for SHELLSORT
     ssort(const xvector<utype>& a) { return shellsort(a);}
-  
+
   template<class utype> xvector<utype>             // HPSORT shortcup for HEAPSORT  
     hpsort(const xvector<utype>& a) { return heapsort(a);}
-  
+
   //  template<class utype> xvector<utype>             // QSORT shortcup for QUICKSORT  
   //  sort(const xvector<utype>& a) { return heapsort(a);}
-  
+
   template<class utype> xvector<utype>                 // SORT shortcup for HPSORT  
     qsort(const xvector<utype>& a) { return quicksort(a);}
 
   template<class utype1, class utype2> void  // QUICKSORT
     sort2(unsigned long n, xvector<utype1>&a, xvector<utype2>&b) {
-    quicksort2(n,a,b);}
+      quicksort2(n,a,b);}
 
   template<class utype1, class utype2, class utype3> void  // QUICKSORT
     sort3(unsigned long n, xvector<utype1>&a, xvector<utype2>&b, xvector<utype3>&c) {
-    quicksort3(n,a,b,c);}
+      quicksort3(n,a,b,c);}
 
   template<class utype1, class utype2, class utype3, class utype4> void  // QUICKSORT
     sort4(unsigned long n, xvector<utype1>&a, xvector<utype2>&b, xvector<utype3>&c, xvector<utype4>&d) {
-    quicksort4(n,a,b,c,d);}
+      quicksort4(n,a,b,c,d);}
 }
 
 namespace aurostd { //CO190419

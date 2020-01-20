@@ -61,7 +61,7 @@ void CalculateNewStateAFLOW(string & SL_name) {
   //int pwd_old_size;
 
   string pwd,pwd_old;
-  pwd=pwd_old=aurostd::execute2string("pwd");
+  pwd=pwd_old=aurostd::getPWD(); //[CO191112 - OBSOLETE]aurostd::execute2string("pwd");
   //pwd_old = getcwd(NULL, 0);  //CO 181019 - avoid strncat warning of size()
   //pwd_old_size = strlen(pwd_old);
   //pwd = new char[strlen(pwd_old) + SL_name.size()+2]; //CO 181019 - avoid strncat warning of size()
@@ -198,12 +198,12 @@ double GetResultFromAFLOW() {
   // get the calculated formation_energy_per_atom from aflow
   // the results are read from aflow.qmvasp.out.bz2
   // commands used here depend on the output format of aflow
-  
+
   // change everything back to the mode "655"
-  
+
   // unzip the result file
   aurostd::execute("bzip -dq " + AFLOW_RESULT_FILE + ".bz2");
-  
+
   ifstream fin_result;
   fin_result.open(AFLOW_RESULT_FILE.c_str());
 
@@ -219,11 +219,11 @@ double GetResultFromAFLOW() {
       // remove the leading spaces
       line.erase(line.begin(), line.begin()+pos+1);
       for (uint i=0; i<line.size(); i++) {
-	if( line.at(i) == ' ' ) {
-	  line.erase(line.begin()+i);
-	} else {
-	  break;
-	}
+        if( line.at(i) == ' ' ) {
+          line.erase(line.begin()+i);
+        } else {
+          break;
+        }
       }
       energy = aurostd::string2utype<long double>(line);
       break;
@@ -280,7 +280,7 @@ void RenameFiles(int count) {
   string com;
   vector<string>::iterator name_itr;
   for (name_itr = backup_file_names.begin();
-       name_itr < backup_file_names.end(); name_itr++) {
+      name_itr < backup_file_names.end(); name_itr++) {
     string old_name = *name_itr;
 
     if( old_name == _FITSTRUCTUREFILE ) {
@@ -288,7 +288,7 @@ void RenameFiles(int count) {
     } else {
       com = "mv";
     }
-            
+
     BackUpFile(old_name, com, count);
   }
 
@@ -300,7 +300,7 @@ void BackUpFile(string old_name, string com, int count) {
   string postfix = aurostd::utype2string(count);
 
   int pos = old_name.find(".");
-        
+
   string new_name;
   new_name = old_name.substr(0,pos) + "_" + postfix + old_name.substr(pos);
 

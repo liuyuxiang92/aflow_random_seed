@@ -634,11 +634,11 @@ namespace anrl {
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vvolumeX.size()=" << vvolumeX.size() << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vvolumeX ="; for(uint i=0;i<vvolumeX.size();i++) {cerr << " " << vvolumeX.at(i);} cerr << endl;}
- 
+
     deque<string> vatomX_backup(vatomX);
     xvector<double> origin(3);origin.clear();
     xstructure str("");str.lattice.clear();
-    
+
     stringstream web;
 
     // ---------------------------------------------------------------------------
@@ -646,12 +646,12 @@ namespace anrl {
     vector<string> vproto,vlabel; 
     vector<uint>   vproto_nspecies,vproto_natoms,vproto_spacegroup,vproto_nunderscores,vproto_nparameters; 
     vector<string> vproto_Pearson_symbol,vproto_params,vproto_Strukturbericht,vproto_prototype,vproto_dialect;
-        
+
     // ---------------------------------------------------------------------------
     // load defaults
     anrl::PrototypeANRL_LoadList(vproto,vlabel,vproto_nspecies,vproto_natoms,
-				 vproto_spacegroup,vproto_nunderscores,vproto_nparameters,vproto_Pearson_symbol,vproto_params,
-				 vproto_Strukturbericht,vproto_prototype,vproto_dialect);
+        vproto_spacegroup,vproto_nunderscores,vproto_nparameters,vproto_Pearson_symbol,vproto_params,
+        vproto_Strukturbericht,vproto_prototype,vproto_dialect);
 
     // ---------------------------------------------------------------------------
     // create strings
@@ -665,11 +665,11 @@ namespace anrl {
     // search for label_permutations
     aurostd::string2tokens(label,tokens,".");
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: tokens.size()=" << tokens.size() << endl;}
-    
+
     if(tokens.size()==0) { label_anrl=label; }
     if(tokens.size()==1) { label_anrl=tokens.at(0); }
     if(tokens.size()==2) { label_anrl=tokens.at(0); label_permutations=tokens.at(1); }
-    
+
     // DX 20181207 - add predefined protos - START
     if(aurostd::substring2bool(label,"-")){
       vector<string> tokens;
@@ -679,7 +679,7 @@ namespace anrl {
         number_id = tokens[1];
       }
     }
-    
+
     for(uint i=0;i<label_permutations.size();i++) vpermutation.push_back(aurostd::mod(label_permutations.at(i)-65,32));
 
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: label=" << label << endl;}
@@ -691,26 +691,26 @@ namespace anrl {
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vpermutation ="; for(uint i=0;i<vpermutation.size();i++) {cerr << " " << vpermutation.at(i);} cerr << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vatomX.size()=" << vatomX.size() << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;}
-    
+
     // ---------------------------------------------------------------------------
     // search
-    
+
     bool found=FALSE;
     uint ifound=0;
     for(uint i=0;i<vlabel.size()&&!found;i++) {
       if(vlabel.at(i)==label_anrl) {  // FIX
-	found=TRUE;
-	ifound=i;
+        found=TRUE;
+        ifound=i;
       }
     }
-    
+
     // ---------------------------------------------------------------------------
     // not found
     if(!found) {
       cerr << "ERROR - anrl::PrototypeANRL: prototype not found [label=" << label << "]" << endl;
       exit(0);
     }
-      
+
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: FOUND" << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: ifound=" << ifound << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vlabel.at(ifound)=" << vlabel.at(ifound) << endl;}
@@ -718,7 +718,7 @@ namespace anrl {
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vproto_natoms.at(ifound)=" << vproto_natoms.at(ifound) << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vproto_spacegroup.at(ifound)=" << vproto_spacegroup.at(ifound) << endl;}
     if(LDEBUG) { cerr << "anrl::PrototypeANRL: vproto.at(ifound)=" << vproto.at(ifound) << endl;}
-      
+
     // ---------------------------------------------------------------------------
     // check for vpermutation size and errors
     if(vpermutation.size()>0 && vpermutation.size()!=vproto_nspecies.at(ifound)) {
@@ -737,7 +737,7 @@ namespace anrl {
       cerr << "        anrl::PrototypeANRL: vatomX ="; for(uint i=0;i<vatomX.size();i++) {cerr << " " << vatomX.at(i);} cerr << endl;
       exit(0);
     }
-    
+
     for(uint i=0;i<vproto_nspecies.at(ifound);i++) { // number of species
       str.num_each_type.push_back(0);str.comp_each_type.push_back(0.0);
       str.species.push_back("");str.species_pp.push_back("");str.species_pp_type.push_back("");str.species_pp_version.push_back("");
@@ -782,7 +782,7 @@ namespace anrl {
         choice = 0; //only one possiblity
         if(number_id.size()!=0){ 
           cerr << "ERROR - anrl::PrototypeANRL: " << vlabel.at(ifound) 
-               << " only has one degree of freedom (lattice parameter), i.e., no enumerated suffix necessary." << endl; 
+            << " only has one degree of freedom (lattice parameter), i.e., no enumerated suffix necessary." << endl; 
           exit(1);
         }
       }
@@ -3491,7 +3491,7 @@ namespace anrl {
     //DX 20181211 - add Corey's kesterite structure - END
 
     // ---------------------------------------------------------------------------
-    
+
 
     // DAVID PUT THEM HERE WITH THE ORDER OF THE PAPER
 
@@ -3517,20 +3517,20 @@ namespace anrl {
       str.atoms.at(iat).number=iat;//iat;    // reference position for convasp
       str.atoms.at(iat).basis=iat;//iat;     // position in the basis
       if(print_mode!=1){ //equations only //DX 20180618
-      str.atoms.at(iat).cpos=F2C(str.lattice,str.atoms.at(iat).fpos);
+        str.atoms.at(iat).cpos=F2C(str.lattice,str.atoms.at(iat).fpos);
       }
       str.num_each_type.at(str.atoms.at(iat).type)++;
       //     str.comp_each_type.at(str.atoms.at(iat).type)+=1.0; inside code
       str.species.at(str.atoms.at(iat).type)=str.atoms.at(iat).name;	
     }
-    
+
     // ---------------------------------------------------------------------------
     // DONE
     if(print_mode!=1){ //equations only //DX 20180618
-    xvector<double> data(6);
-    data=Getabc_angles(str.lattice,DEGREES);
-    str.a=data[1];str.b=data[2];str.c=data[3];str.alpha=data[4];str.beta=data[5];str.gamma=data[6];
-    clear(str.origin);
+      xvector<double> data(6);
+      data=Getabc_angles(str.lattice,DEGREES);
+      str.a=data[1];str.b=data[2];str.c=data[3];str.alpha=data[4];str.beta=data[5];str.gamma=data[6];
+      clear(str.origin);
     }
     //  if(vpflow.flag("STDPRIMCELL")) {cout << "EUREKA"<< endl;} //cout << GetStandardPrimitive(xstructure(cin,IOAFLOW_AUTO));
 
@@ -3550,50 +3550,50 @@ namespace anrl {
         while(str.atoms.size()>0) { str.RemoveAtom(0); }
         // ADD MODIFIED ATOMS
         for(uint i=0;i<atoms.size();i++) {
-	  uint type=atoms.at(i).type;
-	  if(vpermutation.size()>0)  { atoms.at(i).type=vpermutation.at(type); }  // PERMUTATIONS 
-	  if(vpermutation.size()>0 || vatomX.size()>0) { atoms.at(i).name=vatomX.at(atoms.at(i).type); }  // PERMUTATIONS AND ATOMX
-	  //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
-	  str.AddAtom(atoms.at(i));
-        //DX 20181205 - Volume scaling by atomic species - START
-        // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
-        if(scale_volume_by_species==true){
-          double volume=0.0;
-          for(uint i=0;i<str.num_each_type.size();i++) {
-            for(uint j=0;j<(uint)str.num_each_type[i];j++){
-              volume+=vvolumeX[i];
-              if(LDEBUG) { oss << "DEBUG: (anrl::PrototypeANRL) volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
+          uint type=atoms.at(i).type;
+          if(vpermutation.size()>0)  { atoms.at(i).type=vpermutation.at(type); }  // PERMUTATIONS 
+          if(vpermutation.size()>0 || vatomX.size()>0) { atoms.at(i).name=vatomX.at(atoms.at(i).type); }  // PERMUTATIONS AND ATOMX
+          //	atoms.at(i).name=aurostd::mod(label_permutations.at(type)-65,32)+65;
+          str.AddAtom(atoms.at(i));
+          //DX 20181205 - Volume scaling by atomic species - START
+          // if a=1.0 for prototype (i.e., no scaling factor), use atomic species to get volume
+          if(scale_volume_by_species==true){
+            double volume=0.0;
+            for(uint i=0;i<str.num_each_type.size();i++) {
+              for(uint j=0;j<(uint)str.num_each_type[i];j++){
+                volume+=vvolumeX[i];
+                if(LDEBUG) { oss << "DEBUG: (anrl::PrototypeANRL) volume=" << volume << "  (" << vvolumeX[i] << ")" << endl; }
+              }
             }
+            //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
+            str.SetVolume(volume);  //CO190205 - more robust
+            str.neg_scale=TRUE;
           }
-          //[CO190205 - OBSOLETE]str.scale=std::pow((double) (abs(volume)/det(str.lattice)),(double) 1.0/3.0);
-          str.SetVolume(volume);  //CO190205 - more robust
-          str.neg_scale=TRUE;
+          //DX 20181205 - Volume scaling by atomic species - END
         }
-        //DX 20181205 - Volume scaling by atomic species - END
-      }
       }
       str.SpeciesPutAlphabetic();
     }
-    
+
     if(XHOST.vflag_control.flag("WWW")) {
       cout << web.str() << endl;
       exit(0);
     }
 
     //CO181216 - fudging until real fix goes in - DAVID REMOVE
-//DX 20190227 [OBSOLETE]    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too
-//DX 20190227 [OBSOLETE]    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");}
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h ohad bccSQS
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A2BCD4_tI16_82_ac_b_d_g-001")) aurostd::StringSubst(str.title,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001"); //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_tI4_141_a-001")) aurostd::StringSubst(str.title,"A_tI4_141_a","A_tI4_141_a-001"); //A_tI4_141_a mike Sn
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_hP1_191_a-001")) aurostd::StringSubst(str.title,"A_hP1_191_a","A_hP1_191_a-001"); //A_hP1_191_a mike Sn
-//DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB2_hP3_191_a_d-001")) aurostd::StringSubst(str.title,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001"); //AB2_hP3_191_a_d pranab 6-metal-boride
+    //DX 20190227 [OBSOLETE]    aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too
+    //DX 20190227 [OBSOLETE]    if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");}
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B5_oC32_38_abce_abcdf-001")) aurostd::StringSubst(str.title,"A3B5_oC32_38_abce_abcdf","A3B5_oC32_38_abce_abcdf-001"); //A3B5_oC32_38_abce_abcdf ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_12a-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_12a","AB3_mC32_8_4a_12a-001"); //AB3_mC32_8_4a_12a ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A5B11_mP16_6_2abc_2a3b3c-001")) aurostd::StringSubst(str.title,"A5B11_mP16_6_2abc_2a3b3c","A5B11_mP16_6_2abc_2a3b3c-001"); //A5B11_mP16_6_2abc_2a3b3c ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A3B13_oC32_38_ac_a2bcdef-001")) aurostd::StringSubst(str.title,"A3B13_oC32_38_ac_a2bcdef","A3B13_oC32_38_ac_a2bcdef-001"); //A3B13_oC32_38_ac_a2bcdef ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB3_mC32_8_4a_4a4b-001")) aurostd::StringSubst(str.title,"AB3_mC32_8_4a_4a4b","AB3_mC32_8_4a_4a4b-001"); //AB3_mC32_8_4a_4a4b ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB_aP16_2_4i_4i-001")) aurostd::StringSubst(str.title,"AB_aP16_2_4i_4i","AB_aP16_2_4i_4i-001"); //AB_aP16_2_4i_4i ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB7_hR16_166_c_c2h-001")) aurostd::StringSubst(str.title,"AB7_hR16_166_c_c2h","AB7_hR16_166_c_c2h-001"); //AB7_hR16_166_c_c2h ohad bccSQS
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A2BCD4_tI16_82_ac_b_d_g-001")) aurostd::StringSubst(str.title,"A2BCD4_tI16_82_ac_b_d_g","A2BCD4_tI16_82_ac_b_d_g-001"); //A2BCD4_tI16_82_ac_b_d_g natalio kesterite
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_tI4_141_a-001")) aurostd::StringSubst(str.title,"A_tI4_141_a","A_tI4_141_a-001"); //A_tI4_141_a mike Sn
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"A_hP1_191_a-001")) aurostd::StringSubst(str.title,"A_hP1_191_a","A_hP1_191_a-001"); //A_hP1_191_a mike Sn
+    //DX 20190227 [OBSOLETE]    if(!aurostd::substring2bool(str.title,"AB2_hP3_191_a_d-001")) aurostd::StringSubst(str.title,"AB2_hP3_191_a_d","AB2_hP3_191_a_d-001"); //AB2_hP3_191_a_d pranab 6-metal-boride
 
     aurostd::StringSubst(str.title,vlabel.at(ifound),aurostd::joinWDelimiter(str.species,"")+"/"+label);  //vlabel.at(ifound) //use label as we want permutations too //CO181216
     if(scale_volume_by_species){aurostd::StringSubst(str.title," params=1.0"," params=-1");} //CO181216
@@ -3605,9 +3605,9 @@ namespace anrl {
 // ***************************************************************************
 namespace anrl {
   bool PrototypeANRL_Consistency(ostream &oss,
-				 uint vparameters_size,
-				 uint nparameters,string prototype,string label,string Strukturbericht,
-				 string Pearson_symbol,uint spacegroup,string params,uint print_mode) { //DX 20180710 - added print_mode info
+      uint vparameters_size,
+      uint nparameters,string prototype,string label,string Strukturbericht,
+      string Pearson_symbol,uint spacegroup,string params,uint print_mode) { //DX 20180710 - added print_mode info
     if(vparameters_size!=nparameters && print_mode!=1) {                                                //DX 20180710 - if equations only (print_mode==1), we do not need the parameters
       oss << "anrl::PrototypeANRL" << endl;
       oss << " Prototype                   : " << prototype << endl;
@@ -3628,12 +3628,12 @@ namespace anrl {
 // the mother of all the AFLOW-NRL prototypes
 namespace anrl {
   bool vproto2tokens(string proto_line,
-		     string& label,uint& nspecies,uint& natoms,uint& spacegroup,uint& nunderscores,uint& nparameters,
-		     string& Pearson_symbol,string& params,string& Strukturbericht,string& prototype,string& dialect) { 
+      string& label,uint& nspecies,uint& natoms,uint& spacegroup,uint& nunderscores,uint& nparameters,
+      string& Pearson_symbol,string& params,string& Strukturbericht,string& prototype,string& dialect) { 
 
     vector<string> tokens;
     uint j=0;
-    
+
     aurostd::string2tokens(proto_line,tokens,";");
     label=tokens.at(j++);
     nspecies=aurostd::string2utype<uint>(tokens.at(j++));
@@ -3657,27 +3657,27 @@ namespace anrl {
 namespace anrl {
   vector<uint> extractStoichiometry(string& anrl_label) { 
 
-  vector<uint> stoichiometry;
+    vector<uint> stoichiometry;
 
-  vector<string> tokens;
-  aurostd::string2tokens(anrl_label,tokens,"_");
-  string stoichiometry_string = tokens[0];
+    vector<string> tokens;
+    aurostd::string2tokens(anrl_label,tokens,"_");
+    string stoichiometry_string = tokens[0];
 
-  bool is_previous_alpha = false;
-  for(uint i=0;i<stoichiometry_string.size();i++){
-    if(is_previous_alpha && isalpha(stoichiometry_string[i])){
+    bool is_previous_alpha = false;
+    for(uint i=0;i<stoichiometry_string.size();i++){
+      if(is_previous_alpha && isalpha(stoichiometry_string[i])){
+        stoichiometry.push_back(1);
+      }
+      else if(isdigit(stoichiometry_string[i])){
+        stringstream tmp; tmp << stoichiometry_string[i];
+        stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
+      }    
+      is_previous_alpha = isalpha(stoichiometry_string[i]);
+    }
+    if(is_previous_alpha){
       stoichiometry.push_back(1);
     }
-    else if(isdigit(stoichiometry_string[i])){
-      stringstream tmp; tmp << stoichiometry_string[i];
-      stoichiometry.push_back(aurostd::string2utype<uint>(tmp.str()));
-    }    
-    is_previous_alpha = isalpha(stoichiometry_string[i]);
-  }
-  if(is_previous_alpha){
-    stoichiometry.push_back(1);
-  }
-  return stoichiometry;
+    return stoichiometry;
   }
 }
 //DX 20190208 - for making ANRL label - END
@@ -3698,7 +3698,7 @@ namespace anrl {
     xvector<double> a1(3),a2(3),a3(3);
 
     xmatrix<double> rhl_lattice, hex_lattice, rtransf, htransf;
-     
+
     //HEX lattice
     a1=(1.0/2.0)*a*xn-(sqrt(3.0)/2.0)*a*yn;
     a2=(1.0/2.0)*a*xn+(sqrt(3.0)/2.0)*a*yn;
@@ -3795,76 +3795,106 @@ namespace anrl {
     vector<string> lattice_parameter_list;
     // triclinic
     if(lattice_type=='a'){
-			lattice_parameter_list.push_back("a");
-			lattice_parameter_list.push_back("b/a");
-			lattice_parameter_list.push_back("c/a");
-			lattice_parameter_list.push_back("alpha");
-			lattice_parameter_list.push_back("beta");
-			lattice_parameter_list.push_back("gamma");
+      lattice_parameter_list.push_back("a");
+      lattice_parameter_list.push_back("b/a");
+      lattice_parameter_list.push_back("c/a");
+      lattice_parameter_list.push_back("alpha");
+      lattice_parameter_list.push_back("beta");
+      lattice_parameter_list.push_back("gamma");
     }
     // monoclinic
     else if(lattice_type=='m'){
-			lattice_parameter_list.push_back("a");
-			lattice_parameter_list.push_back("b/a");
-			lattice_parameter_list.push_back("c/a");
-			lattice_parameter_list.push_back("beta");
+      lattice_parameter_list.push_back("a");
+      lattice_parameter_list.push_back("b/a");
+      lattice_parameter_list.push_back("c/a");
+      lattice_parameter_list.push_back("beta");
     }
     // orthorhombic
     else if(lattice_type=='o'){
-			lattice_parameter_list.push_back("a");
-			lattice_parameter_list.push_back("b/a");
-			lattice_parameter_list.push_back("c/a");
+      lattice_parameter_list.push_back("a");
+      lattice_parameter_list.push_back("b/a");
+      lattice_parameter_list.push_back("c/a");
     }
     // tetragonal/trigonal/hexagonal
     else if(lattice_type=='t' || lattice_type=='h'){
-			lattice_parameter_list.push_back("a");
-			lattice_parameter_list.push_back("c/a");
+      lattice_parameter_list.push_back("a");
+      lattice_parameter_list.push_back("c/a");
     }
     // cubic
     else if(lattice_type=='c'){
-			lattice_parameter_list.push_back("a");
+      lattice_parameter_list.push_back("a");
     }
-   
-		return lattice_parameter_list;
-	}
+
+    return lattice_parameter_list;
+  }
 }
 
 // *************************************************************************** 
 namespace anrl {
-  vector<double> getANRLLatticeParameterValues(vector<string>& wyccar_ITC, char& lattice_type, char& lattice_centering, uint& setting ){
+  vector<double> getANRLLatticeParameterValuesFromWyccar(const vector<string>& wyccar_ITC, char lattice_type, char lattice_centering, uint setting){
     // get lattice parameter values from the WYCCAR based on the degrees of freedom given the lattice type
 
     // extract lattice parameters from wyccar
     vector<double> all_lattice_parameters = SYM::ExtractLatticeParametersFromWyccar(wyccar_ITC);
 
+    return getANRLLatticeParameterValues(all_lattice_parameters, lattice_type, lattice_centering, setting);
+  }
+
+  vector<double> getANRLLatticeParameterValuesFromABCAngles(const xstructure& xstr, char lattice_type, char lattice_centering, uint setting ){
+    // get lattice parameter values from the XSTRUCTURE
+
+    string function_name = "anrl::getANRLLatticeParameterValuesFromABCAngles()";
+
+    // extract lattice parameters from xstructure
+    vector<double> all_lattice_parameters;
+    all_lattice_parameters.push_back(xstr.a);
+    all_lattice_parameters.push_back(xstr.b);
+    all_lattice_parameters.push_back(xstr.c);
+    all_lattice_parameters.push_back(xstr.alpha);
+    all_lattice_parameters.push_back(xstr.beta);
+    all_lattice_parameters.push_back(xstr.gamma);
+
+    // ensure all lattice parameters have been set (i.e., not zero or negative)
+    for(uint i=0;i<all_lattice_parameters.size();i++){
+      if(all_lattice_parameters[i]<=_ZERO_TOL_){
+        stringstream message; message << "The " << i << "th lattice parameter is ill-defined. Please check input.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_);
+      }
+    }
+
+    return getANRLLatticeParameterValues(all_lattice_parameters, lattice_type, lattice_centering, setting);
+  }
+
+  vector<double> getANRLLatticeParameterValues(const vector<double>& all_lattice_parameters, char lattice_type, char lattice_centering, uint setting ){
+
     // store only relevant parameter values
     vector<double> lattice_parameter_values;
     // triclinic
     if(lattice_type=='a'){
-			lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
-			lattice_parameter_values.push_back(all_lattice_parameters[1]/all_lattice_parameters[0]); // b/a
-			lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
-			lattice_parameter_values.push_back(all_lattice_parameters[3]);                           // alpha
-			lattice_parameter_values.push_back(all_lattice_parameters[4]);                           // beta
-			lattice_parameter_values.push_back(all_lattice_parameters[5]);                           // gamma
+      lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
+      lattice_parameter_values.push_back(all_lattice_parameters[1]/all_lattice_parameters[0]); // b/a
+      lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
+      lattice_parameter_values.push_back(all_lattice_parameters[3]);                           // alpha
+      lattice_parameter_values.push_back(all_lattice_parameters[4]);                           // beta
+      lattice_parameter_values.push_back(all_lattice_parameters[5]);                           // gamma
     }
     // monoclinic
     else if(lattice_type=='m'){
-			lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
-			lattice_parameter_values.push_back(all_lattice_parameters[1]/all_lattice_parameters[0]); // b/a
-			lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
-			lattice_parameter_values.push_back(all_lattice_parameters[4]);                           // beta
+      lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
+      lattice_parameter_values.push_back(all_lattice_parameters[1]/all_lattice_parameters[0]); // b/a
+      lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
+      lattice_parameter_values.push_back(all_lattice_parameters[4]);                           // beta
     }
     // orthorhombic
     else if(lattice_type=='o'){
-			lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
-			lattice_parameter_values.push_back(all_lattice_parameters[1]/all_lattice_parameters[0]); // b/a
-			lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
+      lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
+      lattice_parameter_values.push_back(all_lattice_parameters[1]/all_lattice_parameters[0]); // b/a
+      lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
     }
     // tetragonal/trigonal/hexagonal
     else if(lattice_type=='t' || lattice_type=='h'){
       // if rhl setting, need to get correct a and c from a' and alpha'
-			if(lattice_type=='h' && lattice_centering=='R' && (setting==SG_SETTING_1 || setting==SG_SETTING_ANRL)){
+      if(lattice_type=='h' && lattice_centering=='R' && (setting==SG_SETTING_1 || setting==SG_SETTING_ANRL)){
         double a_prime = all_lattice_parameters[0];             // a'
         double alpha_prime = all_lattice_parameters[3]*deg2rad; // alpha'
         // see ITC (5th edition) pg. 16 for conversion
@@ -3874,35 +3904,35 @@ namespace anrl {
         lattice_parameter_values.push_back(c/a);                                                 // c/a
       }
       else {
-			  lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
-			  lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
+        lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
+        lattice_parameter_values.push_back(all_lattice_parameters[2]/all_lattice_parameters[0]); // c/a
       }
     }
     // cubic
     else if(lattice_type=='c'){
-			lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
+      lattice_parameter_values.push_back(all_lattice_parameters[0]);                           // a
     }
-   
-		return lattice_parameter_values;
-	}
+
+    return lattice_parameter_values;
+  }
 }
 
 // *************************************************************************** 
 namespace anrl {
-  uint getANRLSettingChoice(int& spacegroup){
+  uint getANRLSettingChoice(int spacegroup){ //DX 20191031 - remove reference
     // ANRL setting choice
     // rhl: rhombohedral setting: setting=1
     // monoclinic: unique axis-b: setting=1
     // centrosymmetric: origin on inversion site: setting=2
 
     uint anrl_setting = 1;
-   
+
     // check for centrosymmetric cases 
     if(spacegroup==48 || spacegroup==50 || spacegroup==59 || spacegroup==68 || spacegroup==70 ||
-       spacegroup==85 || spacegroup==86 || spacegroup==88 || spacegroup==125 || spacegroup==126 || 
-       spacegroup==129 || spacegroup==130 || spacegroup==133 || spacegroup==134 || spacegroup==137 || 
-       spacegroup==138 || spacegroup==141 || spacegroup==142 || spacegroup==201 || spacegroup==203 || 
-       spacegroup==222 || spacegroup==224 || spacegroup==227 || spacegroup==228){
+        spacegroup==85 || spacegroup==86 || spacegroup==88 || spacegroup==125 || spacegroup==126 || 
+        spacegroup==129 || spacegroup==130 || spacegroup==133 || spacegroup==134 || spacegroup==137 || 
+        spacegroup==138 || spacegroup==141 || spacegroup==142 || spacegroup==201 || spacegroup==203 || 
+        spacegroup==222 || spacegroup==224 || spacegroup==227 || spacegroup==228){
       anrl_setting=2;
     } 
     return anrl_setting;
@@ -3917,59 +3947,87 @@ namespace anrl {
     string function_name = "anrl::structure2anrl()";
 
     string directory="";
+    bool recalculate_symmetry = true; //DX 20191030
+    uint setting=SG_SETTING_ANRL; //anrl setting choice is default
 
     string usage="aflow --anrl|--convert2anrl|--structure2anrl|--struct2anrl < POSCAR";
     string options="";
-    
+
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
-      
+
+    //DX 20191217 - START
+    // ---------------------------------------------------------------------------
+    // print format 
+    string format = "text";
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+      format = "text";
+    }
+    if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+      format = "json";
+    }
+
+    //DX 20191030 - add force Wyckoff choice option - START
+    // check if forcing certain Wyckoff convention 
+    // Wyckoff positions must be provided (either in CIF, Wyccar, or in Wyckoff object)
+    if(vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF")){
+      // check if Wyckoff information is available
+      if(xstr.wyckoff_sites_ITC.size()==0){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Cannot use --force_Wyckoff option, Wyckoff positions must be given.",_INPUT_ILLEGAL_);
+      }
+      if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Cannot use options --setting and --force_Wyckoff together.",_INPUT_AMBIGUOUS_);
+      }
+      setting = xstr.spacegroupnumberoption;
+      recalculate_symmetry = false;
+    }
+    //DX 20191030 - add force Wyckoff choice option - END
+
     // symmetry tolerance
-    double default_tolerance=SYM::defaultTolerance(xstr); 
     double tolerance = AUROSTD_NAN;
-    if(vpflow.flag("STRUCTURE2::TOLERANCE")){
+    if(vpflow.flag("STRUCTURE2ANRL::TOLERANCE")){
       string tolerance_string = vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE");
       if(tolerance_string[0] == 't' || tolerance_string[0] == 'T'){ //Tight
-        tolerance=default_tolerance;
+        tolerance=SYM::defaultTolerance(xstr); 
       }
       else if(tolerance_string[0] == 'l' || tolerance_string[0] == 'L'){ //Loose
-        tolerance=default_tolerance*10.0;
+        tolerance=SYM::defaultTolerance(xstr)*10.0; 
       }
       else {
         tolerance=aurostd::string2utype<double>(vpflow.getattachedscheme("STRUCTURE2ANRL::TOLERANCE"));
       }
     }
     else {
-      tolerance = default_tolerance;
+      tolerance=SYM::defaultTolerance(xstr); 
     }
-      
+
     // space group setting
-    uint setting=SG_SETTING_ANRL; //anrl setting choice is default
     if(vpflow.flag("STRUCTURE2ANRL::SETTING")){
       if(aurostd::tolower(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING")) == "anrl"){
         setting=SG_SETTING_ANRL;
       }
       else { //DX 20190318 - added else
-      int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING"));
-      if(user_setting==1){setting=SG_SETTING_1;}
-      else if(user_setting==2){setting=SG_SETTING_2;}
+        int user_setting=aurostd::string2utype<int>(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING"));
+        if(user_setting==1){setting=SG_SETTING_1;}
+        else if(user_setting==2){setting=SG_SETTING_2;}
         if(user_setting!=SG_SETTING_1 && user_setting!=SG_SETTING_2){  //DX 20190318
-          cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX 20190318
-        return "";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_); //DX 20191030
+          //DX 20191030 [OBSOLETE] cerr << function_name << "::ERROR: Setting must be 1, 2, or \"anrl\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c). " << endl; //DX 20190318
+          //DX 20191030 [OBSOLETE] return "";
         } //DX 20190318
       }
     }
-    return structure2anrl(xstr,tolerance,setting);
+    return structure2anrl(xstr,tolerance,setting,recalculate_symmetry);
   }
 }   
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr){ 
+  string structure2anrl(xstructure& xstr, bool recalculate_symmetry){ //DX 20190829 - added recalculate_symmetry
     // determine anrl label, parameters, and parameter values of the input structure
     double default_tolerance=SYM::defaultTolerance(xstr); 
     uint setting=SG_SETTING_ANRL; //anrl setting choice is default
-    return structure2anrl(xstr,default_tolerance,setting);
+    return structure2anrl(xstr,default_tolerance,setting, recalculate_symmetry); //DX 20190829 - added recalculate_symmetry
   }
 }
 
@@ -3984,7 +4042,7 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, uint& setting){ 
+  string structure2anrl(xstructure& xstr, uint setting){ //DX 20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     double default_tolerance=SYM::defaultTolerance(xstr); 
     return structure2anrl(xstr,default_tolerance,setting);
@@ -3993,39 +4051,56 @@ namespace anrl {
 
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance, uint& setting){  //CO190520 - removed pointers for bools and doubles, added const where possible
+  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190829 - added recalculate_symmetry //DX 20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(false || XHOST.DEBUG);
-    
+
     string function_name = "anrl::structure2anrl()";
     ostringstream oss;
     stringstream message;
     ofstream FileMESSAGE;
 
+    uint setting = input_setting; //DX 20191230 - if symmetry already calculated, we want to store true setting
+
     // Calculate symmetry
-    uint space_group_number = xstr.SpaceGroup_ITC(tolerance,setting);
-    
+    uint space_group_number=0;
+    if((xstr.space_group_ITC==0 && xstr.spacegroupnumber==0) || recalculate_symmetry){ //DX 20190829 - added if-statement; don't recalculate, it is faster
+      space_group_number = xstr.SpaceGroup_ITC(tolerance,input_setting);
+    }
+    else if(xstr.space_group_ITC>=1 && xstr.space_group_ITC<=230){
+      space_group_number = xstr.space_group_ITC;
+      setting=xstr.setting_ITC; //DX 20191230
+    }
+    else if(xstr.spacegroupnumber>=1 && xstr.spacegroupnumber<=230){
+      space_group_number = xstr.spacegroupnumber;
+      setting=xstr.spacegroupnumberoption; //DX 20191230
+    }
+
     vector<GroupedWyckoffPosition> grouped_Wyckoff_positions;
     compare::groupWyckoffPositions(xstr, grouped_Wyckoff_positions);
 
     // ===== Determine ANRL label ===== //
     // stoichiometry
     xstructure tmp_xstr=xstr; // make new one so we do not override atom names
+    ReScale(tmp_xstr,1.0); //DX 20191031
     bool remove_ones=true;
     compare::fakeAtomsName(tmp_xstr);
     string reduced_stoichiometry = compare::getCompoundName(tmp_xstr,remove_ones);
-      
+
     // Pearson symbol (quick)
     uint conventional_cell_atoms_count = 0;
     for(uint i=0;i<xstr.wyckoff_sites_ITC.size();i++){
       conventional_cell_atoms_count += xstr.wyckoff_sites_ITC[i].multiplicity;
     }
-    char lattice_type = xstr.lattice_label_ITC;
-    char lattice_centering = xstr.bravais_label_ITC;
+    //DX 20191031 [OBSOLETE] char lattice_type = xstr.lattice_label_ITC;
+    //DX 20191031 [OBSOLETE] char lattice_centering = xstr.bravais_label_ITC;
+    string lattice_type_and_centering = LATTICE::SpaceGroup2LatticeTypeAndCentering(space_group_number); //DX 20191031
+    char lattice_type = lattice_type_and_centering[0];
+    char lattice_centering = lattice_type_and_centering[1];
 
     // rhl fixes
     if(lattice_centering == 'R' && setting==SG_SETTING_2){conventional_cell_atoms_count/=3;} // for rhl, number in Pearson symbol is given wrt to rhl cell
-    
+
     //[OBSOLETE] if(lattice_type == 'R'){conventional_cell_atoms_count/=3;} // for rhl, number in Pearson symbol is given wrt to rhl cell
     //[OBSOLETE] if(lattice_type == 'r' && lattice_centering == 'P'){lattice_centering = 'R'; } 
     //[OBSOLETE] if(lattice_type == 'R' || lattice_type == 'r'){lattice_type = 'h'; }
@@ -4041,24 +4116,29 @@ namespace anrl {
 
     // combine stoichiometry + Pearson + space group number + Wyckoff positions to make label
     string aflow_label = reduced_stoichiometry + "_" + Pearson_symbol + "_" + space_group_number_str + "_" + Wyckoff_string; 
-    
+
     if(LDEBUG) {cerr << function_name << ":: AFLOW ANRL label = " << aflow_label << endl;}
 
     // ===== Determine parameters ===== //
     vector<string> parameter_list, lattice_parameter_list, Wyckoff_parameter_list;
     vector<double> parameter_values, lattice_parameter_values, Wyckoff_parameter_values;
-    
+
     // lattice parameters
     lattice_parameter_list = anrl::getANRLLatticeParameterString(lattice_type);
-    lattice_parameter_values = anrl::getANRLLatticeParameterValues(xstr.wyccar_ITC, lattice_type, lattice_centering, setting);
-    
+    if(xstr.wyccar_ITC.size()!=0){
+      lattice_parameter_values = anrl::getANRLLatticeParameterValuesFromWyccar(xstr.wyccar_ITC, lattice_type, lattice_centering, setting);
+    }
+    else{
+      lattice_parameter_values = anrl::getANRLLatticeParameterValuesFromABCAngles(xstr, lattice_type, lattice_centering, setting);
+    }
+
     // Wyckoff parameters
-		vector<wyckoffsite_ITC> ordered_Wyckoff_sites_ITC = xstr.wyckoff_sites_ITC;
+    vector<wyckoffsite_ITC> ordered_Wyckoff_sites_ITC = xstr.wyckoff_sites_ITC;
     // reorder Wyckoff positions alphabetically by Wyckoff letter, then by species
     std::sort(ordered_Wyckoff_sites_ITC.begin(), ordered_Wyckoff_sites_ITC.end()); 
 
     if(LDEBUG) { for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){cerr << function_name << "::Ordered Wyckoff site: " << ordered_Wyckoff_sites_ITC[i] << endl;} }
-    
+
     // determine degrees of freedom in Wyckoff positions 
     for(uint i=0;i<ordered_Wyckoff_sites_ITC.size();i++){
       bool contains_x=false; bool contains_y=false; bool contains_z=false;
@@ -4070,21 +4150,21 @@ namespace anrl {
         }
         // store 
         string variable_designation="";
-				if(contains_x){ 
-					variable_designation="x"+aurostd::utype2string<uint>(i+1); 
-					Wyckoff_parameter_list.push_back(variable_designation);
-					Wyckoff_parameter_values.push_back(ordered_Wyckoff_sites_ITC[i].coord(1));
-				}
-				if(contains_y){ 
-					variable_designation="y"+aurostd::utype2string<uint>(i+1); 
-					Wyckoff_parameter_list.push_back(variable_designation);
-					Wyckoff_parameter_values.push_back(ordered_Wyckoff_sites_ITC[i].coord(2));
-				}
-				if(contains_z){ 
-					variable_designation="z"+aurostd::utype2string<uint>(i+1); 
-					Wyckoff_parameter_list.push_back(variable_designation);
-					Wyckoff_parameter_values.push_back(ordered_Wyckoff_sites_ITC[i].coord(3));
-				}
+        if(contains_x){ 
+          variable_designation="x"+aurostd::utype2string<uint>(i+1); 
+          Wyckoff_parameter_list.push_back(variable_designation);
+          Wyckoff_parameter_values.push_back(ordered_Wyckoff_sites_ITC[i].coord(1));
+        }
+        if(contains_y){ 
+          variable_designation="y"+aurostd::utype2string<uint>(i+1); 
+          Wyckoff_parameter_list.push_back(variable_designation);
+          Wyckoff_parameter_values.push_back(ordered_Wyckoff_sites_ITC[i].coord(2));
+        }
+        if(contains_z){ 
+          variable_designation="z"+aurostd::utype2string<uint>(i+1); 
+          Wyckoff_parameter_list.push_back(variable_designation);
+          Wyckoff_parameter_values.push_back(ordered_Wyckoff_sites_ITC[i].coord(3));
+        }
       }
       else {
         cerr << function_name << "::ERROR: The equations for site " << i << "are not provided. Check symmetry." << endl;
@@ -4098,7 +4178,7 @@ namespace anrl {
 
     parameter_values = lattice_parameter_values; 
     parameter_values.insert(parameter_values.end(), Wyckoff_parameter_values.begin(), Wyckoff_parameter_values.end());
-    
+
     if(LDEBUG) { cerr << function_name << "::ANRL parameters:" << endl; for(uint i=0;i<parameter_list.size();i++){cerr << parameter_list[i] << "=" << parameter_values[i] << endl;} }
 
     // store label/params/params values/etc. in xstructure
@@ -4109,10 +4189,35 @@ namespace anrl {
     xstr.num_lattice_parameters = lattice_parameter_list.size();
 
     // print label/params/params values
-    oss << "AFLOW label   : " << aflow_label << endl;
-    oss << "params        : " << aurostd::joinWDelimiter(parameter_list,",") << endl;
-    oss << "params values : " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,6),",") << endl;
-    
+    string format="text";
+    if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){
+      format="text";
+    }
+    else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){
+      format="json";
+    }
+
+    if(format=="json"){
+      string eendl="";
+      bool roff=true; //round off
+      stringstream sscontent_json;
+      vector<string> vcontent_json;
+
+      sscontent_json << "\"aflow_label\":\"" << aflow_label << "\"" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"aflow_parameter_list\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(parameter_list,"\""),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      sscontent_json << "\"aflow_parameter_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
+      vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+      oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
+    }
+    else{
+      oss << "AFLOW label   : " << aflow_label << endl;
+      oss << "params        : " << aurostd::joinWDelimiter(parameter_list,",") << endl;
+      oss << "params values : " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,6),",") << endl;
+    }
+
     return oss.str();
   }
 }

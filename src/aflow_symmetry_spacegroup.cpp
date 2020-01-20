@@ -148,7 +148,7 @@ namespace SYM {
           swap_columns(atomic_basis_, 1, 2);
         }
       } 
-      
+
 
       // ==================== ORTHORHOMBIC ==================== //
       if(lattice_label == 'o') {
@@ -597,21 +597,21 @@ namespace SYM {
     uint match_type3 = 0;
     bool obverse = true;
     if(SYM::FPOSMatch(atomic_basis_, reverse1, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	     SYM::FPOSMatch(atomic_basis_, reverse2, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	     SYM::FPOSMatch(atomic_basis_, reverse3, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
- 	     match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
+        SYM::FPOSMatch(atomic_basis_, reverse2, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+        SYM::FPOSMatch(atomic_basis_, reverse3, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+        match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
       obverse = false;
     } 
     else if(SYM::FPOSMatch(atomic_basis_, half_x, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	          SYM::FPOSMatch(atomic_basis_, half_x_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	          SYM::FPOSMatch(atomic_basis_, half_x_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	          match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
+        SYM::FPOSMatch(atomic_basis_, half_x_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+        SYM::FPOSMatch(atomic_basis_, half_x_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+        match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
       obverse = false;
     } 
     else if(SYM::FPOSMatch(atomic_basis_, half_xz, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
-	          SYM::FPOSMatch(atomic_basis_, half_xz_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	          SYM::FPOSMatch(atomic_basis_, half_xz_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	         match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
+        SYM::FPOSMatch(atomic_basis_, half_xz_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+        SYM::FPOSMatch(atomic_basis_, half_xz_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+        match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
       obverse = false;
     }
     if(!obverse) {
@@ -682,24 +682,24 @@ namespace SYM {
     bool obverse = true;
     for (uint i = 0; i < equivalent_atoms.size(); i++) {
       if(SYM::FPOSMatch(equivalent_atoms[i], reverse1, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
-	       SYM::FPOSMatch(equivalent_atoms[i], reverse2, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	       SYM::FPOSMatch(equivalent_atoms[i], reverse3, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-	       match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
-	      obverse = false;
-	      break;
+          SYM::FPOSMatch(equivalent_atoms[i], reverse2, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+          SYM::FPOSMatch(equivalent_atoms[i], reverse3, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+          match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
+        obverse = false;
+        break;
       } 
       else if(SYM::FPOSMatch(equivalent_atoms[i], half_x, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-		          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-		          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-		          match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
-	      obverse = false;
-	      break;
+          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+          SYM::FPOSMatch(equivalent_atoms[i], half_x_shift2, match_type3, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+          match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
+        obverse = false;
+        break;
       } 
       else if(SYM::FPOSMatch(equivalent_atoms[i], half_xz, match_type1, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name 
-		          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-		          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift2, match_type3, lattice, f2c,  skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
-		    match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
-	      obverse = false;
+          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift1, match_type2, lattice, f2c, skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+          SYM::FPOSMatch(equivalent_atoms[i], half_xz_shift2, match_type3, lattice, f2c,  skew, tolerance) && //DX 20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
+          match_type1 == match_type2 && match_type2 == match_type3 && match_type1 == match_type3) {
+        obverse = false;
       }
     }
     if(!obverse) {
@@ -781,7 +781,7 @@ namespace SYM {
     for (uint i = 0; i < str.wyccar_ITC.size(); i++) {
       aus << str.wyccar_ITC[i];
       if(i < str.wyccar_ITC.size() - 1) {
-	aus << endl;
+        aus << endl;
       }
     }
     aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET, osswrite, oss);
@@ -824,18 +824,18 @@ uint xstructure::GetPrimitiveCell(void) {
 
   // Copy deque<_atoms> atoms (IN XSTRUCTURE) to atomic_basis_ to manipulate free of xstructure
   for (int i = 0; i < atom_count; i++) {
-    _atom tmp;
-    tmp.fpos = (*this).atoms[i].fpos;
-    tmp.cpos = (*this).atoms[i].cpos;
-    tmp.type = (*this).atoms[i].type;
-    tmp.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
-    tmp.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
-    tmp.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-    tmp.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+    _atom tmp_atom = (*this).atoms[i]; //DX 20191011 - initialized here instead of explicitly setting individual attributes below
+    //DX 20191011 [OBSOLETE] tmp_atom.fpos = (*this).atoms[i].fpos;
+    //DX 20191011 [OBSOLETE] tmp_atom.cpos = (*this).atoms[i].cpos;
+    //DX 20191011 [OBSOLETE] tmp_atom.type = (*this).atoms[i].type;
+    //DX 20191011 [OBSOLETE] tmp_atom.spin = (*this).atoms[i].spin; // DX 9/21/17 - magnetic sym
+    //DX 20191011 [OBSOLETE] tmp_atom.spin_is_given = (*this).atoms[i].spin_is_given; // DX 9/21/17 - magnetic sym
+    //DX 20191011 [OBSOLETE] tmp_atom.noncoll_spin = (*this).atoms[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+    //DX 20191011 [OBSOLETE] tmp_atom.noncoll_spin_is_given = (*this).atoms[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
     string tmpname = (*this).atoms[i].name;
     SYM::cleanupstring(tmpname);
-    tmp.name = tmpname;
-    atomic_basis_.push_back(tmp);
+    tmp_atom.name = tmpname;
+    atomic_basis_.push_back(tmp_atom);
   }
 
   // ===== Expand the lattice and atomic basis ===== //
@@ -883,15 +883,15 @@ uint xstructure::GetPrimitiveCell(void) {
   // ===== Find all possible translation vectors in crystal ===== //
   if(foundbasis == false) {
     for (uint i = 0; i < atomic_basis_.size(); i++) {
-      _atom tmp;
+      _atom tmp = atomic_basis_[i]; //DX 20191011 - initialized instead of setting individually below
       //DX 20190905 [OBSOLETE-no more mod_one_xvec] tmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos);
       tmp.fpos = ::BringInCell(atomic_basis_[i].fpos); //DX 20190905 - new BringInCell function and go outside xstructure scope
-      tmp.name = atomic_basis_[i].name;
-      tmp.type = atomic_basis_[i].type;
-      tmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
-      tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
-      tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-      tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+      //DX 20191011 [OBSOLETE] tmp.name = atomic_basis_[i].name;
+      //DX 20191011 [OBSOLETE] tmp.type = atomic_basis_[i].type;
+      //DX 20191011 [OBSOLETE] tmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
+      //DX 20191011 [OBSOLETE] tmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
+      //DX 20191011 [OBSOLETE] tmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+      //DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
       full_basis.push_back(tmp);
     }
     vector<xvector<double> > diff_vectors;
@@ -916,16 +916,16 @@ uint xstructure::GetPrimitiveCell(void) {
       xvector<double> incell_dist = atoms_by_type[index_for_smallest_group][atom_pos[d]].cpos - atoms_by_type[index_for_smallest_group][0].cpos;
       uint count = 0;
       for (uint i = 0; i < atomic_basis_.size(); i++) {
-        _atom atmp;
+        _atom atmp = atomic_basis_[i]; //DX 20191011 - initialized instead of setting individually below
         //DX 20190905 [OBSOLETE-no more mod_one_xvec] atmp.fpos = SYM::mod_one_xvec(atomic_basis_[i].fpos + diff_vectors[d]);
         atmp.fpos = atomic_basis_[i].fpos + diff_vectors[d]; //DX 20190905 
         BringInCellInPlace(atmp.fpos); //DX 20190905
-        atmp.name = atomic_basis_[i].name;
-        atmp.type = atomic_basis_[i].type;
-        atmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
-        atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
-        atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-        atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] atmp.name = atomic_basis_[i].name;
+        //DX 20191011 [OBSOLETE] atmp.type = atomic_basis_[i].type;
+        //DX 20191011 [OBSOLETE] atmp.spin = atomic_basis_[i].spin; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] atmp.spin_is_given = atomic_basis_[i].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] atmp.noncoll_spin = atomic_basis_[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] atmp.noncoll_spin_is_given = atomic_basis_[i].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
         if(SYM::MapAtom(atomic_basis_, atmp, TRUE, lattice_basis_xmat, f2c, skew, (*this).sym_eps)) { //DX 20190215 - _SYM_TOL_ to (*this).sym_eps //DX 20190619 - lattice_basis_xmat and f2c as input
           count += 1;
         }
@@ -978,15 +978,15 @@ uint xstructure::GetPrimitiveCell(void) {
       amin = (*this).dist_nn_min;  // DX TEST
       double tol_vol = (*this).sym_eps * amin * amin * amin; //DX 20190215 - _SYM_TOL_ to (*this).sym_eps
 
-    //DX 5/3/18 - FASTER MIN CART DISTANCE CALCULATOR - START
-    //DX 5/3/18 - only calculate multiplication once (time-saver)
-    vector<xvector<double> > candidates_cpos;
-    vector<double> candidates_mods;
-    for(uint a=0;a<lattice_vector_candidates.size();a++){
-      xvector<double> tmp = lattice_vector_candidates[a] * lattice_basis_xmat;
-      candidates_cpos.push_back(tmp); candidates_mods.push_back(aurostd::modulus(tmp));
-    }
-    //DX 5/3/18 - FASTER MIN CART DISTANCE CALCULATOR - END
+      //DX 5/3/18 - FASTER MIN CART DISTANCE CALCULATOR - START
+      //DX 5/3/18 - only calculate multiplication once (time-saver)
+      vector<xvector<double> > candidates_cpos;
+      vector<double> candidates_mods;
+      for(uint a=0;a<lattice_vector_candidates.size();a++){
+        xvector<double> tmp = lattice_vector_candidates[a] * lattice_basis_xmat;
+        candidates_cpos.push_back(tmp); candidates_mods.push_back(aurostd::modulus(tmp));
+      }
+      //DX 5/3/18 - FASTER MIN CART DISTANCE CALCULATOR - END
 
       for (uint i = 0; i < candidates_cpos.size(); i++) {
         for (uint j = i+1; j < candidates_cpos.size(); j++) {
@@ -998,21 +998,22 @@ uint xstructure::GetPrimitiveCell(void) {
               candidate_lattice=::NiggliUnitCellForm(candidate_lattice);           // Niggli Second //DX 20180526
               det = aurostd::determinant(candidate_lattice);
               //In order to find minimum, determinant should be positive,less than the first, and an integer multiple of less than first
-              //DX [OBSOLETE] 20180723 - if(det > tol_vol && det < prim_det && aurostd::isinteger(prim_det / det, 0.05)) { //DX 20180614 - now it should be right-handed
               double atom_number_ratio = (double)smallest_group/aurostd::nint(prim_det/det); // atom ratio before and after reducing //DX 20180723
-              if(det > tol_vol && det < prim_det && aurostd::isinteger(prim_det / det, 0.05) && aurostd::isinteger(atom_number_ratio, 0.05) && (atom_number_ratio-1.0)>-_ZERO_TOL_) { //DX 20180614 - now it should be right-handed // check atom ratio after reducing //DX 20180723
+              //DX [OBSOLETE] 20180723 - if(det > tol_vol && det < prim_det && aurostd::isinteger(prim_det / det, 0.05)) //DX 20180614 - now it should be right-handed
+              if(det > tol_vol && det < prim_det && aurostd::isinteger(prim_det / det, 0.05) && aurostd::isinteger(atom_number_ratio, 0.05) && (atom_number_ratio-1.0)>-_ZERO_TOL_) //DX 20180614 - now it should be right-handed // check atom ratio after reducing //DX 20180723
+              { //CO200106 - patching for auto-indenting
                 //double sum_candidate_mods = candidates_mods[i] + candidates_mods[j] + candidates_mods[k];
                 double sum_candidate_mods = aurostd::modulus(candidate_lattice(1)) + aurostd::modulus(candidate_lattice(2)) + aurostd::modulus(candidate_lattice(3)); //DX 20180613 - need to recalculate mods, they may have changed during Minkowski/Niggli 
                 //candidate_lattice=::MinkowskiBasisReduction(candidate_lattice);      // Minkowski first  //DX 20180526
                 //candidate_lattice=::NiggliUnitCellForm(candidate_lattice);           // Niggli Second //DX 20180526
-              if(sum_candidate_mods < sum_mods) {
-                sum_mods = sum_candidate_mods; 
-                nonsimp_reduced_basis = candidate_lattice;
+                if(sum_candidate_mods < sum_mods) {
+                  sum_mods = sum_candidate_mods; 
+                  nonsimp_reduced_basis = candidate_lattice;
+                }
               }
             }
           }
         }
-      }
       }
       prim_lattice = nonsimp_reduced_basis;
       lattice_basis[0] = SYM::extract_row(prim_lattice, 1);
@@ -1067,23 +1068,23 @@ uint xstructure::GetPrimitiveCell(void) {
     }
     (*this).species.clear(); // DX
     for (uint i = 0; i < newbasis.size(); i++) {
-      _atom tmp;
-      tmp.fpos = newbasis[i].fpos;
-      tmp.cpos = newbasis[i].cpos;
-      tmp.name = newbasis[i].name;
-      tmp.type = newbasis[i].type;
-      tmp.name_is_given = true;
-      tmp.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
-      tmp.spin_is_given = false; // DX 9/21/17 - magnetic sym
-      if(aurostd::abs(tmp.spin)>_ZERO_TOL_){
-      tmp.spin_is_given = true; // DX 9/21/17 - magnetic sym
+      _atom tmp_atom = newbasis[i]; //DX 20191011 - initialized instead of setting individually below
+      //DX 20191011 [OBSOLETE] tmp_atom.fpos = newbasis[i].fpos;
+      //DX 20191011 [OBSOLETE] tmp_atom.cpos = newbasis[i].cpos;
+      //DX 20191011 [OBSOLETE] tmp_atom.name = newbasis[i].name;
+      //DX 20191011 [OBSOLETE] tmp_atom.type = newbasis[i].type;
+      //DX 20191011 [OBSOLETE] tmp_atom.name_is_given = true;
+      //DX 20191011 [OBSOLETE] tmp_atom.spin = newbasis[i].spin; // DX 9/21/17 - magnetic sym
+      tmp_atom.spin_is_given = false; // DX 9/21/17 - magnetic sym
+      if(aurostd::abs(tmp_atom.spin)>_ZERO_TOL_){
+        tmp_atom.spin_is_given = true; // DX 9/21/17 - magnetic sym
       }
-      tmp.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-      tmp.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
-      if(aurostd::abs(tmp.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp.noncoll_spin(3))>_ZERO_TOL_){
-        tmp.spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin = newbasis[i].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+      tmp_atom.noncoll_spin_is_given = false; // DX 12/5/17 - magnetic sym (non-collinear)
+      if(aurostd::abs(tmp_atom.noncoll_spin(1))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(2))>_ZERO_TOL_ || aurostd::abs(tmp_atom.noncoll_spin(3))>_ZERO_TOL_){
+        tmp_atom.noncoll_spin_is_given = true; // DX 12/5/17 - magnetic sym (non-collinear) //DX 20191108 - fixed typo, should be noncoll_spin_is_given not spin_is_given
       }
-      (*this).AddAtom(tmp);
+      (*this).AddAtom(tmp_atom);
     }
   }
   (*this).num_each_type = numtypes;
@@ -1156,17 +1157,17 @@ namespace SYM {
     for (uint i = 0; i < expanded_lattice_points.size(); i++) {
       //cerr << "lattice point: " << expanded_lattice_points[i] << endl; //cartesian
       for (uint j = 0; j < xstr.atoms.size(); j++) {  // (OBSOLETE) go from 1 because
-	// the origin at 0 0 0 is taken care of by the expanded lattice
-	_atom tmp;
-	//tmp.print_RHT = true; //CO190405 - get rid of this!
-	tmp.cpos = expanded_lattice_points[i] + F2C(L, xstr.atoms[j].fpos);
-	tmp.name = xstr.atoms[j].name;
-	tmp.type = xstr.atoms[j].type;
-	tmp.spin = xstr.atoms[j].spin; // DX 9/21/17 - magnetic sym
-	tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX 9/21/17 - magnetic sym
-	tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
-	tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
-	out.push_back(tmp);
+        // the origin at 0 0 0 is taken care of by the expanded lattice
+        _atom tmp = xstr.atoms[j]; //DX 20191011 initialized instead of setting explictly (below)
+        //tmp.print_RHT = true; //CO190405 - get rid of this!
+        tmp.cpos = expanded_lattice_points[i] + F2C(L, xstr.atoms[j].fpos);
+        //DX 20191011 [OBSOLETE] tmp.name = xstr.atoms[j].name;
+        //DX 20191011 [OBSOLETE] tmp.type = xstr.atoms[j].type;
+        //DX 20191011 [OBSOLETE] tmp.spin = xstr.atoms[j].spin; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] tmp.spin_is_given = xstr.atoms[j].spin_is_given; // DX 9/21/17 - magnetic sym
+        //DX 20191011 [OBSOLETE] tmp.noncoll_spin = xstr.atoms[j].noncoll_spin; // DX 12/5/17 - magnetic sym (non-collinear)
+        //DX 20191011 [OBSOLETE] tmp.noncoll_spin_is_given = xstr.atoms[j].noncoll_spin_is_given; // DX 12/5/17 - magnetic sym (non-collinear)
+        out.push_back(tmp);
       }
     }
     return out;
@@ -1184,12 +1185,12 @@ namespace SYM {
     xvector<double> tmp;
     for (int x = 0; x <= a; x++) {
       for (int y = 0; y <= b; y++) {
-	for (int z = 0; z <= c; z++) {
-	  tmp(1) = L(1, 1) * x + L(2, 1) * y + L(3, 1) * z;
-	  tmp(2) = L(1, 2) * x + L(2, 2) * y + L(3, 2) * z;
-	  tmp(3) = L(1, 3) * x + L(2, 3) * y + L(3, 3) * z;
-	  out.push_back(tmp);
-	}
+        for (int z = 0; z <= c; z++) {
+          tmp(1) = L(1, 1) * x + L(2, 1) * y + L(3, 1) * z;
+          tmp(2) = L(1, 2) * x + L(2, 2) * y + L(3, 2) * z;
+          tmp(3) = L(1, 3) * x + L(2, 3) * y + L(3, 3) * z;
+          out.push_back(tmp);
+        }
       }
     }
     return out;
@@ -1207,12 +1208,12 @@ namespace SYM {
     xvector<double> tmp;
     for (int x = -a; x <= a; x++) {
       for (int y = -b; y <= b; y++) {
-	for (int z = -c; z <= c; z++) {
-	  tmp(1) = L(1, 1) * x + L(2, 1) * y + L(3, 1) * z;
-	  tmp(2) = L(1, 2) * x + L(2, 2) * y + L(3, 2) * z;
-	  tmp(3) = L(1, 3) * x + L(2, 3) * y + L(3, 3) * z;
-	  out.push_back(tmp);
-	}
+        for (int z = -c; z <= c; z++) {
+          tmp(1) = L(1, 1) * x + L(2, 1) * y + L(3, 1) * z;
+          tmp(2) = L(1, 2) * x + L(2, 2) * y + L(3, 2) * z;
+          tmp(3) = L(1, 3) * x + L(2, 3) * y + L(3, 3) * z;
+          out.push_back(tmp);
+        }
       }
     }
     return out;
@@ -1224,12 +1225,12 @@ namespace SYM {
 //**********************************************************************************************************************************************
 namespace SYM {
   xstructure ConventionalCell(xstructure& xstr, int& IT, int& cell_choice, bool& last_orientation, string& crystalsystem_prev,
-			      xstructure& CrystOut_prev, vector<xmatrix<double> >& candidate_lattice_vectors_prev,
-			      vector<char>& candidate_lattice_chars_prev, symfolder& checkops, SymmetryInformationITC& ITC_sym_info, bool& lattice_reformed,
-			      vector<int>& lattice_pgroups, vector<xmatrix<double> >& lattice_sym_mats,
-			      vector<xmatrix<double> >& crystal_sym_mats, bool& symmetryfound) {
+      xstructure& CrystOut_prev, vector<xmatrix<double> >& candidate_lattice_vectors_prev,
+      vector<char>& candidate_lattice_chars_prev, symfolder& checkops, SymmetryInformationITC& ITC_sym_info, bool& lattice_reformed,
+      vector<int>& lattice_pgroups, vector<xmatrix<double> >& lattice_sym_mats,
+      vector<xmatrix<double> >& crystal_sym_mats, bool& symmetryfound) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    
+
     double sym_tol = xstr.sym_eps; //DX 20190215 - get sym_tol
 
     // ========== Objects containing crystal stucture information ========== //
@@ -1253,12 +1254,12 @@ namespace SYM {
     // === Check if atoms occupying the same space === //
     for (uint i = 0; i < primitive_atomic_basis.size(); i++) {
       for (uint j = i + 1; j < primitive_atomic_basis.size(); j++) {
-	      if(SYM::MapAtom(primitive_atomic_basis[i], primitive_atomic_basis[j], FALSE, LPRIM, f2c, skew, sym_tol)) { //DX 20190215 - added sym_tol //DX 20190619 - LPRIM and f2c as input
-	        if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Atoms occupying the same space (given tolerance " << sym_tol << "). Check structure [dir=" << xstr.directory << "]." << endl; } //DX 20190215 - _SYM_TOL_ to sym_tol
-	        if(LDEBUG) { cerr << "SYM::ConventionalCell: atom #" << i << " symbol: " << primitive_atomic_basis[i].name << " coord: " << primitive_atomic_basis[i].fpos << endl; }
-	        if(LDEBUG) { cerr << "SYM::ConventionalCell: atom #" << j << " symbol: " << primitive_atomic_basis[j].name << " coord: " << primitive_atomic_basis[j].fpos << endl; }
-	        atoms_overlapping = true;
-	      }
+        if(SYM::MapAtom(primitive_atomic_basis[i], primitive_atomic_basis[j], FALSE, LPRIM, f2c, skew, sym_tol)) { //DX 20190215 - added sym_tol //DX 20190619 - LPRIM and f2c as input
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Atoms occupying the same space (given tolerance " << sym_tol << "). Check structure [dir=" << xstr.directory << "]." << endl; } //DX 20190215 - _SYM_TOL_ to sym_tol
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: atom #" << i << " symbol: " << primitive_atomic_basis[i].name << " coord: " << primitive_atomic_basis[i].fpos << endl; }
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: atom #" << j << " symbol: " << primitive_atomic_basis[j].name << " coord: " << primitive_atomic_basis[j].fpos << endl; }
+          atoms_overlapping = true;
+        }
       }
     }
 
@@ -1305,7 +1306,7 @@ namespace SYM {
       twofold_lattice_vectors.push_back(mirror_lattice_vectors[m]);
     }
     if(mirror_ops_vec.size()>2){
-    rot_ops_vec = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew, sym_tol); //DX 20190215 - added sym_tol
+      rot_ops_vec = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew, sym_tol); //DX 20190215 - added sym_tol
     }
     if(LDEBUG) {
       cerr << "SYM::ConventionalCell: Number of mirror operations: " << mirror_ops_vec.size() << " [dir=" << xstr.directory << "]." << endl;
@@ -1346,10 +1347,10 @@ namespace SYM {
     while (reform == true) {
       // ===== If not the first iteration, use the symmetry elements from the first iteration ===== //
       if(IT >= 1) {
-	xstr = CrystOut_prev;
-	xstr.GetPrimitiveCell();
-	L = xstr.lattice;
-	Linv = aurostd::inverse(L);
+        xstr = CrystOut_prev;
+        xstr.GetPrimitiveCell();
+        L = xstr.lattice;
+        Linv = aurostd::inverse(L);
       }
       xstr_out = xstr;
       CrystOut_prev = xstr;
@@ -1368,19 +1369,19 @@ namespace SYM {
       int fourcount = 0;
       int three_six_count = 0;
       for (uint i = 0; i < rot_ops_vec.size(); i++) {
-	if(aurostd::abs(rot_ops_vec[i].return_order() - 4.0) < _ZERO_TOL_) {
-	  fourcount++;
-	}
-	if(aurostd::abs(rot_ops_vec[i].return_order() - 3.0) < _ZERO_TOL_ || aurostd::abs(rot_ops_vec[i].return_order() - 6.0) < _ZERO_TOL_) {
-	  three_six_count++;
-	}
+        if(aurostd::abs(rot_ops_vec[i].return_order() - 4.0) < _ZERO_TOL_) {
+          fourcount++;
+        }
+        if(aurostd::abs(rot_ops_vec[i].return_order() - 3.0) < _ZERO_TOL_ || aurostd::abs(rot_ops_vec[i].return_order() - 6.0) < _ZERO_TOL_) {
+          three_six_count++;
+        }
       }
 
       // ===== If atoms overlapping, then set to TRICLINIC (i.e. spacegroup=1) ===== //
       if(atoms_overlapping == true) {
-	mcount = 0;
-	fourcount = 0;
-	three_six_count = 0;
+        mcount = 0;
+        fourcount = 0;
+        three_six_count = 0;
       }
 
       //When the lattice symetry leads to an incorrect crystalsystem, reformation will occur.
@@ -1393,38 +1394,38 @@ namespace SYM {
       //When on second iteration, use only crystal system to designate cell (having both mcount and crystal system can lead to going into hexagonal
       //and orthorhombic sections which adds redundant atoms) 8/21/13
       if(IT == 0) {
-	if(sym_count > 0) {
-	  mcount = -1;
-	  if(sym_count < candidate_lattice_vectors_prev.size()) {
-	    //cerr << "WARNING: Should never be here..." << endl;
-	    candidate_lattice_vectors = candidate_lattice_vectors_prev;
-	    candidate_lattice_chars = candidate_lattice_chars_prev;
-	    lattice_vectors_found = true;
-	  }
-	}
+        if(sym_count > 0) {
+          mcount = -1;
+          if(sym_count < candidate_lattice_vectors_prev.size()) {
+            //cerr << "WARNING: Should never be here..." << endl;
+            candidate_lattice_vectors = candidate_lattice_vectors_prev;
+            candidate_lattice_chars = candidate_lattice_chars_prev;
+            lattice_vectors_found = true;
+          }
+        }
       }
       if(IT > 0) {
-	crystalsystem = crystalsystem_prev;
-	if((uint)(IT + sym_count) < candidate_lattice_vectors_prev.size()) {
-	  candidate_lattice_vectors = candidate_lattice_vectors_prev;
-	  candidate_lattice_chars = candidate_lattice_chars_prev;
-	  lattice_vectors_found = true;
-	}
+        crystalsystem = crystalsystem_prev;
+        if((uint)(IT + sym_count) < candidate_lattice_vectors_prev.size()) {
+          candidate_lattice_vectors = candidate_lattice_vectors_prev;
+          candidate_lattice_chars = candidate_lattice_chars_prev;
+          lattice_vectors_found = true;
+        }
       }
 
-	  bool continue_ortho = false;
-	  // === Check orthogonality defect ===== //
-	  uint totalcount = mcount;
-	  int totalnum = CombinationNr(3, totalcount);
-	  vector<int> combiset;
-	  combiset = AllCombination41(3, totalcount, 1);
-	  for (int i = 0; i < totalnum; i++) {
-	    if(aurostd::abs(orthogonality_defect(xvec2xmat(mirror_ops_vec[combiset[0]].return_direction(), mirror_ops_vec[combiset[1]].return_direction(), mirror_ops_vec[combiset[2]].return_direction())) - 1.0) < sym_tol) { //DX 20190215 - _SYM_TOL_ to sym_tol
-	      continue_ortho = true;
-	      break;
-	    }
-	    combiset = AllCombination42(3, totalcount, combiset);
-	  }
+      bool continue_ortho = false;
+      // === Check orthogonality defect ===== //
+      uint totalcount = mcount;
+      int totalnum = CombinationNr(3, totalcount);
+      vector<int> combiset;
+      combiset = AllCombination41(3, totalcount, 1);
+      for (int i = 0; i < totalnum; i++) {
+        if(aurostd::abs(orthogonality_defect(xvec2xmat(mirror_ops_vec[combiset[0]].return_direction(), mirror_ops_vec[combiset[1]].return_direction(), mirror_ops_vec[combiset[2]].return_direction())) - 1.0) < sym_tol) { //DX 20190215 - _SYM_TOL_ to sym_tol
+          continue_ortho = true;
+          break;
+        }
+        combiset = AllCombination42(3, totalcount, combiset);
+      }
       // ********************************************************************************************************************************
       // Symmetry/Conventional Cell Routine
       // ********************************************************************************************************************************
@@ -1448,168 +1449,170 @@ namespace SYM {
       // cerr << "SYM::ConventionalCell: crystalsystem: " << crystalsystem << endl;
       // DEBUG
       if(lattice_vectors_found == false) {
-	// *****************************************************************************************************************************
-	// Find the lattice vectors.
-	// *****************************************************************************************************************************
+        // *****************************************************************************************************************************
+        // Find the lattice vectors.
+        // *****************************************************************************************************************************
 
-	// =============== CUBIC =============== //
-	if((mcount == 9 && fourcount == 3) || crystalsystem == "CUBIC") {
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: CUBIC [dir=" << xstr.directory << "]." << endl; }
-	  symmetryfound = true;
-	  crystalsystem = "CUBIC";
+        // =============== CUBIC =============== //
+        if((mcount == 9 && fourcount == 3) || crystalsystem == "CUBIC") {
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: CUBIC [dir=" << xstr.directory << "]." << endl; }
+          symmetryfound = true;
+          crystalsystem = "CUBIC";
 
-	  if(!findCubicLattice(rot_lattice_vectors, rot_ops_vec, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-	    symmetryfound = false;
-	    return xstr_out;
-	  }
-	}
+          if(!findCubicLattice(rot_lattice_vectors, rot_ops_vec, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+            symmetryfound = false;
+            return xstr_out;
+          }
+        }
 
-	// =============== HEXAGONAL =============== //
-	else if(((mcount == 7 || mcount == 8) && three_six_count != 0)|| crystalsystem == "TRIGONAL" || crystalsystem == "HEXAGONAL") {
-	  symmetryfound = true;
-	  crystalsystem = "HEXAGONAL";
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: HEX [dir=" << xstr.directory << "]." << endl; }
-	  if(!findTrigonalLattice(rot_lattice_vectors, rot_ops_vec, big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-	    symmetryfound = false;
-	    return xstr_out;
-	  }
+        // =============== HEXAGONAL =============== //
+        else if(((mcount == 7 || mcount == 8) && three_six_count != 0)|| crystalsystem == "TRIGONAL" || crystalsystem == "HEXAGONAL") {
+          symmetryfound = true;
+          crystalsystem = "HEXAGONAL";
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: HEX [dir=" << xstr.directory << "]." << endl; }
+          if(!findTrigonalLattice(rot_lattice_vectors, rot_ops_vec, big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+            symmetryfound = false;
+            return xstr_out;
+          }
           //DX 20180808 - check rhl - START
           // some ambiguity whether hex or rhl if using crystalsystem as conditional; 
           // if using cell choice 2, the cell is always hex 
           // if using cell choice 1, the cell is hex for hexagonal space groups and rhl for rhombohedral space groups 
           // need to check number of lattice points in the cell
           if(cell_choice==SG_SETTING_1 || cell_choice==SG_SETTING_ANRL){ //DX 20190131 - add ANRL setting
-	    f2c = trasp(candidate_lattice_vectors[0]);
-	    c2f = inverse(trasp(candidate_lattice_vectors[0]));
-	    skew = SYM::isLatticeSkewed(candidate_lattice_vectors[0], xstr_out.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
-	    // ===== Find number of lattice points in cell (lattice centering) ===== //
-	    vector<xvector<double> > bravais_basis;
-	    int bravais_count = 0;
-	    determineLatticeCentering(bravais_basis, bravais_count, c2f, f2c, skew, big_expanded, crystalsystem, candidate_lattice_chars, sym_tol); //DX 20190215 - added sym_tol
-	    if(bravais_count == 3){ // if three lattice points in the cell, then the system is rhl
-	      //use rhombohedral setting
-	      if(LDEBUG) { cerr << "SYM::ConventionalCell: Crystal system is trigonal with three lattice points and setting=1, using rhombohedral setting [dir=" << xstr.directory << "]." << endl; }
-	      if(!findRhombohedralSetting(big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-		symmetryfound = false;
-		return xstr_out;
-	      }
-	    } 
+            f2c = trasp(candidate_lattice_vectors[0]);
+            c2f = inverse(trasp(candidate_lattice_vectors[0]));
+            skew = SYM::isLatticeSkewed(candidate_lattice_vectors[0], xstr_out.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+            // ===== Find number of lattice points in cell (lattice centering) ===== //
+            vector<xvector<double> > bravais_basis;
+            int bravais_count = 0;
+            determineLatticeCentering(bravais_basis, bravais_count, c2f, f2c, skew, big_expanded, crystalsystem, candidate_lattice_chars, sym_tol); //DX 20190215 - added sym_tol
+            if(bravais_count == 3){ // if three lattice points in the cell, then the system is rhl
+              //use rhombohedral setting
+              if(LDEBUG) { cerr << "SYM::ConventionalCell: Crystal system is trigonal with three lattice points and setting=1, using rhombohedral setting [dir=" << xstr.directory << "]." << endl; }
+              if(!findRhombohedralSetting(big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+                symmetryfound = false;
+                return xstr_out;
+              }
+            } 
           }
           //DX 20180808 - check rhl - END
-	}
+        }
 
-	// =============== TETRAGONAL =============== //
-	//else if(((mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL") {
-	else if(((mcount == 3 || mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL") {
-	  symmetryfound = true;
-	  crystalsystem = "TETRAGONAL";
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: TET [dir=" << xstr.directory << "]." << endl; }
+        // =============== TETRAGONAL =============== //
+        //else if(((mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        else if(((mcount == 3 || mcount == 4 || mcount == 5 || mcount == 6 || mcount == 7 || mcount == 8) && fourcount != 0) || crystalsystem == "TETRAGONAL")
+        { //CO200106 - patching for auto-indenting
+          symmetryfound = true;
+          crystalsystem = "TETRAGONAL";
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: TET [dir=" << xstr.directory << "]." << endl; }
 
-	  if(!findTetragonalLattice(rot_lattice_vectors, twofold_lattice_vectors, rot_ops_vec, twofold_ops_vec, big_expanded,
-				     candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-	    symmetryfound = false;
-	    return xstr_out;
-	  }
-	}
+          if(!findTetragonalLattice(rot_lattice_vectors, twofold_lattice_vectors, rot_ops_vec, twofold_ops_vec, big_expanded,
+                candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+            symmetryfound = false;
+            return xstr_out;
+          }
+        }
 
-	// =============== ORTHORHOMBIC/RHOMBOHEDRAL =============== //
-	else if(((mcount == 3 || mcount == 4 || mcount == 5) && continue_ortho && fourcount == 0) || crystalsystem == "ORTHORHOMBIC") {
-	  symmetryfound = true;
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: ORTHO/RHOMB [dir=" << xstr.directory << "]." << endl; }
-	  // ===== Check between orthorhombic and rhombohedral ===== //
-	  // To discern between rhombohedral and orthorhombic lattices by mirror planes,
-	  // check the orthogonality defect. (Rhombohedral mirror planes are not mutually orthogonal).
-	  //bool continue_ortho = false;
-	  //// === Check orthogonality defect ===== //
-	  //uint totalcount = mcount;
-	  //int totalnum = CombinationNr(3, totalcount);
-	  //vector<int> combiset;
-	  //combiset = AllCombination41(3, totalcount, 1);
-	  //for (int i = 0; i < totalnum; i++) {
-	  //  if(aurostd::abs(orthogonality_defect(xvec2xmat(mirror_ops_vec[combiset[0]].return_direction(), mirror_ops_vec[combiset[1]].return_direction(), mirror_ops_vec[combiset[2]].return_direction())) - 1.0) < sym_tol) { //DX 20190215 - _SYM_TOL_ to sym_tol
-	  //    continue_ortho = true;
-	  //    break;
-	  //  }
-	  //  combiset = AllCombination42(3, totalcount, combiset);
-	  //}
-	  //if(crystalsystem == "ORTHORHOMBIC") {  //IF MCOUNT == 30 CRYSTAL CLASS IS ALREADY KNOWN
-	  //  continue_ortho = true;
-	  //}
+        // =============== ORTHORHOMBIC/RHOMBOHEDRAL =============== //
+        else if(((mcount == 3 || mcount == 4 || mcount == 5) && continue_ortho && fourcount == 0) || crystalsystem == "ORTHORHOMBIC") {
+          symmetryfound = true;
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: ORTHO/RHOMB [dir=" << xstr.directory << "]." << endl; }
+          // ===== Check between orthorhombic and rhombohedral ===== //
+          // To discern between rhombohedral and orthorhombic lattices by mirror planes,
+          // check the orthogonality defect. (Rhombohedral mirror planes are not mutually orthogonal).
+          //bool continue_ortho = false;
+          //// === Check orthogonality defect ===== //
+          //uint totalcount = mcount;
+          //int totalnum = CombinationNr(3, totalcount);
+          //vector<int> combiset;
+          //combiset = AllCombination41(3, totalcount, 1);
+          //for (int i = 0; i < totalnum; i++) {
+          //  if(aurostd::abs(orthogonality_defect(xvec2xmat(mirror_ops_vec[combiset[0]].return_direction(), mirror_ops_vec[combiset[1]].return_direction(), mirror_ops_vec[combiset[2]].return_direction())) - 1.0) < sym_tol) { //DX 20190215 - _SYM_TOL_ to sym_tol
+          //    continue_ortho = true;
+          //    break;
+          //  }
+          //  combiset = AllCombination42(3, totalcount, combiset);
+          //}
+          //if(crystalsystem == "ORTHORHOMBIC") {  //IF MCOUNT == 30 CRYSTAL CLASS IS ALREADY KNOWN
+          //  continue_ortho = true;
+          //}
 
-	  // =============== ORTHORHOMBIC =============== //
-	//  if(continue_ortho == true) {
-	    if(LDEBUG) { cerr << "SYM::ConventionalCell: ORTHO true: [dir=" << xstr.directory << "]." << endl; }
-	    crystalsystem = "ORTHORHOMBIC";
+          // =============== ORTHORHOMBIC =============== //
+          //  if(continue_ortho == true) {  //[CO200106 - close bracket for indenting]}
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: ORTHO true: [dir=" << xstr.directory << "]." << endl; }
+          crystalsystem = "ORTHORHOMBIC";
 
-	    if(!findOrthorhombicLattice(twofold_lattice_vectors, mirror_lattice_vectors, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-	      symmetryfound = false;
-	      return xstr_out;
-	    }
-	  }
-	  // =============== RHOMBOHEDRAL =============== //
-	//  else {
-	else if(((mcount == 3 || mcount == 4 || mcount == 5) && !continue_ortho && three_six_count!=0 && fourcount == 0)) {
-	  symmetryfound = true;
-	    // On the second iteration, this section is now equivalent to the hexagonal section above.
-	    // Need a slightly larger expansion to get lattice basis in HEX setting
-	    // Using 'r' to denote rhombohedral in primitive lattice cell and 'R' to denote rhombodehral with hexagonal axes
-	    crystalsystem = "TRIGONAL";
-	    if(LDEBUG) { cerr << "SYM::ConventionalCell: RHOMB [dir=" << xstr.directory << "]." << endl; }
+          if(!findOrthorhombicLattice(twofold_lattice_vectors, mirror_lattice_vectors, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+            symmetryfound = false;
+            return xstr_out;
+          }
+        }
+        // =============== RHOMBOHEDRAL =============== //
+        //  else {  //[CO200106 - close bracket for indenting]}
+        else if(((mcount == 3 || mcount == 4 || mcount == 5) && !continue_ortho && three_six_count!=0 && fourcount == 0)) {
+          symmetryfound = true;
+          // On the second iteration, this section is now equivalent to the hexagonal section above.
+          // Need a slightly larger expansion to get lattice basis in HEX setting
+          // Using 'r' to denote rhombohedral in primitive lattice cell and 'R' to denote rhombodehral with hexagonal axes
+          crystalsystem = "TRIGONAL";
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: RHOMB [dir=" << xstr.directory << "]." << endl; }
 
-	    if(!findRhombohedralLattice(rot_lattice_vectors, rot_ops_vec, big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-	      symmetryfound = false;
-	      return xstr_out;
-	    }
+          if(!findRhombohedralLattice(rot_lattice_vectors, rot_ops_vec, big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+            symmetryfound = false;
+            return xstr_out;
+          }
           //DX 20180808 - check rhl - START
           // need to check number of lattice points in the cell; it may be a hexagonal space group and not rhombohedral
           if(cell_choice==SG_SETTING_1 || cell_choice==SG_SETTING_ANRL){ //DX 20190131 - add ANRL setting
-	    f2c = trasp(candidate_lattice_vectors[0]);
-	    c2f = inverse(trasp(candidate_lattice_vectors[0]));
-	    skew = SYM::isLatticeSkewed(candidate_lattice_vectors[0], xstr_out.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
-	    // ===== Find number of lattice points in cell (lattice centering) ===== //
-	    vector<xvector<double> > bravais_basis;
-	    int bravais_count = 0;
-	    determineLatticeCentering(bravais_basis, bravais_count, c2f, f2c, skew, big_expanded, crystalsystem, candidate_lattice_chars, sym_tol); //DX 20190215 - added sym_tol
-	    if(bravais_count == 3){ // if three lattice points in the cell, then the system is rhl
-	      //use rhombohedral setting
-	      if(!findRhombohedralSetting(big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
-		symmetryfound = false;
-		return xstr_out;
-	      }
+            f2c = trasp(candidate_lattice_vectors[0]);
+            c2f = inverse(trasp(candidate_lattice_vectors[0]));
+            skew = SYM::isLatticeSkewed(candidate_lattice_vectors[0], xstr_out.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+            // ===== Find number of lattice points in cell (lattice centering) ===== //
+            vector<xvector<double> > bravais_basis;
+            int bravais_count = 0;
+            determineLatticeCentering(bravais_basis, bravais_count, c2f, f2c, skew, big_expanded, crystalsystem, candidate_lattice_chars, sym_tol); //DX 20190215 - added sym_tol
+            if(bravais_count == 3){ // if three lattice points in the cell, then the system is rhl
+              //use rhombohedral setting
+              if(!findRhombohedralSetting(big_expanded, candidate_lattice_vectors, candidate_lattice_chars, sym_tol)) { //DX 20190215 - added sym_tol
+                symmetryfound = false;
+                return xstr_out;
+              }
             }
           }
           //DX 20180808 - check rhl - END
-	}
+        }
 
-	// =============== MONOCLINIC =============== //
-	else if(((mcount == 1 || mcount == 2 || mcount == 3) && !continue_ortho && three_six_count==0) || crystalsystem == "MONOCLINIC") {
-	//else if(((mcount == 1 || mcount == 2 || mcount == 3) && three_six_count==0) || crystalsystem == "MONOCLINIC") { //DX 20180613 - can be orthogonal and still be monoclinic 
-	  symmetryfound = true;
-	  crystalsystem = "MONOCLINIC";
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: MONO [dir=" << xstr.directory << "]." << endl; }
+        // =============== MONOCLINIC =============== //
+        else if(((mcount == 1 || mcount == 2 || mcount == 3) && !continue_ortho && three_six_count==0) || crystalsystem == "MONOCLINIC")
+          //else if(((mcount == 1 || mcount == 2 || mcount == 3) && three_six_count==0) || crystalsystem == "MONOCLINIC") //DX 20180613 - can be orthogonal and still be monoclinic 
+        { //CO200106 - patching for auto-indenting
+          symmetryfound = true;
+          crystalsystem = "MONOCLINIC";
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: MONO [dir=" << xstr.directory << "]." << endl; }
 
-	  if(!findMonoclinicLattice(mirror_lattice_vectors, twofold_lattice_vectors, big_expanded,
-				     candidate_lattice_vectors, candidate_lattice_chars, cell_choice, sym_tol)) { //DX 20180816 - added cell choice //DX 20190215 - added sym_tol
-	    symmetryfound = false;
-	    return xstr_out;
-	  }
-	}
+          if(!findMonoclinicLattice(mirror_lattice_vectors, twofold_lattice_vectors, big_expanded,
+                candidate_lattice_vectors, candidate_lattice_chars, cell_choice, sym_tol)) { //DX 20180816 - added cell choice //DX 20190215 - added sym_tol
+            symmetryfound = false;
+            return xstr_out;
+          }
+        }
 
-	// =============== TRICLINIC =============== //
-	else if(mcount == 0 || crystalsystem == "TRICLINIC") {
-	  symmetryfound = true;
-	  crystalsystem = "TRICLINIC";
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: TRI [dir=" << xstr.directory << "]." << endl; }
+        // =============== TRICLINIC =============== //
+        else if(mcount == 0 || crystalsystem == "TRICLINIC") {
+          symmetryfound = true;
+          crystalsystem = "TRICLINIC";
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: TRI [dir=" << xstr.directory << "]." << endl; }
 
-	  if(!findTriclinicLattice(L, candidate_lattice_vectors,
-				    candidate_lattice_chars)) {
-	    symmetryfound = false;
-	    return xstr_out;
-	  }
-	}
+          if(!findTriclinicLattice(L, candidate_lattice_vectors,
+                candidate_lattice_chars)) {
+            symmetryfound = false;
+            return xstr_out;
+          }
+        }
         else {
           if(LDEBUG) { cerr << "SYM::ConventionalCell: Could not identify crystal system, i.e., symmetry operation counts do not match with any of the crystal systems [dir=" << xstr.directory << "]." << endl;}
-	}
+        }
       }  //end of lattice_vectors_found if statement
       // *****************************************************************************************************************************
       // END: Find the lattice vectors.
@@ -1620,165 +1623,165 @@ namespace SYM {
       // *****************************************************************************************************************************
       uint start_index = 0;
       if(candidate_lattice_vectors.size() > (uint)IT) {
-	start_index = IT;
+        start_index = IT;
       } else {
-	start_index = 0;
+        start_index = 0;
       }
       for (uint i = start_index; i < candidate_lattice_vectors.size(); i++) {
-	xmatrix<double> CL = candidate_lattice_vectors[i];
+        xmatrix<double> CL = candidate_lattice_vectors[i];
         if(LDEBUG) {
-	  cerr << "SYM::ConventionalCell: Possible conventional lattice vectors (choice " << (i+1) << " of " << candidate_lattice_vectors.size() << "): [dir=" << xstr.directory << "]." << endl;
+          cerr << "SYM::ConventionalCell: Possible conventional lattice vectors (choice " << (i+1) << " of " << candidate_lattice_vectors.size() << "): [dir=" << xstr.directory << "]." << endl;
           cerr << CL << endl;
         }
-	f2c = trasp(CL);
-	c2f = inverse(trasp(CL));
-	skew = SYM::isLatticeSkewed(CL, xstr_out.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
-	// ===== Find number of lattice points in cell (lattice centering) ===== //
-	vector<xvector<double> > bravais_basis;
-	int bravais_count = 0;
-	determineLatticeCentering(bravais_basis, bravais_count, c2f, f2c, skew, big_expanded, crystalsystem, candidate_lattice_chars, sym_tol); //DX 20190215 - added sym_tol
-	char lattice_char = candidate_lattice_chars[i];
+        f2c = trasp(CL);
+        c2f = inverse(trasp(CL));
+        skew = SYM::isLatticeSkewed(CL, xstr_out.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+        // ===== Find number of lattice points in cell (lattice centering) ===== //
+        vector<xvector<double> > bravais_basis;
+        int bravais_count = 0;
+        determineLatticeCentering(bravais_basis, bravais_count, c2f, f2c, skew, big_expanded, crystalsystem, candidate_lattice_chars, sym_tol); //DX 20190215 - added sym_tol
+        char lattice_char = candidate_lattice_chars[i];
 
-	// *****************************************************************************************************************************
-	// Fill in cell with conventional atomic basis
-	// *****************************************************************************************************************************
-	// ========== Conventional Atomic Basis ========== //
-	//Now add those basis atoms that fit in conventional cell:
-	//[CO190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
-	deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol, false); //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - false->do not check min dists (expensive)
+        // *****************************************************************************************************************************
+        // Fill in cell with conventional atomic basis
+        // *****************************************************************************************************************************
+        // ========== Conventional Atomic Basis ========== //
+        //Now add those basis atoms that fit in conventional cell:
+        //[CO190520]deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, c2f, f2c, skew, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+        deque<_atom> conventional_basis_atoms = foldAtomsInCell(expanded_basis, xstr.lattice, CL, skew, sym_tol, false); //DX 20190215 - _SYM_TOL_ to sym_tol //DX 20190619 - false->do not check min dists (expensive)
 
-	bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.
-	// ===== Check if ratio of atoms is consistent with primitive atomic basis ===== //
-	// Note: If the original POSCAR has atoms overlapping, skip this part (SG will be equal to 1)
-	if(atoms_overlapping == false) {
-	  consistent_ratio = GCD_conventional_atomic_basis(conventional_basis_atoms, prim_split_atom_types, prim_GCD);
-	}
-	if(consistent_ratio == false) {
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Conventional cell atomic basis ratio is inconsistent with the primitive cell! Recalculating. [dir=" << xstr.directory << "]." << endl; }
-	  symmetryfound = false;
-	  continue;
-	}
+        bool consistent_ratio = true;  // Change tolerances if the ratio between atomic basis atoms is inconsistent with the primitive cell.
+        // ===== Check if ratio of atoms is consistent with primitive atomic basis ===== //
+        // Note: If the original POSCAR has atoms overlapping, skip this part (SG will be equal to 1)
+        if(atoms_overlapping == false) {
+          consistent_ratio = GCD_conventional_atomic_basis(conventional_basis_atoms, prim_split_atom_types, prim_GCD);
+        }
+        if(consistent_ratio == false) {
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: WARNING: Conventional cell atomic basis ratio is inconsistent with the primitive cell! Recalculating. [dir=" << xstr.directory << "]." << endl; }
+          symmetryfound = false;
+          continue;
+        }
 
-	// ========== Rearrange atoms/Store ========== //
-	deque<int> sizes = SYM::arrange_atoms(conventional_basis_atoms);
+        // ========== Rearrange atoms/Store ========== //
+        deque<int> sizes = SYM::arrange_atoms(conventional_basis_atoms);
 
-	xstr_out.lattice_label_ITC = lattice_char;
-	xstr_out.lattice = CL;
+        xstr_out.lattice_label_ITC = lattice_char;
+        xstr_out.lattice = CL;
 
-	vector<string> in_names;
-	for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-	  conventional_basis_atoms[c].fpos = C2F(xstr_out.lattice, conventional_basis_atoms[c].cpos);
-	  in_names.push_back(conventional_basis_atoms[c].name);
-	}
-	//Remove old atomic basis
-	while (xstr_out.atoms.size() > 0) {
-	  xstr_out.RemoveAtom((uint)0);
-	}
-	xstr_out.species.clear();
-	// Add new atomic basis
-	for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
-	  xstr_out.AddAtom(conventional_basis_atoms[c]);
-	}
-		
-	//DX 20190410 - START
-	// Check if AddAtom removed atoms
-  if(xstr_out.atoms.size() != conventional_basis_atoms.size()){
-    if(LDEBUG) {
-      cerr << "SYM::ConventionalCell: AddAtom() removed conventional basis atoms due to the tolerance value. Change the tolerance." << endl;
-    }
-    symmetryfound = false;
-	  return xstr_out;
-  }
-	//DX 20190410 - END
-	
-	// Set number of each type
-	xstr_out = pflow::SetNumEachType(xstr_out, sizes);
-	if(xstr_out.num_each_type.size() != in_names.size()) {
-	  xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
-	}
-	xstr_out.FixLattices();
+        vector<string> in_names;
+        for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
+          conventional_basis_atoms[c].fpos = C2F(xstr_out.lattice, conventional_basis_atoms[c].cpos);
+          in_names.push_back(conventional_basis_atoms[c].name);
+        }
+        //Remove old atomic basis
+        while (xstr_out.atoms.size() > 0) {
+          xstr_out.RemoveAtom((uint)0);
+        }
+        xstr_out.species.clear();
+        // Add new atomic basis
+        for (uint c = 0; c < conventional_basis_atoms.size(); c++) {
+          xstr_out.AddAtom(conventional_basis_atoms[c]);
+        }
 
-	// ************************************************************************************************
-	// Check if lattice and crystal symmetry are commensurate
-	// ************************************************************************************************
-	xstr_out.crystal_system_ITC = crystalsystem;
-	orient(xstr_out);
+        //DX 20190410 - START
+        // Check if AddAtom removed atoms
+        if(xstr_out.atoms.size() != conventional_basis_atoms.size()){
+          if(LDEBUG) {
+            cerr << "SYM::ConventionalCell: AddAtom() removed conventional basis atoms due to the tolerance value. Change the tolerance." << endl;
+          }
+          symmetryfound = false;
+          return xstr_out;
+        }
+        //DX 20190410 - END
+
+        // Set number of each type
+        xstr_out = pflow::SetNumEachType(xstr_out, sizes);
+        if(xstr_out.num_each_type.size() != in_names.size()) {
+          xstr_out = pflow::SetAllAtomNames(xstr_out, in_names);
+        }
+        xstr_out.FixLattices();
+
+        // ************************************************************************************************
+        // Check if lattice and crystal symmetry are commensurate
+        // ************************************************************************************************
+        xstr_out.crystal_system_ITC = crystalsystem;
+        orient(xstr_out);
         if(LDEBUG) {
           cerr << "SYM::ConventionalCell: Oriented conventional cell: " << endl;
           cerr << xstr_out << endl;
         }
-	xstr = xstr_out;
+        xstr = xstr_out;
 
-	// ========== PEARSON SYMBOL: Record lattice type and centering ========== //
-	map<int, char> centering;
-	centering[1] = 'P';
-	centering[2] = 'I';
-	centering[3] = 'R';
-	centering[4] = 'F';
-	centering[5] = 'C';
-	xstr_out.bravais_label_ITC = centering[bravais_count];
-	string pearson_symbol = getPearsonSymbol(xstr_out.bravais_label_ITC, lattice_char, conventional_basis_atoms);
+        // ========== PEARSON SYMBOL: Record lattice type and centering ========== //
+        map<int, char> centering;
+        centering[1] = 'P';
+        centering[2] = 'I';
+        centering[3] = 'R';
+        centering[4] = 'F';
+        centering[5] = 'C';
+        xstr_out.bravais_label_ITC = centering[bravais_count];
+        string pearson_symbol = getPearsonSymbol(xstr_out.bravais_label_ITC, lattice_char, conventional_basis_atoms);
 
-	if(LDEBUG) { cerr << "SYM::ConventionalCell: Pearson: " << pearson_symbol << " [dir=" << xstr.directory << "]." << endl; }
-	checkops = check_ccell(xstr_out,ITC_sym_info); //DX 20190215 - add ITC sym info
+        if(LDEBUG) { cerr << "SYM::ConventionalCell: Pearson: " << pearson_symbol << " [dir=" << xstr.directory << "]." << endl; }
+        checkops = check_ccell(xstr_out,ITC_sym_info); //DX 20190215 - add ITC sym info
 
-	// Store lattice symmetry operators only if not reformed (lattice symmetry should not know anything about crystal symmetry)
-	// So we use the first iteration (unreformed)
-	if(lattice_reformed == false) {
-	  lattice_reformed = true;
-	  lattice_pgroups = checkops.lattice_pgroups;
-	  lattice_sym_mats = checkops.lattice_sym_mats;
-	}
-	// Store crystal symmetry operators
-	crystal_sym_mats = checkops.crystal_sym_mats;
+        // Store lattice symmetry operators only if not reformed (lattice symmetry should not know anything about crystal symmetry)
+        // So we use the first iteration (unreformed)
+        if(lattice_reformed == false) {
+          lattice_reformed = true;
+          lattice_pgroups = checkops.lattice_pgroups;
+          lattice_sym_mats = checkops.lattice_sym_mats;
+        }
+        // Store crystal symmetry operators
+        crystal_sym_mats = checkops.crystal_sym_mats;
 
-	if(checkops.latticesystem == "REDO") {
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: Symmetry check failed... [dir=" << xstr.directory << "]." << endl; }
-	}
-	if(checkops.commensurate == true) {
-	  //cerr <<"reform unnecessary" << endl;
-	  reform = false;
-	  xstr_out.crystal_system_ITC = checkops.crystalsystem;
-	  crystalsystem_prev = crystalsystem;
-	  candidate_lattice_vectors_prev = candidate_lattice_vectors;
-	  candidate_lattice_chars_prev = candidate_lattice_chars;
-	  symmetryfound = true;
-	  if(i == candidate_lattice_vectors.size() - 1) {
-	    last_orientation = true;
-	  }
-	  break;
-	}
+        if(checkops.latticesystem == "REDO") {
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: Symmetry check failed... [dir=" << xstr.directory << "]." << endl; }
+        }
+        if(checkops.commensurate == true) {
+          //cerr <<"reform unnecessary" << endl;
+          reform = false;
+          xstr_out.crystal_system_ITC = checkops.crystalsystem;
+          crystalsystem_prev = crystalsystem;
+          candidate_lattice_vectors_prev = candidate_lattice_vectors;
+          candidate_lattice_chars_prev = candidate_lattice_chars;
+          symmetryfound = true;
+          if(i == candidate_lattice_vectors.size() - 1) {
+            last_orientation = true;
+          }
+          break;
+        }
 
-	// ========== If all combinations of cell orientations are exhausted, reform the lattice ========== //
-	if(i == candidate_lattice_vectors.size() - 1 && (checkops.commensurate == false || checkops.latticesystem == "REDO")) {  //added redo as test
-	  if(LDEBUG) { cerr << "SYM::ConventionalCell: All permutations of cell checked. Need to reform the lattice based on the crystal symmetry [dir=" << xstr.directory << "]." << endl; }
-	  //cerr << "i: " << i << endl;
-	  //cerr << "checkops.latticesystem: " << checkops.latticesystem << endl;
-	  //cerr << "checkops.crystalsystem: " << checkops.crystalsystem << endl;
+        // ========== If all combinations of cell orientations are exhausted, reform the lattice ========== //
+        if(i == candidate_lattice_vectors.size() - 1 && (checkops.commensurate == false || checkops.latticesystem == "REDO")) {  //added redo as test
+          if(LDEBUG) { cerr << "SYM::ConventionalCell: All permutations of cell checked. Need to reform the lattice based on the crystal symmetry [dir=" << xstr.directory << "]." << endl; }
+          //cerr << "i: " << i << endl;
+          //cerr << "checkops.latticesystem: " << checkops.latticesystem << endl;
+          //cerr << "checkops.crystalsystem: " << checkops.crystalsystem << endl;
 
-	  // Reduce conventional cell into a primitive form
-	  xstr.GetPrimitiveCell();
+          // Reduce conventional cell into a primitive form
+          xstr.GetPrimitiveCell();
 
-	  L = xstr.lattice;
-	  Linv = aurostd::inverse(L);
-	  bool skew = SYM::isLatticeSkewed(L, xstr.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
-	  crystalsystem = checkops.crystalsystem;
-	  latticesystem = checkops.latticesystem;
+          L = xstr.lattice;
+          Linv = aurostd::inverse(L);
+          bool skew = SYM::isLatticeSkewed(L, xstr.dist_nn_min, sym_tol); //DX 20190215 - _SYM_TOL_ to sym_tol
+          crystalsystem = checkops.crystalsystem;
+          latticesystem = checkops.latticesystem;
 
-	  // Need to find the mirror operations corresponding the the reduced lattice
-	  // Need to do this since the reduced cell has similar operation directions (preserves some orientation info)
-	  expanded_lattice_1 = expand_lattice(b, b, b, L);
-	  expanded_cell_1 = expand_cell(L);
-	  mirror_lattice_vectors.clear();
-	  rot_lattice_vectors.clear();
-	  twofold_lattice_vectors.clear();
+          // Need to find the mirror operations corresponding the the reduced lattice
+          // Need to do this since the reduced cell has similar operation directions (preserves some orientation info)
+          expanded_lattice_1 = expand_lattice(b, b, b, L);
+          expanded_cell_1 = expand_cell(L);
+          mirror_lattice_vectors.clear();
+          rot_lattice_vectors.clear();
+          twofold_lattice_vectors.clear();
 
-	  double radius = RadiusSphereLattice(L);
-	  // DX 9/26/17 [OBSOLETE] vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew);
-	  // DX 9/26/17 [OBSOLETE] vector<Screw> rot_ops_vec_new = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew);
-	  // DX 9/26/17 [OBSOLETE] vector<Screw> twofold_ops_vec_new = twofold_operations(expanded_lattice_1, expanded_cell_1, L, Linv, twofold_lattice_vectors, radius, skew);
-	  vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew, sym_tol); //DX 20190215 - added sym_tol
-	  vector<Screw> twofold_ops_vec_new;
+          double radius = RadiusSphereLattice(L);
+          // DX 9/26/17 [OBSOLETE] vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew);
+          // DX 9/26/17 [OBSOLETE] vector<Screw> rot_ops_vec_new = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew);
+          // DX 9/26/17 [OBSOLETE] vector<Screw> twofold_ops_vec_new = twofold_operations(expanded_lattice_1, expanded_cell_1, L, Linv, twofold_lattice_vectors, radius, skew);
+          vector<Glide> mirror_ops_vec_new = mirror_operations(expanded_lattice_1, expanded_cell_1, L, Linv, mirror_lattice_vectors, radius, skew, sym_tol); //DX 20190215 - added sym_tol
+          vector<Screw> twofold_ops_vec_new;
           for(uint m=0;m<mirror_ops_vec_new.size();m++){
             Screw candidate_rotation;
             xvector<double> axis_direction = mirror_ops_vec_new[m].return_direction();
@@ -1787,67 +1790,67 @@ namespace SYM {
             twofold_ops_vec_new.push_back(candidate_rotation);
             twofold_lattice_vectors.push_back(mirror_lattice_vectors[m]);
           }
-	  vector<Screw> rot_ops_vec_new;
+          vector<Screw> rot_ops_vec_new;
           if(mirror_ops_vec_new.size()>2){
-	    rot_ops_vec_new = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew, sym_tol); //DX 20190215 - added sym_tol
+            rot_ops_vec_new = triplet_operations(expanded_lattice_1, expanded_cell_1, L, Linv, rot_lattice_vectors, radius, skew, sym_tol); //DX 20190215 - added sym_tol
           }
-	  bool all_matched_mirror = true;
-	  bool all_matched_twofold = true;
-	  bool all_matched_rot = true;
+          bool all_matched_mirror = true;
+          bool all_matched_twofold = true;
+          bool all_matched_rot = true;
 
-	  // Now find the corresponding lattice vectors for the checkops operations with respect to the reduced representation
-	  vector<xvector<double> > tmp_mirror_lattice_vectors = mirror_lattice_vectors;
-	  vector<xvector<double> > tmp_twofold_lattice_vectors = twofold_lattice_vectors;
-	  vector<xvector<double> > tmp_rot_lattice_vectors = rot_lattice_vectors;
-	  mirror_lattice_vectors = getLatticeVectorsFromOriginalMirrorOperations(mirror_ops_vec_new, checkops.mirror_ops,
-										 tmp_mirror_lattice_vectors, all_matched_mirror);
-	  twofold_lattice_vectors = getLatticeVectorsFromOriginalRotationOperations(twofold_ops_vec_new, rot_ops_vec_new,
-										    checkops.twofold_ops, tmp_twofold_lattice_vectors,
-										    tmp_rot_lattice_vectors, all_matched_twofold);
+          // Now find the corresponding lattice vectors for the checkops operations with respect to the reduced representation
+          vector<xvector<double> > tmp_mirror_lattice_vectors = mirror_lattice_vectors;
+          vector<xvector<double> > tmp_twofold_lattice_vectors = twofold_lattice_vectors;
+          vector<xvector<double> > tmp_rot_lattice_vectors = rot_lattice_vectors;
+          mirror_lattice_vectors = getLatticeVectorsFromOriginalMirrorOperations(mirror_ops_vec_new, checkops.mirror_ops,
+              tmp_mirror_lattice_vectors, all_matched_mirror);
+          twofold_lattice_vectors = getLatticeVectorsFromOriginalRotationOperations(twofold_ops_vec_new, rot_ops_vec_new,
+              checkops.twofold_ops, tmp_twofold_lattice_vectors,
+              tmp_rot_lattice_vectors, all_matched_twofold);
           if(mirror_ops_vec_new.size()>2){
-	  rot_lattice_vectors = getLatticeVectorsFromOriginalRotationOperations(twofold_ops_vec_new, rot_ops_vec_new,
-										checkops.rot_ops, tmp_twofold_lattice_vectors,
-										tmp_rot_lattice_vectors, all_matched_rot);
+            rot_lattice_vectors = getLatticeVectorsFromOriginalRotationOperations(twofold_ops_vec_new, rot_ops_vec_new,
+                checkops.rot_ops, tmp_twofold_lattice_vectors,
+                tmp_rot_lattice_vectors, all_matched_rot);
           }
-	  // If we could not match all operations from the old representation to the new, then we need to change the tolerance
-	  if(!all_matched_mirror || !all_matched_twofold || !all_matched_rot) {
-	    if(LDEBUG) {
-	      cerr << "SYM::ConventionalCell: WARNING: Couldn't match new mirror operations to old vectors. Changing tolerance." << endl;
-	    }
-	    symmetryfound = false;
-	    return xstr_out;
-	  }
+          // If we could not match all operations from the old representation to the new, then we need to change the tolerance
+          if(!all_matched_mirror || !all_matched_twofold || !all_matched_rot) {
+            if(LDEBUG) {
+              cerr << "SYM::ConventionalCell: WARNING: Couldn't match new mirror operations to old vectors. Changing tolerance." << endl;
+            }
+            symmetryfound = false;
+            return xstr_out;
+          }
 
-	  // Need to set the operators to the ones in checkops. These are the new ones which contain
-	  // the correct symmetry for the crystal
-	  twofold_ops_vec = checkops.twofold_ops;
-	  rot_ops_vec = checkops.rot_ops;
-	  mirror_ops_vec = checkops.mirror_ops;
+          // Need to set the operators to the ones in checkops. These are the new ones which contain
+          // the correct symmetry for the crystal
+          twofold_ops_vec = checkops.twofold_ops;
+          rot_ops_vec = checkops.rot_ops;
+          mirror_ops_vec = checkops.mirror_ops;
 
-	  // ===== Reset variables ===== //
-	  lattice_vectors_found = false;
-	  candidate_lattice_vectors.clear();
-	  candidate_lattice_chars.clear();
-	  candidate_lattice_vectors_prev.clear();
-	  candidate_lattice_chars_prev.clear();
-	}
+          // ===== Reset variables ===== //
+          lattice_vectors_found = false;
+          candidate_lattice_vectors.clear();
+          candidate_lattice_chars.clear();
+          candidate_lattice_vectors_prev.clear();
+          candidate_lattice_chars_prev.clear();
+        }
       }  //END CLs
       if(latticesystem == "REDO") {
-	//cerr << "NEED TO REDO" << endl;
-	if(LDEBUG) { cerr << "SYM::ConventionalCell: Could not find lattice consistent with crystal symmetry [dir=" << xstr.directory << "]." << endl; }
-	symmetryfound = false;
-	return xstr_out;
+        //cerr << "NEED TO REDO" << endl;
+        if(LDEBUG) { cerr << "SYM::ConventionalCell: Could not find lattice consistent with crystal symmetry [dir=" << xstr.directory << "]." << endl; }
+        symmetryfound = false;
+        return xstr_out;
       }
 
       if(symmetryfound == true) {
-	sym_count++;
+        sym_count++;
       }
       // **********************************************************************************************************************
       // ============================== If symmetryfound = false, need to readjust tolerances ============================== //
       // **********************************************************************************************************************
       else if(symmetryfound == false) {
-	if(LDEBUG) { cerr << "SYM::ConventionalCell: Conventional cell consistent with crystal symmetry is found [dir=" << xstr.directory << "]." << endl; }
-	return xstr_out;
+        if(LDEBUG) { cerr << "SYM::ConventionalCell: Conventional cell consistent with crystal symmetry is found [dir=" << xstr.directory << "]." << endl; }
+        return xstr_out;
       }
     }
     xstr_out.standard_lattice_ITC = LPRIM;
@@ -1862,7 +1865,7 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findCubicLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec,
-			vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
     // CUBIC lattice vector criteria: Parallel to 3 equivalent fourfold axes.
     bool LDEBUG = (FALSE || XHOST.DEBUG);
 
@@ -1873,7 +1876,7 @@ namespace SYM {
     vector<xvector<double> > conven;
     for (uint i = 0; i < rot_ops_vec.size(); i++) {
       if(aurostd::abs(rot_ops_vec[i].return_order() - 4.0) < _ZERO_TOL_) {
-	conven.push_back(rot_lattice_vectors[i]);
+        conven.push_back(rot_lattice_vectors[i]);
       }
     }
 
@@ -1885,8 +1888,8 @@ namespace SYM {
 
     // Ensure lengths of vectors are the same
     if(aurostd::abs(aurostd::modulus(conven[0]) - aurostd::modulus(conven[1])) > tol && //DX 20190215 - _SYM_TOL_ to tol
-	aurostd::abs(aurostd::modulus(conven[0]) - aurostd::modulus(conven[2])) > tol && //DX 20190215 - _SYM_TOL_ to tol
-	aurostd::abs(aurostd::modulus(conven[2]) - aurostd::modulus(conven[1])) > tol) { //DX 20190215 - _SYM_TOL_ to tol
+        aurostd::abs(aurostd::modulus(conven[0]) - aurostd::modulus(conven[2])) > tol && //DX 20190215 - _SYM_TOL_ to tol
+        aurostd::abs(aurostd::modulus(conven[2]) - aurostd::modulus(conven[1])) > tol) { //DX 20190215 - _SYM_TOL_ to tol
       if(LDEBUG) { cerr << "SYM::findCubicLattice: Lattice vectors are not the same length..." << endl; }
       return false;
     }
@@ -1933,7 +1936,7 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findTrigonalLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec, vector<xvector<double> >& big_expanded,
-			   vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
     // HEXAGONAL lattice vector criteria:
     //       lattice vector c        : Parallel to 6-fold axis
     //       lattice vectors a, b    : Parallel to 2-fold axes (angle=120 degrees); a=b
@@ -1952,15 +1955,15 @@ namespace SYM {
     vector<xvector<double> > twofold;
     for (uint i = 0; i < rot_ops_vec.size(); i++) {
       if(aurostd::abs(rot_ops_vec[i].return_order() - 6.0) < _ZERO_TOL_) {
-	six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
+        six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
       }
     }
     if(six_or_threefold_lattice_vectors.size() == 0) {
       //cerr << "TRIGONAL HEXAGONAL CELL (ie, no 6fold axis)" << endl;
       for (uint i = 0; i < rot_ops_vec.size(); i++) {
-	if(aurostd::abs(rot_ops_vec[i].return_order() - 3.0) < _ZERO_TOL_) {
-	  six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
-	}
+        if(aurostd::abs(rot_ops_vec[i].return_order() - 3.0) < _ZERO_TOL_) {
+          six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
+        }
       }
     }
 
@@ -1988,26 +1991,26 @@ namespace SYM {
     possible_latt_a_b = find_vectors_inplane(big_expanded, conv_lattice_vec_c, tol); //DX 20190215 - added tol
     for (uint i = 0; i < possible_latt_a_b.size(); i++) {
       for (uint j = 0; j < possible_latt_a_b.size(); j++) {
-	tmpa = possible_latt_a_b[i];
-	tmpb = possible_latt_a_b[j];
-	if(aurostd::abs(aurostd::modulus(tmpa) - aurostd::modulus(tmpb)) < tol && //DX 20190215 - _SYM_TOL_ to tol
-	    SYM::checkAngle(tmpa, tmpb, (2.0 * Pi_r / 3.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	    SYM::checkAngle(tmpa, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	    SYM::checkAngle(tmpb, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	    tmpa != null && tmpb != null) {
-	  count++;
-	  if(count > 1) {
-	    if(aurostd::modulus(tmpa) <= min_norm) {
-	      min_norm = aurostd::modulus(tmpa);
-	      conv_lattice_vec_a = tmpa;
-	      conv_lattice_vec_b = tmpb;
-	    }
-	  } else {
-	    min_norm = aurostd::modulus(tmpa);
-	    conv_lattice_vec_a = tmpa;
-	    conv_lattice_vec_b = tmpb;
-	  }
-	}
+        tmpa = possible_latt_a_b[i];
+        tmpb = possible_latt_a_b[j];
+        if(aurostd::abs(aurostd::modulus(tmpa) - aurostd::modulus(tmpb)) < tol && //DX 20190215 - _SYM_TOL_ to tol
+            SYM::checkAngle(tmpa, tmpb, (2.0 * Pi_r / 3.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+            SYM::checkAngle(tmpa, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+            SYM::checkAngle(tmpb, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+            tmpa != null && tmpb != null) {
+          count++;
+          if(count > 1) {
+            if(aurostd::modulus(tmpa) <= min_norm) {
+              min_norm = aurostd::modulus(tmpa);
+              conv_lattice_vec_a = tmpa;
+              conv_lattice_vec_b = tmpb;
+            }
+          } else {
+            min_norm = aurostd::modulus(tmpa);
+            conv_lattice_vec_a = tmpa;
+            conv_lattice_vec_b = tmpb;
+          }
+        }
       }
     }
 
@@ -2039,8 +2042,8 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findTetragonalLattice(vector<xvector<double> >& rot_lattice_vectors, vector<xvector<double> >& twofold_lattice_vectors,
-			     vector<Screw>& rot_ops_vec, vector<Screw>& twofold_ops_vec, vector<xvector<double> >& big_expanded,
-			     vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
+      vector<Screw>& rot_ops_vec, vector<Screw>& twofold_ops_vec, vector<xvector<double> >& big_expanded,
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
     // TETRAGONAL lattice vectors criteria:
     //        lattice vector c        : Parallel to 4-fold axis
     //        lattice vectors a, b    : Parallel to 2-fold axes (angle=90 degrees); a=b
@@ -2059,14 +2062,14 @@ namespace SYM {
     // ===== Conventional lattice c ===== //
     for (uint i = 0; i < rot_ops_vec.size(); i++) {
       if(aurostd::abs(rot_ops_vec[i].return_order() - 4.0) < _ZERO_TOL_) {
-	fourfold_lattice_vectors.push_back(rot_lattice_vectors[i]);
+        fourfold_lattice_vectors.push_back(rot_lattice_vectors[i]);
       }
     }
     for (uint f = 0; f < fourfold_lattice_vectors.size(); f++) {
       conv_lattice_vec_c = fourfold_lattice_vectors[f];
       if(conv_lattice_vec_c == null) {
-	if(LDEBUG) { cerr << "SYM::findTetragonalLattice: c-axis is null." << endl; }
-	return false;
+        if(LDEBUG) { cerr << "SYM::findTetragonalLattice: c-axis is null." << endl; }
+        return false;
       }
 
       // ===== Conventional lattices a and b ===== //
@@ -2081,51 +2084,51 @@ namespace SYM {
       // different operators.  If this occurs find all the vectors in the plane perpendicular
       // to the c axis
       for (uint i = 0; i < twofold_ops_vec.size(); i++) {
-	xvector<double> rot_dir;
-	if(i == 0) {
-	  rot_dir = twofold_ops_vec[i].return_direction();
-	} else {
-	  xvector<double> rot_tmp = twofold_ops_vec[i].return_direction();
-	  if((rot_dir[1] - rot_tmp[1]) > tol && (rot_dir[2] - rot_tmp[2]) > tol && (rot_dir[3] - rot_tmp[3]) > tol) { //DX 20190215 - _SYM_TOL_ to tol
-	    all_dir_equal = false;
-	    break;
-	  }
-	}
+        xvector<double> rot_dir;
+        if(i == 0) {
+          rot_dir = twofold_ops_vec[i].return_direction();
+        } else {
+          xvector<double> rot_tmp = twofold_ops_vec[i].return_direction();
+          if((rot_dir[1] - rot_tmp[1]) > tol && (rot_dir[2] - rot_tmp[2]) > tol && (rot_dir[3] - rot_tmp[3]) > tol) { //DX 20190215 - _SYM_TOL_ to tol
+            all_dir_equal = false;
+            break;
+          }
+        }
       }
 
       // ===== All directions the same or there is only one 2-fold operator; find vectors perpendicular to c axis
       if(twofold_ops_vec.size() <= 1 || all_dir_equal == true) {
-	possible_latt_a_b = find_vectors_inplane(big_expanded, conv_lattice_vec_c, tol); //DX 20190215 - added tol
+        possible_latt_a_b = find_vectors_inplane(big_expanded, conv_lattice_vec_c, tol); //DX 20190215 - added tol
       } else {
-	// ===== If there are different 2-fold operators ===== //
-	for (uint i = 0; i < twofold_ops_vec.size(); i++) {
-	  possible_latt_a_b.push_back(twofold_lattice_vectors[i]);
-	}
+        // ===== If there are different 2-fold operators ===== //
+        for (uint i = 0; i < twofold_ops_vec.size(); i++) {
+          possible_latt_a_b.push_back(twofold_lattice_vectors[i]);
+        }
       }
 
       for (uint i = 0; i < possible_latt_a_b.size(); i++) {
-	for (uint j = 0; j < possible_latt_a_b.size(); j++) {
-	  tmpa = possible_latt_a_b[i];
-	  tmpb = possible_latt_a_b[j];
-	  if(aurostd::abs(aurostd::modulus(tmpa) - aurostd::modulus(tmpb)) < tol && //DX 20190215 - _SYM_TOL_ to tol
-	      SYM::checkAngle(tmpa, tmpb, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	      SYM::checkAngle(tmpa, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	      SYM::checkAngle(tmpb, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	      tmpa != null && tmpb != null) {
-	    count++;
-	    if(count > 1) {
-	      if(aurostd::modulus(tmpa) <= min_norm) {
-		min_norm = aurostd::modulus(tmpa);
-		conv_lattice_vec_a = tmpa;
-		conv_lattice_vec_b = tmpb;
-	      }
-	    } else {
-	      min_norm = aurostd::modulus(tmpa);
-	      conv_lattice_vec_a = tmpa;
-	      conv_lattice_vec_b = tmpb;
-	    }
-	  }
-	}
+        for (uint j = 0; j < possible_latt_a_b.size(); j++) {
+          tmpa = possible_latt_a_b[i];
+          tmpb = possible_latt_a_b[j];
+          if(aurostd::abs(aurostd::modulus(tmpa) - aurostd::modulus(tmpb)) < tol && //DX 20190215 - _SYM_TOL_ to tol
+              SYM::checkAngle(tmpa, tmpb, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+              SYM::checkAngle(tmpa, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+              SYM::checkAngle(tmpb, conv_lattice_vec_c, (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+              tmpa != null && tmpb != null) {
+            count++;
+            if(count > 1) {
+              if(aurostd::modulus(tmpa) <= min_norm) {
+                min_norm = aurostd::modulus(tmpa);
+                conv_lattice_vec_a = tmpa;
+                conv_lattice_vec_b = tmpb;
+              }
+            } else {
+              min_norm = aurostd::modulus(tmpa);
+              conv_lattice_vec_a = tmpa;
+              conv_lattice_vec_b = tmpb;
+            }
+          }
+        }
       }
 
       // ===== Check if any null vectors ===== //
@@ -2133,14 +2136,14 @@ namespace SYM {
       ab_vecs.push_back(conv_lattice_vec_a);
       ab_vecs.push_back(conv_lattice_vec_b);
       if(anyNullVectors(ab_vecs, tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	if(f != fourfold_lattice_vectors.size() - 1) {
-	  continue;
-	} else {
-	  if(LDEBUG) { cerr << "SYM::findTetragonalLattice: One or more of the lattice vectors is null" << endl; }
-	  return false;
-	}
+        if(f != fourfold_lattice_vectors.size() - 1) {
+          continue;
+        } else {
+          if(LDEBUG) { cerr << "SYM::findTetragonalLattice: One or more of the lattice vectors is null" << endl; }
+          return false;
+        }
       } else {
-	break;
+        break;
       }
     }
 
@@ -2169,8 +2172,8 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findMonoclinicLattice(vector<xvector<double> >& mirror_lattice_vectors, vector<xvector<double> >& twofold_lattice_vectors,
-			     vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-			     vector<char>& candidate_lattice_chars, int& cell_choice, double& tol) { //DX 20180816 - added setting_choice //DX 20190215 - added tol
+      vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
+      vector<char>& candidate_lattice_chars, int& cell_choice, double& tol) { //DX 20180816 - added setting_choice //DX 20190215 - added tol
     // MONOCLINIC lattice vectors criteria:
     //        lattice vector unqiue axis (b or c)        : Parallel to mirror axis or 2-fold axis
     //        lattice vectors a, (c or b)                : Perpendicular to lattice vector c; angle != 90 degree; a!=b
@@ -2193,13 +2196,13 @@ namespace SYM {
     vector<xvector<double> > possible_h_lats;
     if(mirror_lattice_vectors.size() > 0) {
       if(mirror_lattice_vectors.size() > 1) {
-	if(aurostd::modulus(mirror_lattice_vectors[1]) < aurostd::modulus(mirror_lattice_vectors[0])) {
-	  possible_h_lats.push_back(mirror_lattice_vectors[1]);
-	  possible_h_lats.push_back(mirror_lattice_vectors[0]);
-	} else {
-	  possible_h_lats.push_back(mirror_lattice_vectors[0]);
-	  possible_h_lats.push_back(mirror_lattice_vectors[1]);
-	}
+        if(aurostd::modulus(mirror_lattice_vectors[1]) < aurostd::modulus(mirror_lattice_vectors[0])) {
+          possible_h_lats.push_back(mirror_lattice_vectors[1]);
+          possible_h_lats.push_back(mirror_lattice_vectors[0]);
+        } else {
+          possible_h_lats.push_back(mirror_lattice_vectors[0]);
+          possible_h_lats.push_back(mirror_lattice_vectors[1]);
+        }
         if(LDEBUG) {
           cerr << "SYM::findMonoclinicLattice: Two choices for unique axis. " << endl;
           cerr << "SYM::findMonoclinicLattice: choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl; 
@@ -2207,7 +2210,7 @@ namespace SYM {
         }
       } 
       else {
-	possible_h_lats.push_back(mirror_lattice_vectors[0]);
+        possible_h_lats.push_back(mirror_lattice_vectors[0]);
         if(LDEBUG) {
           cerr << "SYM::findMonoclinicLattice: One choice for unique axis. " << endl;
           cerr << "SYM::findMonoclinicLattice: choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl; 
@@ -2250,235 +2253,234 @@ namespace SYM {
       h_lat = possible_h_lats[h];
       possible_efg_vectors = find_vectors_inplane(big_expanded, h_lat, tol); //DX 20190215 - added tol
       for (uint i = 0; i < possible_efg_vectors.size(); i++) {
-	for (uint j = i + 1; j < possible_efg_vectors.size(); j++) {
-	  for (uint k = j + 1; k < possible_efg_vectors.size(); k++) {
-	    int e = -1;
-	    int f = -1;
-	    int g = -1;
-	    xvector<double> tranvec_i = possible_efg_vectors[i];
-	    xvector<double> tranvec_j = possible_efg_vectors[j];
-	    xvector<double> tranvec_k = possible_efg_vectors[k];
+        for (uint j = i + 1; j < possible_efg_vectors.size(); j++) {
+          for (uint k = j + 1; k < possible_efg_vectors.size(); k++) {
+            int e = -1;
+            int f = -1;
+            int g = -1;
+            xvector<double> tranvec_i = possible_efg_vectors[i];
+            xvector<double> tranvec_j = possible_efg_vectors[j];
+            xvector<double> tranvec_k = possible_efg_vectors[k];
 
-	    // ===== Ensure none of the possible vectors is a null vector ===== //
-	    if((aurostd::abs(tranvec_i[1]) >= _ZERO_TOL_ || aurostd::abs(tranvec_i[2]) >= _ZERO_TOL_ || aurostd::abs(tranvec_i[3]) >= _ZERO_TOL_) &&
-		(aurostd::abs(tranvec_j[1]) >= _ZERO_TOL_ || aurostd::abs(tranvec_j[2]) >= _ZERO_TOL_ || aurostd::abs(tranvec_j[3]) >= _ZERO_TOL_) &&
-		(aurostd::abs(tranvec_k[1]) >= _ZERO_TOL_ || aurostd::abs(tranvec_k[2]) >= _ZERO_TOL_ || aurostd::abs(tranvec_k[3]) >= _ZERO_TOL_)) {
-	      vector<int> int_ijk;
-	      int_ijk.push_back(i);
-	      int_ijk.push_back(j);
-	      int_ijk.push_back(k);
-	      vector<xvector<double> > tranvec_ijk;
-	      tranvec_ijk.push_back(tranvec_i);
-	      tranvec_ijk.push_back(tranvec_j);
-	      tranvec_ijk.push_back(tranvec_k);
-	      vector<double> mod_tranvec_ijk;
-	      mod_tranvec_ijk.push_back(aurostd::modulus(tranvec_i));
-	      mod_tranvec_ijk.push_back(aurostd::modulus(tranvec_j));
-	      mod_tranvec_ijk.push_back(aurostd::modulus(tranvec_k));
-	      int tmp_int_e = -1;
-	      int tmp_int_f = -1;
-	      int tmp_int_g = -1;
+            // ===== Ensure none of the possible vectors is a null vector ===== //
+            if((aurostd::abs(tranvec_i[1]) >= _ZERO_TOL_ || aurostd::abs(tranvec_i[2]) >= _ZERO_TOL_ || aurostd::abs(tranvec_i[3]) >= _ZERO_TOL_) &&
+                (aurostd::abs(tranvec_j[1]) >= _ZERO_TOL_ || aurostd::abs(tranvec_j[2]) >= _ZERO_TOL_ || aurostd::abs(tranvec_j[3]) >= _ZERO_TOL_) &&
+                (aurostd::abs(tranvec_k[1]) >= _ZERO_TOL_ || aurostd::abs(tranvec_k[2]) >= _ZERO_TOL_ || aurostd::abs(tranvec_k[3]) >= _ZERO_TOL_)) {
+              vector<int> int_ijk;
+              int_ijk.push_back(i);
+              int_ijk.push_back(j);
+              int_ijk.push_back(k);
+              vector<xvector<double> > tranvec_ijk;
+              tranvec_ijk.push_back(tranvec_i);
+              tranvec_ijk.push_back(tranvec_j);
+              tranvec_ijk.push_back(tranvec_k);
+              vector<double> mod_tranvec_ijk;
+              mod_tranvec_ijk.push_back(aurostd::modulus(tranvec_i));
+              mod_tranvec_ijk.push_back(aurostd::modulus(tranvec_j));
+              mod_tranvec_ijk.push_back(aurostd::modulus(tranvec_k));
+              int tmp_int_e = -1;
+              int tmp_int_f = -1;
+              int tmp_int_g = -1;
 
-	      // ===== Determine the 1st smallest vector : "e" ===== //
-	      tmp_int_e = smallest_gt_min_index(0, -1, -1, mod_tranvec_ijk);
-	      tranvec_e = tranvec_ijk[tmp_int_e];
-	      e = int_ijk[tmp_int_e];
+              // ===== Determine the 1st smallest vector : "e" ===== //
+              tmp_int_e = smallest_gt_min_index(0, -1, -1, mod_tranvec_ijk);
+              tranvec_e = tranvec_ijk[tmp_int_e];
+              e = int_ijk[tmp_int_e];
 
-	      // ===== Determine the 2nd smallest vector : "f" ===== //
-	      tmp_int_f = smallest_gt_min_index(aurostd::modulus(tranvec_e), tmp_int_e, -1, mod_tranvec_ijk);
-	      tranvec_f = tranvec_ijk[tmp_int_f];
-	      f = int_ijk[tmp_int_f];
+              // ===== Determine the 2nd smallest vector : "f" ===== //
+              tmp_int_f = smallest_gt_min_index(aurostd::modulus(tranvec_e), tmp_int_e, -1, mod_tranvec_ijk);
+              tranvec_f = tranvec_ijk[tmp_int_f];
+              f = int_ijk[tmp_int_f];
 
-	      // ===== Determine the 2nd smallest vector : "g" ===== //
-	      tmp_int_g = smallest_gt_min_index(aurostd::modulus(tranvec_f), tmp_int_e, tmp_int_f, mod_tranvec_ijk);
-	      tranvec_g = tranvec_ijk[tmp_int_g];
-	      g = int_ijk[tmp_int_g];
+              // ===== Determine the 2nd smallest vector : "g" ===== //
+              tmp_int_g = smallest_gt_min_index(aurostd::modulus(tranvec_f), tmp_int_e, tmp_int_f, mod_tranvec_ijk);
+              tranvec_g = tranvec_ijk[tmp_int_g];
+              g = int_ijk[tmp_int_g];
 
-	      xvector<double> closed_triangle = tranvec_e + tranvec_f + tranvec_g;
-	      if(nullVector(closed_triangle, tol)) { //DX 20190215 - _SYM_TOL_ to tol
-		//cerr << "closed angle satisfied" << endl;
-		// ===== Neglect anti-parallel vector combinations ===== //
-		if(!SYM::checkAngle(tranvec_e, tranvec_f, Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		    !SYM::checkAngle(tranvec_f, tranvec_g, Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		    !SYM::checkAngle(tranvec_g, tranvec_e, Pi_r, tol)) { //DX 20190215 - _SYM_TOL_ to tol
-		  //cerr << "not anti-parallel" << endl;
-		  // ===== Determine the determinant of e,f,g with h_lat (unique axis_b) ===== //
-		  int consistent = 0;
-		  if((cell_choice == 0 || cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 && //DX 20190131 - add ANRL setting choice
-		      aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis b
-		    consistent = 3;
-		  }
-		  else if(cell_choice == SG_SETTING_2 && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 &&
-		      aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis c
-		    consistent = 3;
-		  }
-		  if(consistent != 3 && (aurostd::abs(aurostd::modulus(tranvec_e) - aurostd::modulus(tranvec_f)) < tol || //DX 20190215 - _SYM_TOL_ to tol
-					  aurostd::abs(aurostd::modulus(tranvec_f) - aurostd::modulus(tranvec_g)) < tol || //DX 20190215 - _SYM_TOL_ to tol
-					  aurostd::abs(aurostd::modulus(tranvec_g) - aurostd::modulus(tranvec_e)) < tol)) { //DX 20190215 - _SYM_TOL_ to tol
-		    int tmp_int = -1;
-		    if(aurostd::abs(aurostd::modulus(tranvec_e) - aurostd::modulus(tranvec_f)) < tol) { //DX 20190215 - _SYM_TOL_ to tol
-		      tmp_int = e;
-		      e = f;
-		      f = tmp_int;
-		    } else if(aurostd::abs(aurostd::modulus(tranvec_f) - aurostd::modulus(tranvec_g)) < tol) { //DX 20190215 - _SYM_TOL_ to tol
-		      tmp_int = f;
-		      f = g;
-		      g = tmp_int;
-		    } else if(aurostd::abs(aurostd::modulus(tranvec_g) - aurostd::modulus(tranvec_e)) < tol) { //DX 20190215 - _SYM_TOL_ to tol
-		      tmp_int = g;
-		      g = e;
-		      e = tmp_int;
-		    }
-		    tranvec_e = possible_efg_vectors[e];
-		    tranvec_f = possible_efg_vectors[f];
-		    tranvec_g = possible_efg_vectors[g];
-		    if((cell_choice == 0 || cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 && //DX 20190131 - add ANRL setting choice
-			aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis b
-		      consistent = 3;
-		    }
-		    else if(cell_choice == SG_SETTING_2 && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 &&
-		        aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis c
-		      consistent = 3;
-		  }
+              xvector<double> closed_triangle = tranvec_e + tranvec_f + tranvec_g;
+              if(nullVector(closed_triangle, tol)) { //DX 20190215 - _SYM_TOL_ to tol
+                //cerr << "closed angle satisfied" << endl;
+                // ===== Neglect anti-parallel vector combinations ===== //
+                if(!SYM::checkAngle(tranvec_e, tranvec_f, Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
+                    !SYM::checkAngle(tranvec_f, tranvec_g, Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
+                    !SYM::checkAngle(tranvec_g, tranvec_e, Pi_r, tol)) { //DX 20190215 - _SYM_TOL_ to tol
+                  //cerr << "not anti-parallel" << endl;
+                  // ===== Determine the determinant of e,f,g with h_lat (unique axis_b) ===== //
+                  int consistent = 0;
+                  if((cell_choice == 0 || cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 && //DX 20190131 - add ANRL setting choice
+                      aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis b
+                    consistent = 3;
                   }
-		  if(consistent == 3) {
-		    vector<int> tmp;
-		    tmp.push_back(e);
-		    tmp.push_back(f);
-		    tmp.push_back(g);
-		    index.push_back(tmp);
-		    total_mod.push_back(aurostd::modulus(tranvec_e) + aurostd::modulus(tranvec_f) + aurostd::modulus(tranvec_g));
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+                  else if(cell_choice == SG_SETTING_2 && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 &&
+                      aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis c
+                    consistent = 3;
+                  }
+                  if(consistent != 3 && (aurostd::abs(aurostd::modulus(tranvec_e) - aurostd::modulus(tranvec_f)) < tol || //DX 20190215 - _SYM_TOL_ to tol
+                        aurostd::abs(aurostd::modulus(tranvec_f) - aurostd::modulus(tranvec_g)) < tol || //DX 20190215 - _SYM_TOL_ to tol
+                        aurostd::abs(aurostd::modulus(tranvec_g) - aurostd::modulus(tranvec_e)) < tol)) { //DX 20190215 - _SYM_TOL_ to tol
+                    int tmp_int = -1;
+                    if(aurostd::abs(aurostd::modulus(tranvec_e) - aurostd::modulus(tranvec_f)) < tol) { //DX 20190215 - _SYM_TOL_ to tol
+                      tmp_int = e;
+                      e = f;
+                      f = tmp_int;
+                    } else if(aurostd::abs(aurostd::modulus(tranvec_f) - aurostd::modulus(tranvec_g)) < tol) { //DX 20190215 - _SYM_TOL_ to tol
+                      tmp_int = f;
+                      f = g;
+                      g = tmp_int;
+                    } else if(aurostd::abs(aurostd::modulus(tranvec_g) - aurostd::modulus(tranvec_e)) < tol) { //DX 20190215 - _SYM_TOL_ to tol
+                      tmp_int = g;
+                      g = e;
+                      e = tmp_int;
+                    }
+                    tranvec_e = possible_efg_vectors[e];
+                    tranvec_f = possible_efg_vectors[f];
+                    tranvec_g = possible_efg_vectors[g];
+                    if((cell_choice == 0 || cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 && //DX 20190131 - add ANRL setting choice
+                        aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis b
+                      consistent = 3;
+                    }
+                    else if(cell_choice == SG_SETTING_2 && aurostd::det(xvec2xmat(tranvec_f, h_lat, tranvec_e)) > 0.0 && aurostd::det(xvec2xmat(tranvec_g, h_lat, tranvec_f)) > 0.0 &&
+                        aurostd::det(xvec2xmat(tranvec_e, h_lat, tranvec_g)) > 0.0) { //DX 20180816 - added cell choice; check axis c
+                      consistent = 3;
+                    }
+                  }
+                  if(consistent == 3) {
+                    vector<int> tmp;
+                    tmp.push_back(e);
+                    tmp.push_back(f);
+                    tmp.push_back(g);
+                    index.push_back(tmp);
+                    total_mod.push_back(aurostd::modulus(tranvec_e) + aurostd::modulus(tranvec_f) + aurostd::modulus(tranvec_g));
+                  }
+                }
+              }
+            }
+          }
+        }
       }
       // === Check if 2 or more vectors were chosen to comprise the monoclinic plane === //
       if(index.size() <= 1 && h == possible_h_lats.size() - 1) {
-	if(LDEBUG) { cerr << "SYM::findMonoclinicLattice: No lattice vectors found in the monoclinic plane" << endl; }
-	return false;
+        if(LDEBUG) { cerr << "SYM::findMonoclinicLattice: No lattice vectors found in the monoclinic plane" << endl; }
+        return false;
       } else if(index.size() <= 1 && h < possible_h_lats.size() - 1) {
-	if(LDEBUG) { cerr << "SYM::findMonoclinicLattice: Not enought lattice vectors found in monoclinic plane. Try the other unique axis." << endl; }
-	possible_efg_vectors.clear();
-	index.clear();
-	total_mod.clear();
-	continue;
+        if(LDEBUG) { cerr << "SYM::findMonoclinicLattice: Not enought lattice vectors found in monoclinic plane. Try the other unique axis." << endl; }
+        possible_efg_vectors.clear();
+        index.clear();
+        total_mod.clear();
+        continue;
       }
       // DX 12/12/17 - Consider all possible unique axis choices - else {
       // DX 12/12/17 - Consider all possible unique axis choices -   break;
       // DX 12/12/17 - Consider all possible unique axis choices - }
-    // DX 12/12/17 - Consider all possible unique axis choices - }
 
-    int e = index[smallest_gt_min_index(0, -1, -1, total_mod)][0];
-    tranvec_e = possible_efg_vectors[e];
-    int f = index[smallest_gt_min_index(0, -1, -1, total_mod)][1];
-    tranvec_f = possible_efg_vectors[f];
-    int g = index[smallest_gt_min_index(0, -1, -1, total_mod)][2];
-    tranvec_g = possible_efg_vectors[g];
-    double mod_e = aurostd::modulus(tranvec_e);
-    double mod_f = aurostd::modulus(tranvec_f);
-    double mod_g = aurostd::modulus(tranvec_g);
+      int e = index[smallest_gt_min_index(0, -1, -1, total_mod)][0];
+      tranvec_e = possible_efg_vectors[e];
+      int f = index[smallest_gt_min_index(0, -1, -1, total_mod)][1];
+      tranvec_f = possible_efg_vectors[f];
+      int g = index[smallest_gt_min_index(0, -1, -1, total_mod)][2];
+      tranvec_g = possible_efg_vectors[g];
+      double mod_e = aurostd::modulus(tranvec_e);
+      double mod_f = aurostd::modulus(tranvec_f);
+      double mod_g = aurostd::modulus(tranvec_g);
 
-    if(LDEBUG) { 
-      cerr << "SYM::findMonoclinicLattice: 1st shortest vector in monoclinic plane (e): " << tranvec_e << " (mod=" << mod_e << ")." << endl;
-      cerr << "SYM::findMonoclinicLattice: 2nd shortest vector in monoclinic plane (f): " << tranvec_f << " (mod=" << mod_f << ")." << endl;
-      cerr << "SYM::findMonoclinicLattice: 3rd shortest vector in monoclinic plane (g): " << tranvec_g << " (mod=" << mod_g << ")." << endl;
-      cerr << "SYM::findMonoclinicLattice: Angle between e and f: " << aurostd::angle(tranvec_e,tranvec_f)*180.0/Pi_r << endl;
-      cerr << "SYM::findMonoclinicLattice: Angle between f and g: " << aurostd::angle(tranvec_f,tranvec_g)*180.0/Pi_r << endl;
-      cerr << "SYM::findMonoclinicLattice: Angle between g and e: " << aurostd::angle(tranvec_g,tranvec_e)*180.0/Pi_r << endl;
-    }
+      if(LDEBUG) { 
+        cerr << "SYM::findMonoclinicLattice: 1st shortest vector in monoclinic plane (e): " << tranvec_e << " (mod=" << mod_e << ")." << endl;
+        cerr << "SYM::findMonoclinicLattice: 2nd shortest vector in monoclinic plane (f): " << tranvec_f << " (mod=" << mod_f << ")." << endl;
+        cerr << "SYM::findMonoclinicLattice: 3rd shortest vector in monoclinic plane (g): " << tranvec_g << " (mod=" << mod_g << ")." << endl;
+        cerr << "SYM::findMonoclinicLattice: Angle between e and f: " << aurostd::angle(tranvec_e,tranvec_f)*180.0/Pi_r << endl;
+        cerr << "SYM::findMonoclinicLattice: Angle between f and g: " << aurostd::angle(tranvec_f,tranvec_g)*180.0/Pi_r << endl;
+        cerr << "SYM::findMonoclinicLattice: Angle between g and e: " << aurostd::angle(tranvec_g,tranvec_e)*180.0/Pi_r << endl;
+      }
 
-    if(mod_e <= _ZERO_TOL_ || mod_f <= _ZERO_TOL_ || mod_g <= _ZERO_TOL_) {
-      if(LDEBUG) { cerr << "SYM::findMonoclinicLattice: One or more lattice vectors in the monoclinic plane is null" << endl; }
-      return false;
-    }
+      if(mod_e <= _ZERO_TOL_ || mod_f <= _ZERO_TOL_ || mod_g <= _ZERO_TOL_) {
+        if(LDEBUG) { cerr << "SYM::findMonoclinicLattice: One or more lattice vectors in the monoclinic plane is null" << endl; }
+        return false;
+      }
 
-    // ========== Pick unique axis-b (See ITC p.38-40. Use option (i) for finding the monoclinic cell discussed on p.40) ========== //
-    if(cell_choice == 0 || cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL){ //DX 20190131 - add ANRL setting
-    conv_lattice_vec_b = h_lat;
-    // ===== e and f ===== //
-    conv_lattice_vec_a = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
-    conv_lattice_vec_c = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
-    CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    if(det(CL) < 0.0) {
-      //cerr << "[0] IN MONO: Negative det" << endl;
-      conv_lattice_vec_a = tranvec_e;  // 2nd shortest (order determined by RH coordinate system requirement)
-      conv_lattice_vec_c = tranvec_f;  // 1st shortest (order determined by RH coordinate system requirement)
-      CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    }
-    candidate_lattice_vectors.push_back(CL);
-    candidate_lattice_chars.push_back('b');
-
-    // ===== e and g ===== //
-    conv_lattice_vec_a = tranvec_e;  // 3rd shortest (order determined by RH coordinate system requirement)
-    conv_lattice_vec_c = tranvec_g;  // 1sd shortest (order determined by RH coordinate system requirement)
-    CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    if(det(CL) < 0.0) {
-      //cerr << "[1] IN MONO: Negative det" << endl;
-      conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
-      conv_lattice_vec_c = tranvec_e;  // 1sd shortest (order determined by RH coordinate system requirement)
-      CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    }
-    candidate_lattice_vectors.push_back(CL);
-    candidate_lattice_chars.push_back('b');
-
-    // ===== g and f ===== //
-    conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
-    conv_lattice_vec_c = tranvec_f;  // 1sd shortest (order determined by RH coordinate system requirement)
-    CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    if(det(CL) < 0.0) {
-      //cerr << "[2] IN MONO: Negative det" << endl;
-      conv_lattice_vec_a = tranvec_f;  // 3rd shortest (order determined by RH coordinate system requirement)
-      conv_lattice_vec_c = tranvec_g;  // 1sd shortest (order determined by RH coordinate system requirement)
-      CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-    }
-    candidate_lattice_vectors.push_back(CL);
-    candidate_lattice_chars.push_back('b');
-    }
-    // ========== Pick unique axis-c (See ITC p.38-40. Use option (i) for finding the monoclinic cell discussed on p.40) ========== //
-    else if(cell_choice == SG_SETTING_2){
-      conv_lattice_vec_c = h_lat;
-      // ===== e and f ===== //
-      conv_lattice_vec_a = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
-      conv_lattice_vec_b = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
-      CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-      if(det(CL) < 0.0) {
-        //cerr << "[0] IN MONO: Negative det" << endl;
+      // ========== Pick unique axis-b (See ITC p.38-40. Use option (i) for finding the monoclinic cell discussed on p.40) ========== //
+      if(cell_choice == 0 || cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL){ //DX 20190131 - add ANRL setting
+        conv_lattice_vec_b = h_lat;
+        // ===== e and f ===== //
         conv_lattice_vec_a = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
-        conv_lattice_vec_b = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
+        conv_lattice_vec_c = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
         CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-      }
-      candidate_lattice_vectors.push_back(CL);
-      candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
+        if(det(CL) < 0.0) {
+          //cerr << "[0] IN MONO: Negative det" << endl;
+          conv_lattice_vec_a = tranvec_e;  // 2nd shortest (order determined by RH coordinate system requirement)
+          conv_lattice_vec_c = tranvec_f;  // 1st shortest (order determined by RH coordinate system requirement)
+          CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        }
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('b');
 
-      // ===== e and g ===== //
-      conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
-      conv_lattice_vec_b = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
-      CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-      if(det(CL) < 0.0) {
-        //cerr << "[1] IN MONO: Negative det" << endl;
-        conv_lattice_vec_a = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
-        conv_lattice_vec_b = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+        // ===== e and g ===== //
+        conv_lattice_vec_a = tranvec_e;  // 3rd shortest (order determined by RH coordinate system requirement)
+        conv_lattice_vec_c = tranvec_g;  // 1sd shortest (order determined by RH coordinate system requirement)
         CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-      }
-      candidate_lattice_vectors.push_back(CL);
-      candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
+        if(det(CL) < 0.0) {
+          //cerr << "[1] IN MONO: Negative det" << endl;
+          conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+          conv_lattice_vec_c = tranvec_e;  // 1sd shortest (order determined by RH coordinate system requirement)
+          CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        }
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('b');
 
-      // ===== g and f ===== //
-      conv_lattice_vec_a = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
-      conv_lattice_vec_b = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
-      CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
-      if(det(CL) < 0.0) {
-        //cerr << "[2] IN MONO: Negative det" << endl;
+        // ===== g and f ===== //
         conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+        conv_lattice_vec_c = tranvec_f;  // 1sd shortest (order determined by RH coordinate system requirement)
+        CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        if(det(CL) < 0.0) {
+          //cerr << "[2] IN MONO: Negative det" << endl;
+          conv_lattice_vec_a = tranvec_f;  // 3rd shortest (order determined by RH coordinate system requirement)
+          conv_lattice_vec_c = tranvec_g;  // 1sd shortest (order determined by RH coordinate system requirement)
+          CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        }
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('b');
+      }
+      // ========== Pick unique axis-c (See ITC p.38-40. Use option (i) for finding the monoclinic cell discussed on p.40) ========== //
+      else if(cell_choice == SG_SETTING_2){
+        conv_lattice_vec_c = h_lat;
+        // ===== e and f ===== //
+        conv_lattice_vec_a = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
         conv_lattice_vec_b = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
         CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        if(det(CL) < 0.0) {
+          //cerr << "[0] IN MONO: Negative det" << endl;
+          conv_lattice_vec_a = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
+          conv_lattice_vec_b = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
+          CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        }
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
+
+        // ===== e and g ===== //
+        conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+        conv_lattice_vec_b = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
+        CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        if(det(CL) < 0.0) {
+          //cerr << "[1] IN MONO: Negative det" << endl;
+          conv_lattice_vec_a = tranvec_e;  // 1st shortest (order determined by RH coordinate system requirement)
+          conv_lattice_vec_b = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+          CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        }
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
+
+        // ===== g and f ===== //
+        conv_lattice_vec_a = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
+        conv_lattice_vec_b = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+        CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        if(det(CL) < 0.0) {
+          //cerr << "[2] IN MONO: Negative det" << endl;
+          conv_lattice_vec_a = tranvec_g;  // 3rd shortest (order determined by RH coordinate system requirement)
+          conv_lattice_vec_b = tranvec_f;  // 2nd shortest (order determined by RH coordinate system requirement)
+          CL = xvec2xmat(conv_lattice_vec_a, conv_lattice_vec_b, conv_lattice_vec_c);
+        }
+        candidate_lattice_vectors.push_back(CL);
+        candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
       }
-      candidate_lattice_vectors.push_back(CL);
-      candidate_lattice_chars.push_back('m'); //unique axis c; use 'm' since 'c' is reserved for cubic
-    }
     } // DX 12/12/17 - Consider all possible unique axis choices 
     return true;
   }
@@ -2489,7 +2491,7 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findTriclinicLattice(xmatrix<double>& lattice, vector<xmatrix<double> >& candidate_lattice_vectors,
-                            vector<char>& candidate_lattice_chars) {
+      vector<char>& candidate_lattice_chars) {
     // TRICLINIC lattice vectors criteria: a!=b!=c; alpha,beta,gamma!=90
     candidate_lattice_vectors.push_back(lattice);
     candidate_lattice_chars.push_back('a');
@@ -2503,7 +2505,7 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findOrthorhombicLattice(vector<xvector<double> >& twofold_lattice_vectors, vector<xvector<double> >& mirror_lattice_vectors,
-			       vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
+      vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
     // ORTHORHOMBIC lattice vector criteria:
     //        lattice vectors a,b,c   : Parallel to 2-fold axis (or two 2-fold and one mirror)
     bool LDEBUG = (FALSE || XHOST.DEBUG);
@@ -2519,29 +2521,29 @@ namespace SYM {
     for (int i = 0; i < totalnum; i++) {
       conven.clear();
       for (int j = 0; j < 3; j++) {
-	if(combiset[j] < (int)(twofold_lattice_vectors.size())) {
-	  conven.push_back(twofold_lattice_vectors[combiset[j]]);
-	} else {
-	  conven.push_back(mirror_lattice_vectors[combiset[j] - twofold_lattice_vectors.size()]);
-	}
+        if(combiset[j] < (int)(twofold_lattice_vectors.size())) {
+          conven.push_back(twofold_lattice_vectors[combiset[j]]);
+        } else {
+          conven.push_back(mirror_lattice_vectors[combiset[j] - twofold_lattice_vectors.size()]);
+        }
       }
       if(SYM::checkAngle(conven[0], conven[1], (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	  SYM::checkAngle(conven[0], conven[2], (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
-	  SYM::checkAngle(conven[1], conven[2], (Pi_r / 2.0), tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	//print(conven);
-	if(latticeVectorsSame(conven[0], conven[1], conven[2], tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	  if(LDEBUG) { cerr << "SYM::findOrthorhombicLattice: Two or more of conventional basis vectors are the same..." << endl; }
-	  conven.clear();
-	} else if(SYM::checkAngle(conven[0], conven[1], Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		   SYM::checkAngle(conven[0], conven[2], Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		   SYM::checkAngle(conven[1], conven[2], Pi_r, tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	  if(LDEBUG) { cerr << "ORTHO: Two or more of conventional basis vectors are the same..." << endl; }
-	  conven.clear();
-	} else {
-	  break;
-	}
+          SYM::checkAngle(conven[0], conven[2], (Pi_r / 2.0), tol) && //DX 20190215 - _SYM_TOL_ to tol
+          SYM::checkAngle(conven[1], conven[2], (Pi_r / 2.0), tol)) { //DX 20190215 - _SYM_TOL_ to tol
+        //print(conven);
+        if(latticeVectorsSame(conven[0], conven[1], conven[2], tol)) { //DX 20190215 - _SYM_TOL_ to tol
+          if(LDEBUG) { cerr << "SYM::findOrthorhombicLattice: Two or more of conventional basis vectors are the same..." << endl; }
+          conven.clear();
+        } else if(SYM::checkAngle(conven[0], conven[1], Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
+            SYM::checkAngle(conven[0], conven[2], Pi_r, tol) && //DX 20190215 - _SYM_TOL_ to tol
+            SYM::checkAngle(conven[1], conven[2], Pi_r, tol)) { //DX 20190215 - _SYM_TOL_ to tol
+          if(LDEBUG) { cerr << "ORTHO: Two or more of conventional basis vectors are the same..." << endl; }
+          conven.clear();
+        } else {
+          break;
+        }
       } else {
-	conven.clear();
+        conven.clear();
       }
       combiset = AllCombination42(3, totalcount, combiset);
     }
@@ -2579,8 +2581,8 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findRhombohedralLattice(vector<xvector<double> >& rot_lattice_vectors, vector<Screw>& rot_ops_vec,
-			       vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-			       vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
+      vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
+      vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
     // RHOMBOHEDRAL lattice vectors criteria:
     //        lattice vector c       : Parallel to 6- or 3-fold axis
     //        lattice vectors a,b    : Parallel to 2-fold axes; Angle ab = 120 degrees
@@ -2599,15 +2601,15 @@ namespace SYM {
     // ===== Lattice vector 'c' ===== //
     for (uint i = 0; i < rot_ops_vec.size(); i++) {
       if(aurostd::abs(rot_ops_vec[i].return_order() - 6.0) < _ZERO_TOL_) {
-	six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
+        six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
       }
     }
     if(six_or_threefold_lattice_vectors.size() == 0) {
       //cerr << "TRIGONAL HEXAGONAL CELL (ie, no 6fold axis)" << endl;
       for (uint i = 0; i < rot_ops_vec.size(); i++) {
-	if(aurostd::abs(rot_ops_vec[i].return_order() - 3.0) < _ZERO_TOL_) {
-	  six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
-	}
+        if(aurostd::abs(rot_ops_vec[i].return_order() - 3.0) < _ZERO_TOL_) {
+          six_or_threefold_lattice_vectors.push_back(rot_lattice_vectors[i]);
+        }
       }
     }
     if(six_or_threefold_lattice_vectors.size() == 0) {
@@ -2628,23 +2630,23 @@ namespace SYM {
     int count = 0;
     for (uint i = 0; i < possible_latt_a_b.size(); i++) {
       for (uint j = i; j < possible_latt_a_b.size(); j++) {
-	tmpa = possible_latt_a_b[i];
-	tmpb = possible_latt_a_b[j];
-	if(aurostd::abs(aurostd::modulus(tmpa) - aurostd::modulus(tmpb)) < tol && //DX 20190215 - _SYM_TOL_ to tol
-	    SYM::checkAngle(tmpa, tmpb, ((2.0 * Pi_r) / 3.0), tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	  count++;
-	  if(count > 1) {
-	    if(aurostd::modulus(tmpa) <= min_norm) {
-	      min_norm = aurostd::modulus(tmpa);
-	      conv_lattice_vec_a = tmpa;
-	      conv_lattice_vec_b = tmpb;
-	    }
-	  } else {
-	    min_norm = aurostd::modulus(tmpa);
-	    conv_lattice_vec_a = tmpa;
-	    conv_lattice_vec_b = tmpb;
-	  }
-	}
+        tmpa = possible_latt_a_b[i];
+        tmpb = possible_latt_a_b[j];
+        if(aurostd::abs(aurostd::modulus(tmpa) - aurostd::modulus(tmpb)) < tol && //DX 20190215 - _SYM_TOL_ to tol
+            SYM::checkAngle(tmpa, tmpb, ((2.0 * Pi_r) / 3.0), tol)) { //DX 20190215 - _SYM_TOL_ to tol
+          count++;
+          if(count > 1) {
+            if(aurostd::modulus(tmpa) <= min_norm) {
+              min_norm = aurostd::modulus(tmpa);
+              conv_lattice_vec_a = tmpa;
+              conv_lattice_vec_b = tmpb;
+            }
+          } else {
+            min_norm = aurostd::modulus(tmpa);
+            conv_lattice_vec_a = tmpa;
+            conv_lattice_vec_b = tmpb;
+          }
+        }
       }
     }
 
@@ -2673,7 +2675,7 @@ namespace SYM {
 // ***********************************************************************************************************************
 namespace SYM {
   bool findRhombohedralSetting(vector<xvector<double> >& big_expanded, vector<xmatrix<double> >& candidate_lattice_vectors,
-			       vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
+      vector<char>& candidate_lattice_chars, double& tol) { //DX 20190215 - added tol
     // RHOMBOHEDRAL setting lattice vectors criteria:
     //        lattice vector a,b,c   : a=b=c=sqrt((hex_a^2/3) + (hex_c^2/9))
     //                                 Angle: alpha=beta=gamma=acos((2.0c^2 - 3a^2)/(2(c^2 + 3.0a^2)))
@@ -2728,36 +2730,36 @@ namespace SYM {
           tmpb = candidate_rhl_setting_vectors[j]; modb = aurostd::modulus(tmpb);
           for (uint k = 0; k < candidate_rhl_setting_vectors.size(); k++) {
             if(k!=j && k!=i){
-	      tmpc = candidate_rhl_setting_vectors[k]; modc = aurostd::modulus(tmpc);
-	      // check if all vectors are coplanar
-	      if(aurostd::abs(aurostd::scalar_product(tmpa,aurostd::vector_product(tmpb,tmpc)))>tol){ //DX 20190215 - _SYM_TOL_ to tol
-		tmpalpha = aurostd::angle(tmpb,tmpc);
-		tmpbeta = aurostd::angle(tmpa,tmpc);
-		tmpgamma = aurostd::angle(tmpa,tmpb);
-		// check if alpha=beta=gamma and != 0
-		if(SYM::checkAngle(modb, modc, tmpalpha, alpha_prime, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		  SYM::checkAngle(moda, modc, tmpbeta, alpha_prime, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		  SYM::checkAngle(moda, modb, tmpgamma, alpha_prime, tol) && //DX 20190215 - _SYM_TOL_ to tol
-		  tmpalpha>_ZERO_TOL_ && tmpbeta>_ZERO_TOL_ && tmpgamma>_ZERO_TOL_ &&
-                  aurostd::scalar_product(tmpa,hex_c)>tol &&                    // we want to orient the rhl cell to be in the positive direction of hex-c //DX 20190215 - _SYM_TOL_ to tol
-                  aurostd::scalar_product(tmpb,hex_c)>tol &&                    // we want to orient the rhl cell to be in the positive direction of hex-c //DX 20190215 - _SYM_TOL_ to tol
-                  aurostd::scalar_product(tmpc,hex_c)>tol) {                    // we want to orient the rhl cell to be in the positive direction of hex-c //DX 20190215 - _SYM_TOL_ to tol 
-		  count++;
-		  if(count > 1) {
-		    if(aurostd::modulus(tmpa) <= min_norm) {
-		      min_norm = aurostd::modulus(tmpa);
-		      conv_lattice_vec_a = tmpa;
-		      conv_lattice_vec_b = tmpb;
-		      conv_lattice_vec_c = tmpc;
-		    }
-		  } 
-		  else {
-		    min_norm = aurostd::modulus(tmpa);
-		    conv_lattice_vec_a = tmpa;
-		    conv_lattice_vec_b = tmpb;
-		    conv_lattice_vec_c = tmpc;
-		  }
-		}
+              tmpc = candidate_rhl_setting_vectors[k]; modc = aurostd::modulus(tmpc);
+              // check if all vectors are coplanar
+              if(aurostd::abs(aurostd::scalar_product(tmpa,aurostd::vector_product(tmpb,tmpc)))>tol){ //DX 20190215 - _SYM_TOL_ to tol
+                tmpalpha = aurostd::angle(tmpb,tmpc);
+                tmpbeta = aurostd::angle(tmpa,tmpc);
+                tmpgamma = aurostd::angle(tmpa,tmpb);
+                // check if alpha=beta=gamma and != 0
+                if(SYM::checkAngle(modb, modc, tmpalpha, alpha_prime, tol) && //DX 20190215 - _SYM_TOL_ to tol
+                    SYM::checkAngle(moda, modc, tmpbeta, alpha_prime, tol) && //DX 20190215 - _SYM_TOL_ to tol
+                    SYM::checkAngle(moda, modb, tmpgamma, alpha_prime, tol) && //DX 20190215 - _SYM_TOL_ to tol
+                    tmpalpha>_ZERO_TOL_ && tmpbeta>_ZERO_TOL_ && tmpgamma>_ZERO_TOL_ &&
+                    aurostd::scalar_product(tmpa,hex_c)>tol &&                    // we want to orient the rhl cell to be in the positive direction of hex-c //DX 20190215 - _SYM_TOL_ to tol
+                    aurostd::scalar_product(tmpb,hex_c)>tol &&                    // we want to orient the rhl cell to be in the positive direction of hex-c //DX 20190215 - _SYM_TOL_ to tol
+                    aurostd::scalar_product(tmpc,hex_c)>tol) {                    // we want to orient the rhl cell to be in the positive direction of hex-c //DX 20190215 - _SYM_TOL_ to tol 
+                  count++;
+                  if(count > 1) {
+                    if(aurostd::modulus(tmpa) <= min_norm) {
+                      min_norm = aurostd::modulus(tmpa);
+                      conv_lattice_vec_a = tmpa;
+                      conv_lattice_vec_b = tmpb;
+                      conv_lattice_vec_c = tmpc;
+                    }
+                  } 
+                  else {
+                    min_norm = aurostd::modulus(tmpa);
+                    conv_lattice_vec_a = tmpa;
+                    conv_lattice_vec_b = tmpb;
+                    conv_lattice_vec_c = tmpc;
+                  }
+                }
               }
             }
           }
@@ -2786,21 +2788,22 @@ namespace SYM {
     xmatrix<double> lattice = trasp(f2c); //DX 20190619 
     for (uint j = 0; j < big_expanded.size(); j++) {
       if(bravais_basis.size() == 0) {
-	bravais_basis.push_back(big_expanded[j]);
+        bravais_basis.push_back(big_expanded[j]);
       } else {
-	bool duplicate_lattice_point = false;
-	for (uint a = 0; a < bravais_basis.size(); a++) {
-	  xvector<double> bravais_fpos = BringInCell(c2f * bravais_basis[a]);
-	  xvector<double> tmp = BringInCell(c2f * big_expanded[j]);
-	  //if(MapAtoms(bravais_fpos, tmp, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	  if(SYM::MapAtom(bravais_fpos,tmp,lattice,f2c,skew,tol)){ //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - lattice and f2c as input
-	    duplicate_lattice_point = true;
-	    break;
-	  }
-	}
-	if(duplicate_lattice_point == false) {
-	  bravais_basis.push_back(big_expanded[j]);
-	}
+        bool duplicate_lattice_point = false;
+        for (uint a = 0; a < bravais_basis.size(); a++) {
+          xvector<double> bravais_fpos = BringInCell(c2f * bravais_basis[a]);
+          xvector<double> tmp = BringInCell(c2f * big_expanded[j]);
+          //if(MapAtoms(bravais_fpos, tmp, f2c, skew, tol)) //DX 20190215 - _SYM_TOL_ to tol
+          if(SYM::MapAtom(bravais_fpos,tmp,lattice,f2c,skew,tol)) //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - lattice and f2c as input
+          { //CO200106 - patching for auto-indenting
+            duplicate_lattice_point = true;
+            break;
+          }
+        }
+        if(duplicate_lattice_point == false) {
+          bravais_basis.push_back(big_expanded[j]);
+        }
       }
     }
     bravais_count = bravais_basis.size();
@@ -2815,61 +2818,61 @@ namespace SYM {
       vector<double> ys;
       vector<double> xs;
       for (uint a = 0; a < bravais_basis.size(); a++) {
-	xvector<double> bravais_direct = c2f * bravais_basis[a];
-	zs.push_back(bravais_direct[3]);
-	ys.push_back(bravais_direct[2]);
-	xs.push_back(bravais_direct[1]);
+        xvector<double> bravais_direct = c2f * bravais_basis[a];
+        zs.push_back(bravais_direct[3]);
+        ys.push_back(bravais_direct[2]);
+        xs.push_back(bravais_direct[1]);
       }
       // ===== Differentiate between C and I centering ===== //
       //Use Bravais Count = 5 to identify Orthorhombic C:
       if(bravais_count == 2 &&
-	  (aurostd::abs(zs[0] - zs[1]) < tol || //DX 20190215 - _SYM_TOL_ to tol
-	   aurostd::abs(ys[0] - ys[1]) < tol || //DX 20190215 - _SYM_TOL_ to tol
-	   aurostd::abs(xs[0] - xs[1]) < tol)) { //DX 20190215 - _SYM_TOL_ to tol
-	// === If two lattice points are on the same plane --> // DX C centering === //
-	bravais_count = 5;
+          (aurostd::abs(zs[0] - zs[1]) < tol || //DX 20190215 - _SYM_TOL_ to tol
+           aurostd::abs(ys[0] - ys[1]) < tol || //DX 20190215 - _SYM_TOL_ to tol
+           aurostd::abs(xs[0] - xs[1]) < tol)) { //DX 20190215 - _SYM_TOL_ to tol
+        // === If two lattice points are on the same plane --> // DX C centering === //
+        bravais_count = 5;
       }
     }
     // ===== If RHOMBOHEDRAL and the bravais_count is only 1, then it is actually HEXAGONAL ===== //
     else if(crystalsystem == "RHOMBOHEDRAL" && bravais_count == 1) {
       crystalsystem = "HEXAGONAL";
       for (uint i = 0; i < candidate_lattice_chars.size(); i++) {
-	candidate_lattice_chars[i] = 'h';
+        candidate_lattice_chars[i] = 'h';
       }
     } else if(crystalsystem == "HEXAGONAL") {
       if(bravais_count == 3) {
-	// Check if HEX has obverse/reverse to know if this is actually rhombohedral
-	xvector<double> centering1;
-	centering1(1) = 2.0 / 3.0;
-	centering1(2) = 1.0 / 3.0;
-	centering1(3) = 1.0 / 3.0;
-	xvector<double> centering2;
-	centering2(1) = 1.0 / 3.0;
-	centering2(2) = 2.0 / 3.0;
-	centering2(3) = 2.0 / 3.0;
-	xvector<double> centering1_swap;
-	centering1_swap(1) = 1.0 / 3.0;
-	centering1_swap(2) = 2.0 / 3.0;
-	centering1_swap(3) = 1.0 / 3.0;
-	xvector<double> centering2_swap;
-	centering2_swap(1) = 2.0 / 3.0;
-	centering2_swap(2) = 1.0 / 3.0;
-	centering2_swap(3) = 2.0 / 3.0;
-	bool centering1_found = false;
-	bool centering2_found = false;
-	for (uint a = 0; a < bravais_basis.size(); a++) {
-	  xvector<double> bravais_fpos = BringInCell(c2f * bravais_basis[a]);
-	  if(SYM::MapAtom(bravais_fpos, centering1, lattice, f2c, skew, tol) || SYM::MapAtom(bravais_fpos, centering1_swap, lattice, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - lattice and f2c as input
-	    centering1_found = true;
-	  } else if(SYM::MapAtom(bravais_fpos, centering2, lattice, f2c, skew, tol) || SYM::MapAtom(bravais_fpos, centering2_swap, lattice, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - lattice and f2c as input
-	    centering2_found = true;
-	  }
-	}
-	if(centering1_found && centering2_found) {
-	  for (uint i = 0; i < candidate_lattice_chars.size(); i++) {
-	    candidate_lattice_chars[i] = 'R';
-	  }
-	}
+        // Check if HEX has obverse/reverse to know if this is actually rhombohedral
+        xvector<double> centering1;
+        centering1(1) = 2.0 / 3.0;
+        centering1(2) = 1.0 / 3.0;
+        centering1(3) = 1.0 / 3.0;
+        xvector<double> centering2;
+        centering2(1) = 1.0 / 3.0;
+        centering2(2) = 2.0 / 3.0;
+        centering2(3) = 2.0 / 3.0;
+        xvector<double> centering1_swap;
+        centering1_swap(1) = 1.0 / 3.0;
+        centering1_swap(2) = 2.0 / 3.0;
+        centering1_swap(3) = 1.0 / 3.0;
+        xvector<double> centering2_swap;
+        centering2_swap(1) = 2.0 / 3.0;
+        centering2_swap(2) = 1.0 / 3.0;
+        centering2_swap(3) = 2.0 / 3.0;
+        bool centering1_found = false;
+        bool centering2_found = false;
+        for (uint a = 0; a < bravais_basis.size(); a++) {
+          xvector<double> bravais_fpos = BringInCell(c2f * bravais_basis[a]);
+          if(SYM::MapAtom(bravais_fpos, centering1, lattice, f2c, skew, tol) || SYM::MapAtom(bravais_fpos, centering1_swap, lattice, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - lattice and f2c as input
+            centering1_found = true;
+          } else if(SYM::MapAtom(bravais_fpos, centering2, lattice, f2c, skew, tol) || SYM::MapAtom(bravais_fpos, centering2_swap, lattice, f2c, skew, tol)) { //DX 20190215 - _SYM_TOL_ to tol //DX 20190619 - lattice and f2c as input
+            centering2_found = true;
+          }
+        }
+        if(centering1_found && centering2_found) {
+          for (uint i = 0; i < candidate_lattice_chars.size(); i++) {
+            candidate_lattice_chars[i] = 'R';
+          }
+        }
       }
     }
     return true;
@@ -3061,13 +3064,14 @@ namespace SYM {
             symOp.ftau = T;
             symOp.ctau = f2c * T;  //atoms_by_type[index_for_smallest_group][0].cpos - Rf*atoms_by_type[index_for_smallest_group][j].cpos;//f2c*T;
             // CO - END
-            //if(SYM::getFullSymBasis(atomicbasis,Rf,c2f,f2c,sym_symbol,T,skew,tol,atom_map,type_map)){ //DX 20190215 - _SYM_TOL_ to tol
-            // DX if(SYM::getFullSymBasis(atomicbasis,L,c2f,f2c,symOp,skew,tol,false,atom_map,type_map)){ //DX 20190215 - _SYM_TOL_ to tol
-            if(SYM::getFullSymBasis(atomicbasis, L, c2f, f2c, symOp, TRUE, skew, tol, atom_map, type_map)) { //DX 20190215 - _SYM_TOL_ to tol
-              /*cerr << "---------" << endl;
-                cerr << "Uf " << endl << symOp.Uf << endl;
-                cerr << "FTAU: " << symOp.ftau << endl;
-                cerr << "---------" << endl;*/
+            //if(SYM::getFullSymBasis(atomicbasis,Rf,c2f,f2c,sym_symbol,T,skew,tol,atom_map,type_map)) //DX 20190215 - _SYM_TOL_ to tol
+            // DX if(SYM::getFullSymBasis(atomicbasis,L,c2f,f2c,symOp,skew,tol,false,atom_map,type_map)) //DX 20190215 - _SYM_TOL_ to tol
+            if(SYM::getFullSymBasis(atomicbasis, L, c2f, f2c, symOp, TRUE, skew, tol, atom_map, type_map)) //DX 20190215 - _SYM_TOL_ to tol
+            { //CO200106 - patching for auto-indenting
+              //cerr << "---------" << endl;
+              //cerr << "Uf " << endl << symOp.Uf << endl;
+              //cerr << "FTAU: " << symOp.ftau << endl;
+              //cerr << "---------" << endl;
               // ===== If one-to-one, store the symmetry operator ===== //
               //cerr << " ===> storing " << ITC_sym_info.symbol[SYMINDEX[i]] << endl;
               //print(atom_map);
@@ -3247,20 +3251,19 @@ namespace SYM {
 } //namespace SYM
 
 // ********************************************************************************************************************************
-// AFLOW2SG:: Prints space group in string format (Void Input)
+// calculateSpaceGroups()
 // ********************************************************************************************************************************
 namespace SYM {
-  void calculateSpaceGroups(vector<xstructure>& vxstrs){
-    for(uint i=0;i<vxstrs.size();i++){
-      vxstrs[i].SpaceGroup_ITC();
-    }
-  }
-}
+  void calculateSpaceGroups(vector<xstructure>& vxstrs, uint start_index, uint end_index, uint setting){ //DX 20191230 add setting option
 
-namespace SYM {
-  void calculateSpaceGroupsInSetRange(vector<xstructure>& vxstrs, uint& start_index, uint& end_index){
-    for(uint i=start_index;i<=end_index;i++){
-      vxstrs[i].SpaceGroup_ITC();
+    bool no_scan = false;
+
+    // if end index is default (i.e., AUROSTD_MAX_UINT), then compute symmetry analysis for all structures
+    if(end_index == AUROSTD_MAX_UINT){ end_index=vxstrs.size(); }
+
+    for(uint i=start_index;i<end_index;i++){ //DX 20191108 - [switching from compare::splitTaskIntoThreads to getThreadDistribution, end index conventions differ, <= vs <]
+      double use_tol = SYM::defaultTolerance(vxstrs[i]);
+      vxstrs[i].SpaceGroup_ITC(use_tol, -1, setting, no_scan);
     }
   }
 }
@@ -3364,8 +3367,9 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& setting) {
 // ********************************************************************************************************************************
 // MAIN FUNCTION:: Space group consistent with the International Tables of Crystallography
 // ********************************************************************************************************************************
-// DX 9/5/17 - [OBSOLETE] uint xstructure::SpaceGroup_ITC(double& use_tol, double& orig_tolerance, const int& manual_it, int& change_sym_count, bool& no_scan) {
-uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int& setting, bool& no_scan) { //DX 20180806 - added setting
+// DX 9/5/17 - [OBSOLETE] uint xstructure::SpaceGroup_ITC(double& use_tol, double& orig_tolerance, const int& manual_it, int& change_sym_count, bool& no_scan)
+uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int& setting, bool& no_scan) //DX 20180806 - added setting
+{ //CO200106 - patching for auto-indenting
   if(use_tol < _ZERO_TOL_) {
     cerr << "SYM::SpaceGroup_ITC: ERROR: Tolerance cannot be zero (i.e. less than 1e-10) [dir=" << (*this).directory << "]." << endl;
     return 0;
@@ -3485,8 +3489,8 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   vector<int> sg_search;
 
   //WYCKOFF VARIABLE DECLARATIONS
-//  bool found_wyckoff = true;
-//  bool first_wyckoff = true;
+  //  bool found_wyckoff = true;
+  //  bool first_wyckoff = true;
   bool found_all_wyckoff = false;
   string spacegroupstring = "";
   vector<int> wyckoffmult;                   // Wyckoff multiplicity
@@ -3577,8 +3581,8 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       int IT = iterate;
       // ===== Conventional Cell Routine ===== //
       CCell = SYM::ConventionalCell(xstr, IT, cell_choice, last_orientation, crystalsystem_prev, CrystOut_prev, candidate_lattice_vectors_prev,
-                               candidate_lattice_chars_prev, checkops, ITC_sym_info, lattice_reformed, lattice_pgroups, lattice_sym_mats, crystal_sym_mats,
-                               symmetryfound);
+          candidate_lattice_chars_prev, checkops, ITC_sym_info, lattice_reformed, lattice_pgroups, lattice_sym_mats, crystal_sym_mats,
+          symmetryfound);
       // ===== If the conventional cell was not found, change the tolerance ===== //
       if(symmetryfound == false) {
         lattice_reformed = false;
@@ -3601,8 +3605,8 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       iterate = MAN_IT;
       // ===== Conventional Cell Routine ===== //
       CCell = SYM::ConventionalCell(xstr, iterate, cell_choice, last_orientation, crystalsystem_prev, CrystOut_prev, candidate_lattice_vectors_prev,
-                               candidate_lattice_chars_prev, checkops, ITC_sym_info, lattice_reformed, lattice_pgroups, lattice_sym_mats, crystal_sym_mats,
-                               symmetryfound);
+          candidate_lattice_chars_prev, checkops, ITC_sym_info, lattice_reformed, lattice_pgroups, lattice_sym_mats, crystal_sym_mats,
+          symmetryfound);
       // ===== If the conventional cell was not found, change the tolerance ===== //
       if(symmetryfound == false) {
         lattice_reformed = false;
@@ -3659,8 +3663,9 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     // ===== Use the point group and the lattice type/lattice centering to narrow down the space group ===== //
     sg_search = SYM::PointGroup_SpaceGroup(pointgroup, CCell.bravais_label_ITC);
     // If we are looking at the rhombohedral setting, we need to use bravais label 'R' instead of 'P' //DX 20180807 
-    //DX 20190130 - add anrl cell choice : if(cell_choice == 1 && CCell.lattice_label_ITC == 'r'){ //DX 20180807
-    if((cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && CCell.lattice_label_ITC == 'r'){ //DX 20190131 - add anrl setting
+    //DX 20190130 - add anrl cell choice : if(cell_choice == 1 && CCell.lattice_label_ITC == 'r') //DX 20180807
+    if((cell_choice == SG_SETTING_1 || cell_choice == SG_SETTING_ANRL) && CCell.lattice_label_ITC == 'r') //DX 20190131 - add anrl setting
+    { //CO200106 - patching for auto-indenting
       sg_search = SYM::PointGroup_SpaceGroup(pointgroup, 'R'); //DX 20180807
     } //DX 20180807
     if(LDEBUG) {
@@ -4021,8 +4026,8 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                   if(possible_shifts.size() > 0) {
                     if(LDEBUG) {
                       cerr << "SYM::SpaceGroup_ITC: Exploring possible shifts to find minimum enumerated Wyckoff set. Testing shift " 
-                               << origin_shift_index << " (" << origin_shift_index+1 << " of " << possible_shifts.size() << "): " 
-                               << possible_shifts[origin_shift_index] << "." << endl; 
+                        << origin_shift_index << " (" << origin_shift_index+1 << " of " << possible_shifts.size() << "): " 
+                        << possible_shifts[origin_shift_index] << "." << endl; 
                     }
                     xvector<double> previous_shift;
                     if(origin_shift_index > 0) {
@@ -4031,117 +4036,117 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                     SYM::shiftWyckoffPositions(equivalent_atoms_shifted, previous_shift, possible_shifts[origin_shift_index]);
                     //DX 20180928 test - SYM::shiftWyckoffPositions(equivalent_atoms_shifted, possible_shifts, origin_shift_index);
                     origin_shift_index++;
-            
+
                     // == Signifies when all possible origin shifts have been tested == //
                     if(origin_shift_index == possible_shifts.size()) {
                       other_shifts_explored = true;
                     }
                   }
-		            } 
+                } 
                 else {
-		              if(LDEBUG) {
-		                cerr << "SYM::SpaceGroup_ITC: Tested (" << possible_shifts.size() << ") possible origin choices. Finding minimum enumerated Wyckoff letters from valid shifts." << endl; 
-		              }
+                  if(LDEBUG) {
+                    cerr << "SYM::SpaceGroup_ITC: Tested (" << possible_shifts.size() << ") possible origin choices. Finding minimum enumerated Wyckoff letters from valid shifts." << endl; 
+                  }
                   //If all possible origin shifts scanned, pick the one with the minimum sum of enumerated Wyckoff letters
                   int min_wyckoff_config = 0;
-		              int min_wyckoff_sum = sum_wyckoff_letters[0];
+                  int min_wyckoff_sum = sum_wyckoff_letters[0];
                   for (uint s = 0; s < sum_wyckoff_letters.size(); s++) {
                     if(min_wyckoff_sum > sum_wyckoff_letters[s] && shift_valid[s]) {
                       min_wyckoff_config = s;
                       min_wyckoff_sum = sum_wyckoff_letters[s];
                     }
                   }
-		              xvector<double> shift_for_min_wyckoff_config;
+                  xvector<double> shift_for_min_wyckoff_config;
                   if(min_wyckoff_config > 0) {
-		                shift_for_min_wyckoff_config = possible_shifts[min_wyckoff_config-1];
-		                OriginShift = OriginShift + shift_for_min_wyckoff_config; // DX NEW
+                    shift_for_min_wyckoff_config = possible_shifts[min_wyckoff_config-1];
+                    OriginShift = OriginShift + shift_for_min_wyckoff_config; // DX NEW
                   }
-		              SYM::shiftWyckoffPositions(equivalent_atoms_shifted, possible_shifts[origin_shift_index-1], shift_for_min_wyckoff_config);
+                  SYM::shiftWyckoffPositions(equivalent_atoms_shifted, possible_shifts[origin_shift_index-1], shift_for_min_wyckoff_config);
                   final_shift = true;
                 }
                 // Find the Wyckoff positions in the ITC standard representation
                 //perhaps change findWyckoffPositions to mapEquivalentAtomsToWyckoffPositions
                 found_all_wyckoff = SYM::findWyckoffPositions(CCell, atomicbasis, tmpvvvstring, equivalent_atoms, equivalent_atoms_shifted, 
-                                                              foundspacegroup, spacegroupstring, orig_origin_shift, OriginShift, 
-                                                              wyckoffmult, wyckoffsymbols, wyckoffVariables, wyckoffPositionsVector, 
-						     wyckoffSymbols, woss, obverse_force_transformed);
-                 shift_valid.push_back(found_all_wyckoff);
-                 if(found_all_wyckoff == false && orig_origin_shift == true) {
-                   foundspacegroup=false;
-                   break;
-                 } else if(found_all_wyckoff == false && orig_origin_shift == false) {
-                   sum_wyckoff_letters.push_back(100);
-                   continue;
-                 }
-                 // ===== Determine multiplicity, letters, and site symmetry in WYCCAR ===== //
-                 // This allows us to investigate if there are other Wyckoff positions corresponding to the
-                 // ones in the POSCAR which will find the "lowest" Wyckoff letter enumeration scheme
-             
-                 // ===== Extract Wyckoff info ===== 
-                 vector<int> wyckoff_mult;
-                 vector<string> wyckoff_letter;
-                 vector<string> wyckoff_site_sym;
-                 for (uint w = 0; w < wyckoffSymbols.size(); w++) {
-                   //cerr << "wyckoffSymbols: " << wyckoffSymbols[w] << endl;
-                   vector<string> tokens;
-                   aurostd::string2tokens(wyckoffSymbols[w], tokens, " ");
-                   if(tokens.size()==3){
-		                 wyckoff_mult.push_back(aurostd::string2utype<int>(tokens[0]));
-		                 wyckoff_letter.push_back(tokens[1]);
-		                 wyckoff_site_sym.push_back(tokens[2]);
-                   }
-                 }
+                    foundspacegroup, spacegroupstring, orig_origin_shift, OriginShift, 
+                    wyckoffmult, wyckoffsymbols, wyckoffVariables, wyckoffPositionsVector, 
+                    wyckoffSymbols, woss, obverse_force_transformed);
+                shift_valid.push_back(found_all_wyckoff);
+                if(found_all_wyckoff == false && orig_origin_shift == true) {
+                  foundspacegroup=false;
+                  break;
+                } else if(found_all_wyckoff == false && orig_origin_shift == false) {
+                  sum_wyckoff_letters.push_back(100);
+                  continue;
+                }
+                // ===== Determine multiplicity, letters, and site symmetry in WYCCAR ===== //
+                // This allows us to investigate if there are other Wyckoff positions corresponding to the
+                // ones in the POSCAR which will find the "lowest" Wyckoff letter enumeration scheme
 
-                 // ===== Calculate the sum of the enumerated wyckoff letters ===== //
-		             sum_wyckoff_letters.push_back(aurostd::sum(SYM::enumerate_wyckoff_letters(wyckoff_letter)));
+                // ===== Extract Wyckoff info ===== 
+                vector<int> wyckoff_mult;
+                vector<string> wyckoff_letter;
+                vector<string> wyckoff_site_sym;
+                for (uint w = 0; w < wyckoffSymbols.size(); w++) {
+                  //cerr << "wyckoffSymbols: " << wyckoffSymbols[w] << endl;
+                  vector<string> tokens;
+                  aurostd::string2tokens(wyckoffSymbols[w], tokens, " ");
+                  if(tokens.size()==3){
+                    wyckoff_mult.push_back(aurostd::string2utype<int>(tokens[0]));
+                    wyckoff_letter.push_back(tokens[1]);
+                    wyckoff_site_sym.push_back(tokens[2]);
+                  }
+                }
 
-                 // ===== If we have performed the original origin shift, now check the other possibilites ===== //
-                 if(orig_origin_shift == true) {
-                   orig_origin_shift = false;
+                // ===== Calculate the sum of the enumerated wyckoff letters ===== //
+                sum_wyckoff_letters.push_back(aurostd::sum(SYM::enumerate_wyckoff_letters(wyckoff_letter)));
 
-		               // ===== Identify minimum enumerated Wyckoff letter occuring in structure ===== // 
-		               int min_enumerated_letter = 1e9;
-		               int min_multiplicity = 1e9;
-                   string min_letter;
-                   string min_site_sym;
-                   for (uint w = 0; w < wyckoff_mult.size(); w++) {
-		                 int enumerated_letter = SYM::enumerate_wyckoff_letter(wyckoff_letter[w]);
-		                 if(enumerated_letter < min_enumerated_letter){
-                       min_multiplicity = wyckoff_mult[w];
-                       min_letter = wyckoff_letter[w];
-                       min_site_sym = wyckoff_site_sym[w];
-		                   min_enumerated_letter = enumerated_letter;
-                     }
-                   }
+                // ===== If we have performed the original origin shift, now check the other possibilites ===== //
+                if(orig_origin_shift == true) {
+                  orig_origin_shift = false;
 
-		               // ===== Determine current Wyckoff lettering enumeration ===== //
-		               vector<int> found_enumerated_Wyckoff_numbers = SYM::enumerate_wyckoff_letters(wyckoff_letter);
-		               int sum_enumerated_found_letters = aurostd::sum(found_enumerated_Wyckoff_numbers);
+                  // ===== Identify minimum enumerated Wyckoff letter occuring in structure ===== // 
+                  int min_enumerated_letter = 1e9;
+                  int min_multiplicity = 1e9;
+                  string min_letter;
+                  string min_site_sym;
+                  for (uint w = 0; w < wyckoff_mult.size(); w++) {
+                    int enumerated_letter = SYM::enumerate_wyckoff_letter(wyckoff_letter[w]);
+                    if(enumerated_letter < min_enumerated_letter){
+                      min_multiplicity = wyckoff_mult[w];
+                      min_letter = wyckoff_letter[w];
+                      min_site_sym = wyckoff_site_sym[w];
+                      min_enumerated_letter = enumerated_letter;
+                    }
+                  }
 
-		               // ===== Determine minimum Wyckoff lettering enumeration ===== //
-		               vector<string> minimum_enumerated_Wyckoff_letters = SYM::get_minimum_enumerated_Wyckoff_letters(spacegroupstring, wyckoff_mult, wyckoff_site_sym);
-		               vector<int> minimum_enumerated_Wyckoff_numbers = SYM::enumerate_wyckoff_letters(minimum_enumerated_Wyckoff_letters);
-		               int minimum_scheme_sum = aurostd::sum(minimum_enumerated_Wyckoff_numbers);
+                  // ===== Determine current Wyckoff lettering enumeration ===== //
+                  vector<int> found_enumerated_Wyckoff_numbers = SYM::enumerate_wyckoff_letters(wyckoff_letter);
+                  int sum_enumerated_found_letters = aurostd::sum(found_enumerated_Wyckoff_numbers);
 
-		               // ===== If we do not have the minimum enumerated Wyckoff letter set, check possible origin shifts ===== //
-		               if(sum_enumerated_found_letters > minimum_scheme_sum) {
-		                 if(LDEBUG) {
-		                 cerr << "SYM::SpaceGroup_ITC: Enumerated Wyckoff letters is not minimized; check origin shifts." << endl;
-                     }
-		                 possible_shifts = SYM::get_possible_origin_shifts(spacegroupstring, min_multiplicity, min_site_sym);
-                   }
-                   else {
-                     final_shift = true;
-                   }
-                 }
-               }
-             }
-	           if(foundspacegroup == true && found_all_wyckoff == true) { //DX 20180613 - moved generator loop
-		           break; //DX 20180613 - moved generator loop
-	           } //DX 20180613 - moved generator loop
-	         } //DX 20180613 - moved generator loop
-	       } //DX 20180613 - moved generator loop
-         if(foundspacegroup == true && found_all_wyckoff == true) {
+                  // ===== Determine minimum Wyckoff lettering enumeration ===== //
+                  vector<string> minimum_enumerated_Wyckoff_letters = SYM::get_minimum_enumerated_Wyckoff_letters(spacegroupstring, wyckoff_mult, wyckoff_site_sym);
+                  vector<int> minimum_enumerated_Wyckoff_numbers = SYM::enumerate_wyckoff_letters(minimum_enumerated_Wyckoff_letters);
+                  int minimum_scheme_sum = aurostd::sum(minimum_enumerated_Wyckoff_numbers);
+
+                  // ===== If we do not have the minimum enumerated Wyckoff letter set, check possible origin shifts ===== //
+                  if(sum_enumerated_found_letters > minimum_scheme_sum) {
+                    if(LDEBUG) {
+                      cerr << "SYM::SpaceGroup_ITC: Enumerated Wyckoff letters is not minimized; check origin shifts." << endl;
+                    }
+                    possible_shifts = SYM::get_possible_origin_shifts(spacegroupstring, min_multiplicity, min_site_sym);
+                  }
+                  else {
+                    final_shift = true;
+                  }
+                }
+              }
+            }
+            if(foundspacegroup == true && found_all_wyckoff == true) { //DX 20180613 - moved generator loop
+              break; //DX 20180613 - moved generator loop
+            } //DX 20180613 - moved generator loop
+          } //DX 20180613 - moved generator loop
+        } //DX 20180613 - moved generator loop
+        if(foundspacegroup == true && found_all_wyckoff == true) {
           break;
         }
       }
@@ -4220,10 +4225,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   wss << setprecision(4) << fixed << 1.00 << endl;  // MODIFIED (RHT)
   if(axis_cell.str().find("b") != std::string::npos) {
     wss << setprecision(4) << fixed << amag << " " << bmag << " " << cmag << " " << alpha << " " << beta << " " << gamma << " " << spacegroup << " "
-        << "1" << endl;  //If b is unique axis ==> first choice (1)
+      << "1" << endl;  //If b is unique axis ==> first choice (1)
   } else if(axis_cell.str().find("m") != std::string::npos) {
     wss << setprecision(4) << fixed << amag << " " << bmag << " " << cmag << " " << alpha << " " << beta << " " << gamma << " " << spacegroup << " "
-        << "2" << endl;  //If c is unique axis ==> second choice (2)
+      << "2" << endl;  //If c is unique axis ==> second choice (2)
   } else {
     wss << setprecision(4) << fixed << amag << " " << bmag << " " << cmag << " " << alpha << " " << beta << " " << gamma << " " << spacegroup << " " << setting_choice << endl;  // CODE PREFERS OPTION 1 (ie, first ITC origin choice)
   }
@@ -4233,7 +4238,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   // === Add Wyckoff positions === //
   wss << endl
-      << "Direct(WYCCAR)" << endl;
+    << "Direct(WYCCAR)" << endl;
   wss << woss.str();  //<< endl;
 
   vector<string> wyccar_string_vec;
@@ -4315,8 +4320,8 @@ namespace SYM {
     *ss << "\\node[draw,circle,inner sep=5pt] at (";
     *ss << L(1, 1) << "*\\x+" << L(2, 1) << "*\\y+" << L(3, 1) << "*\\z," << L(1, 2) << "*\\x+" << L(2, 2) << "*\\y+" << L(3, 2) << "*\\z," << L(1, 3) << "*\\x+" << L(2, 3) << "*\\y+" << L(3, 3) << "*\\z) {};" << endl;
     *ss << "}" << endl
-	<< "}" << endl
-	<< "}" << endl;
+      << "}" << endl
+      << "}" << endl;
 
     *ss << "\\foreach \\x in {" << 0 << ",...," << a << "}{" << endl;
     *ss << "\\foreach \\y in {" << 0 << ",...," << b << "}{" << endl;
@@ -4350,8 +4355,8 @@ namespace SYM {
     *ss << "\\draw[thick,color=" << color << " ] (P123) -- (P23);" << endl;
     *ss << "}\\fi";
     *ss << "}" << endl
-	<< "}" << endl
-	<< "}" << endl;
+      << "}" << endl
+      << "}" << endl;
     return ss;
   }
 } //namespace SYM
@@ -4420,16 +4425,16 @@ namespace SYM {
     vector<int> types;
     for (uint i = 0; i < atoms.size(); i++) {
       if(!invec<int>(types, atoms[i].type)) {
-	types.push_back(atoms[i].type);
+        types.push_back(atoms[i].type);
       }
     }
     for (uint i = 0; i < types.size(); i++) {
       int count = 0;
       for (uint j = 0; j < atoms.size(); j++) {
-	if(types[i] == atoms[j].type) {
-	  atoms_arranged.push_back(atoms[j]);
-	  count++;
-	}
+        if(types[i] == atoms[j].type) {
+          atoms_arranged.push_back(atoms[j]);
+          count++;
+        }
       }
       sizes.push_back(count);
     }

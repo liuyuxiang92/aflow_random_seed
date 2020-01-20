@@ -9,6 +9,8 @@
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
 
+#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO191112 - this file is not compiled like the rest
+
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
@@ -187,7 +189,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
   vschema=b.vschema;
-    // AFLOWRC
+  // AFLOWRC
   aflowrc_filename=b.aflowrc_filename;    // AFLOWRC
   aflowrc_content=b.aflowrc_content;    // AFLOWRC
   vaflowrc.clear();for(uint i=0;i<b.vaflowrc.size();i++) vaflowrc.push_back(b.vaflowrc.at(i));   // AFLOWRC
@@ -207,12 +209,10 @@ const _XHOST& _XHOST::operator=(const _XHOST& b) {  // operator= PUBLIC
   return *this;
 }
 
-/*
-  _XHOST::_XHOST(const _XHOST& b) { // copy PUBLIC
-  //  free();*this=b;
-  copy(b);
-  }
-*/
+//_XHOST::_XHOST(const _XHOST& b) { // copy PUBLIC
+////  free();*this=b;
+//copy(b);
+//}
 
 void _XHOST::free() { // free PRIVATE
   ostrPID.clear();ostrPID.str(string(""));
@@ -287,7 +287,7 @@ std::string _XHOST::command(const string& command) {
   }
   //CO 180705 - STOP
   //[CO190629 - kills is_command(), use xerror (avoids exit)]cerr << "ERROR XHOST.command: command=" << command << " not found ... exiting" << endl; exit(0); // not found
-  throw aurostd::xerror(soliloquy,"command="+command+" not found",_INPUT_MISSING_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
@@ -510,6 +510,7 @@ _kflags::_kflags() {
   KBIN_NEIGHBOURS_DRADIUS                          = 0.0;
   KBIN_POCC                                        = FALSE;
   KBIN_POCC_CALCULATION                            = FALSE;
+  KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO191110
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -628,7 +629,8 @@ void _kflags::copy(const _kflags& b) {
   KBIN_NEIGHBOURS_RADIUS                           = b.KBIN_NEIGHBOURS_RADIUS;
   KBIN_NEIGHBOURS_DRADIUS                          = b.KBIN_NEIGHBOURS_DRADIUS;
   KBIN_POCC                                        = b.KBIN_POCC;
-  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION;
+  KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO191110
+  KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO191110
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -711,14 +713,14 @@ _vflags::_vflags() {
   //  REPEAT
   KBIN_VASP_REPEAT.clear();                                      // REPEAT
   KBIN_VASP_REPEAT.push("");                                // REPEAT
-  
+
   KBIN_VASP_FORCE_OPTION_NOTUNE.clear();                         // NOTUNE
   KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO.clear();                    // SYSTEM_AUTO
- 
+
   //  RELAX_MODE
   KBIN_VASP_FORCE_OPTION_RELAX_MODE.clear();                     // RELAX_MODE forces/energy     
   KBIN_VASP_FORCE_OPTION_RELAX_MODE.push(DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME); // RELAX_MODE forces/energy    
-  
+
   //  RELAX_TYPE
   KBIN_VASP_FORCE_OPTION_RELAX_TYPE.clear();                     // RELAX_TYPE geometry   
   KBIN_VASP_FORCE_OPTION_RELAX_TYPE.push("");               // RELAX_TYPE geometry    
@@ -735,7 +737,7 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_ABMIX.push(DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME); // ABMIX
   KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.clear();          // AUTO_PSEUDOPOTENTIALS
   KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS.push(DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE); // AUTO_PSEUDOPOTENTIALS
-  
+
   // ENMAX_MULTIPLY
   KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL.clear();
   //  KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL.push("1.4");
@@ -762,9 +764,9 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL.push(aurostd::utype2string(0.1));  //default //CO181128
   // RWIGS
   KBIN_VASP_FORCE_OPTION_RWIGS_STATIC                            = FALSE;
-  
+
   KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.clear();                     // SKIP_NOMIX
-  
+
   //  KBIN_VASP_FORCE_OPTION_TRISTATE.clear();                       // 
 
   KBIN_VASP_FORCE_OPTION_SPIN.clear();                           // SPIN
@@ -783,9 +785,10 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_WAVECAR.option                          = DEFAULT_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.clear();                         // CHGCAR
   KBIN_VASP_FORCE_OPTION_CHGCAR.option                           = DEFAULT_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE.clear();                    // ME191028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.clear();                     // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LSCOUPLING.option                       = DEFAULT_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
-  
+
   KBIN_VASP_FORCE_OPTION_LDAU0.clear();                          // LDAU0
   KBIN_VASP_FORCE_OPTION_LDAU1.clear();                          // LDAU1
   KBIN_VASP_FORCE_OPTION_LDAU2.clear();                          // LDAU2
@@ -840,7 +843,7 @@ _vflags::_vflags() {
   KBIN_VASP_KPOINTS_PHONONS_KPPRA.push("1");                // KPPRA
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME.clear();                     // KSCHEME
   KBIN_VASP_KPOINTS_PHONONS_KSCHEME.push(DEFAULT_PHONONS_KSCHEME);  //"Gamma");           // KSCHEME
-  
+
   KBIN_VASP_FORCE_OPTION_KPOINTS_PHONONS_PARITY.clear();         // PARITY
   // BANDS
   // KBIN_VASP_KPOINTS_BANDS_LATTICE
@@ -918,7 +921,7 @@ void _vflags::copy(const _vflags& b) {
 
   KBIN_VASP_FORCE_OPTION_NOTUNE                                  = b.KBIN_VASP_FORCE_OPTION_NOTUNE;  // NOTUNE
   KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO                             = b.KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO;  // SYSTEM_AUTO
- 
+
   // RELAX_MODE
   KBIN_VASP_FORCE_OPTION_RELAX_MODE                              = b.KBIN_VASP_FORCE_OPTION_RELAX_MODE; // RELAX_MODE
 
@@ -931,7 +934,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_IVDW                                    = b.KBIN_VASP_FORCE_OPTION_IVDW; // IVDW
   KBIN_VASP_FORCE_OPTION_ABMIX                                   = b.KBIN_VASP_FORCE_OPTION_ABMIX; // ABMIX
   KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS                   = b.KBIN_VASP_FORCE_OPTION_AUTO_PSEUDOPOTENTIALS; // AUTO_PSEUDOPOTENTIALS
- 
+
   KBIN_VASP_FORCE_OPTION_SKIP_NOMIX                              = b.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX; // SKIP_NOMIX
   // ENMAX_MULTIPLY
   KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL                    = b.KBIN_VASP_FORCE_OPTION_ENMAX_MULTIPLY_EQUAL;
@@ -952,7 +955,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_RWIGS_STATIC                            = b.KBIN_VASP_FORCE_OPTION_RWIGS_STATIC;
 
   // KBIN_VASP_FORCE_OPTION_TRISTATE                                = b.KBIN_VASP_FORCE_OPTION_TRISTATE; // TRISTATE
- 
+
   KBIN_VASP_FORCE_OPTION_SPIN                                    = b.KBIN_VASP_FORCE_OPTION_SPIN; // SPIN
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1                     = b.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1;
   KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2                     = b.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2; 
@@ -962,6 +965,7 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_FORCE_OPTION_SYM                                     = b.KBIN_VASP_FORCE_OPTION_SYM; // SYM
   KBIN_VASP_FORCE_OPTION_WAVECAR                                 = b.KBIN_VASP_FORCE_OPTION_WAVECAR; // WAVECAR
   KBIN_VASP_FORCE_OPTION_CHGCAR                                  = b.KBIN_VASP_FORCE_OPTION_CHGCAR; // CHGCAR
+  KBIN_VASP_FORCE_OPTION_CHGCAR_FILE                             = b.KBIN_VASP_FORCE_OPTION_CHGCAR_FILE;  // ME1901028
   KBIN_VASP_FORCE_OPTION_LSCOUPLING                              = b.KBIN_VASP_FORCE_OPTION_LSCOUPLING; // LSCOUPLING
   KBIN_VASP_FORCE_OPTION_LDAU0                                   = b.KBIN_VASP_FORCE_OPTION_LDAU0;  // LDAU0
   KBIN_VASP_FORCE_OPTION_LDAU1                                   = b.KBIN_VASP_FORCE_OPTION_LDAU1;  // LDAU1
@@ -1477,7 +1481,7 @@ _aimsflags::~_aimsflags() {
 
 void _aimsflags::free() {
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.clear();
-  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].Clear();}
+  for(uint i=0;i<KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size();i++){KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE[i].clear();} //DX 20191220 - uppercase to lowercase clear
   KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.clear();
 }
 
@@ -1540,7 +1544,7 @@ _xaims::~_xaims() {
 }
 
 void _xaims::free() {
-  str.Clear();
+  str.clear(); //DX 20191220 - uppercase to lowercase clear
   xqsub.clear();
 }
 
@@ -2008,6 +2012,8 @@ void xStream::copy(const xStream& b){
   else {p_FileMESSAGE=b.p_FileMESSAGE;}
   f_new_ofstream=b.f_new_ofstream;  //very important! seg faults otherwise
 }
+ostream* xStream::getOSS() const {return p_oss;} //CO191110
+ofstream* xStream::getOFStream() const {return p_FileMESSAGE;} //CO191110
 void xStream::setOFStream(ofstream& FileMESSAGE){p_FileMESSAGE=&FileMESSAGE;}
 void xStream::setOSS(ostream& oss) {p_oss=&oss;}
 

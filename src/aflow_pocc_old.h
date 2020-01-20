@@ -49,9 +49,9 @@ int lcm (int a, int b);
 int CalculateLcmofVector(vector<int> Num);
 
 struct str_num_data {
-    double decimal;
-    int fac;
-    int denom;
+  double decimal;
+  int fac;
+  int denom;
 };
 str_num_data OptimizePoccValue(double dvalue, double tol);
 void OptimizeXstr(xstructure &a, ofstream &FileMESSAGE, _aflags &aflags);
@@ -78,13 +78,13 @@ bool CheckMultiOccupied(xstructure& xstr);
 xstructure CleanVacancy(xstructure& xstr);
 
 struct strno_energy {
-    double energy;
-    int number;
+  double energy;
+  int number;
 };
 
 struct xstr_energy {
-    xstructure xstr;
-    double energy;
+  xstructure xstr;
+  double energy;
 };
 void PrintGulpEnergies(vector<xstructure>& vxstr);
 bool sortenergy (strno_energy str_i, strno_energy str_j);
@@ -194,10 +194,10 @@ void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE)
 namespace pocc {  
   void POCC_SetOptions(string options, string& directory, double& T, double& DOS_Emin, double& DOS_Emax, double& DOSSCALE);
   void POCC_DOS(ostream &oss,string options);
-  bool POCC_Already_Calculated_Input(const string& str_AflowIn);
+  bool POCC_Already_Calculated_Input(const string& str_AflowIn,const string& dir=".");
   void POCC_CalculateDistribution(vector<double>& vdelta_toten, vector<double>& vprob, const double& T, const string& NameDist, const vector<int>& vDE);
   void POCC_GENERATE_DOSDATA(const string& str_dir, const double& T, vector<vector<double> >& TDOS_ONLY, vector<vector<double> >& PDOS_ONLY, vector<double>& POCC_Efermi, double& POCC_mag, vector<double>& vprob);
-  void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS);
+  void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS);  //CO190808 - one without IDOS and one with
   string POCC_GENERATE_GNUPLOTSCRIPT(vector<vector<double> >& DOS, const string& SystemName, const string& dosdatafile, const double& T, const double& DOS_Emin, double& DOS_Emax, const double& DOSSCALE, const double& DOSMAX);
   void POCC_GENERATE_OUTPUT(const string& str_dir, const double& T, const double& DOS_Emin, double& DOS_Emax, const double& DOSSCALE);
   void POCC_BANDGAP(string options);

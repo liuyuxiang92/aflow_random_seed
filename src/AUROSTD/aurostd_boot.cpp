@@ -24,7 +24,9 @@ using aurostd::_isodd;
 using aurostd::_iseven;
 using aurostd::_isfloat;
 using aurostd::_iscomplex;
+using aurostd::_GCD;
 using aurostd::_isinteger;
+using aurostd::_iszero;
 using aurostd::_roundoff;
 using aurostd::mod;
 using aurostd::min;
@@ -57,13 +59,20 @@ using aurostd::_real;
 using aurostd::jacobi;
 using aurostd::eigsrt;
 using aurostd::tred2;
-using aurostd::generalHouseHolderQRDecomposition;
+using aurostd::QRDecomposition_HouseHolder; //CO191110
+using aurostd::QRDecomposition_HouseHolder_MW; //CO191110
+using aurostd::QRDecomposition_HouseHolder_TB; //CO191110
+using aurostd::getEHermite; //CO191110
+using aurostd::getSmithNormalForm; //CO191110
+using aurostd::xmatrixutype2double; //CO191201
+using aurostd::xmatrixdouble2utype; //CO191201
 using aurostd::tqli;
 using aurostd::balanc;
 using aurostd::elmhes;
 using aurostd::hqr;
 using aurostd::eigen;
 using aurostd::trasp;
+using aurostd::traspInPlace;  //CO191201
 using aurostd::uniform;
 using aurostd::gaussian;
 using aurostd::expdev;
@@ -99,8 +108,9 @@ template<class utype> bool initialize_scalar(utype d) {
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","",0);
   // [OBSOLETE] o+=aurostd::args2attachedutype<utype>(vs,"","","","",0);
+  //  s=utype2string(s);
+  //  s=utype2string("  ");
 
-  
   //  utype uu; _aflowlib::web2utype("location",uu);
   // [OBSOLETE]  _aflowlib::web2utype("location",s);
   aurostd::url2tokens("location",vu); aurostd::url2tokens("location",vu," ");
@@ -126,6 +136,7 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x*x;x*r;r*x;x*=y;x*=r; // multiplication	//CO190329 - clang doesn't like x=x, changing to x=y
   x/x;x/r;r/x;x/=y;x/=r; // division		//CO190329 - clang doesn't like x=x, changing to x=y
   x=y;x=r;               // equal		//CO190329 - clang doesn't like x=x, changing to x=y
+  identical(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isdifferent(x,y);isdifferent(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);isequal(x,y);isequal(x,y,(utype)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);// ME200107
   x=abs(x)+arg(x)+polar(r,r)+conj(x)+norm(x)+cos(x)+cosh(x)+exp(x)+log(x)+pow(x,x)+pow(x,int(1))+pow(x,r)+pow(r,x)+sin(x)+sinh(x)+sqrt(x); // functions
   r = magsqr(x);  // ME180907
 
@@ -139,8 +150,8 @@ template<class utype> bool initialize_xcomplex(utype d) {
   conj(vx);  // ME180904
 
   aurostd::xmatrix<utype > mx(2),my(2),mxmx,mxmxmx(2,2),mxmxmxmxmx(1,2,3,4);		//CO190329 - clang doesn't like x=x, changing to x=y
-  mx+mx;mx+=my;mx-mx;mx-=my;mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y
-  sin(mx);sinh(mx);cos(mx);cosh(mx);exp(mx);
+  mx=mx+mx;mx+=my;mx=mx-mx;mx-=my;mx=mx*mx;vx(1)=vy(1);vx[1]=vy[1];		//CO190329 - clang doesn't like x=x, changing to x=y  //CO200106 - set the result or clang complains
+  mx=sin(mx);mx=sinh(mx);mx=cos(mx);mx=cosh(mx);mx=exp(mx); //CO200106 - set the result or clang complains
   aurostd::ones_xv<utype>();aurostd::ones_xv<utype>(3);aurostd::ones_xv<utype>(3,3); //CO190520
   aurostd::ones_xm<utype>();aurostd::ones_xm<utype>(3);aurostd::ones_xm<utype>(3,3);aurostd::ones_xm<utype>(1,2,3,4); //CO190520
   aurostd::eye<utype>();aurostd::eye<utype>(3);aurostd::eye<utype>(3,3);aurostd::eye<utype>(1,2,3,4); //CO190520
@@ -152,22 +163,26 @@ template<class utype> bool initialize_xcomplex(utype d) {
   x+=issymmetric(m)+isantisymmetric(m)+ishermitian(m)+isantihermitian(m);
   trace(m); // DX 1/15/17 - initialize trace for xcomplex
   m(1,1)=n(1,1);m[1][1]=n[1][1];m=n;m=m+m;m=m*m;m=m-m;m.clear();//m=m*r;m=r*m;		//CO190329 - clang doesn't like x=x, changing to x=y
-  m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1]; // DX 1/15/18 - operator and equal operator initialzied for xcomplex		//CO190329 - clang doesn't like x=x, changing to x=y
+  m(1,1)+=n(1,1);m[1][1]-=n[1][1];m[1][1]*=n[1][1];m[1][1]/=n[1][1];mxmx=mx/my;mxmx/=my; // DX 1/15/18 - operator and equal operator initialized for xcomplex		//CO190329 - clang doesn't like x=x, changing to x=y
   exp(m); // DX 1/15/18 - add exponential or complex matrices
   m=x*m;m=m/x; // DX 1/17/18 - allow for xcomplex * xmatrix<xcomplex>
   cout << m << endl; // DX 1/15/18 - ostream
   vx=m.getcol(1);m=conj(m);trasp(m);trasp(vx);vx=m*vx;  // ME 180904
+  bool tf=false;  //CO200106 - set the result or clang complains
+  m=mx*m;tf=bool(m==n);tf=bool(m!=n);jacobiHermitian(m);vx=m(1); // ME190814  //CO200106 - set the result or clang complains
+  if(tf){;} //CO200106 - keep tf busy
 
   //  jacobi(m,vx,m);
- 
+
   return TRUE;
 }
 
 template<class utype> bool initialize_eigenproblems(utype x) {
   aurostd::xvector<utype> v(3);v[1]=x;
-  aurostd::xmatrix<utype> m(3,3);m[1][1]=x;
+  aurostd::xmatrix<utype> m(3,3),q(3,3),r(3,3);m[1][1]=x; //CO191110
   int i=0;i+=jacobi(m,v,m);
-  eigsrt(v,m);generalHouseHolderQRDecomposition(m);tred2(m,v,v);tqli(v,v,m);balanc(m);elmhes(m);hqr(m,v,v);eigen(m,v,v); // EIGENVECTORS
+  eigsrt(v,m);QRDecomposition_HouseHolder(m,q,r);QRDecomposition_HouseHolder_MW(m,q,r);QRDecomposition_HouseHolder_TB(m,q,r); //CO191110
+  tred2(m,v,v);tqli(v,v,m);balanc(m);elmhes(m);hqr(m,v,v);eigen(m,v,v); // EIGENVECTORS
   return TRUE;
 }
 
@@ -176,7 +191,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   int i=0;double d=0,o=0;string s;
   aurostd::xvector<int> xvi(2);
   aurostd::xvector<double> xvd(2);
-  
+
   // initialize vector sort
   vector<utype> vutype;vector<int> vint;vector<uint> vuint;vector<double> vdouble;vector<string> vstring;
   aurostd::sort(vutype);aurostd::sort(vutype,vint);aurostd::sort(vutype,vdouble);
@@ -188,12 +203,16 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::sort(vstring,vint,vstring);aurostd::sort(vstring,vdouble,vstring);aurostd::sort(vstring,vstring,vstring);
   aurostd::sort(vstring,vstring,vdouble,vstring);aurostd::sort(vstring,vstring,vdouble,vdouble,vstring);
   aurostd::sort_remove_duplicates(vstring);
+  aurostd::reduceByGCD(vutype,vutype); //DX 201911225
+  aurostd::reduceByGCD(vuint,vuint); //DX 201911225
   // cout << vutype << vint << vdouble << vstring;
   deque<utype> dutype;deque<int> dint;deque<uint> duint;deque<double> ddouble;deque<string> dstring;
   // aurostd::sort(dstring);aurostd::sort(dstring,dint);aurostd::sort(dstring,ddouble);aurostd::sort(dstring,dstring);
   // aurostd::sort(ddouble);aurostd::sort(ddouble,dint);aurostd::sort(ddouble,ddouble);aurostd::sort(ddouble,dstring);
   aurostd::sort(dstring,dint,dstring);aurostd::sort(dstring,ddouble,dstring);aurostd::sort(dstring,dstring,dstring);
   aurostd::sort(dstring,dstring,ddouble,dstring);aurostd::sort(dstring,dstring,ddouble,ddouble,dstring);
+  aurostd::reduceByGCD(dutype,dutype); //DX 201911225
+  aurostd::reduceByGCD(duint,duint); //DX 201911225
 
   // initialize vector/deque 
   aurostd::string2tokens(s,vstring,"");aurostd::string2tokens(s,dstring,"");
@@ -202,16 +221,16 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::string2tokensAdd(s,vuint,"");aurostd::string2tokensAdd(s,duint,"");
   aurostd::string2tokens(s,vutype,"");aurostd::string2tokens(s,dutype,"");
   aurostd::string2tokensAdd(s,vutype,"");aurostd::string2tokensAdd(s,dutype,"");
-  
+
   // initialize xvector sort
   xvector<utype> vxu;xvector<int> ixv;xvector<double> dxv;
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
-  
+
   // initialize scalars
   o+=nint(x)+factorial(x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
   o+=max(x,x);o+=max(x,x,x);o+=max(x,x,x,x);o+=max(x,x,x,x,x);o+=max(x,x,x,x,x,x);o+=sign(x);
   o+=min(x,x);o+=min(x,x,x);o+=min(x,x,x,x);o+=min(x,x,x,x,x);o+=min(x,x,x,x,x,x);o+=sign(x);
-  o+=_isinteger(x,x)+uniform(x)+uniform(x,x)+gaussian(x)+gaussian(x,x)+expdev(x)+laplacedev(x)+laplacedev(x,x);
+  o+=_isinteger(x,x)+_iszero(x,x)+uniform(x)+uniform(x,x)+gaussian(x)+gaussian(x,x)+expdev(x)+laplacedev(x)+laplacedev(x,x);
   o+=_roundoff(x,x);
   o+=combinations(x,x)+Cnk(x,x);
 
@@ -230,7 +249,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO190629
 
   o=+(v==v);o=+(v!=v);o+=identical(v,v);o+=identical(v,v,x);o+=identical(v,v,(utype&) x);o+=identical(v,v,(const utype&) x);o+=isdifferent(v,v);
-  o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);v+=reduceByGCD(v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v);
+  o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX 20191125 - changed input format for reduceByGCD()
   o+=getcos(v,v);v.clear();v.set(x);v.reset();clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
   o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);o+=distance(v,v);
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
@@ -254,13 +273,15 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   utype* mstar;mstar=NULL;
   aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);
-  vv=m.getcol(1);m=n;m=m+n;m=m-n;m=m*n;m=inverse(m);inverse(m,m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y
-  m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO190329 - clang doesn't like x=x, changing to x=y
-  o+=sum(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x);
+  vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;adjointInPlace(m,n);n=adjoint(m);m=inverseByAdjoint(m);m=inverse(m);isNonInvertible(m);m=reduce_to_shortest_basis(m);		//CO190329 - clang doesn't like x=x, changing to x=y  //CO191110  //CO191201
+  m*=(utype)5;m/=(utype)6;  //CO190911
+  m.getmatInPlace(m,1,1,1,1,1,1);m.getmatInPlace(vv,1,1,1,1,1,1); //CO190911
+  m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;traspSquareInPlace(m,false);traspInPlace(m,false);traspInPlace(m,m,false);m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO190329 - clang doesn't like x=x, changing to x=y
+  o+=sum(m);o+=modulus(m);o+=modulussquare(m);o+=modulus2(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x); //CO191110
   o+=isequal(m,m);o+=isequal(m,m,x);cout<<m<<endl;
   roundoff(m);roundoff(m,x);m=exp(m);aurostd::abs(m);o+=max(m);xdouble(v);xint(v);
   m.clear();m.set(x);m.reset();m.reset();clear(m);reset(m);clear(m);set(m,x);abs(m);mabs(m);
-  o+=det(m);o+=determinant(m);m=submatrix(m,1,1);o+=minordet(m,1,1);o+=minordeterminant(m,1,1);v*m;m*v;
+  o+=det(m);o+=determinant(m);m=submatrix(m,1,1);submatrixInPlace(m,m,1,1);o+=minordet(m,1,1);o+=minordeterminant(m,1,1);v*m;m*v;
   vector<utype> vvv=xvector2vector(v);vector2xvector(vvv,1);
   vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
   if(det(m)==0 || sum(m)==0) return FALSE;
@@ -270,9 +291,11 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   utype tol; // DX 171025
   o+=isequal(m,m)+isequal(m,m,(utype) 0)+isequal(m,m,x)+isdifferent(m,m)+isdifferent(m,m,x)+isinteger(m,x)+isdiagonal(m)+isdiagonal(m,tol)+issymmetric(m)+isantisymmetric(m);
   o+=isidentity(m); //CO
-  swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);
+  swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO191201
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
+  // ME190718 - norms
+  aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
 
   //[ME 180627 START]
@@ -340,7 +363,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   //[OBSOLETE ME180705]t8=x*t8;t8=-t8;t8=+t8;reset(t8);clear(t8);set(t8,x);x=min(t8);x=max(t8);x=trace(t8);t8=identity(t8);
   //[OBSOLETE ME180705]t8.clear();t8.set(x);t8.reset();t8=nint(t8);t8=sign(t8);t8=abs(t8);t8=floor(t8);t8=ceil(t8);//t8=round(t8);t8=trunc(t8);
   //[OBSOLETE ME180705]int i8[8+1];aurostd::xtensor8debug(t8,"");utype ******** b8;aurostd::allocate_xtensor8corpus(b8,i8,i8,i8);
-  
+
   return TRUE;
 }
 
@@ -380,10 +403,11 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=aurostd::string2utype<int>("0");
     o+=aurostd::string2utype<long int>("0");
     o+=aurostd::string2utype<long long int>("0");
+    o+=aurostd::string2utype<unsigned long long int>("0"); //CO191216
     o+=aurostd::string2utype<float>("0");
     o+=aurostd::string2utype<double>("0");
     o+=aurostd::string2utype<long double>("0");
-    
+
     vector<bool> vxb;vector<char> vxc;vector<string> vxs;vector<unsigned int> vxui;vector<int> vxi;vector<long int> vxli;vector<long long int> vxlli;vector<float> vxf;vector<double> vxd;vector<long double> vxld;  //CO181226
     deque<bool> dxb;deque<char> dxc;deque<string> dxs;deque<unsigned int> dxui;deque<int> dxi;deque<long int> dxli;deque<long long int> dxlli;deque<float> dxf;deque<double> dxd;deque<long double> dxld; //CO181226
 
@@ -397,7 +421,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     dxf=aurostd::vector2deque<float>(vxf);  //CO181226
     dxd=aurostd::vector2deque<double>(vxd); //CO181226
     dxld=aurostd::vector2deque<long double>(vxld);  //CO181226
-    
+
     vxb=aurostd::deque2vector<bool>(dxb); //CO181226
     vxc=aurostd::deque2vector<char>(dxc); //CO181226
     vxs=aurostd::deque2vector<string>(dxs); //CO181226
@@ -408,7 +432,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     vxf=aurostd::deque2vector<float>(dxf);  //CO181226
     vxd=aurostd::deque2vector<double>(dxd); //CO181226
     vxld=aurostd::deque2vector<long double>(dxld);  //CO181226
-    
+
 #define AUROSTD_INITIALIZE_BOOL
     //#define AUROSTD_INITIALIZE_CHAR
 #define AUROSTD_INITIALIZE_STRING
@@ -422,8 +446,9 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #define AUROSTD_INITIALIZE_LONG_LONG_INT
 #define AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
 #define AUROSTD_INITIALIZE_COMPLEX_DOUBLE
-      
 
+
+    aurostd::xmatrix<double> mxdouble;  //CO191201
 #ifdef AUROSTD_INITIALIZE_BOOL
     o+=initialize_scalar(bool(FALSE));
 #endif
@@ -450,17 +475,29 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #ifdef AUROSTD_INITIALIZE_INT
     o+=initialize_scalar(int(1));
     o+=initialize_xscalar_xvector_xmatrix_xtensor(int(1));
+    //[CO191201 - better not - these algorithms are NOT meant for ints]o+=initialize_eigenproblems(int(1));  //CO191201
     aurostd::xvector<int> xv; //CO190520
     aurostd::ones_xv<int>();aurostd::ones_xv<int>(3);aurostd::ones_xv<int>(3,3); //CO 180515 //CO190520
-    aurostd::xmatrix<int> mx; //CO190520
+    aurostd::xmatrix<int> mxint; //CO190520
     aurostd::ones_xm<int>();aurostd::ones_xm<int>(3);aurostd::ones_xm<int>(3,3);aurostd::ones_xm<int>(1,2,3,4); //CO 180515 //CO190520
     aurostd::eye<int>();aurostd::eye<int>(3);aurostd::eye<int>(3,3);aurostd::eye<int>(1,2,3,4); //CO 180515 //CO190520
-    aurostd::CMdet<int>(mx);  //CO 180515 //CO190520
+    aurostd::CMdet<int>(mxint);  //CO 180515 //CO190520
+    int igcd=1;_GCD(igcd,igcd,igcd,igcd,igcd);_GCD(igcd,igcd,igcd);  //CO191201
+    int aint=1;getEHermite(aint,aint,mxint); //CO191201
+    getSmithNormalForm(mxint,mxint,mxint,mxint); //CO191201
+    mxdouble=xmatrixutype2double(mxint);  //CO191201
+    mxint=xmatrixdouble2utype<int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));
     o+=initialize_scalar(uint(1));
     //  o+=initialize_xscalar_xvector_xmatrix_xtensor(uint(1));
+    uint uigcd=1;_GCD(uigcd,uigcd,uigcd,uigcd,uigcd);_GCD(uigcd,uigcd,uigcd);  //CO191201
+    aurostd::xmatrix<uint> mxuint; //CO190520
+    uint auint=1;getEHermite(auint,auint,mxuint); //CO191201
+    getSmithNormalForm(mxuint,mxuint,mxuint,mxuint); //CO191201
+    mxdouble=xmatrixutype2double(mxuint);  //CO191201
+    mxuint=xmatrixdouble2utype<uint>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT
@@ -476,7 +513,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       o+=aurostd::isequal<float>(float(d),float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d));
       o+=aurostd::isdifferent<float>(float(d),float(d),float(d));
-     }
+    }
 #endif
 #ifdef AUROSTD_INITIALIZE_DOUBLE
     if(1) { // AUROSTD_INITIALIZE_DOUBLE
@@ -507,6 +544,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       vector<int> bits;bits.push_back(vvxd[0].size());bits.push_back(vvxd[1].size()); //CO 181226
       xc.reset(bits,'E'); //CO 181226
       while(xc.increment()){xc.applyCombo(vvxd);} //CO 181226
+      //[CO191201 - should NOT be needed here, the output should be an int type]getSmithNormalForm(z,z,z,z); //CO191201
     }
 #endif   
 #ifdef AUROSTD_INITIALIZE_LONG_DOUBLE
@@ -526,6 +564,12 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=initialize_xscalar_xvector_xmatrix_xtensor((long int)(1));
     // o+=initialize_xcomplex((long int)(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
+    long int ligcd=1;_GCD(ligcd,ligcd,ligcd,ligcd,ligcd);_GCD(ligcd,ligcd,ligcd);  //CO191201
+    aurostd::xmatrix<long int> mxlint; //CO190520
+    long int alint=1;getEHermite(alint,alint,mxlint); //CO191201
+    getSmithNormalForm(mxlint,mxlint,mxlint,mxlint); //CO191201
+    mxdouble=xmatrixutype2double(mxlint);  //CO191201
+    mxlint=xmatrixdouble2utype<long int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
@@ -533,12 +577,24 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     // o+=initialize_xscalar_xvector_xmatrix_xtensor(((unsigned long int))(1));
     // o+=initialize_xcomplex(((unsigned long int))(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
+    unsigned long int uligcd=1;_GCD(uligcd,uligcd,uligcd,uligcd,uligcd);_GCD(uligcd,uligcd,uligcd);  //CO191201
+    aurostd::xmatrix<unsigned long int> mxulint; //CO190520
+    unsigned long int aulint=1;getEHermite(aulint,aulint,mxulint); //CO191201
+    getSmithNormalForm(mxulint,mxulint,mxulint,mxulint); //CO191201
+    mxdouble=xmatrixutype2double(mxulint);  //CO191201
+    mxulint=xmatrixdouble2utype<unsigned long int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_LONG_LONG_INT
     o+=initialize_scalar((long long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((long long int)(1));
     // o+=initialize_xcomplex((long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);
+    long long int lligcd=1;_GCD(lligcd,lligcd,lligcd,lligcd,lligcd);_GCD(lligcd,lligcd,lligcd);  //CO191201
+    aurostd::xmatrix<long long int> mxllint; //CO190520
+    long long int allint=1;getEHermite(allint,allint,mxllint); //CO191201
+    getSmithNormalForm(mxllint,mxllint,mxllint,mxllint); //CO191201
+    mxdouble=xmatrixutype2double(mxllint);  //CO191201
+    mxllint=xmatrixdouble2utype<long long int>(mxdouble);   //CO191201
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
@@ -546,6 +602,12 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);
+    unsigned long long int ulligcd=1;_GCD(ulligcd,ulligcd,ulligcd,ulligcd,ulligcd);_GCD(ulligcd,ulligcd,ulligcd);  //CO191201
+    aurostd::xmatrix<unsigned long long int> mxullint; //CO190520
+    unsigned long long int aullint=1;getEHermite(aullint,aullint,mxullint); //CO191201
+    getSmithNormalForm(mxullint,mxullint,mxullint,mxullint); //CO191201
+    mxdouble=xmatrixutype2double(mxullint);  //CO191201
+    mxullint=xmatrixdouble2utype<unsigned long long int>(mxdouble);   //CO191201
 #endif
   }
   return TRUE;

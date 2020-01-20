@@ -13,18 +13,18 @@
 // ***************************************************************************
 namespace anrl { 
   uint PrototypeANRL_LoadList(vector<string>& vproto,
-			      vector<string>& vproto_label,
-			      vector<uint>& vproto_nspecies,
-			      vector<uint>& vproto_natoms,
-			      vector<uint>& vproto_spacegroup,
-			      vector<uint>& vproto_nunderscores,
-			      vector<uint>& vproto_nparameters,
-			      vector<string>& vproto_Pearson_symbol,
-			      vector<string>& vproto_params,
-			      vector<string>& vproto_Strukturbericht,
-			      vector<string>& vproto_prototype,
-			      vector<string>& vproto_dialect) {
-    
+      vector<string>& vproto_label,
+      vector<uint>& vproto_nspecies,
+      vector<uint>& vproto_natoms,
+      vector<uint>& vproto_spacegroup,
+      vector<uint>& vproto_nunderscores,
+      vector<uint>& vproto_nparameters,
+      vector<string>& vproto_Pearson_symbol,
+      vector<string>& vproto_params,
+      vector<string>& vproto_Strukturbericht,
+      vector<string>& vproto_prototype,
+      vector<string>& vproto_dialect) {
+
     vproto.clear();
     vproto_label.clear();
     vproto_nspecies.clear();
@@ -38,7 +38,7 @@ namespace anrl {
     vproto_prototype.clear();
     vproto_dialect.clear();
 
-    
+
     //Label     # of Species    # atoms/primcell    #space_group_number   # Underscores     # Parameters    pearson_symbol    params    Strukturbericht     Prototype   Dialect        
     // -------------------------------------------------------------------------
     // Part 1
@@ -639,7 +639,7 @@ namespace anrl {
     vproto.push_back("A2BCD4_tI16_82_ac_b_d_g;4;8;82;6;5;tI16;a,c/a,x5,y5,z5;-;Cu2(Zn,Fe)SnS4;Kesterite");
     //DX 20181211 - add Corey's kesterite structure - END
     // done now produce
-    
+
     // FROM PROTO LIST
     for(uint i=0;i<vproto.size();i++) {
       vproto_label.push_back("");
@@ -653,13 +653,13 @@ namespace anrl {
       vproto_Strukturbericht.push_back("");
       vproto_prototype.push_back("");
       vproto_dialect.push_back("");
-      
+
       anrl::vproto2tokens(vproto.at(i),
-			  vproto_label.at(i),vproto_nspecies.at(i),vproto_natoms.at(i),vproto_spacegroup.at(i),
-			  vproto_nunderscores.at(i),vproto_nparameters.at(i),vproto_Pearson_symbol.at(i),
-			  vproto_params.at(i),vproto_Strukturbericht.at(i),vproto_prototype.at(i),vproto_dialect.at(i));
+          vproto_label.at(i),vproto_nspecies.at(i),vproto_natoms.at(i),vproto_spacegroup.at(i),
+          vproto_nunderscores.at(i),vproto_nparameters.at(i),vproto_Pearson_symbol.at(i),
+          vproto_params.at(i),vproto_Strukturbericht.at(i),vproto_prototype.at(i),vproto_dialect.at(i));
     }
-    
+
     return vproto.size();
   }
 }
@@ -677,9 +677,13 @@ namespace anrl {
     //part2:0
     //part2:1
     //...
+
+    string function_name = "anrl::getANRLParameters()";
+    stringstream message;
+
     vector<string> tokens;
     vector<string> vparameters;
-    
+
     string anrl_label = _anrl_label;
 
     // check if number suffix, i.e., predefined structure, with atomic volume scaling
@@ -689,7 +693,7 @@ namespace anrl {
       anrl_label = tokens[0];
       number_id = tokens[1];
     }
-    
+
     // add option to keep original scaling
     //bool keep_original_lattice_parameter = false;
 
@@ -1164,7 +1168,8 @@ namespace anrl {
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_tI2_139_a"){
-        vparameters.push_back("4.6002,1.07523585931");
+        //DX 20191218 [this is the a' parameter (fct) vs the a parameter (bct)] vparameters.push_back("4.6002,1.07523585931");
+        vparameters.push_back("3.25283,1.52061313499"); //DX 20191218 [CORRECT PARAMETERS]
         vparameters.push_back("3.932,0.823499491353");
       }
       // ---------------------------------------------------------------------------
@@ -3059,7 +3064,7 @@ namespace anrl {
       //DX 20190314 - loop over parameters - START
       for(uint p=0;p<vparameters.size();p++){
         aurostd::string2tokens(vparameters[p],tokens,",");
-      tokens[0]="-1";
+        tokens[0]="-1";
         vparameters[p]=aurostd::joinWDelimiter(tokens,",");
       }
       //DX 20190314 - loop over parameters - END
@@ -3072,17 +3077,17 @@ namespace anrl {
           vparameters=tmp;
         }
         else{
-          cerr << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices." << endl;
-          exit(1);
+          message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " does not have more than " << vparameters.size() << " choices.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
-        cerr << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
+        message << "anrl::getANRLParameters(): ERROR - " << anrl_label << " has " << vparameters.size() << " preset parameter set(s): " << endl;
         for(uint i=0;i<vparameters.size();i++){
-          cerr << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
+          message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
         }   
-        cerr << "Rerun command and specify the parameters or the preset suffix, e.g., ./aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1 << endl;
-        exit(1);
+        message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }
     }
     return vparameters;  

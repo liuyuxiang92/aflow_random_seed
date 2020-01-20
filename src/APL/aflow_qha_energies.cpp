@@ -11,9 +11,7 @@
 #include <iterator>
 #define _isnegative(a) (a<MIN_EIGEN_TRESHOLD) ? true : false
 
-/*
-  This class storing all static energies, phonon dispersion curves and electronic curves from various distorted directories.
-*/
+//  This class storing all static energies, phonon dispersion curves and electronic curves from various distorted directories.
 
 
 namespace apl
@@ -65,17 +63,17 @@ namespace apl
   //get phonon, electronin energies
   bool QH_ENERGIES::get_qha_energies()
   {
-   //phonon directory names
+    //phonon directory names
     _ph_dirs  =  _runeos.get_ph_dir_names();
-   //static energies directory names
+    //static energies directory names
     _ele_dirs =  _runeos.get_eos_dir_names();
-   //volumes of primotive cessa
+    //volumes of primotive cessa
     _ele_vols =  _runeos.get_eos_volumes();
-   //index of relaxed volume
+    //index of relaxed volume
     _eqm_ele_dir_index=_runeos.get_zero_index();
-   //polulate pdos
+    //polulate pdos
     if(!get_pdos()) return false;
-   //populate static energies
+    //populate static energies
     if(!getE0K())   return false;
     //check compound is magnetic
     if(_is_magnetic) _logger << "Compound is magnetic and skipping electronic dos calculation "<< apl::endl;
@@ -119,50 +117,50 @@ namespace apl
   bool QH_ENERGIES::size_check()
   {
     if(_pdos.size()==0)
-      {
-	_logger << apl::error << "_pdos.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_pdos.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_pdos.size()!=_edos.size())
-      {
-	_logger << apl::error << "_pdos.size()!=_edos.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_pdos.size()!=_edos.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()==0)
-      {
-	_logger << apl::error << "_eo.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_fermi_energies.size())
-      {
-	_logger << apl::error << "_eo.size()!=_fermi_energies.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_fermi_energies.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_pV.size())
-      {
-	_logger << apl::error << "_eo.size()!=_pV.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_pV.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_mag_cell.size())
-      {
-	_logger << apl::error << "_eo.size()!=_mag_cell.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_mag_cell.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_ele_dirs.size())
-      {
-	_logger << apl::error << "_eo.size()!=_ele_dirs.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_ele_dirs.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_ele_vols.size())
-      {
-	_logger << apl::error << "_eo.size()!=_ele_vols.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_ele_vols.size() "<< apl::endl;
+      return false;
+    }
     if(_atomic_species.size()==0)
-      {
-	_logger << apl::error << "_atomic_species()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_atomic_species()==0 "<< apl::endl;
+      return false;
+    }
     return true;
   }
   // ***************************************************************************************
@@ -170,35 +168,35 @@ namespace apl
   bool QH_ENERGIES::size_scqha_check()
   {
     if(_eo.size()==0)
-      {
-	_logger << apl::error << "_eo.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_fermi_energies.size())
-      {
-	_logger << apl::error << "_eo.size()!=_fermi_energies.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_fermi_energies.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_pV.size())
-      {
-	_logger << apl::error << "_eo.size()!=_pV.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_pV.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_mag_cell.size())
-      {
-	_logger << apl::error << "_eo.size()!=_mag_cell.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_mag_cell.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_ele_dirs.size())
-      {
-	_logger << apl::error << "_eo.size()!=_ele_dirs.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_ele_dirs.size() "<< apl::endl;
+      return false;
+    }
     if(_eo.size()!=_ele_vols.size())
-      {
-	_logger << apl::error << "_eo.size()!=_ele_vols.size() "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()!=_ele_vols.size() "<< apl::endl;
+      return false;
+    }
     return true;
   }
   // ***************************************************************************************
@@ -207,91 +205,91 @@ namespace apl
   {
     uint j=0;
     if(_index_imag_freq.size()>0)
+    {
+      for(uint i=0; i!=_ele_dirs.size(); i++)
       {
-	for(uint i=0; i!=_ele_dirs.size(); i++)
-	  {
-	    if(i==_index_imag_freq[j])
-	      {
-		_logger << "Imaginary freqs corresponding to the phonon dir = "<<_ele_dirs[i]<<" and excluded." << apl::endl;
-		j++;
-	      }
-	  }
+        if(i==_index_imag_freq[j])
+        {
+          _logger << "Imaginary freqs corresponding to the phonon dir = "<<_ele_dirs[i]<<" and excluded." << apl::endl;
+          j++;
+        }
       }
+    }
   }
   // ***************************************************************************************
   //Check imaginary frequencies
   void QH_ENERGIES::get_imaginary_freq_index()
   {
     for(uint i=0; i!=_pdos.size(); i++)
+    {
+      for(uint j=0; j!=_pdos[i].size(); j++)
       {
-	for(uint j=0; j!=_pdos[i].size(); j++)
-	  {
-	    if(_isnegative(_pdos[i][j][0]))
-	      {
-		if(_isnegative(_pdos[i][j][0]))
-		  {
-		    _index_imag_freq.push_back(i);
-		    break;
-		  }
-		_pdos[i][j][0]=0.0;
-	      }
-	  }
+        if(_isnegative(_pdos[i][j][0]))
+        {
+          if(_isnegative(_pdos[i][j][0]))
+          {
+            _index_imag_freq.push_back(i);
+            break;
+          }
+          _pdos[i][j][0]=0.0;
+        }
       }
+    }
   }
   // ***************************************************************************************
   //remove imaginary frequency directory from the list
   bool QH_ENERGIES::remove_imaginary_freqs()
   {
     if(_index_imag_freq.size()>0)
+    {
+      vector<vector<vector<double> > > tmp_pdos = _pdos;
+      vector<vector<vector<double> > > tmp_edos = _edos;
+      vector<double> tmp_eo=_eo;
+      vector<double> tmp_fermi_energies=_fermi_energies;
+      vector<double> tmp_pV=_pV;
+      vector<double> tmp_mag_cell=_mag_cell;
+      vector<string> tmp_ele_dirs=_ele_dirs;
+      vector<double> tmp_ele_vols=_ele_vols;
+      _pdos.clear();
+      _edos.clear();
+      _eo.clear();
+      _fermi_energies.clear();
+      _pV.clear();
+      _mag_cell.clear();
+      _ele_dirs.clear();
+      _ele_vols.clear();
+      //
+      uint j=0;
+      for(uint i=0; i!=tmp_pdos.size(); i++)
       {
-        vector<vector<vector<double> > > tmp_pdos = _pdos;
-        vector<vector<vector<double> > > tmp_edos = _edos;
-        vector<double> tmp_eo=_eo;
-        vector<double> tmp_fermi_energies=_fermi_energies;
-        vector<double> tmp_pV=_pV;
-        vector<double> tmp_mag_cell=_mag_cell;
-        vector<string> tmp_ele_dirs=_ele_dirs;
-        vector<double> tmp_ele_vols=_ele_vols;
-        _pdos.clear();
-        _edos.clear();
-        _eo.clear();
-        _fermi_energies.clear();
-        _pV.clear();
-        _mag_cell.clear();
-        _ele_dirs.clear();
-        _ele_vols.clear();
-        //
-        uint j=0;
-        for(uint i=0; i!=tmp_pdos.size(); i++)
-          {
-            if(i!=_index_imag_freq[j])
-              {
-                _pdos.push_back(tmp_pdos[i]);
-                _edos.push_back(tmp_edos[i]);
-                _eo.push_back(tmp_eo[i]);
-                _fermi_energies.push_back(tmp_fermi_energies[i]);
-                _pV.push_back(tmp_pV[i]);
-                _mag_cell.push_back(tmp_mag_cell[i]);
-                _ele_dirs.push_back(tmp_ele_dirs[i]);
-                _ele_vols.push_back(tmp_ele_vols[i]);
-              } else j++;
-          }
-
-        if(!write_imag_freq_corrected_energies(tmp_eo)) return false;
- 
-        //clear temporary variables
-        tmp_pdos.clear();
-        tmp_edos.clear();
-        tmp_eo.clear();
-        tmp_fermi_energies.clear();
-        tmp_pV.clear();
-        tmp_mag_cell.clear();
-        tmp_ele_dirs.clear();
-        tmp_ele_vols.clear();
-        //
-	//remove possible noise from electronic bands
-	//get_electronic_corrected_energies();
+        if(i!=_index_imag_freq[j])
+        {
+          _pdos.push_back(tmp_pdos[i]);
+          _edos.push_back(tmp_edos[i]);
+          _eo.push_back(tmp_eo[i]);
+          _fermi_energies.push_back(tmp_fermi_energies[i]);
+          _pV.push_back(tmp_pV[i]);
+          _mag_cell.push_back(tmp_mag_cell[i]);
+          _ele_dirs.push_back(tmp_ele_dirs[i]);
+          _ele_vols.push_back(tmp_ele_vols[i]);
+        } else j++;
       }
+
+      if(!write_imag_freq_corrected_energies(tmp_eo)) return false;
+
+      //clear temporary variables
+      tmp_pdos.clear();
+      tmp_edos.clear();
+      tmp_eo.clear();
+      tmp_fermi_energies.clear();
+      tmp_pV.clear();
+      tmp_mag_cell.clear();
+      tmp_ele_dirs.clear();
+      tmp_ele_vols.clear();
+      //
+      //remove possible noise from electronic bands
+      //get_electronic_corrected_energies();
+    }
     return true;
   }
   // ***************************************************************************************
@@ -310,33 +308,37 @@ namespace apl
     out<<"[AFLOW] "<<STAR<<"\n";
     out<< "[AFLOW_QHA_STATIC_ENERGIES]START" <<"\n";
     out<<"#"<<setw(30)<<"dir"<<setw(15)<<"E0 (eV/Cell)"<<setw(15)<<"Vol (A^3)"
-       <<setw(15)<<"Ef (eV)"<<setw(20)<<"pV (eV/Cell)"<<setw(20)<<"magcell (mu/cell)"<<setw(15)<<"freq_type" <<'\n';
+      <<setw(15)<<"Ef (eV)"<<setw(20)<<"pV (eV/Cell)"<<setw(20)<<"magcell (mu/cell)"<<setw(15)<<"freq_type" <<'\n';
 
     uint j=0;
     for(uint i=0; i!=_eo.size(); i++)
+    {
+      out<<setw(30) << _ele_dirs[i];
+      out<<setw(15)<<_eo[i]<<setw(15)<<_ele_vols[i]
+        <<setw(15)<<_fermi_energies[i]
+        //<<setw(15)<<_edosATfermi[i]
+        <<setw(20)<<_pV[i]<<setw(15)<<_mag_cell[i];
+
+      if(_index_imag_freq.size()>0)
       {
-	out<<setw(30) << _ele_dirs[i];
-        out<<setw(15)<<_eo[i]<<setw(15)<<_ele_vols[i]
-           <<setw(15)<<_fermi_energies[i]
-	  //<<setw(15)<<_edosATfermi[i]
-           <<setw(20)<<_pV[i]<<setw(15)<<_mag_cell[i];
+        if(i==_index_imag_freq[j])
+        {
+          out<<setw(15)<<"-";
+          j++;
+        } else out<<setw(15)<<"+";
+      } else out<<setw(15)<<"+";
 
-	if(_index_imag_freq.size()>0)
-	  {
-	    if(i==_index_imag_freq[j])
-	      {
-		out<<setw(15)<<"-";
-		j++;
-	      } else out<<setw(15)<<"+";
-	  } else out<<setw(15)<<"+";
-
-        out<<'\n';
-      }
+      out<<'\n';
+    }
     out<< "[AFLOW_QHA_STATIC_ENERGIES]END" <<"\n";
     out<<"[AFLOW] "<<STAR<<"\n";
     string eos_out =  "aflow.qha.static_energies.out";
     if(!aurostd::stringstream2file(out, eos_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.static_energies.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.static_energies.out");
+      string function = "QH_ENERGIES::write_energies()";
+      string message = "Cannot write " + eos_out;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(out);
     return true;
@@ -355,29 +357,33 @@ namespace apl
       out<<"[AFLOW] "<<STAR<<"\n";
       out<< "[APL_STATIC_ENERGIES]START" <<"\n";
       out<<"#"<<setw(30)<<"dir"<<setw(15)<<"E0 (eV/Cell)"<<setw(15)<<"Vol (A^3)"
-	 <<setw(15)<<"E_f (eV)"<<setw(20)<<"pV (eV/Cell)"<<setw(20)<<"magcell (mu/cell)"<<setw(15)<<"freq_type" <<'\n';
+        <<setw(15)<<"E_f (eV)"<<setw(20)<<"pV (eV/Cell)"<<setw(20)<<"magcell (mu/cell)"<<setw(15)<<"freq_type" <<'\n';
 
       uint j=0;
       uint k=0;
       for(uint i=0; i!=tmp_eo.size(); i++)
-	{
-	  if(i!=_index_imag_freq[j])
-	    {
-	      out<<setw(30) << _ele_dirs[k];
-	      out<<setw(15)<<_eo[i]<<setw(15)<<_ele_vols[k]
-		 <<setw(15)<<_fermi_energies[k]
-		 <<setw(20)<<_pV[i]<<setw(15)<<_mag_cell[k];
-	      out<<setw(15)<<"+"<<'\n';
-	      k++;
-	    } else
-	    {
-	      j++;
-	    }
-	}
+      {
+        if(i!=_index_imag_freq[j])
+        {
+          out<<setw(30) << _ele_dirs[k];
+          out<<setw(15)<<_eo[i]<<setw(15)<<_ele_vols[k]
+            <<setw(15)<<_fermi_energies[k]
+            <<setw(20)<<_pV[i]<<setw(15)<<_mag_cell[k];
+          out<<setw(15)<<"+"<<'\n';
+          k++;
+        } else
+        {
+          j++;
+        }
+      }
       out<< "[APL_STATIC_ENERGIES]END" <<"\n";
       out<<"[AFLOW] "<<STAR<<"\n";
       if(!aurostd::stringstream2file(out, outfile, "WRITE")) {
-	throw APLRuntimeError("Cannot write aflow.apl.static_corrected.out");
+        // ME191031 - use xerror
+        //throw APLRuntimeError("Cannot write aflow.apl.static_corrected.out");
+        string function = "QH_ENERGIES::write_imag_freq_corrected_energies()";
+        string message = "Cannot write " + outfile;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::StringstreamClean(out);
     }
@@ -391,24 +397,24 @@ namespace apl
     string file="";
     _logger <<"Reading phonon dos files " << apl::endl;
     if(_ele_dirs.size()!=_ph_dirs.size()+1)
-      {
-	_logger << apl::error <<" _ele_dirs.size()!=_ph_dirs.size()+1 " << apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error <<" _ele_dirs.size()!=_ph_dirs.size()+1 " << apl::endl;
+      return false;
+    }
     for(uint i=0; i!=_ph_dirs.size(); i++)
-      {
-	file="";
-	//adding equilibrium directory
-	if((int)i==_eqm_ele_dir_index){
-	  file=pdosfile;  // ME190428
-	  if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
-	  _pdos.push_back(get_pdos(file));
-	}
-	file=_tmp_dir+"/" + pdosfile + "."+_ph_dirs[i];  // ME190428
-	if((!exists_test0(file) && !aurostd::EFileExist(file))) return false;
-	_pdos.push_back(get_pdos(file));
-	
+    {
+      file="";
+      //adding equilibrium directory
+      if((int)i==_eqm_ele_dir_index){
+        file=pdosfile;  // ME190428
+        if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
+        _pdos.push_back(get_pdos(file));
       }
+      file=_tmp_dir+"/" + pdosfile + "."+_ph_dirs[i];  // ME190428
+      if((!exists_test0(file) && !aurostd::EFileExist(file))) return false;
+      _pdos.push_back(get_pdos(file));
+
+    }
     return true;
   }
   // ***************************************************************************************
@@ -418,13 +424,13 @@ namespace apl
     _logger<<"Reading electronic dos files " << apl::endl;
 
     for(uint i=0; i!=_ele_dirs.size(); i++)
-      {
-	string file=_ele_dirs[i]+string("/")+string("DOSCAR.static");
-	if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
-	double fermi=0.0;
-	_edos.push_back(get_edos(file, fermi));
-	_fermi_energies.push_back(fermi);
-      }
+    {
+      string file=_ele_dirs[i]+string("/")+string("DOSCAR.static");
+      if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
+      double fermi=0.0;
+      _edos.push_back(get_edos(file, fermi));
+      _fermi_energies.push_back(fermi);
+    }
     return true;
   }
   // ***************************************************************************************
@@ -433,16 +439,16 @@ namespace apl
   {
     _logger <<"Reading static energies " << apl::endl;
     for(uint i=0; i!=_ele_dirs.size(); i++)
-      {
-	string file=_ele_dirs[i]+"/aflow.qmvasp.out";
-	if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
-	double pv=0.;
-	double magcell=0.;
-	_eo.push_back(getE0K(file, pv, magcell));
-	_pV.push_back(pv);
-	_mag_cell.push_back(magcell);
-	if(std::abs(magcell)>0) _is_magnetic=true;
-      }
+    {
+      string file=_ele_dirs[i]+"/aflow.qmvasp.out";
+      if(!exists_test0(file) && !aurostd::EFileExist(file)) return false;
+      double pv=0.;
+      double magcell=0.;
+      _eo.push_back(getE0K(file, pv, magcell));
+      _pV.push_back(pv);
+      _mag_cell.push_back(magcell);
+      if(std::abs(magcell)>0) _is_magnetic=true;
+    }
     return true;
   }
   // ***************************************************************************************
@@ -450,12 +456,20 @@ namespace apl
   vector<vector<double> > QH_ENERGIES::get_pdos(const string file)
   {
     if(!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      string function = "QHE_ENERGIES::get_pdos()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      string function = "QHE_ENERGIES::get_pdos()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     uint line_count = 0;
     string line;
@@ -467,11 +481,15 @@ namespace apl
       if(line[0]=='#')continue;
       vector<string> vstr=split<string>(line);
       if(vstr.size()!=4)
-	{
-          // ME190726 - exit clean-up
-	  //_logger << apl::error << file<<" Wrong format." << apl::endl; exit(0);
-          throw APLRuntimeError("Wrong format in file " + file + ".");
-	}
+      {
+        // ME190726 - exit clean-up
+        //_logger << apl::error << file<<" Wrong format." << apl::endl; exit(0);
+        // ME191031 - use xerror
+        //throw APLRuntimeError("Wrong format in file " + file + ".");
+        string function = "QH_ENERGIES::get_pdos()";
+        string message = "Wrong format in file " + file + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      }
       vector<double>  tmp(2, 0.0);
       tmp[0]=atof(vstr[0].c_str());
       tmp[1]=atof(vstr[3].c_str());
@@ -489,12 +507,20 @@ namespace apl
   vector<vector<double> > QH_ENERGIES::get_edos(const string file, double &fermi)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      string function = "QHE_ENERGIES::get_edos()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      string function = "QHE_ENERGIES::get_edos()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     fermi=0.0;
@@ -511,13 +537,13 @@ namespace apl
       vector<string> v=split<string>(line);
       if(LC==6)fermi=atof(v[v.size()-2].c_str());
       else if(LC>6)
-	{
-	  if(v.size()!=3)break;
-	  vector<double> tmp_d(2, 0.0);
-	  tmp_d[0]=atof(v[0].c_str());
-	  tmp_d[1]=atof(v[1].c_str());
-	  tmp_edos.push_back(tmp_d);
-	}
+      {
+        if(v.size()!=3)break;
+        vector<double> tmp_d(2, 0.0);
+        tmp_d[0]=atof(v[0].c_str());
+        tmp_d[1]=atof(v[1].c_str());
+        tmp_edos.push_back(tmp_d);
+      }
     }
     return tmp_edos;
   }
@@ -526,12 +552,20 @@ namespace apl
   double QH_ENERGIES::getE0K(const string file, double &pv, double &mag)
   {
     if (!exists_test0(file) && !aurostd::EFileExist(file)) {
-      throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      string function = "QHE_ENERGIES::get_E0K()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(file, vlines);
     if (!vlines.size()) {
-      throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      // ME191031 - use xerror
+      //throw apl::APLRuntimeError("QH_ENERGIES:: Missing file: "+file);
+      string function = "QHE_ENERGIES::get_E0K()";
+      string message = "Missing file: " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
     pv=0.0;
@@ -635,37 +669,37 @@ namespace apl
   }
   // ***************************************************************************************
   template<typename T>
-  std::vector<T> QH_ENERGIES::split(const std::string& line)
-  {
-    std::istringstream is(line);
-    return std::vector<T>(std::istream_iterator<T>(is), std::istream_iterator<T>());
-  }
+    std::vector<T> QH_ENERGIES::split(const std::string& line)
+    {
+      std::istringstream is(line);
+      return std::vector<T>(std::istream_iterator<T>(is), std::istream_iterator<T>());
+    }
   // ***************************************************************************************
   //vector sorting
   template<class T>
-  vector<uint> QH_ENERGIES::sorted_order (const vector<T> & arr)
-  {
-    uint n=arr.size();
-    vector<uint> idx(n, 0);
+    vector<uint> QH_ENERGIES::sorted_order (const vector<T> & arr)
+    {
+      uint n=arr.size();
+      vector<uint> idx(n, 0);
 
-    for (uint i=0; i<n; i++)
+      for (uint i=0; i<n; i++)
       {
-	idx[i] = i;
+        idx[i] = i;
       }
 
-    for (uint i=0; i<n; i++)
+      for (uint i=0; i<n; i++)
       {
-	for (uint j=i+1; j<n; j++)
-	  {
-	    if (arr[idx[i]] > arr[idx[j]])
-	      {
-		std::swap (idx[i], idx[j]);
-	      }
-	  }
+        for (uint j=i+1; j<n; j++)
+        {
+          if (arr[idx[i]] > arr[idx[j]])
+          {
+            std::swap (idx[i], idx[j]);
+          }
+        }
       }
 
-    return idx;
-  }
+      return idx;
+    }
   // ***************************************************************************************
   //remove possible noise from electronic bands
   void  QH_ENERGIES::get_electronic_corrected_energies()
@@ -676,17 +710,17 @@ namespace apl
       double dE =abs(_edos[i][1][0]-_edos[i][0][0]);
       //if deltaE is very small then take the average
       if(_iszero(dE)){
-	dE=0.0;
-	for(uint j=0; j<20; j++)dE+=_edos[i][j+1][0]-_edos[i][j][0];
-	dE/=20.0;
+        dE=0.0;
+        for(uint j=0; j<20; j++)dE+=_edos[i][j+1][0]-_edos[i][j][0];
+        dE/=20.0;
       }
       vector<double> dEv;dEv.clear();
       vector<uint> index; index.clear();
       for(uint j=0; j!=_edos[i].size(); j++){
-	double delE=(_edos[i][j][0]-_fermi_energies[i]);
-	if(std::abs(delE)>dE)continue;
-	dEv.push_back(abs(delE));
-	index.push_back(j);
+        double delE=(_edos[i][j][0]-_fermi_energies[i]);
+        if(std::abs(delE)>dE)continue;
+        dEv.push_back(abs(delE));
+        index.push_back(j);
       }
       double correction=0.0;
       vector<uint> index_sorted = sorted_order(dEv);

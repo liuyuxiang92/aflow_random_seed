@@ -36,7 +36,7 @@ namespace aurostd {
 
     // already scanned
     if(aurostd::FileExist(directory+"/ALREADY_IN_DATABASE") || aurostd::EFileExist(directory+"/ALREADY_IN_DATABASE")) return TRUE;
-  
+
     // no, then scan
     if(LDEBUG) cerr << "SEARCHING" << endl;
     bool already_in_database=FALSE;
@@ -48,7 +48,7 @@ namespace aurostd {
     aurostd::string2tokens(tmp_directory,tokens);
     if(tokens.size()>=2) tmp_directory=tokens.at(tokens.size()-2)+"/"+tokens.at(tokens.size()-1);
     if(tokens.size()==1) tmp_directory=tokens.at(tokens.size()-1);
-    
+
     uint library=LIBRARY_NOTHING;
     // XHOST_LIBRARY_LIB0
     if(aurostd::substring2bool(directory,"LIB0"))     library=XHOST_LIBRARY_LIB0;
@@ -108,58 +108,58 @@ namespace aurostd {
       string tmp;
       vector<string> vLibrary;
       if(library==XHOST_LIBRARY_LIB0) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB0" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_RAW"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB0" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB0_RAW"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB1) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB1" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_RAW"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB1" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB1_RAW"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB2) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB2" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_RAW"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB2" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB2_RAW"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB3) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB3" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB3" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB3_LIB"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB4) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB4" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB4" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB4_LIB"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB5) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB5" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB5" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB5_LIB"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB6) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB6" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB6" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB6_LIB"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB7) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB7" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB7" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB7_LIB"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB8) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB8" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB8" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB8_LIB"),tokens,"\n");
       }
       if(library==XHOST_LIBRARY_LIB9) {
-	if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB9" << endl;
-	aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
+        if(LDEBUG) cerr << "library==XHOST_LIBRARY_LIB9" << endl;
+        aurostd::string2tokens(init::InitGlobalObject("Library_CALCULATED_LIB9_LIB"),tokens,"\n");
       }
       for(uint i=0;i<tokens.size();i++)
-	if(aurostd::substring2bool(tokens.at(i),"/")) {
-	  tmp=tokens.at(i);
-	  aurostd::StringSubst(tmp," ","");
-	  vLibrary.push_back(tmp);
-	}
+        if(aurostd::substring2bool(tokens.at(i),"/")) {
+          tmp=tokens.at(i);
+          aurostd::StringSubst(tmp," ","");
+          vLibrary.push_back(tmp);
+        }
       for(int i=vLibrary.size()-1;i>=0;i--)
-	if(tmp_directory==vLibrary.at(i)) {
-	  already_in_database=TRUE;
-	  if(LDEBUG) cerr << vLibrary.at(i) << " FOUND .." << endl; // NEW
-	}
+        if(tmp_directory==vLibrary.at(i)) {
+          already_in_database=TRUE;
+          if(LDEBUG) cerr << vLibrary.at(i) << " FOUND .." << endl; // NEW
+        }
     }
-    
+
     if(LDEBUG) cerr << "DONE..." << endl;
     if(LDEBUG) cerr << tmp_directory << endl;
 
@@ -200,25 +200,25 @@ namespace KBIN {
   bool Legitimate_aflowin(string _aflowindir,const bool& osswrite,ostringstream& oss) {
     string aflowindir=_aflowindir;
     aurostd::StringSubst(aflowindir,"//","/");
-  
+
     if(aurostd::FileExist(aflowindir)) {  // file must exist
       if(!aurostd::FileEmpty(aflowindir)) { // must not be empty
-	if(aurostd::substring2bool(aflowindir,_AFLOWIN_)) {  // there must be an _AFLOWIN_
-	  aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
-	  if(!aurostd::FileExist(aflowindir+_AFLOWLOCK_)) { // it should be UNLOCKED
-	    //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-	    return TRUE;	
-	  } else { // must be unlocked
-	    if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-	    return FALSE;
-	  }
-	} else { // must contain _AFLOWIN_
-	  if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-	  return FALSE;
-	}
+        if(aurostd::substring2bool(aflowindir,_AFLOWIN_)) {  // there must be an _AFLOWIN_
+          aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
+          if(!aurostd::FileExist(aflowindir+_AFLOWLOCK_)) { // it should be UNLOCKED
+            //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+            return TRUE;	
+          } else { // must be unlocked
+            if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+            return FALSE;
+          }
+        } else { // must contain _AFLOWIN_
+          if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+          return FALSE;
+        }
       } else { // empty
-	if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-	return FALSE;
+        if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+        return FALSE;
       }
     } else { // unexisting
       // if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message("time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
@@ -230,6 +230,18 @@ namespace KBIN {
 
 namespace KBIN {
   bool Legitimate_aflowin(string aflowindir) { ostringstream aus; return KBIN::Legitimate_aflowin(aflowindir,FALSE,aus);};
+}
+
+namespace KBIN {
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO191110
+  void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO191110
+    string soliloquy="getAflowInFromAFlags():";
+    AflowIn_file=string(aflags.Directory+"/"+_AFLOWIN_);
+    if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    aurostd::file2string(AflowIn_file,AflowIn);
+    AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+  }
 }
 
 // ***************************************************************************
@@ -250,13 +262,13 @@ namespace KBIN {
     int XHOST_AFLOW_RUNXnumber_multiplier=3;
 
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
-    
+
     std::deque<_aflags> qaflags;
 
     AFLOW_PTHREADS::Clean_Threads();                                    // clean threads
     // _aflags taflags[MAX_ALLOCATABLE_PTHREADS];
     // _threaded_KBIN_params params[MAX_ALLOCATABLE_PTHREADS];
-  
+
     // cerr << "GMODE" << endl;
     // check BlackList **************************************************
     if(AFLOW_BlackList(XHOST.hostname)) {
@@ -267,29 +279,29 @@ namespace KBIN {
     // get KBIN **************************************************
     //  aus << "MMMMM  AFLOW: running " << _AFLOWIN_ << ": " << " "  << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;   // too much verbosity is annoying
     //  aurostd::PrintMessageStream(aus,XHOST.QUIET);                                                  // too much verbosity is annoying
-    
+
     // do some running
 
-    
+
     //   cerr << "KBIN::KBIN_Main: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
 
-   if(XHOST.AFLOW_RUNXflag) {
+    if(XHOST.AFLOW_RUNXflag) {
       vector<string> tokens;
       if(aurostd::args2attachedflag(argv,"--run=")) {
-	aurostd::string2tokens(aurostd::args2attachedstring(argv,"--run=","1"),tokens,"=");
-	XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens.at(tokens.size()-1));
+        aurostd::string2tokens(aurostd::args2attachedstring(argv,"--run=","1"),tokens,"=");
+        XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens.at(tokens.size()-1));
       }
       if(aurostd::args2attachedflag(argv,"-run=")) {
-	aurostd::string2tokens(aurostd::args2attachedstring(argv,"-run=","1"),tokens,"=");
-	XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens.at(tokens.size()-1));
+        aurostd::string2tokens(aurostd::args2attachedstring(argv,"-run=","1"),tokens,"=");
+        XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens.at(tokens.size()-1));
       }
       if(XHOST.AFLOW_RUNXnumber<1) XHOST.AFLOW_RUNXnumber=1;
     }
-    
+
     if(aurostd::args2flag(argv,"-runone|--runone|-run_one|--run_one|-run1|--run1|--run=1|-run=1")) { // RUNONE COMPATIBILITY
       XHOST.AFLOW_RUNXflag=TRUE;XHOST.AFLOW_RUNXnumber=1;
     }
-    
+
     if(XHOST.AFLOW_RUNXflag)  {
       XHOST.AFLOW_RUNDIRflag=FALSE;
       XHOST.AFLOW_MULTIflag=FALSE;
@@ -298,7 +310,7 @@ namespace KBIN {
       XHOST.AFLOW_RUNDIRflag=FALSE;
       XHOST.AFLOW_RUNXflag=FALSE;
     }
-    
+
     //    cerr << "KBIN::KBIN_Main: XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; // exit(0);
 
     if(XHOST.vflag_aflow.flag("LOOP")) {aus << "MMMMM  KBIN option XHOST.vflag_aflow.flag(\"LOOP\") - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
@@ -326,14 +338,15 @@ namespace KBIN {
     aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN      = aurostd::args2flag(argv,"--generate_symmetry|--generate_sym"); // DX
 
     // DX
-    // DX if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN || aflags.KBIN_GEN_AFLOWIN_FROM_VASP) {
-    if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN || aflags.KBIN_GEN_AFLOWIN_FROM_VASP || aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN || aflags.KBIN_GEN_AIMS_FROM_AFLOWIN) { // CO 180409
+    // DX if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN || aflags.KBIN_GEN_AFLOWIN_FROM_VASP)
+    if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN || aflags.KBIN_GEN_AFLOWIN_FROM_VASP || aflags.KBIN_GEN_SYMMETRY_OF_AFLOWIN || aflags.KBIN_GEN_AIMS_FROM_AFLOWIN) // CO 180409
+    { //CO200106 - patching for auto-indenting
       // DX
       XHOST.AFLOW_RUNXflag=TRUE;XHOST.AFLOW_RUNXnumber=1;
       XHOST.AFLOW_RUNDIRflag=TRUE;
       if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP) aflags.KBIN_RUN_AFLOWIN=FALSE;
     }
-    
+
     aflags.KBIN_DELETE_AFLOWIN=aurostd::args2flag(argv,"--delete_aflowin");
 
     aflags.AFLOW_MODE_QSUB_MODE1 = aurostd::args2flag(argv,"--qsub1|-qsub1");
@@ -351,7 +364,7 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.clear();
     // "MACHINE::DUKE_BETA_MPICH"
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_MPICH",
-				     aurostd::args2flag(argv,"--machine=beta|--machine=duke_beta|--beta|--duke_beta|--machine=beta_mpich|--machine=duke_beta_mpich"));
+        aurostd::args2flag(argv,"--machine=beta|--machine=duke_beta|--beta|--duke_beta|--machine=beta_mpich|--machine=duke_beta_mpich"));
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_MPICH")) XHOST.maxmem=DUKE_BETANEW_DEFAULT_KILL_MEM_CUTOFF;
     // "MACHINE::DUKE_BETA_OPENMPI"
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_OPENMPI",aurostd::args2flag(argv,"--machine=beta_openmpi|--machine=duke_beta_openmpi"));
@@ -401,8 +414,8 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::CMU_EULER",aurostd::args2flag(argv,"--machine=euler|--machine=cmu_euler"));
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::CMU_EULER")) XHOST.maxmem=CMU_EULER_DEFAULT_KILL_MEM_CUTOFF;
     //DX 20190107 - CMU EULER - END
-  
-  
+
+
     // turn off multi pthreads on specific machines
     if(aflags.AFLOW_MACHINE_GLOBAL.flag()) {
       AFLOW_PTHREADS::No_Threads();
@@ -411,9 +424,9 @@ namespace KBIN {
       //    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
       XHOST.MPI=TRUE;
     }
-    
+
     vector<string> vruns;
-  
+
     aflags.AFLOW_PERFORM_CLEAN=XHOST.vflag_aflow.flag("CLEAN");// || XHOST.vflag_aflow.flag("XCLEAN"));
     // [OBSOLETE] aflags.AFLOW_PERFORM_DIRECTORY=aurostd::args2flag(argv,"--DIRECTORY|--D|--d|./");
     aflags.AFLOW_PERFORM_DIRECTORY=XHOST.vflag_control.flag("VDIR");
@@ -449,7 +462,8 @@ namespace KBIN {
       if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
     } else {
       if(!aflags.AFLOW_PERFORM_FILE)
-	vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
+        vruns.push_back(aurostd::getPWD()); //CO191112
+      //[CO191112 - OBSOLETE]vruns.push_back(aurostd::execute2string(XHOST.command("pwd")));
       // vruns.push_back(aurostd::execute2string(XHOST.command("pwd"))+" ./");
     }
     // if file found
@@ -457,43 +471,43 @@ namespace KBIN {
       // [OBSOLETE]   string file_name=aurostd::args2string(argv,"--FILE|--F|--f","xxxx");
       string file_name=XHOST.vflag_control.getattachedscheme("FILE");
       if(!aurostd::FileExist(file_name)) {
-	aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);
+        aus << "EEEEE  FILE_NOT_FOUND = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);
       }
       if(aurostd::FileEmpty(file_name)) {
-	aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);
+        aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);exit(0);
       }
       aus << "MMMMM  Loading File = " << file_name << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       vector<string> vlines;
       vlines.clear();
       aurostd::file2vectorstring(file_name,vlines);
-    
+
       aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VLINES = "+aurostd::utype2string(vlines.size()),40) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       aus << "MMMMM  " <<  aurostd::PaddedPOST("         maxcheck = "+aurostd::utype2string(maxcheck),40) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-    
+
       if(aflags.AFLOW_PERFORM_ORDER_SORT) {   // SORT do something
-	aus << "MMMMM  Requested SORT [aflags.AFLOW_PERFORM_ORDER_SORT=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	aurostd::sort(vlines);}
+        aus << "MMMMM  Requested SORT [aflags.AFLOW_PERFORM_ORDER_SORT=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        aurostd::sort(vlines);}
       if(aflags.AFLOW_PERFORM_ORDER_REVERSE) { // REVERSE do something
-	aus << "MMMMM  Requested REVERSE_SORT [aflags.AFLOW_PERFORM_ORDER_REVERSE=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	aurostd::rsort(vlines);}
+        aus << "MMMMM  Requested REVERSE_SORT [aflags.AFLOW_PERFORM_ORDER_REVERSE=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        aurostd::rsort(vlines);}
       if(aflags.AFLOW_PERFORM_ORDER_RANDOM) { // RANDOM do something
-	aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] start (XHOST.AFLOW_RUNXnumber=" << XHOST.AFLOW_RUNXnumber << ") - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	aurostd::random_shuffle(vlines);  // uses the std library but the seed is initialized in xrandom too
- 	aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] stop (XHOST.AFLOW_RUNXnumber=" << XHOST.AFLOW_RUNXnumber << ") - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] start (XHOST.AFLOW_RUNXnumber=" << XHOST.AFLOW_RUNXnumber << ") - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        aurostd::random_shuffle(vlines);  // uses the std library but the seed is initialized in xrandom too
+        aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] stop (XHOST.AFLOW_RUNXnumber=" << XHOST.AFLOW_RUNXnumber << ") - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET);
       }
-      
+
       for(uint i=0;(i<vlines.size() && vruns.size()<XHOST_AFLOW_RUNXnumber_multiplier*maxcheck && vruns.size()<VRUNS_MAX_CUTOFF);i++) {  // XHOST_AFLOW_RUNXnumber_multiplier times more... for safety
-	if(KBIN::Legitimate_aflowin(vlines.at(i),FALSE,aus)) vruns.push_back(vlines.at(i));             // TRUE puts too much verbosity
+        if(KBIN::Legitimate_aflowin(vlines.at(i),FALSE,aus)) vruns.push_back(vlines.at(i));             // TRUE puts too much verbosity
       }
-    
+
       aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VRUNS = "+aurostd::utype2string(vruns.size()),40) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       // aus << "MMMMM  Legitimate VRUNS = " << vruns.size() << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       // cerr << vlines.size() << endl;
       // exit(0);
     }
-  
+
     if(aflags.AFLOW_PERFORM_CLEAN && !XHOST.AFLOW_RUNDIRflag && !XHOST.AFLOW_MULTIflag && !XHOST.AFLOW_RUNXflag) {
       XHOST.AFLOW_RUNDIRflag=TRUE; // give something to clean
     }
@@ -505,13 +519,13 @@ namespace KBIN {
     if(aflags.AFLOW_PERFORM_CLEAN && aflags.AFLOW_PERFORM_DIRECTORY) {
       //    cout << "DEBUG CLEAN = " << vruns.size() << endl;
     }
-  
+
     bool STOP_DEBUG=aurostd::args2flag(argv,"--STOP|--stop");
-  
+
     // cdebug << "aflags.KBIN_RUN_AFLOWIN=" << aflags.KBIN_RUN_AFLOWIN << endl;
     // cdebug << "aflags.KBIN_GEN_VASP_FROM_AFLOWIN=" << aflags.KBIN_GEN_VASP_FROM_AFLOWIN << endl;
     // cdebug << "aflags.KBIN_GEN_AFLOWIN_FROM_VASP=" << aflags.KBIN_GEN_AFLOWIN_FROM_VASP << endl;
-  
+
     // ------------------------------------------------------------------------------------------------------------------------------------
     // nothing to run
     if(!XHOST.AFLOW_RUNDIRflag && !XHOST.AFLOW_MULTIflag && !XHOST.AFLOW_RUNXflag && !aflags.AFLOW_PERFORM_CLEAN && !aflags.AFLOW_PERFORM_DIRECTORY) {
@@ -525,14 +539,14 @@ namespace KBIN {
     if(XHOST.AFLOW_RUNDIRflag) { // check if daemaon aflowd
       string progname=argv.at(0);
       if(aurostd::substring2bool(progname,"aflowd")) {
-	XHOST.AFLOW_MULTIflag=TRUE;
-	XHOST.AFLOW_RUNXflag=FALSE;
-	XHOST.vflag_aflow.flag("LOOP",TRUE); // add automatically
-	aus << "MMMMM  AFLOW: running as DAEMON (aflow --kmode --multi --loop): " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        XHOST.AFLOW_MULTIflag=TRUE;
+        XHOST.AFLOW_RUNXflag=FALSE;
+        XHOST.vflag_aflow.flag("LOOP",TRUE); // add automatically
+        aus << "MMMMM  AFLOW: running as DAEMON (aflow --kmode --multi --loop): " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET);
       }
     }
-  
+
     // ------------------------------------------------------------------------------------------------------------------------------------
     // run specified directory: XHOST.AFLOW_RUNDIRflag
     if(XHOST.AFLOW_RUNDIRflag) {
@@ -542,9 +556,9 @@ namespace KBIN {
       vector<string> vDirectory=vruns;
       // fix the RUNS
       for(uint ii=0;ii<vDirectory.size();ii++)
-	if(aurostd::substring2bool(vDirectory.at(ii),_AFLOWIN_))
-	  aurostd::StringSubst(vDirectory.at(ii),_AFLOWIN_,"");
-    
+        if(aurostd::substring2bool(vDirectory.at(ii),_AFLOWIN_))
+          aurostd::StringSubst(vDirectory.at(ii),_AFLOWIN_,"");
+
       // if(aflags.AFLOW_PERFORM_ORDER_SORT) {   // SORT do something
       //   aus << "MMMMM  Requested SORT [aflags.AFLOW_PERFORM_ORDER_SORT=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       //   aurostd::sort(vDirectory);}
@@ -554,111 +568,111 @@ namespace KBIN {
       // if(aflags.AFLOW_PERFORM_ORDER_RANDOM) { // RANDOM do something
       //   aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
       //   aurostd::random_shuffle(vDirectory);}  // uses the std library but the seed is initialized in xrandom too
-    
+
       // aurostd::random_shuffle(vDirectory);
       // std::random_shuffle(vDirectory.begin(),vDirectory.end());
-    
+
       for(uint idir=0;idir<vDirectory.size();idir++) {
-	bool krun=TRUE;
-	aflags.Directory=vDirectory.at(idir);
-	aus << "MMMMM  AFLOW: running " << _AFLOWIN_ << ", directory" << "=\""  << aflags.Directory << "\" - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	// If necessary PERFORM CLEAN
-	if(krun && aflags.AFLOW_PERFORM_CLEAN) {
-	  aflags.Directory=vDirectory.at(idir);
-	  aurostd::StringSubst(aflags.Directory,"/"+_AFLOWLOCK_,"");
-	  for(uint iext=0;iext<vext.size();iext++) { 
-	    aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax1"+vext.at(iext),"");    // CLEAN UP A LITTLE
-	    aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax2"+vext.at(iext),"");    // CLEAN UP A LITTLE
-	    aurostd::StringSubst(aflags.Directory,"/OUTCAR.static"+vext.at(iext),"");    // CLEAN UP A LITTLE
-	    aurostd::StringSubst(aflags.Directory,"/OUTCAR.bands"+vext.at(iext),"");     // CLEAN UP A LITTLE
-	  }
-	  for(uint iext=0;iext<vext.size();iext++) { 
-	    aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax1"+vext.at(iext),"");  // CLEAN UP A LITTLE
-	    aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax2"+vext.at(iext),"");  // CLEAN UP A LITTLE
-	    aurostd::StringSubst(aflags.Directory,"/EIGENVAL.static"+vext.at(iext),"");  // CLEAN UP A LITTLE
-	    aurostd::StringSubst(aflags.Directory,"/EIGENVAL.bands"+vext.at(iext),"");   // CLEAN UP A LITTLE
-	  }
-	  aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
-	  aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
-	  //  cerr << aflags.Directory << endl;
-	  KBIN::Clean(aflags);
-	  krun=FALSE;
-	}
-	// RUN
-	// cerr << "STEP0b" << endl;
-	if(krun) {
-	  if(LDEBUG) cerr << "STEP1b" << endl;  // CO 170622 - should be debug
-	  ifstream FileCHECK;string FileNameCHECK;
-	  // check for directory
-	  FileNameCHECK=aflags.Directory;
-	  FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
-	  FileCHECK.clear();FileCHECK.close();
-	  if(!FileCHECK) {                                                                        // ******* Directory is non existent
-	    aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  } else {                                                                                // ******* Directory EXISTS
-	    if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1c" << endl;
-	    if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
-	      aus << "LLLLL  DIRECTORY_LOCKED ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	    } else {
-	      if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1d" << endl;
-	      if(DirectorySkipped(aflags.Directory)) {                                            // ******* Directory is skipped
-		aus << "LLLLL  DIRECTORY_SKIPPED ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	      } else {        
+        bool krun=TRUE;
+        aflags.Directory=vDirectory.at(idir);
+        aus << "MMMMM  AFLOW: running " << _AFLOWIN_ << ", directory" << "=\""  << aflags.Directory << "\" - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        // If necessary PERFORM CLEAN
+        if(krun && aflags.AFLOW_PERFORM_CLEAN) {
+          aflags.Directory=vDirectory.at(idir);
+          aurostd::StringSubst(aflags.Directory,"/"+_AFLOWLOCK_,"");
+          for(uint iext=0;iext<vext.size();iext++) { 
+            aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax1"+vext.at(iext),"");    // CLEAN UP A LITTLE
+            aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax2"+vext.at(iext),"");    // CLEAN UP A LITTLE
+            aurostd::StringSubst(aflags.Directory,"/OUTCAR.static"+vext.at(iext),"");    // CLEAN UP A LITTLE
+            aurostd::StringSubst(aflags.Directory,"/OUTCAR.bands"+vext.at(iext),"");     // CLEAN UP A LITTLE
+          }
+          for(uint iext=0;iext<vext.size();iext++) { 
+            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax1"+vext.at(iext),"");  // CLEAN UP A LITTLE
+            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax2"+vext.at(iext),"");  // CLEAN UP A LITTLE
+            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.static"+vext.at(iext),"");  // CLEAN UP A LITTLE
+            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.bands"+vext.at(iext),"");   // CLEAN UP A LITTLE
+          }
+          aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
+          aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
+          //  cerr << aflags.Directory << endl;
+          KBIN::Clean(aflags);
+          krun=FALSE;
+        }
+        // RUN
+        // cerr << "STEP0b" << endl;
+        if(krun) {
+          if(LDEBUG) cerr << "STEP1b" << endl;  // CO 170622 - should be debug
+          ifstream FileCHECK;string FileNameCHECK;
+          // check for directory
+          FileNameCHECK=aflags.Directory;
+          FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
+          FileCHECK.clear();FileCHECK.close();
+          if(!FileCHECK) {                                                                        // ******* Directory is non existent
+            aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          } else {                                                                                // ******* Directory EXISTS
+            if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1c" << endl;
+            if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
+              aus << "LLLLL  DIRECTORY_LOCKED ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(aus,XHOST.QUIET);
+            } else {
+              if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1d" << endl;
+              if(DirectorySkipped(aflags.Directory)) {                                            // ******* Directory is skipped
+                aus << "LLLLL  DIRECTORY_SKIPPED ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(aus,XHOST.QUIET);
+              } else {        
                 if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1e" << endl;
-		if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {         // ******* Directory is already in the database
-		  aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		  aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		} else {        
+                if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {         // ******* Directory is already in the database
+                  aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                  aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                  aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                } else {        
                   if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1f" << endl;
-		  if(DirectoryUnwritable(aflags.Directory)) {                                     // ******* Directory is unwritable
-		    aus << "LLLLL  DIRECTORY_UNWRITABLE ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		    aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		  } else {                                                                        // ******* Directory is ok
-		    if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1g" << endl;
-		    if(_VERBOSE_) aus << "LLLLL  GOOD ...bzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		    if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		    if(aflags.KBIN_RUN_AFLOWIN)               FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
-		    if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
-		    if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_; // CO 180409
-		    if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     FileNameCHECK=aflags.Directory+"/INCAR";
-		    FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
-		    FileCHECK.clear();FileCHECK.close();
-		    if(!FileCHECK) {                                                                    // ******* _AFLOWIN_ does not exist
-		      if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1h" << endl;
-		      if(aflags.KBIN_RUN_AFLOWIN)               aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		      if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		      if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO 180409
-		      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << "EEEEE  INCAR not found     = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		      aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		    } else {                                                                            // ******* _AFLOWIN_ exists RUN
-		      if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1i" << endl;
-		      if(aflags.KBIN_RUN_AFLOWIN)  {
-			KBIN::RUN_Directory(aflags);
-		      }
-		      // if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)    KBIN::RUN_Directory(aflags);
-		      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     KBIN::GenerateAflowinFromVASPDirectory(aflags);
-		      aus << "MMMMM  AFLOW: Run Done " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		      aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		    }
-		  } // DIRECTORY WRITABLE
-		} // DIRECTORY NOT IN THE DATABASE
-	      } // DIRECTORY UN SKIPPED
-	    } // DIRECTORY UN LOCKED
-	  } // DIRECTORY FOUND
-	  aus << "MMMMM  AFLOW: Done " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	}
+                  if(DirectoryUnwritable(aflags.Directory)) {                                     // ******* Directory is unwritable
+                    aus << "LLLLL  DIRECTORY_UNWRITABLE ...bzzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                    aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                  } else {                                                                        // ******* Directory is ok
+                    if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1g" << endl;
+                    if(_VERBOSE_) aus << "LLLLL  GOOD ...bzzz... !MULTI = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                    if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                    if(aflags.KBIN_RUN_AFLOWIN)               FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
+                    if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
+                    if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_; // CO 180409
+                    if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     FileNameCHECK=aflags.Directory+"/INCAR";
+                    FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
+                    FileCHECK.clear();FileCHECK.close();
+                    if(!FileCHECK) {                                                                    // ******* _AFLOWIN_ does not exist
+                      if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1h" << endl;
+                      if(aflags.KBIN_RUN_AFLOWIN)               aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                      if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                      if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // CO 180409
+                      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << "EEEEE  INCAR not found     = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                    } else {                                                                            // ******* _AFLOWIN_ exists RUN
+                      if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP1i" << endl;
+                      if(aflags.KBIN_RUN_AFLOWIN)  {
+                        KBIN::RUN_Directory(aflags);
+                      }
+                      // if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)    KBIN::RUN_Directory(aflags);
+                      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     KBIN::GenerateAflowinFromVASPDirectory(aflags);
+                      aus << "MMMMM  AFLOW: Run Done " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                    }
+                  } // DIRECTORY WRITABLE
+                } // DIRECTORY NOT IN THE DATABASE
+              } // DIRECTORY UN SKIPPED
+            } // DIRECTORY UN LOCKED
+          } // DIRECTORY FOUND
+          aus << "MMMMM  AFLOW: Done " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        }
       } // idir
       // aus << "MMMMM  AFLOW: Done " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       // aurostd::PrintMessageStream(aus,XHOST.QUIET);
       if(LDEBUG) cerr << "KBIN::KBIN_Main: STEP2" << endl;
     }
-  
+
     // ERRORS ------------------------------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------------------------------------------------------------------
@@ -673,212 +687,212 @@ namespace KBIN {
       bool free_thread;
       int ithread=0;
       if(AFLOW_PTHREADS::FLAG && AFLOW_PTHREADS::MAX_PTHREADS<=1) {
-	aus << "EEEEE  ERROR PTHREADS" << endl;
-	aus << "MMMMM  AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
-	aus << "MMMMM  AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	exit(0);
+        aus << "EEEEE  ERROR PTHREADS" << endl;
+        aus << "MMMMM  AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
+        aus << "MMMMM  AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        exit(0);
       }
       if(AFLOW_PTHREADS::MAX_PTHREADS>1) {
-	aus << "MMMMM  AFLOW: MULTI THREAD START: phread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        aus << "MMMMM  AFLOW: MULTI THREAD START: phread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(aus,XHOST.QUIET);
       }
       aus << "MMMMM  AFLOW: searching subdirectories [d1] " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
       while(!EMPTY) {
-	vector<string> vaflowin;
-	//   cerr << "aflags.AFLOW_PERFORM_DIRECTORY=" << aflags.AFLOW_PERFORM_DIRECTORY << endl;
-	// cerr << "aflags.AFLOW_PERFORM_FILE=" << aflags.AFLOW_PERFORM_FILE << endl;
+        vector<string> vaflowin;
+        //   cerr << "aflags.AFLOW_PERFORM_DIRECTORY=" << aflags.AFLOW_PERFORM_DIRECTORY << endl;
+        // cerr << "aflags.AFLOW_PERFORM_FILE=" << aflags.AFLOW_PERFORM_FILE << endl;
 
-	if(aflags.AFLOW_PERFORM_FILE==FALSE) { // NO FILE SPECIFIED = standard  RUN DIRECTORY
-	  aus << "MMMMM  AFLOW: aflags.AFLOW_PERFORM_FILE==FALSE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	
-	  string FileNameSUBDIR=aurostd::TmpFileCreate("RUN");
-	  stringstream strstream;
-	  aus << "rm -f " <<  FileNameSUBDIR << endl;
-	  aurostd::execute(aus);  // RESET  // RESET
-	
-	  bool isPRIORITY=FALSE;
-	  // NEW, the sorting is done internally (speed and reliability)
-	  for(int ifind=0;ifind<(int)vruns.size();ifind++) {
-	    isPRIORITY=(aurostd::substring2bool(vruns.at(ifind),"PRIORITY") || aurostd::substring2bool(vruns.at(ifind),"priority"));
-	    if((isPRIORITY && aurostd::uniform(1.0)<=PRIORITY_PROBABILITY) || !isPRIORITY) {
-	      aus << "find " << vruns.at(ifind) << " " << XHOST.Find_Parameters;
-	      if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
-	      // if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
-	      // if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
-	      // if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)  aus << " -name \"" << _AFLOWIN_ << "\" ";   // IS THIS CORRECT ?? CHECK !!!
-	      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << " -name \"INCAR\" ";
-	      aus << " | " << PRIORITY_GREP_STRING << " >> ";
-	      aus << FileNameSUBDIR << endl;
-	    }
-	  }
-	  // perform the command
-	  aurostd::execute(aus);  // RESET  // RESET
-	
-	  if(_VERBOSE_) aus << "MMMMM  AFLOW: searching subdirectories [d2] " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  aurostd::string2tokens(aurostd::file2string(FileNameSUBDIR),vaflowin,"\n");
-	  for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");
-	  for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),"INCAR","");
-	  if(STOP_DEBUG) for(i=0;i<(int) vaflowin.size();i++) cout << vaflowin.at(i) << endl;
-	  // RANDOMIZING priority
-	  if(vaflowin.size()>1) { // only if I can poll
-	    // if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
-	  }
-	  // loaded up
-	  aus << "rm -f " << FileNameSUBDIR << endl;
-	  aurostd::execute(aus);  // RESET  // RESET
-	}
-      
-	// FILE SPECIFIED
-	if(aflags.AFLOW_PERFORM_FILE) {
-	  aus << "MMMMM  AFLOW: aflags.AFLOW_PERFORM_FILE==TRUE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  vaflowin.clear();
-	  for(uint i=0;(i<vruns.size() && vaflowin.size()<maxcheck);i++) {
-	    if(KBIN::Legitimate_aflowin(vruns.at(i),FALSE,aus)) vaflowin.push_back(vruns.at(i)); // TRUE puts too much verbosity
-	    // vaflowin.push_back(vruns.at(i)); // just load them up... they were checked before //OLD MUST RECHECH THEM as things change on the fly
-	  }
-	}
-	// NOW TIME OF SORTING/RANDOMIZING
-	if(aflags.AFLOW_PERFORM_ORDER_SORT) {   // SORT do something
-	  aus << "MMMMM  Requested SORT [aflags.AFLOW_PERFORM_ORDER_SORT=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  aurostd::sort(vaflowin);}
-	if(aflags.AFLOW_PERFORM_ORDER_REVERSE) { // REVERSE do something
-	  aus << "MMMMM  Requested REVERSE_SORT [aflags.AFLOW_PERFORM_ORDER_REVERSE=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  aurostd::sort(vaflowin); // PN modification 
-	  aurostd::rsort(vaflowin);}
-	if(aflags.AFLOW_PERFORM_ORDER_RANDOM) { // RANDOM do something
-	  aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  aurostd::random_shuffle(vaflowin);}  // uses the std library but the seed is initialized in xrandom too
-	aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VAFLOWIN = "+aurostd::utype2string(vaflowin.size()),40) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	//      aus << "MMMMM  Legitimate VAFLOWIN = " << vaflowin.size() << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        if(aflags.AFLOW_PERFORM_FILE==FALSE) { // NO FILE SPECIFIED = standard  RUN DIRECTORY
+          aus << "MMMMM  AFLOW: aflags.AFLOW_PERFORM_FILE==FALSE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
 
-	//	for(uint i=0;i<vaflowin.size();i++) cerr << i << " " << vaflowin.at(i) << endl; 	exit(0);
-	
-	// clean AFLOWIN // SAFETY
-	for(uint i=0;i<vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");  
-      
-	if(MULTI_DEBUG) {aus << "MMMMM  SIZE vaflowin=" << vaflowin.size() << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
-	if(MULTI_DEBUG) {for(uint i=0;i<vaflowin.size();i++) {aus << "MMMMM  vaflowin.at(i)=" << vaflowin.at(i) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}}
-	// cerr << vaflowin.at(10) << " " << vaflowin.at(20) << " " << vaflowin.at(30) << endl;
-	// exit(0);
-	// if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
-      
-	FOUND=FALSE;
-	for(uint i=0;i<vaflowin.size()&& !FOUND;i++) {
-	  aflags.Directory="NULL";
-	  if(aurostd::DirectoryLocked(vaflowin.at(i),_AFLOWLOCK_)) {
-	    if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  LOCKED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-	    if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	    FOUND=FALSE;
-	  } else {
-	    if(DirectorySkipped(vaflowin.at(i))) {
-	      if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  SKIPPED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-	      if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	      FOUND=FALSE;
-	    } else {
-	      if(DirectoryAlreadyInDatabase(vaflowin.at(i),aflags.AFLOW_FORCE_RUN)) {
-		if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-		if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry...  MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-		if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		FOUND=FALSE;
-	      } else {
-		if(DirectoryUnwritable(vaflowin.at(i))) {
-		  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  UNWRITABLE ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-		  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		  FOUND=FALSE;
-		} else {
-		  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  GOOD ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-		  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		  aflags.Directory=vaflowin.at(i);
-		  FOUND=TRUE;
-		} // DIRECTORY WRITABLE
-	      } // DIRECTORY NOT IN THE DATABASE
-	    } // DIRECTORY UN SKIPPED
-	  } // DIRECTORY UN LOCKED
-	} // DIRECTORY FOUND
-	// exiting if STOP_DEBUG
-	if(STOP_DEBUG) {cout << "aflow_kbin.cpp: STOP_DEBUG" << endl; exit(0);}
-      
-	// FOUND SOMETHING
-	if(FOUND==FALSE) {
-	  EMPTY=TRUE;
-	  if(AFLOW_PTHREADS::FLAG) {
-	    aus << "MMMMM  AFLOW: MULTI-THREADED: FLUSHING PTHREADS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	    for(ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
-	      if(AFLOW_PTHREADS::vpthread_busy[ithread]) {
-		aus << "MMMMM  AFLOW: MULTI-THREADED: Flushing   pthread=" << ithread << "   pthread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		pthread_join(AFLOW_PTHREADS::vpthread[ithread],NULL);
-	      }
-	  }
-	}
-	// again another check for LOCK, because NFS (network file system might be slow in concurrent seaches
-	//     if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {cerr << "AFLOW EXCEPTION on concurrent LOCK: " << aflags.Directory << endl; FOUND=FALSE;}
-	if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {
-	  aus << "AFLOW EXCEPTION on concurrent LOCK: " << aflags.Directory << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  FOUND=FALSE;
-	}
-      
-	//  ---------------------------------------------------------------------------- START RUNNING
-	if(FOUND) {
-	  // again another check for LOCK, because NFS (network file system might be slow in concurrent seaches
-	  EMPTY=FALSE;
-	  //  ---------------------------------------------------------------------------- KIN_RUN_AFLOWIN
-	  if(aflags.KBIN_RUN_AFLOWIN) {
-	    //	  bool PHONONS;
-	    //  -------------------------------------------------------------------------- KIN_RUN_AFLOWIN multithreaded
-	    // 	  bool found;
-	    // 	  for(uint ii=0;ii<qaflags.size()&&!found;ii++)
-	    // 	    found=(qaflags[ii].Directory==aflags.Directory);       // look in all the list of operations
-	    // 	  if(found==FALSE) {                                 // new operation, generate and save it
-	    // 	    qaflags.push_back(aflags);
-	    // 	  }
-	    //	  cerr << qaflags.size() << endl;
-	    if(AFLOW_PTHREADS::FLAG) {
-	      // there is something to run in aflags.
-	      // wait and put in ithread there is the number of the thread
-	      free_thread=AFLOW_PTHREADS::Wait_Available_Free_Threads(ithread,_VERBOSE_);        // WAIT A WHILE !!
-	      if(free_thread) {
-		aus << "MMMMM  AFLOW: Found subdirectory to run " << aflags.Directory<< " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aus << "MMMMM  AFLOW: MULTI-THREADED: Starting    pthread_free=" << ithread << "   pthread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(aus,XHOST.QUIET);
-		aflags.AFLOW_PTHREADS_NUMBER=ithread;
-		KBIN::RUN_Directory_PTHREADS(aflags);
-		RUN_times++;
-		if(XHOST.AFLOW_RUNXflag) {
-		  aus << "MMMMM  AFLOW: RUNFX finished running " << RUN_times <<  "/" << XHOST.AFLOW_RUNXnumber << " " << aflags.Directory<< " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		  aurostd::PrintMessageStream(aus,XHOST.QUIET);}
-		if(XHOST.AFLOW_RUNXflag && RUN_times==XHOST.AFLOW_RUNXnumber) EMPTY=TRUE; // force to end if RUXN reached
-	      }
-	    }
-	    //  -------------------------------------------------------------------------- KIN_RUN_AFLOWIN normal
-	    if(!AFLOW_PTHREADS::FLAG) {
-	      KBIN::RUN_Directory(aflags);
-	      RUN_times++;
-	      if(XHOST.AFLOW_RUNXflag) {
-		aus << "MMMMM  AFLOW: RUNFX finished running " << RUN_times <<  "/" << XHOST.AFLOW_RUNXnumber << " " << aflags.Directory<< " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(aus,XHOST.QUIET);}
-	      if(XHOST.AFLOW_RUNXflag && RUN_times==XHOST.AFLOW_RUNXnumber) EMPTY=TRUE; // force to end if RUXN reached
-	    }
-	  }
-	  //  ---------------------------------------------------------------------------- KBIN_GEN_VASP_FROM_AFLOWIN normal
-	  //	if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     KBIN::RUN_Directory(argv,aflags);  // IS THIS CORRECT ?? CHECK !!!
-	  //  ---------------------------------------------------------------------------- KBIN_GEN_AFLOWIN_FROM_VASP normal
-	  if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP) {
-	    KBIN::GenerateAflowinFromVASPDirectory(aflags);
-	  }
-	}
-	if(XHOST.vflag_aflow.flag("LOOP") && EMPTY && XHOST.AFLOW_RUNXflag==FALSE) {
-	  EMPTY=FALSE;
-	  aus << "MMMMM  AFLOW: waiting for new subdirectories: " << (int) _KBIN_LOOP_SLEEP_/60 << "mins ";
-	  aus << " - " << XHOST.hostname << " - " << aflow_get_time_string() << endl;//endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	  aurostd::Sleep(_KBIN_LOOP_SLEEP_);
-	}
+          string FileNameSUBDIR=aurostd::TmpFileCreate("RUN");
+          stringstream strstream;
+          aus << "rm -f " <<  FileNameSUBDIR << endl;
+          aurostd::execute(aus);  // RESET  // RESET
+
+          bool isPRIORITY=FALSE;
+          // NEW, the sorting is done internally (speed and reliability)
+          for(int ifind=0;ifind<(int)vruns.size();ifind++) {
+            isPRIORITY=(aurostd::substring2bool(vruns.at(ifind),"PRIORITY") || aurostd::substring2bool(vruns.at(ifind),"priority"));
+            if((isPRIORITY && aurostd::uniform(1.0)<=PRIORITY_PROBABILITY) || !isPRIORITY) {
+              aus << "find " << vruns.at(ifind) << " " << XHOST.Find_Parameters;
+              if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
+              // if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
+              // if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
+              // if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)  aus << " -name \"" << _AFLOWIN_ << "\" ";   // IS THIS CORRECT ?? CHECK !!!
+              if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << " -name \"INCAR\" ";
+              aus << " | " << PRIORITY_GREP_STRING << " >> ";
+              aus << FileNameSUBDIR << endl;
+            }
+          }
+          // perform the command
+          aurostd::execute(aus);  // RESET  // RESET
+
+          if(_VERBOSE_) aus << "MMMMM  AFLOW: searching subdirectories [d2] " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          aurostd::string2tokens(aurostd::file2string(FileNameSUBDIR),vaflowin,"\n");
+          for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");
+          for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),"INCAR","");
+          if(STOP_DEBUG) for(i=0;i<(int) vaflowin.size();i++) cout << vaflowin.at(i) << endl;
+          // RANDOMIZING priority
+          if(vaflowin.size()>1) { // only if I can poll
+            // if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
+          }
+          // loaded up
+          aus << "rm -f " << FileNameSUBDIR << endl;
+          aurostd::execute(aus);  // RESET  // RESET
+        }
+
+        // FILE SPECIFIED
+        if(aflags.AFLOW_PERFORM_FILE) {
+          aus << "MMMMM  AFLOW: aflags.AFLOW_PERFORM_FILE==TRUE" << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          vaflowin.clear();
+          for(uint i=0;(i<vruns.size() && vaflowin.size()<maxcheck);i++) {
+            if(KBIN::Legitimate_aflowin(vruns.at(i),FALSE,aus)) vaflowin.push_back(vruns.at(i)); // TRUE puts too much verbosity
+            // vaflowin.push_back(vruns.at(i)); // just load them up... they were checked before //OLD MUST RECHECH THEM as things change on the fly
+          }
+        }
+        // NOW TIME OF SORTING/RANDOMIZING
+        if(aflags.AFLOW_PERFORM_ORDER_SORT) {   // SORT do something
+          aus << "MMMMM  Requested SORT [aflags.AFLOW_PERFORM_ORDER_SORT=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          aurostd::sort(vaflowin);}
+        if(aflags.AFLOW_PERFORM_ORDER_REVERSE) { // REVERSE do something
+          aus << "MMMMM  Requested REVERSE_SORT [aflags.AFLOW_PERFORM_ORDER_REVERSE=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          aurostd::sort(vaflowin); // PN modification 
+          aurostd::rsort(vaflowin);}
+        if(aflags.AFLOW_PERFORM_ORDER_RANDOM) { // RANDOM do something
+          aus << "MMMMM  Requested RANDOM [aflags.AFLOW_PERFORM_ORDER_RANDOM=1] - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          aurostd::random_shuffle(vaflowin);}  // uses the std library but the seed is initialized in xrandom too
+        aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VAFLOWIN = "+aurostd::utype2string(vaflowin.size()),40) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        //      aus << "MMMMM  Legitimate VAFLOWIN = " << vaflowin.size() << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+
+        //	for(uint i=0;i<vaflowin.size();i++) cerr << i << " " << vaflowin.at(i) << endl; 	exit(0);
+
+        // clean AFLOWIN // SAFETY
+        for(uint i=0;i<vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");  
+
+        if(MULTI_DEBUG) {aus << "MMMMM  SIZE vaflowin=" << vaflowin.size() << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
+        if(MULTI_DEBUG) {for(uint i=0;i<vaflowin.size();i++) {aus << "MMMMM  vaflowin.at(i)=" << vaflowin.at(i) << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}}
+        // cerr << vaflowin.at(10) << " " << vaflowin.at(20) << " " << vaflowin.at(30) << endl;
+        // exit(0);
+        // if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
+
+        FOUND=FALSE;
+        for(uint i=0;i<vaflowin.size()&& !FOUND;i++) {
+          aflags.Directory="NULL";
+          if(aurostd::DirectoryLocked(vaflowin.at(i),_AFLOWLOCK_)) {
+            if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  LOCKED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+            if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+            FOUND=FALSE;
+          } else {
+            if(DirectorySkipped(vaflowin.at(i))) {
+              if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  SKIPPED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+              if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+              FOUND=FALSE;
+            } else {
+              if(DirectoryAlreadyInDatabase(vaflowin.at(i),aflags.AFLOW_FORCE_RUN)) {
+                if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+                if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry...  MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+                if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                FOUND=FALSE;
+              } else {
+                if(DirectoryUnwritable(vaflowin.at(i))) {
+                  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  UNWRITABLE ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+                  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                  FOUND=FALSE;
+                } else {
+                  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  GOOD ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+                  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                  aflags.Directory=vaflowin.at(i);
+                  FOUND=TRUE;
+                } // DIRECTORY WRITABLE
+              } // DIRECTORY NOT IN THE DATABASE
+            } // DIRECTORY UN SKIPPED
+          } // DIRECTORY UN LOCKED
+        } // DIRECTORY FOUND
+        // exiting if STOP_DEBUG
+        if(STOP_DEBUG) {cout << "aflow_kbin.cpp: STOP_DEBUG" << endl; exit(0);}
+
+        // FOUND SOMETHING
+        if(FOUND==FALSE) {
+          EMPTY=TRUE;
+          if(AFLOW_PTHREADS::FLAG) {
+            aus << "MMMMM  AFLOW: MULTI-THREADED: FLUSHING PTHREADS - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(aus,XHOST.QUIET);
+            for(ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
+              if(AFLOW_PTHREADS::vpthread_busy[ithread]) {
+                aus << "MMMMM  AFLOW: MULTI-THREADED: Flushing   pthread=" << ithread << "   pthread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                pthread_join(AFLOW_PTHREADS::vpthread[ithread],NULL);
+              }
+          }
+        }
+        // again another check for LOCK, because NFS (network file system might be slow in concurrent seaches
+        //     if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {cerr << "AFLOW EXCEPTION on concurrent LOCK: " << aflags.Directory << endl; FOUND=FALSE;}
+        if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {
+          aus << "AFLOW EXCEPTION on concurrent LOCK: " << aflags.Directory << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          FOUND=FALSE;
+        }
+
+        //  ---------------------------------------------------------------------------- START RUNNING
+        if(FOUND) {
+          // again another check for LOCK, because NFS (network file system might be slow in concurrent seaches
+          EMPTY=FALSE;
+          //  ---------------------------------------------------------------------------- KIN_RUN_AFLOWIN
+          if(aflags.KBIN_RUN_AFLOWIN) {
+            //	  bool PHONONS;
+            //  -------------------------------------------------------------------------- KIN_RUN_AFLOWIN multithreaded
+            // 	  bool found;
+            // 	  for(uint ii=0;ii<qaflags.size()&&!found;ii++)
+            // 	    found=(qaflags[ii].Directory==aflags.Directory);       // look in all the list of operations
+            // 	  if(found==FALSE) {                                 // new operation, generate and save it
+            // 	    qaflags.push_back(aflags);
+            // 	  }
+            //	  cerr << qaflags.size() << endl;
+            if(AFLOW_PTHREADS::FLAG) {
+              // there is something to run in aflags.
+              // wait and put in ithread there is the number of the thread
+              free_thread=AFLOW_PTHREADS::Wait_Available_Free_Threads(ithread,_VERBOSE_);        // WAIT A WHILE !!
+              if(free_thread) {
+                aus << "MMMMM  AFLOW: Found subdirectory to run " << aflags.Directory<< " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aus << "MMMMM  AFLOW: MULTI-THREADED: Starting    pthread_free=" << ithread << "   pthread_max=" << AFLOW_PTHREADS::MAX_PTHREADS << " - " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(aus,XHOST.QUIET);
+                aflags.AFLOW_PTHREADS_NUMBER=ithread;
+                KBIN::RUN_Directory_PTHREADS(aflags);
+                RUN_times++;
+                if(XHOST.AFLOW_RUNXflag) {
+                  aus << "MMMMM  AFLOW: RUNFX finished running " << RUN_times <<  "/" << XHOST.AFLOW_RUNXnumber << " " << aflags.Directory<< " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                  aurostd::PrintMessageStream(aus,XHOST.QUIET);}
+                if(XHOST.AFLOW_RUNXflag && RUN_times==XHOST.AFLOW_RUNXnumber) EMPTY=TRUE; // force to end if RUXN reached
+              }
+            }
+            //  -------------------------------------------------------------------------- KIN_RUN_AFLOWIN normal
+            if(!AFLOW_PTHREADS::FLAG) {
+              KBIN::RUN_Directory(aflags);
+              RUN_times++;
+              if(XHOST.AFLOW_RUNXflag) {
+                aus << "MMMMM  AFLOW: RUNFX finished running " << RUN_times <<  "/" << XHOST.AFLOW_RUNXnumber << " " << aflags.Directory<< " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(aus,XHOST.QUIET);}
+              if(XHOST.AFLOW_RUNXflag && RUN_times==XHOST.AFLOW_RUNXnumber) EMPTY=TRUE; // force to end if RUXN reached
+            }
+          }
+          //  ---------------------------------------------------------------------------- KBIN_GEN_VASP_FROM_AFLOWIN normal
+          //	if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     KBIN::RUN_Directory(argv,aflags);  // IS THIS CORRECT ?? CHECK !!!
+          //  ---------------------------------------------------------------------------- KBIN_GEN_AFLOWIN_FROM_VASP normal
+          if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP) {
+            KBIN::GenerateAflowinFromVASPDirectory(aflags);
+          }
+        }
+        if(XHOST.vflag_aflow.flag("LOOP") && EMPTY && XHOST.AFLOW_RUNXflag==FALSE) {
+          EMPTY=FALSE;
+          aus << "MMMMM  AFLOW: waiting for new subdirectories: " << (int) _KBIN_LOOP_SLEEP_/60 << "mins ";
+          aus << " - " << XHOST.hostname << " - " << aflow_get_time_string() << endl;//endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          aurostd::Sleep(_KBIN_LOOP_SLEEP_);
+        }
       }
       aus << "MMMMM  AFLOW: no more subdirectories to run " << " - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(aus,XHOST.QUIET);
@@ -906,55 +920,55 @@ namespace KBIN {
 
     if(aflags.AFLOW_GLOBAL_NCPUS<1) {
       if(Kmpi && !aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=",TRUE) && !aflags.AFLOW_MACHINE_LOCAL.flag()) {                      // DEFAULT NO CPU SPECIFIED
-	kflags.KBIN_MPI_NCPUS=MPI_NCPUS_DEFAULT;
-	aus << "00000  MESSAGE MPI: NCPUS=NNNN is missing, taking NCPUS=" << kflags.KBIN_MPI_NCPUS << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
-	Kmpi=FALSE;
+        kflags.KBIN_MPI_NCPUS=MPI_NCPUS_DEFAULT;
+        aus << "00000  MESSAGE MPI: NCPUS=NNNN is missing, taking NCPUS=" << kflags.KBIN_MPI_NCPUS << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
+        Kmpi=FALSE;
       }
       if(Kmpi && (aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=MAX",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=AUTO",TRUE) || aflags.AFLOW_MACHINE_LOCAL.flag())) { // DEFAULT NCPUS=MAX
-	kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;
+        kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;
         if (aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=MAX",TRUE)) kflags.KBIN_MPI_NCPUS_STRING = "MAX";
         if (aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=AUTO",TRUE)) kflags.KBIN_MPI_NCPUS_STRING = "AUTO";
 
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;	// corey
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;        // with DUKE_BETA force NCPUS from QUEUE
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; // corey
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;   // with DUKE_MATERIALS force NCPUS
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;   // with DUKE_AFLOWLIB force NCPUS
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;   // with DUKE_HABANA force NCPUS
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE001; DX added 20190509
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE002; DX added 20190509
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER"))  kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;;  // DX 20190107 - CMU EULER // with CMU_EULER force NCPUS //DX181113
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;           // MACHINE2 has only NCPUS //CO181113
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;          // MACHINE1 has only NCPUS //CO181113
-	if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU"))  kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS;        // with FULTON_MARYLOU force NCPUS
-	if(kflags.KBIN_MPI_NCPUS<1) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores; // SAFE
-	      
-	aus << "00000  MESSAGE MPI: found NCPUS=MAX  NCPUS="<<kflags.KBIN_MPI_NCPUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-	Kmpi=FALSE;
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;	// corey
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;        // with DUKE_BETA force NCPUS from QUEUE
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN; // corey
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;   // with DUKE_MATERIALS force NCPUS
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;   // with DUKE_AFLOWLIB force NCPUS
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;   // with DUKE_HABANA force NCPUS
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // [OBSOLETE] XHOST.SLURM_CPUS_ON_NODE; no CPUS because it gets fooled by HT
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE001; DX added 20190509
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE002; DX added 20190509
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER"))  kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;;  // DX 20190107 - CMU EULER // with CMU_EULER force NCPUS //DX181113
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;           // MACHINE2 has only NCPUS //CO181113
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;          // MACHINE1 has only NCPUS //CO181113
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU"))  kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS;        // with FULTON_MARYLOU force NCPUS
+        if(kflags.KBIN_MPI_NCPUS<1) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores; // SAFE
+
+        aus << "00000  MESSAGE MPI: found NCPUS=MAX  NCPUS="<<kflags.KBIN_MPI_NCPUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        Kmpi=FALSE;
       }
       if(Kmpi && aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=",TRUE)) {                     // DEFAULT NCPUS=XXX
-	kflags.KBIN_MPI_NCPUS=aurostd::substring2utype<int>(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=",TRUE);
-	if(kflags.KBIN_MPI_NCPUS>0) {
+        kflags.KBIN_MPI_NCPUS=aurostd::substring2utype<int>(AflowIn,"[AFLOW_MODE_MPI_MODE]NCPUS=",TRUE);
+        if(kflags.KBIN_MPI_NCPUS>0) {
           kflags.KBIN_MPI_NCPUS_STRING = aurostd::utype2string<int>(kflags.KBIN_MPI_NCPUS); //ME181113
-	  aus << "00000  MESSAGE MPI: found NCPUS="<<kflags.KBIN_MPI_NCPUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-	}
-	Kmpi=FALSE;
+          aus << "00000  MESSAGE MPI: found NCPUS="<<kflags.KBIN_MPI_NCPUS<<" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        }
+        Kmpi=FALSE;
       }
     } else {
       kflags.KBIN_MPI_NCPUS=aflags.AFLOW_GLOBAL_NCPUS;
       aus << "00000  MESSAGE MPI: NCPUS is overriden, taking NCPUS=" << kflags.KBIN_MPI_NCPUS << "  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
     }
-  
+
     if(kflags.KBIN_MPI_NCPUS<1) kflags.KBIN_MPI_NCPUS=1;                                              // DEFAULT NCPUS=troubles
-  
+
     if(kflags.KBIN_MPI_NCPUS==1) {
       kflags.KBIN_MPI=FALSE;
       aus << "00000  MESSAGE MPI: found NCPUS=1 " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -964,73 +978,73 @@ namespace KBIN {
     if(kflags.KBIN_MPI) {
       // get (string) kflags.KBIN_MPI_START
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]START=",TRUE)) {
-	kflags.KBIN_MPI_START=MPI_START_DEFAULT;
-	aus << "00000  MESSAGE MPI: START string is missing, taking START=\"" << kflags.KBIN_MPI_START << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_START=MPI_START_DEFAULT;
+        aus << "00000  MESSAGE MPI: START string is missing, taking START=\"" << kflags.KBIN_MPI_START << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_MPI_START=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]START=",TRUE),'"');
-	aus << "00000  MESSAGE MPI: found START=\"" << kflags.KBIN_MPI_START << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_START=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]START=",TRUE),'"');
+        aus << "00000  MESSAGE MPI: found START=\"" << kflags.KBIN_MPI_START << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       // get (string) kflags.KBIN_MPI_STOP
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]STOP=",TRUE)) {
-	kflags.KBIN_MPI_STOP=MPI_STOP_DEFAULT;
-	aus << "00000  MESSAGE MPI: STOP string is missing, taking STOP=\"" << kflags.KBIN_MPI_STOP << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_STOP=MPI_STOP_DEFAULT;
+        aus << "00000  MESSAGE MPI: STOP string is missing, taking STOP=\"" << kflags.KBIN_MPI_STOP << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_MPI_STOP=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]STOP=",TRUE),'"');
-	aus << "00000  MESSAGE MPI: found STOP=\"" << kflags.KBIN_MPI_STOP << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_STOP=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]STOP=",TRUE),'"');
+        aus << "00000  MESSAGE MPI: found STOP=\"" << kflags.KBIN_MPI_STOP << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       // get (string) kflags.KBIN_MPI_COMMAND
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]COMMAND=",TRUE)) {
-	kflags.KBIN_MPI_COMMAND=MPI_COMMAND_DEFAULT;
-	aus << "00000  MESSAGE MPI: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_MPI_COMMAND << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_COMMAND=MPI_COMMAND_DEFAULT;
+        aus << "00000  MESSAGE MPI: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_MPI_COMMAND << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_MPI_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]COMMAND=",TRUE),'"');
-	aus << "00000  MESSAGE MPI: found COMMAND=\"" << kflags.KBIN_MPI_COMMAND << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]COMMAND=",TRUE),'"');
+        aus << "00000  MESSAGE MPI: found COMMAND=\"" << kflags.KBIN_MPI_COMMAND << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       kflags.KBIN_MPI_AUTOTUNE=aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]AUTOTUNE",TRUE);
       if(kflags.KBIN_MPI_AUTOTUNE) {
-	aus << "00000  MESSAGE MPI: found AUTOTUNE option " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aus << "00000  MESSAGE MPI: input files WILL be auto-tuned for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        aus << "00000  MESSAGE MPI: found AUTOTUNE option " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE MPI: input files WILL be auto-tuned for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	aus << "00000  MESSAGE MPI: AUTOTUNE option NOT found " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aus << "00000  MESSAGE MPI: input files MUST be appropriate for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        aus << "00000  MESSAGE MPI: AUTOTUNE option NOT found " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aus << "00000  MESSAGE MPI: input files MUST be appropriate for PARALLEL execution with " << kflags.KBIN_MPI_NCPUS << " CPUs "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       // get (string) kflags.KBIN_MPI_BIN
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]BINARY=",TRUE)) {
-	kflags.KBIN_MPI_BIN=DEFAULT_VASP_MPI_BIN;
-	aus << "00000  MESSAGE MPI: BINARY string is missing, taking BIN=\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_BIN=DEFAULT_VASP_MPI_BIN;
+        aus << "00000  MESSAGE MPI: BINARY string is missing, taking BIN=\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_MPI_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]BINARY=",TRUE),'"');
-	aus << "00000  MESSAGE MPI: found BINARY=\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]BINARY=",TRUE),'"');
+        aus << "00000  MESSAGE MPI: found BINARY=\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
       // ME 190107 - Grab the serial binary to propagate into child aflow.in files
       if (aurostd::substring2bool(AflowIn, "[AFLOW_MODE_BINARY]")) {
         kflags.KBIN_SERIAL_BIN = aurostd::substring2string(AflowIn, "[AFLOW_MODE_BINARY]");
       } else if (aurostd::substring2bool(AflowIn, "[AFLOW_MODE_BINARY=")) {
-	kflags.KBIN_SERIAL_BIN = aurostd::RemoveCharacter(aurostd::substring2string(AflowIn, "[AFLOW_MODE_BINARY="), ']');
+        kflags.KBIN_SERIAL_BIN = aurostd::RemoveCharacter(aurostd::substring2string(AflowIn, "[AFLOW_MODE_BINARY="), ']');
       }
       aus << "00000  MESSAGE MPI: Overriding BINARY=\"" << kflags.KBIN_BIN << "\" to BINARY =\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       kflags.KBIN_BIN=kflags.KBIN_MPI_BIN;
-  
+
       // get (string) kflags.KBIN_MPI_OPTIONS
       if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI_MODE]OPTIONS=",TRUE)) {
-	kflags.KBIN_MPI_OPTIONS=VASP_OPTIONS_MPI_DEFAULT;
-	aus << "00000  MESSAGE MPI: OPTIONS string is missing, taking OPTIONS=\"" << kflags.KBIN_MPI_OPTIONS << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_OPTIONS=VASP_OPTIONS_MPI_DEFAULT;
+        aus << "00000  MESSAGE MPI: OPTIONS string is missing, taking OPTIONS=\"" << kflags.KBIN_MPI_OPTIONS << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-	kflags.KBIN_MPI_OPTIONS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]OPTIONS=",TRUE),'"');
-	aus << "00000  MESSAGE MPI: found OPTIONS=\"" << kflags.KBIN_MPI_OPTIONS << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
+        kflags.KBIN_MPI_OPTIONS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]OPTIONS=",TRUE),'"');
+        aus << "00000  MESSAGE MPI: found OPTIONS=\"" << kflags.KBIN_MPI_OPTIONS << "\"  " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
     }
   }
@@ -1075,7 +1089,7 @@ namespace KBIN {
     bool Krun=TRUE;
     //  int i;
     _kflags kflags;
-  
+
     if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
 
     if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
@@ -1085,189 +1099,189 @@ namespace KBIN {
       // ***************************************************************************
       // Check LOCK again
       if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) {
-	// ******* Directory is locked/skipped/unwritable
-	// LOCK/SKIP/UNWRITABLE exist, then RUN already RUN
-	if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
-	  aus << "LLLLL  LOCKED ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus << "LLLLL  LOCKED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	}
-	if(DirectorySkipped(aflags.Directory)) {
-	  aus << "LLLLL  SKIPPED ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus << "LLLLL  SKIPPED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	}
-	if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {
-	  aus << "LLLLL  ALREADY_IN_DATABASE ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus << "LLLLL  ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus << "LLLLL  ALREADY_IN_DATABASE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	}
-	if(DirectoryUnwritable(aflags.Directory)) {
-	  aus << "LLLLL  UNWRITABLE ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus << "LLLLL  UNWRITABLE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	}
-	//     exit(1);
+        // ******* Directory is locked/skipped/unwritable
+        // LOCK/SKIP/UNWRITABLE exist, then RUN already RUN
+        if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
+          aus << "LLLLL  LOCKED ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "LLLLL  LOCKED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        }
+        if(DirectorySkipped(aflags.Directory)) {
+          aus << "LLLLL  SKIPPED ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "LLLLL  SKIPPED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        }
+        if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {
+          aus << "LLLLL  ALREADY_IN_DATABASE ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "LLLLL  ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "LLLLL  ALREADY_IN_DATABASE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        }
+        if(DirectoryUnwritable(aflags.Directory)) {
+          aus << "LLLLL  UNWRITABLE ... bzzz ... KBIN::RUN_Directory "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus << "LLLLL  UNWRITABLE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        }
+        //     exit(1);
       } else {                                                                                                  // ******* Directory is fine
-	// make a dumb lock as soon as possible -------------------------------------
-	aus.clear();aus.str(std::string());
-	aus << "echo \"NNNNN  KBIN LOCK ASAP for NFS concurrent jobs (aflow" << string(AFLOW_VERSION) << ")\" >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
-	// aus << "/home/auro/bin/aflow -machine >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
-	// aus << XHOST.command("sensors") << " >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
-	aurostd::execute(aus);
-	// now change its permission
-	aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
-	// now the lock should be done ----------------------------------------------
-	ifstream FileAFLOWIN;string FileNameAFLOWIN;
-	FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_;
-	FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
-	if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
-	  aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-	} else {                                                                                                // ******* _AFLOWIN_ exists RUN    
-	  // ***************************************************************************
-	  // RESET LOCK
-	  ofstream FileLOCK;
-	  string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_;
-	  //	FileLOCK.open(FileNameLOCK.c_str(),std::ios::out);
-	  FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
-	  // ***************************************************************************
-	  // WRITE LOCK
-	  if(0) {
-	    aus <<    "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aus <<    "MMMMM  (C) "<<XHOST.Copyright_Years<<", Stefano Curtarolo - Duke University   - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aus <<    "MMMMM  High-Throughput ab-initio Computing - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // ***************************************************************************
-	    // WRITE AFLOW VERSION
-	    // aus << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    // aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  }
-	  // ***************************************************************************
-	  // START DIRECTORY
-	  aus      << "XXXXX  KBIN DIRECTORY BEGIN (aflow" << string(AFLOW_VERSION) << ")  "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  //	aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  aus      << "XXXXX  KBIN XHOST.CPU_Model : "<<  XHOST.CPU_Model << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus      << "XXXXX  KBIN XHOST.CPU_Cores : "<<  XHOST.CPU_Cores << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus      << "XXXXX  KBIN XHOST.CPU_MHz   : "<<  XHOST.CPU_MHz << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aus      << "XXXXX  KBIN XHOST.RAM_GB    : "<<  XHOST.RAM_GB << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  // ***************************************************************************
-	  // FLUSH & REOPEN to avoid double writing
-	  FileLOCK.flush();FileLOCK.close();FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
-	  // ***************************************************************************
-	  // NOW Digest AFLOWIN
-	  FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
-    //DX 20190125 [OBSOLETE] - need to remove null bytes : AflowIn.clear();char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ _AFLOWIN_ and put into AflowIn
-    AflowIn.clear();char c; while (FileAFLOWIN.get(c)) if(c!='\0'){AflowIn+=c;}               // READ _AFLOWIN_ and put into AflowIn //DX 20190125 - remove null bytes from AflowIn
-	  FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
-	  AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
-    vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn); //CO181226
-	  // ***************************************************************************
-	  // FIND MPI	
-	  kflags.KBIN_MPI= aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI]");  // search for MPI string
-	  // ***************************************************************************
-	  // FIND HOST
-	  // duke_beta	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_MPICH") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]BETA") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_BETA"))   // check DUKE_BETA
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // duke_beta_openmpi	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_OPENMPI") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]BETA_OPENMPI") ||    // check DUKE_BETA_OPENMPI
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_BETA_OPENMPI"))   // check DUKE_BETA_OPENMPI
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // duke_qrats	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_QRATS_MPICH") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]QRATS") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_QRATS"))   // check DUKE_QRATS
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // duke_qflow
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_QFLOW_OPENMPI") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]QFLOW") ||  //backwards compatible // CO 180409
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_QFLOW") || //backwards compatible // CO 180409
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]QUSER") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_QUSER"))   // check DUKE_QFLOW
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // mpcdf_eos	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]EOS") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_EOS"))   // check MPCDF_EOS
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // mpcdf_draco	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_DRACO") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DRACO") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_DRACO"))   // check MPCDF_DRACO
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // mpcdf_cobra	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_COBRA") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]COBRA") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_COBRA"))   // check MPCDF_COBRA
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // mpcdf_hydra	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_HYDRA") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]HYDRA") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_HYDRA"))   // check MPCDF_HYDRA
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
+        // make a dumb lock as soon as possible -------------------------------------
+        aus.clear();aus.str(std::string());
+        aus << "echo \"NNNNN  KBIN LOCK ASAP for NFS concurrent jobs (aflow" << string(AFLOW_VERSION) << ")\" >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
+        // aus << "/home/auro/bin/aflow -machine >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
+        // aus << XHOST.command("sensors") << " >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
+        aurostd::execute(aus);
+        // now change its permission
+        aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
+        // now the lock should be done ----------------------------------------------
+        ifstream FileAFLOWIN;string FileNameAFLOWIN;
+        FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_;
+        FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
+        if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
+          aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+        } else {                                                                                                // ******* _AFLOWIN_ exists RUN    
+          // ***************************************************************************
+          // RESET LOCK
+          ofstream FileLOCK;
+          string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_;
+          //	FileLOCK.open(FileNameLOCK.c_str(),std::ios::out);
+          FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
+          // ***************************************************************************
+          // WRITE LOCK
+          if(0) {
+            aus <<    "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aus <<    "MMMMM  (C) "<<XHOST.Copyright_Years<<", Stefano Curtarolo - Duke University   - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aus <<    "MMMMM  High-Throughput ab-initio Computing - " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // ***************************************************************************
+            // WRITE AFLOW VERSION
+            // aus << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            // aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          }
+          // ***************************************************************************
+          // START DIRECTORY
+          aus      << "XXXXX  KBIN DIRECTORY BEGIN (aflow" << string(AFLOW_VERSION) << ")  "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          //	aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          aus      << "XXXXX  KBIN XHOST.CPU_Model : "<<  XHOST.CPU_Model << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus      << "XXXXX  KBIN XHOST.CPU_Cores : "<<  XHOST.CPU_Cores << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus      << "XXXXX  KBIN XHOST.CPU_MHz   : "<<  XHOST.CPU_MHz << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aus      << "XXXXX  KBIN XHOST.RAM_GB    : "<<  XHOST.RAM_GB << "" << endl;// << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          // ***************************************************************************
+          // FLUSH & REOPEN to avoid double writing
+          FileLOCK.flush();FileLOCK.close();FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
+          // ***************************************************************************
+          // NOW Digest AFLOWIN
+          FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
+          //DX 20190125 [OBSOLETE] - need to remove null bytes : AflowIn.clear();char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ _AFLOWIN_ and put into AflowIn
+          AflowIn.clear();char c; while (FileAFLOWIN.get(c)) if(c!='\0'){AflowIn+=c;}               // READ _AFLOWIN_ and put into AflowIn //DX 20190125 - remove null bytes from AflowIn
+          FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
+          AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+          vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn); //CO181226
+          // ***************************************************************************
+          // FIND MPI	
+          kflags.KBIN_MPI= aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MPI]");  // search for MPI string
+          // ***************************************************************************
+          // FIND HOST
+          // duke_beta	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_MPICH") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]BETA") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_BETA"))   // check DUKE_BETA
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // duke_beta_openmpi	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_BETA_OPENMPI") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]BETA_OPENMPI") ||    // check DUKE_BETA_OPENMPI
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_BETA_OPENMPI"))   // check DUKE_BETA_OPENMPI
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // duke_qrats	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_QRATS_MPICH") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]QRATS") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_QRATS"))   // check DUKE_QRATS
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // duke_qflow
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_QFLOW_OPENMPI") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]QFLOW") ||  //backwards compatible // CO 180409
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_QFLOW") || //backwards compatible // CO 180409
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]QUSER") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_QUSER"))   // check DUKE_QFLOW
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // mpcdf_eos	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]EOS") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_EOS"))   // check MPCDF_EOS
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // mpcdf_draco	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_DRACO") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DRACO") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_DRACO"))   // check MPCDF_DRACO
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // mpcdf_cobra	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_COBRA") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]COBRA") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_COBRA"))   // check MPCDF_COBRA
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // mpcdf_hydra	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_HYDRA") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]HYDRA") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MPCDF_HYDRA"))   // check MPCDF_HYDRA
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
           //DX 20190509 - MACHINE001 - START
-	  // machine001	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE001") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE001"))   // check MACHINE001
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
+          // machine001	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE001") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE001"))   // check MACHINE001
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
           //DX 20190509 - MACHINE001 - END
           //DX 20190509 - MACHINE002 - START
           // machine002
           if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
-            aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE002") ||
-            aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE002"))   // check MACHINE002
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE002") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE002"))   // check MACHINE002
             aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
           if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {
             aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -1275,131 +1289,131 @@ namespace KBIN {
             kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
           }
           //DX 20190509 - MACHINE002 - END
-	  // duke_materials	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_MATERIALS") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MATERIALS") ||    // check DUKE_MATERIALS
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_MATERIALS"))   // check DUKE_MATERIALS
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // duke_aflowlib	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_AFLOWLIB") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]AFLOWLIB") ||    // check DUKE_AFLOWLIB
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_AFLOWLIB"))   // check DUKE_AFLOWLIB
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // duke_habana	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_HABANA") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]HABANA") ||    // check DUKE_HABANA
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_HABANA"))   // check DUKE_HABANA
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // fulton_marylou	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::FULTON_MARYLOU") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MARYLOU") ||    // check FULTON_MARYLOU
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]FULTON_MARYLOU"))   // check FULTON_MARYLOU
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // ohad	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::OHAD") || //CO181113
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE2") ||  // check MACHINE2
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE2"))   // check MACHINE2
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) { //CO181113
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
-	  // host1	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::HOST1") || //CO181113
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE1") ||  // check MACHINE1
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE1"))   // check MACHINE1
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          // duke_materials	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_MATERIALS") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MATERIALS") ||    // check DUKE_MATERIALS
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_MATERIALS"))   // check DUKE_MATERIALS
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // duke_aflowlib	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_AFLOWLIB") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]AFLOWLIB") ||    // check DUKE_AFLOWLIB
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_AFLOWLIB"))   // check DUKE_AFLOWLIB
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // duke_habana	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_HABANA") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]HABANA") ||    // check DUKE_HABANA
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]DUKE_HABANA"))   // check DUKE_HABANA
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // fulton_marylou	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::FULTON_MARYLOU") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MARYLOU") ||    // check FULTON_MARYLOU
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]FULTON_MARYLOU"))   // check FULTON_MARYLOU
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // ohad	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::OHAD") || //CO181113
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE2") ||  // check MACHINE2
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE2"))   // check MACHINE2
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) { //CO181113
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
+          // host1	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::HOST1") || //CO181113
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE1") ||  // check MACHINE1
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE1"))   // check MACHINE1
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
           if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) { //CO181113
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
           //DX 20190107 - CMU EULER - START
-	  // cmu_euler	
-	  if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::CMU_EULER") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]CMU_EULER") || 
-	     aurostd::substring2bool(AflowIn,"[AFLOW_HOST]CMU_EULER"))   // check CMU_EULER
-	    aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
-	  if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
-	    aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
-	  }
+          // cmu_euler	
+          if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::CMU_EULER") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]CMU_EULER") || 
+              aurostd::substring2bool(AflowIn,"[AFLOW_HOST]CMU_EULER"))   // check CMU_EULER
+            aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+          if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {
+            aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+          }
           //DX 20190107 - CMU EULER - END
 
-	  // ***************************************************************************
-	  // OTHER CHECKS FOR MPI
-	  // machines are done withing the VASP/ALIEN stuff, if necessary
-	  if(aflags.AFLOW_FORCE_MPI) kflags.KBIN_MPI=TRUE;      // forcing
-	  if(aflags.AFLOW_FORCE_SERIAL) kflags.KBIN_MPI=FALSE;  // forcing
+          // ***************************************************************************
+          // OTHER CHECKS FOR MPI
+          // machines are done withing the VASP/ALIEN stuff, if necessary
+          if(aflags.AFLOW_FORCE_MPI) kflags.KBIN_MPI=TRUE;      // forcing
+          if(aflags.AFLOW_FORCE_SERIAL) kflags.KBIN_MPI=FALSE;  // forcing
 
-	  kflags.KBIN_QSUB= aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]") && !aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE");  // search for QSUB string
-	  kflags.KBIN_QSUB_MODE1=aflags.AFLOW_MODE_QSUB_MODE1 || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE1"); // search for QSUB string mode1
-	  kflags.KBIN_QSUB_MODE2=aflags.AFLOW_MODE_QSUB_MODE2 || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE2"); // search for QSUB string mode2
-	  kflags.KBIN_QSUB_MODE3=aflags.AFLOW_MODE_QSUB_MODE3 || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE3"); // search for QSUB string mode3
-	  kflags.AFLOW_MODE_ALIEN=                                               // check ALIEN
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE=ALIEN]") ||             // check ALIEN
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ALIEN]") ||             // check ALIEN
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE]ALIEN");                // check ALIEN
-	  kflags.AFLOW_MODE_MATLAB=                                              // check MATLAB
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE=MATLAB]") ||            // check MATLAB
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MATLAB]") ||            // check MATLAB
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE]MATLAB");               // check MATLAB
-	  kflags.AFLOW_MODE_VASP=                                                // check VASP
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE=VASP]") ||              // check VASP
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE_VASP]") ||              // check VASP
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE]VASP");                 // check VASP
-	  kflags.AFLOW_MODE_AIMS=                                                // check AIMS
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE=AIMS]") ||              // check AIMS
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE_AIMS]") ||              // check AIMS
-	    aurostd::substring2bool(AflowIn,"[AFLOW_MODE]AIMS");                 // check AIMS
-    // CO 180406 - fix generate flags
-    if(aflags.KBIN_GEN_GENERAL){
-      if(kflags.AFLOW_MODE_AIMS && !aflags.KBIN_GEN_AIMS_FROM_AFLOWIN){aflags.KBIN_GEN_AIMS_FROM_AFLOWIN=true;} //very safe
-      if(kflags.AFLOW_MODE_VASP && !aflags.KBIN_GEN_VASP_FROM_AFLOWIN){aflags.KBIN_GEN_VASP_FROM_AFLOWIN=true;} //do vasp last, default
-    }
-	  kflags.KBIN_SYMMETRY_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]CALC",TRUE);
+          kflags.KBIN_QSUB= aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]") && !aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE");  // search for QSUB string
+          kflags.KBIN_QSUB_MODE1=aflags.AFLOW_MODE_QSUB_MODE1 || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE1"); // search for QSUB string mode1
+          kflags.KBIN_QSUB_MODE2=aflags.AFLOW_MODE_QSUB_MODE2 || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE2"); // search for QSUB string mode2
+          kflags.KBIN_QSUB_MODE3=aflags.AFLOW_MODE_QSUB_MODE3 || aurostd::substring2bool(AflowIn,"[AFLOW_MODE_QSUB]MODE3"); // search for QSUB string mode3
+          kflags.AFLOW_MODE_ALIEN=                                               // check ALIEN
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE=ALIEN]") ||             // check ALIEN
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ALIEN]") ||             // check ALIEN
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE]ALIEN");                // check ALIEN
+          kflags.AFLOW_MODE_MATLAB=                                              // check MATLAB
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE=MATLAB]") ||            // check MATLAB
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE_MATLAB]") ||            // check MATLAB
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE]MATLAB");               // check MATLAB
+          kflags.AFLOW_MODE_VASP=                                                // check VASP
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE=VASP]") ||              // check VASP
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE_VASP]") ||              // check VASP
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE]VASP");                 // check VASP
+          kflags.AFLOW_MODE_AIMS=                                                // check AIMS
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE=AIMS]") ||              // check AIMS
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE_AIMS]") ||              // check AIMS
+            aurostd::substring2bool(AflowIn,"[AFLOW_MODE]AIMS");                 // check AIMS
+          // CO 180406 - fix generate flags
+          if(aflags.KBIN_GEN_GENERAL){
+            if(kflags.AFLOW_MODE_AIMS && !aflags.KBIN_GEN_AIMS_FROM_AFLOWIN){aflags.KBIN_GEN_AIMS_FROM_AFLOWIN=true;} //very safe
+            if(kflags.AFLOW_MODE_VASP && !aflags.KBIN_GEN_VASP_FROM_AFLOWIN){aflags.KBIN_GEN_VASP_FROM_AFLOWIN=true;} //do vasp last, default
+          }
+          kflags.KBIN_SYMMETRY_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]CALC",TRUE);
           // DX - START
-	  kflags.KBIN_SYMMETRY_NO_SCAN  = aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]NO_SCAN",TRUE);
+          kflags.KBIN_SYMMETRY_NO_SCAN  = aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]NO_SCAN",TRUE);
           //cerr << kflags.KBIN_SYMMETRY_EPS << endl;
           if(aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]SYM_EPS=",TRUE)){
             kflags.KBIN_SYMMETRY_EPS      = aurostd::substring2utype<double>(AflowIn,"[AFLOW_SYMMETRY]SYM_EPS=",TRUE);
           }
           // DX - END
-	  // ---------------------------------------------------------
-	  // parameters for AAPL - CO - 170601
-    // to make backwards compatible, we need to not only look for substring, but need to see if "KAPPA=y"
-    // start with AAPL first, then QHA, then APL, they are mutually exclusive
-    aurostd::xoption KBIN_PHONONS_CALCULATION_AAPL;
-    KBIN_PHONONS_CALCULATION_AAPL.option=false;
-    KBIN_PHONONS_CALCULATION_AAPL.options2entry(AflowIn, string("[AFLOW_AAPL]KAPPA=|[AFLOW_PHONONS]KAPPA="), KBIN_PHONONS_CALCULATION_AAPL.option, KBIN_PHONONS_CALCULATION_AAPL.xscheme); // CO 170601
-	  KBIN_PHONONS_CALCULATION_AAPL.option |= aurostd::substring2bool(AflowIn,"[AFLOW_AAPL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AAPL]CALC",TRUE);  //legacy
-	  kflags.KBIN_PHONONS_CALCULATION_AAPL  = KBIN_PHONONS_CALCULATION_AAPL.option;
-	  // ---------------------------------------------------------
-	  // parameters for QHA - CO - 170601
-	  // to make backwards compatible, we need to not only look for substring, but need to see if "[AFLOW_QHA]CALC"
-    if(!kflags.KBIN_PHONONS_CALCULATION_AAPL){  //mutually exclusive
+          // ---------------------------------------------------------
+          // parameters for AAPL - CO - 170601
+          // to make backwards compatible, we need to not only look for substring, but need to see if "KAPPA=y"
+          // start with AAPL first, then QHA, then APL, they are mutually exclusive
+          aurostd::xoption KBIN_PHONONS_CALCULATION_AAPL;
+          KBIN_PHONONS_CALCULATION_AAPL.option=false;
+          KBIN_PHONONS_CALCULATION_AAPL.options2entry(AflowIn, string("[AFLOW_AAPL]KAPPA=|[AFLOW_PHONONS]KAPPA="), KBIN_PHONONS_CALCULATION_AAPL.option, KBIN_PHONONS_CALCULATION_AAPL.xscheme); // CO 170601
+          KBIN_PHONONS_CALCULATION_AAPL.option |= aurostd::substring2bool(AflowIn,"[AFLOW_AAPL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AAPL]CALC",TRUE);  //legacy
+          kflags.KBIN_PHONONS_CALCULATION_AAPL  = KBIN_PHONONS_CALCULATION_AAPL.option;
+          // ---------------------------------------------------------
+          // parameters for QHA - CO - 170601
+          // to make backwards compatible, we need to not only look for substring, but need to see if "[AFLOW_QHA]CALC"
+          if(!kflags.KBIN_PHONONS_CALCULATION_AAPL){  //mutually exclusive
 
             kflags.KBIN_PHONONS_CALCULATION_QHA=false;
             kflags.KBIN_PHONONS_CALCULATION_QHA_A=false;
@@ -1417,456 +1431,464 @@ namespace KBIN {
             kflags.KBIN_PHONONS_CALCULATION_SCQHA_C=false;
 
 
-	    kflags.KBIN_PHONONS_CALCULATION_QHA  = aurostd::substring2bool(AflowIn,"[AFLOW_QHA]CALC",TRUE) || aurostd::substring2bool(AflowIn,"VASP_QHA]CALC",TRUE);
+            kflags.KBIN_PHONONS_CALCULATION_QHA  = aurostd::substring2bool(AflowIn,"[AFLOW_QHA]CALC",TRUE) || aurostd::substring2bool(AflowIn,"VASP_QHA]CALC",TRUE);
             if(kflags.KBIN_PHONONS_CALCULATION_QHA)
             { //PN 180719
-	    vector<string> tokens;
-	    aurostd::xoption USER_QHA_OPTION; USER_QHA_OPTION.xscheme = "QHA,QHA3P,SCQHA"; 
-	    USER_QHA_OPTION.options2entry(AflowIn, string("[AFLOW_QHA]MODE="), USER_QHA_OPTION.option, USER_QHA_OPTION.xscheme);
-	    tokens.clear();
-            if(USER_QHA_OPTION.option)
-	      {
-		aurostd::string2tokens(USER_QHA_OPTION.content_string,tokens,",");
-		if(tokens.size()>0){
-		  kflags.KBIN_PHONONS_CALCULATION_QHA=false;
-		}
-		for(uint i=0; i<tokens.size(); i++){
-		  if(tokens[i].length()==3){
-		    if (tokens[i].find("QHA")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA=true;
-		    }
-		  } else if(tokens[i].length()==5){
-		    if (tokens[i].find("QHA_A")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA_A=true;
-		    } else if (tokens[i].find("QHA_B")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA_B=true;
-		    } else if (tokens[i].find("QHA_C")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA_C=true;
-		    }
-		  }
+              vector<string> tokens;
+              aurostd::xoption USER_QHA_OPTION; USER_QHA_OPTION.xscheme = "QHA,QHA3P,SCQHA"; 
+              USER_QHA_OPTION.options2entry(AflowIn, string("[AFLOW_QHA]MODE="), USER_QHA_OPTION.option, USER_QHA_OPTION.xscheme);
+              tokens.clear();
+              if(USER_QHA_OPTION.option)
+              {
+                aurostd::string2tokens(USER_QHA_OPTION.content_string,tokens,",");
+                if(tokens.size()>0){
+                  kflags.KBIN_PHONONS_CALCULATION_QHA=false;
+                }
+                for(uint i=0; i<tokens.size(); i++){
+                  if(tokens[i].length()==3){
+                    if (tokens[i].find("QHA")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA=true;
+                    }
+                  } else if(tokens[i].length()==5){
+                    if (tokens[i].find("QHA_A")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA_A=true;
+                    } else if (tokens[i].find("QHA_B")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA_B=true;
+                    } else if (tokens[i].find("QHA_C")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA_C=true;
+                    }
+                  }
 
-		  if(tokens[i].length()==5){
-		    if (tokens[i].find("SCQHA")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_SCQHA=true;
-		    }
-		  } else if(tokens[i].length()==7){
-		    if (tokens[i].find("SCQHA_A")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_SCQHA_A=true;
-		    } else if (tokens[i].find("SCQHA_B")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_SCQHA_B=true;
-		    }if (tokens[i].find("SCQHA_C")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_SCQHA_C=true;
-		    }
-		  }
+                  if(tokens[i].length()==5){
+                    if (tokens[i].find("SCQHA")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_SCQHA=true;
+                    }
+                  } else if(tokens[i].length()==7){
+                    if (tokens[i].find("SCQHA_A")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_SCQHA_A=true;
+                    } else if (tokens[i].find("SCQHA_B")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_SCQHA_B=true;
+                    }if (tokens[i].find("SCQHA_C")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_SCQHA_C=true;
+                    }
+                  }
 
-		  if(tokens[i].length()==5){
-		    if (tokens[i].find("QHA3P")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA3P=true;
-		    }
-		  } else if(tokens[i].length()==7){
-		    if (tokens[i].find("QHA3P_A")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA3P_A=true;
-		    } else if (tokens[i].find("QHA3P_B")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA3P_B=true;
-		    } else if (tokens[i].find("QHA3P_C")!=std::string::npos){
-		      kflags.KBIN_PHONONS_CALCULATION_QHA3P_C=true;
-		    }
-		  }
-		}
-	      }
-            //making some QHA options mutually exclusive //PN180705
-            if(kflags.KBIN_PHONONS_CALCULATION_QHA){ //PN180705
-              kflags.KBIN_PHONONS_CALCULATION_QHA_A  = false; //PN180705
-              kflags.KBIN_PHONONS_CALCULATION_QHA_B  = false; //PN180705
-              kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN180705
-            } else if(kflags.KBIN_PHONONS_CALCULATION_QHA_A){ //PN180705
-              kflags.KBIN_PHONONS_CALCULATION_QHA_B  = false; //PN180705
-              kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN180705
-            } else if(kflags.KBIN_PHONONS_CALCULATION_QHA_B){ //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN180705
-          }
-          //making some SC-QHA options mutually exclusive //PN180705
-          if(kflags.KBIN_PHONONS_CALCULATION_SCQHA){ //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_SCQHA_A  = false; //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_SCQHA_B  = false; //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN180705
-          } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA_A){ //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_SCQHA_B  = false; //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN180705
-          } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA_B){ //PN180705
-            kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN180705
-          }
-        }
-      /////////////////////////////
-      //aurostd::xoption KBIN_PHONONS_CALCULATION_QHA; //PN180705
-      //KBIN_PHONONS_CALCULATION_QHA.option=false; //PN180705
-      //KBIN_PHONONS_CALCULATION_QHA.options2entry(AflowIn, string("[AFLOW_QHA]GRUNEISEN=|[AFLOW_PHONONS]GRUNEISEN="), KBIN_PHONONS_CALCULATION_QHA.option, KBIN_PHONONS_CALCULATION_QHA.xscheme); // CO 170601 //PN180705
-      //KBIN_PHONONS_CALCULATION_QHA.option |= aurostd::substring2bool(AflowIn,"[AFLOW_QHA]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_QHA]CALC",TRUE); //legacy //PN180705
-      //kflags.KBIN_PHONONS_CALCULATION_QHA  = KBIN_PHONONS_CALCULATION_QHA.option; //PN180705
-    }
-	  // ---------------------------------------------------------
-	  // parameters for APL
-    if(!(kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA)){ //mutually exclusive
-	    kflags.KBIN_PHONONS_CALCULATION_APL  = aurostd::substring2bool(AflowIn,"[AFLOW_APL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_PHONONS]CALC",TRUE);
-    }
-	  // ---------------------------------------------------------
-	  // parameters for AGL (Debye Model)
-	  //Cormac created CALCSTRAINORIGIN, so we need to check [AFLOW_AEL]CALC vs. [AFLOW_AEL]CALCSTRAINORIGIN
-	  //kflags.KBIN_PHONONS_CALCULATION_AGL  = aurostd::substring2bool(AflowIn,"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_GIBBS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_GIBBS]CALC",TRUE);
-    for(uint i=0;i<vAflowIn.size()&&!kflags.KBIN_PHONONS_CALCULATION_AGL;i++){
-      if((aurostd::substring2bool(vAflowIn[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AGL]CALC",TRUE)) 
-          && !(
-            aurostd::substring2bool(vAflowIn[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AGL]CALC_",TRUE) ||
-            aurostd::substring2bool(vAflowIn[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AGL]CALCS",TRUE) ||
-            FALSE)){
-        kflags.KBIN_PHONONS_CALCULATION_AGL=true;
-      }
-    }
-	  // ---------------------------------------------------------
-	  // parameters for AEL (Elastic constants)
-	  //Cormac created CALCSTRAINORIGIN, so we need to check [AFLOW_AEL]CALC vs. [AFLOW_AEL]CALCSTRAINORIGIN
-    //kflags.KBIN_PHONONS_CALCULATION_AEL  = aurostd::substring2bool(AflowIn,"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AEL]CALC",TRUE);
-    for(uint i=0;i<vAflowIn.size()&&!kflags.KBIN_PHONONS_CALCULATION_AEL;i++){
-      if((aurostd::substring2bool(vAflowIn[i],"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AEL]CALC",TRUE)) 
-          && !(
-            aurostd::substring2bool(vAflowIn[i],"[AFLOW_AEL]CALC_",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AEL]CALC_",TRUE) ||
-            aurostd::substring2bool(vAflowIn[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AEL]CALCS",TRUE) ||
-            FALSE)){
-        kflags.KBIN_PHONONS_CALCULATION_AEL=true;
-      }
-    }
-	  // ---------------------------------------------------------
-	  // parameters for NEIGHBOURS
-	  kflags.KBIN_NEIGHBOURS_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_NEIGHBOURS]CALC",TRUE) || aurostd::substring2bool(AflowIn, "[AFLOW_NEIGHBORS]CALC");  // ME 190107 - Added American spelling
-	  // ---------------------------------------------------------
-	  // parameters for POCC CALCULATIONS, KESONG YANG
-	  kflags.KBIN_POCC=FALSE;
-	  kflags.KBIN_POCC_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_POCC]CALC",TRUE) && (aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE",TRUE) && aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",TRUE)); // CO 180419
-	  if(kflags.KBIN_POCC_CALCULATION) {
-	    aus << "00000  MESSAGE POCC_CALCULATION "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  }
-	  if(kflags.KBIN_POCC_CALCULATION) {kflags.KBIN_POCC=TRUE;} // CO 180419
-	  // ---------------------------------------------------------
-	  // parameters for FROZSL
-	  kflags.KBIN_FROZSL=FALSE;
-	  kflags.KBIN_PHONONS_CALCULATION_FROZSL  = aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]CALC",TRUE);
-	  if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {
-	    aus << "00000  MESSAGE FROZSL_CALCULATION "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  }
-	  kflags.KBIN_FROZSL_DOWNLOAD     = (aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]DOWN",TRUE) ||
-					     aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]DOWNLOAD",TRUE));
-	  if(kflags.KBIN_FROZSL_DOWNLOAD) {
-	    aus << "00000  MESSAGE FROZSL_DOWNLOAD "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  }
-	  if(kflags.KBIN_FROZSL_FILE) {
-	    aus << "00000  MESSAGE FROZSL_FILE "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  }
-	  kflags.KBIN_FROZSL_FILE  = aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]FILE",TRUE); // load of file somewhere else
-	  if(kflags.KBIN_PHONONS_CALCULATION_FROZSL || kflags.KBIN_FROZSL_DOWNLOAD|| kflags.KBIN_FROZSL_FILE) kflags.KBIN_FROZSL=TRUE;
-	  // ---------------------------------------------------------
-	  // the rest of symmetry stuff is seeked inside ivasp or
-	  if(kflags.AFLOW_MODE_ALIEN) {
-	    kflags.AFLOW_MODE_MATLAB=FALSE;                  // fix PRIORITY
-	    kflags.AFLOW_MODE_VASP=FALSE;                    // fix PRIORITY
-	    kflags.KBIN_MPI=FALSE;                           // fix PRIORITY
-	  }
-	  if(kflags.AFLOW_MODE_MATLAB) {
-	    kflags.AFLOW_MODE_VASP=FALSE;                    // fix PRIORITY
-	    kflags.KBIN_MPI=FALSE;
-	  }
-	  if(LDEBUG) cout << "DEBUG kflags.AFLOW_MODE_ALIEN=" << kflags.AFLOW_MODE_ALIEN << endl;
-	  if(LDEBUG) cout << "DEBUG kflags.AFLOW_MODE_MATLAB=" << kflags.AFLOW_MODE_MATLAB << endl;
-	  if(LDEBUG) cout << "DEBUG kflags.AFLOW_MODE_VASP=" << kflags.AFLOW_MODE_VASP << endl;
-	  // ***************************************************************************
-	  // ZIP COMPRESS
-	  // ***************************************************************************
-	  kflags.KZIP_COMPRESS=TRUE;
-	  aurostd::StringstreamClean(aus);
-	  if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP=none]") ||
-	     aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP=NONE]") ||
-	     !aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP")) {
-	    kflags.KZIP_COMPRESS=FALSE;
-	    for(int i=0;i<1;i++) {
-	      aus << "WWWWW  Warning no compression of output files... " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintWarningStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	  } else {
-	    if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP")) { // "[AFLOW_MODE_ZIP=" not found
-	      kflags.KZIP_BIN=DEFAULT_KZIP_BIN;  // take default
-	      aus << "00000  MESSAGE Taking DEFAULT KZIP_BIN=\"" << kflags.KZIP_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	    if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP]")) { // "[AFLOW_MODE_ZIP]" not found
-	      kflags.KZIP_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_ZIP]");
-	      aus << "00000  MESSAGE Taking KZIP_BIN=\"" << kflags.KZIP_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	    if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP=")) { // "[AFLOW_MODE_ZIP=" found
-	      kflags.KZIP_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_ZIP="),']');
-	      aus << "00000  MESSAGE Taking KZIP_BIN=\"" << kflags.KZIP_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	  }
-	  // ************************************************************************************************************************************
-	  // Get the KZIP_BIN name - moved inside EACH mode
-	  // ************************************************************************************************************************************
-	  // LOAD PREFIX POSTFIX
-	  KBIN::StartStopCheck(AflowIn,"[AFLOW_MODE_PRESCRIPT]",kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT,kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP);
-	  KBIN::StartStopCheck(AflowIn,"[AFLOW_MODE_POSTSCRIPT]",kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT,kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP);
-	  if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT) {  // [AFLOW_MODE_PRESCRIPT] construction
-	    aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]");
-	  }
-	  if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
-	    aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP");
-	  }
-	  if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT) {  // [AFLOW_MODE_POSTSCRIPT] construction
-	    aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]");
-	  }
-	  if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
-	    aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP");
-	  }
-	  if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
-	    aurostd::stringstream2file(kflags.AFLOW_MODE_PRESCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
-	    aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
-	  }
-	  if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
-	    aurostd::stringstream2file(kflags.AFLOW_MODE_POSTSCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
-	    aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
-	  }
-	  // ************************************************************************************************************************************
-	  // ALIEN MODE
-	  if(kflags.AFLOW_MODE_ALIEN) {
-	    AflowInMode="[AFLOW_MODE=ALIEN]";
-	    aus      << "00000  MESSAGE [AFLOW_MODE=ALIEN] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // ***************************************************************************
-	    // Getting KBIN_BIN
-	    kflags.KBIN_BIN = DEFAULT_KBIN_ALIEN_BIN;  // take default
-	    aurostd::StringstreamClean(aus);
-	    if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY")) { // "[AFLOW_MODE_BINARY=" not found
-	      kflags.KBIN_BIN=DEFAULT_KBIN_ALIEN_BIN;  // take default
-	      aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	    if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY]")) { // "[AFLOW_MODE_BINARY]" not found
-	      kflags.KBIN_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY]");
-	      aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	    if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" found
-	      kflags.KBIN_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
-	      aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-            // ME 190107 - Grab the serial binary to propagate into child aflow.in files
-            kflags.KBIN_SERIAL_BIN = kflags.KBIN_BIN;
-	    // ***************************************************************************
-	    // ALIEN MODE  // must contain EMAIL perform
-	    if(Krun) {
-	      kflags.AFLOW_MODE_EMAIL            =
-		aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
-		aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL") ;
-	      Krun=(Krun && ALIEN::Run_Directory(FileLOCK,aflags,kflags));
-	    }
-	    // ***************************************************************************
-	    // COMPRESS
-	    if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
-	  }
-	  // ************************************************************************************************************************************
-	  // MATLAB MODE
-	  if(kflags.AFLOW_MODE_MATLAB) {
-	    AflowInMode="[AFLOW_MODE=MATLAB]";
-	    aus      << "00000  MESSAGE [AFLOW_MODE=MATLAB] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // ***************************************************************************
-	    // MATLAB MODE  // must contain EMAIL perform
-	    if(Krun) {
-	      kflags.AFLOW_MODE_EMAIL            =
-		aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
-		aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL") ;
-	      aurostd::CommandRequired(DEFAULT_KBIN_MATLAB_BIN); // MATLAB MUST BE AVAILABLE
-	      Krun=(Krun && KBIN_MATLAB_Directory(FileLOCK,aflags,kflags));
-	    }
-	    // ***************************************************************************
-	    // COMPRESS
-	    if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
-	    Krun=FALSE;
-	  }
-	  // ************************************************************************************************************************************
-            // AIMS MODE
-            if(kflags.AFLOW_MODE_AIMS) {
-              AflowInMode="[AFLOW_MODE=AIMS]";
-              aus      << "00000  MESSAGE [AFLOW_MODE=AIMS] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-              aurostd::StringstreamClean(aus);
-              if(1){  //no support yet
-                // ***************************************************************************
-                // Getting KBIN_BIN
-                kflags.KBIN_BIN = DEFAULT_AIMS_BIN;  // take default  dont touch MPI as it has already been dealt by  KBIN::MPI_Extract
-                if(kflags.KBIN_MPI==FALSE) { // only if no MPI is specified
-                  if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY")) { // "[AFLOW_MODE_BINARY=" not found
-                    kflags.KBIN_BIN=DEFAULT_AIMS_BIN;  // take default
-                    aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-                    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+                  if(tokens[i].length()==5){
+                    if (tokens[i].find("QHA3P")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA3P=true;
+                    }
+                  } else if(tokens[i].length()==7){
+                    if (tokens[i].find("QHA3P_A")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA3P_A=true;
+                    } else if (tokens[i].find("QHA3P_B")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA3P_B=true;
+                    } else if (tokens[i].find("QHA3P_C")!=std::string::npos){
+                      kflags.KBIN_PHONONS_CALCULATION_QHA3P_C=true;
+                    }
                   }
-                  if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY]")) { // "[AFLOW_MODE_BINARY]" not found
-                    kflags.KBIN_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY]");
-                    aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-                    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-                  }
-                  if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" found
-                    kflags.KBIN_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
-                    aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-                    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-                  }
-                  // ME 190107 - Grab the serial binary to propagate into child aflow.in files
-                  kflags.KBIN_SERIAL_BIN = kflags.KBIN_BIN;
-                } else {
-                  kflags.KBIN_BIN=kflags.KBIN_MPI_BIN;
-                  aus << "00000  MESSAGE Taking KBIN_BIN=KBIN_MPI_BIN=\"" << kflags.KBIN_MPI_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-                  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
                 }
               }
-              // ***************************************************************************
-              // AIMS MODE  // must contain EMAIL perform
-              if(Krun) {
-                kflags.AFLOW_MODE_EMAIL            =
-                  aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
-                  aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL");
-                Krun=(Krun && KBIN::AIMS_Directory(FileLOCK,aflags,kflags));
+              //making some QHA options mutually exclusive //PN180705
+              if(kflags.KBIN_PHONONS_CALCULATION_QHA){ //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_QHA_A  = false; //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_QHA_B  = false; //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN180705
+              } else if(kflags.KBIN_PHONONS_CALCULATION_QHA_A){ //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_QHA_B  = false; //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN180705
+              } else if(kflags.KBIN_PHONONS_CALCULATION_QHA_B){ //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_QHA_C  = false; //PN180705
               }
-              // ***************************************************************************
-              // COMPRESS
-              if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+              //making some SC-QHA options mutually exclusive //PN180705
+              if(kflags.KBIN_PHONONS_CALCULATION_SCQHA){ //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_SCQHA_A  = false; //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_SCQHA_B  = false; //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN180705
+              } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA_A){ //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_SCQHA_B  = false; //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN180705
+              } else if(kflags.KBIN_PHONONS_CALCULATION_SCQHA_B){ //PN180705
+                kflags.KBIN_PHONONS_CALCULATION_SCQHA_C  = false; //PN180705
+              }
             }
-            // ************************************************************************************************************************************
-	  // MPI SWTICHES
-	  if(kflags.KBIN_MPI) KBIN::MPI_Extract(AflowIn,FileLOCK,aflags,kflags);
-	  // ************************************************************************************************************************************
-	  // ************************************************************************************************************************************
-	  // VASP MODE
-	  if(kflags.AFLOW_MODE_VASP) {
-	    AflowInMode="[AFLOW_MODE=VASP]";
-	    aus      << "00000  MESSAGE [AFLOW_MODE=VASP] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // ***************************************************************************
-	    // Getting KBIN_BIN
-	    kflags.KBIN_BIN = DEFAULT_VASP_BIN;  // take default  dont touch MPI as it has already been dealt by  KBIN::MPI_Extract
-	    aurostd::StringstreamClean(aus);
-	    // old Get BIN
-	    // 	  if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" not found
-	    // 	    aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    // 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // 	    //   cerr << "take KBIN=" << kflags.KBIN_BIN << endl;
-	    // 	  } else {
-	    // 	    kflags.KBIN_BIN = aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
-	    // 	    aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    // 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // 	  }
-	    if(kflags.KBIN_MPI==FALSE) { // only if no MPI is specified
-	      if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY")) { // "[AFLOW_MODE_BINARY=" not found
-		kflags.KBIN_BIN=DEFAULT_VASP_BIN;  // take default
-		aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	      }
-	      if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY]")) { // "[AFLOW_MODE_BINARY]" not found
-		kflags.KBIN_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY]");
-		aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	      }
-	      if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" found
-		kflags.KBIN_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
-		aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-		aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	      }
+            /////////////////////////////
+            //aurostd::xoption KBIN_PHONONS_CALCULATION_QHA; //PN180705
+            //KBIN_PHONONS_CALCULATION_QHA.option=false; //PN180705
+            //KBIN_PHONONS_CALCULATION_QHA.options2entry(AflowIn, string("[AFLOW_QHA]GRUNEISEN=|[AFLOW_PHONONS]GRUNEISEN="), KBIN_PHONONS_CALCULATION_QHA.option, KBIN_PHONONS_CALCULATION_QHA.xscheme); // CO 170601 //PN180705
+            //KBIN_PHONONS_CALCULATION_QHA.option |= aurostd::substring2bool(AflowIn,"[AFLOW_QHA]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_QHA]CALC",TRUE); //legacy //PN180705
+            //kflags.KBIN_PHONONS_CALCULATION_QHA  = KBIN_PHONONS_CALCULATION_QHA.option; //PN180705
+          }
+          // ---------------------------------------------------------
+          // parameters for APL
+          if(!(kflags.KBIN_PHONONS_CALCULATION_AAPL || kflags.KBIN_PHONONS_CALCULATION_QHA)){ //mutually exclusive
+            kflags.KBIN_PHONONS_CALCULATION_APL  = aurostd::substring2bool(AflowIn,"[AFLOW_APL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_PHONONS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_PHONONS]CALC",TRUE);
+          }
+          // ---------------------------------------------------------
+          // parameters for AGL (Debye Model)
+          //Cormac created CALCSTRAINORIGIN, so we need to check [AFLOW_AEL]CALC vs. [AFLOW_AEL]CALCSTRAINORIGIN
+          //kflags.KBIN_PHONONS_CALCULATION_AGL  = aurostd::substring2bool(AflowIn,"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[AFLOW_GIBBS]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_GIBBS]CALC",TRUE);
+          for(uint i=0;i<vAflowIn.size()&&!kflags.KBIN_PHONONS_CALCULATION_AGL;i++){
+            if((aurostd::substring2bool(vAflowIn[i],"[AFLOW_AGL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AGL]CALC",TRUE)) 
+                && !(
+                  aurostd::substring2bool(vAflowIn[i],"[AFLOW_AGL]CALC_",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AGL]CALC_",TRUE) ||
+                  aurostd::substring2bool(vAflowIn[i],"[AFLOW_AGL]CALCS",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AGL]CALCS",TRUE) ||
+                  FALSE)){
+              kflags.KBIN_PHONONS_CALCULATION_AGL=true;
+            }
+          }
+          // ---------------------------------------------------------
+          // parameters for AEL (Elastic constants)
+          //Cormac created CALCSTRAINORIGIN, so we need to check [AFLOW_AEL]CALC vs. [AFLOW_AEL]CALCSTRAINORIGIN
+          //kflags.KBIN_PHONONS_CALCULATION_AEL  = aurostd::substring2bool(AflowIn,"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AEL]CALC",TRUE);
+          for(uint i=0;i<vAflowIn.size()&&!kflags.KBIN_PHONONS_CALCULATION_AEL;i++){
+            if((aurostd::substring2bool(vAflowIn[i],"[AFLOW_AEL]CALC",TRUE) || aurostd::substring2bool(AflowIn,"[VASP_AEL]CALC",TRUE)) 
+                && !(
+                  aurostd::substring2bool(vAflowIn[i],"[AFLOW_AEL]CALC_",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AEL]CALC_",TRUE) ||
+                  aurostd::substring2bool(vAflowIn[i],"[AFLOW_AEL]CALCS",TRUE) || aurostd::substring2bool(vAflowIn[i],"[VASP_AEL]CALCS",TRUE) ||
+                  FALSE)){
+              kflags.KBIN_PHONONS_CALCULATION_AEL=true;
+            }
+          }
+          // ---------------------------------------------------------
+          // parameters for NEIGHBOURS
+          kflags.KBIN_NEIGHBOURS_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_NEIGHBOURS]CALC",TRUE) || aurostd::substring2bool(AflowIn, "[AFLOW_NEIGHBORS]CALC");  // ME 190107 - Added American spelling
+          // ---------------------------------------------------------
+          // parameters for POCC CALCULATIONS, KESONG YANG
+          kflags.KBIN_POCC=FALSE;
+          kflags.KBIN_POCC_CALCULATION  = aurostd::substring2bool(AflowIn,"[AFLOW_POCC]CALC",TRUE) && (aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE",TRUE) && aurostd::substring2bool(AflowIn,"[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",TRUE)); // CO 180419
+          if(kflags.KBIN_POCC_CALCULATION) {
+            aus << "00000  MESSAGE POCC_CALCULATION "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          }
+          if(kflags.KBIN_POCC_CALCULATION) {kflags.KBIN_POCC=TRUE;} // CO 180419
+          if(kflags.KBIN_POCC){ //CO191110
+            kflags.KBIN_POCC_TEMPERATURE_STRING=aurostd::substring2string(AflowIn,"[AFLOW_POCC]TEMPERATURE=");  //CO191110
+            if(kflags.KBIN_POCC_TEMPERATURE_STRING.empty()){  //CO191110
+              kflags.KBIN_POCC_TEMPERATURE_STRING=DEFAULT_POCC_TEMPERATURE_STRING;  //CO191110
+            }
+            aus << "00000  MESSAGE POCC_TEMPERATURE_STRING=" << kflags.KBIN_POCC_TEMPERATURE_STRING << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;  //CO191110
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);  //CO191110
+          }
+          // ---------------------------------------------------------
+          // parameters for FROZSL
+          kflags.KBIN_FROZSL=FALSE;
+          kflags.KBIN_PHONONS_CALCULATION_FROZSL  = aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]CALC",TRUE);
+          if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {
+            aus << "00000  MESSAGE FROZSL_CALCULATION "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          }
+          kflags.KBIN_FROZSL_DOWNLOAD     = (aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]DOWN",TRUE) ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]DOWNLOAD",TRUE));
+          if(kflags.KBIN_FROZSL_DOWNLOAD) {
+            aus << "00000  MESSAGE FROZSL_DOWNLOAD "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          }
+          if(kflags.KBIN_FROZSL_FILE) {
+            aus << "00000  MESSAGE FROZSL_FILE "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          }
+          kflags.KBIN_FROZSL_FILE  = aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]FILE",TRUE); // load of file somewhere else
+          if(kflags.KBIN_PHONONS_CALCULATION_FROZSL || kflags.KBIN_FROZSL_DOWNLOAD|| kflags.KBIN_FROZSL_FILE) kflags.KBIN_FROZSL=TRUE;
+          // ---------------------------------------------------------
+          // the rest of symmetry stuff is seeked inside ivasp or
+          if(kflags.AFLOW_MODE_ALIEN) {
+            kflags.AFLOW_MODE_MATLAB=FALSE;                  // fix PRIORITY
+            kflags.AFLOW_MODE_VASP=FALSE;                    // fix PRIORITY
+            kflags.KBIN_MPI=FALSE;                           // fix PRIORITY
+          }
+          if(kflags.AFLOW_MODE_MATLAB) {
+            kflags.AFLOW_MODE_VASP=FALSE;                    // fix PRIORITY
+            kflags.KBIN_MPI=FALSE;
+          }
+          if(LDEBUG) cout << "DEBUG kflags.AFLOW_MODE_ALIEN=" << kflags.AFLOW_MODE_ALIEN << endl;
+          if(LDEBUG) cout << "DEBUG kflags.AFLOW_MODE_MATLAB=" << kflags.AFLOW_MODE_MATLAB << endl;
+          if(LDEBUG) cout << "DEBUG kflags.AFLOW_MODE_VASP=" << kflags.AFLOW_MODE_VASP << endl;
+          // ***************************************************************************
+          // ZIP COMPRESS
+          // ***************************************************************************
+          kflags.KZIP_COMPRESS=TRUE;
+          aurostd::StringstreamClean(aus);
+          if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP=none]") ||
+              aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP=NONE]") ||
+              !aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP")) {
+            kflags.KZIP_COMPRESS=FALSE;
+            for(int i=0;i<1;i++) {
+              aus << "WWWWW  Warning no compression of output files... " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintWarningStream(FileLOCK,aus,XHOST.QUIET);
+            }
+          } else {
+            if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP")) { // "[AFLOW_MODE_ZIP=" not found
+              kflags.KZIP_BIN=DEFAULT_KZIP_BIN;  // take default
+              aus << "00000  MESSAGE Taking DEFAULT KZIP_BIN=\"" << kflags.KZIP_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+            if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP]")) { // "[AFLOW_MODE_ZIP]" not found
+              kflags.KZIP_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_ZIP]");
+              aus << "00000  MESSAGE Taking KZIP_BIN=\"" << kflags.KZIP_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+            if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_ZIP=")) { // "[AFLOW_MODE_ZIP=" found
+              kflags.KZIP_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_ZIP="),']');
+              aus << "00000  MESSAGE Taking KZIP_BIN=\"" << kflags.KZIP_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+          }
+          // ************************************************************************************************************************************
+          // Get the KZIP_BIN name - moved inside EACH mode
+          // ************************************************************************************************************************************
+          // LOAD PREFIX POSTFIX
+          KBIN::StartStopCheck(AflowIn,"[AFLOW_MODE_PRESCRIPT]",kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT,kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP);
+          KBIN::StartStopCheck(AflowIn,"[AFLOW_MODE_POSTSCRIPT]",kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT,kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP);
+          if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT) {  // [AFLOW_MODE_PRESCRIPT] construction
+            aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]");
+          }
+          if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
+            aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP");
+          }
+          if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT) {  // [AFLOW_MODE_POSTSCRIPT] construction
+            aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]");
+          }
+          if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
+            aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << " " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP");
+          }
+          if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
+            aurostd::stringstream2file(kflags.AFLOW_MODE_PRESCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
+            aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
+          }
+          if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
+            aurostd::stringstream2file(kflags.AFLOW_MODE_POSTSCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
+            aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
+          }
+          // ************************************************************************************************************************************
+          // ALIEN MODE
+          if(kflags.AFLOW_MODE_ALIEN) {
+            AflowInMode="[AFLOW_MODE=ALIEN]";
+            aus      << "00000  MESSAGE [AFLOW_MODE=ALIEN] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // ***************************************************************************
+            // Getting KBIN_BIN
+            kflags.KBIN_BIN = DEFAULT_KBIN_ALIEN_BIN;  // take default
+            aurostd::StringstreamClean(aus);
+            if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY")) { // "[AFLOW_MODE_BINARY=" not found
+              kflags.KBIN_BIN=DEFAULT_KBIN_ALIEN_BIN;  // take default
+              aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+            if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY]")) { // "[AFLOW_MODE_BINARY]" not found
+              kflags.KBIN_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY]");
+              aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+            if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" found
+              kflags.KBIN_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
+              aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+            // ME 190107 - Grab the serial binary to propagate into child aflow.in files
+            kflags.KBIN_SERIAL_BIN = kflags.KBIN_BIN;
+            // ***************************************************************************
+            // ALIEN MODE  // must contain EMAIL perform
+            if(Krun) {
+              kflags.AFLOW_MODE_EMAIL            =
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL") ;
+              Krun=(Krun && ALIEN::Run_Directory(FileLOCK,aflags,kflags));
+            }
+            // ***************************************************************************
+            // COMPRESS
+            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+          }
+          // ************************************************************************************************************************************
+          // MATLAB MODE
+          if(kflags.AFLOW_MODE_MATLAB) {
+            AflowInMode="[AFLOW_MODE=MATLAB]";
+            aus      << "00000  MESSAGE [AFLOW_MODE=MATLAB] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // ***************************************************************************
+            // MATLAB MODE  // must contain EMAIL perform
+            if(Krun) {
+              kflags.AFLOW_MODE_EMAIL            =
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL") ;
+              aurostd::CommandRequired(DEFAULT_KBIN_MATLAB_BIN); // MATLAB MUST BE AVAILABLE
+              Krun=(Krun && KBIN_MATLAB_Directory(FileLOCK,aflags,kflags));
+            }
+            // ***************************************************************************
+            // COMPRESS
+            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+            Krun=FALSE;
+          }
+          // ************************************************************************************************************************************
+          // AIMS MODE
+          if(kflags.AFLOW_MODE_AIMS) {
+            AflowInMode="[AFLOW_MODE=AIMS]";
+            aus      << "00000  MESSAGE [AFLOW_MODE=AIMS] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            aurostd::StringstreamClean(aus);
+            if(1){  //no support yet
+              // ***************************************************************************
+              // Getting KBIN_BIN
+              kflags.KBIN_BIN = DEFAULT_AIMS_BIN;  // take default  dont touch MPI as it has already been dealt by  KBIN::MPI_Extract
+              if(kflags.KBIN_MPI==FALSE) { // only if no MPI is specified
+                if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY")) { // "[AFLOW_MODE_BINARY=" not found
+                  kflags.KBIN_BIN=DEFAULT_AIMS_BIN;  // take default
+                  aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+                }
+                if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY]")) { // "[AFLOW_MODE_BINARY]" not found
+                  kflags.KBIN_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY]");
+                  aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+                }
+                if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" found
+                  kflags.KBIN_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
+                  aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+                }
+                // ME 190107 - Grab the serial binary to propagate into child aflow.in files
+                kflags.KBIN_SERIAL_BIN = kflags.KBIN_BIN;
+              } else {
+                kflags.KBIN_BIN=kflags.KBIN_MPI_BIN;
+                aus << "00000  MESSAGE Taking KBIN_BIN=KBIN_MPI_BIN=\"" << kflags.KBIN_MPI_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+              }
+            }
+            // ***************************************************************************
+            // AIMS MODE  // must contain EMAIL perform
+            if(Krun) {
+              kflags.AFLOW_MODE_EMAIL            =
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL");
+              Krun=(Krun && KBIN::AIMS_Directory(FileLOCK,aflags,kflags));
+            }
+            // ***************************************************************************
+            // COMPRESS
+            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+          }
+          // ************************************************************************************************************************************
+          // MPI SWTICHES
+          if(kflags.KBIN_MPI) KBIN::MPI_Extract(AflowIn,FileLOCK,aflags,kflags);
+          // ************************************************************************************************************************************
+          // ************************************************************************************************************************************
+          // VASP MODE
+          if(kflags.AFLOW_MODE_VASP) {
+            AflowInMode="[AFLOW_MODE=VASP]";
+            aus      << "00000  MESSAGE [AFLOW_MODE=VASP] found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // ***************************************************************************
+            // Getting KBIN_BIN
+            kflags.KBIN_BIN = DEFAULT_VASP_BIN;  // take default  dont touch MPI as it has already been dealt by  KBIN::MPI_Extract
+            aurostd::StringstreamClean(aus);
+            // old Get BIN
+            // 	  if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" not found
+            // 	    aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            // 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // 	    //   cerr << "take KBIN=" << kflags.KBIN_BIN << endl;
+            // 	  } else {
+            // 	    kflags.KBIN_BIN = aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
+            // 	    aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            // 	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // 	  }
+            if(kflags.KBIN_MPI==FALSE) { // only if no MPI is specified
+              if(!aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY")) { // "[AFLOW_MODE_BINARY=" not found
+                kflags.KBIN_BIN=DEFAULT_VASP_BIN;  // take default
+                aus << "00000  MESSAGE Taking DEFAULT KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+              }
+              if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY]")) { // "[AFLOW_MODE_BINARY]" not found
+                kflags.KBIN_BIN=aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY]");
+                aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+              }
+              if(aurostd::substring2bool(AflowIn,"[AFLOW_MODE_BINARY=")) { // "[AFLOW_MODE_BINARY=" found
+                kflags.KBIN_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_BINARY="),']');
+                aus << "00000  MESSAGE Taking KBIN_BIN=\"" << kflags.KBIN_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+                aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+              }
               // ME 190107 - Grab the serial binary to propagate into child aflow.in files
               kflags.KBIN_SERIAL_BIN = kflags.KBIN_BIN;
-	    } else {
-	      kflags.KBIN_BIN=kflags.KBIN_MPI_BIN;
-	      aus << "00000  MESSAGE Taking KBIN_BIN=KBIN_MPI_BIN=\"" << kflags.KBIN_MPI_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    }
-	    // ***************************************************************************
-	    // VASP MODE  // must contain EMAIL perform
-	    if(Krun) {
-	      kflags.AFLOW_MODE_EMAIL            =
-		aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
-		aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL");
-	      Krun=(Krun && KBIN::VASP_Directory(FileLOCK,aflags,kflags));
-	    }
-	    // ***************************************************************************
-	    // COMPRESS
-	    if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
-	  }
-	  // ************************************************************************************************************************************
-	  // MATLAB MODE
-	  if(kflags.KBIN_PHONONS_CALCULATION_FROZSL && !kflags.AFLOW_MODE_VASP) {
-	    AflowInMode="[AFLOW_FROZSL]CALC ";
-	    aus      << "00000  MESSAGE [AFLOW_FROZSL]CALC found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	    // PRESCRIPT
-	    if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
-	      KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
-	    // POSTSCRIPT
-	    if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
-	      KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
-	  }
-	  // ************************************************************************************************************************************
-	  // NO MODE MODE
-            if(!kflags.AFLOW_MODE_VASP && !kflags.AFLOW_MODE_AIMS && !kflags.AFLOW_MODE_MATLAB && !kflags.AFLOW_MODE_ALIEN && !kflags.KBIN_PHONONS_CALCULATION_FROZSL) {
-	    aus << "EEEEE  [AFLOW_MODE=????] invalid found in     "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aus << "EEEEE  [AFLOW_MODE=ALIEN]        is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aus << "EEEEE  [AFLOW_MODE=MATLAB]       is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aus << "EEEEE  [AFLOW_MODE=VASP]         is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aus << "EEEEE  [AFLOW_FROZSL]CALC        is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	    aurostd::PrintErrorStream(FileLOCK,aus,XHOST.QUIET);
-	  }
-	  // ***************************************************************************
-	  // FINALIZE AFLOWIN
-	  // DONE, turn OFF the flag
-	  kflags.AFLOW_MODE_VASP=FALSE;    
-	  // ***************************************************************************
-	  // FINALIZE LOCK
-	  aus << "XXXXX  KBIN DIRECTORY END (aflow" << string(AFLOW_VERSION) << ")  "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  // ***************************************************************************
-	  // PREPARE MESSAGE FOR LOG TO BE INTERCEPTED IN COMPRESSION
-	  aus << "XXXXX  KBIN_DIRECTORY_END " << aflags.Directory << endl;
-	  aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-	  // ***************************************************************************
-	  // FINALIZE LOCK
-	  FileLOCK.clear();FileLOCK.close();
-	  // ***************************************************************************
-    // NFS cache-cleaning HACK, opendir() and closedir() to invalidate cache
-    // https://stackoverflow.com/questions/8311710/nfs-cache-cleaning-command
-    // CO 171106
-    vector<string> vfiles_dummyls;
-    aurostd::DirectoryLS(aflags.Directory,vfiles_dummyls);
-	  // ***************************************************************************
-	  // WRITE END
-	  aurostd::string2file(string(Message(aflags,"user,host,time",_AFLOW_FILE_NAME_)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
-	  // ***************************************************************************
-	  // MAKE READEABLE
-	  aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
-	  aus.clear();aus.str(std::string());
-	  aus << "cp " << aflags.Directory << "/" << _AFLOWLOCK_ << " " << aflags.Directory << "/" << _AFLOWLOCK_ << "." << string(AFLOW_VERSION) << endl;  
-	  aurostd::execute(aus);  
-	  aurostd::ChmodFile("664",string(aflags.Directory+"/*"));
-	  aurostd::ChmodFile("777",string(aflags.Directory+"/*"));
-	}
-	FileAFLOWIN.clear();FileAFLOWIN.close();
+            } else {
+              kflags.KBIN_BIN=kflags.KBIN_MPI_BIN;
+              aus << "00000  MESSAGE Taking KBIN_BIN=KBIN_MPI_BIN=\"" << kflags.KBIN_MPI_BIN << "\" "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+              aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            }
+            // ***************************************************************************
+            // VASP MODE  // must contain EMAIL perform
+            if(Krun) {
+              kflags.AFLOW_MODE_EMAIL            =
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE_EMAIL]") ||
+                aurostd::substring2bool(AflowIn,"[AFLOW_MODE]EMAIL");
+              Krun=(Krun && KBIN::VASP_Directory(FileLOCK,aflags,kflags));
+            }
+            // ***************************************************************************
+            // COMPRESS
+            if(Krun && kflags.KZIP_COMPRESS) KBIN::CompressDirectory(aflags,kflags);
+          }
+          // ************************************************************************************************************************************
+          // MATLAB MODE
+          if(kflags.KBIN_PHONONS_CALCULATION_FROZSL && !kflags.AFLOW_MODE_VASP) {
+            AflowInMode="[AFLOW_FROZSL]CALC ";
+            aus      << "00000  MESSAGE [AFLOW_FROZSL]CALC found in " << _AFLOWIN_ << " "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+            // PRESCRIPT
+            if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP)
+              KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
+            // POSTSCRIPT
+            if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP)
+              KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
+          }
+          // ************************************************************************************************************************************
+          // NO MODE MODE
+          if(!kflags.AFLOW_MODE_VASP && !kflags.AFLOW_MODE_AIMS && !kflags.AFLOW_MODE_MATLAB && !kflags.AFLOW_MODE_ALIEN && !kflags.KBIN_PHONONS_CALCULATION_FROZSL) {
+            aus << "EEEEE  [AFLOW_MODE=????] invalid found in     "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aus << "EEEEE  [AFLOW_MODE=ALIEN]        is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aus << "EEEEE  [AFLOW_MODE=MATLAB]       is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aus << "EEEEE  [AFLOW_MODE=VASP]         is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aus << "EEEEE  [AFLOW_FROZSL]CALC        is supported "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+            aurostd::PrintErrorStream(FileLOCK,aus,XHOST.QUIET);
+          }
+          // ***************************************************************************
+          // FINALIZE AFLOWIN
+          // DONE, turn OFF the flag
+          kflags.AFLOW_MODE_VASP=FALSE;    
+          // ***************************************************************************
+          // FINALIZE LOCK
+          aus << "XXXXX  KBIN DIRECTORY END (aflow" << string(AFLOW_VERSION) << ")  "  << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+          aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          // ***************************************************************************
+          // PREPARE MESSAGE FOR LOG TO BE INTERCEPTED IN COMPRESSION
+          aus << "XXXXX  KBIN_DIRECTORY_END " << aflags.Directory << endl;
+          aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+          // ***************************************************************************
+          // FINALIZE LOCK
+          FileLOCK.clear();FileLOCK.close();
+          // ***************************************************************************
+          // NFS cache-cleaning HACK, opendir() and closedir() to invalidate cache
+          // https://stackoverflow.com/questions/8311710/nfs-cache-cleaning-command
+          // CO 171106
+          vector<string> vfiles_dummyls;
+          aurostd::DirectoryLS(aflags.Directory,vfiles_dummyls);
+          // ***************************************************************************
+          // WRITE END
+          aurostd::string2file(string(Message(aflags,"user,host,time",_AFLOW_FILE_NAME_)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
+          // ***************************************************************************
+          // MAKE READEABLE
+          aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
+          aus.clear();aus.str(std::string());
+          aus << "cp " << aflags.Directory << "/" << _AFLOWLOCK_ << " " << aflags.Directory << "/" << _AFLOWLOCK_ << "." << string(AFLOW_VERSION) << endl;  
+          aurostd::execute(aus);  
+          aurostd::ChmodFile("664",string(aflags.Directory+"/*"));
+          aurostd::ChmodFile("777",string(aflags.Directory+"/*"));
+        }
+        FileAFLOWIN.clear();FileAFLOWIN.close();
       }
     }
   };
@@ -1922,7 +1944,7 @@ namespace KBIN {
       if(LDEBUG) {cerr << soliloquy << " file_path=" << file_path << endl;}
       if(aurostd::IsDirectory(file_path)){continue;}  //compress files only
       if(aurostd::EFileExist(file_path,compressed_variant)){
-	//need full path here, also, notice the placement here, actual compressed variant would have been skipped, this is for the uncompressed variant
+        //need full path here, also, notice the placement here, actual compressed variant would have been skipped, this is for the uncompressed variant
         //both compressed and uncompressed variants exists
         //assume compressed is from a previous run, hence obsolete
         //delete it before compressing uncompressed variant
@@ -1984,7 +2006,7 @@ namespace KBIN {
   void Clean(const string _directory) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string directory=_directory;
     //    cerr << "KBIN::Clean: directory=" << aflags.Directory << endl;
-    
+
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
     deque<string> vzip; aurostd::string2tokens("bzip2,xz,gzip",vzip,",");
 
@@ -2006,22 +2028,22 @@ namespace KBIN {
     aurostd::StringSubst(directory,"/aflow.in","");      // so it is easier to search
 
     if(!aurostd::FileExist(string(directory+"/"+"NOCLEAN")) &&
-       !aurostd::FileExist(string(directory+"/"+"NOCLEAR")) &&
-       !aurostd::FileExist(string(directory+"/"+"noclean")) &&
-       !aurostd::FileExist(string(directory+"/"+"noclear")) &&
-       !aurostd::FileExist(string(directory+"/"+"Makefile")) &&
-       !aurostd::FileExist(string(directory+"/"+"aflow.h")) &&
-       !aurostd::FileExist(string(directory+"/"+"paper.tex")) &&
-       !aurostd::FileExist(string(directory+"/"+"manuscript.tex")) &&
-       !aurostd::FileExist(string(directory+"/"+"supplementary_information.tex")) &&
-       !aurostd::FileExist(string(directory+"/"+"supplementary_materials.tex")) &&
-       !aurostd::FileExist(string(directory+"/"+"review.tex"))) {
+        !aurostd::FileExist(string(directory+"/"+"NOCLEAR")) &&
+        !aurostd::FileExist(string(directory+"/"+"noclean")) &&
+        !aurostd::FileExist(string(directory+"/"+"noclear")) &&
+        !aurostd::FileExist(string(directory+"/"+"Makefile")) &&
+        !aurostd::FileExist(string(directory+"/"+"aflow.h")) &&
+        !aurostd::FileExist(string(directory+"/"+"paper.tex")) &&
+        !aurostd::FileExist(string(directory+"/"+"manuscript.tex")) &&
+        !aurostd::FileExist(string(directory+"/"+"supplementary_information.tex")) &&
+        !aurostd::FileExist(string(directory+"/"+"supplementary_materials.tex")) &&
+        !aurostd::FileExist(string(directory+"/"+"review.tex"))) {
       if(aurostd::FileExist(string(directory+"/"+_AFLOWIN_)) ||    // normal aflow.in or specified it
-	 aurostd::FileExist(string(directory+"/aflow.in")) ||      // normal aflow.in
-	 aurostd::FileExist(string(directory+"/agl_aflow.in")) ||  // normal agl_aflow.in
-	 aurostd::FileExist(string(directory+"/ael_aflow.in")) ) { // normal ael_aflow.in
-	
-	// CLEAN directory
+          aurostd::FileExist(string(directory+"/aflow.in")) ||      // normal aflow.in
+          aurostd::FileExist(string(directory+"/agl_aflow.in")) ||  // normal agl_aflow.in
+          aurostd::FileExist(string(directory+"/ael_aflow.in")) ) { // normal ael_aflow.in
+
+        // CLEAN directory
         // DX and CO - START
         vector<string> vfiles;  //not only files, includes EVERYTHING
         string file_path;
@@ -2049,20 +2071,20 @@ namespace KBIN {
             aurostd::RemoveFile(file_path);
           }
         }
-	aurostd::execute("rm -f "+directory+"/.pam*");
-	aurostd::execute("rm -f "+directory+"/*~");
-	
-	// DX and CO - END
-	// now DECOMPRESS _AFLOWIN_.EXT if a mistake was made
-	for(uint iext=0;iext<vext.size();iext++) { 
-	  ifstream FileCHECK;string FileNameCHECK;
-	  FileNameCHECK=directory+"/" + _AFLOWIN_ + vext.at(iext);                    // _AFLOWIN_.EXT
-	  FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);                         // _AFLOWIN_.EXT
-	  FileCHECK.clear();FileCHECK.close();                                        // _AFLOWIN_.EXT
-	  if(FileCHECK) {                                                             // _AFLOWIN_.EXT
-	    aurostd::execute(vzip.at(iext)+" -dqf "+_AFLOWIN_+vext.at(iext)); // _AFLOWIN_.EXT
-	  }
-	} // _AFLOWIN_.EXT
+        aurostd::execute("rm -f "+directory+"/.pam*");
+        aurostd::execute("rm -f "+directory+"/*~");
+
+        // DX and CO - END
+        // now DECOMPRESS _AFLOWIN_.EXT if a mistake was made
+        for(uint iext=0;iext<vext.size();iext++) { 
+          ifstream FileCHECK;string FileNameCHECK;
+          FileNameCHECK=directory+"/" + _AFLOWIN_ + vext.at(iext);                    // _AFLOWIN_.EXT
+          FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);                         // _AFLOWIN_.EXT
+          FileCHECK.clear();FileCHECK.close();                                        // _AFLOWIN_.EXT
+          if(FileCHECK) {                                                             // _AFLOWIN_.EXT
+            aurostd::execute(vzip.at(iext)+" -dqf "+_AFLOWIN_+vext.at(iext)); // _AFLOWIN_.EXT
+          }
+        } // _AFLOWIN_.EXT
       }
     }
   }
@@ -2083,33 +2105,33 @@ namespace KBIN {
     }
 
     deque<string> vext; aurostd::string2tokens(".bz2,.xz,.gz",vext,",");
- 
+
     vector<string> vcheck1;aurostd::string2tokens(string("OUTCAR.static,OUTCAR.relax2,OUTCAR.relax1"),vcheck1,",");
     for(uint iext=0;iext<vext.size();iext++) { vcheck1.push_back("OUTCAR.relax1"+vext.at(iext)); }
     vector<string> vcheck2;aurostd::string2tokens(string("OUTCAR,OUTCAR,OUTCAR"),vcheck2,",");
     for(uint iext=0;iext<vext.size();iext++) { vcheck2.push_back("OUTCAR.relax2"+vext.at(iext)); }
-    
+
     vector<string> vfile;
     bool test=false;
-    
+
     cout << "KBIN::XClean: checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+_AFLOWLOCK_),vfile);
     for(uint j=0;j<vfile.size();j++) {
       aurostd::StringSubst(vfile.at(j),_AFLOWLOCK_,"");
       if(!aurostd::FileExist(vfile.at(j)+"OUTCAR") && !aurostd::EFileExist(vfile.at(j)+"OUTCAR.relax1")) {
-	cout << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
-	if(!test) KBIN::Clean(vfile.at(j));
+        cout << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
+        if(!test) KBIN::Clean(vfile.at(j));
       }
     }
     for(uint i=0;i<vcheck1.size();i++) {
       cout << "KBIN::XClean: checking missing " << vcheck2.at(i) << " with " << vcheck1.at(i) << endl;  // check OUTCAR.static
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+vcheck1.at(i)),vfile);
       for(uint j=0;j<vfile.size();j++) {
-	aurostd::StringSubst(vfile.at(j),vcheck1.at(i),"");
-	if(!aurostd::FileExist(vfile.at(j)+vcheck2.at(i))) {
-	  cout << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
-	  if(!test) KBIN::Clean(vfile.at(j));
-	}
+        aurostd::StringSubst(vfile.at(j),vcheck1.at(i),"");
+        if(!aurostd::FileExist(vfile.at(j)+vcheck2.at(i))) {
+          cout << "KBIN::XClean: cleaning=" << vfile.at(j) << endl;
+          if(!test) KBIN::Clean(vfile.at(j));
+        }
       }
     }    
     if(LDEBUG) cerr << "KBIN::XClean: END" << endl;  

@@ -59,6 +59,7 @@ namespace pflow {
   string ATOMSMAX(string options,istream& input);
   void BANDS(string options,istream& input);
   void BANDGAP(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  // CO 171006
+  void BANDGAP_DOS(aurostd::xoption& vpflow,ostream& oss=cout); // CAMILO  // CO 171006  //CO191110
   void BANDSTRUCTURE(_aflags &aflags);
   string BZDirectionsLATTICE(string options);
   //DX 20181102 [OBSOLETE] string BZDirectionsSTRUCTURE(istream& input);
@@ -68,6 +69,7 @@ namespace pflow {
   bool PerformFullSymmetry(xstructure& a);
   bool PerformFullSymmetry(xstructure& a,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
   bool PerformFullSymmetry(xstructure& a,double& tolerance,bool no_scan,bool force_perform,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss, string format="txt");
+  void ProcessAndAddSpinToXstructure(xstructure& a, const string& magmom_info); //DX 20190801
   void defaultKFlags4SymWrite(_kflags& kflags,bool write=true);
   void defaultKFlags4SymCalc(_kflags& kflags,bool calc=true);
   bool CalculateFullSymmetry(istream& input,aurostd::xoption& vpflow,ostream& oss=cout);
@@ -97,13 +99,14 @@ namespace pflow {
   void CLEANALL(istream& input);
   void CMPSTR(vector<string>);
   void COMPARE(string options);
-  string comparePermutations(istream& input, aurostd::xoption& vpflow); //DAVID //DX 20181004
-  string compareStructures(aurostd::xoption& vpflow); //DAVID
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20191125
+  string compareDatabaseEntries(const aurostd::xoption& vpflow, ofstream& FileMESSAGE, ostream& logstream=cout); //DX 20191125
+  string comparePermutations(istream& input, const aurostd::xoption& vpflow); //DAVID //DX 20181004
   //DX 20190425 [OBSOLETE] string compareStructureDirectory(aurostd::xoption& vpflow); //DAVID
-  string compareMultipleStructures(aurostd::xoption& vpflow); //DAVID //DX 20190425
-  string compare2database(istream& input, aurostd::xoption& vpflow); //DAVID //DX 20181004
-  vector<StructurePrototype> compare2prototypes(istream& input, aurostd::xoption& vpflow); //DX 20181004 //DX 20190314 - changed return value
-  vector<StructurePrototype> compare2prototypes(xstructure& xstr, aurostd::xoption& vpflow); //DX 20190314 - overloaded 
+  string compareMultipleStructures(const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20190425
+  string compare2database(istream& input, const aurostd::xoption& vpflow, ostream& logstream=cout); //DAVID //DX 20181004
+  vector<StructurePrototype> compare2prototypes(istream& input, const aurostd::xoption& vpflow); //DX 20181004 //DX 20190314 - changed return value
+  vector<StructurePrototype> compare2prototypes(xstructure& xstr, const aurostd::xoption& vpflow, ostream& logstream=cout); //DX 20190314 - overloaded 
   // DX 9/1/17 [OBSOLETE] void DATA(string smode,istream& input);
   bool DATA(string smode, istream& input, aurostd::xoption& vpflow, ostream& oss=cout); // DX 9/1/17 - SGDATA + JSON
   void DATA1(string options,istream& input);
@@ -129,8 +132,9 @@ namespace pflow {
   string FROZSL_ANALYZE(istream& input);
   string FROZSL_INPUT(void);
   string FROZSL_OUTPUT(void);
-  bool GetCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry
-  bool GetNonCollinearMagneticInfo(int& num_atoms, string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear
+  string GEOMETRY(istream& input); //CO191110
+  bool GetCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<double>& vmag); // DX 9/27/17 - Magnetic symmetry //DX 20191107 - int to uint
+  bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); // DX 12/5/17 - Magnetic symmetry non-collinear //DX 20191107 - int to uint
   vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX 20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF190329
   void GULP(istream& input);
@@ -294,10 +298,10 @@ namespace pflow {
   void elementsFromPPString(const string& input,vector<string>& velements,bool keep_pp=false); //CO190712
   ////////////////////////////////////////////////////////////////////////////////
   // returns UNSORTED vector<string> from string
-  vector<string> stringElements2VectorElements(const string& input, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
-  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);
-  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, ostream& oss=cout, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  // ME190628
+  vector<string> stringElements2VectorElements(const string& input, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);
+  vector<string> stringElements2VectorElements(const string& input, vector<double>& vcomposition, ofstream& FileMESSAGE, bool clean=true, bool sort_elements=false, compound_designation c_desig=composition_string, bool keep_pp=false, ostream& oss=cout);  // ME190628
   ////////////////////////////////////////////////////////////////////////////////
   //[CO190712 - OBSOLETE]// functions for making input alphabetic
   //[CO190712 - OBSOLETE]// PdMn -> MnPd, does it by CAPITAL letters
@@ -318,18 +322,18 @@ namespace pflow {
   ////////////////////////////////////////////////////////////////////////////////
   // START - added by Corey Oses - May 2017
   // effectively logs EVERYTHING, deals with cout and logger
-  void logger(const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
-  void logger(const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
-  void logger(const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
+  void logger(const string& filename, const string& function_name, stringstream& message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, stringstream& message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // overload
+  void logger(const string& filename, const string& function_name, const string& _message, const string& directory, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
+  void logger(const string& filename, const string& function_name, const string& _message, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss=cout, const char& type=_LOGGER_MESSAGE_, bool silent=false, const string& message_metadata="user, host, time");  // main function
   // END - added by Corey Oses - May 2017
   xstructure LTCELL(string options,istream& input);
   // [OBSOLETE]  xstructure LTCELLFV(string options,istream& input);
@@ -375,8 +379,8 @@ namespace pflow {
   void POCC(vector<string>);
   string POSCAR2AFLOWIN(istream& input, const string& ="");  // Modified ME 181113
   void POSCAR2WYCKOFF(istream& input);
-  string printMatchingPrototypes(xstructure& xstr, aurostd::xoption& vpflow); //DX 20190314 
-  string printMatchingPrototypes(istream& cin, aurostd::xoption& vpflow); //DX 20190314 
+  string printMatchingPrototypes(xstructure& xstr, const aurostd::xoption& vpflow); //DX 20190314 
+  string printMatchingPrototypes(istream& cin, const aurostd::xoption& vpflow); //DX 20190314 
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO 180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); // DX 1/23/18 - added more robust QE reader
@@ -390,7 +394,7 @@ bool AlphabetizePrototypeLabelSpecies(deque<string> &species,string &label);
 string AlphabetizePrototypeLabelSpeciesArgv(vector<string> &argv);
 namespace pflow {
   bool PROTO_PARSE_INPUT(const vector<string>& params,vector<vector<string> >& vstr,vector<vector<double> >& vnum,bool ignore_label=false,bool reverse=false); //CO181226
-  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint nspeciesHTQC,bool patch_nspecies=false); //CO181226
+  bool PROTO_TEST_INPUT(const vector<vector<string> >& vvstr,const vector<vector<double> >& vvnum,uint& nspeciesHTQC,bool patch_nspecies=false); //CO181226
   bool sortPOCCSites(const string& p1,const string& p2); //CO181226
   bool sortPOCCOccs(const string& occ1,const string& occ2); //CO181226
   bool FIX_PRECISION_POCC(const string& occ,string& new_occ); //CO181226
@@ -452,6 +456,7 @@ namespace pflow {
   void XYZ(string options,istream& input);
   void XYZINSPHERE(istream& input,double radius);
   void XYZWS(istream& input);
+  void XelementPrint(string options,ostream& oss=cout);
   void ZVAL(string options);
 }
 
@@ -492,11 +497,11 @@ void PrintNdata(const xstructure&,ostream& oss=cout);
 void PrintPDB(const xstructure&,ostream& oss=cout);
 void platon2print(xstructure,bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3,ostream& sout);
 void PrintRDF(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const pflow::matrix<double>& rdf_all,
-	      pflow::matrix<double>& rdfsh_all,pflow::matrix<double>& rdfsh_loc,ostream& oss=cout);
+    pflow::matrix<double>& rdfsh_all,pflow::matrix<double>& rdfsh_loc,ostream& oss=cout);
 void PrintRDFCmp(const xstructure& str_A,const xstructure& str_B,const double& rmax,const int nbins,
-		 const double& smooth_width,const int nsh,const pflow::matrix<double>& rdfsh_all_A,
-		 const pflow::matrix<double>& rdfsh_all_B,const vector<int>& best_match,
-		 const pflow::matrix<double>& rms_mat,ostream& oss=cout);
+    const double& smooth_width,const int nsh,const pflow::matrix<double>& rdfsh_all_A,
+    const pflow::matrix<double>& rdfsh_all_B,const vector<int>& best_match,
+    const pflow::matrix<double>& rms_mat,ostream& oss=cout);
 void PrintRSM(const xstructure&,ostream& oss=cout);
 void PrintShell(const xstructure& str,const int& ns,const double& rmin,const double& rmax,const string& sname,const int lin_dens,ostream& oss=cout);
 double CorrectionFactor(const double& th);
@@ -538,22 +543,22 @@ namespace pflow {
   vector<uint> GetXrayPeaks(const xstructure& str,vector<double>& v_twotheta,vector<double>& v_intensity,vector<double>& v_intensity_smooth,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520  //CO190620 - v_peaks_amplitude not needed
   vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth); //CO190520  //CO190620 - v_peaks_amplitude not needed
   void GetXray(const xstructure& str,vector<double>& dist,vector<double>& sf,
-	       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
+      vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,double lambda=XRAY_RADIATION_COPPER_Kalpha); //CO190520
   void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,
-        vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
-        vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO190409  //CO190620 - intmax can be grabbed later
+      vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
+      vector<vector<double> >& ids,pflow::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO190409  //CO190620 - intmax can be grabbed later
   void GetRDF(xstructure str,const double& rmax,const int& nbins,matrix<double>& rdf_all);
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,
-		    const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
+      const pflow::matrix<double>& rdf,matrix<double>& rdfsh,matrix<double>& rdfsh_loc);
   double RdfSh_RMS(const int iaA,const int iaB,const int nsh_max,const int nt,
-		   const pflow::matrix<double>& rdfsh_all_A,const pflow::matrix<double>& rdfsh_all_B);
+      const pflow::matrix<double>& rdfsh_all_A,const pflow::matrix<double>& rdfsh_all_B);
   void CmpRDFShells(const xstructure& str_A,const xstructure& str_B,const pflow::matrix<double>& rdfsh_all_A,
-		    const pflow::matrix<double>& rdfsh_all_B,const int nsh,vector<int>& best_match,
-		    pflow::matrix<double>& rms_mat);
+      const pflow::matrix<double>& rdfsh_all_B,const int nsh,vector<int>& best_match,
+      pflow::matrix<double>& rms_mat);
   pflow::matrix<double> GetSmoothRDF(const pflow::matrix<double>& rdf,const double& sigma);
   void CmpStrDist(xstructure str1,xstructure str2,const double& cutoff,
-		  pflow::matrix<double>& dist1,pflow::matrix<double>& dist2,
-		  pflow::matrix<double>& dist_diff,matrix<double>& dist_diff_n);
+      pflow::matrix<double>& dist1,pflow::matrix<double>& dist2,
+      pflow::matrix<double>& dist_diff,matrix<double>& dist_diff_n);
 }
 
 // aflow_pflow.cpp
@@ -566,27 +571,27 @@ int Sign(const double& x);
 namespace pflow {
   class pdosdata
   {
-  public:
-    // Constructors
-    pdosdata(); // default
-    void PrintParams(ostream& oss, const vector<string>& Ltotnames);
-    void PrintPDOS(ostream& oss, const int& sp);
-    // variables
-    string PDOSinfile;
-    pflow::matrix<int> pdos_at;
-    pflow::matrix<int> pdos_k;
-    pflow::matrix<int> pdos_b;
-    pflow::matrix<int> pdos_lm;
-    pflow::matrix<double> pdos;
-    double emin;
-    double emax;
-    double efermi;
-    double smooth_sigma;
-    int spin;
-    int nlm;
-    int natoms;
-    int print_params;
-    int nbins;
+    public:
+      // Constructors
+      pdosdata(); // default
+      void PrintParams(ostream& oss, const vector<string>& Ltotnames);
+      void PrintPDOS(ostream& oss, const int& sp);
+      // variables
+      string PDOSinfile;
+      pflow::matrix<int> pdos_at;
+      pflow::matrix<int> pdos_k;
+      pflow::matrix<int> pdos_b;
+      pflow::matrix<int> pdos_lm;
+      pflow::matrix<double> pdos;
+      double emin;
+      double emax;
+      double efermi;
+      double smooth_sigma;
+      int spin;
+      int nlm;
+      int natoms;
+      int print_params;
+      int nbins;
   };
 }
 
@@ -595,70 +600,70 @@ namespace pflow {
 namespace pflow {
   class rtparams
   {
-  public:
-    void free();
-    void copy(const rtparams& b);
-    // Constructors
-    rtparams(); // default
-    rtparams(const rtparams& b); // default
-    //Operators
-    const rtparams& operator=(const rtparams& b);
-    // Accessors
-    void Print() const;
-    // variables
-    double resx;
-    double resy;
-    vector<double> viewdir;
-    int viewdir_s;
-    vector<double> updir;
-    int updir_s;
-    double zoom;
-    double aspectratio;
-    double antialiasing;
-    double raydepth;
-    vector<double> center;
-    vector<double> center_guide;
-    int center_s;
-    vector<double> background;
-    pflow::matrix<double> lightcenter;
-    vector<double> lightrad;
-    pflow::matrix<double> lightcolor;
-    // Sphere texture variables (ambient, diffuse, specular, opacity)
-    pflow::matrix<double> sphtex_tex;
-    vector<double> sphtex_tex_def;
-    pflow::matrix<double> sphtex_color;
-    vector<double> sphtex_color_def;
-    pflow::matrix<double> sphtex_phong;
-    vector<double> sphtex_phong_def;
-    vector<string> sphtex_names;
-    vector<double> sph_rad;
-    // Plane variables
-    int plane;
-    int plane_s;
-    vector<double> plane_center;
-    vector<double> plane_normal;
-    vector<double> plane_color;
-    vector<double> planetex_tex;
-    vector<double> plane_center_def;
-    vector<double> plane_normal_def;
-    vector<double> plane_color_def;
-    vector<double> planetex_tex_def;
-    int plane_center_s;
-    int plane_normal_s;
-    int plane_color_s;
-    int planetex_tex_s;
-    double sph_rad_def;
-    string shading;
-    string outfile;
-    pflow::matrix<double> sc;
-    int sc_s;
-    int calc_type;
-    vector<string> input_files;
-    int first_set;
-    string insert_file;
-    vector<double> rotation;
-    vector<double> struct_origin;
-    int struct_origin_s;
+    public:
+      void free();
+      void copy(const rtparams& b);
+      // Constructors
+      rtparams(); // default
+      rtparams(const rtparams& b); // default
+      //Operators
+      const rtparams& operator=(const rtparams& b);
+      // Accessors
+      void Print() const;
+      // variables
+      double resx;
+      double resy;
+      vector<double> viewdir;
+      int viewdir_s;
+      vector<double> updir;
+      int updir_s;
+      double zoom;
+      double aspectratio;
+      double antialiasing;
+      double raydepth;
+      vector<double> center;
+      vector<double> center_guide;
+      int center_s;
+      vector<double> background;
+      pflow::matrix<double> lightcenter;
+      vector<double> lightrad;
+      pflow::matrix<double> lightcolor;
+      // Sphere texture variables (ambient, diffuse, specular, opacity)
+      pflow::matrix<double> sphtex_tex;
+      vector<double> sphtex_tex_def;
+      pflow::matrix<double> sphtex_color;
+      vector<double> sphtex_color_def;
+      pflow::matrix<double> sphtex_phong;
+      vector<double> sphtex_phong_def;
+      vector<string> sphtex_names;
+      vector<double> sph_rad;
+      // Plane variables
+      int plane;
+      int plane_s;
+      vector<double> plane_center;
+      vector<double> plane_normal;
+      vector<double> plane_color;
+      vector<double> planetex_tex;
+      vector<double> plane_center_def;
+      vector<double> plane_normal_def;
+      vector<double> plane_color_def;
+      vector<double> planetex_tex_def;
+      int plane_center_s;
+      int plane_normal_s;
+      int plane_color_s;
+      int planetex_tex_s;
+      double sph_rad_def;
+      string shading;
+      string outfile;
+      pflow::matrix<double> sc;
+      int sc_s;
+      int calc_type;
+      vector<string> input_files;
+      int first_set;
+      string insert_file;
+      vector<double> rotation;
+      vector<double> struct_origin;
+      int struct_origin_s;
   };
 
   void SetRTParams(xstructure& str, pflow::rtparams& rtp);
@@ -693,55 +698,55 @@ namespace pflow {
 namespace pflow {
   class projdata
   {
-  public:
-    // Constructors
-    projdata(); // default
-    void Print(ostream& outf);
-    // variables
-    int nl_max; // 4 for s,p,d,f orbitals
-    int nlm_max; // 16 for s,p,d,f orbitals
-    int nlmtot_max; // 20 for s,p,d,f orbitals + p,d,f,all totals
-    int nl; // 3 for spd
-    int nlm; // 9 for spd
-    int nlmtot; // 9+Psum+Dsum+Allsum=12 (for spd)
-    int nkpts;
-    int nbands;
-    int nions;
-    int ntypes;
-    vector<int> num_each_type;
-    pflow::matrix<double> wfermi_u;
-    pflow::matrix<double> wfermi_d;
-    vector<double> wkpt;
-    vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_u;
-    vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_d;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_u;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_d;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_u;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_d;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_u;
-    pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_d;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_u;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_d;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_l_u;
-    vector<pflow::matrix<double> > occ_vs_ion_kpt_l_d;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_u;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_d;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_l_u;
-    vector<pflow::matrix<double> > occ_vs_ion_bnd_l_d;
-    pflow::matrix<double> occ_vs_ion_lm_u;
-    pflow::matrix<double> occ_vs_ion_lm_d;
-    pflow::matrix<double> occ_vs_ion_l_u;
-    pflow::matrix<double> occ_vs_ion_l_d;
-    pflow::matrix<double> ener_k_b_u;
-    pflow::matrix<double> ener_k_b_d;
-    int sp;
-    int rspin;
-    pflow::matrix<double> kpts;
-    vector<string> LMnames;
-    vector<string> Lnames;
-    vector<string> LLMnames;
-    string PROOUTinfile;
-    pflow::matrix<double> lat;
+    public:
+      // Constructors
+      projdata(); // default
+      void Print(ostream& outf);
+      // variables
+      int nl_max; // 4 for s,p,d,f orbitals
+      int nlm_max; // 16 for s,p,d,f orbitals
+      int nlmtot_max; // 20 for s,p,d,f orbitals + p,d,f,all totals
+      int nl; // 3 for spd
+      int nlm; // 9 for spd
+      int nlmtot; // 9+Psum+Dsum+Allsum=12 (for spd)
+      int nkpts;
+      int nbands;
+      int nions;
+      int ntypes;
+      vector<int> num_each_type;
+      pflow::matrix<double> wfermi_u;
+      pflow::matrix<double> wfermi_d;
+      vector<double> wkpt;
+      vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_u;
+      vector<pflow::matrix<pflow::matrix<std::complex<double> > > > pdat_d;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_u;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lm_d;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_u;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_l_d;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_u;
+      pflow::matrix<pflow::matrix<double> > occ_vs_ion_kpt_bnd_lmtot_d;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_u;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_lm_d;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_l_u;
+      vector<pflow::matrix<double> > occ_vs_ion_kpt_l_d;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_u;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_lm_d;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_l_u;
+      vector<pflow::matrix<double> > occ_vs_ion_bnd_l_d;
+      pflow::matrix<double> occ_vs_ion_lm_u;
+      pflow::matrix<double> occ_vs_ion_lm_d;
+      pflow::matrix<double> occ_vs_ion_l_u;
+      pflow::matrix<double> occ_vs_ion_l_d;
+      pflow::matrix<double> ener_k_b_u;
+      pflow::matrix<double> ener_k_b_d;
+      int sp;
+      int rspin;
+      pflow::matrix<double> kpts;
+      vector<string> LMnames;
+      vector<string> Lnames;
+      vector<string> LLMnames;
+      string PROOUTinfile;
+      pflow::matrix<double> lat;
   };
 }
 
@@ -798,42 +803,42 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist, pflow::matrix
 
 namespace pflow {
   class pd_params {
-  public:
-    string type;
-    double scale;
-    pflow::matrix<double> pts;
-    pflow::matrix<double> dpts;
-    int Nx,Ny;
-    string orig_loc;
-    string ortho;
-    void Print(ostream& outf) const;
+    public:
+      string type;
+      double scale;
+      pflow::matrix<double> pts;
+      pflow::matrix<double> dpts;
+      int Nx,Ny;
+      string orig_loc;
+      string ortho;
+      void Print(ostream& outf) const;
   };
-  
+
   bool ReadCHGCAR(xstructure& str,stringstream& chgcar_header, vector<int>& ngrid, vector<int>& format_dim, vector<double>& chg_tot,
-                  vector<double>& chg_diff, stringstream& chgcar_ss,ostream& oss=cout);
+      vector<double>& chg_diff, stringstream& chgcar_ss,ostream& oss=cout);
   bool ReadChg(xstructure& str,vector<int>& ngrid, vector<double>& chg_tot,
-               vector<double>& chg_diff, istream& chgfile);
+      vector<double>& chg_diff, istream& chgfile);
   void GetChgInt(vector<pflow::matrix<double> >& rad_chg_int, pflow::matrix<double>& vor_chg_int,
-		 xstructure& str,vector<int>& ngrid,vector<double>& chg_tot, vector<double>& chg_diff);
+      xstructure& str,vector<int>& ngrid,vector<double>& chg_tot, vector<double>& chg_diff);
   void ReadPlaneDensParams(const xstructure& str, pd_params& pdp, istream& infile);
   void GetPlaneDens(const pd_params& pdp, vector<double>& dens2d_tot, vector<double>& dens2d_diff,
-		    const xstructure& str, const vector<int>& ngrid,
-		    const vector<double>& chg_tot, const vector<double>& chg_diff);
+      const xstructure& str, const vector<int>& ngrid,
+      const vector<double>& chg_tot, const vector<double>& chg_diff);
   void PrintPlaneDens(const pd_params& pdp, const vector<double>& dens2d_tot,
-		      const vector<double>& dens2d_diff, const xstructure& str);
+      const vector<double>& dens2d_diff, const xstructure& str);
 }
 
 // ---------------------------------------------------------------------------
 // EWALD FUNCS EWALD FUNCS EWALD FUNCS EWALD FUNCS EWALD FUNCS EWALD FUNCS EWA
 namespace pflow {
   void Ewald(const xstructure& in_str,double& epoint,double& ereal,
-	     double& erecip,double& eewald,double& eta,const double& SUMTOL);
+      double& erecip,double& eewald,double& eta,const double& SUMTOL);
   double GetEta(const int& natoms,const double& vol);
   double GetPointEner(const double& rteta,const vector<double>& atchg,const double& vol);
   double GetRecipEner(const double& eta,const vector<double>& atchg,const double& vol,
-		      const pflow::matrix<double>& rlat,const pflow::matrix<double>& fpos,const double& SUMTOL);
+      const pflow::matrix<double>& rlat,const pflow::matrix<double>& fpos,const double& SUMTOL);
   double GetRealEner(const double& eta,const vector<double>& atchg,const double& vol,
-		     const pflow::matrix<double>& lat,const pflow::matrix<double>& fpos,const double& SUMTOL);
+      const pflow::matrix<double>& lat,const pflow::matrix<double>& fpos,const double& SUMTOL);
   double GetScreenedESEner(void);
   double ScreenedESEner(const xstructure& in_str,const double& Ks,const double& SUMTOL);
 }

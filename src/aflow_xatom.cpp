@@ -24,21 +24,19 @@
 #define _EPS_ 0.02
 
 //#define _pocc_precision_ 5  // CO 170630 - we should really be fixing default vs. fixed
-/*
-  tested right
-  ./aflow --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  aflow.3.1.184 --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  ./aflow --zval_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  aflow.3.1.184 --zval_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  ./aflow --zval_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  aflow.3.1.184 --zval_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  ./aflow --pomass=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  aflow.3.1.184 --pomass=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  ./aflow --pomass_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  aflow.3.1.184 --pomass_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  ./aflow --pomass_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-  aflow.3.1.184 --pomass_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
-*/
+// tested right
+// ./aflow --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// aflow.3.1.184 --zval=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// ./aflow --zval_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// aflow.3.1.184 --zval_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// ./aflow --zval_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// aflow.3.1.184 --zval_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// ./aflow --pomass=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// aflow.3.1.184 --pomass=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// ./aflow --pomass_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// aflow.3.1.184 --pomass_cell=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// ./aflow --pomass_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
+// aflow.3.1.184 --pomass_atom=/common/LIB3/LIB/AgCdZn/TFCC013.ABC
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -177,8 +175,8 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "corigin" << atom.corigin(1) << " " << atom.corigin(2) << " " << atom.corigin(3) << endl;
       oss << "coord" << atom.coord(1) << " " << atom.coord(2) << " " << atom.coord(3) << endl;
 
-      oss << "fpos_equation" << atom.fpos_equation[0] << " " << atom.fpos_equation[1] << " " << atom.fpos_equation[2] << endl; //DX 20180607 - symbolic math for atom positions
-      oss << "cpos_equation" << atom.cpos_equation[0] << " " << atom.cpos_equation[1] << " " << atom.cpos_equation[3] << endl; //DX 20180607 - symbolic math for atom positions
+      oss << "fpos_equation" << aurostd::joinWDelimiter(atom.fpos_equation," ") << endl; //DX 20180607 - symbolic math for atom positions //DX 20191218 - join with delimiter in case empty
+      oss << "cpos_equation" << aurostd::joinWDelimiter(atom.cpos_equation," ") << endl; //DX 20180607 - symbolic math for atom positions //DX 20191218 - join with delimiter in case empty
       oss << "isincell=" << atom.isincell << endl;
       oss << "reference=" << atom.reference << endl;
       oss << "ireference=" << atom.ireference << endl;
@@ -444,17 +442,17 @@ void atoms_initialize(void) {
   i++; vatom_symbol[i]="Lr"; vatom_name[i]="Lawrencium"; vatom_mass[i]*=262.11;   vatom_volume[i]=NNN;     vatom_valence_std[i]=17; vatom_valence_iupac[i]=3; vatom_miedema_phi_star[i]=NNN;  vatom_miedema_nws[i]=NNN;  vatom_miedema_Vm[i]=NNN; vatom_miedema_gamma_s[i]= NNN;  vatom_miedema_BVm[i]=NNN;  vatom_radius[i]=NNN; vatom_radius_covalent[i]=NNN;   vatom_electronegativity[i]=NNN; vatom_crystal[i]="nnn";  vatom_pettifor_scale[i]=0; vatom_pearson_coefficient[i]=0.0;  // Lr
 
   /*
-    int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
-    for(uint j=1;j<93;j++) {
-    int test=vatom_valence_std[j];
-    if(j<=9 && test>=5) {test=test-8;} // first row
-    if(j<=17 && test>=5) {test=test-8;} // second row
-    //   if(test!=valence_wahyu[j]) 
-    cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
-    if(test!=valence_wahyu[j]) cerr << "   ****   ";
-    cerr << endl;
-    }
-    exit(0);
+     int valence_wahyu[]={9999,1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,-3,-2,-1,0,1,2,3,4,3,3,2,3,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,4,2,4,7,4,3,2,1,2,3,4,-3,-2,-1,0,1,2,3,3,3,3,3,3,2,3,3,3,3,3,3,3,3,4,5,3,4,4,4,2,1,2,3,4,3,0,0,0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3};
+     for(uint j=1;j<93;j++) {
+     int test=vatom_valence_std[j];
+     if(j<=9 && test>=5) {test=test-8;} // first row
+     if(j<=17 && test>=5) {test=test-8;} // second row
+  //   if(test!=valence_wahyu[j]) 
+  cerr << vatom_symbol[j] << " " << vatom_valence_std[j] << " " <<  test  << " " << valence_wahyu[j];
+  if(test!=valence_wahyu[j]) cerr << "   ****   ";
+  cerr << endl;
+  }
+  exit(0);
   */
 
 
@@ -510,7 +508,7 @@ void atoms_initialize(void) {
   //  vatom_mass[1+24]=54.93805*AMU2KILOGRAM; //Mn
 
   // finish and copy
-  
+
 
 }
 
@@ -944,7 +942,7 @@ double GetPearsonCoefficient(const string& symbol) {
   // If not found throw xerror
   string function = "GetPearsonCoefficient";
   string message = symbol + " is not a valid element name or symbol.";
-  throw aurostd::xerror(function, message, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_ILLEGAL_);
 }
 
 double GetPearsonCoefficient(const int& iat) {
@@ -960,7 +958,7 @@ double GetCompoundAttenuationLength(const vector<string>& species,const vector<d
     //[CO190629 - no exit()]exit(0);
     stringstream message; //CO190629
     message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO190629
-    throw aurostd::xerror("GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO190629
   }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
@@ -1082,7 +1080,7 @@ uint new_XATOM_SplitAlloySpecies(string alloy_in, vector<string> &speciesX, vect
   for(uint i=0;i<alloy.length();i++)
     for(uint j=0;j<letters.length();j++)
       if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
-  
+
   cerr << alloy << endl; exit(0); //CO190629 - need to clean this exit(), but this function looks unused...
 
   speciesX.clear();
@@ -1466,6 +1464,7 @@ wyckoffsite_ITC::wyckoffsite_ITC() {
   letter=""; //DX 20180128 - add Wyckoff letter
   site_symmetry=""; //DX 20180128 - add Wyckoff site symmetry
   multiplicity=0; //DX 20180128 - add Wyckoff multiplicity
+  site_occupation=1.0; //DX 20191010 - add site occupation (default: 1.0)
   equations.clear(); //DX 20180128 - add Wyckoff multiplicity
 }
 
@@ -1488,6 +1487,7 @@ const wyckoffsite_ITC& wyckoffsite_ITC::operator=(const wyckoffsite_ITC& b) {   
     letter=b.letter; //DX 20180128 - add Wyckoff letter
     site_symmetry=b.site_symmetry; //DX 20180128 - add Wyckoff site symmetry
     multiplicity=b.multiplicity; //DX 20180128 - add Wyckoff multiplicity
+    site_occupation=b.site_occupation; //DX 20191010 - add site occupation
     equations=b.equations; //DX 20180128 - add Wyckoff multiplicity
   }
   return *this;
@@ -1520,6 +1520,7 @@ wyckoffsite_ITC::wyckoffsite_ITC(const wyckoffsite_ITC& b) {
   letter=b.letter; //DX 20180128 - add Wyckoff letter
   site_symmetry=b.site_symmetry; //DX 20180128 - add Wyckoff site symmetry
   multiplicity=b.multiplicity; //DX 20180128 - add Wyckoff multiplicity
+  site_occupation=b.site_occupation; //DX 20191010 - add site occupation
   equations=b.equations; //DX 20180128 - add Wyckoff multiplicity
 }
 
@@ -1532,6 +1533,8 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
   oss << " site_symmetry: "<< site.site_symmetry << endl;
   oss << " multiplicity: "<< site.multiplicity << endl;
   oss << " wyckoffSymbol: "<< site.wyckoffSymbol << endl;
+  oss << " site_occupation: " << site.site_occupation << endl; //DX 20191010 - add site occupation
+  oss << " equations: " << endl; //DX 20191010 - add site occupation
   for(uint i=0;i<site.equations.size();i++){
     oss << "  " << aurostd::joinWDelimiter(site.equations[i],",") << endl;
   }
@@ -1539,18 +1542,466 @@ ostream& operator<<(ostream& oss,const wyckoffsite_ITC& site) {
 }
 
 // ***************************************************************************
+// AtomEnvironment Class - DX 20191122
+// ***************************************************************************
+// ---------------------------------------------------------------------------
+// AtomEnvironment (constructor)
+AtomEnvironment::AtomEnvironment(){
+  free();
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::free
+void AtomEnvironment::free(){
+  element_center="";
+  type_center=0;
+  elements_neighbor.clear();
+  types_neighbor.clear();
+  distances_neighbor.clear();
+  coordinations_neighbor.clear();
+  coordinates_neighbor.clear();
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment (destructor)
+AtomEnvironment::~AtomEnvironment(){
+  free();
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment (copy constructor)
+AtomEnvironment::AtomEnvironment(const AtomEnvironment& b){
+  copy(b);
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::copy
+void AtomEnvironment::copy(const AtomEnvironment& b) {
+  element_center=b.element_center;
+  type_center=b.type_center;
+  elements_neighbor=b.elements_neighbor;
+  types_neighbor=b.types_neighbor;
+  distances_neighbor=b.distances_neighbor;
+  coordinations_neighbor=b.coordinations_neighbor;
+  coordinates_neighbor=b.coordinates_neighbor;
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::operator=
+const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
+  if(this!=&b){
+    copy(b);
+  }
+  return *this;
+}
+
+// ---------------------------------------------------------------------------
+// AtomEnvironment::operator<< 
+ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
+
+  // operator<< for the AtomEnvironment object (looks like a JSON)
+
+  //if(AtomEnvironment.iomode!=JSON_MODE){ //A safeguard until we construct more output schemes.
+  //  AtomEnvironment.iomode=JSON_MODE;
+  //}
+
+  string eendl="";
+  stringstream sscontent_json;
+  vector<string> vcontent_json, tmp;
+
+  // element_center 
+  sscontent_json << "\"element_center\":\"" << AtomEnvironment.element_center << "\"" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // type_center
+  sscontent_json << "\"type_center\":" << AtomEnvironment.type_center << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // elements_neighbor
+  sscontent_json << "\"elements_neighbor\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(AtomEnvironment.elements_neighbor,"\""),",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // distances_neighbor
+  sscontent_json << "\"distances_neighbor\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(AtomEnvironment.distances_neighbor,8,true,1e-6),",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // coordinations_neighbor
+  sscontent_json << "\"coordinations_neighbor\":[" << aurostd::joinWDelimiter(AtomEnvironment.coordinations_neighbor,",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // coordinates_neighbor
+  sscontent_json << "\"coordinates_neighbor\":[";
+  vector<string> coordinate_sets;
+  for(uint i=0;i<AtomEnvironment.coordinates_neighbor.size();i++){
+    vector<string> coordinates;
+    for(uint j=0;j<AtomEnvironment.coordinates_neighbor[i].size();j++){
+      stringstream ss_tmp; ss_tmp << "[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(AtomEnvironment.coordinates_neighbor[i][j],8,true,1e-6),",") << "]";
+      coordinates.push_back(ss_tmp.str());
+      ss_tmp.clear();
+    }
+    coordinate_sets.push_back("["+aurostd::joinWDelimiter(coordinates,",")+"]");
+  }
+  sscontent_json << aurostd::joinWDelimiter(coordinate_sets,",") << "]" << eendl;
+  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+
+  // Put into json AtomEnvironment object
+  oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
+  vcontent_json.clear();
+
+  return oss;
+}
+
+// ***************************************************************************
+// AtomEnvironment::getAtomEnvironment() - DX 20191122 
+// ***************************************************************************
+// determines the atomic environment around a central atom 
+// current functionality:
+//   - calculates the nearest neighbors by element-type, i.e., minimum coordination shell for a given element-type
+//     the neighbor elements, types, distance, coordination, and coordinates are stored in the object
+//     only one distance is sto
+// preliminary functionality, can/will be expanded in the future
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode){ 
+  vector<string> neighbor_elements;
+  getAtomEnvironment(xstr, center_index, neighbor_elements, mode); 
+}
+
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode){ 
+
+  // ---------------------------------------------------------------------------
+  // ATOM_ENVIRONMENT_MODE_1 : default minimum coordination shell
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_2 : out to a certain radius
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_3 : largest gap in radial distribution function
+
+  // ---------------------------------------------------------------------------
+  // get central atom info
+  for(uint i=0;i<xstr.atoms.size();i++){
+    if(i==center_index){
+      element_center = xstr.atoms[i].name;
+      type_center = xstr.atoms[i].type;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // ATOM_ENVIRONMENT_MODE_1 : minimum coordination environment for each type 
+  if(mode==ATOM_ENVIRONMENT_MODE_1){
+    for(uint i=0;i<xstr.species.size();i++){
+      // check if types are restricted, otherwise get closest neighbors by type
+      if(aurostd::withinList(neighbor_elements, xstr.species[i]) || neighbor_elements.empty()){
+        uint frequency = 0;
+        double min_dist = AUROSTD_MAX_DOUBLE;
+        vector<xvector<double> > coordinates;
+
+        // calculate minimum coordination shell to a particular element-type 
+        minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, xstr.species[i]);
+
+        // store 
+        elements_neighbor.push_back(xstr.species[i]);
+        types_neighbor.push_back(i);
+        distances_neighbor.push_back(min_dist);
+        coordinations_neighbor.push_back(frequency);
+        coordinates_neighbor.push_back(coordinates);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_2 : environment out to a given radius 
+
+  // ---------------------------------------------------------------------------
+  // [FUTURE] ATOM_ENVIRONMENT_MODE_3 : environment out to largest gap in radial distribution function 
+  // i.e., GFA convention
+
+}
+
+// ***************************************************************************
+// getAtomEnvironments() - DX 20191122
+// ***************************************************************************
+vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
+
+  // Calculate the atomic environments in the structure
+
+  vector<AtomEnvironment> environments;
+
+  for(uint i=0;i<xstr.atoms.size();i++){
+    AtomEnvironment env; 
+    env.getAtomEnvironment(xstr, i, mode);
+    environments.push_back(env);
+  }
+  return environments;
+}
+
+// ***************************************************************************
+// getLFAAtomEnvironments() - DX 20191122
+// ***************************************************************************
+vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode){
+
+  // Calculate the LFA atomic environments
+  // i.e., only environments comprised of the least frequent atom (LFA) type
+  // use-case: quickly screen for potential isoconfigurational structures (see AFLOW-XtalMatch)
+
+  vector<AtomEnvironment> environments_LFA;
+
+  for(uint i=0;i<xstr.atoms.size();i++){
+    if(xstr.atoms[i].name == lfa){
+      AtomEnvironment LFA_env; 
+      LFA_env.getAtomEnvironment(xstr, i, LFAs, mode);
+      environments_LFA.push_back(LFA_env);
+    }
+  }
+  return environments_LFA;
+}
+
+// ***************************************************************************
+// Reset dims for RadiusSphereLattice() - DX 20191122
+// ***************************************************************************
+void resetLatticeDimensions(const xmatrix<double>& lattice, 
+    double radius, 
+    xvector<int>& dims,
+    vector<xvector<double> >& l1, 
+    vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, 
+    vector<int>& a_index, 
+    vector<int>& b_index, 
+    vector<int>& c_index){
+
+  // resets the lattice dimensions (dims) based on radius
+  // generates lattice vectors (l1,l2,l3) right away = speed increase
+  // stores dimension indices (a_index,b_index,c_index)
+  // new dims explore order : zeroth cell to max dims = speed increase 
+  // (can break early if match is found)
+  // DX create function date: 20190705
+
+  // ---------------------------------------------------------------------------
+  // get new dimensions based on radius
+  if(radius<=_ZERO_TOL_){ dims[1]=1; dims[2]=1; dims[3]=1; }
+  else{ dims=LatticeDimensionSphere(lattice,radius); }
+  // ---------------------------------------------------------------------------
+  // clear old 
+  l1.clear(); l2.clear(); l3.clear();
+  a_index.clear(); b_index.clear(); c_index.clear();
+
+  // ---------------------------------------------------------------------------
+  // [NEW] - go from zeroth cell out
+  // more likely to find match close to origin, why start so far away
+
+  // push back zeroth cell : dims[1]=dims[2]=dims[3]=0
+  l1.push_back(0*lattice(1));a_index.push_back(0);
+  l2.push_back(0*lattice(2));b_index.push_back(0);
+  l3.push_back(0*lattice(3));c_index.push_back(0);
+
+  // push back 1,-1,2,-2,...dims,-dims
+  for(int a=1;a<=dims[1];a++){l1.push_back(a*lattice(1));a_index.push_back(a); l1.push_back(-a*lattice(1));a_index.push_back(-a);}
+  for(int b=1;b<=dims[2];b++){l2.push_back(b*lattice(2));b_index.push_back(b); l2.push_back(-b*lattice(2));b_index.push_back(-b);}
+  for(int c=1;c<=dims[3];c++){l3.push_back(c*lattice(3));c_index.push_back(c); l3.push_back(-c*lattice(3));c_index.push_back(-c);}
+
+}
+
+// ***************************************************************************
+// minimumCoordinationShellLatticeOnly() - DX 20191122 
+// ***************************************************************************
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates){
+
+  // determine the minimum coordination shell of the lattice
+  // i.e., find the set of closest neighbors to the origin
+  // (overload: uses lattice radius) 
+
+  // ---------------------------------------------------------------------------
+  // determine necessary search radius
+  double radius=RadiusSphereLattice(lattice);
+
+  minimumCoordinationShellLatticeOnly(lattice, min_dist, frequency, coordinates, radius);
+}
+
+// ***************************************************************************
+// minimumCoordinationShellLatticeOnly() - DX 20191122 
+// ***************************************************************************
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates, 
+    double radius){
+
+  // determine the minimum coordination shell of the lattice
+  // i.e., find the set of closest neighbors to the origin
+  // (overload: instantiates lattice dimension information) 
+
+  // ---------------------------------------------------------------------------
+  // instantiate lattice vectors 
+  vector<xvector<double> > l1, l2, l3; 
+  vector<int> a_index, b_index, c_index;
+  xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+  resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+  minimumCoordinationShellLatticeOnly(lattice, dims, l1, l2, l3, 
+      a_index, b_index, c_index, 
+      min_dist, frequency, coordinates, radius);
+}
+
+// ***************************************************************************
+// minimumCoordinationShellLatticeOnly() - DX 20191122
+// ***************************************************************************
+void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice, 
+    xvector<int>& dims,
+    vector<xvector<double> >& l1, 
+    vector<xvector<double> >& l2, 
+    vector<xvector<double> >& l3, 
+    vector<int>& a_index, 
+    vector<int>& b_index, 
+    vector<int>& c_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates,
+    double radius){
+
+  // determine the minimum coordination shell environment of the lattice
+  // i.e., find the set of closest neighbors to the origin
+  // stores l1, l2, l3, a_index, b_index, and c_index for external use
+  // optional "radius" as enables more control over search space 
+  // (and potential speed up, may not need to search as far as the lattice radius)
+
+  xvector<double> tmp;
+
+  // ---------------------------------------------------------------------------
+  // reset lattice dimensions 
+  resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+  double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+
+  // ---------------------------------------------------------------------------
+  // loop through lattice vectors (stored before-hand in l1,l2,l3)
+  for(uint m=0;m<l1.size();m++){
+    xvector<double> a_component = l1[m];                  // DX : coord1-coord2+a*lattice(1)
+    for(uint n=0;n<l2.size();n++){
+      xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+      for(uint p=0;p<l3.size();p++){
+        if(!(m==0 && n==0 && p==0)){
+          tmp = ab_component + l3[p];                     // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+          double tmp_mod = aurostd::modulus(tmp);
+          // ---------------------------------------------------------------------------
+          // if found a new minimum distance and update coordination/frequency and coordinate 
+          if(tmp_mod<min_dist){
+            // ---------------------------------------------------------------------------
+            // if new distance is close to the original it is the same coordination shell (add to coordination)
+            // otherwise, reset coordination shell
+            // DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min_dist
+            else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp); } //initialize
+            min_dist=tmp_mod;
+            // ---------------------------------------------------------------------------
+            // diminishing dims: if minimum distance changed, then we may not need to search as far
+            // reset loop and search again based on new minimum distance
+            if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
+              resetLatticeDimensions(lattice,min_dist,dims,l1,l2,l3,a_index,b_index,c_index);
+              m=n=p=0;
+              frequency=0; //reset
+            }
+          }
+          // DX - FIXED TOL (bad for undecorated prototypes) - else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+          else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp); } // tenth of min dist
+        }
+      }
+    }
+  }
+}
+
+// ***************************************************************************
+// minimumCoordinationShell() - DX 20191122 
+// ***************************************************************************
+void minimumCoordinationShell(const xstructure& xstr, 
+    uint center_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates){
+
+  string type = "";
+
+  minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates, type);
+}
+
+// ***************************************************************************
+// minimumCoordinationShell() - DX 20191122
+// ***************************************************************************
+void minimumCoordinationShell(const xstructure& xstr, 
+    uint center_index, 
+    double& min_dist, 
+    uint& frequency, 
+    vector<xvector<double> >& coordinates, 
+    const string& type){
+
+  // determine the minimum coordination shell environment
+  // "type" enables the search of environments by certain elements/types only
+  // (e.g., find the neighborhood of oxygen atoms surrounding a magnesium center)
+
+  xvector<double> tmp_coord;
+
+  // ---------------------------------------------------------------------------
+  // instantiate lattice vectors 
+  vector<xvector<double> > l1, l2, l3; 
+  vector<int> a_index, b_index, c_index;
+  xvector<int> dims(3); dims[1]=dims[2]=dims[3]=0; // declare/reset
+  //resetLatticeDimensions(lattice,radius,dims,l1,l2,l3,a_index,b_index,c_index);
+
+  double relative_tolerance = 10.0; // coordination shell thickness is ten percent of minimum distance
+
+  for(uint ii=0; ii<xstr.atoms.size(); ii++){
+    // ---------------------------------------------------------------------------
+    // if atom ii is not environment center, find minimum distance between center atom ii's images 
+    if(ii!=center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type=="" 
+      xvector<double> incell_dist = xstr.atoms[center_index].cpos-xstr.atoms[ii].cpos;
+      double incell_mod = aurostd::modulus(incell_dist);
+      if(!(dims[1]==1 && dims[2]==1 && dims[3]==1) && incell_mod!=1e9){
+        resetLatticeDimensions(xstr.lattice,incell_mod,dims,l1,l2,l3,a_index,b_index,c_index);
+      }
+      //DX 4/23/18 - running vector in each loop saves computations; fewer duplicate operations
+      for(uint m=0;m<l1.size();m++){
+        xvector<double> a_component = incell_dist + l1[m];    // DX : coord1-coord2+a*lattice(1)
+        for(uint n=0;n<l2.size();n++){
+          xvector<double> ab_component = a_component + l2[n]; // DX : coord1-coord2+a*lattice(1) + (b*lattice(2))
+          for(uint p=0;p<l3.size();p++){
+            tmp_coord = ab_component + l3[p];                 // DX : coord1-coord2+a*lattice(1) + (b*lattice(2)) + (c*lattice(3))
+            double tmp_mod = aurostd::modulus(tmp_coord);
+            if(tmp_mod<min_dist){
+              //DX - FIXED TOL (bad for undecorated prototypes) - if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+              if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
+              else{ frequency=1; coordinates.clear(); coordinates.push_back(tmp_coord); } //initialize
+              min_dist=tmp_mod;
+            }
+            //DX - FIXED TOL (bad for undecorated prototypes) else if(aurostd::isequal(tmp_mod,min_dist,0.5)){ frequency+=1; } // within half an Angstrom
+            else if(aurostd::isequal(tmp_mod,min_dist,(min_dist/relative_tolerance))){ frequency+=1; coordinates.push_back(tmp_coord); } // tenth of min_dist
+          }
+        }
+      }
+    }
+    // ---------------------------------------------------------------------------
+    // if atom is environment center check its images, but only need to search as 
+    // far as min_dist or lattice_radius (whichever is smaller)
+    else if(ii==center_index && (xstr.atoms[ii].name == type || type == "")){ //DX 20191105 - added type==""
+      double lattice_radius=RadiusSphereLattice(xstr.lattice);
+      double search_radius=min(lattice_radius,min_dist);
+
+      // ---------------------------------------------------------------------------
+      // use variant that stores the lattice dimension information so it can be 
+      // updated for the "minimumCoordinationShell" function
+      minimumCoordinationShellLatticeOnly(xstr.lattice, dims, l1, l2, l3, 
+          a_index, b_index, c_index, 
+          min_dist, frequency, coordinates, search_radius);
+    }
+  }
+}
+
+
+// ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
 // STRUCTURE
 // look into aflow.h for the definitions
 
-void xstructure::free() {
-}
-
-// Constructors
-xstructure::xstructure(string structure_title) {
+void xstructure::free() { //DX 20191220 - moved all initializations from constuctor into free()
   iomode=IOAFLOW_AUTO;        // what else could we do right now...
-  title=structure_title;
+  title=""; //DX 20191210
   directory="";
   prototype="";
   info="";
@@ -1767,32 +2218,43 @@ xstructure::xstructure(string structure_title) {
   // -----------------------------------
 }
 
+// Constructors
+xstructure::xstructure(string structure_title) {
+  free(); //DX 20191220 - moved contents below into free()
+  title=structure_title;
+}
+
 // ifstream/istream
 xstructure::xstructure(istream& _input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   (*this).iomode=_iomode;
   _input >> (*this);
 }
 
 xstructure::xstructure(ifstream& _input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   (*this).iomode=_iomode;
   _input >> (*this);
 }
 
 xstructure::xstructure(stringstream& __input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   (*this).iomode=_iomode;
   stringstream _input(__input.str());
   _input >> (*this);
 }
 
 xstructure::xstructure(const string& _input,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   stringstream strstream;
   aurostd::efile2stringstream(_input,strstream); // CO 171025
-   (*this).iomode=_iomode;
+  (*this).iomode=_iomode;
   (*this).directory = _input; //DX 20180526 - location of xstructure
-   strstream >> (*this);
+  strstream >> (*this);
 }
 
 xstructure::xstructure(const string& url,const string& file,int _iomode) {
+  free(); //DX 20191220 - added free to initialize
   stringstream strstream;
   aurostd::url2stringstream(url+"/"+file,strstream);
   (*this).iomode=_iomode;
@@ -2103,49 +2565,7 @@ xstructure::xstructure(const xstructure& b) {
 
 // destructor
 xstructure::~xstructure() {
-  atoms.clear();
-  qm_forces.clear();
-  qm_positions.clear();
-  pgroup.clear();
-  pgroup_xtal.clear();
-  pgroupk.clear();
-  pgroupk_xtal.clear(); // DX 12/5/17 - Added pgroupk_xtal
-  fgroup.clear();
-  sgroup.clear();
-  for(uint i=0;i<agroup.size();i++)
-    agroup.at(i).clear();
-  agroup.clear();
-  for(uint i=0;i<iatoms.size();i++)
-    iatoms.at(i).clear();
-  iatoms.clear();
-  grid_atoms_dimsL.clear(); // CO 171025
-  grid_atoms_dimsH.clear(); // CO 171025
-  grid_atoms.clear();
-  grid_atoms_sc2pcMap.clear(); // CO 171025
-  grid_atoms_pc2scMap.clear(); // CO 171025
-  lijk_table.clear();
-  lijk_cpos.clear();
-  lijk_fpos.clear();
-  for(uint i=0;i<neighbours_atoms_func_r_vs_nn.size();i++)
-    neighbours_atoms_func_r_vs_nn.at(i).clear();
-  neighbours_atoms_func_r_vs_nn.clear();
-  for(uint i=0;i<neighbours_atoms_func_num_vs_nn.size();i++)
-    neighbours_atoms_func_num_vs_nn.at(i).clear();
-  neighbours_atoms_func_num_vs_nn.clear();
-  neighbours_func_r_vs_nn.clear();
-  neighbours_func_num_vs_nn.clear();
- 
-  wyccar_ITC.clear();                   //(RHT)
-  wyckoff_sites_ITC.clear();            //(RHT)
-  wyckoff_symbols_ITC.clear();          //(RHT)
-  standard_basis_ITC.clear();           //(RHT)
-  standard_lattice_ITC.clear();         // RHT
-  origin_ITC.clear();                   // DX 8/30/17 - SGDATA
-  general_position_ITC.clear();         // DX 8/30/17 - SGDATA
-  symbolic_math_lattice.clear();                         // symbolic math representation of lattice 20180618
-  prototype_parameter_list.clear();                      // prototype parameter list ANRL 20180618
-  prototype_parameter_values.clear();                    // prototype parameters values ANRL 20180618
-  free();
+  free(); //DX 20191220 - added free and moved contents below into free
 }
 
 // copies xtructures: b=a
@@ -2157,15 +2577,15 @@ const xstructure& xstructure::operator=(const xstructure& b) {  // operator=
   return *this;
 }
 
-void xstructure::Clear() {
+void xstructure::clear() { //DX 20191220 - uppercase to lowercase clear
   xstructure _tmp;
   (*this)=_tmp;
 }
 
-void xstructure::Clean() {
+void xstructure::clean() { //DX 20191220 - uppercase to lowercase clean
   stringstream ss_xstr;
   ss_xstr << (*this);
-  (*this).Clear();
+  (*this).clear(); //DX 20191220 - uppercase to lowercase clear
   ss_xstr >> (*this);
   ss_xstr.str("");
 }
@@ -2231,8 +2651,8 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       else {
         oss << a.partial_occupation_site_tol;
         if(1||a.scale_third.isentry){  // CO 170803 - stoich tol //always print
-        oss << " "; 
-        oss << a.partial_occupation_stoich_tol;
+          oss << " "; 
+          oss << a.partial_occupation_stoich_tol;
         }
       }
       oss << std::fixed;
@@ -2241,13 +2661,13 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // ----------------------------------------------------------------------
     if(a_iomode==IOVASP_POSCAR || a_iomode==IOVASP_AUTO) {
       for(uint i=1;i<=3;i++) {
-	for(uint j=1;j<=3;j++) {
-	  oss << " ";
-	  if(abs(a.lattice(i,j))<10.0) oss << " ";
-	  if(!std::signbit(a.lattice(i,j))) oss << " ";
-	  oss << a.lattice(i,j) << "";
-	}
-	oss << endl;
+        for(uint j=1;j<=3;j++) {
+          oss << " ";
+          if(abs(a.lattice(i,j))<10.0) oss << " ";
+          if(!std::signbit(a.lattice(i,j))) oss << " ";
+          oss << a.lattice(i,j) << "";
+        }
+        oss << endl;
       }
     }
     // ----------------------------------------------------------------------
@@ -2285,13 +2705,13 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       for(uint i=0;i<a.species_pp.size();i++) { // ME 190308 - species is empty when structure is based on vasp4 POSCAR
         //oss << a.species.at(i)<< " ";  OBSOLETE ME 190304 - species can contain PP information, which VASP doesn't recognize
         oss << KBIN::VASP_PseudoPotential_CleanName(a.species_pp.at(i)) << " ";  // ME 190308
-        }
+      }
       oss << endl;
     }
     // ----------------------------------------------------------------------
     // CO 170630 - fixing for POCC
     //[CO 180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO 180705 - repetita iuvant
-		//[CO 180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO 180705 - this makes it necessary that atoms are properly typed
+    //[CO 180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO 180705 - this makes it necessary that atoms are properly typed
     if(a.partial_occupation_flag==TRUE) {
       //need to figure out the '+'
       uint iatom=0;
@@ -2303,7 +2723,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         }
       }
       if(a.atoms.size()){
-      for(uint i=0;i<a.num_each_type.size();i++){
+        for(uint i=0;i<a.num_each_type.size();i++){
           vsame_pocc.push_back(vector<uint>(0));  //for first atom
           vsame_pocc.back().push_back(0); //first atom
           last_pocc=a.atoms[iatom].partial_occupation_value;
@@ -2334,11 +2754,11 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         //} else {  //need '+'
         for(uint j=0;j<vsame_pocc[i].size();j++){
           oss << vsame_pocc[i][j] << "*";
-        //oss << std::defaultfloat;
-        oss.unsetf(ios_base::floatfield);
+          //oss << std::defaultfloat;
+          oss.unsetf(ios_base::floatfield);
           oss << a.atoms[iatom].partial_occupation_value << std::fixed << (j!=vsame_pocc[i].size()-1?"+":" ");
           iatom+=vsame_pocc[i][j];
-      }
+        }
         //}
       }
 
@@ -2362,14 +2782,14 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       // CO - 170630, the original num_each_type doesn't work here, so we fix
       if(a.partial_occupation_flag==TRUE) {
         oss << "Partial ";
-	      //oss.precision(_pocc_precision_);  // CO 170630
+        //oss.precision(_pocc_precision_);  // CO 170630
         //oss << std::defaultfloat;
         int comp_prec=(int)ceil(log10(1.0/a.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO181226
         oss.precision(comp_prec); //CO181226
         oss.unsetf(ios_base::floatfield);
-	oss << "[";for(uint i=0;i<a.comp_each_type.size();i++) {oss << char('A'+i) << a.comp_each_type.at(i);}oss << "] ";
+        oss << "[";for(uint i=0;i<a.comp_each_type.size();i++) {oss << char('A'+i) << a.comp_each_type.at(i);}oss << "] ";
         oss << std::fixed;
-	      oss.precision(_precision_);       // CO 170630 //CO181226
+        oss.precision(_precision_);       // CO 170630 //CO181226
       } else {
         oss << "["; for(uint i=0,k=0;i<a.num_each_type.size();k+=a.num_each_type.at(i),i++) { oss << char(a.atoms.at(k).type+65) << a.num_each_type.at(i);} oss << "] ";
       }
@@ -2381,102 +2801,102 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     for(uint iat=0;iat<a.atoms.size();iat++) {
       oss << " ";
       for(uint j=1;j<=3;j++) {
-	//	oss << " ";
-	if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO190322 - remove annoying -0.0000000
-	if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO190322 - remove annoying -0.0000000
+        //	oss << " ";
+        if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO190322 - remove annoying -0.0000000
+        if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO190322 - remove annoying -0.0000000
 
-  _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO190322 - remove annoying -0.0000000
-  if(abs(_coord)<10.0) oss << " "; //CO190322 - remove annoying -0.0000000
-  if(!std::signbit(_coord)) oss << " ";  //CO190322 - remove annoying -0.0000000
-  oss << _coord << " "; //CO190322 - remove annoying -0.0000000
-	
-  //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
-	//[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
+        _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO190322 - remove annoying -0.0000000
+        if(abs(_coord)<10.0) oss << " "; //CO190322 - remove annoying -0.0000000
+        if(!std::signbit(_coord)) oss << " ";  //CO190322 - remove annoying -0.0000000
+        oss << _coord << " "; //CO190322 - remove annoying -0.0000000
+
+        //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
+        //[CO190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
       }
       //  cout << aurostd::modulus(a.atoms.at(iat).cpos) << " ";
       if(a.isd==TRUE)
-	oss << " " << a.atoms.at(iat).sd[0] << " " << a.atoms.at(iat).sd[1] << " " << a.atoms.at(iat).sd[2];
+        oss << " " << a.atoms.at(iat).sd[0] << " " << a.atoms.at(iat).sd[1] << " " << a.atoms.at(iat).sd[2];
       if(a.atoms.at(iat).name_is_given==TRUE) {
-	oss << " " << a.atoms.at(iat).name << " ";
-	for(uint j=a.atoms.at(iat).name.length();j<5;j++) oss << " ";
+        oss << " " << a.atoms.at(iat).name << " ";
+        for(uint j=a.atoms.at(iat).name.length();j<5;j++) oss << " ";
       }
       if(a.partial_occupation_flag==TRUE) {
-	//oss.precision(_pocc_precision_);  // CO 170630
-	//if(a.atoms.at(iat).partial_occupation_flag==FALSE) oss << "-      ";
-	//	if(a.atoms.at(iat).partial_occupation_flag==TRUE) oss << a.atoms.at(iat).partial_occupation_value << "  ";// << " (" << iat << "/" << a.partial_occupation_flags.size() << ")";
-	//oss << std::defaultfloat;
-  oss.unsetf(ios_base::floatfield);
-	oss << "pocc=" << a.atoms.at(iat).partial_occupation_value << "  ";
-	oss << std::fixed;
-	//oss.precision(_precision_); // CO 170630
+        //oss.precision(_pocc_precision_);  // CO 170630
+        //if(a.atoms.at(iat).partial_occupation_flag==FALSE) oss << "-      ";
+        //	if(a.atoms.at(iat).partial_occupation_flag==TRUE) oss << a.atoms.at(iat).partial_occupation_value << "  ";// << " (" << iat << "/" << a.partial_occupation_flags.size() << ")";
+        //oss << std::defaultfloat;
+        oss.unsetf(ios_base::floatfield);
+        oss << "pocc=" << a.atoms.at(iat).partial_occupation_value << "  ";
+        oss << std::fixed;
+        //oss.precision(_precision_); // CO 170630
       }
       if(a.order_parameter_structure==TRUE) {
-	if(a.atoms.at(iat).order_parameter_atom==FALSE) oss << "- ";
-	if(a.atoms.at(iat).order_parameter_atom==TRUE) oss << a.atoms.at(iat).order_parameter_value << " ";// << " (" << iat << "/" << a.order_parameter_atoms.size() << ")";
+        if(a.atoms.at(iat).order_parameter_atom==FALSE) oss << "- ";
+        if(a.atoms.at(iat).order_parameter_atom==TRUE) oss << a.atoms.at(iat).order_parameter_value << " ";// << " (" << iat << "/" << a.order_parameter_atoms.size() << ")";
       }
       if(a.write_inequivalent_flag==TRUE) {
-	oss << " ";
-	// ?	if(i<10) oss << "0";
-	oss << iat << "[";
-	if(a.atoms.at(iat).equivalent<10) oss << "0";
-	oss << a.atoms.at(iat).equivalent << "]";
-	if(a.atoms.at(iat).is_inequivalent) {
-	  oss <<"*";
-	  oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
-	  //  " v" << a.iatoms.size() << "   burp ";
-	  // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
-	}
+        oss << " ";
+        // ?	if(i<10) oss << "0";
+        oss << iat << "[";
+        if(a.atoms.at(iat).equivalent<10) oss << "0";
+        oss << a.atoms.at(iat).equivalent << "]";
+        if(a.atoms.at(iat).is_inequivalent) {
+          oss <<"*";
+          oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
+          //  " v" << a.iatoms.size() << "   burp ";
+          // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
+        }
       }
       if(a.qm_forces_write) {
-	if(a.qm_calculated==TRUE)  oss << "F *(";
-	if(a.qm_calculated==FALSE) oss << "F  (";
-	for(uint j=1;j<=3;j++) {
-	  if(abs(a.qm_forces.at(iat)(j))<10.0) oss << " ";
-	  if(!std::signbit(a.qm_forces.at(iat)(j))) oss << " ";
-	  oss << a.qm_forces.at(iat)(j) << " ";
-	}
-	oss << ")_   ";
+        if(a.qm_calculated==TRUE)  oss << "F *(";
+        if(a.qm_calculated==FALSE) oss << "F  (";
+        for(uint j=1;j<=3;j++) {
+          if(abs(a.qm_forces.at(iat)(j))<10.0) oss << " ";
+          if(!std::signbit(a.qm_forces.at(iat)(j))) oss << " ";
+          oss << a.qm_forces.at(iat)(j) << " ";
+        }
+        oss << ")_   ";
       }
       if(a.qm_positions_write) {
-	if(a.qm_calculated==TRUE)  oss << "P *(";
-	if(a.qm_calculated==FALSE) oss << "P  (";
-	for(uint j=1;j<=3;j++) {
-	  if(abs(a.qm_positions.at(iat)(j))<10.0) oss << " ";
-	  if(!std::signbit(a.qm_positions.at(iat)(j))) oss << " ";
-	  oss << a.qm_positions.at(iat)(j) << " ";
-	}
- 	oss << ")_   ";
+        if(a.qm_calculated==TRUE)  oss << "P *(";
+        if(a.qm_calculated==FALSE) oss << "P  (";
+        for(uint j=1;j<=3;j++) {
+          if(abs(a.qm_positions.at(iat)(j))<10.0) oss << " ";
+          if(!std::signbit(a.qm_positions.at(iat)(j))) oss << " ";
+          oss << a.qm_positions.at(iat)(j) << " ";
+        }
+        oss << ")_   ";
       }
       if(a.write_DEBUG_flag) {
-	oss << " s"<<a.atoms.at(iat).spin;
-	oss << " n"<<a.atoms.at(iat).number;
-	oss << " b"<<a.atoms.at(iat).basis;
-	oss << " N("<<a.atoms.at(iat).cleanname;
-	oss << " "<<a.atoms.at(iat).atomic_number<<" "<<" ["<<a.atoms.at(iat).type<<"] ";
-	oss << " ijk("<<a.atoms.at(iat).ijk(1)<<","<<a.atoms.at(iat).ijk(2)<<","<<a.atoms.at(iat).ijk(3)<<")";
+        oss << " s"<<a.atoms.at(iat).spin;
+        oss << " n"<<a.atoms.at(iat).number;
+        oss << " b"<<a.atoms.at(iat).basis;
+        oss << " N("<<a.atoms.at(iat).cleanname;
+        oss << " "<<a.atoms.at(iat).atomic_number<<" "<<" ["<<a.atoms.at(iat).type<<"] ";
+        oss << " ijk("<<a.atoms.at(iat).ijk(1)<<","<<a.atoms.at(iat).ijk(2)<<","<<a.atoms.at(iat).ijk(3)<<")";
       }
       oss << endl;oss.flush();
     } // iat
     if(a.write_lattice_flag) {
       oss << "DIRECT LATTICE per raw" << endl;
       for(uint i=1;i<=3;i++) {
-	for(uint j=1;j<=3;j++) {
-	  oss << " ";
-	  if(!std::signbit(a.scale*a.lattice(i,j))) oss << " ";
-	  oss << a.scale*a.lattice(i,j) << " ";
-	}
-	oss << endl;
+        for(uint j=1;j<=3;j++) {
+          oss << " ";
+          if(!std::signbit(a.scale*a.lattice(i,j))) oss << " ";
+          oss << a.scale*a.lattice(i,j) << " ";
+        }
+        oss << endl;
       }
     }
     if(a.write_klattice_flag) {
       oss << "RECIPROCAL LATTICE per raw" << endl;
       for(uint i=1;i<=3;i++) {
-	for(uint j=1;j<=3;j++) {
-	  oss << " ";
-	  if(!std::signbit(a.klattice(i,j))) oss << " ";
-	  oss << a.klattice(i,j) << " ";
-	}
-	oss << endl;
+        for(uint j=1;j<=3;j++) {
+          oss << " ";
+          if(!std::signbit(a.klattice(i,j))) oss << " ";
+          oss << a.klattice(i,j) << " ";
+        }
+        oss << endl;
       }
     }
     if(a.write_lattice_flag && a.write_klattice_flag) {
@@ -2484,12 +2904,12 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       xmatrix<double> orto(3,3);
       orto=((a.scale*a.lattice))*trasp(a.klattice)/(2.0*pi);
       for(uint i=1;i<=3;i++) {
-	for(uint j=1;j<=3;j++) {
-	  oss << " ";
-	  if(!std::signbit(orto(i,j))) oss << " ";
-	  oss << orto(i,j) << " ";
-	}
-	oss << endl;
+        for(uint j=1;j<=3;j++) {
+          oss << " ";
+          if(!std::signbit(orto(i,j))) oss << " ";
+          oss << orto(i,j) << " ";
+        }
+        oss << endl;
       }
     }
     if(a.write_DEBUG_flag) {
@@ -2502,8 +2922,8 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(0 && a.partial_occupation_flag==TRUE) { // KESONG
       oss << "*******************************" << endl;
       for(int hnf=1;hnf<10;hnf++) {
-	oss << hnf << " ";
-	oss << endl;
+        oss << hnf << " ";
+        oss << endl;
       }
     }
     //DX 20180618 - Check for symmetry constrained calculation - START
@@ -2537,30 +2957,30 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     for(uint iat=0;iat<a.atoms.size();iat++) {
       oss << " ";
       if(a.atoms.at(iat).name_is_given==TRUE) {
-	oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
+        oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
-	      //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
-	      message << "QE needs atoms species names";  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+        //[CO190629 - no exit()]cerr << "QE needs atoms species names" << endl; exit(0);
+        message << "QE needs atoms species names";  //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
       }
       for(uint j=1;j<=3;j++) {
-	//  oss << " ";
-	if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
-	if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
+        //  oss << " ";
+        if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
+        if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
       }
       oss << " ! // " << a.atoms.at(iat).cleanname << " ";
       if(a.write_inequivalent_flag==TRUE) {
-	oss << " ";
-	//	if(i<10) oss << "0";
-	oss << iat << "[";
-	if(a.atoms.at(iat).equivalent<10) oss << "0";
-	oss << a.atoms.at(iat).equivalent << "]";
-	if(a.atoms.at(iat).is_inequivalent) {
-	  oss <<"*";
-	  oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
-	  //  " v" << a.iatoms.size() << "   burp ";
-	  // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
-	}
+        oss << " ";
+        //	if(i<10) oss << "0";
+        oss << iat << "[";
+        if(a.atoms.at(iat).equivalent<10) oss << "0";
+        oss << a.atoms.at(iat).equivalent << "]";
+        if(a.atoms.at(iat).is_inequivalent) {
+          oss <<"*";
+          oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
+          //  " v" << a.iatoms.size() << "   burp ";
+          // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
+        }
       }
       oss << endl;
     }
@@ -2569,13 +2989,13 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     oss << "CELL_PARAMETERS (angstrom)" << endl ;
     {
       for(uint i=1;i<=3;i++) {
-	for(uint j=1;j<=3;j++) {
-	  oss << " ";
-	  if(abs(a.lattice(i,j))<10.0) oss << " ";
-	  if(!std::signbit(a.lattice(i,j))) oss << " ";
-	  oss << a.lattice(i,j)*a.scale << ""; // DX 2/15/18 - added scaling factor
-	}
-	oss << endl;
+        for(uint j=1;j<=3;j++) {
+          oss << " ";
+          if(abs(a.lattice(i,j))<10.0) oss << " ";
+          if(!std::signbit(a.lattice(i,j))) oss << " ";
+          oss << a.lattice(i,j)*a.scale << ""; // DX 2/15/18 - added scaling factor
+        }
+        oss << endl;
       }
     }
     oss << "# AFLOW::QE END " << endl;
@@ -2603,10 +3023,10 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(j==2) oss << "     ";
       if(j==3) oss << "     ";
       for(uint i=1;i<=3;i++) {
-	oss << " ";
-	if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO190908 - manual is misleading, it's row-based
-	if(!std::signbit(a.lattice(j,i))) oss << " "; //CO190908 - manual is misleading, it's row-based
-	oss << a.lattice(j,i) << "";  //CO190908 - manual is misleading, it's row-based
+        oss << " ";
+        if(abs(a.lattice(j,i))<10.0) oss << " ";  //CO190908 - manual is misleading, it's row-based
+        if(!std::signbit(a.lattice(j,i))) oss << " "; //CO190908 - manual is misleading, it's row-based
+        oss << a.lattice(j,i) << "";  //CO190908 - manual is misleading, it's row-based
       }
       oss << endl;
     }
@@ -2621,30 +3041,30 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     for(uint iat=0;iat<a.atoms.size();iat++) {
       oss << "      ";
       for(uint j=1;j<=3;j++) {
-	if(a.coord_flag==_COORDS_FRACTIONAL_) {
-	  if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
-	  if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
-	  oss << a.atoms.at(iat).fpos(j) << " ";
-	}
-	if(a.coord_flag==_COORDS_CARTESIAN_) {
-	  if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";
-	  if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " ";
-	  oss << a.atoms.at(iat).cpos(j) << " ";
-	}
+        if(a.coord_flag==_COORDS_FRACTIONAL_) {
+          if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";
+          if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " ";
+          oss << a.atoms.at(iat).fpos(j) << " ";
+        }
+        if(a.coord_flag==_COORDS_CARTESIAN_) {
+          if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";
+          if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " ";
+          oss << a.atoms.at(iat).cpos(j) << " ";
+        }
       }
       oss << " # " << a.atoms.at(iat).cleanname << " ";
       if(a.write_inequivalent_flag==TRUE) {
-	oss << " ";
-	//	if(i<10) oss << "0";
-	oss << iat << "[";
-	if(a.atoms.at(iat).equivalent<10) oss << "0";
-	oss << a.atoms.at(iat).equivalent << "]";
-	if(a.atoms.at(iat).is_inequivalent) {
-	  oss <<"*";
-	  oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
-	  //  " v" << a.iatoms.size() << "   burp ";
-	  // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
-	}
+        oss << " ";
+        //	if(i<10) oss << "0";
+        oss << iat << "[";
+        if(a.atoms.at(iat).equivalent<10) oss << "0";
+        oss << a.atoms.at(iat).equivalent << "]";
+        if(a.atoms.at(iat).is_inequivalent) {
+          oss <<"*";
+          oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
+          //  " v" << a.iatoms.size() << "   burp ";
+          // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
+        }
       }
       oss << endl;
     }
@@ -2673,9 +3093,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << "lattice_vector ";
       for(uint j=1;j<=3;j++) {
         if(abs(aa.lattice(i,j))<100.0) oss << " ";
-	if(abs(aa.lattice(i,j))<10.0) oss << " ";
+        if(abs(aa.lattice(i,j))<10.0) oss << " ";
         if(!std::signbit(aa.lattice(i,j))) oss << " ";
-	oss << aa.lattice(i,j) << "";
+        oss << aa.lattice(i,j) << "";
       }
       oss << endl;
     }
@@ -2687,32 +3107,32 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       oss << (aa.coord_flag==_COORDS_FRACTIONAL_ ? "atom_frac" : "atom") << " ";
       for(uint j=1;j<=3;j++) {
-	if(aa.coord_flag==_COORDS_FRACTIONAL_) {
+        if(aa.coord_flag==_COORDS_FRACTIONAL_) {
           if(abs(aa.atoms.at(iat).fpos(j))<100.0) oss << " ";
-	  if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
+          if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
           if(!std::signbit(aa.atoms.at(iat).fpos(j))) oss << " ";
-	  oss << aa.atoms.at(iat).fpos(j) << " ";
-	}
-	if(aa.coord_flag==_COORDS_CARTESIAN_)  {
+          oss << aa.atoms.at(iat).fpos(j) << " ";
+        }
+        if(aa.coord_flag==_COORDS_CARTESIAN_)  {
           if(abs(aa.atoms.at(iat).cpos(j))<100.0) oss << " ";
-	  if(abs(aa.atoms.at(iat).cpos(j))<10.0) oss << " ";
+          if(abs(aa.atoms.at(iat).cpos(j))<10.0) oss << " ";
           if(!std::signbit(aa.atoms.at(iat).cpos(j))) oss << " ";
-	  oss << aa.atoms.at(iat).cpos(j) << " ";
-	}
+          oss << aa.atoms.at(iat).cpos(j) << " ";
+        }
       }
       oss << " " << aa.atoms.at(iat).cleanname << " ";
       if(aa.write_inequivalent_flag==TRUE) {
         oss << " # ";
-	//	if(i<10) oss << "0";
-	oss << iat << "[";
-	if(aa.atoms.at(iat).equivalent<10) oss << "0";
-	oss << aa.atoms.at(iat).equivalent << "]";
-	if(aa.atoms.at(iat).is_inequivalent) {
-	  oss <<"*";
-	  oss << "_(" << aa.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << aa.atoms.at(iat).index_iatoms << "  ";
-    //  " v" << aa.iatoms.size() << "   burp ";
-    // for(uint jat=0;jat<aa.iatoms.size();jat++)  oss << aa.iatoms.at(jat).size() << " ";
-	}
+        //	if(i<10) oss << "0";
+        oss << iat << "[";
+        if(aa.atoms.at(iat).equivalent<10) oss << "0";
+        oss << aa.atoms.at(iat).equivalent << "]";
+        if(aa.atoms.at(iat).is_inequivalent) {
+          oss <<"*";
+          oss << "_(" << aa.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << aa.atoms.at(iat).index_iatoms << "  ";
+          //  " v" << aa.iatoms.size() << "   burp ";
+          // for(uint jat=0;jat<aa.iatoms.size();jat++)  oss << aa.iatoms.at(jat).size() << " ";
+        }
       }
       oss << endl;
     }
@@ -2763,7 +3183,7 @@ string xstructure::PrintSymbolicMathRepresentation(void){
       }
     } else {
       for(uint i=0;i<aa.num_each_type.size();i++){
-      oss << aa.num_each_type.at(i) << " ";
+        oss << aa.num_each_type.at(i) << " ";
       }
     }
     oss << endl;
@@ -2773,12 +3193,12 @@ string xstructure::PrintSymbolicMathRepresentation(void){
     if(1) { 
       if(aa.partial_occupation_flag==TRUE) {
         oss << "Partial ";
-	//oss.precision(_pocc_precision_);  // CO 170630
+        //oss.precision(_pocc_precision_);  // CO 170630
         //oss << std::defaultfloat;
         oss.unsetf(ios_base::floatfield);
-	oss << "[";for(uint i=0;i<aa.comp_each_type.size();i++) {oss << char('A'+i) << aa.comp_each_type.at(i);}oss << "] ";
+        oss << "[";for(uint i=0;i<aa.comp_each_type.size();i++) {oss << char('A'+i) << aa.comp_each_type.at(i);}oss << "] ";
         oss << std::fixed;
-	//oss.precision(_precision_);       // CO 170630
+        //oss.precision(_precision_);       // CO 170630
       } else {
         oss << "["; for(uint i=0,k=0;i<aa.num_each_type.size();k+=aa.num_each_type.at(i),i++) { oss << char(aa.atoms.at(k).type+65) << aa.num_each_type.at(i);} oss << "] ";
       }
@@ -2793,13 +3213,13 @@ string xstructure::PrintSymbolicMathRepresentation(void){
         oss << "   " << aurostd::joinWDelimiter(aa.atoms[i].cpos_equation,"  ");
       }
       if(aa.atoms.at(i).name_is_given==TRUE) {
-	oss << " " << aa.atoms.at(i).name << " ";
-	for(uint j=aa.atoms.at(i).name.length();j<5;j++) oss << " ";
+        oss << " " << aa.atoms.at(i).name << " ";
+        for(uint j=aa.atoms.at(i).name.length();j<5;j++) oss << " ";
       }
       if(aa.partial_occupation_flag==TRUE) {
         oss.unsetf(ios_base::floatfield);
-	oss << "pocc=" << aa.atoms.at(i).partial_occupation_value << "  ";
-	oss << std::fixed;
+        oss << "pocc=" << aa.atoms.at(i).partial_occupation_value << "  ";
+        oss << std::fixed;
       }
       oss << endl;
     }
@@ -2839,54 +3259,55 @@ string xstructure::PrintSymbolicMathRepresentation(void){
         oss << "symmetry_cart " << aurostd::joinWDelimiter(aa.atoms[i].cpos_equation," , ") << endl;
       }
     }
-/*    for(uint i=1;i<=3;i++) { // each COLUMN of this array is one primitive translation
-      oss << "lattice_vector ";
-      for(uint j=1;j<=3;j++) {
-        if(abs(aa.lattice(i,j))<100.0) oss << " ";
-	if(abs(aa.lattice(i,j))<10.0) oss << " ";
-        if(!std::signbit(aa.lattice(i,j))) oss << " ";
-	oss << aa.lattice(i,j) << "";
-      }
-      oss << endl;
-    }
-    for(uint iat=0;iat<aa.atoms.size();iat++) {
-      if(0||LDEBUG){
-        cerr << "XSTRUCTURE<<: AIMS aa.coord_flag==" << aa.coord_flag << endl;
-        cerr << "XSTRUCTURE<<: AIMS _COORDS_FRACTIONAL_==" << _COORDS_FRACTIONAL_ << endl;
-        cerr << "XSTRUCTURE<<: AIMS _COORDS_CARTESIAN_==" << _COORDS_CARTESIAN_ << endl;
-      }
-      oss << (aa.coord_flag==_COORDS_FRACTIONAL_ ? "atom_frac" : "atom") << " ";
-      for(uint j=1;j<=3;j++) {
-	if(aa.coord_flag==_COORDS_FRACTIONAL_) {
-          if(abs(aa.atoms.at(iat).fpos(j))<100.0) oss << " ";
-	  if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
-          if(!std::signbit(aa.atoms.at(iat).fpos(j))) oss << " ";
-	  oss << aa.atoms.at(iat).fpos(j) << " ";
-	}
-	if(aa.coord_flag==_COORDS_CARTESIAN_)  {
-          if(abs(aa.atoms.at(iat).cpos(j))<100.0) oss << " ";
-	  if(abs(aa.atoms.at(iat).cpos(j))<10.0) oss << " ";
-          if(!std::signbit(aa.atoms.at(iat).cpos(j))) oss << " ";
-	  oss << aa.atoms.at(iat).cpos(j) << " ";
-	}
-      }
-      oss << " " << aa.atoms.at(iat).cleanname << " ";
-      if(aa.write_inequivalent_flag==TRUE) {
-        oss << " # ";
-	//	if(i<10) oss << "0";
-	oss << iat << "[";
-	if(aa.atoms.at(iat).equivalent<10) oss << "0";
-	oss << aa.atoms.at(iat).equivalent << "]";
-	if(aa.atoms.at(iat).is_inequivalent) {
-	  oss <<"*";
-	  oss << "_(" << aa.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << aa.atoms.at(iat).index_iatoms << "  ";
-    //  " v" << aa.iatoms.size() << "   burp ";
-    // for(uint jat=0;jat<aa.iatoms.size();jat++)  oss << aa.iatoms.at(jat).size() << " ";
-	}
-      }
-      oss << endl;
-    }
-  */
+
+    //for(uint i=1;i<=3;i++) { // each COLUMN of this array is one primitive translation
+    //oss << "lattice_vector ";
+    //for(uint j=1;j<=3;j++) {
+    //if(abs(aa.lattice(i,j))<100.0) oss << " ";
+    //if(abs(aa.lattice(i,j))<10.0) oss << " ";
+    //if(!std::signbit(aa.lattice(i,j))) oss << " ";
+    //oss << aa.lattice(i,j) << "";
+    //}
+    //oss << endl;
+    //}
+    //for(uint iat=0;iat<aa.atoms.size();iat++) {
+    //if(0||LDEBUG){
+    //cerr << "XSTRUCTURE<<: AIMS aa.coord_flag==" << aa.coord_flag << endl;
+    //cerr << "XSTRUCTURE<<: AIMS _COORDS_FRACTIONAL_==" << _COORDS_FRACTIONAL_ << endl;
+    //cerr << "XSTRUCTURE<<: AIMS _COORDS_CARTESIAN_==" << _COORDS_CARTESIAN_ << endl;
+    //}
+    //oss << (aa.coord_flag==_COORDS_FRACTIONAL_ ? "atom_frac" : "atom") << " ";
+    //for(uint j=1;j<=3;j++) {
+    //if(aa.coord_flag==_COORDS_FRACTIONAL_) {
+    //if(abs(aa.atoms.at(iat).fpos(j))<100.0) oss << " ";
+    //if(abs(aa.atoms.at(iat).fpos(j))<10.0) oss << " ";
+    //if(!std::signbit(aa.atoms.at(iat).fpos(j))) oss << " ";
+    //oss << aa.atoms.at(iat).fpos(j) << " ";
+    //}
+    //if(aa.coord_flag==_COORDS_CARTESIAN_)  {
+    //if(abs(aa.atoms.at(iat).cpos(j))<100.0) oss << " ";
+    //if(abs(aa.atoms.at(iat).cpos(j))<10.0) oss << " ";
+    //if(!std::signbit(aa.atoms.at(iat).cpos(j))) oss << " ";
+    //oss << aa.atoms.at(iat).cpos(j) << " ";
+    //}
+    //}
+    //oss << " " << aa.atoms.at(iat).cleanname << " ";
+    //if(aa.write_inequivalent_flag==TRUE) {
+    //oss << " # ";
+    ////	if(i<10) oss << "0";
+    //oss << iat << "[";
+    //if(aa.atoms.at(iat).equivalent<10) oss << "0";
+    //oss << aa.atoms.at(iat).equivalent << "]";
+    //if(aa.atoms.at(iat).is_inequivalent) {
+    //oss <<"*";
+    //oss << "_(" << aa.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << aa.atoms.at(iat).index_iatoms << "  ";
+    ////  " v" << aa.iatoms.size() << "   burp ";
+    //// for(uint jat=0;jat<aa.iatoms.size();jat++)  oss << aa.iatoms.at(jat).size() << " ";
+    //}
+    //}
+    //oss << endl;
+    //}
+
   }
   return oss.str();
 }
@@ -3034,7 +3455,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  // CO 171008
   if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  // CO 171008
   if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX 20180723
-  
+
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
   uint iline=0;
   vector<string> vinput,tokens;
@@ -3044,7 +3465,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
     //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
   }  // CO 180702
 
   if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
@@ -3067,9 +3488,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   if(vinput.size()==0) {
     //[CO190629 - no exit()]cerr << soliloquy << " No input..." << endl; exit(0);
-    throw aurostd::xerror(soliloquy,"No input",_INPUT_MISSING_);  //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO190629
   }  // CO 180420
-  
+
   //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   exit(0);
   string sstring,stmp;
   bool IOMODE_found=FALSE;
@@ -3114,21 +3535,21 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ntyp)=" << QE << endl;
     for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"atomic_positions",true)+aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS",true); // DX 1/23/18 - added true to clean the spaces in string
     if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ATOMIC_POSITIONS)=" << QE << endl;
-    
+
     for(uint i=0;i<vinput.size()&&QE==5;i++) {
       if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && 
-	 !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
-	 !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
-	 !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
-	cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
+          !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
+          !aurostd::substring2bool(vinput[i],"bohr","BOHR") && // DX added
+          !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
+        cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
       if( aurostd::substring2bool(vinput[i],"&system")) {
-	//	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
+        //	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
     }
     if(QE==5 && QE_ERROR) {
       //[CO190629 - no exit()]cerr << soliloquy << " QE input errors..." << endl; exit(0);
-      throw aurostd::xerror(soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO190629
     }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
@@ -3136,7 +3557,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       IOMODE_found=TRUE;
     }
   }
-  
+
   //for CIF input //DX 20180723 - add cif reader - START
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " CIF DETECTOR" << endl;
@@ -3158,7 +3579,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
   }
   //DX 20180723 - add cif reader - END
- 
+
   //for AIMS input - unfortunately, it's very generic so leave for last
   if(!IOMODE_found) {
     vector<string> tokens_line;
@@ -3212,7 +3633,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             message << "lattice_vector "; //CO190629
             message << "at line[" << i+1 << "] is ill-defined" << endl; //CO190629
             message << "line: " << vinput[i] << endl; //CO190629
-            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
             //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, ";
@@ -3228,14 +3649,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO190629
             else {message << "is ill-defined" << endl;} //CO190629
             message << "line: " << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
           }
         }
       }
       if(!atom_found_anywhere){
         //[CO190629 - no exit()]cerr << soliloquy << " AIMS input error, no atoms found..." << endl;
         //[CO190629 - no exit()]exit(1);
-        throw aurostd::xerror(soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -3253,20 +3674,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else {
               //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, too many lattice vectors found" << endl;
               //[CO190629 - no exit()]exit(1);
-              throw aurostd::xerror(soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
           //[CO190629 - no exit()]oss << soliloquy << " AIMS input error, incomplete lattice vector specification (needed if atom_frac found)" << endl;
           //[CO190629 - no exit()]exit(1);
-          throw aurostd::xerror(soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO190629
         }
       }
     }
     else {if(LDEBUG) {cerr << soliloquy << " AIMS GEOM DETECTOR = FALSE" << endl;}}
   }
-  
+
   // DESPERATE FINDING => VASP
   if(!IOMODE_found) {
     if(LDEBUG) cerr << soliloquy << " VASP DETECTOR" << endl;
@@ -3277,7 +3698,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(LDEBUG) cerr << soliloquy << " VASP DETECTOR = TRUE" << endl;
     }
   }
-  
+
   // ----------------------------------------------------------------------
   // SOME EXTRA VERBOSE
   if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
@@ -3308,7 +3729,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     a.title=vinput.at(iline++);
     // -------------- SCALE
@@ -3319,7 +3740,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
@@ -3330,7 +3751,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing second line in poscar" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // oss << tokens.size() <<  " = " << tokens.at(0) << endl;exit(0);
     a.scale=0.0;
@@ -3348,7 +3769,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -3371,7 +3792,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
@@ -3381,7 +3802,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -3452,13 +3873,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO190629
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
     }
 
     // VASP 4
     a.is_vasp4_poscar_format=TRUE;
     a.is_vasp5_poscar_format=FALSE;
-    
+
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       // VASP 5
       a.is_vasp4_poscar_format=FALSE;
@@ -3473,13 +3894,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
       aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
       aurostd::string2tokens(stmp,tokens);  //now we should have D/C line
     }
-    
+
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_MISSING_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO190629
     }
-  
+
     //[CO190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
     //[CO190629 - OBSOLETE]  // VASP 4
     //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=TRUE;
@@ -3489,7 +3910,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - OBSOLETE]  a.is_vasp4_poscar_format=FALSE;
     //[CO190629 - OBSOLETE]  a.is_vasp5_poscar_format=TRUE;
     //[CO190629 - OBSOLETE]}
-    
+
     a.partial_occupation_flag=FALSE;
 
     for(uint j=1;j<tokens.size();j++) if(tokens[j][0]=='P' || tokens[j][0]=='p') a.partial_occupation_flag=TRUE;
@@ -3498,7 +3919,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.partial_occupation_site_tol=DEFAULT_POCC_SITE_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined  // CO 170803 - site tol
     a.partial_occupation_stoich_tol=DEFAULT_POCC_STOICH_TOL; //DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined // CO 180409
     //}
-    if(a.partial_occupation_flag){ //&& a.neg_scale_second) { // CO 180409
+    if(a.partial_occupation_flag) //&& a.neg_scale_second) // CO 180409
+    { //CO200106 - patching for auto-indenting
       if(LDEBUG) {cerr << soliloquy << " a.neg_scale_second=" << a.neg_scale_second << ", a.scale_second=" << a.scale_second << endl;}
       if(a.neg_scale_second){a.partial_occupation_HNF=(int) (-a.scale_second);} // CO 180409
       else {
@@ -3527,7 +3949,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -3539,7 +3961,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -3555,7 +3977,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "missing line[" << iline << "]" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  // CO 180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -3598,7 +4020,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               //[CO190629 - no exit()]exit(0);
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
             }
             nnumber=aurostd::string2utype<int>(tokens_k.at(0));
             if(tokens_k.size()==1) dpocc=1.0;
@@ -3615,7 +4037,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               //[CO190629 - no exit()]exit(0);
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
             }
           } // loop on +
           a.num_each_type.push_back(number);
@@ -3636,7 +4058,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "missing line[" << iline << "]" << endl; //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }  // CO 180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -3649,7 +4071,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     } else {
       if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
@@ -3662,7 +4084,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "missing line[" << iline << "]" << endl; //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }  // CO 180420 - check for missing lines
         stmp=vinput.at(iline++);
         sstmp=aurostd::RemoveSpaces(stmp);
@@ -3683,7 +4105,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             //[CO190629 - no exit()]exit(0);
             message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO190629
             for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-            throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
           }
         } else {
           //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>> Did not find coordinate type D/d or C/c." << endl;
@@ -3691,7 +4113,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Did not find coordinate type D/d or C/c." << endl;  //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }
       }
       a.coord_type[1]='\0';
@@ -3737,7 +4159,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //	bool plug_atom=TRUE;
         iat++; // it startf from -1 so the first is ZERO
         //  cerr << iat << " type=" << itype << endl;
-        //  for(int iat=1;iat<=(num_atoms);iat++) {
+        //  for(int iat=1;iat<=(num_atoms);iat++) { //[CO200106 - close bracket for indenting]}
         // cerr << iat << " " << (num_atoms) << endl;
         _atom atom;                                        // create new atom
         string stmp;
@@ -3749,7 +4171,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Insufficient number of atom lines." << endl;  //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }  
         if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
@@ -3763,7 +4185,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }  
 
         int id=0;
@@ -3840,7 +4262,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               message << " where x,y,z are the coordinates " << endl; //CO190629
               message << " Name is the symbol of the atom  " << endl; //CO190629
               message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO190629
-              throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
             }
           }
           if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
@@ -3939,144 +4361,144 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       // DX 1/23/18 - added ibrav - END
     }
-      xvector<double> parameters(6); 
-      uint celldm_count = 0;
-      bool isabc = false; // distinguish between celldm and a,b,c,cosAB,cosAC,cosBC
+    xvector<double> parameters(6); 
+    uint celldm_count = 0;
+    bool isabc = false; // distinguish between celldm and a,b,c,cosAB,cosAC,cosBC
 
-      // celldm variant
+    // celldm variant
+    for(uint i=0;i<vinput.size();i++){
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
+        vector<string> comma_tokens; 
+        aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+        for(uint j=0;j<comma_tokens.size();j++){
+          if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"CELLDM",true)){ // DX 1/24/17 - added aurostd::toupper
+            celldm_count++;
+            vector<string> tokens; 
+            aurostd::string2tokens(aurostd::RemoveWhiteSpaces(comma_tokens.at(j)),tokens,"=");
+            // In case the celldms are not in order, or not all are given; need to check number
+            vector<string> parentheses_tokens; 
+            aurostd::string2tokens(aurostd::RemoveWhiteSpaces(tokens.at(0)),parentheses_tokens,"(");
+            uint index = aurostd::string2utype<uint>(aurostd::RemoveCharacter(parentheses_tokens.at(1),')'));  
+            parameters[index] = aurostd::string2utype<double>(tokens.at(1));
+          }
+        }
+      } 
+    }
+    // a,b,c,cosAB,cosAC,cosBC variant
+    if(celldm_count == 0){
+      isabc = true;
       for(uint i=0;i<vinput.size();i++){
-        if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"CELLDM")){
+        if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
           vector<string> comma_tokens; 
-          aurostd::string2tokens(aurostd::RemoveWhiteSpaces(vinput[i]),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
           for(uint j=0;j<comma_tokens.size();j++){
-            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"CELLDM",true)){ // DX 1/24/17 - added aurostd::toupper
-              celldm_count++;
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"A=",true)){ // DX 1/24/17 - added aurostd::toupper
               vector<string> tokens; 
-              aurostd::string2tokens(aurostd::RemoveWhiteSpaces(comma_tokens.at(j)),tokens,"=");
-              // In case the celldms are not in order, or not all are given; need to check number
-              vector<string> parentheses_tokens; 
-              aurostd::string2tokens(aurostd::RemoveWhiteSpaces(tokens.at(0)),parentheses_tokens,"(");
-              uint index = aurostd::string2utype<uint>(aurostd::RemoveCharacter(parentheses_tokens.at(1),')'));  
-              parameters[index] = aurostd::string2utype<double>(tokens.at(1));
+              aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"A=");
+              if(tokens.size()==1){
+                parameters[1] = aurostd::string2utype<double>(tokens.at(0)); //A only
+              }
+            }
+          }
+        } 
+        if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
+          vector<string> comma_tokens; 
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          for(uint j=0;j<comma_tokens.size();j++){
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"B=",true)){ // DX 1/24/17 - added aurostd::toupper
+              vector<string> tokens; 
+              aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"B=");
+              if(tokens.size()==1){
+                parameters[2] = aurostd::string2utype<double>(tokens.at(0)); //B only
+              }
+            }
+          }
+        } 
+        if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
+          vector<string> comma_tokens; 
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          for(uint j=0;j<comma_tokens.size();j++){
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"C=",true)){ // DX 1/24/17 - added aurostd::toupper
+              vector<string> tokens; 
+              aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"C=");
+              if(tokens.size()==1){
+                parameters[3] = aurostd::string2utype<double>(tokens.at(0)); //C only
+              }
+            }
+          }
+        } 
+        if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
+          vector<string> comma_tokens; 
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          for(uint j=0;j<comma_tokens.size();j++){
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAB=",true)){ // DX 1/24/17 - added aurostd::toupper
+              vector<string> tokens; 
+              aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSAB=");
+              if(tokens.size()==1){
+                parameters[4] = aurostd::string2utype<double>(tokens.at(0)); // COSAB only
+              }
+            }
+          }
+        } 
+        if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
+          vector<string> comma_tokens; 
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          for(uint j=0;j<comma_tokens.size();j++){
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAC=",true)){ // DX 1/24/17 - added aurostd::toupper
+              vector<string> tokens; 
+              aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSAC=");
+              if(tokens.size()==1){
+                parameters[5] = aurostd::string2utype<double>(tokens.at(0)); // COSAC only
+              }
+            }
+          }
+        } 
+        if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
+          vector<string> comma_tokens; 
+          aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
+          for(uint j=0;j<comma_tokens.size();j++){
+            if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSBC=",true)){ // DX 1/24/17 - added aurostd::toupper
+              vector<string> tokens; 
+              aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSBC=");
+              if(tokens.size()==1){
+                parameters[6] = aurostd::string2utype<double>(tokens.at(0)); // COSBC only
+              }
             }
           }
         } 
       }
-      // a,b,c,cosAB,cosAC,cosBC variant
-      if(celldm_count == 0){
-        isabc = true;
-	for(uint i=0;i<vinput.size();i++){
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"A=")){
-	    vector<string> comma_tokens; 
-	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
-	    for(uint j=0;j<comma_tokens.size();j++){
-	      if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"A=",true)){ // DX 1/24/17 - added aurostd::toupper
-                vector<string> tokens; 
-                aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"A=");
-                if(tokens.size()==1){
-		  parameters[1] = aurostd::string2utype<double>(tokens.at(0)); //A only
-                }
-	      }
-	    }
-	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"B=")){
-	    vector<string> comma_tokens; 
-	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
-	    for(uint j=0;j<comma_tokens.size();j++){
-	      if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"B=",true)){ // DX 1/24/17 - added aurostd::toupper
-                vector<string> tokens; 
-                aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"B=");
-                if(tokens.size()==1){
-		  parameters[2] = aurostd::string2utype<double>(tokens.at(0)); //B only
-                }
-	      }
-	    }
-	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"C=")){
-	    vector<string> comma_tokens; 
-	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
-	    for(uint j=0;j<comma_tokens.size();j++){
-	      if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"C=",true)){ // DX 1/24/17 - added aurostd::toupper
-                vector<string> tokens; 
-                aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"C=");
-                if(tokens.size()==1){
-		  parameters[3] = aurostd::string2utype<double>(tokens.at(0)); //C only
-                }
-	      }
-	    }
-	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAB=")){
-	    vector<string> comma_tokens; 
-	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
-	    for(uint j=0;j<comma_tokens.size();j++){
-	      if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAB=",true)){ // DX 1/24/17 - added aurostd::toupper
-                vector<string> tokens; 
-                aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSAB=");
-                if(tokens.size()==1){
-		  parameters[4] = aurostd::string2utype<double>(tokens.at(0)); // COSAB only
-                }
-	      }
-	    }
-	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSAC=")){
-	    vector<string> comma_tokens; 
-	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
-	    for(uint j=0;j<comma_tokens.size();j++){
-	      if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSAC=",true)){ // DX 1/24/17 - added aurostd::toupper
-                vector<string> tokens; 
-                aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSAC=");
-                if(tokens.size()==1){
-		  parameters[5] = aurostd::string2utype<double>(tokens.at(0)); // COSAC only
-                }
-	      }
-	    }
-	  } 
-	  if(aurostd::substring2bool(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),"COSBC=")){
-	    vector<string> comma_tokens; 
-	    aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(vinput[i])),comma_tokens,","); // DX - it is possible to have multiple fields per line
-	    for(uint j=0;j<comma_tokens.size();j++){
-	      if(aurostd::substring2bool(aurostd::toupper(comma_tokens.at(j)),"COSBC=",true)){ // DX 1/24/17 - added aurostd::toupper
-                vector<string> tokens; 
-                aurostd::string2tokens(aurostd::toupper(aurostd::RemoveWhiteSpaces(comma_tokens.at(j))),tokens,"COSBC=");
-                if(tokens.size()==1){
-		  parameters[6] = aurostd::string2utype<double>(tokens.at(0)); // COSBC only
-                }
-	      }
-	    }
-	  } 
-	}
-      }
+    }
     // DX 1/23/18 - added ibrav/parameters - START
     if(ibrav_value!=0){
       a.lattice = pflow::QE_ibrav2lattice(ibrav_value, parameters, isabc);
     }
     // DX 1/23/18 - added ibrav/parameters - END
     else {
-    if(iline<vinput.size()-3) { // IN a1 / a2 / a3 rows version
-      if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO FOUND 3 extra lines after, trying a1/a2/a3 on raws" << endl;
-      stringstream input_tmp;
-      input_tmp.clear();input_tmp.str(vinput.at(iline++));
-      input_tmp >> a.lattice(1,1) >> a.lattice(1,2) >> a.lattice(1,3);
-      input_tmp.clear();input_tmp.str(vinput.at(iline++));
-      input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
-      input_tmp.clear();input_tmp.str(vinput.at(iline++));
-      input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
-      if(bohr_lat){                     // DX 1/23/18 - added bohr 
-	  a.lattice = a.lattice*bohr2angstrom; // DX 1/23/18 - added bohr
-	}                             // DX 1/23/18 - added bohr
-      if(alat){                     // DX 2/15/18 - added alat 
-        if(isabc){
-          a.lattice = a.lattice*parameters[1]; // DX 1/23/18 - added alat
-        }
-        else {
-          a.lattice = a.lattice*parameters[1]*bohr2angstrom; // DX 1/23/18 - added alat
-        }
-      }                             // DX 2/15/18 - added alat
-      xvector<double> data(6);
-      data=Getabc_angles(a.lattice,DEGREES);
-      a.a=data[1];a.b=data[2];a.c=data[3];
-      a.alpha=data[4];a.beta=data[5];a.gamma=data[6];
-    }
+      if(iline<vinput.size()-3) { // IN a1 / a2 / a3 rows version
+        if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO FOUND 3 extra lines after, trying a1/a2/a3 on raws" << endl;
+        stringstream input_tmp;
+        input_tmp.clear();input_tmp.str(vinput.at(iline++));
+        input_tmp >> a.lattice(1,1) >> a.lattice(1,2) >> a.lattice(1,3);
+        input_tmp.clear();input_tmp.str(vinput.at(iline++));
+        input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
+        input_tmp.clear();input_tmp.str(vinput.at(iline++));
+        input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
+        if(bohr_lat){                     // DX 1/23/18 - added bohr 
+          a.lattice = a.lattice*bohr2angstrom; // DX 1/23/18 - added bohr
+        }                             // DX 1/23/18 - added bohr
+        if(alat){                     // DX 2/15/18 - added alat 
+          if(isabc){
+            a.lattice = a.lattice*parameters[1]; // DX 1/23/18 - added alat
+          }
+          else {
+            a.lattice = a.lattice*parameters[1]*bohr2angstrom; // DX 1/23/18 - added alat
+          }
+        }                             // DX 2/15/18 - added alat
+        xvector<double> data(6);
+        data=Getabc_angles(a.lattice,DEGREES);
+        a.a=data[1];a.b=data[2];a.c=data[3];
+        a.alpha=data[4];a.beta=data[5];a.gamma=data[6];
+      }
     }
     // ---------------------------------------------------------------
     // SOME FOR ABCCAR
@@ -4088,24 +4510,26 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.kpoints_k1=0;a.kpoints_k2=0;a.kpoints_k3=0;
     a.kpoints_kmax=0;a.kpoints_kppra=0;a.kpoints_kscheme="";
     clear(a.origin);
-    
+
     // cerr << "iline=" << iline << endl;
     // cerr << "vinput.size()=" << vinput.size() << endl;
     // NOW ADD ATOMS
     for(uint i=0;i<vinput.size();i++) {
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL")) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) { // DX 1/24/18 - added aurostd::toupper
-	iline=i+1;a.coord_flag=_COORDS_FRACTIONAL_;
+      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"crystal","CRYSTAL"))
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"CRYSTAL")) // DX 1/24/18 - added aurostd::toupper
+      { //CO200106 - patching for auto-indenting
+        iline=i+1;a.coord_flag=_COORDS_FRACTIONAL_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
       }
-      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
-      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) { // DX 1/24/18 - added aurostd::toupper
-	iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
+      // DX 1/24/18 [OBSOLETE] if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM"))
+      if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"ANGSTROM")) // DX 1/24/18 - added aurostd::toupper
+      { //CO200106 - patching for auto-indenting
+        iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
       }
       // DX 1/24/18 -- added Bohr case - START
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ATOMIC_POSITIONS") && aurostd::substring2bool(aurostd::toupper(vinput[i]),"BOHR")) { // DX 1/24/18 - added aurostd::toupper
-	iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
+        iline=i+1;a.coord_flag=_COORDS_CARTESIAN_;
         jline=iline+nat_value; // DX 1/23/18 - added nat
         bohr_pos = true;
       }
@@ -4126,7 +4550,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //[CO190629 - no exit()]exit(0);
         message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }  
       int id=0;
       string name;
@@ -4136,24 +4560,24 @@ istream& operator>>(istream& cinput, xstructure& a) {
       v(2)=aurostd::string2utype<double>(stmp_tokens.at(id++)); // should be indicized with () instead of [],
       v(3)=aurostd::string2utype<double>(stmp_tokens.at(id++)); // b/c () does boundary checks !
       if(a.coord_flag==_COORDS_FRACTIONAL_) {
-	atom.fpos=v;
-	atom.cpos=F2C(a.lattice,atom.fpos);
+        atom.fpos=v;
+        atom.cpos=F2C(a.lattice,atom.fpos);
       }
       if(a.coord_flag==_COORDS_CARTESIAN_) {
         if(bohr_pos){ // DX 1/24/18 - added bohr case
-	  atom.cpos=bohr2angstrom*v; // DX 1/24/18 - added bohr case
-	  atom.fpos=C2F(a.lattice,atom.cpos);
+          atom.cpos=bohr2angstrom*v; // DX 1/24/18 - added bohr case
+          atom.fpos=C2F(a.lattice,atom.cpos);
         }
         else { // DX 1/24/18 - added bohr case
-	atom.cpos=v;
-	atom.fpos=C2F(a.lattice,atom.cpos);
-      }
+          atom.cpos=v;
+          atom.fpos=C2F(a.lattice,atom.cpos);
+        }
       }
       atom.name=name;
       atom.CleanName();
       atom.CleanSpin();
       atom.name_is_given=TRUE;
-       
+
       atom.number=a.atoms.size();    // reference position for convasp
       atom.basis=a.atoms.size();     // position in the basis
       atom.ijk(1)=0;atom.ijk(2)=0;atom.ijk(3)=0; // inside the zero cell...
@@ -4178,8 +4602,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint iat=0;
     for(uint itype=0;itype<a.num_each_type.size();itype++) 
       for(uint j=0;j<(uint) a.num_each_type.at(itype);j++) {
-	if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
-	a.atoms.at(iat++).type=itype;
+        if(j==0) a.title+=a.atoms.at(iat).name+aurostd::utype2string(a.num_each_type.at(itype));
+        a.atoms.at(iat++).type=itype;
       }
     // for(uint i=0;i<a.atoms.size();i++) cerr << "a.atoms.at(i).type=" << a.atoms.at(i).type << endl;
     a.partial_occupation_flag=FALSE;
@@ -4188,7 +4612,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp5_poscar_format=FALSE;
     // DONE ?
   } // QE INPUT
-  
+
   // ----------------------------------------------------------------------
   // CIF INPUT
   if(a.iomode==IOCIF) { // CIF
@@ -4205,14 +4629,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
         vector<string> tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SYMMETRY_INT_TABLES_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
-	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
+          a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"_SPACE_GROUP_IT_NUMBER")){ // converted to upper to be case insensitive
         vector<string> tokens; 
         aurostd::string2tokens(aurostd::RemoveWhiteSpaces(aurostd::toupper(vinput[i])),tokens,"_SPACE_GROUP_IT_NUMBER"); // converted to upper to be case insensitive
         if(tokens.size()==1){
-	  a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
+          a.spacegroupnumber = aurostd::string2utype<uint>(tokens.at(0));
         }
       }
       //DX 20190708 - added another space group variant - START
@@ -4224,7 +4648,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           string spacegroupsymbol = aurostd::joinWDelimiter(tokens,"");
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\''); //clean
           spacegroupsymbol = aurostd::RemoveCharacterFromTheFrontAndBack(spacegroupsymbol,'\"'); //clean
-          a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol);
+          try{ 
+            a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); 
+          } //DX 20191029 - added try/catch sequence
+          catch(aurostd::xerror& re){ 
+            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_); } 
+          } //DX 20191029 - added try/catch sequence
         }
       }
       //DX 20190708 - added another space group variant - END
@@ -4244,6 +4673,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         //DX 20190708 - fix Hall reader - END
       }
     }
+    //DX 20191029 - check if space group number is found - START
+    if(a.spacegroupnumber==0){
+      message << "Either space group number was not given or it was given in a non-standard setting.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_VALUE_ERROR_);
+    }
+    //DX 20191029 - check if space group number is found - END
     bool found_setting = false;
     // loop over possible settings in aflow
     for(uint setting_number=1;setting_number<=2;setting_number++){
@@ -4253,42 +4688,42 @@ istream& operator>>(istream& cinput, xstructure& a) {
       // get general Wyckoff multiplicity and position saved in aflow
       SYM::getGeneralWyckoffMultiplicityAndPosition(a.spacegroupnumber, setting_string, general_wyckoff_multiplicity, general_wyckoff_position);
 
-//      SYM::initsgs(setting_string);
-//      using SYM::gl_sgs;
-//      cerr << "find the spacegroupstring" << endl;
-//      string spacegroupstring = gl_sgs[a.spacegroupnumber - 1];
-//      cerr << "spacegroupstring: " << spacegroupstring << endl;
-//      vector<int> wyckoff_multiplicities = SYM::get_multiplicities(spacegroupstring);
-//      cerr << "wyckoff_multiplicity: " << wyckoff_multiplicities[1] << endl;
-//      // get symops from cif
-//      vector<string> spacegroup_symop_xyz;  
-//      int multiplicity_count=0;
-//      bool found_symops=FALSE;
-//      cerr << "wyckoff_multiplicities[1]: " << wyckoff_multiplicities[1] << endl;
-//      for(uint i=0;i<vinput.size();i++) {
-//	if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
-//	  found_symops=TRUE;
-//	}
-//	else if(found_symops && multiplicity_count<wyckoff_multiplicities[1]){
-//	  multiplicity_count+=1;
-//	  vector<string> tokens; 
-//	  aurostd::string2tokens(vinput[i],tokens," ");
-//	  if(tokens.size()==2){
-//	    spacegroup_symop_xyz.push_back(tokens[1]);
-//	  }
-//	
-//	}
-//      }
-//      // check symops against general wyckoff position to determine setting
-//      //uint setting_number = 1; //default is first setting
-//      vector<string> general_wyckoff_position = SYM::findGeneralWyckoffPosition(spacegroupstring, wyckoff_multiplicities[1]);
-//      cerr << "general position" << endl;
-//      print(general_wyckoff_position);
-//      cerr << "====================================" << endl;
-//      cerr << "cif symop" << endl;
-//      print(spacegroup_symop_xyz);
-//      cerr << "general_wyckoff_position.size(): " << general_wyckoff_position.size() << endl;
-//      cerr << "spacegroup_symop_xyz.size(): " << spacegroup_symop_xyz.size() << endl;
+      //      SYM::initsgs(setting_string);
+      //      using SYM::gl_sgs;
+      //      cerr << "find the spacegroupstring" << endl;
+      //      string spacegroupstring = gl_sgs[a.spacegroupnumber - 1];
+      //      cerr << "spacegroupstring: " << spacegroupstring << endl;
+      //      vector<int> wyckoff_multiplicities = SYM::get_multiplicities(spacegroupstring);
+      //      cerr << "wyckoff_multiplicity: " << wyckoff_multiplicities[1] << endl;
+      //      // get symops from cif
+      //      vector<string> spacegroup_symop_xyz;  
+      //      int multiplicity_count=0;
+      //      bool found_symops=FALSE;
+      //      cerr << "wyckoff_multiplicities[1]: " << wyckoff_multiplicities[1] << endl;
+      //      for(uint i=0;i<vinput.size();i++) {
+      //	if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){ // _space_group_symop_operation_xyz supersedes all
+      //	  found_symops=TRUE;
+      //	}
+      //	else if(found_symops && multiplicity_count<wyckoff_multiplicities[1]){
+      //	  multiplicity_count+=1;
+      //	  vector<string> tokens; 
+      //	  aurostd::string2tokens(vinput[i],tokens," ");
+      //	  if(tokens.size()==2){
+      //	    spacegroup_symop_xyz.push_back(tokens[1]);
+      //	  }
+      //	
+      //	}
+      //      }
+      //      // check symops against general wyckoff position to determine setting
+      //      //uint setting_number = 1; //default is first setting
+      //      vector<string> general_wyckoff_position = SYM::findGeneralWyckoffPosition(spacegroupstring, wyckoff_multiplicities[1]);
+      //      cerr << "general position" << endl;
+      //      print(general_wyckoff_position);
+      //      cerr << "====================================" << endl;
+      //      cerr << "cif symop" << endl;
+      //      print(spacegroup_symop_xyz);
+      //      cerr << "general_wyckoff_position.size(): " << general_wyckoff_position.size() << endl;
+      //      cerr << "spacegroup_symop_xyz.size(): " << spacegroup_symop_xyz.size() << endl;
       // check equations in cif
       vector<string> spacegroup_symop_xyz;  
       int multiplicity_count=0;
@@ -4347,6 +4782,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         else {
           a.spacegroupnumberoption = setting_number;
+          a.spacegroupoption = setting_string; //DX 20191029
           found_setting = true;
           break; //found setting
         }
@@ -4359,7 +4795,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO190629
           << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-        throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
       }
     }
     if(!found_setting){
@@ -4368,7 +4804,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -4432,20 +4868,30 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         //DX 20190718 - check tokens first; Springer Materials has extra spaces - END
         if(tokens.size()==atom_site_fields.size()){
-          _atom tmp;
+          _atom atom_tmp;
+          wyckoffsite_ITC wyckoff_tmp; //DX 20191029
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ atom_tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); atom_tmp.name_is_given=TRUE; } //DX 20190718 - remove surrounding '' (common in Springer Materials cifs)
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ atom_tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ atom_tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ atom_tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_occupancy")){ 
-              tmp.partial_occupation_value = aurostd::string2utype<double>(tokens[t]); 
-              if(aurostd::abs(tmp.partial_occupation_value-1.0)<1e-6){ tmp.partial_occupation_flag = FALSE; }
-              else { tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
+              atom_tmp.partial_occupation_value = aurostd::string2utype<double>(tokens[t]); 
+              wyckoff_tmp.site_occupation = atom_tmp.partial_occupation_value; //DX 20191029 
+              if(aurostd::abs(atom_tmp.partial_occupation_value-1.0)<1e-6){ atom_tmp.partial_occupation_flag = FALSE; }
+              else { atom_tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
             }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_symmetry_multiplicity")){ wyckoff_tmp.multiplicity=aurostd::string2utype<double>(tokens[t]); }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label")){ wyckoff_tmp.letter=tokens[t]; }
           }
-          tmp.cpos=a.f2c*tmp.fpos;
-          a.AddAtom(tmp);
+          wyckoff_tmp.type = atom_tmp.name; //DX 20191029
+          wyckoff_tmp.coord = atom_tmp.fpos; //DX 20191029
+          if(wyckoff_tmp.multiplicity!=0 && wyckoff_tmp.letter!=""){
+            SYM::getWyckoffInformation(a.spacegroupnumber, a.spacegroupoption, wyckoff_tmp.letter, wyckoff_tmp.multiplicity, wyckoff_tmp.site_symmetry, wyckoff_tmp.equations);
+          }
+          a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
+          atom_tmp.cpos=a.f2c*atom_tmp.fpos;
+          a.AddAtom(atom_tmp);
           already_storing_atoms=TRUE; //DX 20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
           //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl; 
@@ -4453,12 +4899,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //[CO190629 - no exit()]exit(0);
           message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-          throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
         }
       }
     }
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
     a.isd=FALSE; // set Selective Dynamics to false
+    //DX 20191010 - moved loop that used to be here after re-alphabetizing
+    a.MakeBasis();
+    a.MakeTypes(); //DX 20190508 - otherwise types are not created
+    a.SpeciesPutAlphabetic(); //DX 20190508 - put alphabetic, needed for many AFLOW functions to work properly
+    //DX 20191010 - moved this loop - START
     for(uint i=0;i<a.atoms.size();i++){
       if(a.atoms[i].partial_occupation_flag==TRUE){
         poccaus.push_back(a.atoms[i].partial_occupation_value);
@@ -4469,9 +4920,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
       }
     }
-    a.MakeBasis();
-    a.MakeTypes(); //DX 20190508 - otherwise types are not created
-    a.SpeciesPutAlphabetic(); //DX 20190508 - put alphabetic, needed for many AFLOW functions to work properly
+    //DX 20191010 - moved this loop - END
     a.is_vasp4_poscar_format=FALSE; //DX 20190308 - needed or SPECIES section breaks
     a.is_vasp5_poscar_format=FALSE; //DX 20190308 - needed or SPECIES section breaks
   } // CIF INPUT
@@ -4488,7 +4937,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
     a.lattice=aurostd::eye<double>();//CO190520
-    
+
     uint lat_count=0;
     //get lattice first, if available (c2f,f2c)
     for(uint i=0;i<vinput.size();i++){
@@ -4501,10 +4950,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       if(lat_count==3){break;}
     }
-    
+
     a.FixLattices();
     //a.f2c=trasp(a.lattice), a.c2f=inverse(a.f2c);
-    
+
     if(LDEBUG) {
       cerr << soliloquy << " AIMS lattice" << endl;
       cerr << a.lattice << endl;
@@ -4552,7 +5001,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }//ignore else, garbage
         if(atom_found){
           atom_props_search=true; //so we can look for other props on the next line
-          
+
           //set some defaults! - START
           atom.name_is_given=true;
           //atom.CleanName();
@@ -4574,7 +5023,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.partial_occupation_value=1.0;
           atom.partial_occupation_flag=FALSE;
           //set some defaults! - STOP
-          
+
           atoms.push_back(atom);
           //wait till later to add to structure, sort first that we don't screw up species
           //a.AddAtom(atom);
@@ -4585,19 +5034,19 @@ istream& operator>>(istream& cinput, xstructure& a) {
       } //ignore else
     }
 
-		//sort first, then assign types
+    //sort first, then assign types
     //MUST BE STABLE SORT, absolutely critical
     //otherwise the order of equivalent names will be mixed EVERY TIME
     //this will screw up forces in APL
-		std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames); //safe because we do AddAtom() below
+    std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames); //safe because we do AddAtom() below
 
-		//assign types
-		uint itype=0;
-		atoms[0].type=itype;
-		for(uint i=1;i<atoms.size();i++){
-			if(atoms[i].name!=atoms[i-1].name){itype++;}
-			atoms[i].type=itype;
-		}
+    //assign types
+    uint itype=0;
+    atoms[0].type=itype;
+    for(uint i=1;i<atoms.size();i++){
+      if(atoms[i].name!=atoms[i-1].name){itype++;}
+      atoms[i].type=itype;
+    }
 
     //a.atoms.clear();  //we clear atoms earlier with RemoveAtom()
     //now add atoms in right order (for species, etc.)
@@ -4614,8 +5063,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
         cerr << "comp_each_type[" << i <<"]=" <<a.comp_each_type[i] << endl;
       }
     }
-    
-		//grab title last
+
+    //grab title last
     a.title.clear();
     if(vinput.size()){
       std::size_t pos=vinput[0].find_first_of('#');
@@ -4626,7 +5075,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(a.title.empty()){a.buildGenericTitle();}
-    
+
     if(LDEBUG) {cerr << soliloquy << " AIMS title=" << a.title << endl;}
 
     a.partial_occupation_flag=FALSE;
@@ -4652,7 +5101,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO190629 - no exit()]exit(0);
       message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -4661,13 +5110,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // screen each one
     for(uint i=0;i<a.atoms.size();i++) {
       if(poccaus.at(i)<1.0-1e-5) {
-	a.atoms.at(i).partial_occupation_flag=TRUE;
-	a.atoms.at(i).partial_occupation_value=poccaus.at(i);
-	a.comp_each_type.at(a.atoms.at(i).type)+=a.atoms.at(i).partial_occupation_value;
+        a.atoms.at(i).partial_occupation_flag=TRUE;
+        a.atoms.at(i).partial_occupation_value=poccaus.at(i);
+        a.comp_each_type.at(a.atoms.at(i).type)+=a.atoms.at(i).partial_occupation_value;
       } else {
-	a.atoms.at(i).partial_occupation_flag=FALSE;
-	a.atoms.at(i).partial_occupation_value=1.0;
-	a.comp_each_type.at(a.atoms.at(i).type)+=a.atoms.at(i).partial_occupation_value;
+        a.atoms.at(i).partial_occupation_flag=FALSE;
+        a.atoms.at(i).partial_occupation_value=1.0;
+        a.comp_each_type.at(a.atoms.at(i).type)+=a.atoms.at(i).partial_occupation_value;
       }
     }
   }
@@ -4684,13 +5133,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
       partial_occupation_sublattice_iatom.push_back(iatom);
     } else {
       for(uint jatom=0;jatom<a.atoms.size();jatom++) {
-	if(a.atoms.at(jatom).type==a.partial_occupation_sublattice.at(iatom))
-	  partial_occupation_sublattice_iatom.push_back(iatom);	  
+        if(a.atoms.at(jatom).type==a.partial_occupation_sublattice.at(iatom))
+          partial_occupation_sublattice_iatom.push_back(iatom);	  
       }
     }
     if(0) {    cerr << a.partial_occupation_sublattice.at(iatom) << ", ";
       for(uint jatom=0;jatom<partial_occupation_sublattice_iatom.size();jatom++)
-	cerr << partial_occupation_sublattice_iatom.at(jatom) << " ";
+        cerr << partial_occupation_sublattice_iatom.at(jatom) << " ";
       cerr << endl;
     }
   }
@@ -4734,7 +5183,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << "You need to specify the same number of species and atoms types" << endl;  //CO190629
       message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO190629
       message << "      tokens.size()=" << tokens.size() << endl; //CO190629
-      throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -4749,11 +5198,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint k=0;
     for(uint i=0;i<a.num_each_type.size();i++)
       for(uint j=0;j<(uint) a.num_each_type.at(i);j++) {
-	if(a.atoms.at(k).name_is_given==FALSE) {
-	  a.atoms.at(k).name=a.species.at(i);
-	  a.atoms.at(k).name_is_given=TRUE;
-	}
-	k++;
+        if(a.atoms.at(k).name_is_given==FALSE) {
+          a.atoms.at(k).name=a.species.at(i);
+          a.atoms.at(k).name_is_given=TRUE;
+        }
+        k++;
       }
   }
   // ---------------------------------------------------------------
@@ -4863,7 +5312,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
     //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_forces.size() " << endl;
@@ -4871,7 +5320,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
     //[CO190629 - no exit()]oss << "ERROR - xstructure::operator>>: a.atoms.size()!=a.qm_positions.size() " << endl;
@@ -4879,9 +5328,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //[CO190629 - no exit()]exit(0);
     message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO190629
-    throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_); //CO190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO190629
   }
-  
+
   // ---------------------------------------------------------------
   if(LDEBUG) cerr << soliloquy << " DONE [99]" << endl;
   // DONE
@@ -5173,27 +5622,27 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 // change coordinates type
 void xstructure::SetCoordinates(const int& mode)  {
   switch(mode) {
-  case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-    cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
-    break;
-  }
-  case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-    cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
-    break;
-  }
-  case _COORDS_CARTESIAN_ : {
-    coord_flag=_COORDS_CARTESIAN_;
-    strcpy(coord_type,"C");
-    break;
-  }
-  case _COORDS_FRACTIONAL_ : {
-    coord_flag=_COORDS_FRACTIONAL_;
-    strcpy(coord_type,"D");
-    break;
-  }
-  default: {
-    cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
-  }
+    case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
+                                                   cerr << "ERROR SetCoordinate [1] mode=" << mode << endl; exit(0);
+                                                   break;
+                                                 }
+    case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
+                                                   cerr << "ERROR SetCoordinate [2] mode=" << mode << endl; exit(0);
+                                                   break;
+                                                 }
+    case _COORDS_CARTESIAN_ : {
+                                coord_flag=_COORDS_CARTESIAN_;
+                                strcpy(coord_type,"C");
+                                break;
+                              }
+    case _COORDS_FRACTIONAL_ : {
+                                 coord_flag=_COORDS_FRACTIONAL_;
+                                 strcpy(coord_type,"D");
+                                 break;
+                               }
+    default: {
+               cerr << "SetCoordinates NOTHING TO DO  mode=" << mode << endl;
+             }
   }
 }
 
@@ -5247,21 +5696,21 @@ void xstructure::AddAtom(const _atom& atom) {
   for(uint iat=0;iat<atoms.size()&&FOUND_POSITION==FALSE;iat++)
     if(atoms.at(iat).type==atom.type && atoms.at(iat).name==atom.name)
       for(int i=-1;i<=1&&FOUND_POSITION==FALSE;i++)
-	for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
-	  for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
-	    aijk[1]=i;aijk[2]=j;aijk[3]=k;
-	    //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
+        for(int j=-1;j<=1&&FOUND_POSITION==FALSE;j++)
+          for(int k=-1;k<=1&&FOUND_POSITION==FALSE;k++) {
+            aijk[1]=i;aijk[2]=j;aijk[3]=k;
+            //	if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE;
             // DX and CO -START    
             // DX if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<0.01) FOUND_POSITION=TRUE;
             if((*this).sym_eps!=AUROSTD_NAN && (*this).sym_eps<AUROSTD_NAN && (*this).sym_eps>1e-10){ // DX 12/1/17 - Added (*this).sym_eps>1e-10 // DX 2/15/18 - added (*this).sym_eps<AUROSTD_NAN (needed) 
               if(aurostd::modulus((*this).f2c*(atoms.at(iat).fpos-(aijk+atom.fpos)))<=(*this).sym_eps) FOUND_POSITION=TRUE; // DX
             }
             else { 
-            //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; // DX
-	    if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; // DX 12/1/17
+              //if(aurostd::modulus(atoms.at(iat).fpos-(aijk+atom.fpos))<1e-10) FOUND_POSITION=TRUE; // DX
+              if(aurostd::modulus(atoms.at(iat).cpos-(((double)i)*a1+((double)j)*a2+((double)k)*a3+atom.cpos))<0.1) FOUND_POSITION=TRUE; // DX 12/1/17
             }
             // DX and CO - END
-	  }
+          }
   if(FOUND_POSITION==TRUE) return; // found no need to add it further
 
   // now found that it does not exist check type
@@ -5270,7 +5719,7 @@ void xstructure::AddAtom(const _atom& atom) {
   uint species_position=0;
   for(uint isp=0;isp<species.size()&&FOUND_SPECIES==FALSE;isp++)
     if(atom.name==species.at(isp)) {FOUND_SPECIES=TRUE;species_position=isp;}
-  
+
   if(FOUND_SPECIES==FALSE) {
     if(LDEBUG) cerr << "AddAtom new_specie=" << atom.name << endl;
     num_each_type.push_back(1);
@@ -5302,27 +5751,27 @@ void xstructure::AddAtom(const _atom& atom) {
   // NEW STYLE
   bool found=FALSE;
   if(0)  for(uint iat=0;iat<atoms.size()&&!found;iat++) {
-      if(iat<atoms.size()-1) {
-        if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
-          //	if(LDEBUG)
-          cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-          atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
-          found=TRUE;
-        }
+    if(iat<atoms.size()-1) {
+      if(atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) {
+        //	if(LDEBUG)
+        cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+        atoms.insert(iat+atoms.begin()+1,btom); // potential problem  with CAST
+        found=TRUE;
       }
     }
+  }
   if(1) {
     std::deque<_atom>::iterator it=atoms.begin();
     for(uint iat=0;iat<atoms.size()&&!found;iat++,it++) {
       if(iat<atoms.size()-1) {
-	//	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
-	if((atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) || 
-      (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO 180705 - for pocc sorting, larger pocc ahead of smaller pocc
-	  //	if(LDEBUG)
-	  //	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
-	  atoms.insert(it+1,btom);  // it is iterator, fine for insert.
-	  found=TRUE;
-	}
+        //	cerr << "HERE0 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;
+        if((atoms.at(iat).type==btom.type && atoms.at(iat+1).type!=btom.type) || 
+            (atoms.at(iat).type==btom.type && atoms.at(iat+1).partial_occupation_value<btom.partial_occupation_value)) {  //CO 180705 - for pocc sorting, larger pocc ahead of smaller pocc
+          //	if(LDEBUG)
+          //	  cerr << "HERE1 iat=" << iat << "  atoms.at(iat).type=" << atoms.at(iat).type << "  btom.type=" << btom.type << endl;//" atoms.begin()=" <<  long(atoms.begin()) << endl;
+          atoms.insert(it+1,btom);  // it is iterator, fine for insert.
+          found=TRUE;
+        }
       }
     }
   }
@@ -5364,7 +5813,7 @@ void xstructure::RemoveAtom(const uint& iatom) {
       //at the end, but it is not unsafe (seg fault) in the way it is written
       for(uint i=0;i<atoms.size();i++)
         if(i!=iatom && atoms.at(i).type>(int)itype)
-	  atoms.at(i).type--;
+          atoms.at(i).type--;
     }
     //170721 CO - this is obsolete with MakeBasis() below!
     // do atoms
@@ -5383,7 +5832,7 @@ void xstructure::RemoveAtom(const uint& iatom) {
     // 170721 CO - this is okay as it won't seg fault (doesn't delete anything bigger than .size() )
     for(uint i=0;i<order_parameter_atoms.size();i++)
       if(iatom==order_parameter_atoms.at(i))
-	order_parameter_atoms.erase(order_parameter_atoms.begin()+i);
+        order_parameter_atoms.erase(order_parameter_atoms.begin()+i);
   }
   GetStoich();  //170724 CO
   // done
@@ -5426,10 +5875,10 @@ void xstructure::RemoveCopies(double tol) {
     } else {
       flag_remove=false;
       for(iat2=iat1+1;iat2<atoms.size()&&flag_remove==FALSE;iat2++)
-	if((aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol || aurostd::modulus(atoms.at(iat1).cpos-atoms.at(iat2).cpos)<tol) && flag_remove==FALSE) {
-	  flag_remove=TRUE;
-	  irm=iat2;
-	}
+        if((aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol || aurostd::modulus(atoms.at(iat1).cpos-atoms.at(iat2).cpos)<tol) && flag_remove==FALSE) {
+          flag_remove=TRUE;
+          irm=iat2;
+        }
       if(flag_remove==TRUE) RemoveAtom(irm);
       else iat1++;
     }
@@ -5449,12 +5898,13 @@ void xstructure::RemoveFractionalCopies(double tol) {
         xvector<double> fdiff = atoms.at(iat1).fpos-atoms.at(iat2).fpos; //DX 5/3/18 - account for PBC
         fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
         //DX 20190613 [OBSOLETE] SYM::PBC(fdiff); //DX 5/3/18 - account for PBC
-        if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) { //DX 5/3/18 - account for PBC and perform in Cartesian space
-	//DX 5/3/18 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE) {
-	  flag_remove=TRUE;
-	  irm=iat2;
-	}
-	}
+        if(aurostd::modulus((*this).f2c*fdiff)<tol && flag_remove==FALSE) //DX 5/3/18 - account for PBC and perform in Cartesian space
+          //DX 5/3/18 [OBSOLETE] if(aurostd::modulus(atoms.at(iat1).fpos-atoms.at(iat2).fpos)<tol && flag_remove==FALSE)
+        { //CO200106 - patching for auto-indenting
+          flag_remove=TRUE;
+          irm=iat2;
+        }
+      }
       if(flag_remove==TRUE) RemoveAtom(irm);
       else iat1++;
     }
@@ -5471,10 +5921,10 @@ void xstructure::RemoveCartesianCopies(double tol) {
     } else {
       flag_remove=false;
       for(iat2=iat1+1;iat2<atoms.size()&&flag_remove==FALSE;iat2++)
-	if(aurostd::modulus(atoms.at(iat1).cpos-atoms.at(iat2).cpos)<tol && flag_remove==FALSE) {
-	  flag_remove=TRUE;
-	  irm=iat2;
-	}
+        if(aurostd::modulus(atoms.at(iat1).cpos-atoms.at(iat2).cpos)<tol && flag_remove==FALSE) {
+          flag_remove=TRUE;
+          irm=iat2;
+        }
       if(flag_remove==TRUE) RemoveAtom(irm);
       else iat1++;
     }
@@ -5492,13 +5942,13 @@ void xstructure::AddCorners(void) {
   for(uint iat=0;iat<str.atoms.size();iat++) {
     for(double i=0;i<=1;i+=0.99) {
       for(double j=0;j<=1;j+=0.99) {
-	for(double k=0;k<=1;k+=0.99) {
-	  _atom atom=str.atoms.at(iat);
-	  atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
-	  atom.cpos=F2C(lattice,atom.fpos);
-	  if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) AddAtom(atom);
-	  //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   AddAtom(atom);	    //AddAtom(atom);
-	}
+        for(double k=0;k<=1;k+=0.99) {
+          _atom atom=str.atoms.at(iat);
+          atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
+          atom.cpos=F2C(lattice,atom.fpos);
+          if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0) AddAtom(atom);
+          //	    if(aurostd::isequal(atom.fpos[1],1.0,0.02) && atom.fpos[2]<1.0 && atom.fpos[3]<1.0)   AddAtom(atom);	    //AddAtom(atom);
+        }
       }
     }
   }
@@ -5563,10 +6013,10 @@ xstructure SetSDTypes(const xstructure& a, const vector<string>& in_sd) {
       for(int j=0;j<(int)b.num_each_type.at(i);j++) {
         cnt++;
         b.atoms.at(cnt).sd=in_sd[i];
-	if(in_sd[i].size()<2) {
-	  cerr << "WARNING:  Atom=" << cnt << " you must specify SD strings 3 characters long (switching to TTT)" << endl;
-	  b.atoms.at(cnt).sd="TTT";
-	}
+        if(in_sd[i].size()<2) {
+          cerr << "WARNING:  Atom=" << cnt << " you must specify SD strings 3 characters long (switching to TTT)" << endl;
+          b.atoms.at(cnt).sd="TTT";
+        }
       }
     }
   }
@@ -5634,7 +6084,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -6111,10 +6561,10 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   stringstream message;
   int spacegroupnumber=0;
   if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
-     spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
+      spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -6582,7 +7032,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   else{
     message << "routine: space group specified invalid; perhaps non-ITC setting: ";
     message << "space group symbol=" << spacegroupsymbol << " [dir=" << directory << "].";
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
   }
   return spacegroupnumber;
 }
@@ -6597,7 +7047,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -7078,13 +7528,13 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX 20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX 20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   if(setting==0){ //signals default //DX 20180807
     // if RHL, AFLOW prefers hexagonal setting (i.e., setting=2)
     if(spacegroupnumber==146 || spacegroupnumber==148 || spacegroupnumber==155 || spacegroupnumber==160 || 
-       spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
+        spacegroupnumber==161 || spacegroupnumber==166 || spacegroupnumber==167){
       setting=2;
     }
     // else setting==1
@@ -7094,7 +7544,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   }
   if(setting < 1 || setting > 2) {
     message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX 20190708 - for xerror
-    throw aurostd::xerror(soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX 20190708 - for xerror
   }
   // OK
   // DX+ME 20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -7283,7 +7733,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   else if(spacegroupnumber==86 && setting==1) { // ------------------- 86  P 4n -1n #86 (setting 1)
     spacegroup="P 4n -1n";}
   else if(spacegroupnumber==86 && setting==2) { // ------------------- 86  -P 4bc #86 (setting 2)
-     spacegroup="-P 4bc";}
+    spacegroup="-P 4bc";}
   else if(spacegroupnumber==87) { // ------------------- 87  -I 4 #87
     spacegroup="-I 4";}
   else if(spacegroupnumber==88 && setting==1) { // ------------------- 88  I 4bw -1bw #88 (setting 1)
@@ -7389,7 +7839,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   else if(spacegroupnumber==133 && setting==1) { // ------------------- 133  P 4n 2c -1n #133 (setting 1)
     spacegroup="P 4n 2c -1n";}
   else if(spacegroupnumber==133 && setting==2) { // ------------------- 133  -P 4ac 2b #133 (setting 2)
-   spacegroup="-P 4ac 2b";}
+    spacegroup="-P 4ac 2b";}
   else if(spacegroupnumber==134 && setting==1) { // ------------------- 134  -P 4ac 2bc #134 (setting 1)
     spacegroup="P 4n 2 -1n";}
   else if(spacegroupnumber==134 && setting==2) { // ------------------- 134  -P 4ac 2bc #134 (setting 2)
@@ -7551,7 +8001,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   else if(spacegroupnumber==201 && setting==1) { // ------------------- 201  P 2 2 3 -1n #201 (setting 1)
     spacegroup="P 2 2 3 -1n";}
   else if(spacegroupnumber==201 && setting==2) { // ------------------- 201  -P 2ab 2bc 3 #201 (setting 2)
-   spacegroup="-P 2ab 2bc 3";}
+    spacegroup="-P 2ab 2bc 3";}
   else if(spacegroupnumber==202) { // ------------------- 202  -F 2 2 3 #202
     spacegroup="-F 2 2 3";}
   else if(spacegroupnumber==203 && setting==1) { // ------------------- 203  F 2 2 3 -1d #203 (setting 1)
@@ -7768,20 +8218,20 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
     while(!found) {
       kk++;
       if(dk<=1e-5) {
-	k1=1;k2=1;k3=1;
-	aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        k1=1;k2=1;k3=1;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
       kk3=(int) floor((double) nb3/dk);db3=b3/((double) kk3);
       if(kk1+kk2+kk3>iverbose) {
-	//  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
-	aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
-	iverbose=kk1+kk2+kk3;
+        //  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "]=" << kk1*kk2*kk3 << " =[" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << endl;
+        iverbose=kk1+kk2+kk3;
       }
       if(kk1*kk2*kk3>=NK) {
-	k1=kk1;k2=kk2;k3=kk3;
-	found=TRUE;
+        k1=kk1;k2=kk2;k3=kk3;
+        found=TRUE;
       }
       dk=dk*dkdelta;
     }
@@ -7823,8 +8273,8 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
     while(!found) {
       kk++;
       if(dk<=1e-5) {
-	k1=1;k2=1;k3=1;
-	aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        k1=1;k2=1;k3=1;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
@@ -7832,13 +8282,13 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
       kdatagrid=kdata;kdatagrid[1]=1.0;kdatagrid[2]=1.0*aurostd::modulus(db2)/aurostd::modulus(db1);kdatagrid[3]=1.0*aurostd::modulus(db3)/aurostd::modulus(db1);
 
       if(kk1+kk2+kk3>iverbose) {
-	//  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
-	aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "," << GetLatticeType(kdatagrid) << "]=" << kk1*kk2*kk3 << " = [" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << " " << endl;
-	iverbose=kk1+kk2+kk3;
+        //  if(!mod(kk,50) || kk1*kk2*kk3>=NK)
+        aus << "00000  MESSAGE KPOINTS KPPRA minimizing k=[" << kk1 << "," << kk2 << "," << kk3 << "," << GetLatticeType(kdatagrid) << "]=" << kk1*kk2*kk3 << " = [" << aurostd::modulus(db1) << "," << aurostd::modulus(db2) << "," << aurostd::modulus(db3) << "]   dk=" << dk << " " << endl;
+        iverbose=kk1+kk2+kk3;
       }
       if(kk1*kk2*kk3>=NK) {
-	k1=kk1;k2=kk2;k3=kk3;
-	found=TRUE;
+        k1=kk1;k2=kk2;k3=kk3;
+        found=TRUE;
       }
       dk=dk*dkdelta;
     }
@@ -7904,7 +8354,7 @@ string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const
         iverbose=kk1+kk2+kk3;
       }
       if((aurostd::modulus(db1)<DK) && (aurostd::modulus(db2)<DK) && (aurostd::modulus(db3)<DK)) {
-	found=TRUE;k1=kk1;k2=kk2;k3=kk3;}
+        found=TRUE;k1=kk1;k2=kk2;k3=kk3;}
       dk=dk*dkdelta;
     }
   } else { // force 1 1 1 for Gamma
@@ -7944,7 +8394,11 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
   out=out*1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
   out=out*1.05;     // Mon Apr 23 13:40:02 EST 2018 // HELPS SCAN
   // cerr << "GetNBANDS=" << out << endl;
-  out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
+  if (nions < 100) {
+    out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
+  } else {
+    out= out * std::pow((double) nions,(double) 0.06);  // ME191028 - prior scaling factor not sufficient for supercells
+  }
   //  cerr << "GetNBANDS=" << out << endl;
   // exit(0);
   return (int) ceil(out);
@@ -8091,7 +8545,7 @@ double GetCellAtomPOMASS(const string& directory,vector<double>& vPOMASS,vector<
     if(!sss.str().length() && aurostd::FileExist(directory+"/"+vfile.at(i))) aurostd::file2stringstream(directory+"/"+vfile.at(i),sss);  
     if(!sss.str().length() && aurostd::EFileExist(directory+"/"+vfile.at(i))) aurostd::efile2stringstream(directory+"/"+vfile.at(i),sss);
   } //  cerr << sss.str() << endl;
-  
+
   // search for xstructure
   stringstream sstr("");
   aurostd::string2tokens("POSCAR,CONTCAR,POSCAR.relax1,POSCAR.relax2,POSCAR.static,POSCAR.bands,CONTCAR.relax1,CONTCAR.relax2,CONTCAR.static,CONTCAR.bands",vfile,",");
@@ -8100,7 +8554,7 @@ double GetCellAtomPOMASS(const string& directory,vector<double>& vPOMASS,vector<
     if(!sstr.str().length() && aurostd::FileExist(directory+"/"+vfile.at(i))) aurostd::file2stringstream(directory+"/"+vfile.at(i),sstr);  
     if(!sstr.str().length() && aurostd::EFileExist(directory+"/"+vfile.at(i))) aurostd::efile2stringstream(directory+"/"+vfile.at(i),sstr);
   } //  cerr << sstr.str() << endl;
-  
+
   // done
   return GetCellAtomPOMASS(sss,vPOMASS,sstr,sPOMASS,mode);
 }
@@ -8129,15 +8583,19 @@ double xstructure::GetPOMASS(const vector<double>& vPOMASS) {
 // convasp framework to aflow.
 
 double GetVol(const xmatrix<double>& lat) {
-  return abs(det(lat));}        // AFLOW_FUNCTION_IMPLEMENTATION
+  return abs(det(lat));
+}        // AFLOW_FUNCTION_IMPLEMENTATION
 double det(const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
-  return scalar_product(v1,vector_product(v2,v3));}
+  return scalar_product(v1,vector_product(v2,v3));
+}
 double det(const double& a11,const double& a12,const double& a13,
-	   const double& a21,const double& a22,const double& a23,
-	   const double& a31,const double& a32,const double& a33) {
-  return a11*a22*a33+a12*a23*a31+a13*a21*a32-a13*a22*a31-a12*a21*a33-a11*a23*a32;}
+    const double& a21,const double& a22,const double& a23,
+    const double& a31,const double& a32,const double& a33) {
+  return a11*a22*a33+a12*a23*a31+a13*a21*a32-a13*a22*a31-a12*a21*a33-a11*a23*a32;
+}
 double GetVol(const xvector<double>& v1,const xvector<double>& v2,const xvector<double>& v3) {
-  return abs(det(v1,v2,v3));}        // AFLOW_FUNCTION_IMPLEMENTATION
+  return abs(det(v1,v2,v3));
+}        // AFLOW_FUNCTION_IMPLEMENTATION
 
 
 // ***************************************************************************
@@ -8196,9 +8654,9 @@ xvector<double> Getabc_angles(const xmatrix<double>& lat,const xvector<int>& per
 }
 
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -8207,10 +8665,10 @@ xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_
 }
 
 xvector<double> Getabc_angles(const xvector<double>& r1,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
-			      const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
-			      const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r2,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<double>& r3,      // AFLOW_FUNCTION_IMPLEMENTATION
+    const xvector<int>& permut,     // AFLOW_FUNCTION_IMPLEMENTATION
+    const int& mode) {              // AFLOW_FUNCTION_IMPLEMENTATION
   xmatrix<double> lat(3,3);
   lat(1,1)=r1(1);lat(1,2)=r1(2);lat(1,3)=r1(3);
   lat(2,1)=r2(1);lat(2,2)=r2(2);lat(2,3)=r2(3);
@@ -8367,8 +8825,8 @@ double RadiusSphereLattice(const xmatrix<double>& lattice,double scale) {
   for(int i=-1;i<=1;i++)
     for(int j=-1;j<=1;j++)
       for(int k=-1;k<=1;k++)
-	if(aurostd::modulus((double)i*lattice(1)+(double)j*lattice(2)+(double)k*lattice(3))>radius)
-	  radius=aurostd::modulus((double)i*lattice(1)+(double)j*lattice(2)+(double)k*lattice(3));
+        if(aurostd::modulus((double)i*lattice(1)+(double)j*lattice(2)+(double)k*lattice(3))>radius)
+          radius=aurostd::modulus((double)i*lattice(1)+(double)j*lattice(2)+(double)k*lattice(3));
   return scale*radius;
 }
 
@@ -8403,10 +8861,10 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   if(0) { // without eijk
     for(i=1;i<=3;i++)
       for(j=1;j<=3;j++)
-	//     normals(i,j)=lattice((i+1)%3+1,(j+1)%3+1)*lattice((i+2)%3+1,(j+2)%3+1)-  // original
-	//	lattice((i+1)%3+1,(j+2)%3+1)*lattice((i+2)%3+1,(j+1)%3+1);            // original
-	normals(i,j)=lattice((i+1-1)%3+1,(j+1-1)%3+1)*lattice((i+2-1)%3+1,(j+2-1)%3+1)-
-	  lattice((i+1-1)%3+1,(j+2-1)%3+1)*lattice((i+2-1)%3+1,(j+1-1)%3+1);
+        //     normals(i,j)=lattice((i+1)%3+1,(j+1)%3+1)*lattice((i+2)%3+1,(j+2)%3+1)-  // original
+        //	lattice((i+1)%3+1,(j+2)%3+1)*lattice((i+2)%3+1,(j+1)%3+1);            // original
+        normals(i,j)=lattice((i+1-1)%3+1,(j+1-1)%3+1)*lattice((i+2-1)%3+1,(j+2-1)%3+1)-
+          lattice((i+1-1)%3+1,(j+2-1)%3+1)*lattice((i+2-1)%3+1,(j+1-1)%3+1);
     //  for(i=1;i<=3;i++)
     //   for(j=1;j<=3;j++)
     //    normals(i,j)=vector_product(lattice((i+1-1)%3+1),lattice((i+2-1)%3+1))[j];
@@ -8414,11 +8872,11 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   if(1) { // with eijk
     for(int m=1;m<=3;m++)
       for(int n=1;n<=3;n++)
-	for(int l=1;l<=3;l++) {
-	  normals(1,l)+=aurostd::eijk(l,m,n)*lattice(2,m)*lattice(3,n);
-	  normals(2,l)+=aurostd::eijk(l,m,n)*lattice(3,m)*lattice(1,n);
-	  normals(3,l)+=aurostd::eijk(l,m,n)*lattice(1,m)*lattice(2,n);
-	}
+        for(int l=1;l<=3;l++) {
+          normals(1,l)+=aurostd::eijk(l,m,n)*lattice(2,m)*lattice(3,n);
+          normals(2,l)+=aurostd::eijk(l,m,n)*lattice(3,m)*lattice(1,n);
+          normals(3,l)+=aurostd::eijk(l,m,n)*lattice(1,m)*lattice(2,n);
+        }
   }
   if(LDEBUG) {
     for(uint i=1;i<(uint)normals.rows+1;i++){
@@ -8428,11 +8886,11 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   if(0) { // with eijk and estarijk
     for(int m=1;m<=3;m++)
       for(int n=1;n<=3;n++)
-	for(int l=1;l<=3;l++)
-	  for(int i=1;i<=3;i++)
-	    for(int j=1;j<=3;j++)
-	      for(int k=1;k<=3;k++)
-		normals(i,l)+=aurostd::eijk(l,m,n)*lattice(j,m)*lattice(k,n)*aurostd::estarijk(i,j,k);
+        for(int l=1;l<=3;l++)
+          for(int i=1;i<=3;i++)
+            for(int j=1;j<=3;j++)
+              for(int k=1;k<=3;k++)
+                normals(i,l)+=aurostd::eijk(l,m,n)*lattice(j,m)*lattice(k,n)*aurostd::estarijk(i,j,k);
   }
   for(i=1;i<=3;i++) {
     length=aurostd::modulus(normals(i));
@@ -8488,7 +8946,7 @@ xvector<int> LatticeDimensionSphere(const xstructure& str, double radius) {
 //  see notes on operation of force constant tensors
 
 // **************************************************************************
-// -------------------------------------------------------- for COLUM vectors
+// -------------------------------------------------------- for COLUMN vectors
 xvector<double> F2C(const double& scale,const xmatrix<double>& lattice,const xvector<double>& fpos) {
   xmatrix<double> f2c(3,3);f2c=scale*trasp(lattice);
   return f2c*fpos;                                 // fpos are F components per COLUMS !
@@ -9021,7 +9479,7 @@ bool xstructure::SpeciesGetAlphabetic(void) {
   vector<string> sspecies;
   for(uint isp=0;isp<species.size();isp++)
     sspecies.push_back(aurostd::RemoveNumbers(KBIN::VASP_PseudoPotential_CleanName(species.at(isp))));
-  
+
   for(uint isp=0;isp<sspecies.size()-1;isp++)
     if(sspecies.at(isp)>sspecies.at(isp+1)) return FALSE;
   // otherwise return TRUE;
@@ -9079,12 +9537,12 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
   stringstream message; //CO190317
   if(vspecies.size()!=species.size() ) {
     message << "vspecies.size()!=species.size()"; //CO190317
-    aurostd::xerror(soliloquy,message,_VALUE_RANGE_); //CO190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
     //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=species.size()" << endl;exit(0);
   }
   if(vspecies.size()!=num_each_type.size() ) {
     message << "vspecies.size()!=num_each_type.size()"; //CO190317
-    aurostd::xerror(soliloquy,message,_VALUE_RANGE_); //CO190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO190317
     //[CO190317]cerr << "ERROR - xstructure::SetSpecies:  vspecies.size()!=num_each_type.size()" << endl;exit(0);
   }
   int iatom=0;
@@ -9110,61 +9568,59 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
 // ***************************************************************************
 // Calculates the reduced Niggli cell.  It is based on
 // a program of Eric Wu's.  Here is his + my documentation.
-/*
-  FUNCTION:
-  Subroutine calculates the reduced cell (Niggli cell) for a given
-  primitive cell.  It also gives the transformation matrix to go from
-  the primitive cell to the Niggli cell.
-
-  REFERENCES:
-  Y. Lepage, J. Appl. Cryst 15 255-229 (1982) and
-  Y. Lepage, J. Appl. Cryst 20 264-269 (1987)
-  International tables for crystallography Ch 5,9
-  I Krivy, B. Gruber. Acta Cryst 1976 A32 297 (1975)
-  W. Clegg., Acta Cryst A37 913-915 (1981)
-  A.D. Mighell J. Appl Cryst 9 491-498 (1976)
-
-  METHODOLOGY:
-  The Niggli cell is UNIQUE and reduced. A Niggli cell is a Buerger cell
-  (shortest lattice vectors) but  not necessarily the other way around,
-  since the Buerger cell is not unique.  This info is useful because with
-  the Niggli cell one knows instantly the type of bravais lattice
-  and how to go to the conventional cell if you apply the correct
-  algorithm.  There are 2 ways to do this.  The first is the straight
-  way -  see International Tables Ch. 9 .  The other involves counting
-  the # of 2fold axes and going from there, see the Lepage and Clegg
-  references.  This second method is more useful if you want to find
-  more than just bravais lattice (symmetry elements or space group
-  for example).  The subroutine assumes you input a primitive cell
-  and it spits out the Niggli cell and the transformation matrix
-  to go from the primitive cell to Niggli cell.
-  NB! There is a typo in step 3 of Krivy and Gruber that I corrected.
-  [ (ksi*eta*ksi) should be (ksi*eta*zeta) in first part of Eq. 3. ]
-
-  INPUT:
-  in_lat: a primitive set of lattice vectors,
-  in_lat(1,1)=a_x
-  in_lat(1,2)=a_y
-  in_lat(2,1)=b_x  ...
-
-  OUTPUT:
-  niggli_lat - reduced (Niggli) cell, same format
-  P - Matrix to go from Primitive to Niggli cell
-  Q - P^-1;
-
-  For more info of the definitions here see Int. Tables Cryst. ch.5
-  Let nlat be the niggli lattice, where the first column is a,
-  second b, third c.  Let lat be the original cell equivalent.
-  The P matrix to transform cells is generally defined by
-  nlat = lat * P
-  We will follow this convention for defining P and Q.
-  Note that is the rest of the code, we define lattices with
-  rows equal to a, b, and c.  Therefore, under our conventional
-  definitions of nlat, call it nlat_c=nlat^T, and lat, call
-  it lat_c=lat^T, we have
-  nlat_c = P^T * lat_c
-  where ^T means the transpose.
-*/
+//FUNCTION:
+//Subroutine calculates the reduced cell (Niggli cell) for a given
+//primitive cell.  It also gives the transformation matrix to go from
+//the primitive cell to the Niggli cell.
+//
+//REFERENCES:
+//Y. Lepage, J. Appl. Cryst 15 255-229 (1982) and
+//Y. Lepage, J. Appl. Cryst 20 264-269 (1987)
+//International tables for crystallography Ch 5,9
+//I Krivy, B. Gruber. Acta Cryst 1976 A32 297 (1975)
+//W. Clegg., Acta Cryst A37 913-915 (1981)
+//A.D. Mighell J. Appl Cryst 9 491-498 (1976)
+//
+//METHODOLOGY:
+//The Niggli cell is UNIQUE and reduced. A Niggli cell is a Buerger cell
+//(shortest lattice vectors) but  not necessarily the other way around,
+//since the Buerger cell is not unique.  This info is useful because with
+//the Niggli cell one knows instantly the type of bravais lattice
+//and how to go to the conventional cell if you apply the correct
+//algorithm.  There are 2 ways to do this.  The first is the straight
+//way -  see International Tables Ch. 9 .  The other involves counting
+//the # of 2fold axes and going from there, see the Lepage and Clegg
+//references.  This second method is more useful if you want to find
+//more than just bravais lattice (symmetry elements or space group
+//for example).  The subroutine assumes you input a primitive cell
+//and it spits out the Niggli cell and the transformation matrix
+//to go from the primitive cell to Niggli cell.
+//NB! There is a typo in step 3 of Krivy and Gruber that I corrected.
+//[ (ksi*eta*ksi) should be (ksi*eta*zeta) in first part of Eq. 3. ]
+//
+//INPUT:
+//in_lat: a primitive set of lattice vectors,
+//in_lat(1,1)=a_x
+//in_lat(1,2)=a_y
+//in_lat(2,1)=b_x  ...
+//
+//OUTPUT:
+//niggli_lat - reduced (Niggli) cell, same format
+//P - Matrix to go from Primitive to Niggli cell
+//Q - P^-1;
+//
+//For more info of the definitions here see Int. Tables Cryst. ch.5
+//Let nlat be the niggli lattice, where the first column is a,
+//second b, third c.  Let lat be the original cell equivalent.
+//The P matrix to transform cells is generally defined by
+//nlat = lat * P
+//We will follow this convention for defining P and Q.
+//Note that is the rest of the code, we define lattices with
+//rows equal to a, b, and c.  Therefore, under our conventional
+//definitions of nlat, call it nlat_c=nlat^T, and lat, call
+//it lat_c=lat^T, we have
+//nlat_c = P^T * lat_c
+//where ^T means the transpose.
 
 void _sdebug_GetNiggliCell(int,int,double,double,double,double,double,double,ostream&);
 
@@ -9232,7 +9688,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Start loop
 
- LoopHead:
+LoopHead:
 
   cnt++;
   //  cerr << "DEBUG: Niggli() cnt=" << cnt << endl;
@@ -9252,10 +9708,11 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
     return FALSE;
   }
 
-  
+
   // Step 1
-  // DX 2/9/18 [OBSOLETE] if(((a-b)>TOL) || ((abs(a-b)<TOL) && (abs(ksi)>abs(eta)) ) ) {
-  if(((a-b)>TOL) || ((abs(a-b)<TOL) && ((abs(ksi)-abs(eta))>TOL) ) ) { // DX 2/9/18 - more robust; precision
+  // DX 2/9/18 [OBSOLETE] if(((a-b)>TOL) || ((abs(a-b)<TOL) && (abs(ksi)>abs(eta)) ) )
+  if(((a-b)>TOL) || ((abs(a-b)<TOL) && ((abs(ksi)-abs(eta))>TOL) ) ) // DX 2/9/18 - more robust; precision
+  { //CO200106 - patching for auto-indenting
     temp=a;a=b;b=temp;
     temp=-ksi;ksi=-eta;eta=temp;
     P=P*m1;
@@ -9264,8 +9721,9 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
   }
 
   // Step 2
-  // DX 2/9/18 [OBSOLETE] if(((b-c)>TOL) || ((abs(b-c)<TOL) && (abs(eta)>abs(zeta)) ) ) {
-  if(((b-c)>TOL) || ((abs(b-c)<TOL) && ((abs(eta)-abs(zeta))>TOL) ) ) { // DX 2/9/18 - more robust; precision
+  // DX 2/9/18 [OBSOLETE] if(((b-c)>TOL) || ((abs(b-c)<TOL) && (abs(eta)>abs(zeta)) ) )
+  if(((b-c)>TOL) || ((abs(b-c)<TOL) && ((abs(eta)-abs(zeta))>TOL) ) ) // DX 2/9/18 - more robust; precision
+  { //CO200106 - patching for auto-indenting
     temp=b;b=c;c=temp;
     temp=-eta;eta=-zeta;zeta=temp;
     P=P*m2;
@@ -9275,8 +9733,9 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
   }
 
   // Step 3
-  // DX 2/9/18 [OBSOLETE] if((ksi*eta*zeta)>0.0) {
-  if((ksi*eta*zeta)>TOL) { // DX 2/9/18 - more robust; precision
+  // DX 2/9/18 [OBSOLETE] if((ksi*eta*zeta)>0.0)
+  if((ksi*eta*zeta)>TOL) // DX 2/9/18 - more robust; precision
+  { //CO200106 - patching for auto-indenting
     m3(1,1)=SignNoZero(ksi);
     m3(2,2)=SignNoZero(eta);
     m3(3,3)=SignNoZero(zeta);
@@ -9289,9 +9748,10 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
   }
 
   // Step 4
-  // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0)) {
-  if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL)) {  // DX 2/12/18 - if any are zero, then, ksi*eta*zeta is zero
-  //if(ksi*eta*zeta<=TOL) { // DX 2/9/18 - more robust; precision
+  // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
+  if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=-TOL))  // DX 2/12/18 - if any are zero, then, ksi*eta*zeta is zero
+    //if(ksi*eta*zeta<=TOL) // DX 2/9/18 - more robust; precision
+  { //CO200106 - patching for auto-indenting
     m4(1,1)=-(SignNoZero(ksi));
     m4(2,2)=-(SignNoZero(eta));
     m4(3,3)=-(SignNoZero(zeta));
@@ -9308,11 +9768,12 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 5
   if(((abs(ksi)-b)>TOL) ||
-     ((abs(ksi-b)<TOL) && (2.0*eta-zeta)<-TOL) || // DX 2/9/18 - more robust; precision
-     ((abs(ksi+b)<TOL) && (zeta<-TOL)) ) { // DX 2/9/18 - more robust; precision
-  // DX 2/9/18 [OBSOLETE] if(((abs(ksi)-b)>=TOL) ||
-     // DX 2/9/18 [OBSOLETE] ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
-     // DX 2/9/18 [OBSOLETE] ((abs(ksi+b)<TOL) && (zeta<0)) ) {
+      ((abs(ksi-b)<TOL) && (2.0*eta-zeta)<-TOL) || // DX 2/9/18 - more robust; precision
+      ((abs(ksi+b)<TOL) && (zeta<-TOL)) ) // DX 2/9/18 - more robust; precision
+    // DX 2/9/18 [OBSOLETE] if(((abs(ksi)-b)>=TOL) ||
+    // DX 2/9/18 [OBSOLETE] ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
+    // DX 2/9/18 [OBSOLETE] ((abs(ksi+b)<TOL) && (zeta<0)) )
+  { //CO200106 - patching for auto-indenting
     m5(2,3)=-(SignNoZero(ksi));
     P=P*m5;
     temp1=b+c-ksi*SignNoZero(ksi);
@@ -9328,10 +9789,11 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 6
   if(((abs(eta)-a)>TOL) || 
-     ((abs(eta-a)<TOL) && (2.0*ksi-zeta)<-TOL) || // DX 2/9/18 - more robust; precision
-     ((abs(eta+a)<TOL) && (zeta<-TOL))) { // DX 2/9/18 - more robust; precision
-     // DX 2/9/18 [OBSOLETE] ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
-     // DX 2/9/18 [OBSOLETE] ((abs(eta+a)<TOL) && (zeta<0))) {
+      ((abs(eta-a)<TOL) && (2.0*ksi-zeta)<-TOL) || // DX 2/9/18 - more robust; precision
+      ((abs(eta+a)<TOL) && (zeta<-TOL))) // DX 2/9/18 - more robust; precision
+    // DX 2/9/18 [OBSOLETE] ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
+    // DX 2/9/18 [OBSOLETE] ((abs(eta+a)<TOL) && (zeta<0)))
+  { //CO200106 - patching for auto-indenting
     m6(1,3)=-SignNoZero(eta);
     P=P*m6;
     temp1=a+c-eta*SignNoZero(eta);
@@ -9347,10 +9809,11 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 7
   if(((abs(zeta)-a)>TOL) || 
-     ((abs(zeta-a)<TOL) && (2.0*ksi-eta)<-TOL) || // DX 2/9/18 - more robust; precision
-     ((abs(zeta+a)<TOL) && (eta<-TOL))) { // DX 2/9/18 - more robust; precision
-     // DX 2/9/18 [OBSOLETE] ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
-     // DX 2/9/18 [OBSOLETE] ((abs(zeta+a)<TOL) && (eta<0))) {
+      ((abs(zeta-a)<TOL) && (2.0*ksi-eta)<-TOL) || // DX 2/9/18 - more robust; precision
+      ((abs(zeta+a)<TOL) && (eta<-TOL))) // DX 2/9/18 - more robust; precision
+    // DX 2/9/18 [OBSOLETE] ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
+    // DX 2/9/18 [OBSOLETE] ((abs(zeta+a)<TOL) && (eta<0)))
+  { //CO200106 - patching for auto-indenting
     m7(1,2)=-SignNoZero(zeta);
     P=P*m7;
     temp1=a+b-zeta*SignNoZero(zeta);
@@ -9366,9 +9829,10 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 8
   // DX 2/9/18 [OBSOLETE] if((ksi+eta+zeta+a+b<0) ||
-  // DX 2/9/18 [OBOSLETE]   ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
+  // DX 2/9/18 [OBOSLETE]   ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0)))
   if((ksi+eta+zeta+a+b<-TOL) || // DX 2/9/18 - more robust; precision
-     (abs(ksi+eta+zeta+a+b)<TOL && (2.0*(a+eta)+zeta>TOL))) { // DX 2/9/18 - more robust; precision
+      (abs(ksi+eta+zeta+a+b)<TOL && (2.0*(a+eta)+zeta>TOL))) // DX 2/9/18 - more robust; precision
+  { //CO200106 - patching for auto-indenting
     P=P*m8;
     temp1=a+b+c+ksi+eta+zeta;
     temp2=2.0*b+ksi+zeta;
@@ -9380,7 +9844,7 @@ bool GetNiggliCell_20180213(const xmatrix<double>& in_lat,xmatrix<double>& niggl
     // _sdebug_GetNiggliCell(8,cnt,a,b,c,ksi,eta,zeta,cout);
     goto LoopHead;
   }
-  
+
   // Renormalize back to regular cell (divide by RENORM)
   xvector<double> outdat(6);
   //      outdat(1)=sqrt(a/RENORM);
@@ -9494,7 +9958,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Start loop
 
- LoopHead:
+LoopHead:
 
   cnt++;
   //  cerr << "DEBUG: Niggli() cnt=" << cnt << endl;
@@ -9513,7 +9977,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
     //     // -------
     return FALSE;
   }
-  
+
   // Step 1
   if(((a-b)>TOL) || ((abs(a-b)<TOL) && (abs(ksi)>abs(eta)) ) ) {
     temp=a;a=b;b=temp;
@@ -9547,8 +10011,9 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
   }
 
   // Step 4
-  // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0)) {
-  if(ksi*eta*zeta<=0) {
+  // Eric's original if((abs(ksi)<TOL)||(abs(eta)<TOL)||(abs(zeta)<TOL)||(ksi*eta*zeta<=0))
+  if(ksi*eta*zeta<=0)
+  { //CO200106 - patching for auto-indenting
     m4(1,1)=-(SignNoZero(ksi));
     m4(2,2)=-(SignNoZero(eta));
     m4(3,3)=-(SignNoZero(zeta));
@@ -9565,8 +10030,8 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 5
   if(((abs(ksi)-b)>=TOL) ||
-     ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
-     ((abs(ksi+b)<TOL) && (zeta<0)) ) {
+      ((abs(ksi-b)<TOL) && (2.0*eta<zeta)) ||
+      ((abs(ksi+b)<TOL) && (zeta<0)) ) {
     m5(2,3)=-(SignNoZero(ksi));
     P=P*m5;
     temp1=b+c-ksi*SignNoZero(ksi);
@@ -9582,7 +10047,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 6
   if(((abs(eta)-a)>TOL) || ((abs(eta-a)<TOL) && (2.0*ksi<zeta)) ||
-     ((abs(eta+a)<TOL) && (zeta<0))) {
+      ((abs(eta+a)<TOL) && (zeta<0))) {
     m6(1,3)=-SignNoZero(eta);
     P=P*m6;
     temp1=a+c-eta*SignNoZero(eta);
@@ -9597,7 +10062,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 7
   if(((abs(zeta)-a)>TOL) || ((abs(zeta-a)<TOL) && (2.0*ksi<eta)) ||
-     ((abs(zeta+a)<TOL) && (eta<0))) {
+      ((abs(zeta+a)<TOL) && (eta<0))) {
     m7(1,2)=-SignNoZero(zeta);
     P=P*m7;
     temp1=a+b-zeta*SignNoZero(zeta);
@@ -9613,7 +10078,7 @@ bool GetNiggliCell_20180101(const xmatrix<double>& in_lat,xmatrix<double>& niggl
 
   // Step 8
   if((ksi+eta+zeta+a+b<0) ||
-     ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
+      ((ksi+eta+zeta+a+b<0) && (2.0*(a+eta)+zeta>0))) {
     P=P*m8;
     temp1=a+b+c+ksi+eta+zeta;
     temp2=2.0*b+ksi+zeta;
@@ -9731,7 +10196,7 @@ xmatrix<double> GetNiggliStr(const xmatrix<double>& lattice) {
 }
 
 void _sdebug_GetNiggliCell(int step,int iter,double a,double b,double c,
-			   double ksi,double eta,double zeta,ostream& sout) {
+    double ksi,double eta,double zeta,ostream& sout) {
   if(0) {
     // tpx
     sout << "Step: " << step << endl;
@@ -9892,10 +10357,10 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //vector<int> sc2pcMap, pc2scMap; //dummy
     if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
-    atomic_grid=a;atomic_grid.Clean();
+    atomic_grid=a;atomic_grid.clean(); //DX 20191220 - uppercase to lowercase clean
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
     if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
-    ptr_atoms=&atomic_grid.atoms;
+    ptr_atoms=&atomic_grid.grid_atoms;  //CO190808 - GenerateGridAtoms() populates grid_atoms, not atoms
   }
   const deque<_atom> atoms=*ptr_atoms;
 
@@ -9905,9 +10370,9 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
 deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX 20190619 - added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy="foldAtomsInCell():";
-  
+
   deque<_atom> atoms_in_cell;
-  
+
   xmatrix<double> f2c_new=trasp(lattice_new);
   xmatrix<double> c2f_new=inverse(f2c_new);
 
@@ -9915,7 +10380,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     cerr << soliloquy << " f2c_new=" << endl;cerr << f2c_new << endl;
     cerr << soliloquy << " c2f_new=" << endl;cerr << c2f_new << endl;
   }
-  
+
   _atom tmp;
   for (uint j = 0; j < atoms.size(); j++) {
     //[CO190520 - this case is not needed]if(atoms_in_cell.size() == 0) {
@@ -9926,19 +10391,20 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     //[CO190520 - this case is not needed]  atoms_in_cell.back().fpos = BringInCell(c2f_new * atoms[j].cpos);
     //[CO190520 - this case is not needed]  atoms_in_cell.back().cpos = f2c_new * atoms_in_cell.back().fpos;
     //[CO190520 - this case is not needed]  atoms_in_cell.back().ijk(1)=0; atoms_in_cell.back().ijk(2)=0; atoms_in_cell.back().ijk(3)=0;
-    //[CO190520 - this case is not needed]} else {
+    //[CO190520 - this case is not needed]} else {  //[CO200106 - close bracket for indenting]}
     //bool duplicate_atom = false;
     tmp.fpos = BringInCell(c2f_new * atoms[j].cpos);
     tmp.cpos = f2c_new * tmp.fpos;
     //[OBSOLETE]for (uint a = 0; a < atoms_in_cell.size(); a++) {
-    //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
-    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol)) {
+    //[OBSOLETE]  if(MapAtomsInNewCell(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
+    //[OBSOLETE]  if(MapAtoms(atoms_in_cell[a], tmp, c2f_orig, f2c_new, skew, tol))
+    //[OBSOLETE]  { //CO200106 - patching for auto-indenting
     //[OBSOLETE]    duplicate_atom = true;
     //[OBSOLETE]    break;
     //[OBSOLETE]  }
     //[OBSOLETE]}
     //[OBSOLETE]if(duplicate_atom == false) {
-      if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX 20190619 - lattice_new and f2c_new as input
+    if(!SYM::MapAtom(atoms_in_cell,tmp,false,lattice_new,f2c_new,skew,tol)){ //DX 20190619 - lattice_new and f2c_new as input
       //[OBSOLETE]atoms[j].fpos = tmp.fpos; //BringInCell(tmp.fpos);
       //[OBSOLETE]atoms[j].cpos = tmp.cpos; //f2c_new * atoms[j].fpos;
       atoms_in_cell.push_back(atoms[j]);
@@ -9950,13 +10416,16 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
   }
 
   if(check_min_dists){ //DX 20190613
-    double min_dist_orig=SYM::minimumDistance(atoms,lattice_orig);
-    double min_dist_new=SYM::minimumDistance(atoms_in_cell,lattice_new);
+    double min_dist_orig=SYM::minimumDistance(atoms);  //lattice_orig //this does NOT work if we use GenerateGridAtoms (no longer periodic with lattice), so simply compare distances between atoms. NOTE: this is no longer the TRUE minimumDistance(), which requires knowledge of the lattice vectors
+    double min_dist_new=SYM::minimumDistance(atoms_in_cell);  //lattice_new
     if(LDEBUG){
+      cerr << soliloquy << " lattice_orig=" << endl;cerr << lattice_orig << endl;
+      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << soliloquy << " atoms_orig=" << endl;for(uint i=0;i<atoms.size();i++){cerr << atoms[i] << endl;}
       cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
       cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
     }
-    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(soliloquy,"Minimum distance changed, check that atoms are not rotated",_INPUT_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
 
   return atoms_in_cell;
@@ -10034,7 +10503,13 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
     string function_name = "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
-    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+  }
+  if (std::signbit(tolerance)) { //DX 20191115 
+    string function_name = "BringInCellInPlace()";
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
+    message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
   }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
@@ -10077,7 +10552,13 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
     string function_name = "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
-    throw aurostd::xerror(function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX 20190905 - replaced cerr with throw
+  }
+  if (std::signbit(tolerance)) { //DX 20191115 
+    string function_name = "BringInCell()";
+    stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
+    message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
@@ -10099,7 +10580,7 @@ xvector<double> BringInCell(const xvector<double>& fpos_in, double tolerance, do
 _atom BringInCellFPOS(const _atom& atom_in, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   _atom atom_out = atom_in;
   BringInCellInPlace(atom_out.fpos, tolerance, upper_bound, lower_bound);
-  
+
   // update ijk
   for(int i=atom_out.fpos.lrows; i<=atom_out.fpos.urows; i++){
     atom_out.ijk(i) = (int)(atom_out.fpos[i]-atom_in.fpos[i]);
@@ -10126,7 +10607,7 @@ xstructure BringInCell(const xstructure& xstr_in, double tolerance, double upper
 void BringInCellInPlaceFPOS(_atom& atom, double tolerance, double upper_bound, double lower_bound) { //DX 20190904
   xvector<double> orig_fpos = atom.fpos; //DX - needed for ijk later
   BringInCellInPlace(atom.fpos, tolerance, upper_bound, lower_bound);
-  
+
   // update ijk
   for(int i=atom.fpos.lrows; i<=atom.fpos.urows; i++){
     atom.ijk(i) = (int)(atom.fpos[i]-orig_fpos[i]);
@@ -10141,7 +10622,7 @@ _atom BringInCell(const _atom& atom_in, const xmatrix<double>& lattice, double t
   // update cpos
   atom_out.cpos=F2C(lattice,atom_out.fpos);
   atom_out.isincell=TRUE;
-  
+
   return atom_out;
 }
 
@@ -10380,32 +10861,33 @@ xstructure _old_BringInCompact(const xstructure& a) {
     for(uint ii=0;ii<i;ii++) {                      // scan over all the reference atoms
       adref1pos=sstr.atoms.at(ii).fpos;
       for(int ic=1;ic<=3;ic++) {                     // scan over all the reference atoms
-	acref1pos(ic)=0.0;                          // scan over all the reference atoms
-	for(int jc=1;jc<=3;jc++)
-	  acref1pos(ic)=acref1pos(ic)+adref1pos(jc)*sstr.lattice(jc,ic);
-	// scan over all the reference atoms
+        acref1pos(ic)=0.0;                          // scan over all the reference atoms
+        for(int jc=1;jc<=3;jc++)
+          acref1pos(ic)=acref1pos(ic)+adref1pos(jc)*sstr.lattice(jc,ic);
+        // scan over all the reference atoms
       }                                             // scan over all the reference atoms
 
       for(int i1=-1;i1<=1;i1++)                     // roll over first neighbour cells
-	for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
-	  for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
-	    adtstpos(1)=sstr.atoms.at(i).fpos(1)+i1;
-	    adtstpos(2)=sstr.atoms.at(i).fpos(2)+j1;
-	    adtstpos(3)=sstr.atoms.at(i).fpos(3)+k1;      // test the atom
-	    for(int ic=1;ic<=3;ic++) {                // test the atom
-	      actstpos(ic)=0.0;                      // test the atom
-	      for(int jc=1;jc<=3;jc++)               // test the atom
-		actstpos(ic)=actstpos(ic)+adtstpos(jc)*sstr.lattice(jc,ic);   // test the atom
-	    }                                        // test the atom  
-	    bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
-	    // if((bond<min_bond) {                  // if it is OK then DO IT !
-	    if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) ) {
-	      // if it is OK then DO IT !
-	      min_bond=bond;                                      // update
-	      adtrgpos=adtstpos;
-	      actrgpos=actstpos;
-	    }
-	  }
+        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
+          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
+            adtstpos(1)=sstr.atoms.at(i).fpos(1)+i1;
+            adtstpos(2)=sstr.atoms.at(i).fpos(2)+j1;
+            adtstpos(3)=sstr.atoms.at(i).fpos(3)+k1;      // test the atom
+            for(int ic=1;ic<=3;ic++) {                // test the atom
+              actstpos(ic)=0.0;                      // test the atom
+              for(int jc=1;jc<=3;jc++)               // test the atom
+                actstpos(ic)=actstpos(ic)+adtstpos(jc)*sstr.lattice(jc,ic);   // test the atom
+            }                                        // test the atom  
+            bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
+            // if((bond<min_bond)                  // if it is OK then DO IT !
+            if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) )
+            { //CO200106 - patching for auto-indenting
+              // if it is OK then DO IT !
+              min_bond=bond;                                      // update
+              adtrgpos=adtstpos;
+              actrgpos=actstpos;
+            }
+          }
     }
     // now the TRG atom has all the information about the bst position of the atom to be moved.
     // than EAT IT !
@@ -10433,32 +10915,33 @@ void xstructure::BringInCompact(void) {
     for(uint ii=0;ii<i;ii++) {                      // scan over all the reference atoms
       adref1pos=atoms.at(ii).fpos;
       for(int ic=1;ic<=3;ic++) {                     // scan over all the reference atoms
-	acref1pos(ic)=0.0;                          // scan over all the reference atoms
-	for(int jc=1;jc<=3;jc++)
-	  acref1pos(ic)=acref1pos(ic)+adref1pos(jc)*lattice(jc,ic);
-	// scan over all the reference atoms
+        acref1pos(ic)=0.0;                          // scan over all the reference atoms
+        for(int jc=1;jc<=3;jc++)
+          acref1pos(ic)=acref1pos(ic)+adref1pos(jc)*lattice(jc,ic);
+        // scan over all the reference atoms
       }                                             // scan over all the reference atoms
 
       for(int i1=-1;i1<=1;i1++)                     // roll over first neighbour cells
-	for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
-	  for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
-	    adtstpos(1)=atoms.at(i).fpos(1)+i1;
-	    adtstpos(2)=atoms.at(i).fpos(2)+j1;
-	    adtstpos(3)=atoms.at(i).fpos(3)+k1;      // test the atom
-	    for(int ic=1;ic<=3;ic++) {                // test the atom
-	      actstpos(ic)=0.0;                      // test the atom        
-	      for(int jc=1;jc<=3;jc++)               // test the atom
-		actstpos(ic)=actstpos(ic)+adtstpos(jc)*lattice(jc,ic);   // test the atom
-	    }                                        // test the atom  
-	    bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
-	    // if((bond<min_bond) {                  // if it is OK then DO IT !
-	    if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) ) {
-	      // if it is OK then DO IT !
-	      min_bond=bond;                                      // update
-	      adtrgpos=adtstpos;
-	      actrgpos=actstpos;
-	    }
-	  }
+        for(int j1=-1;j1<=1;j1++)                   // roll over first neighbour cells
+          for(int k1=-1;k1<=1;k1++) {               // roll over first neighbour cells
+            adtstpos(1)=atoms.at(i).fpos(1)+i1;
+            adtstpos(2)=atoms.at(i).fpos(2)+j1;
+            adtstpos(3)=atoms.at(i).fpos(3)+k1;      // test the atom
+            for(int ic=1;ic<=3;ic++) {                // test the atom
+              actstpos(ic)=0.0;                      // test the atom        
+              for(int jc=1;jc<=3;jc++)               // test the atom
+                actstpos(ic)=actstpos(ic)+adtstpos(jc)*lattice(jc,ic);   // test the atom
+            }                                        // test the atom  
+            bond=aurostd::modulus(actstpos-acref1pos);    // test the bond distance
+            // if((bond<min_bond)                  // if it is OK then DO IT !
+            if((bond<1.03*min_bond && abs((int) i-(int) ii)<10) || (bond<0.98*min_bond) )
+            { //CO200106 - patching for auto-indenting
+              // if it is OK then DO IT !
+              min_bond=bond;                                      // update
+              adtrgpos=adtstpos;
+              actrgpos=actstpos;
+            }
+          }
     }
     // now the TRG atom has all the information about the bst position of the atom to be moved.
     // than EAT IT !
@@ -10494,28 +10977,28 @@ void xstructure::BringInWignerSeitz(void) {
   for(uint iat=0;iat<atoms.size();iat++) {
     for(int i=-1;i<=1;i++)
       for(int j=-1;j<=1;j++)
-	for(int k=-1;k<=1;k++) {
-	  rat=atoms.at(iat).cpos+((double)i)*a1+((double)j)*a2+((double)k)*a3;
-	  proj_a1=scalar_product(rat,a1)/na1/na1;
-	  proj_a2=scalar_product(rat,a2)/na2/na2;
-	  proj_a3=scalar_product(rat,a3)/na3/na3;
-	  proj_a12=scalar_product(rat,a12)/na12/na12;
-	  proj_a31=scalar_product(rat,a31)/na31/na31;
-	  proj_a23=scalar_product(rat,a23)/na23/na23;
-	  proj_a123=scalar_product(rat,a123)/na123/na123;
-	  if((proj_a1>-0.5 && proj_a1<=0.5) &&
-	     (proj_a2>-0.5 && proj_a2<=0.5) &&
-	     (proj_a3>-0.5 && proj_a3<=0.5) &&
-	     (proj_a12>-0.5 && proj_a12<=0.5) &&
-	     (proj_a31>-0.5 && proj_a31<=0.5) &&
-	     (proj_a23>-0.5 && proj_a23<=0.5) &&
-	     (proj_a123>-0.5 && proj_a123<=0.5)) {
-	    atoms.at(iat).cpos(1)=rat(1);
-	    atoms.at(iat).cpos(2)=rat(2);
-	    atoms.at(iat).cpos(3)=rat(3);
-	    i=10;j=10;k=10;
-	  }
-	}
+        for(int k=-1;k<=1;k++) {
+          rat=atoms.at(iat).cpos+((double)i)*a1+((double)j)*a2+((double)k)*a3;
+          proj_a1=scalar_product(rat,a1)/na1/na1;
+          proj_a2=scalar_product(rat,a2)/na2/na2;
+          proj_a3=scalar_product(rat,a3)/na3/na3;
+          proj_a12=scalar_product(rat,a12)/na12/na12;
+          proj_a31=scalar_product(rat,a31)/na31/na31;
+          proj_a23=scalar_product(rat,a23)/na23/na23;
+          proj_a123=scalar_product(rat,a123)/na123/na123;
+          if((proj_a1>-0.5 && proj_a1<=0.5) &&
+              (proj_a2>-0.5 && proj_a2<=0.5) &&
+              (proj_a3>-0.5 && proj_a3<=0.5) &&
+              (proj_a12>-0.5 && proj_a12<=0.5) &&
+              (proj_a31>-0.5 && proj_a31<=0.5) &&
+              (proj_a23>-0.5 && proj_a23<=0.5) &&
+              (proj_a123>-0.5 && proj_a123<=0.5)) {
+            atoms.at(iat).cpos(1)=rat(1);
+            atoms.at(iat).cpos(2)=rat(2);
+            atoms.at(iat).cpos(3)=rat(3);
+            i=10;j=10;k=10;
+          }
+        }
     atoms.at(iat).fpos=C2F(lattice,atoms.at(iat).cpos);
   }
 }
@@ -10559,8 +11042,8 @@ bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec)
     found_atom=FALSE;
     for(uint jat=0;jat<a.atoms.size()&&!found_atom&&found_tvec;jat++) {
       if(types[iat]==types[jat]) {
-	//        diff=ftpos-a.atoms.at(jat).fpos;
- 	diff=BringInCell(a.atoms.at(iat).fpos-a.atoms.at(jat).fpos+ftvec,tolerance);
+        //        diff=ftpos-a.atoms.at(jat).fpos;
+        diff=BringInCell(a.atoms.at(iat).fpos-a.atoms.at(jat).fpos+ftvec,tolerance);
         // If the translated atom maps onto another and its type is the same as the atom mapped onto then increment.
         if(aurostd::modulus(diff)<=tolerance) {CntGoodTrans++;found_atom=TRUE;}
       }
@@ -10589,9 +11072,9 @@ bool IsTranslationFVectorORIGINAL(const xstructure& a, const xvector<double>& ft
     // Find closest atom in unit cell to translated position (should only be one atom less than tolerance).
     for(uint jat=0;jat<a.atoms.size();jat++) {
       if(types[iat]==types[jat]) {
-	//        diff=ftpos-a.atoms.at(jat).fpos;
-  	diff=BringInCell(a.atoms.at(iat).fpos-a.atoms.at(jat).fpos+ftvec,tolerance);
-	// If the translated atom maps onto another and its type is the same as the atom mapped onto then increment.
+        //        diff=ftpos-a.atoms.at(jat).fpos;
+        diff=BringInCell(a.atoms.at(iat).fpos-a.atoms.at(jat).fpos+ftvec,tolerance);
+        // If the translated atom maps onto another and its type is the same as the atom mapped onto then increment.
         if(aurostd::modulus(diff)<=tolerance) CntGoodTrans++;
       }
     } // For jat
@@ -10694,7 +11177,7 @@ xstructure GetPrimitive(const xstructure& _a,double tolerance) {
   // return GetPrimitiveMULTITHREAD(a);
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   if(LDEBUG) cerr << "GetPrimitive(const xstructure& _a,double tolerance): BEGIN" << endl;
-  
+
   bool bool_backup=AFLOW_PTHREADS::FLAG;
   uint uint_backup=AFLOW_PTHREADS::MAX_PTHREADS;
   xstructure a(_a);
@@ -10859,18 +11342,18 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   // no threads
 
   if(LDEBUG) cerr << "GetPrimitiveMULTITHREAD: [3] " << endl;
-  
+
   if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
     //   cerr << "NO PTHREADS" << endl;
     for(uint iat1=0;iat1<sstr.atoms.size();iat1++) { //      if(sstr.atoms.at(iat1).type==ispecie_min)
       for(uint iat2=0;iat2<sstr.atoms.size();iat2++) { //           if(sstr.atoms.at(iat2).type==ispecie_min)
-	if(iat1!=iat2) {
-	  fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
-	  cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
-	  if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
-	    if(IsTranslationFVector(sstr,fdisp)) 
-	      candidate_lattice_vector.push_back(cdisp);
-	}
+        if(iat1!=iat2) {
+          fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
+          cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
+          if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
+            if(IsTranslationFVector(sstr,fdisp)) 
+              candidate_lattice_vector.push_back(cdisp);
+        }
       }
     }
   } else { // multithread
@@ -10915,7 +11398,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
           for(uint i=1;i<=3;i++) plattice[3][i]=candidate_lattice_vector.at(iw)[i];
           if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
             if(aurostd::isinteger(sstr_volume/det(plattice),0.0001)) {    // integer ratio of volumes
-	      //  cerr << sstr_volume/det(plattice) << " " << aurostd::isinteger(sstr_volume/det(plattice),0.001) << endl;
+              //  cerr << sstr_volume/det(plattice) << " " << aurostd::isinteger(sstr_volume/det(plattice),0.001) << endl;
               if(det(plattice)<det(olattice)) {                    // better than before
                 if(LDEBUG) cout<<"DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
                 if(isdifferent(plattice,olattice,0.001)) {
@@ -10994,7 +11477,7 @@ xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // 
   // no fractional ratio of atoms
   double fraction_atoms=(double) a.atoms.size()/b.atoms.size();
   if(!aurostd::isinteger(fraction_atoms,0.01)) return _a;
-  
+
   // nearest too close
   if(NearestNeighbour(b)<5.0*tolerance)  return _a;
   if(NearestNeighbour(b)<0.1)  return _a;
@@ -11055,13 +11538,13 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
   for(uint iat1=0;iat1<sstr.atoms.size();iat1++)
     if(sstr.atoms.at(iat1).type==ispecie_min)
       for(uint iat2=0;iat2<sstr.atoms.size();iat2++)
-	if(sstr.atoms.at(iat2).type==ispecie_min) {
-	  fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
-	  cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
-	  if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
-	    if(IsTranslationFVector(sstr,fdisp))
-	      candidate_lattice_vector.push_back(cdisp);
-	}
+        if(sstr.atoms.at(iat2).type==ispecie_min) {
+          fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
+          cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
+          if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
+            if(IsTranslationFVector(sstr,fdisp))
+              candidate_lattice_vector.push_back(cdisp);
+        }
   if(LDEBUG) cout << "DEBUG" << candidate_lattice_vector.size() << endl;
   int cnt=0;
   olattice=sstr.lattice;                      // the lattice is always a good lattice
@@ -11071,22 +11554,22 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
     for(uint iv=0;iv<candidate_lattice_vector.size()&& iv!=iu;iv++) {
       for(uint i=1;i<=3;i++) plattice(2,i)=candidate_lattice_vector.at(iv)(i);
       for(uint iw=0;iw<candidate_lattice_vector.size()&& iw!=iv && iw!=iu;iw++) {
-	for(uint i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
-	if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
-	  if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
-	    if(det(plattice)<det(olattice)) {                    // better than before
-	      if(LDEBUG) cout<<"DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
-	      if(isdifferent(plattice,olattice,0.0001)) {
-		plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
-		plattice=NiggliUnitCellForm(plattice);           // Niggli Second
-		if(isdifferent(plattice,olattice,0.0001)) {
-		  olattice=plattice;
-		  cnt++;
-		}
-	      }
-	    }
-	  }
-	}
+        for(uint i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
+        if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
+          if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
+            if(det(plattice)<det(olattice)) {                    // better than before
+              if(LDEBUG) cout<<"DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+              if(isdifferent(plattice,olattice,0.0001)) {
+                plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
+                plattice=NiggliUnitCellForm(plattice);           // Niggli Second
+                if(isdifferent(plattice,olattice,0.0001)) {
+                  olattice=plattice;
+                  cnt++;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -11152,7 +11635,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
   xmatrix<double> plattice(3,3),olattice(3,3);
   xvector<double> fdisp(3),cdisp(3);
   std::vector<xvector<double> > candidate_lattice_vector;
-  
+
   int specie_min=100000,ispecie_min=0;
   for(uint ispecie=0;ispecie<sstr.num_each_type.size();ispecie++)
     if(sstr.num_each_type.at(ispecie)<specie_min) {
@@ -11168,8 +11651,8 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
   for(uint iat1=0;iat1<sstr.atoms.size();iat1++) {
     for(uint iat2=0;iat2<sstr.atoms.size();iat2++) {
       if(iat2!=iat1 &&
-         sstr.atoms.at(iat1).type==ispecie_min &&
-         sstr.atoms.at(iat2).type==ispecie_min) {
+          sstr.atoms.at(iat1).type==ispecie_min &&
+          sstr.atoms.at(iat2).type==ispecie_min) {
         fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
         cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
         if(IsTranslationFVector(sstr,fdisp)) candidate_lattice_vector.push_back(cdisp);
@@ -11229,8 +11712,8 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
           atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
           atom.fpos=C2F(b.lattice,atom.cpos);
           if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-             atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-             atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
             for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
               atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
             // atom_found=FALSE;
@@ -11326,12 +11809,12 @@ xstructure GetPrimitive2(const xstructure& a) {
     for(int iv=0;iv<num_cand;iv++) {
       for(i=1;i<=3;i++) plattice(2,i)=candidate_lattice_vector.at(iv)(i);
       for(int iw=0;iw<num_cand;iw++) {
-	if(iu!=iw && iu!=iv && iv!=iw) {
-	  for(i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
-	  new_vol=GetVol(plattice);
-	  // if(new_vol<=min_vol && new_vol>tolerance) min_vol=new_vol;
-	  if(new_vol<=min_vol && new_vol>1.0e-5) min_vol=new_vol;
-	}
+        if(iu!=iw && iu!=iv && iv!=iw) {
+          for(i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
+          new_vol=GetVol(plattice);
+          // if(new_vol<=min_vol && new_vol>tolerance) min_vol=new_vol;
+          if(new_vol<=min_vol && new_vol>1.0e-5) min_vol=new_vol;
+        }
       } //iw loop
     } //iv loop
   } //iu loop
@@ -11343,11 +11826,11 @@ xstructure GetPrimitive2(const xstructure& a) {
       for(i=1;i<=3;i++) plattice(2,i)=candidate_lattice_vector.at(iv)(i);
       for(int iw=0;iw<num_cand;iw++) {
         if(iu!=iw && iu!=iv && iv!=iw) {
-	  for(i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
+          for(i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
           new_vol=GetVol(plattice);
           if(aurostd::abs(new_vol-min_vol)<tolerance && new_vol>1.0e-5)
-	    plattice_list.push_back(plattice); // Add to plattice_list
-	  //if new_vol=min_vol
+            plattice_list.push_back(plattice); // Add to plattice_list
+          //if new_vol=min_vol
         } //if iu!=iv!=iw
       } //iw loop
     } //iv loop
@@ -11399,26 +11882,26 @@ xstructure GetPrimitive2(const xstructure& a) {
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
     for(int i=-dims;i<=dims;i++)
       for(int j=-dims;j<=dims;j++)
-	for(int k=-dims;k<=dims;k++) {
+        for(int k=-dims;k<=dims;k++) {
           //    atom=BringInCell(sstr.atoms.at(i),sstr.lattice);
-	  atom=sstr.atoms.at(iat);
-	  atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
-	  atom.fpos=C2F(b.lattice,atom.cpos);
-	  if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
-	    for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
-	      atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
-	    // atom_found=FALSE;
-	    if(!atom_found) {
-	      atom.fpos=roundoff(atom.fpos,tolerance);
-	      atom.cpos=roundoff(atom.cpos,tolerance);
-	      b.atoms.push_back(atom);
-	      b.num_each_type.at(atom.type)++;         // CONVASP_MODE
-	      b.comp_each_type.at(atom.type)+=atom.partial_occupation_value;         // CONVASP_MODE
-	    }
-	  }
-	}
+          atom=sstr.atoms.at(iat);
+          atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
+          atom.fpos=C2F(b.lattice,atom.cpos);
+          if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
+              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+            for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
+              atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
+            // atom_found=FALSE;
+            if(!atom_found) {
+              atom.fpos=roundoff(atom.fpos,tolerance);
+              atom.cpos=roundoff(atom.cpos,tolerance);
+              b.atoms.push_back(atom);
+              b.num_each_type.at(atom.type)++;         // CONVASP_MODE
+              b.comp_each_type.at(atom.type)+=atom.partial_occupation_value;         // CONVASP_MODE
+            }
+          }
+        }
   }
   b.GetStoich();  //170724 CO
   // some check
@@ -11487,10 +11970,10 @@ xstructure GetPrimitive3(const xstructure& a) {
       //    cerr << i << " " << sstr.fgroup.at(i).ctau << endl;
       sym_found=FALSE;
       for(uint ii=0;ii<candidate_lattice_vector.size()&&!sym_found;ii++)
-	sym_found=identical(sstr.fgroup.at(i).ctau,candidate_lattice_vector[ii],tolerance);    // look in all the list of operations
+        sym_found=identical(sstr.fgroup.at(i).ctau,candidate_lattice_vector[ii],tolerance);    // look in all the list of operations
       if(sym_found==FALSE) {                                          // new operation, generate and save it
-	candidate_lattice_vector.push_back(sstr.fgroup.at(i).ctau);
-	cerr << i << " " << sstr.fgroup.at(i).ctau << endl;
+        candidate_lattice_vector.push_back(sstr.fgroup.at(i).ctau);
+        cerr << i << " " << sstr.fgroup.at(i).ctau << endl;
       }
     }
   }
@@ -11503,18 +11986,18 @@ xstructure GetPrimitive3(const xstructure& a) {
     for(uint iv=0;iv<candidate_lattice_vector.size()&& iv!=iu;iv++) {
       for(uint i=1;i<=3;i++) plattice(2,i)=candidate_lattice_vector.at(iv)(i);
       for(uint iw=0;iw<candidate_lattice_vector.size()&& iw!=iv && iw!=iu;iw++) {
-	for(uint i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
-	if(det(plattice)>tolerance && det(plattice)<sstr_volume && det(plattice)<det(olattice)) { // well defined
-	  if(isdifferent(plattice,olattice,0.0001)) {
-	    plattice=MinkowskiBasisReduction(plattice); // Minkowski first
-	    plattice=NiggliUnitCellForm(plattice);      // Niggli Second
-	    if(isdifferent(plattice,olattice,0.0001)) {
-	      olattice=plattice;
-	      //      cerr << det(olattice) << " " << cnt<< endl;
-	      cnt++;
-	    }
-	  }
-	}
+        for(uint i=1;i<=3;i++) plattice(3,i)=candidate_lattice_vector.at(iw)(i);
+        if(det(plattice)>tolerance && det(plattice)<sstr_volume && det(plattice)<det(olattice)) { // well defined
+          if(isdifferent(plattice,olattice,0.0001)) {
+            plattice=MinkowskiBasisReduction(plattice); // Minkowski first
+            plattice=NiggliUnitCellForm(plattice);      // Niggli Second
+            if(isdifferent(plattice,olattice,0.0001)) {
+              olattice=plattice;
+              //      cerr << det(olattice) << " " << cnt<< endl;
+              cnt++;
+            }
+          }
+        }
       }
     }
   }
@@ -11540,26 +12023,26 @@ xstructure GetPrimitive3(const xstructure& a) {
   for(uint iat=0;iat<sstr.atoms.size();iat++) {
     for(int i=-dims;i<=dims;i++)
       for(int j=-dims;j<=dims;j++)
-	for(int k=-dims;k<=dims;k++) {
+        for(int k=-dims;k<=dims;k++) {
           //    atom=BringInCell(sstr.atoms.at(i),sstr.lattice);
-	  atom=sstr.atoms.at(iat);
-	  atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
-	  atom.fpos=C2F(b.lattice,atom.cpos);
-	  if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
-	     atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
-	     atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
-	    for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
-	      atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
-	    // atom_found=FALSE;
-	    if(!atom_found) {
-	      atom.fpos=roundoff(atom.fpos,tolerance);
-	      atom.cpos=roundoff(atom.cpos,tolerance);
-	      b.atoms.push_back(atom);
-	      b.num_each_type.at(atom.type)++;         // CONVASP_MODE
-	      b.comp_each_type.at(atom.type)+=atom.partial_occupation_value;         // CONVASP_MODE
-	    }
-	  }
-	}
+          atom=sstr.atoms.at(iat);
+          atom.cpos=atom.cpos+((double)i)*sstr.lattice(1)+((double)j)*sstr.lattice(2)+((double)k)*sstr.lattice(3);
+          atom.fpos=C2F(b.lattice,atom.cpos);
+          if(atom.fpos(1)>=-tolerance && atom.fpos(1)<1.0-tolerance &&
+              atom.fpos(2)>=-tolerance && atom.fpos(2)<1.0-tolerance &&
+              atom.fpos(3)>=-tolerance && atom.fpos(3)<1.0-tolerance) {      // found something inside
+            for(uint ii=0;ii<b.atoms.size()&&!atom_found;ii++)
+              atom_found=identical(atom.cpos,b.atoms.at(ii).cpos,0.1);       // look in all the list of operations
+            // atom_found=FALSE;
+            if(!atom_found) {
+              atom.fpos=roundoff(atom.fpos,tolerance);
+              atom.cpos=roundoff(atom.cpos,tolerance);
+              b.atoms.push_back(atom);
+              b.num_each_type.at(atom.type)++;         // CONVASP_MODE
+              b.comp_each_type.at(atom.type)+=atom.partial_occupation_value;         // CONVASP_MODE
+            }
+          }
+        }
   }
   b.GetStoich();  //170724 CO
   // rescale back to original scale.
@@ -11728,6 +12211,63 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
 }
 
 // ***************************************************************************
+// Function SetAutoVolume
+// ***************************************************************************
+void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO191010
+  string soliloquy="xstructure::setAutoVolume():";
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  stringstream message;
+
+  if(LDEBUG) {cerr << soliloquy << " fixing volume" << endl;}
+  if(LDEBUG) {cerr << soliloquy << " volume_orig=" << GetVolume() << endl;}
+  double volume=0; //,voli=0;
+  bool use_AFLOW_defaults=use_AFLOW_defaults_in;
+  //try and pull from species_volume first
+  for(uint i=0;i<atoms.size()&&!use_AFLOW_defaults;i++){
+    for(uint j=0;j<num_each_type.size()&&!use_AFLOW_defaults;j++){
+      if(atoms[i].name==species[j]){
+        const double& voli=species_volume[j];
+        if(LDEBUG) {cerr << soliloquy << " atoms[i].name=" << atoms[i].name << " atoms[i].vol=" << voli << endl;}
+        if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){use_AFLOW_defaults=true;}
+        if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
+          message << "partial_occupation_value==0.0 for atom=" << i;
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        }
+        volume+=atoms[i].partial_occupation_value*voli;
+      }
+    }
+  }
+  //otherwise get defaults from AFLOW
+  if(use_AFLOW_defaults || abs(volume)<_XPROTO_ZERO_VOL_){
+    if(LDEBUG) {cerr << soliloquy << " using automatic volumes" << endl;}
+    volume=0;
+    double voli;
+    for(uint i=0;i<atoms.size();i++){
+      for(uint j=0;j<num_each_type.size();j++){
+        if(atoms[i].name==species[j]){
+          voli=GetAtomVolume(atoms[i].name);
+          if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){
+            message << "No volume found for " << atoms[i].name << " (auto volumes)";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          }
+          if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
+            message << "partial_occupation_value==0.0 for atom=" << i;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          }
+          volume+=atoms[i].partial_occupation_value*voli;
+        }
+      }
+    }
+  }
+  if(abs(volume)<_XPROTO_ZERO_VOL_){
+    message << "Final volume==0, check species default volumes";
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+  }
+  SetVolume(volume);
+  if(LDEBUG) {cerr << soliloquy << " volume_new=" << GetVolume() << endl;}
+}
+
+// ***************************************************************************
 // Function InflateLattice
 // ***************************************************************************
 void xstructure::InflateLattice(const double &coefficient) {
@@ -11820,18 +12360,55 @@ bool uniqueAtomInCell(_atom& atom, deque<_atom>& atoms){
 }
 
 // DX - START
-bool inCell(xvector<double>& pos_vec){
-  //DX 20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
-  //DX 20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
-  //DX 20180726 [OBSOLETE]    pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0-_ZERO_TOL_) {      // found something inside
-  if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-     pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-     pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0+_ZERO_TOL_) {      // found something inside //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
-    return TRUE;
-  }
-  return FALSE;
-}
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW] bool inCell(xvector<double>& pos_vec){
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   //DX 20180726 [OBSOLETE] if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0-_ZERO_TOL_ &&
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   //DX 20180726 [OBSOLETE]    pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0-_ZERO_TOL_ &&
+////DX 20180726 [OBSOLETE]    pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0-_ZERO_TOL_) {      // found something inside
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   if(pos_vec(1)>=-_ZERO_TOL_ && pos_vec(1)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(2)>=-_ZERO_TOL_ && pos_vec(2)<1.0+_ZERO_TOL_ && //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]      pos_vec(3)>=-_ZERO_TOL_ && pos_vec(3)<1.0+_ZERO_TOL_) {      // found something inside //DX 20180726 - changed from 1.0-_ZERO_TOL_ to 1.0+_ZERO_TOL_
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]     return TRUE;
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   }
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW]   return FALSE;
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW] }
+//DX 20191125 [OBSOLETE - GENERALIZED BELOW] }
 // DX - END
+
+// ***************************************************************************
+// atomInCell() 
+// ***************************************************************************
+bool atomInCell(const _atom& atom, double tolerance){ 
+
+  // check if the atom is in the unit cell based on fractional coordinates
+  // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
+  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
+  // filtering with this function with soft cutoffs before MapAtom() is faster, 
+  // especially if there are many atoms to check (e.g., 20,000)
+  // Note: check over each component and returning false immediately (faster)
+
+  return inCell(atom.fpos, tolerance);
+
+}
+
+// ***************************************************************************
+// inCell() 
+// ***************************************************************************
+bool inCell(const xvector<double>& pos_vec, double tolerance){ 
+
+  // check if the position is in the unit cell based on fractional coordinates
+  // if you use the non-default tolerance (i.e., _ZERO_TOL_), this alone is not robust 
+  // and should be used in tandem with SYM::MapAtom() to account for periodic boundary conditions
+  // filtering with this function with soft cutoffs before MapAtom() is faster, 
+  // especially if there are many positions to check (e.g., 20,000)
+  // Note: check over each component and returning false immediately (faster)
+
+  for(uint f=1;f<4;f++){
+    if(pos_vec[f] > 1.0+tolerance || pos_vec[f] < -tolerance){ //allows tunable cutoff
+      return false;
+    }
+  }
+  return true;
+}
 
 
 //DX 20180726 - check if already in cell - START
@@ -11841,9 +12418,9 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
     fdiff = SYM::minimizeDistanceFractionalMethod(fdiff); //DX 20190613
     //DX 20190613 [OBSOLETE] SYM::PBC(fdiff);
     if(aurostd::abs(fdiff(1))<_ZERO_TOL_ && 
-       aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
-       aurostd::abs(fdiff(3))<_ZERO_TOL_){
-       return TRUE;
+        aurostd::abs(fdiff(2))<_ZERO_TOL_ && 
+        aurostd::abs(fdiff(3))<_ZERO_TOL_){
+      return TRUE;
     }
   }
   return FALSE;
@@ -11870,8 +12447,9 @@ bool alreadyInCell(_atom& atom, deque<_atom> atoms){
 
 // COREY - START
 xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-                        bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
-  //xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell) {
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  //xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell)
+{ //CO200106 - patching for auto-indenting
   //#define _eps_scell_ 1.0e-5
   //#define _eps_scell_ 0.0
   // check for error
@@ -11879,7 +12457,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   string soliloquy="GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);} //exit(0)
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);} //exit(0)
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -11905,8 +12483,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   bool skew = false; // DX 20190319 - declared outside loop
 
   if(get_symmetry){ //DX 20190319 - added if statement; don't calc unless necessary
-  if(b.dist_nn_min==AUROSTD_NAN){b.dist_nn_min=SYM::minimumDistance(a);} //calculate dist_nn_min
-  if(b.sym_eps==AUROSTD_NAN){b.sym_eps=SYM::defaultTolerance(b);}
+    if(b.dist_nn_min==AUROSTD_NAN){b.dist_nn_min=SYM::minimumDistance(a);} //calculate dist_nn_min
+    if(b.sym_eps==AUROSTD_NAN){b.sym_eps=SYM::defaultTolerance(b);}
     skew = SYM::isLatticeSkewed(b.lattice,b.dist_nn_min,b.sym_eps); // DX 20190319 - declared above
   } //DX //DX 20190319 - added if statement; don't calc unless necessary
 
@@ -11918,8 +12496,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //                            abs(supercell(2,1))<zeroTol && abs(supercell(2,3))<zeroTol &&
   //                            abs(supercell(3,1))<zeroTol && abs(supercell(3,2))<zeroTol);
   bool derivative_structure=!(aurostd::isdiagonal(supercell) && 
-                              aurostd::isequal(nx,ny) && 
-                              aurostd::isequal(ny,nz));
+      aurostd::isequal(nx,ny) && 
+      aurostd::isequal(ny,nz));
   // COREY
   //VERY IMPORTANT, as we need to reduce the symmetry of the derivative structure
   //getting the basis serves as a validation for the symmetry operator
@@ -11974,9 +12552,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     for(uint ia=0;ia<a.iatoms.size();ia++){
       for(uint iia=0;iia<a.iatoms[ia].size();iia++){
         pcmap=false;
-        //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {
-        //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {
-        //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {
+        //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++) {  //[CO200106 - close bracket for indenting]}
+        //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++) {  //[CO200106 - close bracket for indenting]}
+        //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++) {  //[CO200106 - close bracket for indenting]}
         for(i=-dims[1];i<=dims[1];i++) {
           for(j=-dims[2];j<=dims[2];j++) {
             for(k=-dims[3];k<=dims[3];k++) {
@@ -11988,11 +12566,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //  atom.fpos=roundoff(atom.fpos);
               //cerr << "atom " << a.iatoms[ia][iia] << " fpos_rot   " << atom.fpos << endl;
               //cerr << "atom_fpos: " << atom.fpos << endl;
-              //DX 20180726 - if(inCell(atom.fpos)){  //hard cut off
-              if(uniqueAtomInCell(atom, b.atoms)){  //soft cut off; then check images later //DX 20180726
+              //DX 20180726 - if(inCell(atom.fpos)) //hard cut off
+              if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX 20180726
+              { //CO200106 - patching for auto-indenting
                 //if(atom.fpos(1)>=-_eps_scell_ && atom.fpos(1)<1.0-_eps_scell_ &&
                 //  atom.fpos(2)>=-_eps_scell_ && atom.fpos(2)<1.0-_eps_scell_ &&
-                //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_) {      // found something inside
+                //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_)      // found something inside
                 // atom=BringInCell(atom,b.lattice);
                 b.num_each_type[atom.type]++;                  // CONVASP_MODE
                 b.comp_each_type[atom.type]+=atom.partial_occupation_value;                  // CONVASP_MODE
@@ -12009,7 +12588,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 
                 //ijk
                 atom.ijk(1)=i;atom.ijk(2)=j;atom.ijk(3)=k;
-               
+
                 //DX 20180726 - bring close to origin 
                 atom = BringCloseToOrigin(atom, b.f2c);  //updates fpos/cpos/ijk
 
@@ -12056,7 +12635,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
         if(ignore_pcmap==false && pcmap==false){
           if(force_strict_pc2scMap){
             message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-            throw aurostd::xerror(soliloquy,message,_INDEX_MISMATCH_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
           }
           ignore_pcmap=true;
           pc2scMap.clear();
@@ -12079,9 +12658,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   } else {
     for(uint ia=0;ia<a.atoms.size();ia++) {
       pcmap=false;
-      //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){
-      //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){
-      //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){
+      //[CO190520 - EXCESSIVE]for(i=-dim;i<=dim;i++){ //[CO200106 - close bracket for indenting]}
+      //[CO190520 - EXCESSIVE]  for(j=-dim;j<=dim;j++){ //[CO200106 - close bracket for indenting]}
+      //[CO190520 - EXCESSIVE]    for(k=-dim;k<=dim;k++){ //[CO200106 - close bracket for indenting]}
       for(i=-dims[1];i<=dims[1];i++){
         for(j=-dims[2];j<=dims[2];j++){
           for(k=-dims[3];k<=dims[3];k++){
@@ -12091,12 +12670,13 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             atom.cpos=atom.cpos+cshift;
             atom.fpos=b.c2f*atom.cpos; //C2F(b.lattice,atom.cpos);               // put in fractional of new basis
             //  atom.fpos=roundoff(atom.fpos);
-            //DX 20180726 - if(inCell(atom.fpos)){  //hard cut off
-            if(uniqueAtomInCell(atom, b.atoms)){  //soft cut off; then check images later //DX 20180726
+            //DX 20180726 - if(inCell(atom.fpos)) //hard cut off
+            if(uniqueAtomInCell(atom, b.atoms)) //soft cut off; then check images later //DX 20180726
               //if(atom.fpos(1)>=-_eps_scell_ && atom.fpos(1)<1.0-_eps_scell_ &&
               //  atom.fpos(2)>=-_eps_scell_ && atom.fpos(2)<1.0-_eps_scell_ &&
-              //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_) {      // found something inside
+              //  atom.fpos(3)>=-_eps_scell_ && atom.fpos(3)<1.0-_eps_scell_)      // found something inside
               // atom=BringInCell(atom,b.lattice);
+            { //CO200106 - patching for auto-indenting
               b.num_each_type[atom.type]++;                  // CONVASP_MODE
               b.comp_each_type[atom.type]+=atom.partial_occupation_value;                  // CONVASP_MODE
               //ijk
@@ -12145,7 +12725,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       if(ignore_pcmap==false && pcmap==false){
         if(force_strict_pc2scMap){
           message << "pc2scMap not found for atom[i=" << ia << "]";
-          throw aurostd::xerror(soliloquy, message, _INDEX_MISMATCH_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
         }
         ignore_pcmap=true;
         pc2scMap.clear();
@@ -12196,7 +12776,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     message << "a.lattice          = " << endl;
     message << a.lattice << endl;
 
-    throw aurostd::xerror(soliloquy,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
     //exit(0);
   }
 
@@ -12291,7 +12871,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           //      cerr << "Symmetry propagation FAILED with uniform supercell structure at point group" << endl;
           //    } else {
           //      cerr << "Symmetry propagation PASSED with uniform supercell structure at point group" << endl;
-            //}
+          //}
           //  }
           //  pSymOp.basis_map_calculated=KRUN;
           //}
@@ -12354,7 +12934,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
         //}
       }
       //////////////////////////////////////////////////////////////////////////
-      
+
       //////////////////////////////////////////////////////////////////////////
       //PGROUP_XTAL
       if(KRUN && a.pgroup_xtal_calculated){
@@ -12432,14 +13012,14 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               // We have to correct the Uf for each symop since we have changed the lattice...
               aSymOp.Uf=b.c2f * aSymOp.Uc * b.f2c;
               //no longer necessary since we force a basis map calculation
-              /*aSymOp.basis_atoms_map.clear();
-                aSymOp.basis_types_map.clear();
-                aSymOp.basis_map_calculated=FALSE;
-                for(uint iii=0;iii<b.atoms.size();iii++){
-                aSymOp.basis_atoms_map.push_back(0);
-                aSymOp.basis_types_map.push_back(0);
-                }
-                fSymOp.basis_map_calculated=false;*/
+              //aSymOp.basis_atoms_map.clear();
+              //aSymOp.basis_types_map.clear();
+              //aSymOp.basis_map_calculated=FALSE;
+              //for(uint iii=0;iii<b.atoms.size();iii++){
+              //aSymOp.basis_atoms_map.push_back(0);
+              //aSymOp.basis_types_map.push_back(0);
+              //}
+              //fSymOp.basis_map_calculated=false;
               KRUN = KRUN && SYM::getFullSymBasis(b_atoms,b.lattice,b.c2f,b.f2c,aSymOp,TRUE,skew,b.sym_eps,aSymOp.basis_atoms_map,aSymOp.basis_types_map);
               if(LDEBUG) {
                 if(!KRUN){
@@ -12473,7 +13053,6 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           //cerr << "Unable to propagate site symmetry to equivalent atoms." << endl;
           //cerr << "Unable to propagate site symmetry to equivalent atoms. Exiting." << endl;
           //exit(0);
-          //}
         } else {
           //can be faster than procedure above because there are MANY fgroups
           KRUN = KRUN && SYM::CalculateSitePointGroup(FileMESSAGE,b,1,aflags,_write_,osswrite,oss);  //we already know get_full_basis==FALSE, so don't waste time calculating for eatoms
@@ -12501,7 +13080,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //no need for krun here with force_perform: if it fails with full scan, it will calculate at default tolerance and keep going!
     }
   }
-  
+
   //cerr << "prim: " << a.pgroup.size() << ", sup: " << b.pgroup.size() << endl;    // COREY REMOVE
 
   //corey END
@@ -12512,8 +13091,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 // COREY - END
 
 xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-                        bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
-  //xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell) {
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  //xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell)
+{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   if(supercell.rows==9) {
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
@@ -12530,12 +13110,13 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
   string soliloquy="GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-                        bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
-  //xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell) {
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  //xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell)
+{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   if(supercell.rows==9) {
     _supercell(1,1)=supercell(1);_supercell(1,2)=supercell(2);_supercell(1,3)=supercell(3);
@@ -12552,12 +13133,13 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
   string soliloquy="GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(soliloquy,message,_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-                        bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
-  //xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33) {
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  //xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33)
+{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   _supercell.clear();
   _supercell(1,1)=(double) sc11;_supercell(1,2)=(double) sc12;_supercell(1,3)=(double) sc13;
@@ -12567,8 +13149,9 @@ xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,con
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3,vector<int>& sc2pcMap,vector<int>& pc2scMap,
-                        bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) { //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
-  //xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3) {
+    bool get_symmetry, bool get_full_basis, bool force_supercell_matrix,bool force_strict_pc2scMap) //DX 20190319 - added force_supercell_matrix  //CO190409 - added force_strict_pc2scMap
+  //xstructure GetSuperCell(const xstructure& a, const int& sc1,const int& sc2,const int& sc3)
+{ //CO200106 - patching for auto-indenting
   xmatrix<double> _supercell(3,3);
   _supercell.clear();
   _supercell(1,1)=(double) sc1;
@@ -12677,15 +13260,15 @@ void xstructure::ClearSymmetry(void) {
 // ***************************************************************************
 bool xstructure::CalculateSymmetry(bool ossverbose,double radius) {
   ofstream FileDevNull("/dev/null");
-  
+
   _aflags aflags; aflags.Directory="./"; aflags.QUIET=TRUE;
   _kflags kflags; pflow::defaultKFlags4SymWrite(kflags,false); pflow::defaultKFlags4SymCalc(kflags,true);
-  
+
   (*this).LatticeReduction_avoid=TRUE;
   (*this).sgroup_radius=radius;
-  
+
   return pflow::PerformFullSymmetry(*this,FileDevNull,aflags,kflags,ossverbose,oss);
-  
+
   //SYM::CalculatePointGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculatePointGroupKlattice(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
   //SYM::CalculateSitePointGroup(FileDevNull,*this,aflags,FALSE,ossverbose,cout);
@@ -12701,13 +13284,13 @@ bool xstructure::CalculateSymmetry(void) {
 
 bool CalculateSymmetry(xstructure& str,bool ossverbose,ostream& oss,bool fffverbose,double radius) {
   ofstream FileDevNull("/dev/null");
-  
+
   _aflags aflags; aflags.Directory="./"; aflags.QUIET=TRUE;
   _kflags kflags; pflow::defaultKFlags4SymWrite(kflags,fffverbose); pflow::defaultKFlags4SymCalc(kflags,true);
-  
+
   str.LatticeReduction_avoid=TRUE;
   str.sgroup_radius=radius;
-  
+
   return pflow::PerformFullSymmetry(str,FileDevNull,aflags,kflags,ossverbose,oss);
   //SYM::CalculatePointGroup(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
   //SYM::CalculatePointGroupKlattice(FileDevNull,str,aflags,fffverbose,ossverbose,oss);
@@ -13006,7 +13589,6 @@ void xstructure::xstructure2vasp(void) {
   //      if(j==0) title+=atoms.at(iat).name+aurostd::utype2string(num_each_type.at(itype));
   //      //      atoms.at(iat++).type=itype;
   //    }
-  //}
   return;
 }
 
@@ -13088,43 +13670,43 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   oss << "TITL " << str.title << endl;
   oss.precision(8);
   oss << "CELL "
-      << str.scale*aurostd::modulus(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3)) << " "
-      << str.scale*aurostd::modulus(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3)) << " "
-      << str.scale*aurostd::modulus(str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-      << aurostd::angle(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-      << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
-      << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(2,1),str.lattice(2,2),str.lattice(2,3))
-      << endl;
+    << str.scale*aurostd::modulus(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3)) << " "
+    << str.scale*aurostd::modulus(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3)) << " "
+    << str.scale*aurostd::modulus(str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+    << aurostd::angle(str.lattice(2,1),str.lattice(2,2),str.lattice(2,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+    << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(3,1),str.lattice(3,2),str.lattice(3,3)) << " "
+    << aurostd::angle(str.lattice(1,1),str.lattice(1,2),str.lattice(1,3),str.lattice(2,1),str.lattice(2,2),str.lattice(2,3))
+    << endl;
   // oss << str.atoms.size() << endl;
   oss.precision(10);
   k=0;
   if(str.num_each_type.size()!=2) {
     for(uint i=0;i<str.num_each_type.size();i++)
       for(int j=1;j<=str.num_each_type.at(i);j++) {
-	//      printf("%c%i ",i+66,j);
-	if(str.atoms.at(k).name_is_given) {
-	  oss << str.atoms.at(k).cleanname << j << " ";
-	}
-	else { // Must make up a name
-	  if(i>(el_names.size()-1)) { // No more default names so make everything W
-	    oss << "W" << j << " ";
-	  }
-	  else { // Use default names
-	    oss << el_names[i] << j << " ";
-	  }
-	}
-	oss << str.atoms.at(k).fpos(1)<< " " << str.atoms.at(k).fpos(2) << " " << str.atoms.at(k).fpos(3) << endl;
-	k++;
+        //      printf("%c%i ",i+66,j);
+        if(str.atoms.at(k).name_is_given) {
+          oss << str.atoms.at(k).cleanname << j << " ";
+        }
+        else { // Must make up a name
+          if(i>(el_names.size()-1)) { // No more default names so make everything W
+            oss << "W" << j << " ";
+          }
+          else { // Use default names
+            oss << el_names[i] << j << " ";
+          }
+        }
+        oss << str.atoms.at(k).fpos(1)<< " " << str.atoms.at(k).fpos(2) << " " << str.atoms.at(k).fpos(3) << endl;
+        k++;
       }
   }
   if(str.num_each_type.size()==2) {
     for(uint i=0;i<str.num_each_type.size();i++)
       for(int j=1;j<=str.num_each_type.at(i);j++) {
-	if(str.num_each_type.at(0)>str.num_each_type.at(1))
-	  oss << el_names[1-i] << j << " " << str.atoms.at(k).fpos(1)<< " " << str.atoms.at(k).fpos(2) << " " << str.atoms.at(k).fpos(3) << endl;
-	else
-	  oss << el_names[i] << j << " " << str.atoms.at(k).fpos(1)<< " " << str.atoms.at(k).fpos(2) << " " << str.atoms.at(k).fpos(3) << endl;
-	k++;
+        if(str.num_each_type.at(0)>str.num_each_type.at(1))
+          oss << el_names[1-i] << j << " " << str.atoms.at(k).fpos(1)<< " " << str.atoms.at(k).fpos(2) << " " << str.atoms.at(k).fpos(3) << endl;
+        else
+          oss << el_names[i] << j << " " << str.atoms.at(k).fpos(1)<< " " << str.atoms.at(k).fpos(2) << " " << str.atoms.at(k).fpos(3) << endl;
+        k++;
       }
   }
   // oss <<  num_each_type.at(i) << " ";
@@ -13137,9 +13719,9 @@ string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_
   if(P_EQUAL) oss << "EQUAL ";
   if(P_EXACT) oss << "EXACT ";
   if(!aurostd::isequal(P_ang,PLATON_TOLERANCE_ANGLE,1.0e-6) ||
-     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D1,1.0e-6) ||
-     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D2,1.0e-6) ||
-     !aurostd::isequal(P_d1,PLATON_TOLERANCE_D3,1.0e-6))
+      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D1,1.0e-6) ||
+      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D2,1.0e-6) ||
+      !aurostd::isequal(P_d1,PLATON_TOLERANCE_D3,1.0e-6))
     //    printf("%14.10f %14.10f %14.10f %14.10f ",P_ang,P_d1,P_d2,P_d3);  printf("\n");
     oss << P_ang << " " << P_d1 << " " << P_d2 << " " << P_d3 << " ";//
   oss << endl;
@@ -13157,12 +13739,12 @@ void xstructure::FakeNames(void) {
     for(int j=0;j<num_each_type.at(itype);j++) {
       //    if(atoms.at(iatom).name_is_given==FALSE)
       {
-	atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
-	if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
-	//	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
-	atoms.at(iatom).CleanName();
-	// DX 9/21/17 - Need to keep spin info atoms.at(iatom).CleanSpin();
-	atoms.at(iatom).name_is_given=TRUE;
+        atoms.at(iatom).name=vatom_symbol[2+atoms.at(iatom).type];
+        if(atoms.at(iatom).type==0) atoms.at(iatom).name="Ag"; // works....
+        //	if(atoms.at(iatom).type==1) atoms.at(iatom).name="Au"; // works....
+        atoms.at(iatom).CleanName();
+        // DX 9/21/17 - Need to keep spin info atoms.at(iatom).CleanSpin();
+        atoms.at(iatom).name_is_given=TRUE;
       }
       iatom++;
     }
@@ -13275,7 +13857,7 @@ string xstructure::findsym2print(double tolerance) {
     oss << sstr.atoms.size() << "                             number of atoms in the primitive unit cell" << endl;
     for(uint i=0;i<sstr.num_each_type.size();i++)
       for(int j=1;j<=sstr.num_each_type.at(i);j++)
-	oss <<  sstr.num_each_type.at(i) << " ";
+        oss <<  sstr.num_each_type.at(i) << " ";
   }
   if(1) { //new
     oss << "2 Form of lattice parameters: to be entered as lengths and angles " << endl;
@@ -13612,7 +14194,11 @@ int xstructure::GenerateGridAtoms(int d) {
   return GenerateGridAtoms(*this,-d,d,-d,d,-d,d);
 }
 
-int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) {
+int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218
+  return GenerateGridAtoms_20191218(str,i1,i2,j1,j2,k1,k2);
+}
+
+int GenerateGridAtoms_20190520(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218 - added date [ORIG]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
   string soliloquy="GenerateGridAtoms():"; //CO190520
   if(LDEBUG) { //CO190520
@@ -13631,32 +14217,175 @@ int GenerateGridAtoms(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2)
   const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
   const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
   const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
+
   for(uint iat=0;iat<str.atoms.size();iat++){
-    str.grid_atoms.push_back(str.atoms.at(iat));  // put first the unit cell !
+    str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
     str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
     str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
   }
   for(int i=i1;i<=i2;i++) {
     for(int j=j1;j<=j2;j++) {
       for(int k=k1;k<=k2;k++) {
-	if(i!=0 || j!=0 || k!=0) {  //these are ALREADY included
-	  for(uint iat=0;iat<str.atoms.size();iat++) {
-	    atom=str.atoms.at(iat);
-	    atom.isincell=FALSE; // these are OUT OF CELL
-	    atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms.at(iat).cpos;
-	    atom.fpos[1]=i+str.atoms.at(iat).fpos[1];
-	    atom.fpos[2]=j+str.atoms.at(iat).fpos[2];
-	    atom.fpos[3]=k+str.atoms.at(iat).fpos[3];
-	    str.grid_atoms.push_back(atom);
+        if(i!=0 || j!=0 || k!=0) {
+          for(uint iat=0;iat<str.atoms.size();iat++) {
+            atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
+            atom.isincell=FALSE; // these are OUT OF CELL
+            atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
+            atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
+            atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
+            atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+            str.grid_atoms.push_back(atom);
             str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
-      if(LDEBUG) { //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
-        cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
-      } //CO190520
-	  }
-	}
+            if(LDEBUG) { //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms.back() << endl; //DX 20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << str.grid_atoms.size()-1 << "]=" << str.grid_atoms_sc2pcMap.back() << endl; // DX 20191218
+            } //CO190520
+          }
+        }
       }
     }
+  }
+  if(0){  //CO190808 - quick check of mindist
+    double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<str.grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<str.grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+        if(min_dist_local<min_dist){
+          min_dist=min_dist_local;
+        }
+      }
+    }
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+  }
+  str.grid_atoms_calculated=TRUE;
+  str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
+  str.grid_atoms_dimsH[1]=i2;str.grid_atoms_dimsH[2]=j2;str.grid_atoms_dimsH[3]=k2;
+  str.grid_atoms_number=str.grid_atoms.size();
+  //  for(uint i=0;i<str.grid_atoms.size();i++)
+  //   cerr << str.grid_atoms.at(i).cpos << endl;
+  // cerr << str.grid_atoms.size() << endl;
+  return str.grid_atoms.size();
+}
+
+int GenerateGridAtoms_20191218(xstructure& str,int i1,int i2,int j1,int j2,int k1,int k2) { //DX 20191218 - [NEW]
+  bool LDEBUG=(FALSE || XHOST.DEBUG); //CO190520
+  string soliloquy="GenerateGridAtoms():"; //CO190520
+  if(LDEBUG) { //CO190520
+    cerr << soliloquy << " str=" << endl;cerr << str << endl; //CO190520
+    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO190520
+    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO190520
+    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO190520
+  } //CO190520
+  // same scale as before
+  str.grid_atoms.clear();
+  str.grid_atoms_sc2pcMap.clear(); str.grid_atoms_pc2scMap.clear();
+  _atom atom;
+  str.BringInCell();  // are INCELL.
+  //xvector<double> a1(3),a2(3),a3(3);                     // a1,a2,a3 are the rows of the lattice matrix
+  //a1=str.lattice(1);a2=str.lattice(2);a3=str.lattice(3); // a1,a2,a3 are the rows of the lattice matrix
+  const xvector<double>& a1=str.lattice(1);  //CO190520 - no need to make copies
+  const xvector<double>& a2=str.lattice(2);  //CO190520 - no need to make copies
+  const xvector<double>& a3=str.lattice(3);  //CO190520 - no need to make copies
+  //DX 20190709 - calculate and store once = speed - START
+  vector<xvector<double> > l1, l2, l3;
+  vector<int> a_index, b_index, c_index;
+  for(int i=i1;i<=i2;i++){l1.push_back(i*a1);a_index.push_back(i);}
+  for(int j=j1;j<=j2;j++){l2.push_back(j*a2);b_index.push_back(j);}
+  for(int k=k1;k<=k2;k++){l3.push_back(k*a3);c_index.push_back(k);}
+  //DX 20191218 - calculate and store once = speed - END
+
+  // resize vectors - DX 20191122
+  uint num_grid_atoms = str.atoms.size()*l1.size()*l2.size()*l3.size();
+  str.grid_atoms.resize(num_grid_atoms);
+  str.grid_atoms_pc2scMap.resize(str.atoms.size()); //DX 20191218 - should be the size of the the primitive cell, not grid
+  str.grid_atoms_sc2pcMap.resize(num_grid_atoms);
+
+  uint grid_atom_count = 0; // keep track of index - DX 20191122
+
+  for(uint iat=0;iat<str.atoms.size();iat++){
+    //str.grid_atoms.push_back(str.atoms[iat]);  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
+    //str.grid_atoms_pc2scMap.push_back(str.grid_atoms.size()-1); // CO 171025 
+    //str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+    str.grid_atoms[grid_atom_count] = str.atoms[iat];  // put first the unit cell ! //DX 20190709 - at to [] = speed increase
+    str.grid_atoms_pc2scMap[grid_atom_count] = iat; //DX 20191218 - use the index of the primitive cell not the running count of grid_atoms since it was resized
+    str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
+    grid_atom_count++; //DX 20191122
+  }
+  //for(int i=i1;i<=i2;i++) {
+  //for(int j=j1;j<=j2;j++) {
+  //for(int k=k1;k<=k2;k++) {
+  //if(i!=0 || j!=0 || k!=0) {
+  //for(uint iat=0;iat<str.atoms.size();iat++) {
+  //atom=str.atoms[iat]; //DX 20190709 - at to [] = speed increase
+  //atom.isincell=FALSE; // these are OUT OF CELL
+  //atom.cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
+  //atom.fpos[1]=i+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
+  //atom.fpos[2]=j+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
+  //atom.fpos[3]=k+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+  //str.grid_atoms.push_back(atom);
+  //str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+  //if(LDEBUG) { //CO190520
+  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+  //cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+  //} //CO190520
+  //}
+  //}
+  //}
+  //}
+  //}
+  xvector<double> a_component(3), ab_component(3), abc_component(3); //DX+ME 20191107 - define outside loop (speed increase)
+  uint natoms = str.atoms.size(); //DX 20191107 - initialize natoms outside loop (speed increase)
+  for(uint i=0;i<l1.size();i++) {
+    a_component = l1[i];                           // DX : i*lattice(1)
+    for(uint j=0;j<l2.size();j++) {
+      ab_component = a_component + l2[j];          // DX : i*lattice(1) + j*lattice(2)
+      for(uint k=0;k<l3.size();k++) {
+        //DX 20191218 [WRONG INDICES] if(i!=0 || j!=0 || k!=0)
+        if(a_index[i]!=0 || b_index[j]!=0 || c_index[k]!=0) //DX 20191218
+        { //CO200106 - patching for auto-indenting
+          abc_component = ab_component + l3[k];    // DX : i*lattice(1) + j*lattice(2) + k*lattice(3)
+          for(uint iat=0;iat<natoms;iat++) {       //DX 20191107 - replace str.atoms.size() with natoms
+            atom=str.atoms[iat];                   //DX 20190709 - at to [] = speed increase
+            atom.isincell=FALSE;                   // these are OUT OF CELL
+            //DX 20191127 [OBOSLETE] atom.cpos=abc_component+str.atoms[iat].cpos; //DX 20190709 - at to [] = speed increase
+            atom.cpos+=abc_component;              //DX 20190709 - at to [] = speed increase // CO 20191127 
+            //DX 20191127 [OBOSLETE] atom.fpos[1]=a_index[i]+str.atoms[iat].fpos[1]; //DX 20190709 - at to [] = speed increase
+            //DX 20191127 [OBOSLETE] atom.fpos[2]=b_index[j]+str.atoms[iat].fpos[2]; //DX 20190709 - at to [] = speed increase
+            //DX 20191127 [OBOSLETE] atom.fpos[3]=c_index[k]+str.atoms[iat].fpos[3]; //DX 20190709 - at to [] = speed increase
+            atom.fpos[1]+=a_index[i];              //DX 20190709 - at to [] = speed increase //CO 20191127
+            atom.fpos[2]+=b_index[j];              //DX 20190709 - at to [] = speed increase //CO 20191127
+            atom.fpos[3]+=c_index[k];              //DX 20190709 - at to [] = speed increase //CO 20191127
+            //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms.push_back(atom);
+            //DX 20191122 [OBSOLETE-PUSH_BACK] str.grid_atoms_sc2pcMap.push_back(iat); // CO 171025
+            str.grid_atoms[grid_atom_count] = atom;
+            str.grid_atoms_sc2pcMap[grid_atom_count] = iat; // CO 171025
+            if(LDEBUG) { //CO190520
+              //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].cpos=" << str.grid_atoms.back().cpos << endl; //CO190520
+              //DX 20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << str.grid_atoms.size()-1 << "].fpos=" << str.grid_atoms.back().fpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << str.grid_atoms[grid_atom_count].cpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << str.grid_atoms[grid_atom_count].fpos << endl; //CO190520
+              cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << str.grid_atoms[grid_atom_count] << endl; //DX 20191218
+              cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << str.grid_atoms_sc2pcMap[grid_atom_count] << endl; // DX 20191218
+            } //CO190520
+            grid_atom_count++; //DX 20191122
+          }
+        }
+      }
+    }
+  }
+  if(0){  //CO190808 - quick check of mindist
+    double min_dist_local=AUROSTD_MAX_DOUBLE,min_dist=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<str.grid_atoms.size()-1;i++){
+      for(uint j=i+1;j<str.grid_atoms.size();j++){
+        min_dist_local=aurostd::modulus(str.grid_atoms[i].cpos-str.grid_atoms[j].cpos);
+        if(min_dist_local<min_dist){
+          min_dist=min_dist_local;
+        }
+      }
+    }
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance(str),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   str.grid_atoms_calculated=TRUE;
   str.grid_atoms_dimsL[1]=i1;str.grid_atoms_dimsL[2]=j1;str.grid_atoms_dimsL[3]=k1;
@@ -13675,7 +14404,7 @@ int GenerateGridAtoms(xstructure& str,const double& radius) {
 }
 
 int GenerateGridAtoms(xstructure& str,int d1,int d2,int d3) {
-  return GenerateGridAtoms(str,-d1,d1,-d2,d2,-d3,d3);
+  return GenerateGridAtoms_20191218(str,-d1,d1,-d2,d2,-d3,d3);
 }
 
 int GenerateGridAtoms(xstructure& str,int d) {
@@ -13690,25 +14419,26 @@ int GenerateGridAtoms(xstructure& str) {
   return GenerateGridAtoms(str,-1,1,-1,1,-1,1);
 }
 
+
 // **************************************************************************
 // GenerateLIJK table stuff
 // **************************************************************************
 namespace aurostd {   // INT
   class _ssort_int_value0123 {                    // sorting through reference
-  public:
-    bool operator()(const vector<int>& v1, const vector<int>& v2) const {
-      if(v1[0]<v2[0]) return TRUE;
-      if(v1[0]==v2[0]) {
-	if(v1[1]>v2[1]) return TRUE;
-	if(v1[1]==v2[1]) {
-	  if(v1[2]>v2[2]) return TRUE;
-	  if(v1[2]==v2[2]) {
-	    if(v1[3]>v2[3]) return TRUE;
-	  }
-	}
+    public:
+      bool operator()(const vector<int>& v1, const vector<int>& v2) const {
+        if(v1[0]<v2[0]) return TRUE;
+        if(v1[0]==v2[0]) {
+          if(v1[1]>v2[1]) return TRUE;
+          if(v1[1]==v2[1]) {
+            if(v1[2]>v2[2]) return TRUE;
+            if(v1[2]==v2[2]) {
+              if(v1[3]>v2[3]) return TRUE;
+            }
+          }
+        }
+        return FALSE;
       }
-      return FALSE;
-    }
   };
 }
 
@@ -13730,13 +14460,13 @@ int xstructure::GenerateLIJK(double radius) {
   for(int i=-lijk_dims[1];i<=lijk_dims[1];i++) {
     for(int j=-lijk_dims[2];j<=lijk_dims[2];j++) {
       for(int k=-lijk_dims[3];k<=lijk_dims[3];k++) {
-	cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3;
-	// 	if(aurostd::modulus(cpos)<=radius)  // I put them all since I will not be scanning through.
-	{
-	  _lijk[0]=(int) (10000000.0*sqrt(aurostd::modulus(cpos))); // for the next sorting
-	  _lijk[1]=i;_lijk[2]=j;_lijk[3]=k;
-	  _temp_lijk_table.push_back(_lijk);
-	}
+        cpos=((double)i)*a1+((double)j)*a2+((double)k)*a3;
+        // 	if(aurostd::modulus(cpos)<=radius)  // I put them all since I will not be scanning through.
+        {
+          _lijk[0]=(int) (10000000.0*sqrt(aurostd::modulus(cpos))); // for the next sorting
+          _lijk[1]=i;_lijk[2]=j;_lijk[3]=k;
+          _temp_lijk_table.push_back(_lijk);
+        }
       }
     }
   }
@@ -13797,8 +14527,8 @@ void ijk2l(const xstructure& str,int &l,const int &i,const int &j,const int &k) 
   for(uint ll=0;ll<str.lijk_table.size();ll++) // start search
     if(str.lijk_table.at(ll)[1]==i)         // faster comparison one at a time
       if(str.lijk_table.at(ll)[2]==j)       // faster comparison one at a time
-	if(str.lijk_table.at(ll)[3]==k)     // faster comparison one at a time
-	  l=ll;
+        if(str.lijk_table.at(ll)[3]==k)     // faster comparison one at a time
+          l=ll;
   if(l<0) {cerr << "ijk2l error: l not found" << endl; exit(0);}
 }
 
@@ -13885,18 +14615,18 @@ xvector<double> r_lattice(const xstructure& str,const xvector<int>& ijk) {
 // CO 170717 - Compare this with PBC() function, this function brings in to 0th cell, PBC brings in to cell between -0.5 and 0.5
 // PBC() is good for minimizing overall fpos
 void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
-		    xvector<int>& ijk,const xmatrix<double>& lattice,
-		    const bool coord_flag) {
+    xvector<int>& ijk,const xmatrix<double>& lattice,
+    const bool coord_flag) {
   double TOL=1e-11;
   xvector<double> cpos(3),fpos(3);
   // p_cell0=xvector<double> (3);
   // ijk=xvector<int> (3);
-  
+
   clear(ijk);clear(p_cell0);
 
   if(coord_flag==TRUE) // ppos is in cartesian coords
     fpos=C2F(lattice,ppos);
-  
+
   for(int ic=1;ic<=3;ic++) {
     int s;
     s=SignNoZero(fpos(ic));
@@ -13920,38 +14650,38 @@ void GetUnitCellRep(const xvector<double>& ppos,xvector<double>& p_cell0,
 // **************************************************************************
 // For sort algorithm in GetNeighData
 class compare_GetNeighData {
-public:  
-  int operator()(const _atom& a, const _atom& b) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)" << endl;
-    double tol=1e-15;
-    // Sort by distance
-    if(aurostd::isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)) {
-      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
-      // Sort by unit cell values
-      if(a.name==b.name) {
-	if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name==b.name" << endl;
-        xvector<int> ijka=a.ijk;
-        xvector<int> ijkb=b.ijk;
-        int va=100*ijka(1)+10*ijka(2)+1*ijka(3);
-        int vb=100*ijkb(1)+10*ijkb(2)+1*ijkb(3);
-        return va<vb;
+  public:  
+    int operator()(const _atom& a, const _atom& b) {
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)" << endl;
+      double tol=1e-15;
+      // Sort by distance
+      if(aurostd::isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)) {
+        if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
+        // Sort by unit cell values
+        if(a.name==b.name) {
+          if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name==b.name" << endl;
+          xvector<int> ijka=a.ijk;
+          xvector<int> ijkb=b.ijk;
+          int va=100*ijka(1)+10*ijka(2)+1*ijka(3);
+          int vb=100*ijkb(1)+10*ijkb(2)+1*ijkb(3);
+          return va<vb;
+        } else {
+          if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name!=b.name" << endl;
+          return a.name<b.name;
+        }
       } else {
-	if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  a.name!=b.name" << endl;
-	return a.name<b.name;
+        if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  !isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
+        return GetDistFromOrigin(a)<GetDistFromOrigin(b);
       }
-    } else {
-      if(LDEBUG) cerr << "operator()(const _atom& a, const _atom& b)  !isequal(GetDistFromOrigin(a),GetDistFromOrigin(b),tol)" << endl;
-      return GetDistFromOrigin(a)<GetDistFromOrigin(b);
+      // Sort by name
+      // if(a.name==b.name) {
+      //  return GetDistFromOrigin(a)<GetDistFromOrigin(b);
+      // }
+      // else {
+      //  return a.name<b.name;
+      // }
     }
-    // Sort by name
-    // if(a.name==b.name) {
-    //  return GetDistFromOrigin(a)<GetDistFromOrigin(b);
-    // }
-    // else {
-    //  return a.name<b.name;
-    // }
-  }
 };
 
 // **************************************************************************
@@ -13961,8 +14691,8 @@ public:
 // it for each atom in a vector of atom objects in order of increasing distance.  
 
 void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,		
-			      const double& rmin, const double& rmax,
-			      deque<deque<_atom> >& neigh_mat) {
+    const double& rmin, const double& rmax,
+    deque<deque<_atom> >& neigh_mat) {
   double epsilon=1.0e-3;  // sometimes you have wrong images due to roundoff
   deque<_atom> neigh_vec;
   // Get data from str.
@@ -13980,10 +14710,10 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
   //sstr.NiggliUnitCellForm();  
   sstr.MinkowskiBasisReduction();
   //    cerr << sstr << endl;
-  
+
   xmatrix<double> lat(3,3);
   lat=sstr.lattice;
-  
+
   //  Convert input atom_vec to Niggli lattice
   deque<_atom> atom_vec=in_atom_vec;
   xmatrix<int>  atom_shifts((int) atom_vec.size()-1,3,0,1);
@@ -13998,12 +14728,12 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
     atom_shifts(ia,2)=atom_shifts_temp(2);
     atom_shifts(ia,3)=atom_shifts_temp(3);
   }    
-  
+
   // Create vector of all atoms in all periodic images needed so that for atoms in the unit cell every possible neighbor within rmax
   // is included.  This can be done by looping over all atoms in all unit cells such that if the unit cells are given by
   // n0*v0,n1*v1,n2*v2, then ni_max*vi>rmax for all i=0->2.  This is not rigorous but seems to work quite well.  It failed for very
   // angular cells, but by using the Niggli reduced cell this pitfall seems to be avoided (but no proof, so be careful).
-  
+
   int imax,jmax,kmax;
   // Find imax
   // (algorithm 1) approximate
@@ -14028,26 +14758,26 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
   for(ijk(1)=-imax;ijk(1)<=imax;ijk(1)++) {
     for(ijk(2)=-jmax;ijk(2)<=jmax;ijk(2)++) {
       for(ijk(3)=-kmax;ijk(3)<=kmax;ijk(3)++) {
-	xvector<double> ctpos(3);
-	xvector<double> ftpos(3);
-	for(uint iat=0;iat<sstr.atoms.size();iat++) {
-	  _atom a;
-	  a=sstr.atoms.at(iat);
-	  a.name=sstr.atoms.at(iat).name;
-	  a.number=iat;
-	  a.ijk=ijk;
-	  for(int ic=1;ic<=3;ic++)
-	    ctpos(ic)=sstr.atoms.at(iat).cpos(ic)+ijk(1)*lat(1,ic)+ijk(2)*lat(2,ic)+ijk(3)*lat(3,ic);
-	  ftpos=C2F(lat,ctpos);
-	  a.cpos=ctpos;
-	  a.fpos=ftpos;
-	  a.type=sstr.atoms.at(iat).type;
-	  all_atom_vec.push_back(a);
-	} // iat
+        xvector<double> ctpos(3);
+        xvector<double> ftpos(3);
+        for(uint iat=0;iat<sstr.atoms.size();iat++) {
+          _atom a;
+          a=sstr.atoms.at(iat);
+          a.name=sstr.atoms.at(iat).name;
+          a.number=iat;
+          a.ijk=ijk;
+          for(int ic=1;ic<=3;ic++)
+            ctpos(ic)=sstr.atoms.at(iat).cpos(ic)+ijk(1)*lat(1,ic)+ijk(2)*lat(2,ic)+ijk(3)*lat(3,ic);
+          ftpos=C2F(lat,ctpos);
+          a.cpos=ctpos;
+          a.fpos=ftpos;
+          a.type=sstr.atoms.at(iat).type;
+          all_atom_vec.push_back(a);
+        } // iat
       } // ijk
     } // ijk
   } // ijk
-  
+
   // Now build neighbors list for each atom on atom list.  Each
   // neighbor list will be row in the neigh_mat matrix.
   for(uint ia1=0;ia1<atom_vec.size();ia1++) {
@@ -14060,15 +14790,15 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
     for(uint ia2=0;ia2<all_atom_vec.size();ia2++) {
       double dist = AtomDist(at,all_atom_vec.at(ia2));
       if(dist<=rmax && dist>=rmin && dist>=epsilon) {
-	all_atom_vec.at(ia2).corigin=corigin;
-	neigh_vec.push_back(all_atom_vec.at(ia2));
+        all_atom_vec.at(ia2).corigin=corigin;
+        neigh_vec.push_back(all_atom_vec.at(ia2));
       } // if
     } // ia2
     sort(neigh_vec.begin()+1,neigh_vec.end(),compare_GetNeighData());
     neigh_mat.push_back(neigh_vec);
   } // ia1
-  
-    //  Convert neigh_mat from Niggli cell to original lattice
+
+  //  Convert neigh_mat from Niggli cell to original lattice
   for(uint ia=0;ia<neigh_mat.size();ia++) {
     for(uint ja=0;ja<neigh_mat.at(ia).size();ja++) {
       xvector<double> fpos(3);
@@ -14077,7 +14807,7 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
       a=neigh_mat.at(ia).at(ja);
       fpos=a.fpos;
       for(int ic=1;ic<=3;ic++) {
-	fpos(ic)=fpos(ic)+atom_shifts(ia,ic);
+        fpos(ic)=fpos(ic)+atom_shifts(ia,ic);
       }
       cpos=F2C(lat,fpos);
       a.cpos=cpos;
@@ -14144,7 +14874,7 @@ void xstructure::qm_clear(void) {
   }
   qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0;
   qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0; 
- 
+
   if(atoms.size()!=qm_atoms.size())     {cerr << "ERROR qm_clear [1] atoms.size()!=qm_atoms.size()"<<endl;exit(0);}
   if(atoms.size()!=qm_forces.size())    {cerr << "ERROR qm_clear [2] atoms.size()!=qm_forces.size()"<<endl;exit(0);}
   if(atoms.size()!=qm_positions.size()) {cerr << "ERROR qm_clear [3] atoms.size()!=qm_positions.size()"<<endl;exit(0);}
@@ -14176,7 +14906,7 @@ void xstructure::qm_load(string Directory,string suffix,int iomode) {
     xOUTCAR outcar;
     //if(aurostd::FileEmpty(Directory+"/OUTCAR"))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}
     if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {cerr << "ERROR xtructure::qm_load: Empty OUTCAR" << endl;exit(0);}  // PINKU AND JOSE FIXED BUG
- 
+
     outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix,data_natoms,TRUE);
 
     if(abs(data_natoms-(double) outcar.natoms)>0.1) { 
@@ -14205,18 +14935,18 @@ void xstructure::qm_load(string Directory,string suffix,int iomode) {
     //vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml");
     vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml"+suffix); //PINKU AND JOSE FIXED BUG
     qm_forces.clear(); for(uint i=0;i<vasprunxml.vforces.size();i++)  qm_forces.push_back(vasprunxml.vforces.at(i)); 
-   
-    
+
+
     // OLD
     stringstream CONTCAR_stringstream;
     CONTCAR_stringstream.str(std::string()); CONTCAR_stringstream << aurostd::FileToString(Directory+"/CONTCAR"+suffix);
-     
+
     qm_E_cell=outcar.energy_cell;qm_E_atom=outcar.energy_atom;
     qm_H_cell=outcar.enthalpy_cell;qm_H_atom=outcar.enthalpy_atom;
     qm_PV_cell=outcar.PV_cell;qm_PV_atom=outcar.PV_atom;
     qm_P=outcar.pressure;
     qm_mag_cell=outcar.mag_cell;qm_mag_atom=outcar.mag_atom;
-    
+
     // CONTCAR OPERATIONS ---------------------------------------------------------------
     // cerr << "DEBUG: xstructure::qm_clear(void)" << endl;
     // cerr << CONTCAR_stringstream.str() << endl;
@@ -14285,14 +15015,14 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
     for(uint j=1;j<vinput.size();j++) {
       aurostd::string2tokens(vinput[j],tokens);
       if(tokens.size()==7) {
-	if(tokens.at(1)==elements.at(i)) {
-	  cout << "   ";
-	  for(uint k=0;k<3;k++) cout << aurostd::PaddedPOST(tokens.at(4+k),7," ") << "  ";
-	  cout << char(i+65) << "   "; // shift to ascii
-	  cout << aurostd::PaddedPRE(tokens.at(0),7," ") << "  ";
-	  for(uint k=1;k<4;k++) cout << aurostd::PaddedPOST(tokens.at(k),4," ") << "  ";
-	  cout << endl;
-	}
+        if(tokens.at(1)==elements.at(i)) {
+          cout << "   ";
+          for(uint k=0;k<3;k++) cout << aurostd::PaddedPOST(tokens.at(4+k),7," ") << "  ";
+          cout << char(i+65) << "   "; // shift to ascii
+          cout << aurostd::PaddedPRE(tokens.at(0),7," ") << "  ";
+          for(uint k=1;k<4;k++) cout << aurostd::PaddedPOST(tokens.at(k),4," ") << "  ";
+          cout << endl;
+        }
       }
     }
   }
@@ -14327,7 +15057,7 @@ string xstructure2json(xstructure& xstr) {
     if(PRINT_NULL){ sscontent_json << "\"scale\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-  
+
   // LATTICE
   if(xstr.lattice.rows){
     sscontent_json << "\"lattice\":[" << aurostd::xmatDouble2String(xstr.lattice,_AFLOW_XSTR_PRINT_PRECISION_,roff) << "]" << eendl; //CO 180515
@@ -14335,7 +15065,7 @@ string xstructure2json(xstructure& xstr) {
     if(PRINT_NULL){ sscontent_json << "\"lattice\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
- 
+
   // SPECIES 
   if(xstr.species.size()){
     deque<string> cleaned_species; //DX 20190612 - cleaned species names
@@ -14409,7 +15139,7 @@ string atom2json(_atom& atom, int coord_flag, int poccupation) {
     if(PRINT_NULL){ sscontent_json << "\"position\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-  
+
   // OCCUPANCY
   if(poccupation==TRUE){
     sscontent_json << "\"occupancy\":" << atom.partial_occupation_value << eendl;

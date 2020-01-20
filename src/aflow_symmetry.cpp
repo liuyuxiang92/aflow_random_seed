@@ -56,11 +56,22 @@ namespace SYM {
 } // namespace SYM
 
 namespace SYM {
+  double minimumDistance(const deque<_atom>& atoms){  //CO190808
+    //for NON periodic systems, use the default with lattice otherwise: minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale)
+    double dist=0,dist_min=AUROSTD_MAX_DOUBLE;
+    for(uint i=0;i<atoms.size()-1;i++){
+      for(uint j=i+1;j<atoms.size();j++){
+        dist=aurostd::modulus(atoms[i].cpos-atoms[j].cpos);
+        if(dist<dist_min){dist_min=dist;}
+      }
+    }
+    return dist_min;
+  }
   double minimumDistance(const deque<_atom>& atoms,const xmatrix<double>& lattice,double scale){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double min_dist=AUROSTD_MAX_DOUBLE;
     if(LDEBUG) cerr << "minimumDistance: INITIAL [0] " << min_dist << endl;
-    
+
     double radius=RadiusSphereLattice(lattice);
     xvector<int> dims(3);
     dims=LatticeDimensionSphere(lattice,radius);
@@ -74,7 +85,7 @@ namespace SYM {
     }
     //}
     if(LDEBUG) cerr << "minimumDistance: LATTICE VECTORS [1] " << min_dist << endl;
-    
+
     //DX 5/8/18 - FASTER MIN CART DISTANCE CALCULATOR - START
     //DX 5/8/18 - only calculate multiplication once (time-saver)
     vector<vector<xvector<double> > > lattice_lengths;
@@ -90,9 +101,9 @@ namespace SYM {
     for(int c=1;c<=dim;c++){latt.push_back(c*lattice(3));index.push_back(c);} //DX calc once and store
     lattice_lengths.push_back(latt); latt.clear();
     lattice_indices.push_back(index); index.clear();
-    
+
     //combos of two lattice vectors
-    for(uint i=0;i<lattice_lengths.size();i++){     
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
@@ -104,7 +115,7 @@ namespace SYM {
       }
     }
     if(LDEBUG) cerr << "minimumDistance: COMBOS OF 2 LATTICE VECTORS [2] " << min_dist << endl;
-   
+
     ////combos of two lattice vectors
     //for(int a=1;a<=dim;a++){
     //  for(int b=1;b<=dim;b++){
@@ -135,13 +146,13 @@ namespace SYM {
     lattice_indices.push_back(index); index.clear();
 
     //combos of three lattice vectors 
-    for(uint i=0;i<lattice_lengths.size();i++){     
+    for(uint i=0;i<lattice_lengths.size()-1;i++){ //CO190808 - .size()-1
       for(uint j=i+1;j<lattice_lengths.size();j++){    
         for(uint a=0;a<lattice_lengths[i].size();a++){
           for(uint b=0;b<lattice_lengths[j].size();b++){
-              xvector<double> added = lattice_lengths[i][a]+lattice_lengths[j][b];
-              xvector<double> subtracted = lattice_lengths[i][a]+lattice_lengths[j][b];
-              for(uint k=j+1;k<lattice_lengths.size();k++){    
+            xvector<double> added = lattice_lengths[i][a]+lattice_lengths[j][b];
+            xvector<double> subtracted = lattice_lengths[i][a]+lattice_lengths[j][b];
+            for(uint k=j+1;k<lattice_lengths.size();k++){    
               for(uint c=0;c<lattice_lengths[k].size();c++){
                 min_dist = aurostd::min(min_dist,aurostd::modulus(added+lattice_lengths[k][c]));
                 min_dist = aurostd::min(min_dist,aurostd::modulus(subtracted-lattice_lengths[k][c]));
@@ -186,7 +197,6 @@ namespace SYM {
     // than the minimum distance, it becomes the radius for the new lattice dimensions sphere for the next iteration. 
 
 
-
     //DX 5/8/18 - FASTER MIN CART DISTANCE CALCULATOR - START
     //DX 5/8/18 - only calculate multiplication once (time-saver)
     vector<xvector<double> > l1, l2, l3;
@@ -197,7 +207,7 @@ namespace SYM {
 
     xvector<double> tmp;
 
-    for(uint i=0; i<atoms.size(); i++){
+    for(uint i=0; i<atoms.size()-1; i++){ //CO190808 - .size()-1
       // Cannot reduce more than (1,1,1), so don't recalculate
       if(!(dims[1]==1 && dims[2]==1 && dims[3]==1)){
         dims=LatticeDimensionSphere(lattice,min_dist);
@@ -321,8 +331,9 @@ namespace SYM {
 // **********************************************************************************************************************
 // Tolerance scan for symmetry analysis
 namespace SYM {
-  // DX 9/5/17 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible
-  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan){ //CO190520 - removed pointers for bools and doubles, added const where possible,  //DX 20190524 - need pointer for change tolerance, otherwise it will not update
+  // DX 9/5/17 [OBSOLETE] bool change_tolerance(xstructure& xstr, double tolerance, double& orig_tolerance_old, int& count , double& min_dist, bool& no_scan) //CO190520 - removed pointers for bools and doubles, added const where possible
+  bool change_tolerance(xstructure& xstr, double& tolerance, double& min_dist, bool& no_scan) //CO190520 - removed pointers for bools and doubles, added const where possible,  //DX 20190524 - need pointer for change tolerance, otherwise it will not update
+  { //CO200106 - patching for auto-indenting
     // Scans between 5*orig_tol/10.0 on upper end and 5*orig_tol/10 on the right
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // DX 20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
@@ -337,61 +348,61 @@ namespace SYM {
 
     double incomming_tolerance = tolerance; //store current tolerance
     double orig_tolerance = 0; 
-    
+
     // Calculate original tolerance based on the number of times this function has been called
     cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
     if(cycle_count<=20){
-    orig_range = step*cycle_count;
-    if(xstr.sym_eps_change_count%2==0){  //if even, scanned down in previous iteration // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-	sign = -1.0;
+      orig_range = step*cycle_count;
+      if(xstr.sym_eps_change_count%2==0){  //if even, scanned down in previous iteration // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+        sign = -1.0;
       }
-    else {  //if odd, scanned up in previous iteration
-      sign = 1.0;
-    }   
-    orig_tolerance = tolerance / (std::pow(10.0,(sign*orig_range)));
+      else {  //if odd, scanned up in previous iteration
+        sign = 1.0;
+      }   
+      orig_tolerance = tolerance / (std::pow(10.0,(sign*orig_range)));
     }
     else {
       orig_tolerance = tolerance;
     }
     if(orig_range<=max_range && cycle_count<=20){ 
-    // Calculate next tolerance value
-    xstr.sym_eps_change_count += 1; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-    cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-    range = step*((double)cycle_count);
-    if(xstr.sym_eps_change_count%2==0){  //if even, scan down // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-      sign = -1.0;
-    }   
-    else {  //if odd, scan up
-      sign = 1.0;
-    }    
-    if(!no_scan){
-      if(range<=max_range){
-	tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
-	if(tolerance >= min_dist){ //if larger than min distance, force lower scan
-	  sign = -1.0;
-	  tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
-	  xstr.sym_eps_change_count += 1; // can no longer scan up, so we increase the count // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-	}
-	if(tolerance < _ZERO_TOL_){
-	  sign = 1.0;
-	  xstr.sym_eps_change_count += 1; // can no longer scan down, so we increase the count // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-	  cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
-	  range = step*((double)cycle_count);
-	  tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
-	}
-        if(LDEBUG) {
-	  cerr << "SYM::change_tolerance: Inconsistent symmetry at this tolerance " << incomming_tolerance << ", changing tolerance to: " << tolerance << " [dir=" << directory << "]." << endl;
-        } 
-	  return TRUE; 
-      }
-      else {
-	cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; // DX 4/26/18 - changed xstr.directory to directory (pwd)
-	// DX 9/1/17 exit(0);
+      // Calculate next tolerance value
+      xstr.sym_eps_change_count += 1; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+      cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+      range = step*((double)cycle_count);
+      if(xstr.sym_eps_change_count%2==0){  //if even, scan down // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+        sign = -1.0;
+      }   
+      else {  //if odd, scan up
+        sign = 1.0;
+      }    
+      if(!no_scan){
+        if(range<=max_range){
+          tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
+          if(tolerance >= min_dist){ //if larger than min distance, force lower scan
+            sign = -1.0;
+            tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
+            xstr.sym_eps_change_count += 1; // can no longer scan up, so we increase the count // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+          }
+          if(tolerance < _ZERO_TOL_){
+            sign = 1.0;
+            xstr.sym_eps_change_count += 1; // can no longer scan down, so we increase the count // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+            cycle_count = (xstr.sym_eps_change_count+1)/2; // DX 2/22/18 - is now system specific (changed count to xstr.sym_eps_change_count)
+            range = step*((double)cycle_count);
+            tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
+          }
+          if(LDEBUG) {
+            cerr << "SYM::change_tolerance: Inconsistent symmetry at this tolerance " << incomming_tolerance << ", changing tolerance to: " << tolerance << " [dir=" << directory << "]." << endl;
+          } 
+          return TRUE; 
+        }
+        else {
+          cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; // DX 4/26/18 - changed xstr.directory to directory (pwd)
+          // DX 9/1/17 exit(0);
           //count -=1;
-	no_scan = true;
-        tolerance = orig_tolerance; // DX 9/6/17
-	return FALSE;
-      }
+          no_scan = true;
+          tolerance = orig_tolerance; // DX 9/6/17
+          return FALSE;
+        }
       }
       //count -=1;
       no_scan = true;
@@ -405,76 +416,75 @@ namespace SYM {
     //cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [dir=" << xstr.directory << "]" << endl;
     return FALSE;
 
-// DX [OBSOLETE]    cerr << "determine orig tolerance: " << endl;
-// DX [OBSOLETE]    double times = (call_count/2);
-// DX [OBSOLETE]    int remainder = call_count%2;
-// DX [OBSOLETE]    if(remainder==0){
-// DX [OBSOLETE]      sign =1.0;
-// DX [OBSOLETE]    }
-// DX [OBSOLETE]    else {
-// DX [OBSOLETE]      sign =-1.0;
-// DX [OBSOLETE]    }
-// DX [OBSOLETE]    cerr << "times: " << times << endl;
-// DX [OBSOLETE]    cerr << "remainder: " << remainder << endl;
-// DX [OBSOLETE]    cerr << "sign: " << sign << endl;
-// DX [OBSOLETE]    cerr << "tolerance: " << tolerance << endl;
-// DX [OBSOLETE]    double orig_tolerance = tolerance / (1.0+(sign*times*(5.0/100.0)));
-// DX [OBSOLETE]    cerr << "orig_tolerance: " << orig_tolerance << endl;
-// DX [OBSOLETE]    
-// DX [OBSOLETE]    double tol_increment = 5.0*orig_tolerance/100.0;
-// DX [OBSOLETE]
-// DX [OBSOLETE]    call_count++;
-// DX [OBSOLETE]    times = (call_count/2);
-// DX [OBSOLETE]    if(remainder==0){
-// DX [OBSOLETE]      sign =-1.0;
-// DX [OBSOLETE]    }
-// DX [OBSOLETE]    else {
-// DX [OBSOLETE]      sign =1.0;
-// DX [OBSOLETE]    }
-// DX [OBSOLETE]    cerr << "times: " << times << endl;
-// DX [OBSOLETE]    cerr << "call count" << call_count << endl;   
-// DX [OBSOLETE]    if(!no_scan){
-// DX [OBSOLETE]      if(tolerance>orig_tolerance){ // previous iteration was an increase in tolerance, the next should decrease
-// DX [OBSOLETE]	sign = -1.0;
-// DX [OBSOLETE]	tol_increment = tol_increment;
-// DX [OBSOLETE]      }
-// DX [OBSOLETE]      if(call_count<=max_count){
-// DX [OBSOLETE]	tolerance = orig_tolerance + sign*(times*tol_increment);
-// DX [OBSOLETE]	if(tolerance >= min_dist){ //if larger than min distance, force lower scan
-// DX [OBSOLETE]	  sign = -1.0;
-// DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
-// DX [OBSOLETE]          call_count +=1;
-// DX [OBSOLETE]	}
-// DX [OBSOLETE]	// DXif(tolerance < 0.0){
-// DX [OBSOLETE]	if(tolerance < _ZERO_TOL_){
-// DX [OBSOLETE]	  sign = 1.0;
-// DX [OBSOLETE]	  call_count += 1;
-// DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
-// DX [OBSOLETE]	}
-// DX [OBSOLETE]	// DX 9/4/17 [OBSOLETE] if(LDEBUG) {cerr << "CHANGING TOLERANCE TO: " << tolerance << " (" << count << "/" << max_count << ")" << endl;} 
-// DX [OBSOLETE]	//if(sign<0.0){ // one count involves scanning up and then down once
-// DX [OBSOLETE]	//  count += 1;
-// DX [OBSOLETE]	//}
-// DX [OBSOLETE]        if(call_count <= max_count){
-// DX [OBSOLETE]          cerr << "WARNING: Inconsistent symmetry, changing tolerance to: " << tolerance << endl; 
-// DX [OBSOLETE]	}
-// DX [OBSOLETE]      }
-// DX [OBSOLETE]      cerr << "new tol: " << tolerance << endl;
-// DX [OBSOLETE]	cerr << "tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
-// DX [OBSOLETE]      if(call_count > max_count){
-// DX [OBSOLETE]	// DX cerr << "ERROR: Symmetry routine failed, tolerance range (" << orig_tolerance-(max_count*tol_increment) << " to " << orig_tolerance+(max_count*tol_increment) << ") tested [dir=" << xstr.directory << "]. Report to David Hicks (d.hicks@duke.edu). EXITING." << endl;
-// DX [OBSOLETE]	cerr << "WARNING: Inconsistent symmetry, tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
-// DX [OBSOLETE]	// DX 9/1/17 exit(0);
-// DX [OBSOLETE]        no_scan = true;
-// DX [OBSOLETE]	return FALSE;
-// DX [OBSOLETE]      }
-// DX [OBSOLETE]      return TRUE;
-// DX [OBSOLETE]    }
-// DX [OBSOLETE]    else {
-// DX [OBSOLETE]      return false;
-// DX [OBSOLETE]    }
-// DX [OBSOLETE]  }
-// DX [OBSOLETE]} // namespace SYM
+    // DX [OBSOLETE]    cerr << "determine orig tolerance: " << endl;
+    // DX [OBSOLETE]    double times = (call_count/2);
+    // DX [OBSOLETE]    int remainder = call_count%2;
+    // DX [OBSOLETE]    if(remainder==0){
+    // DX [OBSOLETE]      sign =1.0;
+    // DX [OBSOLETE]    }
+    // DX [OBSOLETE]    else {
+    // DX [OBSOLETE]      sign =-1.0;
+    // DX [OBSOLETE]    }
+    // DX [OBSOLETE]    cerr << "times: " << times << endl;
+    // DX [OBSOLETE]    cerr << "remainder: " << remainder << endl;
+    // DX [OBSOLETE]    cerr << "sign: " << sign << endl;
+    // DX [OBSOLETE]    cerr << "tolerance: " << tolerance << endl;
+    // DX [OBSOLETE]    double orig_tolerance = tolerance / (1.0+(sign*times*(5.0/100.0)));
+    // DX [OBSOLETE]    cerr << "orig_tolerance: " << orig_tolerance << endl;
+    // DX [OBSOLETE]    
+    // DX [OBSOLETE]    double tol_increment = 5.0*orig_tolerance/100.0;
+    // DX [OBSOLETE]
+    // DX [OBSOLETE]    call_count++;
+    // DX [OBSOLETE]    times = (call_count/2);
+    // DX [OBSOLETE]    if(remainder==0){
+    // DX [OBSOLETE]      sign =-1.0;
+    // DX [OBSOLETE]    }
+    // DX [OBSOLETE]    else {
+    // DX [OBSOLETE]      sign =1.0;
+    // DX [OBSOLETE]    }
+    // DX [OBSOLETE]    cerr << "times: " << times << endl;
+    // DX [OBSOLETE]    cerr << "call count" << call_count << endl;   
+    // DX [OBSOLETE]    if(!no_scan){
+    // DX [OBSOLETE]      if(tolerance>orig_tolerance){ // previous iteration was an increase in tolerance, the next should decrease
+    // DX [OBSOLETE]	sign = -1.0;
+    // DX [OBSOLETE]	tol_increment = tol_increment;
+    // DX [OBSOLETE]      }
+    // DX [OBSOLETE]      if(call_count<=max_count){
+    // DX [OBSOLETE]	tolerance = orig_tolerance + sign*(times*tol_increment);
+    // DX [OBSOLETE]	if(tolerance >= min_dist){ //if larger than min distance, force lower scan
+    // DX [OBSOLETE]	  sign = -1.0;
+    // DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
+    // DX [OBSOLETE]          call_count +=1;
+    // DX [OBSOLETE]	}
+    // DX [OBSOLETE]	// DXif(tolerance < 0.0){
+    // DX [OBSOLETE]	if(tolerance < _ZERO_TOL_){
+    // DX [OBSOLETE]	  sign = 1.0;
+    // DX [OBSOLETE]	  call_count += 1;
+    // DX [OBSOLETE]	  tolerance = orig_tolerance + sign*(times*tol_increment);
+    // DX [OBSOLETE]	}
+    // DX [OBSOLETE]	// DX 9/4/17 [OBSOLETE] if(LDEBUG) {cerr << "CHANGING TOLERANCE TO: " << tolerance << " (" << count << "/" << max_count << ")" << endl;} 
+    // DX [OBSOLETE]	//if(sign<0.0){ // one count involves scanning up and then down once
+    // DX [OBSOLETE]	//  count += 1;
+    // DX [OBSOLETE]	//}
+    // DX [OBSOLETE]        if(call_count <= max_count){
+    // DX [OBSOLETE]          cerr << "WARNING: Inconsistent symmetry, changing tolerance to: " << tolerance << endl; 
+    // DX [OBSOLETE]	}
+    // DX [OBSOLETE]      }
+    // DX [OBSOLETE]      cerr << "new tol: " << tolerance << endl;
+    // DX [OBSOLETE]	cerr << "tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
+    // DX [OBSOLETE]      if(call_count > max_count){
+    // DX [OBSOLETE]	// DX cerr << "ERROR: Symmetry routine failed, tolerance range (" << orig_tolerance-(max_count*tol_increment) << " to " << orig_tolerance+(max_count*tol_increment) << ") tested [dir=" << xstr.directory << "]. Report to David Hicks (d.hicks@duke.edu). EXITING." << endl;
+    // DX [OBSOLETE]	cerr << "WARNING: Inconsistent symmetry, tolerance range (" << orig_tolerance-((max_count/2)*tol_increment) << " to " << orig_tolerance+((max_count/2)*tol_increment) << ") tested [dir=" << xstr.directory << "]." << endl;
+    // DX [OBSOLETE]	// DX 9/1/17 exit(0);
+    // DX [OBSOLETE]        no_scan = true;
+    // DX [OBSOLETE]	return FALSE;
+    // DX [OBSOLETE]      }
+    // DX [OBSOLETE]      return TRUE;
+    // DX [OBSOLETE]    }
+    // DX [OBSOLETE]    else {
+    // DX [OBSOLETE]      return false;
+    // DX [OBSOLETE]    }
+    // DX [OBSOLETE]  }
   }
 } // namespace SYM
 
@@ -526,23 +536,23 @@ namespace SYM {
     int type;
     while(count < expanded_crystal.size()){
       for(uint i=0;i<expanded_crystal.size();i++){
-	NEW = true;
-	for(uint j=0;j<used_types.size();j++){
-	  if(expanded_crystal[i].type == used_types[j]){
-	    NEW = false;
+        NEW = true;
+        for(uint j=0;j<used_types.size();j++){
+          if(expanded_crystal[i].type == used_types[j]){
+            NEW = false;
           }
         }
-	if(NEW == true){
-	  type = expanded_crystal[i].type;
-	  used_types.push_back(type);
-	  for(uint ii=0;ii<expanded_crystal.size();ii++){
-	    if(expanded_crystal[ii].type == type){
-	      temp_atom_group.push_back(expanded_crystal[ii]);
-	      count++;
+        if(NEW == true){
+          type = expanded_crystal[i].type;
+          used_types.push_back(type);
+          for(uint ii=0;ii<expanded_crystal.size();ii++){
+            if(expanded_crystal[ii].type == type){
+              temp_atom_group.push_back(expanded_crystal[ii]);
+              count++;
             }
           }
-	  out.push_back(temp_atom_group);
-	  temp_atom_group.clear();
+          out.push_back(temp_atom_group);
+          temp_atom_group.clear();
         }
       }
     }
@@ -562,19 +572,22 @@ namespace SYM {
     xmatrix<double> f2c=trasp(lattice);
     return AtomsMapped(a, b, lattice, f2c, skew, tol);
   }
-    
+
   bool AtomsMapped(const _atom& a, const _atom& b, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(a.spin_is_given){ // DX 9/21/17 - magnetic symmetry
       bool spins_match = (aurostd::abs(a.spin-b.spin)<=tol);
-      return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else if(a.noncoll_spin_is_given){ // DX 12/5/17 - magnetic sym (non-collinear)
       bool spins_match = (aurostd::abs(a.noncoll_spin(1)-b.noncoll_spin(1))<=tol && aurostd::abs(a.noncoll_spin(2)-b.noncoll_spin(2))<=tol &&
-                          aurostd::abs(a.noncoll_spin(3)-b.noncoll_spin(3))<=tol);
-      return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+          aurostd::abs(a.noncoll_spin(3)-b.noncoll_spin(3))<=tol);
+      //return a.type==b.type&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      return a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_))&&spins_match&&FPOSMatch(a,b,lattice,f2c,skew,tol); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     }
     else {
-      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+      //return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type; //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
+      return FPOSMatch(a,b,lattice,f2c,skew,tol)&&a.type==b.type&&(aurostd::isequal(a.partial_occupation_value,b.partial_occupation_value,_AFLOW_POCC_ZERO_TOL_)); //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name 
     }
   }
 } // namespace SYM
@@ -586,8 +599,8 @@ namespace SYM {
 namespace SYM {
   bool isLatticeSkewed(const xmatrix<double>& lattice, double& min_dist, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible
     double max_skew = aurostd::max(aurostd::abs(SYM::DotPro(lattice(1),lattice(2))/(aurostd::modulus(lattice(1))*aurostd::modulus(lattice(2)))),
-                                   aurostd::max(aurostd::abs(SYM::DotPro(lattice(2),lattice(3))/(aurostd::modulus(lattice(2))*aurostd::modulus(lattice(3)))),
-                                                aurostd::abs(SYM::DotPro(lattice(3),lattice(1)/(aurostd::modulus(lattice(3))*aurostd::modulus(lattice(1)))))));
+        aurostd::max(aurostd::abs(SYM::DotPro(lattice(2),lattice(3))/(aurostd::modulus(lattice(2))*aurostd::modulus(lattice(3)))),
+          aurostd::abs(SYM::DotPro(lattice(3),lattice(1)/(aurostd::modulus(lattice(3))*aurostd::modulus(lattice(1)))))));
     double skew_tol = (1.0-aurostd::abs(max_skew))*min_dist;
     XHOST.SKEW_TOL=skew_tol; // DX 10/19/17
     return (skew_tol<tol);
@@ -682,7 +695,7 @@ namespace SYM {
     //DX 20180903 needs to return min_vec : return min_mod;
 
     return min_vec; //DX 20180903 needs to return min_vec
-    }
+  }
 } //namespace SYM
 
 // ******************************************************************************
@@ -710,11 +723,11 @@ namespace SYM {
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff){
     //DX 20190904 [OBSOLETE] xvector<int> ijk;
     //DX 20190904 [OBSOLETE] return minimizeDistanceFractionalMethod(fdiff, ijk);
-    
+
     // ---------------------------------------------------------------------------
     // loop over each component and bring close to origin 
     // (i.e., between -0.5 and 0.5 in fractional coordinates)
-    
+
     //DX 20190904 - START
     double tolerance=0.0;
     double upper_bound=0.5;
@@ -731,7 +744,7 @@ namespace SYM {
 // ---------------------------------------------------------------------------
 namespace SYM {
   xvector<double> minimizeDistanceFractionalMethod(const xvector<double>& fdiff, xvector<int>& ijk){
-    
+
     // ---------------------------------------------------------------------------
     // loop over each component and bring close to origin 
     // (i.e., between -0.5 and 0.5 in fractional coordinates)
@@ -938,7 +951,7 @@ namespace SYM {
     xmatrix<double> f2c=trasp(lattice);
     return FPOSMatch(atom_set,atom2,match_type,lattice,f2c,skew,tol);
   }
-  
+
   bool FPOSMatch(const deque<_atom>& atom_set, const _atom& atom2, uint& match_type, const xmatrix<double>& lattice, 
       const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
     for(uint i=0;i<atom_set.size();i++){
@@ -960,18 +973,18 @@ namespace SYM {
     xmatrix<double> f2c=trasp(lattice);
     return FPOSMatch(atom1,atom2,lattice,f2c,skew,tol);
   }
-  
+
   bool FPOSMatch(const _atom& atom1, const _atom& atom2, const xmatrix<double>& lattice, 
       const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
     return FPOSMatch(atom1.fpos,atom2.fpos,lattice,f2c,skew,tol); //DX 20190619 - added lattice to input and remove "Atom" prefix in name
-    /*xvector<double> fdiff = atom1.fpos - atom2.fpos;
-      if(skew){
-      return minimizeCartesianDistance(atom1.cpos,atom2.cpos,fdiff,c2f,f2c,tol);
-      }
-      else {
-      PBC(fdiff);
-      }
-      return (aurostd::modulus(f2c*fdiff)<tol);*/
+    //xvector<double> fdiff = atom1.fpos - atom2.fpos;
+    //if(skew){
+    //return minimizeCartesianDistance(atom1.cpos,atom2.cpos,fdiff,c2f,f2c,tol);
+    //}
+    //else {
+    //PBC(fdiff);
+    //}
+    //return (aurostd::modulus(f2c*fdiff)<tol);
   }
 } // namespace SYM
 
@@ -983,7 +996,7 @@ namespace SYM {
     xmatrix<double> f2c=trasp(lattice);
     return FPOSMatch(fpos1,fpos2,lattice,f2c,skew,tol);
   }
-  
+
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
       const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190620 - lattice and f2c as input and remove "Atom" prefix in name
     string soliloquy="SYM::FPOSMatch():";
@@ -1002,23 +1015,23 @@ namespace SYM {
       stringstream message; 
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)<_ZERO_TOL_){
         message << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(soliloquy, message, cerr, _LOGGER_MESSAGE_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_MESSAGE_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist<=tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist>tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(soliloquy, message, cerr, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)!=(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
         message << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
       if((min_cdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)!=(min_fdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)){
         message << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(soliloquy,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
       }
     }
     double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX 20190620
@@ -1120,7 +1133,7 @@ namespace SYM {
 // applies c2f and f2c to atom.fpos and atom.cpos to see if there's a correspondence
 namespace SYM {
   bool validateAtomPosition(const _atom& atom,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
-    
+
     return validateAtomPosition(atom.cpos,atom.fpos,c2f,f2c,skew,_eps_);
   }
   bool validateAtomPosition(const xvector<double>& cpos,const xvector<double>& fpos,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew,double& _eps_){ //CO190520 - removed pointers for bools and doubles, added const where possible
@@ -1161,22 +1174,22 @@ namespace SYM {
 namespace SYM {
   //overload //DX 20190620
   bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
-                        bool skew, double tol, uint& mapped_index,bool fast){ 
+      bool skew, double tol, uint& mapped_index,bool fast){ 
     xmatrix<double> f2c=trasp(lattice);
     return MapAtomWithBasis(vec, a, map_types, index_to_check, lattice, f2c, skew, tol, mapped_index, fast);
   }
 
   bool MapAtomWithBasis(const vector<_atom>& vec, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
-                        const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
+      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input, remove "Atom" prefix from name
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = vec[index_to_check[i]];
         if(a.type==vec[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
-        if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input 
-          count++;
-          mapped_index=i;
+          if(AtomsMapped(a,vec[index_to_check[i]],lattice,f2c,skew,tol)){ //type specific //DX 20190619 - lattice and f2c as input 
+            count++;
+            mapped_index=i;
             if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
           }
         }
@@ -1211,22 +1224,22 @@ namespace SYM {
 namespace SYM {
   //overload //DX 20190620
   bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice, 
-                        bool skew, double tol, uint& mapped_index,bool fast){ 
+      bool skew, double tol, uint& mapped_index,bool fast){ 
     xmatrix<double> f2c=trasp(lattice);
     return MapAtomWithBasis(deq, a, map_types, index_to_check, lattice, f2c, skew, tol, mapped_index, fast);
   }
 
   bool MapAtomWithBasis(const deque<_atom>& deq, const _atom& a, bool map_types, deque<uint>& index_to_check, const xmatrix<double>& lattice,
-                        const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
+      const xmatrix<double>& f2c, bool skew, double tol, uint& mapped_index,bool fast){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     int count=0;
 
     if(map_types){
       for(uint i=0;i<index_to_check.size();i++){
         //_atom b = deq[index_to_check[i]];
         if(a.type==deq[index_to_check[i]].type){ // DX - 7/31/17 - Speed increase
-        if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input
-          count++;
-          mapped_index=i;
+          if(AtomsMapped(a,deq[index_to_check[i]],lattice,f2c,skew,tol)){ //DX 20190619 - lattice and f2c as input
+            count++;
+            mapped_index=i;
             if(fast){return TRUE;} // DX - 7/31/17 - Speed increase, check one-to-one after
           }
         }
@@ -1259,7 +1272,7 @@ namespace SYM {
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a_deq, b, map_types, lattice, f2c, skew, tol);
   } 
-  
+
   bool MapAtom(const deque<_atom>& a_deq, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     for(uint i=0;i<a_deq.size();i++){
       //_atom a = a_deq[i];
@@ -1320,7 +1333,7 @@ namespace SYM {
     xmatrix<double> f2c=trasp(lattice);
     return MapAtom(a, b, map_types, lattice, f2c, skew, tol);
   }
-  
+
   bool MapAtom(const _atom& a, const _atom& b, bool map_types, const xmatrix<double>& lattice, const xmatrix<double>& f2c, bool skew, double tol){ //CO190520 - removed pointers for bools and doubles, added const where possible //DX 20190619 - lattice and f2c as input
     if(map_types){
       return AtomsMapped(a,b,lattice,f2c,skew,tol); //type specific //DX 20190619 - replace f2c and c2f with lattice
@@ -1445,39 +1458,40 @@ namespace SYM {
       tmp(1)=0.5; tmp(2)=0.0; tmp(3)=0.0; // (1/2,0,0)
       conv_lattice_points.push_back(tmp);
     }  
-   
+
     // Compress lattice fractional coordinates by the size of the expansion 
     vector<xvector<double> > compressed_lattice_points;
     for(uint i=0;i<conv_lattice_points.size();i++){
       compressed_lattice_points.push_back(conv_lattice_points[i]/(double)expand_size);
     }  
-    
+
     // Check if the compressed lattice points are in the set of supercell translations
     for(uint j=0;j<compressed_lattice_points.size();j++){
       bool matched = false;
       for(uint ii=0;ii<xstr.fgroup.size();ii++){
         if(aurostd::identical(xstr.fgroup[ii].Uf,xstr.fgroup[0].Uf)){ // DX 12/7/17 use default xmatrix identical tol
-	  //DX 20190613 [OBSOLETE] xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j];
+          //DX 20190613 [OBSOLETE] xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j];
           double min_dist = 1e9;
-	  if(skew){
-	    xvector<double> tmp1 = xstr.f2c*xstr.fgroup[ii].ftau;
-	    xvector<double> tmp2 = xstr.f2c*compressed_lattice_points[j];
-	    xvector<double> min_cdiff = minimizeDistanceCartesianMethod(tmp1,tmp2,xstr.lattice); //DX 20190613
+          if(skew){
+            xvector<double> tmp1 = xstr.f2c*xstr.fgroup[ii].ftau;
+            xvector<double> tmp2 = xstr.f2c*compressed_lattice_points[j];
+            xvector<double> min_cdiff = minimizeDistanceCartesianMethod(tmp1,tmp2,xstr.lattice); //DX 20190613
             min_dist = aurostd::modulus(min_cdiff); //DX 20190613
-	    //DX 20190613 [OBSOLETE] minimizeCartesianDistance(tmp1,tmp2,fdiff,xstr.c2f,xstr.f2c,xstr.sym_eps);
-	  }
-	  else {
-	    xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j]; //DX 20190613
-	    xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+            //DX 20190613 [OBSOLETE] minimizeCartesianDistance(tmp1,tmp2,fdiff,xstr.c2f,xstr.f2c,xstr.sym_eps);
+          }
+          else {
+            xvector<double> fdiff = xstr.fgroup[ii].ftau - compressed_lattice_points[j]; //DX 20190613
+            xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
             min_dist = aurostd::modulus(xstr.f2c*min_fdiff); //DX 20190613
-	    //DX 20190613 [OBSOLETE] PBC(fdiff);
-	  }
-	  //DX 20190613 [OBSOLETE] if(aurostd::modulus(xstr.f2c*fdiff)<=xstr.sym_eps){
-	  if(min_dist<=xstr.sym_eps){ //DX 20190613
-	    matched = true;
-	    break;
-	  }
-	}
+            //DX 20190613 [OBSOLETE] PBC(fdiff);
+          }
+          //DX 20190613 [OBSOLETE] if(aurostd::modulus(xstr.f2c*fdiff)<=xstr.sym_eps)
+          if(min_dist<=xstr.sym_eps) //DX 20190613
+          { //CO200106 - patching for auto-indenting
+            matched = true;
+            break;
+          }
+        }
       }
       if(matched == false){
         if(num_lattice_points == 3 && !reverse_tested){ // Need to test reverse setting before exiting
@@ -1489,8 +1503,8 @@ namespace SYM {
           reverse_tested = true;
         }
         else {
-	  // Not a supercell of a conventional lattice
-	  return false;
+          // Not a supercell of a conventional lattice
+          return false;
         }
       }
     }
@@ -1521,7 +1535,7 @@ namespace SYM {
       }
       return false;
     }
-   
+
     // Determine lattice centering
     int num_lattice_pts = 0;
     char centering = space_group_string[0];
@@ -1537,7 +1551,7 @@ namespace SYM {
     else if(centering == 'F'){ //face-centered
       num_lattice_pts = 4;
     }
-    
+
     // Determine if multiplicity of lattice points is consistent with a uniform expansion
     // Check for primitive
     uint n_prim=0;
@@ -1564,14 +1578,14 @@ namespace SYM {
         }
       }    
     }
-     
+
     string tmp_point_group = "";
     bool screw_operator = false;
     for(uint i=0;i<space_group_string.size();i++){
       if(i > 0){ // Do not need lattice type
         // Reduce glide to mirror
         if(space_group_string[i] == 'a' || space_group_string[i] == 'b' || space_group_string[i] == 'c' ||
-           space_group_string[i] == 'd' || space_group_string[i] == 'e' || space_group_string[i] == 'n' ){
+            space_group_string[i] == 'd' || space_group_string[i] == 'e' || space_group_string[i] == 'n' ){
           tmp_point_group += "m";
         }
         // Reduce screw to rotation
@@ -1637,13 +1651,13 @@ namespace SYM {
 namespace SYM {
   // DX and CO - START
   bool ApplyAtomValidate(const _atom &atom_in,_atom& atom_out,
-                         const _sym_op &symop,const xstructure& a){
+      const _sym_op &symop,const xstructure& a){
     bool _incell_=false;
     bool roff=true; // CO, hate this, but it was the default, NEVER fudge positions
     return ApplyAtomValidate(atom_in,atom_out,symop,a,_incell_,roff);
   }
   bool ApplyAtomValidate(const _atom &atom_in,_atom& atom_out,
-                         const _sym_op &symop,const xstructure& a,bool _incell_,bool roff){
+      const _sym_op &symop,const xstructure& a,bool _incell_,bool roff){
     //xmatrix<double> lattice = a.lattice;
     //xmatrix<double> f2c(3,3);f2c=a.f2c;//trasp(a.lattice); //  cpos=f2c*fpos;
     //xmatrix<double> c2f(3,3);c2f=a.c2f;//inverse(trasp(a.lattice));
@@ -1663,28 +1677,28 @@ namespace SYM {
     return ApplyAtomValidate(atom_in,atom_out,symop,a.lattice,a.c2f,a.f2c,skew,_incell_,roff,_eps_);
   }
   bool ApplyAtomValidate(const _atom &atom_in,_atom& atom_out,
-                         const _sym_op &symop,const xstructure& a,bool skew, bool _incell_,bool roff, double _eps_){
+      const _sym_op &symop,const xstructure& a,bool skew, bool _incell_,bool roff, double _eps_){
     return ApplyAtomValidate(atom_in,atom_out,symop,a.lattice,a.c2f,a.f2c,skew,_incell_,roff,_eps_);
   }
   bool ApplyAtomValidate(const _atom &atom_in,_atom& atom_out,
-                         const _sym_op &symop,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c,
-                         bool skew, bool _incell_,bool roff, double _eps_){
+      const _sym_op &symop,const xmatrix<double>& lattice,const xmatrix<double>& c2f, const xmatrix<double>& f2c,
+      bool skew, bool _incell_,bool roff, double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     bool in_valid = validateAtomPosition(atom_in,c2f,f2c,skew,_eps_);
     if(!in_valid){
       if(LDEBUG) {
-      cerr << "a.fpos " << atom_in.fpos << endl;
-      cerr << "a.cpos " << atom_in.cpos << endl;
-      cerr << "c2f " << c2f << endl;
-      cerr << "f2c " << f2c << endl;
-      xvector<double>fdiff=(c2f*atom_in.cpos)-atom_in.fpos;
-      cerr << "(c2f*cpos)-fpos = " << (c2f*atom_in.cpos)-atom_in.fpos << endl;
-      xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
-      cerr << "minimizeDistanceFractionalMethod(fdiff) = " << min_fdiff << endl; //DX 20190613
-      cerr << "modulus(f2c*min_fdiff) = " << modulus(f2c*min_fdiff) << " <? " << _eps_ <<endl; //DX 20190613
-      //DX 20190613 [OBSOLETE] PBC(fdiff);
-      //DX 20190613 [OBSOLETE] cerr << "PBC(fdiff) = " << fdiff << endl;
-      //DX 20160613 [OBSOLETE] cerr << "modulus(f2c*fdiff) = " << modulus(f2c*fdiff) << " <? " << _eps_ <<endl;
+        cerr << "a.fpos " << atom_in.fpos << endl;
+        cerr << "a.cpos " << atom_in.cpos << endl;
+        cerr << "c2f " << c2f << endl;
+        cerr << "f2c " << f2c << endl;
+        xvector<double>fdiff=(c2f*atom_in.cpos)-atom_in.fpos;
+        cerr << "(c2f*cpos)-fpos = " << (c2f*atom_in.cpos)-atom_in.fpos << endl;
+        xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fdiff); //DX 20190613
+        cerr << "minimizeDistanceFractionalMethod(fdiff) = " << min_fdiff << endl; //DX 20190613
+        cerr << "modulus(f2c*min_fdiff) = " << modulus(f2c*min_fdiff) << " <? " << _eps_ <<endl; //DX 20190613
+        //DX 20190613 [OBSOLETE] PBC(fdiff);
+        //DX 20190613 [OBSOLETE] cerr << "PBC(fdiff) = " << fdiff << endl;
+        //DX 20160613 [OBSOLETE] cerr << "modulus(f2c*fdiff) = " << modulus(f2c*fdiff) << " <? " << _eps_ <<endl;
       }
       return false;
     }
@@ -1702,7 +1716,7 @@ namespace SYM {
     bool _incell_=false;
     return SYM::ApplyAtom(atom_in,symop,str,_incell_);
   }
-  
+
   _atom ApplyAtom(const _atom &atom_in,const _sym_op &symop,const xstructure& str,bool _incell_) {
     bool roff=true;
     return ApplyAtom(atom_in,symop,str,_incell_,roff);
@@ -1713,7 +1727,7 @@ namespace SYM {
     bool validatePosition=true;
     return ApplyAtom(atom_in,symop,str,_incell_,roff,validatePosition);
   }
-  
+
   _atom ApplyAtom(const _atom &atom_in,const _sym_op &symop,const xstructure& str,bool _incell_,bool roff,bool validatePosition) {
     // COREY - WE SHOULD PULL FROM XSTR INSTEAD OF RECALCUALTING EVERYTIME ?
     xmatrix<double> lattice = str.lattice;
@@ -1730,7 +1744,7 @@ namespace SYM {
     double min_dist = str.dist_nn_min;
     if(min_dist == AUROSTD_NAN){min_dist=SYM::minimumDistance(str);}
     bool skew = isLatticeSkewed(lattice,min_dist,_eps_);
-    
+
     return ApplyAtom(atom_in,symop,lattice,c2f,f2c,skew,_incell_,roff,validatePosition,_eps_);
   }
 
@@ -1799,17 +1813,18 @@ namespace SYM {
 
       //if(ignoreFractionalOperation){
       //  atom.fpos=c2f*atom.cpos;
-      //} else {
+      //} else {  //[CO200106 - close bracket for indenting]}
       // atom.cpos=f2c*atom.fpos;
-      /*fdiff = (c2f*atom.cpos)-atom.fpos;
-        if(skew){
-        tmp = f2c*atom.fpos;
-        minimizeCartesianDistance(atom.cpos,tmp,fdiff,c2f,f2c,_eps_);
-        }
-        else {
-        PBC(fdiff);
-        }
-        if(modulus(f2c*fdiff)>_eps_) {*/
+      //fdiff = (c2f*atom.cpos)-atom.fpos;
+      //if(skew){
+      //tmp = f2c*atom.fpos;
+      //minimizeCartesianDistance(atom.cpos,tmp,fdiff,c2f,f2c,_eps_);
+      //}
+      //else {
+      //PBC(fdiff);
+      //}
+      //if(modulus(f2c*fdiff)>_eps_) {
+
       if(validatePosition){
         if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
           cerr << "SYM::ApplyAtom: error [3]" << endl;
@@ -1833,10 +1848,11 @@ namespace SYM {
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       atom.basis=atom_in.basis;
     }
-    else if(symop.is_fgroup==TRUE) {
-      // cerr << "factor group symmetry" << endl;
-      //if(symop.str_Hermann_Mauguin != "1") {
-      if(!isidentity(symop.Uf)){
+      else if(symop.is_fgroup==TRUE) {
+        // cerr << "factor group symmetry" << endl;
+        //if(symop.str_Hermann_Mauguin != "1")
+        if(!isidentity(symop.Uf))
+        { //[CO200106 - close bracket for indenting]}
         atom.cpos=symop.Uc*atom_in.cpos; //symop.ctau+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
         atom.fpos=symop.Uf*atom_in.fpos; //symop.ftau+symop.Uf*atom_in.fpos;if(roff) roundoff(atom.fpos,_EPS_roundoff_);
       }
@@ -1844,51 +1860,54 @@ namespace SYM {
         atom.cpos=atom.cpos+symop.ctau;
         atom.fpos=atom.fpos+symop.ftau;
       }
-      //if(symop.str_Hermann_Mauguin == "1" && symop.ftau[1]<=_ZERO_TOL_ && symop.ftau[2]<=_ZERO_TOL_ && symop.ftau[3]<=_ZERO_TOL_){
-      if(isidentity(symop.Uf) && symop.ftau[1]<=_ZERO_TOL_ && symop.ftau[2]<=_ZERO_TOL_ && symop.ftau[3]<=_ZERO_TOL_){
-        identity=true;
+      //if(symop.str_Hermann_Mauguin == "1" && symop.ftau[1]<=_ZERO_TOL_ && symop.ftau[2]<=_ZERO_TOL_ && symop.ftau[3]<=_ZERO_TOL_)
+      if(isidentity(symop.Uf) && symop.ftau[1]<=_ZERO_TOL_ && symop.ftau[2]<=_ZERO_TOL_ && symop.ftau[3]<=_ZERO_TOL_)
+      { //[CO200106 - close bracket for indenting]}
+      identity=true;
+    }
+    //if(roff) roundoff(atom.fpos,_EPS_roundoff_);
+    //if(roff) roundoff(atom.cpos,_EPS_roundoff_);
+    //atom.fpos=symop.ftau+symop.Uf*atom_in.fpos;if(roff) roundoff(atom.fpos,_EPS_roundoff_);
+    //atom.cpos=symop.ctau+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
+    //  atom.cpos=f2c*atom.fpos;
+
+    //if(ignoreFractionalOperation){
+    //  atom.fpos=c2f*atom.cpos;
+    //} else {  //[CO200106 - close bracket for indenting]}
+    //fdiff = (c2f*atom.cpos)-atom.fpos;
+    //if(skew){
+    //tmp = f2c*atom.fpos;
+    //minimizeCartesianDistance(atom.cpos,tmp,fdiff,c2f,f2c,_eps_);
+    //}
+    //else {
+    //PBC(fdiff);
+    //}
+    //if(modulus(atom.cpos-f2c*atom.fpos)>_eps_)
+    //if(modulus(f2c*fdiff)>_eps_) 
+    //{
+
+    if(validatePosition){
+      if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
+        cerr << "SYM::ApplyAtom: error [4]" << endl;
+        cerr << "  atom_in.cpos=" << atom_in.cpos << endl;
+        cerr << "  atom_in.fpos=" << atom_in.fpos << endl;
+        cerr << "  _sym_op=" << endl;
+        cerr << symop << endl;
+        cerr << "  atom.cpos=" << atom.cpos << endl;
+        cerr << "  atom.fpos=" << atom.fpos << endl;
+        cerr << "  f2c=" << endl << f2c << endl;
+        cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
+        cerr << "  c2f=" << endl << c2f << endl;
+        cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
+        cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
+        cerr << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
+        cerr << "  EPS=" << _eps_ << endl;
+        exit(0);
       }
-      //if(roff) roundoff(atom.fpos,_EPS_roundoff_);
-      //if(roff) roundoff(atom.cpos,_EPS_roundoff_);
-      //atom.fpos=symop.ftau+symop.Uf*atom_in.fpos;if(roff) roundoff(atom.fpos,_EPS_roundoff_);
-      //atom.cpos=symop.ctau+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
-      //  atom.cpos=f2c*atom.fpos;
-      
-      //if(ignoreFractionalOperation){
-      //  atom.fpos=c2f*atom.cpos;
-      //} else {
-      /*fdiff = (c2f*atom.cpos)-atom.fpos;
-        if(skew){
-        tmp = f2c*atom.fpos;
-        minimizeCartesianDistance(atom.cpos,tmp,fdiff,c2f,f2c,_eps_);
-        }
-        else {
-        PBC(fdiff);
-        }
-        //if(modulus(atom.cpos-f2c*atom.fpos)>_eps_) {
-        if(modulus(f2c*fdiff)>_eps_) {*/
-      if(validatePosition){
-        if(!validateAtomPosition(atom,c2f,f2c,skew,_eps_)){
-          cerr << "SYM::ApplyAtom: error [4]" << endl;
-          cerr << "  atom_in.cpos=" << atom_in.cpos << endl;
-          cerr << "  atom_in.fpos=" << atom_in.fpos << endl;
-          cerr << "  _sym_op=" << endl;
-          cerr << symop << endl;
-          cerr << "  atom.cpos=" << atom.cpos << endl;
-          cerr << "  atom.fpos=" << atom.fpos << endl;
-          cerr << "  f2c=" << endl << f2c << endl;
-          cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
-          cerr << "  c2f=" << endl << c2f << endl;
-          cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
-          cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-          cerr << "  modulus = " << modulus(f2c*((c2f*atom.cpos)-atom.fpos)) << endl;
-          cerr << "  EPS=" << _eps_ << endl;
-          exit(0);
-        }
-      }
-      //}
-      if(_incell_) atom.ijk=xint(floor(atom.fpos));
-      if(symop.basis_map_calculated){ //FIXING FOR ME (MARCO) CO 180420
+    }
+    //}
+    if(_incell_) atom.ijk=xint(floor(atom.fpos));
+    if(symop.basis_map_calculated){ //FIXING FOR ME (MARCO) CO 180420
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
         cerr << "SYM::ApplyAtom: error [5]" << endl;
         cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
@@ -1899,11 +1918,12 @@ namespace SYM {
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }
-    }
+  }
     else if(symop.is_sgroup==TRUE) {
       // cerr << "space group symmetry" << endl;
-      //if(symop.str_Hermann_Mauguin != "1") {
-      if(!isidentity(symop.Uf)){
+      //if(symop.str_Hermann_Mauguin != "1")
+      if(!isidentity(symop.Uf))
+      { //CO200106 - patching for auto-indenting
         atom.cpos=symop.Uc*atom_in.cpos; //symop.ctau+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
         atom.fpos=symop.Uf*atom_in.fpos; //symop.ftau+symop.Uf*atom_in.fpos;if(roff) roundoff(atom.fpos,_EPS_roundoff_);
       }
@@ -1917,7 +1937,7 @@ namespace SYM {
       }
       //if(symop.str_Hermann_Mauguin == "1" && symop.ftau[1]<=_ZERO_TOL_ && symop.ftau[2]<=_ZERO_TOL_ && symop.ftau[3]<=_ZERO_TOL_ &&
       if(isidentity(symop.Uf) && symop.ftau[1]<=_ZERO_TOL_ && symop.ftau[2]<=_ZERO_TOL_ && symop.ftau[3]<=_ZERO_TOL_ &&
-         symop.ftrasl[1]<=_ZERO_TOL_ && symop.ftrasl[2]<=_ZERO_TOL_ && symop.ftrasl[3]<=_ZERO_TOL_){
+          symop.ftrasl[1]<=_ZERO_TOL_ && symop.ftrasl[2]<=_ZERO_TOL_ && symop.ftrasl[3]<=_ZERO_TOL_){
         identity=true;
       }
       //if(roff) roundoff(atom.fpos,_EPS_roundoff_);
@@ -1926,21 +1946,23 @@ namespace SYM {
       //atom.fpos=symop.ftau+symop.ftrasl+symop.Uf*atom_in.fpos;if(roff) roundoff(atom.fpos,_EPS_roundoff_);
       //atom.cpos=symop.ctau+symop.ctrasl+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       // atom.cpos=f2c*atom.fpos;
-      
+
       //if(ignoreFractionalOperation){
       //  atom.fpos=c2f*atom.cpos;
-      //} else {
-      /*fdiff = (c2f*atom.cpos)-atom.fpos;
-        if(skew){
-        tmp = f2c*atom.fpos;
-        minimizeCartesianDistance(atom.cpos,tmp,fdiff,c2f,f2c,_eps_);
-        }
-        else {
-        PBC(fdiff);
-        }
-      
-        //if(modulus(atom.cpos-f2c*atom.fpos)>_eps_) {
-        if(modulus(f2c*fdiff)>_eps_) {*/
+      //} else {  //[CO200106 - close bracket for indenting]}
+      //fdiff = (c2f*atom.cpos)-atom.fpos;
+      //if(skew){
+      //tmp = f2c*atom.fpos;
+      //minimizeCartesianDistance(atom.cpos,tmp,fdiff,c2f,f2c,_eps_);
+      //}
+      //else {
+      //PBC(fdiff);
+      //}
+
+      //if(modulus(atom.cpos-f2c*atom.fpos)>_eps_)
+      //if(modulus(f2c*fdiff)>_eps_) 
+      //{
+
       // CO/DX 170810
       //do not validate for sgroups, requires large search radius in the worse case (minimizeCartesianDistance)
       //if you did want to validate, need to change validateAtomPosition and subtract ctrasl/ftrasl first
@@ -2017,17 +2039,17 @@ namespace SYM {
       atom.cpos=symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       // atom.cpos=f2c*atom.fpos;
       if(modulus(atom.cpos-f2c*atom.fpos)>_EPS_) {
-	cerr << "SYM::ApplyAtom: error [1]" << endl;
-	cerr << "  atom.cpos=" << atom.cpos << endl;
-	cerr << "  atom.fpos=" << atom.fpos << endl;
-	cerr << "  f2c=" << endl << f2c << endl;
-	cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
-	cerr << "  c2f=" << endl << c2f << endl;
-	cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
-	cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
-	cerr << "  modulus = " << modulus(atom.cpos-f2c*atom.fpos) << endl;
-	cerr << "  EPS=" << _EPS_ << endl;
-	exit(0);
+        cerr << "SYM::ApplyAtom: error [1]" << endl;
+        cerr << "  atom.cpos=" << atom.cpos << endl;
+        cerr << "  atom.fpos=" << atom.fpos << endl;
+        cerr << "  f2c=" << endl << f2c << endl;
+        cerr << "  f2c*atom.fpos=" << f2c*atom.fpos << endl;
+        cerr << "  c2f=" << endl << c2f << endl;
+        cerr << "  c2f*atom.cpos=" << c2f*atom.cpos << endl;
+        cerr << "  f2c*c2f=" << endl << f2c*c2f << endl;
+        cerr << "  modulus = " << modulus(atom.cpos-f2c*atom.fpos) << endl;
+        cerr << "  EPS=" << _EPS_ << endl;
+        exit(0);
       }
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       atom.basis=atom_in.basis;
@@ -2038,20 +2060,20 @@ namespace SYM {
       atom.cpos=symop.ctau+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       //  atom.cpos=f2c*atom.fpos;
       if(modulus(atom.cpos-f2c*atom.fpos)>_EPS_) {
-	cerr << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
-	cerr << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
-	cerr << f2c*atom.fpos << endl;
-	cerr << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
-	cerr << "SYM::ApplyAtom: error [2]" << endl;
-	exit(0);
+        cerr << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
+        cerr << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
+        cerr << f2c*atom.fpos << endl;
+        cerr << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
+        cerr << "SYM::ApplyAtom: error [2]" << endl;
+        exit(0);
       }
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
-	cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
-	cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
-	cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
-	cerr << "SYM::ApplyAtom: fgroup is mapping out of range" << endl;
-	exit(0);
+        cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
+        cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
+        cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
+        cerr << "SYM::ApplyAtom: fgroup is mapping out of range" << endl;
+        exit(0);
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }
@@ -2061,20 +2083,20 @@ namespace SYM {
       atom.cpos=symop.ctau+symop.ctrasl+symop.Uc*atom_in.cpos;if(roff) roundoff(atom.cpos,_EPS_roundoff_);
       // atom.cpos=f2c*atom.fpos;
       if(modulus(atom.cpos-f2c*atom.fpos)>_EPS_) {
-	cerr << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
-	cerr << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
-	cerr << f2c*atom.fpos << endl;
-	cerr << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
-	cerr << "SYM::ApplyAtom: error [3]" << endl;
-	exit(0);
+        cerr << atom.fpos << " | " << symop.ftau << " | " << symop.ftrasl << endl;
+        cerr << atom.cpos << " | " << symop.ctau << " | " << symop.ctrasl << endl;
+        cerr << f2c*atom.fpos << endl;
+        cerr << modulus(atom.cpos-f2c*atom.fpos) << " " << _EPS_ << endl;
+        cerr << "SYM::ApplyAtom: error [3]" << endl;
+        exit(0);
       }
       if(_incell_) atom.ijk=xint(floor(atom.fpos));
       if((uint) atom_in.basis>=symop.basis_atoms_map.size()) {
-	cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
-	cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
-	cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
-	cerr << "SYM::ApplyAtom: sgroup is mapping out of range" << endl;
-	exit(0);
+        cerr << "ERROR atom_in.basis=" << atom_in.basis << endl;
+        cerr << "ERROR symop.basis_atoms_map.size()=" << symop.basis_atoms_map.size() << endl;
+        cerr << "ERROR symop.basis_types_map.size()=" << symop.basis_types_map.size() << endl;
+        cerr << "SYM::ApplyAtom: sgroup is mapping out of range" << endl;
+        exit(0);
       }
       atom.basis=symop.basis_atoms_map.at(atom_in.basis);
     }
@@ -2122,32 +2144,32 @@ namespace SYM {
     xvector<double> fijk(3),cijk(3);
     xvector<int>    ijk(3);
     bool roff=TRUE;
-  
+
     for(int i=1;i<=3;i++) {
       fijk[i]=ijk_in[i];
       cijk[i]=ijk_in[1]*str.lattice[1][i]+ijk_in[2]*str.lattice[2][i]+ijk_in[3]*str.lattice[3][i];
     }
-  
+
     if(symop.is_pgroup==TRUE || symop.is_agroup==TRUE) {
       fijk=symop.Uf*fijk;if(roff) roundoff(fijk,_EPS_roundoff_);
       for(int i=1;i<=3;i++) ijk[i]=(int) fijk[i];
-    
+
       cijk=symop.Uc*cijk;if(roff) roundoff(cijk,_EPS_roundoff_);
       if(modulus(fijk-cijk)>0.01) {
-	cerr << "ERROR SYM::ApplyIJK mismatch error modulus(fijk-cijk)" << endl;
-	cerr << fijk << endl;
-	cerr << C2F(str.lattice,cijk) << endl;
-	exit(0);
+        cerr << "ERROR SYM::ApplyIJK mismatch error modulus(fijk-cijk)" << endl;
+        cerr << fijk << endl;
+        cerr << C2F(str.lattice,cijk) << endl;
+        exit(0);
       }
       for(int i=1;i<=3;i++) {
-	if(abs(fijk[i]-ijk[i])>0.01) {
-	  cerr << "ERROR SYM::ApplyIJK mismatch error" << endl;
-	  cerr << ijk_in << endl;
-	  cerr << fijk << endl;
-	  cerr << ijk << endl;
-	  cerr << symop.Uf << endl;
-	  exit(0);
-	}
+        if(abs(fijk[i]-ijk[i])>0.01) {
+          cerr << "ERROR SYM::ApplyIJK mismatch error" << endl;
+          cerr << ijk_in << endl;
+          cerr << fijk << endl;
+          cerr << ijk << endl;
+          cerr << symop.Uf << endl;
+          exit(0);
+        }
       }
     }
     if(symop.is_fgroup==TRUE) {cerr << "SYM::ApplyIJK not defined for fgroup" << endl;exit(0);}
@@ -2194,7 +2216,7 @@ namespace SYM {
   bool AtomsEquivalent(xstructure& str, _atom& atom1, _atom& atom2, double& eps) {
     return AtomsEquivalent_20161115(str,atom1,atom2,eps);
   }
-  
+
   bool AtomsEquivalent_20161115(xstructure& str,_atom& atom1,_atom& atom2) {
     double _eps_=AUROSTD_NAN;// DX =_EPS_;
     if(str.sym_eps!=AUROSTD_NAN){ //Tolerance came from user or was calculated
@@ -2206,7 +2228,7 @@ namespace SYM {
     }
     return SYM::AtomsEquivalent(str,atom1,atom2,_eps_);
   }
-  
+
 #ifndef COMPILE_SLIM
   bool AtomsEquivalent_20160101(xstructure& str,_atom& atom1,_atom& atom2) {
     double eps = _EPS_;
@@ -2221,7 +2243,7 @@ namespace SYM {
     //xmatrix<double> c2f=inverse(trasp(str.lattice));  //co necessary?
     double min_dist = AUROSTD_NAN;
     if(str.dist_nn_min == AUROSTD_NAN){str.MinDist();}
-      min_dist = str.dist_nn_min;
+    min_dist = str.dist_nn_min;
     bool skew = isLatticeSkewed(str.lattice,min_dist,eps);
     return AtomsEquivalent(str,atom1,atom2,skew,eps);
   }
@@ -2329,8 +2351,9 @@ namespace SYM {
 // symmetry operation - SC aug2007
 
 namespace SYM {
-  //bool TypePointGroupOperation(const xmatrix<double> &Uc,string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator) {
-  bool TypePointGroupOperation(const xmatrix<double> &Uc, const xmatrix<double> &Uf, string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator, xvector<double>& _generator_coefficients, xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) { // DX 1/17/18 - added SU(2) and su(2) coefficients
+  //bool TypePointGroupOperation(const xmatrix<double> &Uc,string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator)
+  bool TypePointGroupOperation(const xmatrix<double> &Uc, const xmatrix<double> &Uf, string &_string, bool &_inversion,double &_angle,xvector<double> &_axis,xmatrix<double> &_generator, xvector<double>& _generator_coefficients, xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) // DX 1/17/18 - added SU(2) and su(2) coefficients
+  { //CO200106 - patching for auto-indenting
     // calculate the type of symmetry.
     // you need to put your right hand on the origin,
     // and rotate as screwing a scredriver along direction r(1),r(2),r(3),
@@ -2358,8 +2381,9 @@ namespace SYM {
     I=aurostd::identity(I);II=-I;
     if(_roundoff_U) roundoff(U,_EPS_roundoff_);
     //  cerr << " U= " << endl << U << endl;
-    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,I,_eps_)) {                                           // check unity  // fix the problem at theta=0.0
-    if(identical(Uf,I)) {
+    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,I,_eps_))                                           // check unity  // fix the problem at theta=0.0
+    if(identical(Uf,I))
+    { //CO200106 - patching for auto-indenting
       theta=0.0;r(1)=0.0;r(2)=0.0;r(3)=0.0;clear(A);  // ANGLE IS ZERO and axis is not defined
       inversion=FALSE;
       aus << "unity I       ";
@@ -2368,8 +2392,9 @@ namespace SYM {
       ComplexSU2Rotations(_SU2_matrix,_su2_coefficients,theta,_axis); // DX 1/17/18 - added SU2 and su2 coefficients
       return TRUE;
     }
-    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,II,_eps_)) {                                           // check unity  // fix the problem at theta=0.0
-    if(identical(Uf,II)) {
+    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,II,_eps_))                                           // check unity  // fix the problem at theta=0.0
+    if(identical(Uf,II))
+    { //CO200106 - patching for auto-indenting
       theta=0.0;r(1)=0.0;r(2)=0.0;r(3)=0.0;clear(A);  // ANGLE IS ZERO and axis is not defined
       inversion=TRUE;
       aus << "inversion -I  ";
@@ -2385,8 +2410,9 @@ namespace SYM {
     }
     // check if theta = 0 or pi (0 already done)
     // if angle is pi, then U*U=I, hence inv(U)=U, but inv(U)=Ut, hence U=Ut.... symmetric
-    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,trasp(U),_eps_)) {    // if symmetric, theta = pi, because two operations U*U brings 2pi=I
-    if(identical(Uf*Uf,I)) {
+    // DX 12/7/17 Use Uf, elements are -1,0,1 : if(identical(U,trasp(U),_eps_))    // if symmetric, theta = pi, because two operations U*U brings 2pi=I
+    if(identical(Uf*Uf,I))
+    { //CO200106 - patching for auto-indenting
       double x,y,z;
       x=(U(1,1)+1.0)/2.0;             // definition of x
       if(x>0.0) x=sqrt(x);           // can only take square root of positive number, always TRUE for orthogonal matrix
@@ -2398,11 +2424,11 @@ namespace SYM {
       if(z>0.0) z=sqrt(z);           // can only take square root of positive number, always TRUE for orthogonal matrix
       else z=0.0;                     // in case matrix has become de-orthogonalised
       if((abs(x)<_eps_) && !(abs(y)<_eps_) && !(abs(z)<_eps_)) { // implements  last 6 rows of above table
-	if(!(U(2,3)>0.0)) y=-y;
+        if(!(U(2,3)>0.0)) y=-y;
       } else if((abs(y)<_eps_) && !(abs(z)<_eps_)) {
-	if(!(U(1,3)>0.0)) z=-z;
+        if(!(U(1,3)>0.0)) z=-z;
       } else if((abs(z)<_eps_)) {
-	if(!(U(1,2)>0.0)) x=-x;
+        if(!(U(1,2)>0.0)) x=-x;
       }
       theta=pi;
       r(1)=x;r(2)=y;r(3)=z;clear(A);
@@ -2462,14 +2488,15 @@ namespace SYM {
 
 namespace SYM {
   //bool TypePointGroupOperationInternational(const xmatrix<double>& Uc,string& _stringHM,string& _stringSC,const bool& _inversion,const double& _angle,
-  //					    const xvector<double>& _axis,const xmatrix<double>& _generator) {
+  //					    const xvector<double>& _axis,const xmatrix<double>& _generator)
   bool TypePointGroupOperationInternational(const xmatrix<double>& Uc,string& _stringHM,string& _stringSC,const bool& _inversion,const double& _angle,
-					    const xvector<double>& _axis,const xmatrix<double>& _generator, xvector<double>& _generator_coefficients, 
-                                            xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) { // DX 12/6/17 - added generator coefficents // DX 1/17/18 - added SU(2) and su(2) coefficients
+      const xvector<double>& _axis,const xmatrix<double>& _generator, xvector<double>& _generator_coefficients, 
+      xmatrix<xcomplex<double> >& _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double _eps_) // DX 12/6/17 - added generator coefficents // DX 1/17/18 - added SU(2) and su(2) coefficients
+  { //CO200106 - patching for auto-indenting
     //double _eps_=_EPS_; // DX 10/24/17
     _stringHM="XXXXX";
     _stringSC="XXXXX";
-  
+
     // get diagonal stuff    1 and -1
     if(isdiagonal(Uc,_eps_)) {
       if(isequal(Uc[1][1], 1.0,_eps_) && isequal(Uc[2][2], 1.0,_eps_) && isequal(Uc[3][3], 1.0,_eps_)) { _stringHM= "1"; _stringSC="1"; return TRUE;}
@@ -2525,10 +2552,10 @@ bool MapOperations(string s1,string s2) {
   for(uint i1=0;i1<tokens1.size();i1++)
     for(uint i2=0;i2<tokens2.size();i2++)
       if(tokens1.at(i1)!="X" && tokens2.at(i2)!="X")
-	if(tokens1.at(i1)==tokens2.at(i2)) { // nail
-	  tokens1.at(i1)="X";tokens2.at(i2)="X";
-	  maps++;
-	}
+        if(tokens1.at(i1)==tokens2.at(i2)) { // nail
+          tokens1.at(i1)="X";tokens2.at(i2)="X";
+          maps++;
+        }
   //  for(uint i1=0;i1<tokens1.size();i1++) cerr << tokens1.at(i1) << endl;
   //   for(uint i1=0;i1<tokens1.size();i1++) cerr << tokens2.at(i1) << endl;
   //   cerr << maps << endl;
@@ -2594,7 +2621,7 @@ namespace SYM {
 namespace SYM {
   bool CalculateQuaternion(_sym_op& a){
     //GEENA START WORKING HERE
-	 
+
     a.quaternion_vector.clear(); a.quaternion_matrix.clear();  // CO 170706 - clear first
     xvector<double> quaternion_vector(4); // creating the vector for 4x1
     xmatrix<double> quaternion_matrix(4, 4); // creating the matrix for 4x4
@@ -2609,7 +2636,7 @@ namespace SYM {
     secondcomponent = a.axis[1]*sin(angleD/2);
     thirdcomponent  = a.axis[2]*sin(angleD/2);
     fourthcomponent = a.axis[3]*sin(angleD/2);
-	
+
     // 4x1 Quaternion Vector
     a.quaternion_vector(1)=firstcomponent;
     a.quaternion_vector(2)=secondcomponent;
@@ -2628,13 +2655,13 @@ namespace SYM {
     a.quaternion_matrix(2, 2)= firstcomponent;
     a.quaternion_matrix(2, 3)= -1*fourthcomponent;
     a.quaternion_matrix(2, 4)= thirdcomponent;
-	 
+
     // Components of the third row
     a.quaternion_matrix(3, 1)= -1*thirdcomponent;
     a.quaternion_matrix(3, 2)= fourthcomponent;
     a.quaternion_matrix(3, 3)= firstcomponent;
     a.quaternion_matrix(3, 4)= -1*secondcomponent;
-	 
+
     // Components of the fourth row
     a.quaternion_matrix(4, 1)= -1*fourthcomponent;
     a.quaternion_matrix(4, 2)= -1*thirdcomponent;
@@ -2653,7 +2680,7 @@ namespace SYM {
 // this function fills in the SU(2) and su(2) coefficient attribute to _sym_op
 namespace SYM {
   bool ComplexSU2Rotations(xmatrix<xcomplex<double> > & _SU2_matrix, xvector<xcomplex<double> >& _su2_coefficients, double& theta, xvector<double>& _axis){
-    
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     xcomplex<double> q11(1.0*cos(theta/2.0),_axis(3)*sin(theta/2.0));                   // DX 1/17/18 - added SU(2) matrix
     xcomplex<double> q12(_axis(2)*sin(theta/2.0),_axis(1)*sin(theta/2.0));              // DX 1/17/18 - added SU(2) matrix
@@ -2676,12 +2703,12 @@ namespace SYM {
       complex_matrix(2,2) = theta*tmp3;
       xmatrix<xcomplex<double> > exp_matrix = aurostd::exp(complex_matrix);
       if(!(abs(_SU2_matrix(1,1).re-exp_matrix(1,1).re)<1e-3 && abs(_SU2_matrix(1,1).im-exp_matrix(1,1).im)<1e-3 &&
-	   abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
-	   abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
-	   abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
-	cerr << "ComplexSU2Rotations::WARNING: exp(theta*su(2)) != SU(2):" << endl;
-	cerr << "ComplexSU2Rotations::SU2:" << _SU2_matrix(1,1) << " " << _SU2_matrix(1,2) << " " << _SU2_matrix(2,1) << " " << _SU2_matrix(2,2) << endl;
-	cerr << "ComplexSU2Rotations::exp_matrix:" << exp_matrix(1,1) << " " << exp_matrix(1,2) << " " << exp_matrix(2,1) << " " << exp_matrix(2,2) << endl;
+            abs(_SU2_matrix(1,2).re-exp_matrix(1,2).re)<1e-3 && abs(_SU2_matrix(1,2).im-exp_matrix(1,2).im)<1e-3 &&
+            abs(_SU2_matrix(2,1).re-exp_matrix(2,1).re)<1e-3 && abs(_SU2_matrix(2,1).im-exp_matrix(2,1).im)<1e-3 &&
+            abs(_SU2_matrix(2,2).re-exp_matrix(2,2).re)<1e-3 && abs(_SU2_matrix(2,2).im-exp_matrix(2,2).im)<1e-3)){
+        cerr << "ComplexSU2Rotations::WARNING: exp(theta*su(2)) != SU(2):" << endl;
+        cerr << "ComplexSU2Rotations::SU2:" << _SU2_matrix(1,1) << " " << _SU2_matrix(1,2) << " " << _SU2_matrix(2,1) << " " << _SU2_matrix(2,2) << endl;
+        cerr << "ComplexSU2Rotations::exp_matrix:" << exp_matrix(1,1) << " " << exp_matrix(1,2) << " " << exp_matrix(2,1) << " " << exp_matrix(2,2) << endl;
       }
     }
     return true;
@@ -2719,7 +2746,7 @@ namespace SYM {
   bool CalculatePointGroupCrystal_20170814(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_, string format) {
     // Obtain the structure tolerance
     a.sym_eps=_eps_; // DX
-    
+
     ostringstream aus;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
@@ -2795,11 +2822,11 @@ namespace SYM {
       }
     }
     if(group==_PGROUP_XTAL_){
-    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
-      vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
-      operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
-      if(kk<a.pgroup_xtal.size()) operations=operations+" ";
-    }
+      for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+        vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
+        operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
+        if(kk<a.pgroup_xtal.size()) operations=operations+" ";
+      }
     }
     bool pg_found=FALSE;
 
@@ -2869,13 +2896,13 @@ namespace SYM {
     string message="PGROUP_XTAL";
 
     // LOOK up table for the point group operations of the crystal
-// DX 9/16/17 [OBSOLETE]    vector<string> vops;vops.clear();
-// DX 9/16/17 [OBSOLETE]   string operations="";
-// DX 9/16/17 [OBSOLETE]    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
-// DX 9/16/17 [OBSOLETE]      vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
-// DX 9/16/17 [OBSOLETE]      operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
-// DX 9/16/17 [OBSOLETE]      if(kk<a.pgroup_xtal.size()) operations=operations+" ";
-// DX 9/16/17 [OBSOLETE]    }
+    // DX 9/16/17 [OBSOLETE]    vector<string> vops;vops.clear();
+    // DX 9/16/17 [OBSOLETE]   string operations="";
+    // DX 9/16/17 [OBSOLETE]    for(uint kk=1;kk<=a.pgroup_xtal.size();kk++) {  // I shift of 1 so I use the same [kk-1]...
+    // DX 9/16/17 [OBSOLETE]      vops.push_back(a.pgroup_xtal[kk-1].str_Hermann_Mauguin);
+    // DX 9/16/17 [OBSOLETE]      operations=operations+a.pgroup_xtal[kk-1].str_Hermann_Mauguin;
+    // DX 9/16/17 [OBSOLETE]      if(kk<a.pgroup_xtal.size()) operations=operations+" ";
+    // DX 9/16/17 [OBSOLETE]    }
 
     a.crystal_family="";a.crystal_system="";a.point_group_crystal_class="";
     a.point_group_Shoenflies="";a.point_group_Hermann_Mauguin="";a.point_group_orbifold="";
@@ -2884,61 +2911,61 @@ namespace SYM {
     string pgname = ""; // DX 9/6/17
     string operations = ""; // DX 9/6/17
 
-// DX 9/16/17 [OBSOLETE]    vector<string> pgf,pgn;
-// DX 9/16/17 [OBSOLETE]    // TRICLINIC
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1");pgn.push_back("1"); // 1
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -1");pgn.push_back("-1"); // 2
-// DX 9/16/17 [OBSOLETE]    // MONOCLINIC
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2");pgn.push_back("2"); // 3-5
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m");pgn.push_back("m"); // 6-9
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 m -1");pgn.push_back("2/m"); // 10-15
-// DX 9/16/17 [OBSOLETE]    // ORTHORHOMBIC
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 2 2");pgn.push_back("222"); // 16-24
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m m 2");pgn.push_back("mm2"); // 25-46
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m m 2 m 2 2 -1");pgn.push_back("mmm"); // 47-74
-// DX 9/16/17 [OBSOLETE]    // TETRAGONAL
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4");pgn.push_back("4"); // 75-80
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 -4 -4");pgn.push_back("-4"); // 81-82
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 m -4 -1 -4");pgn.push_back("4/m"); // 83-88
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 2 2 2 2");pgn.push_back("422"); // 89-98
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2");pgn.push_back("4mm"); // 99-110
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m 2 -4 m 2 -4 2");pgn.push_back("-42m"); // 111-122
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2 m 2 2 -4 2 -1 -4 2");pgn.push_back("4/mmm"); // 123-142
-// DX 9/16/17 [OBSOLETE]    // HEXAGONAL-TRIGONAL
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3");pgn.push_back("3"); // 143-146
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 -1 -3 -3");pgn.push_back("-3"); // 147-148
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 2 3 3 2");pgn.push_back("32"); // 149-155
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 m -2 -2");pgn.push_back("3m"); // 156-161
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 3 3 -2 -1 2 2 -3 -3 2");pgn.push_back("-3m"); // 162-167
-// DX 9/16/17 [OBSOLETE]
-// DX 9/16/17 [OBSOLETE]    // HEXAGONAL-HEXAGONAL
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6");pgn.push_back("6"); // 168-173
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 m -6 -6");pgn.push_back("-6"); // 174
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 m -6 -6 -1 -3 -3");pgn.push_back("6/m"); // 175-176
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 2 2 2 2 2 2");pgn.push_back("622"); // 177-182
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 m 3 3 -2 2 -2 m 6 6 -2");pgn.push_back("6mm"); // 183-186
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2");pgn.push_back("-6m2"); // 187-190
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2 2 -1 -2 2 m 2 6 -3 6 -3 -2 2");pgn.push_back("6/mmm"); // 	191-194
-// DX 9/16/17 [OBSOLETE]    // CUBIC
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 3 3 3 3 2 2 3 3 3 3");pgn.push_back("23"); //  195-199
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 3 3 3 3 2 3 3 2 -1 -3 -3 m -3 -3 -3 -3 m -3 -3 m");pgn.push_back("m-3"); // 200-206
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 2 3 4 3 3 4 3 2 2 2 2 2 4 3 2 3 3 4 3 2");pgn.push_back("432"); // 207-214
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 -2 3 3 -2 2 -2 -4 3 3 -4 -4 3 2 -4 3 -4 -4 2 -2 3 3 -2");pgn.push_back("-43m"); // 215-220
-// DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 2 m -2 3 -3 4 3 -2 4 -3 2 -2 -1 2 -3 -3 -2 3 4 4 3 -2 -3 -4 3 2 2 3 -4 -3 2 -4 -3 3 4 m 2 -4 -3 2 3 -4 m 4 -4 2");pgn.push_back("m-3m"); // 221-230
-// DX 9/16/17 [OBSOLETE]    //  pgf.push_back("1 -2 -2 3 3 -2 -2 2 3 -4 -4 3 3 -4 -2 3 2 -4 -4 3 3 -2 -4 2 -1 2 2 -3 -3 2 2 m -3 4 4 -3 -3 4 2 -3 -2 4 4 -3 -3 2 4 -2");pgn.push_back("m-3m"); // 221-230
-// DX 9/16/17 [OBSOLETE]    // done
-// DX 9/16/17 [OBSOLETE]    for(uint i=0;i<pgf.size();i++) aurostd::StringSubst(pgf.at(i),"-2","m"); // -2 are mirrors orthogonal to the axis....
-// DX 9/16/17 [OBSOLETE]
-// DX 9/16/17 [OBSOLETE]    // -------------------------------------------------------------------- scanning  ORDER=48
-// DX 9/16/17 [OBSOLETE]    // find point group
-// DX 9/16/17 [OBSOLETE]    string pgname;
-// DX 9/16/17 [OBSOLETE]    aurostd::StringSubst(operations,"-2","m");
-// DX 9/16/17 [OBSOLETE]
-// DX 9/16/17 [OBSOLETE]    for(uint i=0;i<pgf.size()&&!pg_found;i++) {
-// DX 9/16/17 [OBSOLETE]      if(MapOperations(operations,pgf.at(i))) {pg_found=TRUE;pgname=pgn.at(i);}
-// DX 9/16/17 [OBSOLETE]    }
-// DX 9/16/17 [OBSOLETE]    //  cerr << pg_found << endl;
-// DX 9/16/17 [OBSOLETE]    //   cerr << pgname << endl;
+    // DX 9/16/17 [OBSOLETE]    vector<string> pgf,pgn;
+    // DX 9/16/17 [OBSOLETE]    // TRICLINIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1");pgn.push_back("1"); // 1
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -1");pgn.push_back("-1"); // 2
+    // DX 9/16/17 [OBSOLETE]    // MONOCLINIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2");pgn.push_back("2"); // 3-5
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m");pgn.push_back("m"); // 6-9
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 m -1");pgn.push_back("2/m"); // 10-15
+    // DX 9/16/17 [OBSOLETE]    // ORTHORHOMBIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 2 2");pgn.push_back("222"); // 16-24
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m m 2");pgn.push_back("mm2"); // 25-46
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m m 2 m 2 2 -1");pgn.push_back("mmm"); // 47-74
+    // DX 9/16/17 [OBSOLETE]    // TETRAGONAL
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4");pgn.push_back("4"); // 75-80
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 -4 -4");pgn.push_back("-4"); // 81-82
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 m -4 -1 -4");pgn.push_back("4/m"); // 83-88
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 2 2 2 2");pgn.push_back("422"); // 89-98
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2");pgn.push_back("4mm"); // 99-110
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m 2 -4 m 2 -4 2");pgn.push_back("-42m"); // 111-122
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 4 m 2 4 -2 m 2 2 -4 2 -1 -4 2");pgn.push_back("4/mmm"); // 123-142
+    // DX 9/16/17 [OBSOLETE]    // HEXAGONAL-TRIGONAL
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3");pgn.push_back("3"); // 143-146
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 -1 -3 -3");pgn.push_back("-3"); // 147-148
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 2 3 3 2");pgn.push_back("32"); // 149-155
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 m -2 -2");pgn.push_back("3m"); // 156-161
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 3 3 -2 -1 2 2 -3 -3 2");pgn.push_back("-3m"); // 162-167
+    // DX 9/16/17 [OBSOLETE]
+    // DX 9/16/17 [OBSOLETE]    // HEXAGONAL-HEXAGONAL
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6");pgn.push_back("6"); // 168-173
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 m -6 -6");pgn.push_back("-6"); // 174
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 m -6 -6 -1 -3 -3");pgn.push_back("6/m"); // 175-176
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 6 6 2 2 2 2 2 2");pgn.push_back("622"); // 177-182
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 m 3 3 -2 2 -2 m 6 6 -2");pgn.push_back("6mm"); // 183-186
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2");pgn.push_back("-6m2"); // 187-190
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 m -2 2 m 2 3 -6 3 -6 -2 2 2 -1 -2 2 m 2 6 -3 6 -3 -2 2");pgn.push_back("6/mmm"); // 	191-194
+    // DX 9/16/17 [OBSOLETE]    // CUBIC
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 2 3 3 3 3 2 2 3 3 3 3");pgn.push_back("23"); //  195-199
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 3 3 2 3 3 3 3 2 3 3 2 -1 -3 -3 m -3 -3 -3 -3 m -3 -3 m");pgn.push_back("m-3"); // 200-206
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 4 2 4 2 3 4 3 3 4 3 2 2 2 2 2 4 3 2 3 3 4 3 2");pgn.push_back("432"); // 207-214
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 -2 3 3 -2 2 -2 -4 3 3 -4 -4 3 2 -4 3 -4 -4 2 -2 3 3 -2");pgn.push_back("-43m"); // 215-220
+    // DX 9/16/17 [OBSOLETE]    pgf.push_back("1 -2 2 m -2 3 -3 4 3 -2 4 -3 2 -2 -1 2 -3 -3 -2 3 4 4 3 -2 -3 -4 3 2 2 3 -4 -3 2 -4 -3 3 4 m 2 -4 -3 2 3 -4 m 4 -4 2");pgn.push_back("m-3m"); // 221-230
+    // DX 9/16/17 [OBSOLETE]    //  pgf.push_back("1 -2 -2 3 3 -2 -2 2 3 -4 -4 3 3 -4 -2 3 2 -4 -4 3 3 -2 -4 2 -1 2 2 -3 -3 2 2 m -3 4 4 -3 -3 4 2 -3 -2 4 4 -3 -3 2 4 -2");pgn.push_back("m-3m"); // 221-230
+    // DX 9/16/17 [OBSOLETE]    // done
+    // DX 9/16/17 [OBSOLETE]    for(uint i=0;i<pgf.size();i++) aurostd::StringSubst(pgf.at(i),"-2","m"); // -2 are mirrors orthogonal to the axis....
+    // DX 9/16/17 [OBSOLETE]
+    // DX 9/16/17 [OBSOLETE]    // -------------------------------------------------------------------- scanning  ORDER=48
+    // DX 9/16/17 [OBSOLETE]    // find point group
+    // DX 9/16/17 [OBSOLETE]    string pgname;
+    // DX 9/16/17 [OBSOLETE]    aurostd::StringSubst(operations,"-2","m");
+    // DX 9/16/17 [OBSOLETE]
+    // DX 9/16/17 [OBSOLETE]    for(uint i=0;i<pgf.size()&&!pg_found;i++) {
+    // DX 9/16/17 [OBSOLETE]      if(MapOperations(operations,pgf.at(i))) {pg_found=TRUE;pgname=pgn.at(i);}
+    // DX 9/16/17 [OBSOLETE]    }
+    // DX 9/16/17 [OBSOLETE]    //  cerr << pg_found << endl;
+    // DX 9/16/17 [OBSOLETE]    //   cerr << pgname << endl;
 
     bool pg_found = PointGroupMap(a,pgname,operations,_PGROUP_XTAL_); // DX 9/6/17
     // -------------------------------------------------------------------- scanning  ORDER=48
@@ -3147,9 +3174,9 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-        << " ---------------------------------------------------------------------------" << endl;
+      << " ---------------------------------------------------------------------------" << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-        << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
@@ -3163,7 +3190,7 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-        << " ---------------------------------------------------------------------------" << endl;
+      << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
@@ -3177,7 +3204,7 @@ namespace SYM {
   bool CalculatePointGroupCrystal_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_, string format) {
     // Obtain the structure tolerance
     a.sym_eps=_eps_; // DX
-    
+
     ostringstream aus;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
@@ -3515,9 +3542,9 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-        << " ---------------------------------------------------------------------------" << endl;
+      << " ---------------------------------------------------------------------------" << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-        << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
@@ -3531,7 +3558,7 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-        << " ---------------------------------------------------------------------------" << endl;
+      << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss,format);
@@ -3548,10 +3575,10 @@ namespace SYM {
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_CRYSTAL Symmetry: BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    
+
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [0]" << endl;
     // this function returns the PointGroup of the Crystal by searching through the Hermann-Mauguin combinations
-    
+
     bool Krun=TRUE;
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);  // translation
     xmatrix<double> Uf(3,3),Uc(3,3);                      // matrices
@@ -3566,12 +3593,12 @@ namespace SYM {
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [0e]" << endl;
     string message="PGROUP_XTAL";
     //  double _eps_=_EPS_;
-    
+
     xstructure b(a),t(a);   // for backup... will use at the end to plug back the postions
     // a.GetPrimitive(); nooooo I should not change the structure as it willl bust the factor group later
     a.BringInCell();
     // a.BringInWignerSeitz(); //I could but I would loose some.
-  
+
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [1]" << endl;
 
     // aflags.QUIET=TRUE;
@@ -3580,7 +3607,7 @@ namespace SYM {
     // if(a.sgroup_calculated==FALSE) Krun=Krun && SYM::CalculateSpaceGroup(FileMESSAGE,a,aflags,FALSE,osswrite,oss);          // NEED SPACE GROUP
     // if(a.iatoms_calculated==FALSE) Krun=Krun && SYM::CalculateInequivalentAtoms(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED EQUIV ATOMS
     // if(a.iatoms_calculated==FALSE) Krun=Krun && SYM::CalculateSitePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss);    // NEED EQUIV ATOMS
-  
+
     // this one removes the double matrices so it takes care of non primitive systems
     for(uint ip=0;ip<a.fgroup.size();ip++) {  // I shift of 1 so I use the same [kk-1]...
       clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
@@ -3588,23 +3615,23 @@ namespace SYM {
       Uf=a.fgroup[ip].Uf;Uc=a.fgroup[ip].Uc;ftau=a.fgroup[ip].ftau;ctau=a.fgroup[ip].ctau;
       bool sym_found=FALSE;
       for(uint ii=0;ii<a.pgroup_xtal.size()&&!sym_found;ii++)
-	//   sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf,_eps_) && identical(ftau,a.pgroup_xtal[ii].ftau,_eps_));
-	sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf,_eps_));     // look in all the list of operations
+        //   sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf,_eps_) && identical(ftau,a.pgroup_xtal[ii].ftau,_eps_));
+        sym_found=(identical(Uf,a.pgroup_xtal[ii].Uf,_eps_));     // look in all the list of operations
       if(sym_found==FALSE) {                                    // new operation, generate and save it
-	// [UNUSED] uint kk; // warning: variable ‘kk’ set but not used 
-	// [UNUSED] kk=
+        // [UNUSED] uint kk; // warning: variable ‘kk’ set but not used 
+        // [UNUSED] kk=
         // DX and CO - START
         SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_PGROUP_XTAL_);   // in kk the number of pgroup_xtal
         // DX and CO - END
-	// aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTL " << a.pgroup_xtal[kk-1].str_type
-	// << " theta="; if(a.pgroup_xtal[kk-1].angle<100) aus << " "; if(a.pgroup_xtal[kk-1].angle<10) aus << " ";
-	// aus << a.pgroup_xtal[kk-1].angle << " " << " r=(" << a.pgroup_xtal[kk-1].axis << ")"
-	// << endl;  // remember vectors start from 0
-	// aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+        // aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUP_XTL " << a.pgroup_xtal[kk-1].str_type
+        // << " theta="; if(a.pgroup_xtal[kk-1].angle<100) aus << " "; if(a.pgroup_xtal[kk-1].angle<10) aus << " ";
+        // aus << a.pgroup_xtal[kk-1].angle << " " << " r=(" << a.pgroup_xtal[kk-1].axis << ")"
+        // << endl;  // remember vectors start from 0
+        // aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       }
     }
     a.pgroup_xtal_calculated=TRUE;
-  
+
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [2]" << endl;
 
     // PGROUP_XTAL
@@ -3621,7 +3648,7 @@ namespace SYM {
       aus    << endl;  // remember vectors start from 0
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     }
-  
+
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroupCrystal [3]" << endl;
 
     // LOOK up tabe for the point group operations of the crystal
@@ -3636,7 +3663,7 @@ namespace SYM {
     a.point_group_Shoenflies="";a.point_group_Hermann_Mauguin="";a.point_group_orbifold="";
     a.point_group_type="";a.point_group_order="";a.point_group_structure="";
     bool pg_found=FALSE;
-  
+
     vector<string> pgf,pgn;
     // TRICLINIC
     pgf.push_back("1");pgn.push_back("1"); // 1
@@ -3663,7 +3690,7 @@ namespace SYM {
     pgf.push_back("1 2 2 3 3 2");pgn.push_back("32"); // 149-155
     pgf.push_back("1 3 3 m -2 -2");pgn.push_back("3m"); // 156-161
     pgf.push_back("1 m -2 3 3 -2 -1 2 2 -3 -3 2");pgn.push_back("-3m"); // 162-167
-                              
+
     // HEXAGONAL-HEXAGONAL
     pgf.push_back("1 3 3 2 6 6");pgn.push_back("6"); // 168-173
     pgf.push_back("1 3 3 m -6 -6");pgn.push_back("-6"); // 174
@@ -3681,7 +3708,7 @@ namespace SYM {
     //  pgf.push_back("1 -2 -2 3 3 -2 -2 2 3 -4 -4 3 3 -4 -2 3 2 -4 -4 3 3 -2 -4 2 -1 2 2 -3 -3 2 2 m -3 4 4 -3 -3 4 2 -3 -2 4 4 -3 -3 2 4 -2");pgn.push_back("m-3m"); // 221-230
     // done
     for(uint i=0;i<pgf.size();i++) aurostd::StringSubst(pgf.at(i),"-2","m"); // -2 are mirrors orthogonal to the axis....
-  
+
     // -------------------------------------------------------------------- scanning  ORDER=48
     // find point group
     string pgname;
@@ -3899,9 +3926,9 @@ namespace SYM {
 
     // ------------------------------------------------------------------------------------------- PRINTING AND LEAVING
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-	<< " ---------------------------------------------------------------------------" << endl;
+      << " ---------------------------------------------------------------------------" << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-	<< " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      << " Symmetry: unique point group operations " << a.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: " << operations << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal Family = " << a.crystal_family << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: Crystal System = " << a.crystal_system << endl;
@@ -3915,7 +3942,7 @@ namespace SYM {
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " ---------------------------------------------------------------------------" << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message
-	<< " ---------------------------------------------------------------------------" << endl;
+      << " ---------------------------------------------------------------------------" << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
     // exit(0);
     if(_write_) Krun=Krun && KBIN_SymmetryWrite(FileMESSAGE,a,aflags,_PGROUP_XTAL_,osswrite,oss);
@@ -3932,24 +3959,24 @@ namespace SYM {
 // pgroup operations in the xstructure structure -  SC aug2007
 namespace SYM {
   uint AddSymmetryToStructure(xstructure &a,const uint& iat,
-			      const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
-			      const xvector<double> &ctrasl,const xvector<double> &ftrasl,
-			      const std::vector<int> &basis_atoms_map,
-			      const std::vector<int> &basis_types_map,
-                              bool basis_map_calculated,
-			      char group) {
+      const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
+      const xvector<double> &ctrasl,const xvector<double> &ftrasl,
+      const std::vector<int> &basis_atoms_map,
+      const std::vector<int> &basis_types_map,
+      bool basis_map_calculated,
+      char group) {
     // DX AND COREY - START
     bool roff=TRUE;
     return AddSymmetryToStructure(a,iat,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,basis_map_calculated,group,roff);
   }
   uint AddSymmetryToStructure(xstructure &a,const uint& iat,
-                              const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
-                              const xvector<double> &ctrasl,const xvector<double> &ftrasl,
-                              const std::vector<int> &basis_atoms_map,
-                              const std::vector<int> &basis_types_map,
-                              bool basis_map_calculated,
-                              char group,
-                              bool roff) {
+      const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
+      const xvector<double> &ctrasl,const xvector<double> &ftrasl,
+      const std::vector<int> &basis_atoms_map,
+      const std::vector<int> &basis_types_map,
+      bool basis_map_calculated,
+      char group,
+      bool roff) {
     // DX AND COREY - END
     xmatrix<double> _Uc(3,3);_Uc=Uc;             // here we make copies so we do not mess up input
     xmatrix<double> _Uf(3,3);_Uf=Uf;             // here we make copies so we do not mess up input
@@ -4044,13 +4071,13 @@ namespace SYM {
 namespace SYM {
   // DX AND COREY - START
   uint AddSymmetryToStructure(xstructure &a,const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
-			      const xvector<double> &ctrasl,const xvector<double> &ftrasl,const std::vector<int> &basis_atoms_map,const std::vector<int> &basis_types_map,bool basis_map_calculated,char group) {
-    
+      const xvector<double> &ctrasl,const xvector<double> &ftrasl,const std::vector<int> &basis_atoms_map,const std::vector<int> &basis_types_map,bool basis_map_calculated,char group) {
+
     bool roff=TRUE;
     return AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,basis_map_calculated,group,roff);
   }
   uint AddSymmetryToStructure(xstructure &a,const xmatrix<double> &Uc,const xmatrix<double> &Uf,const xvector<double> &ctau,const xvector<double> &ftau,
-                              const xvector<double> &ctrasl,const xvector<double> &ftrasl,const std::vector<int> &basis_atoms_map,const std::vector<int> &basis_types_map,bool basis_map_calculated,char group,bool roff) {
+      const xvector<double> &ctrasl,const xvector<double> &ftrasl,const std::vector<int> &basis_atoms_map,const std::vector<int> &basis_types_map,bool basis_map_calculated,char group,bool roff) {
     return SYM::AddSymmetryToStructure(a,0,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,basis_map_calculated,group,roff);
     // DX AND COREY - END
   }
@@ -4122,7 +4149,7 @@ namespace SYM {
     // Obtain the structure tolerance
     //DX 20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
     a.sym_eps=_eps_; // DX
-    
+
     // AFLOW_FUNCTION_IMPLEMENTATION
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroup" << endl;
     // ------------------------------------------------------------------------------
@@ -4219,21 +4246,22 @@ namespace SYM {
               ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
               //keep only the lattice points within the sphere with radius
               if(modulus(rrr)<radius && 
-                 // DX - START : Speed up vectors to check
-                 //((modulus(rrr)>na1_min && modulus(rrr)<na1_max) || 
-                 // (modulus(rrr)>na2_min && modulus(rrr)<na2_max) || 
-                 // (modulus(rrr)>na3_min && modulus(rrr)<na3_max))){
-                 (aurostd::abs(modulus(rrr)-na1) < _eps_ ||
-                  aurostd::abs(modulus(rrr)-na2) < _eps_ ||
-                  aurostd::abs(modulus(rrr)-na3) < _eps_)){
-                // DX - END : Speed up vectors to check
-                grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
-                *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
-                grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
-                grid_flattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
-                *grid_flattice_ptr=ddd;                            // SAVE THEM ALL
-                grid_flattice.push_back(grid_flattice_ptr);        // SAVE THEM ALL
-              }
+                  // DX - START : Speed up vectors to check
+                  //((modulus(rrr)>na1_min && modulus(rrr)<na1_max) || 
+                  // (modulus(rrr)>na2_min && modulus(rrr)<na2_max) || 
+                  // (modulus(rrr)>na3_min && modulus(rrr)<na3_max)))
+                (aurostd::abs(modulus(rrr)-na1) < _eps_ ||
+                 aurostd::abs(modulus(rrr)-na2) < _eps_ ||
+                 aurostd::abs(modulus(rrr)-na3) < _eps_))
+                 {  //CO200106 - patching for auto-indenting
+                   // DX - END : Speed up vectors to check
+                   grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
+                   *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
+                   grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
+                   grid_flattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
+                   *grid_flattice_ptr=ddd;                            // SAVE THEM ALL
+                   grid_flattice.push_back(grid_flattice_ptr);        // SAVE THEM ALL
+                 }
             }
           }
         }
@@ -4283,7 +4311,7 @@ namespace SYM {
                           // U=trasp(A)*inv(trasp(U))
                           Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
                           Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
-                          
+
                           //[CO190520 - testing setUf and setUc]if(LDEBUG) { //delete me
                           //[CO190520 - testing setUf and setUc]  test.setUf(Uf,lattice);
                           //[CO190520 - testing setUf and setUc]  isequal=aurostd::isequal(Uc,test.Uc);
@@ -4315,7 +4343,7 @@ namespace SYM {
                             clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
                             kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
                             aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << a.pgroup[kk-1].str_type
-                                << " theta=";
+                              << " theta=";
                             if(a.pgroup[kk-1].angle<100) aus << " ";
                             if(a.pgroup[kk-1].angle<10) aus << " ";
                             aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")";
@@ -4326,7 +4354,7 @@ namespace SYM {
                             if(0) { // to fix the JOSE BUG
                               if(a.pgroup.size()==28) {
                                 cerr << clatticedata[1] << " " << clatticedata[2] << " " << clatticedata[3] << " "
-                                     << clatticedata[4] << " " << clatticedata[5] << " " << clatticedata[6] << " " << endl;
+                                  << clatticedata[4] << " " << clatticedata[5] << " " << clatticedata[6] << " " << endl;
                                 cerr << "Adt" << endl << Adt << endl;
                                 cerr << "Act" << endl << Act << endl;
                                 cerr << "Bdt" << endl << Bdt << endl;
@@ -4338,13 +4366,13 @@ namespace SYM {
                             }
                             // DX _eps_ to _ZERO_TOL_
                             if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_ZERO_TOL_) // DX used to be _eps_
-                              {cerr << "SYM::CalculatePointGroup Uf error[1] [dir=" << a.directory << "]" << endl;exit(0);} 
+                            {cerr << "SYM::CalculatePointGroup Uf error[1] [dir=" << a.directory << "]" << endl;exit(0);} 
                             if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_ZERO_TOL_) // DX used to be _eps_
-                              {cerr << "SYM::CalculatePointGroup Uc error[2] [dir=" << a.directory << "]" << endl;exit(0);}
+                            {cerr << "SYM::CalculatePointGroup Uc error[2] [dir=" << a.directory << "]" << endl;exit(0);}
                             if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_ZERO_TOL_) // DX used to be _eps_
-                              {cerr << "SYM::CalculatePointGroup Uf error[3] [dir=" << a.directory << "]" << endl;exit(0);}
+                            {cerr << "SYM::CalculatePointGroup Uf error[3] [dir=" << a.directory << "]" << endl;exit(0);}
                             if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_ZERO_TOL_) // DX used to be _eps_
-                              {cerr << "SYM::CalculatePointGroup Uc error[4] [dir=" << a.directory << "]" << endl;exit(0);}
+                            {cerr << "SYM::CalculatePointGroup Uc error[4] [dir=" << a.directory << "]" << endl;exit(0);}
                             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
                             // DX _eps_ to _ZERO_TOL_
                           }
@@ -4393,8 +4421,9 @@ namespace SYM {
 
 #ifndef COMPILE_SLIM
 namespace SYM {
-  // DX bool CalculatePointGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_) {        // AFLOW_FUNCTION_IMPLEMENTATION
-  bool CalculatePointGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  // DX bool CalculatePointGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_)        // AFLOW_FUNCTION_IMPLEMENTATION
+  bool CalculatePointGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_)        // AFLOW_FUNCTION_IMPLEMENTATION
+  { //CO200106 - patching for auto-indenting
     if(DEBUG_SYMMETRY) cerr << "DEBUG: SYM::CalculatePointGroup" << endl;
     // ------------------------------------------------------------------------------
     // Some of this routine is inspired by AVDV structure::calc_point_group() code.
@@ -4476,23 +4505,23 @@ namespace SYM {
     //  cerr << I3 << endl;
     for(int i=-dims[1];i<=dims[1];i++) {
       for(int j=-dims[2];j<=dims[2];j++) {
-	for(int k=-dims[3];k<=dims[3];k++) {
-	  if(!(i==0 && j==0 && k==0)) {
-	    if((!(i==1 && j==0 && k==0)) && (!(i==0 && j==1 && k==0)) && (!(i==0 && j==0 && k==1))) { // to avoid plugging a1,a2,a2 back
-	      rrr=((double)i)*a1+((double)j)*a2+((double)k)*a3;
-	      ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
-	      //keep only the lattice points within the sphere with radius
-	      if(modulus(rrr)<radius) {
-		grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
-		*grid_clattice_ptr=rrr;                            // SAVE THEM ALL
-		grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
-		grid_flattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
-		*grid_flattice_ptr=ddd;                            // SAVE THEM ALL
-		grid_flattice.push_back(grid_flattice_ptr);        // SAVE THEM ALL
-	      }
-	    }
-	  }
-	}
+        for(int k=-dims[3];k<=dims[3];k++) {
+          if(!(i==0 && j==0 && k==0)) {
+            if((!(i==1 && j==0 && k==0)) && (!(i==0 && j==1 && k==0)) && (!(i==0 && j==0 && k==1))) { // to avoid plugging a1,a2,a2 back
+              rrr=((double)i)*a1+((double)j)*a2+((double)k)*a3;
+              ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
+              //keep only the lattice points within the sphere with radius
+              if(modulus(rrr)<radius) {
+                grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
+                *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
+                grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
+                grid_flattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
+                *grid_flattice_ptr=ddd;                            // SAVE THEM ALL
+                grid_flattice.push_back(grid_flattice_ptr);        // SAVE THEM ALL
+              }
+            }
+          }
+        }
       }
     }
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: found " << grid_clattice.size() << " vectors inside radius" << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -4505,81 +4534,81 @@ namespace SYM {
       for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
       for(ii=1;ii<=3;ii++) temp_flattice(1,ii)=(*grid_flattice[i])(ii);
       for(uint j=0;j<grid_clattice.size();j++) {
-	for(ii=1;ii<=3;ii++) temp_clattice(2,ii)=(*grid_clattice[j])(ii);
-	for(ii=1;ii<=3;ii++) temp_flattice(2,ii)=(*grid_flattice[j])(ii);
-	for(uint k=0;k<grid_clattice.size();k++) {	
-	  if(i!=j && i!=k && j!=k) {
-	    for(ii=1;ii<=3;ii++) temp_clattice(3,ii)=(*grid_clattice[k])(ii);
-	    for(ii=1;ii<=3;ii++) temp_flattice(3,ii)=(*grid_flattice[k])(ii);
-	    temp_clatticevol=abs(det(temp_clattice));
-	    if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {  // check volume !!! FAST !
-	      temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
-	      jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
-	      // compare the temp_clattice... and lattice... to see if they are the same lattice
-	      // that is do the lattice vectors have the same lengths and the same angles
-	      if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)                // check lattices
-		if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)              // check lattices
-		  if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)            // check lattices
-		    if(abs(clatticedata[4]-temp_clatticedata[4]) < _eps_angle_)        // check angles
-		      if(abs(clatticedata[5]-temp_clatticedata[5]) < _eps_angle_)      // check angles
-			if(abs(clatticedata[6]-temp_clatticedata[6]) < _eps_angle_) {  // check angles
-			  // SYMMETRY OPERATION POINT_GROUP and FACTOR_GROUP
-			  // get the matrix that relates the two lattice vectors
-			  // A=U*B but in A and B we plug vectors as columns
-			  // watch lattice is per row Uc=A*inv(B)
-			  // A is the lattice (vectors per colum), B is the test lattice (epr column)
-			  // Uc is the point_group operation which operates AFTER the vector (row)
-			  // as: new_vector_row=old_vector_row*Uc
-			  // point_group is the list of all the Uc !!!
-			  // since A and B are saved as trasposed, I get
-			  // U=trasp(A)*inv(trasp(U))
-			  Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
-			  Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
-			  // check whether this symmetry operation is new or not
-			  sym_found=FALSE;
-			  for(ii=0;ii<a.pgroup.size()&&!sym_found;ii++)
-			    sym_found=identical(Uc,a.pgroup[ii].Uc,_eps_);       // look in all the list of operations
-			  // if the symmetry operation is new, add it to the pointgroup array
-			  // and update all info about the sym_op object
-			  if(sym_found==FALSE) {                                 // new operation, generate and save it
-			    clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
-			    kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_);  // kk number pgroups
-			    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << a.pgroup[kk-1].str_type
-				<< " theta=";
-			    if(a.pgroup[kk-1].angle<100) aus << " ";
-			    if(a.pgroup[kk-1].angle<10) aus << " ";
-			    aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")";
-			    aus << "    HM=" <<  aurostd::PaddedPRE(a.pgroup[kk-1].str_Hermann_Mauguin,2," ");     // remember vectors start from 0
-			    aus << "    S=" <<  aurostd::PaddedPRE(a.pgroup[kk-1].str_Schoenflies,2," ");          // remember vectors start from 0
-			    aus << endl;  // remember vectors start from 0
-			    //			    aus << "JOSE =" << Uf << endl;
-			    if(0) { // to fix the JOSE BUG
-			      if(a.pgroup.size()==28) {
-				cerr << clatticedata[1] << " " << clatticedata[2] << " " << clatticedata[3] << " "
-				     << clatticedata[4] << " " << clatticedata[5] << " " << clatticedata[6] << " " << endl;
-				cerr << "Adt" << endl << Adt << endl;
-				cerr << "Act" << endl << Act << endl;
-				cerr << "Bdt" << endl << Bdt << endl;
-				cerr << "Bct" << endl << Bct << endl;
-				cerr << "Uf" << endl << Uf << endl;
-				cerr << "Uc" << endl << Uc << endl;
-				//	exit(0);
-			      }
-			    }
-			    if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uf error[1]" << endl;exit(0);}
-			    if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uc error[2]" << endl;exit(0);}
-			    if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uf error[3]" << endl;exit(0);}
-			    if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uc error[4]" << endl;exit(0);}
-			    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-			  }
-			}
-	    }
-	  }
-	}
+        for(ii=1;ii<=3;ii++) temp_clattice(2,ii)=(*grid_clattice[j])(ii);
+        for(ii=1;ii<=3;ii++) temp_flattice(2,ii)=(*grid_flattice[j])(ii);
+        for(uint k=0;k<grid_clattice.size();k++) {	
+          if(i!=j && i!=k && j!=k) {
+            for(ii=1;ii<=3;ii++) temp_clattice(3,ii)=(*grid_clattice[k])(ii);
+            for(ii=1;ii<=3;ii++) temp_flattice(3,ii)=(*grid_flattice[k])(ii);
+            temp_clatticevol=abs(det(temp_clattice));
+            if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {  // check volume !!! FAST !
+              temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
+              jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
+              // compare the temp_clattice... and lattice... to see if they are the same lattice
+              // that is do the lattice vectors have the same lengths and the same angles
+              if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)                // check lattices
+                if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)              // check lattices
+                  if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)            // check lattices
+                    if(abs(clatticedata[4]-temp_clatticedata[4]) < _eps_angle_)        // check angles
+                      if(abs(clatticedata[5]-temp_clatticedata[5]) < _eps_angle_)      // check angles
+                        if(abs(clatticedata[6]-temp_clatticedata[6]) < _eps_angle_) {  // check angles
+                          // SYMMETRY OPERATION POINT_GROUP and FACTOR_GROUP
+                          // get the matrix that relates the two lattice vectors
+                          // A=U*B but in A and B we plug vectors as columns
+                          // watch lattice is per row Uc=A*inv(B)
+                          // A is the lattice (vectors per colum), B is the test lattice (epr column)
+                          // Uc is the point_group operation which operates AFTER the vector (row)
+                          // as: new_vector_row=old_vector_row*Uc
+                          // point_group is the list of all the Uc !!!
+                          // since A and B are saved as trasposed, I get
+                          // U=trasp(A)*inv(trasp(U))
+                          Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
+                          Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
+                          // check whether this symmetry operation is new or not
+                          sym_found=FALSE;
+                          for(ii=0;ii<a.pgroup.size()&&!sym_found;ii++)
+                            sym_found=identical(Uc,a.pgroup[ii].Uc,_eps_);       // look in all the list of operations
+                          // if the symmetry operation is new, add it to the pointgroup array
+                          // and update all info about the sym_op object
+                          if(sym_found==FALSE) {                                 // new operation, generate and save it
+                            clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
+                            kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_);  // kk number pgroups
+                            aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << a.pgroup[kk-1].str_type
+                              << " theta=";
+                            if(a.pgroup[kk-1].angle<100) aus << " ";
+                            if(a.pgroup[kk-1].angle<10) aus << " ";
+                            aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")";
+                            aus << "    HM=" <<  aurostd::PaddedPRE(a.pgroup[kk-1].str_Hermann_Mauguin,2," ");     // remember vectors start from 0
+                            aus << "    S=" <<  aurostd::PaddedPRE(a.pgroup[kk-1].str_Schoenflies,2," ");          // remember vectors start from 0
+                            aus << endl;  // remember vectors start from 0
+                            //			    aus << "JOSE =" << Uf << endl;
+                            if(0) { // to fix the JOSE BUG
+                              if(a.pgroup.size()==28) {
+                                cerr << clatticedata[1] << " " << clatticedata[2] << " " << clatticedata[3] << " "
+                                  << clatticedata[4] << " " << clatticedata[5] << " " << clatticedata[6] << " " << endl;
+                                cerr << "Adt" << endl << Adt << endl;
+                                cerr << "Act" << endl << Act << endl;
+                                cerr << "Bdt" << endl << Bdt << endl;
+                                cerr << "Bct" << endl << Bct << endl;
+                                cerr << "Uf" << endl << Uf << endl;
+                                cerr << "Uc" << endl << Uc << endl;
+                                //	exit(0);
+                              }
+                            }
+                            if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uf error[1]" << endl;exit(0);}
+                            if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uc error[2]" << endl;exit(0);}
+                            if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uf error[3]" << endl;exit(0);}
+                            if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uc error[4]" << endl;exit(0);}
+                            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                          }
+                        }
+            }
+          }
+        }
       }
     }
     // ------------------------------------------------------------------------------
@@ -4677,11 +4706,11 @@ int PointGroup_HITS(xstructure &a,double _eps_) {
             ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
             if(modulus(rrr)<radius) {
               grid_clattice_ptr = new xvector<double>(3);
-	      *grid_clattice_ptr=rrr;
-	      grid_clattice.push_back(grid_clattice_ptr);
-	      grid_flattice_ptr = new xvector<double>(3);
-	      *grid_flattice_ptr=ddd;
-	      grid_flattice.push_back(grid_flattice_ptr);
+              *grid_clattice_ptr=rrr;
+              grid_clattice.push_back(grid_clattice_ptr);
+              grid_flattice_ptr = new xvector<double>(3);
+              *grid_flattice_ptr=ddd;
+              grid_flattice.push_back(grid_flattice_ptr);
             }
           }
         }
@@ -4701,16 +4730,16 @@ int PointGroup_HITS(xstructure &a,double _eps_) {
           for(ii=1;ii<=3;ii++) temp_flattice(3,ii)=(*grid_flattice[k])(ii);
           temp_clatticevol=abs(det(temp_clattice));
           if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {
-	    temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
-	    jj++;
-	    if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)
-	      if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)
-		if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)
-		  if(abs(clatticedata[4]-temp_clatticedata[4]) < _eps_angle_)
-		    if(abs(clatticedata[5]-temp_clatticedata[5]) < _eps_angle_)
-		      if(abs(clatticedata[6]-temp_clatticedata[6]) < _eps_angle_) {
-			count++;
-		      }
+            temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
+            jj++;
+            if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)
+              if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)
+                if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)
+                  if(abs(clatticedata[4]-temp_clatticedata[4]) < _eps_angle_)
+                    if(abs(clatticedata[5]-temp_clatticedata[5]) < _eps_angle_)
+                      if(abs(clatticedata[6]-temp_clatticedata[6]) < _eps_angle_) {
+                        count++;
+                      }
           }
         }
       }
@@ -4844,7 +4873,7 @@ namespace SYM {
 //
 namespace SYM {
   bool TransformSymmetryFromRealToReciprocal(ofstream &FileMESSAGE, xstructure& real_xstr, xstructure& reciprocal_xstr,
-                                             _aflags& aflags, const bool& osswrite, ostream& oss, string& pgroup_type){
+      _aflags& aflags, const bool& osswrite, ostream& oss, string& pgroup_type){
     ostringstream aus;
     xvector<double> ctau(3),ftau(3),ctrasl(3),ftrasl(3);                    // translation
     clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
@@ -4858,41 +4887,41 @@ namespace SYM {
 
     //pgroupk version
     if(pgroup_type == "pgroupk" && real_xstr.pgroup_calculated){
-    string message="PGROUP_KLATTICE";
+      string message="PGROUP_KLATTICE";
       // clean up pgroupk                                                     // just initialize
       reciprocal_xstr.pgroup.clear();
       reciprocal_xstr.pgroup_calculated=FALSE;                               // just initialize
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-    uint kk=0;
-    xmatrix<double> Uf, Uc;
+      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      uint kk=0;
+      xmatrix<double> Uf, Uc;
 
-    xmatrix<double> trasp_real_f2c = trasp(real_xstr.f2c);
-    xmatrix<double> trasp_real_c2f = trasp(real_xstr.c2f);
-    for(uint i=0;i<real_xstr.pgroup.size();i++){
-      //Uf = trasp_real_f2c*real_xstr.pgroup[i].Uc*trasp_real_c2f;
-      //Uc = reciprocal_xstr.f2c*Uf*reciprocal_xstr.c2f;
-      Uf = trasp(inverse(real_xstr.pgroup[i].Uf)); // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
-      Uc = real_xstr.pgroup[i].Uc; // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
-      kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
-      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup[kk-1].str_type
+      xmatrix<double> trasp_real_f2c = trasp(real_xstr.f2c);
+      xmatrix<double> trasp_real_c2f = trasp(real_xstr.c2f);
+      for(uint i=0;i<real_xstr.pgroup.size();i++){
+        //Uf = trasp_real_f2c*real_xstr.pgroup[i].Uc*trasp_real_c2f;
+        //Uc = reciprocal_xstr.f2c*Uf*reciprocal_xstr.c2f;
+        Uf = trasp(inverse(real_xstr.pgroup[i].Uf)); // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        Uc = real_xstr.pgroup[i].Uc; // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_,FALSE);  // kk number pgroups
+        aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup[kk-1].str_type
           << " theta=";
-      if(reciprocal_xstr.pgroup[kk-1].angle<100) aus << " ";
-      if(reciprocal_xstr.pgroup[kk-1].angle<10) aus << " ";
-      aus << reciprocal_xstr.pgroup[kk-1].angle << " " << " r=(" << reciprocal_xstr.pgroup[kk-1].axis << ")";
-      aus << "    HM=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup[kk-1].str_Hermann_Mauguin,2," ");     // remember vectors start from 0
-      aus << "    S=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup[kk-1].str_Schoenflies,2," ");          // remember vectors start from 0
-      aus << endl;  // remember vectors start from 0
+        if(reciprocal_xstr.pgroup[kk-1].angle<100) aus << " ";
+        if(reciprocal_xstr.pgroup[kk-1].angle<10) aus << " ";
+        aus << reciprocal_xstr.pgroup[kk-1].angle << " " << " r=(" << reciprocal_xstr.pgroup[kk-1].axis << ")";
+        aus << "    HM=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup[kk-1].str_Hermann_Mauguin,2," ");     // remember vectors start from 0
+        aus << "    S=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup[kk-1].str_Schoenflies,2," ");          // remember vectors start from 0
+        aus << endl;  // remember vectors start from 0
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+      }
+      for(uint k=0;k<reciprocal_xstr.pgroup.size();k++) {
+        Uc=reciprocal_xstr.pgroup[k].Uc;
+        Uf=reciprocal_xstr.pgroup[k].Uf;
+        roundoff(reciprocal_xstr.pgroup[k].Uc,_EPS_roundoff_);
+      }
+      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+      aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    }
-    for(uint k=0;k<reciprocal_xstr.pgroup.size();k++) {
-      Uc=reciprocal_xstr.pgroup[k].Uc;
-      Uf=reciprocal_xstr.pgroup[k].Uf;
-      roundoff(reciprocal_xstr.pgroup[k].Uc,_EPS_roundoff_);
-    }
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-    aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-    return true;
+      return true;
     }
     //pgroupk_xtal version
     else if(pgroup_type == "pgroupk_xtal" && real_xstr.pgroup_xtal_calculated){
@@ -4906,25 +4935,25 @@ namespace SYM {
       xmatrix<double> trasp_real_f2c = trasp(real_xstr.f2c);
       xmatrix<double> trasp_real_c2f = trasp(real_xstr.c2f);
       for(uint i=0;i<real_xstr.pgroup_xtal.size();i++){
-	//Uf = trasp_real_f2c*real_xstr.pgroup_xtal[i].Uc*trasp_real_c2f;
-	//Uc = reciprocal_xstr.f2c*Uf*reciprocal_xstr.c2f;
-	Uf = trasp(inverse(real_xstr.pgroup_xtal[i].Uf)); // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
-	Uc = real_xstr.pgroup_xtal[i].Uc; // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
-	kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_XTAL_,FALSE);  // kk number pgroups
-	aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup_xtal[kk-1].str_type
-	    << " theta=";
-	if(reciprocal_xstr.pgroup_xtal[kk-1].angle<100) aus << " ";
-	if(reciprocal_xstr.pgroup_xtal[kk-1].angle<10) aus << " ";
-	aus << reciprocal_xstr.pgroup_xtal[kk-1].angle << " " << " r=(" << reciprocal_xstr.pgroup_xtal[kk-1].axis << ")";
-	aus << "    HM=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup_xtal[kk-1].str_Hermann_Mauguin,2," ");     // remember vectors start from 0
-	aus << "    S=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup_xtal[kk-1].str_Schoenflies,2," ");          // remember vectors start from 0
-	aus << endl;  // remember vectors start from 0
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+        //Uf = trasp_real_f2c*real_xstr.pgroup_xtal[i].Uc*trasp_real_c2f;
+        //Uc = reciprocal_xstr.f2c*Uf*reciprocal_xstr.c2f;
+        Uf = trasp(inverse(real_xstr.pgroup_xtal[i].Uf)); // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        Uc = real_xstr.pgroup_xtal[i].Uc; // DX 9/5/17 - Faster/more direct calculation of reciprocal Uf (see D.E. Sands Vectors and Tensors in Cryst.)
+        kk=SYM::AddSymmetryToStructure(reciprocal_xstr,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_XTAL_,FALSE);  // kk number pgroups
+        aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " " << reciprocal_xstr.pgroup_xtal[kk-1].str_type
+          << " theta=";
+        if(reciprocal_xstr.pgroup_xtal[kk-1].angle<100) aus << " ";
+        if(reciprocal_xstr.pgroup_xtal[kk-1].angle<10) aus << " ";
+        aus << reciprocal_xstr.pgroup_xtal[kk-1].angle << " " << " r=(" << reciprocal_xstr.pgroup_xtal[kk-1].axis << ")";
+        aus << "    HM=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup_xtal[kk-1].str_Hermann_Mauguin,2," ");     // remember vectors start from 0
+        aus << "    S=" <<  aurostd::PaddedPRE(reciprocal_xstr.pgroup_xtal[kk-1].str_Schoenflies,2," ");          // remember vectors start from 0
+        aus << endl;  // remember vectors start from 0
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       }
       for(uint k=0;k<reciprocal_xstr.pgroup_xtal.size();k++) {
-	Uc=reciprocal_xstr.pgroup_xtal[k].Uc;
-	Uf=reciprocal_xstr.pgroup_xtal[k].Uf;
-	roundoff(reciprocal_xstr.pgroup_xtal[k].Uc,_EPS_roundoff_);
+        Uc=reciprocal_xstr.pgroup_xtal[k].Uc;
+        Uf=reciprocal_xstr.pgroup_xtal[k].Uf;
+        roundoff(reciprocal_xstr.pgroup_xtal[k].Uc,_EPS_roundoff_);
       }
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: unique point group operations " << reciprocal_xstr.pgroup_xtal.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << message << " Symmetry: END " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -5054,13 +5083,13 @@ namespace SYM {
       /*if(symOp.str_Hermann_Mauguin == "1" && abs(symOp.ftau[1])<=_ZERO_TOL_ && abs(symOp.ftau[2])<=_ZERO_TOL_ && abs(symOp.ftau[3])<=_ZERO_TOL_ ){
         tmp.fpos=atoms[k].fpos; //(Uf*atoms[k].fpos + ftau); // CO
         }
-        // === Else bring back in the cell === //
-        else {
-        tmp.fpos = (SYM::mod_one_xvec((symOp.Uf*atoms[k].fpos + symOp.ftau))); 
-        }
-        tmp.cpos = f2c*tmp.fpos; 
-        tmp.name = atoms[k].name;
-        tmp.type = atoms[k].type;*/
+      // === Else bring back in the cell === //
+      else {
+      tmp.fpos = (SYM::mod_one_xvec((symOp.Uf*atoms[k].fpos + symOp.ftau))); 
+      }
+      tmp.cpos = f2c*tmp.fpos; 
+      tmp.name = atoms[k].name;
+      tmp.type = atoms[k].type;*/
       // DX TEST
       uint mapped_index=0;
       if(MapAtomWithBasis(atoms, tmp, map_types, index_to_check, lattice, f2c, skew, tolerance, mapped_index,true)){ //DX 20190619 - lattice and f2c as input
@@ -5154,13 +5183,13 @@ namespace SYM {
       /*if(symOp.str_Hermann_Mauguin == "1" && abs(symOp.ftau[1])<=_ZERO_TOL_ && abs(symOp.ftau[2])<=_ZERO_TOL_ && abs(symOp.ftau[3])<=_ZERO_TOL_ ){
         tmp.fpos=atoms[k].fpos; //(Uf*atoms[k].fpos + ftau); // CO
         }
-        // === Else bring back in the cell === //
-        else {
-        tmp.fpos = (SYM::mod_one_xvec((symOp.Uf*atoms[k].fpos + symOp.ftau))); 
-        }
-        tmp.cpos = f2c*tmp.fpos; 
-        tmp.name = atoms[k].name;
-        tmp.type = atoms[k].type;*/
+      // === Else bring back in the cell === //
+      else {
+      tmp.fpos = (SYM::mod_one_xvec((symOp.Uf*atoms[k].fpos + symOp.ftau))); 
+      }
+      tmp.cpos = f2c*tmp.fpos; 
+      tmp.name = atoms[k].name;
+      tmp.type = atoms[k].type;*/
       // DX TEST
       if(MapAtom(atoms,tmp,map_types,lattice,f2c,skew,tolerance)){ //DX 20190619 - lattice and f2c as input
         transformedcrystal.push_back(tmp);
@@ -5321,8 +5350,9 @@ namespace SYM {
         symOp.ctau=a.f2c*symOp.ftau;
         if(LDEBUG) {cerr << "DEBUG: SYM::CalculateFactorGroup about to test symop" << endl;}
         // CO - END
-        //if(getFullSymBasis(a.atoms,a.pgroup[pg].Uf,a.c2f,a.f2c,a.pgroup[pg].str_Hermann_Mauguin,symOp.ftau,skew,_eps_,basis_atoms_map,basis_types_map)){
-        if(getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,TRUE,skew,_eps_,basis_atoms_map,basis_types_map)){
+        //if(getFullSymBasis(a.atoms,a.pgroup[pg].Uf,a.c2f,a.f2c,a.pgroup[pg].str_Hermann_Mauguin,symOp.ftau,skew,_eps_,basis_atoms_map,basis_types_map))
+        if(getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,TRUE,skew,_eps_,basis_atoms_map,basis_types_map))
+        { //CO200106 - patching for auto-indenting
           //Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=symOp.ftau; // for safety try to check out inverse
           //DX 20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau=mod_one_xvec(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[
           BringInCellInPlace(symOp.ftau);  // moves fractional coordinates to [0.0 to 1.0[ //DX 20190905 - uses new BringInCell function
@@ -5335,8 +5365,8 @@ namespace SYM {
           sym_found=FALSE;
           for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++){
             sym_found=(aurostd::identical(symOp.Uf,a.fgroup[ii].Uf) &&   // DX 12/7/17 - Use xmatrix identical eps
-                       aurostd::identical(symOp.ctau,a.fgroup[ii].ctau,_eps_) && // DX 12/7/17 - Use ctau not ftau
-                       aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // look in all the list of operations
+                aurostd::identical(symOp.ctau,a.fgroup[ii].ctau,_eps_) && // DX 12/7/17 - Use ctau not ftau
+                aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // look in all the list of operations
           }
           if(sym_found==FALSE) {                                          // new operation, generate and save it
             uint kk;
@@ -5425,12 +5455,12 @@ namespace SYM {
     a.fgroup_calculated=FALSE;
 
     vector<xvector<double> > vfshifts;vfshifts.clear();
-  
+
     // prepare all the possible shifts
 
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  
+
     // 143  Cu2S3Si1_ICSD_24132 ICSD_24132    HEX
     // 144  Te1Zn1_ICSD_80076                 HEX    OK *************
     // 147  451  hP9                                 OK *************
@@ -5445,76 +5475,78 @@ namespace SYM {
     xvector<double> corigin,forigin;
     //  corigin=a.atoms[0].cpos;
     // forigin=a.atoms[0].fpos;
-  
+
     //  double radius=RadiusSphereLattice(a.lattice);  // smarter !
     fshift.clear();  vfshifts.push_back(fshift); // no translation is always good translation    // 120710 Stefano...
 
     double ops[]={0.0,1./4,1./2,3./4,1./3,2./3,1./6,5./6,1.0,-1./4,-1./2,-3./4,-1./3,-2./3,-1./6,-5./6,-1.0};  // they are 15 0--14
     if(0)
       for(int ic=0;ic<17;ic++)
-	for(int jc=0;jc<17;jc++)
-	  for(int kc=0;kc<17;kc++) {
-	    fshift[1]=ops[ic];fshift[2]=ops[jc];fshift[3]=ops[kc];
-	    if(0) vfshifts.push_back(fshift);
-	    if(1) {
-	      // fshift=BringInCell(fshift);
-	      for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++)
-		sym_found=identical(fshift,vfshifts.at(ii),_eps_);  // look in all the list of operations
-	      if(sym_found==FALSE) vfshifts.push_back(fshift);
-	    }
-	  }
-  
+        for(int jc=0;jc<17;jc++)
+          for(int kc=0;kc<17;kc++) {
+            fshift[1]=ops[ic];fshift[2]=ops[jc];fshift[3]=ops[kc];
+            if(0) vfshifts.push_back(fshift);
+            if(1) {
+              // fshift=BringInCell(fshift);
+              for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++)
+                sym_found=identical(fshift,vfshifts.at(ii),_eps_);  // look in all the list of operations
+              if(sym_found==FALSE) vfshifts.push_back(fshift);
+            }
+          }
+
     if(0) {
       int ijk=2;
       for(int ic=-ijk;ic<=ijk;ic++)
-	for(int jc=-ijk;jc<=ijk;jc++)
-	  for(int kc=-ijk;kc<=ijk;kc++)
-	    for(uint i=0;i<a.atoms.size();i++) {
-	      fshift[1]=(double)ic;fshift[2]=(double)jc;fshift[3]=(double)kc;
-	      vfshifts.push_back(fshift);
-	    }
+        for(int jc=-ijk;jc<=ijk;jc++)
+          for(int kc=-ijk;kc<=ijk;kc++)
+            for(uint i=0;i<a.atoms.size();i++) {
+              fshift[1]=(double)ic;fshift[2]=(double)jc;fshift[3]=(double)kc;
+              vfshifts.push_back(fshift);
+            }
     }
-  
+
     if(1) {
       for(uint pg=0;pg<a.pgroup.size();pg++) {
-	xstructure b(a);
-	b=SYM::ApplyXstructure(a.pgroup[pg],a,FALSE);
-	b.BringInCell(_eps_);
-	// try to map a in b
-	for(uint iat=0;iat<a.atoms.size();iat++)
-	  for(uint jat=0;jat<b.atoms.size();jat++) {
-	    if(a.atoms.size()<1000) {
-	      //  if(a.atoms[iat].type==b.atoms[jat].type  && iat==0) { // shifts must work for all atoms, so it must work for atom0 too. TRY ALL OF FEW ATOMS Jan2012
-	      if(a.atoms[iat].type==b.atoms[jat].type) { // shifts must work for all atoms, but picking them all helps to find more..
-		fshift=a.atoms[iat].fpos-b.atoms[jat].fpos; sym_found=FALSE;
-		fshift=BringInCell(fshift,_eps_/20.0);
-		// fshift=BringInCell2(fshift);
-		// fshift=BringInCell2(fshift,0.01);
-		for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++) sym_found=identical(fshift,vfshifts.at(ii),_eps_/10.0);  // look in all the list of operations
-		if(sym_found==FALSE) { vfshifts.push_back(fshift);}
-	      }
-	    } else {
-	      if(a.atoms[iat].type==b.atoms[jat].type  && iat==0) { // shifts must work for all atoms, so it must work for atom0 too. TRY ONLY ONE Jan2012
-		// if(a.atoms[iat].type==b.atoms[jat].type) { // shifts must work for all atoms, but picking them all helps to find more..
-		fshift=a.atoms[iat].fpos-b.atoms[jat].fpos; sym_found=FALSE;
-		fshift=BringInCell(fshift,_eps_/20.0);
-		// fshift=BringInCell2(fshift);
-		for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++) sym_found=identical(fshift,vfshifts.at(ii),_eps_/10.0);  // look in all the list of operations
-		if(sym_found==FALSE) { vfshifts.push_back(fshift);}
-	      }
-	    }
-	  }
+        xstructure b(a);
+        b=SYM::ApplyXstructure(a.pgroup[pg],a,FALSE);
+        b.BringInCell(_eps_);
+        // try to map a in b
+        for(uint iat=0;iat<a.atoms.size();iat++)
+          for(uint jat=0;jat<b.atoms.size();jat++) {
+            if(a.atoms.size()<1000) {
+              //  if(a.atoms[iat].type==b.atoms[jat].type  && iat==0) // shifts must work for all atoms, so it must work for atom0 too. TRY ALL OF FEW ATOMS Jan2012
+              if(a.atoms[iat].type==b.atoms[jat].type) // shifts must work for all atoms, but picking them all helps to find more..
+              { //CO200106 - patching for auto-indenting
+                fshift=a.atoms[iat].fpos-b.atoms[jat].fpos; sym_found=FALSE;
+                fshift=BringInCell(fshift,_eps_/20.0);
+                // fshift=BringInCell2(fshift);
+                // fshift=BringInCell2(fshift,0.01);
+                for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++) sym_found=identical(fshift,vfshifts.at(ii),_eps_/10.0);  // look in all the list of operations
+                if(sym_found==FALSE) { vfshifts.push_back(fshift);}
+              }
+            } else {
+              if(a.atoms[iat].type==b.atoms[jat].type  && iat==0) // shifts must work for all atoms, so it must work for atom0 too. TRY ONLY ONE Jan2012
+                // if(a.atoms[iat].type==b.atoms[jat].type) // shifts must work for all atoms, but picking them all helps to find more..
+              { //CO200106 - patching for auto-indenting
+                fshift=a.atoms[iat].fpos-b.atoms[jat].fpos; sym_found=FALSE;
+                fshift=BringInCell(fshift,_eps_/20.0);
+                // fshift=BringInCell2(fshift);
+                for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++) sym_found=identical(fshift,vfshifts.at(ii),_eps_/10.0);  // look in all the list of operations
+                if(sym_found==FALSE) { vfshifts.push_back(fshift);}
+              }
+            }
+          }
       }
     }
-  
+
     //  cerr << vfshifts.size() << endl; exit(0);
-  
+
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
       //   aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  
+
     // all symmetry operations are done within the fractional coordinate system
     // since translations back into the unit cell are straightforward
     // for each point group operation, apply it to the crystal and store the transformed
@@ -5525,83 +5557,83 @@ namespace SYM {
       // make this so I do not have to reproduce all the time
       atoms_rotated.clear();
       for(uint i=0;i<a.atoms.size();i++) {
-	hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE); // store transformed atoms... for speed
-	atoms_rotated.push_back(hatom);
+        hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE); // store transformed atoms... for speed
+        atoms_rotated.push_back(hatom);
       }
       for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
-	//     cerr << vfshifts.at(ifshift) << endl;
-	// consider all internal shifts that move an atom of the original structure to an atom of the transformed structure.
-	// Then see if that translation maps the transformed crystal onto the original crystal.
-	// create a basis_atoms_map and basis_types_map vector graph
-	// operation is a.pgroup[pg]+vfshifts.at(ifshift)
-	fshift=vfshifts.at(ifshift);     //      fshift=a.atoms[i].fpos-atoms_rotated[j].fpos; // try a translation
-	// clean up basis mapping
-	for(uint n=0;n<a.atoms.size();n++) { basis_atoms_map[n]=0; basis_types_map[n]=0; }
-	//	if(LDEBUG) cerr << "basis_atoms_map.size()=" << basis_atoms_map.size() << endl;
-	//	if(LDEBUG) cerr << "basis_types_map.size()=" << basis_types_map.size() << endl;
-      
-	num_suc_maps=0; // we store the number of successful maps with the same fshift
-	for(uint n=0;n<a.atoms.size();n++) {
-	  for(uint m=0;m<atoms_rotated.size();m++) {
-	    if(a.atoms[n].type==atoms_rotated[m].type) { // we fshift them all
-	      temp=a.atoms[n].fpos-atoms_rotated[m].fpos-fshift;
-	      //	temp=BringInCell(temp,_eps_); // moves fractional coordinates to [0.0 to 1.0[
-	      temp=BringInCell2(temp); // moves fractional coordinates to [0.0 to 1.0[
-	      if(abs(temp[1])<_eps_ && abs(temp[2])<_eps_ && abs(temp[3])<_eps_) {
-		num_suc_maps++;
-		basis_atoms_map[atoms_rotated[m].basis]=a.atoms[n].basis;
-		basis_types_map[atoms_rotated[m].basis]=a.atoms[n].type;
-	      }
-	    }
-	  }
-	}    
-	if(abs(fshift[1])<_eps_ && abs(fshift[2])<_eps_ && abs(fshift[3])<_eps_ && num_suc_maps==2*a.atoms.size()) num_suc_maps=a.atoms.size();  // 120710 Stefano...
-	// cerr << vfshifts.at(ifshift) << " " << num_suc_maps/2 << endl;
-	// 	    if(0) if(modulus(BringInCell(temp,_eps_)-BringInCell2(temp))>0.1) {
-	// 		cerr << "ERROR" << endl;
-	// 		cerr << "temp =" << temp << endl;
-	// 		cerr << "BringInCell(temp)=" << BringInCell(temp) << endl;
-	// 		cerr << "BringInCell2(temp)=" << BringInCell2(temp) << endl;
-	// 		exit(0);
-	// 	    }
-      
-	if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
-	  // check whether the symmetry operation already exists in the factorgroup array
-	  Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift; // for safety try to check out inverse                                  
-	  //	  if(iorder==1) {Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf);ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
-	  ftau=BringInCell2(ftau);  // moves fractional coordinates to [0.0 to 1.0[
-	  for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
-	  ctau=f2c*ftau;clear(ctrasl);clear(ftrasl);
-	  sym_found=FALSE;
-	  //	  cerr << "FOUND CANDIDATE" << endl;
-	  for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
-	    // 2010-07-11	  //
-	    sym_found=(aurostd::identical(Uf,a.fgroup[ii].Uf,_eps_) && aurostd::identical(ftau,a.fgroup[ii].ftau,_eps_) && aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // look in all the list of operations
-	  //	  sym_found=((aurostd::identical(Uf,a.fgroup[ii].Uf,_eps_) && aurostd::identical(ftau,a.fgroup[ii].ftau,_eps_)) || aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // if basis identical then simple translation of bravais
-	  // if the symmetry operation is new, add it to the factorgroup array
-	  // and update all info about the sym_op object
-	  if(sym_found==FALSE) {                                          // new operation, generate and save it
-	    uint kk;
-	    kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-	    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
-	    aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
-	    aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
-	    // aus	<< "  fshift=(" << fshift << ")  ";
-	    aus	<< "  ftau=(" << a.fgroup[kk-1].ftau << ")   ";
-	    aus << " basis_atoms_map = [ "; for(uint n=0;n<a.fgroup[kk-1].basis_atoms_map.size();n++) aus << a.fgroup[kk-1].basis_atoms_map[n] << " "; aus << "] ";
-	    //  aus << " basis_types_map = [ "; for(uint n=0;n<a.fgroup[kk-1].basis_types_map.size();n++) aus << a.fgroup[kk-1].basis_types_map[n] << " "; aus << "] ";
-	    //	  if(iorder==0) aus << " (found) ";
-	    // if(iorder==1) aus << " (inverted) ";
-	    aus << endl;  // remember vectors start from 0
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-	    // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
-	    // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
-	  }
-	}
+        //     cerr << vfshifts.at(ifshift) << endl;
+        // consider all internal shifts that move an atom of the original structure to an atom of the transformed structure.
+        // Then see if that translation maps the transformed crystal onto the original crystal.
+        // create a basis_atoms_map and basis_types_map vector graph
+        // operation is a.pgroup[pg]+vfshifts.at(ifshift)
+        fshift=vfshifts.at(ifshift);     //      fshift=a.atoms[i].fpos-atoms_rotated[j].fpos; // try a translation
+        // clean up basis mapping
+        for(uint n=0;n<a.atoms.size();n++) { basis_atoms_map[n]=0; basis_types_map[n]=0; }
+        //	if(LDEBUG) cerr << "basis_atoms_map.size()=" << basis_atoms_map.size() << endl;
+        //	if(LDEBUG) cerr << "basis_types_map.size()=" << basis_types_map.size() << endl;
+
+        num_suc_maps=0; // we store the number of successful maps with the same fshift
+        for(uint n=0;n<a.atoms.size();n++) {
+          for(uint m=0;m<atoms_rotated.size();m++) {
+            if(a.atoms[n].type==atoms_rotated[m].type) { // we fshift them all
+              temp=a.atoms[n].fpos-atoms_rotated[m].fpos-fshift;
+              //	temp=BringInCell(temp,_eps_); // moves fractional coordinates to [0.0 to 1.0[
+              temp=BringInCell2(temp); // moves fractional coordinates to [0.0 to 1.0[
+              if(abs(temp[1])<_eps_ && abs(temp[2])<_eps_ && abs(temp[3])<_eps_) {
+                num_suc_maps++;
+                basis_atoms_map[atoms_rotated[m].basis]=a.atoms[n].basis;
+                basis_types_map[atoms_rotated[m].basis]=a.atoms[n].type;
+              }
+            }
+          }
+        }    
+        if(abs(fshift[1])<_eps_ && abs(fshift[2])<_eps_ && abs(fshift[3])<_eps_ && num_suc_maps==2*a.atoms.size()) num_suc_maps=a.atoms.size();  // 120710 Stefano...
+        // cerr << vfshifts.at(ifshift) << " " << num_suc_maps/2 << endl;
+        // 	    if(0) if(modulus(BringInCell(temp,_eps_)-BringInCell2(temp))>0.1) {
+        // 		cerr << "ERROR" << endl;
+        // 		cerr << "temp =" << temp << endl;
+        // 		cerr << "BringInCell(temp)=" << BringInCell(temp) << endl;
+        // 		cerr << "BringInCell2(temp)=" << BringInCell2(temp) << endl;
+        // 		exit(0);
+        // 	    }
+
+        if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
+          // check whether the symmetry operation already exists in the factorgroup array
+          Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift; // for safety try to check out inverse                                  
+          //	  if(iorder==1) {Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf);ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
+          ftau=BringInCell2(ftau);  // moves fractional coordinates to [0.0 to 1.0[
+          for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
+          ctau=f2c*ftau;clear(ctrasl);clear(ftrasl);
+          sym_found=FALSE;
+          //	  cerr << "FOUND CANDIDATE" << endl;
+          for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
+            // 2010-07-11	  //
+            sym_found=(aurostd::identical(Uf,a.fgroup[ii].Uf,_eps_) && aurostd::identical(ftau,a.fgroup[ii].ftau,_eps_) && aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // look in all the list of operations
+          //	  sym_found=((aurostd::identical(Uf,a.fgroup[ii].Uf,_eps_) && aurostd::identical(ftau,a.fgroup[ii].ftau,_eps_)) || aurostd::identical(basis_atoms_map,a.fgroup[ii].basis_atoms_map,0)); // if basis identical then simple translation of bravais
+          // if the symmetry operation is new, add it to the factorgroup array
+          // and update all info about the sym_op object
+          if(sym_found==FALSE) {                                          // new operation, generate and save it
+            uint kk;
+            kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
+            aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
+            aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
+            aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
+            // aus	<< "  fshift=(" << fshift << ")  ";
+            aus	<< "  ftau=(" << a.fgroup[kk-1].ftau << ")   ";
+            aus << " basis_atoms_map = [ "; for(uint n=0;n<a.fgroup[kk-1].basis_atoms_map.size();n++) aus << a.fgroup[kk-1].basis_atoms_map[n] << " "; aus << "] ";
+            //  aus << " basis_types_map = [ "; for(uint n=0;n<a.fgroup[kk-1].basis_types_map.size();n++) aus << a.fgroup[kk-1].basis_types_map[n] << " "; aus << "] ";
+            //	  if(iorder==0) aus << " (found) ";
+            // if(iorder==1) aus << " (inverted) ";
+            aus << endl;  // remember vectors start from 0
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+            // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
+            // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
+          }
+        }
       }
       atoms_rotated.clear();
     }
-    
+
     // ------------------------------------------------------------------------------
     a.fgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
@@ -5609,16 +5641,16 @@ namespace SYM {
     if(1) {
       uint unities=0;
       for(uint ii=0;ii<a.fgroup.size();ii++)
-	if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf,_eps_/10.0)) {unities++;}    // check unity 0 is always unity
+        if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf,_eps_/10.0)) {unities++;}    // check unity 0 is always unity
       if(unities>1) {
-	aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
-	aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+        aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: Cell not primitive: as big as " << unities << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
       }
       for(uint ii=0+1;ii<a.fgroup.size();ii++) // avoid origin
-	if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf,_eps_/10.0)) {
-	  aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
-	  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-	}
+        if(aurostd::identical(a.fgroup[ii].Uf,a.fgroup[0].Uf,_eps_/10.0)) {
+          aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: non-primitive internal translation ftau=(" << a.fgroup[ii].ftau << ") " << endl;  
+          aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+        }
     }
     // Printing and leaving
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: unique factor group operations " << a.fgroup.size() << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -5650,7 +5682,7 @@ namespace SYM {
     // JOSE BUG a.BringInWignerSeitz();
 
     a.FixLattices();a.BringInCell();
- 
+
     xmatrix<double> f2c(3,3);f2c=trasp(a.lattice);
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
 
@@ -5668,7 +5700,7 @@ namespace SYM {
 
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  
+
     // 143  Cu2S3Si1_ICSD_24132 ICSD_24132    HEX
     // 144  Te1Zn1_ICSD_80076                 HEX    OK *************
     // 147  451  hP9                                 OK *************
@@ -5683,7 +5715,7 @@ namespace SYM {
     xvector<double> corigin,forigin;
     //  corigin=a.atoms[0].cpos;
     // forigin=a.atoms[0].fpos;
-  
+
     double radius=RadiusSphereLattice(a.lattice);  // smarter !
 
     if(2) {
@@ -5695,40 +5727,41 @@ namespace SYM {
       // 	}
 
       for(uint pg=0;pg<a.pgroup.size();pg++) {
-	for(uint j=0;j<a.atoms.size();j++) { // stefano
-	  //	hatom=SYM::ApplyAtom(a.atoms[j],a.pgroup[pg],a,FALSE);
-	  hatom=a.atoms[j];
-	  hatom.cpos=a.pgroup[pg].Uc*(a.atoms[j].cpos-corigin)+corigin;
-	  hatom.fpos=a.pgroup[pg].Uf*(a.atoms[j].fpos-forigin)+forigin;
-	  for(uint i=0;i<a.atoms.size();i++)  //stefano
-	    if(a.atoms[i].type==a.atoms[j].type) { // && a.atoms[i].type==a.atoms[0].type) { // I can choose the one with fewer atoms..
-	      cshift=a.atoms[i].cpos-hatom.cpos;
+        for(uint j=0;j<a.atoms.size();j++) { // stefano
+          //	hatom=SYM::ApplyAtom(a.atoms[j],a.pgroup[pg],a,FALSE);
+          hatom=a.atoms[j];
+          hatom.cpos=a.pgroup[pg].Uc*(a.atoms[j].cpos-corigin)+corigin;
+          hatom.fpos=a.pgroup[pg].Uf*(a.atoms[j].fpos-forigin)+forigin;
+          for(uint i=0;i<a.atoms.size();i++)  //stefano
+            if(a.atoms[i].type==a.atoms[j].type) // && a.atoms[i].type==a.atoms[0].type) // I can choose the one with fewer atoms..
+            { //CO200106 - patching for auto-indenting
+              cshift=a.atoms[i].cpos-hatom.cpos;
 
-	      if(modulus(cshift)<=radius+0.0001) {
-		fshift=c2f*cshift;
-		//   fshift=BringInCell(fshift);
-		//	    if(abs(fshift[1])<0.001 || fshift[1]>0.999) fshift[1]=0.0;
-		//  if(abs(fshift[2])<0.001 || fshift[2]>0.999) fshift[2]=0.0;
-		//  if(abs(fshift[3])<0.001 || fshift[3]>0.999) fshift[3]=0.0;
-		sym_found=FALSE;
-		//  fshift=BringInCell(fshift/3.0);
-		for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++)
-		  sym_found=identical(fshift,vfshifts.at(ii),_eps_);  // look in all the list of operations
-		if(sym_found==FALSE) vfshifts.push_back(fshift);
-	      }
-	    }
-	}
+              if(modulus(cshift)<=radius+0.0001) {
+                fshift=c2f*cshift;
+                //   fshift=BringInCell(fshift);
+                //	    if(abs(fshift[1])<0.001 || fshift[1]>0.999) fshift[1]=0.0;
+                //  if(abs(fshift[2])<0.001 || fshift[2]>0.999) fshift[2]=0.0;
+                //  if(abs(fshift[3])<0.001 || fshift[3]>0.999) fshift[3]=0.0;
+                sym_found=FALSE;
+                //  fshift=BringInCell(fshift/3.0);
+                for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++)
+                  sym_found=identical(fshift,vfshifts.at(ii),_eps_);  // look in all the list of operations
+                if(sym_found==FALSE) vfshifts.push_back(fshift);
+              }
+            }
+        }
       }
     }
     cerr << vfshifts.size() << endl;
     //  exit(0);
-  
+
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
       // aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
     }
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  
+
     // all symmetry operations are done within the fractional coordinate system
     // since translations back into the unit cell are straightforward
     // for each point group operation, apply it to the crystal and store the transformed
@@ -5738,71 +5771,71 @@ namespace SYM {
       // make this so I do not have to reproduce all the time
       atoms_rotated.clear();
       for(uint i=0;i<a.atoms.size();i++) {
-	//     hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE); // store transformed atoms... for speed
-	hatom=a.atoms[i];
-	hatom.cpos=a.pgroup[pg].Uc*(a.atoms[i].cpos-corigin)+corigin;
-	hatom.fpos=a.pgroup[pg].Uf*(a.atoms[i].fpos-forigin)+forigin;
-	atoms_rotated.push_back(hatom);
+        //     hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE); // store transformed atoms... for speed
+        hatom=a.atoms[i];
+        hatom.cpos=a.pgroup[pg].Uc*(a.atoms[i].cpos-corigin)+corigin;
+        hatom.fpos=a.pgroup[pg].Uf*(a.atoms[i].fpos-forigin)+forigin;
+        atoms_rotated.push_back(hatom);
       }
       for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
-	// consider all internal shifts that move an atom of the original structure to an atom of the transformed structure.
-	// Then see if that translation maps the transformed crystal onto the original crystal.
-	// create a basis_atoms_map basis_types_map vector graph
-	// operation is a.pgroup[pg]+vfshifts.at(ifshift)
-	fshift=vfshifts.at(ifshift);     //      fshift=a.atoms[i].fpos-atoms_rotated[j].fpos; // try a translation
-	// clean up basis mapping
-	for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
-	for(uint n=0;n<a.atoms.size();n++) { basis_atoms_map[n]=0; basis_types_map[n]=0; }
-      
-	num_suc_maps=0; // we store the number of successful maps with the same fshift
-	for(uint n=0;n<a.atoms.size();n++) {
-	  for(uint m=0;m<atoms_rotated.size();m++) {
-	    if(a.atoms[n].type==atoms_rotated[m].type) { // we fshift them all
-	      temp=a.atoms[n].fpos-atoms_rotated[m].fpos-fshift;
-	      temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
-	      if(modulus(temp)<1.001*sqrt(3)*_eps_) {
-		num_suc_maps++;
-		basis_atoms_map[atoms_rotated[m].basis]=a.atoms[n].basis;
-		basis_types_map[atoms_rotated[m].basis]=a.atoms[n].type;
-	      }
-	    }
-	  }
-	}    
+        // consider all internal shifts that move an atom of the original structure to an atom of the transformed structure.
+        // Then see if that translation maps the transformed crystal onto the original crystal.
+        // create a basis_atoms_map basis_types_map vector graph
+        // operation is a.pgroup[pg]+vfshifts.at(ifshift)
+        fshift=vfshifts.at(ifshift);     //      fshift=a.atoms[i].fpos-atoms_rotated[j].fpos; // try a translation
+        // clean up basis mapping
+        for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
+        for(uint n=0;n<a.atoms.size();n++) { basis_atoms_map[n]=0; basis_types_map[n]=0; }
 
-	if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
-	  uint iorder=0;
-	  for(iorder=0;iorder<1;iorder++)
-	    {
-	      // check whether the symmetry operation already exists in the factorgroup array
-	      if(iorder==0) {Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift;} // for safety try to check out inverse                                  
-	      //	  if(iorder==1) {Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf);ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
-	      ftau=BringInCell(ftau);  // moves fractional coordinates to [0.0 to 1.0[
-	      for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
-	      ctau=f2c*ftau;clear(ctrasl);clear(ftrasl);
-	      sym_found=FALSE;
-	      for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
-		sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) && identical(ftau,a.fgroup[ii].ftau,_eps_));  // look in all the list of operations
-	      // if the symmetry operation is new, add it to the factorgroup array
-	      // and update all info about the sym_op object
-	      if(sym_found==FALSE) {                                          // new operation, generate and save it
-		uint kk;
-		kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-		aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
-		aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
-		aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
-		aus	<< "  fshift=(" << a.fgroup[kk-1].ftau << ")  ";
-		for(uint n=0;n<a.fgroup[kk-1].basis_atoms_map.size();n++) aus << a.fgroup[kk-1].basis_atoms_map[n] << " ";
-		aus << "  ";
-		//  for(uint n=0;n<a.fgroup[kk-1].basis_types_map.size();n++) aus << a.fgroup[kk-1].basis_types_map[n] << " ";
-		if(iorder==0) aus << " (found) ";
-		if(iorder==1) aus << " (inverted) ";
-		aus << endl;  // remember vectors start from 0
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-		// for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
-		// for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
-	      }
-	    }
-	}
+        num_suc_maps=0; // we store the number of successful maps with the same fshift
+        for(uint n=0;n<a.atoms.size();n++) {
+          for(uint m=0;m<atoms_rotated.size();m++) {
+            if(a.atoms[n].type==atoms_rotated[m].type) { // we fshift them all
+              temp=a.atoms[n].fpos-atoms_rotated[m].fpos-fshift;
+              temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
+              if(modulus(temp)<1.001*sqrt(3)*_eps_) {
+                num_suc_maps++;
+                basis_atoms_map[atoms_rotated[m].basis]=a.atoms[n].basis;
+                basis_types_map[atoms_rotated[m].basis]=a.atoms[n].type;
+              }
+            }
+          }
+        }    
+
+        if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
+          uint iorder=0;
+          for(iorder=0;iorder<1;iorder++)
+          {
+            // check whether the symmetry operation already exists in the factorgroup array
+            if(iorder==0) {Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift;} // for safety try to check out inverse                                  
+            //	  if(iorder==1) {Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf);ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
+            ftau=BringInCell(ftau);  // moves fractional coordinates to [0.0 to 1.0[
+            for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
+            ctau=f2c*ftau;clear(ctrasl);clear(ftrasl);
+            sym_found=FALSE;
+            for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
+              sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) && identical(ftau,a.fgroup[ii].ftau,_eps_));  // look in all the list of operations
+            // if the symmetry operation is new, add it to the factorgroup array
+            // and update all info about the sym_op object
+            if(sym_found==FALSE) {                                          // new operation, generate and save it
+              uint kk;
+              kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
+              aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type;
+              aus << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
+              aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")";
+              aus	<< "  fshift=(" << a.fgroup[kk-1].ftau << ")  ";
+              for(uint n=0;n<a.fgroup[kk-1].basis_atoms_map.size();n++) aus << a.fgroup[kk-1].basis_atoms_map[n] << " ";
+              aus << "  ";
+              //  for(uint n=0;n<a.fgroup[kk-1].basis_types_map.size();n++) aus << a.fgroup[kk-1].basis_types_map[n] << " ";
+              if(iorder==0) aus << " (found) ";
+              if(iorder==1) aus << " (inverted) ";
+              aus << endl;  // remember vectors start from 0
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+              // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
+              // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
+            }
+          }
+        }
       }
       atoms_rotated.clear();
     }
@@ -5833,9 +5866,9 @@ namespace SYM {
     // 	hatom.cpos=Uc*a.atoms[i].cpos;hatom.fpos=Uf*a.atoms[i].fpos;
     // 	atoms_rotated.push_back(hatom);
     //       }
-      
+
     //       {
-    //  //    for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
+    //  //    for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano  //[CO200106 - close bracket for indenting]}
     // //       fshift=vfshifts.at(ifshift);     //      fshift=a.atoms[i].fpos-atoms_rotated[j].fpos; // try a translation
 
 
@@ -5883,7 +5916,7 @@ namespace SYM {
 
     //     }
     //   }
-    
+
     // ------------------------------------------------------------------------------
     a.fgroup_calculated=TRUE;
     // ------------------------------------------------------------------------------
@@ -5899,8 +5932,9 @@ namespace SYM {
 
 
 namespace SYM {
-  //bool CalculateFactorGroup_20100202(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss) {
-  bool _CalculateFactorGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss) {
+  //bool CalculateFactorGroup_20100202(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss)
+  bool _CalculateFactorGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss)
+  { //CO200106 - patching for auto-indenting
     // ------------------------------------------------------------------------------
     // Some of this routine is taken from AVDV structure::calc_factor_group() code.
     // SC made modificatios for speed and consistency with aflow architecture
@@ -5916,7 +5950,7 @@ namespace SYM {
     // lattice fix to reduce the number of tested operations
     // (JOSE BUG) if(a.LatticeReduction_avoid==FALSE) a.LatticeReduction(); // better not repeat. but it is checked in
     a.FixLattices();a.BringInCell();
-    
+
     xmatrix<double> f2c(3,3);f2c=trasp(a.lattice);
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
@@ -5931,18 +5965,18 @@ namespace SYM {
     vector<xvector<double> > vfshifts;
     for(int ic=-ijk;ic<=ijk;ic++)
       for(int jc=-ijk;jc<=ijk;jc++)
-	for(int kc=-ijk;kc<=ijk;kc++)
-	  for(uint i=0;i<a.atoms.size();i++) {
-	    if(a.atoms[i].type==a.atoms[0].type) {  // a reference type (fgroup must work for all the atoms)
-	      //fshift=a.atoms[i].fpos-atomlist[j].fpos; // try a translation
-	      fshift=a.atoms[i].fpos;
-	      fshift[1]+=(double)ic;fshift[2]+=(double)jc;fshift[3]+=(double)kc;
-	      //	vfshifts.push_back(BringInCell(fshift));
-	      vfshifts.push_back(fshift);
-	    }
-	  }
+        for(int kc=-ijk;kc<=ijk;kc++)
+          for(uint i=0;i<a.atoms.size();i++) {
+            if(a.atoms[i].type==a.atoms[0].type) {  // a reference type (fgroup must work for all the atoms)
+              //fshift=a.atoms[i].fpos-atomlist[j].fpos; // try a translation
+              fshift=a.atoms[i].fpos;
+              fshift[1]+=(double)ic;fshift[2]+=(double)jc;fshift[3]+=(double)kc;
+              //	vfshifts.push_back(BringInCell(fshift));
+              vfshifts.push_back(fshift);
+            }
+          }
     fshift.clear();
-  
+
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
@@ -5957,70 +5991,70 @@ namespace SYM {
     for(uint pg=0;pg<a.pgroup.size();pg++) {
       std::deque<_atom> atomlist;
       for(uint i=0;i<a.atoms.size();i++) {
-	hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
-	atomlist.push_back(hatom);                  // store transformed str
+        hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
+        atomlist.push_back(hatom);                  // store transformed str
       }
       // consider all internal shifts that move an atom of the original structure (e.g. the first
       // atom) to an atom of the transformed structure. Then see if that translation maps the
       // transformed crystal onto the original crystal.
       // create a basis_atoms_map basis_types_map  vector graph
       for(uint i=0;i<a.atoms.size();i++) { // try all the possible operations
-	if(a.atoms[i].type==a.atoms[0].type) {  // fix type
-	  for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
-	    // clean up basis mapping
-	    for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
-	    for(uint n=0;n<a.atoms.size();n++) basis_types_map[n]=0;
-	    fshift=vfshifts.at(ifshift)-atomlist[i].fpos; // try a translation
-	    // cerr << fshift << " type1=" << a.atoms[iref].type << " type2=" << atomlist[i].type << endl;
-	    num_suc_maps=0; // we store the number of successful maps with the same fshift
-	    for(uint n=0;n<a.atoms.size();n++) {
-	      for(uint m=0;m<atomlist.size();m++) {
-		if(a.atoms[n].type==atomlist[m].type) {
-		  // we fshift them all
-		  temp=a.atoms[n].fpos-atomlist[m].fpos-fshift;
-		  temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
-		  if(abs(temp[1])<0.005 && abs(temp[2])<0.005 && abs(temp[3])<0.005) {
-		    num_suc_maps++;
-		    basis_atoms_map[atomlist[m].basis]=a.atoms[n].basis;
-		    basis_types_map[atomlist[m].basis]=a.atoms[n].type;
-		  }
-		}
-	      }
-	    }    
-	    if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
-	      cerr << "FOUND" << endl;
-	      // for(uint i=1;i<=2;i++)
-	      {
-		// check whether the symmetry operation already exists in the factorgroup array
-		//		if(i==1)
-		{ Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift;}
-		//	if(i==2) { Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf); ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
-		ftau=BringInCell(ftau);  // moves fractional coordinates to [0.0 to 1.0[
-		for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
-		ctau=f2c*ftau;
-		clear(ctrasl);clear(ftrasl);
-		sym_found=FALSE;
-		for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
-		  sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) && identical(ftau,a.fgroup[ii].ftau,_eps_));  // look in all the list of operations
-		// if the symmetry operation is new, add it to the factorgroup array
-		// and update all info about the sym_op object
-		if(sym_found==FALSE) {                                          // new operation, generate and save it
-		  uint kk;
-		  kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-		  aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
-		      << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
-		  aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
-		      << "  fshift=(" << fshift << ")"
-		      << "  ftau=(" << a.fgroup[kk-1].ftau << ")"
-		      << endl;  // remember vectors start from 0
-		  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-		  // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
-		  // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
-		}
-	      }
-	    }
-	  }
-	}
+        if(a.atoms[i].type==a.atoms[0].type) {  // fix type
+          for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
+            // clean up basis mapping
+            for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
+            for(uint n=0;n<a.atoms.size();n++) basis_types_map[n]=0;
+            fshift=vfshifts.at(ifshift)-atomlist[i].fpos; // try a translation
+            // cerr << fshift << " type1=" << a.atoms[iref].type << " type2=" << atomlist[i].type << endl;
+            num_suc_maps=0; // we store the number of successful maps with the same fshift
+            for(uint n=0;n<a.atoms.size();n++) {
+              for(uint m=0;m<atomlist.size();m++) {
+                if(a.atoms[n].type==atomlist[m].type) {
+                  // we fshift them all
+                  temp=a.atoms[n].fpos-atomlist[m].fpos-fshift;
+                  temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
+                  if(abs(temp[1])<0.005 && abs(temp[2])<0.005 && abs(temp[3])<0.005) {
+                    num_suc_maps++;
+                    basis_atoms_map[atomlist[m].basis]=a.atoms[n].basis;
+                    basis_types_map[atomlist[m].basis]=a.atoms[n].type;
+                  }
+                }
+              }
+            }    
+            if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
+              cerr << "FOUND" << endl;
+              // for(uint i=1;i<=2;i++)
+              {
+                // check whether the symmetry operation already exists in the factorgroup array
+                //		if(i==1)
+                { Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift;}
+                //	if(i==2) { Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf); ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
+                ftau=BringInCell(ftau);  // moves fractional coordinates to [0.0 to 1.0[
+                for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
+                ctau=f2c*ftau;
+                clear(ctrasl);clear(ftrasl);
+                sym_found=FALSE;
+                for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
+                  sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) && identical(ftau,a.fgroup[ii].ftau,_eps_));  // look in all the list of operations
+                // if the symmetry operation is new, add it to the factorgroup array
+                // and update all info about the sym_op object
+                if(sym_found==FALSE) {                                          // new operation, generate and save it
+                  uint kk;
+                  kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
+                  aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
+                    << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
+                  aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
+                    << "  fshift=(" << fshift << ")"
+                    << "  ftau=(" << a.fgroup[kk-1].ftau << ")"
+                    << endl;  // remember vectors start from 0
+                  aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                  // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
+                  // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
+                }
+              }
+            }
+          }
+        }
       }
       atomlist.clear();
     }
@@ -6042,8 +6076,9 @@ namespace SYM {
 // ---------------------------------------------------------------------------------------------------------------------------- FACTOR GROUP OPERATIONS
 // SYM::CalculateFactorGroup_201001
 namespace SYM {
-  //bool CalculateFactorGroup_201001(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss) { // AFLOW_FUNCTION_IM
-  bool __CalculateFactorGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss) {
+  //bool CalculateFactorGroup_201001(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss) // AFLOW_FUNCTION_IM
+  bool __CalculateFactorGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss)
+  { //CO200106 - patching for auto-indenting
     // ------------------------------------------------------------------------------
     // Some of this routine is taken from AVDV structure::calc_factor_group() code.
     // SC made modificatios for speed and consistency with aflow architecture
@@ -6059,7 +6094,7 @@ namespace SYM {
     // lattice fix to reduce the number of tested operations
     // (JOSE BUG) if(a.LatticeReduction_avoid==FALSE) a.LatticeReduction(); // better not repeat. but it is checked in
     a.FixLattices();a.BringInCell();
-    
+
     xmatrix<double> f2c(3,3);f2c=trasp(a.lattice);
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
@@ -6074,16 +6109,16 @@ namespace SYM {
     vector<xvector<double> > vfshifts;
     for(int ic=-ijk;ic<=ijk;ic++)
       for(int jc=-ijk;jc<=ijk;jc++)
-	for(int kc=-ijk;kc<=ijk;kc++) {
-	  fshift[1]=(double)ic;fshift[2]=(double)jc;fshift[3]=(double)kc;
-	  // fshift=BringInCell(fshift);  // no shift here
-	  sym_found=FALSE;
-	  for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++)
-	    sym_found=identical(fshift,vfshifts.at(ii),_eps_); // look in all the list of operations
-	  if(sym_found==FALSE) vfshifts.push_back(fshift);
-	}
+        for(int kc=-ijk;kc<=ijk;kc++) {
+          fshift[1]=(double)ic;fshift[2]=(double)jc;fshift[3]=(double)kc;
+          // fshift=BringInCell(fshift);  // no shift here
+          sym_found=FALSE;
+          for(uint ii=0;ii<vfshifts.size()&&!sym_found;ii++)
+            sym_found=identical(fshift,vfshifts.at(ii),_eps_); // look in all the list of operations
+          if(sym_found==FALSE) vfshifts.push_back(fshift);
+        }
     fshift.clear();
-  
+
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: found test translations = " << vfshifts.size() << endl;
     for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
       // aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: translations " << vfshifts.at(ifshift) << endl;
@@ -6097,8 +6132,8 @@ namespace SYM {
     for(uint pg=0;pg<a.pgroup.size();pg++) {
       std::deque<_atom> atomlist;
       for(uint i=0;i<a.atoms.size();i++) {
-	hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
-	atomlist.push_back(hatom);                  // store transformed str
+        hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
+        atomlist.push_back(hatom);                  // store transformed str
       }
       // consider all internal shifts that move an atom of the original structure (e.g. the first
       // atom) to an atom of the transformed structure. Then see if that translation maps the
@@ -6106,65 +6141,65 @@ namespace SYM {
       // create a basis_atoms_map basis_types_map vector graph
       //   iref=0;  // anton
       for(uint ifshift=0;ifshift<vfshifts.size();ifshift++) { // stefano
-	for(iref=0;iref<a.atoms.size();iref++) { //stefano
-	  // cout << iref << endl;cout.flush();
-	  for(uint i=0;i<a.atoms.size();i++) {
-	    if(a.atoms[iref].type==a.atoms[i].type) {
-	      // clean up basis mapping
-	      for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
-	      for(uint n=0;n<a.atoms.size();n++) basis_types_map[n]=0;
-	      // creating translation shift
-	      fshift=a.atoms[iref].fpos-atomlist[i].fpos; // try a translation
-	      fshift=fshift+vfshifts.at(ifshift);
-	      // cerr << fshift << " type1=" << a.atoms[iref].type << " type2=" << atomlist[i].type << endl;
-	      num_suc_maps=0; // we store the number of successful maps with the same fshift
-	      for(uint n=0;n<a.atoms.size();n++) {
-		for(uint m=0;m<atomlist.size();m++) {
-		  if(a.atoms[n].type==atomlist[m].type) {
-		    // we fshift them all
-		    temp=a.atoms[n].fpos-atomlist[m].fpos-fshift;
-		    temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
-		    if(abs(temp[1])<0.005 && abs(temp[2])<0.005 && abs(temp[3])<0.005) {
-		      num_suc_maps++;
-		      basis_atoms_map[atomlist[m].basis]=a.atoms[n].basis;
-		      basis_types_map[atomlist[m].basis]=a.atoms[n].type;
-		    }
-		  }
-		}
-	      }    
-	      if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
-		// for(uint i=1;i<=2;i++)
-		{
-		  // check whether the symmetry operation already exists in the factorgroup array
-		  //		if(i==1)
-		  { Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift;}
-		  //	if(i==2) { Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf); ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
-		  ftau=BringInCell(ftau);  // moves fractional coordinates to [0.0 to 1.0[
-		  for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
-		  ctau=f2c*ftau;
-		  clear(ctrasl);clear(ftrasl);
-		  sym_found=FALSE;
-		  for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
-		    sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) && identical(ftau,a.fgroup[ii].ftau,_eps_));  // look in all the list of operations
-		  // if the symmetry operation is new, add it to the factorgroup array
-		  // and update all info about the sym_op object
-		  if(sym_found==FALSE) {                                          // new operation, generate and save it
-		    uint kk;
-		    kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-		    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
-			<< " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
-		    aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
-			<< "  fshift=(" << a.fgroup[kk-1].ftau << ")"
-			<< endl;  // remember vectors start from 0
-		    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-		    // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
-		    // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+        for(iref=0;iref<a.atoms.size();iref++) { //stefano
+          // cout << iref << endl;cout.flush();
+          for(uint i=0;i<a.atoms.size();i++) {
+            if(a.atoms[iref].type==a.atoms[i].type) {
+              // clean up basis mapping
+              for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
+              for(uint n=0;n<a.atoms.size();n++) basis_types_map[n]=0;
+              // creating translation shift
+              fshift=a.atoms[iref].fpos-atomlist[i].fpos; // try a translation
+              fshift=fshift+vfshifts.at(ifshift);
+              // cerr << fshift << " type1=" << a.atoms[iref].type << " type2=" << atomlist[i].type << endl;
+              num_suc_maps=0; // we store the number of successful maps with the same fshift
+              for(uint n=0;n<a.atoms.size();n++) {
+                for(uint m=0;m<atomlist.size();m++) {
+                  if(a.atoms[n].type==atomlist[m].type) {
+                    // we fshift them all
+                    temp=a.atoms[n].fpos-atomlist[m].fpos-fshift;
+                    temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
+                    if(abs(temp[1])<0.005 && abs(temp[2])<0.005 && abs(temp[3])<0.005) {
+                      num_suc_maps++;
+                      basis_atoms_map[atomlist[m].basis]=a.atoms[n].basis;
+                      basis_types_map[atomlist[m].basis]=a.atoms[n].type;
+                    }
+                  }
+                }
+              }    
+              if(num_suc_maps==a.atoms.size()) { // here if the shift maps all the atoms in the same atom,
+                // for(uint i=1;i<=2;i++)
+                {
+                  // check whether the symmetry operation already exists in the factorgroup array
+                  //		if(i==1)
+                  { Uc=a.pgroup[pg].Uc;Uf=a.pgroup[pg].Uf; ftau=fshift;}
+                  //	if(i==2) { Uc=inverse(a.pgroup[pg].Uc);Uf=inverse(a.pgroup[pg].Uf); ftau=-inverse(a.pgroup[pg].Uf)*fshift;}
+                  ftau=BringInCell(ftau);  // moves fractional coordinates to [0.0 to 1.0[
+                  for(uint i=1;i<=3;i++) if(ftau[i]>0.995) ftau[i]=0.0; // roundoff
+                  ctau=f2c*ftau;
+                  clear(ctrasl);clear(ftrasl);
+                  sym_found=FALSE;
+                  for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
+                    sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) && identical(ftau,a.fgroup[ii].ftau,_eps_));  // look in all the list of operations
+                  // if the symmetry operation is new, add it to the factorgroup array
+                  // and update all info about the sym_op object
+                  if(sym_found==FALSE) {                                          // new operation, generate and save it
+                    uint kk;
+                    kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
+                    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
+                      << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
+                    aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
+                      << "  fshift=(" << a.fgroup[kk-1].ftau << ")"
+                      << endl;  // remember vectors start from 0
+                    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                    // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
+                    // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
       atomlist.clear();
     }
@@ -6206,7 +6241,7 @@ namespace SYM {
     // lattice fix to reduce the number of tested operations
     // (JOSE BUG) if(a.LatticeReduction_avoid==FALSE) a.LatticeReduction(); // better not repeat. but it is checked in
     a.FixLattices();a.BringInCell();
-    
+
     xmatrix<double> f2c(3,3);f2c=trasp(a.lattice);
     xmatrix<double> c2f(3,3);c2f=inverse(trasp(a.lattice));
     if(a.pgroup_calculated==FALSE) Krun=Krun && SYM::CalculatePointGroup(FileMESSAGE,a,aflags,_write_,osswrite,oss); // NEED POINT GROUP
@@ -6224,8 +6259,8 @@ namespace SYM {
     for(uint pg=0; pg<a.pgroup.size(); pg++) {
       std::deque<_atom> atomlist;
       for(uint i=0;i<a.atoms.size();i++) {
-	hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
-	atomlist.push_back(hatom);                  // store transformed str
+        hatom=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
+        atomlist.push_back(hatom);                  // store transformed str
       }
       // consider all internal shifts that move an atom of the original structure (e.g. the first
       // atom) to an atom of the transformed structure. Then see if that translation maps the
@@ -6233,64 +6268,65 @@ namespace SYM {
       // create a basis_atoms_map basis_types_map vector graph
       //   for(iref=0;iref<a.atoms.size();iref++)
       {
-	// cout << iref << endl;cout.flush();
-	iref=0;
-	for(uint i=0;i<a.atoms.size();i++) {
-	  if(a.atoms[iref].type==a.atoms[i].type) {
-	    // clean up basis mapping
-	    for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
-	    for(uint n=0;n<a.atoms.size();n++) basis_types_map[n]=0;
-	    // creating translation shift
-	    fshift=a.atoms[iref].fpos-atomlist[i].fpos; // try a translation
-	    // cerr << fshift << " type1=" << a.atoms[iref].type << " type2=" << atomlist[i].type << endl;
-	    num_suc_maps=0; // we store the number of successful maps with the same fshift
-	    for(uint n=0;n<a.atoms.size();n++) {
-	      for(uint m=0;m<atomlist.size();m++) {
-		if(a.atoms[n].type==atomlist[m].type) {
-		  // we fshift them all
-		  temp=a.atoms[n].fpos-atomlist[m].fpos-fshift;
-		  temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
-		  if(abs(temp[1])<0.0005 && abs(temp[2])<0.0005 && abs(temp[3])<0.0005) {
-		    num_suc_maps++;
-		    basis_atoms_map[atomlist[m].basis]=a.atoms[n].basis;
-		    basis_types_map[atomlist[m].basis]=a.atoms[n].type;
-		  }
-		}
-	      }
-	    }	
-	    if(num_suc_maps==a.atoms.size()) {
-	      // here if the shift maps all the atoms in the same atom,
-	      fshift=BringInCell(fshift);  // moves fractional coordinates to [0.0 to 1.0[
-	      // check whether the symmetry operation already exists in the factorgroup array
-	      Uc=a.pgroup[pg].Uc;
-	      Uf=a.pgroup[pg].Uf;
-	      ftau=fshift;
-	      ctau=f2c*fshift;
-	      clear(ctrasl);
-	      clear(ftrasl);
-	      sym_found=FALSE;
-	      for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
-		sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) &&
-			   identical(ftau,a.fgroup[ii].ftau,_eps_));    // look in all the list of operations
-	      // if the symmetry operation is new, add it to the factorgroup array
-	      // and update all info about the sym_op object
-	      if(sym_found==FALSE) {                                          // new operation, generate and save it
-		//	  if(sym_found==FALSE || a.fgroup.size() == 0) {
-		uint kk;
-		kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
-		aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
-		    << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
-		aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
-		    << "  ftau=(" << a.fgroup[kk-1].ftau << ")"
-		    << endl;  // remember vectors start from 0
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-		// for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
-		// for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
-	      }
-	    }
-	
-	  }
-	}
+        // cout << iref << endl;cout.flush();
+        iref=0;
+        for(uint i=0;i<a.atoms.size();i++) {
+          if(a.atoms[iref].type==a.atoms[i].type) {
+            // clean up basis mapping
+            for(uint n=0;n<a.atoms.size();n++) basis_atoms_map[n]=0;
+            for(uint n=0;n<a.atoms.size();n++) basis_types_map[n]=0;
+            // creating translation shift
+            fshift=a.atoms[iref].fpos-atomlist[i].fpos; // try a translation
+            // cerr << fshift << " type1=" << a.atoms[iref].type << " type2=" << atomlist[i].type << endl;
+            num_suc_maps=0; // we store the number of successful maps with the same fshift
+            for(uint n=0;n<a.atoms.size();n++) {
+              for(uint m=0;m<atomlist.size();m++) {
+                if(a.atoms[n].type==atomlist[m].type) {
+                  // we fshift them all
+                  temp=a.atoms[n].fpos-atomlist[m].fpos-fshift;
+                  temp=BringInCell(temp); // moves fractional coordinates to [0.0 to 1.0[
+                  if(abs(temp[1])<0.0005 && abs(temp[2])<0.0005 && abs(temp[3])<0.0005) {
+                    num_suc_maps++;
+                    basis_atoms_map[atomlist[m].basis]=a.atoms[n].basis;
+                    basis_types_map[atomlist[m].basis]=a.atoms[n].type;
+                  }
+                }
+              }
+            }	
+            if(num_suc_maps==a.atoms.size()) {
+              // here if the shift maps all the atoms in the same atom,
+              fshift=BringInCell(fshift);  // moves fractional coordinates to [0.0 to 1.0[
+              // check whether the symmetry operation already exists in the factorgroup array
+              Uc=a.pgroup[pg].Uc;
+              Uf=a.pgroup[pg].Uf;
+              ftau=fshift;
+              ctau=f2c*fshift;
+              clear(ctrasl);
+              clear(ftrasl);
+              sym_found=FALSE;
+              for(uint ii=0;ii<a.fgroup.size()&&!sym_found;ii++)
+                sym_found=(identical(Uf,a.fgroup[ii].Uf,_eps_) &&
+                    identical(ftau,a.fgroup[ii].ftau,_eps_));    // look in all the list of operations
+              // if the symmetry operation is new, add it to the factorgroup array
+              // and update all info about the sym_op object
+              if(sym_found==FALSE)                                          // new operation, generate and save it
+                //	  if(sym_found==FALSE || a.fgroup.size() == 0)
+              { //CO200106 - patching for auto-indenting
+                uint kk;
+                kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_FGROUP_);        // in kk there is the number _0 point group
+                aus << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP " << a.fgroup[kk-1].str_type
+                  << " theta="; if(a.fgroup[kk-1].angle<100) aus << " "; if(a.fgroup[kk-1].angle<10) aus << " ";
+                aus << a.fgroup[kk-1].angle << " " << " r=(" << a.fgroup[kk-1].axis << ")"
+                  << "  ftau=(" << a.fgroup[kk-1].ftau << ")"
+                  << endl;  // remember vectors start from 0
+                aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                // for(n=0;n<a.atoms.size();n++) cout << basis_atoms_map[n] << " "; cerr << endl;
+                // for(n=0;n<a.atoms.size();n++) cout << basis_types_map[n] << " "; cerr << endl;
+              }
+            }
+
+          }
+        }
       }
       atomlist.clear();
     }
@@ -6390,8 +6426,9 @@ namespace SYM {
             // 	    sym_found=(identical(Uf,a.sgroup[ii].Uf,_EPS_) && identical(ftau+ftrasl,a.sgroup[ii].ftau+a.sgroup[ii].ftrasl,_EPS_));    // look in all the list of operations
             // if the symmetry operation is new, add it to the factorgroup array
             // and update all info about the sym_op object
-            if(sym_found==FALSE) {                                          // new operation, generate and save it
-              //	  if(sym_found==FALSE || a.sgroup.size() == 0){
+            if(sym_found==FALSE)                                          // new operation, generate and save it
+              //	  if(sym_found==FALSE || a.sgroup.size() == 0)
+            { //CO200106 - patching for auto-indenting
               uint kk;
               kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_SGROUP_,FALSE);        // in kk there is the number _0 point group
               if(kk>KBIN_SYMMETRY_SGROUP_MAX_NUMBER) {
@@ -6405,11 +6442,11 @@ namespace SYM {
               }
               if(0) { // some printing
                 aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
-                    << " theta="; if(a.sgroup[kk-1].angle<100) aus << " "; if(a.sgroup[kk-1].angle<10) aus << " ";
+                  << " theta="; if(a.sgroup[kk-1].angle<100) aus << " "; if(a.sgroup[kk-1].angle<10) aus << " ";
                 aus << a.sgroup[kk-1].angle << " " << " r=(" << a.sgroup[kk-1].axis << ")"
-                    << "  ftau=(" << a.sgroup[kk-1].ftau << ")"
-                    << "  ftrasl=(" << a.sgroup[kk-1].ftrasl << ")"
-                    << endl;  // remember vectors start from 0
+                  << "  ftau=(" << a.sgroup[kk-1].ftau << ")"
+                  << "  ftrasl=(" << a.sgroup[kk-1].ftrasl << ")"
+                  << endl;  // remember vectors start from 0
                 aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
               }
             }
@@ -6477,48 +6514,49 @@ namespace SYM {
     //  dims.clear();
     for(int i=-dims[1];i<=dims[1];i++) {
       for(int j=-dims[2];j<=dims[2];j++) {
-	for(int k=-dims[3];k<=dims[3];k++) {
-	  ctrasl=((double)i)*a1+((double)j)*a2+((double)k)*a3;
-	  ftrasl(1)=(double)i;ftrasl(2)=(double) j;ftrasl(3)=(double) k;
-	  for(uint fg=0; fg<a.fgroup.size(); fg++) {
-	    Uc=a.fgroup[fg].Uc;
-	    Uf=a.fgroup[fg].Uf;
-	    ctau=a.fgroup[fg].ctau;
-	    ftau=a.fgroup[fg].ftau;
-	    basis_atoms_map=a.fgroup[fg].basis_atoms_map;
-	    basis_types_map=a.fgroup[fg].basis_types_map;
-	    sym_found=FALSE;
-	    // no check required, as they are different by construction (not really)
-	    // 	  for(uint ii=0;ii<a.sgroup.size()&&!sym_found;ii++)
-	    // 	    //	    sym_found=(identical(Uf,a.sgroup[ii].Uf,_EPS_) && identical(ftau,a.sgroup[ii].ftau,_EPS_) && identical(ftrasl,a.sgroup[ii].ftrasl,_EPS_));    // look in all the list of operations
-	    // 	    sym_found=(identical(Uf,a.sgroup[ii].Uf,_EPS_) && identical(ftau+ftrasl,a.sgroup[ii].ftau+a.sgroup[ii].ftrasl,_EPS_));    // look in all the list of operations
-	    // if the symmetry operation is new, add it to the factorgroup array
-	    // and update all info about the sym_op object
-	    if(sym_found==FALSE) {                                          // new operation, generate and save it
-	      //	  if(sym_found==FALSE || a.sgroup.size() == 0) {
-	      uint kk;
-	      kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_SGROUP_);        // in kk there is the number _0 point group
-	      if(kk>KBIN_SYMMETRY_SGROUP_MAX_NUMBER) {
-		aus << "EEEEE  ERROR: SYM::CalculateSpaceGroup cannot deal with more than " << KBIN_SYMMETRY_SGROUP_MAX_NUMBER << " space group operations." << endl;
-		aus << "EEEEE  ERROR: You need to reduce the radius of the space group calculation (SGROUP_RADIUS=XXX) or" << endl;
-		aus << "EEEEE  ERROR: modify KBIN_SYMMETRY_SGROUP_MAX_NUMBER in aflow.h and recompile." << endl;
-		aus << "EEEEE  ERROR: WARNING: by increasing KBIN_SYMMETRY_SGROUP_MAX_NUMBER you can use a lot of memory" << endl;
-		aus << "EEEEE  ERROR: and disk space if you decide to save the space group file (SGROUP_WRITE)." << endl;
-		aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-		return FALSE;
-	      }
-	      if(0) { // some printing
-		aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
-		    << " theta="; if(a.sgroup[kk-1].angle<100) aus << " "; if(a.sgroup[kk-1].angle<10) aus << " ";
-		aus << a.sgroup[kk-1].angle << " " << " r=(" << a.sgroup[kk-1].axis << ")"
-		    << "  ftau=(" << a.sgroup[kk-1].ftau << ")"
-		    << "  ftrasl=(" << a.sgroup[kk-1].ftrasl << ")"
-		    << endl;  // remember vectors start from 0
-		aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-	      }
-	    }
-	  }
-	}
+        for(int k=-dims[3];k<=dims[3];k++) {
+          ctrasl=((double)i)*a1+((double)j)*a2+((double)k)*a3;
+          ftrasl(1)=(double)i;ftrasl(2)=(double) j;ftrasl(3)=(double) k;
+          for(uint fg=0; fg<a.fgroup.size(); fg++) {
+            Uc=a.fgroup[fg].Uc;
+            Uf=a.fgroup[fg].Uf;
+            ctau=a.fgroup[fg].ctau;
+            ftau=a.fgroup[fg].ftau;
+            basis_atoms_map=a.fgroup[fg].basis_atoms_map;
+            basis_types_map=a.fgroup[fg].basis_types_map;
+            sym_found=FALSE;
+            // no check required, as they are different by construction (not really)
+            // 	  for(uint ii=0;ii<a.sgroup.size()&&!sym_found;ii++)
+            // 	    //	    sym_found=(identical(Uf,a.sgroup[ii].Uf,_EPS_) && identical(ftau,a.sgroup[ii].ftau,_EPS_) && identical(ftrasl,a.sgroup[ii].ftrasl,_EPS_));    // look in all the list of operations
+            // 	    sym_found=(identical(Uf,a.sgroup[ii].Uf,_EPS_) && identical(ftau+ftrasl,a.sgroup[ii].ftau+a.sgroup[ii].ftrasl,_EPS_));    // look in all the list of operations
+            // if the symmetry operation is new, add it to the factorgroup array
+            // and update all info about the sym_op object
+            if(sym_found==FALSE)                                          // new operation, generate and save it
+              //	  if(sym_found==FALSE || a.sgroup.size() == 0)
+            { //CO200106 - patching for auto-indenting
+              uint kk;
+              kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,true,_SGROUP_);        // in kk there is the number _0 point group
+              if(kk>KBIN_SYMMETRY_SGROUP_MAX_NUMBER) {
+                aus << "EEEEE  ERROR: SYM::CalculateSpaceGroup cannot deal with more than " << KBIN_SYMMETRY_SGROUP_MAX_NUMBER << " space group operations." << endl;
+                aus << "EEEEE  ERROR: You need to reduce the radius of the space group calculation (SGROUP_RADIUS=XXX) or" << endl;
+                aus << "EEEEE  ERROR: modify KBIN_SYMMETRY_SGROUP_MAX_NUMBER in aflow.h and recompile." << endl;
+                aus << "EEEEE  ERROR: WARNING: by increasing KBIN_SYMMETRY_SGROUP_MAX_NUMBER you can use a lot of memory" << endl;
+                aus << "EEEEE  ERROR: and disk space if you decide to save the space group file (SGROUP_WRITE)." << endl;
+                aurostd::PrintErrorStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+                return FALSE;
+              }
+              if(0) { // some printing
+                aus << (aflags.QUIET?"":"00000  MESSAGE ") << "Sgroup " << a.sgroup[kk-1].str_type
+                  << " theta="; if(a.sgroup[kk-1].angle<100) aus << " "; if(a.sgroup[kk-1].angle<10) aus << " ";
+                aus << a.sgroup[kk-1].angle << " " << " r=(" << a.sgroup[kk-1].axis << ")"
+                  << "  ftau=(" << a.sgroup[kk-1].ftau << ")"
+                  << "  ftrasl=(" << a.sgroup[kk-1].ftrasl << ")"
+                  << endl;  // remember vectors start from 0
+                aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+              }
+            }
+          }
+        }
       }
     }
     // ------------------------------------------------------------------------------
@@ -6569,7 +6607,7 @@ namespace SYM {
     // Obtain the structure tolerance
     a.sym_eps=_eps_;
     bool skew = isLatticeSkewed(a.lattice,a.dist_nn_min,_eps_);
-    
+
     ostringstream aus;
     bool Krun=TRUE;
 
@@ -6600,7 +6638,7 @@ namespace SYM {
     if(rely_on_basis){
       for(uint iat1=0;iat1<a.atoms.size();iat1++) {
         for(uint iat2=iat1+1;iat2<a.atoms.size();iat2++) {
-          //if(iat2!=iat1) {  //ALREADY TRUE
+          //if(iat2!=iat1) {  //ALREADY TRUE  //[CO200106 - close bracket for indenting]}
           if(a.atoms[iat1].type==a.atoms[iat2].type){
             if(AtomsEquivalent_Basis(a,iat1,iat2)){
               a.atoms.at(iat2).equivalent=a.atoms.at(iat1).equivalent;
@@ -6613,7 +6651,7 @@ namespace SYM {
     } else {
       for(uint iat1=0;iat1<a.atoms.size();iat1++) {
         for(uint iat2=iat1+1;iat2<a.atoms.size();iat2++) {
-          //if(iat2!=iat1) {  //ALREADY TRUE
+          //if(iat2!=iat1) {  //ALREADY TRUE  //[CO200106 - close bracket for indenting]}
           if(a.atoms[iat1].type==a.atoms[iat2].type){
             if(AtomsEquivalent(a,a.atoms.at(iat1),a.atoms.at(iat2),skew,_eps_)){
               a.atoms.at(iat2).equivalent=a.atoms.at(iat1).equivalent;
@@ -6717,29 +6755,29 @@ namespace SYM {
     for(uint iat1=0;iat1<a.atoms.size();iat1++) {
       //  a.atoms.at(iat1).num_equivalents=0;
       for(uint iat2=iat1+1;iat2<a.atoms.size();iat2++) {
-	if(iat2!=iat1) {
-	  if(SYM::AtomsEquivalent(a,a.atoms.at(iat1),a.atoms.at(iat2),eps)) {
-	    a.atoms.at(iat2).equivalent=a.atoms.at(iat1).equivalent;
-	    //	  if(a.atoms.at(iat1).num_equivalents==0) a.atoms.at(iat1).num_equivalents++;
-	    //	  a.atoms.at(iat1).num_equivalents++;
-	    a.atoms.at(iat2).is_inequivalent=FALSE;
-	    iat2=a.atoms.size();
-	  }
-	}
+        if(iat2!=iat1) {
+          if(SYM::AtomsEquivalent(a,a.atoms.at(iat1),a.atoms.at(iat2),eps)) {
+            a.atoms.at(iat2).equivalent=a.atoms.at(iat1).equivalent;
+            //	  if(a.atoms.at(iat1).num_equivalents==0) a.atoms.at(iat1).num_equivalents++;
+            //	  a.atoms.at(iat1).num_equivalents++;
+            a.atoms.at(iat2).is_inequivalent=FALSE;
+            iat2=a.atoms.size();
+          }
+        }
       }
     }
     // ------------------------------------------------------------------------------
     // create the list of inequivalent (rows)
     for(uint iat=0;iat<a.atoms.size();iat++)
       if(a.atoms.at(iat).is_inequivalent)
-	a.iatoms.push_back(std::vector<int>(1,iat));
+        a.iatoms.push_back(std::vector<int>(1,iat));
     // create the list of inequivalent (cols)
     for(uint iat1=0;iat1<a.atoms.size();iat1++) {
       if(!a.atoms.at(iat1).is_inequivalent) {
-	for(uint iat2=0;iat2<a.iatoms.size();iat2++)
-	  if(a.atoms.at(iat1).equivalent==a.iatoms.at(iat2).at(0)) {
-	    a.iatoms.at(iat2).push_back(iat1);
-	  }
+        for(uint iat2=0;iat2<a.iatoms.size();iat2++)
+          if(a.atoms.at(iat1).equivalent==a.iatoms.at(iat2).at(0)) {
+            a.iatoms.at(iat2).push_back(iat1);
+          }
       }
     }
     // ------------------------------------------------------------------------------
@@ -6747,18 +6785,18 @@ namespace SYM {
     uint iequivalent=0;
     for(uint iat=0;iat<a.atoms.size();iat++) {
       if(a.atoms.at(iat).is_inequivalent) {
-	a.atoms.at(iat).num_equivalents=a.iatoms.at(iequivalent).size();
-	a.atoms.at(iat).index_iatoms=iequivalent;
-	iequivalent++;
+        a.atoms.at(iat).num_equivalents=a.iatoms.at(iequivalent).size();
+        a.atoms.at(iat).index_iatoms=iequivalent;
+        iequivalent++;
       }
     }
     // ------------------------------------------------------------------------------
     //  // DEBUG so far it works
     if(0) { // DEBUG so far it works
       for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-	for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
-	  cout << a.iatoms.at(iat1).at(iat2) << " ";
-	cout << endl;
+        for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
+          cout << a.iatoms.at(iat1).at(iat2) << " ";
+        cout << endl;
       }
     }
     // ------------------------------------------------------------------------------
@@ -6773,7 +6811,7 @@ namespace SYM {
       }
       aus << a.iatoms.at(iat1).at(0) << "] ";
       for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++){
-	aus << a.iatoms.at(iat1).at(iat2) << " ";
+        aus << a.iatoms.at(iat1).at(iat2) << " ";
       }
       aus << endl;
     }
@@ -6816,7 +6854,7 @@ namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
     //CALCULATION_MODE == 0 (default) - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for all
     //CALCULATION_MODE == 1 - calculate iatoms first, then propagate to equivalent atoms using fgroups, get full basis for iatoms ONLY
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
@@ -6824,13 +6862,13 @@ namespace SYM {
       cerr << "SYM::CalculateSitePointGroup ERROR:  Invalid calculation mode.  Must be 0, 1, or 2. Exiting [dir=" << a.directory << "]" << endl;
       exit(0); // CO 180502 - normally don't use exit()'s, this one indicates input is INVALID
     }
-    
+
     // Obtain the structure tolerance
     a.sym_eps=_eps_; 
     //xstructure b(a);  //NEVER COPY AN XSTRUCTURE UNLESS IT'S ABSOLUTELY NECESSARY
     deque<_atom> b_atoms=a.atoms;
     bool skew = isLatticeSkewed(a.lattice,a.dist_nn_min,_eps_);
-    
+
     ostringstream aus;
     bool Krun=TRUE;
     std::vector<int> basis_atoms_map;       // will map like the fgroup
@@ -6987,7 +7025,7 @@ namespace SYM {
     bool Krun=TRUE;
     std::vector<int> basis_atoms_map(a.atoms.size());       // will map like the fgroup
     std::vector<int> basis_types_map(a.atoms.size());       // will map like the fgroup
- 
+
     xstructure b(a),t(a);   // for backup... will use at the end to plug back the postions
     a.BringInCell();
     a.BringInWignerSeitz();
@@ -7000,10 +7038,10 @@ namespace SYM {
 
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-  
+
     //  double _eps_=MaxStructureLattice(a)/1000.0;
     //  double _eps_=_EPS_; optional
-  
+
     // ------------------------------------------------------------------------------
     // clear a little and create the framework
     for(uint i=0;i<a.agroup.size();i++) a.agroup.at(i).clear();
@@ -7015,7 +7053,7 @@ namespace SYM {
     uint iat;
     uint isequal,kk=0;
     bool sym_found;
-  
+
     for(uint iiat=0;iiat<a.iatoms.size();iiat++) {
       iat=a.iatoms.at(iiat).at(0);
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP ---------------------------------------------------------------------------" << endl;
@@ -7028,47 +7066,47 @@ namespace SYM {
       a.BringInCell();
 
       for(uint pg=0;pg<a.pgroup.size();pg++) {
-	std::deque<_atom> atomlist;
-	for(uint i=0;i<a.atoms.size();i++)
-	  t.atoms[i]=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
-	t.BringInCell();
-	//  t.BringInWignerSeitz();
-	isequal=0;
-	for(uint i1=0;i1<basis_atoms_map.size();i1++) 
-	  basis_atoms_map[i1]=0;
-	for(uint i1=0;i1<a.atoms.size();i1++)
-	  for(uint i2=0;i2<a.atoms.size();i2++)
-	    if(modulus(a.atoms[i1].fpos-t.atoms[i2].fpos)<_eps_) {
-	      basis_atoms_map[i1]=i2;
-	      isequal++;
-	    }
-	if(isequal==a.atoms.size()) {
-	  // found a site point group
-	  sym_found=FALSE;
-	  for(uint ii=0;ii<a.agroup.at(iat).size()&&!sym_found;ii++)
-	    sym_found=identical(a.pgroup[pg].Uc,a.agroup.at(iat)[ii].Uc,_eps_);       // look in all the list of operations
-	  // if the symmetry operation is new, add it to the pointgroup array
-	  // and update all info about the sym_op object
-	  if(sym_found==FALSE) {                                 // new operation, generate and save it
-	    // kk=SYM::AddSymmetryToStructure(a,iat,a.pgroup[pg].Uc,a.pgroup[pg].Uf,basis_atoms_map,basis_types_map,_AGROUP_);  // kk number pgroups
-	    // copy over the equivalent
-	    for(uint iat2=0;iat2<a.iatoms.at(iiat).size();iat2++)
-	      kk=SYM::AddSymmetryToStructure(a,a.iatoms.at(iiat).at(iat2),a.pgroup[pg].Uc,a.pgroup[pg].Uf,basis_atoms_map,basis_types_map,true,_AGROUP_);  // kk number pgroups
-	    //aus << a.iatoms.at(iiat).at(iat2) << " ";
-	  
-	    // some verbose  
-	    //	  cerr << "F " << iiat << " " <<  pg << "/" << a.pgroup.size() << " " << kk << endl;
-	    aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
-	    aus << a.agroup[iat][kk-1].str_type << " theta=";                                        // remember vectors start from 0
-	    if(a.agroup[iat][kk-1].angle<100) aus << " ";                                            // remember vectors start from 0
-	    if(a.agroup[iat][kk-1].angle<10) aus << " ";                                             // remember vectors start from 0
-	    aus << a.agroup[iat][kk-1].angle << " " << " r=(" << a.agroup[iat][kk-1].axis << ")";    // remember vectors start from 0
-	    aus << "    HM=" <<  aurostd::PaddedPRE(a.agroup[iat][kk-1].str_Hermann_Mauguin,2," ");  // remember vectors start from 0
-	    aus << "    S=" <<  aurostd::PaddedPRE(a.agroup[iat][kk-1].str_Schoenflies,2," ");       // remember vectors start from 0
-	    aus << endl;                                                                             // remember vectors start from 0
-	    aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
-	  }
-	}
+        std::deque<_atom> atomlist;
+        for(uint i=0;i<a.atoms.size();i++)
+          t.atoms[i]=SYM::ApplyAtom(a.atoms[i],a.pgroup[pg],a,FALSE);
+        t.BringInCell();
+        //  t.BringInWignerSeitz();
+        isequal=0;
+        for(uint i1=0;i1<basis_atoms_map.size();i1++) 
+          basis_atoms_map[i1]=0;
+        for(uint i1=0;i1<a.atoms.size();i1++)
+          for(uint i2=0;i2<a.atoms.size();i2++)
+            if(modulus(a.atoms[i1].fpos-t.atoms[i2].fpos)<_eps_) {
+              basis_atoms_map[i1]=i2;
+              isequal++;
+            }
+        if(isequal==a.atoms.size()) {
+          // found a site point group
+          sym_found=FALSE;
+          for(uint ii=0;ii<a.agroup.at(iat).size()&&!sym_found;ii++)
+            sym_found=identical(a.pgroup[pg].Uc,a.agroup.at(iat)[ii].Uc,_eps_);       // look in all the list of operations
+          // if the symmetry operation is new, add it to the pointgroup array
+          // and update all info about the sym_op object
+          if(sym_found==FALSE) {                                 // new operation, generate and save it
+            // kk=SYM::AddSymmetryToStructure(a,iat,a.pgroup[pg].Uc,a.pgroup[pg].Uf,basis_atoms_map,basis_types_map,_AGROUP_);  // kk number pgroups
+            // copy over the equivalent
+            for(uint iat2=0;iat2<a.iatoms.at(iiat).size();iat2++)
+              kk=SYM::AddSymmetryToStructure(a,a.iatoms.at(iiat).at(iat2),a.pgroup[pg].Uc,a.pgroup[pg].Uf,basis_atoms_map,basis_types_map,true,_AGROUP_);  // kk number pgroups
+            //aus << a.iatoms.at(iiat).at(iat2) << " ";
+
+            // some verbose  
+            //	  cerr << "F " << iiat << " " <<  pg << "/" << a.pgroup.size() << " " << kk << endl;
+            aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
+            aus << a.agroup[iat][kk-1].str_type << " theta=";                                        // remember vectors start from 0
+            if(a.agroup[iat][kk-1].angle<100) aus << " ";                                            // remember vectors start from 0
+            if(a.agroup[iat][kk-1].angle<10) aus << " ";                                             // remember vectors start from 0
+            aus << a.agroup[iat][kk-1].angle << " " << " r=(" << a.agroup[iat][kk-1].axis << ")";    // remember vectors start from 0
+            aus << "    HM=" <<  aurostd::PaddedPRE(a.agroup[iat][kk-1].str_Hermann_Mauguin,2," ");  // remember vectors start from 0
+            aus << "    S=" <<  aurostd::PaddedPRE(a.agroup[iat][kk-1].str_Schoenflies,2," ");       // remember vectors start from 0
+            aus << endl;                                                                             // remember vectors start from 0
+            aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
+          }
+        }
       }
       aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP " << "[site="; if(iat<10) aus << "0"; aus << iat << "] ";
       aus << "unique site point group operations " << a.agroup.at(iat).size() << " (#pg=" << a.pgroup.size() << ")  " << endl;// Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -7094,7 +7132,7 @@ namespace SYM {
       if(a.iatoms.at(iat1).at(0)<10) aus << "0";
       aus << a.iatoms.at(iat1).at(0) << "] ";
       for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
-	aus << a.iatoms.at(iat1).at(iat2) << "(" << a.agroup.at(a.iatoms.at(iat1).at(iat2)).size() << ")" << " ";
+        aus << a.iatoms.at(iat1).at(iat2) << "(" << a.agroup.at(a.iatoms.at(iat1).at(iat2)).size() << ")" << " ";
       aus << endl;
     }
     aus << (aflags.QUIET?"":"00000  MESSAGE ") << "AGROUP Symmetry: END " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl;
@@ -7117,7 +7155,7 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string directory=aurostd::execute2string("pwd"); // DX 4/26/18 - added current working directory
+    string directory=aurostd::getPWD(); // DX 4/26/18 - added current working directory  //[CO191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
     a.sym_eps=_eps_;
@@ -7209,7 +7247,7 @@ namespace SYM {
             SYM::AddSymmetryToStructure(a,eat,aSymOp.Uc,aSymOp.Uf,aSymOp.ctau,aSymOp.ftau,aSymOp.ctrasl,aSymOp.ftrasl,aSymOp.basis_atoms_map,aSymOp.basis_types_map,aSymOp.basis_map_calculated,_AGROUP_,FALSE);  // CO 170706 - make sure quaternion is updated
           }
         } else {
-          //if(!found_fgroup){
+          //if(!found_fgroup){  //[CO200106 - close bracket for indenting]}
           if(DEBUG_SYMMETRY){
             cerr << "SYM::CalculateSitePointGroup_Equivalent warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; // DX 4/26/18 - changed a.directory to directory (pwd)
           }
@@ -7220,73 +7258,73 @@ namespace SYM {
         }
       } 
     }
-    //} else {
+    //else {  //[CO200106 - close bracket for indenting]}
     //if basis_atoms_map was not found/stored, we need to find map from iatom to eatom manually
-    /*_atom tatom;
-      for(uint iiat=0;iiat<a.iatoms.size();iiat++) {
-      iat=a.iatoms.at(iiat).at(0);
-      //cerr << "IATOM ORIG " << a.atoms.at(iat).fpos << endl;
-      //perform transformation for equivalent atoms and apply
-      for(uint ii=1;ii<a.iatoms.at(iiat).size();ii++){
-      found_fgroup=false;
-      eat=a.iatoms.at(iiat).at(ii);
-      //cerr << "EATOM ORIG " << a.atoms.at(eat).fpos << endl;
-      //find fgroup that maps iatom onto the equivalent atom
-      for(uint fg=0;fg<a.fgroup.size() && !found_fgroup;fg++) {
-      // DX tatom=SYM::ApplyAtom(a.atoms.at(iat),a.fgroup[fg],a,FALSE,FALSE,derivative_structure);
-      if(!SYM::ApplyAtomValidate(a.atoms.at(iat),tatom,a.fgroup[fg],a.lattice,a.c2f,a.f2c,skew,FALSE,FALSE,_eps_)){
-      // Applying c2f and f2c to the Cartesian and fractional positions give different results (a tolerance issue) 
-      return FALSE;
-      }
-      tatom.fpos=mod_one_xvec(tatom.fpos);
-      //cerr << "IATOM ROTATED " << tatom.fpos << endl;
-      if(MapAtom(tatom, a.atoms.at(eat), FALSE,a.c2f, a.f2c, skew, _eps_)){ 
-      fSymOp=a.fgroup[fg];
-      found_fgroup=true;
-      //break;
-      }
-      }
-      if(found_fgroup){
-      for(uint ag=0;ag<a.agroup.at(iat).size();ag++){
-      aSymOp=a.agroup.at(iat).at(ag);
-      aSymOp.Uc= fSymOp.Uc * aSymOp.Uc * inverse(fSymOp.Uc);    //convert basis to that of fgroup
-      aSymOp.Uf= fSymOp.Uf * aSymOp.Uf * inverse(fSymOp.Uf);    //convert basis to that of fgroup
-      if(get_full_basis){
-      //update basis_atoms_map and basis_types_map
-      //reset from original before flipping everything around
-      for(uint ii=0;ii<b.atoms.size();ii++){
-      b.atoms.at(ii).cpos=a.atoms.at(ii).cpos;
-      b.atoms.at(ii).fpos=a.atoms.at(ii).fpos;
-      }
-      b.ShifOriginToAtom(eat);
-      b.BringInCell();
-      if(!getFullSymBasis(b.atoms,a.lattice,a.c2f,a.f2c,aSymOp,TRUE,skew,_eps_,aSymOp.basis_atoms_map,aSymOp.basis_types_map)){
-      //if(derivative_structure){
-      //  continue;
-      //} else {
-      cerr << "SYM::CalculateSitePointGroup_Equivalent error[2] - Cannot find full atom/types basis" << endl;
-      return FALSE;
-      //}
-      }
-      } else {
-      for(uint iii=0;iii<a.atoms.size();iii++){
-      aSymOp.basis_atoms_map.push_back(0);
-      aSymOp.basis_types_map.push_back(0);
-      }
-      aSymOp.basis_map_calculated=false;
-      }
-      a.agroup.at(eat).push_back(aSymOp);
-      }
-      } else {
-      //if(!found_fgroup){
-      cerr << "SYM::CalculateSitePointGroup_Equivalent error[1b] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << endl;
-      return FALSE;
-      //cerr << "Not exiting though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
-      //a.agroup[eat]=a.agroup.at(iat);
-      //exit(0);
-      }
-      } 
-      }*/
+    //_atom tatom;
+    //for(uint iiat=0;iiat<a.iatoms.size();iiat++) {
+    //iat=a.iatoms.at(iiat).at(0);
+    ////cerr << "IATOM ORIG " << a.atoms.at(iat).fpos << endl;
+    ////perform transformation for equivalent atoms and apply
+    //for(uint ii=1;ii<a.iatoms.at(iiat).size();ii++){
+    //found_fgroup=false;
+    //eat=a.iatoms.at(iiat).at(ii);
+    ////cerr << "EATOM ORIG " << a.atoms.at(eat).fpos << endl;
+    ////find fgroup that maps iatom onto the equivalent atom
+    //for(uint fg=0;fg<a.fgroup.size() && !found_fgroup;fg++) {
+    //// DX tatom=SYM::ApplyAtom(a.atoms.at(iat),a.fgroup[fg],a,FALSE,FALSE,derivative_structure);
+    //if(!SYM::ApplyAtomValidate(a.atoms.at(iat),tatom,a.fgroup[fg],a.lattice,a.c2f,a.f2c,skew,FALSE,FALSE,_eps_)){
+    //// Applying c2f and f2c to the Cartesian and fractional positions give different results (a tolerance issue) 
+    //return FALSE;
+    //}
+    //tatom.fpos=mod_one_xvec(tatom.fpos);
+    ////cerr << "IATOM ROTATED " << tatom.fpos << endl;
+    //if(MapAtom(tatom, a.atoms.at(eat), FALSE,a.c2f, a.f2c, skew, _eps_)){ 
+    //fSymOp=a.fgroup[fg];
+    //found_fgroup=true;
+    ////break;
+    //}
+    //}
+    //if(found_fgroup){
+    //for(uint ag=0;ag<a.agroup.at(iat).size();ag++){
+    //aSymOp=a.agroup.at(iat).at(ag);
+    //aSymOp.Uc= fSymOp.Uc * aSymOp.Uc * inverse(fSymOp.Uc);    //convert basis to that of fgroup
+    //aSymOp.Uf= fSymOp.Uf * aSymOp.Uf * inverse(fSymOp.Uf);    //convert basis to that of fgroup
+    //if(get_full_basis){
+    ////update basis_atoms_map and basis_types_map
+    ////reset from original before flipping everything around
+    //for(uint ii=0;ii<b.atoms.size();ii++){
+    //b.atoms.at(ii).cpos=a.atoms.at(ii).cpos;
+    //b.atoms.at(ii).fpos=a.atoms.at(ii).fpos;
+    //}
+    //b.ShifOriginToAtom(eat);
+    //b.BringInCell();
+    //if(!getFullSymBasis(b.atoms,a.lattice,a.c2f,a.f2c,aSymOp,TRUE,skew,_eps_,aSymOp.basis_atoms_map,aSymOp.basis_types_map)){
+    ////if(derivative_structure){
+    ////  continue;
+    ////} else {
+    //cerr << "SYM::CalculateSitePointGroup_Equivalent error[2] - Cannot find full atom/types basis" << endl;
+    //return FALSE;
+    ////}
+    //}
+    //} else {
+    //for(uint iii=0;iii<a.atoms.size();iii++){
+    //aSymOp.basis_atoms_map.push_back(0);
+    //aSymOp.basis_types_map.push_back(0);
+    //}
+    //aSymOp.basis_map_calculated=false;
+    //}
+    //a.agroup.at(eat).push_back(aSymOp);
+    //}
+    //} else {
+    ////if(!found_fgroup){
+    //cerr << "SYM::CalculateSitePointGroup_Equivalent error[1b] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << endl;
+    //return FALSE;
+    ////cerr << "Not exiting though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
+    ////a.agroup[eat]=a.agroup.at(iat);
+    ////exit(0);
+    //}
+    //} 
+    //}
     //}
     return TRUE;
   }
@@ -7296,25 +7334,24 @@ namespace SYM {
 
 // --------------------------------------------------------------------------
 namespace SYM {
-  //void CalculateSitePointGroup2(xstructure &a,vector<vector<uint> > &Bsitesym, bool ComMidss) {
-  void CalculateSitePointGroup2(xstructure &a, bool ComMidss) {
-    /*
-      This function calculates site symmetry of all basis in POSCAR.
-      First, it calculates the point group of the lattice.
-      Then, 4-vectors: a1 a2 a3 of the original lattice vectors + Gamma are used
-      to verify that the rotated versions of these 4-vectors map to the lattice points
-      after the symmetry operation is done to the 4vectors.
+  //void CalculateSitePointGroup2(xstructure &a,vector<vector<uint> > &Bsitesym, bool ComMidss)
+  void CalculateSitePointGroup2(xstructure &a, bool ComMidss)
+  { //CO200106 - patching for auto-indenting
+    //This function calculates site symmetry of all basis in POSCAR.
+    //First, it calculates the point group of the lattice.
+    //Then, 4-vectors: a1 a2 a3 of the original lattice vectors + Gamma are used
+    //to verify that the rotated versions of these 4-vectors map to the lattice points
+    //after the symmetry operation is done to the 4vectors.
 
-      The application of symmetry operation is done after the basis is used as origin.
-      Then, the map checking is done after the original (0,0,0) is used as origin.
-      After the symmetry operation, a translation is done to bring the 4-vectors within
-      cutoff sphere of the original lattice points. The translation integers are determined
-      by calculating the integers that would bring the new Gamma point inside the wigner-seitz
-      cell of the original unit cell.
+    //The application of symmetry operation is done after the basis is used as origin.
+    //Then, the map checking is done after the original (0,0,0) is used as origin.
+    //After the symmetry operation, a translation is done to bring the 4-vectors within
+    //cutoff sphere of the original lattice points. The translation integers are determined
+    //by calculating the integers that would bring the new Gamma point inside the wigner-seitz
+    //cell of the original unit cell.
 
-      written by wahyu@alumni.duke.edu (2009) with the block to calculate the point group taken from
-      SYM::CalculatePointGroup function.
-    */
+    //written by wahyu@alumni.duke.edu (2009) with the block to calculate the point group taken from
+    //SYM::CalculatePointGroup function.
 
     uint i,j,ib,jp;
     ostringstream aus;
@@ -7366,8 +7403,8 @@ namespace SYM {
     radius=1.5*RadiusSphereLattice(lattice);
     dims=LatticeDimensionSphere(lattice,radius);
     flog<<"radius = "<<radius<<endl
-	<<"dims: "<<dims<<endl
-	<<"tolerance eps, epsabc: "<<_eps_<<", "<<_eps_abc_<<endl;
+      <<"dims: "<<dims<<endl
+      <<"tolerance eps, epsabc: "<<_eps_<<", "<<_eps_abc_<<endl;
     grid_clattice.clear();grid_flattice.clear();
     for(uint i=1;i<=3;i++) {
       grid_clattice_ptr = new xvector<double>(3);
@@ -7380,22 +7417,22 @@ namespace SYM {
     uint ii,jj,kk;
     for(int i=-dims[1];i<=dims[1];i++) {
       for(int j=-dims[2];j<=dims[2];j++) {
-	for(int k=-dims[3];k<=dims[3];k++) {
-	  if(!(i==0 && j==0 && k==0)) {
-	    if((!(i==1 && j==0 && k==0)) && (!(i==0 && j==1 && k==0)) && (!(i==0 && j==0 && k==1))) { // to avoid plugging a1,a2,a2 back
-	      rrr=((double)i)*a1+((double)j)*a2+((double)k)*a3;
-	      ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
-	      if(modulus(rrr)<(radius+3*_eps_abc_)) {
-		grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
-		*grid_clattice_ptr=rrr;                            // SAVE THEM ALL
-		grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
-		grid_flattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
-		*grid_flattice_ptr=ddd;                            // SAVE THEM ALL
-		grid_flattice.push_back(grid_flattice_ptr);        // SAVE THEM ALL
-	      }
-	    }
-	  }
-	}
+        for(int k=-dims[3];k<=dims[3];k++) {
+          if(!(i==0 && j==0 && k==0)) {
+            if((!(i==1 && j==0 && k==0)) && (!(i==0 && j==1 && k==0)) && (!(i==0 && j==0 && k==1))) { // to avoid plugging a1,a2,a2 back
+              rrr=((double)i)*a1+((double)j)*a2+((double)k)*a3;
+              ddd(1)=(double) i;ddd(2)=(double) j;ddd(3)=(double) k;
+              if(modulus(rrr)<(radius+3*_eps_abc_)) {
+                grid_clattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
+                *grid_clattice_ptr=rrr;                            // SAVE THEM ALL
+                grid_clattice.push_back(grid_clattice_ptr);        // SAVE THEM ALL
+                grid_flattice_ptr = new xvector<double>(3);        // SAVE THEM ALL
+                *grid_flattice_ptr=ddd;                            // SAVE THEM ALL
+                grid_flattice.push_back(grid_flattice_ptr);        // SAVE THEM ALL
+              }
+            }
+          }
+        }
       }
     }
     // for each set of three lattice points within the sphere see which one has the
@@ -7405,64 +7442,64 @@ namespace SYM {
       for(ii=1;ii<=3;ii++) temp_clattice(1,ii)=(*grid_clattice[i])(ii);
       for(ii=1;ii<=3;ii++) temp_flattice(1,ii)=(*grid_flattice[i])(ii);
       for(uint j=0;j<grid_clattice.size();j++) {
-	for(ii=1;ii<=3;ii++) temp_clattice(2,ii)=(*grid_clattice[j])(ii);
-	for(ii=1;ii<=3;ii++) temp_flattice(2,ii)=(*grid_flattice[j])(ii);
-	for(uint k=0;k<grid_clattice.size();k++) {
-	  if(i!=j && i!=k && j!=k) {
-	    for(ii=1;ii<=3;ii++) temp_clattice(3,ii)=(*grid_clattice[k])(ii);
-	    for(ii=1;ii<=3;ii++) temp_flattice(3,ii)=(*grid_flattice[k])(ii);
-	    temp_clatticevol=abs(det(temp_clattice));
-	    if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {  // check volume !!! FAST !
-	      temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
-	      jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
-	      // compare the temp_clattice... and lattice... to see if they are the same lattice
-	      // that is do the lattice vectors have the same lengths and the same angles
-	      if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)                // check lattices
-		if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)              // check lattices
-		  if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)            // check lattices
-		    if(abs(clatticedata[4]-temp_clatticedata[4]) < _eps_angle_)        // check angles
-		      if(abs(clatticedata[5]-temp_clatticedata[5]) < _eps_angle_)      // check angles
-			if(abs(clatticedata[6]-temp_clatticedata[6]) < _eps_angle_) {  // check angles
-			  // SYMMETRY OPERATION POINT_GROUP and FACTOR_GROUP
-			  // get the matrix that relates the two lattice vectors
-			  // A=U*B but in A and B we plug vectors as columns
-			  // watch lattice is per row Uc=A*inv(B)
-			  // A is the lattice (vectors per colum), B is the test lattice (epr column)
-			  // Uc is the point_group operation which operates AFTER the vector (row)
-			  // as: new_vector_row=old_vector_row*Uc
-			  // point_group is the list of all the Uc !!!
-			  // since A and B are saved as trasposed, I get
-			  // U=trasp(A)*inv(trasp(U))
-			  Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
-			  Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
-			  // check whether this symmetry operation is new or not
-			  sym_found=FALSE;
-			  for(ii=0;ii<a.pgroup.size()&&!sym_found;ii++)
-			    sym_found=identical(Uf,a.pgroup[ii].Uf);       // look in all the list of operations  // DX 12/7/17 - Use Uf (only integers) not Uc and use xmatrix identical eps
-			  // if the symmetry operation is new, add it to the pointgroup array
-			  // and update all info about the sym_op object
-			  if(sym_found==FALSE) {                                 // new operation, generate and save it
-			    clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
-			    kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_);  // kk number pgroups
-			    aus << a.pgroup[kk-1].str_type
-				<< " theta=";
-			    if(a.pgroup[kk-1].angle<100) aus << " ";
-			    if(a.pgroup[kk-1].angle<10) aus << " ";
-			    aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")"
-				<< endl;  // remember vectors start from 0
-			    if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uf error[1]" << endl;exit(0);}
-			    if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uc error[2]" << endl;exit(0);}
-			    if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uf error[3]" << endl;exit(0);}
-			    if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
-			      {cerr << "SYM::CalculatePointGroup Uc error[4]" << endl;exit(0);}
-			  }
-			}
-	    }
-	  }
-	}
+        for(ii=1;ii<=3;ii++) temp_clattice(2,ii)=(*grid_clattice[j])(ii);
+        for(ii=1;ii<=3;ii++) temp_flattice(2,ii)=(*grid_flattice[j])(ii);
+        for(uint k=0;k<grid_clattice.size();k++) {
+          if(i!=j && i!=k && j!=k) {
+            for(ii=1;ii<=3;ii++) temp_clattice(3,ii)=(*grid_clattice[k])(ii);
+            for(ii=1;ii<=3;ii++) temp_flattice(3,ii)=(*grid_flattice[k])(ii);
+            temp_clatticevol=abs(det(temp_clattice));
+            if(abs(temp_clatticevol-latticevol)<=_eps_vol_) {  // check volume !!! FAST !
+              temp_clatticedata=_Getabc_angles(temp_clattice,DEGREES);
+              jj++;//if(!mod(jj,100000)) cerr << temp_clatticedata << endl;
+              // compare the temp_clattice... and lattice... to see if they are the same lattice
+              // that is do the lattice vectors have the same lengths and the same angles
+              if(abs(clatticedata[1]-temp_clatticedata[1]) < _eps_abc_)                // check lattices
+                if(abs(clatticedata[2]-temp_clatticedata[2]) < _eps_abc_)              // check lattices
+                  if(abs(clatticedata[3]-temp_clatticedata[3]) < _eps_abc_)            // check lattices
+                    if(abs(clatticedata[4]-temp_clatticedata[4]) < _eps_angle_)        // check angles
+                      if(abs(clatticedata[5]-temp_clatticedata[5]) < _eps_angle_)      // check angles
+                        if(abs(clatticedata[6]-temp_clatticedata[6]) < _eps_angle_) {  // check angles
+                          // SYMMETRY OPERATION POINT_GROUP and FACTOR_GROUP
+                          // get the matrix that relates the two lattice vectors
+                          // A=U*B but in A and B we plug vectors as columns
+                          // watch lattice is per row Uc=A*inv(B)
+                          // A is the lattice (vectors per colum), B is the test lattice (epr column)
+                          // Uc is the point_group operation which operates AFTER the vector (row)
+                          // as: new_vector_row=old_vector_row*Uc
+                          // point_group is the list of all the Uc !!!
+                          // since A and B are saved as trasposed, I get
+                          // U=trasp(A)*inv(trasp(U))
+                          Bct=temp_clattice;Uc=trasp(Act)*inverse(trasp(Bct)); // Act=lattice;
+                          Bdt=temp_flattice;Uf=trasp(Adt)*inverse(trasp(Bdt)); // Adt=I3... could remove !
+                          // check whether this symmetry operation is new or not
+                          sym_found=FALSE;
+                          for(ii=0;ii<a.pgroup.size()&&!sym_found;ii++)
+                            sym_found=identical(Uf,a.pgroup[ii].Uf);       // look in all the list of operations  // DX 12/7/17 - Use Uf (only integers) not Uc and use xmatrix identical eps
+                          // if the symmetry operation is new, add it to the pointgroup array
+                          // and update all info about the sym_op object
+                          if(sym_found==FALSE) {                                 // new operation, generate and save it
+                            clear(ctau);clear(ftau);clear(ctrasl);clear(ftrasl);
+                            kk=SYM::AddSymmetryToStructure(a,Uc,Uf,ctau,ftau,ctrasl,ftrasl,basis_atoms_map,basis_types_map,false,_PGROUP_);  // kk number pgroups
+                            aus << a.pgroup[kk-1].str_type
+                              << " theta=";
+                            if(a.pgroup[kk-1].angle<100) aus << " ";
+                            if(a.pgroup[kk-1].angle<10) aus << " ";
+                            aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")"
+                              << endl;  // remember vectors start from 0
+                            if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uf error[1]" << endl;exit(0);}
+                            if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uc error[2]" << endl;exit(0);}
+                            if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uf error[3]" << endl;exit(0);}
+                            if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
+                            {cerr << "SYM::CalculatePointGroup Uc error[4]" << endl;exit(0);}
+                          }
+                        }
+            }
+          }
+        }
       }
     }
     // ------------------------------------------------------------------------------
@@ -7481,13 +7518,13 @@ namespace SYM {
     cout<<"Point symmtery operations:"<<endl;
     for(i=0;i<a.pgroup.size();i++) {
       cout<<"pointsym_op "<<i<<"/"<<a.pgroup.size()<<": "
-	  <<a.pgroup[i].str_type<<", "<<a.pgroup[i].angle<<" about "
-	  <<a.pgroup[i].axis<<endl
-	  <<a.pgroup[i].Uc<<endl;
+        <<a.pgroup[i].str_type<<", "<<a.pgroup[i].angle<<" about "
+        <<a.pgroup[i].axis<<endl
+        <<a.pgroup[i].Uc<<endl;
       flog<<"pointsym_op "<<i<<"/"<<a.pgroup.size()<<": "
-	  <<a.pgroup[i].str_type<<", "<<a.pgroup[i].angle<<" about "
-	  <<a.pgroup[i].axis<<endl
-	  <<a.pgroup[i].Uc<<endl;
+        <<a.pgroup[i].str_type<<", "<<a.pgroup[i].angle<<" about "
+        <<a.pgroup[i].axis<<endl
+        <<a.pgroup[i].Uc<<endl;
     }
 
     bool foundG,founda1,founda2,founda3;
@@ -7516,92 +7553,92 @@ namespace SYM {
       for(it=1;it<4;it++) mGb4Uc(1,it)=-basis[ib][it];
       mGb4Uc(3)=mGb4Uc(2)=mGb4Uc(1);
       flog<<"rlatt r=r-basis["<<ib<<"]:"<<endl<<rlattb4Uc<<endl
-	  <<"gamma g=g-basis["<<ib<<"]: "<<mGb4Uc(1)<<endl;
+        <<"gamma g=g-basis["<<ib<<"]: "<<mGb4Uc(1)<<endl;
       for(jp=0;jp<a.pgroup.size();jp++) {
-	//r=Ur
-	rlatttmp=a.pgroup[jp].Uc*(trasp(rlattb4Uc));
-	rlatt=trasp(rlatttmp);
-	rlatttmp=a.pgroup[jp].Uc*(trasp(mGb4Uc));
-	mG=trasp(rlatttmp);
-	flog<<"try sym_op "<<jp<<"/"<<a.pgroup.size()<<", rotation matrix U:"<<endl<<a.pgroup[jp].Uc<<endl;
-	flog<<"rlatt r=Ur:"<<endl<<rlatt<<endl
-	    <<"gamma  g=U*g: "<<mG(1)<<endl;
-	//r=r+A
-	for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it)+basis[ib][it];
-	for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it)+basis[ib][it];
-	for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it)+basis[ib][it];
-	for(it=1;it<4;it++) mG(1,it)=mG(1,it)+basis[ib][it];
-	flog<<"rlatt r=r+basis["<<ib<<"]:"<<endl<<rlatt<<endl
-	    <<"gamma  g=g+basis["<<ib<<"]: "<<mG(1)<<endl;
-	//bring inside radius
-	irlatt=inverse(lattice);
-	mG(2,1)=0.0; mG(2,2)=0.0; mG(2,3)=0.0;
-	for(it=1;it<4;it++) mG(2,1)=mG(2,1) + mG(1,it)*irlatt(it,1);
-	for(it=1;it<4;it++) mG(2,2)=mG(2,2) + mG(1,it)*irlatt(it,2);
-	for(it=1;it<4;it++) mG(2,3)=mG(2,3) + mG(1,it)*irlatt(it,3);
-	n1=(int)(round(mG(2,1))); n2=(int)(round(mG(2,2))); n3=(int)(round(mG(2,3)));
-	flog<<"Gamma cartesian  coordinate: "<<mG(1)<<endl
-	    <<"Gamma fractional coordinate: "<<mG(2)<<endl
-	    <<"shifting along -(n1*a1+n2*a2+n3*a3) with n1 n2 n3: "<<n1<<" "<<n2<<" "<<n3<<endl;
-	for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-	for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-	for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-	for(it=1;it<4;it++) mG(1,it)=mG(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-	if(modulus(rlatt(1))>(radius+3*_eps_abc_) ||
-	   modulus(rlatt(2))>(radius+3*_eps_abc_) ||
-	   modulus(rlatt(3))>(radius+3*_eps_abc_)
-	   ) {
-	  cerr<<"ERROR: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
-	  flog<<"ERROR: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
-	  flog.close();
-	  //deallocate pointer
-	  for(uint i=0;i<grid_clattice.size();i++)
-	    delete grid_clattice[i];
-	  grid_clattice.clear();
-	  for(uint i=0;i<grid_flattice.size();i++)
-	    delete grid_flattice[i];
-	  grid_flattice.clear();
-	  exit(1);
-	}
+        //r=Ur
+        rlatttmp=a.pgroup[jp].Uc*(trasp(rlattb4Uc));
+        rlatt=trasp(rlatttmp);
+        rlatttmp=a.pgroup[jp].Uc*(trasp(mGb4Uc));
+        mG=trasp(rlatttmp);
+        flog<<"try sym_op "<<jp<<"/"<<a.pgroup.size()<<", rotation matrix U:"<<endl<<a.pgroup[jp].Uc<<endl;
+        flog<<"rlatt r=Ur:"<<endl<<rlatt<<endl
+          <<"gamma  g=U*g: "<<mG(1)<<endl;
+        //r=r+A
+        for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it)+basis[ib][it];
+        for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it)+basis[ib][it];
+        for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it)+basis[ib][it];
+        for(it=1;it<4;it++) mG(1,it)=mG(1,it)+basis[ib][it];
+        flog<<"rlatt r=r+basis["<<ib<<"]:"<<endl<<rlatt<<endl
+          <<"gamma  g=g+basis["<<ib<<"]: "<<mG(1)<<endl;
+        //bring inside radius
+        irlatt=inverse(lattice);
+        mG(2,1)=0.0; mG(2,2)=0.0; mG(2,3)=0.0;
+        for(it=1;it<4;it++) mG(2,1)=mG(2,1) + mG(1,it)*irlatt(it,1);
+        for(it=1;it<4;it++) mG(2,2)=mG(2,2) + mG(1,it)*irlatt(it,2);
+        for(it=1;it<4;it++) mG(2,3)=mG(2,3) + mG(1,it)*irlatt(it,3);
+        n1=(int)(round(mG(2,1))); n2=(int)(round(mG(2,2))); n3=(int)(round(mG(2,3)));
+        flog<<"Gamma cartesian  coordinate: "<<mG(1)<<endl
+          <<"Gamma fractional coordinate: "<<mG(2)<<endl
+          <<"shifting along -(n1*a1+n2*a2+n3*a3) with n1 n2 n3: "<<n1<<" "<<n2<<" "<<n3<<endl;
+        for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+        for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+        for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+        for(it=1;it<4;it++) mG(1,it)=mG(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+        if(modulus(rlatt(1))>(radius+3*_eps_abc_) ||
+            modulus(rlatt(2))>(radius+3*_eps_abc_) ||
+            modulus(rlatt(3))>(radius+3*_eps_abc_)
+          ) {
+          cerr<<"ERROR: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
+          flog<<"ERROR: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
+          flog.close();
+          //deallocate pointer
+          for(uint i=0;i<grid_clattice.size();i++)
+            delete grid_clattice[i];
+          grid_clattice.clear();
+          for(uint i=0;i<grid_flattice.size();i++)
+            delete grid_flattice[i];
+          grid_flattice.clear();
+          exit(1);
+        }
 
-	flog<<"rlatt row-lattice vectors new coord: "<<endl<<rlatt<<endl
-	    <<"Gamma-point new cart coord: "<<mG(1)<<endl;
-	//there is a chance that one of the rlatt rows is zero
-	//or rlatt rows are coplanar
-	//check mapping
-	sym_found=false;
-	foundG=false;founda1=false;founda2=false;founda3=false;
-	for(i=0;i<grid_clattice.size();i++) {
-	  if( !foundG && (modulus(mG(1))<_eps_abc_) ) {
-	    foundG=true;flog<<"*foundG*"<<endl;}
-	  if( !foundG && (abs(mG(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-	      (abs(mG(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-	      (abs(mG(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-	    foundG=true;flog<<"**foundG**"<<endl;}
-	  if( !founda1 && (modulus(rlatt(1))<_eps_abc_) ) {
-	    founda1=true;flog<<"*founda1*"<<endl;}
-	  if( !founda1 && (abs(rlatt(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-	      (abs(rlatt(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-	      (abs(rlatt(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-	    founda1=true;flog<<"**founda1**"<<endl;}
-	  if( !founda2 && (modulus(rlatt(2))<_eps_abc_) ) {
-	    founda2=true;flog<<"*founda2*"<<endl;}
-	  if( !founda2 && (abs(rlatt(2,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-	      (abs(rlatt(2,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-	      (abs(rlatt(2,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-	    founda2=true;flog<<"**founda2**"<<endl;}
-	  if( !founda3 && (modulus(rlatt(3))<_eps_abc_) ) {
-	    founda3=true;flog<<"*founda3*"<<endl;}
-	  if( !founda3 && (abs(rlatt(3,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-	      (abs(rlatt(3,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-	      (abs(rlatt(3,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-	    founda3=true;flog<<"**founda3**"<<endl;}
-	  if(foundG && founda1 && founda2 && founda3) {
-	    sym_found=true;
-	    flog<<"***sym_found***"<<endl;
-	    Bsitesym[ib].push_back(jp); break;
-	  }
-	}
+        flog<<"rlatt row-lattice vectors new coord: "<<endl<<rlatt<<endl
+          <<"Gamma-point new cart coord: "<<mG(1)<<endl;
+        //there is a chance that one of the rlatt rows is zero
+        //or rlatt rows are coplanar
+        //check mapping
+        sym_found=false;
+        foundG=false;founda1=false;founda2=false;founda3=false;
+        for(i=0;i<grid_clattice.size();i++) {
+          if( !foundG && (modulus(mG(1))<_eps_abc_) ) {
+            foundG=true;flog<<"*foundG*"<<endl;}
+          if( !foundG && (abs(mG(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+              (abs(mG(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+              (abs(mG(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+            foundG=true;flog<<"**foundG**"<<endl;}
+          if( !founda1 && (modulus(rlatt(1))<_eps_abc_) ) {
+            founda1=true;flog<<"*founda1*"<<endl;}
+          if( !founda1 && (abs(rlatt(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+              (abs(rlatt(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+              (abs(rlatt(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+            founda1=true;flog<<"**founda1**"<<endl;}
+          if( !founda2 && (modulus(rlatt(2))<_eps_abc_) ) {
+            founda2=true;flog<<"*founda2*"<<endl;}
+          if( !founda2 && (abs(rlatt(2,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+              (abs(rlatt(2,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+              (abs(rlatt(2,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+            founda2=true;flog<<"**founda2**"<<endl;}
+          if( !founda3 && (modulus(rlatt(3))<_eps_abc_) ) {
+            founda3=true;flog<<"*founda3*"<<endl;}
+          if( !founda3 && (abs(rlatt(3,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+              (abs(rlatt(3,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+              (abs(rlatt(3,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+            founda3=true;flog<<"**founda3**"<<endl;}
+          if(foundG && founda1 && founda2 && founda3) {
+            sym_found=true;
+            flog<<"***sym_found***"<<endl;
+            Bsitesym[ib].push_back(jp); break;
+          }
+        }
 
       }//loop for pgroup
     }//loop for basis
@@ -7609,10 +7646,10 @@ namespace SYM {
     for(i=0;i<Nbasis;i++) {
       cout<<"Site symmetry operations for basis["<<i<<"]:"<<endl;
       for(j=0;j<Bsitesym[i].size();j++) {
-	cout<<"sitesym_op "<<j<<"/"<<Bsitesym[i].size()<<": "
-	    <<a.pgroup[Bsitesym[i][j]].str_type<<", "
-	    <<a.pgroup[Bsitesym[i][j]].angle<<" about "<<a.pgroup[Bsitesym[i][j]].axis<<endl
-	    <<a.pgroup[Bsitesym[i][j]].Uc<<endl;
+        cout<<"sitesym_op "<<j<<"/"<<Bsitesym[i].size()<<": "
+          <<a.pgroup[Bsitesym[i][j]].str_type<<", "
+          <<a.pgroup[Bsitesym[i][j]].angle<<" about "<<a.pgroup[Bsitesym[i][j]].axis<<endl
+          <<a.pgroup[Bsitesym[i][j]].Uc<<endl;
       }
     }
 
@@ -7625,113 +7662,113 @@ namespace SYM {
     }
     if(ComMidss) {
       for(iA=0;iA<Nbasis-1;iA++) {
-	for(jpA=0;jpA<Bsitesym[iA].size();jpA++) {
-	  for(iB=iA+1;iB<Nbasis;iB++) {
-	    for(jpB=0;jpB<Bsitesym[iB].size();jpB++) {
-	      if(Bsitesym[iA][jpA]==Bsitesym[iB][jpB]) {
-		jp=Bsitesym[iB][jpB];//index of symop in pgroup that is common for site A and B.
-		cerr<<"common site symop found: "<<jp<<endl;
-		for(it=1;it<4;it++) AMB[it]=(basis[iA][it]+basis[iB][it])/2.0;
-		//r=r-A
-		for(it=1;it<4;it++) rlattb4Uc(1,it)=lattice(1,it)-AMB[it];
-		for(it=1;it<4;it++) rlattb4Uc(2,it)=lattice(2,it)-AMB[it];
-		for(it=1;it<4;it++) rlattb4Uc(3,it)=lattice(3,it)-AMB[it];
-		for(it=1;it<4;it++) mGb4Uc(1,it)=-AMB[it];
-		mGb4Uc(3)=mGb4Uc(2)=mGb4Uc(1);
-		//r=Ur
-		rlatttmp=a.pgroup[jp].Uc*(trasp(rlattb4Uc));
-		rlatt=trasp(rlatttmp);
-		rlatttmp=a.pgroup[jp].Uc*(trasp(mGb4Uc));
-		mG=trasp(rlatttmp);
-		//r=r+A
-		for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it)+AMB[it];
-		for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it)+AMB[it];
-		for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it)+AMB[it];
-		for(it=1;it<4;it++) mG(1,it)=mG(1,it)+AMB[it];
-		//bring inside radius
-		irlatt=inverse(lattice);
-		mG(2,1)=0.0; mG(2,2)=0.0; mG(2,3)=0.0;
-		for(it=1;it<4;it++) mG(2,1)=mG(2,1) + mG(1,it)*irlatt(it,1);
-		for(it=1;it<4;it++) mG(2,2)=mG(2,2) + mG(1,it)*irlatt(it,2);
-		for(it=1;it<4;it++) mG(2,3)=mG(2,3) + mG(1,it)*irlatt(it,3);
-		n1=(int)(round(mG(2,1))); n2=(int)(round(mG(2,2))); n3=(int)(round(mG(2,3)));
-		//flog<<"Gamma cartesian  coordinate: "<<mG(1)<<endl
-		//<<"Gamma fractional coordinate: "<<mG(2)<<endl
-		//<<"shifting along -(n1*a1+n2*a2+n3*a3) with n1 n2 n3: "<<n1<<" "<<n2<<" "<<n3<<endl;
-		for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-		for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-		for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-		for(it=1;it<4;it++) mG(1,it)=mG(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
-		if(modulus(rlatt(1))>(radius+3*_eps_abc_) ||
-		   modulus(rlatt(2))>(radius+3*_eps_abc_) ||
-		   modulus(rlatt(3))>(radius+3*_eps_abc_)
-		   ) {
-		  cerr<<"ERROR mid: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
-		  flog<<"ERROR mid: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
-		  flog.close();
-		  //deallocate pointer
-		  for(uint i=0;i<grid_clattice.size();i++)
-		    delete grid_clattice[i];
-		  grid_clattice.clear();
-		  for(uint i=0;i<grid_flattice.size();i++)
-		    delete grid_flattice[i];
-		  grid_flattice.clear();
-		  exit(1);
-		}
-		//check mapping
-		sym_found=false;
-		foundG=false;founda1=false;founda2=false;founda3=false;
-		for(i=0;i<grid_clattice.size();i++) {
-		  if( !foundG && (modulus(mG(1))<_eps_abc_) ) {
-		    foundG=true;}
-		  if( !foundG && (abs(mG(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-		      (abs(mG(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-		      (abs(mG(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-		    foundG=true;}
-		  if( !founda1 && (modulus(rlatt(1))<_eps_abc_) ) {
-		    founda1=true;}
-		  if( !founda1 && (abs(rlatt(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-		      (abs(rlatt(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-		      (abs(rlatt(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-		    founda1=true;}
-		  if( !founda2 && (modulus(rlatt(2))<_eps_abc_) ) {
-		    founda2=true;}
-		  if( !founda2 && (abs(rlatt(2,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-		      (abs(rlatt(2,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-		      (abs(rlatt(2,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-		    founda2=true;}
-		  if( !founda3 && (modulus(rlatt(3))<_eps_abc_) ) {
-		    founda3=true;}
-		  if( !founda3 && (abs(rlatt(3,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
-		      (abs(rlatt(3,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
-		      (abs(rlatt(3,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
-		    founda3=true;}
-		  if(foundG && founda1 && founda2 && founda3) {
-		    sym_found=true;
-		    AMBsitesym[iA][iB].push_back(jp); break;
-		  }
-		}
+        for(jpA=0;jpA<Bsitesym[iA].size();jpA++) {
+          for(iB=iA+1;iB<Nbasis;iB++) {
+            for(jpB=0;jpB<Bsitesym[iB].size();jpB++) {
+              if(Bsitesym[iA][jpA]==Bsitesym[iB][jpB]) {
+                jp=Bsitesym[iB][jpB];//index of symop in pgroup that is common for site A and B.
+                cerr<<"common site symop found: "<<jp<<endl;
+                for(it=1;it<4;it++) AMB[it]=(basis[iA][it]+basis[iB][it])/2.0;
+                //r=r-A
+                for(it=1;it<4;it++) rlattb4Uc(1,it)=lattice(1,it)-AMB[it];
+                for(it=1;it<4;it++) rlattb4Uc(2,it)=lattice(2,it)-AMB[it];
+                for(it=1;it<4;it++) rlattb4Uc(3,it)=lattice(3,it)-AMB[it];
+                for(it=1;it<4;it++) mGb4Uc(1,it)=-AMB[it];
+                mGb4Uc(3)=mGb4Uc(2)=mGb4Uc(1);
+                //r=Ur
+                rlatttmp=a.pgroup[jp].Uc*(trasp(rlattb4Uc));
+                rlatt=trasp(rlatttmp);
+                rlatttmp=a.pgroup[jp].Uc*(trasp(mGb4Uc));
+                mG=trasp(rlatttmp);
+                //r=r+A
+                for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it)+AMB[it];
+                for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it)+AMB[it];
+                for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it)+AMB[it];
+                for(it=1;it<4;it++) mG(1,it)=mG(1,it)+AMB[it];
+                //bring inside radius
+                irlatt=inverse(lattice);
+                mG(2,1)=0.0; mG(2,2)=0.0; mG(2,3)=0.0;
+                for(it=1;it<4;it++) mG(2,1)=mG(2,1) + mG(1,it)*irlatt(it,1);
+                for(it=1;it<4;it++) mG(2,2)=mG(2,2) + mG(1,it)*irlatt(it,2);
+                for(it=1;it<4;it++) mG(2,3)=mG(2,3) + mG(1,it)*irlatt(it,3);
+                n1=(int)(round(mG(2,1))); n2=(int)(round(mG(2,2))); n3=(int)(round(mG(2,3)));
+                //flog<<"Gamma cartesian  coordinate: "<<mG(1)<<endl
+                //<<"Gamma fractional coordinate: "<<mG(2)<<endl
+                //<<"shifting along -(n1*a1+n2*a2+n3*a3) with n1 n2 n3: "<<n1<<" "<<n2<<" "<<n3<<endl;
+                for(it=1;it<4;it++) rlatt(1,it)=rlatt(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+                for(it=1;it<4;it++) rlatt(2,it)=rlatt(2,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+                for(it=1;it<4;it++) rlatt(3,it)=rlatt(3,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+                for(it=1;it<4;it++) mG(1,it)=mG(1,it) - (n1*a1(it)+n2*a2(it)+n3*a3(it));
+                if(modulus(rlatt(1))>(radius+3*_eps_abc_) ||
+                    modulus(rlatt(2))>(radius+3*_eps_abc_) ||
+                    modulus(rlatt(3))>(radius+3*_eps_abc_)
+                  ) {
+                  cerr<<"ERROR mid: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
+                  flog<<"ERROR mid: one of the rlatt points is outside radius, algorithm 1.5*Rsphere failed."<<endl;
+                  flog.close();
+                  //deallocate pointer
+                  for(uint i=0;i<grid_clattice.size();i++)
+                    delete grid_clattice[i];
+                  grid_clattice.clear();
+                  for(uint i=0;i<grid_flattice.size();i++)
+                    delete grid_flattice[i];
+                  grid_flattice.clear();
+                  exit(1);
+                }
+                //check mapping
+                sym_found=false;
+                foundG=false;founda1=false;founda2=false;founda3=false;
+                for(i=0;i<grid_clattice.size();i++) {
+                  if( !foundG && (modulus(mG(1))<_eps_abc_) ) {
+                    foundG=true;}
+                  if( !foundG && (abs(mG(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+                      (abs(mG(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+                      (abs(mG(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+                    foundG=true;}
+                  if( !founda1 && (modulus(rlatt(1))<_eps_abc_) ) {
+                    founda1=true;}
+                  if( !founda1 && (abs(rlatt(1,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+                      (abs(rlatt(1,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+                      (abs(rlatt(1,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+                    founda1=true;}
+                  if( !founda2 && (modulus(rlatt(2))<_eps_abc_) ) {
+                    founda2=true;}
+                  if( !founda2 && (abs(rlatt(2,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+                      (abs(rlatt(2,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+                      (abs(rlatt(2,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+                    founda2=true;}
+                  if( !founda3 && (modulus(rlatt(3))<_eps_abc_) ) {
+                    founda3=true;}
+                  if( !founda3 && (abs(rlatt(3,1)-(*grid_clattice[i])(1)) < _eps_abc_) &&
+                      (abs(rlatt(3,2)-(*grid_clattice[i])(2)) < _eps_abc_) &&
+                      (abs(rlatt(3,3)-(*grid_clattice[i])(3)) < _eps_abc_) ) {
+                    founda3=true;}
+                  if(foundG && founda1 && founda2 && founda3) {
+                    sym_found=true;
+                    AMBsitesym[iA][iB].push_back(jp); break;
+                  }
+                }
 
-	      }//find common A&B
-	    }//jpB
-	  }//iB
-	}//jpA
+              }//find common A&B
+            }//jpB
+          }//iB
+        }//jpA
       }//iA
     } //ComMidss
 
     for(i=0;i<Nbasis;i++) {
       cout<<"Index of site symop for basis["<<i<<"]:(total "<<Bsitesym[i].size()<<")";
       for(j=0;j<Bsitesym[i].size();j++) {
-	cout<<" "<<Bsitesym[i][j];
+        cout<<" "<<Bsitesym[i][j];
       }
       cout<<endl;
     }
 
     for(iA=0;iA<Nbasis-1;iA++) {
       for(iB=iA+1;iB<Nbasis;iB++) {
-	cout<<"index common site sym_op "<<iA<<"-mid-"<<iB<<":(total "<<AMBsitesym[iA][iB].size()<<")";
-	for(jp=0;jp<AMBsitesym[iA][iB].size();jp++) cout<<" "<<AMBsitesym[iA][iB][jp];
-	cout<<endl;
+        cout<<"index common site sym_op "<<iA<<"-mid-"<<iB<<":(total "<<AMBsitesym[iA][iB].size()<<")";
+        for(jp=0;jp<AMBsitesym[iA][iB].size();jp++) cout<<" "<<AMBsitesym[iA][iB][jp];
+        cout<<endl;
       }
     }
 
@@ -7780,7 +7817,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
       if(PRINT_NULL){ sscontent_json << "\"group\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
+
     // site (agroup only)
     if(group[i].ctau.rows && group_str == "agroup"){
       sscontent_json << "\"site\":" << group[i].site << eendl;
@@ -7820,7 +7857,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
       if(PRINT_NULL){ sscontent_json << "\"Uc\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
+
     // Uf
     if(group[i].Uf.lrows){
       sscontent_json << "\"Uf\":[" << aurostd::xmatDouble2String(group[i].Uf,1,roff) << "]" << eendl;
@@ -7945,7 +7982,7 @@ string SymmetryToJson(vector<_sym_op>& group, char& mode){
       if(PRINT_NULL){ sscontent_json << "\"basis_types_map\":null" << eendl;}
     }
     vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-    
+
     // ctrasl
     if(group[i].ctrasl.rows && group_str == "sgroup"){
       sscontent_json << "\"ctrasl\":[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(group[i].ctrasl,5,roff),",") << "]" << eendl;
@@ -8026,22 +8063,22 @@ string EquivalentAtomsToJson(vector<vector<int> >& iatoms){
     for(uint iat1=0;iat1<iatoms.size();iat1++) {
       sscontent_json << "[" << eendl;
       for(uint iat2=0;iat2<iatoms[iat1].size();iat2++){
-	sscontent_json << iatoms[iat1][iat2] << eendl;
-	if(iat2 != iatoms[iat1].size()-1){
-	  sscontent_json << "," << eendl;
-	}
+        sscontent_json << iatoms[iat1][iat2] << eendl;
+        if(iat2 != iatoms[iat1].size()-1){
+          sscontent_json << "," << eendl;
+        }
       }
       sscontent_json << "]" << eendl;
       if(iat1 != iatoms.size()-1){
-	sscontent_json << "," << eendl;
+        sscontent_json << "," << eendl;
       }
     }
-  sscontent_json << "]" << eendl;
+    sscontent_json << "]" << eendl;
   } else {
     if(PRINT_NULL){ sscontent_json << "\"equivalent_sets\":null" << eendl;}
   }
   vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-  
+
   sss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
   vcontent_json.clear();
   return sss.str();
@@ -8080,14 +8117,14 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   if(mode==_PGROUPK_XTAL_) aus << (aflags.QUIET?"":"00000  MESSAGE ") << "PGROUPK_XTAL Symmetry: writing BEGIN " << Message(aflags,"user,host,time",_AFLOW_FILE_NAME_) << endl; // DX 12/5/17 - Added pgroupk_xtal
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
   if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-  if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_OUT;
-  if(mode==_PGROUPK_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT;
-  if(mode==_FGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_FGROUP_OUT;
-  if(mode==_SGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_SGROUP_OUT;
-  if(mode==_AGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_AGROUP_OUT;
-  if(mode==_IATOMS_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_IATOMS_OUT;
-  if(mode==_PGROUP_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT;
-  if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT; // DX 12/5/17 - Added pgroupk_xtal
+    if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_OUT;
+    if(mode==_PGROUPK_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_OUT;
+    if(mode==_FGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_FGROUP_OUT;
+    if(mode==_SGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_SGROUP_OUT;
+    if(mode==_AGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_AGROUP_OUT;
+    if(mode==_IATOMS_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_IATOMS_OUT;
+    if(mode==_PGROUP_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_XTAL_OUT;
+    if(mode==_PGROUPK_XTAL_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUPK_XTAL_OUT; // DX 12/5/17 - Added pgroupk_xtal
   }
   if(format=="json" || format=="Json" || format=="JSON"){
     if(mode==_PGROUP_) FileNameOUTPUT=aflags.Directory+"/"+DEFAULT_AFLOW_PGROUP_JSON;
@@ -8102,21 +8139,21 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   string _lines_="------------------------------------------------------------------------------------------------";
   FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
   if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-  FileOUTPUT << _lines_ << endl;
+    FileOUTPUT << _lines_ << endl;
   } // DX 8/2/17
   if(mode==_PGROUP_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    FileOUTPUT << a.pgroup.size() << "    point group operations " << endl;
-    for(uint k=0;k<a.pgroup.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) FileOUTPUT << _lines_ << endl;
-      FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
-      FileOUTPUT << a.pgroup[k]; // << endl;
-      FileOUTPUT << _lines_ << endl;
-      FileOUTPUT.flush();
-    }
+      FileOUTPUT << "AFLOW point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      FileOUTPUT << a.pgroup.size() << "    point group operations " << endl;
+      for(uint k=0;k<a.pgroup.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
+        FileOUTPUT << a.pgroup[k]; // << endl;
+        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT.flush();
+      }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << SymmetryToJson(a.pgroup,mode);          // DX 8/2/17
@@ -8127,17 +8164,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   if(mode==_PGROUP_XTAL_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    FileOUTPUT << a.pgroup_xtal.size() << "    crystal point group operations " << endl;
-    for(uint k=0;k<a.pgroup_xtal.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) FileOUTPUT << _lines_ << endl;
-      FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
-      FileOUTPUT << a.pgroup_xtal[k]; // << endl;
-      FileOUTPUT << _lines_ << endl;
-      FileOUTPUT.flush();
-    }
+      FileOUTPUT << "AFLOW crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      FileOUTPUT << a.pgroup_xtal.size() << "    crystal point group operations " << endl;
+      for(uint k=0;k<a.pgroup_xtal.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
+        FileOUTPUT << a.pgroup_xtal[k]; // << endl;
+        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT.flush();
+      }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << SymmetryToJson(a.pgroup_xtal,mode);     // DX 8/2/17
@@ -8149,17 +8186,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   // DX 12/5/17 - Added pgroupk_xtal - START
   if(mode==_PGROUPK_XTAL_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW dual of crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    FileOUTPUT << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
-    for(uint k=0;k<a.pgroupk_xtal.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) FileOUTPUT << _lines_ << endl;
-      FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
-      FileOUTPUT << a.pgroupk_xtal[k]; // << endl;
-      FileOUTPUT << _lines_ << endl;
-      FileOUTPUT.flush();
-    }
+      FileOUTPUT << "AFLOW dual of crystal point group file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      FileOUTPUT << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
+      for(uint k=0;k<a.pgroupk_xtal.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
+        FileOUTPUT << a.pgroupk_xtal[k]; // << endl;
+        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT.flush();
+      }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << SymmetryToJson(a.pgroupk_xtal,mode);     // DX 8/2/17
@@ -8171,17 +8208,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   // DX 12/5/17 - Added pgroupk_xtal - END
   if(mode==_PGROUPK_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW point group klattice file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    FileOUTPUT << a.pgroupk.size() << "    point group operations " << endl;
-    for(uint k=0;k<a.pgroupk.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) FileOUTPUT << _lines_ << endl;
-      FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
-      FileOUTPUT << a.pgroupk[k]; // << endl;
-      FileOUTPUT << _lines_ << endl;
-      FileOUTPUT.flush();
-    }
+      FileOUTPUT << "AFLOW point group klattice file, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      FileOUTPUT << a.pgroupk.size() << "    point group operations " << endl;
+      for(uint k=0;k<a.pgroupk.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
+        FileOUTPUT << a.pgroupk[k]; // << endl;
+        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT.flush();
+      }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << SymmetryToJson(a.pgroupk,mode);         // DX 8/2/17
@@ -8192,17 +8229,17 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   if(mode==_FGROUP_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW factor group file, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
-    FileOUTPUT << a.fgroup.size() << "    factor group operations " << endl;
-    for(uint k=0;k<a.fgroup.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-      if(k==0) FileOUTPUT << _lines_ << endl;
-      FileOUTPUT << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
-      FileOUTPUT << a.fgroup[k]; // << endl;
-      FileOUTPUT << _lines_ << endl;
-      FileOUTPUT.flush();
-    }
+      FileOUTPUT << "AFLOW factor group file, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
+      FileOUTPUT << a.fgroup.size() << "    factor group operations " << endl;
+      for(uint k=0;k<a.fgroup.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
+        if(k==0) FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
+        FileOUTPUT << a.fgroup[k]; // << endl;
+        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT.flush();
+      }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << SymmetryToJson(a.fgroup,mode);          // DX 8/2/17
@@ -8213,19 +8250,19 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   if(mode==_SGROUP_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW space group file, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
-    FileOUTPUT << a.sgroup.size() << "    space group operations " << endl;
-    FileOUTPUT << a.sgroup_radius << "    radius of space group " << endl;
-    FileOUTPUT << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
-    for(uint k=0;k<a.sgroup.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-      if(k==0) FileOUTPUT << _lines_ << endl;
-      FileOUTPUT << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
-      FileOUTPUT << a.sgroup[k]; // << endl;
-      FileOUTPUT << _lines_ << endl;
-      FileOUTPUT.flush();
-    }
+      FileOUTPUT << "AFLOW space group file, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
+      FileOUTPUT << a.sgroup.size() << "    space group operations " << endl;
+      FileOUTPUT << a.sgroup_radius << "    radius of space group " << endl;
+      FileOUTPUT << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
+      for(uint k=0;k<a.sgroup.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
+        if(k==0) FileOUTPUT << _lines_ << endl;
+        FileOUTPUT << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
+        FileOUTPUT << a.sgroup[k]; // << endl;
+        FileOUTPUT << _lines_ << endl;
+        FileOUTPUT.flush();
+      }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << SymmetryToJson(a.sgroup,mode);          // DX 8/2/17
@@ -8236,21 +8273,21 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   if(mode==_AGROUP_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "AFLOW site point group file centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    for(uint iat=0;iat<a.atoms.size();iat++) {
-      FileOUTPUT << " Site="  << iat << endl;
-      FileOUTPUT << a.agroup.at(iat).size() << "   site point group operations " << endl;
-      for(uint k=0;k<a.agroup.at(iat).size();k++) {
-	for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-	for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-	if(k==0) FileOUTPUT << _lines_ << endl;
-	FileOUTPUT << " Site = " << iat << endl;
- 	FileOUTPUT << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
-	FileOUTPUT << a.agroup.at(iat)[k]; // << endl;
-	FileOUTPUT << _lines_ << endl;
-	FileOUTPUT.flush();
+      FileOUTPUT << "AFLOW site point group file centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      for(uint iat=0;iat<a.atoms.size();iat++) {
+        FileOUTPUT << " Site="  << iat << endl;
+        FileOUTPUT << a.agroup.at(iat).size() << "   site point group operations " << endl;
+        for(uint k=0;k<a.agroup.at(iat).size();k++) {
+          for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+          for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
+          if(k==0) FileOUTPUT << _lines_ << endl;
+          FileOUTPUT << " Site = " << iat << endl;
+          FileOUTPUT << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
+          FileOUTPUT << a.agroup.at(iat)[k]; // << endl;
+          FileOUTPUT << _lines_ << endl;
+          FileOUTPUT.flush();
+        }
       }
-    }
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << AgroupSymmetryToJson(a.agroup,mode);    // DX 8/2/17
@@ -8261,21 +8298,21 @@ bool KBIN_SymmetryWrite(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,char
   }
   if(mode==_IATOMS_) {
     if(format=="txt" || format=="Txt" || format=="TXT" || format=="text" || format=="Text" || format=="TEXT"){ // DX 8/2/17
-    FileOUTPUT << "Equivalent atoms file " << endl;
-    FileOUTPUT << _lines_ << endl;
-    for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-      FileOUTPUT << " [" << a.iatoms.at(iat1).at(0) << "]  ";
-      for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
-	FileOUTPUT << a.iatoms.at(iat1).at(iat2) << " ";
-      FileOUTPUT << endl;
-    }
-    FileOUTPUT << _lines_ << endl;
-    bool temp=a.write_inequivalent_flag;
-    a.write_inequivalent_flag=TRUE;
-    FileOUTPUT << a;
-    a.write_inequivalent_flag=temp;
-    FileOUTPUT << _lines_ << endl;
-    FileOUTPUT.flush();
+      FileOUTPUT << "Equivalent atoms file " << endl;
+      FileOUTPUT << _lines_ << endl;
+      for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
+        FileOUTPUT << " [" << a.iatoms.at(iat1).at(0) << "]  ";
+        for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
+          FileOUTPUT << a.iatoms.at(iat1).at(iat2) << " ";
+        FileOUTPUT << endl;
+      }
+      FileOUTPUT << _lines_ << endl;
+      bool temp=a.write_inequivalent_flag;
+      a.write_inequivalent_flag=TRUE;
+      FileOUTPUT << a;
+      a.write_inequivalent_flag=temp;
+      FileOUTPUT << _lines_ << endl;
+      FileOUTPUT.flush();
     }                                                       // DX 8/2/17
     if(format=="json" || format=="Json" || format=="JSON"){ // DX 8/2/17
       FileOUTPUT << EquivalentAtomsToJson(a.iatoms);   // DX 8/2/17
@@ -8302,116 +8339,116 @@ bool KBIN_SymmetryToScreen(xstructure& a, string& format, ostream& oss, char mod
     xvector<double> aux_rrr(9),aux_ijk(9);
     string _lines_="------------------------------------------------------------------------------------------------";
     if(mode == '\0' || mode == _PGROUP_){
-    oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    oss << a.pgroup.size() << "    point group operations " << endl;
-    for(uint k=0;k<a.pgroup.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) oss << _lines_ << endl;
-      oss << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
-      oss << a.pgroup[k]; // << endl;
-      oss << _lines_ << endl;
-      oss.flush();
-    }
+      oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      oss << a.pgroup.size() << "    point group operations " << endl;
+      for(uint k=0;k<a.pgroup.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) oss << _lines_ << endl;
+        oss << " Operation number = " << k+1 << " / " << a.pgroup.size() << endl;
+        oss << a.pgroup[k]; // << endl;
+        oss << _lines_ << endl;
+        oss.flush();
+      }
     }
     if(mode == '\0' || mode == _PGROUPK_){
-    oss << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    oss << a.pgroupk.size() << "    point group operations " << endl;
-    for(uint k=0;k<a.pgroupk.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) oss << _lines_ << endl;
-      oss << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
-      oss << a.pgroupk[k]; // << endl;
-      oss << _lines_ << endl;
-      oss.flush();
-    }
+      oss << "AFLOW point groups klattice, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      oss << a.pgroupk.size() << "    point group operations " << endl;
+      for(uint k=0;k<a.pgroupk.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) oss << _lines_ << endl;
+        oss << " Operation number = " << k+1 << " / " << a.pgroupk.size() << endl;
+        oss << a.pgroupk[k]; // << endl;
+        oss << _lines_ << endl;
+        oss.flush();
+      }
     }
     if(mode == '\0' || mode == _FGROUP_){
-    oss << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
-    oss << a.fgroup.size() << "    factor group operations " << endl;
-    for(uint k=0;k<a.fgroup.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-      if(k==0) oss << _lines_ << endl;
-      oss << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
-      oss << a.fgroup[k]; // << endl;
-      oss << _lines_ << endl;
-    }
+      oss << "AFLOW factor groups, operations are as a=U*b+tau (cols vectors), (Uc,Uf,ctau,ftau for cartesian/fractional)" << endl;
+      oss << a.fgroup.size() << "    factor group operations " << endl;
+      for(uint k=0;k<a.fgroup.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.fgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.fgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
+        if(k==0) oss << _lines_ << endl;
+        oss << " Operation number = " << k+1 << " / " << a.fgroup.size() << endl;
+        oss << a.fgroup[k]; // << endl;
+        oss << _lines_ << endl;
+      }
     }
     if(mode == '\0' || mode == _PGROUP_XTAL_){
-    oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    oss << a.pgroup_xtal.size() << "    point group operations " << endl;
-    for(uint k=0;k<a.pgroup_xtal.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) oss << _lines_ << endl;
-      oss << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
-      oss << a.pgroup_xtal[k]; // << endl;
-      oss << _lines_ << endl;
-      oss.flush();
-    }
+      oss << "AFLOW point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      oss << a.pgroup_xtal.size() << "    point group operations " << endl;
+      for(uint k=0;k<a.pgroup_xtal.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroup_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroup_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) oss << _lines_ << endl;
+        oss << " Operation number = " << k+1 << " / " << a.pgroup_xtal.size() << endl;
+        oss << a.pgroup_xtal[k]; // << endl;
+        oss << _lines_ << endl;
+        oss.flush();
+      }
     }
     // DX 12/5/17 - Added pgroupk_xtal - START
     if(mode == '\0' || mode == _PGROUPK_XTAL_){
-    oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
-    for(uint k=0;k<a.pgroupk_xtal.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
-      if(k==0) oss << _lines_ << endl;
-      oss << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
-      oss << a.pgroupk_xtal[k]; // << endl;
-      oss << _lines_ << endl;
-      oss.flush();
-    }
+      oss << "AFLOW dual of crystal point groups, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      oss << a.pgroupk_xtal.size() << "    dual of crystal point group operations " << endl;
+      for(uint k=0;k<a.pgroupk_xtal.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.pgroupk_xtal[k].Uc(int(i/3)+1,mod(i,3)+1);                 // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.pgroupk_xtal[k].Uf(int(i/3)+1,mod(i,3)+1);                  // put in rows
+        if(k==0) oss << _lines_ << endl;
+        oss << " Operation number = " << k+1 << " / " << a.pgroupk_xtal.size() << endl;
+        oss << a.pgroupk_xtal[k]; // << endl;
+        oss << _lines_ << endl;
+        oss.flush();
+      }
     }
     // DX 12/5/17 - Added pgroupk_xtal - END
     if(mode == '\0' || mode == _SGROUP_){
-    oss << "AFLOW - space groups, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
-    oss << a.sgroup.size() << "    space group operations " << endl;
-    oss << a.sgroup_radius << "    radius of space group " << endl;
-    oss << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
-    for(uint k=0;k<a.sgroup.size();k++) {
-      for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-      for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-      if(k==0) oss << _lines_ << endl;
-      oss << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
-      oss << a.sgroup[k]; // << endl;
-      oss << _lines_ << endl;
-      oss.flush();
-    }
+      oss << "AFLOW - space groups, operations are as a=U*b+tau+trasl (cols vectors), (Uc,Uf,ctau,ftau,ctrasl,ftrasl for cartesian/fractional)" << endl;
+      oss << a.sgroup.size() << "    space group operations " << endl;
+      oss << a.sgroup_radius << "    radius of space group " << endl;
+      oss << a.sgroup_radius_dims << "    dimension of radius of space group " << endl;
+      for(uint k=0;k<a.sgroup.size();k++) {
+        for(int i=0;i<9;i++) aux_rrr(i+1)=a.sgroup[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+        for(int i=0;i<9;i++) aux_ijk(i+1)=a.sgroup[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
+        if(k==0) oss << _lines_ << endl;
+        oss << " Operation number = " << k+1 << " / " << a.sgroup.size() << endl;
+        oss << a.sgroup[k]; // << endl;
+        oss << _lines_ << endl;
+        oss.flush();
+      }
     }
     if(mode == '\0' || mode == _AGROUP_){
-    oss << "AFLOW site point groups centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
-    for(uint iat=0;iat<a.atoms.size();iat++) {
-      oss << " Site="  << iat << endl;
-      oss << a.agroup.at(iat).size() << "   site point group operations " << endl;
-      for(uint k=0;k<a.agroup.at(iat).size();k++) {
-        for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
-        for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
-        if(k==0) oss << _lines_ << endl;
-        oss << " Site = " << iat << endl;
-        oss << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
-        oss << a.agroup.at(iat)[k]; // << endl;
-        oss << _lines_ << endl;
-      }
-    }   
+      oss << "AFLOW site point groups centered on the site, operations are as a=U*b (cols vectors), (Uc,Uf for cartesian/fractional) " << endl;
+      for(uint iat=0;iat<a.atoms.size();iat++) {
+        oss << " Site="  << iat << endl;
+        oss << a.agroup.at(iat).size() << "   site point group operations " << endl;
+        for(uint k=0;k<a.agroup.at(iat).size();k++) {
+          for(int i=0;i<9;i++) aux_rrr(i+1)=a.agroup.at(iat)[k].Uc(int(i/3)+1,mod(i,3)+1);                       // put in rows
+          for(int i=0;i<9;i++) aux_ijk(i+1)=a.agroup.at(iat)[k].Uf(int(i/3)+1,mod(i,3)+1);                    // put in rows
+          if(k==0) oss << _lines_ << endl;
+          oss << " Site = " << iat << endl;
+          oss << " Operation number = " << k+1 << " / " << a.agroup.at(iat).size() << endl;
+          oss << a.agroup.at(iat)[k]; // << endl;
+          oss << _lines_ << endl;
+        }
+      }   
     }   
     if(mode == '\0' || mode == _IATOMS_){
-    oss << "Equivalent atoms" << endl;
-    oss << _lines_ << endl;
-    for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
-      oss << " [" << a.iatoms.at(iat1).at(0) << "]  ";
-      for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
-        oss << a.iatoms.at(iat1).at(iat2) << " ";
-      oss << endl;
-    }
-    oss << _lines_ << endl;
-    bool temp=a.write_inequivalent_flag;
-    a.write_inequivalent_flag=TRUE;
-    oss << a;
-    a.write_inequivalent_flag=temp;
+      oss << "Equivalent atoms" << endl;
+      oss << _lines_ << endl;
+      for(uint iat1=0;iat1<a.iatoms.size();iat1++) {
+        oss << " [" << a.iatoms.at(iat1).at(0) << "]  ";
+        for(uint iat2=0;iat2<a.iatoms.at(iat1).size();iat2++)
+          oss << a.iatoms.at(iat1).at(iat2) << " ";
+        oss << endl;
+      }
+      oss << _lines_ << endl;
+      bool temp=a.write_inequivalent_flag;
+      a.write_inequivalent_flag=TRUE;
+      oss << a;
+      a.write_inequivalent_flag=temp;
     }
     return TRUE;
   }

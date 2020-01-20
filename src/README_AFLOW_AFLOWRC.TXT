@@ -48,6 +48,34 @@ DEFAULT_KZIP_EXT
   default: ".xz"
 
 ####################################################################################################
+DEFAULTS FOR THE AFLOW DATABASE
+
+DEFAULT_AFLOW_DB_FILE
+  description: The location of the AFLOW database file.
+  type: string
+  default: "/mnt/ramd/aflowlib.db"
+
+DEFAULT_AFLOW_DB_STATS_FILE
+  description: The location of the AFLOW database statistics file.
+  type: string
+  default: "/mnt/ramd/aflowlib.json"
+
+DEFAULT_AFLOW_DB_DATA_PATH
+  description: The location of the AFLOW database JSON files.
+  type: string
+  default: "/common/AFLOW/LIBS/"
+
+DEFAULT_AFLOW_DB_LOCK_FILE
+  description: The location of the AFLOW database lock file.
+  type: string
+  default: "/mnt/ramd/ADB_Idle.lock"
+
+DEFAULT_AFLOW_DB_STALE_THRESHOLD
+  description: The time in seconds at which the AFLOW database rebuild process is considered stale.
+  type: double
+  default: 10800 (3 hours)
+
+####################################################################################################
 FILENAMES FOR AFLOW.ORG ANALYSIS
 
 DEFAULT_FILE_AFLOWLIB_ENTRY_OUT
@@ -977,6 +1005,11 @@ ARUN_DIRECTORY_PREFIX
 ####################################################################################################
 DEFAULTS POCC
 
+POCC_FILE_PREFIX
+  description: Temperature range over which POCC will perform post-processing. Scan 0 to 1200 (K) in 300 (K) increments. 0 is converted to _ZERO_TOL_ since T=0 exactly is undefined for the Boltzmann distribution.
+  type: string
+  default: "0:1200:300"
+
 DEFAULT_POCC_SITE_TOL
   description: Default site tolerance for HNF calculation.
   type: double
@@ -1003,7 +1036,7 @@ DEFAULT_UFF_CLUSTER RADIUS
   default: 10 Angstroms
 
 DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON
-  description: Default option for performing robust structure comparison (AFLOW-XTAL-MATCH) IN ADDITION TO UFF energy analysis.
+  description: Default option for performing robust structure comparison (AFLOW-XtalMatch) IN ADDITION TO UFF energy analysis.
   type: bool
   default: 0
 
@@ -1015,7 +1048,7 @@ DEFAULT_POCC_WRITE_OUT_ALL_DERIVATIVE_STRUCTURES
 POCC_FILE_PREFIX
   description: Prefix for files written by POCC module.
   type: string
-  default: "aflow.apl."
+  default: "aflow.pocc."
 
 POCC_ALL_DERIVATIVE_STRUCTURES_FILE
   description: Name for all derivative structures file.
@@ -1036,6 +1069,16 @@ POCC_ALL_SITE_CONFIGURATIONS_FILE
   description: Name for site configurations file.
   type: string
   default: "site_configurations.out"
+
+POCC_OUT_FILE
+  description: Name for POCC post-processing properties file.
+  type: string
+  default: "out"
+
+POCC_DOSCAR_FILE
+  description: Name for ensemble average DOSCAR.
+  type: string
+  default: "DOSCAR.pocc"
 
 ####################################################################################################
 DEFAULTS APL
@@ -1101,6 +1144,11 @@ DEFAULT_APL_ZEROSTATE
   description: Calculate the forces of the undistorted supercell.
   type: bool
   default: 1
+
+DEFAULT_APL_ZEROSTATE_CHGCAR
+  description: Use the CHGCAR of the ZEROSTATE calculation to be read by other APL and AAPL calculations.
+  type: bool
+  default: 0
 
 DEFAULT_APL_USE_LEPSILON
   description: Use LEPSILON for the calculation of the Born effective charge tensor. Otherwise, use LCALCEPS.
@@ -1292,14 +1340,24 @@ DEFAULT_AAPL_IRRQPTS_FILE
   default: "irred_qpoints.out"
 
 DEFAULT_AAPL_FREQ_FILE
-  description: Output file for the harmonic frequencies at the q-points used for thermal conductivity calculations.
+  description: Output file for the harmonic frequencies of the phonon modes used for thermal conductivity calculations.
   type: string
   default: "frequencies.out"
 
 DEFAULT_AAPL_GVEL_FILE
-  description: Output file for the group velocities at the q-points used for thermal conductivity calculations.
+  description: Output file for the group velocities of the phonon modes used for thermal conductivity calculations.
   type: string
   default: "group_velocities.out"
+
+DEFAULT_AAPL_PS_FILE
+  description: Output file for the phase space of the phonon modes obtained from thermal conductivity calculations.
+  type: string
+  default: "phase_space.out"
+
+DEFAULT_AAPL_GRUENEISEN_FILE
+  description: Output file for the average and mode Grueneisen parameters obtained from thermal conductivity calculations.
+  type: string
+  default: "grueneisen.out"
 
 DEFAULT_AAPL_RATES_FILE
   description: Output file for the total phonon scattering rates.

@@ -7,9 +7,7 @@
 // Written by Pinku Nath
 // pn49@duke.edu
 
-/*
-   This class computes EOS using QHA method [Ref. Comp. Mat. Sci. 125, 82–91 (2016)]
-*/
+//   This class computes EOS using QHA method [Ref. Comp. Mat. Sci. 125, 82–91 (2016)]
 
 #include "aflow_apl.h"
 using namespace std;
@@ -102,48 +100,48 @@ namespace apl
   bool QHAEOS::check_size()
   {
     if(_eo.size()==0)
-      {
-	_logger << apl::error << "_eo.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_eo.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_ele_vols.size()==0)
-      {
-	_logger << apl::error << "_ele_vols.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_ele_vols.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_pdos.size()==0)
-      {
-	_logger << apl::error << "_pdos.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_pdos.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_fermi_energies.size()==0)
-      {
-	_logger << apl::error << "_fermi_energies.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_fermi_energies.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_pV.size()==0)
-      {
-	_logger << apl::error << "_pV.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_pV.size()==0 "<< apl::endl;
+      return false;
+    }
     if(_zpe.size()==0)
-      {
-	_logger << apl::error << "_zpe.size()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_zpe.size()==0 "<< apl::endl;
+      return false;
+    }
     if(!_is_magnetic)
+    {
+      if(_edos.size()==0)
       {
-	if(_edos.size()==0)
-	  {
-	    _logger << apl::error << "_edos.size()==0 "<< apl::endl;
-	    return false;
-	  }
+        _logger << apl::error << "_edos.size()==0 "<< apl::endl;
+        return false;
       }
+    }
     if(_atomic_species.size()==0)
-      {
-	_logger << apl::error << "_atomic_species()==0 "<< apl::endl;
-	return false;
-      }
+    {
+      _logger << apl::error << "_atomic_species()==0 "<< apl::endl;
+      return false;
+    }
     return true;
   }
   // ***************************************************************************************
@@ -174,18 +172,18 @@ namespace apl
     osfit << "[AFLOW_QHA_FIT_ERROR]START" <<"\n";
     osfit <<setprecision(2) << std::fixed << std::showpoint;
     osfit<<"#"<<aurostd::PaddedPRE("T(K)",14," ")
-         <<aurostd::PaddedPRE("status",15," ")
-         <<aurostd::PaddedPRE("lchisq",15," ")
-         <<aurostd::PaddedPRE("lERR(V)",17," ")
-         <<aurostd::PaddedPRE("lERR(E)",14," ")
-         <<aurostd::PaddedPRE("lERR(B)",15," ")
-         <<aurostd::PaddedPRE("name",12," ")
-         <<aurostd::PaddedPRE("chisq_dof",19," ")
-         <<aurostd::PaddedPRE("nERR(V)",15," ")
-         <<aurostd::PaddedPRE("nERR(E)",15," ")
-         <<aurostd::PaddedPRE("nERR(B)",15," ")
-         <<aurostd::PaddedPRE("nERR(Bp)",15," ")
-         <<"\n";
+      <<aurostd::PaddedPRE("status",15," ")
+      <<aurostd::PaddedPRE("lchisq",15," ")
+      <<aurostd::PaddedPRE("lERR(V)",17," ")
+      <<aurostd::PaddedPRE("lERR(E)",14," ")
+      <<aurostd::PaddedPRE("lERR(B)",15," ")
+      <<aurostd::PaddedPRE("name",12," ")
+      <<aurostd::PaddedPRE("chisq_dof",19," ")
+      <<aurostd::PaddedPRE("nERR(V)",15," ")
+      <<aurostd::PaddedPRE("nERR(E)",15," ")
+      <<aurostd::PaddedPRE("nERR(B)",15," ")
+      <<aurostd::PaddedPRE("nERR(Bp)",15," ")
+      <<"\n";
 
     oseos<<"[AFLOW] "<<STAR150<<"\n";
     oseos<<"# U     => vibrational internal energy\n";
@@ -206,134 +204,138 @@ namespace apl
     oseos<<"[AFLOW] "<<STAR150<<"\n";
     oseos << "[AFLOW_QHA_THERMO]START" <<"\n";
     oseos<<"#"<<aurostd::PaddedPRE("T(K)",6," ")
-         <<aurostd::PaddedPRE("U(eV/cell)",19," ")
-         <<aurostd::PaddedPRE("F(eV/cell)",15," ")
-         <<aurostd::PaddedPRE("S(kB/cell)",14," ")
-         <<aurostd::PaddedPRE("Fqh(eV/cell)",16," ")
-         <<aurostd::PaddedPRE("V(A^3)",10," ")
-         <<aurostd::PaddedPRE("B(GPa)",15," ")
-         <<aurostd::PaddedPRE("Bp",11," ")
-         <<aurostd::PaddedPRE("gamma",19," ")
-         <<aurostd::PaddedPRE("alpha (1/K)",20," ")
-         <<aurostd::PaddedPRE("Cv(kB/cell)",15," ")
-         <<aurostd::PaddedPRE("Cp(kB/cell)",15," ");
+      <<aurostd::PaddedPRE("U(eV/cell)",19," ")
+      <<aurostd::PaddedPRE("F(eV/cell)",15," ")
+      <<aurostd::PaddedPRE("S(kB/cell)",14," ")
+      <<aurostd::PaddedPRE("Fqh(eV/cell)",16," ")
+      <<aurostd::PaddedPRE("V(A^3)",10," ")
+      <<aurostd::PaddedPRE("B(GPa)",15," ")
+      <<aurostd::PaddedPRE("Bp",11," ")
+      <<aurostd::PaddedPRE("gamma",19," ")
+      <<aurostd::PaddedPRE("alpha (1/K)",20," ")
+      <<aurostd::PaddedPRE("Cv(kB/cell)",15," ")
+      <<aurostd::PaddedPRE("Cp(kB/cell)",15," ");
     if(_include_ele){
       oseos<<aurostd::PaddedPRE("Cv_e(kB/cell)",15," ");
       oseos<<aurostd::PaddedPRE("alpha_e (1/K)",15," ");
     }
 
     if(_fitting_type=="BM3")
-      {
-        oseos <<aurostd::PaddedPRE("Bpp(1/GPa)",15," ")<<"\n";
-      } else {
+    {
+      oseos <<aurostd::PaddedPRE("Bpp(1/GPa)",15," ")<<"\n";
+    } else {
       oseos<<"\n";
     }
 
     for(double K=(double)USER_TP_TSTART; K<=(double)USER_TP_TEND; K+=USER_TP_TSTEP) //temperature loop
+    {
+      if(!_include_ele){osfvt<<"[AFLOW] "<<STAR50<<"\n";
+        osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]START" <<"\n";
+      }
+      xvector<double> Ftotal(_eo.size(), 1);
+      xvector<double> volume(_eo.size(), 1);
+
+      if(!_include_ele){
+        osfvt<<"#"<<setw(15)<<aurostd::PaddedPRE("V(A^3)",12," ")
+          <<aurostd::PaddedPRE("Ftot(eV/Cell)",15," ")
+          <<aurostd::PaddedPRE("E0K(eV/Cell)",15," ")
+          <<aurostd::PaddedPRE("Fvib(eV/Cell)",15," ");
+      }
+      if(includePV && !_include_ele)osfvt<<aurostd::PaddedPRE("pV(eV/Cell)",15," ")<<"\n";
+      else osfvt<<"\n";
+
+      for(uint i=0; i!=_eo.size(); i++)
       {
-	if(!_include_ele){osfvt<<"[AFLOW] "<<STAR50<<"\n";
-	  osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]START" <<"\n";
-        }
-	xvector<double> Ftotal(_eo.size(), 1);
-	xvector<double> volume(_eo.size(), 1);
+        double vib_i=VibrationEnergy(K, i);
+
+        if(includePV)Ftotal[i+1]=_eo[i]+vib_i+_pV[i];
+        else         Ftotal[i+1]=_eo[i]+vib_i;
+
+        volume[i+1]=_ele_vols[i];
 
         if(!_include_ele){
-	  osfvt<<"#"<<setw(15)<<aurostd::PaddedPRE("V(A^3)",12," ")
-	       <<aurostd::PaddedPRE("Ftot(eV/Cell)",15," ")
-	       <<aurostd::PaddedPRE("E0K(eV/Cell)",15," ")
-	       <<aurostd::PaddedPRE("Fvib(eV/Cell)",15," ");
+          osfvt <<setw(15)<<std::setprecision(8)  <<volume[i+1]
+            <<setw(15)<<std::setprecision(8)  <<Ftotal[i+1]
+            <<setw(15)<<std::setprecision(8)  <<_eo[i]
+            <<setw(15)<<std::setprecision(8)  <<vib_i;
+          if(includePV)osfvt<<setw(15)<<std::setprecision(8)  <<_pV[i];
+          osfvt<<"\n";
         }
-	if(includePV && !_include_ele)osfvt<<aurostd::PaddedPRE("pV(eV/Cell)",15," ")<<"\n";
-	else osfvt<<"\n";
+      }
+      if(!_include_ele){
+        osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]END" <<"\n";
+        osfvt<<"[AFLOW] "<<STAR50<<"\n";
+      }
+      //fitting
+      initialize_output_variables();
+      md_lsquares_call(volume, Ftotal);
+      double error_sum=std::abs(_uncertanity_V0)+std::abs(_uncertanity_E0)+std::abs(_uncertanity_B0)+std::abs(_uncertanity_Bp); 
 
-	for(uint i=0; i!=_eo.size(); i++)
-	  {
-            double vib_i=VibrationEnergy(K, i);
+      //calculate CTE and Cp
+      double avgGP=_qha.average_gruneisen_parameter(K);
+      double cv=getIsochoricSpecificHeat(K, _eqm_ele_dir_index);
+      double CTE=((avgGP)*cv)/(_Beqm*_Veqm);
+      double Cp=cv + CTE* CTE * _Beqm* _Veqm* K;
 
-	    if(includePV)Ftotal[i+1]=_eo[i]+vib_i+_pV[i];
-	    else         Ftotal[i+1]=_eo[i]+vib_i;
+      double THERMO_Ut=e.getInternalEnergy(K,apl::meV);
+      double THERMO_Ft=e.getVibrationalFreeEnergy(K,apl::meV);
+      double THERMO_St=e.getVibrationalEntropy(K, apl::kB);
+      double THERMO_Cvt=e.getIsochoricSpecificHeat(K, apl::kB);
 
-	    volume[i+1]=_ele_vols[i];
+      //electronic cv 
+      double ele_cv=0.0;
+      double ele_CTE=0.0;
+      if(_include_ele){
+        ele_cv=Electronic_Cv(K,_eqm_ele_dir_index);
+        ele_CTE=(2.0/(3.0*_Beqm*_Veqm))*ele_cv;
+      }
 
-            if(!_include_ele){
-	      osfvt <<setw(15)<<std::setprecision(8)  <<volume[i+1]
-		    <<setw(15)<<std::setprecision(8)  <<Ftotal[i+1]
-		    <<setw(15)<<std::setprecision(8)  <<_eo[i]
-		    <<setw(15)<<std::setprecision(8)  <<vib_i;
-	      if(includePV)osfvt<<setw(15)<<std::setprecision(8)  <<_pV[i];
-	      osfvt<<"\n";
-            }
-	  }
-        if(!_include_ele){
-	  osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]END" <<"\n";
-	  osfvt<<"[AFLOW] "<<STAR50<<"\n";
+      oseos <<setw(8) << setprecision(2)<<std::fixed << std::showpoint << K
+        <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << THERMO_Ut/1000.00
+        <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << THERMO_Ft/1000.00
+        <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << THERMO_St
+        <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << _Feqm
+        <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << _Veqm
+        <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << _Beqm*160.2176487
+        <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << _Bp
+        <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << avgGP
+        <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << CTE*1.0E6
+        <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << THERMO_Cvt 
+        <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << (Cp/0.000086173324); //converted to Kb/cell
+
+      if(_include_ele){
+        oseos <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << ele_cv/0.000086173324; //converted to Kb/cell
+        oseos <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << ele_CTE*1.0E6;
+      }
+
+      if(_fitting_type=="BM3")
+        oseos<<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << _Bpp/160.2176487<<"\n";
+      else oseos<<"\n";
+      //printing all output
+      if(!_data_read_error){
+        if((!std::isnan(error_sum)) || (error_sum <allowed_fit_error)){
+          osfit<<setw(15)<<K<<setw(15)<<"sucess";
+          osfit<<setw(15)<<_lchisq <<setw(15)<<_luncertanity_V0<<setw(15)<<_luncertanity_E0<<setw(15)<<_luncertanity_B0;
+          osfit << setw(15) << _fdfsolver_name <<setw(15)<<_chisq_dof<<setw(15)<<_uncertanity_V0
+            <<setw(15)<<_uncertanity_E0<<setw(15)<<_uncertanity_B0<<setw(15)<<_uncertanity_Bp;
+          osfit<<"\n";
+        } else {
+          osfit<<"WARNING at T= "<< K <<" data is not well behaved "<<"\n";
+          _logger << apl::warning<<" problem with FVT data at T= "<<K << "[K] check  err_fit.out "<<apl::endl;
         }
-	//fitting
-	initialize_output_variables();
-	md_lsquares_call(volume, Ftotal);
-        double error_sum=std::abs(_uncertanity_V0)+std::abs(_uncertanity_E0)+std::abs(_uncertanity_B0)+std::abs(_uncertanity_Bp); 
-
-	//calculate CTE and Cp
-	double avgGP=_qha.average_gruneisen_parameter(K);
-	double cv=getIsochoricSpecificHeat(K, _eqm_ele_dir_index);
-	double CTE=((avgGP)*cv)/(_Beqm*_Veqm);
-	double Cp=cv + CTE* CTE * _Beqm* _Veqm* K;
-
-	double THERMO_Ut=e.getInternalEnergy(K,apl::meV);
-	double THERMO_Ft=e.getVibrationalFreeEnergy(K,apl::meV);
-	double THERMO_St=e.getVibrationalEntropy(K, apl::kB);
-	double THERMO_Cvt=e.getIsochoricSpecificHeat(K, apl::kB);
-
-        //electronic cv 
-	double ele_cv=0.0;
-	double ele_CTE=0.0;
-	if(_include_ele){
-	  ele_cv=Electronic_Cv(K,_eqm_ele_dir_index);
-	  ele_CTE=(2.0/(3.0*_Beqm*_Veqm))*ele_cv;
-	}
-
-        oseos <<setw(8) << setprecision(2)<<std::fixed << std::showpoint << K
-              <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << THERMO_Ut/1000.00
-              <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << THERMO_Ft/1000.00
-              <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << THERMO_St
-              <<setw(15)<< setprecision(6)<<std::fixed << std::showpoint << _Feqm
-              <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << _Veqm
-              <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << _Beqm*160.2176487
-              <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << _Bp
-              <<setw(15)<<setprecision(6) <<std::fixed << std::showpoint << avgGP
-              <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << CTE*1.0E6
-              <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << THERMO_Cvt 
-              <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << (Cp/0.000086173324); //converted to Kb/cell
-
-	if(_include_ele){
-	  oseos <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << ele_cv/0.000086173324; //converted to Kb/cell
-	  oseos <<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << ele_CTE*1.0E6;
-	}
-
-        if(_fitting_type=="BM3")
-          oseos<<setw(15)<<setprecision(6)<<std::fixed << std::showpoint << _Bpp/160.2176487<<"\n";
-        else oseos<<"\n";
-	//printing all output
-	if(!_data_read_error){
-	  if((!std::isnan(error_sum)) || (error_sum <allowed_fit_error)){
-	    osfit<<setw(15)<<K<<setw(15)<<"sucess";
-	    osfit<<setw(15)<<_lchisq <<setw(15)<<_luncertanity_V0<<setw(15)<<_luncertanity_E0<<setw(15)<<_luncertanity_B0;
-	    osfit << setw(15) << _fdfsolver_name <<setw(15)<<_chisq_dof<<setw(15)<<_uncertanity_V0
-		  <<setw(15)<<_uncertanity_E0<<setw(15)<<_uncertanity_B0<<setw(15)<<_uncertanity_Bp;
-	    osfit<<"\n";
-	  } else {
-	    osfit<<"WARNING at T= "<< K <<" data is not well behaved "<<"\n";
-	    _logger << apl::warning<<" problem with FVT data at T= "<<K << "[K] check  err_fit.out "<<apl::endl;
-	  }
-	} else {
-	  osfit<<"error in data reading"<<"\n"; 
-	  apl::APLRuntimeError("problem with volume and energy data");
-	}
-       vector<double> tmp(2, 0);
-       tmp[0]=K;
-       tmp[1]=_Feqm;
+      } else {
+        osfit<<"error in data reading"<<"\n"; 
+        // ME191031 - use xerror
+        //apl::APLRuntimeError("problem with volume and energy data");
+        string function = "QHAEOS::calc_qheos()";
+        string message = "problem with volume and energy data";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
+      vector<double> tmp(2, 0);
+      tmp[0]=K;
+      tmp[1]=_Feqm;
       _TF.push_back(tmp);
-      }//K loop
+    }//K loop
 
     osfit << "[AFLOW_QHA_FIT_ERROR]END" <<"\n";
     osfit<<"[AFLOW] "<<STAR180<<"\n";
@@ -343,19 +345,31 @@ namespace apl
     if(!_include_ele){
       string FVTfile =  "aflow.qha.FVT.out";
       if(!aurostd::stringstream2file(osfvt, FVTfile, "WRITE")) {
-	throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+        // ME191031 - use xerror
+        //throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+        string function = "QHAEOS::calc_qheos()";
+        string message = "Cannot write " + FVTfile;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
       }
       aurostd::StringstreamClean(osfvt);
     }
     string fit_out =  "aflow.qha.err_fit.out";
     if(!aurostd::stringstream2file(osfit, fit_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.err_fit.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.err_fit.out");
+      string function = "QHAEOS::calc_qheos()";
+      string message = "Cannot write " + fit_out;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(osfit);
 
     string eos_out =  "aflow.qha.thermo.out";
     if(!aurostd::stringstream2file(oseos, eos_out, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.thermo.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.thermo.out");
+      string function = "QHAEOS::calc_qheos()";
+      string message = "Cannot write " + eos_out;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(oseos);
 
@@ -375,41 +389,41 @@ namespace apl
     double f = 0.0;
     double beta = 1.0 / ( 0.0861734315 * temperature_in_kelvins ); // beta = 1/kBT = 1 / ([meV/K] [K])
     for(uint i = 0; i != _pdos[dir_index].size(); i++)
-      {
-        double hni = 4.1356673310 * _pdos[dir_index][i][0]; // hplanck in [eV.s] * 10^-15 * freq in [Hz] * 10^12 => hni in [meV].
-        f += _pdos[dir_index][i][1] * aurostd::ln( 1.0 - exp( -beta * hni ) ) / beta ;
-      }
+    {
+      double hni = 4.1356673310 * _pdos[dir_index][i][0]; // hplanck in [eV.s] * 10^-15 * freq in [Hz] * 10^12 => hni in [meV].
+      f += _pdos[dir_index][i][1] * aurostd::ln( 1.0 - exp( -beta * hni ) ) / beta ;
+    }
     return ( _zpe[dir_index] + ( f * steps )/1000.0 );
   }
   // ***************************************************
   void QHAEOS::calculate_zpe()
   {
     for(uint i=0; i!=_pdos.size(); i++)
+    {
+      double sum=0.0;
+      double d_omega=_pdos[i][1][0]-_pdos[i][0][0];
+      for(uint j=0; j!=_pdos[i].size(); j++)
       {
-	double sum=0.0;
-	double d_omega=_pdos[i][1][0]-_pdos[i][0][0];
-	for(uint j=0; j!=_pdos[i].size(); j++)
-	  {
-	    sum+=_pdos[i][j][1]*_pdos[i][j][0];
-	  }
-	sum*=0.5*d_omega*4.135667662*1.0E-3;//1/2 * h * nu
-	_zpe[i]=sum;
+        sum+=_pdos[i][j][1]*_pdos[i][j][0];
       }
+      sum*=0.5*d_omega*4.135667662*1.0E-3;//1/2 * h * nu
+      _zpe[i]=sum;
+    }
   }
   // ***************************************************
   //calculate zero point energies at each distorted volumes point
   void QHAEOS::getZeroPointVibrationEnergy()
   {
     for(uint i=0; i!=_pdos.size(); i++)
-      {
-	double sum=0.0;
-	double steps=_pdos[i][1][0]-_pdos[i][0][0];
-	for(uint j=0; j!=_pdos[i].size(); j++){
-	  sum += _pdos[i][j][0] * _pdos[i][j][1];
-	}
-	sum *= steps * 0.5 * 4.1356651596736798;//  0.5*h*nu
-	_zpe[i]=sum/1000.0;
+    {
+      double sum=0.0;
+      double steps=_pdos[i][1][0]-_pdos[i][0][0];
+      for(uint j=0; j!=_pdos[i].size(); j++){
+        sum += _pdos[i][j][0] * _pdos[i][j][1];
       }
+      sum *= steps * 0.5 * 4.1356651596736798;//  0.5*h*nu
+      _zpe[i]=sum/1000.0;
+    }
   }
   // ***************************************************
   //get electronic energies for a proper file index
@@ -421,25 +435,25 @@ namespace apl
     double sum1=0.0;
     double sum2=0.0;
     double sum3=0.0;
-            
+
     double dE=edos[1][0]-edos[0][0];
     for(uint j=0; j<edos.size(); j++)
-      {
-        double Ediff=edos[j][0]-fermi;
-        double f= fermi_dirac_distribution(Ediff, temperature_in_kelvins);
-        //continue if edos is .gt. 1.0e-5
-        if(edos[j][1]<1.0e-5)continue;
-        if(edos[j][0]<=fermi)sum2+=edos[j][1]*edos[j][0];
-        //continue if f is .gt. 1.0e-6
-        if(f<1.0e-6)continue;
-        sum1+=edos[j][1]*f*edos[j][0];
+    {
+      double Ediff=edos[j][0]-fermi;
+      double f= fermi_dirac_distribution(Ediff, temperature_in_kelvins);
+      //continue if edos is .gt. 1.0e-5
+      if(edos[j][1]<1.0e-5)continue;
+      if(edos[j][0]<=fermi)sum2+=edos[j][1]*edos[j][0];
+      //continue if f is .gt. 1.0e-6
+      if(f<1.0e-6)continue;
+      sum1+=edos[j][1]*f*edos[j][0];
 
-        if(!_isequal(f,1.0))
-          {
-            double x=f*log(f)+(1.0-f)*log(1.0-f);
-            sum3+=edos[j][1]*x;
-          }
+      if(!_isequal(f,1.0))
+      {
+        double x=f*log(f)+(1.0-f)*log(1.0-f);
+        sum3+=edos[j][1]*x;
       }
+    }
     sum1*=dE;
     sum2*=dE;
     sum3*=8.6173303*1.0e-5*temperature_in_kelvins*dE;
@@ -457,38 +471,38 @@ namespace apl
 
     double dE=edos[1][0]-edos[0][0];
     for(uint j=0; j<edos.size(); j++)
-      {
-        double Ediff=edos[j][0]-fermi;
-        double f= fermi_dirac_distribution(Ediff, temperature_in_kelvins);
-        //continue if edos is .gt. 1.0e-5
-        if(edos[j][1]<1.0e-5)continue;
-        //continue if f is .gt. 1.0e-6
-        if(f<1.0e-6)continue;
+    {
+      double Ediff=edos[j][0]-fermi;
+      double f= fermi_dirac_distribution(Ediff, temperature_in_kelvins);
+      //continue if edos is .gt. 1.0e-5
+      if(edos[j][1]<1.0e-5)continue;
+      //continue if f is .gt. 1.0e-6
+      if(f<1.0e-6)continue;
 
-        if(!_isequal(f,1.0))
-          {
-            double x=f*log(f)+(1.0-f)*log(1.0-f);
-            sum_t+=edos[j][1]*x;
-          }
+      if(!_isequal(f,1.0))
+      {
+        double x=f*log(f)+(1.0-f)*log(1.0-f);
+        sum_t+=edos[j][1]*x;
       }
+    }
     sum_t*=-8.6173303*1.0e-5*dE;
     for(uint j=0; j<edos.size(); j++)
-      {
-        double Ediff=edos[j][0]-fermi;
-        double f= fermi_dirac_distribution(Ediff, temperature_in_kelvins+10.0);
-        //continue if edos is .gt. 1.0e-5
-        if(edos[j][1]<1.0e-5)continue;
-        //continue if f is .gt. 1.0e-6
-        if(f<1.0e-6)continue;
+    {
+      double Ediff=edos[j][0]-fermi;
+      double f= fermi_dirac_distribution(Ediff, temperature_in_kelvins+10.0);
+      //continue if edos is .gt. 1.0e-5
+      if(edos[j][1]<1.0e-5)continue;
+      //continue if f is .gt. 1.0e-6
+      if(f<1.0e-6)continue;
 
-        if(!_isequal(f,1.0))
-          {
-            double x=f*log(f)+(1.0-f)*log(1.0-f);
-            sum_tp+=edos[j][1]*x;
-          }
+      if(!_isequal(f,1.0))
+      {
+        double x=f*log(f)+(1.0-f)*log(1.0-f);
+        sum_tp+=edos[j][1]*x;
       }
+    }
     sum_tp*=-8.6173303*1.0e-5*dE;
-   
+
     double cv=temperature_in_kelvins*(sum_tp-sum_t)/10.0;
     return (cv);
   }
@@ -537,10 +551,10 @@ namespace apl
     md_lsquares mdfit;
     mdfit.clear();
     for(int i=1; i<=V.rows; i++)
-      {
-	mdfit.Xdata.push_back(V[i]);
-	mdfit.Ydata.push_back(E[i]);
-      }
+    {
+      mdfit.Xdata.push_back(V[i]);
+      mdfit.Ydata.push_back(E[i]);
+    }
     mdfit.cubic_polynomial_fit(); // it calls both linear and nonlinear fit functions
     _data_read_error=mdfit.data_read_error;
     _nl_success_status=mdfit.nl_success_status;
@@ -642,11 +656,11 @@ namespace apl
     double beta = 1.0 / ( 0.0861734315 * temperature_in_kelvins ); // beta = 1/kBT = 1 / ([meV/K] [K])
     double steps=_pdos[dir_index][1][0]-_pdos[dir_index][0][0];
     for(uint i = 0; i < _pdos[dir_index].size(); i++)
-      {
-        double bhni = beta * 4.1356673310 * _pdos[dir_index][i][0];
-        double ebhni = exp(bhni);
-        cv += _pdos[dir_index][i][1] * 0.0861734315 * bhni * bhni / ( ( 1.0 - 1.0 / ebhni ) * ( ebhni - 1.0 ) );
-      }
+    {
+      double bhni = beta * 4.1356673310 * _pdos[dir_index][i][0];
+      double ebhni = exp(bhni);
+      cv += _pdos[dir_index][i][1] * 0.0861734315 * bhni * bhni / ( ( 1.0 - 1.0 / ebhni ) * ( ebhni - 1.0 ) );
+    }
     if( isnan(cv) ) return 0.0;
     return (cv * steps)*0.001; //[meV/K]->[eV/K]
   }
@@ -684,7 +698,11 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.qha.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      string function = "QHAEOS::total_enthalpy()";
+      string message = "Cannot write " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();
@@ -700,52 +718,56 @@ namespace apl
     xvector<double> E0(_eo.size(), 1);
 
     for(uint i=0; i!=_eo.size(); i++)
-      {
-	E0[i+1]=ElectronicEnergy(2.0,i);
-      }
+    {
+      E0[i+1]=ElectronicEnergy(2.0,i);
+    }
     vector<vector<double> > data;
     double e_i=0.0;
     for(double K=(double)USER_TP_TSTART; K<=(double)USER_TP_TEND; K+=USER_TP_TSTEP)
+    {
+      osfvt<<"[AFLOW] "<<STAR80<<"\n";
+      osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]START" <<"\n";
+      osfvt<<"#"<<setw(15)<<aurostd::PaddedPRE("V(A^3)",12," ")
+        <<aurostd::PaddedPRE("Ftot(eV/Cell)",15," ")
+        <<aurostd::PaddedPRE("E0K(eV/Cell)",15," ")
+        <<aurostd::PaddedPRE("Fvib(eV/Cell)",15," ")
+        <<aurostd::PaddedPRE("Fele(eV/Cell)",15," ");
+      osfvt<<"\n";
+      for(uint i=0; i!=_eo.size(); i++)
       {
-	osfvt<<"[AFLOW] "<<STAR80<<"\n";
-	osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]START" <<"\n";
-	osfvt<<"#"<<setw(15)<<aurostd::PaddedPRE("V(A^3)",12," ")
-	     <<aurostd::PaddedPRE("Ftot(eV/Cell)",15," ")
-	     <<aurostd::PaddedPRE("E0K(eV/Cell)",15," ")
-	     <<aurostd::PaddedPRE("Fvib(eV/Cell)",15," ")
-	     <<aurostd::PaddedPRE("Fele(eV/Cell)",15," ");
-	osfvt<<"\n";
-	for(uint i=0; i!=_eo.size(); i++)
-	  {
-	    double vib_i=VibrationEnergy(K, i);
-            e_i=ElectronicEnergy(K,i)-E0[i+1];
-	    if(K<1.0)e_i=0.0;
-            if(abs(e_i)<0.001)e_i=0.0;
-	    Ftotal[i+1]=_eo[i]+vib_i+e_i;
-	    volume[i+1]=_ele_vols[i];
-	    osfvt <<setw(15)<<std::setprecision(8)  <<volume[i+1]
-		  <<setw(15)<<std::setprecision(8)  <<Ftotal[i+1]
-		  <<setw(15)<<std::setprecision(8)  <<_eo[i]
-		  <<setw(15)<<std::setprecision(8)  <<vib_i
-		  <<setw(15)<<std::setprecision(8)  <<e_i;
-	    osfvt<<"\n";
-	  }
-	//fitting
-	initialize_output_variables();
-	md_lsquares_call(volume, Ftotal);
-        vector<double> tmp(2,0);
-        tmp[0]=K;
-        tmp[1]=_Feqm;
-        data.push_back(tmp);
-
-
-        osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]END" <<"\n";
-        osfvt<<"[AFLOW] "<<STAR80<<"\n";
+        double vib_i=VibrationEnergy(K, i);
+        e_i=ElectronicEnergy(K,i)-E0[i+1];
+        if(K<1.0)e_i=0.0;
+        if(abs(e_i)<0.001)e_i=0.0;
+        Ftotal[i+1]=_eo[i]+vib_i+e_i;
+        volume[i+1]=_ele_vols[i];
+        osfvt <<setw(15)<<std::setprecision(8)  <<volume[i+1]
+          <<setw(15)<<std::setprecision(8)  <<Ftotal[i+1]
+          <<setw(15)<<std::setprecision(8)  <<_eo[i]
+          <<setw(15)<<std::setprecision(8)  <<vib_i
+          <<setw(15)<<std::setprecision(8)  <<e_i;
+        osfvt<<"\n";
       }
+      //fitting
+      initialize_output_variables();
+      md_lsquares_call(volume, Ftotal);
+      vector<double> tmp(2,0);
+      tmp[0]=K;
+      tmp[1]=_Feqm;
+      data.push_back(tmp);
+
+
+      osfvt << "[AFLOW_QHA_ENERGIES  T="<<setprecision(2)<<std::fixed<<K<<" K ]END" <<"\n";
+      osfvt<<"[AFLOW] "<<STAR80<<"\n";
+    }
 
     string FVTfile =  "aflow.qha.FVT.out";
     if(!aurostd::stringstream2file(osfvt, FVTfile, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.FVT.out");
+      string function = "QHAEOS::enhtalpy_including_ele()";
+      string message = "Cannot write " + FVTfile;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(osfvt);
 
@@ -780,7 +802,11 @@ namespace apl
     outfile<<"[AFLOW] "<<STAR50<<"\n";
     string file="aflow.qha.enthalpy.out";
     if(!aurostd::stringstream2file(outfile, file, "WRITE")) {
-      throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      // ME191031 - use xerror
+      //throw APLRuntimeError("Cannot write aflow.qha.enthalpy.out");
+      string function = "QHAEOS::enhtalpy_including_ele()";
+      string message = "Cannot write " + file;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
     aurostd::StringstreamClean(outfile);
     data.clear();

@@ -35,25 +35,38 @@ const string AFLOW_POCC_TAG="[AFLOW_POCC]";
 //we should not need to have more than 30 species, but if you want to add to list
 //I recommend adding IN ORDER so that elements become more different left to right (like periodic table)
 const string STD_ELEMENTS_LIST="Sc Ti V Cr Mn Fe Co Ni Cu Zn "
-                               "Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
-                               "La Hf Ta W Re Os Ir Pt Au Hg ";
+"Y Zr Nb Mo Tc Ru Rh Pd Ag Cd "
+"La Hf Ta W Re Os Ir Pt Au Hg ";
 
 namespace pocc {
-  bool structuresGenerated();
-  xstructure extractPARTCAR(const string& AflowIn);
-  
-  void generateStructures(const string& AflowIn, ostream& oss=cout);
-  void generateStructures(const string& AflowIn, ofstream& FileMESSAGE, ostream& oss=cout);
-  void generateStructures(const _xvasp& xvasp,const string& AflowIn,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags, ofstream& FileMESSAGE, ostream& oss=cout);
+  class POccCalculator; //forward declaration
+  struct POccSuperCellSet; //forward declaration
 
-	void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=cout);
+  string POCC_MINIMUM_CONFIGURATION(const aurostd::xoption& vpflow);
+  string POCC_MINIMUM_CONFIGURATION(const string& directory="./");
+  bool structuresGenerated(const string& directory=".");
+  xstructure extractPARTCAR(const string& AflowIn);
+
+  vector<double> getVTemperatures(const string& temp_string);
+
+  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash);
+  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& site_config_index_str);
+  unsigned long long int getDGFromXStructureTitle(const string& title);
+  void parsePropertyByTag(const string& line,const string& tag,double& prop);
+  bool patchStructuresAllFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
+  bool patchStructuresAllFile(stringstream& structures_file_ss);
+  bool patchStructuresUniqueFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
+  bool patchStructuresUniqueFile(stringstream& structures_file_ss);
+  void patchStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+
+  void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss=cout);
   vector<string> getElementsList();
 
   class POccUnit;  //forward declaration
   class POccSiteConfiguration;    //forward declaration
   struct UFFParamAtom;  //forward declaration
   struct UFFParamBond;  //forward declaration
- 
+
   //bool sortAtoms(const _atom& a1,const _atom& a2);
   //bool getNextSiteConfiguration(vector<vector<POccSiteConfiguration> >& vv_count_configs,vector<uint>& v_config_order,vector<int>& v_config_iterators,vector<vector<int> >& v_types_config);
   bool getNextSiteConfiguration(vector<vector<POccSiteConfiguration> >& vv_count_configs,vector<int>& v_config_iterators,vector<vector<int> >& v_types_config);
@@ -72,6 +85,8 @@ namespace pocc {
   bool sortPOccSites(const POccUnit& p1,const POccUnit& p2);
   bool sortPOccGroups(const POccUnit& p1,const POccUnit& p2);
 
+  string getARUNString(const std::list<POccSuperCellSet>& l_supercell_sets,unsigned long long int i);
+  string getARUNString(unsigned long long int index_structure_group,unsigned long long int vstructure_groups_size,unsigned long long int index_structure,unsigned long long int vstructures_size,unsigned long long int index_hnf,unsigned long long int index_site_config,bool include_strgrp=false);
 } // namespace pocc
 
 namespace pocc {
@@ -106,10 +121,10 @@ namespace pocc {
       uint equivalent;                                  //from iatoms of non-pocc structure
 
       //general setters
-      void create(ostream& oss=cout);
-      void create(ofstream& FileMESSAGE,ostream& oss=cout);
-      void create(const _aflags& aflags,ostream& oss=cout);
-      void create(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(ostream& oss=cout);
+      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void setAFlags(const _aflags& aflags);
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
@@ -135,19 +150,28 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  struct POccSuperCell {
-    //no need (YET) to make a class, simple ints and double, no real methods
-    POccSuperCell();
-    POccSuperCell(const POccSuperCell& b);
-    const POccSuperCell& operator=(const POccSuperCell& b);
-    bool operator<(const POccSuperCell& other) const;
-    void free();
-    void copy(const POccSuperCell& b);
-    
-    unsigned long long int hnf_index;
-    unsigned long long int site_config_index;
-    unsigned long long int degeneracy;
-    double m_uff_energy;
+  class POccSuperCell {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      POccSuperCell();
+      POccSuperCell(const POccSuperCell& b);
+      //constructors - STOP
+      ~POccSuperCell();
+      const POccSuperCell& operator=(const POccSuperCell& b);
+      bool operator<(const POccSuperCell& other) const;
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - END
+
+      unsigned long long int m_hnf_index;
+      unsigned long long int m_site_config_index;
+      unsigned long long int m_degeneracy;
+      double m_energy_uff;
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const POccSuperCell& b);
+      //NECESSARY END CLASS METHODS - END
   };
   bool sortPSCsUFFEnergy(const POccSuperCell& a, const POccSuperCell& b);
 } // namespace pocc
@@ -162,8 +186,10 @@ namespace pocc {
     double getHNFIndex() const;
     double getSiteConfigIndex() const;
     double getUFFEnergy() const;
-    
-    vector<POccSuperCell> psc_set;
+
+    vector<POccSuperCell> m_psc_set;
+    double m_energy_dft;  //only calculate this for the set
+    double m_probability;
   };
   bool sortPSCSetsUFFEnergy(const POccSuperCellSet& a, const POccSuperCellSet& b);
 } // namespace pocc
@@ -172,7 +198,7 @@ namespace pocc{
   struct UFFParamAtom{
     //no need (YET) to make a class, simple ints and double, no real methods
     const UFFParamAtom& operator=(const UFFParamAtom& b);
-    
+
     string symbol;
     double r1;        //bond distance
     double theta0;
@@ -191,7 +217,7 @@ namespace pocc{
     //no need (YET) to make a class, simple ints and double, no real methods
     const UFFParamBond& operator=(const UFFParamBond& b);
     void calculate(UFFParamAtom& uffp1,UFFParamAtom& uffp2,double distij);
-    
+
     double ren;
     double R0;
     double Kij;
@@ -217,11 +243,11 @@ namespace pocc {
       const POccSiteConfiguration& operator=(const POccSiteConfiguration& b);
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       //debug
       //vector<int> types_configuration_debug;                  //atom types, vacancy is -1
       //debug
-   
+
       int site;                                         //reflexive
       int i_hnf;                                        //reflexive
       bool partial_occupation_flag;
@@ -237,7 +263,7 @@ namespace pocc {
       int vacancy_count;
       double max_site_error;
       //double error_total;
-      
+
       void prepareNoPOccConfig();
       void preparePOccConfig();
       int getNextOccupationMultiple(int i_hnf,xvector<int>& xv_occupation_multiple);
@@ -265,7 +291,7 @@ namespace pocc {
       //constructors - STOP
       ~POccCalculatorTemplate();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       xstructure xstr_pocc;                   //input from PARTCAR
       aurostd::xoption m_p_flags;             //e.g., vpflow
       _aflags m_aflags;                       //standard aflow flags
@@ -273,7 +299,7 @@ namespace pocc {
       xstructure xstr_nopocc;                 //will contain symmetry objects (_sym_op, pgroups most important here)
       vector<uint> types2pc_map;              //list of atom indices where types2pc_map(0) is 1st type 0 atom, types2pc_map(1) is 1st type 1 atom, etc.
       vector<string> m_species_redecoration;  //species used to redecorate xstr's for consistent symmetry/uff energies
-      
+
       void setPOccFlags(const aurostd::xoption& pocc_flags);
       void setAFlags(const _aflags& Aflags);                      //standard _aflags
       void setPOccStructure(const xstructure& xstr_pocc);
@@ -295,7 +321,7 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc { 
-  class POccUFFEnergyAnalyzer: public POccCalculatorTemplate,xStream {
+  class POccUFFEnergyAnalyzer: public POccCalculatorTemplate, public xStream {
     public:
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
@@ -322,7 +348,7 @@ namespace pocc {
       const POccUFFEnergyAnalyzer& operator=(const POccUFFEnergyAnalyzer& b);
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - END
-      
+
       //underlying data structures
       bool m_initialized;
       xmatrix<double> hnf_mat;
@@ -335,7 +361,7 @@ namespace pocc {
       xstructure xstr_ss;       //superstructure
       vector<int> sc2pc_map;
       vector<int> pc2sc_map;
-      
+
       void initialize(ostream& oss=cout);
       void initialize(const aurostd::xoption& pocc_flags,ostream& oss=cout); 
       void initialize(const _aflags& aflags,ostream& oss=cout);
@@ -362,6 +388,8 @@ namespace pocc {
       double bondEnergyBond(const UFFParamBond& uffb);
       double bondEnergyNoBond(const UFFParamBond& uffb);
       double getUFFBondEnergy(xstructure& xstr,vector<vector<uint> >& v_bonded_atom_indices,uint MODE);
+
+
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
       void free();
@@ -375,7 +403,7 @@ namespace pocc {
 
       bool has_vacancies;                                     //are there vacancies present in m_types_config?
       bool bonding_set;                                       //have we already found bonding for this configuration?
-      double m_uff_energy;
+      double m_energy_uff;
 
       uint NNDistancesMapPC(uint atom);
       uint NNDistancesMapSC(uint atom);
@@ -384,30 +412,62 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  class POccCalculator : public POccCalculatorTemplate,xStream {
+  class POccCalculator : public POccCalculatorTemplate, public xStream {
     public:
       //NECESSARY PUBLIC CLASS METHODS - START
       //constructors - START
       POccCalculator(ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       POccCalculator(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccCalculator(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       POccCalculator(const POccCalculator& b);
       //constructors - STOP
       ~POccCalculator();
@@ -418,6 +478,7 @@ namespace pocc {
       //inputs
       bool m_initialized;
       _kflags m_kflags;                         //standard aflow flags
+      _vflags m_vflags;                         //standard aflow flags
       xstructure xstr_sym;                    //will contain symmetry objects (_sym_op, pgroups most important here)
       int n_hnf;
       vector<POccUnit> m_pocc_sites;                   //groupings of atoms that are on the same site, non-vacant sites only, relative to xstr_nopocc
@@ -431,35 +492,81 @@ namespace pocc {
       std::list<POccSuperCellSet> l_supercell_sets;
       //standard flags - ALL options will be handled via xoptions
       aurostd::xoption enumerator_mode;       //how do we determine duplicates - UFF, SNF, ...
-      
+
+      //post-processing
+      vector<string> m_ARUN_directories;
+      double m_efa;
+      int m_zero_padding_temperature;
+      bool m_temperatures_int;
+      double m_energy_dft_ground;
+      uint m_ARUN_directory_ground;
+      xDOSCAR m_xdoscar;
+      vector<double> m_Egap;
+      double m_Egap_net;
+
       void initialize(ostream& oss=cout);
+      void initialize(const _aflags& aflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const _aflags& aflags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const _kflags& kflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _vflags& vflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ostream& oss=cout);
       void initialize(const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
       void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const xstructure& xstr_pocc,const aurostd::xoption& pocc_flags,const _aflags& aflags,const _kflags& kflags,const _vflags& vflags,ofstream& FileMESSAGE,ostream& oss=cout);
 
       //external methods
       void setPOccFlags(const aurostd::xoption& pocc_flags);  //input flags, e.g., vpflow
+      void loadPOccStructureFromAFlags(const _aflags& aflags);
       void setPOccStructure(const xstructure& xstr_pocc);
       void setKFlags(const _kflags& Kflags);                      //standard _kflags
-      
-      xstructure createXStructure(const POccSuperCell& psc,int n_hnf=0,unsigned long long int hnf_count=0,unsigned long long int types_config_permutations_count=0,bool clean_structure=false,bool primitivize=false);
+      void setVFlags(const _vflags& Vflags);                      //standard _vflags
 
+      void writePARTCAR() const;
+      void generateStructures(const _xvasp& xvasp);
+      xstructure createXStructure(const POccSuperCell& psc,int n_hnf=0,unsigned long long int hnf_count=0,unsigned long long int types_config_permutations_count=0,bool clean_structure=false,bool primitivize=false);
       bool areEquivalentStructuresByUFF(std::list<POccSuperCellSet>::iterator it, const POccSuperCell& psc) const;
       void add2DerivativeStructuresList(const POccSuperCell& psc,std::list<POccSuperCellSet>::iterator i_start,std::list<POccSuperCellSet>::iterator i_end);
       void add2DerivativeStructuresList(const POccSuperCell& psc);
@@ -478,12 +585,27 @@ namespace pocc {
       //void resetMaxSLRadius();
       void resetHNFMatrices();
       void resetSiteConfigurations();
+
+      void postProcessing();
+      void StructuresAllFile2SupercellSets();
+      void StructuresUniqueFile2SupercellSets();
+      bool QMVASPsFound() const;
+      void setDFTEnergies();
+      void setEFA();
+      void calculateSTATICProperties(double temperature=300);
+      void setPOccStructureProbabilities(double temperature=300); //room temperature
+      string getTemperatureString(double temperature) const;
+      void setAvgDOSCAR(double temperature=300);  //depends on probabilities
+      void plotAvgDOSCAR(double temperature=300);
+      void writeResults() const;
+      void writeResults(double temperature) const;
+
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
       void free();
       void copy(const POccCalculator& b);
       //NECESSARY END CLASS METHODS - END
-      
+
       //hnf matrices
       int a_start, b_start, c_start;
       int d_start, e_start, f_start;
@@ -495,7 +617,7 @@ namespace pocc {
       //vector<int> v_config_iterators;
       uint config_iterator;
       vector<uint> v_config_order;
-      double m_uff_energy_tolerance;
+      double m_energy_uff_tolerance;
 
       void initializePOccStructure();
       void cleanPOccStructure();
@@ -504,15 +626,15 @@ namespace pocc {
       const xmatrix<double>& getLattice() const;
       const vector<_sym_op>& getPGroup() const;
       //const StructureConfiguration& getXStrCountConfiguration(uint i) const;
-      
+
       //void calculateHNF();                   //get n_hnf
-      
+
       //useful internal methods
       //vector<_sym_op> getPGroups();           //fetch pgroups of xstr_nopocc
       //uint getHNFCount();                     //get count of hnf matrices, refers to v_hnf
       //xmatrix<double> getHNFMatrix(uint i);   //fetch specific hnf matrix, refers to v_hnf
       //_atom getAtom(uint i);                  //grab specific atom, refers to xstr_pocc
-      
+
       //table stuff
       //set some nice printing precisions and paddings, mostly definitions
       uint getHNFTabelPOCCPrecision() const;
@@ -523,18 +645,18 @@ namespace pocc {
       string getHeaderMaxSiteError() const;
       string getHeaderMaxStoichError() const;
       string getHeaderStoichiometry() const;
-      
+
       string hnfTableHeader();
       void writeHNFTableOutput(int i_hnf,double& stoich_error,double& site_error);
       string hnfTableLineOutput(int i_hnf,int str_config);
       //void setHNFTablePadding(int _AFLOW_POCC_PRECISION_);
-      
+
       void partitionPOccSites();              //get pocc_sites
       xvector<double> calculateStoichEachType(vector<vector<int> >& v_types_config);
       void calculateSymNonPOccStructure(bool verbose=true);          //calculate symmetry of non-pocc structure
       void propagateEquivalentAtoms2POccStructure();  //propagates equivalent atoms info from xstr_sym to xstr_pocc for sorting
       void redecorateXStructures();            //redecorate xstr_nopocc for standardization of UFF energies
-      
+
       //void getSiteCountConfigurations(int i_hnf,double& stoich_error);
       void getSiteCountConfigurations(int i_hnf);
       void getOptimizedSiteCountConfigurations(int site,int i_hnf,vector<POccSiteConfiguration>& v_site_configs);
@@ -548,6 +670,58 @@ namespace pocc {
       bool getNextSiteConfiguration(vector<vector<int> >& v_site_config);
   };
 
+} // namespace pocc
+
+namespace pocc {
+  class POccStructuresFile : public xStream {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      POccStructuresFile(ostream& oss=cout);
+      POccStructuresFile(ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const _aflags& aflags,ostream& oss=cout);
+      POccStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,const _aflags& aflags,ostream& oss=cout);
+      POccStructuresFile(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+
+      POccStructuresFile(const POccStructuresFile& b);
+      //constructors - STOP
+      ~POccStructuresFile();
+      const POccStructuresFile& operator=(const POccStructuresFile& b);
+      void clear();
+
+      bool m_initialized;
+      string m_content;vector<string> m_vcontent;string m_filename;
+      _aflags m_aflags;
+      //vector<string> m_ARUN_directories;
+      std::list<POccSuperCellSet> l_supercell_sets;
+      aurostd::xoption m_fileoptions;
+      vector<vector<vector<uint> > > m_vPOSCAR_lines;  //contains start/stop indices for POSCARs in m_vcontent
+
+      void initialize(ostream& oss=cout);
+      void initialize(ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const string& fileIn,ostream& oss=cout);
+      void initialize(const string& fileIn,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ostream& oss=cout);
+      void initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+      void initialize(const string& fileIn,const _aflags& aflags,ostream& oss=cout);
+      void initialize(const string& fileIn,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss=cout);
+
+      void setAFlags(const _aflags& aflags);
+      void readFile(const string& fileIn);
+      void processFile();
+      bool getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS=true);
+      bool loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS=true);
+
+      friend ostream& operator<<(ostream&, const POccStructuresFile&);
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const POccStructuresFile& b);
+      //NECESSARY END CLASS METHODS - END
+  };
 }
 
 #endif  // _AFLOW_POCC_H_
