@@ -9,7 +9,7 @@
         -- AFLOW DFT calculations can now read in CHGCAR files. (ME)
         -- Improved runtimes and memory requirements for AAPL. (ME)
         -- Switched the thermal conductivity integration method to the tetrahedron method. (ME)
-        -- Added Grueneisen parameter and phase space calculation to thermal conductvity calculations. (ME)
+        -- Added Grueneisen parameter and phase space calculation to thermal conductivity calculations. (ME)
         -- APL and AAPL can now use the CHGCAR file from the ZEROSTATE calculation to speed up calculations. (ME)
         -- Replaced APLLogicError and APLRuntimeError with aurostd::xerror. (ME)
         -- Fixed bug in APL and AAPL that did not properly process -D option. (ME)
