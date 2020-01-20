@@ -1383,6 +1383,7 @@ namespace pocc {
   unsigned long long int POccSuperCellSet::getDegeneracy() const {
     unsigned long long int degeneracy=0;
     for(uint i=0;i<m_psc_set.size();i++){degeneracy+=m_psc_set[i].m_degeneracy;}
+    if(degeneracy==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"POccSuperCellSet::getDegeneracy():","degeneracy==0",_RUNTIME_ERROR_);}
     return degeneracy;
     //return m_psc_set.size();
   }
